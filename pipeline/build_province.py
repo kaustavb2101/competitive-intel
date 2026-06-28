@@ -100,7 +100,7 @@ def build_all():
     veh = _load(os.path.join(SRC, "vehicles_by_province.json"))["provinces"]
     emp = _load(os.path.join(SRC, "employment_by_province.json"))["provinces"]
     osm = _load(os.path.join(SRC, "osm_layers.json"))
-    rayong_facts = _load(os.path.join(REPO, "platform", "data", "rayong_province.json")).get("facts", {})
+    narr = _load(os.path.join(SRC, "province_narratives.json")).get("provinces", {})
     EMPTY_FACTS = {"minwage": "", "minwage_mo": "", "natl_avg": "", "premium": "",
                    "skill_gap": "", "anchors": [], "workers": [], "impacts": []}
 
@@ -197,7 +197,7 @@ def build_all():
         obj = {"province_th": prov, "province_en": en, "region": REGION[prov],
                "districts": {"type": "FeatureCollection", "features": feats},
                "branches": bout, "competitors": [], "poi": poi, "estates": [],
-               "facts": rayong_facts if prov == "ระยอง" else EMPTY_FACTS,
+               "facts": narr.get(prov, EMPTY_FACTS),
                "gov": {"factories": gp["fac"], "workers": gp["workers"],
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"}}
