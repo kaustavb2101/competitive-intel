@@ -5,6 +5,25 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-06-28 — Gov data unblocked from the Thai IP + first real-data fold-in (factories)
+
+**Milestone:** the data.go.th pull — impossible from the sandbox's foreign IP — ran from Kaustav's
+Thai laptop (Claude Code in PowerShell). 277 CSVs / 57 MB landed in `pipeline/dgt_out/`.
+
+- **Puller hardened** (`autox_dgt_ingest.py`): UTF-8 manifest (Windows cp1252 crash), crash-proof
+  per-resource try/except, province-coverage reporting (★ at ≥20 provinces), depth 5→120 datasets/topic.
+- **Coverage (honest):** one genuinely national table secured — **DIW `factype3` = 66,100 factories,
+  all 77 provinces, district-level + worker counts**. Vehicles (DLT) and crops (OAE) are published
+  per-province; we have ~20 vehicle provinces + many crop-province files (stitch later, partial).
+- **First fold-in** (`ingest_gov.py` → `source-data/factories_by_district.json`): real factory & worker
+  counts per province|district. 99% of branches (2,005/2,015) join by (province, district).
+  **Factories by region (measured): Central&BKK 34,403 · East 9,607 · Isan 8,612 · North 7,196 ·
+  South 6,282** — hard-number confirmation of the "worker lending = Central+East" thesis.
+- **Surfaced in the Rayong pilot:** `build_rayong.py` attaches province totals (2,113 factories /
+  132,733 workers) + per-district `real_fac`/`real_workers`; the province KPI strip now shows
+  **Factories (DIW)** + **Factory workers** (measured, replacing the OSM `industrial` POI estimate).
+- Both new builders have `--check` (byte-exact reproduce-from-source).
+
 ## 2026-06-28 — Province/region data hygiene (prerequisite for by-province/by-region rollout)
 
 **Why:** Rayong is the deep-dive pilot; Kaustav wants it replicated **by province, then by

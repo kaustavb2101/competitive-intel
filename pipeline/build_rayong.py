@@ -53,6 +53,8 @@ def build():
     master = _load(os.path.join(SRC, "branches_final.json"))
     prev = _load(OUT)                       # carry curated/editorial blocks from current file
     comps = _load(os.path.join(SRC, "rayong_competitors.json"))
+    fbd = _load(os.path.join(SRC, "factories_by_district.json"))   # real DIW factory/worker counts
+    govp = fbd["provinces"].get(PROV, {"fac": 0, "workers": 0})
     ray = [b for b in master if b["prov"] == PROV]
 
     poi = prev["poi"]                        # OSM points — unaffected by the master fix
@@ -92,12 +94,17 @@ def build():
             pr["gold_avg"] = round(st.mean(r["gold10"] for r in rows))
             pr["market_avg"] = round(st.mean(r["fmkt10"] for r in rows))
             pr["own"] = len(rows)
+        gd = fbd["districts"].get(f"{PROV}|{d}", {"fac": 0, "workers": 0})   # real DIW counts
+        pr["real_fac"] = gd["fac"]
+        pr["real_workers"] = gd["workers"]
         feats.append({**f, "properties": pr})
     districts = {**prev["districts"], "features": feats}
 
     return {"districts": districts, "branches": branches,
             "competitors": [{"brand": c["brand"], "name": c["name"], "lat": c["lat"], "lng": c["lng"]} for c in comps],
-            "poi": prev["poi"], "estates": prev["estates"], "facts": prev["facts"]}
+            "poi": prev["poi"], "estates": prev["estates"], "facts": prev["facts"],
+            "gov": {"factories": govp["fac"], "workers": govp["workers"],
+                    "src": "DIW factory registry (data.go.th) — measured"}}
 
 
 def run(check=False):
