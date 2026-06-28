@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Branch 3D Explorer — AutoX · เงินไชโย</title>
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<style>
+:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
+#map{position:fixed;inset:0;top:44px;background:var(--ink)}
+#bar{position:fixed;top:0;left:0;right:0;height:44px;z-index:50;display:flex;align-items:center;gap:12px;
+ padding:0 14px;background:rgba(8,11,18,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+#bar a{color:var(--mid);text-decoration:none;font:600 13px 'IBM Plex Sans Thai'}
+#bar a:hover{color:var(--hi)}
+#bar .nm{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+#bar .sub{font:500 12px 'IBM Plex Sans Thai';color:var(--dim)}
+#panel{position:fixed;top:56px;left:12px;width:268px;max-height:calc(100vh - 72px);overflow:auto;z-index:40;
+ background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:14px;backdrop-filter:blur(8px)}
+#panel h3{font:700 12px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px}
+#panel h3:first-child{margin-top:0}
+.pr{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;color:var(--txt)}
+.pr span{flex:1}.pr b{font-family:'IBM Plex Mono';min-width:30px;text-align:right}
+.bar{display:inline-block;width:54px;height:6px;border-radius:3px;background:#1a2336;overflow:hidden}
+.bar i{display:block;height:100%}
+.note{font-size:10.5px;color:var(--dim);line-height:1.5;margin-top:10px}
+#status{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;
+ background:rgba(14,19,31,.95);border:1px solid var(--line);border-radius:20px;padding:8px 16px;font-size:12px;color:var(--mid)}
+#status.err{color:#E0474B;border-color:#5b2330}
+.ctl{position:fixed;top:56px;right:12px;z-index:40;display:flex;flex-direction:column;gap:6px}
+.ctl button{background:rgba(14,19,31,.94);border:1px solid var(--line);color:var(--txt);border-radius:8px;
+ padding:7px 11px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer}
+.ctl button.on{border-color:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<div id="bar">
+  <a href="index.html#map">← National</a>
+  <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span>
+</div>
+<div id="map"></div>
+<div class="ctl">
+  <button id="t-ring" class="on">10&nbsp;km ring</button>
+  <button id="t-reload">↻ buildings here</button>
+</div>
+<div id="panel"></div>
+<div id="status">Loading…</div>
+<script>
+'use strict';
+const Q = new URLSearchParams(location.search);
+const LAT = parseFloat(Q.get('lat')), LNG = parseFloat(Q.get('lng'));
+const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
+const TILE = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
+const MIRRORS = ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+let showRing = true, branchRec = null, buildings = [];
+
+const $ = s => document.querySelector(s);
+function status(t, err){ const s=$('#status'); s.textContent=t; s.className=err?'err':''; s.style.display=t?'block':'none'; }
+function fmt(n){ return (n||0).toLocaleString(); }
+
+if(isNaN(LAT)||isNaN(LNG)){ status('No branch coordinates in the link.', true); }
+$('#bnm').textContent = NM;
+
+/* ---- geometry helpers ---- */
+const D2R=Math.PI/180;
+function circle(lat,lng,km,steps=64){const pts=[];const dLat=km/111;const dLng=km/(111*Math.cos(lat*D2R));
+  for(let i=0;i<=steps;i++){const a=2*Math.PI*i/steps;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+function bldgHeight(tags){
+  tags=tags||{};
+  if(tags.height){const h=parseFloat(tags.height); if(h>0)return Math.min(h,300);}
+  if(tags['building:levels']){const l=parseFloat(tags['building:levels']); if(l>0)return Math.min(l*3.2,300);}
+  return 8.5;
+}
+
+/* ---- deck.gl ---- */
+const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15, pitch:55, bearing:-12, maxZoom:19, minZoom:9};
+let deckgl;
+function baseLayer(){
+  return new deck.TileLayer({id:'base',data:TILE,minZoom:0,maxZoom:19,tileSize:256,
+    renderSubLayers:p=>{const{west,south,east,north}=p.tile.bbox;
+      return new deck.BitmapLayer(p,{data:null,image:p.data,bounds:[west,south,east,north]});}});
+}
+function layers(){
+  const L=[baseLayer()];
+  L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
+    getPolygon:b=>b.p,getElevation:b=>b.h,
+    getFillColor:b=>{const t=Math.min(1,b.h/45);return [78+t*70,92+t*60,150+t*80,225];},
+    material:{ambient:0.55,diffuse:0.7,shininess:24,specularColor:[60,70,110]},pickable:false}));
+  if(showRing && !isNaN(LAT)){
+    L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
+      getPolygon:d=>d.poly,extruded:false,stroked:true,filled:false,
+      getLineColor:d=>{const h=d.c;return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),180];},
+      getLineWidth:18,lineWidthMinPixels:1.2}));
+  }
+  if(!isNaN(LAT)){
+    L.push(new deck.ScatterplotLayer({id:'branch',data:[{x:LNG,y:LAT}],getPosition:d=>[d.x,d.y],
+      getRadius:90,radiusMinPixels:6,radiusMaxPixels:13,getFillColor:[224,169,59,255],
+      stroked:true,getLineColor:[255,255,255,230],lineWidthMinPixels:2}));
+  }
+  return L;
+}
+function render(){ if(deckgl) deckgl.setProps({layers:layers()}); }
+
+/* ---- live OSM building fetch ---- */
+function viewBounds(){
+  try{ const vp=new deck.WebMercatorViewport(deckgl.viewManager._viewports[0]||INITIAL); return vp.getBounds(); }
+  catch(e){ const d=0.012; return [LNG-d,LAT-d,LNG+d,LAT+d]; }
+}
+async function overpass(q){
+  for(const ep of MIRRORS){
+    try{
+      const r=await fetch(ep,{method:'POST',body:'data='+encodeURIComponent(q),
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      if(r.ok) return await r.json();
+    }catch(e){/* try next mirror */}
+  }
+  throw new Error('all Overpass mirrors failed');
+}
+async function loadBuildings(){
+  if(isNaN(LAT)) return;
+  const b=viewBounds();              // [W,S,E,N]
+  const W=b[0],S=b[1],E=b[2],N=b[3];
+  // guard: only fetch when the box is small enough to be sane (≈ <6km across)
+  if((N-S)>0.08 || (E-W)>0.08){ status('Zoom in to load buildings (area too large)'); return; }
+  status('Loading buildings…');
+  const q=`[out:json][timeout:25];(way["building"](${S},${W},${N},${E}););out body geom 7000;`;
+  try{
+    const d=await overpass(q);
+    const out=[];
+    for(const el of (d.elements||[])){
+      if(el.type==='way' && el.geometry && el.geometry.length>2){
+        out.push({p:el.geometry.map(g=>[g.lon,g.lat]), h:bldgHeight(el.tags)});
+      }
+    }
+    buildings=out; render();
+    status(out.length?`${fmt(out.length)} buildings in view`:'No OSM buildings here (rural/factory zone)');
+  }catch(e){
+    status('Could not load buildings (Overpass blocked?). '+e.message, true);
+  }
+}
+
+/* ---- branch radar panel (from branches.json) ---- */
+function barHTML(v,col,mx){return `<span class="bar"><i style="width:${Math.round(54*Math.min(v||0,mx)/mx)}px;background:${col}"></i></span>`;}
+async function loadPanel(){
+  try{
+    const data=await fetch('data/branches.json').then(r=>r.json());
+    // nearest branch to the given coords
+    let best=null,bd=1e9;
+    for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}}
+    branchRec=best;
+    if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
+    $('#bsub').textContent = `${best.v}${best.d?' · '+best.d:''} · ${best.r}`;
+    const k=best.k10||{};
+    const radar=[
+      ['Factories (OSM)',k.ind,60,'#E6B450'],['Vehicle/moto shops',k.veh,40,'#7A4FE0'],
+      ['Gold shops',k.gold,15,'#7A4FE0'],['Banks',k.bank,40,'#5B7CFA'],['ATMs',k.atm,60,'#5B7CFA'],
+      ['Convenience',k.cvs,80,'#1C8C7D'],['Fresh markets',k.fmkt,15,'#1C8C7D'],['Restaurants',k.rest,80,'#1C8C7D'],
+      ['Schools',k.sch,40,'#8b90a7'],['Hospitals/gov',k.civic,30,'#8b90a7'],
+    ];
+    const rr=([lab,v,mx,c])=>`<div class="pr"><span>${lab}</span>${barHTML(v,c,mx)}<b style="color:${c}">${v||0}</b></div>`;
+    const sc=(lab,v,c)=>`<div class="pr"><span>${lab}</span><b style="color:${c}">${v}</b></div>`;
+    $('#panel').innerHTML =
+      `<h3>${best.n}</h3>
+       <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
+       <h3>Segment scores</h3>
+       ${sc('Acquisition opp.',best.o,'#E6B450')}${sc('Farmer agri-PD',best.a,'#C8433B')}
+       ${sc('Merchant demand',best.m,'#1C8C7D')}${sc('Collateral density',best.c,'#7A4FE0')}
+       <h3>Within 10 km (OSM)</h3>${radar.map(rr).join('')}
+       <h3>District (DIW · measured)</h3>
+       ${sc('Factories',fmt(best.dfac),'#E6B450')}${sc('Factory workers',fmt(best.dwork),'#E6B450')}
+       <div class="note">3D buildings = live OpenStreetMap footprints in view. Rings = 3 / 5 / 10 km. Within-10km counts are measured (OSM); district factories/workers are DIW (measured).</div>`;
+  }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
+}
+
+/* ---- init ---- */
+function init(){
+  deckgl=new deck.DeckGL({container:'map',mapStyle:null,initialViewState:INITIAL,controller:true,
+    layers:layers(),
+    onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(loadBuildings,650); }});
+  $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
+  $('#t-reload').onclick=loadBuildings;
+  loadPanel(); loadBuildings();
+}
+init();
+</script>
+</body>
+</html>

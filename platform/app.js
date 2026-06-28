@@ -160,6 +160,9 @@ function popupHTML(d){
   return `<div class="pop" style="max-height:62vh;overflow:auto">
     <div class="pn">${d.n}</div>
     <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
+    <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}"
+       style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
+       background:#5B7CFA;color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
     ${sec('Segment scores')}
     ${r('Acquisition opp.', d.o, '#E6B450')}
     ${r('Farmer agri-PD', d.a, '#C8433B')}
