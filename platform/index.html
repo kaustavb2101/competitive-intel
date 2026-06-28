@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AutoX · เงินไชโย — Credit Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav id="nav">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a data-v="overview" class="on">Overview</a>
+  <a data-v="map">National</a>
+  <a href="rayong-province.html">Rayong 3D</a>
+  <a href="rayong-catchment.html">Catchment</a>
+  <a data-v="acq">Acquisition</a>
+  <a data-v="branches">Branches</a>
+</nav>
+<div id="updated" style="display:none"></div>
+
+<main>
+  <!-- OVERVIEW -->
+  <section class="view on" id="v-overview">
+    <h2>Macro overlay — current conditions</h2>
+    <div class="grid macro" id="macro"></div>
+
+    <h2>Commodity board — the segments diverge</h2>
+    <div class="insight">
+      <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) face
+      double-digit price declines, while livestock, fisheries &amp; forestry households see income
+      <b>rise</b> (chicken +25.6%, beef +18.4%). Gold +62.7% lifts pawn/gold-collateral value.
+    </div>
+    <div class="cols2">
+      <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
+      <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
+    </div>
+
+    <h2>Segment signals by region</h2>
+    <table class="tbl" id="region"></table>
+    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle + gold trade density.</p>
+  </section>
+
+  <!-- MAP -->
+  <section class="view" id="v-map">
+    <div class="lenses" id="lenses"></div>
+    <div id="map"></div>
+    <div class="maplegend" id="maplegend"></div>
+    <p class="lead">Tap any branch for its scores. Dot colour and size scale with the selected lens.</p>
+  </section>
+
+  <!-- ACQUISITION -->
+  <section class="view" id="v-acq">
+    <h2>Industrial-estate white-space · worker lending</h2>
+    <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
+    <table class="tbl" id="estates"></table>
+
+    <h2>Merchant white-space · small sellers</h2>
+    <p class="lead">High vendor demand (markets + footfall + population), ≤4 AutoX branches within 10km.</p>
+    <table class="tbl" id="mws"></table>
+
+    <h2>Collateral-rich white-space</h2>
+    <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
+    <table class="tbl" id="cws"></table>
+  </section>
+
+  <!-- BRANCHES -->
+  <section class="view" id="v-branches">
+    <input class="search" id="search" placeholder="Search branch or province…">
+    <div class="chips" id="sortchips"></div>
+    <table class="tbl" id="branches"></table>
+  </section>
+
+  <div class="note">
+    <b>One platform, live data.</b> Branch features, commodities, climate and macro are computed by the
+    enrichment loop and served as data files. Provenance: World Bank Pink Sheet (prices), OAE planting-area
+    (crops), WFP/HDX (drought), UNFPA (population), OpenStreetMap (13 POI layers), IMF/OECD/BoT/MOTS (macro).
+    Pending the data.go.th run: DIW factories, DLT vehicle registrations.
+  </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

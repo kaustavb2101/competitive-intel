@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Rayong · เงินไชโย — EEC Deep-Dive</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<style>
+:root{--bg:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
+ --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:var(--txt)}
+#map{position:fixed;inset:0}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* title chip */
+#title{position:fixed;top:0;left:0;right:0;z-index:10;padding:11px 14px;
+ background:linear-gradient(180deg,rgba(7,10,17,.92),rgba(7,10,17,0));pointer-events:none}
+#title h1{font-size:15px;font-weight:700;color:var(--hi)}
+#title h1 b{color:var(--gold)}
+#title p{font-size:11px;color:var(--mid);margin-top:1px}
+
+/* control rail */
+#ctl{position:fixed;top:54px;right:10px;z-index:10;display:flex;flex-direction:column;gap:6px;max-width:43vw}
+.cbtn{background:rgba(14,19,31,.9);border:1px solid var(--line);border-radius:8px;color:var(--mid);
+ font:500 11px 'IBM Plex Sans Thai';padding:6px 9px;cursor:pointer;backdrop-filter:blur(6px);text-align:left;display:flex;align-items:center;gap:6px}
+.cbtn.on{color:var(--hi);border-color:#37445f}
+.cbtn .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.cbtn .sw.rd{border-radius:50%}
+#elev{display:flex;gap:4px;background:rgba(14,19,31,.9);border:1px solid var(--line);border-radius:8px;padding:3px;backdrop-filter:blur(6px)}
+#elev button{flex:1;background:none;border:none;color:var(--dim);font:500 10px 'IBM Plex Mono';padding:5px 4px;border-radius:5px;cursor:pointer}
+#elev button.on{background:#1b2740;color:var(--hi)}
+
+/* tooltip */
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:230px}
+.dtt b{color:#fff}
+
+/* bottom sheet */
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:rgba(11,15,24,.97);
+ border-top:1px solid var(--line);border-radius:16px 16px 0 0;backdrop-filter:blur(12px);
+ transform:translateY(calc(100% - 116px));transition:transform .28s cubic-bezier(.4,0,.2,1);max-height:78vh;display:flex;flex-direction:column}
+#sheet.open{transform:translateY(0)}
+#grip{padding:9px 0 5px;cursor:pointer;flex:none}
+#grip .bar{width:36px;height:4px;background:#36425c;border-radius:3px;margin:0 auto}
+#peek{padding:0 16px 12px;flex:none}
+#peek .h{font-size:12px;font-weight:700;color:var(--hi)}
+#peek .row{display:flex;gap:7px;margin-top:8px;overflow-x:auto;scrollbar-width:none}
+#peek .row::-webkit-scrollbar{display:none}
+.kpi{flex:none;background:#0c1422;border:1px solid var(--line);border-radius:9px;padding:7px 11px;min-width:84px}
+.kpi .v{font:600 16px 'IBM Plex Mono';color:var(--hi)}
+.kpi .k{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-top:1px}
+#tabs{display:flex;gap:3px;padding:2px 12px 0;flex:none;overflow-x:auto;scrollbar-width:none}
+#tabs::-webkit-scrollbar{display:none}
+.tb{flex:none;background:none;border:none;border-bottom:2px solid transparent;color:var(--mid);
+ font:500 12.5px 'IBM Plex Sans Thai';padding:9px 11px;cursor:pointer;white-space:nowrap}
+.tb.on{color:var(--hi);border-bottom-color:var(--gold)}
+#body{overflow-y:auto;padding:13px 16px 26px}
+.view{display:none}.view.on{display:block}
+.lead{font-size:12.5px;color:var(--mid);margin-bottom:10px;line-height:1.55}
+.imp{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #131b2a}
+.imp .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
+.imp .t{font-size:12.5px;font-weight:600;color:var(--hi)}
+.imp .d{font-size:11.5px;color:var(--mid);margin-top:1px;line-height:1.5}
+.tag{font:600 9px 'IBM Plex Mono';padding:1px 6px;border-radius:9px;margin-left:6px;vertical-align:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.chip{background:#0c1422;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:11.5px;color:var(--txt)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--dim);font:600 10px 'IBM Plex Mono';text-transform:uppercase;padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:6px 6px;border-bottom:1px solid #121a28}
+td.n{color:var(--hi)}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);font-size:13px;z-index:99}
+@media(min-width:760px){#sheet{left:auto;right:14px;bottom:14px;width:380px;border-radius:14px;border:1px solid var(--line);
+  transform:translateY(calc(100% - 150px))}#ctl{max-width:200px}}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:#E0A93B;margin:0 1px}
+#nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
+ padding:6px 11px;border-radius:7px;white-space:nowrap}
+#nav a.on{color:#fff;background:#1a2336}
+#nav a:active{background:#161d2c}
+
+#map{top:44px}
+#title{display:none}
+.err{top:44px}
+</style>
+</head>
+<body>
+<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-province.html" class="on">Rayong 3D</a><a href="rayong-catchment.html">Catchment</a><a href="index.html#acq">Acquisition</a><a href="index.html#branches">Branches</a></nav>
+<div id="map"></div>
+
+
+<div id="ctl">
+  <div id="elev">
+    <button data-m="wa" class="on">Workers</button>
+    <button data-m="fac">Factories</button>
+    <button data-m="veh">Vehicles</button>
+  </div>
+  <button class="cbtn on" data-l="branches"><span class="sw rd" style="background:var(--gold)"></span>My branches</button>
+  <button class="cbtn on" data-l="comp"><span class="sw rd" style="background:var(--red)"></span>Competitors</button>
+  <button class="cbtn on" data-l="fac"><span class="sw" style="background:#7b8aa6"></span>Factories</button>
+  <button class="cbtn" data-l="veh"><span class="sw" style="background:var(--teal)"></span>Vehicle shops</button>
+  <button class="cbtn" data-l="mkt"><span class="sw" style="background:var(--orange)"></span>Markets</button>
+</div>
+
+<div id="sheet">
+  <div id="grip"><div class="bar"></div></div>
+  <div id="peek">
+    <div class="h">Who these people are — and what moves them</div>
+    <div class="row" id="kpis"></div>
+  </div>
+  <div id="tabs">
+    <button class="tb on" data-v="impacts">What impacts them</button>
+    <button class="tb" data-v="workers">Workers &amp; income</button>
+    <button class="tb" data-v="districts">Districts</button>
+    <button class="tb" data-v="comp">Competitors</button>
+    <button class="tb" data-v="near">Nearest</button>
+  </div>
+  <div id="body">
+    <div class="view on" id="v-impacts"></div>
+    <div class="view" id="v-workers"></div>
+    <div class="view" id="v-districts"></div>
+    <div class="view" id="v-comp"></div>
+    <div class="view" id="v-near"></div>
+  </div>
+</div>
+<script>window.initRayong=function(){
+'use strict';
+try{
+const RY=window.RY;
+const C={gold:[230,180,80],red:[224,71,75],mag:[214,90,160],blue:[91,124,250],orange:[224,144,47],teal:[31,163,140],fac:[123,138,166]};
+const BRAND={Srisawad:C.red,Muangthai:C.mag,Tidlor:C.blue,Krungsri:C.orange};
+const layersOn={branches:true,comp:true,fac:true,veh:false,mkt:false};
+let elevMetric='wa';
+
+// normalize district metric -> elevation
+function maxOf(m){return Math.max(...RY.districts.features.map(f=>f.properties[metricField(m)]||0));}
+function metricField(m){return m==='wa'?'workingage':m==='fac'?'factories_avg':'vehicle_avg';}
+function districtColor(f){
+  const m=elevMetric, v=f.properties[metricField(m)]||0, t=Math.min(1,v/(maxOf(m)||1));
+  const base = m==='wa'?[91,124,250]:m==='fac'?[224,90,75]:[31,163,140];
+  return [base[0],base[1],base[2], 40+Math.round(t*150)];
+}
+
+const deckgl=new deck.DeckGL({
+  container:'map',
+  initialViewState:{longitude:101.28,latitude:12.78,zoom:9.3,pitch:52,bearing:12},
+  controller:true,
+  getTooltip:({object,layer})=>{
+    if(!object) return null;
+    if(layer.id==='districts'){const p=object.properties;
+      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Factory density: <b>${p.factories_avg}</b> · Vehicle: <b>${p.vehicle_avg}</b><br>My branches: <b>${p.branches}</b> · Estates: <b>${p.estates}</b></div>`};}
+    if(layer.id==='branches'){const d=object;
+      return {html:`<div class="dtt"><b>${d.n||'(branch)'}</b> · ${d.d}<br>Nearest factory: <b>${d.nfac??'–'} km</b> · market: <b>${d.nmkt??'–'} km</b><br>Nearest competitor: <b>${d.ncompn} ${d.ncomp} km</b><br>Vehicle shops ≤10km: <b>${d.veh}</b> · Gold: <b>${d.gold}</b></div>`};}
+    if(layer.id==='comp'){return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};}
+    if(layer.id==='estates'){return {html:`<div class="dtt"><b>${object.name}</b><br>industrial estate</div>`};}
+    return null;
+  }
+});
+
+function basemap(){
+  return new deck.TileLayer({
+    id:'base', data:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    minZoom:0,maxZoom:19,tileSize:256,
+    renderSubLayers:props=>{const{boundingBox}=props.tile;
+      return new deck.BitmapLayer(props,{data:null,image:props.data,
+        bounds:[boundingBox[0][0],boundingBox[0][1],boundingBox[1][0],boundingBox[1][1]]});}
+  });
+}
+function render(){
+  const L=[basemap()];
+  L.push(new deck.PolygonLayer({
+    id:'districts',data:RY.districts.features,
+    getPolygon:f=>f.geometry.type==='MultiPolygon'?f.geometry.coordinates[0][0]:f.geometry.coordinates[0],
+    extruded:true,wireframe:true,filled:true,
+    getElevation:f=>{const v=f.properties[metricField(elevMetric)]||0;return v/(maxOf(elevMetric)||1)*9000;},
+    getFillColor:districtColor,getLineColor:[120,140,180,90],lineWidthMinPixels:1,
+    pickable:true,updateTriggers:{getElevation:[elevMetric],getFillColor:[elevMetric]}
+  }));
+  if(layersOn.fac) L.push(new deck.ScatterplotLayer({id:'fac',data:RY.poi.industrial,
+    getPosition:p=>[p[1],p[0]],getRadius:120,radiusMinPixels:1.4,radiusMaxPixels:4,
+    getFillColor:[123,138,166,150],pickable:false}));
+  if(layersOn.veh) L.push(new deck.ScatterplotLayer({id:'veh',data:RY.poi.vehicle_commerce,
+    getPosition:p=>[p[1],p[0]],getRadius:150,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[31,163,140,200]}));
+  if(layersOn.mkt) L.push(new deck.ScatterplotLayer({id:'mkt',data:RY.poi.fresh_market,
+    getPosition:p=>[p[1],p[0]],getRadius:160,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[224,144,47,210]}));
+  L.push(new deck.ScatterplotLayer({id:'estates',data:RY.estates,
+    getPosition:d=>[d.lng,d.lat],getRadius:600,radiusMinPixels:5,radiusMaxPixels:16,
+    getFillColor:[230,180,80,30],getLineColor:[230,180,80,200],lineWidthMinPixels:1.5,stroked:true,filled:true,pickable:true}));
+  if(layersOn.comp) L.push(new deck.ScatterplotLayer({id:'comp',data:RY.competitors,
+    getPosition:d=>[d.lng,d.lat],getRadius:170,radiusMinPixels:3.5,radiusMaxPixels:8,
+    getFillColor:d=>BRAND[d.brand]||[200,200,200],getLineColor:[10,12,18,255],lineWidthMinPixels:1,stroked:true,pickable:true}));
+  if(layersOn.branches) L.push(new deck.ScatterplotLayer({id:'branches',data:RY.branches,
+    getPosition:d=>[d.x,d.y],getRadius:230,radiusMinPixels:4.5,radiusMaxPixels:11,
+    getFillColor:[230,180,80,255],getLineColor:[40,28,8,255],lineWidthMinPixels:1.3,stroked:true,pickable:true}));
+  deckgl.setProps({layers:L});
+}
+render();
+
+/* ---- controls ---- */
+document.querySelectorAll('#elev button').forEach(b=>b.onclick=()=>{
+  elevMetric=b.dataset.m;document.querySelectorAll('#elev button').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.querySelectorAll('.cbtn').forEach(b=>b.onclick=()=>{
+  const l=b.dataset.l;layersOn[l]=!layersOn[l];b.classList.toggle('on',layersOn[l]);render();});
+
+/* ---- bottom sheet ---- */
+const sheet=document.getElementById('sheet');
+document.getElementById('grip').onclick=()=>sheet.classList.toggle('open');
+document.getElementById('peek').onclick=()=>sheet.classList.add('open');
+document.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tb').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));
+  sheet.classList.add('open');});
+
+/* ---- panels ---- */
+const f=RY.facts;
+const totWA=RY.districts.features.reduce((s,d)=>s+(d.properties.workingage||0),0);
+document.getElementById('kpis').innerHTML=[
+  ['57','Branches'],['8','Districts'],[RY.competitors.length,'Competitors'],
+  [RY.poi.industrial.length,'Factories'],[f.minwage,'Min wage']
+].map(([v,k])=>`<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+
+const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};
+document.getElementById('v-impacts').innerHTML=
+  `<p class="lead">Rayong is the core of Thailand's Eastern Economic Corridor. Incomes are high for Thailand, but tied to factories — so the risks are industrial, not agricultural.</p>`+
+  f.impacts.map(([t,d,k])=>`<div class="imp"><span class="dot" style="background:${tagcol[k]}"></span><div><div class="t">${t}<span class="tag" style="color:${tagcol[k]};border:1px solid ${tagcol[k]}">${k.toUpperCase()}</span></div><div class="d">${d}</div></div></div>`).join('');
+
+document.getElementById('v-workers').innerHTML=
+  `<p class="lead">Top-tier wages by Thai standards, anchored by heavy industry — and a population that needs a vehicle for daily life.</p>`+
+  `<div class="chips">
+    <div class="chip">Min wage <b>${f.minwage}</b> · ${f.minwage_mo}</div>
+    <div class="chip">National avg ${f.natl_avg}</div>
+    <div class="chip">${f.premium}</div>
+    <div class="chip">${f.skill_gap}</div></div>
+   <table><tr><th>Economic anchors</th></tr>${f.anchors.map(a=>`<tr><td class="n">${a}</td></tr>`).join('')}</table>
+   <table style="margin-top:12px"><tr><th>Who the workers are</th></tr>${f.workers.map(a=>`<tr><td>${a}</td></tr>`).join('')}</table>`;
+
+const ds=RY.districts.features.map(x=>x.properties).sort((a,b)=>(b.workingage||0)-(a.workingage||0));
+document.getElementById('v-districts').innerHTML=
+  `<table><tr><th>District</th><th>Br</th><th>Workers</th><th>Fac</th><th>Veh</th></tr>`+
+  ds.map(p=>`<tr><td class="n">${p.district}</td><td class="mono">${p.branches}</td><td class="mono">${(p.workingage||0).toLocaleString()}</td><td class="mono">${p.factories_avg}</td><td class="mono">${p.vehicle_avg}</td></tr>`).join('')+`</table>
+  <p class="lead" style="margin-top:10px">Bars on the map rise with the metric you pick (Workers / Factories / Vehicles). <b>Pluak Daeng</b> is the factory core; <b>Mueang Rayong</b> holds the workers and vehicle trade.</p>`;
+
+const byBrand={};RY.competitors.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
+document.getElementById('v-comp').innerHTML=
+  `<p class="lead">Live from the map. Competitors cluster in <b>Mueang Rayong</b> (Thapma, Choeng Noen, Noen Phra) and <b>Map Ta Phut</b> — the same urban core, leaving factory-edge and eastern districts thinner.</p>`+
+  `<div class="chips">`+Object.entries(byBrand).map(([b,n])=>`<div class="chip"><span style="color:rgb(${(BRAND[b]||[200,200,200]).join(',')})">●</span> ${b} <b>${n}</b></div>`).join('')+`</div>`+
+  `<table><tr><th>Brand</th><th>Branch</th></tr>`+RY.competitors.map(c=>`<tr><td style="color:rgb(${(BRAND[c.brand]||[200,200,200]).join(',')})">${c.brand}</td><td>${c.name.replace(/^[^ ]+ /,'')}</td></tr>`).join('')+`</table>`;
+
+const near=RY.branches.slice().sort((a,b)=>(a.ncomp)-(b.ncomp));
+document.getElementById('v-near').innerHTML=
+  `<p class="lead">For each branch: distance to the nearest factory, market and competitor. Sorted by closest competitor (most contested first).</p>`+
+  `<table><tr><th>Branch</th><th>Fac km</th><th>Mkt km</th><th>Comp</th></tr>`+
+  near.map(d=>`<tr><td class="n">${d.n}</td><td class="mono">${d.nfac??'–'}</td><td class="mono">${d.nmkt??'–'}</td><td class="mono" style="color:var(--red)">${d.ncomp}</td></tr>`).join('')+`</table>`;
+
+}catch(e){
+  document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed to load: '+(e&&e.message?e.message:e)+'</div>');
+  console.error(e);
+}
+};</script>
+<script>
+(function(){
+ var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading Rayong province…';document.body.appendChild(box);
+ fetch('data/rayong_province.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();})
+  .then(function(d){window.RY=d;box.remove();window.initRayong();})
+  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load province data: '+e.message;});
+})();
+</script>
+</body>
+</html>

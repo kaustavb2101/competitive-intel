@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Rayong Catchment Explorer · เงินไชโย</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<style>
+:root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
+ --gold:#E0A93B;--red:#E0474B;--mag:#D65AA0;--blue:#4F7BF0;--orange:#E07B2F;--teal:#159b86;--purp:#9a7fd6;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink)}
+#map{position:fixed;inset:0;background:#e9e6df}
+.mono{font-family:'IBM Plex Mono',monospace}
+canvas{outline:none}
+
+/* top brand strip */
+#strip{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
+ background:linear-gradient(180deg,rgba(16,19,28,.86),rgba(16,19,28,0));scrollbar-width:none;align-items:center}
+#strip::-webkit-scrollbar{display:none}
+#strip .ttl{font:700 13px 'IBM Plex Sans Thai';color:#fff;white-space:nowrap;margin-right:4px}
+#strip .ttl b{color:var(--gold)}
+.bchip{flex:none;background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;
+ font:600 11px 'IBM Plex Mono';color:var(--txt);backdrop-filter:blur(6px);white-space:nowrap}
+.bchip b{color:#fff;margin-left:3px}
+.bchip .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+
+/* side cards */
+.side{position:fixed;top:52px;bottom:14px;width:312px;z-index:8;background:rgba(13,17,27,.93);
+ border:1px solid var(--cardln);border-radius:13px;backdrop-filter:blur(13px);display:flex;flex-direction:column;
+ box-shadow:0 12px 40px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#left{left:14px}#right{right:14px}
+.side h2{font:600 11px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;
+ padding:13px 15px 0}
+.side .scroll{overflow-y:auto;padding:11px 15px 16px;flex:1}
+.cardttl{padding:13px 15px 4px;border-bottom:1px solid #1a2236}
+.cardttl .a{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+.cardttl .b{font-size:11px;color:var(--mid);margin-top:1px}
+
+/* reachable block */
+.reach{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:12px;margin-bottom:12px}
+.reach .big{font:600 27px 'IBM Plex Mono';color:var(--gold);line-height:1}
+.reach .cap{font-size:11px;color:var(--mid);margin:3px 0 9px}
+.reach .r{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.reach .r .sw{width:9px;height:9px;border-radius:50%}
+.reach .r .lab{color:var(--txt);flex:1}
+.reach .r b{font-family:'IBM Plex Mono';color:#fff}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+
+.stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.stat .v small{color:var(--dim)}
+
+/* leads */
+.verdict{border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5}
+.verdict.hot{background:rgba(224,71,75,.12);border:1px solid rgba(224,71,75,.4);color:#f0b9bb}
+.verdict.hot b{color:#fff}
+.lead{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #161d2c;cursor:pointer}
+.lead:active{background:#121a28}
+.lead .rank{font:700 12px 'IBM Plex Mono';color:var(--gold);width:18px;flex:none}
+.lead .body{flex:1}
+.lead .t{font-size:12.5px;font-weight:600;color:var(--hi)}
+.lead .d{font-size:11px;color:var(--mid);margin-top:1px;line-height:1.45}
+.reco{display:flex;gap:8px;padding:8px 0;font-size:12px;color:var(--txt);line-height:1.5;border-bottom:1px solid #161d2c}
+.reco .n{color:var(--teal);font-weight:700;flex:none}
+
+/* controls */
+#ctl{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:8;display:flex;gap:5px;
+ background:rgba(13,17,27,.9);border:1px solid var(--cardln);border-radius:9px;padding:4px;backdrop-filter:blur(8px)}
+#ctl button{background:none;border:none;color:var(--dim);font:500 11px 'IBM Plex Mono';padding:5px 9px;border-radius:6px;cursor:pointer}
+#ctl button.on{background:#1c2740;color:var(--hi)}
+
+/* mobile toggles */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(13,17,27,.95);border:1px solid var(--cardln);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.xbtn{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none}
+
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
+.dtt b{color:#fff}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
+
+@media(max-width:820px){
+ .side{width:86vw;max-width:340px;top:46px;bottom:78px}
+ #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
+ #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
+ .xbtn{display:block}#mtog{display:flex}#ctl{top:46px}
+ #strip .ttl{font-size:12px}
+}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:#E0A93B;margin:0 1px}
+#nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
+ padding:6px 11px;border-radius:7px;white-space:nowrap}
+#nav a.on{color:#fff;background:#1a2336}
+#nav a:active{background:#161d2c}
+
+#strip{top:44px}
+.side{top:96px}
+#ctl{top:94px}
+.err{top:44px}
+@media(max-width:820px){.side{top:90px}#ctl{top:90px}}
+</style>
+</head>
+<body>
+<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-province.html">Rayong 3D</a><a href="rayong-catchment.html" class="on">Catchment</a><a href="index.html#acq">Acquisition</a><a href="index.html#branches">Branches</a></nav>
+<div id="map"></div>
+
+<div id="strip"><span class="ttl">Rayong <b>·</b> Mueang core</span></div>
+
+<div id="ctl">
+  <button data-b="voyager" class="on">Map</button>
+  <button data-b="dark">Dark</button>
+  <button id="ringtog" class="on">Rings</button>
+</div>
+
+<aside class="side" id="left">
+  <button class="xbtn" data-x="left">✕</button>
+  <div class="cardttl"><div class="a" id="focalName">—</div><div class="b" id="focalSub">Tap a gold branch to refocus</div></div>
+  <div class="scroll">
+    <div class="reach">
+      <div class="big" id="reach15">—</div>
+      <div class="cap">people reachable · 15-min walk</div>
+      <div class="r"><span class="sw" style="background:#3FB57E"></span><span class="lab">5 min · 400 m</span><b id="reach5">—</b></div>
+      <div class="r"><span class="sw" style="background:#E0A93B"></span><span class="lab">10 min · 800 m</span><b id="reach10">—</b></div>
+      <div class="r"><span class="sw" style="background:#E0474B"></span><span class="lab">15 min · 1.2 km</span><b id="reach15b">—</b></div>
+      <div class="foot" id="reachFoot"></div>
+    </div>
+    <h2 style="padding:0 0 6px">Catchment context</h2>
+    <div id="ctx"></div>
+  </div>
+</aside>
+
+<aside class="side" id="right">
+  <button class="xbtn" data-x="right">✕</button>
+  <div class="cardttl"><div class="a">Acquisition leads</div><div class="b">Where competitors own ground you don't</div></div>
+  <div class="scroll">
+    <div id="verdict"></div>
+    <h2 style="padding:0 0 4px">Top gaps</h2>
+    <div id="leads"></div>
+    <h2 style="padding:10px 0 4px">Recommendations</h2>
+    <div id="recos"></div>
+  </div>
+</aside>
+
+<div id="mtog">
+  <button data-s="left">Analysis</button>
+  <button data-s="right">Leads</button>
+</div>
+<script>window.initCatch=function(){
+'use strict';
+try{
+const CA=window.CA;
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47]};
+const RINGS=[400,800,1200], RCOL=[[63,181,126],[224,169,59],[224,71,75]];
+let basemap='voyager', showRings=true, focal=CA.focal||CA.branches[0];
+
+function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
+  const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));}
+function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
+  for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+function reachable(lat,lng){const acc=[0,0,0];
+  for(const b of CA.buildings){const d=hav(lat,lng,b.cy,b.cx);
+    for(let i=0;i<3;i++)if(d<=RINGS[i])acc[i]+=b.fa;}
+  return acc.map(fa=>Math.round(fa*CA.occ));}
+
+const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+const deckgl=new deck.DeckGL({container:'map',
+  initialViewState:{longitude:CA.center.lng,latitude:CA.center.lat,zoom:13.4,pitch:55,bearing:18},
+  controller:true,
+  getTooltip:({object,layer})=>{
+    if(!object)return null;
+    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
+    if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};
+    if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
+    return null;}});
+
+function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
+  renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+    bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
+
+function darkMode(){return basemap==='dark';}
+function render(){
+  const L=[baseLayer()];
+  L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
+    getPolygon:b=>b.p,getElevation:b=>b.h,
+    getFillColor:b=>{const t=Math.min(1,b.h/40);return darkMode()?[90+t*60,70+t*40,150+t*70,200]:[150,128,210,205];},
+    material:{ambient:0.6,diffuse:0.6,shininess:20},pickable:false}));
+  if(showRings && focal){
+    L.push(new deck.PolygonLayer({id:'rings',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
+      getPolygon:d=>d.poly,extruded:false,stroked:true,filled:true,
+      getFillColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],26],
+      getLineColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],200],getLineWidthMinPixels:1.4,pickable:false}));
+  }
+  // POI
+  L.push(new deck.ScatterplotLayer({id:'conv',data:CA.poi.convenience,getPosition:p=>[p[1],p[0]],
+    getRadius:55,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[224,123,47,220]}));
+  L.push(new deck.ScatterplotLayer({id:'veh',data:CA.poi.vehicle_commerce,getPosition:p=>[p[1],p[0]],
+    getRadius:60,radiusMinPixels:2.2,radiusMaxPixels:6,getFillColor:[21,155,134,235]}));
+  L.push(new deck.ScatterplotLayer({id:'mkt',data:CA.poi.fresh_market,getPosition:p=>[p[1],p[0]],
+    getRadius:70,radiusMinPixels:2.5,radiusMaxPixels:7,getFillColor:[224,200,80,240]}));
+  // competitors
+  L.push(new deck.ScatterplotLayer({id:'comp',data:CA.competitors,getPosition:d=>[d.lng,d.lat],
+    getRadius:95,radiusMinPixels:4,radiusMaxPixels:9,stroked:true,getLineColor:[20,20,28,255],lineWidthMinPixels:1.2,
+    getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
+  // my branches
+  L.push(new deck.ScatterplotLayer({id:'branches',data:CA.branches,getPosition:d=>[d.x,d.y],
+    getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
+    getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
+    updateTriggers:{getFillColor:[focal]}}));
+  L.push(new deck.TextLayer({id:'branch-labels',data:CA.branches,getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
+    getSize:11,getColor:[40,28,8,255],getBackgroundColor:[224,169,59,235],background:true,
+    backgroundPadding:[5,3],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
+    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
+  L.push(new deck.TextLayer({id:'land',data:CA.landmarks,getPosition:d=>[d.cx,d.cy],getText:d=>d.nm,
+    getSize:10,getColor:[255,255,255,255],getBackgroundColor:[70,52,30,225],background:true,
+    backgroundPadding:[5,3],fontFamily:'IBM Plex Sans Thai',fontWeight:500,getTextAnchor:'middle',
+    characterSet:'auto',sizeUnits:'pixels',pickable:true}));
+  deckgl.setProps({layers:L,
+    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){focal=object;updatePanels();render();}}});
+}
+
+/* ---------- panels ---------- */
+function fmt(n){return n.toLocaleString();}
+function updatePanels(){
+  const r=reachable(focal.y,focal.x);
+  document.getElementById('focalName').textContent=focal.n||'AutoX branch';
+  document.getElementById('focalSub').textContent=`เงินไชโย · ${CA.meta.dist} · vehicle shops ${focal.veh}`;
+  document.getElementById('reach15').textContent=fmt(r[2]);
+  document.getElementById('reach5').textContent=fmt(r[0]);
+  document.getElementById('reach10').textContent=fmt(r[1]);
+  document.getElementById('reach15b').textContent=fmt(r[2]);
+  document.getElementById('reachFoot').textContent='Dasymetric estimate: OSM building floor-area within each walk radius × local occupancy (~1 person / 45 m²). Not a street-network isochrone.';
+  // competitor & own within 1.2km
+  const cNear=CA.competitors.filter(c=>hav(focal.y,focal.x,c.lat,c.lng)<=1200).length;
+  const bNear=CA.branches.filter(b=>b!==focal&&hav(focal.y,focal.x,b.y,b.x)<=1200).length;
+  const convNear=CA.poi.convenience.filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
+  const vehNear=CA.poi.vehicle_commerce.filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
+  const m=CA.meta;
+  document.getElementById('ctx').innerHTML=[
+    ['Competitors ≤1.2km',`${cNear} <small>vs ${bNear} AutoX</small>`],
+    ['Convenience stores',`${convNear} <small>≤1.2km</small>`],
+    ['Vehicle shops ≤1.2km',`${vehNear} <small>collateral supply</small>`],
+    ['District',`${m.dist}`],
+    ['District reg. pop',`${fmt(m.dist_pop)}`],
+    ['Buildings mapped',`${fmt(CA.buildings.length)}`],
+  ].map(([k,v])=>`<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+}
+
+function buildLeads(){
+  // gaps: competitors whose nearest AutoX branch is far -> contested ground we don't hold
+  const gaps=CA.competitors.map(c=>{
+    const nb=Math.min(...CA.branches.map(b=>hav(c.lat,c.lng,b.y,b.x)));
+    return {c,nb};}).filter(g=>g.nb>650).sort((a,b)=>b.nb-a.nb);
+  // cluster by tambon-ish proximity (dedupe within 600m, keep farthest)
+  const picked=[];
+  for(const g of gaps){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
+  const ratio=(CA.competitors.length/Math.max(1,CA.branches.length)).toFixed(1);
+  document.getElementById('verdict').innerHTML=
+    `<div class="verdict hot">Contested core — <b>${CA.competitors.length} competitor branches</b> vs <b>${CA.branches.length} AutoX</b> (${ratio}:1). Srisawad &amp; Tidlor own the Thapma–Choeng Noen corridor; AutoX is thin in the urban centre while strong on the factory edge.</div>`;
+  document.getElementById('leads').innerHTML=picked.map((g,i)=>{
+    const r=reachable(g.c.lat,g.c.lng);
+    return `<div class="lead" data-lat="${g.c.lat}" data-lng="${g.c.lng}">
+      <div class="rank">${i+1}</div><div class="body">
+      <div class="t">${g.c.name.replace(/^[^ ]+ /,'')} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
+      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km. ~${fmt(r[2])} reachable in 15 min.</div>
+      </div></div>`;}).join('');
+  document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
+    const lat=+el.dataset.lat,lng=+el.dataset.lng;
+    deckgl.setProps({initialViewState:{longitude:lng,latitude:lat,zoom:14.6,pitch:55,bearing:18,transitionDuration:900}});
+    focal={n:'Gap (competitor-held)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
+    if(window.innerWidth<=820){document.getElementById('left').classList.add('show');document.getElementById('right').classList.remove('show');}
+  });
+  document.getElementById('recos').innerHTML=[
+    ['1','Infill the Thapma–Choeng Noen corridor: it carries the highest reachable population and the densest competitor stack, but few AutoX points. A single well-placed branch contests 4–5 rivals at once.'],
+    ['2','Lead with vehicle-title + gold collateral here — '+CA.meta.n_veh+' vehicle shops and '+CA.meta.n_gold+' gold dealers in-frame mean strong collateral supply and pawn competition. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
+    ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core selectively where reachable population > 8k and no AutoX within 1 km.'],
+  ].map(([n,t])=>`<div class="reco"><span class="n">${n}</span><span>${t}</span></div>`).join('');
+}
+
+/* strip */
+function buildStrip(){
+  const byB={};CA.competitors.forEach(c=>byB[c.brand]=(byB[c.brand]||0)+1);
+  const items=[['AutoX',CA.branches.length,'#E0A93B'],['Srisawad',byB.Srisawad||0,'#E0474B'],
+    ['Tidlor',byB.Tidlor||0,'#4F7BF0'],['Muangthai',byB.Muangthai||0,'#D65AA0'],
+    ['7-Eleven+',CA.meta.n_conv,'#E07B2F'],['Vehicle',CA.meta.n_veh,'#159b86'],['Markets',CA.meta.n_mkt,'#E0C850']];
+  document.getElementById('strip').insertAdjacentHTML('beforeend',
+    items.map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));
+}
+
+/* controls */
+document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+  const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
+  el.classList.toggle('show');other.classList.remove('show');});
+document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+
+buildStrip();buildLeads();updatePanels();render();
+}catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
+};</script>
+<script>
+(function(){
+ var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading catchment…';document.body.appendChild(box);
+ fetch('data/rayong_catchment.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();})
+  .then(function(d){window.CA=d;box.remove();window.initCatch();})
+  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load catchment data: '+e.message;});
+})();
+</script>
+</body>
+</html>
