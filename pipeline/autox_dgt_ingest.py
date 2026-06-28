@@ -22,6 +22,8 @@ if not KEY:
 BASE = "https://data.go.th/api/3/action"        # CKAN action API
 HDR  = {"User-Agent": "Mozilla/5.0", "api-key": KEY}
 OUT  = pathlib.Path("dgt_out"); OUT.mkdir(exist_ok=True)
+SEARCH_ROWS = 50      # how many datasets to consider per topic (was 5 — too shallow, missed national tables)
+MAX_RES     = 40      # cap resources pulled per topic, to bound run time / disk
 
 # What we want — each entry is (label, search terms). Tune the queries if a
 # better dataset shows up in the manifest.
@@ -60,6 +62,14 @@ def save_csv(name, rows):
         for r in rows: w.writerow(r)
     return len(rows)
 
+PROV_KEYS = ("จังหวัด", "province", "provance", "prov", "changwat")
+def province_count(rows):
+    """How many distinct provinces a resource covers — lets us spot national tables."""
+    if not rows: return 0
+    key = next((k for k in rows[0].keys() if (k or "").strip() in PROV_KEYS), None)
+    if not key: return 0
+    return len({(r.get(key) or "").strip() for r in rows if (r.get(key) or "").strip()})
+
 def main():
     # sanity check the key/network first
     try:
@@ -70,18 +80,24 @@ def main():
                  f"  You're likely on a blocked IP — run from a Thai network/proxy.")
 
     manifest = []
+    seen = set()                       # dedup resources across topics
     for label, query in TARGETS:
         print(f"── {label}: searching '{query}'")
         try:
-            res = api("package_search", q=query, rows=5)["result"]
+            res = api("package_search", q=query, rows=SEARCH_ROWS)["result"]
         except Exception as e:
             print(f"   search failed: {e}"); continue
-        print(f"   {res['count']} datasets matched; scanning top {min(5,len(res['results']))}")
+        print(f"   {res['count']} datasets matched; scanning up to {min(SEARCH_ROWS,len(res['results']))} "
+              f"(cap {MAX_RES} resources)")
         got = 0
         for pkg in res["results"]:
+            if got >= MAX_RES: break
             for r in pkg.get("resources", []):
+                if got >= MAX_RES: break
                 if not r.get("datastore_active"): continue
                 rid = r["id"]
+                if rid in seen: continue
+                seen.add(rid)
                 try:
                     rows = datastore_all(rid)
                 except Exception as e:
@@ -89,16 +105,20 @@ def main():
                 if rows:
                     fname = f"{label}__{pkg['name'][:30]}__{rid[:8]}"
                     n = save_csv(fname, rows)
-                    print(f"   ✓ {n:6d} rows → {fname}.csv")
+                    pc = province_count(rows)
+                    flag = "  ★ broad coverage" if pc >= 20 else ""
+                    print(f"   ✓ {n:6d} rows · {pc:2d} provinces → {fname}.csv{flag}")
                     manifest.append({"label": label, "dataset": pkg["title"],
                                      "package": pkg["name"], "resource_id": rid,
-                                     "rows": n, "file": fname + ".csv"})
+                                     "rows": n, "provinces": pc, "file": fname + ".csv"})
                     got += 1
         if not got:
             print("   (no datastore-backed resources — may be file downloads; check manifest)")
     with open(OUT / "manifest.json", "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=2)
-    print(f"\nDone. {len(manifest)} files in ./dgt_out/  — upload that folder back to Claude.")
+    nat = sum(1 for m in manifest if m.get("provinces", 0) >= 20)
+    print(f"\nDone. {len(manifest)} files in ./dgt_out/  ({nat} with broad ★ coverage). "
+          f"Commit the folder and tell Claude.")
 
 if __name__ == "__main__":
     main()
