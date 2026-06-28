@@ -23,12 +23,7 @@ REPO = os.path.dirname(ROOT)
 DGT  = os.path.join(ROOT, "dgt_out")
 SRC  = os.path.join(REPO, "source-data")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION
-
-
-def norm_district(d):
-    """Drop the อำเภอ/อ./เขต prefixes so DIW อำเภอ matches the branch `district`."""
-    return (d or "").replace("อำเภอ", "").replace("อ.", "").replace("เขต", "").strip()
+from regionmap import canonical, REGION, norm_district
 
 
 def to_int(x):
@@ -49,7 +44,7 @@ def build_factories():
         with open(fp, encoding="utf-8-sig") as f:
             for r in csv.DictReader(f):
                 p = canonical((r.get("จังหวัด") or "").strip())
-                d = norm_district((r.get("อำเภอ") or "").strip())
+                d = norm_district(r.get("อำเภอ"), p)
                 if not p or not d:
                     continue
                 w = to_int(r.get("คนงานรวม"))

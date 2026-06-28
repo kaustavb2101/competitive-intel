@@ -23,7 +23,7 @@ REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUTDIR = os.path.join(REPO, "platform", "data", "provinces")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION
+from regionmap import canonical, REGION, norm_district
 
 # the 10 POI layers the province page expects (subset of osm_layers), output as [lat,lng]
 POI_LAYERS = ["industrial", "vehicle_commerce", "fresh_market", "gold", "bank",
@@ -145,7 +145,7 @@ def build_all():
                 continue
             thai_d = collections.Counter(b["district"] for b in rows).most_common(1)[0][0]
             cx, cy = _centroid(f["geometry"])
-            gd = fbd["districts"].get(f"{prov}|{thai_d}", {"fac": 0, "workers": 0})
+            gd = fbd["districts"].get(f"{prov}|{norm_district(thai_d, prov)}", {"fac": 0, "workers": 0})
             feats.append({"type": "Feature", "geometry": f["geometry"], "properties": {
                 "district": thai_d, "shapeName": f["properties"]["shapeName"],
                 "branches": len(rows), "workingage": rows[0].get("dist_workingage"),

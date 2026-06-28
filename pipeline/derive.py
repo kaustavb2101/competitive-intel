@@ -24,12 +24,14 @@ recoverable from source-data alone, so we never silently overwrite it):
   meta.mws, meta.cws            merchant / collateral white-space rankings
   meta.macro, meta.updated      editorial macro board + freshness stamp
 """
-import os, json, math, argparse
+import os, sys, json, math, argparse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUT  = os.path.join(REPO, "platform", "data")
+sys.path.insert(0, ROOT)
+from regionmap import norm_district   # shared district normalizer (Thai SARA-AM safe)
 
 # fields carried straight from the master record into the compact branch record
 DIRECT = {"v": "prov", "r": "region", "a": "agri_pd", "m": "merchant_demand",
@@ -58,17 +60,17 @@ POI10 = {"ind": "ind10", "bank": "bank10", "atm": "atm10", "cvs": "cvs10", "hote
          "pharm": "pharm10", "gold": "gold10", "veh": "veh10", "sch": "sch10", "est": "n_estate10"}
 
 
-def _normd(d):
-    return (d or "").replace("อำเภอ", "").replace("อ.", "").replace("เขต", "").strip()
-
-
 def build_branches(master):
     """Compact per-branch record the app loads (platform/data/branches.json)."""
     fbd = _load(os.path.join(SRC, "factories_by_district.json"))["districts"]
     out = []
+    misses = {}
     for b in master:
         k10 = {sk: b.get(mk, 0) for sk, mk in POI10.items()}   # what's within 10km (OSM)
-        gd = fbd.get(f"{b['prov']}|{_normd(b.get('district'))}", {"fac": 0, "workers": 0})
+        key = f"{b['prov']}|{norm_district(b.get('district'), b['prov'])}"
+        if key not in fbd:
+            misses[key] = misses.get(key, 0) + 1
+        gd = fbd.get(key, {"fac": 0, "workers": 0})
         # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,t,dem,fmkt,veh,rain
         rec = {"x": round(b["lng"], 4), "y": round(b["lat"], 4), "n": b["name"][:34],
                "v": b["prov"], "r": b["region"], "o": round(b["opportunity"], 1),
@@ -77,6 +79,10 @@ def build_branches(master):
                "fmkt": b["fmkt10"], "veh": b["veh10"], "rain": b["rain_3mo_anom"],
                "k10": k10, "dfac": gd["fac"], "dwork": gd["workers"], "d": b.get("district", "")}
         out.append(rec)
+    if misses:
+        n = sum(misses.values())
+        print(f"  ⚠ {n} branches have no DIW factory-district match ({len(misses)} distinct keys); "
+              f"dfac/dwork=0 for them: {', '.join(list(misses)[:6])}{' …' if len(misses) > 6 else ''}")
     return out
 
 

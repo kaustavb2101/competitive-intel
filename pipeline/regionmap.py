@@ -47,3 +47,17 @@ def canonical(prov, district=None):
 def region_of(prov, district=None):
     """Canonical region for a raw province string, or 'Other' if still unresolved."""
     return REGION.get(canonical(prov, district), 'Other')
+
+def norm_district(d, prov=None):
+    """Normalize an amphoe (district) name so branch records and the DIW
+    factory layer join. Folds the DECOMPOSED SARA-AM (U+0E4D U+0E32 -> U+0E33,
+    which NFC does not compose), drops อำเภอ/เขต/Amphoe/อ. prefixes, fixes the
+    'อำเมือง' typo, and expands a bare 'เมือง' to the capital amphoe 'เมือง<prov>'."""
+    s = (d or '').replace('ํา', 'ำ').strip()   # decomposed SARA-AM -> composed
+    s = s.replace('อำเมือง', 'เมือง')                          # typo: missing เภอ
+    for pre in ('อำเภอ', 'เขต', 'Amphoe ', 'อ.', 'อ '):
+        if s.startswith(pre):
+            s = s[len(pre):].strip(); break
+    if s == 'เมือง' and prov:
+        s = 'เมือง' + prov
+    return s
