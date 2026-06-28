@@ -220,7 +220,7 @@ document.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{
 const f=RY.facts;
 const totWA=RY.districts.features.reduce((s,d)=>s+(d.properties.workingage||0),0);
 document.getElementById('kpis').innerHTML=[
-  ['57','Branches'],['8','Districts'],[RY.competitors.length,'Competitors'],
+  [RY.branches.length,'Branches'],[RY.districts.features.length,'Districts'],[RY.competitors.length,'Competitors'],
   [RY.poi.industrial.length,'Factories'],[f.minwage,'Min wage']
 ].map(([v,k])=>`<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
 
