@@ -52,18 +52,30 @@ def hav(la1, lo1, la2, lo2):
     return 2 * R * math.asin(math.sqrt(a))
 
 
+# within-10km POI counts (master field -> short key) for the per-branch radar
+POI10 = {"ind": "ind10", "bank": "bank10", "atm": "atm10", "cvs": "cvs10", "hotel": "hotel10",
+         "civic": "civic10", "fmkt": "fmkt10", "rest": "rest10", "super": "super10",
+         "pharm": "pharm10", "gold": "gold10", "veh": "veh10", "sch": "sch10", "est": "n_estate10"}
+
+
+def _normd(d):
+    return (d or "").replace("อำเภอ", "").replace("อ.", "").replace("เขต", "").strip()
+
+
 def build_branches(master):
     """Compact per-branch record the app loads (platform/data/branches.json)."""
+    fbd = _load(os.path.join(SRC, "factories_by_district.json"))["districts"]
     out = []
     for b in master:
-        rec = {"x": round(b["lng"], 4), "y": round(b["lat"], 4), "n": b["name"][:34]}
-        for k, mk in DIRECT.items():
-            rec[k] = b[mk]
+        k10 = {sk: b.get(mk, 0) for sk, mk in POI10.items()}   # what's within 10km (OSM)
+        gd = fbd.get(f"{b['prov']}|{_normd(b.get('district'))}", {"fac": 0, "workers": 0})
         # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,t,dem,fmkt,veh,rain
-        rec = {"x": rec["x"], "y": rec["y"], "n": rec["n"], "v": rec["v"], "r": rec["r"],
-               "o": round(b["opportunity"], 1), "a": rec["a"], "m": rec["m"], "c": rec["c"],
-               "w": rec["w"], "t": rec["t"], "dem": rec["dem"], "fmkt": rec["fmkt"],
-               "veh": rec["veh"], "rain": rec["rain"]}
+        rec = {"x": round(b["lng"], 4), "y": round(b["lat"], 4), "n": b["name"][:34],
+               "v": b["prov"], "r": b["region"], "o": round(b["opportunity"], 1),
+               "a": b["agri_pd"], "m": b["merchant_demand"], "c": b["collateral_density"],
+               "w": b["own10"], "t": b["tourism_score"], "dem": b["demand"],
+               "fmkt": b["fmkt10"], "veh": b["veh10"], "rain": b["rain_3mo_anom"],
+               "k10": k10, "dfac": gd["fac"], "dwork": gd["workers"], "d": b.get("district", "")}
         out.append(rec)
     return out
 

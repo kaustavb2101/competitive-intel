@@ -11,6 +11,7 @@ const LENS = {
 const SEG_COLORS = {Crops:'#C8433B', Livestock:'#1C8C7D', Fisheries:'#1C8C7D', Forestry:'#C9A227', Collateral:'#E6B450'};
 
 let DATA=null, META=null, map=null, markers=[], curLens='opp', branchSort='o', mapReady=false;
+let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
 const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
@@ -106,18 +107,67 @@ function initMap(){
   const renderer = L.canvas({padding:0.5});
   markers = DATA.map(d=>{
     const m = L.circleMarker([d.y,d.x], {renderer, radius:4, weight:0.4, color:'#0c1118', fillOpacity:0.85});
-    m._d=d; m.on('click',()=>m.bindPopup(popupHTML(d),{closeButton:false}).openPopup());
+    m._d=d; m.on('click',()=>selectBranch(d,m));
     return m.addTo(map);
   });
+  map.on('popupclose', clearRadius);
+  addRadiusToggle();
   styleMarkers();
+}
+function selectBranch(d,m){
+  m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
+  drawRadius(d);
+}
+function drawRadius(d){
+  clearRadius();
+  if(!showRadius) return;
+  radiusCircle = L.circle([d.y,d.x], {radius:10000, color:'#5B7CFA', weight:1.2,
+    fillColor:'#5B7CFA', fillOpacity:0.07, dashArray:'4 4', interactive:false}).addTo(map);
+}
+function clearRadius(){ if(radiusCircle){ map.removeLayer(radiusCircle); radiusCircle=null; } }
+function addRadiusToggle(){
+  const C = L.control({position:'topright'});
+  C.onAdd = ()=>{ const d=el('div','radius-toggle',
+    `<label style="display:flex;align-items:center;gap:6px;background:rgba(8,11,18,.9);
+      border:1px solid #2e3350;border-radius:7px;padding:6px 9px;font:600 12px 'IBM Plex Sans Thai',sans-serif;
+      color:#c7cedd;cursor:pointer">
+      <input type="checkbox" ${showRadius?'checked':''} style="accent-color:#5B7CFA"> 10&nbsp;km radius</label>`);
+    L.DomEvent.disableClickPropagation(d);
+    d.querySelector('input').onchange = e=>{ showRadius=e.target.checked;
+      if(!showRadius) clearRadius(); };
+    return d; };
+  C.addTo(map);
 }
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
-  return `<div class="pop"><div class="pn">${d.n}</div><div class="pv">${d.v} · ${d.r} · ${d.w} AutoX ≤10km</div>
+  const k=d.k10||{};
+  // within-10km radar: label, count, bar scaled to a sensible per-row max
+  const radar=[
+    ['Factories (OSM)',k.ind,60,'#E6B450'],['Industrial estates',k.est,5,'#E6B450'],
+    ['Vehicle/moto shops',k.veh,40,'#7A4FE0'],['Gold shops',k.gold,15,'#7A4FE0'],
+    ['Banks',k.bank,40,'#5B7CFA'],['ATMs',k.atm,60,'#5B7CFA'],
+    ['Convenience',k.cvs,80,'#1C8C7D'],['Supermarkets',k.super,15,'#1C8C7D'],
+    ['Fresh markets',k.fmkt,15,'#1C8C7D'],['Restaurants',k.rest,80,'#1C8C7D'],
+    ['Schools',k.sch,40,'#8b90a7'],['Hospitals/gov',k.civic,30,'#8b90a7'],
+    ['Hotels',k.hotel,40,'#8b90a7'],['Pharmacies',k.pharm,30,'#8b90a7'],
+  ];
+  const sec=t=>`<div style="margin:8px 0 3px;font:700 11px 'IBM Plex Sans Thai';color:#8b90a7;text-transform:uppercase;letter-spacing:.5px">${t}</div>`;
+  const rrow=([lab,v,mx,col])=>`<div class="pr" style="gap:8px"><span style="flex:1">${lab}</span>
+     ${barHTML(v||0,col,mx)}<b class="mono" style="color:${col};min-width:24px;text-align:right">${v||0}</b></div>`;
+  const dist = (d.dfac!=null) ? sec('District (DIW · measured)')
+     + r('Factories', (d.dfac||0).toLocaleString(), '#E6B450')
+     + r('Factory workers', (d.dwork||0).toLocaleString(), '#E6B450') : '';
+  return `<div class="pop" style="max-height:62vh;overflow:auto">
+    <div class="pn">${d.n}</div>
+    <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
+    ${sec('Segment scores')}
     ${r('Acquisition opp.', d.o, '#E6B450')}
     ${r('Farmer agri-PD', d.a, '#C8433B')}
     ${r('Merchant demand', d.m, '#1C8C7D')}
-    ${r('Collateral density', d.c, '#7A4FE0')}</div>`;
+    ${r('Collateral density', d.c, '#7A4FE0')}
+    ${sec('Within 10 km (OSM)')}
+    ${radar.map(rrow).join('')}
+    ${dist}</div>`;
 }
 function styleMarkers(){
   const l=LENS[curLens];
