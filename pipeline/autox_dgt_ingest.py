@@ -22,8 +22,8 @@ if not KEY:
 BASE = "https://data.go.th/api/3/action"        # CKAN action API
 HDR  = {"User-Agent": "Mozilla/5.0", "api-key": KEY}
 OUT  = pathlib.Path("dgt_out"); OUT.mkdir(exist_ok=True)
-SEARCH_ROWS = 50      # how many datasets to consider per topic (was 5 — too shallow, missed national tables)
-MAX_RES     = 40      # cap resources pulled per topic, to bound run time / disk
+SEARCH_ROWS = 120     # how many datasets to consider per topic (was 5 — too shallow, missed national tables)
+MAX_RES     = 120     # cap resources pulled per topic (set high for "maximum data"; Ctrl-C anytime, files save as they go)
 
 # What we want — each entry is (label, search terms). Tune the queries if a
 # better dataset shows up in the manifest.
@@ -41,7 +41,7 @@ def api(action, **params):
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.load(r)
 
-def datastore_all(resource_id, page=10000, cap=200000):
+def datastore_all(resource_id, page=10000, cap=1000000):
     """Pull every row of a datastore resource, paginating."""
     rows, off = [], 0
     while off < cap:
@@ -64,11 +64,15 @@ def save_csv(name, rows):
 
 PROV_KEYS = ("จังหวัด", "province", "provance", "prov", "changwat")
 def province_count(rows):
-    """How many distinct provinces a resource covers — lets us spot national tables."""
+    """How many distinct provinces a resource covers — lets us spot national tables.
+    Robust to numeric/None cell values (coerce to str) and never raises."""
     if not rows: return 0
-    key = next((k for k in rows[0].keys() if (k or "").strip() in PROV_KEYS), None)
-    if not key: return 0
-    return len({(r.get(key) or "").strip() for r in rows if (r.get(key) or "").strip()})
+    try:
+        key = next((k for k in rows[0].keys() if (k or "").strip() in PROV_KEYS), None)
+        if not key: return 0
+        return len({str(r.get(key) or "").strip() for r in rows if str(r.get(key) or "").strip()})
+    except Exception:
+        return 0
 
 def main():
     # sanity check the key/network first
@@ -100,18 +104,20 @@ def main():
                 seen.add(rid)
                 try:
                     rows = datastore_all(rid)
+                    if rows:
+                        fname = f"{label}__{pkg['name'][:30]}__{rid[:8]}"
+                        n = save_csv(fname, rows)
+                        pc = province_count(rows)
+                        flag = "  ★ broad coverage" if pc >= 20 else ""
+                        print(f"   ✓ {n:6d} rows · {pc:2d} provinces → {fname}.csv{flag}")
+                        manifest.append({"label": label, "dataset": pkg["title"],
+                                         "package": pkg["name"], "resource_id": rid,
+                                         "rows": n, "provinces": pc, "file": fname + ".csv"})
+                        got += 1
+                except KeyboardInterrupt:
+                    raise
                 except Exception as e:
-                    print(f"   ! {rid[:8]} pull failed: {e}"); continue
-                if rows:
-                    fname = f"{label}__{pkg['name'][:30]}__{rid[:8]}"
-                    n = save_csv(fname, rows)
-                    pc = province_count(rows)
-                    flag = "  ★ broad coverage" if pc >= 20 else ""
-                    print(f"   ✓ {n:6d} rows · {pc:2d} provinces → {fname}.csv{flag}")
-                    manifest.append({"label": label, "dataset": pkg["title"],
-                                     "package": pkg["name"], "resource_id": rid,
-                                     "rows": n, "provinces": pc, "file": fname + ".csv"})
-                    got += 1
+                    print(f"   ! {rid[:8]} skipped: {e}"); continue
         if not got:
             print("   (no datastore-backed resources — may be file downloads; check manifest)")
     with open(OUT / "manifest.json", "w", encoding="utf-8") as f:
