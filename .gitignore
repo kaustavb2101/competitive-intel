@@ -1,5 +1,10 @@
 node_modules/
 .vercel/
+
+# local secrets — NEVER commit real keys (use .env.example as the template)
+.env
+*.env
+!.env.example
 __pycache__/
 *.pyc
 .DS_Store

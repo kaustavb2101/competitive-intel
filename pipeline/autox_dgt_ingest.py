@@ -14,10 +14,13 @@ It self-discovers the right datasets via CKAN package_search, pulls every
 datastore-backed resource, paginates, and saves raw CSVs + a manifest.
 """
 import os, sys, csv, json, time, urllib.request, urllib.parse, pathlib
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from envload import load_env
+load_env()                                  # auto-load keys from repo-root .env if present
 
 KEY = os.environ.get("DATA_GO_TH_TOKEN", "").strip()
 if not KEY:
-    sys.exit("Set DATA_GO_TH_TOKEN first:  export DATA_GO_TH_TOKEN=...")
+    sys.exit("Set DATA_GO_TH_TOKEN first: put it in a .env file (copy .env.example) or export it.")
 
 BASE = "https://data.go.th/api/3/action"        # CKAN action API
 HDR  = {"User-Agent": "Mozilla/5.0", "api-key": KEY}
