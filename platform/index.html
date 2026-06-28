@@ -19,6 +19,8 @@
   <a href="rayong-province.html">Rayong 3D</a>
   <a href="rayong-catchment.html">Catchment</a>
   <a data-v="acq">Acquisition</a>
+  <a data-v="provinces">Provinces</a>
+  <a data-v="risk">Risk</a>
   <a data-v="branches">Branches</a>
   <button id="themeToggle" title="Toggle light / dark" aria-pressed="false"
     style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
@@ -81,6 +83,21 @@
     <input class="search" id="search" placeholder="Search branch or province…">
     <div class="chips" id="sortchips"></div>
     <table class="tbl" id="branches"></table>
+  </section>
+
+  <section class="view" id="v-provinces">
+    <h2 class="opp">Provinces · 77 deep-dives</h2>
+    <p class="lead">Tap a province for its 3D district deep-dive. <b>Fac/br</b> = DIW factories per AutoX branch — high with few branches = industrial white-space.</p>
+    <input class="search" id="provsearch" placeholder="Search province (Thai or English)…">
+    <div class="chips" id="provchips"></div>
+    <table class="tbl" id="provtbl"></table>
+  </section>
+
+  <section class="view" id="v-risk">
+    <h2 class="risk">Portfolio risk · branch watchlist</h2>
+    <p class="lead">Branches ranked by a composite risk score — farmer-PD + drought + thin-merchant-buffer + AutoX concentration. <span id="riskcount" class="sub"></span></p>
+    <button id="riskcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="risktbl"></table>
   </section>
 
   <div class="note">
