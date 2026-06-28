@@ -4,3 +4,9 @@ __pycache__/
 *.pyc
 .DS_Store
 .cache/
+
+# enrichment-loop build artifacts (regenerate with pipeline/autox_enrich_loop.py)
+pipeline/cache/
+pipeline/iteration_log.json
+pipeline/autox-branch-features.csv
+pipeline/deck_payload.json

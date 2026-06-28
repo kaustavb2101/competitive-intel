@@ -39,8 +39,15 @@ Rayong views = deck.gl 8.9.35 (3D). Don't merge them into one page.
 ### The pipeline — `pipeline/`
 - `autox_enrich_loop.py` — the re-runnable enrichment loop. Source registry (13 OSM POI layers,
   OAE crops, HDX pop/rainfall, World Bank Pink Sheet), freshness-TTL caching, recomputes per-branch
-  features + segment scores, writes `iteration_log.json`. `--watch --interval 86400` to self-refresh.
+  features + segment scores into `source-data/branches_final.json`, then calls `derive.py` so the
+  refresh lands in the app; writes `iteration_log.json`. `--watch --interval 86400` to self-refresh;
+  `--derive-only` skips all network pulls and just re-projects the master (runnable offline).
   Has DATA_GO_TH_TOKEN hooks (off by default; turn on from a Thai network — see DATA_SOURCES.md).
+- `derive.py` — **projects the master into the app**: regenerates `platform/data/branches.json` +
+  `meta.json` from `source-data/`, deterministic and network-free. `--check` verifies the committed
+  data still reproduces exactly (byte-for-byte). Mechanical fields are derived; the livestock-buffered
+  agri counts (`region.hi`, `n_agri`), white-space tables (`mws`/`cws`) and editorial macro are
+  carried forward (they need the live enrich loop, not source-data alone).
 - `autox_dgt_ingest.py` — ready-to-run data.go.th ingestion (DIW factories, DLT vehicles, OAE).
   **Blocked from a foreign IP; must run from Kaustav's Thai network.**
 - `regionmap.py` — province→region + tier lookup (imported by other scripts).
@@ -65,9 +72,10 @@ cd platform && python3 -m http.server 8000      # open http://localhost:8000
 # deploy (Kaustav's Vercel; sets root to platform/)
 cd platform && npx vercel --prod                  # prints live URL
 
-# refresh data (national features + segment scores)
-cd pipeline && python3 autox_enrich_loop.py       # writes updated branches_final.json + iteration_log.json
-#   then regenerate platform/data/*.json from it (see ARCHITECTURE.md "regenerate" section)
+# refresh data (national features + segment scores) — now writes straight to platform/data/
+cd pipeline && python3 autox_enrich_loop.py       # recompute master + derive platform/data + log iteration
+cd pipeline && python3 derive.py                  # just re-project master → platform/data (no network)
+cd pipeline && python3 derive.py --check          # verify committed platform/data still matches the master
 
 # pull the BLOCKED gov data — ONLY works from a Thai/residential IP
 cd pipeline && python3 autox_dgt_ingest.py        # DIW factories, DLT vehicle registrations

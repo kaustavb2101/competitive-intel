@@ -42,10 +42,18 @@ Replace the walk-radius dasymetric estimate with a real street-network reach pol
 - This sharpens the agri-PD livestock buffer (the resilient-segment story). Look for DLD/DOF open data
   (likely via data.go.th from the Thai IP) or provincial statistical yearbooks.
 
-## 6. Wire the enrichment loop straight into `platform/data/`
-- Have `autox_enrich_loop.py` (or a small `derive.py`) write `branches.json` + `meta.json` +
-  `rayong_*.json` directly, so "refresh + redeploy" is one command.
-- Add the iteration log to the Overview tab (last-refreshed, source freshness).
+## 6. Wire the enrichment loop straight into `platform/data/`  ⟶ DONE for national data
+- ✅ `derive.py` projects `source-data/branches_final.json` → `platform/data/branches.json` + `meta.json`,
+  deterministic + network-free, with `--check` (byte-exact verification of the committed output).
+- ✅ `autox_enrich_loop.py` now reads/writes the real master in `source-data/`, calls `derive.py` each
+  iteration, and has `--derive-only` (offline re-project). Refresh now reaches the app in one command.
+- ⚠️ The livestock-buffered agri counts (`region.hi`, `n_agri`), white-space tables (`mws`/`cws`) and the
+  editorial macro board are still **carried forward** by `derive.py` — they aren't recoverable from
+  `source-data/` alone. To make them refresh too, have `autox_enrich_loop.py`'s scoring stage emit them
+  into the master (or a sidecar) and extend `derive.py` to read them instead of carrying them.
+- ⏳ Still to do: have `derive.py` also rebuild `rayong_*.json` from `bldg_wide.json` /
+  `rayong_competitors.json` / `rayong_districts.geojson`; and surface the iteration log on the Overview
+  tab (last-refreshed + per-source freshness).
 
 ## 7. Nice-to-haves
 - Search-protection / role gating if this goes to a wider internal audience.

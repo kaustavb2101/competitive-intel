@@ -20,7 +20,10 @@ DATA_GO_TH_TOKEN to also pull those (hooks included, off by default).
 import os, json, time, math, csv, argparse, datetime, urllib.request, urllib.parse, collections
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(ROOT)
 CACHE = os.path.join(ROOT, "cache"); os.makedirs(CACHE, exist_ok=True)
+# the canonical master lives in source-data/ (everything in platform/data is derived from it)
+MASTER = os.path.join(REPO, "source-data", "branches_final.json")
 UA = {"User-Agent": "Mozilla/5.0"}
 OVERPASS = ["https://maps.mail.ru/osm/tools/overpass/api/interpreter",
             "https://overpass.kumi.systems/api/interpreter"]
@@ -171,7 +174,7 @@ def stage_score(branches, com, log):
     return branches
 
 def write_outputs(branches, com, log):
-    json.dump(branches, open(os.path.join(ROOT,"branches_final.json"),"w"), ensure_ascii=False)
+    json.dump(branches, open(MASTER,"w"), ensure_ascii=False)
     cols=["store_code","name","province","region","lat","lng","agri_pd","merchant_demand",
           "collateral_density","merchant_pd","tourism_score","veh10","gold10","fmkt10","rest10",
           "dist_workingage","rain_3mo_anom","own10","opportunity"]
@@ -181,14 +184,21 @@ def write_outputs(branches, com, log):
             w.writerow([b.get(k.replace("store_code","code").replace("province","prov"),"") for k in cols])
     log["written"]=["branches_final.json","autox-branch-features.csv"]
 
-def iterate(force=False):
+def iterate(force=False, derive_only=False):
+    import derive  # projection master → platform/data (same dir)
     t0=time.time(); log={"ts":datetime.datetime.now().isoformat(timespec="seconds")}
-    branches=json.load(open(os.path.join(ROOT,"branches_final.json")))
-    layers=stage_osm(force, log)
-    com=stage_commodities(force, log)
-    branches=stage_features(branches, layers, log)
-    branches=stage_score(branches, com, log)
-    write_outputs(branches, com, log)
+    branches=json.load(open(MASTER, encoding="utf-8"))
+    if derive_only:
+        log["mode"]="derive-only (no network; re-project master → platform/data)"
+    else:
+        layers=stage_osm(force, log)
+        com=stage_commodities(force, log)
+        branches=stage_features(branches, layers, log)
+        branches=stage_score(branches, com, log)
+        write_outputs(branches, com, log)
+    # close the loop: push the refreshed master into the deployable app data
+    derive.run()
+    log["derived"]=["platform/data/branches.json","platform/data/meta.json"]
     log["seconds"]=round(time.time()-t0,1)
     hist_path=os.path.join(ROOT,"iteration_log.json")
     hist=json.load(open(hist_path)) if os.path.exists(hist_path) else []
@@ -202,12 +212,14 @@ if __name__=="__main__":
     ap.add_argument("--watch",action="store_true",help="run forever on an interval")
     ap.add_argument("--interval",type=int,default=86400,help="seconds between iterations")
     ap.add_argument("--force",action="store_true",help="ignore cache TTL, refresh all")
+    ap.add_argument("--derive-only",action="store_true",
+                    help="skip all network pulls; just re-project the master into platform/data + log it")
     a=ap.parse_args()
     if a.watch:
         print(f"recursive loop · every {a.interval}s · Ctrl-C to stop")
         while True:
-            try: iterate(a.force)
+            try: iterate(a.force, a.derive_only)
             except Exception as e: print("iteration error:",e)
             time.sleep(a.interval)
     else:
-        iterate(a.force)
+        iterate(a.force, a.derive_only)

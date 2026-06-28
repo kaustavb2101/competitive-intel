@@ -5,6 +5,29 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-06-28 — One-command refresh: `derive.py` + wired enrichment loop (NEXT_STEPS #6)
+
+**State now:** "Refresh the data" is one deterministic command, and the recursive loop is runnable
+(and offline-testable) in this repo. Pushed to branch `claude/new-session-wto26j` (draft PR).
+
+- Added `pipeline/derive.py` — projects the master `source-data/branches_final.json` into the
+  deployable `platform/data/branches.json` + `meta.json`. Network-free and deterministic. `--check`
+  rebuilds in memory and byte-compares against the committed files (exits 1 on drift) — verified it
+  reproduces both files exactly.
+- **Decision — derive only what `source-data/` actually determines; carry the rest forward.** Reverse-
+  engineered the projection from the committed output: `branches.json` = compact records
+  (`x=round(lng,4)`, `y=round(lat,4)`, `n=name[:34]`, `o=round(opportunity,1)`, + direct fields);
+  `meta` region rollups = count + rounded mean; estate `own` = AutoX branches within 10 km. But
+  `region.hi`/`n_agri` embed the regional **livestock-income buffer** (Isan 376→316 = the cattle-belt
+  adjustment), and `mws`/`cws`/`macro` are analyst/editorial — none recoverable from `source-data/`
+  alone, so `derive.py` carries them forward unchanged rather than silently inventing different numbers.
+- Wired `autox_enrich_loop.py`: it now reads/writes the **real** master in `source-data/` (it previously
+  pointed at a non-existent `pipeline/branches_final.json`, so it couldn't run here), calls `derive.py`
+  every iteration, and gained `--derive-only` (skip all network, just re-project + log). Loop artifacts
+  (`cache/`, `iteration_log.json`, the CSV) are now gitignored.
+- **Bug fix carried from import:** Python 3.12-only f-string (backslash in expression) in
+  `build_platform.py` now compiles on 3.11.
+
 ## 2026-06-28 — Unified Vercel platform + Rayong catchment explorer
 
 **State now:** One deployable static app in `platform/` with a shared nav across all routes.
