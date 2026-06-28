@@ -96,7 +96,8 @@ def main():
                     got += 1
         if not got:
             print("   (no datastore-backed resources — may be file downloads; check manifest)")
-    json.dump(manifest, open(OUT / "manifest.json", "w"), ensure_ascii=False, indent=2)
+    with open(OUT / "manifest.json", "w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
     print(f"\nDone. {len(manifest)} files in ./dgt_out/  — upload that folder back to Claude.")
 
 if __name__ == "__main__":
