@@ -22,17 +22,28 @@ if not KEY:
 BASE = "https://data.go.th/api/3/action"        # CKAN action API
 HDR  = {"User-Agent": "Mozilla/5.0", "api-key": KEY}
 OUT  = pathlib.Path("dgt_out"); OUT.mkdir(exist_ok=True)
-SEARCH_ROWS = 120     # how many datasets to consider per topic (was 5 — too shallow, missed national tables)
-MAX_RES     = 120     # cap resources pulled per topic (set high for "maximum data"; Ctrl-C anytime, files save as they go)
+NAT_CAP  = 120        # datasets to scan in the national/aggregate pass per query
+PROV_CAP = 12         # datasets to scan per (topic × province) search
 
-# What we want — each entry is (label, search terms). Tune the queries if a
-# better dataset shows up in the manifest.
-TARGETS = [
-    ("factories_diw",  "โรงงาน กรมโรงงานอุตสาหกรรม จังหวัด"),
-    ("vehicles_dlt",   "รถจดทะเบียน กรมการขนส่งทางบก จังหวัด"),
-    ("crop_area_oae",  "เนื้อที่เพาะปลูก สำนักงานเศรษฐกิจการเกษตร"),
-    ("crop_price_oae", "ราคา ผลผลิต เกษตร จังหวัด"),
-    ("estates_ieat",   "นิคมอุตสาหกรรม การนิคมอุตสาหกรรม"),
+# 77 canonical Thai provinces — sweeping each by name guarantees we hit every
+# provincial dataset (DLT vehicles / OAE crops / NSO employment are per-province).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from regionmap import REGION
+    PROVINCES = sorted(REGION.keys())
+except Exception:
+    PROVINCES = []
+
+# Each topic: (label, [national queries], province-sweep term). We pull every
+# datastore-backed resource we find across BOTH passes, deduped + resumable.
+TOPICS = [
+    ("factories_diw",  ["โรงงาน กรมโรงงานอุตสาหกรรม", "จำนวนโรงงาน จังหวัด"],          "โรงงาน"),
+    ("vehicles_dlt",   ["รถจดทะเบียน กรมการขนส่งทางบก", "จำนวนรถจดทะเบียน จังหวัด"],   "รถจดทะเบียน"),
+    ("crop_area_oae",  ["เนื้อที่เพาะปลูก สำนักงานเศรษฐกิจการเกษตร", "เนื้อที่เพาะปลูก จังหวัด"], "เนื้อที่เพาะปลูก"),
+    ("crop_price_oae", ["ราคาที่เกษตรกรขายได้", "ราคาผลผลิตเกษตร จังหวัด"],            "ราคาที่เกษตรกรขายได้"),
+    ("employment",     ["ภาวะการทำงานของประชากร", "ผู้มีงานทำ จังหวัด",
+                        "ผู้ประกันตน ประกันสังคม", "กำลังแรงงาน จังหวัด"],              "ผู้มีงานทำ"),
+    ("estates_ieat",   ["นิคมอุตสาหกรรม การนิคมอุตสาหกรรม"],                          None),
 ]
 
 def api(action, **params):
@@ -74,54 +85,86 @@ def province_count(rows):
     except Exception:
         return 0
 
+def search_results(q, cap):
+    """Yield packages for a query, paging through up to `cap` datasets."""
+    start = 0
+    while start < cap:
+        try:
+            res = api("package_search", q=q, rows=min(50, cap - start), start=start)["result"]
+        except Exception as e:
+            print(f"   search '{q[:24]}…' failed: {e}"); return
+        results = res.get("results", [])
+        if not results:
+            return
+        for pkg in results:
+            yield pkg
+        start += len(results)
+        if start >= res.get("count", 0):
+            return
+
+
+def pull_pkg(label, pkg, manifest, seen):
+    """Pull every datastore resource of a package (resume-safe, deduped)."""
+    n = 0
+    for r in pkg.get("resources", []):
+        if not r.get("datastore_active"):
+            continue
+        rid = r["id"]
+        if rid in seen:
+            continue
+        seen.add(rid)
+        fname = f"{label}__{pkg['name'][:30]}__{rid[:8]}"
+        fpath = OUT / (fname + ".csv")
+        if fpath.exists():                      # resume: already downloaded a prior run
+            n += 1; continue
+        try:
+            rows = datastore_all(rid)
+            if rows:
+                cnt = save_csv(fname, rows)
+                pc = province_count(rows)
+                flag = "  ★" if pc >= 20 else ""
+                print(f"   ✓ {cnt:6d} rows · {pc:2d} prov → {fname}.csv{flag}")
+                manifest.append({"label": label, "dataset": pkg.get("title", ""),
+                                 "package": pkg["name"], "resource_id": rid,
+                                 "rows": cnt, "provinces": pc, "file": fname + ".csv"})
+                n += 1
+        except KeyboardInterrupt:
+            raise
+        except Exception as e:
+            print(f"   ! {rid[:8]} skipped: {e}")
+    return n
+
+
 def main():
-    # sanity check the key/network first
     try:
         api("package_search", q="test", rows=1)
-        print("✓ data.go.th reachable + key accepted\n")
+        print("✓ data.go.th reachable + key accepted")
+        print(f"  exhaustive mode: national pass + {len(PROVINCES)}-province sweep per topic, "
+              f"resume-safe (Ctrl-C anytime)\n")
     except Exception as e:
         sys.exit(f"✗ Cannot reach data.go.th from this network ({e}).\n"
                  f"  You're likely on a blocked IP — run from a Thai network/proxy.")
 
-    manifest = []
-    seen = set()                       # dedup resources across topics
-    for label, query in TARGETS:
-        print(f"── {label}: searching '{query}'")
-        try:
-            res = api("package_search", q=query, rows=SEARCH_ROWS)["result"]
-        except Exception as e:
-            print(f"   search failed: {e}"); continue
-        print(f"   {res['count']} datasets matched; scanning up to {min(SEARCH_ROWS,len(res['results']))} "
-              f"(cap {MAX_RES} resources)")
+    manifest, seen = [], set()
+    for label, queries, prov_term in TOPICS:
+        print(f"── {label}")
         got = 0
-        for pkg in res["results"]:
-            if got >= MAX_RES: break
-            for r in pkg.get("resources", []):
-                if got >= MAX_RES: break
-                if not r.get("datastore_active"): continue
-                rid = r["id"]
-                if rid in seen: continue
-                seen.add(rid)
-                try:
-                    rows = datastore_all(rid)
-                    if rows:
-                        fname = f"{label}__{pkg['name'][:30]}__{rid[:8]}"
-                        n = save_csv(fname, rows)
-                        pc = province_count(rows)
-                        flag = "  ★ broad coverage" if pc >= 20 else ""
-                        print(f"   ✓ {n:6d} rows · {pc:2d} provinces → {fname}.csv{flag}")
-                        manifest.append({"label": label, "dataset": pkg["title"],
-                                         "package": pkg["name"], "resource_id": rid,
-                                         "rows": n, "provinces": pc, "file": fname + ".csv"})
-                        got += 1
-                except KeyboardInterrupt:
-                    raise
-                except Exception as e:
-                    print(f"   ! {rid[:8]} skipped: {e}"); continue
-        if not got:
-            print("   (no datastore-backed resources — may be file downloads; check manifest)")
-    with open(OUT / "manifest.json", "w", encoding="utf-8") as f:
-        json.dump(manifest, f, ensure_ascii=False, indent=2)
+        # (1) national / aggregate pass
+        for q in queries:
+            for pkg in search_results(q, NAT_CAP):
+                got += pull_pkg(label, pkg, manifest, seen)
+        # (2) province sweep — guarantees per-province coverage
+        if prov_term and PROVINCES:
+            print(f"   province sweep ({len(PROVINCES)} provinces)…")
+            for prov in PROVINCES:
+                for pkg in search_results(f"{prov_term} {prov}", PROV_CAP):
+                    got += pull_pkg(label, pkg, manifest, seen)
+        covered = sorted({m["file"] for m in manifest if m["label"] == label})
+        maxprov = max([m.get("provinces", 0) for m in manifest if m["label"] == label] or [0])
+        print(f"   → {label}: {len(covered)} files, best single-file coverage {maxprov} provinces")
+        with open(OUT / "manifest.json", "w", encoding="utf-8") as f:   # checkpoint after each topic
+            json.dump(manifest, f, ensure_ascii=False, indent=2)
+
     nat = sum(1 for m in manifest if m.get("provinces", 0) >= 20)
     print(f"\nDone. {len(manifest)} files in ./dgt_out/  ({nat} with broad ★ coverage). "
           f"Commit the folder and tell Claude.")
