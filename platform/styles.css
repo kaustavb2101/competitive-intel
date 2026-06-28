@@ -373,3 +373,48 @@ a:focus-visible,button:focus-visible,.lens:focus-visible,.chip:focus-visible,.se
   .lens .ld{display:none}
   .mcard,.lens{box-shadow:var(--elev-1)}
 }
+
+/* ============================================================
+   LIGHT / "Paper Console" theme — toggle via html[data-theme="light"].
+   Light reading chrome; maps/3D stay DARK inside a light-framed well
+   (per the light-slate panel verdict). Default remains dark.
+   ============================================================ */
+html[data-theme="light"]{
+  --bg:#EEF1F6; --bg-top:#EEF1F6;
+  --panel2:#E7ECF3; --panel:#FFFFFF; --raised:#F5F8FD;
+  --line:#D3DAE6; --line2:#E4E8F1;
+  --hi:#11151F; --txt:#2C3444; --mid:#5A6477; --dim:#828CA0;
+  --accent:#5B7CFA; --accent-soft:rgba(91,124,250,.10); --accent-glow:rgba(91,124,250,.16);
+  --agri:#B53A33; --merch:#15705F; --collat:#5E3DB0; --opp:#B8862B; --gold:#B8862B;
+  --up:#15705F; --down:#B53A33;
+  --elev-1:0 1px 2px rgba(16,22,40,.06),0 2px 8px rgba(16,22,40,.05);
+  --elev-2:0 1px 2px rgba(16,22,40,.06),0 12px 28px rgba(16,22,40,.10);
+  --pop-sh:0 14px 38px rgba(16,22,40,.18);
+  --glass:linear-gradient(180deg,#ffffff,#f5f8fd); --glass-sh:0 12px 30px -10px rgba(16,22,40,.22);
+}
+html[data-theme="light"] body{background:var(--bg)}
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);box-shadow:0 1px 8px rgba(16,22,40,.06)}
+html[data-theme="light"] #nav a:hover{background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
+html[data-theme="light"] #nav .nb b,html[data-theme="light"] .brand h1 b,
+html[data-theme="light"] .tab.on,html[data-theme="light"] .mcard .v{text-shadow:none}
+html[data-theme="light"] h2::before,html[data-theme="light"] .bar>i{box-shadow:none}
+html[data-theme="light"] .bar{background:#e3e8f1}
+html[data-theme="light"] .tbl th{background:#f3f6fb}
+html[data-theme="light"] .tbl tr:active{background:#eef2f8}
+html[data-theme="light"] .tbl tbody tr:nth-child(even) td{background:rgba(16,22,40,.025)}
+html[data-theme="light"] .tbl th.h-agri{color:#B53A33}
+html[data-theme="light"] .tbl th.h-merch{color:#15705F}
+html[data-theme="light"] .lens.on{background:#e7edf8}
+html[data-theme="light"] .insight,html[data-theme="light"] .purpose{color:var(--txt)}
+/* maps stay DARK inside a light-framed well */
+html[data-theme="light"] #map{box-shadow:0 2px 12px rgba(16,22,40,.10)}
+html[data-theme="light"] .leaflet-popup-content-wrapper,
+html[data-theme="light"] .leaflet-popup-tip{background:#fff;color:var(--txt);border:1px solid var(--line)}
+html[data-theme="light"] .leaflet-control-attribution{background:rgba(255,255,255,.82)!important;color:#5a6678!important}
+html[data-theme="light"] #status{background:#fff;color:var(--mid)}
+/* cards that hardcode a dark gradient end (#161d2c) — flip to light */
+html[data-theme="light"] .mcard,
+html[data-theme="light"] .lens,
+html[data-theme="light"] .kpi,
+html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6fc)!important}
