@@ -70,7 +70,11 @@ def datastore_all(resource_id, page=10000, cap=1000000):
 
 def save_csv(name, rows):
     if not rows: return 0
-    keys = list({k for r in rows for k in r.keys()})
+    keys, seen = [], set()                    # first-seen order -> deterministic CSV columns
+    for r in rows:
+        for k in r:
+            if k not in seen:
+                seen.add(k); keys.append(k)
     with open(OUT / f"{name}.csv", "w", newline="", encoding="utf-8-sig") as f:
         w = csv.DictWriter(f, fieldnames=keys); w.writeheader()
         for r in rows: w.writerow(r)

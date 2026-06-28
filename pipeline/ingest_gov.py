@@ -35,24 +35,21 @@ def to_int(x):
 
 def build_factories():
     """National DIW factory registry -> per-district factory & worker counts."""
-    files = glob.glob(os.path.join(DGT, "factories_diw__factype3__*.csv"))
-    if not files:
-        raise SystemExit("factype3 file not found in dgt_out/ — run autox_dgt_ingest.py first")
+    fp = _biggest("factories_diw__factype3__*.csv")   # one authoritative file (no double-count on re-pull)
     districts = collections.defaultdict(lambda: {"fac": 0, "workers": 0})
     provinces = collections.defaultdict(lambda: {"fac": 0, "workers": 0})
-    for fp in files:
-        with open(fp, encoding="utf-8-sig") as f:
-            for r in csv.DictReader(f):
-                p = canonical((r.get("จังหวัด") or "").strip())
-                d = norm_district(r.get("อำเภอ"), p)
-                if not p or not d:
-                    continue
-                w = to_int(r.get("คนงานรวม"))
-                key = f"{p}|{d}"
-                districts[key]["fac"] += 1
-                districts[key]["workers"] += w
-                provinces[p]["fac"] += 1
-                provinces[p]["workers"] += w
+    with open(fp, encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            p = canonical((r.get("จังหวัด") or "").strip())
+            d = norm_district(r.get("อำเภอ"), p)
+            if not p or not d:
+                continue
+            w = to_int(r.get("คนงานรวม"))
+            key = f"{p}|{d}"
+            districts[key]["fac"] += 1
+            districts[key]["workers"] += w
+            provinces[p]["fac"] += 1
+            provinces[p]["workers"] += w
     return {
         "source": "DIW โรงงาน (factype3, data.go.th) — national factory registry; measured, not OSM proxy",
         "n_factories": sum(v["fac"] for v in provinces.values()),
