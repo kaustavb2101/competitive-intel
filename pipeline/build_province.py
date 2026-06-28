@@ -202,10 +202,13 @@ def build_all():
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"}}
         out[slug] = obj
+        pv = veh.get(prov, {}); ev = emp.get(prov, {})
         index.append({"slug": slug, "th": prov, "en": en, "region": REGION[prov],
                       "branches": len(bout), "districts": len(feats),
-                      "factories": gp["fac"], "vehicles": veh.get(prov, {}).get("total", 0),
-                      "workers": gp["workers"]})
+                      "factories": gp["fac"], "vehicles": pv.get("total", 0),
+                      "pickup": pv.get("pickup", 0), "moto": pv.get("moto", 0), "ev": pv.get("ev", 0),
+                      "workers": gp["workers"],
+                      "informal": ev.get("informal", 0), "formal": ev.get("formal", 0)})
 
     index.sort(key=lambda r: -r["branches"])
     return out, index

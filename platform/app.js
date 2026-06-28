@@ -26,7 +26,7 @@ function showTab(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
-  if(v==='risk') renderRisk();
+  if(v==='market') renderMarket();
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
@@ -242,41 +242,59 @@ function drawProv(){
      <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td></tr>`).join('');
 }
 
-/* ---------- portfolio risk watchlist ---------- */
-let riskRows=null;
-function riskScore(d){
-  const drought = (d.rain!=null && d.rain<70) ? Math.round((70-d.rain)*0.4) : 0; // lower 3-mo anomaly = drier
-  const single  = (d.a>=55 && d.m<45) ? 12 : 0;   // high farmer-PD, thin merchant buffer
-  const conc    = (d.a>=55 && d.w>=6) ? 10 : 0;    // stacked AutoX in a stressed catchment
-  return Math.round((d.a||0) + drought + single + conc);
+/* ---------- market assessment (real measured numbers, no indices) ---------- */
+// region -> worst (most negative YoY) crop on the commodity board (best-effort token match)
+const REG_ABBR={Isan:['isan'],North:['n','north'],South:['s','south'],East:['e'],'Central&BKK':['c','central']};
+function regionWorstCrop(region){
+  if(!META||!META.board) return null;
+  const ab=REG_ABBR[region]||[];
+  const toks=s=>(s||'').toLowerCase().split(/[·,\s]+/);
+  let worst=null;
+  META.board.filter(b=>b.seg==='Crops' && b.yoy!=null).forEach(b=>{
+    if(toks(b.reg).some(t=>ab.includes(t)) && (!worst||b.yoy<worst.yoy)) worst=b;
+  });
+  return worst;
 }
-function riskFlags(d){
-  const f=[];
-  if(d.a>=60) f.push('agri-PD high');
-  if(d.rain!=null && d.rain<60) f.push('drought');
-  if(d.a>=55 && d.m<45) f.push('single-segment');
-  if(d.a>=55 && d.w>=6) f.push('concentration');
-  return f;
+function provLookupByName(){ const m={}; (PROV||[]).forEach(p=>m[p.th]=p); return m; }
+function renderMarket(){
+  (PROV ? Promise.resolve(PROV) : fetch('data/provinces/index.json').then(r=>r.json()).then(d=>(PROV=d)))
+   .then(()=>{
+    if(!$('#mktchips').dataset.init){
+      const regions=['all',...Array.from(new Set(PROV.map(p=>p.region)))];
+      $('#mktchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}">${r==='all'?'All':r}</button>`).join('');
+      $('#mktchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
+        document.querySelectorAll('#mktchips .chip').forEach(c=>c.classList.toggle('on',c===b));
+        mktRegion=b.dataset.r; drawMarket();};
+      $('#mktsearch').oninput=drawMarket; $('#mktchips').dataset.init='1';
+      $('#mktnote').textContent='Workforce NSO 2024 · vehicles DLT · factories DIW · crop YoY World Bank 2025M12.';
+    }
+    drawMarket();
+   }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
 }
-function renderRisk(){
-  if(!DATA) return;
-  riskRows=DATA.map(d=>({d,score:riskScore(d),flags:riskFlags(d)})).sort((a,b)=>b.score-a.score);
-  const flagged=riskRows.filter(r=>r.flags.length).length;
-  $('#riskcount').textContent=`${flagged} branches flagged · showing top 150 by composite risk · Drought = 3-mo rainfall anomaly (lower = drier).`;
-  $('#risktbl').innerHTML=`<tr><th>Branch</th><th>Prov</th><th>Risk</th><th>Agri-PD</th><th>Drought</th><th>Merch</th><th>AutoX</th><th>Flags</th></tr>`+
-   riskRows.slice(0,150).map(({d,score,flags})=>`<tr><td>${d.n}</td><td class="sub">${d.v}</td>
-     <td class="mono" style="color:var(--agri)"><b>${score}</b></td>
-     <td class="mono">${d.a}</td><td class="mono">${d.rain!=null?Math.round(d.rain):'–'}</td>
-     <td class="mono">${d.m}</td><td class="mono sub">${d.w}</td>
-     <td>${flags.map(f=>`<span class="tag risk">${f}</span>`).join(' ')}</td></tr>`).join('');
-  $('#riskcsv').onclick=()=>{
-    const hdr=['name','province','district','region','composite_risk','agri_pd','rain_anom','merchant','autox_10km','flags'];
-    const lines=[hdr.join(',')].concat(riskRows.map(({d,score,flags})=>
-      [d.n,d.v,d.d||'',d.r,score,d.a,d.rain,d.m,d.w,flags.join('|')]
-        .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')));
+let mktRegion='all';
+function drawMarket(){
+  const q=($('#mktsearch').value||'').trim().toLowerCase();
+  const rows=PROV.filter(p=>(mktRegion==='all'||p.region===mktRegion) &&
+    (!q||p.th.includes(q)||(p.en||'').toLowerCase().includes(q))).sort((a,b)=>(b.informal||0)-(a.informal||0));
+  const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
+  $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th>Factory workers</th><th>Informal workforce</th><th>Pickups</th><th>Pickup %</th><th>Weakest crop (YoY)</th></tr>`+
+   rows.map(p=>{const wc=regionWorstCrop(p.region);
+     return `<tr onclick="location.href='province.html?p=${p.slug}'" style="cursor:pointer">
+     <td><b>${p.th}</b> <span class="sub">${p.en||''}</span></td>
+     <td class="sub">${p.region}</td>
+     <td class="mono">${(p.workers||0).toLocaleString()}</td>
+     <td class="mono" style="color:var(--collat)">${(p.informal||0).toLocaleString()}</td>
+     <td class="mono">${(p.pickup||0).toLocaleString()}</td>
+     <td class="mono sub">${pct(p)}%</td>
+     <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('');
+  $('#mktcsv').onclick=()=>{
+    const hdr=['province','province_en','region','branches','factory_workers','informal_workforce','pickups','pickup_share_pct','vehicles_total','weakest_crop','weakest_crop_yoy'];
+    const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
+      return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
+        .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
     const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='autox_risk_watchlist.csv'; a.click(); URL.revokeObjectURL(a.href);
+    a.download='autox_market_assessment.csv'; a.click(); URL.revokeObjectURL(a.href);
   };
 }
 
