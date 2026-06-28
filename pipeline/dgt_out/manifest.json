@@ -1,4 +1,2495 @@
 [
   {
     "label": "factories_diw",
-    "dataset": 
+    "dataset": "ข้อมูลโรงงานจังหวัดบุรีรัมย์ (อำเภอเมืองบุรีรัมย์)",
+    "package": "mindburiram",
+    "resource_id": "6bd3f5b7-5c85-4b92-8ba0-be292986c661",
+    "rows": 92,
+    "provinces": 1,
+    "file": "factories_diw__mindburiram__6bd3f5b7.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานจังหวัดบุรีรัมย์ (อำเภอเมืองบุรีรัมย์)",
+    "package": "mindburiram",
+    "resource_id": "22879570-de9d-4d38-a1d0-2d2f98af9c4f",
+    "rows": 92,
+    "provinces": 1,
+    "file": "factories_diw__mindburiram__22879570.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่จดทะเบียนในจังหวัด",
+    "package": "lp68_33_003",
+    "resource_id": "16d94847-2531-486e-8fff-710309cc3465",
+    "rows": 7,
+    "provinces": 1,
+    "file": "factories_diw__lp68_33_003__16d94847.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรม จังหวัดนนทบุรี",
+    "package": "industry6",
+    "resource_id": "93d665c4-0ed0-4c43-ab53-432071f3a370",
+    "rows": 1625,
+    "provinces": 1,
+    "file": "factories_diw__industry6__93d665c4.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถิติโรงงานอุตสาหกรรมจังหวัดนนทบุรี",
+    "package": "factory-nonthaburi",
+    "resource_id": "59223f62-842b-49df-8173-30cde657285a",
+    "rows": 1250,
+    "provinces": 1,
+    "file": "factories_diw__factory-nonthaburi__59223f62.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถิติโรงงานอุตสาหกรรมจังหวัดนนทบุรี",
+    "package": "factory-nonthaburi",
+    "resource_id": "5fe50faf-f4ae-408d-a2b0-aa985729c716",
+    "rows": 1250,
+    "provinces": 1,
+    "file": "factories_diw__factory-nonthaburi__5fe50faf.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถิติโรงงานอุตสาหกรรมจังหวัดนนทบุรี",
+    "package": "factory-nonthaburi",
+    "resource_id": "f3d0b8b1-eb7e-4b49-b95c-ea1a74a67a6b",
+    "rows": 1625,
+    "provinces": 1,
+    "file": "factories_diw__factory-nonthaburi__f3d0b8b1.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรมจังหวัดสุรินทร์สะสมรายปี",
+    "package": "data-008",
+    "resource_id": "719cb3f0-a446-48c6-b3b7-0b9910d87144",
+    "rows": 13,
+    "provinces": 0,
+    "file": "factories_diw__data-008__719cb3f0.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "พื้นที่ตั้งโรงงานอุตสาหกรรมในจังหวัดสุพรรณบุรี",
+    "package": "moi14",
+    "resource_id": "20a25441-e28d-45ec-af4c-3bd18628cc54",
+    "rows": 10,
+    "provinces": 0,
+    "file": "factories_diw__moi14__20a25441.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "พื้นที่ตั้งโรงงานอุตสาหกรรมในจังหวัดสุพรรณบุรี",
+    "package": "moi14",
+    "resource_id": "aa807531-d7a8-423c-a4d3-79c1a90c3646",
+    "rows": 10,
+    "provinces": 0,
+    "file": "factories_diw__moi14__aa807531.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมจังหวัดที่แจ้งประกอบกิจการแล้ว",
+    "package": "092",
+    "resource_id": "879aae00-65ec-4e71-a4c4-4266307ea11c",
+    "rows": 1250,
+    "provinces": 1,
+    "file": "factories_diw__092__879aae00.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมจังหวัดที่แจ้งประกอบกิจการแล้ว",
+    "package": "092",
+    "resource_id": "fe237ae0-169a-4d59-9015-59219b80b664",
+    "rows": 2863,
+    "provinces": 1,
+    "file": "factories_diw__092__fe237ae0.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปทางการเกษตร",
+    "package": "agricultural-processing-factory",
+    "resource_id": "4e2e245e-39af-4565-9181-d77171712841",
+    "rows": 192,
+    "provinces": 1,
+    "file": "factories_diw__agricultural-processing-factor__4e2e245e.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปทางการเกษตร",
+    "package": "agricultural-processing-factory",
+    "resource_id": "bd7abc9f-837a-4ba2-85c6-65d5c1b086ae",
+    "rows": 192,
+    "provinces": 1,
+    "file": "factories_diw__agricultural-processing-factor__bd7abc9f.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานในเขตพัฒนาพิเศษภาคตะวันออก",
+    "package": "fac-eec-class31",
+    "resource_id": "08cd67da-127d-4c23-97fa-dc98ad6863d6",
+    "rows": 2750,
+    "provinces": 3,
+    "file": "factories_diw__fac-eec-class31__08cd67da.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ผ่านการรับรองอุตสาหกรรมสีเขียว",
+    "package": "dataset_10_1313",
+    "resource_id": "2050adb4-b23b-4c5f-9094-704f15f2f4a1",
+    "rows": 24,
+    "provinces": 0,
+    "file": "factories_diw__dataset_10_1313__2050adb4.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานประกอบกิจการเกี่ยวกับการจัดการสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้ว",
+    "package": "factype101-105-106",
+    "resource_id": "f7465980-3ff7-4fb2-85af-2c9705f342e6",
+    "rows": 2831,
+    "provinces": 67,
+    "file": "factories_diw__factype101-105-106__f7465980.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานในเขตพัฒนาพิเศษภาคตะวันออก",
+    "package": "fac-eec-class3",
+    "resource_id": "0a0893fd-ba9d-4a4c-86af-b67141bcfccf",
+    "rows": 1250,
+    "provinces": 1,
+    "file": "factories_diw__fac-eec-class3__0a0893fd.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมในพื้นที่จังหวัดสุพรรณบุรี",
+    "package": "moi12",
+    "resource_id": "b4caf51e-c8cc-473a-871a-0908c31c5b6e",
+    "rows": 750,
+    "provinces": 1,
+    "file": "factories_diw__moi12__b4caf51e.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมในพื้นที่จังหวัดสุพรรณบุรี",
+    "package": "moi12",
+    "resource_id": "b32efef3-42f4-4a33-8c1b-9cd65ec9b6c8",
+    "rows": 750,
+    "provinces": 1,
+    "file": "factories_diw__moi12__b32efef3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมในจังหวัด",
+    "package": "data-004",
+    "resource_id": "74db0159-9134-430c-a9f0-4d7a5c4ba176",
+    "rows": 34,
+    "provinces": 0,
+    "file": "factories_diw__data-004__74db0159.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลจำนวนกากอุตสาหกรรมของจังหวัดลพบุรี",
+    "package": "industrial-waste1",
+    "resource_id": "0ac603cc-5580-4179-b58b-831abe50204f",
+    "rows": 118,
+    "provinces": 0,
+    "file": "factories_diw__industrial-waste1__0ac603cc.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลจำนวนกากอุตสาหกรรมของจังหวัดลพบุรี",
+    "package": "industrial-waste1",
+    "resource_id": "79c73282-7f95-41f7-aefd-da41cbcb115a",
+    "rows": 127,
+    "provinces": 0,
+    "file": "factories_diw__industrial-waste1__79c73282.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลจำนวนกากอุตสาหกรรมของจังหวัดลพบุรี",
+    "package": "industrial-waste1",
+    "resource_id": "6f4ca326-da1e-4f19-909e-e58bbd66525d",
+    "rows": 30,
+    "provinces": 0,
+    "file": "factories_diw__industrial-waste1__6f4ca326.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลจำนวนกากอุตสาหกรรมของจังหวัดลพบุรี",
+    "package": "industrial-waste1",
+    "resource_id": "67b8c3f6-e025-455b-bf81-1ddf902a7c3b",
+    "rows": 313,
+    "provinces": 0,
+    "file": "factories_diw__industrial-waste1__67b8c3f6.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่จดทะเบียน",
+    "package": "industry-utt",
+    "resource_id": "2361a2fd-aa9f-4182-beb2-8cf3d7912df6",
+    "rows": 14,
+    "provinces": 0,
+    "file": "factories_diw__industry-utt__2361a2fd.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานจำพวกที่ 2",
+    "package": "factype2",
+    "resource_id": "4f3156eb-3e7a-42d8-9666-f04ea170bdc3",
+    "rows": 1250,
+    "provinces": 4,
+    "file": "factories_diw__factype2__4f3156eb.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานจำพวกที่ 3",
+    "package": "factype3",
+    "resource_id": "587811fa-084d-4bf4-a7e1-7a5ea11e1839",
+    "rows": 66100,
+    "provinces": 77,
+    "file": "factories_diw__factype3__587811fa.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "จำนวนโรงงานและรายชื่อโรงงานตามแผนเฝ้าระวัง PM2.5",
+    "package": "pm25",
+    "resource_id": "bfcc624a-04a8-4176-b7d2-5deefcb360ed",
+    "rows": 191,
+    "provinces": 1,
+    "file": "factories_diw__pm25__bfcc624a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ความหนาแน่นของโรงงานอุตสาหกรรม",
+    "package": "https-www-diw-go-th-intranet",
+    "resource_id": "92f8237d-6cb1-484c-97fe-f3ce398fff6b",
+    "rows": 32,
+    "provinces": 1,
+    "file": "factories_diw__https-www-diw-go-th-intranet__92f8237d.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ความหนาแน่นของโรงงานอุตสาหกรรม",
+    "package": "https-www-diw-go-th-intranet",
+    "resource_id": "7523948d-7523-443a-af73-9d465a981f10",
+    "rows": 32,
+    "provinces": 1,
+    "file": "factories_diw__https-www-diw-go-th-intranet__7523948d.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "รายชื่อโรงงานแปรรูปทุเรียน",
+    "package": "factory2",
+    "resource_id": "1c5ac223-52b6-490a-ab94-4531285253f9",
+    "rows": 7,
+    "provinces": 0,
+    "file": "factories_diw__factory2__1c5ac223.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "รายชื่อโรงงานอุตสาหกรรมเป้าหมาย",
+    "package": "69_28",
+    "resource_id": "2d5fefc6-7b97-4226-bd63-81c60af96a10",
+    "rows": 6104,
+    "provinces": 1,
+    "file": "factories_diw__69_28__2d5fefc6.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานคัดแยกสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้ว",
+    "package": "dataset_16_055",
+    "resource_id": "d97baeb1-0f7a-46a2-8826-c267e3786e13",
+    "rows": 22,
+    "provinces": 1,
+    "file": "factories_diw__dataset_16_055__d97baeb1.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานคัดแยกสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้ว",
+    "package": "dataset_16_055",
+    "resource_id": "be162939-1f94-47bb-91a6-df66c8a8a47e",
+    "rows": 22,
+    "provinces": 1,
+    "file": "factories_diw__dataset_16_055__be162939.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "จำนวนโรงงานอุตสาหกรรม",
+    "package": "industry01",
+    "resource_id": "db51f2a3-0363-42be-b60d-a23a1b5c699c",
+    "rows": 28,
+    "provinces": 1,
+    "file": "factories_diw__industry01__db51f2a3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปสินค้าเกษตร",
+    "package": "dataset_10_129",
+    "resource_id": "07d371f8-46eb-4302-ac30-65dfea2adbbd",
+    "rows": 4,
+    "provinces": 4,
+    "file": "factories_diw__dataset_10_129__07d371f8.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปเพื่อสร้างมูลค่าเพิ่ม",
+    "package": "dataset_ag_13",
+    "resource_id": "4e0e6d9e-064a-4cac-832b-e56afa953133",
+    "rows": 30,
+    "provinces": 1,
+    "file": "factories_diw__dataset_ag_13__4e0e6d9e.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานแยกตามขนาด",
+    "package": "data-005",
+    "resource_id": "56f45f93-5431-4192-8acb-e952dc647e80",
+    "rows": 4,
+    "provinces": 0,
+    "file": "factories_diw__data-005__56f45f93.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรมแยกตามประเภทอุตสาหกรรม",
+    "package": "data-007",
+    "resource_id": "611d0a50-59a1-4d89-8cca-2b0436acc28e",
+    "rows": 56,
+    "provinces": 0,
+    "file": "factories_diw__data-007__611d0a50.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานที่เงินลงทุนสูงสุด",
+    "package": "data-006",
+    "resource_id": "594c3058-2afc-431c-b32d-8870bbb62c11",
+    "rows": 11,
+    "provinces": 0,
+    "file": "factories_diw__data-006__594c3058.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปสินค้าเกษตร",
+    "package": "https-www-diw-go-th-webdiw",
+    "resource_id": "78d0f731-b120-4e47-b9f0-c8d31ce0d4f4",
+    "rows": 20,
+    "provinces": 1,
+    "file": "factories_diw__https-www-diw-go-th-webdiw__78d0f731.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานแปรรูปสินค้าเกษตร",
+    "package": "https-www-diw-go-th-webdiw",
+    "resource_id": "2ce73b83-fe50-4830-b6b6-ee782499a13f",
+    "rows": 20,
+    "provinces": 1,
+    "file": "factories_diw__https-www-diw-go-th-webdiw__2ce73b83.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ได้รับอนุญาตประกอบกิจการ",
+    "package": "skn_industry7",
+    "resource_id": "125ab622-aafd-42c2-b6b3-8223244b835b",
+    "rows": 63,
+    "provinces": 0,
+    "file": "factories_diw__skn_industry7__125ab622.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ได้รับอนุญาตประกอบกิจการ",
+    "package": "skn_industry7",
+    "resource_id": "ff7e0cef-3a4e-4f8d-918f-70cb0adf44fc",
+    "rows": 63,
+    "provinces": 0,
+    "file": "factories_diw__skn_industry7__ff7e0cef.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ได้รับอนุญาตประกอบกิจการ",
+    "package": "skn_industry7",
+    "resource_id": "bd3cff74-d974-42dd-947f-aef6966861f0",
+    "rows": 73,
+    "provinces": 1,
+    "file": "factories_diw__skn_industry7__bd3cff74.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ได้รับอนุญาตประกอบกิจการ",
+    "package": "skn_industry7",
+    "resource_id": "ed4c654a-ba8e-4d84-b078-ce6319e48494",
+    "rows": 73,
+    "provinces": 1,
+    "file": "factories_diw__skn_industry7__ed4c654a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงานอุตสาหกรรม",
+    "package": "dataset_10_1411",
+    "resource_id": "3b09c41c-31fa-4278-91cc-8a2eafdfafa7",
+    "rows": 49,
+    "provinces": 1,
+    "file": "factories_diw__dataset_10_1411__3b09c41c.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "จำนวนโรงงานที่ขออนุญาตนำของเสียไม่เป็นอันตรายออกนอกโรงงาน",
+    "package": "dataset_31_035",
+    "resource_id": "e68a7274-67fa-4e63-b3df-3e7662a8b2ad",
+    "rows": 5,
+    "provinces": 0,
+    "file": "factories_diw__dataset_31_035__e68a7274.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "Industry : ข้อมูลโรงงาน",
+    "package": "industry",
+    "resource_id": "84054824-09fb-49e3-840e-4aa5ba170e27",
+    "rows": 21,
+    "provinces": 0,
+    "file": "factories_diw__industry__84054824.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "e292bcea-c1cd-48b4-820f-c68ab3e6373c",
+    "rows": 138,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__e292bcea.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "941cee5a-0750-4700-9ad1-86ab6a4d1c58",
+    "rows": 146,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__941cee5a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "683549b4-cb19-4182-b2c0-39f2c43f365e",
+    "rows": 56,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__683549b4.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "e925f46b-67bf-4ee2-a8e4-68aad3ef8595",
+    "rows": 110,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__e925f46b.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "8a288ced-2c68-4f47-a423-06413672826a",
+    "rows": 33,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__8a288ced.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "02da8cb3-973e-4b07-a1f0-ca132cc0d561",
+    "rows": 37,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__02da8cb3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "d75f4926-81d2-4368-b85d-beff273efe89",
+    "rows": 19,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__d75f4926.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "4e453c54-77ed-42d6-b032-2ec45bc28749",
+    "rows": 17,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__4e453c54.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "d2d8d3fe-1dd7-45f8-adc4-2c0af5ed1bfc",
+    "rows": 9,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__d2d8d3fe.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "f6f04303-151b-4f67-9b46-0de1d2cebbe9",
+    "rows": 6,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__f6f04303.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ข้อมูลโรงงานอุตสาหกรรม",
+    "package": "industry_lopburi",
+    "resource_id": "2128170d-710e-4f42-9730-7e51893a622f",
+    "rows": 46,
+    "provinces": 1,
+    "file": "factories_diw__industry_lopburi__2128170d.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมเกษตร ปี 2568",
+    "package": "industry4",
+    "resource_id": "9bdf5bcf-4d66-4a95-b078-4537ad1ff4bc",
+    "rows": 32,
+    "provinces": 0,
+    "file": "factories_diw__industry4__9bdf5bcf.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมเกษตร ปี 2568",
+    "package": "industry4",
+    "resource_id": "0a8d0e8a-64aa-4f08-8c55-cd3f9a3744b0",
+    "rows": 117,
+    "provinces": 0,
+    "file": "factories_diw__industry4__0a8d0e8a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมเกษตร ปี 2568",
+    "package": "industry4",
+    "resource_id": "34e361c5-98c6-4a16-b467-cefd34005d81",
+    "rows": 117,
+    "provinces": 0,
+    "file": "factories_diw__industry4__34e361c5.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานคัดแยกสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้วฯ ที่ไม่ใช่ของเสียอันตราย",
+    "package": "y7_05_23",
+    "resource_id": "aec1fac2-b615-46cb-8389-b88bd7d52c70",
+    "rows": 6,
+    "provinces": 0,
+    "file": "factories_diw__y7_05_23__aec1fac2.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานคัดแยกสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้วฯ ที่ไม่ใช่ของเสียอันตราย",
+    "package": "y7_05_23",
+    "resource_id": "5502db2d-f408-4995-996a-43d1d14f3142",
+    "rows": 6,
+    "provinces": 0,
+    "file": "factories_diw__y7_05_23__5502db2d.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานคัดแยกสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้วฯ ที่ไม่ใช่ของเสียอันตราย (105)",
+    "package": "_21_18_2566",
+    "resource_id": "07cd6675-922f-4232-8d5a-1c954a8e7cde",
+    "rows": 1,
+    "provinces": 0,
+    "file": "factories_diw___21_18_2566__07cd6675.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมอาหาร 2568",
+    "package": "256818",
+    "resource_id": "4b2785c4-2d67-4946-a79e-bf44784319e6",
+    "rows": 32,
+    "provinces": 0,
+    "file": "factories_diw__256818__4b2785c4.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมอาหาร 2568",
+    "package": "256818",
+    "resource_id": "b0f66214-4b8c-4de3-8f2b-9a1915df2ddb",
+    "rows": 117,
+    "provinces": 0,
+    "file": "factories_diw__256818__b0f66214.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมอาหาร 2568",
+    "package": "256818",
+    "resource_id": "afca28b3-a6aa-4641-80b1-4c92b9ebd3c9",
+    "rows": 117,
+    "provinces": 0,
+    "file": "factories_diw__256818__afca28b3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ผ่านการรับรองอุตสาหกรรมสีเขียว",
+    "package": "skn_industry6",
+    "resource_id": "48403285-cfa4-4ec4-9c98-be8bd9a2155d",
+    "rows": 40,
+    "provinces": 0,
+    "file": "factories_diw__skn_industry6__48403285.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานอุตสาหกรรมที่ผ่านการรับรองอุตสาหกรรมสีเขียว",
+    "package": "skn_industry6",
+    "resource_id": "71897067-1a27-4398-839d-bf8041ec31f6",
+    "rows": 40,
+    "provinces": 0,
+    "file": "factories_diw__skn_industry6__71897067.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ผลการประเมินความเป็นเมืองอุตสาหกรรมเชิงนิเวศ ในพื้นที่เมืองอุตสาหกรรมเชิงนิเวศ",
+    "package": "skn_industry5",
+    "resource_id": "e2bd1b32-ddbf-430e-913a-b0110c9478bc",
+    "rows": 7,
+    "provinces": 0,
+    "file": "factories_diw__skn_industry5__e2bd1b32.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานนำสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้วมาผ่านกระบวนการผลิต เพื่อเกิดผลิตภัณฑ์นำกลับมาใช้ใหม่",
+    "package": "y7_05_19",
+    "resource_id": "7b87add2-ca83-4caf-ab56-f806a49dee3f",
+    "rows": 5,
+    "provinces": 1,
+    "file": "factories_diw__y7_05_19__7b87add2.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "โรงงานนำสิ่งปฏิกูลหรือวัสดุที่ไม่ใช้แล้วมาผ่านกระบวนการผลิต เพื่อเกิดผลิตภัณฑ์นำกลับมาใช้ใหม่",
+    "package": "y7_05_19",
+    "resource_id": "0dcfaeb3-023c-4433-aca9-5779362d3f71",
+    "rows": 5,
+    "provinces": 1,
+    "file": "factories_diw__y7_05_19__0dcfaeb3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "c50ff021-ca9d-4700-99c0-64378ada68f9",
+    "rows": 445,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__c50ff021.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "2886b4f1-60cc-433b-8667-db477023c8e7",
+    "rows": 78,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__2886b4f1.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "f21dbe47-eb30-4aca-9b23-a61b39909010",
+    "rows": 215,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__f21dbe47.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "86c11883-35b0-4efa-861c-05d48f08bb66",
+    "rows": 17,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__86c11883.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "e64fb3da-3849-4d71-aa63-b2a3ebe71362",
+    "rows": 774,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__e64fb3da.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "edeb8aa0-097e-40d7-80d7-a1cadaf032a8",
+    "rows": 47,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__edeb8aa0.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "df26a23f-5b96-426b-ac74-d26040f82ac5",
+    "rows": 86,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__df26a23f.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "f9215b76-38f6-4639-9497-4e64a497536c",
+    "rows": 1,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__f9215b76.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "d9bf5745-3f1d-44e4-81c4-4387bbca28b1",
+    "rows": 1,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__d9bf5745.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "cb8cb867-37b7-4817-859a-8a1f1c1b907c",
+    "rows": 254,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__cb8cb867.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "d74f474f-787e-4933-a5f2-452f9a7446a6",
+    "rows": 131,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__d74f474f.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "5a6ebcbe-c9c4-451a-98ee-16fc82938093",
+    "rows": 262,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__5a6ebcbe.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "e2e28b94-5427-4d2c-a2da-b3c34b6a24ae",
+    "rows": 26,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__e2e28b94.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "e0ac6cb0-e7eb-48a8-be07-18b7554c022d",
+    "rows": 2,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__e0ac6cb0.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "5944c07a-5fce-41c9-ad6e-c5566f60def4",
+    "rows": 65,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__5944c07a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "28bd43e9-38e1-4577-9ede-36888eb6831f",
+    "rows": 9,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__28bd43e9.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว",
+    "package": "gi-level",
+    "resource_id": "a3f2701f-42f1-4cde-98eb-1754215939dc",
+    "rows": 2339,
+    "provinces": 1,
+    "file": "factories_diw__gi-level__a3f2701f.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว 69",
+    "package": "green2569",
+    "resource_id": "48667db9-6d8e-46ca-ad2f-84ca2287bf48",
+    "rows": 64,
+    "provinces": 1,
+    "file": "factories_diw__green2569__48667db9.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว 69",
+    "package": "green2569",
+    "resource_id": "3f64a468-6a9a-4aa9-92b7-1f052c845c6d",
+    "rows": 32,
+    "provinces": 1,
+    "file": "factories_diw__green2569__3f64a468.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว 69",
+    "package": "green2569",
+    "resource_id": "54185163-31f2-4734-9843-8d7f9f1b9578",
+    "rows": 83,
+    "provinces": 1,
+    "file": "factories_diw__green2569__54185163.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว 69",
+    "package": "green2569",
+    "resource_id": "96839a82-904b-4164-878f-be1fdac5d08b",
+    "rows": 3,
+    "provinces": 1,
+    "file": "factories_diw__green2569__96839a82.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "มูลค่าการลงทุนของอุตสาหกรรม ด้านการเกษตรและด้านอาหาร",
+    "package": "68_122",
+    "resource_id": "8672f995-0684-47f8-ade5-5fcdfee04c6d",
+    "rows": 83,
+    "provinces": 0,
+    "file": "factories_diw__68_122__8672f995.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2567",
+    "package": "green25671",
+    "resource_id": "92aa21a8-82fd-41b0-b04e-ec2877d50241",
+    "rows": 1678,
+    "provinces": 1,
+    "file": "factories_diw__green25671__92aa21a8.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2567",
+    "package": "green25671",
+    "resource_id": "48fef162-054f-4187-8794-f0f8a3a17768",
+    "rows": 112,
+    "provinces": 1,
+    "file": "factories_diw__green25671__48fef162.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2567",
+    "package": "green25671",
+    "resource_id": "5171ff3a-c22b-492a-8302-2025479c3268",
+    "rows": 205,
+    "provinces": 1,
+    "file": "factories_diw__green25671__5171ff3a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2567",
+    "package": "green25671",
+    "resource_id": "cb0b9527-3ed0-4d4c-a924-160034d9437c",
+    "rows": 21,
+    "provinces": 1,
+    "file": "factories_diw__green25671__cb0b9527.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2567",
+    "package": "green25671",
+    "resource_id": "b65c782c-c092-4d26-ac40-b1c9a4bccf15",
+    "rows": 3,
+    "provinces": 1,
+    "file": "factories_diw__green25671__b65c782c.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2568",
+    "package": "green2568",
+    "resource_id": "a4ce540f-0ca6-4cd1-a28e-20dcc4927489",
+    "rows": 254,
+    "provinces": 1,
+    "file": "factories_diw__green2568__a4ce540f.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2568",
+    "package": "green2568",
+    "resource_id": "370849e7-ead0-474f-bef2-631558861133",
+    "rows": 131,
+    "provinces": 1,
+    "file": "factories_diw__green2568__370849e7.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2568",
+    "package": "green2568",
+    "resource_id": "104aa6c7-36c6-4077-94e7-a0d4bc19c807",
+    "rows": 262,
+    "provinces": 1,
+    "file": "factories_diw__green2568__104aa6c7.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2568",
+    "package": "green2568",
+    "resource_id": "d8ca6474-2d18-4f04-8875-84bfbe14ef27",
+    "rows": 26,
+    "provinces": 1,
+    "file": "factories_diw__green2568__d8ca6474.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "อุตสาหกรรมสีเขียว2568",
+    "package": "green2568",
+    "resource_id": "843bed89-c875-47de-bbdf-479440e9df8c",
+    "rows": 2,
+    "provinces": 1,
+    "file": "factories_diw__green2568__843bed89.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "ปริมาณกากของเสียอุตสาหกรรมที่เกิดขึ้น",
+    "package": "dataset_90_22",
+    "resource_id": "56623dc3-54cf-483d-ab90-f16ea8abd948",
+    "rows": 5,
+    "provinces": 0,
+    "file": "factories_diw__dataset_90_22__56623dc3.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "2024GreenIndustry",
+    "package": "2024greenlevel1",
+    "resource_id": "58d8e773-649e-42b0-8264-ed8483653422",
+    "rows": 2757,
+    "provinces": 0,
+    "file": "factories_diw__2024greenlevel1__58d8e773.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "2024GreenIndustry",
+    "package": "2024greenlevel1",
+    "resource_id": "a11d61b5-0b5d-471c-b20e-55a2b509066d",
+    "rows": 152,
+    "provinces": 0,
+    "file": "factories_diw__2024greenlevel1__a11d61b5.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "2024GreenIndustry",
+    "package": "2024greenlevel1",
+    "resource_id": "ef290f74-42fe-40ca-9762-2d35e7ac8975",
+    "rows": 211,
+    "provinces": 0,
+    "file": "factories_diw__2024greenlevel1__ef290f74.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "2024GreenIndustry",
+    "package": "2024greenlevel1",
+    "resource_id": "04e63399-32b3-4ea8-bab1-d32697457ea7",
+    "rows": 11,
+    "provinces": 0,
+    "file": "factories_diw__2024greenlevel1__04e63399.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "2024GreenIndustry",
+    "package": "2024greenlevel1",
+    "resource_id": "54e55b0a-5f11-48d8-b9de-0354299625ec",
+    "rows": 3,
+    "provinces": 0,
+    "file": "factories_diw__2024greenlevel1__54e55b0a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมตั้งใหม่",
+    "package": "dataset-23-04",
+    "resource_id": "1234083a-80f3-4f2b-b551-4cc3f1a0c54e",
+    "rows": 21,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-04__1234083a.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมตั้งใหม่",
+    "package": "dataset-23-04",
+    "resource_id": "9ef6000e-9a83-404f-9323-c9fe1af737c2",
+    "rows": 21,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-04__9ef6000e.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมเลิกกิจการ",
+    "package": "dataset-23-05",
+    "resource_id": "7b6cd380-ab0e-47fe-9f2c-4821198becf3",
+    "rows": 22,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-05__7b6cd380.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมเลิกกิจการ",
+    "package": "dataset-23-05",
+    "resource_id": "cafafc59-b364-49de-b551-9694b02060e5",
+    "rows": 22,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-05__cafafc59.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมขยายกิจการ",
+    "package": "dataset-23-06",
+    "resource_id": "f9c198d7-b21c-45d5-9005-a3fd0331b6af",
+    "rows": 22,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-06__f9c198d7.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการอุตสาหกรรมขยายกิจการ",
+    "package": "dataset-23-06",
+    "resource_id": "8fa4e45b-dbd1-43d7-8ae5-b2d330b88e8b",
+    "rows": 22,
+    "provinces": 0,
+    "file": "factories_diw__dataset-23-06__8fa4e45b.csv"
+  },
+  {
+    "label": "factories_diw",
+    "dataset": "สถานประกอบการที่เข้าสู่อุตสาหกรรมสีเขียวระดับต่าง ๆ",
+    "package": "green-industry",
+    "resource_id": "1adc6d28-d349-44ed-b7c8-759c5c87ed0b",
+    "rows": 20,
+    "provinces": 1,
+    "file": "factories_diw__green-industry__1adc6d28.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "e4f48f76-54c2-4789-a177-9065a9b7dbe3",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__e4f48f76.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "78394a99-b3eb-4b4f-8199-0d7c5cc61337",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__78394a99.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "1f71751c-708e-4eeb-8f61-9d11ecb849a4",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__1f71751c.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "092bbeca-1a79-4359-8c96-836c0599643e",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__092bbeca.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "1579ee57-31fb-402e-bde8-7a2934d7d372",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__1579ee57.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "5102fcb4-f967-498d-9881-789bce5ddac1",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__5102fcb4.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "d6710780-62eb-4896-8ba8-079cfce02270",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__d6710780.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "113ea542-2a4f-4c4b-a55f-d3a3576c7ced",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__113ea542.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "0552e2de-a116-4e3c-a7c2-3802b26fc475",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__0552e2de.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง | สำนักงานขนส่งจังหวัดนครราชสีมา",
+    "package": "2562-2566",
+    "resource_id": "f32d0625-c9f9-4d48-8f58-02404d8a7936",
+    "rows": 525,
+    "provinces": 1,
+    "file": "vehicles_dlt__2562-2566__f32d0625.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง (รายจังหวัด)",
+    "package": "newcarfuel",
+    "resource_id": "1d8fd9a4-b586-417e-96e5-1a5f823cc0bb",
+    "rows": 43,
+    "provinces": 0,
+    "file": "vehicles_dlt__newcarfuel__1d8fd9a4.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ จำแนกตามชนิดเชื้อเพลิง (รายจังหวัด)",
+    "package": "newcarfuel",
+    "resource_id": "a52ea84e-3339-447a-864f-dee99aeb1596",
+    "rows": 43,
+    "provinces": 0,
+    "file": "vehicles_dlt__newcarfuel__a52ea84e.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "รถจดทะเบียนใหม่ตามพระราชบัญญัติรถยนต์ พ.ศ.2522",
+    "package": "statistics_1",
+    "resource_id": "d0b920ab-3ad6-49e8-8073-e458d614e6aa",
+    "rows": 648,
+    "provinces": 0,
+    "file": "vehicles_dlt__statistics_1__d0b920ab.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "รถจดทะเบียนสะสมตามพระราชบัญญัติการขนส่งทางบก พ.ศ.2522",
+    "package": "dataset_30_024",
+    "resource_id": "94bf30c9-cd8d-4335-be8c-a6aa2977cac3",
+    "rows": 49,
+    "provinces": 1,
+    "file": "vehicles_dlt__dataset_30_024__94bf30c9.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "รถจดทะเบียนใหม่ตามพระราชบัญญัติการขนส่งทางบก พ.ศ. 2522",
+    "package": "dataset_30_034",
+    "resource_id": "5e69089d-88c6-4821-8a99-ab5952b6539b",
+    "rows": 49,
+    "provinces": 1,
+    "file": "vehicles_dlt__dataset_30_034__5e69089d.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "รถจดทะเบียนใหม่ตามพระราชบัญญัติการขนส่งทางบก พ.ศ. 2522",
+    "package": "dataset_30_034",
+    "resource_id": "33608594-10a5-49e0-84a0-353b87e9caf9",
+    "rows": 288,
+    "provinces": 0,
+    "file": "vehicles_dlt__dataset_30_034__33608594.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "รถจดทะเบียนใหม่ตามพระราชบัญญัติการขนส่งทางบก พ.ศ. 2522",
+    "package": "dataset_30_034",
+    "resource_id": "cab186be-e2c1-48da-9e55-7f99c8196279",
+    "rows": 165,
+    "provinces": 0,
+    "file": "vehicles_dlt__dataset_30_034__cab186be.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถจดทะเบียนใหม่ ตามกฎหมายว่าด้วยรถยนต์",
+    "package": "dataset_66_04_016",
+    "resource_id": "bfe24cd7-16f0-4437-8db7-183f5245a8b9",
+    "rows": 504,
+    "provinces": 0,
+    "file": "vehicles_dlt__dataset_66_04_016__bfe24cd7.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "สถิติจำนวนรถจดทะเบียน(สะสม) จำแนกตามประเภทรถ ตามกฎหมายว่าด้วยรถยนต์ (ณ วันที่)",
+    "package": "car2563-2567",
+    "resource_id": "95f1b69d-db71-41cb-a3e4-942692144bc9",
+    "rows": 55,
+    "provinces": 0,
+    "file": "vehicles_dlt__car2563-2567__95f1b69d.csv"
+  },
+  {
+    "label": "vehicles_dlt",
+    "dataset": "จำนวนรถโดยสารจดทะเบียน(สะสม) และรถจดทะเบียนใหม่ ตามพระราชบัญญัติการขนส่งทางบก พ.ศ.2522",
+    "package": "dataset_10_261",
+    "resource_id": "f322b45a-454a-4790-b8d8-5399789e8e3b",
+    "rows": 21,
+    "provinces": 0,
+    "file": "vehicles_dlt__dataset_10_261__f322b45a.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกลำไยจังหวัดเชียงใหม่",
+    "package": "data_68_151",
+    "resource_id": "65c994ce-83a6-4f30-83d1-8553de262cb2",
+    "rows": 10,
+    "provinces": 0,
+    "file": "crop_area_oae__data_68_151__65c994ce.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกลำไยจังหวัดเชียงใหม่",
+    "package": "data_68_151",
+    "resource_id": "54a14bad-d30e-4810-9954-187758c0dfd4",
+    "rows": 16,
+    "provinces": 0,
+    "file": "crop_area_oae__data_68_151__54a14bad.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกทุเรียน",
+    "package": "dataset_30_355",
+    "resource_id": "1de3d0be-3ffe-4715-a424-9a2a8e7122cf",
+    "rows": 80,
+    "provinces": 1,
+    "file": "crop_area_oae__dataset_30_355__1de3d0be.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกปาล์มน้ำมัน",
+    "package": "dataset_30_345",
+    "resource_id": "99b6af0c-2ee8-49d3-84ab-c78be8cfde5f",
+    "rows": 72,
+    "provinces": 1,
+    "file": "crop_area_oae__dataset_30_345__99b6af0c.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกข้าว",
+    "package": "dataset_11_0224",
+    "resource_id": "aac3f221-3d5c-4800-828c-51df8129c6af",
+    "rows": 72,
+    "provinces": 0,
+    "file": "crop_area_oae__dataset_11_0224__aac3f221.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "เนื้อที่เพาะปลูกข้าว",
+    "package": "dataset_11_0224",
+    "resource_id": "e5314627-0a04-4464-a046-e96824a2cda5",
+    "rows": 72,
+    "provinces": 0,
+    "file": "crop_area_oae__dataset_11_0224__e5314627.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "ข้าวนาปรัง",
+    "package": "data04",
+    "resource_id": "9317599e-1172-4d3e-8761-cd8aba09eb04",
+    "rows": 30,
+    "provinces": 0,
+    "file": "crop_area_oae__data04__9317599e.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "ข้าวนาปี",
+    "package": "data03",
+    "resource_id": "6431da71-6423-49d5-964c-9e84cc514c6c",
+    "rows": 40,
+    "provinces": 0,
+    "file": "crop_area_oae__data03__6431da71.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "มูลค่าของผลไม้เมืองร้อน",
+    "package": "tropical-fruits",
+    "resource_id": "d1374b32-895c-48b0-bd29-7917b217c809",
+    "rows": 420,
+    "provinces": 0,
+    "file": "crop_area_oae__tropical-fruits__d1374b32.csv"
+  },
+  {
+    "label": "crop_area_oae",
+    "dataset": "มูลค่าของผลไม้เมืองร้อน",
+    "package": "tropical-fruits",
+    "resource_id": "3fe521a7-3e5d-404e-8a69-e5fd7970c3ad",
+    "rows": 6,
+    "provinces": 0,
+    "file": "crop_area_oae__tropical-fruits__3fe521a7.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาและมูลค่าผลผลิตกาแฟในพื้นที่จังหวัดกระบี่",
+    "package": "doae_022",
+    "resource_id": "829ed08d-23aa-49de-a54d-0c0e3757fda0",
+    "rows": 15,
+    "provinces": 1,
+    "file": "crop_price_oae__doae_022__829ed08d.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ผลผลิต ราคา และมูลค่าของพืชเศรษฐกิจ",
+    "package": "skn_doae5",
+    "resource_id": "1a0f1853-6cf2-4bc0-8e65-2af1fd2a31f9",
+    "rows": 60,
+    "provinces": 1,
+    "file": "crop_price_oae__skn_doae5__1a0f1853.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ผลผลิต ราคา และมูลค่าของพืชเศรษฐกิจ",
+    "package": "skn_doae5",
+    "resource_id": "dd9741bf-c3c0-43d0-a356-2af3f0910406",
+    "rows": 60,
+    "provinces": 1,
+    "file": "crop_price_oae__skn_doae5__dd9741bf.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาและมูลค่าผลผลิต",
+    "package": "201_030",
+    "resource_id": "147c642b-5581-42d5-a6a7-57b9ebe40d80",
+    "rows": 42,
+    "provinces": 1,
+    "file": "crop_price_oae__201_030__147c642b.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าเกษตรและอาหารปลอดภัย โคนม",
+    "package": "dataset_10_22_1",
+    "resource_id": "4645a06d-6aa3-4d2f-a261-ec72c5012c6f",
+    "rows": 15,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_22_1__4645a06d.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าเกษตรและอาหารปลอดภัย โคนม",
+    "package": "dataset_10_22_1",
+    "resource_id": "5707b4ec-6959-432c-abcc-774c5a47b15b",
+    "rows": 15,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_22_1__5707b4ec.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เครื่องชี้ภาวะเศรษฐกิจการเกษตร",
+    "package": "10_21",
+    "resource_id": "b58d4a10-9a3c-4d13-a3f9-bc024d9647a0",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__10_21__b58d4a10.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เครื่องชี้ภาวะเศรษฐกิจการเกษตร",
+    "package": "10_21",
+    "resource_id": "ad94269a-264e-40f6-9a9f-c89c60eab862",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__10_21__ad94269a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เครื่องชี้ภาวะเศรษฐกิจการเกษตร",
+    "package": "10_21",
+    "resource_id": "77cd2580-2f0b-4836-af83-f3f78015c6b7",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__10_21__77cd2580.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เครื่องชี้ภาวะเศรษฐกิจการเกษตร",
+    "package": "10_21",
+    "resource_id": "2a93cb0f-4a31-43ac-bd01-2b8701bd1b80",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__10_21__2a93cb0f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตข้าว จำแนกตามรอบการผลิต",
+    "package": "pricerice",
+    "resource_id": "e9ee23c0-4e19-4a89-8666-8301dd0f90bd",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__pricerice__e9ee23c0.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เกษตรกรที่เพาะปลูกพืชเศรษฐกิจ",
+    "package": "skn_doae4",
+    "resource_id": "635eacec-f7a3-4d97-ba11-be49db09bf80",
+    "rows": 189,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae4__635eacec.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เกษตรกรที่เพาะปลูกพืชเศรษฐกิจ",
+    "package": "skn_doae4",
+    "resource_id": "8999884c-e908-403c-9dcf-59bef2501686",
+    "rows": 189,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae4__8999884c.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "การกระจายผลผลิตกระเทียมแห้งตามโครงการช่วยเหลือเกษตรกร",
+    "package": "dataset_04_14",
+    "resource_id": "0a1e6906-f022-45f8-9dbb-de2d2bd6327a",
+    "rows": 3,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_04_14__0a1e6906.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "การกระจายผลผลิตกระเทียมแห้งตามโครงการช่วยเหลือเกษตรกร",
+    "package": "dataset_04_14",
+    "resource_id": "98ebb8f1-e8a7-430a-ae9d-e0b838b4a4a8",
+    "rows": 3,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_04_14__98ebb8f1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "การกระจายผลผลิตกระเทียมแห้งตามโครงการช่วยเหลือเกษตรกร",
+    "package": "dataset_04_14",
+    "resource_id": "f92f30f4-fd57-4a45-ba67-89f12df01262",
+    "rows": 3,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_04_14__f92f30f4.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "การกระจายผลผลิตกระเทียมแห้งตามโครงการช่วยเหลือเกษตรกร",
+    "package": "dataset_04_14",
+    "resource_id": "d0a7e4d7-07d5-4dfa-b574-ef3fcba52076",
+    "rows": 3,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_04_14__d0a7e4d7.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประชากรจากการทะเบียน(สนง.เกษตรจังหวัด)",
+    "package": "dataset_12__1992",
+    "resource_id": "2541f698-3274-4c2b-b051-5e8e15c5d99d",
+    "rows": 10,
+    "provinces": 1,
+    "file": "crop_price_oae__dataset_12__1992__2541f698.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประชากรจากการทะเบียน(สนง.เกษตรจังหวัด)",
+    "package": "dataset_12__1992",
+    "resource_id": "4fec701a-9b8f-4555-a392-4ec3f76306e5",
+    "rows": 10,
+    "provinces": 1,
+    "file": "crop_price_oae__dataset_12__1992__4fec701a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าภาคการเกษตรที่สำคัญ พืชผลทางการเกษตร",
+    "package": "dataset_10_19_11",
+    "resource_id": "a8c457f1-20a0-4000-b8dd-6a1aaac49ab1",
+    "rows": 48,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_19_11__a8c457f1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าภาคการเกษตรที่สำคัญ พืชผลทางการเกษตร",
+    "package": "dataset_10_19_11",
+    "resource_id": "6365f1ee-7cd1-40eb-9a8f-66f005820942",
+    "rows": 48,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_19_11__6365f1ee.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการราคาผลผลิตของทุเรียน",
+    "package": "dataset_30_058",
+    "resource_id": "73a5bb3f-4fae-469a-8999-408fe6f70a16",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_30_058__73a5bb3f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าเกษตรและอาหารปลอดภัย ไก่เนื้อ",
+    "package": "dataset_10_20_11",
+    "resource_id": "66cb5227-2f7d-4100-aa2b-fe457e414d18",
+    "rows": 30,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_20_11__66cb5227.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสินค้าเกษตรและอาหารปลอดภัย ไก่เนื้อ",
+    "package": "dataset_10_20_11",
+    "resource_id": "7bc5be53-dba1-4d83-bacc-f69daf74ba18",
+    "rows": 30,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_20_11__7bc5be53.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของกล้วย",
+    "package": "doae12_05",
+    "resource_id": "1569291f-bc2b-45c2-97ab-ba466954f995",
+    "rows": 4,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_05__1569291f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของกล้วย",
+    "package": "doae12_05",
+    "resource_id": "5b6af709-e52d-4488-856d-99cbfeda24df",
+    "rows": 4,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_05__5b6af709.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของพืชแต่ละชนิด",
+    "package": "doae12_13",
+    "resource_id": "4a4938c6-fdb5-4e93-9361-0ab81cb46056",
+    "rows": 6,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_13__4a4938c6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของพืชแต่ละชนิด",
+    "package": "doae12_13",
+    "resource_id": "b4745df5-39dc-4053-aa04-3ae24b738169",
+    "rows": 6,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_13__b4745df5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ปริมาณผลผลิตพืชเศรษฐกิจ",
+    "package": "price04",
+    "resource_id": "e6d21f37-ff06-4107-860d-2e96bfdbfa99",
+    "rows": 36,
+    "provinces": 0,
+    "file": "crop_price_oae__price04__e6d21f37.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตอะโวคาโด",
+    "package": "_21_07",
+    "resource_id": "66ccc712-2e04-4efc-a545-9b0b088f7211",
+    "rows": 25,
+    "provinces": 0,
+    "file": "crop_price_oae___21_07__66ccc712.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตอะโวคาโด",
+    "package": "_21_07",
+    "resource_id": "a9aa5bc8-f942-4779-9046-9aa458016bbf",
+    "rows": 25,
+    "provinces": 0,
+    "file": "crop_price_oae___21_07__a9aa5bc8.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของมะพร้าวน้ำหอม",
+    "package": "skn_doae25",
+    "resource_id": "08ab811b-1f5f-4a63-a3b2-4d1a837a35dc",
+    "rows": 15,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae25__08ab811b.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตของมะพร้าวน้ำหอม",
+    "package": "skn_doae25",
+    "resource_id": "234cbae7-7a25-49d6-b6a0-02cb6c8f90e0",
+    "rows": 15,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae25__234cbae7.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พื้นที่เพาะปลูกพืชเศรษฐกิจ",
+    "package": "skn_doae29",
+    "resource_id": "b0c33dce-f305-472a-b2e6-01f1ad129f32",
+    "rows": 189,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae29__b0c33dce.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พื้นที่เพาะปลูกพืชเศรษฐกิจ",
+    "package": "skn_doae29",
+    "resource_id": "25dce05c-421b-4420-a003-7c7af7b07f30",
+    "rows": 189,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae29__25dce05c.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พื้นที่เก็บเกี่ยวพืชเศรษฐกิจ",
+    "package": "skn_doae6",
+    "resource_id": "cd527784-3b3d-48bc-bbd4-62a4b28eb7ba",
+    "rows": 63,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae6__cd527784.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พื้นที่เก็บเกี่ยวพืชเศรษฐกิจ",
+    "package": "skn_doae6",
+    "resource_id": "5bf28b1e-cebb-4fd2-a56a-83ee89ff3f63",
+    "rows": 63,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae6__5bf28b1e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคามันสำปะหลัง",
+    "package": "plant_03",
+    "resource_id": "07d49e2e-13d5-4674-9381-eac60713cf78",
+    "rows": 6,
+    "provinces": 0,
+    "file": "crop_price_oae__plant_03__07d49e2e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตเฉลี่ย (ด้านปศุสัตว์)",
+    "package": "price2",
+    "resource_id": "6dcf0e07-974a-4150-9a8f-b88c44f024d4",
+    "rows": 25,
+    "provinces": 0,
+    "file": "crop_price_oae__price2__6dcf0e07.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตเฉลี่ย (ด้านปศุสัตว์)",
+    "package": "price2",
+    "resource_id": "bab46ec1-da98-4cf3-8f4a-69614e7915b6",
+    "rows": 25,
+    "provinces": 0,
+    "file": "crop_price_oae__price2__bab46ec1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตเฉลี่ย",
+    "package": "dataset09",
+    "resource_id": "be7c022a-fcbf-4e91-ac2d-3ef77b08053c",
+    "rows": 40,
+    "provinces": 1,
+    "file": "crop_price_oae__dataset09__be7c022a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "e43fda43-ae88-4516-a3f7-32b3c5310fd8",
+    "rows": 45,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__e43fda43.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "84cba9d5-1904-4144-94f4-f316added758",
+    "rows": 45,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__84cba9d5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "547fa831-2726-4044-bceb-cf85e26d6e60",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__547fa831.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "2a757fca-02d3-440b-b827-19694864adf6",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__2a757fca.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "63c4716a-e53a-4ff5-92a2-3a97427e59fc",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__63c4716a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "d2763beb-e1a8-496a-a0ca-5af23aa8027d",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__d2763beb.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "73e4bc7a-1cbe-44eb-823e-2efb231a0ecc",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__73e4bc7a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "de3bd6f8-d784-4636-84bc-61bc493dd4fb",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__de3bd6f8.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "c3c52519-4efe-4242-b9db-b8f7de298bba",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__c3c52519.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "1b8768df-5507-4405-b3d4-fd86d8f4f7b5",
+    "rows": 5,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__1b8768df.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "be8eb5e6-a28d-4725-984b-e2f6134b3b9e",
+    "rows": 56,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__be8eb5e6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "dataset_10_0212",
+    "resource_id": "7378ea1f-3e15-410f-9288-9ad13a84e7da",
+    "rows": 63,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_0212__7378ea1f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคา และมูลค่าผลผลิต",
+    "package": "doae12_17",
+    "resource_id": "593e472c-9987-426b-8986-207113624806",
+    "rows": 45,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_17__593e472c.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคา และมูลค่าผลผลิต",
+    "package": "doae12_17",
+    "resource_id": "49e359de-b20b-4c57-9672-cbde8dadf6bb",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__doae12_17__49e359de.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจจังหวัดนครปฐม",
+    "package": "dataset-plantdoae1",
+    "resource_id": "227d63c0-2d8b-4f4c-846d-69f3054a7c32",
+    "rows": 189,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset-plantdoae1__227d63c0.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาผลผลิตลิ้นจี่ นพ.1",
+    "package": "dataset_10_061",
+    "resource_id": "31fc74c3-6c8c-4847-be79-76f5362bdbf4",
+    "rows": 96,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_10_061__31fc74c3.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อเสนอเชิงนโยบายด้านการเกษตร",
+    "package": "gdpublish-proposal1",
+    "resource_id": "f1335db6-0602-4151-a389-9bdf23ba01eb",
+    "rows": 439,
+    "provinces": 0,
+    "file": "crop_price_oae__gdpublish-proposal1__f1335db6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตข้าวหอมมะลิ",
+    "package": "jasmine-production",
+    "resource_id": "d5f59011-7490-4b8c-8378-ec14defe2f19",
+    "rows": 30,
+    "provinces": 0,
+    "file": "crop_price_oae__jasmine-production__d5f59011.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตข้าวหอมมะลิ",
+    "package": "jasmine-production",
+    "resource_id": "2e12ee3f-10f3-4c0d-ad52-5275fb544404",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__jasmine-production__2e12ee3f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop8",
+    "resource_id": "772840a2-ed05-4fef-b2b4-64777e82e883",
+    "rows": 93,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop8__772840a2.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop8",
+    "resource_id": "c55bb3f1-9733-44e5-8c81-2cc57e137d7a",
+    "rows": 92,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop8__c55bb3f1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "kb05",
+    "resource_id": "1cdd037f-26c1-497c-adb7-b9f564f1ce00",
+    "rows": 10,
+    "provinces": 0,
+    "file": "crop_price_oae__kb05__1cdd037f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "kb05",
+    "resource_id": "95fee5c1-f874-4999-b0ac-9a523730d7a0",
+    "rows": 11,
+    "provinces": 0,
+    "file": "crop_price_oae__kb05__95fee5c1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop",
+    "resource_id": "a2a2e5d9-48f0-47e4-a8d4-9921496a5910",
+    "rows": 29,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop__a2a2e5d9.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop",
+    "resource_id": "93dad485-ae06-4ea6-827e-24b1fc37ed62",
+    "rows": 28,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop__93dad485.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop5",
+    "resource_id": "f3664906-6e66-4373-8f6c-d6fa11b7481c",
+    "rows": 37,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop5__f3664906.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "cash-crop5",
+    "resource_id": "3c4f3d50-52cd-4cde-9513-de214dd52b2a",
+    "rows": 37,
+    "provinces": 0,
+    "file": "crop_price_oae__cash-crop5__3c4f3d50.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคามันสำปะหลัง (มันเส้น) ปีปฏิทิน 2568",
+    "package": "dried-cassava2568",
+    "resource_id": "33f82388-3ea9-48ed-aac4-5cbd82e89cb2",
+    "rows": 120,
+    "provinces": 0,
+    "file": "crop_price_oae__dried-cassava2568__33f82388.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคามันสำปะหลัง (มันเส้น) ปีปฏิทิน 2568",
+    "package": "dried-cassava2568",
+    "resource_id": "e1f8b6ae-d041-4519-9605-85c1a219eb6b",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__dried-cassava2568__e1f8b6ae.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาปาล์มทะลาย (คละ) ปีปฏิทิน 2568",
+    "package": "palm2568",
+    "resource_id": "f68fac23-7007-447e-baff-1a881d5534ab",
+    "rows": 120,
+    "provinces": 0,
+    "file": "crop_price_oae__palm2568__f68fac23.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาปาล์มทะลาย (คละ) ปีปฏิทิน 2568",
+    "package": "palm2568",
+    "resource_id": "e8c0cc0a-f58a-4ff3-a84e-fb5dedb230aa",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__palm2568__e8c0cc0a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าสินค้าเกษตรและสินค้าเกษตรมูลค่าสูง",
+    "package": "my-dataset72",
+    "resource_id": "09f4d3d8-878e-4e1c-b37b-b06a0d9719ea",
+    "rows": 3,
+    "provinces": 0,
+    "file": "crop_price_oae__my-dataset72__09f4d3d8.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาสินค้าปศุสัตว์",
+    "package": "econ_21_01",
+    "resource_id": "b95a01f5-2453-4c53-95bd-442bb8e170f5",
+    "rows": 664,
+    "provinces": 0,
+    "file": "crop_price_oae__econ_21_01__b95a01f5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตส้มโอ",
+    "package": "dataset_11_176",
+    "resource_id": "5dd63c6d-f92a-4c52-914c-3c2268e72b5e",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_11_176__5dd63c6d.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตส้มโอ",
+    "package": "dataset_11_176",
+    "resource_id": "92f5142c-5b5c-442b-9ad7-ee331a5bb684",
+    "rows": 9,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_11_176__92f5142c.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "sk08",
+    "resource_id": "52040bb6-f65d-46d5-a589-430dc878b0b6",
+    "rows": 88,
+    "provinces": 1,
+    "file": "crop_price_oae__sk08__52040bb6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "sk08",
+    "resource_id": "196e53ec-50b7-4b00-8e16-b51f2298251f",
+    "rows": 88,
+    "provinces": 1,
+    "file": "crop_price_oae__sk08__196e53ec.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เกษตรกรผู้เลี้ยงไก่เนื้อ",
+    "package": "dataset_11_1131",
+    "resource_id": "0f3c72fd-0019-4a7b-a525-5424d2e9f264",
+    "rows": 16,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_11_1131__0f3c72fd.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เกษตรกรผู้เลี้ยงไก่เนื้อ",
+    "package": "dataset_11_1131",
+    "resource_id": "1430e633-3a1c-4668-9821-d098d6724ef1",
+    "rows": 45,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_11_1131__1430e633.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "เกษตรกรที่เข้ารับการอบรมการถ่ายทอดเทคโนโลยีการเพิ่มประสิทธิภาพการผลิตสินค้าปลอดภัยสู้มาตรฐานเกษตรอินทรีย์",
+    "package": "dataset_51_36",
+    "resource_id": "d8597180-bc24-4214-a7c3-608a33b37209",
+    "rows": 75,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_51_36__d8597180.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ผลผลิตข้าว",
+    "package": "dataset_51_032",
+    "resource_id": "49236040-5eae-4165-856c-a17f39180b87",
+    "rows": 90,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_51_032__49236040.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ผลผลิตข้าวเฉลี่ยต่อไร่",
+    "package": "dataset_51_042",
+    "resource_id": "71259ab7-7ae3-4189-aa64-e71e849f9ca9",
+    "rows": 90,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_51_042__71259ab7.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "47acf62d-e752-4fa6-a5e8-bac9a2f78099",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__47acf62d.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "b42e3dc4-2d14-46b7-bb15-c080b008457d",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__b42e3dc4.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "0d692d18-fa62-4355-9a6f-f3062bc67050",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__0d692d18.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "1d089698-6702-430d-984b-9c1a7f431d31",
+    "rows": 595,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__1d089698.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "eb7eeb61-a3a8-40e2-b38c-60719ac1fd5f",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__eb7eeb61.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "9c5a63d5-30f6-4a92-b4a4-c3ef38228217",
+    "rows": 595,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__9c5a63d5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "40d476e3-5548-421d-8b5c-813dc2141b7f",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__40d476e3.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "6a120b25-457b-4097-885c-dbd6d6114e20",
+    "rows": 595,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__6a120b25.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "3b6db4e6-1eae-462a-9826-c6eafef814fb",
+    "rows": 579,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__3b6db4e6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ข้อมูลการผลิตข้าว",
+    "package": "rice-2560-2565",
+    "resource_id": "b3fb4d6a-d799-47f9-8ef7-99ffe52eff25",
+    "rows": 595,
+    "provinces": 0,
+    "file": "crop_price_oae__rice-2560-2565__b3fb4d6a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "รายได้เฉลี่ยต่อไร่ของเกษตรกรผู้ปลูกปาล์มน้ำมัน",
+    "package": "dataset_13-3_04",
+    "resource_id": "58ba1816-5262-4c84-99a0-dd92ba886aa2",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13-3_04__58ba1816.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "รายได้เฉลี่ยต่อไร่ของเกษตรกรผู้ปลูกปาล์มน้ำมัน",
+    "package": "dataset_13-3_04",
+    "resource_id": "23d48269-7b5e-416c-85ad-46f93437122d",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13-3_04__23d48269.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "รายได้เฉลี่ยของเกษตรกรผู้ปลูกปาล์มน้ำมัน ภาคใต้",
+    "package": "dataset_12_173",
+    "resource_id": "745a36c3-ab9a-4eb9-a4bc-a1c5b3bb818f",
+    "rows": 24,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_12_173__745a36c3.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "รายได้เฉลี่ยของเกษตรกรผู้ปลูกปาล์มน้ำมัน ภาคใต้",
+    "package": "dataset_12_173",
+    "resource_id": "352d4b6e-a6e5-4459-b6f9-2679a8bd14b5",
+    "rows": 20,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_12_173__352d4b6e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคามันสำปะหลัง (หัวมันสด คละ) ปีปฏิทิน 2568",
+    "package": "cassava2568",
+    "resource_id": "c09fdde6-c1a7-488d-b982-fe634341a245",
+    "rows": 120,
+    "provinces": 0,
+    "file": "crop_price_oae__cassava2568__c09fdde6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคามันสำปะหลัง (หัวมันสด คละ) ปีปฏิทิน 2568",
+    "package": "cassava2568",
+    "resource_id": "6eeb220e-daff-4528-9af8-5e462923034d",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__cassava2568__6eeb220e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคายางก้อนถ้วย (พักค้างคืน) ปีปฏิทิน 2568",
+    "package": "rubber-cup-lump-one-night2568",
+    "resource_id": "071b74a6-de91-4cd6-a863-dbd6026fe91c",
+    "rows": 120,
+    "provinces": 0,
+    "file": "crop_price_oae__rubber-cup-lump-one-night2568__071b74a6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคายางก้อนถ้วย (พักค้างคืน) ปีปฏิทิน 2568",
+    "package": "rubber-cup-lump-one-night2568",
+    "resource_id": "c35eb11f-7d79-4b5b-bef1-7204428df98a",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__rubber-cup-lump-one-night2568__c35eb11f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคายางก้อนถ้วย (สด) ปีปฏิทิน 2568",
+    "package": "rubber-cup-lump2568",
+    "resource_id": "e2b1a4a8-ec96-4319-a988-5f4849639d71",
+    "rows": 120,
+    "provinces": 0,
+    "file": "crop_price_oae__rubber-cup-lump2568__e2b1a4a8.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคายางก้อนถ้วย (สด) ปีปฏิทิน 2568",
+    "package": "rubber-cup-lump2568",
+    "resource_id": "aecf722e-e92c-4de3-8b4a-80992fa8e0ce",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__rubber-cup-lump2568__aecf722e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาประกันข้าวเปลือก",
+    "package": "12_09",
+    "resource_id": "04cf28b1-f3c8-49f1-9592-73945401e2aa",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__12_09__04cf28b1.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ราคาประกันข้าวเปลือก",
+    "package": "12_09",
+    "resource_id": "a4b60ae6-31f9-49dc-ab8a-81c7269d0b64",
+    "rows": 16,
+    "provinces": 0,
+    "file": "crop_price_oae__12_09__a4b60ae6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสับปะรด",
+    "package": "dataset_31_8",
+    "resource_id": "4b205725-869a-420f-8bc2-1ac5edd4bc75",
+    "rows": 6,
+    "provinces": 1,
+    "file": "crop_price_oae__dataset_31_8__4b205725.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "มูลค่าผลผลิตสับปะรด",
+    "package": "dataset_31_8",
+    "resource_id": "16fe7d0e-7a43-44b4-ad16-916957146457",
+    "rows": 6,
+    "provinces": 1,
+    "file": "crop_price_oae__dataset_31_8__16fe7d0e.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการมูลค่าความเสียหายทางการเกษตรจากภัยแล้งของข้าวโพดเลี้ยงสัตว์ปัจจุบันไม่มีการจัดเก็บข้อมูลแล้ว",
+    "package": "dataset_13_046",
+    "resource_id": "c3943a24-8a99-4829-8310-2f930511e16b",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13_046__c3943a24.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการมูลค่าความเสียหายทางการเกษตรจากภัยแล้งของข้าวโพดเลี้ยงสัตว์ปัจจุบันไม่มีการจัดเก็บข้อมูลแล้ว",
+    "package": "dataset_13_046",
+    "resource_id": "d4dc92d5-9989-4c87-aef7-81b0a0ddb863",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13_046__d4dc92d5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการมูลค่าความเสียหายทางการเกษตรจากภัยแล้งของอ้อยโรงงานปัจจุบันไม่มีการจัดเก็บข้อมูลแล้ว",
+    "package": "dataset_13_037",
+    "resource_id": "72d7528d-a046-4591-b035-d45b5a3abf0a",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13_037__72d7528d.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการมูลค่าความเสียหายทางการเกษตรจากภัยแล้งของมันสำปะหลังปัจจุบันไม่มีการจัดเก็บข้อมูลแล้ว",
+    "package": "dataset_13_0213",
+    "resource_id": "256d99d9-cc47-4781-9c94-af735a9b8465",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13_0213__256d99d9.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ประมาณการมูลค่าความเสียหายทางการเกษตรจากภัยแล้งของสับปะรดโรงงานปัจจุบันไม่มีการจัดเก็บข้อมูลแล้ว",
+    "package": "dataset_13_054",
+    "resource_id": "07bbf5ec-36e8-470f-bb21-57043d5835ab",
+    "rows": 8,
+    "provinces": 0,
+    "file": "crop_price_oae__dataset_13_054__07bbf5ec.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "skn_doae2",
+    "resource_id": "0a42201f-c1b6-4a44-94d8-3ab19749f9e5",
+    "rows": 92,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae2__0a42201f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "พืชเศรษฐกิจสำคัญ",
+    "package": "skn_doae2",
+    "resource_id": "9291d75b-50c1-46f1-9aa6-abf2e3920b28",
+    "rows": 112,
+    "provinces": 0,
+    "file": "crop_price_oae__skn_doae2__9291d75b.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "6f02c53a-bfd5-4c96-852d-4aaac5125c00",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__6f02c53a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "8843f1c5-fe93-406c-906e-c2df8adab7a7",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__8843f1c5.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "36b674d6-6d7d-47be-8da4-495bb5a19cee",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__36b674d6.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "c4749c6a-f642-4656-b69b-4adce0a07a93",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__c4749c6a.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "d4f7392f-2cf9-4c1d-8afe-2c2e585091ad",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__d4f7392f.csv"
+  },
+  {
+    "label": "crop_price_oae",
+    "dataset": "ภาวะเศรษฐกิจการคลังจังหวัดลพบุรี",
+    "package": "e-con1",
+    "resource_id": "7a79cd0f-a35f-4ae4-b22f-77870ee4b95f",
+    "rows": 12,
+    "provinces": 0,
+    "file": "crop_price_oae__e-con1__7a79cd0f.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "พื้นที่ก่อสร้างที่ได้รับอนุญาตให้ก่อสร้าง",
+    "package": "os_12_00026",
+    "resource_id": "b9813f99-3c4f-4e6d-8889-b8f8623ddbef",
+    "rows": 1750,
+    "provinces": 153,
+    "file": "estates_ieat__os_12_00026__b9813f99.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "พื้นที่ก่อสร้างที่ได้รับอนุญาตให้ก่อสร้าง",
+    "package": "os_12_00026",
+    "resource_id": "2a4b6412-76f6-4c6a-9de6-5061744654a6",
+    "rows": 1916,
+    "provinces": 153,
+    "file": "estates_ieat__os_12_00026__2a4b6412.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "พื้นที่ก่อสร้างที่ได้รับอนุญาตให้ก่อสร้าง",
+    "package": "os_12_00026",
+    "resource_id": "d9ef4781-5402-40e6-acfa-c801dbcfaf07",
+    "rows": 1916,
+    "provinces": 153,
+    "file": "estates_ieat__os_12_00026__d9ef4781.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "พื้นที่ก่อสร้างที่ได้รับอนุญาตให้ก่อสร้าง",
+    "package": "os_12_00026",
+    "resource_id": "2bf6e7fb-e1db-4337-8b8b-c890d71df59e",
+    "rows": 10,
+    "provinces": 0,
+    "file": "estates_ieat__os_12_00026__2bf6e7fb.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "หนี้รัฐวิสาหกิจที่ไม่เป็นสถาบันการเงินและรัฐบาลไม่ค้ำประกันจากแหล่งเงินกู้ในและต่างประเทศ",
+    "package": "gdpublish-0309_01_21",
+    "resource_id": "46bfad47-b7d0-4843-b396-28fe170597dd",
+    "rows": 5000,
+    "provinces": 0,
+    "file": "estates_ieat__gdpublish-0309_01_21__46bfad47.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "หนี้รัฐวิสาหกิจที่ไม่เป็นสถาบันการเงินและรัฐบาลค้ำประกันจากแหล่งเงินกู้ในและต่างประเทศ",
+    "package": "gdpublish-0309_01_17",
+    "resource_id": "0f367e7f-91a0-4c49-87fe-fe44c2c46751",
+    "rows": 4500,
+    "provinces": 0,
+    "file": "estates_ieat__gdpublish-0309_01_17__0f367e7f.csv"
+  },
+  {
+    "label": "estates_ieat",
+    "dataset": "ประกาศ กนอ.",
+    "package": "ieat-annoucement",
+    "resource_id": "8ce370d0-0c0c-4268-8d8a-55ab3e034458",
+    "rows": 53,
+    "provinces": 0,
+    "file": "estates_ieat__ieat-annoucement__8ce370d0.csv"
+  }
+]
