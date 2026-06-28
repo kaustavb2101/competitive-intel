@@ -1,0 +1,11 @@
+﻿Field Size,Field Name,_id,Description,Data Type,Example
+200,PROVINCE,1,จังหวัด (โรงงาน) ,NVARCHAR,กรุงเทพมหานคร
+5,TSIC,2,รหัส TSIC,NVARCHAR ,10411
+200,DESCR,3,ชื่อกิจกรรม,NVARCHAR ,การผลิตน้ำมันถั่วเหลือง
+10,TOTAL,4,จำนวนโรงงานที่ยังประกอบกิจการ,NVARCHAR ,30
+,TOTALMAN,5,จำนวนคนงานทั้งหมด (ตามคำขอ),INT,5
+,TOTALCAP,6,เงินลงทุนทั้งหมด (ตามคำขอ),FLOAT,3000.0
+,FACSIZE_S,7,จำนวนโรงงาน Size S (คนไม่เกิน 50 คน เงินไม่เกิน 100 ล้านบาท),INT,300.0
+,FACSIZE_M,8,จำนวนโรงงาน Size M (คน 50-200 คน เงิน 100 - 500 ล้านบาท),INT,200.0
+,FACSIZE_L,9,จำนวนโรงงาน Size L (คน 201 คนขึ้นไป เงินไม่เกิน 100 ล้านบาท),INT,100.0
+,LAST_UPDATE,10,อัพเดทล่าสุด,DATETIME,2021-10-11 22:30:24

@@ -1,0 +1,8 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,,1,text,YEAR
+2,สถานภาพแรงงาน,,2,text,LABOUR_STATUS
+3,การสำเร็จการศึกษาด้าน S&T,,3,text,ST_GRADUATE
+4,กลุ่มอายุ ช่วงอายุ หมวดอายุ,,4,text,AGE_GROUP
+5,ค่าข้อมูล,,5,numeric,VALUE
+6,หน่วยนับ,,6,text,UNIT
+7,ที่มา (ระดับกรม),,7,text,SOURCE

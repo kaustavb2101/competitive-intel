@@ -1,0 +1,9 @@
+﻿Field Size,Field Name,_id,Description,Data Type,Example
+4,YEAR,1,ปี พ.ศ.,NVARCHAR,2561
+20,MONTH,2,เดือน,NVARCHAR,กุมภาพันธ์
+200,FPROVNAME,3,จังหวัด (โรงงาน),NVARCHAR ,สมุทรปราการ
+5,TSIC,4,รหัส TSIC,NVARCHAR ,10411
+200,DESCR,5,ชื่อกิจกรรม,NVARCHAR ,การผลิตน้ำมันถั่วเหลือง
+50,STATUS,6,ชื่อสถานะ,NVARCHAR ,ยังไม่แจ้งประกอบ/ดำเนินกิจการ/เลิกประกอบกิจการ/หยุดชั่วคราว/โอนอำนาจ/ต่ำกว่า 50 แรงม้า
+10,TOTAL,7,จำนวนโรงงาน,NVARCHAR ,30
+,LAST_UPDATE,8,อัพเดทล่าสุด,DATETIME,2021-10-11 22:30:24

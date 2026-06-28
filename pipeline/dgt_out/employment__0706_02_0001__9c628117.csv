@@ -1,0 +1,12 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,-,1,text,year
+2,ภาค,-,2,text,region
+3,จังหวัด,-,3,text,province
+4,ไตรมาส,-,4,text,quarter
+5,เขตการปกครอง,-,5,text,area
+6,เพศ,-,6,text,sex
+7,กลุ่มอายุ ,-,7,text,age_group
+8,สถานภาพแรงงาน,-,8,text,labor force status
+9,ค่าข้อมูล,-,9,numeric,value
+10,หน่วยนับ,-,10,text,unit
+11,ที่มาระดับกรม,-,11,text,source

@@ -1,0 +1,22 @@
+﻿จำนวนผู้เข้า,_id,มาตรฐานอุตสาหกรรม,จำนวนผู้ผ่าน,จำนวนเป้าหมาย
+4713,1,"ศิลปะ ความบันเทิงและนันทนาการ (Arts, entertainment and recreation)",4744,4381
+8495,2,ที่พักแรมและบริการด้านอาหาร (Accommodation and food service activities),8273,8361
+8462,3,ข้อมูลข่าวสารและการสื่อสาร (Information and communication),8367,10622
+10723,4,"กิจกรรมวิชาชีพ วิทยาศาสตร์และกิจกรรมทางวิชาการ (Professional, scientific and technical activities)",10521,11434
+2871,5,กิจกรรมทางการเงินและการประกันภัย (Financial and insurance activities),2901,2575
+4832,6,กิจกรรมด้านสุขภาพและงานสังคมสงเคราะห์ (Human health and social work activities),4823,5149
+365,7,กิจกรรมขององค์การระหว่างประเทศและภาคีสมาชิก (Activities of extraterritorial organizations and bodies),365,364
+94015,8,กิจกรรมการบริหารและบริการสนับสนุน (Administrative and support service activities),95384,104208
+149100,9,กิจกรรมการบริการด้านอื่น ๆ (Other service activities),148179,143262
+42349,10,กิจกรรมการจ้างงานในครัวเรือน กิจกรรมการผลิตสินค้าและบริการที่ทำขึ้นเองเพื่อใช้ในครัวเรือน ซึ่งไม่สามารถจำแนกกิจกรรมได้อย่างชัดเจน (Activities of households as employers; undifferentiated goods- and services-producing activities of households for own use),42554,39613
+20,11,กิจกรรมเกี่ยวกับอสังหาริมทรัพย์ (Real estate activities),34,54
+154361,12,การศึกษา (Education),153712,151434
+89698,13,การผลิต (Manufacturing),91834,103989
+1361,14,การบริหารราชการ การป้องกันประเทศและการประกันสังคมภาคบังคับ (Public administration and defence; compulsory social security),1361,1334
+65,15,การทำเหมืองแร่และเหมืองหิน (Mining and quarrying),65,65
+1170,16,"การจัดหาน้ำ การจัดการน้ำเสียและของเสีย รวมถึงกิจกรรมที่เกี่ยวข้อง (Water supply; sewerage, waste management and remediation activities)",1168,1159
+6839,17,การขายส่งและการขายปลีก การซ่อมยานยนต์ และจักรยานยนต์ (Wholesale and retail trade; repair of motor vehicles and motorcycles),6581,6798
+33989,18,การขนส่งและสถานที่เก็บสินค้า (Transportation and storage),33799,59538
+3817,19,การก่อสร้าง (Construction),3836,4390
+7219,20,"ไฟฟ้า ก๊าซ ไอน้ำและระบบการปรับอากาศ (Electricity, gas, steam and air conditioning supply)",7157,7466
+162546,21,"เกษตรกรรม การป่าไม้และการประมง (Agriculture, forestry and fishing)",162934,148160

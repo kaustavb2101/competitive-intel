@@ -1,0 +1,5 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,-,1,text,year
+2,ค่าข้อมูล,-,2,decimal,value
+3,หน่วยนับ,-,3,text,unit
+4,ที่มา(ระดับกรม),-,4,text,source

@@ -1,0 +1,12 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,-,1,text,year
+2,ไตรมาส,-,2,text,quarter
+3,ภาค,-,3,text,region
+4,เขตการปกครอง,-,4,text,area
+5,เพศ,-,5,text,sex
+6,กลุ่มอายุ ,-,6,text,age_group
+7,จำนวนชั่วโมงการทำงานต่อสัปดาห์,-,7,text,hours_worked_per_week
+8,ระดับการศึกษาที่สำเร็จ ระดับการศึกษา,-,8,text,level_of_educational_attainment
+9,ค่าข้อมูล,-,9,numeric,value
+10,หน่วยนับ,-,10,text,unit
+11,ที่มาระดับกรม,-,11,text,source

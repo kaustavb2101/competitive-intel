@@ -1,0 +1,7 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,-,1,text,year
+2,ไตรมาส,-,2,text,quarter
+3,กลุ่มอายุ,-,3,text,age group
+4,ค่าข้อมูล,-,4,numeric,value
+5,หน่วยนับ,-,5,text,unit
+6,ที่มาระดับกรม,-,6,text,source

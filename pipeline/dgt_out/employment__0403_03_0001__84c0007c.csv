@@ -1,0 +1,5 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,Year,1,text,year
+2,เพศ,Sex,2,text,sex
+3,ค่าข้อมูล,Value,3,numeric,value
+4,หน่วยนับ,Unit,4,text,unit

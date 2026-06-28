@@ -1,0 +1,8 @@
+﻿dic_id,description_thai,description_en,_id,data_type,field_name
+1,ปี,-,1,text,year
+2,ไตรมาส,-,2,text,quarter
+3,การมีเวลาเหลือพอที่จะทำงานเพิ่ม,-,3,text,availability_for_additional_work
+4,จำนวนชั่วโมงการทำงานต่อสัปดาห์,-,4,text,hours_worked_per_week
+5,ค่าข้อมูล,-,5,numeric,value
+6,หน่วยนับ,-,6,text,unit
+7,ที่มาระดับกรม,-,7,text,source
