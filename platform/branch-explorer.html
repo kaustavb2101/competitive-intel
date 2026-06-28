@@ -52,8 +52,9 @@ const Q = new URLSearchParams(location.search);
 const LAT = parseFloat(Q.get('lat')), LNG = parseFloat(Q.get('lng'));
 const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
 const TILE = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
-const MIRRORS = ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+const MIRRORS = ['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
 let showRing = true, branchRec = null, buildings = [];
+const tileCache = {};   // bbox-keyed building cache so panning doesn't refetch
 
 const $ = s => document.querySelector(s);
 function status(t, err){ const s=$('#status'); s.textContent=t; s.className=err?'err':''; s.style.display=t?'block':'none'; }
@@ -66,16 +67,47 @@ $('#bnm').textContent = NM;
 const D2R=Math.PI/180;
 function circle(lat,lng,km,steps=64){const pts=[];const dLat=km/111;const dLng=km/(111*Math.cos(lat*D2R));
   for(let i=0;i<=steps;i++){const a=2*Math.PI*i/steps;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
-function bldgHeight(tags){
+function ringAreaM2(ring){               // approx footprint area (m²) from a lon/lat ring
+  let a=0; for(let i=0,j=ring.length-1;i<ring.length;j=i++){a+=(ring[j][0]-ring[i][0])*(ring[j][1]+ring[i][1]);}
+  const latm=111320, lngm=111320*Math.cos((LAT||13.5)*D2R);
+  return Math.abs(a/2)*latm*lngm;
+}
+function bldgHeight(tags,fa){            // measured tag if present, else estimate by type + footprint
   tags=tags||{};
-  if(tags.height){const h=parseFloat(tags.height); if(h>0)return Math.min(h,300);}
-  if(tags['building:levels']){const l=parseFloat(tags['building:levels']); if(l>0)return Math.min(l*3.2,300);}
-  return 8.5;
+  if(tags.height){const h=parseFloat(tags.height); if(h>0)return Math.min(h,60);}
+  if(tags['building:levels']){const l=parseFloat(tags['building:levels']); if(l>0)return Math.min(l*3.2,60);}
+  const b=tags.building||'yes', L=Math.log2(Math.max(fa||60,30));
+  if(b==='house')return 6;
+  if(/residential|apartments/.test(b))return Math.max(12,Math.min(45,14+L*2));
+  if(/retail|commercial|shop/.test(b))return 8;
+  if(b==='office')return 24;
+  if(/industrial|warehouse/.test(b))return 11;
+  if(b==='school')return 9;
+  if(b==='hotel')return Math.max(14,Math.min(45,18+L*2));
+  if(b==='roof')return 4;
+  return fa<120?6:fa<400?9:fa<800?11:13;
+}
+function heightColor(h){                  // 3-stop ramp: low slate -> accent -> gold
+  const t=Math.max(0,Math.min(1,h/40)), a=[43,58,85],b=[91,124,250],c=[224,169,59];
+  const m=t<.5?a.map((v,i)=>Math.round(v+(b[i]-v)*t*2)):b.map((v,i)=>Math.round(v+(c[i]-v)*(t-.5)*2));
+  return [m[0],m[1],m[2],232];
 }
 
 /* ---- deck.gl ---- */
 const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15, pitch:55, bearing:-12, maxZoom:19, minZoom:9};
 let deckgl;
+// directional sun + ambient + fill, with shadows on desktop (the DataProteins look)
+let LIGHTING=null;
+try{
+  if(deck.LightingEffect && deck.AmbientLight && deck.DirectionalLight){
+    const useShadow=!/Mobi|Android/i.test(navigator.userAgent) && window.innerWidth>900;
+    LIGHTING=new deck.LightingEffect({
+      ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
+      sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
+      fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
+    LIGHTING.shadowColor=[0,0,0,0.32];
+  }
+}catch(e){ LIGHTING=null; }
 function baseLayer(){
   return new deck.TileLayer({id:'base',data:TILE,minZoom:0,maxZoom:19,tileSize:256,
     renderSubLayers:p=>{const{west,south,east,north}=p.tile.bbox;
@@ -85,8 +117,11 @@ function layers(){
   const L=[baseLayer()];
   L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
-    getFillColor:b=>{const t=Math.min(1,b.h/45);return [78+t*70,92+t*60,150+t*80,225];},
-    material:{ambient:0.55,diffuse:0.7,shininess:24,specularColor:[60,70,110]},pickable:false}));
+    getFillColor:b=>heightColor(b.h),
+    stroked:true,getLineColor:[10,14,22,55],getLineWidth:1,lineWidthMinPixels:0.4,
+    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},
+    parameters:{depthTest:true},transitions:{getElevation:600},
+    _shadow:true,pickable:false}));
   if(showRing && !isNaN(LAT)){
     L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:false,
@@ -123,6 +158,8 @@ async function loadBuildings(){
   const W=b[0],S=b[1],E=b[2],N=b[3];
   // guard: only fetch when the box is small enough to be sane (≈ <6km across)
   if((N-S)>0.08 || (E-W)>0.08){ status('Zoom in to load buildings (area too large)'); return; }
+  const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');     // bbox cache so panning doesn't refetch
+  if(tileCache[ckey]){ buildings=tileCache[ckey]; render(); status(`${fmt(buildings.length)} buildings in view`); return; }
   status('Loading buildings…');
   const q=`[out:json][timeout:25];(way["building"](${S},${W},${N},${E}););out body geom 7000;`;
   try{
@@ -130,11 +167,16 @@ async function loadBuildings(){
     const out=[];
     for(const el of (d.elements||[])){
       if(el.type==='way' && el.geometry && el.geometry.length>2){
-        out.push({p:el.geometry.map(g=>[g.lon,g.lat]), h:bldgHeight(el.tags)});
+        const ring=el.geometry.map(g=>[g.lon,g.lat]);
+        const fa=ringAreaM2(ring);
+        let h=bldgHeight(el.tags,fa);
+        const seed=Math.abs(Math.sin(ring[0][0]*12.9898+ring[0][1]*78.233))%1;   // deterministic ±8% jitter
+        h=Math.min(60,h*(0.92+0.16*seed));
+        out.push({p:ring,h});
       }
     }
-    buildings=out; render();
-    status(out.length?`${fmt(out.length)} buildings in view`:'No OSM buildings here (rural/factory zone)');
+    buildings=out; tileCache[ckey]=out; render();
+    status(out.length?`${fmt(out.length)} buildings · heights estimated from type + footprint`:'No OSM buildings here (rural/factory zone)');
   }catch(e){
     status('Could not load buildings (Overpass blocked?). '+e.message, true);
   }
@@ -162,20 +204,19 @@ async function loadPanel(){
     const sc=(lab,v,c)=>`<div class="pr"><span>${lab}</span><b style="color:${c}">${v}</b></div>`;
     $('#panel').innerHTML =
       `<h3>${best.n}</h3>
+       <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
        <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
-       <h3>Segment scores</h3>
-       ${sc('Acquisition opp.',best.o,'#E6B450')}${sc('Farmer agri-PD',best.a,'#C8433B')}
-       ${sc('Merchant demand',best.m,'#1C8C7D')}${sc('Collateral density',best.c,'#7A4FE0')}
-       <h3>Within 10 km (OSM)</h3>${radar.map(rr).join('')}
-       <h3>District (DIW · measured)</h3>
+       <h3>District workforce (DIW · measured)</h3>
        ${sc('Factories',fmt(best.dfac),'#E6B450')}${sc('Factory workers',fmt(best.dwork),'#E6B450')}
-       <div class="note">3D buildings = live OpenStreetMap footprints in view. Rings = 3 / 5 / 10 km. Within-10km counts are measured (OSM); district factories/workers are DIW (measured).</div>`;
+       <h3>Within 10 km (OSM · measured)</h3>${radar.map(rr).join('')}
+       <div class="note">3D buildings = live OpenStreetMap footprints (measured). Building heights are estimated from type + footprint area (OSM rarely tags height in Thailand). Rings = 3 / 5 / 10 km. Within-10km counts measured (OSM); district factories/workers measured (DIW).</div>`;
   }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
 }
 
 /* ---- init ---- */
 function init(){
-  deckgl=new deck.DeckGL({container:'map',mapStyle:null,initialViewState:INITIAL,controller:true,
+  deckgl=new deck.DeckGL({container:'map',mapStyle:null,initialViewState:INITIAL,
+    controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
     layers:layers(),
     onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(loadBuildings,650); }});
   $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
