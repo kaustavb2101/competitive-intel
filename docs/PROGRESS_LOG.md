@@ -5,6 +5,25 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-06-28 — Province/region data hygiene (prerequisite for by-province/by-region rollout)
+
+**Why:** Rayong is the deep-dive pilot; Kaustav wants it replicated **by province, then by
+region**. Before that can be correct, the master's geography keys had to be clean — and they
+weren't: 116 distinct province strings (should be 77), and **87 branches (4.3%) sat in a junk
+region `Other`**, silently dropped from every by-region rollup (the committed `meta.json` only
+ever summed 1,928 of 2,015 branches). Rayong itself was clean (`ระยอง`), which is why the pilot
+looked perfect while the national base was not.
+
+- `regionmap.py`: added `ISO` (full ISO 3166-2:TH → Thai name), `ALIAS` (English names), a
+  `DISTRICT_PROV` fallback for blanks, and `canonical()` / `region_of()`.
+- `fix_provinces.py`: normalizes `prov` + recomputes `region` on the master; `--check` dry-runs
+  and fails if anything stays unresolved. Deterministic, offline, idempotent.
+- Result: **116 → 77 provinces, 0 `Other`, all 2,015 branches now roll up.** Region counts:
+  Isan 553→601, Central&BKK 561→580, South 241→250, East 265→273, North 308→311.
+- Re-derived `platform/data/` (derive `--check` passes). NOTE: the carried-forward `meta`
+  fields (`region.hi`, `n_agri`, `mws`, `cws`) were computed by the enrich loop under the old
+  geography — they're stale until a full `autox_enrich_loop.py` run refreshes them.
+
 ## 2026-06-28 — One-command refresh: `derive.py` + wired enrichment loop (NEXT_STEPS #6)
 
 **State now:** "Refresh the data" is one deterministic command, and the recursive loop is runnable

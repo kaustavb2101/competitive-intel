@@ -2,6 +2,28 @@
 
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
 
+## 0. Replicate the Rayong deep-dive by province, then by region  ⟶ the standing ask
+Rayong is the **pilot template**; the goal is the same deep-dive for every province, rolled up by
+region. Anatomy of what a province view needs, and where each piece comes from:
+
+| Piece | Source | Scales? |
+|---|---|---|
+| branches (filter master by prov) | `source-data/branches_final.json` | ✅ free, all 77 provinces |
+| POI-within-province (10 layers) | `source-data/osm_layers.json` (national) | ✅ free |
+| per-district rollups | **amphoe polygons** — only Rayong has one today | ⛔ need nationwide boundaries |
+| competitors | hand-curated Google Places, **Rayong only** (30) | ⚠️ automate per province (Places) |
+| "what impacts them" narrative | editorial, **Rayong only** | ⚠️ template by region, refine per province |
+| catchment 3D buildings | OSM footprints, urban cores only | ⚠️ opportunistic (rural/factory zones have ~0) |
+
+- ✅ **Done (prerequisite):** province/region keys normalized — 116→77 provinces, 0 `Other`
+  (`fix_provinces.py` + `regionmap.canonical`). By-province/by-region rollups are now complete.
+- **Next concrete step:** acquire **nationwide amphoe (district) polygons** — the one gating
+  dataset. Try HDX `cod-ab-tha` (admin level 2) or GADM 4.1 Thailand; both should be reachable.
+  Then generalize `rayong-province.html` + its JSON into a province-parameterized
+  `build_province.py` that reproduces Rayong from national data + per-province inputs.
+- **Then:** automate competitor pulls per province (Places, brand × province), and template the
+  narrative by region (EEC-East, agri-Isan, tourism-South…) before refining per province.
+
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
   `team_pYNrbLMZobN80m4jD7WPWybD`; set Root Directory = current folder).
