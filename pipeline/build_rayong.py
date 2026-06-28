@@ -55,6 +55,8 @@ def build():
     comps = _load(os.path.join(SRC, "rayong_competitors.json"))
     fbd = _load(os.path.join(SRC, "factories_by_district.json"))   # real DIW factory/worker counts
     govp = fbd["provinces"].get(PROV, {"fac": 0, "workers": 0})
+    veh = _load(os.path.join(SRC, "vehicles_by_province.json"))["provinces"].get(PROV, {})
+    emp = _load(os.path.join(SRC, "employment_by_province.json"))["provinces"].get(PROV, {})
     ray = [b for b in master if b["prov"] == PROV]
 
     poi = prev["poi"]                        # OSM points — unaffected by the master fix
@@ -104,7 +106,8 @@ def build():
             "competitors": [{"brand": c["brand"], "name": c["name"], "lat": c["lat"], "lng": c["lng"]} for c in comps],
             "poi": prev["poi"], "estates": prev["estates"], "facts": prev["facts"],
             "gov": {"factories": govp["fac"], "workers": govp["workers"],
-                    "src": "DIW factory registry (data.go.th) — measured"}}
+                    "vehicles": veh, "employment": emp,
+                    "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"}}
 
 
 def run(check=False):

@@ -222,7 +222,9 @@ const totWA=RY.districts.features.reduce((s,d)=>s+(d.properties.workingage||0),0
 document.getElementById('kpis').innerHTML=[
   [RY.branches.length,'Branches'],[RY.districts.features.length,'Districts'],[RY.competitors.length,'Competitors'],
   [(RY.gov?RY.gov.factories.toLocaleString():RY.poi.industrial.length),'Factories (DIW)'],
-  [(RY.gov?Math.round(RY.gov.workers/1000)+'k':'—'),'Factory workers'],[f.minwage,'Min wage']
+  [(RY.gov&&RY.gov.vehicles?Math.round(RY.gov.vehicles.total/1000)+'k':'—'),'Vehicles (DLT)'],
+  [(RY.gov&&RY.gov.vehicles?Math.round(100*RY.gov.vehicles.moto/RY.gov.vehicles.total)+'%':'—'),'Motorcycles'],
+  [(RY.gov&&RY.gov.employment?Math.round(RY.gov.employment.informal/1000)+'k':'—'),'Informal workers'],[f.minwage,'Min wage']
 ].map(([v,k])=>`<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
 
 const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};

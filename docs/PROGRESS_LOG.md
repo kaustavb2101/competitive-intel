@@ -5,6 +5,22 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-06-28 — Exhaustive gov pull + national fold-in (vehicles, employment, crops)
+
+- **Exhaustive puller**: national pass + 77-province sweep + employment topic + resume → 1,925 files.
+  National tables secured for every topic (vehicles `dataset_1_1_04` 77 prov; employment `skn_nso8`
+  82 prov; crop area `newprovince_weekly` 78 prov; crop prices `35`).
+- **`ingest_gov.py`** now distills four layers into `source-data/`: `factories_by_district.json`,
+  `vehicles_by_province.json` (car/pickup/moto/EV), `employment_by_province.json` (formal/informal,
+  latest year), `crop_prices.json` (95 commodities, latest + YoY). All `--check` byte-exact.
+  - **Vehicles by region:** Central&BKK 17.9M · Isan 9.2M · North 7.5M · South 5.5M · East 4.3M.
+  - **Formal workers by region:** Central&BKK 6.1M · Isan 2.4M · East 2.3M · South 2.2M · North 1.8M.
+- **Rayong pilot** now shows measured DLT vehicles (878k; 58% motorcycles), NSO workers
+  (467k formal / 903k informal) alongside DIW factories — KPI strip + `gov` block.
+- regionmap: aliased the ฏ/ฎ Surat Thani spelling variant seen in NSO data.
+- ⚠️ `pipeline/dgt_out/` is now ~491 MB of raw CSVs in the branch — distilled layers make it
+  redundant in-repo; should be git-ignored / removed before merge (see NEXT_STEPS).
+
 ## 2026-06-28 — Gov data unblocked from the Thai IP + first real-data fold-in (factories)
 
 **Milestone:** the data.go.th pull — impossible from the sandbox's foreign IP — ran from Kaustav's
