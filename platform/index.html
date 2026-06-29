@@ -115,6 +115,25 @@
     <div class="chips" id="acqchips"></div>
     <button id="acqcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
+
+    <h2 class="opp">District white-space leaderboard · all 928 amphoe</h2>
+    <p class="lead">The catchment screen above ranks <i>around our existing branches</i>. This ranks <b>every district in Thailand</b> —
+      including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so true
+      white space surfaces. <b>★ Whitespace</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
+      <b>measured at the amphoe</b>) minus a penalty for AutoX branches already inside it. Higher = more underserved.
+      <span class="sub">Branches &amp; POI counts are MEASURED (point-in-polygon). DIW workers are measured only where the
+      district name resolves (✓); vehicles / workforce are <b>province-inherited</b>, not amphoe-measured.</span></p>
+    <div class="insight" id="ampreadout" style="border-left-color:var(--gold)">Loading districts…</div>
+    <div class="chips" id="ampchips"></div>
+    <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="amptbl"></table>
+
+    <h2 class="risk">Most-stressed districts · risk readout</h2>
+    <p class="lead">Top districts by an <b>ESTIMATED</b> risk proxy (0–100): half agri crop-stress, plus collateral / merchant
+      pressure where we have branches inside the amphoe. <b>Agri stress is province-inherited</b> (every district takes its
+      province mean), so this is a triage signal — read the province, not the exact district. Not a measured default rate.</p>
+    <div class="chips" id="amprchips"></div>
+    <table class="tbl" id="amprtbl"></table>
   </section>
 
   <!-- EXPOSURE / CONCENTRATION -->

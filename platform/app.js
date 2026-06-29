@@ -59,6 +59,7 @@ function showTab(v){
   if(v==='market') renderMarket();
   if(v==='exposure') renderExposure();
   if(v==='trend') renderTrend();
+  if(v==='acq') loadAmphoe();
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
@@ -368,6 +369,115 @@ function acqCSV(){
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_acquisition_leaderboard.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- district (amphoe) white-space + risk (Step 2) ----------
+   Lazy-loads data/amphoe.json (928 districts, built by pipeline/build_amphoe.py via point-in-polygon
+   of branches + OSM POIs into th_amphoe.geojson). Unlike the catchment screen above (which only looks
+   around our existing branches), this ranks EVERY district nationally — surfacing the 86 amphoe with no
+   AutoX branch at all. Two readouts: a white-space leaderboard (acquisition) and a most-stressed risk
+   list (portfolio). All scores are precomputed in the data file; we only sort/filter/label here. */
+let AMP=null, ampLoaded=false, ampMeta=null, ampRegion='all', ampRRegion='all', ampRows=[], ampRRows=[];
+async function loadAmphoe(){
+  if(ampLoaded) return AMP;
+  ampLoaded=true;
+  try{
+    const j=await fetch('data/amphoe.json').then(r=>r.json());
+    AMP=j.amphoe||[]; ampMeta=j.meta||null;
+  }catch(e){ AMP=[]; }
+  renderAmphoe();
+  return AMP;
+}
+function ampChips(id,cur,onPick){
+  const box=$(id); if(!box||box.dataset.init) return;
+  const regions=['all',...Array.from(new Set(AMP.map(a=>a.region)))];
+  box.innerHTML=regions.map(r=>`<button class="chip ${r===cur?'on':''}" data-r="${r}">${r==='all'?'All regions':r}</button>`).join('');
+  box.onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
+    box.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); onPick(b.dataset.r);};
+  box.dataset.init='1';
+}
+// readable district label: Thai name where measured, else the English shapeName.
+function ampName(a){return a.name_measured?`${a.name} <span class="sub">${a.name_en}</span>`:`${a.name_en}`;}
+function renderAmphoe(){
+  if(!AMP||!$('#amptbl')) return;
+  if(ampMeta&&$('#ampzero')) $('#ampzero').textContent=(ampMeta.n_amphoe_zero_branch||0)+' ';
+  ampChips('#ampchips',ampRegion,r=>{ampRegion=r;drawAmpBoard();});
+  ampChips('#amprchips',ampRRegion,r=>{ampRRegion=r;drawAmpRisk();});
+  if($('#ampcsv')&&!$('#ampcsv').dataset.init){$('#ampcsv').onclick=ampCSV;$('#ampcsv').dataset.init='1';}
+  drawAmpBoard(); drawAmpRisk();
+}
+function drawAmpBoard(){
+  ampRows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
+    .sort((x,y)=>(y.whitespace||0)-(x.whitespace||0)).slice(0,25);
+  const mx=Math.max(1,...ampRows.map(a=>a.whitespace||0));
+  $('#amptbl').innerHTML=`<tr><th>#</th>`+
+    `<th class="h-opp" title="ESTIMATED white-space score (0–100): district demand proxy minus an AutoX-presence penalty. Higher = more underserved.">Whitespace ★ est</th>`+
+    `<th>District</th><th>Province</th><th>Region</th>`+
+    `<th title="AutoX branches inside this amphoe (MEASURED, point-in-polygon). 0 = no own presence at all.">AutoX</th>`+
+    `<th class="h-opp" title="DIW factory workers in the district (MEASURED where ✓; — where the district name didn't resolve to DIW)">Workers (DIW)</th>`+
+    `<th title="convenience stores + restaurants inside the amphoe (OSM, MEASURED) — merchant footfall proxy">Merchant POI ◇</th>`+
+    `<th title="gold shops + vehicle dealers inside the amphoe (OSM, MEASURED) — title/gold-collateral demand proxy">Collat POI ◇</th></tr>`+
+    ampRows.map((a,i)=>{const ws=a.whitespace||0; const sc=ws>=50?'#E6B450':ws>=35?'#23A28F':'var(--mid)';
+      const p=a.poi||{}; const merch=(p.cvs||0)+(p.rest||0); const collat=(p.gold||0)+(p.veh||0);
+      const wkr=a.fac_measured?`<span style="color:#E6B450">${(a.workers||0).toLocaleString()}</span> <span class="sub" title="DIW-measured at this district">✓</span>`:`<span class="sub" title="district name did not resolve to a DIW record">—</span>`;
+      const hd=a.branches===0?' · no AutoX':a.branches<=1?' · thin':'';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${barHTML(ws,sc,mx)} <span class="mono" style="color:${sc}">${ws.toFixed(0)}</span></td>
+        <td>${ampName(a)}<span class="sub">${hd}</span></td>
+        <td class="sub">${a.province_th}</td><td class="sub">${a.region}</td>
+        <td class="mono ${a.branches===0?'':'sub'}" style="${a.branches===0?'color:#E6B450':''}">${a.branches}</td>
+        <td class="mono">${wkr}</td>
+        <td class="mono" style="color:#1C8C7D">${merch.toLocaleString()}</td>
+        <td class="mono" style="color:#7A4FE0">${collat.toLocaleString()}</td></tr>`;}).join('');
+  // plain-language readout: lead with the answer.
+  if($('#ampreadout')){
+    const top=ampRows[0]; const zeros=ampRows.filter(a=>a.branches===0).length;
+    const scope=ampRegion==='all'?'nationwide':`in ${ampRegion}`;
+    if(top){
+      const drivers=[];
+      if(top.branches===0) drivers.push('no AutoX branch there yet');
+      else drivers.push(`only ${top.branches} AutoX inside`);
+      if(top.fac_measured&&(top.workers||0)>=5000) drivers.push(`${Math.round((top.workers||0)/1000)}k DIW factory workers`);
+      $('#ampreadout').innerHTML=`<b>Most underserved district ${scope}:</b> ${top.name_measured?top.name:''} ${top.name_en} (${top.province_th}, ${top.region})
+        at <b style="color:var(--gold)">★ ${(top.whitespace||0).toFixed(0)}</b> — ${drivers.join(', ')}.
+        ${zeros?`<b>${zeros}</b> of the top 25 ${scope} have <b>zero AutoX presence</b>. `:''}
+        <span class="sub">Estimated screen from measured branch + POI counts; confirm with a site survey.</span>`;
+    }
+  }
+}
+function drawAmpRisk(){
+  ampRRows=AMP.filter(a=>ampRRegion==='all'||a.region===ampRRegion)
+    .sort((x,y)=>(y.risk_proxy||0)-(x.risk_proxy||0)).slice(0,25);
+  const mx=Math.max(1,...ampRRows.map(a=>a.risk_proxy||0));
+  $('#amprtbl').innerHTML=`<tr><th>#</th>`+
+    `<th class="h-opp" title="ESTIMATED risk proxy (0–100): 0.5·agri crop-stress + collateral/merchant pressure. NOT a measured default rate.">Risk ▲ est</th>`+
+    `<th>District</th><th>Province</th><th>Region</th>`+
+    `<th title="province-mean agri crop-stress (price proxy × drought) — PROVINCE-INHERITED, not amphoe-measured">Agri stress ▲ est</th>`+
+    `<th title="AutoX branches inside this amphoe (MEASURED) — footprint exposed to the stress">AutoX</th></tr>`+
+    ampRRows.map((a,i)=>{const rk=a.risk_proxy||0; const sc=rk>=60?'#C8433B':rk>=45?'#D9742B':'var(--mid)';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${barHTML(rk,sc,mx)} <span class="mono" style="color:${sc}">${rk.toFixed(0)}</span></td>
+        <td>${ampName(a)}</td>
+        <td class="sub">${a.province_th}</td><td class="sub">${a.region}</td>
+        <td class="mono" style="color:#C8433B">${(a.agri_stress||0).toFixed(0)} <span class="sub" title="province-inherited">prov</span></td>
+        <td class="mono ${a.branches?'':'sub'}">${a.branches}</td></tr>`;}).join('');
+}
+function ampCSV(){
+  const rows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
+    .sort((x,y)=>(y.whitespace||0)-(x.whitespace||0));
+  const hdr=['rank','whitespace_score_est','district_th','district_en','province','region','autox_branches_measured',
+    'diw_workers','diw_workers_measured','merchant_poi_cvs_rest_measured','collateral_poi_gold_veh_measured',
+    'demand_proxy_est','risk_proxy_est','agri_stress_province_inherited'];
+  const lines=[hdr.join(',')].concat(rows.map((a,i)=>{const p=a.poi||{};
+    return [i+1,(a.whitespace||0).toFixed(1),a.name_measured?a.name:'',a.name_en,a.province_th,a.region,a.branches,
+      a.fac_measured?(a.workers||0):'',a.fac_measured?'true':'false',(p.cvs||0)+(p.rest||0),(p.gold||0)+(p.veh||0),
+      (a.demand||0).toFixed(1),(a.risk_proxy||0).toFixed(1),(a.agri_stress||0).toFixed(1)]
+      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_district_whitespace.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- portfolio exposure / concentration (item 3) ----------
