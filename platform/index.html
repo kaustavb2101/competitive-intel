@@ -19,6 +19,7 @@
   <a href="rayong-province.html">Rayong 3D</a>
   <a href="rayong-catchment.html">Catchment</a>
   <a data-v="acq">Acquisition</a>
+  <a data-v="exposure">Exposure</a>
   <a data-v="provinces">Provinces</a>
   <a data-v="market">Market</a>
   <a data-v="branches">Branches</a>
@@ -58,9 +59,10 @@
   <!-- MAP -->
   <section class="view" id="v-map">
     <div class="lenses" id="lenses"></div>
+    <div class="chips" id="riskSub" style="display:none"></div>
     <div id="map"></div>
     <div class="maplegend" id="maplegend"></div>
-    <p class="lead">Tap any branch for its scores. Dot colour and size scale with the selected lens.</p>
+    <p class="lead">Tap any branch for its scores. Dot colour and size scale with the selected lens. The <b>Portfolio risk</b> lens is an <b>estimated proxy</b> (OSM/price-based, 0–100), not a measured default rate.</p>
   </section>
 
   <!-- ACQUISITION -->
@@ -76,6 +78,22 @@
     <h2>Collateral-rich white-space</h2>
     <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
     <table class="tbl" id="cws"></table>
+
+    <h2 class="opp">Nationwide acquisition leaderboard · all 2,015 catchments</h2>
+    <p class="lead"><b>★ White-space score</b> is an <b>estimated screen</b> (0–100), not a site survey: demand proxy (footfall + DIW workers + province pickups + precomputed opportunity) amplified by own-AutoX <b>headroom</b> (fewer AutoX ≤10km = more white space). Region-filterable, CSV-exportable, computed client-side.</p>
+    <div class="chips" id="acqchips"></div>
+    <button id="acqcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
+  </section>
+
+  <!-- EXPOSURE / CONCENTRATION -->
+  <section class="view" id="v-exposure">
+    <h2 class="risk">Portfolio exposure · concentration read</h2>
+    <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
+    <div class="grid macro" id="expocards"></div>
+    <h2 class="risk">By region</h2>
+    <p class="lead">Share of each region's branches falling in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
+    <table class="tbl" id="expotbl"></table>
   </section>
 
   <!-- BRANCHES -->

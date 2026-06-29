@@ -3,22 +3,29 @@
    Loads data files, renders overview/map/acquisition/branches. Vanilla JS, no build step. */
 
 // Real measured quantities (no indices). val() reads measured fields; color/size scale to absolute max.
+// Portfolio-risk lens is the exception: a/m/c are ESTIMATED proxies (OSM/price-based, 0–100), not measured.
 const LENS = {
   workers:  {label:'Factory workers',     desc:'DIW factory employment in the branch district', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
   pickups:  {label:'Pickup stock',        desc:'DLT pickups in the province — title collateral', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
   informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
+  risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
 };
-const SEG_COLORS = {Crops:'#C8433B', Livestock:'#1C8C7D', Fisheries:'#1C8C7D', Forestry:'#C9A227', Collateral:'#E6B450'};
+// risk sub-metric: composite (max of the three proxies) or a single selectable score.
+let riskMetric='composite';
+function riskVal(d){
+  const a=d.a==null?0:d.a, m=d.m==null?0:d.m, c=d.c==null?0:d.c;
+  return riskMetric==='a'?a : riskMetric==='m'?m : riskMetric==='c'?c : Math.max(a,m,c);
+}
 
 let DATA=null, META=null, map=null, markers=[], curLens='workers', branchSort='dwork', mapReady=false;
 let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
 const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
-const lerp=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
-function ramp3(v,[c0,c1,c2]){v=Math.max(0,Math.min(100,v))/100;const c=v<.5?lerp(c0,c1,v*2):lerp(c1,c2,(v-.5)*2);return `rgb(${c[0]},${c[1]},${c[2]})`;}
 function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Math.round(62*Math.min(v,max)/max)}px;background:${color}"></i></span>`;}
+// honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
+function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
 
 /* ---------- tabs ---------- */
 function showTab(v){
@@ -28,6 +35,7 @@ function showTab(v){
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
+  if(v==='exposure') renderExposure();
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
@@ -83,16 +91,135 @@ function renderAcq(){
     META.mws.map(m=>`<tr><td class="mono" style="color:#1C8C7D">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:#7A4FE0">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
+  renderAcqBoard();
+}
+
+/* ---------- nationwide acquisition leaderboard (item 2) ----------
+   Ranks all 2,015 branch catchments by a white-space score computed client-side from
+   data already present: high demand proxy (k10 footfall + district workers + province
+   pickups + precomputed 'o' opportunity) against LOW own-AutoX saturation (w = ≤10km).
+   Everything here is an ESTIMATED screen, not a site-survey. */
+let acqRegion='all', acqRows=[];
+function acqScore(d){
+  const pl=(typeof PLOOK!=='undefined'&&PLOOK)?(PLOOK[d.v]||{}):{};
+  const k=d.k10||{};
+  // demand proxy: footfall (convenience+restaurants+fresh markets), district factory workers,
+  // province pickup collateral stock, and the precomputed opportunity 'o'. Normalised 0–1.
+  const foot=((k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3);
+  const demand = norm(foot,ACQN.foot) + norm(d.dwork||0,ACQN.dwork) + norm(pl.pickup||0,ACQN.pickup) + norm(d.o||0,ACQN.o);
+  // white-space: fewer own AutoX ≤10km -> more headroom. w can be 0..many.
+  const head = 1 - Math.min(1,(d.w||0)/8);
+  return Math.round(100*(demand/4)*(0.35+0.65*head)); // demand weighted, amplified by headroom
+}
+let ACQN={};
+function buildAcqNorms(){
+  const mx=f=>Math.max(1,...DATA.map(f));
+  ACQN={
+    foot:mx(d=>{const k=d.k10||{};return (k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3;}),
+    dwork:mx(d=>d.dwork||0),
+    pickup:mx(d=>(PLOOK[d.v]||{}).pickup||0),
+    o:mx(d=>d.o||0),
+  };
+}
+function norm(v,mx){return Math.min(1,(v||0)/(mx||1));}
+function renderAcqBoard(){
+  if(!$('#acqboard')) return;
+  buildAcqNorms();
+  if(!$('#acqchips').dataset.init){
+    const regions=['all',...Array.from(new Set(DATA.map(d=>d.r)))];
+    $('#acqchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}">${r==='all'?'All regions':r}</button>`).join('');
+    $('#acqchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
+      $('#acqchips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+      acqRegion=b.dataset.r; drawAcqBoard();};
+    $('#acqcsv').onclick=acqCSV; $('#acqchips').dataset.init='1';
+  }
+  drawAcqBoard();
+}
+function drawAcqBoard(){
+  acqRows=DATA.filter(d=>acqRegion==='all'||d.r===acqRegion)
+    .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
+  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th><th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th></tr>`+
+    acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'#E6B450':row.s>=40?'#23A28F':'var(--mid)';
+      const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
+      return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
+      <td class="mono sub">${i+1}</td>
+      <td class="mono"><a href="${branchHref(d)}" style="color:${sc};text-decoration:none">★ ${row.s}</a></td>
+      <td>${d.n}<span class="sub">${hd}</span></td>
+      <td class="sub">${d.v}</td><td class="sub">${d.r}</td>
+      <td class="mono ${d.w<=2?'':'sub'}" style="${d.w<=2?'color:#E6B450':''}">${d.w}</td>
+      <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
+      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td></tr>`;}).join('');
+}
+function acqCSV(){
+  const hdr=['rank','whitespace_score_est','branch','province','region','own_autox_10km','factory_workers_diw','province_pickups_dlt','opportunity_o_est'];
+  const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{};
+    return [i+1,row.s,d.n,d.v,d.r,d.w,d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,d.o==null?'':d.o]
+      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_acquisition_leaderboard.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- portfolio exposure / concentration (item 3) ----------
+   "How much of the book sits in stressed-crop / drought / weak-segment provinces."
+   Book proxy = branch count (we have no per-branch ฿ balance), labelled honestly.
+   Uses branch fields already present: r (region), rain (drought proxy), a/m/c risk proxies,
+   and the region's weakest-crop YoY from the commodity board. */
+function renderExposure(){
+  if(!DATA||!$('#expo')) return;
+  const N=DATA.length;
+  const pctS=n=>(100*n/N).toFixed(1)+'%';
+  // 1) stressed-crop exposure: branches whose region's weakest crop is in price stress (YoY < -10%)
+  const stressed=DATA.filter(d=>{const wc=regionWorstCrop(d.r); return wc && wc.yoy<-10;});
+  // 2) drought proxy: branches with low recent rainfall (bottom quartile of 'rain')
+  const rains=DATA.map(d=>d.rain).filter(v=>v!=null).sort((a,b)=>a-b);
+  const q1=rains.length?rains[Math.floor(rains.length*0.25)]:0;
+  const drought=DATA.filter(d=>d.rain!=null && d.rain<=q1);
+  // 3) weak-segment (high estimated agri-PD proxy >=60)
+  const weakAgri=DATA.filter(d=>(d.a||0)>=60);
+  const cards=[
+    ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', '#E0574F','▼'],
+    ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', '#E6B450','☀'],
+    ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', '#E0574F','▲'],
+  ];
+  $('#expocards').innerHTML=cards.map(([k,n,p,note,col,gl])=>
+    `<div class="mcard"><div class="k">${gl} ${k}</div><div class="v" style="color:${col}">${p}</div>
+     <div class="n">${n.toLocaleString()} of ${N.toLocaleString()} branches · ${note}</div></div>`).join('');
+  // per-region concentration table
+  const byReg={};
+  DATA.forEach(d=>{const r=d.r||'—'; const o=byReg[r]||(byReg[r]={n:0,str:0,dry:0,agri:0});
+    o.n++; const wc=regionWorstCrop(r); if(wc&&wc.yoy<-10)o.str++; if(d.rain!=null&&d.rain<=q1)o.dry++; if((d.a||0)>=60)o.agri++;});
+  const regs=Object.entries(byReg).sort((a,b)=>b[1].n-a[1].n);
+  $('#expotbl').innerHTML=`<tr><th>Region</th><th>Branches</th><th class="h-agri" title="share in stressed-crop region (est)">Stressed-crop ▼ est</th><th class="h-opp" title="share in dry quartile (est)">Drought ☀ est</th><th class="h-agri" title="share with high agri-PD proxy (est)">High agri-PD ▲ est</th></tr>`+
+    regs.map(([r,o])=>{const wc=regionWorstCrop(r);
+      return `<tr><td><b>${r}</b>${wc?` <span class="sub">${wc.lab} ${wc.yoy>0?'+':''}${wc.yoy}%</span>`:''}</td>
+      <td class="mono">${o.n}</td>
+      <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
+      <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
+      <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
 }
 
 /* ---------- map ---------- */
 function renderLenses(){
   $('#lenses').innerHTML = Object.entries(LENS).map(([k,l])=>
-    `<button class="lens ${k===curLens?'on':''}" data-l="${k}">
+    `<button class="lens ${k===curLens?'on':''}" data-l="${k}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
        <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
        <div class="ld">${l.desc}</div></button>`).join('');
   $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b)return; setLens(b.dataset.l);};
+  renderRiskSub();
   renderLegend();
+}
+// risk sub-metric chips — only shown when the Portfolio-risk lens is active
+function renderRiskSub(){
+  const wrap=$('#riskSub'); if(!wrap) return;
+  if(curLens!=='risk'){ wrap.style.display='none'; wrap.innerHTML=''; return; }
+  wrap.style.display='flex';
+  const opts=[['composite','Composite (worst of 3)'],['a','Agri-PD ●'],['m','Merchant ◆'],['c','Collateral ▲']];
+  wrap.innerHTML='<span class="sub" style="align-self:center;margin-right:2px">Risk proxy:</span>'+
+    opts.map(([k,t])=>`<button class="chip ${k===riskMetric?'on':''}" data-rm="${k}">${t}</button>`).join('');
+  wrap.onclick=e=>{const b=e.target.closest('[data-rm]'); if(!b)return; riskMetric=b.dataset.rm;
+    wrap.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+    renderLegend(); if(mapReady) styleMarkers();};
 }
 function hexRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
 function lensColor(t,hex){const a=[40,46,64],b=hexRgb(hex);t=Math.max(0,Math.min(1,t));
@@ -101,10 +228,11 @@ function lensMax(l){return Math.max(1,...DATA.map(l.val));}
 function fmtK(n){return n>=1000?Math.round(n/1000)+'k':String(Math.round(n));}
 function renderLegend(){
   const l=LENS[curLens], mx=lensMax(l);
+  const est=l.est?' <span class="sub" title="Estimated proxy, not measured">▲ estimated</span>':'';
   $('#maplegend').innerHTML =
     `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
      <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
-     <span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`;
+     <span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>${est}`;
 }
 function initMap(){
   if(mapReady){ map.invalidateSize(); return; }
@@ -174,12 +302,16 @@ function popupHTML(d){
     <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:#5B7CFA;color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
+    ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
+    ${r('Agri-PD ● (est)', d.a==null?'n/a':d.a, '#E0574F')}
+    ${r('Merchant ◆ (est)', d.m==null?'n/a':d.m, '#23A28F')}
+    ${r('Collateral ▲ (est)', d.c==null?'n/a':d.c, '#8E63E8')}
     ${sec('Market — measured')}
-    ${r('District factories (DIW)', (d.dfac||0).toLocaleString(), '#E6B450')}
-    ${r('District factory workers', (d.dwork||0).toLocaleString(), '#E6B450')}
-    ${pl?r('Province pickups (DLT)', (pl.pickup||0).toLocaleString(), '#7A4FE0'):''}
-    ${pl?r('Province informal workers', (pl.informal||0).toLocaleString(), '#7A4FE0'):''}
-    ${wc?r('Region weakest crop (YoY)', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
+    ${r('District factories (DIW)', naNum(d.dfac), '#E6B450')}
+    ${r('District factory workers (DIW)', naNum(d.dwork), '#E6B450')}
+    ${pl?r('Province pickups (DLT)', naNum(pl.pickup), '#7A4FE0'):''}
+    ${pl?r('Province informal workers (NSO)', naNum(pl.informal), '#7A4FE0'):''}
+    ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}</div>`;
 }
@@ -193,28 +325,32 @@ function styleMarkers(){
 function setLens(k){
   curLens=k;
   document.querySelectorAll('.lens').forEach(b=>b.classList.toggle('on',b.dataset.l===k));
-  renderLegend(); if(mapReady) styleMarkers();
+  renderRiskSub(); renderLegend(); if(mapReady) styleMarkers();
 }
 
 /* ---------- branches ---------- */
 function renderBranchSort(){
-  const opts=[['dwork','Factory workers'],['ind','Factories ≤10km'],['w','AutoX nearby']];
+  const opts=[['risk','Portfolio risk ▲ est'],['dwork','Factory workers'],['ind','Factories ≤10km'],['w','AutoX nearby']];
   $('#sortchips').innerHTML = opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}">${t}</button>`).join('');
   $('#sortchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return; branchSort=b.dataset.s;
-    document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); renderBranches();};
+    $('#sortchips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); renderBranches();};
   $('#search').oninput=()=>renderBranches();
 }
-function branchSortVal(d,k){ return k==='ind' ? ((d.k10&&d.k10.ind)||0) : (d[k]||0); }
+function branchSortVal(d,k){ return k==='ind'?((d.k10&&d.k10.ind)||0) : k==='risk'?riskVal(d) : (d[k]||0); }
+function branchHref(d){return `branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}`;}
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q));
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
-  $('#branches').innerHTML = `<tr><th>Branch</th><th>Prov</th><th>Factory workers</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
-    rows.map(d=>{const pl=PLOOK[d.v]||{}; return `<tr><td>${d.n}</td><td class="sub">${d.v}</td>
-      <td class="mono" style="color:#E6B450">${(d.dwork||0).toLocaleString()}</td>
-      <td class="mono" style="color:#7A4FE0">${(pl.pickup||0).toLocaleString()}</td>
-      <td class="mono" style="color:#7A4FE0">${(pl.informal||0).toLocaleString()}</td>
+  $('#branches').innerHTML = `<tr><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
+    rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'#E0574F':rk>=40?'#E6B450':'#23A28F';
+      return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
+      <td class="mono"><a href="${branchHref(d)}" style="color:${rc};text-decoration:none" title="ESTIMATED risk proxy ${riskMetric==='composite'?'(worst of agri/merchant/collateral)':''}">▲ ${rk}</a></td>
+      <td>${d.n}</td><td class="sub">${d.v}</td>
+      <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
+      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td>
+      <td class="mono" style="color:#7A4FE0">${naNum(pl.informal)}</td>
       <td class="mono sub">${d.w}</td></tr>`;}).join('');
 }
 
@@ -242,7 +378,7 @@ function drawProv(){
     .sort((a,b)=>b.branches-a.branches);
   $('#provtbl').innerHTML=`<tr><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
    rows.map(p=>`<tr onclick="location.href='province.html?p=${p.slug}'" style="cursor:pointer">
-     <td><b>${p.th}</b> <span class="sub">${p.en||''}</span></td>
+     <td><a href="province.html?p=${p.slug}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${p.branches}</td>
      <td class="mono">${p.districts}</td>
@@ -252,17 +388,28 @@ function drawProv(){
 }
 
 /* ---------- market assessment (real measured numbers, no indices) ---------- */
-// region -> worst (most negative YoY) crop on the commodity board (best-effort token match)
-const REG_ABBR={Isan:['isan'],North:['n','north'],South:['s','south'],East:['e'],'Central&BKK':['c','central']};
+// region -> worst (most negative YoY) crop on the commodity board.
+// EXPLICIT mapping: commodity-board `reg` abbreviation -> set of app regions it covers.
+// (The old single-letter token match collided: "North" tokenised to "n" hit Rice's "N".)
+// Each crop row is attributed to the region(s) where it is the dominant smallholder crop,
+// not every province where a stalk grows. Rice -> Isan & Central paddy belt (the North's
+// signature crop is Maize, so North is deliberately NOT tagged to Rice). East/Central upland
+// has no single dominant board crop -> left unmatched so those regions show "—" honestly.
+const BOARD_REG_TAGS={
+  'Isan·N·C':['Isan','Central&BKK'], // Rice — Isan + central paddy belt
+  'S·E':['South','East'],            // Rubber — southern + eastern plantations
+  'Isan·C':['Isan'],                 // Sugar — Isan cane belt
+  'South':['South'],                 // Palm oil — deep south
+  'North':['North'],                 // Maize — northern uplands
+};
 function regionWorstCrop(region){
   if(!META||!META.board) return null;
-  const ab=REG_ABBR[region]||[];
-  const toks=s=>(s||'').toLowerCase().split(/[·,\s]+/);
   let worst=null;
   META.board.filter(b=>b.seg==='Crops' && b.yoy!=null).forEach(b=>{
-    if(toks(b.reg).some(t=>ab.includes(t)) && (!worst||b.yoy<worst.yoy)) worst=b;
+    const tags=BOARD_REG_TAGS[b.reg]; // only explicitly-tagged crop rows are eligible
+    if(tags && tags.includes(region) && (!worst||b.yoy<worst.yoy)) worst=b;
   });
-  return worst;
+  return worst; // null -> callers render "—"
 }
 function provLookupByName(){ const m={}; (PROV||[]).forEach(p=>m[p.th]=p); return m; }
 function renderMarket(){
@@ -275,7 +422,7 @@ function renderMarket(){
         document.querySelectorAll('#mktchips .chip').forEach(c=>c.classList.toggle('on',c===b));
         mktRegion=b.dataset.r; drawMarket();};
       $('#mktsearch').oninput=drawMarket; $('#mktchips').dataset.init='1';
-      $('#mktnote').textContent='Workforce NSO 2024 · vehicles DLT · factories DIW · crop YoY World Bank 2025M12.';
+      $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
     }
     drawMarket();
    }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
@@ -283,21 +430,25 @@ function renderMarket(){
 let mktRegion='all';
 function drawMarket(){
   const q=($('#mktsearch').value||'').trim().toLowerCase();
+  // sort by informal workforce, but push null-informal provinces (not in NSO release) to the
+  // bottom rather than ranking them as a fake zero (e.g. Bangkok).
   const rows=PROV.filter(p=>(mktRegion==='all'||p.region===mktRegion) &&
-    (!q||p.th.includes(q)||(p.en||'').toLowerCase().includes(q))).sort((a,b)=>(b.informal||0)-(a.informal||0));
+    (!q||p.th.includes(q)||(p.en||'').toLowerCase().includes(q)))
+    .sort((a,b)=>{const an=a.informal==null, bn=b.informal==null;
+      if(an!==bn) return an?1:-1; return (b.informal||0)-(a.informal||0);});
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
-  $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th>Factory workers</th><th>Informal workforce</th><th>Pickups</th><th>Pickup %</th><th>Weakest crop (YoY)</th></tr>`+
+  $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th class="h-opp" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th>Pickups</th><th>Pickup %</th><th title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
      return `<tr onclick="location.href='province.html?p=${p.slug}'" style="cursor:pointer">
-     <td><b>${p.th}</b> <span class="sub">${p.en||''}</span></td>
+     <td><a href="province.html?p=${p.slug}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
-     <td class="mono">${(p.workers||0).toLocaleString()}</td>
-     <td class="mono" style="color:var(--collat)">${(p.informal||0).toLocaleString()}</td>
-     <td class="mono">${(p.pickup||0).toLocaleString()}</td>
+     <td class="mono">${naNum(p.workers)}</td>
+     <td class="mono" style="color:var(--collat)">${naNum(p.informal)}</td>
+     <td class="mono">${naNum(p.pickup)}</td>
      <td class="mono sub">${pct(p)}%</td>
      <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('');
   $('#mktcsv').onclick=()=>{
-    const hdr=['province','province_en','region','branches','factory_workers','informal_workforce','pickups','pickup_share_pct','vehicles_total','weakest_crop','weakest_crop_yoy'];
+    const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','weakest_crop_est','weakest_crop_yoy_est'];
     const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
       return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
