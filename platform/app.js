@@ -99,8 +99,51 @@ function renderOverview(){
       <td class="mono" style="color:var(--agri)">${r.hi}</td>
       <td>${barHTML(r.md,'#1C8C7D')} <span class="mono">${r.md}</span></td>
       <td>${barHTML(r.col,'#7A4FE0')} <span class="mono">${r.col}</span></td></tr>`).join('');
+  renderBotCap();
+  renderCollatOutlook();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
+}
+
+/* ---------- BoT hire-purchase rate-cap macro card (objective #1, margin watch) ----------
+   Editorial / regulatory note. The Bank of Thailand introduced a ceiling on interest +
+   fees for car & motorcycle hire-purchase lending, effective ~Dec 2025. We deliberately do
+   NOT print a precise rate — only the direction and that it is a SECTOR-MARGIN watch, not a
+   borrower-credit signal. Clearly dated and labelled editorial. */
+function renderBotCap(){
+  const el=$('#botcap'); if(!el) return;
+  el.innerHTML=`<b>Bank of Thailand hire-purchase rate/fee cap</b> on car &amp; motorcycle lending —
+    effective <b>~Dec 2025</b>. Ceiling on interest + fees compresses yields across the auto &amp;
+    motorcycle hire-purchase sector, a <b>margin watch</b> for lenders. AutoX's core is
+    <b>title loans</b> (not hire-purchase), so the direct hit is limited — but it signals a
+    <b>tightening regulatory posture</b> on vehicle-secured consumer credit and caps pricing
+    headroom across the segment.
+    <span class="sub" style="display:block;margin-top:6px">Editorial / regulatory · no precise rate stated · dated ~Dec 2025 · sector-margin item, not a portfolio-credit signal.</span>`;
+}
+
+/* ---------- Collateral outlook board (objective #1, portfolio risk) ----------
+   Makes explicit that the two things AutoX lends against are diverging:
+   GOLD value is UP (measured, from the commodity board), while the DIESEL-PICKUP collateral
+   backing most title loans is under depreciation pressure (used-pickup glut + EV/PHEV
+   transition). We have NO live Thai used-pickup index, so the pickup card is labelled an
+   EDITORIAL / ESTIMATED WATCH — said plainly in the note. */
+function renderCollatOutlook(){
+  const el=$('#collat-outlook'); if(!el) return;
+  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
+  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
+  const cards=[
+    {k:'Gold collateral', v:gy, d:'value ↑', cls:'up',
+     n:'Measured · commodity board (World Bank, '+(gold&&gold.stale?gold.stale:'2025M12')+'). Lifts pawn / gold-backed loan value & recovery.'},
+    {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
+     n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
+  ];
+  el.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  const note=$('#collat-note');
+  if(note) note.innerHTML='<b>Read:</b> the gold side of the book is appreciating while the diesel-pickup side faces a slow value squeeze — '+
+    'if recovery values on repossessed pickups fall, loss-given-default on the title book rises even before any change in default rates. '+
+    'The pickup direction is an <b>estimated/editorial watch</b> (no live Thai used-pickup price index in this data); gold is measured.';
 }
 /* ---------- crop-household stress (Overview card) ----------
    Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
