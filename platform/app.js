@@ -7,6 +7,7 @@
 const LENS = {
   workers:  {label:'Factory workers',     desc:'DIW factory employment in the branch district', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
   pickups:  {label:'Pickup stock',        desc:'DLT pickups in the province — title collateral', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
+  motomix:  {label:'Motorcycle-title share ▲', desc:'MEASURED (DLT) — motorcycle share of the province vehicle stock (moto ÷ total). The most volatile, lowest-recovery title collateral; higher share = more exposure to a used-motorcycle value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
   informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
@@ -16,6 +17,9 @@ const LENS = {
 // CSTRESS maps Thai province name -> province record; val() returns agri_stress on a 0–100 scale.
 let CSTRESS=null, cstressLoaded=false;
 function cstressVal(d){const p=CSTRESS&&CSTRESS[d.v]; return p?Math.round((p.agri_stress||0)*100):0;}
+// Motorcycle-title share (MEASURED, DLT): moto ÷ total vehicle stock in the branch's province, 0–100.
+// This is the highest-volatility / lowest-recovery title collateral — the lens colours branches by exposure.
+function motoShare(d){const p=PLOOK&&PLOOK[d.v]; if(!p||!p.vehicles||p.moto==null) return 0; return Math.round(100*p.moto/p.vehicles);}
 async function loadCropStress(){
   if(cstressLoaded) return CSTRESS;
   cstressLoaded=true;
@@ -101,6 +105,8 @@ function renderOverview(){
       <td>${barHTML(r.col,'#7A4FE0')} <span class="mono">${r.col}</span></td></tr>`).join('');
   renderBotCap();
   renderCollatOutlook();
+  renderCollatMix();
+  renderRecoverySensitivity();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
 }
@@ -145,6 +151,72 @@ function renderCollatOutlook(){
     'if recovery values on repossessed pickups fall, loss-given-default on the title book rises even before any change in default rates. '+
     'The pickup direction is an <b>estimated/editorial watch</b> (no live Thai used-pickup price index in this data); gold is measured.';
 }
+/* ---------- Collateral mix · most motorcycle-heavy provinces (objective #1, MEASURED) ----------
+   Pure DLT vehicle stock split per province (moto / car / pickup / EV share of total). A ฿10k
+   motorcycle title and a ฿500k car title are one "vehicle" each but very different risk — this
+   surfaces the mix. We rank provinces WHERE AUTOX OPERATES (branches > 0) by motorcycle share,
+   the most volatile / lowest-recovery title collateral. Everything here is MEASURED (DLT). */
+function collatMixRows(){
+  return (PROV||[]).filter(p=>p.vehicles&&p.moto!=null&&(p.branches||0)>0)
+    .map(p=>({th:p.th,region:p.region,branches:p.branches,vehicles:p.vehicles,
+              moto:Math.round(100*p.moto/p.vehicles),
+              car:p.car!=null?Math.round(100*p.car/p.vehicles):null,
+              pickup:p.pickup!=null?Math.round(100*p.pickup/p.vehicles):null,
+              ev:p.ev!=null?Math.round(100*p.ev/p.vehicles):null}))
+    .sort((a,b)=>b.moto-a.moto);
+}
+function renderCollatMix(){
+  const tbl=$('#collatmixtbl'), note=$('#collatmix-note'); if(!tbl) return;
+  const rows=collatMixRows();
+  if(!rows.length){ if(note) note.textContent='Vehicle-mix data not available (data/provinces/index.json missing).'; return; }
+  const natMoto=(()=>{let m=0,t=0;(PROV||[]).forEach(p=>{if(p.vehicles&&p.moto!=null){m+=p.moto;t+=p.vehicles;}});return t?Math.round(100*m/t):0;})();
+  if(note) note.innerHTML='The collateral behind a title loan is not one thing: a ฿10k motorcycle title and a ฿500k car title are each <b>one "vehicle"</b> but very different risk. '+
+    'These are the provinces (with AutoX branches) whose registered fleet is most <b>motorcycle</b>-weighted — the lowest-recovery, most volatile title collateral. '+
+    'All shares are <b>measured (DLT registered vehicle stock)</b>. Nationally motorcycles are <b>'+natMoto+'%</b> of the fleet.';
+  const top=rows.slice(0,10);
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of the province registered vehicle stock — DLT, measured">Motorcycle % ▲</th><th title="DLT, measured">Car %</th><th title="DLT, measured">Pickup %</th><th title="DLT, measured">EV %</th></tr>`+
+    top.map((p,i)=>{const mc=p.moto>=70?'#C8433B':p.moto>=60?'#E6B450':'#7A4FE0';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
+      <td class="mono">${p.branches}</td>
+      <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
+      <td class="mono sub">${p.car!=null?p.car+'%':'—'}</td>
+      <td class="mono sub">${p.pickup!=null?p.pickup+'%':'—'}</td>
+      <td class="mono sub">${p.ev!=null?p.ev+'%':'—'}</td></tr>`;}).join('');
+}
+
+/* ---------- Collateral recovery-value sensitivity (objective #1, ILLUSTRATIVE) ----------
+   Combines the MEASURED gold move (+62.7%, commodity board — gold collateral firming) with an
+   ILLUSTRATIVE used-motorcycle value shock. We have NO loan balances and NO LTV, so we do NOT
+   invent LTV-breach counts. Instead we rank the provinces AutoX operates in by motorcycle-title
+   SHARE (measured) — those most exposed if used-motorcycle recovery values fall. The 10% figure
+   is a stated, illustrative scenario, NOT a forecast. */
+function renderRecoverySensitivity(){
+  const cards=$('#recovery-cards'), note=$('#recovery-note'), tbl=$('#recoverytbl'); if(!cards) return;
+  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
+  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
+  cards.innerHTML=[
+    {k:'Gold collateral',v:gy,d:'recovery value ↑',cls:'up',
+     n:'MEASURED · commodity board (World Bank, '+(gold&&gold.stale?gold.stale:'2025M12')+'). Higher gold price lifts recovery on gold-backed loans.'},
+    {k:'Used-motorcycle value',v:'−10%',d:'illustrative shock',cls:'down',
+     n:'ILLUSTRATIVE scenario (not a forecast). We have no Thai used-motorcycle price index; this is a stated stress to rank exposure.'},
+    {k:'Most exposed',v:'high-moto provinces',d:'by title-share',cls:'down',
+     n:'Ranked by MEASURED motorcycle-title share (DLT). No LTV/loan-balance data, so we rank exposure — we do NOT show breach counts.'},
+  ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  if(note) note.innerHTML='<b>Read:</b> gold collateral is appreciating (measured, +62.7%) while motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
+    'A <b>10% fall in used-motorcycle values</b> most exposes the provinces below, which carry the highest motorcycle-title share. '+
+    'This is an <b>ESTIMATED / illustrative sensitivity</b>: we have <b>no loan balances and no LTV</b>, so we rank by motorcycle-share exposure and deliberately show <b>no LTV-breach counts</b>. Shares are measured (DLT).';
+  const rows=collatMixRows().slice(0,8); if(!tbl||!rows.length) return;
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of registered vehicle stock — DLT, measured">Moto-title share ▲ (DLT)</th><th class="h-collat" title="relative exposure to a 10% used-motorcycle value fall — illustrative, proportional to motorcycle share">Relative exposure ◇ illustrative</th></tr>`+
+    rows.map((p,i)=>{const mc=p.moto>=70?'#C8433B':p.moto>=60?'#E6B450':'#7A4FE0';
+      const rank=i===0?'Highest':i<3?'High':'Elevated';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
+      <td class="mono">${p.branches}</td>
+      <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
+      <td class="mono" style="color:${mc}">▲ ${rank}</td></tr>`;}).join('');
+}
+
 /* ---------- crop-household stress (Overview card) ----------
    Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
    dominant crop + share (OAE, measured), price YoY (World Bank GLOBAL direction proxy — NOT Thai
@@ -538,6 +610,19 @@ function cstressPopupHTML(d,sec,r){
     + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'#C8433B':'#1C8C7D')
     + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'#E6B450':'#23A28F');
 }
+// Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
+// Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
+function collatMixPopupHTML(d,sec,r){
+  const p=PLOOK&&PLOOK[d.v]; if(!p||!p.vehicles) return '';
+  const pct=v=>v==null?null:Math.round(100*v/p.vehicles);
+  const mp=pct(p.moto), cp=pct(p.car), pp=pct(p.pickup), ep=pct(p.ev);
+  const mc=mp!=null&&mp>=55?'#C8433B':'#7A4FE0';
+  return sec('Collateral mix — DLT vehicle stock · measured')
+    + r('Motorcycle share ▲', mp!=null?mp+'%':'n/a', mc)
+    + (cp!=null?r('Car share', cp+'%', '#8b90a7'):'')
+    + (pp!=null?r('Pickup share', pp+'%', '#8b90a7'):'')
+    + (ep!=null?r('EV share', ep+'%', '#23A28F'):'');
+}
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
@@ -574,6 +659,7 @@ function popupHTML(d){
     ${r('District factory workers (DIW)', naNum(d.dwork), '#E6B450')}
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), '#7A4FE0'):''}
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), '#7A4FE0'):''}
+    ${collatMixPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}

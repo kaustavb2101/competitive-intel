@@ -223,6 +223,7 @@ def build_all():
                       "branches": len(bout), "districts": len(feats),
                       "factories": gp["fac"],
                       "vehicles": _f(pv, "total", veh_present), "pickup": _f(pv, "pickup", veh_present),
+                      "car": _f(pv, "car", veh_present),
                       "moto": _f(pv, "moto", veh_present), "ev": _f(pv, "ev", veh_present),
                       "workers": gp["workers"],
                       "informal": _f(ev, "informal", emp_present), "formal": _f(ev, "formal", emp_present)})
