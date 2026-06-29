@@ -143,6 +143,23 @@
 
   <!-- ACQUISITION -->
   <section class="view" id="v-acq">
+    <h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2>
+    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
+      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
+      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
+      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
+      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
+    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
+    <details style="margin:6px 0 10px"><summary style="cursor:pointer;color:var(--mid);font-size:12px">How the split is computed (formula)</summary>
+      <p class="lead" style="margin-top:6px">For each region:
+        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
+        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
+        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
+        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
+        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></details>
+    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="r3ktbl"></table>
+
     <h2>Industrial-estate white-space · worker lending</h2>
     <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
     <table class="tbl" id="estates"></table>

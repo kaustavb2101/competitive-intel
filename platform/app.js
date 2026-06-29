@@ -273,6 +273,115 @@ function renderAcq(){
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:#7A4FE0">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
+  renderRoad3k();
+}
+
+/* ---------- Road to 3,000 · regional headroom allocation ----------
+   Splits the net-new branches (3,000 target − current) across the 5 regions, proportional to
+   remaining headroom. Capacity proxy = regional WORKFORCE (informal+formal employment, NSO,
+   measured) aggregated from data/provinces/index.json — a market-SIZE stand-in, NOT a demand or
+   revenue model. Saturation = branches per 100k workforce. Headroom = the gap to the
+   branches-per-100k density that the 3,000-branch target implies nationally:
+     fair_share@3000 = TARGET × (region workforce / national workforce)
+     headroom        = max(0, fair_share@3000 − current branches)
+     alloc           = NET_NEW × (region headroom / Σ headroom)   [largest-remainder rounding → Σ = TARGET]
+   Everything here is an ILLUSTRATIVE planning split, labelled as such. */
+const R3K_TARGET=3000;
+let r3kRows=[], r3kNet=0;
+function computeRoad3k(){
+  if(!PROV||!PROV.length) return null;
+  const byReg={};
+  PROV.forEach(p=>{const r=p.region||'—';
+    const o=byReg[r]||(byReg[r]={r,branches:0,wf:0});
+    o.branches+=p.branches||0;
+    o.wf+=(p.informal||0)+(p.formal||0);   // workforce capacity proxy (NSO, measured); nulls treated as 0
+  });
+  const regs=Object.values(byReg).filter(o=>o.wf>0);
+  const totBr=regs.reduce((s,o)=>s+o.branches,0);
+  const totWf=regs.reduce((s,o)=>s+o.wf,0);
+  if(!totWf||!totBr) return null;
+  const net=Math.max(0,R3K_TARGET-totBr);
+  // headroom relative to the per-workforce density implied by the 3,000 target
+  regs.forEach(o=>{
+    o.fair=R3K_TARGET*o.wf/totWf;
+    o.headroom=Math.max(0,o.fair-o.branches);
+    o.sat=o.branches/o.wf*1e5;            // branches per 100k workforce (current saturation)
+  });
+  const totHr=regs.reduce((s,o)=>s+o.headroom,0);
+  // largest-remainder allocation so the alloc sums to exactly `net`
+  if(totHr>0){
+    regs.forEach(o=>{o._raw=net*o.headroom/totHr; o.alloc=Math.floor(o._raw); o._rem=o._raw-o.alloc;});
+    let assigned=regs.reduce((s,o)=>s+o.alloc,0);
+    regs.sort((a,b)=>b._rem-a._rem).forEach(o=>{ if(assigned<net){o.alloc++;assigned++;} });
+  } else { regs.forEach(o=>o.alloc=0); }
+  regs.forEach(o=>{o.targetBranches=o.branches+o.alloc;});
+  regs.sort((a,b)=>b.alloc-a.alloc);
+  r3kRows=regs; r3kNet=net;
+  return {regs,net,totBr,totWf,totHr};
+}
+function renderRoad3k(){
+  if(!$('#r3ktbl')) return;
+  const c=computeRoad3k();
+  if(!c){ $('#r3ktbl').innerHTML='<tr><td class="sub">Workforce data not available (data/provinces/index.json).</td></tr>'; return; }
+  const {regs,net,totBr}=c;
+  if($('#r3kcur')) $('#r3kcur').textContent=totBr.toLocaleString();
+  if($('#r3knet')) $('#r3knet').textContent=net.toLocaleString();
+  const mxT=Math.max(1,...regs.map(o=>o.targetBranches));   // shared scale: current & target bars comparable
+  const mxA=Math.max(1,...regs.map(o=>o.alloc));
+  $('#r3ktbl').innerHTML=`<tr><th>Region</th>`+
+    `<th title="AutoX branches today (measured)">Now</th>`+
+    `<th title="regional workforce = informal + formal employment (NSO, measured) — a market-SIZE proxy, not demand">Workforce</th>`+
+    `<th title="branches per 100k workforce — lower = more headroom">Per 100k</th>`+
+    `<th class="h-opp" title="gap to the branches-per-100k density that the 3,000 target implies nationally">Headroom est</th>`+
+    `<th class="h-opp" title="net-new branches allocated to this region, proportional to headroom (illustrative split)">+ New</th>`+
+    `<th title="now vs target (illustrative). Filled = current, outline tick = target">Now → 3,000 (target)</th>`+
+    `<th title="branches at the 3,000-branch target">Target</th></tr>`+
+    regs.map(o=>{
+      const curW=Math.round(62*Math.min(o.branches,mxT)/mxT);
+      const tgtW=Math.round(62*Math.min(o.targetBranches,mxT)/mxT);
+      const ac=o.alloc>0?'#E6B450':'var(--mid)';
+      // dual bar: gold target outline behind, blue (accent) current filled in front, gold tick at target
+      const dual=`<span class="bar" style="position:relative;width:62px">`+
+        `<i style="position:absolute;left:0;top:0;width:${tgtW}px;background:rgba(230,180,80,.22)"></i>`+
+        `<i style="position:absolute;left:0;top:0;width:${curW}px;background:#5B7CFA"></i>`+
+        `</span>`;
+      return `<tr>
+        <td><b>${o.r}</b></td>
+        <td class="mono">${o.branches.toLocaleString()}</td>
+        <td class="mono sub">${(o.wf/1e6).toFixed(1)}M</td>
+        <td class="mono sub">${o.sat.toFixed(2)}</td>
+        <td class="mono" style="color:#E6B450">${Math.round(o.headroom).toLocaleString()}</td>
+        <td>${barHTML(o.alloc,ac,mxA)} <span class="mono" style="color:${ac}">+${o.alloc}</span></td>
+        <td>${dual}</td>
+        <td class="mono" style="color:#E6B450">${o.targetBranches.toLocaleString()}</td></tr>`;}).join('')+
+    `<tr style="border-top:2px solid var(--line)"><td><b>Total</b></td>`+
+      `<td class="mono"><b>${totBr.toLocaleString()}</b></td>`+
+      `<td class="mono sub">${(c.totWf/1e6).toFixed(1)}M</td><td></td>`+
+      `<td class="mono" style="color:#E6B450"><b>${Math.round(c.totHr).toLocaleString()}</b></td>`+
+      `<td class="mono" style="color:#E6B450"><b>+${net.toLocaleString()}</b></td><td></td>`+
+      `<td class="mono" style="color:#E6B450"><b>${(totBr+net).toLocaleString()}</b></td></tr>`;
+  if($('#r3kreadout')){
+    const top=regs[0];
+    const ranked=regs.filter(o=>o.alloc>0).map(o=>`${o.r} +${o.alloc}`).join(' · ');
+    $('#r3kreadout').innerHTML=`<b>Road to 3,000:</b> add <b style="color:var(--gold)">${net.toLocaleString()}</b> branches (${totBr.toLocaleString()} → 3,000).
+      Biggest share goes to <b>${top.r}</b> (<b style="color:var(--gold)">+${top.alloc}</b>) — it is furthest below the workforce-density line.
+      Split: ${ranked}.
+      <span class="sub">Capacity = workforce (NSO, measured); allocation is an illustrative planning proxy, not a demand model — confirm with site surveys.</span>`;
+  }
+  if($('#r3kcsv')&&!$('#r3kcsv').dataset.init){ $('#r3kcsv').onclick=road3kCSV; $('#r3kcsv').dataset.init='1'; }
+}
+function road3kCSV(){
+  if(!r3kRows.length) computeRoad3k();
+  const hdr=['region','branches_now_measured','workforce_informal_plus_formal_nso_measured','branches_per_100k_workforce',
+    'fair_share_at_3000_proxy','headroom_est','net_new_allocated_illustrative','target_branches'];
+  const lines=[hdr.join(',')].concat(r3kRows.map(o=>
+    [o.r,o.branches,o.wf,o.sat.toFixed(3),Math.round(o.fair),Math.round(o.headroom),o.alloc,o.targetBranches]
+      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')));
+  const totBr=r3kRows.reduce((s,o)=>s+o.branches,0), totWf=r3kRows.reduce((s,o)=>s+o.wf,0), totHr=r3kRows.reduce((s,o)=>s+o.headroom,0);
+  lines.push(['Total',totBr,totWf,'',R3K_TARGET,Math.round(totHr),r3kNet,totBr+r3kNet].map(v=>`"${v}"`).join(','));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_road_to_3000.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- nationwide acquisition leaderboard (item 2) ----------
