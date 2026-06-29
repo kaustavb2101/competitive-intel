@@ -63,7 +63,7 @@ function naNum(v){return v==null?'<span class="sub" title="Not in the NSO releas
 /* ---------- tabs ---------- */
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
-  document.querySelectorAll('#nav a[data-v]').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
+  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);t.setAttribute('aria-selected',String(sel));});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='map') initMap();
@@ -87,6 +87,22 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('#v-home a[data-v]'); if(!a) return;
   e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
 });
+// Keyboard activation for clickable table rows (role="link" tabindex=0): Enter / Space.
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return;
+  const row=e.target.closest&&e.target.closest('tr[role="link"][onclick]');
+  if(!row||row!==e.target) return;
+  e.preventDefault(); row.click();
+});
+// Acquisition in-tab jump-nav: open the target collapsible section and scroll to it.
+(function(){const j=document.getElementById('acqjump'); if(!j) return;
+  j.addEventListener('click',e=>{const a=e.target.closest('[data-acq]'); if(!a) return;
+    e.preventDefault();
+    const sec=document.getElementById(a.dataset.acq); if(!sec) return;
+    sec.open=true;
+    sec.scrollIntoView({behavior:'smooth',block:'start'});
+    const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
+  });})();
 
 /* ---------- load ---------- */
 async function boot(){
@@ -449,7 +465,7 @@ function drawAcqRegions(){
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
   $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean white-space score across the region (est)">Avg white-space ★ est</th><th>Best single opening (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'#E6B450':o.avg>=30?'#23A28F':'var(--mid)';
-      return `<tr onclick="location.href='${branchHref(o.top)}'" style="cursor:pointer">
+      return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
       <td class="mono sub">${o.n.toLocaleString()}</td>
       <td>${barHTML(o.avg,sc,mxAvg)} <span class="mono" style="color:${sc}">${o.avg.toFixed(1)}</span></td>
@@ -478,7 +494,7 @@ function drawAcqBoard(){
     acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'#E6B450':row.s>=40?'#23A28F':'var(--mid)';
       const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
-      return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
+      return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${sc};text-decoration:none">★ ${row.s}</a></td>
       <td>${d.n}<span class="sub">${hd}</span></td>
@@ -944,7 +960,7 @@ async function renderTrend(){
 /* ---------- map ---------- */
 function renderLenses(){
   $('#lenses').innerHTML = Object.entries(LENS).map(([k,l])=>
-    `<button class="lens ${k===curLens?'on':''}" data-l="${k}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
+    `<button class="lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${l.label.replace(/"/g,'&quot;')}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
        <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
        <div class="ld">${l.desc}</div></button>`).join('');
   $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b)return; setLens(b.dataset.l);};
@@ -1115,7 +1131,7 @@ function styleMarkers(){
 }
 function setLens(k){
   curLens=k;
-  document.querySelectorAll('.lens').forEach(b=>b.classList.toggle('on',b.dataset.l===k));
+  document.querySelectorAll('.lens').forEach(b=>{const on=b.dataset.l===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));});
   renderRiskSub();
   if(k==='cstress' && !cstressLoaded){
     loadCropStress().then(()=>{ if(curLens==='cstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
@@ -1129,9 +1145,10 @@ function setLens(k){
 /* ---------- branches ---------- */
 function renderBranchSort(){
   const opts=[['risk','Portfolio risk ▲ est'],['dwork','Factory workers'],['ind','Factories ≤10km'],['w','AutoX nearby']];
-  $('#sortchips').innerHTML = opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}">${t}</button>`).join('');
+  $('#sortchips').setAttribute('role','group'); $('#sortchips').setAttribute('aria-label','Sort branches by');
+  $('#sortchips').innerHTML = opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}" aria-pressed="${k===branchSort}">${t}</button>`).join('');
   $('#sortchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return; branchSort=b.dataset.s;
-    $('#sortchips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); renderBranches();};
+    $('#sortchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));}); renderBranches();};
   $('#search').oninput=()=>renderBranches();
 }
 function branchSortVal(d,k){ return k==='ind'?((d.k10&&d.k10.ind)||0) : k==='risk'?riskVal(d) : (d[k]||0); }
@@ -1145,7 +1162,7 @@ function renderBranches(){
     rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'#E0574F':rk>=40?'#E6B450':'#23A28F';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
-      return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
+      return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="no-print">${starBtn(id,wItem)}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${rc};text-decoration:none" title="ESTIMATED risk proxy ${riskMetric==='composite'?'(worst of agri/merchant/collateral)':''}">▲ ${rk}</a></td>
       <td>${d.n}</td><td class="sub">${d.v}</td>
@@ -1180,7 +1197,7 @@ function drawProv(){
   $('#provtbl').innerHTML=`<tr><th class="no-print"></th><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
    rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
-     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" tabindex="0" role="link" style="cursor:pointer">
      <td class="no-print">${starBtn(id,wItem)}</td>
      <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
@@ -1243,7 +1260,7 @@ function drawMarket(){
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
   $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th class="h-opp" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th>Pickups</th><th>Pickup %</th><th title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
-     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" tabindex="0" role="link" style="cursor:pointer">
      <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${naNum(p.workers)}</td>

@@ -12,20 +12,20 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<nav id="nav">
+<nav id="nav" role="tablist" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
-  <a data-v="home" class="on">Command center</a>
-  <a data-v="overview">Overview</a>
-  <a data-v="map">National</a>
+  <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Command center</a>
+  <a data-v="overview" href="#overview" role="tab" aria-selected="false">Overview</a>
+  <a data-v="map" href="#map" role="tab" aria-selected="false">National</a>
   <a href="rayong-catchment.html">Rayong 3D</a>
-  <a data-v="trend">Risk trend</a>
-  <a data-v="acq">Acquisition</a>
-  <a data-v="exposure">Exposure</a>
-  <a data-v="sim">Simulator</a>
-  <a data-v="provinces">Provinces</a>
-  <a data-v="market">Market</a>
-  <a data-v="branches">Branches</a>
-  <button id="themeToggle" title="Toggle light / dark" aria-pressed="false"
+  <a data-v="trend" href="#trend" role="tab" aria-selected="false">Risk trend</a>
+  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Acquisition</a>
+  <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
+  <a data-v="sim" href="#sim" role="tab" aria-selected="false">Simulator</a>
+  <a data-v="provinces" href="#provinces" role="tab" aria-selected="false">Provinces</a>
+  <a data-v="market" href="#market" role="tab" aria-selected="false">Market</a>
+  <a data-v="branches" href="#branches" role="tab" aria-selected="false">Branches</a>
+  <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
     style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
 </nav>
 <script>
@@ -143,7 +143,17 @@
 
   <!-- ACQUISITION -->
   <section class="view" id="v-acq">
-    <h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2>
+    <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
+      <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
+      <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
+      <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
+      <a class="chip" href="#acq" data-acq="sec-collateral">Collateral</a>
+      <a class="chip" href="#acq" data-acq="sec-districts">Districts</a>
+      <a class="chip" href="#acq" data-acq="sec-distrisk">District risk</a>
+    </nav>
+
+    <details class="acqsec" id="sec-r3k" open>
+    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
     <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
       This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
       <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
@@ -159,35 +169,45 @@
         Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></details>
     <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="r3ktbl"></table>
+    </details>
 
-    <h2>Industrial-estate white-space · worker lending</h2>
+    <details class="acqsec" id="sec-estates">
+    <summary><h2>Industrial-estate white-space · worker lending</h2></summary>
     <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
     <table class="tbl" id="estates"></table>
+    </details>
 
-    <h2>Merchant white-space · small sellers</h2>
+    <details class="acqsec" id="sec-merchant">
+    <summary><h2>Merchant white-space · small sellers</h2></summary>
     <p class="lead">High vendor demand (markets + footfall + population), ≤4 AutoX branches within 10km.</p>
     <table class="tbl" id="mws"></table>
+    </details>
 
-    <h2>Collateral-rich white-space</h2>
+    <details class="acqsec" id="sec-collateral">
+    <summary><h2>Collateral-rich white-space</h2></summary>
     <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
     <table class="tbl" id="cws"></table>
+    </details>
 
-    <h2 class="opp">Where to open next · white-space score v2</h2>
+    <details class="acqsec" id="sec-districts" open>
+    <summary><h2 class="opp">Where to open next · district &amp; catchment white-space</h2></summary>
+
+    <h3 class="acqsub">Catchment white-space score v2 · around existing branches</h3>
     <p class="lead"><b>★ White-space score</b> is an <b>estimated screen</b> (0–100), not a site survey:
       <b>demand</b> (footfall + DIW factory workers + province pickups + precomputed opportunity)
       × <b>own-AutoX headroom</b> (fewer of our branches ≤10km = more room)
       × <b>competitor-proxy headroom</b> (fewer banks+ATMs ≤10km — an OSM financial-density proxy, <i>not</i> a lender census; we have no national competitor data). Computed client-side, CSV-exportable.</p>
     <div class="insight" id="acqreadout" style="border-left-color:var(--gold)">Computing the screen…</div>
 
-    <h3 style="font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:18px 0 8px;font-weight:600">Region ranking · average white space</h3>
+    <h4 class="acqsub2">Region ranking · average white space</h4>
     <table class="tbl" id="acqregions"></table>
 
-    <h3 style="font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:18px 0 8px;font-weight:600">Top catchments</h3>
+    <h4 class="acqsub2">Top catchments</h4>
     <div class="chips" id="acqchips"></div>
     <button id="acqcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
 
-    <h2 class="opp">District white-space leaderboard · all 928 amphoe</h2>
+    <h3 class="acqsub">District white-space leaderboard · all 928 amphoe</h3>
     <p class="lead">The catchment screen above ranks <i>around our existing branches</i>. This ranks <b>every district in Thailand</b> —
       including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so true
       white space surfaces. <b>★ Whitespace</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
@@ -198,13 +218,16 @@
     <div class="chips" id="ampchips"></div>
     <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="amptbl"></table>
+    </details>
 
-    <h2 class="risk">Most-stressed districts · risk readout</h2>
+    <details class="acqsec" id="sec-distrisk">
+    <summary><h2 class="risk">Most-stressed districts · risk readout</h2></summary>
     <p class="lead">Top districts by an <b>ESTIMATED</b> risk proxy (0–100): half agri crop-stress, plus collateral / merchant
       pressure where we have branches inside the amphoe. <b>Agri stress is province-inherited</b> (every district takes its
       province mean), so this is a triage signal — read the province, not the exact district. Not a measured default rate.</p>
     <div class="chips" id="amprchips"></div>
     <table class="tbl" id="amprtbl"></table>
+    </details>
   </section>
 
   <!-- EXPOSURE / CONCENTRATION -->

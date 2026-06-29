@@ -337,8 +337,10 @@ button.btn,.ctl button,.cbtn{font-family:var(--sans);cursor:pointer}
   padding:14px 16px;margin-top:var(--s5);font-size:11.5px;color:var(--mid);line-height:1.7;box-shadow:var(--elev-1)}
 .note b{color:var(--txt)}
 .loading{color:var(--dim);padding:48px 0;text-align:center;font-family:var(--mono);font-size:12px}
-a:focus-visible,button:focus-visible,.lens:focus-visible,.chip:focus-visible,.search:focus-visible{
+a:focus-visible,button:focus-visible,.lens:focus-visible,.chip:focus-visible,.search:focus-visible,
+tr[role="link"]:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   outline:2px solid var(--accent);outline-offset:2px}
+tr[role="link"]:focus-visible{outline-offset:-2px}
 
 /* ============================================================
    deck.gl pages: shared glass for #panel / #sheet / .side /
@@ -480,3 +482,30 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .sim-toggle{cursor:pointer}
 .sim-toggle input{accent-color:var(--agri);margin-right:6px}
 .sim-out .grid.macro{margin-bottom:6px}
+
+/* ---------- Acquisition: in-tab jump-nav + collapsible sections ---------- */
+.jumpnav{display:flex;gap:7px;flex-wrap:wrap;position:sticky;top:48px;z-index:20;
+  background:rgba(10,14,23,.92);backdrop-filter:blur(8px);padding:8px 0 9px;margin:0 0 6px;
+  border-bottom:1px solid var(--line2)}
+.jumpnav .chip{text-decoration:none}
+[data-theme=light] .jumpnav{background:rgba(247,248,251,.92)}
+/* collapsible sections — keep the h2 look, add a disclosure caret to summary */
+details.acqsec{border-top:1px solid var(--line2);margin:0}
+details.acqsec:first-of-type{border-top:none}
+details.acqsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  outline-offset:2px}
+details.acqsec>summary::-webkit-details-marker{display:none}
+details.acqsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
+details.acqsec:first-of-type>summary>h2{margin-top:4px}
+details.acqsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
+  margin-top:2px}
+details.acqsec[open]>summary::after{transform:rotate(90deg)}
+details.acqsec>summary:hover::after,details.acqsec>summary:hover>h2{color:var(--txt)}
+details.acqsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
+details.acqsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
+.acqsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+  margin:18px 0 8px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
+.acqsub.opp{color:var(--opp)}
+.acqsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+  margin:18px 0 8px;font-weight:600}
+@media print{.jumpnav{display:none!important}details.acqsec>summary::after{display:none}}
