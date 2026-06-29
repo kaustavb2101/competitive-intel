@@ -66,6 +66,8 @@ function showTab(v){
   document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);t.setAttribute('aria-selected',String(sel));});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
+  if(v==='overview') renderOverview();
+  if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
@@ -118,7 +120,7 @@ async function boot(){
     showTab((location.hash||'').replace('#',''));
   }catch(err){
     document.querySelector('main').insertAdjacentHTML('afterbegin',
-      `<div class="insight" style="border-left-color:#C8433B">Couldn't load data files. Make sure <b>data/branches.json</b> and <b>data/meta.json</b> sit next to this page. (${err})</div>`);
+      `<div class="insight" style="border-left-color:var(--agri)">Couldn't load data files. Make sure <b>data/branches.json</b> and <b>data/meta.json</b> sit next to this page. (${err})</div>`);
   }
 }
 
@@ -131,13 +133,13 @@ function renderOverview(){
   const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
   $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
   $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops').map(row).join('');
-  const rc={Isan:'#C8433B',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'#5B7CFA'};
+  const rc={Isan:'var(--agri)',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'var(--accent)'};
   $('#region').innerHTML = `<tr><th>Region</th><th>Branches</th><th>Agri-PD</th><th>Elevated</th><th>Merchant</th><th>Collateral</th></tr>`+
     META.region.map(r=>`<tr><td><b>${r.r}</b></td><td class="mono">${r.n}</td>
       <td>${barHTML(r.agri,rc[r.r])} <span class="mono">${r.agri}</span></td>
       <td class="mono" style="color:var(--agri)">${r.hi}</td>
-      <td>${barHTML(r.md,'#1C8C7D')} <span class="mono">${r.md}</span></td>
-      <td>${barHTML(r.col,'#7A4FE0')} <span class="mono">${r.col}</span></td></tr>`).join('');
+      <td>${barHTML(r.md,'var(--merch)')} <span class="mono">${r.md}</span></td>
+      <td>${barHTML(r.col,'var(--collat)')} <span class="mono">${r.col}</span></td></tr>`).join('');
   renderBotCap();
   renderCollatOutlook();
   renderCollatMix();
@@ -210,7 +212,7 @@ function renderCollatMix(){
     'All shares are <b>measured (DLT registered vehicle stock)</b>. Nationally motorcycles are <b>'+natMoto+'%</b> of the fleet.';
   const top=rows.slice(0,10);
   tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of the province registered vehicle stock — DLT, measured">Motorcycle % ▲</th><th title="DLT, measured">Car %</th><th title="DLT, measured">Pickup %</th><th title="DLT, measured">EV %</th></tr>`+
-    top.map((p,i)=>{const mc=p.moto>=70?'#C8433B':p.moto>=60?'#E6B450':'#7A4FE0';
+    top.map((p,i)=>{const mc=p.moto>=70?'var(--agri)':p.moto>=60?'var(--gold)':'var(--collat)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
       <td class="mono">${p.branches}</td>
       <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
@@ -244,7 +246,7 @@ function renderRecoverySensitivity(){
     'This is an <b>ESTIMATED / illustrative sensitivity</b>: we have <b>no loan balances and no LTV</b>, so we rank by motorcycle-share exposure and deliberately show <b>no LTV-breach counts</b>. Shares are measured (DLT).';
   const rows=collatMixRows().slice(0,8); if(!tbl||!rows.length) return;
   tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of registered vehicle stock — DLT, measured">Moto-title share ▲ (DLT)</th><th class="h-collat" title="relative exposure to a 10% used-motorcycle value fall — illustrative, proportional to motorcycle share">Relative exposure ◇ illustrative</th></tr>`+
-    rows.map((p,i)=>{const mc=p.moto>=70?'#C8433B':p.moto>=60?'#E6B450':'#7A4FE0';
+    rows.map((p,i)=>{const mc=p.moto>=70?'var(--agri)':p.moto>=60?'var(--gold)':'var(--collat)';
       const rank=i===0?'Highest':i<3?'High':'Elevated';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
       <td class="mono">${p.branches}</td>
@@ -270,7 +272,7 @@ function renderCropStress(){
     '<b>Dominant crop</b> (OAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="World Bank GLOBAL price YoY direction proxy — not Thai farm-gate">Price YoY ◇ est</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th></tr>`+
     top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
-      const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'#C8433B':sv>=25?'#E6B450':'#23A28F'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'#23A28F';
+      const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
       const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region||'—'}</td>
       <td>${barHTML(sv,bar)} <span class="mono" style="color:${sc}">${sv}</span></td>
@@ -282,12 +284,12 @@ function renderCropStress(){
 /* ---------- acquisition ---------- */
 function renderAcq(){
   $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
-    META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'#E6B450':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
+    META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
       return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
   $('#mws').innerHTML = `<tr><th>Demand</th><th>AutoX</th><th>Fresh mkts</th><th>Province</th><th>Branch</th></tr>`+
-    META.mws.map(m=>`<tr><td class="mono" style="color:#1C8C7D">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
+    META.mws.map(m=>`<tr><td class="mono" style="color:var(--merch)">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
-    META.cws.map(c=>`<tr><td class="mono" style="color:#7A4FE0">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
+    META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
   renderRoad3k();
 }
@@ -355,27 +357,27 @@ function renderRoad3k(){
     regs.map(o=>{
       const curW=Math.round(62*Math.min(o.branches,mxT)/mxT);
       const tgtW=Math.round(62*Math.min(o.targetBranches,mxT)/mxT);
-      const ac=o.alloc>0?'#E6B450':'var(--mid)';
+      const ac=o.alloc>0?'var(--gold)':'var(--mid)';
       // dual bar: gold target outline behind, blue (accent) current filled in front, gold tick at target
       const dual=`<span class="bar" style="position:relative;width:62px">`+
         `<i style="position:absolute;left:0;top:0;width:${tgtW}px;background:rgba(230,180,80,.22)"></i>`+
-        `<i style="position:absolute;left:0;top:0;width:${curW}px;background:#5B7CFA"></i>`+
+        `<i style="position:absolute;left:0;top:0;width:${curW}px;background:var(--accent)"></i>`+
         `</span>`;
       return `<tr>
         <td><b>${o.r}</b></td>
         <td class="mono">${o.branches.toLocaleString()}</td>
         <td class="mono sub">${(o.wf/1e6).toFixed(1)}M</td>
         <td class="mono sub">${o.sat.toFixed(2)}</td>
-        <td class="mono" style="color:#E6B450">${Math.round(o.headroom).toLocaleString()}</td>
+        <td class="mono" style="color:var(--gold)">${Math.round(o.headroom).toLocaleString()}</td>
         <td>${barHTML(o.alloc,ac,mxA)} <span class="mono" style="color:${ac}">+${o.alloc}</span></td>
         <td>${dual}</td>
-        <td class="mono" style="color:#E6B450">${o.targetBranches.toLocaleString()}</td></tr>`;}).join('')+
+        <td class="mono" style="color:var(--gold)">${o.targetBranches.toLocaleString()}</td></tr>`;}).join('')+
     `<tr style="border-top:2px solid var(--line)"><td><b>Total</b></td>`+
       `<td class="mono"><b>${totBr.toLocaleString()}</b></td>`+
       `<td class="mono sub">${(c.totWf/1e6).toFixed(1)}M</td><td></td>`+
-      `<td class="mono" style="color:#E6B450"><b>${Math.round(c.totHr).toLocaleString()}</b></td>`+
-      `<td class="mono" style="color:#E6B450"><b>+${net.toLocaleString()}</b></td><td></td>`+
-      `<td class="mono" style="color:#E6B450"><b>${(totBr+net).toLocaleString()}</b></td></tr>`;
+      `<td class="mono" style="color:var(--gold)"><b>${Math.round(c.totHr).toLocaleString()}</b></td>`+
+      `<td class="mono" style="color:var(--gold)"><b>+${net.toLocaleString()}</b></td><td></td>`+
+      `<td class="mono" style="color:var(--gold)"><b>${(totBr+net).toLocaleString()}</b></td></tr>`;
   if($('#r3kreadout')){
     const top=regs[0];
     const ranked=regs.filter(o=>o.alloc>0).map(o=>`${o.r} +${o.alloc}`).join(' · ');
@@ -464,12 +466,12 @@ function drawAcqRegions(){
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
   $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean white-space score across the region (est)">Avg white-space ★ est</th><th>Best single opening (est)</th></tr>`+
-    regs.map((o,i)=>{const sc=o.avg>=45?'#E6B450':o.avg>=30?'#23A28F':'var(--mid)';
+    regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
       <td class="mono sub">${o.n.toLocaleString()}</td>
       <td>${barHTML(o.avg,sc,mxAvg)} <span class="mono" style="color:${sc}">${o.avg.toFixed(1)}</span></td>
-      <td class="sub">${o.top.n} <span class="mono" style="color:#E6B450">★ ${o.topS}</span> · ${o.top.v}</td></tr>`;}).join('');
+      <td class="sub">${o.top.n} <span class="mono" style="color:var(--gold)">★ ${o.topS}</span> · ${o.top.v}</td></tr>`;}).join('');
   // plain-language readout: lead with the answer.
   const best=regs[0], top1=acqRows[0];
   if($('#acqreadout')&&best&&top1){
@@ -491,7 +493,7 @@ function drawAcqBoard(){
     .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
   drawAcqRegions();
   $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th><th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
-    acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'#E6B450':row.s>=40?'#23A28F':'var(--mid)';
+    acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
       const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
       return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
@@ -499,9 +501,9 @@ function drawAcqBoard(){
       <td class="mono"><a href="${branchHref(d)}" style="color:${sc};text-decoration:none">★ ${row.s}</a></td>
       <td>${d.n}<span class="sub">${hd}</span></td>
       <td class="sub">${d.v}</td><td class="sub">${d.r}</td>
-      <td class="mono ${d.w<=2?'':'sub'}" style="${d.w<=2?'color:#E6B450':''}">${d.w}</td>
-      <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
-      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td>
+      <td class="mono ${d.w<=2?'':'sub'}" style="${d.w<=2?'color:var(--gold)':''}">${d.w}</td>
+      <td class="mono" style="color:var(--gold)">${naNum(d.dwork)}</td>
+      <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono sub">${fin}</td></tr>`;}).join('');
 }
 function acqCSV(){
@@ -577,19 +579,19 @@ function drawAmpBoard(){
     `<th class="h-opp" title="DIW factory workers in the district (MEASURED where ✓; — where the district name didn't resolve to DIW)">Workers (DIW)</th>`+
     `<th title="convenience stores + restaurants inside the amphoe (OSM, MEASURED) — merchant footfall proxy">Merchant POI ◇</th>`+
     `<th title="gold shops + vehicle dealers inside the amphoe (OSM, MEASURED) — title/gold-collateral demand proxy">Collat POI ◇</th></tr>`+
-    ampRows.map((a,i)=>{const ws=a.whitespace||0; const sc=ws>=50?'#E6B450':ws>=35?'#23A28F':'var(--mid)';
+    ampRows.map((a,i)=>{const ws=a.whitespace||0; const sc=ws>=50?'var(--gold)':ws>=35?'var(--merch)':'var(--mid)';
       const p=a.poi||{}; const merch=(p.cvs||0)+(p.rest||0); const collat=(p.gold||0)+(p.veh||0);
-      const wkr=a.fac_measured?`<span style="color:#E6B450">${(a.workers||0).toLocaleString()}</span> <span class="sub" title="DIW-measured at this district">✓</span>`:`<span class="sub" title="district name did not resolve to a DIW record">—</span>`;
+      const wkr=a.fac_measured?`<span style="color:var(--gold)">${(a.workers||0).toLocaleString()}</span> <span class="sub" title="DIW-measured at this district">✓</span>`:`<span class="sub" title="district name did not resolve to a DIW record">—</span>`;
       const hd=a.branches===0?' · no AutoX':a.branches<=1?' · thin':'';
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(ws,sc,mx)} <span class="mono" style="color:${sc}">${ws.toFixed(0)}</span></td>
         <td>${ampName(a)}<span class="sub">${hd}</span></td>
         <td class="sub">${a.province_th}</td><td class="sub">${a.region}</td>
-        <td class="mono ${a.branches===0?'':'sub'}" style="${a.branches===0?'color:#E6B450':''}">${a.branches}</td>
+        <td class="mono ${a.branches===0?'':'sub'}" style="${a.branches===0?'color:var(--gold)':''}">${a.branches}</td>
         <td class="mono">${wkr}</td>
-        <td class="mono" style="color:#1C8C7D">${merch.toLocaleString()}</td>
-        <td class="mono" style="color:#7A4FE0">${collat.toLocaleString()}</td></tr>`;}).join('');
+        <td class="mono" style="color:var(--merch)">${merch.toLocaleString()}</td>
+        <td class="mono" style="color:var(--collat)">${collat.toLocaleString()}</td></tr>`;}).join('');
   // plain-language readout: lead with the answer.
   if($('#ampreadout')){
     const top=ampRows[0]; const zeros=ampRows.filter(a=>a.branches===0).length;
@@ -615,13 +617,13 @@ function drawAmpRisk(){
     `<th>District</th><th>Province</th><th>Region</th>`+
     `<th title="province-mean agri crop-stress (price proxy × drought) — PROVINCE-INHERITED, not amphoe-measured">Agri stress ▲ est</th>`+
     `<th title="AutoX branches inside this amphoe (MEASURED) — footprint exposed to the stress">AutoX</th></tr>`+
-    ampRRows.map((a,i)=>{const rk=a.risk_proxy||0; const sc=rk>=60?'#C8433B':rk>=45?'#D9742B':'var(--mid)';
+    ampRRows.map((a,i)=>{const rk=a.risk_proxy||0; const sc=rk>=60?'var(--agri)':rk>=45?'#D9742B':'var(--mid)';
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(rk,sc,mx)} <span class="mono" style="color:${sc}">${rk.toFixed(0)}</span></td>
         <td>${ampName(a)}</td>
         <td class="sub">${a.province_th}</td><td class="sub">${a.region}</td>
-        <td class="mono" style="color:#C8433B">${(a.agri_stress||0).toFixed(0)} <span class="sub" title="province-inherited">prov</span></td>
+        <td class="mono" style="color:var(--agri)">${(a.agri_stress||0).toFixed(0)} <span class="sub" title="province-inherited">prov</span></td>
         <td class="mono ${a.branches?'':'sub'}">${a.branches}</td></tr>`;}).join('');
 }
 function ampCSV(){
@@ -665,11 +667,11 @@ function renderExposure(){
   const provCount=Object.keys(byProvN).length;
   const hhi=Object.values(byProvN).reduce((s,n)=>s+Math.pow(100*n/N,2),0);
   const hhiLabel=hhi<1500?'unconcentrated':hhi<2500?'moderate':'concentrated';
-  const hhiCol=hhi<1500?'#23A28F':hhi<2500?'#E6B450':'#E0574F';
+  const hhiCol=hhi<1500?'var(--merch)':hhi<2500?'var(--gold)':'var(--agri)';
   const cards=[
-    ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', '#E0574F','▼'],
-    ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', '#E6B450','☀'],
-    ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', '#E0574F','▲'],
+    ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', 'var(--agri)','▼'],
+    ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', 'var(--gold)','☀'],
+    ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', 'var(--agri)','▲'],
   ];
   $('#expocards').innerHTML=
     `<div class="mcard"><div class="k">◆ Geographic concentration (HHI)</div>
@@ -922,7 +924,7 @@ async function renderTrend(){
   const RC=$('#trendregions');
   if(RC){
     RC.innerHTML=(DELTAS.region||[]).map(r=>{
-      const legs=[['Agri-PD',r.d_agri,r.agri,'#E0574F'],['Merchant',r.d_md,r.md,'#23A28F'],['Collateral',r.d_col,r.col,'#8E63E8']];
+      const legs=[['Agri-PD',r.d_agri,r.agri,'var(--agri)'],['Merchant',r.d_md,r.md,'var(--merch)'],['Collateral',r.d_col,r.col,'var(--collat)']];
       const worst=legs.reduce((a,b)=>Math.abs(b[1])>Math.abs(a[1])?b:a,legs[0]);
       const hc=worst[1]>0.05?'var(--agri)':worst[1]<-0.05?'var(--up)':'var(--mid)';
       return `<div class="mcard"><div class="k">${r.r} <span class="sub">· ${r.n} branches</span></div>
@@ -947,7 +949,7 @@ async function renderTrend(){
   if(BR){
     const rows=DELTAS.branches||[];
     BR.innerHTML=`<tr><th>#</th><th title="composite risk proxy = worst of agri/merchant/collateral (est)">Risk now ▲ est</th><th title="change in composite proxy vs prior vintage">Δ composite · est</th><th>Branch</th><th>Prov</th><th>Region</th><th>Δ agri</th><th>Δ merch</th><th>Δ collat</th></tr>`+
-      (rows.length?rows.map((d,i)=>{const rc=d.comp>=60?'#E0574F':d.comp>=40?'#E6B450':'#23A28F';
+      (rows.length?rows.map((d,i)=>{const rc=d.comp>=60?'var(--agri)':d.comp>=40?'var(--gold)':'var(--merch)';
         return `<tr><td class="mono sub">${i+1}</td>
         <td class="mono" style="color:${rc}">▲ ${d.comp}</td>
         <td>${deltaPill(d.d_comp)}</td>
@@ -1021,7 +1023,7 @@ function selectBranch(d,m){
 function drawRadius(d){
   clearRadius();
   if(!showRadius) return;
-  radiusCircle = L.circle([d.y,d.x], {radius:10000, color:'#5B7CFA', weight:1.2,
+  radiusCircle = L.circle([d.y,d.x], {radius:10000, color:'var(--accent)', weight:1.2,
     fillColor:'#5B7CFA', fillOpacity:0.07, dashArray:'4 4', interactive:false}).addTo(map);
 }
 function clearRadius(){ if(radiusCircle){ map.removeLayer(radiusCircle); radiusCircle=null; } }
@@ -1031,7 +1033,7 @@ function addRadiusToggle(){
     `<label style="display:flex;align-items:center;gap:6px;background:rgba(8,11,18,.9);
       border:1px solid #2e3350;border-radius:7px;padding:6px 9px;font:600 12px 'IBM Plex Sans Thai',sans-serif;
       color:#c7cedd;cursor:pointer">
-      <input type="checkbox" ${showRadius?'checked':''} style="accent-color:#5B7CFA"> 10&nbsp;km radius</label>`);
+      <input type="checkbox" ${showRadius?'checked':''} style="accent-color:var(--accent)"> 10&nbsp;km radius</label>`);
     L.DomEvent.disableClickPropagation(d);
     d.querySelector('input').onchange = e=>{ showRadius=e.target.checked;
       if(!showRadius) clearRadius(); };
@@ -1045,12 +1047,12 @@ function cstressPopupHTML(d,sec,r){
   const dom=(p.crop_mix&&p.crop_mix[0])||null;
   const c=p.components||{};
   const sv=Math.round((p.agri_stress||0)*100);
-  const sc=sv>=45?'#C8433B':sv>=25?'#E6B450':'#23A28F';
+  const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
   return sec('Crop-household stress — ESTIMATED triage')
     + r('Agri-stress (0–100) · est', `<span style="color:${sc}">▲ ${sv}</span>`, sc)
     + (dom?r('Dominant crop (OAE · measured)', `${dom.crop} ${Math.round((dom.share||0)*100)}%`, '#c7cedd'):'')
-    + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'#C8433B':'#1C8C7D')
-    + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'#E6B450':'#23A28F');
+    + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
+    + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'var(--gold)':'var(--merch)');
 }
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
@@ -1058,12 +1060,12 @@ function collatMixPopupHTML(d,sec,r){
   const p=PLOOK&&PLOOK[d.v]; if(!p||!p.vehicles) return '';
   const pct=v=>v==null?null:Math.round(100*v/p.vehicles);
   const mp=pct(p.moto), cp=pct(p.car), pp=pct(p.pickup), ep=pct(p.ev);
-  const mc=mp!=null&&mp>=55?'#C8433B':'#7A4FE0';
+  const mc=mp!=null&&mp>=55?'var(--agri)':'var(--collat)';
   return sec('Collateral mix — DLT vehicle stock · measured')
     + r('Motorcycle share ▲', mp!=null?mp+'%':'n/a', mc)
     + (cp!=null?r('Car share', cp+'%', '#8b90a7'):'')
     + (pp!=null?r('Pickup share', pp+'%', '#8b90a7'):'')
-    + (ep!=null?r('EV share', ep+'%', '#23A28F'):'');
+    + (ep!=null?r('EV share', ep+'%', 'var(--merch)'):'');
 }
 // District (amphoe) block for a branch popup — shows the whole-district scores joined to this
 // branch. White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED. Renders
@@ -1071,12 +1073,12 @@ function collatMixPopupHTML(d,sec,r){
 function amphoePopupHTML(d,sec,r){
   const a=d._amp; if(!a) return '';
   const ws=a.whitespace, rk=a.risk_proxy;
-  const wc=ws>=40?'#E6B450':ws>=20?'#cda23e':'#8b90a7';
-  const rc=rk>=55?'#C8433B':rk>=45?'#E6B450':'#23A28F';
+  const wc=ws>=40?'var(--gold)':ws>=20?'#cda23e':'#8b90a7';
+  const rc=rk>=55?'var(--agri)':rk>=45?'var(--gold)':'var(--merch)';
   return sec('District (amphoe) — white-space & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
-    + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), '#5B7CFA')
+    + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
 }
 function popupHTML(d){
@@ -1086,11 +1088,11 @@ function popupHTML(d){
   const wc=regionWorstCrop(d.r);
   // within-10km radar: label, count, bar scaled to a sensible per-row max
   const radar=[
-    ['Factories (OSM)',k.ind,60,'#E6B450'],['Industrial estates',k.est,5,'#E6B450'],
-    ['Vehicle/moto shops',k.veh,40,'#7A4FE0'],['Gold shops',k.gold,15,'#7A4FE0'],
-    ['Banks',k.bank,40,'#5B7CFA'],['ATMs',k.atm,60,'#5B7CFA'],
-    ['Convenience',k.cvs,80,'#1C8C7D'],['Supermarkets',k.super,15,'#1C8C7D'],
-    ['Fresh markets',k.fmkt,15,'#1C8C7D'],['Restaurants',k.rest,80,'#1C8C7D'],
+    ['Factories (OSM)',k.ind,60,'var(--gold)'],['Industrial estates',k.est,5,'var(--gold)'],
+    ['Vehicle/moto shops',k.veh,40,'var(--collat)'],['Gold shops',k.gold,15,'var(--collat)'],
+    ['Banks',k.bank,40,'var(--accent)'],['ATMs',k.atm,60,'var(--accent)'],
+    ['Convenience',k.cvs,80,'var(--merch)'],['Supermarkets',k.super,15,'var(--merch)'],
+    ['Fresh markets',k.fmkt,15,'var(--merch)'],['Restaurants',k.rest,80,'var(--merch)'],
     ['Schools',k.sch,40,'#8b90a7'],['Hospitals/gov',k.civic,30,'#8b90a7'],
     ['Hotels',k.hotel,40,'#8b90a7'],['Pharmacies',k.pharm,30,'#8b90a7'],
   ];
@@ -1098,26 +1100,26 @@ function popupHTML(d){
   const rrow=([lab,v,mx,col])=>`<div class="pr" style="gap:8px"><span style="flex:1">${lab}</span>
      ${barHTML(v||0,col,mx)}<b class="mono" style="color:${col};min-width:24px;text-align:right">${v||0}</b></div>`;
   const dist = (d.dfac!=null) ? sec('District (DIW · measured)')
-     + r('Factories', (d.dfac||0).toLocaleString(), '#E6B450')
-     + r('Factory workers', (d.dwork||0).toLocaleString(), '#E6B450') : '';
+     + r('Factories', (d.dfac||0).toLocaleString(), 'var(--gold)')
+     + r('Factory workers', (d.dwork||0).toLocaleString(), 'var(--gold)') : '';
   return `<div class="pop" style="max-height:62vh;overflow:auto">
     <div class="pn">${d.n}</div>
     <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
     <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
-       background:#5B7CFA;color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
+       background:var(--accent);color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
-    ${r('Agri-PD ● (est)', d.a==null?'n/a':d.a, '#E0574F')}
-    ${r('Merchant ◆ (est)', d.m==null?'n/a':d.m, '#23A28F')}
-    ${r('Collateral ▲ (est)', d.c==null?'n/a':d.c, '#8E63E8')}
+    ${r('Agri-PD ● (est)', d.a==null?'n/a':d.a, 'var(--agri)')}
+    ${r('Merchant ◆ (est)', d.m==null?'n/a':d.m, 'var(--merch)')}
+    ${r('Collateral ▲ (est)', d.c==null?'n/a':d.c, 'var(--collat)')}
     ${sec('Market — measured')}
-    ${r('District factories (DIW)', naNum(d.dfac), '#E6B450')}
-    ${r('District factory workers (DIW)', naNum(d.dwork), '#E6B450')}
-    ${pl?r('Province pickups (DLT)', naNum(pl.pickup), '#7A4FE0'):''}
-    ${pl?r('Province informal workers (NSO)', naNum(pl.informal), '#7A4FE0'):''}
+    ${r('District factories (DIW)', naNum(d.dfac), 'var(--gold)')}
+    ${r('District factory workers (DIW)', naNum(d.dwork), 'var(--gold)')}
+    ${pl?r('Province pickups (DLT)', naNum(pl.pickup), 'var(--collat)'):''}
+    ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
-    ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
+    ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}</div>`;
@@ -1159,16 +1161,16 @@ function renderBranches(){
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
   $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
-    rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'#E0574F':rk>=40?'#E6B450':'#23A28F';
+    rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
       return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="no-print">${starBtn(id,wItem)}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${rc};text-decoration:none" title="ESTIMATED risk proxy ${riskMetric==='composite'?'(worst of agri/merchant/collateral)':''}">▲ ${rk}</a></td>
       <td>${d.n}</td><td class="sub">${d.v}</td>
-      <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
-      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td>
-      <td class="mono" style="color:#7A4FE0">${naNum(pl.informal)}</td>
+      <td class="mono" style="color:var(--gold)">${naNum(d.dwork)}</td>
+      <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
+      <td class="mono" style="color:var(--collat)">${naNum(pl.informal)}</td>
       <td class="mono sub">${d.w}</td></tr>`;}).join('');
 }
 
@@ -1380,7 +1382,7 @@ function renderHomeRisk(){
     html+=`<div class="cc-sub2">Most motorcycle-heavy collateral ${TAG_M}</div>`;
     html+=moto.map(p=>ccRow(`${p.th} <span class="sub">${p.region}</span>`,
       `${p.branches} branches · lowest-recovery title collateral`,
-      `${p.moto}%`,'moto share','#C8433B')).join('');
+      `${p.moto}%`,'moto share','var(--agri)')).join('');
   }
   // gold-up vs pickup-pressure collateral read (board measured + editorial pickup watch)
   const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
