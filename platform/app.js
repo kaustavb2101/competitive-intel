@@ -10,7 +10,23 @@ const LENS = {
   informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
+  cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
 };
+// per-province crop-household stress — lazy-loaded from data/crop_stress.json (objective #1).
+// CSTRESS maps Thai province name -> province record; val() returns agri_stress on a 0–100 scale.
+let CSTRESS=null, cstressLoaded=false;
+function cstressVal(d){const p=CSTRESS&&CSTRESS[d.v]; return p?Math.round((p.agri_stress||0)*100):0;}
+async function loadCropStress(){
+  if(cstressLoaded) return CSTRESS;
+  cstressLoaded=true;
+  try{
+    const j = await fetch('data/crop_stress.json').then(r=>r.json());
+    CSTRESS={}; CSTRESS_META=j.meta||null; CSTRESS_LIST=j.provinces||[];
+    (j.provinces||[]).forEach(p=>{CSTRESS[p.th]=p;});
+  }catch(e){ CSTRESS={}; CSTRESS_LIST=[]; }
+  return CSTRESS;
+}
+let CSTRESS_META=null, CSTRESS_LIST=[];
 // risk sub-metric: composite (max of the three proxies) or a single selectable score.
 let riskMetric='composite';
 // carry the current light/dark theme over to the standalone 3D/map pages
@@ -83,6 +99,34 @@ function renderOverview(){
       <td class="mono" style="color:var(--agri)">${r.hi}</td>
       <td>${barHTML(r.md,'#1C8C7D')} <span class="mono">${r.md}</span></td>
       <td>${barHTML(r.col,'#7A4FE0')} <span class="mono">${r.col}</span></td></tr>`).join('');
+  // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
+  loadCropStress().then(renderCropStress);
+}
+/* ---------- crop-household stress (Overview card) ----------
+   Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
+   dominant crop + share (OAE, measured), price YoY (World Bank GLOBAL direction proxy — NOT Thai
+   farm-gate), rainfall % of normal (HDX, measured). Data from data/crop_stress.json (lazy). */
+function renderCropStress(){
+  const tbl=$('#cstresstbl'), note=$('#cstress-note');
+  if(!tbl) return;
+  if(!CSTRESS_LIST||!CSTRESS_LIST.length){
+    if(note) note.textContent='Crop-household stress data not available (data/crop_stress.json missing).';
+    return;
+  }
+  const top=CSTRESS_LIST.slice(0,8); // already sorted worst-first by agri_stress
+  if(note) note.innerHTML='Which crop-farming provinces are squeezing borrower income most. '+
+    '<b>Agri-stress</b> is an <b>estimated triage index</b> (price proxy × drought, scaled by how much the province farms). '+
+    '<b>Price YoY</b> = World Bank <b>global</b> price direction proxy (<i>not</i> Thai farm-gate). '+
+    '<b>Dominant crop</b> (OAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.';
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="World Bank GLOBAL price YoY direction proxy — not Thai farm-gate">Price YoY ◇ est</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th></tr>`+
+    top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
+      const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'#C8433B':sv>=25?'#E6B450':'#23A28F'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'#23A28F';
+      const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region||'—'}</td>
+      <td>${barHTML(sv,bar)} <span class="mono" style="color:${sc}">${sv}</span></td>
+      <td class="sub">${dom.crop||'—'} <span class="mono">${dom.share!=null?Math.round(dom.share*100)+'%':''}</span></td>
+      <td class="mono" style="color:${p.price_stress<0?'var(--agri)':'var(--mid)'}">${p.price_stress!=null?(p.price_stress>0?'+':'')+p.price_stress+'%':'—'}</td>
+      <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td></tr>`;}).join('');
 }
 
 /* ---------- acquisition ---------- */
@@ -437,6 +481,20 @@ function addRadiusToggle(){
     return d; };
   C.addTo(map);
 }
+// crop-household stress block for a branch popup — only the cstress lens loads the data,
+// so render nothing until it's available. Shows the REAL components, honestly labelled.
+function cstressPopupHTML(d,sec,r){
+  const p=CSTRESS&&CSTRESS[d.v]; if(!p) return '';
+  const dom=(p.crop_mix&&p.crop_mix[0])||null;
+  const c=p.components||{};
+  const sv=Math.round((p.agri_stress||0)*100);
+  const sc=sv>=45?'#C8433B':sv>=25?'#E6B450':'#23A28F';
+  return sec('Crop-household stress — ESTIMATED triage')
+    + r('Agri-stress (0–100) · est', `<span style="color:${sc}">▲ ${sv}</span>`, sc)
+    + (dom?r('Dominant crop (OAE · measured)', `${dom.crop} ${Math.round((dom.share||0)*100)}%`, '#c7cedd'):'')
+    + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'#C8433B':'#1C8C7D')
+    + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'#E6B450':'#23A28F');
+}
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
@@ -474,6 +532,7 @@ function popupHTML(d){
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), '#7A4FE0'):''}
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), '#7A4FE0'):''}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
+    ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}</div>`;
 }
@@ -487,7 +546,11 @@ function styleMarkers(){
 function setLens(k){
   curLens=k;
   document.querySelectorAll('.lens').forEach(b=>b.classList.toggle('on',b.dataset.l===k));
-  renderRiskSub(); renderLegend(); if(mapReady) styleMarkers();
+  renderRiskSub();
+  if(k==='cstress' && !cstressLoaded){
+    loadCropStress().then(()=>{ if(curLens==='cstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  renderLegend(); if(mapReady) styleMarkers();
 }
 
 /* ---------- branches ---------- */
