@@ -85,6 +85,28 @@ def bldg_height(tags, fa):
     return 6.0 if fa < 120 else (9.0 if fa < 400 else (11.0 if fa < 800 else 13.0))
 
 
+def bldg_type(tags):
+    """Short type bucket from the SAME matched OSM building tag bldg_height() branches on.
+    Returns one of: house, residential, commercial, industrial, office, school, hotel, mixed."""
+    tags = tags or {}
+    b = tags.get('building', 'yes')
+    if b == 'house':
+        return 'house'
+    if b in ('residential', 'apartments') or 'residential' in b or 'apartments' in b:
+        return 'residential'
+    if any(k in b for k in ('retail', 'commercial', 'shop')):
+        return 'commercial'
+    if b == 'office':
+        return 'office'
+    if 'industrial' in b or 'warehouse' in b:
+        return 'industrial'
+    if b == 'school':
+        return 'school'
+    if b == 'hotel':
+        return 'hotel'
+    return 'mixed'
+
+
 def jitter(h, ring):
     """Deterministic +-8% jitter, exactly as the live page (seed from first vertex)."""
     seed = abs(math.sin(ring[0][0] * 12.9898 + ring[0][1] * 78.233)) % 1.0
@@ -123,6 +145,7 @@ def rebake(catch):
         fp = ring_area_m2(ring, bld.get('cy', 12.7))
         h = jitter(bldg_height(tags, fp), ring)
         bld['h'] = round(h, 2)
+        bld['ty'] = bldg_type(tags)
     return catch, matched, measured
 
 
