@@ -29,6 +29,12 @@ from regionmap import canonical, REGION, norm_district, PROVINCE_EN
 POI_LAYERS = ["industrial", "vehicle_commerce", "fresh_market", "gold", "bank",
               "convenience", "restaurant", "hotel", "supermarket", "pharmacy"]
 
+# full within-10km POI counts per branch (short key -> master field), sourced the
+# same way derive.py builds k10 from the master — measured (OSM, within 10km).
+K10 = {"ind": "ind10", "bank": "bank10", "atm": "atm10", "cvs": "cvs10", "hotel": "hotel10",
+       "civic": "civic10", "fmkt": "fmkt10", "rest": "rest10", "super": "super10",
+       "pharm": "pharm10", "gold": "gold10", "veh": "veh10", "sch": "sch10", "est": "n_estate10"}
+
 
 def _load(p):
     with open(p, encoding="utf-8") as f:
@@ -182,7 +188,8 @@ def build_all():
                          "d": b["district"], "ind": b["ind10"], "veh": b["veh10"], "gold": b["gold10"],
                          "fmkt": b["fmkt10"], "own": b["own10"], "wa": b.get("dist_workingage"),
                          "nfac": near(b["lat"], b["lng"], ind_pts), "nmkt": near(b["lat"], b["lng"], mkt_pts),
-                         "nest": b.get("nearest_km"), "ncomp": None, "ncompn": None})
+                         "nest": b.get("nearest_km"), "ncomp": None, "ncompn": None,
+                         "k10": {sk: b.get(mk, 0) for sk, mk in K10.items()}})
 
         en = PROVINCE_EN.get(prov, "")         # explicit override (BKK, Ayutthaya — no "Mueang" amphoe)
         if not en:
