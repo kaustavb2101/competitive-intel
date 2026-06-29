@@ -3,6 +3,7 @@
 #
 # Phases (run all by default; pass a phase name to run just one):
 #   check    determinism gate: pipeline --check + node --check on app.js & every page's inline JS
+#            + data integrity (validate_data.py over platform/data/*.json)
 #   render   headless-render every page in tests/pages.manifest with self-hosted deck.gl/leaflet
 #   health   per-page smoke: no uncaught errors, lib init, non-blank canvas, DOM hooks present
 #   visual   compare fresh renders to tests/baseline/*.png within tolerance
@@ -77,6 +78,15 @@ phase_check(){
     done
     [ "$nbad" -eq 0 ] && ok "node --check inline JS of $name" || bad "node --check inline JS of $name ($nbad block(s) failed)"
   done
+
+  # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).
+  # The determinism/syntax checks above don't look INSIDE the data; this does. Its own per-check
+  # report is shown so a failure points at the exact integrity violation (an IPO-readiness gate).
+  if python3 "$TESTS/validate_data.py"; then
+    ok "validate_data.py (platform/data integrity)"
+  else
+    bad "validate_data.py (platform/data integrity — see report above)"
+  fi
 }
 
 # ---------------------------------------------------------------------------
