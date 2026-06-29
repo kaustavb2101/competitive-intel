@@ -220,11 +220,12 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </script>
 <div id="map"></div>
 
-<div id="strip"><span class="ttl">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
+<div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="ctl">
   <button data-b="voyager" class="on">Map</button>
   <button data-b="dark">Dark</button>
+  <button data-b="satellite">Satellite</button>
   <button id="ringtog" class="on">Rings</button>
 </div>
 
@@ -270,13 +271,25 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 'use strict';
 try{
 const CA=window.CA;
+const CITY=window.CITY||'rayong';
+// Human label for the city: prefer the catchment meta name, else title-case the slug.
+const CITY_LABEL=(CA.meta&&(CA.meta.city||CA.meta.name))||
+  (CITY.charAt(0).toUpperCase()+CITY.slice(1).replace(/[-_]/g,' '));
+// Header + tab title. For Rayong the strip text is unchanged (byte-equivalent default view).
+if(CITY!=='rayong'){
+  const ct=document.getElementById('cityTitle');
+  if(ct)ct.innerHTML=CITY_LABEL+' 3D <b>·</b> branches · POIs · 10km reach';
+  try{document.title=CITY_LABEL+' 3D · เงินไชโย';}catch(e){}
+}
 const PROV=window.PROV||{};
 const IDX=window.PROV_INDEX||null;
-// 59 province branches drive the dropdown, dots, labels and 10km rings; catchment buildings stay as Mueang-core scenery.
-const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:CA.branches;
-const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:CA.competitors;
+// 59 province branches drive the dropdown, dots, labels and 10km rings; catchment buildings stay as city-core scenery.
+// Each falls back to [] / {} for cities whose province/competitor/POI files don't exist yet — the
+// scene still renders (buildings + ground); the Rayong-only panels just stay empty and degrade.
+const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:(CA.branches||[]);
+const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:(CA.competitors||[]);
 // full POI palette comes from the province file ([lat,lng]); fall back to the catchment POIs if missing.
-const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:CA.poi;
+const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:(CA.poi||{});
 const DISTRICTS=PROV.districts||null;
 const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47]};
 const GOLD=[230,180,80]; // 10km collateral catchment ring
@@ -297,15 +310,20 @@ let basemap='voyager', showRings=true;
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
   return 2*R*Math.asin(Math.sqrt(x));}
-// default focal = the province branch nearest the Mueang-core building cluster (so the reachable card + 3D both read well)
+// default focal = the province branch nearest the city-core building cluster (so the reachable card + 3D both read well).
+// For a city with no branch data, focal is null — every consumer null-guards it (rings, label, panels, cascade).
 let focal=(function(){const c=CA.center||{lat:12.686,lng:101.245};
-  if(!BR||!BR.length)return CA.focal||CA.branches[0];
+  if(!BR||!BR.length)return CA.focal||(CA.branches&&CA.branches[0])||null;
   let best=BR[0],bd=Infinity;for(const b of BR){const d=hav(c.lat,c.lng,b.y,b.x);if(d<bd){bd=d;best=b;}}return best;})();
 function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
   for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
 
+// Basemap raster sources. voyager (default) + dark from CARTO; satellite = Esri World Imagery.
+// NOTE Esri's template is {z}/{y}/{x} (row before column) — different from CARTO's {z}/{x}/{y}.
+// deck.gl's TileLayer resolves {x}/{y}/{z} tokens wherever they appear, so the order is respected.
 const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            satellite:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'};
 let LIGHTING=null;
 try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
   // shadows OFF: the cast shadow of ~3,631 thin footprints smeared into a grey dome under software WebGL.
@@ -315,9 +333,17 @@ try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
     sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:false}),
     fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
 } }catch(e){ LIGHTING=null; }
-// cinematic default: frame the Mueang-core building cluster (not the focal branch, which may sit on the rim),
+// cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
-const CORE=CA.center||{lat:12.686,lng:101.245};
+// Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
+// so ANY city frames itself. Computed lazily here to avoid forward-referencing buildingBbox.
+const CORE=(function(){
+  if(CA.center&&CA.center.lat!=null&&CA.center.lng!=null)return CA.center;
+  const b=CA.buildings||[];let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p;if(!p)continue;for(const pt of p){
+    if(pt[0]<minX)minX=pt[0];if(pt[0]>maxX)maxX=pt[0];if(pt[1]<minY)minY=pt[1];if(pt[1]>maxY)maxY=pt[1];}}
+  if(!isFinite(minX))return {lat:13.75,lng:100.5};   // last-resort fallback (Bangkok-ish)
+  return {lat:(minY+maxY)/2,lng:(minX+maxX)/2};})();
 const deckgl=new deck.DeckGL({container:'map',
   initialViewState:{longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-26},
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
@@ -336,7 +362,8 @@ function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],min
   renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
     bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
 
-function darkMode(){return basemap==='dark';}
+// satellite imagery reads as a dark base, so style buildings/ground with the dark palette over it.
+function darkMode(){return basemap==='dark'||basemap==='satellite';}
 
 // ---- OPTIONAL ground layers (future OSM pull) — render UNDER buildings; absent file => skipped silently. ----
 // These are populated by a later Overpass pull on Kaustav's Thai laptop (network-blocked in this sandbox).
@@ -592,7 +619,7 @@ function render(){
     getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),235],background:true,
     backgroundPadding:[4,2],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
     getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
-  L.push(new deck.TextLayer({id:'land',data:CA.landmarks,getPosition:d=>[d.cx,d.cy],getText:d=>d.nm,
+  L.push(new deck.TextLayer({id:'land',data:CA.landmarks||[],getPosition:d=>[d.cx,d.cy],getText:d=>d.nm,
     getSize:10,getColor:[255,255,255,255],getBackgroundColor:[70,52,30,225],background:true,
     backgroundPadding:[5,3],fontFamily:'IBM Plex Sans Thai',fontWeight:500,getTextAnchor:'middle',
     characterSet:'auto',sizeUnits:'pixels',pickable:true}));
@@ -645,7 +672,14 @@ const OCC=[
 ];
 
 function updatePanels(){
-  const dist=focal.d||CA.meta.dist;
+  // No branch data (a city without a province file) — leave the analysis panels in their empty state.
+  if(!focal){
+    const k10host=document.getElementById('k10panel');
+    if(k10host)k10host.innerHTML='<div class="foot">Branch + POI overlays for this city are not loaded yet — the 3D buildings and ground render from the catchment pull. Rayong has the full analysis stack.</div>';
+    const whost=document.getElementById('workpanel'); if(whost)whost.innerHTML='';
+    return;
+  }
+  const dist=focal.d||(CA.meta&&CA.meta.dist)||CITY_LABEL;
   const k=focal.k10||null;
   document.getElementById('focalName').textContent=focal.n||'AutoX branch';
   document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${focal.veh!=null?focal.veh:'—'}`;
@@ -696,6 +730,15 @@ function updatePanels(){
 }
 
 function buildLeads(){
+  // Rayong-specific acquisition panel: needs both competitors AND branches. Degrade gracefully
+  // for cities without that data (the right-hand card just shows a short note).
+  if(!COMP.length||!BR.length){
+    const v=document.getElementById('verdict');
+    if(v)v.innerHTML='<div class="foot">Competitor + branch overlays for this city are not loaded yet. The 3D scene (buildings + ground) renders from the catchment pull; the full acquisition read is available for Rayong.</div>';
+    const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
+    const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
+    return;
+  }
   // gaps: competitors whose nearest AutoX branch is far -> contested ground we don't hold
   const gaps=COMP.map(c=>{
     const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
@@ -816,19 +859,29 @@ buildStrip();buildLegend();buildCascade();buildLeads();updatePanels();render();
 };</script>
 <script>
 (function(){
- var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading Rayong 3D…';document.body.appendChild(box);
- // catchment = Mueang-core buildings + reachable-pop; province = 59 branches, full POI palette, district polygons; index = nationwide cascade
- // OPTIONAL future layers (roads/water/landuse) — fetched best-effort; missing file => null => layer skipped (graceful).
- // These come from a later OSM pull on Kaustav's Thai laptop; see the EXPECTED JSON SHAPE comments in initCatch().
+ // ?city=<slug> picks the dataset. Default (omitted) => 'rayong' => the exact files this page
+ // always loaded, so the default view is byte-equivalent behaviour to before generalisation.
+ var CITY='rayong';
+ try{var q=new URLSearchParams(location.search).get('city');if(q)CITY=q.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');}catch(e){}
+ if(!CITY)CITY='rayong';
+ window.CITY=CITY;
+ var pretty=CITY.charAt(0).toUpperCase()+CITY.slice(1).replace(/[-_]/g,' ');
+ var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading '+pretty+' 3D…';document.body.appendChild(box);
+ // catchment = city-core buildings (+reachable-pop for rayong); province = branches, full POI palette,
+ // district polygons; index = nationwide cascade. For non-rayong cities the province/index files
+ // usually don't exist yet — they load best-effort and the page degrades gracefully (Rayong-specific
+ // extras such as competitors, province panel and the branch cascade are skipped when absent).
+ // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
  function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+ var P='data/'+CITY;
  Promise.all([
-   fetch('data/rayong_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
-   fetch('data/rayong_province.json').then(function(r){if(!r.ok)throw new Error('province '+r.status);return r.json();}),
-   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
-   opt('data/rayong_roads.json'), opt('data/rayong_water.json'), opt('data/rayong_landuse.json')
- ]).then(function(a){window.CA=a[0];window.PROV=a[1];window.PROV_INDEX=a[2];
+   fetch(P+'_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
+   opt(P+'_province.json'),
+   opt('data/provinces/index.json'),
+   opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json')
+ ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];box.remove();window.initCatch();})
-  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load Rayong 3D data: '+e.message;});
+  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();
 </script>
 </body>
