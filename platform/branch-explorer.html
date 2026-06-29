@@ -53,6 +53,8 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui
 #panel{top:94px;max-height:calc(100vh - 110px)}
 .ctl{top:94px}
 
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
+.dtt b{color:#fff}
 /* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
 html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
 html[data-theme="light"] #nav .nb{color:#11151F}
@@ -135,13 +137,13 @@ function bldgHeight(tags,fa){            // measured tag if present, else estima
   return fa<120?6:fa<400?9:fa<800?11:13;
 }
 function heightColor(h){                  // 3-stop ramp: low slate -> accent -> gold
-  const t=Math.max(0,Math.min(1,h/40)), a=[43,58,85],b=[91,124,250],c=[224,169,59];
+  const t=Math.pow(Math.max(0,Math.min(1,h/40)),1.1), a=[43,58,85],b=[91,124,250],c=[224,169,59];
   const m=t<.5?a.map((v,i)=>Math.round(v+(b[i]-v)*t*2)):b.map((v,i)=>Math.round(v+(c[i]-v)*(t-.5)*2));
   return [m[0],m[1],m[2],232];
 }
 
 /* ---- deck.gl ---- */
-const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15, pitch:55, bearing:-12, maxZoom:19, minZoom:9};
+const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15.2, pitch:58, bearing:-12, maxZoom:19, minZoom:9};
 let deckgl;
 // directional sun + ambient + fill, with shadows on desktop (the DataProteins look)
 let LIGHTING=null;
@@ -150,9 +152,9 @@ try{
     const useShadow=!/Mobi|Android/i.test(navigator.userAgent) && window.innerWidth>900;
     LIGHTING=new deck.LightingEffect({
       ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-      sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
-      fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
-    LIGHTING.shadowColor=[0,0,0,0.32];
+      sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:useShadow}),
+      fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
+    LIGHTING.shadowColor=[0,0,0,0.50];
   }
 }catch(e){ LIGHTING=null; }
 function baseLayer(){
@@ -165,10 +167,10 @@ function layers(){
   L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>heightColor(b.h),
-    stroked:true,getLineColor:[10,14,22,55],getLineWidth:1,lineWidthMinPixels:0.4,
-    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},
+    stroked:true,getLineColor:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
     parameters:{depthTest:true},transitions:{getElevation:600},
-    _shadow:true,pickable:false}));
+    _shadow:true,pickable:true}));
   if(showRing && !isNaN(LAT)){
     L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:false,
@@ -219,7 +221,7 @@ async function loadBuildings(){
         let h=bldgHeight(el.tags,fa);
         const seed=Math.abs(Math.sin(ring[0][0]*12.9898+ring[0][1]*78.233))%1;   // deterministic ±8% jitter
         h=Math.min(60,h*(0.92+0.16*seed));
-        out.push({p:ring,h});
+        out.push({p:ring,h,fa});
       }
     }
     buildings=out; tileCache[ckey]=out; render();
@@ -265,6 +267,10 @@ function init(){
   deckgl=new deck.DeckGL({container:'map',mapStyle:null,initialViewState:INITIAL,
     controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
     layers:layers(),
+    getTooltip:({object,layer})=>{
+      if(!object)return null;
+      if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · est. from footprint</div>`};
+      return null;},
     onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(loadBuildings,650); }});
   $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
   $('#t-reload').onclick=loadBuildings;
