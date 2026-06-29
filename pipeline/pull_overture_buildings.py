@@ -143,7 +143,10 @@ def download_geojson(cli, bbox, dest):
             f"'{cli}' not found on PATH. Install it first:\n"
             f"    pip install overturemaps\n"
             f"(or pass --geojson PATH to use an existing export, or --cli to point at the binary).")
-    cmd = [cli, "download", f"--bbox={ovt_bbox}", "-f", "geojson",
+    # Use line-delimited GeoJSON (geojsonseq): Overture's per-feature streaming
+    # writer. The single-FeatureCollection 'geojson' writer crashes in
+    # write_batch() on newer pyarrow / Python 3.14; geojsonseq avoids that path.
+    cmd = [cli, "download", f"--bbox={ovt_bbox}", "-f", "geojsonseq",
            "--type=building", "-o", dest]
     print("running:", " ".join(cmd), file=sys.stderr)
     # Capture stderr so the CLI's real failure (S3/network/pyarrow) is surfaced,
@@ -276,14 +279,33 @@ def convert(features):
 
 
 def load_features(path):
-    data = json.load(open(path))
-    if isinstance(data, dict) and data.get("type") == "FeatureCollection":
-        return data.get("features", [])
-    if isinstance(data, list):
-        return data
-    if isinstance(data, dict) and data.get("type") == "Feature":
-        return [data]
-    raise ValueError(f"{path} is not a GeoJSON FeatureCollection/Feature(s)")
+    text = open(path, encoding="utf-8").read()
+    # Try whole-file JSON first (a FeatureCollection / Feature / list — e.g. a
+    # user-supplied --geojson export).
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        data = None
+    if data is not None:
+        if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+            return data.get("features", [])
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict) and data.get("type") == "Feature":
+            return [data]
+        raise ValueError(f"{path} is not a GeoJSON FeatureCollection/Feature(s)")
+    # Otherwise treat as line-delimited GeoJSON (geojsonseq): one Feature per line.
+    feats = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        ft = json.loads(line)
+        if isinstance(ft, dict) and ft.get("type") == "FeatureCollection":
+            feats.extend(ft.get("features", []))
+        else:
+            feats.append(ft)
+    return feats
 
 
 def main():
