@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Rayong · เงินไชโย — EEC Deep-Dive</title>
@@ -87,10 +89,42 @@ td.n{color:var(--hi)}
 #map{top:44px}
 #title{display:none}
 .err{top:44px}
+
+/* theme toggle button in nav */
+#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);
+ border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px}
+
+/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK (per styles.css verdict) */
+html[data-theme="light"]{--bg:#EEF1F6;--panel:#FFFFFF;--line:#D3DAE6;--hi:#11151F;--txt:#2C3444;--mid:#5A6477;--dim:#828CA0}
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
+html[data-theme="light"] #nav .nb{color:#11151F}
+html[data-theme="light"] #nav a{color:#5A6477}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] #nav a:active{background:#e2e8f4}
+html[data-theme="light"] #themeToggle{border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] .cbtn,html[data-theme="light"] #elev{background:rgba(255,255,255,.92);border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] .cbtn.on{color:#11151F;border-color:#aab6cc}
+html[data-theme="light"] #elev button{color:#828CA0}
+html[data-theme="light"] #elev button.on{background:#e7edf8;color:#11151F}
+html[data-theme="light"] #sheet{background:rgba(255,255,255,.97);border-color:#D3DAE6}
+html[data-theme="light"] #grip .bar{background:#c3cbdb}
+html[data-theme="light"] #peek .h,html[data-theme="light"] .kpi .v,html[data-theme="light"] .imp .t,
+html[data-theme="light"] td.n{color:#11151F}
+html[data-theme="light"] .tb.on{color:#11151F}
+html[data-theme="light"] .kpi,html[data-theme="light"] .chip{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] th{border-bottom-color:#D3DAE6}
+html[data-theme="light"] td{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .imp{border-bottom-color:#E4E8F1}
 </style>
 </head>
 <body>
-<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-province.html" class="on">Rayong 3D</a><a href="rayong-catchment.html">Catchment</a><a href="index.html#acq">Acquisition</a><a href="index.html#branches">Branches</a></nav>
+<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-province.html" class="on">Rayong 3D</a><a href="rayong-catchment.html">Catchment</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
 <div id="map"></div>
 
 
@@ -146,8 +180,18 @@ function districtColor(f){
   return [base[0],base[1],base[2], 40+Math.round(t*150)];
 }
 
+let LIGHTING=null;
+try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
+  const useShadow=!/Mobi|Android/i.test(navigator.userAgent)&&window.innerWidth>900;
+  LIGHTING=new deck.LightingEffect({
+    ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
+    sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
+    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
+  LIGHTING.shadowColor=[0,0,0,0.32];
+} }catch(e){ LIGHTING=null; }
 const deckgl=new deck.DeckGL({
   container:'map',
+  effects:LIGHTING?[LIGHTING]:[],
   initialViewState:{longitude:101.28,latitude:12.78,zoom:9.3,pitch:52,bearing:12},
   controller:true,
   getTooltip:({object,layer})=>{
@@ -179,6 +223,7 @@ function render(){
     extruded:true,wireframe:true,filled:true,
     getElevation:f=>{const v=f.properties[metricField(elevMetric)]||0;return v/(maxOf(elevMetric)||1)*9000;},
     getFillColor:districtColor,getLineColor:[120,140,180,90],lineWidthMinPixels:1,
+    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},_shadow:true,
     pickable:true,updateTriggers:{getElevation:[elevMetric],getFillColor:[elevMetric]}
   }));
   if(layersOn.fac) L.push(new deck.ScatterplotLayer({id:'fac',data:RY.poi.industrial,
