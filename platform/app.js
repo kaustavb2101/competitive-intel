@@ -102,25 +102,38 @@ function renderAcq(){
    pickups + precomputed 'o' opportunity) against LOW own-AutoX saturation (w = ≤10km).
    Everything here is an ESTIMATED screen, not a site-survey. */
 let acqRegion='all', acqRows=[];
-function acqScore(d){
+// White-space score v2 — a defensible screen, not a site survey. Three legs, all from data present:
+//   DEMAND  (0–1, avg of 4 proxies): footfall (cvs+rest+fmkt·3), DIW district factory workers,
+//           province pickup stock (title collateral), and the precomputed opportunity 'o'.
+//   SATURATION penalty: own AutoX ≤10km (w) — more of our own branches = less headroom.
+//   COMPETITOR penalty (proxy, labelled): nearby banks+ATMs (k10) stand in for rival financial
+//           presence — we have NO national lender-branch census (only 30 hand-curated competitors
+//           in Rayong), so this is an OSM financial-density proxy, NOT a competitor count.
+// Score = demand × ownHeadroom × compHeadroom, scaled 0–100. Each leg returned for transparency.
+function acqLegs(d){
   const pl=(typeof PLOOK!=='undefined'&&PLOOK)?(PLOOK[d.v]||{}):{};
   const k=d.k10||{};
-  // demand proxy: footfall (convenience+restaurants+fresh markets), district factory workers,
-  // province pickup collateral stock, and the precomputed opportunity 'o'. Normalised 0–1.
   const foot=((k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3);
-  const demand = norm(foot,ACQN.foot) + norm(d.dwork||0,ACQN.dwork) + norm(pl.pickup||0,ACQN.pickup) + norm(d.o||0,ACQN.o);
-  // white-space: fewer own AutoX ≤10km -> more headroom. w can be 0..many.
-  const head = 1 - Math.min(1,(d.w||0)/8);
-  return Math.round(100*(demand/4)*(0.35+0.65*head)); // demand weighted, amplified by headroom
+  const demand=(norm(foot,ACQN.foot)+norm(d.dwork||0,ACQN.dwork)+norm(pl.pickup||0,ACQN.pickup)+norm(d.o||0,ACQN.o))/4;
+  // own-AutoX headroom: 1 at zero own branches, decays toward 0.35 floor as saturation rises.
+  const ownHead=0.35+0.65*(1-Math.min(1,(d.w||0)/8));
+  // competitor (financial-density proxy) headroom: dense banks+ATMs => slightly less white space.
+  const fin=(k.bank||0)+(k.atm||0);
+  const compHead=0.6+0.4*(1-Math.min(1,fin/(ACQN.fin||1)));
+  return {demand,ownHead,compHead,fin};
 }
+function acqScore(d){const L=acqLegs(d); return Math.round(100*L.demand*L.ownHead*L.compHead);}
 let ACQN={};
 function buildAcqNorms(){
   const mx=f=>Math.max(1,...DATA.map(f));
+  // 90th-pct cap for the financial-density proxy so a couple of CBD outliers don't flatten everyone.
+  const fins=DATA.map(d=>{const k=d.k10||{};return (k.bank||0)+(k.atm||0);}).sort((a,b)=>a-b);
   ACQN={
     foot:mx(d=>{const k=d.k10||{};return (k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3;}),
     dwork:mx(d=>d.dwork||0),
     pickup:mx(d=>(PLOOK[d.v]||{}).pickup||0),
     o:mx(d=>d.o||0),
+    fin:Math.max(1,fins[Math.floor(fins.length*0.9)]||1),
   };
 }
 function norm(v,mx){return Math.min(1,(v||0)/(mx||1));}
@@ -137,12 +150,46 @@ function renderAcqBoard(){
   }
   drawAcqBoard();
 }
+// Per-region ranking: which region has the most white space on average + the single best opening.
+function drawAcqRegions(){
+  if(!$('#acqregions')) return;
+  const byReg={};
+  DATA.forEach(d=>{const r=d.r||'—'; const s=acqScore(d);
+    const o=byReg[r]||(byReg[r]={r,n:0,sum:0,top:null,topS:-1});
+    o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
+  const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
+  const mxAvg=Math.max(1,...regs.map(o=>o.avg));
+  $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean white-space score across the region (est)">Avg white-space ★ est</th><th>Best single opening (est)</th></tr>`+
+    regs.map((o,i)=>{const sc=o.avg>=45?'#E6B450':o.avg>=30?'#23A28F':'var(--mid)';
+      return `<tr onclick="location.href='${branchHref(o.top)}'" style="cursor:pointer">
+      <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
+      <td class="mono sub">${o.n.toLocaleString()}</td>
+      <td>${barHTML(o.avg,sc,mxAvg)} <span class="mono" style="color:${sc}">${o.avg.toFixed(1)}</span></td>
+      <td class="sub">${o.top.n} <span class="mono" style="color:#E6B450">★ ${o.topS}</span> · ${o.top.v}</td></tr>`;}).join('');
+  // plain-language readout: lead with the answer.
+  const best=regs[0], top1=acqRows[0];
+  if($('#acqreadout')&&best&&top1){
+    const t=top1.d, L=acqLegs(t);
+    const drivers=[];
+    if(L.demand>=0.4) drivers.push('strong demand signals');
+    if(t.w<=2) drivers.push(`almost no own AutoX nearby (${t.w} ≤10km)`);
+    else if(t.w<=5) drivers.push(`thin own coverage (${t.w} ≤10km)`);
+    if((t.dwork||0)>=8000) drivers.push(`${Math.round((t.dwork||0)/1000)}k factory workers in the district`);
+    const scope=acqRegion==='all'?'nationwide':`in ${acqRegion}`;
+    $('#acqreadout').innerHTML=`<b>Open here next:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
+      at <b style="color:var(--gold)">★ ${top1.s}</b>${drivers.length?' — '+drivers.join(', ')+'.':'.'}
+      By region, <b>${best.r}</b> shows the most average white space (★ ${best.avg.toFixed(1)} across ${best.n.toLocaleString()} catchments).
+      <span class="sub">Estimated screen — confirm with a site survey before committing.</span>`;
+  }
+}
 function drawAcqBoard(){
   acqRows=DATA.filter(d=>acqRegion==='all'||d.r===acqRegion)
     .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
-  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th><th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th></tr>`+
+  drawAcqRegions();
+  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th><th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
     acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'#E6B450':row.s>=40?'#23A28F':'var(--mid)';
       const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
+      const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
       return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
       <td class="mono sub">${i+1}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${sc};text-decoration:none">★ ${row.s}</a></td>
@@ -150,12 +197,13 @@ function drawAcqBoard(){
       <td class="sub">${d.v}</td><td class="sub">${d.r}</td>
       <td class="mono ${d.w<=2?'':'sub'}" style="${d.w<=2?'color:#E6B450':''}">${d.w}</td>
       <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
-      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td></tr>`;}).join('');
+      <td class="mono" style="color:#7A4FE0">${naNum(pl.pickup)}</td>
+      <td class="mono sub">${fin}</td></tr>`;}).join('');
 }
 function acqCSV(){
-  const hdr=['rank','whitespace_score_est','branch','province','region','own_autox_10km','factory_workers_diw','province_pickups_dlt','opportunity_o_est'];
-  const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{};
-    return [i+1,row.s,d.n,d.v,d.r,d.w,d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,d.o==null?'':d.o]
+  const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
+  const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=acqLegs(d);
+    return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
@@ -179,18 +227,45 @@ function renderExposure(){
   const drought=DATA.filter(d=>d.rain!=null && d.rain<=q1);
   // 3) weak-segment (high estimated agri-PD proxy >=60)
   const weakAgri=DATA.filter(d=>(d.a||0)>=60);
+  // Herfindahl-Hirschman concentration of the footprint across provinces (book proxy = branch count).
+  // HHI = sum of squared province shares. Reported on the 0–10,000 scale (×share-in-%²) like a regulator
+  // would read it: <1500 unconcentrated, 1500–2500 moderate, >2500 concentrated.
+  const byProvN={};
+  DATA.forEach(d=>{const v=d.v||'—'; byProvN[v]=(byProvN[v]||0)+1;});
+  const provCount=Object.keys(byProvN).length;
+  const hhi=Object.values(byProvN).reduce((s,n)=>s+Math.pow(100*n/N,2),0);
+  const hhiLabel=hhi<1500?'unconcentrated':hhi<2500?'moderate':'concentrated';
+  const hhiCol=hhi<1500?'#23A28F':hhi<2500?'#E6B450':'#E0574F';
   const cards=[
     ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', '#E0574F','▼'],
     ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', '#E6B450','☀'],
     ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', '#E0574F','▲'],
   ];
-  $('#expocards').innerHTML=cards.map(([k,n,p,note,col,gl])=>
+  $('#expocards').innerHTML=
+    `<div class="mcard"><div class="k">◆ Geographic concentration (HHI)</div>
+       <div class="v" style="color:${hhiCol}">${Math.round(hhi).toLocaleString()}</div>
+       <div class="n">${hhiLabel} · footprint spread over ${provCount} provinces · book proxy = branch count</div></div>`+
+    cards.map(([k,n,p,note,col,gl])=>
     `<div class="mcard"><div class="k">${gl} ${k}</div><div class="v" style="color:${col}">${p}</div>
      <div class="n">${n.toLocaleString()} of ${N.toLocaleString()} branches · ${note}</div></div>`).join('');
   // per-region concentration table
   const byReg={};
   DATA.forEach(d=>{const r=d.r||'—'; const o=byReg[r]||(byReg[r]={n:0,str:0,dry:0,agri:0});
     o.n++; const wc=regionWorstCrop(r); if(wc&&wc.yoy<-10)o.str++; if(d.rain!=null&&d.rain<=q1)o.dry++; if((d.a||0)>=60)o.agri++;});
+  // top exposed provinces: count branches carrying ≥1 stress flag, rank by that count.
+  if($('#expoprov')){
+    const byProv={};
+    DATA.forEach(d=>{const v=d.v||'—'; const o=byProv[v]||(byProv[v]={v,r:d.r||'—',n:0,flag:0,str:0,dry:0,agri:0});
+      o.n++; const wc=regionWorstCrop(d.r); const sf=wc&&wc.yoy<-10; const df=d.rain!=null&&d.rain<=q1; const af=(d.a||0)>=60;
+      if(sf)o.str++; if(df)o.dry++; if(af)o.agri++; if(sf||df||af)o.flag++;});
+    const provs=Object.values(byProv).sort((a,b)=>b.flag-a.flag||b.n-a.n).slice(0,15);
+    $('#expoprov').innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th>Branches</th><th class="h-agri" title="branches carrying ≥1 stress flag (est)">Exposed (est)</th><th title="exposed share of the province's branches">Share</th><th>Flags</th></tr>`+
+      provs.map((o,i)=>{const sh=o.n?100*o.flag/o.n:0; const fc=sh>=66?'var(--agri)':sh>=33?'var(--gold)':'var(--mid)';
+        const fl=[o.str?'▼crop':'',o.dry?'☀dry':'',o.agri?'▲agri':''].filter(Boolean).join(' · ');
+        return `<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>
+        <td class="mono">${o.n}</td><td class="mono" style="color:${fc}">${o.flag}</td>
+        <td class="mono" style="color:${fc}">${sh.toFixed(0)}%</td><td class="sub">${fl||'—'}</td></tr>`;}).join('');
+  }
   const regs=Object.entries(byReg).sort((a,b)=>b[1].n-a[1].n);
   $('#expotbl').innerHTML=`<tr><th>Region</th><th>Branches</th><th class="h-agri" title="share in stressed-crop region (est)">Stressed-crop ▼ est</th><th class="h-opp" title="share in dry quartile (est)">Drought ☀ est</th><th class="h-agri" title="share with high agri-PD proxy (est)">High agri-PD ▲ est</th></tr>`+
     regs.map(([r,o])=>{const wc=regionWorstCrop(r);
