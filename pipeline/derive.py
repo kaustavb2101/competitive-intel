@@ -33,10 +33,13 @@ OUT  = os.path.join(REPO, "platform", "data")
 sys.path.insert(0, ROOT)
 from regionmap import norm_district   # shared district normalizer (Thai SARA-AM safe)
 
-# fields carried straight from the master record into the compact branch record
+# fields carried straight from the master record into the compact branch record.
+# NOTE: tourism_score/demand/fmkt10/veh10 were dropped from the per-branch record
+# (2024-Q2 payload trim) — they were never read by the app (the radar reads k10.fmkt /
+# k10.veh, and the acquisition score recomputes its own demand proxy). The k10 within-10km
+# dict still carries fmkt/veh, so nothing the UI shows is lost.
 DIRECT = {"v": "prov", "r": "region", "a": "agri_pd", "m": "merchant_demand",
-          "c": "collateral_density", "w": "own10", "t": "tourism_score",
-          "dem": "demand", "fmkt": "fmkt10", "veh": "veh10", "rain": "rain_3mo_anom"}
+          "c": "collateral_density", "w": "own10", "rain": "rain_3mo_anom"}
 # meta fields that are not derivable from source-data alone (kept from current meta)
 CARRY = ("mws", "cws", "macro", "n_agri", "updated")
 
@@ -71,12 +74,11 @@ def build_branches(master):
         if key not in fbd:
             misses[key] = misses.get(key, 0) + 1
         gd = fbd.get(key, {"fac": 0, "workers": 0})
-        # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,t,dem,fmkt,veh,rain
+        # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,rain,k10,dfac,dwork,d
         rec = {"x": round(b["lng"], 4), "y": round(b["lat"], 4), "n": b["name"][:34],
                "v": b["prov"], "r": b["region"], "o": round(b["opportunity"], 1),
                "a": b["agri_pd"], "m": b["merchant_demand"], "c": b["collateral_density"],
-               "w": b["own10"], "t": b["tourism_score"], "dem": b["demand"],
-               "fmkt": b["fmkt10"], "veh": b["veh10"], "rain": b["rain_3mo_anom"],
+               "w": b["own10"], "rain": b["rain_3mo_anom"],
                "k10": k10, "dfac": gd["fac"], "dwork": gd["workers"], "d": b.get("district", "")}
         out.append(rec)
     if misses:
