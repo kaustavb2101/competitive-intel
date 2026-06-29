@@ -108,13 +108,24 @@ def build():
     polys = [(f, _bbox(f["geometry"])) for f in amphoe]
 
     # ── province agri_stress (province-inherited proxy) ──────────────────────────
-    # No amphoe-level crop file exists, so we derive a PROVINCE agri-stress index
-    # from the master's branch-level agri_pd (mean per province, 0-100). Inherited
-    # by every amphoe in the province — explicitly NOT amphoe-measured.
-    prov_agri = collections.defaultdict(list)
+    # Primary source: platform/data/crop_stress.json — the richer per-province crop-
+    # household stress index (price proxy × drought, scaled by crop_dependence, with
+    # measured components). It ships agri_stress on a 0..1 scale; we rescale to 0-100
+    # to keep the amphoe.json contract (the frontend reads amphoe agri_stress / risk_proxy
+    # as 0-100). Inherited by every amphoe in the province — explicitly NOT amphoe-measured.
+    # Fallback (only for provinces ABSENT from crop_stress.json, e.g. บึงกาฬ): the old
+    # branch-level agri_pd province mean from the master (also 0-100).
+    cs = _load(os.path.join(REPO, "platform", "data", "crop_stress.json"))["provinces"]
+    prov_agri = {canonical(p["th"]): round((p.get("agri_stress") or 0) * 100, 1) for p in cs}
+    n_cropstress = len(prov_agri)
+    prov_branch_mean = collections.defaultdict(list)
     for b in master:
-        prov_agri[canonical(b["prov"], b.get("district"))].append(b.get("agri_pd", 0))
-    prov_agri = {p: round(sum(v) / len(v), 1) for p, v in prov_agri.items() if v}
+        prov_branch_mean[canonical(b["prov"], b.get("district"))].append(b.get("agri_pd", 0))
+    n_fallback_prov = 0
+    for p, v in prov_branch_mean.items():
+        if p and p not in prov_agri and v:
+            prov_agri[p] = round(sum(v) / len(v), 1)
+            n_fallback_prov += 1
 
     # ── spatial join: branches -> amphoe polygon (PIP, bbox prefilter) ───────────
     # branch_sid[i] = shapeID of the amphoe branch i (master order) falls inside.
@@ -270,7 +281,10 @@ def build():
             "province_inherited": [
                 "veh{car,pickup,moto,ev} (DLT vehicles_by_province — every amphoe inherits its province total)",
                 "informal/formal (NSO employment_by_province — province-inherited)",
-                "agri_stress (province mean of branch agri_pd from the master — province-inherited, ESTIMATED)",
+                "agri_stress (platform/data/crop_stress.json per-province crop-household stress index — "
+                "price proxy x drought scaled by crop_dependence, rescaled 0..1 -> 0-100; province-inherited, "
+                "ESTIMATED. Provinces absent from crop_stress.json fall back to the province mean of branch "
+                "agri_pd from the master.)",
             ],
             "name_note": "amphoe name is Thai (from branches inside it) where name_measured=true; "
                          "otherwise the English shapeName from th_amphoe.geojson.",
@@ -288,6 +302,8 @@ def build():
             "branch_to_amphoe": f"{branch_join}/{len(master)}",
             "branch_amphoe_fallback": f"{n_fallback}/{len(master)} branches off any polygon, assigned nearest amphoe centroid (ESTIMATED)",
             "factories_to_amphoe": f"{fac_join}/{fac_attempt} (attempted only on branch amphoe with a Thai district name)",
+            "agri_stress_from_crop_stress": f"{n_cropstress} provinces from crop_stress.json, "
+                                            f"{n_fallback_prov} provinces fell back to branch agri_pd mean",
         },
         "branch_amphoe_note": "branch_amphoe[i] = index into amphoe[] for the i-th branch in "
                               "platform/data/branches.json (same order as branches_final.json). "
