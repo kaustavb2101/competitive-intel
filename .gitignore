@@ -29,3 +29,7 @@ platform/_qa_*.html
 tests/.cache/
 tests/.work/
 tests/node_modules/
+
+# loan-tape synthetic scaffold — large + deterministically regenerable (pipeline/make_synthetic_tape.py)
+source-data/loan_tape_synthetic.json
+source-data/branch_aum_monthly_synthetic.json
