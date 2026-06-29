@@ -207,3 +207,9 @@ the Places key, or any real loan tape** — the synthetic tape and tokens are gi
 - Vercel team: `team_pYNrbLMZobN80m4jD7WPWybD` ("Kaustav Bagchi's projects")
 - Token lives in Vercel project `thailand-labor-intel` (`prj_VLpR8SIHOSwe5NXuqMjQaTBwwJFc`).
 - Overpass mirror: `https://maps.mail.ru/osm/tools/overpass/api/interpreter`
+
+
+---
+## ⏰ Deferred reminder (set 2026-07-01)
+- **Rotate DATA_GO_TH_TOKEN** — user deferred on 2026-06-29; revisit ~2 days later. (Old token was exposed in chat.)
+- **Regenerate the OpenRouteService key** — it was pasted in chat on 2026-06-29; regenerate after the isochrone is wired.
