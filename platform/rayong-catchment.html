@@ -172,9 +172,18 @@ function reachable(lat,lng){const acc=[0,0,0];
 
 const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+let LIGHTING=null;
+try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
+  const useShadow=!/Mobi|Android/i.test(navigator.userAgent)&&window.innerWidth>900;
+  LIGHTING=new deck.LightingEffect({
+    ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
+    sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
+    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
+  LIGHTING.shadowColor=[0,0,0,0.32];
+} }catch(e){ LIGHTING=null; }
 const deckgl=new deck.DeckGL({container:'map',
   initialViewState:{longitude:CA.center.lng,latitude:CA.center.lat,zoom:13.4,pitch:55,bearing:18},
-  controller:true,
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   getTooltip:({object,layer})=>{
     if(!object)return null;
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
@@ -191,8 +200,13 @@ function render(){
   const L=[baseLayer()];
   L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
-    getFillColor:b=>{const t=Math.min(1,b.h/40);return darkMode()?[90+t*60,70+t*40,150+t*70,200]:[150,128,210,205];},
-    material:{ambient:0.6,diffuse:0.6,shininess:20},pickable:false}));
+    getFillColor:b=>{const t=Math.max(0,Math.min(1,b.h/40));
+      const lo=darkMode()?[43,58,85]:[176,188,214], mid=[91,124,250], hi=[224,169,59];
+      const m=t<.5?lo.map((v,i)=>Math.round(v+(mid[i]-v)*t*2)):mid.map((v,i)=>Math.round(v+(hi[i]-v)*(t-.5)*2));
+      return [m[0],m[1],m[2],darkMode()?232:215];},
+    stroked:true,getLineColor:darkMode()?[10,14,22,55]:[120,130,150,80],getLineWidth:1,lineWidthMinPixels:0.4,
+    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},
+    parameters:{depthTest:true},_shadow:true,pickable:false}));
   if(showRings && focal){
     L.push(new deck.PolygonLayer({id:'rings',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:true,
