@@ -552,6 +552,61 @@ function groundLayers(){
   return G;
 }
 
+// ---- OPTIONAL extra layers (Overpass pull) — TREES + RAIL. Additive + null-guarded:
+//      absent file => layer skipped, default scene unchanged. Drawn between the ground bed
+//      and the buildings so they read as ground detail, not over the skyline.
+//
+//  data/rayong_trees.json -> { "trees": [ [lng,lat], [lng,lat], ... ] }
+//      Rendered as small green points (ScatterplotLayer) plus short green columns so they
+//      stand a touch off the ground between buildings without cluttering the skyline.
+//  data/rayong_rail.json  -> { "rail": [ { "path": [[lng,lat],...] }, ... ] }
+//      Rendered as a dark DASHED PathLayer UNDER the roads (rail bed reads as track).
+function extraLayers(){
+  const G=[], D=darkMode();
+  // ---- RAIL: dark dashed track. Drawn first so roads/buildings sit on top of it. ----
+  const RAIL=window.RAIL, rl=RAIL&&Array.isArray(RAIL.rail)?RAIL.rail:null;
+  if(rl&&rl.length&&deck.PathLayer){
+    const railCol=D?[58,64,78,230]:[70,62,52,225];   // dark slate (dark) / dark brown (light)
+    // solid bed first so the line still reads if PathStyleExtension is unavailable
+    G.push(new deck.PathLayer({id:'rail-bed',data:rl,getPath:f=>f.path,
+      getWidth:5,widthUnits:'meters',widthMinPixels:1,widthMaxPixels:5,
+      getColor:[railCol[0],railCol[1],railCol[2],Math.round(railCol[3]*0.55)],
+      capRounded:true,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    if(deck.PathStyleExtension){
+      G.push(new deck.PathLayer({id:'rail-dash',data:rl,getPath:f=>f.path,
+        getWidth:2.4,widthUnits:'meters',widthMinPixels:0.8,widthMaxPixels:2.6,
+        getColor:railCol,getDashArray:[5,5],dashJustified:true,
+        extensions:[new deck.PathStyleExtension({dash:true})],
+        capRounded:false,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    }
+  }
+  // ---- TREES: small green points + short columns. ScatterplotLayer flat dot for the canopy
+  //      read at any zoom; a low ColumnLayer trunk so they have a little 3D presence. ----
+  const TREES=window.TREES, tr=TREES&&Array.isArray(TREES.trees)?TREES.trees:null;
+  if(tr&&tr.length){
+    const green=D?[96,170,108]:[78,150,86];
+    if(deck.ColumnLayer){
+      G.push(new deck.ColumnLayer({id:'trees-col',data:tr,
+        getPosition:p=>[p[0],p[1]],
+        diskResolution:5,radius:3.5,radiusUnits:'meters',
+        extruded:true,elevationScale:1,getElevation:6,
+        getFillColor:[green[0],green[1],green[2],225],
+        stroked:false,
+        material:{ambient:0.5,diffuse:0.7,shininess:8,specularColor:[60,90,60]},
+        parameters:{depthTest:true},pickable:false}));
+    }
+    if(deck.ScatterplotLayer){
+      G.push(new deck.ScatterplotLayer({id:'trees-pt',data:tr,
+        getPosition:p=>[p[0],p[1]],
+        getRadius:3.2,radiusUnits:'meters',radiusMinPixels:0.6,radiusMaxPixels:4,
+        filled:true,stroked:false,
+        getFillColor:[green[0]+18,green[1]+30,green[2]+18,210],
+        parameters:{depthTest:false},pickable:false}));
+    }
+  }
+  return G;
+}
+
 // Isochrone (travel-time) bands. Graded by minutes: near = warm red -> far = cool green, translucent.
 // Drawn FLAT, above the ground bed but under buildings/markers/labels. Null-guarded (file absent
 // until pull_isochrone.py runs). Bands are sorted far->near so the smaller near band paints on top.
@@ -585,7 +640,8 @@ function isoLayers(){
 
 function render(){
   // ground scaffolding first so buildings/rings/POIs draw on top of it.
-  const L=[baseLayer(), ...groundLayers()];
+  // extraLayers() (optional trees + rail) sit just above the ground bed / under buildings.
+  const L=[baseLayer(), ...groundLayers(), ...extraLayers()];
   // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
@@ -997,9 +1053,11 @@ buildStrip();buildLegend();buildIsoLegend();buildCascade();buildLeads();updatePa
    opt(P+'_province.json'),
    opt('data/provinces/index.json'),
    opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json'),
-   opt(P+'_isochrone.json')
+   opt(P+'_isochrone.json'),
+   opt(P+'_trees.json'), opt(P+'_rail.json')
  ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
-   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];box.remove();window.initCatch();})
+   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
+   window.TREES=a[7];window.RAIL=a[8];box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();
 </script>
