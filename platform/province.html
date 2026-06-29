@@ -209,8 +209,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
 <div id="ctl">
-  <button data-b="dark" class="on">Dark</button>
+  <button data-b="light" class="on">Light</button>
   <button data-b="voyager">Map</button>
+  <button data-b="dark">Dark</button>
   <button id="ringtog" class="on">10km rings</button>
 </div>
 
@@ -283,7 +284,8 @@ const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Bank
 const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
 const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
-let basemap='dark', showRings=true;
+// DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT (matches rayong-catchment).
+let basemap='light', showRings=true;
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -306,8 +308,13 @@ function provView(){
   return {longitude:lng,latitude:lat,zoom:z,pitch:42,bearing:8};
 }
 
-const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+// Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
+const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+            voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+// light (Positron) gets the DataProteins white-paper treatment: orange branches/links, soft tints,
+// readable pill labels. dark keeps the original instrument-console palette.
+function lightMode(){return basemap==='light';}
 const deckgl=new deck.DeckGL({container:'map',
   initialViewState:provView(),
   controller:{inertia:300,dragRotate:true},
@@ -330,17 +337,22 @@ function dGeom(f){return f.geometry.type==='MultiPolygon'?f.geometry.coordinates
 
 function render(){
   const L=[baseLayer()];
-  // (0) district context — FLAT polygons (non-Rayong provinces have no 3D buildings; this is the geography layer)
+  const LIGHT=lightMode();
+  // (0) district context — FLAT polygons (non-Rayong provinces have no 3D buildings; this is the geography layer).
+  //     On the light Positron base: soft warm-grey landuse-style tint + a readable mid stroke, so parcels read
+  //     as gentle context (DataProteins look) rather than the dark blue wash used on the dark base.
   if(DISTRICTS && DISTRICTS.features && deck.GeoJsonLayer){
     L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
-      getFillColor:[91,124,250,16],getLineColor:[120,140,180,95],lineWidthMinPixels:1,pickable:true}));
+      getFillColor:LIGHT?[150,164,196,30]:[91,124,250,16],
+      getLineColor:LIGHT?[120,134,168,150]:[120,140,180,95],lineWidthMinPixels:1,pickable:true,
+      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
   }
   // (1) 10km collateral catchment rings — faint over ALL branches; bright on the selected one
   if(showRings && BR.length){
     L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
       extruded:false,stroked:true,filled:true,
-      getFillColor:[GOLD[0],GOLD[1],GOLD[2],8],getLineColor:[GOLD[0],GOLD[1],GOLD[2],60],
-      lineWidthMinPixels:1,pickable:false}));
+      getFillColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?14:8],getLineColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?110:60],
+      lineWidthMinPixels:1,pickable:false,updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
     if(focal){
       L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
         extruded:false,stroked:true,filled:true,
@@ -348,31 +360,36 @@ function render(){
         lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
     }
   }
-  // (2) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng]
+  // (2) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng].
+  //     On the light base give each dot a darker same-hue ring so the shared palette stays legible on white.
   POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
     const c=POI_COLORS[t];
     L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
-      getRadius:90,radiusMinPixels:1.6,radiusMaxPixels:5,getFillColor:[c[0],c[1],c[2],210],
-      stroked:false,pickable:true,_poiType:t}));
+      getRadius:90,radiusMinPixels:LIGHT?2:1.6,radiusMaxPixels:5,getFillColor:[c[0],c[1],c[2],LIGHT?235:210],
+      stroked:LIGHT,getLineColor:[Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255],lineWidthMinPixels:0.6,
+      pickable:true,_poiType:t,updateTriggers:{getFillColor:[LIGHT],stroked:[LIGHT]}}));
   });
   // (3) competitors (graceful: empty for most provinces today)
   if(COMP.length){
     L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
-      getRadius:170,radiusMinPixels:4,radiusMaxPixels:10,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:1.6,
-      getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
+      getRadius:170,radiusMinPixels:4,radiusMaxPixels:10,stroked:true,
+      getLineColor:LIGHT?[255,255,255,255]:[210,210,220,255],lineWidthMinPixels:1.6,
+      getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true,updateTriggers:{getLineColor:[LIGHT]}}));
   }
-  // (4) AutoX branches — selected one is white
+  // (4) AutoX branches — gold (brand) markers; selected one is white. Dark outline reads on the white base.
   L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
     getRadius:230,radiusMinPixels:5,radiusMaxPixels:12,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.4,
     getFillColor:d=>d===focal?[255,255,255,255]:[230,180,80,255],pickable:true,
     updateTriggers:{getFillColor:[focal]}}));
-  // (5) only the SELECTED branch is labelled
+  // (5) only the SELECTED branch is labelled — pill+icon chip (DataProteins look). On the light base the
+  //     chip gets a gold border so the white pill separates from the white paper.
   if(focal){
-    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
-      getSize:12,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,245],background:true,
-      backgroundPadding:[6,3],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>'◉ '+(d.n||'AutoX'),
+      getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
+      getBorderColor:[224,169,59,255],getBorderWidth:LIGHT?1.5:0,
+      background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
       getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
-      updateTriggers:{getText:[focal],getPosition:[focal]}}));
+      updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[LIGHT]}}));
   }
   deckgl.setProps({layers:L,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});

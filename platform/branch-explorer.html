@@ -119,6 +119,9 @@ html[data-theme="light"] .ctl button.on{border-color:var(--accent);color:#11151F
 </div>
 <div id="map"></div>
 <div class="ctl">
+  <button id="b-light" class="base on">Light</button>
+  <button id="b-voyager" class="base">Map</button>
+  <button id="b-dark" class="base">Dark</button>
   <button id="t-ring" class="on">10&nbsp;km ring</button>
   <button id="t-reload">↻ buildings here</button>
 </div>
@@ -129,7 +132,12 @@ html[data-theme="light"] .ctl button.on{border-color:var(--accent);color:#11151F
 const Q = new URLSearchParams(location.search);
 const LAT = parseFloat(Q.get('lat')), LNG = parseFloat(Q.get('lng'));
 const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
-const TILE = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
+// Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
+const TILE_SRC={light:'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+                voyager:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                dark:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+let basemap='light';
+function lightMode(){return basemap==='light';}
 const MIRRORS = ['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
 let showRing = true, branchRec = null, buildings = [];
 let provRec = null;     // matched province row (informal/formal), if derivable
@@ -203,10 +211,22 @@ function bldgHeight(tags,fa){            // measured tag if present, else estima
   if(b==='roof')return 4;
   return fa<120?6:fa<400?9:fa<800?11:13;
 }
-function heightColor(h){                  // 3-stop ramp: low slate -> accent -> gold
+function heightColor(h){                  // 3-stop ramp: low slate -> accent -> gold (dark/voyager base)
   const t=Math.pow(Math.max(0,Math.min(1,h/40)),1.1), a=[43,58,85],b=[91,124,250],c=[224,169,59];
   const m=t<.5?a.map((v,i)=>Math.round(v+(b[i]-v)*t*2)):b.map((v,i)=>Math.round(v+(c[i]-v)*(t-.5)*2));
   return [m[0],m[1],m[2],232];
+}
+// DataProteins light path: muted light-grey context buildings, with the tallest decile lifted toward the
+// collateral-purple crown so the few tall structures still read against the white Positron base.
+const PURP=[122,79,224], GREY=[206,210,218];
+function heightColorLight(h){
+  const t=Math.max(0,Math.min(1,h/40));
+  if(t>=0.62){const lift=t*40;const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+    return [cl(PURP[0]+lift*0.2),cl(PURP[1]+lift*0.3),cl(PURP[2]+lift*0.1),238];}
+  // low/mid rise = muted grey, slightly translucent so the white base breathes through
+  const j=Math.round((t-0.3)*10);
+  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+  return [cl(GREY[0]+j),cl(GREY[1]+j),cl(GREY[2]+j),182];
 }
 
 /* ---- deck.gl ---- */
@@ -225,29 +245,31 @@ try{
   }
 }catch(e){ LIGHTING=null; }
 function baseLayer(){
-  return new deck.TileLayer({id:'base',data:TILE,minZoom:0,maxZoom:19,tileSize:256,
+  return new deck.TileLayer({id:'base',data:TILE_SRC[basemap]||TILE_SRC.light,minZoom:0,maxZoom:19,tileSize:256,
     renderSubLayers:p=>{const{west,south,east,north}=p.tile.bbox;
       return new deck.BitmapLayer(p,{data:null,image:p.data,bounds:[west,south,east,north]});}});
 }
 function layers(){
   const L=[baseLayer()];
+  const LIGHT=lightMode();
   L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
-    getFillColor:b=>heightColor(b.h),
-    stroked:true,getLineColor:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
+    stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
     material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
     parameters:{depthTest:true},transitions:{getElevation:600},
-    _shadow:true,pickable:true}));
-  // live POI markers as 3D columns coloured by type — only when Overpass returned data
+    _shadow:true,pickable:true,updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
+  // live POI markers as 3D columns coloured by type — only when Overpass returned data. On the light
+  // base give each column a darker same-hue rim so the shared palette stays legible on white.
   if(pois.length && deck.ColumnLayer){
     L.push(new deck.ColumnLayer({id:'poi',data:pois,diskResolution:6,radius:36,
       extruded:true,elevationScale:1,
       getPosition:p=>[p.x,p.y],
       getElevation:p=>poiColumnHeight(p.t),
       getFillColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [c[0],c[1],c[2],235];},
-      stroked:false,
+      stroked:LIGHT,getLineColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255];},lineWidthMinPixels:0.6,
       material:{ambient:0.4,diffuse:0.8,shininess:30,specularColor:[80,90,120]},
-      parameters:{depthTest:true},pickable:true}));
+      parameters:{depthTest:true},pickable:true,updateTriggers:{stroked:[LIGHT]}}));
   }
   if(showRing && !isNaN(LAT)){
     L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
@@ -256,9 +278,21 @@ function layers(){
       getLineWidth:18,lineWidthMinPixels:1.2}));
   }
   if(!isNaN(LAT)){
+    // gold branch dot — dark outline on the light base so it separates from white; white outline on dark.
     L.push(new deck.ScatterplotLayer({id:'branch',data:[{x:LNG,y:LAT}],getPosition:d=>[d.x,d.y],
       getRadius:90,radiusMinPixels:6,radiusMaxPixels:13,getFillColor:[224,169,59,255],
-      stroked:true,getLineColor:[255,255,255,230],lineWidthMinPixels:2}));
+      stroked:true,getLineColor:LIGHT?[40,28,8,255]:[255,255,255,230],lineWidthMinPixels:2,
+      updateTriggers:{getLineColor:[LIGHT]}}));
+    // pill+icon label (DataProteins look) — white chip with a gold border on the light base.
+    if(deck.TextLayer){
+      const nm=(branchRec&&branchRec.n)||NM||'AutoX';
+      L.push(new deck.TextLayer({id:'branch-label',data:[{x:LNG,y:LAT,n:nm}],getPosition:d=>[d.x,d.y],
+        getText:d=>'◉ '+d.n,getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
+        getBorderColor:[224,169,59,255],getBorderWidth:LIGHT?1.5:0,
+        background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+        getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+        updateTriggers:{getText:[nm],getBorderWidth:[LIGHT]}}));
+    }
   }
   return L;
 }
@@ -438,6 +472,11 @@ function init(){
     onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(()=>{loadBuildings();loadPOIs();},650); }});
   $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
   $('#t-reload').onclick=()=>{ loadBuildings(); loadPOIs(); };
+  // basemap toggle (light Positron default / voyager / dark) — re-styles buildings + markers for the base.
+  const baseBtns={light:$('#b-light'),voyager:$('#b-voyager'),dark:$('#b-dark')};
+  Object.keys(baseBtns).forEach(k=>{ if(!baseBtns[k])return;
+    baseBtns[k].onclick=()=>{ basemap=k;
+      Object.keys(baseBtns).forEach(j=>baseBtns[j]&&baseBtns[j].classList.toggle('on',j===k)); render(); };});
   loadPanel(); loadBuildings(); loadPOIs();
 }
 init();
