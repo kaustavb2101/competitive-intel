@@ -146,7 +146,18 @@ def download_geojson(cli, bbox, dest):
     cmd = [cli, "download", f"--bbox={ovt_bbox}", "-f", "geojson",
            "--type=building", "-o", dest]
     print("running:", " ".join(cmd), file=sys.stderr)
-    subprocess.run(cmd, check=True)
+    # Capture stderr so the CLI's real failure (S3/network/pyarrow) is surfaced,
+    # not swallowed behind a bare CalledProcessError traceback.
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        tail = (proc.stderr or proc.stdout or "").strip()
+        raise RuntimeError(
+            f"overturemaps download failed (exit {proc.returncode}).\n"
+            f"--- CLI output ---\n{tail or '(no output captured)'}\n"
+            f"------------------\n"
+            f"Common causes: no network reach to the Overture S3 bucket, an outdated "
+            f"pyarrow, or too-large a bbox timing out. Try a tiny bbox first to confirm "
+            f"reachability, e.g. --bbox 12.68,101.27,12.70,101.29")
     return dest
 
 
