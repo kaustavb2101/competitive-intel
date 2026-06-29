@@ -166,7 +166,7 @@ function acqCSV(){
    Uses branch fields already present: r (region), rain (drought proxy), a/m/c risk proxies,
    and the region's weakest-crop YoY from the commodity board. */
 function renderExposure(){
-  if(!DATA||!$('#expo')) return;
+  if(!DATA||!$('#expocards')||!$('#expotbl')) return;
   const N=DATA.length;
   const pctS=n=>(100*n/N).toFixed(1)+'%';
   // 1) stressed-crop exposure: branches whose region's weakest crop is in price stress (YoY < -10%)
