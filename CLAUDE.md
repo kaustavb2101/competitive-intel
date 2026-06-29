@@ -22,38 +22,71 @@ A branch-intelligence platform over all **2,015 AutoX branches**, plus deep-dive
 **static site deployed to Vercel** (no build step) backed by a **Python data pipeline**.
 
 ### The deployable app — `platform/` (deploy THIS subfolder)
-One Vercel app, one nav bar, multiple routes (kept as separate pages on purpose — three heavy
+One Vercel app, one nav bar, multiple routes (kept as separate pages on purpose — heavy
 deck.gl/WebGL scenes in one DOM crashed on mobile; separate routes each get a fresh GL context):
-- `index.html` + `app.js` — SPA with tabs: **Overview** (macro + commodity board + region signals),
-  **National** (Leaflet 2D map, 2,015 branches, lens switcher: opportunity / agri-PD / merchant / collateral),
-  **Acquisition** (white-space tables), **Branches** (search/sort).
-- `rayong-province.html` — deck.gl **3D extruded district polygons** (8 districts), 57 branches,
-  live competitors, "what impacts them" panel. Loads `data/rayong_province.json`.
+- `index.html` + `app.js` — SPA with lazy-rendered tabs (hash routes):
+  - **Command center** (`#home`) — exec front door: aggregates expand + risk into one readout (top
+    white-space districts, most-stressed segments/provinces, headline KPIs). Lead with the answer.
+  - **Overview** (`#overview`) — macro + commodity board + collateral outlook + BoT rate-cap card + region signals.
+  - **National** (`#map`) — Leaflet 2D map, 2,015 branches; branch lenses (opportunity / agri-PD /
+    merchant / collateral) **and district (amphoe) lenses** (white-space / risk).
+  - **Risk trend** (`#trend`) — the TIME dimension: snapshots + deltas (which segments/branches are
+    getting riskier). Reads `data/snapshots_index.json` + `data/deltas.json`.
+  - **Acquisition** (`#acq`) — district white-space leaderboard, district-risk readout, **Road to
+    3,000** regional headroom allocation, estate/merchant/collateral white-space tables.
+  - **Exposure** (`#exposure`) — portfolio concentration (segment × collateral) + white-space v2.
+  - **Simulator** (`#sim`) — client-side portfolio what-if (rate/price/drought levers → PD + exposure).
+  - **Provinces** (`#provinces`) — selector into the 77-province deep-dive. **Market** (`#market`) —
+    real-numbers market assessment. **Branches** (`#branches`) — search/sort.
+- `province.html?p=<slug>` — generalized deck.gl **3D district-polygon** deep-dive for ANY of 77
+  provinces (Rayong = curated pilot). Loads `data/provinces/<slug>.json`.
+- `branch-explorer.html?lat=&lng=&n=` — per-branch deck.gl **3D scene** (live OSM buildings, 10km
+  rings, grouped establishments, who-works-nearby proxy, 3D POI columns).
 - `rayong-catchment.html` — deck.gl **3D buildings** (3,631 extruded), Mueang Rayong core.
   Left = reachable-population card; right = acquisition leads + recommendations. Loads `data/rayong_catchment.json`.
-- `styles.css`, `vercel.json` (static, cleanUrls). Data served from `platform/data/`.
+- `rayong-province.html` — RETIRED redirect stub → `rayong-catchment` (kept for old bookmarks).
+- `styles.css`, `vercel.json` (static, cleanUrls). Data served from `platform/data/`
+  (`branches.json`, `meta.json`, `amphoe.json`, `crop_stress.json`, `deltas.json`,
+  `snapshots_index.json`, `loan_tape_derived.json`, `provinces/`, `rayong_*.json`).
 
 **Map tech split (deliberate):** National view = Leaflet (light, reliable on mobile for 2,015 pts).
-Rayong views = deck.gl 8.9.35 (3D). Don't merge them into one page.
+Province / branch / Rayong views = deck.gl 8.9.35 (3D). Don't merge them into one page.
 
 ### The pipeline — `pipeline/`
+*All derive/build scripts are deterministic + network-free and carry `--check` (byte-exact reproduce).
+`bash tests/run.sh check` gates derive / build_province / build_amphoe / bake_catchment_heights /
+timeseries `--check` plus `node --check` on every page's JS.*
 - `autox_enrich_loop.py` — the re-runnable enrichment loop. Source registry (13 OSM POI layers,
   OAE crops, HDX pop/rainfall, World Bank Pink Sheet), freshness-TTL caching, recomputes per-branch
   features + segment scores into `source-data/branches_final.json`, then calls `derive.py` so the
   refresh lands in the app; writes `iteration_log.json`. `--watch --interval 86400` to self-refresh;
   `--derive-only` skips all network pulls and just re-projects the master (runnable offline).
-  Has DATA_GO_TH_TOKEN hooks (off by default; turn on from a Thai network — see DATA_SOURCES.md).
 - `derive.py` — **projects the master into the app**: regenerates `platform/data/branches.json` +
-  `meta.json` from `source-data/`, deterministic and network-free. `--check` verifies the committed
-  data still reproduces exactly (byte-for-byte). Mechanical fields are derived; the livestock-buffered
-  agri counts (`region.hi`, `n_agri`), white-space tables (`mws`/`cws`) and editorial macro are
-  carried forward (they need the live enrich loop, not source-data alone).
-- `autox_dgt_ingest.py` — ready-to-run data.go.th ingestion (DIW factories, DLT vehicles, OAE).
-  **Blocked from a foreign IP; must run from Kaustav's Thai network.**
-- `regionmap.py` — province→region + tier lookup (imported by other scripts).
-- `save_competitors.py` — writes `rayong_competitors.json` (live Google Places pull, hand-curated list).
-- `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls for Rayong catchments.
-- `build_platform.py` — assembles the two Rayong HTML pages from head + app + loader, wires the nav.
+  `meta.json` from `source-data/`. `--check` verifies byte-for-byte. Livestock-buffered agri counts
+  (`region.hi`, `n_agri`), white-space tables (`mws`/`cws`) and editorial macro are carried forward.
+- `build_province.py` — generalizes the Rayong deep-dive to ALL 77 provinces via spatial join (amphoe
+  polygons + branches PIP + gov layers) → `platform/data/provinces/<slug>.json` + index.
+- `build_amphoe.py` — **district (amphoe) intelligence engine**: scores all 928 amphoe polygons
+  (incl. 0-branch white-space) → `platform/data/amphoe.json` (whitespace + risk_proxy + raw components).
+- `build_crop_stress.py` — per-province crop-household stress (objective #1) → `platform/data/crop_stress.json`
+  (crop mix, price_stress [GLOBAL proxy], drought, agri_stress + components).
+- `timeseries.py` — captures a per-vintage SNAPSHOT (label from `meta.updated`, never wall clock) +
+  diffs → `source-data/snapshots/`, `platform/data/snapshots_index.json` + `deltas.json` (Risk-trend tab).
+- **Loan-tape bridge** (objective #1; synthetic until a real export lands):
+  - `loan_tape_schema.md` — the no-PII export contract (loans + monthly branch-AUM; join on branch `code`).
+  - `make_synthetic_tape.py` — deterministic SYNTHETIC tape (`loan_id` prefix `SYNTH-`); synthetic
+    files are **gitignored**.
+  - `ingest_loan_tape.py` — validates against the contract (fails loudly) → `platform/data/loan_tape_derived.json`
+    (vintage 90+ aging, branch ROI/payback, HHI concentration, PD calibration). `--real` drops the SYNTHETIC stamp.
+- `ingest_gov.py` — folds the data.go.th pull (`pipeline/dgt_out/` CSVs) into clean source-data layers
+  (DIW factories etc.). `autox_dgt_ingest.py` — the data.go.th puller. **Both blocked from a foreign
+  IP; must run from Kaustav's Thai network** (see `docs/TONIGHT_CHECKLIST.md`).
+- `fix_provinces.py` — province/region key normalizer (116→77, 0 `Other`). `regionmap.py` —
+  province→region + tier lookup (imported widely). `bake_catchment_heights.py` — bakes per-building
+  type/height into `rayong_catchment.json`.
+- `save_competitors.py` — writes `rayong_competitors.json` (hand-curated Google Places list).
+- `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. `build_platform.py` —
+  assembles the Rayong HTML pages from head + app + loader, wires the nav.
 
 ### Master data — `source-data/`
 - `branches_final.json` — **the master**, all 2,015 branches, 46 fields each (see DATA_SOURCES.md
@@ -63,6 +96,12 @@ Rayong views = deck.gl 8.9.35 (3D). Don't merge them into one page.
   `commodity_board.json` / `commodities*.json` (Pink Sheet prices), `crop_prov_area.json` /
   `rice_prov_area.json` (province planting area), `bldg_wide.json` (3,633 Rayong buildings),
   `rayong_districts.geojson` (8 district polygons + rollups).
+- `th_amphoe.geojson` — **nationwide 928 amphoe (district) polygons** (drives build_province/build_amphoe).
+- `factories_by_district.json`, `vehicles_by_province.json`, `employment_by_province.json`,
+  `crop_prices.json` — the gov fold-in (DIW / DLT / NSO / OAE) from `ingest_gov.py`.
+- `province_narratives.json` — editorial "what impacts them" narratives (Rayong curated).
+- `snapshots/` — per-vintage time-dimension snapshots (written by `timeseries.py`).
+- `loan_tape_synthetic.json` / `branch_aum_monthly_synthetic.json` — **gitignored** SYNTHETIC loan tape.
 
 ## How to run things
 ```bash
@@ -75,10 +114,22 @@ cd platform && npx vercel --prod                  # prints live URL
 # refresh data (national features + segment scores) — now writes straight to platform/data/
 cd pipeline && python3 autox_enrich_loop.py       # recompute master + derive platform/data + log iteration
 cd pipeline && python3 derive.py                  # just re-project master → platform/data (no network)
-cd pipeline && python3 derive.py --check          # verify committed platform/data still matches the master
 
-# pull the BLOCKED gov data — ONLY works from a Thai/residential IP
-cd pipeline && python3 autox_dgt_ingest.py        # DIW factories, DLT vehicle registrations
+# rebuild the derived layers (all deterministic + network-free, all have --check)
+cd pipeline && python3 build_province.py          # provinces/<slug>.json (77-province deep-dive)
+cd pipeline && python3 build_amphoe.py            # amphoe.json (928-district whitespace + risk)
+cd pipeline && python3 build_crop_stress.py       # crop_stress.json (per-province agri stress)
+cd pipeline && python3 timeseries.py              # snapshot the current vintage + rebuild deltas
+
+# loan-tape bridge (objective #1) — synthetic today; --real once a true export lands
+cd pipeline && python3 make_synthetic_tape.py     # regenerate the SYNTHETIC tape (gitignored)
+cd pipeline && python3 ingest_loan_tape.py        # → loan_tape_derived.json (4 portfolio-risk outputs)
+
+# QA gate (must pass before commit) — offline, deterministic
+bash tests/run.sh check
+
+# pull the BLOCKED gov data — ONLY works from a Thai/residential IP (see docs/TONIGHT_CHECKLIST.md)
+cd pipeline && python3 autox_dgt_ingest.py        # DIW factories, DLT vehicles, NSO, OAE
 ```
 `pip install --break-system-packages shapely openlocationcode openpyxl pdfplumber` if missing.
 

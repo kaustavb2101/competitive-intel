@@ -5,6 +5,72 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-06-29 — Decision layer: command center, time dimension, district engine, loan-tape bridge
+
+Big session (~80 commits on `claude/new-session-wto26j`). The platform moved from "branch map +
+Rayong pilot" to a full **decision layer** for the two standing objectives (portfolio risk +
+acquisition), with the honesty conventions made explicit everywhere. QA (`bash tests/run.sh check`)
+is green: 11/11 determinism + syntax gates pass.
+
+**New SPA tabs (one nav, lazy-rendered, `index.html` + `app.js`):**
+- **Command center** (`#home`) — the exec front door. Aggregates the expand + risk signals into a
+  single readout (top white-space districts, most-stressed segments/provinces, headline KPIs) so
+  Kaustav lands on the answer, not a map.
+- **Risk trend** (`#trend`) — the **time dimension**. Snapshots + deltas (which segments/branches are
+  getting riskier). Built to work with one vintage today ("baseline captured") and light up
+  automatically on the next refresh. Reads `platform/data/snapshots_index.json` + `deltas.json`.
+- **Exposure** (`#exposure`) — real portfolio concentration (segment × collateral), white-space v2.
+- **Simulator** (`#sim`) — client-side portfolio what-if (move a rate/price/drought lever, see the
+  segment PD + exposure response). All in-browser, no server.
+- **Provinces** (`#provinces`) — selector into the generalized 77-province deep-dive (`province.html?p=`).
+- National map gained **district (amphoe) lenses** (white-space + risk) on top of the branch lenses.
+- Acquisition tab rebuilt: **district (amphoe) white-space leaderboard**, most-stressed **district
+  risk** readout, and **Road to 3,000** regional headroom allocation (branch-count gap to the 3,000
+  target, allocated by regional demand vs saturation). IA/a11y pass (role=tab, deep-link chips).
+
+**New pipeline scripts (all deterministic + `--check`, all gated in `tests/run.sh check`):**
+- `build_amphoe.py` → `platform/data/amphoe.json` — **district intelligence engine**. Spatial-joins
+  national point layers onto all 928 amphoe polygons (`source-data/th_amphoe.geojson`), **including
+  amphoe with zero AutoX branches** (the white-space targets). Per amphoe: branch count, POI counts,
+  DIW factories/workers (where the Thai district name is resolvable), province-inherited vehicles/
+  employment/agri-stress (clearly tagged province-inherited, NOT amphoe-measured), plus a
+  `whitespace` score (demand minus saturation; works for 0-branch amphoe) and a `risk_proxy`.
+- `build_crop_stress.py` → `platform/data/crop_stress.json` — **per-province crop-household stress**
+  (objective #1). Joins planting area (`crop_prov_area.json`) + price board YoY (`commodity_board.json`,
+  a GLOBAL World-Bank direction proxy, NOT Thai farm-gate) + branch drought anomaly. Emits crop mix,
+  price_stress, drought, crop_dependence, a transparent `agri_stress` composite, and the raw
+  components behind it so the UI shows reality, not just a score.
+- `timeseries.py` → `source-data/snapshots/*` + `platform/data/snapshots_index.json` + `deltas.json` —
+  captures a deterministic snapshot per data **vintage** (label derived from `meta.updated`, never the
+  wall clock, so `--check` is byte-exact) and diffs it against the prior snapshot for the Risk-trend tab.
+- `build_province.py` → `platform/data/provinces/<slug>.json` + index — **generalizes the Rayong
+  deep-dive to all 77 provinces** from national data (amphoe PIP + gov layers). Competitors/facts
+  carried only where curated (Rayong today); others get safe empties. Renders via `province.html?p=`.
+- **Loan-tape bridge** (objective #1, synthetic until a real export lands):
+  - `pipeline/loan_tape_schema.md` — the **no-PII data contract** Kaustav exports from core banking
+    (loans + monthly branch-AUM, join on branch `code`). One-command validation at the bottom.
+  - `make_synthetic_tape.py` → `source-data/loan_tape_synthetic.json` +
+    `branch_aum_monthly_synthetic.json` — deterministic, clearly-labelled SYNTHETIC (every `loan_id`
+    starts `SYNTH-`), proves the pipeline end-to-end.
+  - `ingest_loan_tape.py` → `platform/data/loan_tape_derived.json` — validates against the contract
+    (enums/ranges/join-rate/status sanity, **fails loudly**) and computes the four turnkey outputs:
+    (a) vintage 90+ aging curves, (b) per-branch ROI/payback proxy, (c) HHI concentration by
+    segment×collateral, (d) proxy-vs-actual PD **calibration**. `--real` drops the SYNTHETIC stamp.
+    The synthetic tape is **gitignored** (only the schema + generators are committed).
+- `ingest_gov.py` / `save_competitors.py` / `bake_catchment_heights.py` carried forward from prior
+  sessions (the DIW fold-in, Rayong competitor list, catchment building-height bake).
+
+**Honesty conventions (made MANDATORY and enforced in the UI):**
+- Every number is labelled **measured / proxy / estimated / SYNTHETIC** at the point of display.
+  Loan-tape outputs carry `meta.measured` + a `SYNTHETIC` flag; the app shows the stamp.
+- Province-level data inherited down to amphoe is tagged "province-inherited, not amphoe-measured".
+- Crop price stress is explicitly a **global price direction proxy**, not Thai farm-gate.
+- Abstract indices were retired earlier; scores that remain (whitespace, agri_stress, risk_proxy)
+  ship the **raw components** alongside the number so the exec sees reality, not just an index.
+
+**Perf / a11y / IA:** payload trims, theme-aware colors, mobile grid fixes, Overview/Branches
+re-render fix, SPA a11y pass (tab roles, deep-link chips into Acquisition sections).
+
 ## 2026-06-28 — Exhaustive gov pull + national fold-in (vehicles, employment, crops)
 
 - **Exhaustive puller**: national pass + 77-province sweep + employment topic + resume → 1,925 files.
@@ -151,13 +217,20 @@ Kaustav deploys).
 ---
 
 ## Known-good checkpoints
-- `platform/` serves 200 on all routes via `python3 -m http.server` (last verified 2026-06-28).
-- All embedded JS passes `node --check`.
-- `branches_final.json` = 2,015 records, 46 fields, ~99% joined on district population.
+- **`bash tests/run.sh check` passes 11/11** (determinism + syntax gate) — last verified 2026-06-29.
+  Gated scripts: derive, build_province, build_amphoe, bake_catchment_heights, timeseries `--check`
+  (byte-exact) + `node --check` on app.js and every page's inline JS.
+- `platform/` serves 200 on all routes via `python3 -m http.server`.
+- `branches_final.json` = 2,015 records, ~99% joined on district population.
+- SPA tabs live: Command center, Overview, National, Risk trend, Acquisition, Exposure, Simulator,
+  Provinces, Market, Branches.
 
-## Open threads (see NEXT_STEPS.md for detail)
+## Open threads (see NEXT_STEPS.md for detail — and TONIGHT_CHECKLIST.md for the Thai-IP pulls)
 1. Deploy to Vercel + verify production (Claude can read logs once it's live).
-2. Run blocked gov data from Thai IP → DLT vehicles, DIW factories → fold into the loop.
-3. True 15-min isochrone (routing API) to replace the catchment walk-radius estimate.
-4. Widen the catchment view beyond Mueang Rayong where OSM building coverage allows.
-5. Province-precise livestock/aquaculture mapping (DLD/DOF data not in OAE datastore).
+2. Run blocked gov data from the Thai IP → DLT vehicles, DIW factories, NSO occupations → fold in.
+   Plus OSM roads/water/landuse/buildings, agri farm-gate/reservoir/flood, competitor census.
+3. **Get a real loan tape** from core banking (schema = `pipeline/loan_tape_schema.md`); run
+   `ingest_loan_tape.py --real` to flip the four portfolio-risk outputs from SYNTHETIC to measured.
+4. True 15-min isochrone (routing API) to replace the catchment walk-radius estimate.
+5. Widen the catchment view beyond Mueang Rayong where OSM building coverage allows.
+6. Province-precise livestock/aquaculture mapping (DLD/DOF data not in OAE datastore).

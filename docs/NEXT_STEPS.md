@@ -1,28 +1,38 @@
 # NEXT STEPS — prioritized backlog
 
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
+**For the exact Thai-laptop pulls (copy-pasteable), see `docs/TONIGHT_CHECKLIST.md`.**
 
-## 0. Replicate the Rayong deep-dive by province, then by region  ⟶ the standing ask
-Rayong is the **pilot template**; the goal is the same deep-dive for every province, rolled up by
-region. Anatomy of what a province view needs, and where each piece comes from:
+## 0. Replicate the Rayong deep-dive by province, then by region  ⟶ DONE (engine), refine with data
+Rayong was the pilot template; the goal was the same deep-dive for every province, rolled up by region.
 
-| Piece | Source | Scales? |
+| Piece | Source | Status |
 |---|---|---|
-| branches (filter master by prov) | `source-data/branches_final.json` | ✅ free, all 77 provinces |
-| POI-within-province (10 layers) | `source-data/osm_layers.json` (national) | ✅ free |
-| per-district rollups | **amphoe polygons** — only Rayong has one today | ⛔ need nationwide boundaries |
-| competitors | hand-curated Google Places, **Rayong only** (30) | ⚠️ automate per province (Places) |
-| "what impacts them" narrative | editorial, **Rayong only** | ⚠️ template by region, refine per province |
-| catchment 3D buildings | OSM footprints, urban cores only | ⚠️ opportunistic (rural/factory zones have ~0) |
+| branches (filter master by prov) | `source-data/branches_final.json` | ✅ all 77 provinces |
+| POI-within-province (10 layers) | `source-data/osm_layers.json` (national) | ✅ |
+| nationwide amphoe (district) polygons | `source-data/th_amphoe.geojson` (928 amphoe) | ✅ acquired |
+| per-district rollups (all 77 prov) | `build_province.py` / `build_amphoe.py` (spatial join) | ✅ done |
+| competitors | hand-curated Google Places, **Rayong only** (30) | ⚠️ automate per province |
+| "what impacts them" narrative | editorial, **Rayong only** | ⚠️ template by region |
+| catchment 3D buildings | OSM footprints, urban cores only | ⚠️ opportunistic |
 
-- ✅ **Done (prerequisite):** province/region keys normalized — 116→77 provinces, 0 `Other`
-  (`fix_provinces.py` + `regionmap.canonical`). By-province/by-region rollups are now complete.
-- **Next concrete step:** acquire **nationwide amphoe (district) polygons** — the one gating
-  dataset. Try HDX `cod-ab-tha` (admin level 2) or GADM 4.1 Thailand; both should be reachable.
-  Then generalize `rayong-province.html` + its JSON into a province-parameterized
-  `build_province.py` that reproduces Rayong from national data + per-province inputs.
-- **Then:** automate competitor pulls per province (Places, brand × province), and template the
-  narrative by region (EEC-East, agri-Isan, tourism-South…) before refining per province.
+- ✅ **Done:** province/region keys normalized (116→77, 0 `Other`); nationwide amphoe polygons
+  acquired; `build_province.py` reproduces Rayong's shape for all 77 provinces; `build_amphoe.py`
+  scores all 928 districts (incl. 0-branch white-space). Rendered via `province.html?p=<slug>` and
+  the National-map amphoe lenses + Acquisition district leaderboard.
+- **Remaining (data-gated, see TONIGHT_CHECKLIST §competitors):** automate competitor pulls per
+  province (Places, brand × province) so the deep-dive isn't competitor-blind outside Rayong; then
+  template the "what impacts them" narrative by region (EEC-East, agri-Isan, tourism-South…).
+
+## 0b. Get a REAL loan tape  ⟶ highest-leverage data unlock for objective #1 (portfolio risk)
+The loan-tape bridge is built and proven on SYNTHETIC data; it flips to measured the moment a real
+export lands. Until then the four portfolio-risk outputs are stamped SYNTHETIC.
+- ✅ **Done:** the no-PII contract (`pipeline/loan_tape_schema.md`), deterministic synthetic generator
+  (`make_synthetic_tape.py`), and the validating ingest (`ingest_loan_tape.py`) that computes vintage
+  90+ aging, branch ROI/payback, HHI concentration, and proxy-vs-actual PD calibration.
+- **Next concrete step:** Kaustav exports two no-PII files from core banking per the schema
+  (`loan_tape.json` + `branch_aum_monthly.json`, join on branch `code`), drops them in `source-data/`,
+  and runs the one command in TONIGHT_CHECKLIST §loan-tape. The platform then stamps `measured`.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
@@ -35,16 +45,21 @@ region. Anatomy of what a province view needs, and where each piece comes from:
   (password / SSO) on the deployment.
 
 ## 2. Unblock the gov data from the Thai IP  ⟶ biggest data win, only possible locally
-The whole reason to be in Claude Code on Kaustav's laptop.
-- `cd pipeline && python3 autox_dgt_ingest.py` — should now reach data.go.th / DLT / DIW from a Thai connection.
-  - Read the token from env, don't hardcode: `export DATA_GO_TH_TOKEN=...` (rotate the old one first).
-- Targets:
-  - **DLT vehicle registrations** by province/district → replace `collateral_density` proxy and the
-    catchment "vehicle" layer with real counts (cars vs motorcycles vs pickups vs trucks — matters because
-    motorcycle title ≈ 50% of the book, car/pickup ≈ 25%).
-  - **DIW factories** (โรงงาน) → real factory census to replace OSM `ind10` proxy, esp. in factory zones
-    (Pluak Daeng/Nikhom) where OSM has ~nothing.
-- Then merge into `source-data/branches_final.json` and re-derive `platform/data/`.
+The whole reason to be in Claude Code on Kaustav's laptop. **Exact copy-pasteable commands live in
+`docs/TONIGHT_CHECKLIST.md`** — this is the summary of what and why.
+- ✅ **Partly done (prior session):** DIW factories (66,100, all 77 prov) + a first DLT vehicle / NSO
+  employment fold-in landed via `autox_dgt_ingest.py` → `ingest_gov.py`. Vehicles/crops are still only
+  partial-province; widen them.
+- **Still to pull (TONIGHT_CHECKLIST):**
+  - **DLT vehicle registrations** all-province/district → replace `collateral_density` proxy + the
+    catchment "vehicle" layer with real counts (motorcycle title ≈ 50% of the book, car/pickup ≈ 25%).
+  - **DIW factories** — widen coverage to factory zones (Pluak Daeng/Nikhom) where OSM has ~nothing.
+  - **NSO Census Table 6 occupations** → real who-works-here per district (replaces the OSM workforce proxy).
+  - **OSM roads / water / landuse / buildings** (Overpass mirror) → catchment widening + isochrones.
+  - **Agri farm-gate prices / reservoir / flood** → replace the GLOBAL price-direction proxy in
+    `build_crop_stress.py` with real Thai farm-gate.
+- **Rotate `DATA_GO_TH_TOKEN`** (it was exposed in chat) before running.
+- Then merge into `source-data/branches_final.json` and re-derive (`derive.py` + `build_*` + `timeseries.py`).
 
 ## 3. True 15-minute isochrone (catchment view)
 Replace the walk-radius dasymetric estimate with a real street-network reach polygon.
