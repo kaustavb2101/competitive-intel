@@ -12,6 +12,11 @@ const LENS = {
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
+  // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
+  // White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED (province-inherited
+  // agri-stress + local mix). Both lazy-load amphoe.json (joined per-branch via build_amphoe.py).
+  dws:  {label:'District white-space ◇', desc:"MEASURED — the branch's whole district demand (POI footfall + workers) minus AutoX saturation. Higher = underserved room around an existing branch. From amphoe.json.", color:'#E6B450', unit:'white-space (0–100)', amp:true, val:d=>d._amp?d._amp.whitespace:0},
+  drisk:{label:'District risk ▲ est', desc:"ESTIMATED — the branch's district risk proxy (province-inherited agri-stress + local collateral/merchant mix, 0–100). NOT a measured default rate. From amphoe.json.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, val:d=>d._amp?d._amp.risk_proxy:0},
 };
 // per-province crop-household stress — lazy-loaded from data/crop_stress.json (objective #1).
 // CSTRESS maps Thai province name -> province record; val() returns agri_stress on a 0–100 scale.
@@ -390,15 +395,32 @@ function acqCSV(){
    AutoX branch at all. Two readouts: a white-space leaderboard (acquisition) and a most-stressed risk
    list (portfolio). All scores are precomputed in the data file; we only sort/filter/label here. */
 let AMP=null, ampLoaded=false, ampMeta=null, ampRegion='all', ampRRegion='all', ampRows=[], ampRRows=[];
+// BAMP[i] = index into AMP[] for DATA[i] (branches.json is 1:1 with branches_final.json,
+// and build_amphoe.py emits branch_amphoe in that same order). Attaching the joined
+// amphoe onto each branch record (d._amp) lets the National map district lenses colour
+// every marker by its district's measured white-space / estimated risk — a total join.
+let BAMP=null, ampJoinAttached=false;
+let ampPromise=null;
 async function loadAmphoe(){
-  if(ampLoaded) return AMP;
+  if(ampPromise) return ampPromise;
   ampLoaded=true;
-  try{
-    const j=await fetch('data/amphoe.json').then(r=>r.json());
-    AMP=j.amphoe||[]; ampMeta=j.meta||null;
-  }catch(e){ AMP=[]; }
-  renderAmphoe();
-  return AMP;
+  ampPromise=(async()=>{
+    try{
+      const j=await fetch('data/amphoe.json').then(r=>r.json());
+      AMP=j.amphoe||[]; ampMeta=j.meta||null; BAMP=j.branch_amphoe||null;
+    }catch(e){ AMP=[]; }
+    attachAmpToBranches();
+    renderAmphoe();
+    return AMP;
+  })();
+  return ampPromise;
+}
+// join the per-district record onto each branch so the map lenses can read d._amp.
+function attachAmpToBranches(){
+  if(ampJoinAttached||!DATA||!AMP||!BAMP) return;
+  if(BAMP.length!==DATA.length) return;   // order/length mismatch → skip rather than mis-join
+  for(let i=0;i<DATA.length;i++){ DATA[i]._amp = AMP[BAMP[i]] || null; }
+  ampJoinAttached=true;
 }
 function ampChips(id,cur,onPick){
   const box=$(id); if(!box||box.dataset.init) return;
@@ -681,6 +703,8 @@ function initMap(){
   if(mapReady){ map.invalidateSize(); return; }
   if(!DATA) return;
   mapReady=true;
+  // optional ?lens=<key> deep-link: pick the starting map lens (validated against LENS).
+  try{ const ql=new URLSearchParams(location.search).get('lens'); if(ql&&LENS[ql]&&ql!==curLens){ curLens=ql; renderLenses(); } }catch(e){}
   map = L.map('map',{preferCanvas:true, attributionControl:true, zoomControl:true}).setView([13.4,101.2], window.innerWidth<600?5:6);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:19}).addTo(map);
@@ -693,6 +717,9 @@ function initMap(){
   map.on('popupclose', clearRadius);
   addRadiusToggle();
   styleMarkers();
+  // warm the district join so popups always carry the amphoe white-space/risk block and the
+  // district lenses recolour instantly. Small file, also used by the Acquisition tab.
+  if(!ampJoinAttached) loadAmphoe().then(()=>{ if(mapReady){ renderLegend(); styleMarkers(); } });
 }
 function selectBranch(d,m){
   m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
@@ -745,6 +772,20 @@ function collatMixPopupHTML(d,sec,r){
     + (pp!=null?r('Pickup share', pp+'%', '#8b90a7'):'')
     + (ep!=null?r('EV share', ep+'%', '#23A28F'):'');
 }
+// District (amphoe) block for a branch popup — shows the whole-district scores joined to this
+// branch. White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED. Renders
+// only once amphoe.json has been joined (d._amp set), so it appears after a district lens loads.
+function amphoePopupHTML(d,sec,r){
+  const a=d._amp; if(!a) return '';
+  const ws=a.whitespace, rk=a.risk_proxy;
+  const wc=ws>=40?'#E6B450':ws>=20?'#cda23e':'#8b90a7';
+  const rc=rk>=55?'#C8433B':rk>=45?'#E6B450':'#23A28F';
+  return sec('District (amphoe) — white-space & risk')
+    + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
+    + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
+    + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), '#5B7CFA')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
+}
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
@@ -782,6 +823,7 @@ function popupHTML(d){
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), '#7A4FE0'):''}
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), '#7A4FE0'):''}
     ${collatMixPopupHTML(d,sec,r)}
+    ${amphoePopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
@@ -800,6 +842,9 @@ function setLens(k){
   renderRiskSub();
   if(k==='cstress' && !cstressLoaded){
     loadCropStress().then(()=>{ if(curLens==='cstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if((k==='dws'||k==='drisk') && !ampJoinAttached){
+    loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   renderLegend(); if(mapReady) styleMarkers();
 }

@@ -117,15 +117,29 @@ def build():
     prov_agri = {p: round(sum(v) / len(v), 1) for p, v in prov_agri.items() if v}
 
     # ── spatial join: branches -> amphoe polygon (PIP, bbox prefilter) ───────────
+    # branch_sid[i] = shapeID of the amphoe branch i (master order) falls inside.
+    # A few branches sit just off a polygon (coast/border geometry) — those get a
+    # nearest-centroid fallback below so EVERY branch maps to an amphoe (the client
+    # district lens needs a total join). branch_pip flags true PIP vs fallback.
+    poly_centroids = [(_centroid(f["geometry"]), f["properties"]["shapeID"]) for f in amphoe]
     branches_by_poly = collections.defaultdict(list)
+    branch_sid = [None] * len(master)
+    branch_pip = [False] * len(master)
     branch_join = 0
-    for b in master:
+    for i, b in enumerate(master):
         x, y = b["lng"], b["lat"]
         for f, (x0, y0, x1, y1) in polys:
             if x0 <= x <= x1 and y0 <= y <= y1 and _contains(f["geometry"], x, y):
                 branches_by_poly[f["properties"]["shapeID"]].append(b)
+                branch_sid[i] = f["properties"]["shapeID"]
+                branch_pip[i] = True
                 branch_join += 1
                 break
+        if branch_sid[i] is None:
+            # fallback: nearest amphoe centroid (geometric, ESTIMATED)
+            (cxx0, cyy0), sid0 = min(
+                poly_centroids, key=lambda c: hav(y, x, c[0][1], c[0][0]))
+            branch_sid[i] = sid0
 
     # branch centroids per province for assigning province to ZERO-branch amphoe
     # (nearest branch's province). Branch amphoe get province from their branches.
@@ -230,6 +244,16 @@ def build():
 
     recs.sort(key=lambda r: -r["whitespace"])
 
+    # ── branch -> amphoe index (master order) ────────────────────────────────────
+    # platform/data/branches.json is derived 1:1 from branches_final.json in the
+    # same order (derive.py iterates the master and appends one record per branch),
+    # so branch_amphoe[i] is the index into this (sorted) amphoe[] list for the
+    # i-th branch. Lets the National map color each branch by its district scores
+    # with a guaranteed total join — no fuzzy client-side name matching.
+    sid_to_idx = {r["id"]: k for k, r in enumerate(recs)}
+    branch_amphoe = [sid_to_idx[sid] for sid in branch_sid]
+    n_fallback = sum(1 for p in branch_pip if not p)
+
     meta = {
         "generated_by": "pipeline/build_amphoe.py",
         "n_amphoe": len(recs),
@@ -262,11 +286,15 @@ def build():
         },
         "join_rates": {
             "branch_to_amphoe": f"{branch_join}/{len(master)}",
+            "branch_amphoe_fallback": f"{n_fallback}/{len(master)} branches off any polygon, assigned nearest amphoe centroid (ESTIMATED)",
             "factories_to_amphoe": f"{fac_join}/{fac_attempt} (attempted only on branch amphoe with a Thai district name)",
         },
+        "branch_amphoe_note": "branch_amphoe[i] = index into amphoe[] for the i-th branch in "
+                              "platform/data/branches.json (same order as branches_final.json). "
+                              "PIP join; coast/border misses use nearest amphoe centroid.",
         "sorted_by": "whitespace desc",
     }
-    return {"meta": meta, "amphoe": recs}, branch_join, len(master), fac_join, fac_attempt
+    return {"meta": meta, "amphoe": recs, "branch_amphoe": branch_amphoe}, branch_join, len(master), fac_join, fac_attempt
 
 
 def run(check=False):
