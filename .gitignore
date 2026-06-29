@@ -23,3 +23,9 @@ pipeline/dgt_out/
 # QA render temp (headless screenshots)
 platform/_qa_vendor/
 platform/_qa_*.html
+
+# test harness caches/work — regenerate with tests/run.sh (npm-installed deps + fresh renders).
+# tests/baseline/*.png IS committed (visual-regression reference); everything else here is not.
+tests/.cache/
+tests/.work/
+tests/node_modules/
