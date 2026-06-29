@@ -1,6 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,-,1,text,year
-2,สถานภาพการทำงาน,-,2,text,work status
-3,ค่าข้อมูล,-,3,decimal,value
-4,หน่วยนับ,-,4,text,unit
-5,ที่มา(ระดับกรม),-,5,text,source

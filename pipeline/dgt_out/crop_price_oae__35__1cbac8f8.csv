@@ -1,7 +1,0 @@
-﻿Scope,Data_Type,_id,Primary,Type,Length,Auto_Increment,Field_Name,Mandatory,Comment,Default
-N/A,text,1,No,N/A,4,No,YEAR,M,ปี,
-N/A,text,2,No,N/A,2,No,MONTH,M,เดือน,
-N/A,text,3,No,N/A,1,No,WEEK,M,สัปดาห์ที่,
-N/A,text,4,No,N/A,100,No,PRODUCT_NAME,M,ชื่อพืช,
-N/A,text,5,No,N/A,100,No,PROVINCE_NAME,M,ชื่อจังหวัด,
-N/A,numeric,6,No,N/A,20,No,PRICE,O,ราคา,

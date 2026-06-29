@@ -1,5 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,Year,1,TEXT,YEAR
-2,จำนวนผู้มีงานทำด้านเทคโนโลยีฯ,Employed,2,NUMERIC,VALUE
-3,พันคน,Thousands,3,TEXT,UNIT
-4,สำนักงานสถิติแห่งชาติ,National Statistical Office,4,TEXT,SOURCE

@@ -1,8 +1,0 @@
-﻿_id,name,example,data_type,description_en,description_thai,no,note
-1,year_th,2558.0,int,Year (Buddhist Era) of the record,ปี พ.ศ. ของข้อมูล,1,ระบุปีในรูปแบบ พ.ศ.
-2,commod,สับปะรดปัตตาเวีย,string,Agricultural commodity name,ชื่อสินค้าเกษตร,2,ชื่อพืชผลหลัก เช่น สับปะรดปัตตาเวีย ลำไย ลิ้นจี่ มังคุด ทุเรียน
-3,attribute,ผลผลิต,string,Type of attribute / indicator,ประเภทของข้อมูล/ตัวชี้วัด,3,"เช่น เนื้อที่เพาะปลูก, ราคาที่เกษตรกรขายได้"
-4,value,1825.0,float,Numerical value of the attribute,ค่าตัวเลขตาม attribute,4,มีทศนิยมได้
-5,unit,พันตัน,string,Unit of measurement,หน่วยของข้อมูล,5,"เช่น พันไร่, กก./ไร่, บาท/กก."
-6,note,P,string,Additional notes,หมายเหตุเพิ่มเติม,6,"P = ข้อมูลเบื้องต้น
-F = ข้อมูลพยากรณ์"

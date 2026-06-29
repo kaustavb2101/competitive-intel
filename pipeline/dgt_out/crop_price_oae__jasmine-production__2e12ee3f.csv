@@ -1,9 +1,0 @@
-﻿_id,name,example,data_type,description_en,description_thai,no,note
-1,year_th,2564.0,int,Thai calendar year of data,ปี พ.ศ. ของข้อมูล,1,ใช้ปี พ.ศ.
-2,crop_year,2564/65,string,Crop year / Production season,ปีการผลิต/ฤดูกาลการผลิต,2,ปีการผลิต/ฤดูกาลการผลิต
-3,province_name,ประเทศไทย,string,Province or area name,จังหวัด หรือพื้นที่ที่เก็บข้อมูล,3,"ถ้าเป็นรวมประเทศใช้คำว่า ""ประเทศไทย"""
-4,commod,ข้าวนาปี,string,Crop type,ประเภทพืช,4,
-5,product_type,ข้าวเจ้าหอมมะลิในพื้นที่,string,Subtype of crop,ประเภท/ชนิดย่อยของพืช,5,เช่น “ในพื้นที่”/“นอกพื้นที่”
-6,attribute,เนื้อที่เพาะปลูก,string,Attribute of data,ประเภทตัวชี้วัดของข้อมูล,6,"เช่น เนื้อที่เพาะปลูก, เนื้อที่เก็บเกี่ยว"
-7,values,24733030.0,int,Numeric value,ค่าข้อมูลตัวเลข,7,ไม่มีคอมมาในฐานข้อมูล (เก็บเป็นตัวเลข)
-8,unit,ไร่,string,Unit of measurement,หน่วยของข้อมูล,8,"เช่น ไร่, ตัน"

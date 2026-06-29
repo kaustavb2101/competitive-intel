@@ -1,9 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,-,1,text,year
-2,ไตรมาส,-,2,text,quarter
-3,ภาค,-,3,text,region
-4,กลุ่มอายุ,-,4,text,age group
-5,ระดับการศึกษาที่สำเร็จ ระดับการศึกษา,-,5,text,level_of_educational_attainment
-6,ค่าข้อมูล,-,6,numeric,value
-7,หน่วยนับ,-,7,text,unit
-8,ที่มาระดับกรม,-,8,text,source

@@ -1,5 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,Year,1,text,YEAR
-2,ค่าข้อมูล,Value,2,numeric,VALUE
-3,หน่วยนับ,Unit,3,text,UNIT
-4,ที่มา (ระดับกรม),National Statistical Office,4,text,SOURCE

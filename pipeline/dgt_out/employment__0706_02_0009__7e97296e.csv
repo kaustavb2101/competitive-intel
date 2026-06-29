@@ -1,8 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,Year,1,TEXT,YEAR
-2,ภาค,Region,2,TEXT,REGION
-3,เพศ,Sex,3,TEXT,SEX
-4,ประเภทอุตสาหกรรม,Industry,4,TEXT,INDUSTRY
-5,ค่าจ้างเฉลี่ยต่อเดือนของลูกจ้าง,Average wages and salaries,5,NUMERIC,VALUE
-6,บาท,bath,6,TEXT,UNIT
-7,สำนักงานสถิติแห่งชาติ,National Statistical Office,7,TEXT,SOURCE

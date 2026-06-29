@@ -1,8 +1,0 @@
-﻿dic_id,description_thai,description_en,_id,data_type,field_name
-1,ปี,-,1,text,year
-2,กลุ่มอายุ,-,2,text,age_group
-3,สถานภาพการทำงาน,-,3,text,work status
-4,ระดับการศึกษา,-,4,text,Level_educational
-5,ค่าข้อมูล,-,5,decimal,value
-6,หน่วยนับ,-,6,text,unit
-7,ที่มา(ระดับกรม),-,7,text,source
