@@ -2,15 +2,16 @@
 /* AutoX · เงินไชโย — Credit Intelligence Platform
    Loads data files, renders overview/map/acquisition/branches. Vanilla JS, no build step. */
 
+// Real measured quantities (no indices). val() reads measured fields; color/size scale to absolute max.
 const LENS = {
-  opp:    {field:'o', label:'Acquisition opportunity', desc:'net demand vs competition', color:'#E6B450', ramp:[[74,80,96],[122,79,224],[230,180,80]], hi:'high opportunity'},
-  agri:   {field:'a', label:'Farmer · agri-PD',         desc:'crop stress × drought, net livestock', color:'#C8433B', ramp:[[28,140,125],[201,162,39],[200,67,59]], hi:'high stress'},
-  merch:  {field:'m', label:'Merchant demand',          desc:'vendor ecosystem + footfall', color:'#1C8C7D', ramp:[[70,80,100],[91,124,250],[43,182,115]], hi:'high demand'},
-  collat: {field:'c', label:'Collateral density',       desc:'vehicle + gold trade', color:'#7A4FE0', ramp:[[60,66,84],[122,79,224],[230,180,80]], hi:'high density'},
+  workers:  {label:'Factory workers',     desc:'DIW factory employment in the branch district', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
+  pickups:  {label:'Pickup stock',        desc:'DLT pickups in the province — title collateral', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
+  informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
+  autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
 };
 const SEG_COLORS = {Crops:'#C8433B', Livestock:'#1C8C7D', Fisheries:'#1C8C7D', Forestry:'#C9A227', Collateral:'#E6B450'};
 
-let DATA=null, META=null, map=null, markers=[], curLens='opp', branchSort='dwork', mapReady=false;
+let DATA=null, META=null, map=null, markers=[], curLens='workers', branchSort='dwork', mapReady=false;
 let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
@@ -93,12 +94,17 @@ function renderLenses(){
   $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b)return; setLens(b.dataset.l);};
   renderLegend();
 }
+function hexRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function lensColor(t,hex){const a=[40,46,64],b=hexRgb(hex);t=Math.max(0,Math.min(1,t));
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`;}
+function lensMax(l){return Math.max(1,...DATA.map(l.val));}
+function fmtK(n){return n>=1000?Math.round(n/1000)+'k':String(Math.round(n));}
 function renderLegend(){
-  const l=LENS[curLens];
+  const l=LENS[curLens], mx=lensMax(l);
   $('#maplegend').innerHTML =
-    `<span><i style="background:${ramp3(15,l.ramp)}"></i>low</span>
-     <span><i style="background:${ramp3(55,l.ramp)}"></i>mid</span>
-     <span><i style="background:${ramp3(92,l.ramp)}"></i>${l.hi}</span>`;
+    `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
+     <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
+     <span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`;
 }
 function initMap(){
   if(mapReady){ map.invalidateSize(); return; }
@@ -178,10 +184,10 @@ function popupHTML(d){
     ${radar.map(rrow).join('')}</div>`;
 }
 function styleMarkers(){
-  const l=LENS[curLens];
+  const l=LENS[curLens], mx=lensMax(l);
   markers.forEach(m=>{
-    const v=m._d[l.field];
-    m.setStyle({fillColor:ramp3(v,l.ramp), radius:3+Math.min(v,100)/100*7});
+    const v=l.val(m._d), t=v/mx;
+    m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7});
   });
 }
 function setLens(k){
