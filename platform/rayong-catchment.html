@@ -214,15 +214,23 @@ try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
   const useShadow=!/Mobi|Android/i.test(navigator.userAgent)&&window.innerWidth>900;
   LIGHTING=new deck.LightingEffect({
     ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-    sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
-    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
-  LIGHTING.shadowColor=[0,0,0,0.32];
+    sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:useShadow}),
+    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
+  LIGHTING.shadowColor=[0,0,0,0.50];
 } }catch(e){ LIGHTING=null; }
 const deckgl=new deck.DeckGL({container:'map',
   initialViewState:{longitude:CA.center.lng,latitude:CA.center.lat,zoom:13.4,pitch:55,bearing:18},
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   getTooltip:({object,layer})=>{
     if(!object)return null;
+    if(layer.id==='bldg'){
+      const ty=object.ty||'building';
+      let near='';
+      if(object.cx!=null&&object.cy!=null){
+        const nv=CA.poi.vehicle_commerce.filter(p=>hav(object.cy,object.cx,p[0],p[1])<=200).length;
+        const nc=CA.poi.convenience.filter(p=>hav(object.cy,object.cx,p[0],p[1])<=200).length;
+        if(nv||nc)near=`<br><span style="color:var(--mid)">≤200m: ${nv} vehicle · ${nc} convenience</span>`;}
+      return {html:`<div class="dtt"><b>${Math.round(object.h)} m</b> · ${ty}<br>~${Math.round(object.fa).toLocaleString()} m² floor area${near}</div>`};}
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
     if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};
     if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
@@ -237,13 +245,18 @@ function render(){
   const L=[baseLayer()];
   L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
-    getFillColor:b=>{const t=Math.max(0,Math.min(1,b.h/40));
+    getFillColor:b=>{const t=Math.pow(Math.max(0,Math.min(1,b.h/40)),1.1);
       const lo=darkMode()?[43,58,85]:[176,188,214], mid=[91,124,250], hi=[224,169,59];
       const m=t<.5?lo.map((v,i)=>Math.round(v+(mid[i]-v)*t*2)):mid.map((v,i)=>Math.round(v+(hi[i]-v)*(t-.5)*2));
-      return [m[0],m[1],m[2],darkMode()?232:215];},
-    stroked:true,getLineColor:darkMode()?[10,14,22,55]:[120,130,150,80],getLineWidth:1,lineWidthMinPixels:0.4,
-    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},
-    parameters:{depthTest:true},_shadow:true,pickable:false}));
+      const a=darkMode()?232:215;
+      if(!b.ty||b.ty==='mixed'||b.ty==='house')return [m[0],m[1],m[2],a];
+      const TINT={residential:[88,118,200],commercial:[224,169,59],hotel:[224,169,59],
+        industrial:[200,67,59],office:[122,79,224],school:[120,140,170]};
+      const c=TINT[b.ty];if(!c)return [m[0],m[1],m[2],a];
+      return [Math.round(m[0]*.7+c[0]*.3),Math.round(m[1]*.7+c[1]*.3),Math.round(m[2]*.7+c[2]*.3),a];},
+    stroked:true,getLineColor:darkMode()?[45,60,90,170]:[120,130,150,150],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
+    parameters:{depthTest:true},transitions:{getElevation:600},_shadow:true,pickable:true}));
   if(showRings && focal){
     L.push(new deck.PolygonLayer({id:'rings',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:true,
@@ -257,9 +270,11 @@ function render(){
     getRadius:60,radiusMinPixels:2.2,radiusMaxPixels:6,getFillColor:[21,155,134,235]}));
   L.push(new deck.ScatterplotLayer({id:'mkt',data:CA.poi.fresh_market,getPosition:p=>[p[1],p[0]],
     getRadius:70,radiusMinPixels:2.5,radiusMaxPixels:7,getFillColor:[224,200,80,240]}));
+  L.push(new deck.ScatterplotLayer({id:'bank',data:CA.poi.bank,getPosition:p=>[p[1],p[0]],
+    getRadius:55,radiusMinPixels:2,radiusMaxPixels:6,getFillColor:[91,124,250,180]}));
   // competitors
   L.push(new deck.ScatterplotLayer({id:'comp',data:CA.competitors,getPosition:d=>[d.lng,d.lat],
-    getRadius:95,radiusMinPixels:4,radiusMaxPixels:9,stroked:true,getLineColor:[20,20,28,255],lineWidthMinPixels:1.2,
+    getRadius:95,radiusMinPixels:8,radiusMaxPixels:16,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
     getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
   // my branches
   L.push(new deck.ScatterplotLayer({id:'branches',data:CA.branches,getPosition:d=>[d.x,d.y],
@@ -269,6 +284,11 @@ function render(){
   L.push(new deck.TextLayer({id:'branch-labels',data:CA.branches,getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
     getSize:11,getColor:[40,28,8,255],getBackgroundColor:[224,169,59,235],background:true,
     backgroundPadding:[5,3],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
+    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
+  L.push(new deck.TextLayer({id:'comp-labels',data:CA.competitors,getPosition:d=>[d.lng,d.lat],
+    getText:d=>(d.brand||'?').charAt(0),getSize:9,getColor:[255,255,255,255],
+    getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),235],background:true,
+    backgroundPadding:[4,2],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
     getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
   L.push(new deck.TextLayer({id:'land',data:CA.landmarks,getPosition:d=>[d.cx,d.cy],getText:d=>d.nm,
     getSize:10,getColor:[255,255,255,255],getBackgroundColor:[70,52,30,225],background:true,
