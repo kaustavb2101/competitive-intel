@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/rayong-province", "destination": "/rayong-catchment", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/data/(.*)",

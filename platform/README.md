@@ -4,11 +4,14 @@ One Vercel app. No build step. Static files; data served from `data/`.
 
 ## Routes (one nav bar across all)
 - **index.html** — Overview · National map (lens switcher) · Acquisition · Branches
-- **rayong-province.html** — Rayong 3D deep-dive: extruded district polygons, 57 branches, live competitors, "what impacts them"
-- **rayong-catchment.html** — Mueang Rayong catchment explorer: 3,631 extruded buildings, reachable-population card, acquisition leads + recommendations
+- **rayong-catchment.html** — unified **Rayong 3D** view: 3,631 extruded Mueang-core buildings (scenery), 59 branches with
+  10km collateral catchment rings, color-coded POIs (toggleable legend), flat district context, a Region>Province>Branch
+  cascade (populated nationwide from `data/provinces/index.json`, interactive for Rayong now), reachable-population card,
+  acquisition leads + recommendations.
+- **rayong-province.html** — retired redirect stub → `/rayong-catchment` (preserves old deep-links).
 
 ```
-index.html  rayong-province.html  rayong-catchment.html
+index.html  rayong-catchment.html  rayong-province.html(stub)
 app.js  styles.css  vercel.json
 data/
   branches.json        national (2,015 branches)

@@ -14,13 +14,14 @@ NAV_CSS = """
 """
 
 def nav_html(active):
+    # Rayong 3D + Catchment were consolidated into one page (rayong-catchment.html).
+    # 'province' is kept as an alias key so nav_html('province') still resolves to the unified tab.
     links=[("index.html#overview","Overview","overview"),
            ("index.html#map","National","map"),
-           ("rayong-province.html","Rayong 3D","province"),
-           ("rayong-catchment.html","Catchment","catchment"),
+           ("rayong-catchment.html","Rayong 3D",("catchment","province")),
            ("index.html#acq","Acquisition","acq"),
            ("index.html#branches","Branches","branches")]
-    def cls(k): return ' class="on"' if k==active else ''
+    def cls(k): return ' class="on"' if (active in k if isinstance(k,tuple) else k==active) else ''
     a="".join(f'<a href="{h}"{cls(k)}>{t}</a>' for h,t,k in links)
     return f'<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span>{a}</nav>'
 
