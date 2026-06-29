@@ -10,6 +10,7 @@ const LENS = {
   motomix:  {label:'Motorcycle-title share ▲', desc:'MEASURED (DLT) — motorcycle share of the province vehicle stock (moto ÷ total). The most volatile, lowest-recovery title collateral; higher share = more exposure to a used-motorcycle value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
   informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
+  comp:     {label:'Competitor density ◆', desc:'MEASURED competitor locations (Google Places, a LOWER BOUND, not a registry) — rival title-loan / vehicle-finance branches (Srisawad, Muangthai, Tidlor, Heng) within ~5km of each AutoX branch. Lazy-loads competitors_national.json; run pull_competitors.py to populate.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
   // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
@@ -42,6 +43,67 @@ async function loadCropStress(){
   return cstressPromise;
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
+
+/* ---------- competitor census (objective #2: competitor-AWARE white-space) ----------
+   Lazy-loads data/competitors_national.json — a MEASURED census of rival title-loan / vehicle-
+   finance branches (Srisawad, Muangthai, Tidlor, Heng) from Google Places, written by
+   pipeline/pull_competitors.py (run from a Thai IP). It is a LOWER BOUND, not a registry:
+   Places caps ~60 results/query and not every branch is listed. Everything is null-guarded so
+   the app works BEFORE the file exists — the lens then shows a quiet "run pull_competitors.py" note.
+   We count rival branches within ~5km of each AutoX branch (client-side haversine) so an
+   "underserved" district can be re-read as "underserved AND undercompeted". */
+let COMP=null, COMP_META=null, COMP_ITEMS=[], compLoaded=false, compPromise=null;
+let compAttached=false;               // per-AutoX competitor counts joined onto DATA (d._comp)
+const COMP_RADIUS_KM=5;               // competitor-proximity radius (km) for the AutoX-vs-rival count
+// brand -> dot colour for faint competitor points + tooltips (kept distinct from AutoX accent).
+const COMP_BRAND_COLOR={Srisawad:'#E0574F',Muangthai:'#E6B450',Tidlor:'#1C8C7D',Heng:'#7A4FE0'};
+function compHasData(){return !!(COMP_ITEMS&&COMP_ITEMS.length);}
+async function loadCompetitors(){
+  if(compPromise) return compPromise;
+  compLoaded=true;
+  compPromise=(async()=>{
+    try{
+      const j=await fetch('data/competitors_national.json').then(r=>{if(!r.ok)throw 0;return r.json();});
+      COMP=j; COMP_META=j.meta||null; COMP_ITEMS=(j.items||[]).filter(it=>it&&it.lat!=null&&it.lng!=null);
+    }catch(e){ COMP=null; COMP_META=null; COMP_ITEMS=[]; }
+    attachCompToBranches();
+    return COMP_ITEMS;
+  })();
+  return compPromise;
+}
+// great-circle distance (km) between two lat/lng points.
+function havKm(la1,lo1,la2,lo2){
+  const R=6371, p=Math.PI/180;
+  const dla=(la2-la1)*p, dlo=(lo2-lo1)*p;
+  const a=Math.sin(dla/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin(dlo/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+// For each AutoX branch, count rival branches within COMP_RADIUS_KM and tally by brand.
+// O(branches × competitors) but tiny (≤2,015 × a few thousand) and runs once, lazily.
+function attachCompToBranches(){
+  if(compAttached||!DATA) return;
+  const has=compHasData();
+  for(let i=0;i<DATA.length;i++){
+    const d=DATA[i];
+    if(!has){ d._comp={n:0,brands:{},ok:false}; continue; }
+    const by={}; let n=0;
+    for(let j=0;j<COMP_ITEMS.length;j++){
+      const it=COMP_ITEMS[j];
+      if(havKm(d.y,d.x,it.lat,it.lng)<=COMP_RADIUS_KM){ n++; by[it.brand]=(by[it.brand]||0)+1; }
+    }
+    d._comp={n,brands:by,ok:true};
+  }
+  compAttached=true;
+}
+function compCount(d){return (d._comp&&d._comp.ok)?d._comp.n:0;}
+// competitor-vs-AutoX read for a branch: ratio of nearby rivals to our own ≤10km presence.
+// High rivals + low own = contested; low rivals + demand = undercompeted white space.
+function compTooltip(d){
+  const c=d._comp; if(!c||!c.ok) return 'No competitor data — run pull_competitors.py';
+  if(!c.n) return `No rival branches ≤${COMP_RADIUS_KM}km (measured, lower bound)`;
+  const parts=Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([b,n])=>`${b} ${n}`);
+  return `${c.n} rival branch${c.n===1?'':'es'} ≤${COMP_RADIUS_KM}km: ${parts.join(', ')} (measured, lower bound)`;
+}
 // risk sub-metric: composite (max of the three proxies) or a single selectable score.
 let riskMetric='composite';
 // carry the current light/dark theme over to the standalone 3D/map pages
@@ -473,6 +535,9 @@ function renderAcqBoard(){
     $('#acqcsv').onclick=acqCSV; $('#acqchips').dataset.init='1';
   }
   drawAcqBoard();
+  // lazily fold the competitor census into the board so "underserved" can be re-read as
+  // "underserved AND undercompeted". Null-safe: if the file is absent the column shows "n/a".
+  if(!compAttached) loadCompetitors().then(()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAcqBoard(); });
 }
 // Per-region ranking: which region has the most white space on average + the single best opening.
 function drawAcqRegions(){
@@ -510,24 +575,49 @@ function drawAcqBoard(){
   acqRows=DATA.filter(d=>acqRegion==='all'||d.r===acqRegion)
     .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
   drawAcqRegions();
-  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th><th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
+  const haveComp=compHasData();
+  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th>`+
+    `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high white-space = underserved AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
+    `<th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
     acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
       const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
+      // competitor cell: measured count + an "undercompeted" flag when high white-space meets few rivals.
+      const cn=compCount(d);
+      const under = haveComp && row.s>=40 && cn===0;
+      const compCell = !haveComp
+        ? '<span class="sub" title="run pipeline/pull_competitors.py">n/a</span>'
+        : (cn===0
+            ? `<span style="color:${under?'var(--gold)':'var(--merch)'}">0${under?' ✦':''}</span>`
+            : `<span style="color:var(--agri)">${cn}</span>`);
       return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${sc};text-decoration:none">★ ${row.s}</a></td>
       <td>${d.n}<span class="sub">${hd}</span></td>
       <td class="sub">${d.v}</td><td class="sub">${d.r}</td>
       <td class="mono ${d.w<=2?'':'sub'}" style="${d.w<=2?'color:var(--gold)':''}">${d.w}</td>
+      <td class="mono" title="${haveComp?compTooltip(d).replace(/"/g,'&quot;'):'no competitor data yet'}">${compCell}</td>
       <td class="mono" style="color:var(--gold)">${naNum(d.dwork)}</td>
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono sub">${fin}</td></tr>`;}).join('');
+  // honest one-line note under the board about the competitor column's provenance + meaning.
+  const cnote=$('#acqcompnote');
+  if(cnote){
+    if(!compLoaded){ cnote.innerHTML='<span class="sub">Loading competitor census…</span>'; }
+    else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — no competitor census yet. Run <span class="mono">pipeline/pull_competitors.py</span> (from a Thai IP) and the column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
+    else {
+      const flagged=acqRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
+      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>underserved AND undercompeted</b> — high white-space with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
+        `Competitor counts are <b>measured</b> (Google Places) but a <b>lower bound</b>, not a lender registry.</span>`;
+    }
+  }
 }
 function acqCSV(){
-  const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
+  const haveComp=compHasData();
+  const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','rival_branches_5km_measured_lower_bound','undercompeted_flag','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
   const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=acqLegs(d);
-    return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
+    const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
+    return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
@@ -1007,6 +1097,25 @@ function fmtK(n){return n>=1000?Math.round(n/1000)+'k':String(Math.round(n));}
 function renderLegend(){
   const l=LENS[curLens], mx=lensMax(l);
   const est=l.est?' <span class="sub" title="Estimated proxy, not measured">▲ estimated</span>':'';
+  // Competitor-density lens: if the census file isn't present yet, say so quietly (no crash) instead
+  // of a meaningless 0-coloured scale, and point at the puller. Once data is in, show the scale + an
+  // honest "measured, lower bound" tag and a tiny brand key for the faint rival points.
+  if(l.cmp){
+    if(!compLoaded){ $('#maplegend').innerHTML='<span class="sub">Loading competitor census…</span>'; return; }
+    if(!compHasData()){
+      $('#maplegend').innerHTML='<span class="sub" title="competitors_national.json not found in data/">'+
+        'No competitor data yet — run <span class="mono">pipeline/pull_competitors.py</span> (from a Thai IP) to populate the rival-branch census.</span>';
+      return;
+    }
+    const key=Object.entries(COMP_BRAND_COLOR).map(([b,c])=>`<span><i style="background:${c};border-radius:50%"></i>${b}</span>`).join('');
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>0</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`+
+      ` <span class="sub" title="competitor locations from Google Places — a lower bound, not a registry">◆ measured · lower bound</span>`+
+      ` &nbsp; ${key}`;
+    return;
+  }
   $('#maplegend').innerHTML =
     `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
      <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
@@ -1033,6 +1142,10 @@ function initMap(){
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
   if(!ampJoinAttached) loadAmphoe().then(()=>{ if(mapReady){ renderLegend(); styleMarkers(); } });
+  // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
+  if(curLens==='comp' && !compAttached){
+    loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
+  }
 }
 function selectBranch(d,m){
   m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
@@ -1057,6 +1170,48 @@ function addRadiusToggle(){
       if(!showRadius) clearRadius(); };
     return d; };
   C.addTo(map);
+}
+// faint competitor points — plotted ONLY while the Competitor-density lens is active, so the 2,015
+// AutoX dots stay readable in every other lens. Small translucent markers, brand-coloured, with a
+// click popup naming the rival. Built once, then shown/hidden. Null-safe: no data → nothing drawn.
+let compLayer=null;
+function drawCompPoints(){
+  if(!mapReady||!map) return;
+  if(curLens!=='comp'||!compHasData()){
+    if(compLayer){ map.removeLayer(compLayer); compLayer=null; }
+    return;
+  }
+  if(compLayer) return;  // already drawn for this lens
+  const renderer=L.canvas({padding:0.5});
+  compLayer=L.layerGroup();
+  COMP_ITEMS.forEach(it=>{
+    const col=COMP_BRAND_COLOR[it.brand]||'#8b90a7';
+    const m=L.circleMarker([it.lat,it.lng],{renderer,radius:2.6,weight:0,fillColor:col,fillOpacity:0.55,interactive:true});
+    m.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${col}">◆ ${it.brand}</div>`+
+      `<div class="pv">${it.name||''}${it.prov?' · '+it.prov:''}</div>`+
+      `<div class="sub" style="margin-top:4px">Rival branch · measured location (Google Places, lower bound)</div></div>`,
+      {closeButton:true,maxWidth:260});
+    compLayer.addLayer(m);
+  });
+  compLayer.addTo(map);
+  if(map.getPane('markerPane')&&compLayer.eachLayer){/* keep AutoX markers clickable on top */}
+}
+// competitor block for an AutoX branch popup — measured rivals within ~5km, broken out by brand,
+// read against own ≤10km saturation. Only meaningful once the census is loaded (d._comp.ok).
+function compPopupHTML(d,sec,r){
+  const c=d._comp; if(!c||!c.ok) return '';
+  const col=c.n>0?'var(--agri)':'var(--merch)';
+  const brands=Object.entries(c.brands).sort((a,b)=>b[1]-a[1])
+    .map(([b,n])=>`${b} ${n}`).join(' · ');
+  // contested vs undercompeted read: rivals nearby vs our own ≤10km presence
+  const verdict = c.n===0 ? 'no nearby rivals — undercompeted'
+    : (c.n> (d.w||0) ? 'more rivals than own AutoX — contested'
+                     : 'rivals present, own coverage leads');
+  return sec('Competitors — measured (Google Places, lower bound)')
+    + r(`Rival branches ≤${COMP_RADIUS_KM}km`, `<span style="color:${col}">${c.n}</span>`, col)
+    + (brands?r('By brand', brands, '#c7cedd'):'')
+    + r('Own AutoX ≤10km', (d.w||0), 'var(--accent)')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">${verdict} · Places coverage is a lower bound, not a lender registry</div>`;
 }
 // crop-household stress block for a branch popup — only the cstress lens loads the data,
 // so render nothing until it's available. Shows the REAL components, honestly labelled.
@@ -1137,6 +1292,7 @@ function popupHTML(d){
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
+    ${compPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
@@ -1159,6 +1315,10 @@ function setLens(k){
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
+  if(k==='comp' && !compAttached){
+    loadCompetitors().then(()=>{ if(curLens==='comp'){ renderLegend(); if(mapReady){ drawCompPoints(); styleMarkers(); } } });
+  }
+  if(mapReady) drawCompPoints();   // show/hide the faint rival points with the lens
   renderLegend(); if(mapReady) styleMarkers();
 }
 

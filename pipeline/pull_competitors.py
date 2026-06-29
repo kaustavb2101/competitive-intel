@@ -16,7 +16,7 @@ is ~4 brands x 77 provinces x up to 3 pages ≈ 300-900 calls (~$10-30 or your f
 quota). Use --provinces N to cap it. The script prints an estimate and the running
 call count, and stops cleanly on OVER_QUERY_LIMIT / REQUEST_DENIED.
 
-Output: source-data/competitors_national.json
+Output: platform/data/competitors_national.json   (served dir — the frontend fetches it here)
   { "meta": {...}, "brands": {...counts...},
     "items": [ {"brand","name","lat","lng","prov","place_id"} ] }
 Deduped by place_id. Folds into the acquisition white-space + a map lens later.
@@ -26,6 +26,9 @@ import json, os, sys, time, argparse, urllib.parse, urllib.request
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 SRC = os.path.join(REPO, "source-data")
+# Write straight into the served app dir so a fresh pull lands where the frontend fetches it
+# (platform/data/competitors_national.json — read by the National-map competitor lens + Acquisition).
+OUT_DIR = os.path.join(REPO, "platform", "data")
 sys.path.insert(0, ROOT)
 try:
     from envload import load_env; load_env()
@@ -86,7 +89,7 @@ def run(brands, prov_limit, check=False):
     provs = provinces(prov_limit)
     est = len(brands) * len(provs)
     print(f"~{est}-{est*3} Places calls across {len(brands)} brands x {len(provs)} provinces "
-          f"(billable; Ctrl-C to stop). Output -> source-data/competitors_national.json")
+          f"(billable; Ctrl-C to stop). Output -> platform/data/competitors_national.json")
     seen, items, calls = set(), [], 0
     for brand in brands:
         q = BRANDS[brand]
@@ -113,7 +116,8 @@ def run(brands, prov_limit, check=False):
                     "brands_queried": brands, "provinces": len(provs), "places_calls": calls,
                     "note": "Coverage is best-effort (Places caps ~60/query/province); a lower bound, not a registry."},
            "brands": by_brand, "items": sorted(items, key=lambda x: (x["brand"], x["prov"]))}
-    path = os.path.join(SRC, "competitors_national.json")
+    os.makedirs(OUT_DIR, exist_ok=True)
+    path = os.path.join(OUT_DIR, "competitors_national.json")
     json.dump(out, open(path, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"\nwrote {path}: {len(items)} competitor branches  {by_brand}")
     return 0
