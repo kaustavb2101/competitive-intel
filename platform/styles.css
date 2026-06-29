@@ -255,6 +255,10 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .tbl th.h-collat{color:#a684ef} .tbl th.h-opp{color:#f0c869}
 .sub{color:var(--mid);font-size:var(--fz-xs)}
 
+/* risk-trend tab: region mover cards lead with the delta pill; legs wrap on the .n line */
+#v-trend .mcard .v{font-size:var(--fz-lg)}
+#v-trend .mcard .n{line-height:1.7}
+
 /* inline data bars: visible track + colored glowing fill */
 .bar{display:inline-block;background:#10182A;border-radius:4px;height:8px;width:64px;vertical-align:middle;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}

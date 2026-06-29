@@ -38,6 +38,7 @@ function showTab(v){
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
   if(v==='exposure') renderExposure();
+  if(v==='trend') renderTrend();
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
@@ -274,6 +275,90 @@ function renderExposure(){
       <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
+}
+
+/* ---------- risk trend (time dimension, Phase 3) ----------
+   Lazy-loads data/deltas.json (built by pipeline/timeseries.py from the snapshot
+   set). With one vintage it shows a "baseline captured" message; with two it shows
+   region movers, the commodity-board YoY re-rating, and the biggest branch movers.
+   All region/branch numbers are ESTIMATED proxies; the board is editorial price dir. */
+let DELTAS=null, trendLoaded=false;
+// signed delta pill: ▲ red when risk rises, ▼ green when it eases, • grey when flat.
+function deltaPill(d,invert){
+  const v=d==null?0:d; const eps=0.05;
+  const rising = invert ? v<-eps : v>eps;     // for board YoY a FALL is the bad/“rising-stress” case
+  const easing = invert ? v>eps : v<-eps;
+  const col = rising?'var(--agri)':easing?'var(--up)':'var(--mid)';
+  const arr = rising?'▲':easing?'▼':'•';
+  const txt = d==null?'n/a':(v>0?'+':'')+v;
+  return `<span class="mono" style="color:${col}" title="change vs prior vintage">${arr} ${txt}</span>`;
+}
+async function renderTrend(){
+  if(!trendLoaded){
+    trendLoaded=true;
+    try{ DELTAS = await fetch('data/deltas.json').then(r=>r.json()); }
+    catch(e){ DELTAS=null; }
+  }
+  const baseEl=$('#trendbaseline'), bodyEl=$('#trendbody'), vintEl=$('#trendvint');
+  if(!DELTAS){
+    if(baseEl){ baseEl.style.display='block';
+      baseEl.innerHTML='Trend data not available yet (<b>data/deltas.json</b> missing).'; }
+    if(bodyEl) bodyEl.style.display='none';
+    return;
+  }
+  if(vintEl){
+    vintEl.textContent = DELTAS.baseline
+      ? (DELTAS.to?`Baseline vintage: ${DELTAS.to}.`:'')
+      : `Comparing ${DELTAS.from} → ${DELTAS.to}.`;
+  }
+  if(DELTAS.baseline){
+    if(baseEl){ baseEl.style.display='block';
+      baseEl.innerHTML=`<b>Baseline captured${DELTAS.to?` (${DELTAS.to})`:''}.</b> Trends appear after the next data refresh —
+        once a second vintage is snapshotted, this tab fills in with region movers, commodity re-rating and per-branch risk shifts.
+        <span class="sub">The plumbing is live; it just needs one more data point.</span>`; }
+    if(bodyEl) bodyEl.style.display='none';
+    return;
+  }
+  if(baseEl) baseEl.style.display='none';
+  if(bodyEl) bodyEl.style.display='block';
+
+  // region mover cards — composite arrow led by the worst-moving leg
+  const RC=$('#trendregions');
+  if(RC){
+    RC.innerHTML=(DELTAS.region||[]).map(r=>{
+      const legs=[['Agri-PD',r.d_agri,r.agri,'#E0574F'],['Merchant',r.d_md,r.md,'#23A28F'],['Collateral',r.d_col,r.col,'#8E63E8']];
+      const worst=legs.reduce((a,b)=>Math.abs(b[1])>Math.abs(a[1])?b:a,legs[0]);
+      const hc=worst[1]>0.05?'var(--agri)':worst[1]<-0.05?'var(--up)':'var(--mid)';
+      return `<div class="mcard"><div class="k">${r.r} <span class="sub">· ${r.n} branches</span></div>
+        <div class="v" style="color:${hc}">${deltaPill(worst[1])}</div>
+        <div class="n">${legs.map(([lab,d,now])=>`${lab} ${now} ${deltaPill(d)}`).join(' · ')}</div></div>`;
+    }).join('') || '<div class="sub">No region movers.</div>';
+  }
+  // commodity board YoY re-rating — for board, a FALLING YoY = deepening stress (invert)
+  const BD=$('#trendboard');
+  if(BD){
+    const rows=(DELTAS.board||[]).filter(b=>b.d_yoy!=null)
+      .sort((a,b)=>Math.abs(b.d_yoy)-Math.abs(a.d_yoy));
+    BD.innerHTML=`<tr><th>Item</th><th>Segment</th><th>YoY now</th><th>Prior YoY</th><th title="change in the YoY figure — a fall means deepening price stress">Δ YoY · est</th></tr>`+
+      (rows.length?rows.map(b=>`<tr><td>${b.lab}</td><td class="sub">${b.seg||'—'}</td>
+        <td class="mono">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td>
+        <td class="mono sub">${b.prev_yoy!=null?(b.prev_yoy>0?'+':'')+b.prev_yoy+'%':'—'}</td>
+        <td>${deltaPill(b.d_yoy,true)}</td></tr>`).join('')
+        :'<tr><td class="sub" colspan="5">No board re-rating between these vintages.</td></tr>');
+  }
+  // per-branch risk movers
+  const BR=$('#trendbranches');
+  if(BR){
+    const rows=DELTAS.branches||[];
+    BR.innerHTML=`<tr><th>#</th><th title="composite risk proxy = worst of agri/merchant/collateral (est)">Risk now ▲ est</th><th title="change in composite proxy vs prior vintage">Δ composite · est</th><th>Branch</th><th>Prov</th><th>Region</th><th>Δ agri</th><th>Δ merch</th><th>Δ collat</th></tr>`+
+      (rows.length?rows.map((d,i)=>{const rc=d.comp>=60?'#E0574F':d.comp>=40?'#E6B450':'#23A28F';
+        return `<tr><td class="mono sub">${i+1}</td>
+        <td class="mono" style="color:${rc}">▲ ${d.comp}</td>
+        <td>${deltaPill(d.d_comp)}</td>
+        <td>${d.n}</td><td class="sub">${d.v}</td><td class="sub">${d.r}</td>
+        <td>${deltaPill(d.d_a)}</td><td>${deltaPill(d.d_m)}</td><td>${deltaPill(d.d_c)}</td></tr>`;}).join('')
+        :'<tr><td class="sub" colspan="9">No branch-level movement between these vintages.</td></tr>');
+  }
 }
 
 /* ---------- map ---------- */

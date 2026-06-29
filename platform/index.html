@@ -17,6 +17,7 @@
   <a data-v="overview" class="on">Overview</a>
   <a data-v="map">National</a>
   <a href="rayong-catchment.html">Rayong 3D</a>
+  <a data-v="trend">Risk trend</a>
   <a data-v="acq">Acquisition</a>
   <a data-v="exposure">Exposure</a>
   <a data-v="provinces">Provinces</a>
@@ -106,6 +107,29 @@
     <h2 class="risk">By region</h2>
     <p class="lead">Share of each region's branches falling in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
     <table class="tbl" id="expotbl"></table>
+  </section>
+
+  <!-- RISK TREND (time dimension) -->
+  <section class="view" id="v-trend">
+    <h2 class="risk">Risk trend · what's getting riskier over time</h2>
+    <p class="lead">Compares the latest data vintage against the previous one. Region cards and branch movers
+      use the <b>estimated agri-PD / merchant / collateral proxies</b> (OSM/price-based, 0–100) — not measured
+      defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
+    <div class="insight" id="trendbaseline" style="display:none;border-left-color:var(--gold)"></div>
+
+    <div id="trendbody" style="display:none">
+      <h2>Region movers · proxy change vs prior vintage</h2>
+      <p class="lead">Arrow + delta show how each region's mean risk proxy shifted. ▲ red = getting riskier · ▼ green = easing. All estimated.</p>
+      <div class="grid macro" id="trendregions"></div>
+
+      <h2>Commodity board · YoY re-rating</h2>
+      <p class="lead">How the year-on-year price move itself changed between vintages — a falling YoY means the income squeeze on that segment is deepening. Editorial/measured (World Bank direction proxy).</p>
+      <table class="tbl" id="trendboard"></table>
+
+      <h2 class="risk">Branch movers · biggest risk-proxy shifts</h2>
+      <p class="lead">Branches whose composite risk proxy (worst of agri/merchant/collateral) moved the most. ▲ = riskier. Estimated screen.</p>
+      <table class="tbl" id="trendbranches"></table>
+    </div>
   </section>
 
   <!-- BRANCHES -->

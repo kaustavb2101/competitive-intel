@@ -18,6 +18,7 @@
 # map (that's lazy-initialised only when the National tab is opened), so gl=none, min_canvas=0.
 index	index.html	none	0	macro,region
 national	index.html#map	leaflet	1	map
+risk-trend	index.html#trend	none	0	trendbaseline
 branch-explorer	branch-explorer.html?lat=12.7506&lng=101.038&n=%E0%B8%A3%E0%B8%B0%E0%B8%A2%E0%B8%AD%E0%B8%87	webgl	1	map
 province-rayong	province.html?p=rayong	webgl	1	map,kpis,v-districts
 province-chonburi	province.html?p=chon-buri	webgl	1	map,kpis
