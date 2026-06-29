@@ -5,75 +5,136 @@
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Rayong · เงินไชโย — EEC Deep-Dive</title>
+<title>Province · เงินไชโย — Deep-Dive</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
 <style>
-:root{--bg:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
- --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;}
+:root{--ink:#070a11;--card:#0e131f;--cardln:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
+ --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:var(--txt)}
-#map{position:fixed;inset:0}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
+#map{position:fixed;inset:0;background:#070a11}
 .mono{font-family:'IBM Plex Mono',monospace}
+canvas{outline:none}
 
-/* title chip */
-#title{position:fixed;top:0;left:0;right:0;z-index:10;padding:11px 14px;
- background:linear-gradient(180deg,rgba(7,10,17,.92),rgba(7,10,17,0));pointer-events:none}
-#title h1{font-size:15px;font-weight:700;color:var(--hi)}
-#title h1 b{color:var(--gold)}
-#title p{font-size:11px;color:var(--mid);margin-top:1px}
+/* top brand strip (KPI chips) */
+#strip{position:fixed;top:44px;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
+ background:linear-gradient(180deg,rgba(7,10,17,.88),rgba(7,10,17,0));scrollbar-width:none;align-items:center}
+#strip::-webkit-scrollbar{display:none}
+#strip .ttl{font:700 13px 'IBM Plex Sans Thai';color:#fff;white-space:nowrap;margin-right:4px}
+#strip .ttl b{color:var(--gold)}
+.bchip{flex:none;background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;
+ font:600 11px 'IBM Plex Mono';color:var(--txt);backdrop-filter:blur(6px);white-space:nowrap}
+.bchip b{color:#fff;margin-left:3px}
+.bchip .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
 
-/* control rail */
-#ctl{position:fixed;top:54px;right:10px;z-index:10;display:flex;flex-direction:column;gap:6px;max-width:43vw}
-.cbtn{background:rgba(14,19,31,.9);border:1px solid var(--line);border-radius:8px;color:var(--mid);
- font:500 11px 'IBM Plex Sans Thai';padding:6px 9px;cursor:pointer;backdrop-filter:blur(6px);text-align:left;display:flex;align-items:center;gap:6px}
-.cbtn.on{color:var(--hi);border-color:#37445f}
-.cbtn .sw{width:9px;height:9px;border-radius:2px;flex:none}
-.cbtn .sw.rd{border-radius:50%}
-#elev{display:flex;gap:4px;background:rgba(14,19,31,.9);border:1px solid var(--line);border-radius:8px;padding:3px;backdrop-filter:blur(6px)}
-#elev button{flex:1;background:none;border:none;color:var(--dim);font:500 10px 'IBM Plex Mono';padding:5px 4px;border-radius:5px;cursor:pointer}
-#elev button.on{background:#1b2740;color:var(--hi)}
+/* side cards */
+.side{position:fixed;top:96px;bottom:14px;width:316px;z-index:8;background:rgba(14,19,31,.93);
+ border:1px solid var(--cardln);border-radius:13px;backdrop-filter:blur(13px);display:flex;flex-direction:column;
+ box-shadow:0 12px 40px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#left{left:14px}#right{right:14px}
+.side h2{font:600 11px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;padding:13px 15px 0}
+.side .scroll{overflow-y:auto;padding:11px 15px 16px;flex:1}
+.cardttl{padding:13px 15px 4px;border-bottom:1px solid #1a2236}
+.cardttl .a{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+.cardttl .b{font-size:11px;color:var(--mid);margin-top:1px}
 
-/* tooltip */
-.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:230px}
-.dtt b{color:#fff}
+.stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
 
-/* bottom sheet */
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:rgba(11,15,24,.97);
- border-top:1px solid var(--line);border-radius:16px 16px 0 0;backdrop-filter:blur(12px);
- transform:translateY(calc(100% - 116px));transition:transform .28s cubic-bezier(.4,0,.2,1);max-height:78vh;display:flex;flex-direction:column}
-#sheet.open{transform:translateY(0)}
-#grip{padding:9px 0 5px;cursor:pointer;flex:none}
-#grip .bar{width:36px;height:4px;background:#36425c;border-radius:3px;margin:0 auto}
-#peek{padding:0 16px 12px;flex:none}
-#peek .h{font-size:12px;font-weight:700;color:var(--hi)}
-#peek .row{display:flex;gap:7px;margin-top:8px;overflow-x:auto;scrollbar-width:none}
-#peek .row::-webkit-scrollbar{display:none}
-.kpi{flex:none;background:#0c1422;border:1px solid var(--line);border-radius:9px;padding:7px 11px;min-width:84px}
-.kpi .v{font:600 16px 'IBM Plex Mono';color:var(--hi)}
-.kpi .k{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-top:1px}
-#tabs{display:flex;gap:3px;padding:2px 12px 0;flex:none;overflow-x:auto;scrollbar-width:none}
-#tabs::-webkit-scrollbar{display:none}
-.tb{flex:none;background:none;border:none;border-bottom:2px solid transparent;color:var(--mid);
- font:500 12.5px 'IBM Plex Sans Thai';padding:9px 11px;cursor:pointer;white-space:nowrap}
-.tb.on{color:var(--hi);border-bottom-color:var(--gold)}
-#body{overflow-y:auto;padding:13px 16px 26px}
-.view{display:none}.view.on{display:block}
-.lead{font-size:12.5px;color:var(--mid);margin-bottom:10px;line-height:1.55}
+/* provenance tags */
+.tag{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;padding:2px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.tag.meas{background:rgba(31,163,140,.16);color:#3fc4ab;border:1px solid rgba(31,163,140,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+
+/* within-10km grouped count rows */
+.kgrp{margin-bottom:11px}
+.kgrp .gh{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 3px}
+.krow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.krow .sw{width:8px;height:8px;border-radius:50%;flex:none}
+.krow .lab{color:var(--txt);flex:1}
+.krow b{font-family:'IBM Plex Mono';color:var(--hi);font-weight:600}
+
+/* workforce measured block + occupation proxy bars */
+.wbox{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:11px 12px;margin-bottom:11px}
+.wbox .wr{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:12.5px}
+.wbox .wr .k{color:var(--mid)}
+.wbox .wr .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.wbox .wr .v small{color:var(--dim)}
+.wbox .big{font:600 23px 'IBM Plex Mono';color:var(--gold);line-height:1.1}
+.wbox .cap{font-size:11px;color:var(--mid);margin:1px 0 7px}
+.occ .or{margin:6px 0}
+.occ .ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt);margin-bottom:2px}
+.occ .ot b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+.occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
+.occ .bar i{display:block;height:100%;border-radius:4px}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+
+/* right card: impacts + tables */
 .imp{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #131b2a}
 .imp .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
 .imp .t{font-size:12.5px;font-weight:600;color:var(--hi)}
 .imp .d{font-size:11.5px;color:var(--mid);margin-top:1px;line-height:1.5}
-.tag{font:600 9px 'IBM Plex Mono';padding:1px 6px;border-radius:9px;margin-left:6px;vertical-align:1px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
-.chip{background:#0c1422;border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:11.5px;color:var(--txt)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;color:var(--dim);font:600 10px 'IBM Plex Mono';text-transform:uppercase;padding:6px 6px;border-bottom:1px solid var(--line)}
+.imp .tg{font:600 9px 'IBM Plex Mono';padding:1px 6px;border-radius:9px;margin-left:6px;vertical-align:1px}
+.lead{font-size:12px;color:var(--mid);margin:2px 0 9px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+th{text-align:left;color:var(--dim);font:600 10px 'IBM Plex Mono';text-transform:uppercase;padding:6px 6px;border-bottom:1px solid var(--cardln)}
 td{padding:6px 6px;border-bottom:1px solid #121a28}
 td.n{color:var(--hi)}
-.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);font-size:13px;z-index:99}
-@media(min-width:760px){#sheet{left:auto;right:14px;bottom:14px;width:380px;border-radius:14px;border:1px solid var(--line);
-  transform:translateY(calc(100% - 150px))}#ctl{max-width:200px}}
+.subtabs{display:flex;gap:3px;padding:8px 15px 0;border-bottom:1px solid #1a2236;flex:none;overflow-x:auto;scrollbar-width:none}
+.subtabs::-webkit-scrollbar{display:none}
+.stb{flex:none;background:none;border:none;border-bottom:2px solid transparent;color:var(--mid);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;cursor:pointer;white-space:nowrap}
+.stb.on{color:var(--hi);border-bottom-color:var(--gold)}
+.view{display:none}.view.on{display:block}
+
+/* controls */
+#ctl{position:fixed;top:94px;left:50%;transform:translateX(-50%);z-index:8;display:flex;gap:5px;
+ background:rgba(14,19,31,.9);border:1px solid var(--cardln);border-radius:9px;padding:4px;backdrop-filter:blur(8px)}
+#ctl button{background:none;border:none;color:var(--dim);font:500 11px 'IBM Plex Mono';padding:5px 9px;border-radius:6px;cursor:pointer}
+#ctl button.on{background:#1b2740;color:var(--hi)}
+
+/* mobile toggles */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(14,19,31,.95);border:1px solid var(--cardln);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.xbtn{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none}
+
+/* cascade (Region>Province>Branch) */
+.casc{padding:10px 15px 11px;border-bottom:1px solid #1a2236;display:flex;flex-direction:column;gap:6px}
+.cscrow{display:flex;align-items:center;gap:8px}
+.cscrow label{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;width:62px;flex:none}
+.casc select{flex:1;min-width:0;background:#0a1018;border:1px solid #1c2740;color:var(--hi);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;border-radius:7px;cursor:pointer}
+.casc select:disabled{color:var(--dim);cursor:not-allowed;opacity:.7}
+.cscnote{font-size:10px;color:var(--dim);line-height:1.4;margin-top:1px}
+
+/* POI legend overlay (bottom-center) */
+#legendwrap{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:8;max-width:min(94vw,720px);
+ background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 10px 9px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
+#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
+ font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
+.lg.on{opacity:1;color:var(--hi);border-color:#33405e}
+.lg .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
+.lg.on b{color:var(--hi)}
+
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:230px;line-height:1.45}
+.dtt b{color:#fff}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
+
+@media(max-width:820px){
+ .side{width:86vw;max-width:340px;top:90px;bottom:78px}
+ #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
+ #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
+ .xbtn{display:block}#mtog{display:flex}
+ #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
+ #legend{max-height:88px;overflow-y:auto}
+}
 
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
  padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
@@ -85,43 +146,54 @@ td.n{color:var(--hi)}
  padding:6px 11px;border-radius:7px;white-space:nowrap}
 #nav a.on{color:#fff;background:#1a2336}
 #nav a:active{background:#161d2c}
-
-#map{top:44px}
-#title{display:none}
 .err{top:44px}
 
-/* theme toggle button in nav */
-#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);
+#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid var(--cardln);color:var(--mid);
  border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px}
 
-/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK (per styles.css verdict) */
-html[data-theme="light"]{--bg:#EEF1F6;--panel:#FFFFFF;--line:#D3DAE6;--hi:#11151F;--txt:#2C3444;--mid:#5A6477;--dim:#828CA0}
+/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
 html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
 html[data-theme="light"] #nav .nb{color:#11151F}
 html[data-theme="light"] #nav a{color:#5A6477}
 html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8}
-html[data-theme="light"] #nav a:active{background:#e2e8f4}
 html[data-theme="light"] #themeToggle{border-color:#D3DAE6;color:#5A6477}
-html[data-theme="light"] .cbtn,html[data-theme="light"] #elev{background:rgba(255,255,255,.92);border-color:#D3DAE6;color:#5A6477}
-html[data-theme="light"] .cbtn.on{color:#11151F;border-color:#aab6cc}
-html[data-theme="light"] #elev button{color:#828CA0}
-html[data-theme="light"] #elev button.on{background:#e7edf8;color:#11151F}
-html[data-theme="light"] #sheet{background:rgba(255,255,255,.97);border-color:#D3DAE6}
-html[data-theme="light"] #grip .bar{background:#c3cbdb}
-html[data-theme="light"] #peek .h,html[data-theme="light"] .kpi .v,html[data-theme="light"] .imp .t,
-html[data-theme="light"] td.n{color:#11151F}
-html[data-theme="light"] .tb.on{color:#11151F}
-html[data-theme="light"] .kpi,html[data-theme="light"] .chip{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .side{background:rgba(255,255,255,.95);border-color:#D3DAE6;box-shadow:0 12px 40px rgba(16,22,40,.16)}
+html[data-theme="light"] .cardttl{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cardttl .a,html[data-theme="light"] .stat .v,html[data-theme="light"] .imp .t,html[data-theme="light"] td.n{color:#11151F}
+html[data-theme="light"] .cardttl .b,html[data-theme="light"] .side h2,html[data-theme="light"] .stat .k,html[data-theme="light"] .imp .d,html[data-theme="light"] .lead{color:#5A6477}
+html[data-theme="light"] .stat,html[data-theme="light"] .imp,html[data-theme="light"] td{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow .lab{color:#2C3444}
+html[data-theme="light"] .krow b,html[data-theme="light"] .kgrp .gh{color:#11151F}
+html[data-theme="light"] .wbox{background:#F5F8FD;border-color:#D3DAE6}
+html[data-theme="light"] .wbox .big{color:#B8862B}
+html[data-theme="light"] .wbox .wr .k{color:#5A6477}
+html[data-theme="light"] .wbox .wr .v{color:#11151F}
+html[data-theme="light"] .occ .ot{color:#2C3444}
+html[data-theme="light"] .occ .bar{background:#E4E8F1}
+html[data-theme="light"] #ctl{background:rgba(255,255,255,.92);border-color:#D3DAE6}
+html[data-theme="light"] #ctl button{color:#828CA0}
+html[data-theme="light"] #ctl button.on{background:#e7edf8;color:#11151F}
+html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .bchip b{color:#11151F}
+html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .casc,html[data-theme="light"] .subtabs{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cscrow label,html[data-theme="light"] .cscnote{color:#828CA0}
+html[data-theme="light"] .casc select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .stb.on{color:#11151F}
 html[data-theme="light"] th{border-bottom-color:#D3DAE6}
-html[data-theme="light"] td{border-bottom-color:#E4E8F1}
-html[data-theme="light"] .imp{border-bottom-color:#E4E8F1}
+html[data-theme="light"] #legendwrap{background:rgba(255,255,255,.94);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] .lgttl{color:#828CA0}
+html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828CA0}
+html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
+html[data-theme="light"] .lg b{color:#5A6477}
+html[data-theme="light"] .lg.on b{color:#11151F}
 </style>
 </head>
 <body>
 <nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-catchment.html" data-nav="rayong">Rayong 3D</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces" data-nav="provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
 <script>
 (function(){
- /* active tab: a province deep-dive belongs to "Provinces"; Rayong's own slug lights "Rayong 3D" */
  var slug=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
  var sel=document.querySelector('#nav a[data-nav="'+(slug==='rayong'?'rayong':'provinces')+'"]');
  if(sel)sel.classList.add('on');
@@ -134,213 +206,410 @@ html[data-theme="light"] .imp{border-bottom-color:#E4E8F1}
 </script>
 <div id="map"></div>
 
+<div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
 <div id="ctl">
-  <div id="elev">
-    <button data-m="wa" class="on">Workers</button>
-    <button data-m="fac">Factories</button>
-    <button data-m="veh">Vehicles</button>
-  </div>
-  <button class="cbtn on" data-l="branches"><span class="sw rd" style="background:var(--gold)"></span>My branches</button>
-  <button class="cbtn on" data-l="comp"><span class="sw rd" style="background:var(--red)"></span>Competitors</button>
-  <button class="cbtn on" data-l="fac"><span class="sw" style="background:#7b8aa6"></span>Factories</button>
-  <button class="cbtn" data-l="veh"><span class="sw" style="background:var(--teal)"></span>Vehicle shops</button>
-  <button class="cbtn" data-l="mkt"><span class="sw" style="background:var(--orange)"></span>Markets</button>
+  <button data-b="dark" class="on">Dark</button>
+  <button data-b="voyager">Map</button>
+  <button id="ringtog" class="on">10km rings</button>
 </div>
 
-<div id="sheet">
-  <div id="grip"><div class="bar"></div></div>
-  <div id="peek">
-    <div class="h">Who these people are — and what moves them</div>
-    <div class="row" id="kpis"></div>
+<aside class="side" id="left">
+  <button class="xbtn" data-x="left">✕</button>
+  <div class="cardttl"><div class="a" id="focalName">—</div><div class="b" id="focalSub">Tap a gold branch to refocus</div></div>
+  <div class="casc">
+    <div class="cscrow"><label>Region</label><select id="cscRegion"></select></div>
+    <div class="cscrow"><label>Province</label><select id="cscProv"></select></div>
+    <div class="cscrow"><label>Branch</label><select id="cscBranch"></select></div>
+    <div class="cscnote" id="cscNote"></div>
   </div>
-  <div id="tabs">
-    <button class="tb on" data-v="impacts">What impacts them</button>
-    <button class="tb" data-v="workers">Workers &amp; income</button>
-    <button class="tb" data-v="districts">Districts</button>
-    <button class="tb" data-v="comp">Competitors</button>
-    <button class="tb" data-v="near">Nearest</button>
+  <div class="scroll">
+    <h2 style="padding:0 0 6px">Within 10km of branch <span class="tag meas">measured · OSM</span></h2>
+    <div id="k10panel"></div>
+    <h2 style="padding:14px 0 6px">Who works nearby</h2>
+    <div id="workpanel"></div>
   </div>
-  <div id="body">
+</aside>
+
+<aside class="side" id="right">
+  <button class="xbtn" data-x="right">✕</button>
+  <div class="cardttl"><div class="a" id="provTitle">Province</div><div class="b" id="provSub">—</div></div>
+  <div class="subtabs">
+    <button class="stb on" data-v="impacts">What moves incomes</button>
+    <button class="stb" data-v="districts">Districts</button>
+    <button class="stb" data-v="near">Nearest</button>
+    <button class="stb" data-v="comp">Competitors</button>
+  </div>
+  <div class="scroll">
     <div class="view on" id="v-impacts"></div>
-    <div class="view" id="v-workers"></div>
     <div class="view" id="v-districts"></div>
-    <div class="view" id="v-comp"></div>
     <div class="view" id="v-near"></div>
+    <div class="view" id="v-comp"></div>
   </div>
+</aside>
+
+<div id="mtog">
+  <button data-s="left">Branch reach</button>
+  <button data-s="right">Province</button>
 </div>
-<script>window.initRayong=function(){
+
+<div id="legendwrap">
+  <div class="lgttl">POI types <span>· tap to toggle</span></div>
+  <div id="legend"></div>
+</div>
+
+<script>window.initProvince=function(){
 'use strict';
 try{
 const RY=window.RY;
-const C={gold:[230,180,80],red:[224,71,75],mag:[214,90,160],blue:[91,124,250],orange:[224,144,47],teal:[31,163,140],fac:[123,138,166]};
-const BRAND={Srisawad:C.red,Muangthai:C.mag,Tidlor:C.blue,Krungsri:C.orange};
-const layersOn={branches:true,comp:true,fac:true,veh:false,mkt:false};
-let elevMetric='wa';
+const IDX=window.PROV_INDEX||null;
+const SLUG=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
+const BR=RY.branches||[];
+const COMP=RY.competitors||[];
+const POIS=RY.poi||{};
+const DISTRICTS=RY.districts||null;
+const provEn=RY.province_en||'', provTh=RY.province_th||'', reg=RY.region||'';
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[91,124,250],Krungsri:[224,123,47]};
+const GOLD=[230,180,80];
 
-// normalize district metric -> elevation
-function maxOf(m){return Math.max(...RY.districts.features.map(f=>f.properties[metricField(m)]||0));}
-function metricField(m){return m==='wa'?'workingage':m==='fac'?'factories_avg':'vehicle_avg';}
-function districtColor(f){
-  const m=elevMetric, v=f.properties[metricField(m)]||0, t=Math.min(1,v/(maxOf(m)||1));
-  const base = m==='wa'?[91,124,250]:m==='fac'?[224,90,75]:[31,163,140];
-  return [base[0],base[1],base[2], 40+Math.round(t*150)];
+// canonical type->color map: single source of truth for map dots AND legend AND toggles (Rayong palette)
+const POI_COLORS={
+  vehicle_commerce:[31,163,140], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
+  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
+  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
+const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
+  fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
+  restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
+const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
+const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
+let basemap='dark', showRings=true;
+
+function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
+  const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));}
+function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
+  for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+
+// default focal = the branch with the richest measured surroundings (most vehicle shops in 10km), else first
+let focal=(function(){if(!BR.length)return null;
+  let best=BR[0],bv=-1;for(const b of BR){const v=(b.k10&&b.k10.veh)||b.veh||0;if(v>bv){bv=v;best=b;}}return best;})();
+
+// view bounds from branches
+function provView(){
+  if(!BR.length){return {longitude:101,latitude:14,zoom:7,pitch:40,bearing:0};}
+  const xs=BR.map(b=>b.x),ys=BR.map(b=>b.y);
+  const lng=(Math.max.apply(null,xs)+Math.min.apply(null,xs))/2;
+  const lat=(Math.max.apply(null,ys)+Math.min.apply(null,ys))/2;
+  const span=Math.max((Math.max.apply(null,xs)-Math.min.apply(null,xs))||0.3,(Math.max.apply(null,ys)-Math.min.apply(null,ys))||0.3);
+  const z=span>1.8?7.4:span>1.1?8.0:span>0.6?8.6:9.2;
+  return {longitude:lng,latitude:lat,zoom:z,pitch:42,bearing:8};
 }
 
-let LIGHTING=null;
-try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
-  const useShadow=!/Mobi|Android/i.test(navigator.userAgent)&&window.innerWidth>900;
-  LIGHTING=new deck.LightingEffect({
-    ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-    sun:new deck.DirectionalLight({color:[255,245,225],intensity:2.4,direction:[-1,-3,-1],_shadow:useShadow}),
-    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.8,direction:[1,1,-0.5]})});
-  LIGHTING.shadowColor=[0,0,0,0.32];
-} }catch(e){ LIGHTING=null; }
-const deckgl=new deck.DeckGL({
-  container:'map',
-  effects:LIGHTING?[LIGHTING]:[],
-  initialViewState:(function(){var cx=RY.districts.features.map(f=>f.properties.cx).filter(v=>v!=null),cy=RY.districts.features.map(f=>f.properties.cy).filter(v=>v!=null);var lng=cx.length?cx.reduce((a,b)=>a+b,0)/cx.length:(RY.branches[0]?RY.branches[0].x:101.2),lat=cy.length?cy.reduce((a,b)=>a+b,0)/cy.length:(RY.branches[0]?RY.branches[0].y:13.5);var xs=RY.branches.map(b=>b.x),ys=RY.branches.map(b=>b.y);var span=Math.max((Math.max.apply(null,xs)-Math.min.apply(null,xs))||0.3,(Math.max.apply(null,ys)-Math.min.apply(null,ys))||0.3);var z=span>1.8?7.2:span>1.1?7.8:span>0.6?8.5:9.2;return{longitude:lng,latitude:lat,zoom:z,pitch:52,bearing:12};})(),
-  controller:true,
+const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+const deckgl=new deck.DeckGL({container:'map',
+  initialViewState:provView(),
+  controller:{inertia:300,dragRotate:true},
   getTooltip:({object,layer})=>{
-    if(!object) return null;
+    if(!object)return null;
     if(layer.id==='districts'){const p=object.properties;
-      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Factory density: <b>${p.factories_avg}</b> · Vehicle: <b>${p.vehicle_avg}</b><br>My branches: <b>${p.branches}</b> · Estates: <b>${p.estates}</b></div>`};}
-    if(layer.id==='branches'){const d=object;
-      return {html:`<div class="dtt"><b>${d.n||'(branch)'}</b> · ${d.d}<br>Nearest factory: <b>${d.nfac??'–'} km</b> · market: <b>${d.nmkt??'–'} km</b><br>Nearest competitor: <b>${d.ncompn} ${d.ncomp} km</b><br>Vehicle shops ≤10km: <b>${d.veh}</b> · Gold: <b>${d.gold}</b></div>`};}
-    if(layer.id==='comp'){return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};}
-    if(layer.id==='estates'){return {html:`<div class="dtt"><b>${object.name}</b><br>industrial estate</div>`};}
-    return null;
-  }
-});
+      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Branches: <b>${p.branches}</b> · DIW workers: <b>${(p.real_workers||0).toLocaleString()}</b></div>`};}
+    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||provEn} · vehicle shops ${object.veh!=null?object.veh:'—'} · gold ${object.gold!=null?object.gold:'—'}</div>`};
+    if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name||''}</div>`};
+    if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
+      const nm=Array.isArray(object)?object[2]:null;
+      return {html:`<div class="dtt"><b>${POI_LABEL[t]||t}</b>${nm?'<br>'+nm:''}<br><span style="color:#8a94a8">OSM point · in view</span></div>`};}
+    return null;}});
 
-function basemap(){
-  return new deck.TileLayer({
-    id:'base', data:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-    minZoom:0,maxZoom:19,tileSize:256,
-    renderSubLayers:props=>{const{boundingBox}=props.tile;
-      return new deck.BitmapLayer(props,{data:null,image:props.data,
-        bounds:[boundingBox[0][0],boundingBox[0][1],boundingBox[1][0],boundingBox[1][1]]});}
-  });
-}
+function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
+  renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+    bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
+
+function dGeom(f){return f.geometry.type==='MultiPolygon'?f.geometry.coordinates.map(poly=>poly[0]):f.geometry.coordinates[0];}
+
 function render(){
-  const L=[basemap()];
-  L.push(new deck.PolygonLayer({
-    id:'districts',data:RY.districts.features,
-    getPolygon:f=>f.geometry.type==='MultiPolygon'?f.geometry.coordinates[0][0]:f.geometry.coordinates[0],
-    extruded:true,wireframe:true,filled:true,
-    getElevation:f=>{const v=f.properties[metricField(elevMetric)]||0;return v/(maxOf(elevMetric)||1)*9000;},
-    getFillColor:districtColor,getLineColor:[120,140,180,90],lineWidthMinPixels:1,
-    material:{ambient:0.35,diffuse:0.85,shininess:12,specularColor:[40,40,55]},_shadow:true,
-    pickable:true,updateTriggers:{getElevation:[elevMetric],getFillColor:[elevMetric]}
-  }));
-  if(layersOn.fac) L.push(new deck.ScatterplotLayer({id:'fac',data:RY.poi.industrial,
-    getPosition:p=>[p[1],p[0]],getRadius:120,radiusMinPixels:1.4,radiusMaxPixels:4,
-    getFillColor:[123,138,166,150],pickable:false}));
-  if(layersOn.veh) L.push(new deck.ScatterplotLayer({id:'veh',data:RY.poi.vehicle_commerce,
-    getPosition:p=>[p[1],p[0]],getRadius:150,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[31,163,140,200]}));
-  if(layersOn.mkt) L.push(new deck.ScatterplotLayer({id:'mkt',data:RY.poi.fresh_market,
-    getPosition:p=>[p[1],p[0]],getRadius:160,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[224,144,47,210]}));
-  L.push(new deck.ScatterplotLayer({id:'estates',data:RY.estates,
-    getPosition:d=>[d.lng,d.lat],getRadius:600,radiusMinPixels:5,radiusMaxPixels:16,
-    getFillColor:[230,180,80,30],getLineColor:[230,180,80,200],lineWidthMinPixels:1.5,stroked:true,filled:true,pickable:true}));
-  if(layersOn.comp) L.push(new deck.ScatterplotLayer({id:'comp',data:RY.competitors,
-    getPosition:d=>[d.lng,d.lat],getRadius:170,radiusMinPixels:3.5,radiusMaxPixels:8,
-    getFillColor:d=>BRAND[d.brand]||[200,200,200],getLineColor:[10,12,18,255],lineWidthMinPixels:1,stroked:true,pickable:true}));
-  if(layersOn.branches) L.push(new deck.ScatterplotLayer({id:'branches',data:RY.branches,
-    getPosition:d=>[d.x,d.y],getRadius:230,radiusMinPixels:4.5,radiusMaxPixels:11,
-    getFillColor:[230,180,80,255],getLineColor:[40,28,8,255],lineWidthMinPixels:1.3,stroked:true,pickable:true}));
-  deckgl.setProps({layers:L});
+  const L=[baseLayer()];
+  // (0) district context — FLAT polygons (non-Rayong provinces have no 3D buildings; this is the geography layer)
+  if(DISTRICTS && DISTRICTS.features && deck.GeoJsonLayer){
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
+      getFillColor:[91,124,250,16],getLineColor:[120,140,180,95],lineWidthMinPixels:1,pickable:true}));
+  }
+  // (1) 10km collateral catchment rings — faint over ALL branches; bright on the selected one
+  if(showRings && BR.length){
+    L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
+      extruded:false,stroked:true,filled:true,
+      getFillColor:[GOLD[0],GOLD[1],GOLD[2],8],getLineColor:[GOLD[0],GOLD[1],GOLD[2],60],
+      lineWidthMinPixels:1,pickable:false}));
+    if(focal){
+      L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
+        extruded:false,stroked:true,filled:true,
+        getFillColor:[GOLD[0],GOLD[1],GOLD[2],26],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
+        lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
+    }
+  }
+  // (2) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng]
+  POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
+    const c=POI_COLORS[t];
+    L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
+      getRadius:90,radiusMinPixels:1.6,radiusMaxPixels:5,getFillColor:[c[0],c[1],c[2],210],
+      stroked:false,pickable:true,_poiType:t}));
+  });
+  // (3) competitors (graceful: empty for most provinces today)
+  if(COMP.length){
+    L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
+      getRadius:170,radiusMinPixels:4,radiusMaxPixels:10,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:1.6,
+      getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
+  }
+  // (4) AutoX branches — selected one is white
+  L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
+    getRadius:230,radiusMinPixels:5,radiusMaxPixels:12,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.4,
+    getFillColor:d=>d===focal?[255,255,255,255]:[230,180,80,255],pickable:true,
+    updateTriggers:{getFillColor:[focal]}}));
+  // (5) only the SELECTED branch is labelled
+  if(focal){
+    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
+      getSize:12,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,245],background:true,
+      backgroundPadding:[6,3],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+      getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+      updateTriggers:{getText:[focal],getPosition:[focal]}}));
+  }
+  deckgl.setProps({layers:L,
+    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
-render();
 
-/* ---- controls ---- */
-document.querySelectorAll('#elev button').forEach(b=>b.onclick=()=>{
-  elevMetric=b.dataset.m;document.querySelectorAll('#elev button').forEach(x=>x.classList.toggle('on',x===b));render();});
-document.querySelectorAll('.cbtn').forEach(b=>b.onclick=()=>{
-  const l=b.dataset.l;layersOn[l]=!layersOn[l];b.classList.toggle('on',layersOn[l]);render();});
+/* ---------- panels ---------- */
+function fmt(n){return (n==null?0:n).toLocaleString();}
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 
-/* ---- bottom sheet ---- */
-const sheet=document.getElementById('sheet');
-document.getElementById('grip').onclick=()=>sheet.classList.toggle('open');
-document.getElementById('peek').onclick=()=>sheet.classList.add('open');
-document.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.tb').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));
-  sheet.classList.add('open');});
-
-/* ---- panels ---- */
-const f=RY.facts||{};
-const gov=RY.gov||{};
-const prov=RY.province_en||'', reg=RY.region||'';
-const totWA=RY.districts.features.reduce((s,d)=>s+(d.properties.workingage||0),0);
-document.getElementById('kpis').innerHTML=[
-  [RY.branches.length,'Branches'],[RY.districts.features.length,'Districts'],
-  RY.competitors.length?[RY.competitors.length,'Competitors']:null,
-  [(gov.factories!=null?gov.factories.toLocaleString():(RY.poi&&RY.poi.industrial?RY.poi.industrial.length:0)),'Factories (DIW)'],
-  (gov.vehicles&&gov.vehicles.total)?[Math.round(gov.vehicles.total/1000)+'k','Vehicles (DLT)']:null,
-  (gov.vehicles&&gov.vehicles.total)?[Math.round(100*gov.vehicles.moto/gov.vehicles.total)+'%','Motorcycles']:null,
-  (gov.employment&&gov.employment.informal)?[Math.round(gov.employment.informal/1000)+'k','Informal workers']:null,
-  f.minwage?[f.minwage,'Min wage']:null
-].filter(Boolean).map(([v,k])=>`<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
-
-const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};
-// auto-derive "what impacts them" from measured gov data when editorial facts are absent
-function autoImpacts(){
-  const out=[], v=gov.vehicles||{}, e=gov.employment||{};
-  const tot=v.total||0, inf=e.informal||0, form=e.formal||0, infShare=(inf+form)?Math.round(100*inf/(inf+form)):0;
-  if(infShare>=55) out.push(['Informal-income base',infShare+'% of workers are informal/own-account — variable, underbanked income; the core title-loan borrower.','risk']);
-  if(tot){const ms=Math.round(100*(v.moto||0)/tot); if(ms>=60) out.push(['Motorcycle-heavy collateral',ms+'% of registered vehicles are motorcycles — high volume, weaker loss-given-default; price on speed, watch LTV.','watch']);}
-  if((v.ev||0)>0) out.push(['EV transition',(v.ev).toLocaleString()+' EVs registered and rising — watch ICE auto-parts jobs where factories are auto-supply.','watch']);
-  if((gov.factories||0)>1500) out.push(['Industrial payroll dependence',(gov.factories).toLocaleString()+' factories — incomes track factory demand and export cycles.','risk']);
-  if(!out.length) out.push(['Vehicle-dependent daily life','Households rely on a motorbike or pickup for work — title-loan relevant.','opp']);
-  return out;
+const EMP=(RY.gov&&RY.gov.employment)||null;
+function districtWorkers(d){
+  if(!DISTRICTS||!DISTRICTS.features)return null;
+  const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
+  return f&&f.properties.real_workers!=null?f.properties.real_workers:null;
 }
-const editorial=f.impacts&&f.impacts.length;
-const impacts=editorial?f.impacts:autoImpacts();
-document.getElementById('v-impacts').innerHTML=
-  `<p class="lead">${prov?prov+' · '+reg+' region — '+RY.branches.length+' branches, '+RY.districts.features.length+' districts. ':''}What moves local incomes${editorial?'':' (auto-derived from measured DLT/NSO/DIW data; editorial narrative pending)'}:</p>`+
-  impacts.map(([t,d,k])=>`<div class="imp"><span class="dot" style="background:${tagcol[k]}"></span><div><div class="t">${t}<span class="tag" style="color:${tagcol[k]};border:1px solid ${tagcol[k]}">${(k||'').toUpperCase()}</span></div><div class="d">${d}</div></div></div>`).join('');
 
-document.getElementById('v-workers').innerHTML=
-  `<p class="lead">Workforce &amp; income context.</p>`+
-  `<div class="chips">`+
-    (f.minwage?`<div class="chip">Min wage <b>${f.minwage}</b>${f.minwage_mo?' · '+f.minwage_mo:''}</div>`:'')+
-    (f.natl_avg?`<div class="chip">National avg ${f.natl_avg}</div>`:'')+
-    (gov.employment?`<div class="chip">Formal <b>${(gov.employment.formal||0).toLocaleString()}</b></div><div class="chip">Informal <b>${(gov.employment.informal||0).toLocaleString()}</b></div>`:'')+
-    (f.premium?`<div class="chip">${f.premium}</div>`:'')+`</div>`+
-   (f.anchors&&f.anchors.length?`<table><tr><th>Economic anchors</th></tr>${f.anchors.map(a=>`<tr><td class="n">${a}</td></tr>`).join('')}</table>`:'')+
-   (f.workers&&f.workers.length?`<table style="margin-top:12px"><tr><th>Who the workers are</th></tr>${f.workers.map(a=>`<tr><td>${a}</td></tr>`).join('')}</table>`:'');
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM)
+const K10_GROUPS=[
+  ['Collateral & finance',[
+    ['veh','Auto / vehicle shops','vehicle_commerce'],
+    ['gold','Gold dealers','gold'],
+    [['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[
+    ['fmkt','Fresh markets','fresh_market'],
+    ['super','Supermarkets','supermarket'],
+    ['cvs','Convenience','convenience'],
+    ['rest','Restaurants','restaurant']]],
+  ['Industry & services',[
+    ['ind','Factories','industrial'],
+    ['hotel','Hotels','hotel'],
+    ['sch','Schools','school'],
+    ['pharm','Pharmacies','pharmacy']]],
+];
+// establishment-mix -> occupation proxy (ESTIMATED). same mapping as Rayong.
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
 
-const ds=RY.districts.features.map(x=>x.properties).sort((a,b)=>(b.workingage||0)-(a.workingage||0));
-document.getElementById('v-districts').innerHTML=
-  `<table><tr><th>District</th><th>Br</th><th>Workers</th><th>Fac</th><th>Veh</th></tr>`+
-  ds.map(p=>`<tr><td class="n">${p.district}</td><td class="mono">${p.branches}</td><td class="mono">${(p.workingage||0).toLocaleString()}</td><td class="mono">${p.factories_avg}</td><td class="mono">${p.vehicle_avg}</td></tr>`).join('')+`</table>
-  <p class="lead" style="margin-top:10px">Bars on the map rise with the metric you pick (Workers / Factories / Vehicles).</p>`;
+function updatePanels(){
+  const dist=(focal&&focal.d)||provEn;
+  const k=(focal&&focal.k10)||null;
+  document.getElementById('focalName').textContent=(focal&&focal.n)||'AutoX branch';
+  document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${(focal&&focal.veh!=null)?focal.veh:'—'}`;
 
-const byBrand={};RY.competitors.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
-document.getElementById('v-comp').innerHTML= RY.competitors.length?
-  (`<p class="lead">Competitor locations (live pull).</p>`+
-  `<div class="chips">`+Object.entries(byBrand).map(([b,n])=>`<div class="chip"><span style="color:rgb(${(BRAND[b]||[200,200,200]).join(',')})">●</span> ${b} <b>${n}</b></div>`).join('')+`</div>`+
-  `<table><tr><th>Brand</th><th>Branch</th></tr>`+RY.competitors.map(c=>`<tr><td style="color:rgb(${(BRAND[c.brand]||[200,200,200]).join(',')})">${c.brand}</td><td>${(c.name||'').replace(/^[^ ]+ /,'')}</td></tr>`).join('')+`</table>`)
-  : `<p class="lead">Competitor locations not yet pulled for this province — Rayong has a live set; others pending a Google Places pull.</p>`;
+  // (C) "Within 10km of <branch>" — measured counts, grouped for a lender
+  const k10host=document.getElementById('k10panel');
+  if(!k){
+    k10host.innerHTML='<div class="foot">Select an AutoX branch from the cascade or map to see its measured 10km surroundings.</div>';
+  }else{
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    k10host.innerHTML=K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(([key,lab,col])=>{
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('')
+      +`<div class="foot">Counts are establishments mapped in OpenStreetMap within a 10 km radius of this branch — measured, not estimated.</div>`;
+  }
 
-const near=RY.branches.slice().filter(d=>d.ncomp!=null).sort((a,b)=>(a.ncomp)-(b.ncomp));
-document.getElementById('v-near').innerHTML=
-  `<p class="lead">For each branch: distance to the nearest factory and market${near.length?', and nearest competitor (most contested first)':''}.</p>`+
-  `<table><tr><th>Branch</th><th>Fac km</th><th>Mkt km</th>${near.length?'<th>Comp</th>':''}</tr>`+
-  (near.length?near:RY.branches).map(d=>`<tr><td class="n">${d.n}</td><td class="mono">${d.nfac??'–'}</td><td class="mono">${d.nmkt??'–'}</td>${near.length?`<td class="mono" style="color:var(--red)">${d.ncomp}</td>`:''}</tr>`).join('')+`</table>`;
-
-}catch(e){
-  document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed to load: '+(e&&e.message?e.message:e)+'</div>');
-  console.error(e);
+  // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
+  const whost=document.getElementById('workpanel');
+  let html='';
+  if(EMP){
+    const inf=EMP.informal||0, frm=EMP.formal||0, tot=inf+frm;
+    const share=tot?Math.round(inf/tot*100):0;
+    html+='<div class="wbox">'
+      +`<div class="big">${share}%</div><div class="cap">of ${provEn} workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+      +`<div class="wr"><span class="k">Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+      +`<div class="wr"><span class="k">Formal workers</span><span class="v">${fmt(frm)}</span></div>`;
+    const dw=districtWorkers(dist);
+    if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
+    html+='</div>';
+  }
+  if(k){
+    const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    if(rows.length){
+      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h2>`
+        +`<div class="occ">`+rows.map(r=>{
+          const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/tot*100);
+          return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+            +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
+        }).join('')+`</div>`
+        +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
+    }
+  }
+  whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
 }
+
+/* ---------- right card: province context ---------- */
+function buildProvincePanels(){
+  document.getElementById('provTitle').textContent=provEn+(provTh?' · '+provTh:'');
+  document.getElementById('provSub').textContent=`${reg} region · ${BR.length} branches · ${DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0} districts`;
+  const f=RY.facts||{}, gov=RY.gov||{};
+  const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};
+  function autoImpacts(){
+    const out=[], v=gov.vehicles||{}, e=gov.employment||{};
+    const tot=v.total||0, inf=e.informal||0, form=e.formal||0, infShare=(inf+form)?Math.round(100*inf/(inf+form)):0;
+    if(infShare>=55) out.push(['Informal-income base',infShare+'% of workers are informal/own-account — variable, underbanked income; the core title-loan borrower.','risk']);
+    if(tot){const ms=Math.round(100*(v.moto||0)/tot); if(ms>=60) out.push(['Motorcycle-heavy collateral',ms+'% of registered vehicles are motorcycles — high volume, weaker loss-given-default; price on speed, watch LTV.','watch']);}
+    if((v.ev||0)>0) out.push(['EV transition',(v.ev).toLocaleString()+' EVs registered and rising — watch ICE auto-parts jobs where factories are auto-supply.','watch']);
+    if((gov.factories||0)>1500) out.push(['Industrial payroll dependence',(gov.factories).toLocaleString()+' factories — incomes track factory demand and export cycles.','risk']);
+    if(!out.length) out.push(['Vehicle-dependent daily life','Households rely on a motorbike or pickup for work — title-loan relevant.','opp']);
+    return out;
+  }
+  const editorial=f.impacts&&f.impacts.length;
+  const impacts=editorial?f.impacts:autoImpacts();
+  document.getElementById('v-impacts').innerHTML=
+    `<p class="lead">What moves local incomes${editorial?'':' (auto-derived from measured DLT/NSO/DIW data; editorial narrative pending)'}:</p>`+
+    impacts.map(([t,d,k])=>`<div class="imp"><span class="dot" style="background:${tagcol[k]}"></span><div><div class="t">${t}<span class="tg" style="color:${tagcol[k]};border:1px solid ${tagcol[k]}">${(k||'').toUpperCase()}</span></div><div class="d">${d}</div></div></div>`).join('');
+
+  // districts table (id v-districts MUST stay non-empty for the QA hooks)
+  const ds=(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.map(x=>x.properties):[]).sort((a,b)=>(b.workingage||0)-(a.workingage||0));
+  document.getElementById('v-districts').innerHTML= ds.length?
+    (`<p class="lead">Working-age, branches and measured DIW factory workers per district.</p>`+
+    `<table><tr><th>District</th><th>Br</th><th>Working-age</th><th>DIW workers</th></tr>`+
+    ds.map(p=>`<tr><td class="n">${p.district}</td><td class="mono">${p.branches||0}</td><td class="mono">${(p.workingage||0).toLocaleString()}</td><td class="mono">${(p.real_workers||0).toLocaleString()}</td></tr>`).join('')+`</table>`)
+    : `<p class="lead">No district breakdown available for this province.</p>`;
+
+  // nearest table
+  document.getElementById('v-near').innerHTML=
+    `<p class="lead">For each branch: distance to nearest factory and market (measured).</p>`+
+    `<table><tr><th>Branch</th><th>Fac km</th><th>Mkt km</th></tr>`+
+    BR.map(d=>`<tr><td class="n">${d.n||'—'}</td><td class="mono">${d.nfac!=null?d.nfac:'–'}</td><td class="mono">${d.nmkt!=null?d.nmkt:'–'}</td></tr>`).join('')+`</table>`;
+
+  // competitors
+  const byBrand={};COMP.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
+  document.getElementById('v-comp').innerHTML= COMP.length?
+    (`<p class="lead">Competitor branches (live pull).</p>`+
+    `<table><tr><th>Brand</th><th>Branch</th></tr>`+COMP.map(c=>`<tr><td style="color:rgb(${(BRAND[c.brand]||[200,200,200]).join(',')})">${c.brand}</td><td>${(c.name||'').replace(/^[^ ]+ /,'')}</td></tr>`).join('')+`</table>`)
+    : `<p class="lead">Competitor locations not yet pulled for this province — Rayong has a live set; others pending a Google Places pull. The map and panels still show your branches, POIs and 10km reach.</p>`;
+}
+
+/* strip KPI chips (id kpis MUST stay non-empty for the QA hooks) */
+function buildStrip(){
+  const gov=RY.gov||{}, emp=gov.employment||{}, veh=gov.vehicles||{};
+  const items=[['Branches',BR.length,'#E6B450'],
+    ['Districts',(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0),'#5B7CFA'],
+    ['Factories',(gov.factories!=null?gov.factories:(POIS.industrial?POIS.industrial.length:0)),'#7b8aa6'],
+    (veh.total?['Vehicles',Math.round(veh.total/1000)+'k','#1FA38C']:null),
+    (emp.informal?['Informal',Math.round(emp.informal/1000)+'k','#E0902F']:null),
+    ['Vehicle shops',(POIS.vehicle_commerce||[]).length,'#1FA38C'],
+    ['Gold dealers',(POIS.gold||[]).length,'#E6B450']].filter(Boolean);
+  // NOTE: chip text comes BEFORE the swatch so the QA hook's crude inner-text grab (id="kpis"> .. </) sees content
+  document.getElementById('kpis').innerHTML=
+    items.map(([n,v,c])=>`<span class="bchip">${n}<b>${typeof v==='number'?v.toLocaleString():v}</b><span class="d" style="background:${c};margin:0 0 0 5px"></span></span>`).join('');
+  document.getElementById('stripTtl').innerHTML=`${provEn} <b>·</b> branches · POIs · 10km reach`;
+}
+
+/* ---------- branch selection ---------- */
+function selectBranch(b,fly){
+  if(!b)return; focal=b;
+  if(fly){deckgl.setProps({initialViewState:{longitude:b.x,latitude:b.y,zoom:12.0,pitch:45,bearing:8,transitionDuration:850}});}
+  updatePanels();render();
+  const br=document.getElementById('cscBranch'); const fi=BR.indexOf(b); if(br&&fi>=0)br.value=String(fi);
+  if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
+}
+
+/* ---------- Region > Province > Branch cascade (nationwide index; selecting a province navigates) ---------- */
+function buildCascade(){
+  const reg=document.getElementById('cscRegion'), prov=document.getElementById('cscProv'), br=document.getElementById('cscBranch');
+  if(!reg||!prov||!br)return;
+  const myReg=RY.region||(IDX?(IDX.find(p=>p.slug===SLUG)||{}).region:null)||'East';
+  const regions=IDX?[...new Set(IDX.map(p=>p.region))]:[myReg];
+  const order=['Central&BKK','East','North','Isan','South'];
+  regions.sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+  reg.innerHTML=regions.map(r=>`<option value="${r}">${r}</option>`).join('');
+  reg.value=myReg;
+  function fillProv(){
+    const r=reg.value;
+    const list=IDX?IDX.filter(p=>p.region===r):[{slug:SLUG,en:provEn,th:provTh,branches:BR.length}];
+    list.sort((a,b)=>(b.branches||0)-(a.branches||0));
+    prov.innerHTML=list.map(p=>`<option value="${p.slug}">${p.en||p.th} (${p.branches||0})</option>`).join('');
+    if(list.some(p=>p.slug===SLUG))prov.value=SLUG;
+  }
+  function fillBranch(){
+    br.disabled=!BR.length;
+    if(!BR.length){br.innerHTML='<option>— no branches —</option>';return;}
+    br.innerHTML=BR.map((b,i)=>`<option value="${i}">${b.n||('Branch '+(i+1))}${b.d?' · '+b.d:''}</option>`).join('');
+    const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
+  }
+  reg.onchange=()=>{fillProv();};
+  // selecting a different province navigates (?p=slug); same province re-fills branches
+  prov.onchange=()=>{const s=prov.value; if(s&&s!==SLUG){location.search='?p='+s;}};
+  br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
+  fillProv();fillBranch();
+  const note=document.getElementById('cscNote');
+  if(note)note.textContent=(SLUG==='rayong')?'Rayong has the full 3D deep-dive — open Rayong 3D from the nav for extruded buildings.':'Pick a province to jump there; pick a branch to focus its 10km reach.';
+}
+
+/* ---------- POI legend ---------- */
+function buildLegend(){
+  const host=document.getElementById('legend'); if(!host)return;
+  if(!POI_TYPES.length){host.innerHTML='<span class="lgttl" style="margin:0">No mapped POI layers for this province</span>';return;}
+  host.innerHTML=POI_TYPES.map(t=>{
+    const c=POI_COLORS[t], n=(POIS[t]||[]).length;
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+      <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
+  }).join('');
+  host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
+}
+
+/* controls */
+document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+  const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
+  el.classList.toggle('show');other.classList.remove('show');});
+document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.stb').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));});
+
+buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
+}catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed to load: '+(e&&e.message||e)+'</div>');console.error(e);}
 };</script>
 <script>
 (function(){
  var slug=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
  var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading province…';document.body.appendChild(box);
- fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();})
-  .then(function(d){window.RY=d;document.title=(d.province_en||'Province')+' · '+(d.region||'')+' — AutoX · เงินไชโย';box.remove();window.initRayong();})
+ Promise.all([
+   fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
+   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];
+   document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
+   box.remove();window.initProvince();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load province "'+slug+'": '+e.message;});
 })();
 </script>
