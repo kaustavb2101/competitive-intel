@@ -315,8 +315,11 @@ try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
     sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:false}),
     fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
 } }catch(e){ LIGHTING=null; }
+// cinematic default: frame the Mueang-core building cluster (not the focal branch, which may sit on the rim),
+// low-and-wide so the extruded skyline catches the light and reads as 3D depth.
+const CORE=CA.center||{lat:12.686,lng:101.245};
 const deckgl=new deck.DeckGL({container:'map',
-  initialViewState:{longitude:focal.x,latitude:focal.y,zoom:12.5,pitch:52,bearing:18},
+  initialViewState:{longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-26},
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   getTooltip:({object,layer})=>{
     if(!object)return null;
@@ -334,8 +337,52 @@ function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],min
     bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
 
 function darkMode(){return basemap==='dark';}
+
+// ---- OPTIONAL ground layers (future OSM pull) — render UNDER buildings; absent file => skipped silently. ----
+// These are populated by a later Overpass pull on Kaustav's Thai laptop (network-blocked in this sandbox).
+// Each loader reads window.ROADS / window.WATER / window.LANDUSE (set by the bottom fetch; null if missing).
+//
+// EXPECTED JSON SHAPES (the laptop pull must emit exactly these so they plug in with no code change):
+//
+//  data/rayong_roads.json   ->  { "roads": [ { "path": [[lng,lat],[lng,lat],...], "cls": "primary" }, ... ] }
+//      path : array of [lng,lat] vertices (a polyline). cls (optional): OSM highway class
+//             one of primary|secondary|tertiary|residential|service (drives line width; default residential).
+//
+//  data/rayong_water.json   ->  { "water": [ { "polygon": [[lng,lat],...], "nm": "Rayong River" }, ... ] }
+//      polygon : closed ring of [lng,lat] (rivers/lakes/coast). nm (optional) name. Rendered FLAT at ground.
+//
+//  data/rayong_landuse.json ->  { "landuse": [ { "polygon": [[lng,lat],...], "kind": "park" }, ... ] }
+//      polygon : closed ring of [lng,lat]. kind (optional): park|forest|grass|recreation (all tint green).
+//      Rendered FLAT at ground (extruded:false).
+function groundLayers(){
+  const G=[], D=darkMode();
+  const WATER=window.WATER, LANDUSE=window.LANDUSE, ROADS=window.ROADS;
+  // landuse (parks/green) — flat, sits just above the basemap
+  const lu=LANDUSE&&Array.isArray(LANDUSE.landuse)?LANDUSE.landuse:null;
+  if(lu&&lu.length&&deck.PolygonLayer){
+    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,filled:true,stroked:false,
+      getFillColor:D?[40,86,58,150]:[126,182,120,120],pickable:false}));
+  }
+  // water — flat blue at ground
+  const wa=WATER&&Array.isArray(WATER.water)?WATER.water:null;
+  if(wa&&wa.length&&deck.PolygonLayer){
+    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,filled:true,stroked:false,
+      getFillColor:D?[36,74,128,205]:[120,162,214,200],pickable:false}));
+  }
+  // roads — thin paths, width by highway class if present
+  const rd=ROADS&&Array.isArray(ROADS.roads)?ROADS.roads:null;
+  if(rd&&rd.length&&deck.PathLayer){
+    const W={primary:7,secondary:5,tertiary:3.5,residential:2,service:1.5};
+    G.push(new deck.PathLayer({id:'roads',data:rd,getPath:f=>f.path,
+      getWidth:f=>W[f.cls]||2,widthUnits:'meters',widthMinPixels:0.6,widthMaxPixels:6,
+      getColor:D?[150,160,180,150]:[120,128,142,170],capRounded:true,jointRounded:true,pickable:false}));
+  }
+  return G;
+}
+
 function render(){
-  const L=[baseLayer()];
+  // ground scaffolding first so buildings/rings/POIs draw on top of it.
+  const L=[baseLayer(), ...groundLayers()];
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
   if(DISTRICTS && deck.GeoJsonLayer){
     L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
@@ -354,28 +401,53 @@ function render(){
         lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
     }
   }
-  // (2) extruded buildings — Mueang-core scenery, non-interactive, no shadow
+  // (2) extruded buildings — Mueang-core scenery, non-interactive, no shadow.
+  //     Granularity comes from: a stronger height->color ramp (deep base -> blue -> gold crown),
+  //     per-type tint, a touch of deterministic per-building jitter (so a block isn't one flat slab),
+  //     a height EXAGGERATION so the few tall buildings punch above the low-rise mat (skyline reads).
+  const DARK=darkMode();
+  // deterministic per-building hash in [0,1) from its centroid — gives stable variation, no Math.random churn.
+  const jit=b=>{const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453;return s-Math.floor(s);};
+  const TINT={residential:[96,126,206],commercial:[228,172,66],hotel:[224,150,90],
+    industrial:[200,80,68],office:[140,96,228],school:[120,150,180]};
   L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
-    getPolygon:b=>b.p,getElevation:b=>b.h,
-    getFillColor:b=>{const t=Math.pow(Math.max(0,Math.min(1,b.h/40)),1.1);
-      const lo=darkMode()?[43,58,85]:[176,188,214], mid=[91,124,250], hi=[224,169,59];
+    getPolygon:b=>b.p,
+    // exaggerate height non-linearly: low-rise stays low, mid/tall get stretched so the skyline separates.
+    getElevation:b=>{const h=b.h||4;return h*(h<10?1.35:h<22?1.9:2.6);},
+    getFillColor:b=>{
+      const t=Math.pow(Math.max(0,Math.min(1,(b.h||4)/34)),0.85); // height fraction, eased
+      // 3-stop ramp: deep slate base -> mid blue -> warm gold crown (strong tonal travel = visible relief)
+      const lo=DARK?[34,46,72]:[170,182,210], mid=[78,116,236], hi=[232,176,72];
       const m=t<.5?lo.map((v,i)=>Math.round(v+(mid[i]-v)*t*2)):mid.map((v,i)=>Math.round(v+(hi[i]-v)*(t-.5)*2));
-      const a=darkMode()?232:215;
-      if(!b.ty||b.ty==='mixed'||b.ty==='house')return [m[0],m[1],m[2],a];
-      const TINT={residential:[88,118,200],commercial:[224,169,59],hotel:[224,169,59],
-        industrial:[200,67,59],office:[122,79,224],school:[120,140,170]};
-      const c=TINT[b.ty];if(!c)return [m[0],m[1],m[2],a];
-      return [Math.round(m[0]*.7+c[0]*.3),Math.round(m[1]*.7+c[1]*.3),Math.round(m[2]*.7+c[2]*.3),a];},
-    stroked:true,getLineColor:darkMode()?[55,72,108,190]:[120,130,150,150],getLineWidth:1.6,lineWidthMinPixels:0.7,
-    material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
-    parameters:{depthTest:true},transitions:{getElevation:600},pickable:false}));
-  // (4) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng].
-  //     pickable so a click reveals the POI's type (and name if available); buildings stay scenery.
+      // per-building brightness jitter (+/-) so neighbouring footprints don't merge into one mass
+      const j=(jit(b)-0.5)*(DARK?26:20);
+      let r=m[0]+j, g=m[1]+j, bl=m[2]+j;
+      const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
+      if(c){r=r*.62+c[0]*.38; g=g*.62+c[1]*.38; bl=bl*.62+c[2]*.38;}
+      const clamp=v=>Math.max(0,Math.min(255,Math.round(v)));
+      return [clamp(r),clamp(g),clamp(bl),DARK?236:220];},
+    stroked:true,getLineColor:DARK?[16,22,36,210]:[120,130,150,150],getLineWidth:1.4,lineWidthMinPixels:0.6,
+    material:{ambient:0.30,diffuse:0.92,shininess:28,specularColor:[90,100,135]},
+    parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
+    updateTriggers:{getFillColor:[DARK],getLineColor:[DARK]}}));
+  // (4) color-coded POIs — one ColumnLayer per type (short EXTRUDED hexagonal stubs, not flat dots),
+  //     each toggleable; POIS items are [lat,lng] (optionally [lat,lng,name]). The little 3D pegs read
+  //     as granular detail standing on the ground between the buildings. Capped short so they don't
+  //     clutter or hide the skyline; collateral types (vehicle/gold) stand a touch taller to pop.
+  const POI_ELEV={vehicle_commerce:80,gold:80,bank:65,fresh_market:58,supermarket:58,
+    industrial:62,convenience:48,restaurant:42,hotel:55,school:52,pharmacy:45};
   POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
-    const c=POI_COLORS[t];
-    L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
-      getRadius:60,radiusMinPixels:2,radiusMaxPixels:6,getFillColor:[c[0],c[1],c[2],225],
-      stroked:false,pickable:true,_poiType:t}));
+    const c=POI_COLORS[t], e=POI_ELEV[t]||70;
+    L.push(new deck.ColumnLayer({id:'poi-'+t,data:POIS[t],
+      getPosition:p=>[p[1],p[0]],
+      diskResolution:6, radius:42, radiusUnits:'meters',
+      extruded:true, elevationScale:1, getElevation:e,
+      getFillColor:[c[0],c[1],c[2],232],
+      stroked:true, getLineColor:[Math.round(c[0]*.55),Math.round(c[1]*.55),Math.round(c[2]*.55),255],
+      lineWidthMinPixels:0.5,
+      material:{ambient:0.45,diffuse:0.8,shininess:32,specularColor:[120,130,160]},
+      parameters:{depthTest:true},
+      pickable:true,_poiType:t}));
   });
   // (5) competitors
   L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
@@ -625,11 +697,16 @@ buildStrip();buildLegend();buildCascade();buildLeads();updatePanels();render();
 (function(){
  var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading Rayong 3D…';document.body.appendChild(box);
  // catchment = Mueang-core buildings + reachable-pop; province = 59 branches, full POI palette, district polygons; index = nationwide cascade
+ // OPTIONAL future layers (roads/water/landuse) — fetched best-effort; missing file => null => layer skipped (graceful).
+ // These come from a later OSM pull on Kaustav's Thai laptop; see the EXPECTED JSON SHAPE comments in initCatch().
+ function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
  Promise.all([
    fetch('data/rayong_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    fetch('data/rayong_province.json').then(function(r){if(!r.ok)throw new Error('province '+r.status);return r.json();}),
-   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.CA=a[0];window.PROV=a[1];window.PROV_INDEX=a[2];box.remove();window.initCatch();})
+   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   opt('data/rayong_roads.json'), opt('data/rayong_water.json'), opt('data/rayong_landuse.json')
+ ]).then(function(a){window.CA=a[0];window.PROV=a[1];window.PROV_INDEX=a[2];
+   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load Rayong 3D data: '+e.message;});
 })();
 </script>
