@@ -14,7 +14,8 @@
 <body>
 <nav id="nav">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
-  <a data-v="overview" class="on">Overview</a>
+  <a data-v="home" class="on">Command center</a>
+  <a data-v="overview">Overview</a>
   <a data-v="map">National</a>
   <a href="rayong-catchment.html">Rayong 3D</a>
   <a data-v="trend">Risk trend</a>
@@ -35,8 +36,60 @@
 <div id="updated" style="display:none"></div>
 
 <main>
+  <!-- COMMAND CENTER (daily-use front door) -->
+  <section class="view on" id="v-home">
+    <div class="cc-head">
+      <div>
+        <h2 style="margin:0">Command center</h2>
+        <p class="lead" id="cc-sub">The two questions, on one screen: where to expand, and what is getting riskier. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>.</p>
+      </div>
+      <div class="cc-actions no-print">
+        <button class="chip" id="cc-csv">⬇ Download brief (CSV)</button>
+        <button class="chip" id="cc-print">🖨 Print / PDF</button>
+      </div>
+    </div>
+
+    <div class="cc-grid">
+      <!-- WHERE TO EXPAND -->
+      <div class="cc-card" id="cc-whitespace">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Where to expand
+          <a class="cc-link no-print" data-v="acq">Acquisition →</a></div>
+        <div class="cc-card-b" id="cc-ws-body"><p class="lead">Loading white-space…</p></div>
+      </div>
+
+      <!-- WHAT IS GETTING RISKIER -->
+      <div class="cc-card" id="cc-risk">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>What is getting riskier
+          <a class="cc-link no-print" data-v="exposure">Exposure →</a></div>
+        <div class="cc-card-b" id="cc-risk-body"><p class="lead">Loading risk signals…</p></div>
+      </div>
+
+      <!-- MACRO / REGULATORY -->
+      <div class="cc-card" id="cc-macro">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Macro &amp; regulatory
+          <a class="cc-link no-print" data-v="overview">Overview →</a></div>
+        <div class="cc-card-b" id="cc-macro-body"><p class="lead">Loading macro…</p></div>
+      </div>
+
+      <!-- RISK MOVERS -->
+      <div class="cc-card" id="cc-movers">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--collat)"></span>Risk movers
+          <a class="cc-link no-print" data-v="trend">Risk trend →</a></div>
+        <div class="cc-card-b" id="cc-movers-body"><p class="lead">Loading movers…</p></div>
+      </div>
+
+      <!-- WATCHLIST -->
+      <div class="cc-card cc-card-wide" id="cc-watch">
+        <div class="cc-card-h"><span class="cc-dot" style="background:#E6B450"></span>Watchlist
+          <span class="cc-link sub no-print">★ star branches &amp; provinces to pin them here</span></div>
+        <div class="cc-card-b" id="cc-watch-body"></div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:14px"><b>Provenance:</b> white-space &amp; risk scores are <b>estimated screens</b> (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are <b>measured</b>; the commodity board is World Bank <b>measured</b> price direction; the diesel-pickup outlook is an <b>editorial watch</b>. Confirm any expansion with a site survey.</p>
+  </section>
+
   <!-- OVERVIEW -->
-  <section class="view on" id="v-overview">
+  <section class="view" id="v-overview">
     <h2>Macro overlay — current conditions</h2>
     <div class="grid macro" id="macro"></div>
 

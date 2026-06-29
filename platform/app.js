@@ -20,15 +20,21 @@ function cstressVal(d){const p=CSTRESS&&CSTRESS[d.v]; return p?Math.round((p.agr
 // Motorcycle-title share (MEASURED, DLT): moto ÷ total vehicle stock in the branch's province, 0–100.
 // This is the highest-volatility / lowest-recovery title collateral — the lens colours branches by exposure.
 function motoShare(d){const p=PLOOK&&PLOOK[d.v]; if(!p||!p.vehicles||p.moto==null) return 0; return Math.round(100*p.moto/p.vehicles);}
+let cstressPromise=null;
 async function loadCropStress(){
-  if(cstressLoaded) return CSTRESS;
+  // cache the in-flight PROMISE (not just the boolean) so concurrent callers all await the real
+  // fetch — otherwise a second caller returns early with CSTRESS still empty mid-flight.
+  if(cstressPromise) return cstressPromise;
   cstressLoaded=true;
-  try{
-    const j = await fetch('data/crop_stress.json').then(r=>r.json());
-    CSTRESS={}; CSTRESS_META=j.meta||null; CSTRESS_LIST=j.provinces||[];
-    (j.provinces||[]).forEach(p=>{CSTRESS[p.th]=p;});
-  }catch(e){ CSTRESS={}; CSTRESS_LIST=[]; }
-  return CSTRESS;
+  cstressPromise=(async()=>{
+    try{
+      const j = await fetch('data/crop_stress.json').then(r=>r.json());
+      CSTRESS={}; CSTRESS_META=j.meta||null; CSTRESS_LIST=j.provinces||[];
+      (j.provinces||[]).forEach(p=>{CSTRESS[p.th]=p;});
+    }catch(e){ CSTRESS={}; CSTRESS_LIST=[]; }
+    return CSTRESS;
+  })();
+  return cstressPromise;
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
 // risk sub-metric: composite (max of the three proxies) or a single selectable score.
@@ -51,9 +57,10 @@ function naNum(v){return v==null?'<span class="sub" title="Not in the NSO releas
 
 /* ---------- tabs ---------- */
 function showTab(v){
-  if(!v||!document.getElementById('v-'+v)) v='overview';
+  if(!v||!document.getElementById('v-'+v)) v='home';
   document.querySelectorAll('#nav a[data-v]').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
+  if(v==='home') renderHome();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
@@ -69,6 +76,11 @@ $('#nav').addEventListener('click', e=>{
   showTab(v);
 });
 window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#','')));
+// command-center "→" links carry data-v but live outside #nav; jump to that tab.
+document.addEventListener('click',e=>{
+  const a=e.target.closest('#v-home a[data-v]'); if(!a) return;
+  e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
+});
 
 /* ---------- load ---------- */
 async function boot(){
@@ -807,9 +819,12 @@ function renderBranches(){
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q));
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
-  $('#branches').innerHTML = `<tr><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
+  $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
     rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'#E0574F':rk>=40?'#E6B450':'#23A28F';
+      const id=`branch:${d.n}|${d.v}`;
+      const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
       return `<tr onclick="location.href='${branchHref(d)}'" style="cursor:pointer">
+      <td class="no-print">${starBtn(id,wItem)}</td>
       <td class="mono"><a href="${branchHref(d)}" style="color:${rc};text-decoration:none" title="ESTIMATED risk proxy ${riskMetric==='composite'?'(worst of agri/merchant/collateral)':''}">▲ ${rk}</a></td>
       <td>${d.n}</td><td class="sub">${d.v}</td>
       <td class="mono" style="color:#E6B450">${naNum(d.dwork)}</td>
@@ -840,15 +855,18 @@ function drawProv(){
   const rows=PROV.filter(p=>(provRegion==='all'||p.region===provRegion) &&
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
-  $('#provtbl').innerHTML=`<tr><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
-   rows.map(p=>`<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+  $('#provtbl').innerHTML=`<tr><th class="no-print"></th><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
+   rows.map(p=>{const id=`prov:${p.th}`;
+     const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
+     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+     <td class="no-print">${starBtn(id,wItem)}</td>
      <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${p.branches}</td>
      <td class="mono">${p.districts}</td>
      <td class="mono" style="color:var(--gold)">${(p.factories||0).toLocaleString()}</td>
      <td class="mono">${Math.round((p.vehicles||0)/1000)}k</td>
-     <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td></tr>`).join('');
+     <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td></tr>`;}).join('');
 }
 
 /* ---------- market assessment (real measured numbers, no indices) ---------- */
@@ -920,6 +938,211 @@ function drawMarket(){
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='autox_market_assessment.csv'; a.click(); URL.revokeObjectURL(a.href);
   };
+}
+
+/* ---------- command center (Step 1, daily-use front door) ----------
+   Aggregates the existing computed signals into one screen answering the two standing
+   objectives: WHERE TO EXPAND (top white-space districts + provinces) and WHAT IS GETTING
+   RISKIER (crop stress, motorcycle-heavy collateral, gold-up vs pickup-pressure). Plus a
+   macro/regulatory read, risk movers (when ≥2 vintages exist), a localStorage watchlist, and
+   CSV + print export. Every figure is tagged measured (m) or estimated/proxy (e). No new data
+   files — it reuses branches.json, meta.json, amphoe.json, crop_stress.json, deltas.json. */
+const TAG_M='<span class="cc-tag m" title="Measured">measured</span>';
+const TAG_E='<span class="cc-tag e" title="Estimated / proxy — not a measured outcome">est</span>';
+function ccRow(l,sub,r,rsub,col){
+  return `<div class="cc-row"><div class="l">${l}${sub?`<span class="s">${sub}</span>`:''}</div>`+
+    `<div class="r" ${col?`style="color:${col}"`:''}>${r}${rsub?`<span class="s">${rsub}</span>`:''}</div></div>`;
+}
+
+/* ---- watchlist (localStorage) ---- */
+const WATCH_KEY='autox-watchlist';
+function watchLoad(){try{return JSON.parse(localStorage.getItem(WATCH_KEY)||'[]');}catch(e){return [];}}
+function watchSave(a){try{localStorage.setItem(WATCH_KEY,JSON.stringify(a));}catch(e){}}
+// id schema: "type:key" — branch:<name>|<province>, prov:<thai>
+function watchHas(id){return watchLoad().some(w=>w.id===id);}
+function watchToggle(item){
+  let a=watchLoad(); const i=a.findIndex(w=>w.id===item.id);
+  if(i>=0) a.splice(i,1); else a.push(item);
+  watchSave(a);
+  // refresh any visible star buttons for this id + the watchlist card
+  document.querySelectorAll(`.cc-star[data-id="${cssEsc(item.id)}"]`).forEach(b=>b.classList.toggle('on',watchHas(item.id)));
+  if(document.getElementById('v-home').classList.contains('on')) renderWatchlist();
+}
+function cssEsc(s){return String(s).replace(/["\\]/g,'\\$&');}
+function starBtn(id,item){
+  const on=watchHas(id)?' on':'';
+  return `<button class="cc-star${on} no-print" data-id="${id.replace(/"/g,'&quot;')}" title="Add to watchlist" onclick='event.stopPropagation();ccStar(${JSON.stringify(item).replace(/'/g,"&#39;")})'>★</button>`;
+}
+function ccStar(item){watchToggle(item);}
+
+/* ---- home orchestration ---- */
+let homeBooted=false;
+function renderHome(){
+  renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
+  renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
+  renderHomeMacro();        // META.macro + META.board
+  renderHomeMovers();       // deltas.json
+  renderWatchlist();
+  if(!homeBooted){
+    homeBooted=true;
+    loadAmphoe().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeWhitespace(); });
+    loadCropStress().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeRisk(); });
+    const c=$('#cc-csv'), p=$('#cc-print');
+    if(c) c.onclick=ccBriefCSV;
+    if(p) p.onclick=()=>window.print();
+  }
+}
+
+// WHERE TO EXPAND — top 3 districts (amphoe whitespace) + top 3 provinces (province whitespace avg).
+function renderHomeWhitespace(){
+  const box=$('#cc-ws-body'); if(!box||!META) return;
+  let html='';
+  // top districts from amphoe.json (whitespace, est) — surfaces zero-branch white space
+  if(AMP&&AMP.length){
+    const top=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0)).slice(0,3);
+    html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}</div>`;
+    html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
+      const where=`${a.province_th} · ${a.region}`;
+      const hd=a.branches===0?'no AutoX branch yet':`${a.branches} AutoX inside`;
+      return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,`${where} · ${hd}`,
+        `★ ${(a.whitespace||0).toFixed(0)}`,'whitespace','var(--gold)');}).join('');
+  } else {
+    html+=`<div class="cc-empty">Loading district white-space…</div>`;
+  }
+  // top provinces by mean district whitespace (rolled up from amphoe) — "which province has room"
+  if(AMP&&AMP.length){
+    const byP={};
+    AMP.forEach(a=>{const k=a.province_th; const o=byP[k]||(byP[k]={th:k,region:a.region,sum:0,n:0,zero:0});
+      o.sum+=(a.whitespace||0); o.n++; if(a.branches===0)o.zero++;});
+    const provs=Object.values(byP).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg).slice(0,3);
+    html+=`<div class="cc-sub2">Top provinces · mean district white-space ${TAG_E}</div>`;
+    html+=provs.map(o=>ccRow(`${o.th}`,`${o.region} · ${o.zero} district${o.zero===1?'':'s'} with no AutoX`,
+      `★ ${o.avg.toFixed(0)}`,'avg','var(--gold)')).join('');
+  }
+  box.innerHTML=html;
+}
+
+// WHAT IS GETTING RISKIER — worst crop-stress province, motorcycle-heavy collateral, gold-up vs pickup.
+function renderHomeRisk(){
+  const box=$('#cc-risk-body'); if(!box||!META) return;
+  let html='';
+  // worst crop-household stress region/province (crop_stress.json)
+  if(CSTRESS_LIST&&CSTRESS_LIST.length){
+    const w=CSTRESS_LIST[0]; const sv=Math.round((w.agri_stress||0)*100);
+    const dom=(w.crop_mix&&w.crop_mix[0])||{};
+    html+=`<div class="cc-sub2" style="margin-top:0">Worst crop-household stress ${TAG_E}</div>`;
+    html+=ccRow(`${w.th} <span class="sub">${w.region||''}</span>`,
+      `${dom.crop||'crops'} ${dom.share!=null?Math.round(dom.share*100)+'%':''} · price ${w.price_stress!=null?(w.price_stress>0?'+':'')+w.price_stress+'%':'—'}`,
+      `▲ ${sv}`,'agri-stress','var(--agri)');
+  } else { html+=`<div class="cc-empty">Loading crop stress…</div>`; }
+  // most motorcycle-heavy collateral provinces (DLT, measured) — lowest-recovery title collateral
+  const moto=collatMixRows().slice(0,2);
+  if(moto.length){
+    html+=`<div class="cc-sub2">Most motorcycle-heavy collateral ${TAG_M}</div>`;
+    html+=moto.map(p=>ccRow(`${p.th} <span class="sub">${p.region}</span>`,
+      `${p.branches} branches · lowest-recovery title collateral`,
+      `${p.moto}%`,'moto share','#C8433B')).join('');
+  }
+  // gold-up vs pickup-pressure collateral read (board measured + editorial pickup watch)
+  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
+  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
+  html+=`<div class="cc-sub2">Collateral value · the two backings diverge</div>`;
+  html+=ccRow(`Gold collateral ${TAG_M}`,'pawn / gold-backed recovery value ↑',gy,'value ↑','var(--up)');
+  html+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');
+  box.innerHTML=html;
+}
+
+// MACRO / REGULATORY — BoT rate-cap watch + key commodity moves from META.board.
+function renderHomeMacro(){
+  const box=$('#cc-macro-body'); if(!box||!META) return;
+  let html='';
+  html+=`<div class="cc-sub2" style="margin-top:0">Regulatory watch</div>`;
+  html+=ccRow(`BoT hire-purchase rate/fee cap ${TAG_E}`,
+    'car &amp; motorcycle lending · effective ~Dec 2025 · sector-margin item, not a credit signal',
+    '~Dec 2025','margin watch','#D9742B');
+  // key commodity moves: 2 worst crop YoY + gold
+  const board=(META.board||[]);
+  const crops=board.filter(b=>b.seg==='Crops'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2);
+  const gold=board.find(b=>/gold/i.test(b.lab||''));
+  html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction</span></div>`;
+  crops.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY','var(--agri)'));
+  if(gold) html+=ccRow(`Gold`,gold.note||'collateral value ↑',`+${gold.yoy}%`,'YoY','var(--up)');
+  box.innerHTML=html;
+}
+
+// RISK MOVERS — top movers if deltas has ≥2 snapshots, else honest baseline message.
+function renderHomeMovers(){
+  const box=$('#cc-movers-body'); if(!box) return;
+  const draw=()=>{
+    if(!DELTAS||DELTAS.baseline||!(DELTAS.branches&&DELTAS.branches.length)){
+      box.innerHTML=`<div class="cc-empty">Baseline captured${DELTAS&&DELTAS.to?` (${DELTAS.to})`:''} — trends appear after the next data refresh. The plumbing is live; it needs one more vintage.</div>`;
+      return;
+    }
+    let html='';
+    const reg=(DELTAS.region||[]).slice().sort((a,b)=>Math.abs(b.d_agri||0)-Math.abs(a.d_agri||0)).slice(0,2);
+    if(reg.length){
+      html+=`<div class="cc-sub2" style="margin-top:0">Region movers ${TAG_E} <span class="sub">vs prior vintage</span></div>`;
+      html+=reg.map(r=>ccRow(`${r.r} <span class="sub">${r.n} branches</span>`,'agri-PD proxy shift',
+        `${(r.d_agri||0)>0?'▲ +':'▼ '}${r.d_agri}`,'Δ agri',(r.d_agri||0)>0?'var(--agri)':'var(--up)')).join('');
+    }
+    const br=(DELTAS.branches||[]).slice(0,3);
+    if(br.length){
+      html+=`<div class="cc-sub2">Branch movers ${TAG_E}</div>`;
+      html+=br.map(d=>ccRow(`${d.n} <span class="sub">${d.v} · ${d.r}</span>`,'composite risk proxy',
+        `▲ ${d.comp}`,`Δ ${(d.d_comp||0)>0?'+':''}${d.d_comp}`,'var(--agri)')).join('');
+    }
+    box.innerHTML=html||`<div class="cc-empty">No material movement between vintages.</div>`;
+  };
+  if(DELTAS!==null||trendLoaded){ draw(); }
+  else { fetch('data/deltas.json').then(r=>r.json()).then(j=>{DELTAS=j;trendLoaded=true;draw();}).catch(()=>{trendLoaded=true;DELTAS=null;draw();}); }
+}
+
+// WATCHLIST — starred branches & provinces with their key numbers.
+function renderWatchlist(){
+  const box=$('#cc-watch-body'); if(!box) return;
+  const items=watchLoad();
+  if(!items.length){
+    box.innerHTML=`<div class="cc-empty">No starred items yet. Hit the ★ on any row in <b>Branches</b> or <b>Provinces</b> to pin it here with its key numbers.</div>`;
+    return;
+  }
+  box.innerHTML=items.map(w=>{
+    const star=`<button class="cc-star on no-print" data-id="${w.id.replace(/"/g,'&quot;')}" title="Remove from watchlist" onclick='ccStar(${JSON.stringify(w).replace(/'/g,"&#39;")})'>★</button>`;
+    return ccRow(`${star} ${w.label}`,w.sub||'',w.val||'',w.valSub||'',w.col||'var(--hi)');
+  }).join('');
+}
+
+// EXPORT — CSV brief of the command-center numbers.
+function ccBriefCSV(){
+  const rows=[['section','item','detail','value','provenance']];
+  // white-space
+  if(AMP&&AMP.length){
+    AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0)).slice(0,3).forEach(a=>{
+      rows.push(['where_to_expand_district',(a.name_measured?a.name:a.name_en),`${a.province_th} | ${a.region} | ${a.branches} AutoX inside`,(a.whitespace||0).toFixed(0),'estimated']);});
+    const byP={}; AMP.forEach(a=>{const o=byP[a.province_th]||(byP[a.province_th]={s:0,n:0,r:a.region});o.s+=(a.whitespace||0);o.n++;});
+    Object.entries(byP).map(([th,o])=>[th,o.r,o.s/o.n]).sort((a,b)=>b[2]-a[2]).slice(0,3).forEach(([th,r,avg])=>
+      rows.push(['where_to_expand_province',th,r,avg.toFixed(0),'estimated']));
+  }
+  // risk
+  if(CSTRESS_LIST&&CSTRESS_LIST.length){const w=CSTRESS_LIST[0];
+    rows.push(['risk_crop_stress',w.th,`${w.region} | price ${w.price_stress}%`,Math.round((w.agri_stress||0)*100),'estimated']);}
+  collatMixRows().slice(0,2).forEach(p=>rows.push(['risk_moto_collateral',p.th,`${p.region} | ${p.branches} branches`,p.moto+'%','measured']));
+  const gold=(META.board||[]).find(b=>/gold/i.test(b.lab||''));
+  if(gold) rows.push(['collateral_gold','Gold',gold.note||'',(gold.yoy>0?'+':'')+gold.yoy+'%','measured']);
+  rows.push(['collateral_pickup','Diesel-pickup','used-pickup glut + EV transition','pressure (down)','editorial']);
+  // macro
+  rows.push(['regulatory','BoT hire-purchase rate/fee cap','effective ~Dec 2025, sector-margin','~Dec 2025','editorial']);
+  (META.board||[]).filter(b=>b.seg==='Crops'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2).forEach(b=>
+    rows.push(['macro_commodity',b.lab,b.note||'',(b.yoy>0?'+':'')+b.yoy+'%','measured']));
+  // movers
+  if(DELTAS&&!DELTAS.baseline&&DELTAS.branches){
+    (DELTAS.branches||[]).slice(0,3).forEach(d=>rows.push(['risk_mover',d.n,`${d.v} | ${d.r}`,`comp ${d.comp} (d ${d.d_comp})`,'estimated']));
+  } else { rows.push(['risk_mover','(baseline)','one vintage captured — trends after next refresh','','']); }
+  // watchlist
+  watchLoad().forEach(w=>rows.push(['watchlist',w.label,w.sub||'',w.val||'',(w.prov||'')]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_command_center_brief.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 boot();
