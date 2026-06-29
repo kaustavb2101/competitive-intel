@@ -405,6 +405,7 @@ async function loadPanel(){
     // re-centre on the matched branch so the scene and panel agree
     if(deckgl && !isNaN(best.x) && !isNaN(best.y)){
       deckgl.setProps({initialViewState:Object.assign({},INITIAL,{longitude:best.x,latitude:best.y})});
+      render(); // re-evaluate layers so the branch-label pill shows the matched name, not the URL ?n=
     }
     $('#bnm').textContent = best.n || NM;
     $('#bsub').textContent = `${best.v}${best.d?' · '+best.d:''} · ${best.r}`;
