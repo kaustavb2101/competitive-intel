@@ -84,15 +84,35 @@ if [ -z "$CHROME" ]; then echo "FATAL: no chromium under /opt/pw-browsers" >&2; 
 URL="http://localhost:$PORT/_qa_$(basename "$PAGE")$QUERY"
 # hard wall: each chrome pass gets (budget + 20s) wall time so a wedged swiftshader can't stall CI.
 WALL=$(( BUDGET / 1000 + 20 ))
-UDD="$(mktemp -d)"
-COMMON=(--headless=new --no-sandbox --disable-gpu --use-gl=angle --use-angle=swiftshader \
+CHROME_FLAGS=(--headless=new --no-sandbox --disable-gpu --use-gl=angle --use-angle=swiftshader \
         --enable-unsafe-swiftshader --hide-scrollbars --window-size="$SIZE" \
-        --user-data-dir="$UDD" --virtual-time-budget="$BUDGET")
+        --virtual-time-budget="$BUDGET")
 
-timeout "$WALL" "$CHROME" "${COMMON[@]}" --screenshot="$OUT" "$URL" >/dev/null 2>&1 || true
-# second pass: dump the settled DOM so the probe state (errors + lib init) is readable
-DOM="$(timeout "$WALL" "$CHROME" "${COMMON[@]}" --dump-dom "$URL" 2>/dev/null || true)"
-rm -rf "$UDD"
+# Under software WebGL the heaviest scene (rayong-catchment, 3,631 buildings) intermittently makes
+# a single chrome pass come back empty within the wall — the screenshot pass occasionally produces
+# NO png, and the DOM-dump pass occasionally returns an EMPTY string — even though the page is fine.
+# Both passes therefore RETRY until they yield real output (treat empty as "retry", not "fail").
+# Each attempt gets its own fresh user-data-dir so a wedged profile can't poison the next try; this
+# stays fully deterministic (no network, fixed virtual-time budget).
+for try in 1 2 3 4; do
+  rm -f "$OUT"
+  SDD="$(mktemp -d)"
+  timeout "$WALL" "$CHROME" "${CHROME_FLAGS[@]}" --user-data-dir="$SDD" \
+          --screenshot="$OUT" "$URL" >/dev/null 2>&1 || true
+  rm -rf "$SDD"
+  # accept once a non-empty png exists.
+  [ -s "$OUT" ] && break
+done
+# second pass: dump the settled DOM so the probe state (errors + lib init) is readable.
+DOM=""
+for try in 1 2 3 4; do
+  TDD="$(mktemp -d)"
+  DOM="$(timeout "$WALL" "$CHROME" "${CHROME_FLAGS[@]}" --user-data-dir="$TDD" \
+          --dump-dom "$URL" 2>/dev/null || true)"
+  rm -rf "$TDD"
+  # accept once the dump is non-empty AND carries the synchronously-injected probe node.
+  case "$DOM" in *'id="__qa"'*) break;; esac
+done
 
 # Persist the settled DOM (incl. the #__qa probe node) next to the screenshot. health.sh parses
 # both the DOM (errors, lib init, hooks) and the PNG (pixel variance) to decide pass/fail.

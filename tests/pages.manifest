@@ -22,5 +22,8 @@ risk-trend	index.html#trend	none	0	trendbaseline
 branch-explorer	branch-explorer.html?lat=12.7506&lng=101.038&n=%E0%B8%A3%E0%B8%B0%E0%B8%A2%E0%B8%AD%E0%B8%87	webgl	1	map
 province-rayong	province.html?p=rayong	webgl	1	map,kpis,v-districts
 province-chonburi	province.html?p=chon-buri	webgl	1	map,kpis
-rayong-province	rayong-province.html	webgl	1	map,kpis,v-districts
+# rayong-province.html is a RETIRED redirect stub (meta-refresh + location.replace -> /rayong-catchment,
+# mirrored by a vercel.json permanent redirect). It has no WebGL scene, so it is intentionally NOT a
+# manifest row — the harness only renders live views. The route was consolidated into rayong-catchment
+# in f28d6df; the stub just keeps old deep-links/bookmarks alive.
 rayong-catchment	rayong-catchment.html	webgl	1	map,focalName,leads,recos
