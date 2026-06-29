@@ -5,7 +5,7 @@
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Rayong Catchment Explorer · เงินไชโย</title>
+<title>Rayong 3D · เงินไชโย</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
 <style>
@@ -79,6 +79,30 @@ canvas{outline:none}
  font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .xbtn{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none}
 
+/* cascade (Region>Province>Branch) */
+.casc{padding:10px 15px 11px;border-bottom:1px solid #1a2236;display:flex;flex-direction:column;gap:6px}
+.cscrow{display:flex;align-items:center;gap:8px}
+.cscrow label{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;width:62px;flex:none}
+.casc select{flex:1;min-width:0;background:#0a1018;border:1px solid #1c2740;color:var(--hi);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;border-radius:7px;cursor:pointer}
+.casc select:disabled{color:var(--dim);cursor:not-allowed;opacity:.7}
+.casc select option:disabled{color:#5a6479}
+.cscnote{font-size:10px;color:var(--dim);line-height:1.4;margin-top:1px}
+
+/* POI legend overlay (bottom-center) */
+#legendwrap{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:8;max-width:min(94vw,720px);
+ background:rgba(13,17,27,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 10px 9px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
+#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
+ font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
+.lg.on{opacity:1;color:var(--hi);border-color:#33405e}
+.lg .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
+.lg.on b{color:var(--hi)}
+
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
 .dtt b{color:#fff}
 .err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
@@ -89,6 +113,8 @@ canvas{outline:none}
  #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
  .xbtn{display:block}#mtog{display:flex}#ctl{top:46px}
  #strip .ttl{font-size:12px}
+ #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
+ #legend{max-height:88px;overflow-y:auto}
 }
 
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
@@ -136,10 +162,19 @@ html[data-theme="light"] #ctl button.on{background:#e7edf8;color:#11151F}
 html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
 html[data-theme="light"] .bchip b{color:#11151F}
 html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .casc{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cscrow label,html[data-theme="light"] .cscnote{color:#828CA0}
+html[data-theme="light"] .casc select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] #legendwrap{background:rgba(255,255,255,.94);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] .lgttl{color:#828CA0}
+html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828CA0}
+html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
+html[data-theme="light"] .lg b{color:#5A6477}
+html[data-theme="light"] .lg.on b{color:#11151F}
 </style>
 </head>
 <body>
-<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-province.html">Rayong 3D</a><a href="rayong-catchment.html" class="on">Catchment</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
+<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-catchment.html" class="on">Rayong 3D</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
 <script>
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
  function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
@@ -148,7 +183,7 @@ html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-co
 </script>
 <div id="map"></div>
 
-<div id="strip"><span class="ttl">Rayong <b>·</b> Mueang core</span></div>
+<div id="strip"><span class="ttl">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="ctl">
   <button data-b="voyager" class="on">Map</button>
@@ -159,6 +194,12 @@ html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-co
 <aside class="side" id="left">
   <button class="xbtn" data-x="left">✕</button>
   <div class="cardttl"><div class="a" id="focalName">—</div><div class="b" id="focalSub">Tap a gold branch to refocus</div></div>
+  <div class="casc">
+    <div class="cscrow"><label>Region</label><select id="cscRegion"></select></div>
+    <div class="cscrow"><label>Province</label><select id="cscProv"></select></div>
+    <div class="cscrow"><label>Branch</label><select id="cscBranch"></select></div>
+    <div class="cscnote" id="cscNote"></div>
+  </div>
   <div class="scroll">
     <div class="reach">
       <div class="big" id="reach15">—</div>
@@ -189,17 +230,47 @@ html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-co
   <button data-s="left">Analysis</button>
   <button data-s="right">Leads</button>
 </div>
+
+<div id="legendwrap">
+  <div class="lgttl">POI types <span>· tap to toggle</span></div>
+  <div id="legend"></div>
+</div>
 <script>window.initCatch=function(){
 'use strict';
 try{
 const CA=window.CA;
+const PROV=window.PROV||{};
+const IDX=window.PROV_INDEX||null;
+// 59 province branches drive the dropdown, dots, labels and 10km rings; catchment buildings stay as Mueang-core scenery.
+const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:CA.branches;
+const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:CA.competitors;
+// full POI palette comes from the province file ([lat,lng]); fall back to the catchment POIs if missing.
+const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:CA.poi;
+const DISTRICTS=PROV.districts||null;
 const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47]};
-const RINGS=[400,800,1200], RCOL=[[63,181,126],[224,169,59],[224,71,75]];
-let basemap='voyager', showRings=true, focal=CA.focal||CA.branches[0];
+const RINGS=[400,800,1200], RCOL=[[63,181,126],[224,169,59],[224,71,75]]; // walk reach (green/amber/red)
+const GOLD=[230,180,80]; // 10km collateral catchment ring
+// canonical type->color map: single source of truth for map dots AND legend AND toggles
+const POI_COLORS={
+  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
+  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
+  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
+const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
+  fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
+  restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
+// preserve a stable legend order matching POI_COLORS keys, restricted to types actually present
+const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
+const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
+let basemap='voyager', showRings=true;
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
   return 2*R*Math.asin(Math.sqrt(x));}
+// default focal = the province branch nearest the Mueang-core building cluster (so the reachable card + 3D both read well)
+let focal=(function(){const c=CA.center||{lat:12.686,lng:101.245};
+  if(!BR||!BR.length)return CA.focal||CA.branches[0];
+  let best=BR[0],bd=Infinity;for(const b of BR){const d=hav(c.lat,c.lng,b.y,b.x);if(d<bd){bd=d;best=b;}}return best;})();
 function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
   for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
 function reachable(lat,lng){const acc=[0,0,0];
@@ -211,27 +282,20 @@ const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
 let LIGHTING=null;
 try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
-  const useShadow=!/Mobi|Android/i.test(navigator.userAgent)&&window.innerWidth>900;
+  // shadows OFF: the cast shadow of ~3,631 thin footprints smeared into a grey dome under software WebGL.
+  // Keep the directional lights (face-shading still reads buildings as 3D); no shadow map, no shadowColor.
   LIGHTING=new deck.LightingEffect({
     ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-    sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:useShadow}),
+    sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:false}),
     fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
-  LIGHTING.shadowColor=[0,0,0,0.50];
 } }catch(e){ LIGHTING=null; }
 const deckgl=new deck.DeckGL({container:'map',
-  initialViewState:{longitude:CA.center.lng,latitude:CA.center.lat,zoom:13.4,pitch:55,bearing:18},
+  initialViewState:{longitude:focal.x,latitude:focal.y,zoom:12.5,pitch:52,bearing:18},
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   getTooltip:({object,layer})=>{
     if(!object)return null;
-    if(layer.id==='bldg'){
-      const ty=object.ty||'building';
-      let near='';
-      if(object.cx!=null&&object.cy!=null){
-        const nv=CA.poi.vehicle_commerce.filter(p=>hav(object.cy,object.cx,p[0],p[1])<=200).length;
-        const nc=CA.poi.convenience.filter(p=>hav(object.cy,object.cx,p[0],p[1])<=200).length;
-        if(nv||nc)near=`<br><span style="color:var(--mid)">≤200m: ${nv} vehicle · ${nc} convenience</span>`;}
-      return {html:`<div class="dtt"><b>${Math.round(object.h)} m</b> · ${ty}<br>~${Math.round(object.fa).toLocaleString()} m² floor area${near}</div>`};}
-    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
+    // buildings are non-interactive scenery — no per-building readout (owner request)
+    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||'Rayong'} · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
     if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};
     if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
     return null;}});
@@ -243,6 +307,25 @@ function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],min
 function darkMode(){return basemap==='dark';}
 function render(){
   const L=[baseLayer()];
+  // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
+  if(DISTRICTS && deck.GeoJsonLayer){
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
+      getFillColor:[91,124,250,18],getLineColor:[120,140,180,90],lineWidthMinPixels:1,pickable:false}));
+  }
+  // (1) 10km collateral catchment rings — faint over ALL branches; bright only on the selected branch (drawn beneath buildings)
+  if(showRings){
+    L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
+      extruded:false,stroked:true,filled:true,
+      getFillColor:[GOLD[0],GOLD[1],GOLD[2],10],getLineColor:[GOLD[0],GOLD[1],GOLD[2],70],
+      lineWidthMinPixels:1,pickable:false}));
+    if(focal){
+      L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
+        extruded:false,stroked:true,filled:true,
+        getFillColor:[GOLD[0],GOLD[1],GOLD[2],28],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
+        lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
+    }
+  }
+  // (2) extruded buildings — Mueang-core scenery, non-interactive, no shadow
   L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>{const t=Math.pow(Math.max(0,Math.min(1,b.h/40)),1.1);
@@ -254,38 +337,42 @@ function render(){
         industrial:[200,67,59],office:[122,79,224],school:[120,140,170]};
       const c=TINT[b.ty];if(!c)return [m[0],m[1],m[2],a];
       return [Math.round(m[0]*.7+c[0]*.3),Math.round(m[1]*.7+c[1]*.3),Math.round(m[2]*.7+c[2]*.3),a];},
-    stroked:true,getLineColor:darkMode()?[45,60,90,170]:[120,130,150,150],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    stroked:true,getLineColor:darkMode()?[55,72,108,190]:[120,130,150,150],getLineWidth:1.6,lineWidthMinPixels:0.7,
     material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
-    parameters:{depthTest:true},transitions:{getElevation:600},_shadow:true,pickable:true}));
+    parameters:{depthTest:true},transitions:{getElevation:600},pickable:false}));
+  // (3) walk-reach rings (400/800/1200m) around the selected branch — distinct from the gold 10km ring
   if(showRings && focal){
-    L.push(new deck.PolygonLayer({id:'rings',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
+    L.push(new deck.PolygonLayer({id:'walk',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:true,
       getFillColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],26],
-      getLineColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],200],getLineWidthMinPixels:1.4,pickable:false}));
+      getLineColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],200],getLineWidthMinPixels:1.4,pickable:false,
+      updateTriggers:{getPolygon:[focal]}}));
   }
-  // POI
-  L.push(new deck.ScatterplotLayer({id:'conv',data:CA.poi.convenience,getPosition:p=>[p[1],p[0]],
-    getRadius:55,radiusMinPixels:2,radiusMaxPixels:5,getFillColor:[224,123,47,220]}));
-  L.push(new deck.ScatterplotLayer({id:'veh',data:CA.poi.vehicle_commerce,getPosition:p=>[p[1],p[0]],
-    getRadius:60,radiusMinPixels:2.2,radiusMaxPixels:6,getFillColor:[21,155,134,235]}));
-  L.push(new deck.ScatterplotLayer({id:'mkt',data:CA.poi.fresh_market,getPosition:p=>[p[1],p[0]],
-    getRadius:70,radiusMinPixels:2.5,radiusMaxPixels:7,getFillColor:[224,200,80,240]}));
-  L.push(new deck.ScatterplotLayer({id:'bank',data:CA.poi.bank,getPosition:p=>[p[1],p[0]],
-    getRadius:55,radiusMinPixels:2,radiusMaxPixels:6,getFillColor:[91,124,250,180]}));
-  // competitors
-  L.push(new deck.ScatterplotLayer({id:'comp',data:CA.competitors,getPosition:d=>[d.lng,d.lat],
-    getRadius:95,radiusMinPixels:8,radiusMaxPixels:16,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
+  // (4) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng]
+  POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
+    const c=POI_COLORS[t];
+    L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
+      getRadius:60,radiusMinPixels:2,radiusMaxPixels:6,getFillColor:[c[0],c[1],c[2],225],
+      stroked:false,pickable:false}));
+  });
+  // (5) competitors
+  L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
+    getRadius:95,radiusMinPixels:7,radiusMaxPixels:15,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
     getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
-  // my branches
-  L.push(new deck.ScatterplotLayer({id:'branches',data:CA.branches,getPosition:d=>[d.x,d.y],
+  // (6) AutoX branches (all 59) — selected one is white
+  L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
     getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
     getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
     updateTriggers:{getFillColor:[focal]}}));
-  L.push(new deck.TextLayer({id:'branch-labels',data:CA.branches,getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
-    getSize:11,getColor:[40,28,8,255],getBackgroundColor:[224,169,59,235],background:true,
-    backgroundPadding:[5,3],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
-    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
-  L.push(new deck.TextLayer({id:'comp-labels',data:CA.competitors,getPosition:d=>[d.lng,d.lat],
+  // (7) only the SELECTED branch is labelled (59 labels would overwhelm the scene)
+  if(focal){
+    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
+      getSize:12,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,245],background:true,
+      backgroundPadding:[6,3],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+      getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+      updateTriggers:{getText:[focal],getPosition:[focal]}}));
+  }
+  L.push(new deck.TextLayer({id:'comp-labels',data:COMP,getPosition:d=>[d.lng,d.lat],
     getText:d=>(d.brand||'?').charAt(0),getSize:9,getColor:[255,255,255,255],
     getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),235],background:true,
     backgroundPadding:[4,2],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
@@ -295,53 +382,59 @@ function render(){
     backgroundPadding:[5,3],fontFamily:'IBM Plex Sans Thai',fontWeight:500,getTextAnchor:'middle',
     characterSet:'auto',sizeUnits:'pixels',pickable:true}));
   deckgl.setProps({layers:L,
-    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){focal=object;updatePanels();render();}}});
+    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
 
 /* ---------- panels ---------- */
 function fmt(n){return n.toLocaleString();}
+function poiArr(t){return (POIS[t]&&POIS[t].length)?POIS[t]:[];}
 function updatePanels(){
   const r=reachable(focal.y,focal.x);
+  const dist=focal.d||CA.meta.dist;
+  const inCore=r[2]>0; // buildings (and therefore the reachable estimate) only exist for the Mueang core
   document.getElementById('focalName').textContent=focal.n||'AutoX branch';
-  document.getElementById('focalSub').textContent=`เงินไชโย · ${CA.meta.dist} · vehicle shops ${focal.veh}`;
-  document.getElementById('reach15').textContent=fmt(r[2]);
-  document.getElementById('reach5').textContent=fmt(r[0]);
-  document.getElementById('reach10').textContent=fmt(r[1]);
-  document.getElementById('reach15b').textContent=fmt(r[2]);
-  document.getElementById('reachFoot').textContent='Dasymetric estimate: OSM building floor-area within each walk radius × local occupancy (~1 person / 45 m²). Not a street-network isochrone.';
-  // competitor & own within 1.2km
-  const cNear=CA.competitors.filter(c=>hav(focal.y,focal.x,c.lat,c.lng)<=1200).length;
-  const bNear=CA.branches.filter(b=>b!==focal&&hav(focal.y,focal.x,b.y,b.x)<=1200).length;
-  const convNear=CA.poi.convenience.filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
-  const vehNear=CA.poi.vehicle_commerce.filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
-  const m=CA.meta;
+  document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${focal.veh!=null?focal.veh:'—'}`;
+  document.getElementById('reach15').textContent=inCore?fmt(r[2]):'—';
+  document.getElementById('reach5').textContent=inCore?fmt(r[0]):'—';
+  document.getElementById('reach10').textContent=inCore?fmt(r[1]):'—';
+  document.getElementById('reach15b').textContent=inCore?fmt(r[2]):'—';
+  document.getElementById('reachFoot').textContent=inCore
+    ?'Dasymetric estimate: OSM building floor-area within each walk radius × local occupancy (~1 person / 45 m²). Not a street-network isochrone.'
+    :'Reachable-population is only measured for the Mueang Rayong core (the 3D building footprints). Select a Mueang-core branch for the walk estimate.';
+  // competitor & own within 1.2km (province-wide sets)
+  const cNear=COMP.filter(c=>hav(focal.y,focal.x,c.lat,c.lng)<=1200).length;
+  const bNear=BR.filter(b=>b!==focal&&hav(focal.y,focal.x,b.y,b.x)<=1200).length;
+  const convNear=poiArr('convenience').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
+  const vehNear=poiArr('vehicle_commerce').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
+  const goldNear=poiArr('gold').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
   document.getElementById('ctx').innerHTML=[
     ['Competitors ≤1.2km',`${cNear} <small>vs ${bNear} AutoX</small>`],
     ['Convenience stores',`${convNear} <small>≤1.2km</small>`],
     ['Vehicle shops ≤1.2km',`${vehNear} <small>collateral supply</small>`],
-    ['District',`${m.dist}`],
-    ['District reg. pop',`${fmt(m.dist_pop)}`],
-    ['Buildings mapped',`${fmt(CA.buildings.length)}`],
+    ['Gold dealers ≤1.2km',`${goldNear} <small>pawn competition</small>`],
+    ['District',`${dist}`],
+    ['Buildings mapped',`${fmt(CA.buildings.length)} <small>Mueang core</small>`],
   ].map(([k,v])=>`<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
 }
 
 function buildLeads(){
   // gaps: competitors whose nearest AutoX branch is far -> contested ground we don't hold
-  const gaps=CA.competitors.map(c=>{
-    const nb=Math.min(...CA.branches.map(b=>hav(c.lat,c.lng,b.y,b.x)));
+  const gaps=COMP.map(c=>{
+    const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
     return {c,nb};}).filter(g=>g.nb>650).sort((a,b)=>b.nb-a.nb);
   // cluster by tambon-ish proximity (dedupe within 600m, keep farthest)
   const picked=[];
   for(const g of gaps){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
-  const ratio=(CA.competitors.length/Math.max(1,CA.branches.length)).toFixed(1);
+  const ratio=(COMP.length/Math.max(1,BR.length)).toFixed(1);
   document.getElementById('verdict').innerHTML=
-    `<div class="verdict hot">Contested core — <b>${CA.competitors.length} competitor branches</b> vs <b>${CA.branches.length} AutoX</b> (${ratio}:1). Srisawad &amp; Tidlor own the Thapma–Choeng Noen corridor; AutoX is thin in the urban centre while strong on the factory edge.</div>`;
+    `<div class="verdict hot">Contested ground — <b>${COMP.length} competitor branches</b> vs <b>${BR.length} AutoX</b> (${ratio}:1) across Rayong. Srisawad &amp; Tidlor own the Thapma–Choeng Noen corridor; AutoX is thin in the urban centre while strong on the factory edge.</div>`;
   document.getElementById('leads').innerHTML=picked.map((g,i)=>{
     const r=reachable(g.c.lat,g.c.lng);
+    const reachTxt=r[2]>0?`~${fmt(r[2])} reachable in 15 min.`:'outside the mapped Mueang core.';
     return `<div class="lead" data-lat="${g.c.lat}" data-lng="${g.c.lng}">
       <div class="rank">${i+1}</div><div class="body">
       <div class="t">${g.c.name.replace(/^[^ ]+ /,'')} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
-      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km. ~${fmt(r[2])} reachable in 15 min.</div>
+      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km. ${reachTxt}</div>
       </div></div>`;}).join('');
   document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
     const lat=+el.dataset.lat,lng=+el.dataset.lng;
@@ -349,21 +442,85 @@ function buildLeads(){
     focal={n:'Gap (competitor-held)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
     if(window.innerWidth<=820){document.getElementById('left').classList.add('show');document.getElementById('right').classList.remove('show');}
   });
+  const nVeh=(POIS.vehicle_commerce||[]).length, nGold=(POIS.gold||[]).length;
   document.getElementById('recos').innerHTML=[
     ['1','Infill the Thapma–Choeng Noen corridor: it carries the highest reachable population and the densest competitor stack, but few AutoX points. A single well-placed branch contests 4–5 rivals at once.'],
-    ['2','Lead with vehicle-title + gold collateral here — '+CA.meta.n_veh+' vehicle shops and '+CA.meta.n_gold+' gold dealers in-frame mean strong collateral supply and pawn competition. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
+    ['2','Lead with vehicle-title + gold collateral here — '+nVeh+' vehicle shops and '+nGold+' gold dealers in-frame mean strong collateral supply and pawn competition. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
     ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core selectively where reachable population > 8k and no AutoX within 1 km.'],
   ].map(([n,t])=>`<div class="reco"><span class="n">${n}</span><span>${t}</span></div>`).join('');
 }
 
 /* strip */
 function buildStrip(){
-  const byB={};CA.competitors.forEach(c=>byB[c.brand]=(byB[c.brand]||0)+1);
-  const items=[['AutoX',CA.branches.length,'#E0A93B'],['Srisawad',byB.Srisawad||0,'#E0474B'],
+  const byB={};COMP.forEach(c=>byB[c.brand]=(byB[c.brand]||0)+1);
+  const items=[['AutoX',BR.length,'#E0A93B'],['Srisawad',byB.Srisawad||0,'#E0474B'],
     ['Tidlor',byB.Tidlor||0,'#4F7BF0'],['Muangthai',byB.Muangthai||0,'#D65AA0'],
-    ['7-Eleven+',CA.meta.n_conv,'#E07B2F'],['Vehicle',CA.meta.n_veh,'#159b86'],['Markets',CA.meta.n_mkt,'#E0C850']];
+    ['7-Eleven+',(POIS.convenience||[]).length,'#E07B2F'],['Vehicle',(POIS.vehicle_commerce||[]).length,'#159b86'],
+    ['Markets',(POIS.fresh_market||[]).length,'#E0C850']];
   document.getElementById('strip').insertAdjacentHTML('beforeend',
     items.map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));
+}
+
+/* ---------- branch selection (drives the camera + focus ring + panels) ---------- */
+function selectBranch(b,fly){
+  if(!b)return; focal=b;
+  if(fly){deckgl.setProps({initialViewState:{longitude:b.x,latitude:b.y,zoom:12.5,pitch:55,bearing:18,transitionDuration:900}});}
+  updatePanels();render();
+  const sum=document.getElementById('cascSummary'); if(sum)sum.textContent='Rayong · '+(b.n||'branch');
+  if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
+}
+
+/* ---------- Region > Province > Branch cascade (populated from nationwide index.json; interactive for Rayong only now) ---------- */
+function buildCascade(){
+  const reg=document.getElementById('cscRegion'), prov=document.getElementById('cscProv'), br=document.getElementById('cscBranch');
+  if(!reg||!prov||!br)return;
+  const regions=IDX?[...new Set(IDX.map(p=>p.region))]:['East'];
+  // keep a sensible region order with East first (it holds Rayong)
+  regions.sort((a,b)=>(a==='East'?-1:b==='East'?1:a.localeCompare(b)));
+  reg.innerHTML=regions.map(r=>`<option value="${r}">${r}</option>`).join('');
+  reg.value='East';
+  function fillProv(){
+    const r=reg.value;
+    const list=IDX?IDX.filter(p=>p.region===r):[{slug:'rayong',th:'ระยอง',en:'Rayong'}];
+    list.sort((a,b)=>(b.branches||0)-(a.branches||0));
+    prov.innerHTML=list.map(p=>{
+      const isR=p.slug==='rayong';
+      const lbl=`${p.en||p.th} (${p.branches||0})`;
+      return `<option value="${p.slug}" ${isR?'':'disabled'}>${lbl}${isR?'':' · 3D: Rayong only'}</option>`;
+    }).join('');
+    // pick Rayong if present, else the first enabled, else first
+    if(list.some(p=>p.slug==='rayong'))prov.value='rayong';
+    fillBranch();
+  }
+  function fillBranch(){
+    // branches only available for Rayong (the loaded set). key by positional index to avoid short-name collisions.
+    if(prov.value==='rayong'){
+      br.disabled=false;
+      br.innerHTML=BR.map((b,i)=>`<option value="${i}">${b.n||('Branch '+(i+1))}${b.d?' · '+b.d:''}</option>`).join('');
+      const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
+    }else{
+      br.disabled=true;
+      br.innerHTML=`<option>— buildings: Rayong only —</option>`;
+    }
+  }
+  reg.onchange=fillProv;
+  prov.onchange=fillBranch;
+  br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
+  fillProv();
+  const note=document.getElementById('cscNote');
+  if(note)note.textContent='3D buildings: Rayong only — points & 10km rings nationwide (coming).';
+}
+
+/* ---------- POI legend (swatch + label + count) — single source of truth = POI_COLORS; click toggles the layer ---------- */
+function buildLegend(){
+  const host=document.getElementById('legend'); if(!host)return;
+  host.innerHTML=POI_TYPES.map(t=>{
+    const c=POI_COLORS[t], n=(POIS[t]||[]).length;
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+      <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
+  }).join('');
+  host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
 }
 
 /* controls */
@@ -375,15 +532,19 @@ document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
   el.classList.toggle('show');other.classList.remove('show');});
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
-buildStrip();buildLeads();updatePanels();render();
+buildStrip();buildLegend();buildCascade();buildLeads();updatePanels();render();
 }catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
 };</script>
 <script>
 (function(){
- var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading catchment…';document.body.appendChild(box);
- fetch('data/rayong_catchment.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();})
-  .then(function(d){window.CA=d;box.remove();window.initCatch();})
-  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load catchment data: '+e.message;});
+ var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading Rayong 3D…';document.body.appendChild(box);
+ // catchment = Mueang-core buildings + reachable-pop; province = 59 branches, full POI palette, district polygons; index = nationwide cascade
+ Promise.all([
+   fetch('data/rayong_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
+   fetch('data/rayong_province.json').then(function(r){if(!r.ok)throw new Error('province '+r.status);return r.json();}),
+   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.CA=a[0];window.PROV=a[1];window.PROV_INDEX=a[2];box.remove();window.initCatch();})
+  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load Rayong 3D data: '+e.message;});
 })();
 </script>
 </body>
