@@ -131,6 +131,16 @@ canvas{outline:none}
 .lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
 .lg.on b{color:var(--hi)}
 
+/* isochrone (travel-time) legend — graded band swatches above the POI legend */
+#isolegend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#isolegend .il-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#isolegend .il{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#isolegend .il .sw{width:14px;height:9px;border-radius:3px;flex:none;border:1px solid rgba(255,255,255,.25)}
+html[data-theme="light"] #isolegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #isolegend .il-ttl{color:#828CA0}
+html[data-theme="light"] #isolegend .il{color:#2C3444}
+
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
 .dtt b{color:#fff}
 .err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
@@ -223,10 +233,12 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="ctl">
-  <button data-b="voyager" class="on">Map</button>
+  <button data-b="light" class="on">Light</button>
+  <button data-b="voyager">Map</button>
   <button data-b="dark">Dark</button>
   <button data-b="satellite">Satellite</button>
   <button id="ringtog" class="on">Rings</button>
+  <button id="isotog" class="on">Isochrone</button>
 </div>
 
 <aside class="side" id="left">
@@ -264,6 +276,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </div>
 
 <div id="legendwrap">
+  <div id="isolegend" style="display:none"></div>
   <div class="lgttl">POI types <span>· tap to toggle</span></div>
   <div id="legend"></div>
 </div>
@@ -305,7 +318,8 @@ const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
 // preserve a stable legend order matching POI_COLORS keys, restricted to types actually present
 const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
-let basemap='voyager', showRings=true;
+// DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT. showIso gated on data presence.
+let basemap='light', showRings=true, showIso=true;
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -318,10 +332,12 @@ let focal=(function(){const c=CA.center||{lat:12.686,lng:101.245};
 function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
   for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
 
-// Basemap raster sources. voyager (default) + dark from CARTO; satellite = Esri World Imagery.
+// Basemap raster sources. light (CARTO Positron, the DataProteins white base + DEFAULT) +
+// voyager + dark from CARTO; satellite = Esri World Imagery.
 // NOTE Esri's template is {z}/{y}/{x} (row before column) — different from CARTO's {z}/{x}/{y}.
 // deck.gl's TileLayer resolves {x}/{y}/{z} tokens wherever they appear, so the order is respected.
-const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+            voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
             satellite:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'};
 let LIGHTING=null;
@@ -364,6 +380,9 @@ function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],min
 
 // satellite imagery reads as a dark base, so style buildings/ground with the dark palette over it.
 function darkMode(){return basemap==='dark'||basemap==='satellite';}
+// the DataProteins "white paper" look — muted-grey context buildings, ORANGE roads, selective
+// accent highlight — is reserved for the light CARTO Positron base. voyager keeps its old styling.
+function lightMode(){return basemap==='light';}
 
 // ---- OPTIONAL ground layers (future OSM pull) — render UNDER buildings; absent file => skipped silently. ----
 // These are populated by a later Overpass pull on Kaustav's Thai laptop (network-blocked in this sandbox).
@@ -478,9 +497,13 @@ function groundLayers(){
     const w=f=>W[f.cls]||3, cw=f=>CASE[f.cls]||5;
     const major=f=>f.cls==='primary'||f.cls==='secondary'||f.cls==='tertiary';
     const majors=rd.filter(major), minors=rd.filter(f=>!major(f));
-    // ribbon (fill) colour: warm light-grey asphalt in dark theme, mid-grey on light basemap
-    const fill=D?[196,204,220,245]:[140,148,164,225];
-    const casing=D?[8,12,22,240]:[80,88,104,220];
+    // ribbon (fill) colour:
+    //  - dark / satellite : warm light-grey asphalt
+    //  - light (Positron, DataProteins look) : ORANGE arterials (~#F2A65A) on a soft tan casing
+    //  - voyager : the original mid-grey
+    const L=lightMode();
+    const fill=D?[196,204,220,245]:(L?[242,166,90,250]:[140,148,164,225]);
+    const casing=D?[8,12,22,240]:(L?[214,138,72,220]:[80,88,104,220]);
     // 1) casing for majors (drawn first, sits under the fill)
     if(majors.length){
       G.push(new deck.PathLayer({id:'roads-case',data:majors,getPath:f=>f.path,
@@ -501,7 +524,8 @@ function groundLayers(){
         const dist=Math.min(1.2,Math.sqrt(dx*dx+dy*dy));
         const fade=Math.max(0.18,1-dist*0.62);                 // 1 at centre -> ~0.18 at rim
         const a=Math.round((D?185:170)*fade);
-        return D?[120,130,150,a]:[150,158,172,a];};
+        // light base: lighter orange minor streets (CARTO Positron style); else grey
+        return D?[120,130,150,a]:(L?[246,196,150,a]:[150,158,172,a]);};
       G.push(new deck.PathLayer({id:'roads-minor',data:minors,getPath:f=>f.path,
         getWidth:minorW,widthUnits:'meters',widthMinPixels:0.4,widthMaxPixels:5,
         getColor:minorCol,capRounded:true,jointRounded:true,
@@ -528,9 +552,42 @@ function groundLayers(){
   return G;
 }
 
+// Isochrone (travel-time) bands. Graded by minutes: near = warm red -> far = cool green, translucent.
+// Drawn FLAT, above the ground bed but under buildings/markers/labels. Null-guarded (file absent
+// until pull_isochrone.py runs). Bands are sorted far->near so the smaller near band paints on top.
+function isoMinutes(f){const p=(f&&f.properties)||{};
+  if(p.minutes!=null)return +p.minutes;
+  if(p.value!=null)return +p.value/60;     // ORS/GISTDA emit seconds in properties.value
+  if(p.time!=null)return +p.time/60;
+  return null;}
+function isoColor(m){
+  // 0..~20+ min ramp: warm red (near) -> amber -> teal/green (far). Translucent fills.
+  const stops=[[0,[224,71,75]],[5,[230,150,70]],[10,[224,180,60]],[15,[80,170,130]],[20,[60,150,180]]];
+  let lo=stops[0],hi=stops[stops.length-1];
+  for(let i=0;i<stops.length-1;i++){if(m>=stops[i][0]&&m<=stops[i+1][0]){lo=stops[i];hi=stops[i+1];break;}}
+  const span=(hi[0]-lo[0])||1,t=Math.max(0,Math.min(1,(m-lo[0])/span));
+  const c=lo[1].map((v,i)=>Math.round(v+(hi[1][i]-v)*t));
+  return [c[0],c[1],c[2]];}
+function isoLayers(){
+  const G=[]; const ISO=window.ISO;
+  const feats=ISO&&ISO.features&&ISO.features.length?ISO.features.slice():null;
+  if(!feats||!deck.GeoJsonLayer)return G;
+  // paint far bands first (under), near bands last (on top) so concentric rings read correctly
+  feats.sort((a,b)=>(isoMinutes(b)||0)-(isoMinutes(a)||0));
+  G.push(new deck.GeoJsonLayer({id:'isochrone',data:{type:'FeatureCollection',features:feats},
+    extruded:false,filled:true,stroked:true,
+    getFillColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],104];},
+    getLineColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],235];},
+    getLineWidth:14,lineWidthUnits:'meters',lineWidthMinPixels:2,lineWidthMaxPixels:5,
+    parameters:{depthTest:false},pickable:false,
+    updateTriggers:{getFillColor:[feats.length],getLineColor:[feats.length]}}));
+  return G;}
+
 function render(){
   // ground scaffolding first so buildings/rings/POIs draw on top of it.
   const L=[baseLayer(), ...groundLayers()];
+  // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
+  if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
   if(DISTRICTS && deck.GeoJsonLayer){
     L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
@@ -553,16 +610,45 @@ function render(){
   //     Granularity comes from: a stronger height->color ramp (deep base -> blue -> gold crown),
   //     per-type tint, a touch of deterministic per-building jitter (so a block isn't one flat slab),
   //     a height EXAGGERATION so the few tall buildings punch above the low-rise mat (skyline reads).
-  const DARK=darkMode();
+  const DARK=darkMode(), LIGHT=lightMode();
   // deterministic per-building hash in [0,1) from its centroid — gives stable variation, no Math.random churn.
   const jit=b=>{const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453;return s-Math.floor(s);};
   const TINT={residential:[96,126,206],commercial:[228,172,66],hotel:[224,150,90],
     industrial:[200,80,68],office:[140,96,228],school:[120,150,180]};
+  // ---- DataProteins selective highlight (light base only) ----
+  // KEY buildings = inside the SELECTED branch's 10km catchment ring OR in the tallest height decile;
+  // everything else renders soft light-grey, low-saturation, slightly translucent (muted context).
+  // The two accents come from the existing palette: collateral purple #7A4FE0 + accent blue #5B7CFA.
+  const PURP=[122,79,224], BLUE=[91,124,250], GREY=[206,210,218];
+  let tallThresh=Infinity;
+  if(LIGHT&&CA.buildings&&CA.buildings.length){
+    const hs=CA.buildings.map(b=>b.h||4).sort((a,b)=>a-b);
+    tallThresh=hs[Math.floor(hs.length*0.9)]||Infinity;   // 90th-pct height = tallest decile
+  }
+  // is a building inside the focal branch's 10km catchment? (cheap squared-degree test on centroid)
+  const inFocalRing=b=>{ if(!focal)return false;
+    const dy=(b.cy-focal.y)*111320, dx=(b.cx-focal.x)*111320*Math.cos(focal.y*Math.PI/180);
+    return (dx*dx+dy*dy)<=(10000*10000); };
+  const isKey=b=>LIGHT&&((b.h||4)>=tallThresh||inFocalRing(b));
   L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,
     // exaggerate height non-linearly: low-rise stays low, mid/tall get stretched so the skyline separates.
     getElevation:b=>{const h=b.h||4;return h*(h<10?1.35:h<22?1.9:2.6);},
     getFillColor:b=>{
+      // LIGHT (DataProteins) path: muted grey context, saturated accent for KEY buildings only.
+      if(LIGHT){
+        const j=(jit(b)-0.5)*14;
+        const clampL=v=>Math.max(0,Math.min(255,Math.round(v)));
+        if(isKey(b)){
+          // tall ones get the purple crown, ring-only ones the blue — both saturated, opaque.
+          const acc=((b.h||4)>=tallThresh)?PURP:BLUE;
+          // lift accent with height so taller key buildings read brighter
+          const t=Math.min(1,(b.h||4)/40), lift=t*40;
+          return [clampL(acc[0]+lift*0.2+j),clampL(acc[1]+lift*0.3+j),clampL(acc[2]+lift*0.1+j),238];
+        }
+        // muted light-grey context, slightly translucent so the white base breathes through
+        return [clampL(GREY[0]+j),clampL(GREY[1]+j),clampL(GREY[2]+j),176];
+      }
       const t=Math.pow(Math.max(0,Math.min(1,(b.h||4)/34)),0.85); // height fraction, eased
       // 3-stop ramp: deep slate base -> mid blue -> warm gold crown (strong tonal travel = visible relief)
       const lo=DARK?[34,46,72]:[170,182,210], mid=[78,116,236], hi=[232,176,72];
@@ -574,10 +660,10 @@ function render(){
       if(c){r=r*.62+c[0]*.38; g=g*.62+c[1]*.38; bl=bl*.62+c[2]*.38;}
       const clamp=v=>Math.max(0,Math.min(255,Math.round(v)));
       return [clamp(r),clamp(g),clamp(bl),DARK?236:220];},
-    stroked:true,getLineColor:DARK?[16,22,36,210]:[120,130,150,150],getLineWidth:1.4,lineWidthMinPixels:0.6,
+    stroked:true,getLineColor:LIGHT?(b=>isKey(b)?[60,40,120,180]:[176,182,194,120]):(DARK?[16,22,36,210]:[120,130,150,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
     material:{ambient:0.30,diffuse:0.92,shininess:28,specularColor:[90,100,135]},
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
-    updateTriggers:{getFillColor:[DARK],getLineColor:[DARK]}}));
+    updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh],getLineColor:[DARK,LIGHT,focal,tallThresh]}}));
   // (4) color-coded POIs — one ColumnLayer per type (short EXTRUDED hexagonal stubs, not flat dots),
   //     each toggleable; POIS items are [lat,lng] (optionally [lat,lng,name]). The little 3D pegs read
   //     as granular detail standing on the ground between the buildings. Capped short so they don't
@@ -606,23 +692,37 @@ function render(){
     getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
     getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
     updateTriggers:{getFillColor:[focal]}}));
-  // (7) only the SELECTED branch is labelled (59 labels would overwhelm the scene)
+  // (7) pill+icon labels (DataProteins look). deck.gl TextLayer backgrounds are rectangular, so the
+  //     "pill" is approximated with a soft padded white chip + a leading icon glyph; readable on light.
+  //     Only the SELECTED branch is labelled (59 labels would overwhelm the scene).
+  const onLight=lightMode();
   if(focal){
-    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>d.n||'AutoX',
-      getSize:12,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,245],background:true,
-      backgroundPadding:[6,3],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],
+      getText:d=>'◉ '+(d.n||'AutoX'),
+      getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
+      getBorderColor:[224,169,59,255],getBorderWidth:onLight?1.5:0,
+      background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],
+      fontFamily:'IBM Plex Sans Thai',fontWeight:700,
       getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
-      updateTriggers:{getText:[focal],getPosition:[focal]}}));
+      updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[onLight]}}));
   }
+  // competitor pills — brand-coloured chip + brand initial glyph; white text reads on the chip
   L.push(new deck.TextLayer({id:'comp-labels',data:COMP,getPosition:d=>[d.lng,d.lat],
-    getText:d=>(d.brand||'?').charAt(0),getSize:9,getColor:[255,255,255,255],
-    getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),235],background:true,
-    backgroundPadding:[4,2],getPixelOffset:[0,-16],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
-    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels'}));
-  L.push(new deck.TextLayer({id:'land',data:CA.landmarks||[],getPosition:d=>[d.cx,d.cy],getText:d=>d.nm,
-    getSize:10,getColor:[255,255,255,255],getBackgroundColor:[70,52,30,225],background:true,
-    backgroundPadding:[5,3],fontFamily:'IBM Plex Sans Thai',fontWeight:500,getTextAnchor:'middle',
-    characterSet:'auto',sizeUnits:'pixels',pickable:true}));
+    getText:d=>(d.brand||'?').charAt(0),getSize:9.5,getColor:[255,255,255,255],
+    getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),240],
+    getBorderColor:[255,255,255,210],getBorderWidth:onLight?1:0,
+    background:true,backgroundPadding:[5,3,5,3],getPixelOffset:[0,-16],
+    fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+    updateTriggers:{getBorderWidth:[onLight]}}));
+  // landmark pills — soft chip; light-aware so they stay legible on the white base
+  L.push(new deck.TextLayer({id:'land',data:CA.landmarks||[],getPosition:d=>[d.cx,d.cy],getText:d=>'★ '+d.nm,
+    getSize:10,getColor:onLight?[60,52,30,255]:[255,255,255,255],
+    getBackgroundColor:onLight?[255,255,255,235]:[70,52,30,225],
+    getBorderColor:[170,140,80,220],getBorderWidth:onLight?1:0,
+    background:true,backgroundPadding:[6,3,6,3],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
+    getTextAnchor:'middle',characterSet:'auto',sizeUnits:'pixels',pickable:true,
+    updateTriggers:{getColor:[onLight],getBackgroundColor:[onLight],getBorderWidth:[onLight]}}));
   deckgl.setProps({layers:L,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
@@ -845,16 +945,34 @@ function buildLegend(){
     const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
 }
 
+/* ---------- isochrone legend (graded travel-time bands) — only shown when iso data is present ---------- */
+function buildIsoLegend(){
+  const host=document.getElementById('isolegend'); if(!host)return;
+  const ISO=window.ISO, feats=ISO&&ISO.features&&ISO.features.length?ISO.features:null;
+  const isotog=document.getElementById('isotog');
+  if(!feats){host.style.display='none'; if(isotog)isotog.style.display='none'; return;}
+  if(isotog)isotog.style.display='';
+  // unique minute bands, ascending (near -> far)
+  const mins=[...new Set(feats.map(f=>isoMinutes(f)).filter(m=>m!=null))].sort((a,b)=>a-b);
+  if(!mins.length){host.style.display='none';return;}
+  host.style.display='flex';
+  host.innerHTML='<span class="il-ttl">Drive time</span>'+mins.map(m=>{
+    const c=isoColor(m);
+    return `<span class="il"><span class="sw" style="background:rgba(${c[0]},${c[1]},${c[2]},.55)"></span>${m} min</span>`;
+  }).join('');
+}
+
 /* controls */
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
   basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+document.getElementById('isotog').onclick=function(){showIso=!showIso;this.classList.toggle('on',showIso);render();};
 document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
   const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
   el.classList.toggle('show');other.classList.remove('show');});
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
-buildStrip();buildLegend();buildCascade();buildLeads();updatePanels();render();
+buildStrip();buildLegend();buildIsoLegend();buildCascade();buildLeads();updatePanels();render();
 }catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
 };</script>
 <script>
@@ -878,9 +996,10 @@ buildStrip();buildLegend();buildCascade();buildLeads();updatePanels();render();
    fetch(P+'_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    opt(P+'_province.json'),
    opt('data/provinces/index.json'),
-   opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json')
+   opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json'),
+   opt(P+'_isochrone.json')
  ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
-   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];box.remove();window.initCatch();})
+   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();
 </script>
