@@ -13,6 +13,8 @@ const LENS = {
 };
 // risk sub-metric: composite (max of the three proxies) or a single selectable score.
 let riskMetric='composite';
+// carry the current light/dark theme over to the standalone 3D/map pages
+function themeQS(){try{return '&theme='+(document.documentElement.dataset.theme==='light'?'light':'dark');}catch(e){return '';}}
 function riskVal(d){
   const a=d.a==null?0:d.a, m=d.m==null?0:d.m, c=d.c==null?0:d.c;
   return riskMetric==='a'?a : riskMetric==='m'?m : riskMetric==='c'?c : Math.max(a,m,c);
@@ -299,7 +301,7 @@ function popupHTML(d){
   return `<div class="pop" style="max-height:62vh;overflow:auto">
     <div class="pn">${d.n}</div>
     <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
-    <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}"
+    <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:#5B7CFA;color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
@@ -337,7 +339,7 @@ function renderBranchSort(){
   $('#search').oninput=()=>renderBranches();
 }
 function branchSortVal(d,k){ return k==='ind'?((d.k10&&d.k10.ind)||0) : k==='risk'?riskVal(d) : (d[k]||0); }
-function branchHref(d){return `branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}`;}
+function branchHref(d){return `branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}`;}
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q));
@@ -377,8 +379,8 @@ function drawProv(){
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
   $('#provtbl').innerHTML=`<tr><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
-   rows.map(p=>`<tr onclick="location.href='province.html?p=${p.slug}'" style="cursor:pointer">
-     <td><a href="province.html?p=${p.slug}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
+   rows.map(p=>`<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+     <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${p.branches}</td>
      <td class="mono">${p.districts}</td>
@@ -439,8 +441,8 @@ function drawMarket(){
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
   $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th class="h-opp" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th>Pickups</th><th>Pickup %</th><th title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
-     return `<tr onclick="location.href='province.html?p=${p.slug}'" style="cursor:pointer">
-     <td><a href="province.html?p=${p.slug}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
+     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" style="cursor:pointer">
+     <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${naNum(p.workers)}</td>
      <td class="mono" style="color:var(--collat)">${naNum(p.informal)}</td>
