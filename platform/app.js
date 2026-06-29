@@ -10,7 +10,7 @@ const LENS = {
 };
 const SEG_COLORS = {Crops:'#C8433B', Livestock:'#1C8C7D', Fisheries:'#1C8C7D', Forestry:'#C9A227', Collateral:'#E6B450'};
 
-let DATA=null, META=null, map=null, markers=[], curLens='opp', branchSort='o', mapReady=false;
+let DATA=null, META=null, map=null, markers=[], curLens='opp', branchSort='dwork', mapReady=false;
 let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
@@ -46,6 +46,7 @@ async function boot(){
     ]);
     DATA=b; META=m;
     $('#updated').textContent = META.updated || '';
+    try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); PLOOK=provLookupByName(); }catch(e){}
     renderOverview(); renderAcq(); renderLenses(); renderBranchSort(); renderBranches();
     showTab((location.hash||'').replace('#',''));
   }catch(err){
@@ -143,6 +144,8 @@ function addRadiusToggle(){
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
+  const pl=(typeof PLOOK!=='undefined'&&PLOOK)?PLOOK[d.v]:null;
+  const wc=regionWorstCrop(d.r);
   // within-10km radar: label, count, bar scaled to a sensible per-row max
   const radar=[
     ['Factories (OSM)',k.ind,60,'#E6B450'],['Industrial estates',k.est,5,'#E6B450'],
@@ -165,14 +168,14 @@ function popupHTML(d){
     <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:#5B7CFA;color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
-    ${sec('Segment scores')}
-    ${r('Acquisition opp.', d.o, '#E6B450')}
-    ${r('Farmer agri-PD', d.a, '#C8433B')}
-    ${r('Merchant demand', d.m, '#1C8C7D')}
-    ${r('Collateral density', d.c, '#7A4FE0')}
-    ${sec('Within 10 km (OSM)')}
-    ${radar.map(rrow).join('')}
-    ${dist}</div>`;
+    ${sec('Market — measured')}
+    ${r('District factories (DIW)', (d.dfac||0).toLocaleString(), '#E6B450')}
+    ${r('District factory workers', (d.dwork||0).toLocaleString(), '#E6B450')}
+    ${pl?r('Province pickups (DLT)', (pl.pickup||0).toLocaleString(), '#7A4FE0'):''}
+    ${pl?r('Province informal workers', (pl.informal||0).toLocaleString(), '#7A4FE0'):''}
+    ${wc?r('Region weakest crop (YoY)', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'#C8433B':'#1C8C7D'):''}
+    ${sec('Within 10 km (OSM · measured)')}
+    ${radar.map(rrow).join('')}</div>`;
 }
 function styleMarkers(){
   const l=LENS[curLens];
@@ -189,28 +192,28 @@ function setLens(k){
 
 /* ---------- branches ---------- */
 function renderBranchSort(){
-  const opts=[['o','Opportunity'],['a','Agri-PD'],['m','Merchant'],['c','Collateral'],['w','AutoX nearby']];
+  const opts=[['dwork','Factory workers'],['ind','Factories ≤10km'],['w','AutoX nearby']];
   $('#sortchips').innerHTML = opts.map(([k,t])=>`<button class="chip ${k===branchSort?'on':''}" data-s="${k}">${t}</button>`).join('');
   $('#sortchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return; branchSort=b.dataset.s;
     document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); renderBranches();};
   $('#search').oninput=()=>renderBranches();
 }
+function branchSortVal(d,k){ return k==='ind' ? ((d.k10&&d.k10.ind)||0) : (d[k]||0); }
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q));
-  rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : b[branchSort]-a[branchSort]);
+  rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
-  $('#branches').innerHTML = `<tr><th>Branch</th><th>Prov</th><th>Opp</th><th>Agri</th><th>Merch</th><th>Collat</th><th>AutoX</th></tr>`+
-    rows.map(d=>`<tr><td>${d.n}</td><td class="sub">${d.v}</td>
-      <td class="mono" style="color:#E6B450">${d.o}</td>
-      <td class="mono" style="color:#C8433B">${d.a}</td>
-      <td class="mono" style="color:#1C8C7D">${d.m}</td>
-      <td class="mono" style="color:#7A4FE0">${d.c}</td>
-      <td class="mono sub">${d.w}</td></tr>`).join('');
+  $('#branches').innerHTML = `<tr><th>Branch</th><th>Prov</th><th>Factory workers</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
+    rows.map(d=>{const pl=PLOOK[d.v]||{}; return `<tr><td>${d.n}</td><td class="sub">${d.v}</td>
+      <td class="mono" style="color:#E6B450">${(d.dwork||0).toLocaleString()}</td>
+      <td class="mono" style="color:#7A4FE0">${(pl.pickup||0).toLocaleString()}</td>
+      <td class="mono" style="color:#7A4FE0">${(pl.informal||0).toLocaleString()}</td>
+      <td class="mono sub">${d.w}</td></tr>`;}).join('');
 }
 
 /* ---------- provinces selector ---------- */
-let PROV=null, provRegion='all';
+let PROV=null, provRegion='all', PLOOK={};
 async function renderProvinces(){
   if(!PROV){
     try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); }
