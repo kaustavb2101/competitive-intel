@@ -61,9 +61,12 @@ phase_check(){
 
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
-  # every page: extract each inline <script> (that has no src) and node --check it
+  # every page: extract each inline <script> (that has no src) and node --check it.
+  # skip the _qa_*.html render temp copies (gitignored; may linger between runs) so the gate is
+  # deterministic regardless of leftover work files.
   for pg in "$PLATFORM"/*.html; do
     name="$(basename "$pg")"
+    case "$name" in _qa_*) continue;; esac
     python3 "$LIB/extract_inline_js.py" "$pg" "$WORK/inline" >/dev/null 2>&1 || { bad "extract inline JS from $name"; continue; }
     nbad=0
     for js in "$WORK/inline/$name".*.js; do

@@ -49,7 +49,7 @@ including the `?params` each needs:
 
 | id                | page + params                                  | lib     |
 |-------------------|------------------------------------------------|---------|
-| index             | `index.html`                                   | leaflet |
+| index             | `index.html` (Overview tab — no map)           | none    |
 | national          | `index.html#map` (National tab)                | leaflet |
 | branch-explorer   | `branch-explorer.html?lat=&lng=&n=` (real pt)  | webgl   |
 | province-rayong   | `province.html?p=rayong`                        | webgl   |
