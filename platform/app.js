@@ -70,6 +70,7 @@ function showTab(v){
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
   if(v==='exposure') renderExposure();
+  if(v==='sim') renderSim();
   if(v==='trend') renderTrend();
   if(v==='acq') loadAmphoe();
   window.scrollTo(0,0);
@@ -578,6 +579,173 @@ function renderExposure(){
       <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
+}
+
+/* ---------- scenario simulator (client-side what-if) ----------
+   An ILLUSTRATIVE sensitivity the exec can drive with sliders — NOT a forecast. It re-runs the
+   SAME estimated agri-stress proxy already shipped in crop_stress.json under a crop-price + rainfall
+   shock, recomputing per-province agri_stress from the published formula (so it stays consistent with
+   the rest of the site). It counts how many provinces / branches tip into "high agri-stress" (≥45/100),
+   reads collateral recovery-value DIRECTION from the gold + used-vehicle sliders, and surfaces the
+   provinces that worsen most. Deterministic. Exposure = branch footprint (no per-branch ฿ balance / LTV /
+   elasticities — all stated). Reuses crop_stress.json (lazy) + branches.json; no new data, no server. */
+const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
+const simState={price:0,rain:0,gold:0,veh:0,botcap:false};
+let simWired=false;
+// recompute one province's agri_stress (0..1) from its published components under a price/rain shock.
+// Mirrors crop_stress.json meta.formula EXACTLY so the baseline (shock=0) reproduces the shipped value.
+function simAgriStress(p,priceShock,rainShock){
+  const c=p.components||{};
+  // price_stress is a YoY %; a negative crop-price shock makes it more negative (deeper income squeeze).
+  const ps=(p.price_stress==null?0:p.price_stress)+priceShock;
+  const priceTerm=Math.max(0,Math.min(1,-ps/25));
+  // rain shock shifts rainfall as % of normal; drier (lower %) raises drought hazard.
+  const rain=(c.rain_pct_of_normal==null?100:c.rain_pct_of_normal)+rainShock;
+  const droughtTerm=Math.max(0,Math.min(1,(100-rain)/40));
+  const hazard=0.6*priceTerm+0.4*droughtTerm;
+  return hazard*(p.crop_dependence==null?0:p.crop_dependence);
+}
+// branch count per province (book proxy) — built once from DATA.
+let SIM_BRN=null;
+function simBranchByProv(){
+  if(SIM_BRN) return SIM_BRN;
+  SIM_BRN={}; (DATA||[]).forEach(d=>{const v=d.v||'—'; SIM_BRN[v]=(SIM_BRN[v]||0)+1;});
+  return SIM_BRN;
+}
+function renderSim(){
+  if(!simWired) wireSim();
+  loadCropStress().then(()=>{ if(document.getElementById('v-sim').classList.contains('on')) computeSim(); });
+}
+function wireSim(){
+  simWired=true;
+  const bind=(id,key,fmt)=>{const inp=$(id); if(!inp) return;
+    inp.oninput=()=>{simState[key]=+inp.value; const lab=$(id+'-v'); if(lab&&fmt) lab.textContent=fmt(+inp.value); computeSim();};};
+  bind('#sim-price','price',v=>(v>0?'+':'')+v+'%');
+  bind('#sim-rain','rain',v=>v===0?'normal':(v>0?'wetter +':'drier ')+v+'%');
+  bind('#sim-gold','gold',v=>(v>0?'+':'')+v+'%');
+  bind('#sim-veh','veh',v=>(v>0?'+':'')+v+'%');
+  const bot=$('#sim-botcap'); if(bot) bot.onchange=()=>{simState.botcap=bot.checked; computeSim();};
+  const rs=$('#sim-reset'); if(rs) rs.onclick=simReset;
+}
+function simReset(){
+  simState.price=0; simState.rain=0; simState.gold=0; simState.veh=0; simState.botcap=false;
+  const set=(id,v)=>{const e=$(id); if(e) e.value=v;};
+  set('#sim-price',0); set('#sim-rain',0); set('#sim-gold',0); set('#sim-veh',0);
+  const bot=$('#sim-botcap'); if(bot) bot.checked=false;
+  $('#sim-price-v')&&($('#sim-price-v').textContent='0%');
+  $('#sim-rain-v')&&($('#sim-rain-v').textContent='normal');
+  $('#sim-gold-v')&&($('#sim-gold-v').textContent='0%');
+  $('#sim-veh-v')&&($('#sim-veh-v').textContent='0%');
+  computeSim();
+}
+function computeSim(){
+  if(!$('#sim-cards')) return;
+  if(!CSTRESS_LIST||!CSTRESS_LIST.length){
+    $('#sim-cards').innerHTML='';
+    $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the what-if needs it.';
+    $('#sim-prov').innerHTML=''; renderSimCollat(); return;
+  }
+  const brn=simBranchByProv();
+  const {price,rain}=simState;
+  // baseline (shock=0) vs scenario, per province
+  let baseHiP=0, scenHiP=0, baseHiBr=0, scenHiBr=0, newBr=0;
+  const rows=CSTRESS_LIST.map(p=>{
+    const base=simAgriStress(p,0,0)*100;
+    const scen=simAgriStress(p,price,rain)*100;
+    const br=brn[p.th]||0;
+    const baseHi=base>=SIM_HI, scenHi=scen>=SIM_HI;
+    if(baseHi){baseHiP++; baseHiBr+=br;}
+    if(scenHi){scenHiP++; scenHiBr+=br;}
+    if(scenHi&&!baseHi) newBr+=br;
+    return {th:p.th,region:p.region,base,scen,delta:scen-base,br,baseHi,scenHi,isNew:scenHi&&!baseHi};
+  });
+  const N=(DATA||[]).length||1;
+  const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr;
+  const shocked=(price!==0||rain!==0);
+  // ----- summary cards -----
+  const dCol=v=>v>0?'var(--agri)':v<0?'var(--up)':'var(--mid)';
+  const sign=v=>(v>0?'+':'')+v;
+  const cards=[
+    {k:'High agri-stress provinces',v:`${scenHiP}`,
+     d:shocked?`${sign(dP)} vs base (${baseHiP})`:`baseline (${baseHiP})`,col:dCol(dP),
+     n:'Provinces with the ESTIMATED agri-stress proxy ≥45/100 under the scenario. What-if, not a forecast.'},
+    {k:'Branches in high-stress provinces',v:`${scenHiBr.toLocaleString()}`,
+     d:shocked?`${sign(dBr)} vs base (${baseHiBr.toLocaleString()})`:`baseline (${baseHiBr.toLocaleString()})`,col:dCol(dBr),
+     n:'Footprint exposure = branch count (no per-branch ฿ balance). Branch counts MEASURED; stress flag ESTIMATED.'},
+    {k:'Newly-stressed exposure',v:`${(100*newBr/N).toFixed(1)}%`,
+     d:`${newBr.toLocaleString()} branches tip in`,col:newBr>0?'var(--agri)':'var(--mid)',
+     n:'Share of all '+N.toLocaleString()+' branches that move into a newly high-stress province because of this shock.'},
+  ];
+  $('#sim-cards').innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v" style="color:${c.col}">${c.v}</div>
+    <div class="d" style="color:${c.col}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  // ----- plain-language readout (lead with the answer) -----
+  let read;
+  if(!shocked){
+    read=`<b>No crop shock set.</b> At baseline, <b>${baseHiP}</b> provinces (<b>${baseHiBr.toLocaleString()}</b> branches) sit in high agri-stress. `+
+      `Drag the crop-price or rainfall slider to see who tips in.`;
+  } else {
+    const worse=rows.filter(r=>r.isNew).sort((a,b)=>b.delta-a.delta);
+    const lead=worse[0];
+    read=`<b>Under this what-if:</b> high agri-stress provinces go from <b>${baseHiP}</b> to <b style="color:${dCol(dP)}">${scenHiP}</b> `+
+      `(${sign(dP)}), and the exposed footprint from <b>${baseHiBr.toLocaleString()}</b> to <b style="color:${dCol(dBr)}">${scenHiBr.toLocaleString()}</b> branches `+
+      `(<b>${(100*scenHiBr/N).toFixed(1)}%</b> of the network). `+
+      (lead?`<b>${worse.length}</b> province${worse.length===1?'':'s'} newly tip in — worst is <b>${lead.th}</b> (${lead.region||'—'}, +${lead.delta.toFixed(0)} pts). `:`No new province crosses the high-stress line. `);
+  }
+  if(simState.botcap) read+=`<br><span class="sub">⚑ BoT rate/fee cap flagged: a sector <b>margin</b> compression on auto/moto hire-purchase — pricing-headroom watch, not a borrower-credit signal. AutoX core is title loans, so the direct hit is limited.</span>`;
+  read+=`<br><span class="sub">ILLUSTRATIVE sensitivity — same estimated proxy, no measured elasticities / loan balances / LTV. A direction, not a number.</span>`;
+  $('#sim-readout').innerHTML=read;
+  // ----- worsening provinces table -----
+  const tbl=$('#sim-prov');
+  if(tbl){
+    if(!shocked){ tbl.innerHTML='<tr><td class="sub" style="padding:10px">Move a crop-price or rainfall slider to rank the provinces that worsen.</td></tr>'; }
+    else {
+      const worse=rows.filter(r=>r.delta>0.5).sort((a,b)=>b.delta-a.delta).slice(0,15);
+      if(!worse.length){ tbl.innerHTML='<tr><td class="sub" style="padding:10px">No province worsens materially under this shock.</td></tr>'; }
+      else {
+        const mx=Math.max(1,...worse.map(r=>r.delta));
+        tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches — measured footprint">Branches</th>`+
+          `<th class="h-agri" title="ESTIMATED agri-stress proxy before the shock (0–100)">Base ▲ est</th>`+
+          `<th class="h-agri" title="ESTIMATED agri-stress proxy under the shock (0–100)">Scenario ▲ est</th>`+
+          `<th class="h-agri" title="rise in the estimated agri-stress proxy">Δ est</th><th>Status</th></tr>`+
+          worse.map((r,i)=>{const sc=r.scen>=SIM_HI?'var(--agri)':r.scen>=25?'var(--gold)':'var(--mid)';
+            const tag=r.isNew?'<span class="mono" style="color:var(--agri)">↑ NEW high</span>':r.scenHi?'<span class="mono" style="color:var(--gold)">stays high</span>':'<span class="sub">elevated</span>';
+            return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td><td class="sub">${r.region||'—'}</td>
+            <td class="mono">${r.br}</td>
+            <td class="mono sub">${r.base.toFixed(0)}</td>
+            <td>${barHTML(r.scen,sc)} <span class="mono" style="color:${sc}">${r.scen.toFixed(0)}</span></td>
+            <td class="mono" style="color:var(--agri)">+${r.delta.toFixed(0)}</td>
+            <td>${tag}</td></tr>`;}).join('');
+      }
+    }
+  }
+  renderSimCollat();
+}
+// collateral recovery-value DIRECTION from the gold + used-vehicle sliders (illustrative, no balances).
+function renderSimCollat(){
+  const box=$('#sim-collat'); if(!box) return;
+  const {gold,veh}=simState;
+  const dir=(v,upTxt,dnTxt)=>v>0?{t:upTxt,cls:'up',col:'var(--up)',a:'▲'}:v<0?{t:dnTxt,cls:'down',col:'var(--agri)',a:'▼'}:{t:'unchanged',cls:'',col:'var(--mid)',a:'•'};
+  const g=dir(gold,'recovery value ↑','recovery value ↓');
+  const v=dir(veh,'recovery value ↓ · LGD ↑','recovery value ↑ · LGD ↓');
+  // for vehicles a NEGATIVE move is the bad case, so flip the colour logic
+  const vCol=veh<0?'var(--agri)':veh>0?'var(--up)':'var(--mid)';
+  const cards=[
+    {k:'Gold collateral',v:(gold>0?'+':'')+gold+'%',d:g.a+' '+g.t,col:g.col,
+     n:'ILLUSTRATIVE move applied to gold-backed recovery value. Baseline gold direction (measured) is +62.7% YoY on the board.'},
+    {k:'Used-vehicle collateral',v:(veh>0?'+':'')+veh+'%',d:(veh<0?'▼':veh>0?'▲':'•')+' '+v.t,col:vCol,
+     n:'ILLUSTRATIVE move on used motorcycle/pickup resale — the title-book backing. Down lowers recovery (loss-given-default rises). No LTV/balances.'},
+    {k:'Net collateral read',
+     v:(gold>=0&&veh>=0)?'firming':(gold<0&&veh<0)?'softening':'mixed',
+     d:'direction only',
+     col:(gold<0&&veh<0)?'var(--agri)':(gold>0&&veh>=0)||(gold>=0&&veh>0)?'var(--up)':'var(--mid)',
+     n:'Qualitative net of the two backings. Gold up + vehicles down = the divergence AutoX already faces. No portfolio ฿ figure — illustrative.'},
+  ];
+  box.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v" style="color:${c.col}">${c.v}</div>
+    <div class="d" style="color:${c.col}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
 }
 
 /* ---------- risk trend (time dimension, Phase 3) ----------

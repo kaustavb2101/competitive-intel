@@ -21,6 +21,7 @@
   <a data-v="trend">Risk trend</a>
   <a data-v="acq">Acquisition</a>
   <a data-v="exposure">Exposure</a>
+  <a data-v="sim">Simulator</a>
   <a data-v="provinces">Provinces</a>
   <a data-v="market">Market</a>
   <a data-v="branches">Branches</a>
@@ -201,6 +202,69 @@
     <h2 class="risk">By region</h2>
     <p class="lead">Share of each region's branches falling in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
     <table class="tbl" id="expotbl"></table>
+  </section>
+
+  <!-- SCENARIO SIMULATOR (client-side what-if) -->
+  <section class="view" id="v-sim">
+    <h2 class="risk">Scenario simulator · portfolio what-if</h2>
+    <div class="insight risk" style="border-left-color:var(--gold)">
+      <b>What this is — and is not.</b> Drag the sliders to stress the portfolio and watch how many
+      provinces and branches tip into <b>high agri-stress</b>, and which way collateral recovery value moves.
+      This is an <b>ILLUSTRATIVE sensitivity / what-if</b>, <b>not a forecast</b>. It re-runs the same
+      <b>estimated proxy scores</b> already on this site (the crop-stress index) under the shock you set —
+      it uses <b>no measured price elasticities, no loan balances, no LTV</b>. "Exposure" is counted as
+      <b>branch footprint</b> (we have no per-branch ฿ balance). Treat every number as a direction, not a number.
+    </div>
+
+    <div class="sim-grid">
+      <div class="sim-controls">
+        <div class="sim-ctl-h">Shocks <button id="sim-reset" class="chip no-print">↺ Reset</button></div>
+
+        <div class="sim-slider">
+          <label>Crop-price shock <span class="mono" id="sim-price-v">0%</span></label>
+          <input type="range" id="sim-price" min="-30" max="10" step="5" value="0">
+          <div class="sim-hint">Move global crop prices (World Bank direction proxy). Lower = farm-gate income squeeze.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Rainfall / drought <span class="mono" id="sim-rain-v">normal</span></label>
+          <input type="range" id="sim-rain" min="-30" max="20" step="5" value="0">
+          <div class="sim-hint">Shift rainfall vs normal. Drier (left) raises drought hazard on crop households.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Gold price move <span class="mono" id="sim-gold-v">0%</span></label>
+          <input type="range" id="sim-gold" min="-30" max="30" step="5" value="0">
+          <div class="sim-hint">Gold-backed collateral recovery value. Up = stronger recovery on pawn/gold loans.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
+          <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0">
+          <div class="sim-hint">Used motorcycle/pickup resale value. Down = lower recovery on the title book (LGD up).</div>
+        </div>
+
+        <div class="sim-slider">
+          <label class="sim-toggle"><input type="checkbox" id="sim-botcap"> BoT hire-purchase rate/fee cap in force</label>
+          <div class="sim-hint">Qualitative flag only — a sector <b>margin</b> watch, not a portfolio-credit signal.</div>
+        </div>
+      </div>
+
+      <div class="sim-out">
+        <div class="grid macro" id="sim-cards"></div>
+        <div class="insight" id="sim-readout" style="border-left-color:var(--gold)">Set a shock to see the impact…</div>
+      </div>
+    </div>
+
+    <h2 class="risk">Provinces that worsen most under this scenario</h2>
+    <p class="lead">Ranked by the biggest rise in the <b>estimated</b> agri-stress proxy under the shock you set.
+      <b>↑ NEW</b> = crosses into high stress (≥45/100) only because of the scenario. Branch counts are
+      <b>measured</b> (footprint); the stress index is an <b>estimated</b> what-if. Empty until you move a slider.</p>
+    <table class="tbl" id="sim-prov"></table>
+
+    <h2 class="collat">Collateral recovery-value direction</h2>
+    <p class="lead">Direction only, from the gold &amp; used-vehicle sliders — <b>illustrative</b>, no loan balances or LTV.</p>
+    <div class="grid macro" id="sim-collat"></div>
   </section>
 
   <!-- RISK TREND (time dimension) -->

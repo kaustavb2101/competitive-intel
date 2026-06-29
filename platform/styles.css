@@ -463,3 +463,20 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
   .cc-grid{grid-template-columns:1fr 1fr}
   a{color:#111!important;text-decoration:none}
 }
+
+/* ---------- scenario simulator ---------- */
+.sim-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin:10px 0 4px}
+@media(max-width:760px){.sim-grid{grid-template-columns:1fr}}
+.sim-controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.sim-ctl-h{display:flex;align-items:center;justify-content:space-between;font:600 11px var(--sans);
+  text-transform:uppercase;letter-spacing:.5px;color:var(--mid);margin-bottom:12px}
+.sim-slider{margin-bottom:16px}
+.sim-slider:last-child{margin-bottom:0}
+.sim-slider label{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font:500 12.5px var(--sans);color:var(--txt);margin-bottom:6px}
+.sim-slider label .mono{color:var(--gold);font-weight:600}
+.sim-slider input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.sim-hint{font-size:10.5px;color:var(--dim);margin-top:4px;line-height:1.45}
+.sim-toggle{cursor:pointer}
+.sim-toggle input{accent-color:var(--agri);margin-right:6px}
+.sim-out .grid.macro{margin-bottom:6px}
