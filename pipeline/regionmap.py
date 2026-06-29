@@ -34,6 +34,13 @@ ALIAS={'Lamphun':'ลำพูน','Samut Prakan':'สมุทรปราก�
 DISTRICT_PROV={'ไชโย':'อ่างทอง','ลำปลายมาศ':'บุรีรัมย์','ลำลูกกา':'ปทุมธานี',
  'ลานสัก':'อุทัยธานี','เมืองร้อยเอ็ด':'ร้อยเอ็ด'}
 
+# Explicit English-name / slug overrides for provinces whose name cannot be derived
+# from a "Mueang <prov>" amphoe (build_province.py's default heuristic). Without these
+# the province inherits an arbitrary district name: กรุงเทพมหานคร has no "Mueang" amphoe
+# so it fell back to "Bang Kapi", and พระนครศรีอยุธยา's capital amphoe is
+# "Phra Nakhon Si Ayutthaya" (not "Mueang ...") so it fell back to "Bang Sai".
+PROVINCE_EN={'กรุงเทพมหานคร':'Bangkok','พระนครศรีอยุธยา':'Ayutthaya'}
+
 def canonical(prov, district=None):
     """Fold a raw province string to its canonical Thai name (or '' if unresolved)."""
     p=(prov or '').strip()

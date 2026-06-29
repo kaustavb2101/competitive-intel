@@ -23,7 +23,7 @@ REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUTDIR = os.path.join(REPO, "platform", "data", "provinces")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION, norm_district
+from regionmap import canonical, REGION, norm_district, PROVINCE_EN
 
 # the 10 POI layers the province page expects (subset of osm_layers), output as [lat,lng]
 POI_LAYERS = ["industrial", "vehicle_commerce", "fresh_market", "gold", "bank",
@@ -184,11 +184,12 @@ def build_all():
                          "nfac": near(b["lat"], b["lng"], ind_pts), "nmkt": near(b["lat"], b["lng"], mkt_pts),
                          "nest": b.get("nearest_km"), "ncomp": None, "ncompn": None})
 
-        en = ""
-        for ft in feats:                       # province English name from its "Mueang" amphoe
-            sn = ft["properties"]["shapeName"]
-            if sn.startswith("Mueang "):
-                en = sn[len("Mueang "):]; break
+        en = PROVINCE_EN.get(prov, "")         # explicit override (BKK, Ayutthaya — no "Mueang" amphoe)
+        if not en:
+            for ft in feats:                   # province English name from its "Mueang" amphoe
+                sn = ft["properties"]["shapeName"]
+                if sn.startswith("Mueang "):
+                    en = sn[len("Mueang "):]; break
         if not en and feats:
             en = feats[0]["properties"]["shapeName"]
         slug = slugify(en) or slugify(prov)
@@ -202,13 +203,22 @@ def build_all():
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"}}
         out[slug] = obj
-        pv = veh.get(prov, {}); ev = emp.get(prov, {})
+        # null (not 0) when a province is genuinely ABSENT from the measured source —
+        # a real measured 0 in the file is preserved. Mis-ranking BKK (no NSO labour
+        # row in the release) to the bottom was the bug this guards against.
+        pv = veh.get(prov);  pv = pv if pv is not None else {}
+        ev = emp.get(prov);  ev = ev if ev is not None else {}
+        veh_present = prov in veh
+        emp_present = prov in emp
+        def _f(d, k, present):
+            return d.get(k) if present else None
         index.append({"slug": slug, "th": prov, "en": en, "region": REGION[prov],
                       "branches": len(bout), "districts": len(feats),
-                      "factories": gp["fac"], "vehicles": pv.get("total", 0),
-                      "pickup": pv.get("pickup", 0), "moto": pv.get("moto", 0), "ev": pv.get("ev", 0),
+                      "factories": gp["fac"],
+                      "vehicles": _f(pv, "total", veh_present), "pickup": _f(pv, "pickup", veh_present),
+                      "moto": _f(pv, "moto", veh_present), "ev": _f(pv, "ev", veh_present),
                       "workers": gp["workers"],
-                      "informal": ev.get("informal", 0), "formal": ev.get("formal", 0)})
+                      "informal": _f(ev, "informal", emp_present), "formal": _f(ev, "formal", emp_present)})
 
     index.sort(key=lambda r: -r["branches"])
     return out, index
