@@ -54,6 +54,34 @@ canvas{outline:none}
 .stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
 .stat .v small{color:var(--dim)}
 
+/* tags: measured vs estimated provenance (honesty is mandatory) */
+.tag{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;padding:2px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.tag.meas{background:rgba(21,155,134,.16);color:#3fc4ab;border:1px solid rgba(21,155,134,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+
+/* within-10km grouped count rows */
+.kgrp{margin-bottom:11px}
+.kgrp .gh{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 3px}
+.krow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.krow .sw{width:8px;height:8px;border-radius:50%;flex:none}
+.krow .lab{color:var(--txt);flex:1}
+.krow b{font-family:'IBM Plex Mono';color:var(--hi);font-weight:600}
+
+/* workforce measured block + occupation proxy bars */
+.wbox{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:11px 12px;margin-bottom:11px}
+.wbox .wr{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:12.5px}
+.wbox .wr .k{color:var(--mid)}
+.wbox .wr .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.wbox .wr .v small{color:var(--dim)}
+.wbox .big{font:600 23px 'IBM Plex Mono';color:var(--gold);line-height:1.1}
+.wbox .cap{font-size:11px;color:var(--mid);margin:1px 0 7px}
+.occ .or{margin:6px 0}
+.occ .ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt);margin-bottom:2px}
+.occ .ot b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+.occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
+.occ .bar i{display:block;height:100%;border-radius:4px}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+
 /* leads */
 .verdict{border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5}
 .verdict.hot{background:rgba(224,71,75,.12);border:1px solid rgba(224,71,75,.4);color:#f0b9bb}
@@ -156,6 +184,15 @@ html[data-theme="light"] .reach .lab{color:#2C3444}
 html[data-theme="light"] .reach .r b,html[data-theme="light"] .foot{color:#11151F}
 html[data-theme="light"] .foot{color:#828CA0}
 html[data-theme="light"] .stat,html[data-theme="light"] .lead,html[data-theme="light"] .reco{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow .lab{color:#2C3444}
+html[data-theme="light"] .krow b,html[data-theme="light"] .kgrp .gh{color:#11151F}
+html[data-theme="light"] .wbox{background:#F5F8FD;border-color:#D3DAE6}
+html[data-theme="light"] .wbox .big{color:#B8862B}
+html[data-theme="light"] .wbox .wr .k{color:#5A6477}
+html[data-theme="light"] .wbox .wr .v{color:#11151F}
+html[data-theme="light"] .occ .ot{color:#2C3444}
+html[data-theme="light"] .occ .bar{background:#E4E8F1}
 html[data-theme="light"] #ctl{background:rgba(255,255,255,.92);border-color:#D3DAE6}
 html[data-theme="light"] #ctl button{color:#828CA0}
 html[data-theme="light"] #ctl button.on{background:#e7edf8;color:#11151F}
@@ -201,16 +238,10 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="cscnote" id="cscNote"></div>
   </div>
   <div class="scroll">
-    <div class="reach">
-      <div class="big" id="reach15">—</div>
-      <div class="cap">people reachable · 15-min walk</div>
-      <div class="r"><span class="sw" style="background:#3FB57E"></span><span class="lab">5 min · 400 m</span><b id="reach5">—</b></div>
-      <div class="r"><span class="sw" style="background:#E0A93B"></span><span class="lab">10 min · 800 m</span><b id="reach10">—</b></div>
-      <div class="r"><span class="sw" style="background:#E0474B"></span><span class="lab">15 min · 1.2 km</span><b id="reach15b">—</b></div>
-      <div class="foot" id="reachFoot"></div>
-    </div>
-    <h2 style="padding:0 0 6px">Catchment context</h2>
-    <div id="ctx"></div>
+    <h2 style="padding:0 0 6px">Within 10km <span class="tag meas">measured · OSM</span></h2>
+    <div id="k10panel"></div>
+    <h2 style="padding:14px 0 6px">Who works nearby</h2>
+    <div id="workpanel"></div>
   </div>
 </aside>
 
@@ -248,7 +279,6 @@ const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:CA.compe
 const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:CA.poi;
 const DISTRICTS=PROV.districts||null;
 const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47]};
-const RINGS=[400,800,1200], RCOL=[[63,181,126],[224,169,59],[224,71,75]]; // walk reach (green/amber/red)
 const GOLD=[230,180,80]; // 10km collateral catchment ring
 // canonical type->color map: single source of truth for map dots AND legend AND toggles
 const POI_COLORS={
@@ -273,10 +303,6 @@ let focal=(function(){const c=CA.center||{lat:12.686,lng:101.245};
   let best=BR[0],bd=Infinity;for(const b of BR){const d=hav(c.lat,c.lng,b.y,b.x);if(d<bd){bd=d;best=b;}}return best;})();
 function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
   for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
-function reachable(lat,lng){const acc=[0,0,0];
-  for(const b of CA.buildings){const d=hav(lat,lng,b.cy,b.cx);
-    for(let i=0;i<3;i++)if(d<=RINGS[i])acc[i]+=b.fa;}
-  return acc.map(fa=>Math.round(fa*CA.occ));}
 
 const TILE={voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
@@ -298,6 +324,9 @@ const deckgl=new deck.DeckGL({container:'map',
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||'Rayong'} · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
     if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};
     if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
+    if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
+      const nm=Array.isArray(object)?object[2]:null;
+      return {html:`<div class="dtt"><b>${POI_LABEL[t]||t}</b>${nm?'<br>'+nm:''}<br><span style="color:#8a94a8">OSM point · within view</span></div>`};}
     return null;}});
 
 function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
@@ -340,20 +369,13 @@ function render(){
     stroked:true,getLineColor:darkMode()?[55,72,108,190]:[120,130,150,150],getLineWidth:1.6,lineWidthMinPixels:0.7,
     material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false}));
-  // (3) walk-reach rings (400/800/1200m) around the selected branch — distinct from the gold 10km ring
-  if(showRings && focal){
-    L.push(new deck.PolygonLayer({id:'walk',data:[2,1,0].map(i=>({i,poly:circle(focal.y,focal.x,RINGS[i])})),
-      getPolygon:d=>d.poly,extruded:false,stroked:true,filled:true,
-      getFillColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],26],
-      getLineColor:d=>[RCOL[d.i][0],RCOL[d.i][1],RCOL[d.i][2],200],getLineWidthMinPixels:1.4,pickable:false,
-      updateTriggers:{getPolygon:[focal]}}));
-  }
-  // (4) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng]
+  // (4) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng].
+  //     pickable so a click reveals the POI's type (and name if available); buildings stay scenery.
   POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
     const c=POI_COLORS[t];
     L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
       getRadius:60,radiusMinPixels:2,radiusMaxPixels:6,getFillColor:[c[0],c[1],c[2],225],
-      stroked:false,pickable:false}));
+      stroked:false,pickable:true,_poiType:t}));
   });
   // (5) competitors
   L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
@@ -388,33 +410,96 @@ function render(){
 /* ---------- panels ---------- */
 function fmt(n){return n.toLocaleString();}
 function poiArr(t){return (POIS[t]&&POIS[t].length)?POIS[t]:[];}
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+
+// province workforce (MEASURED, NSO via gov.employment) — informal share is the core title-loan base
+const EMP=(PROV.gov&&PROV.gov.employment)||null;
+// district DIW factory-worker count (MEASURED, DIW) from the district polygons (real_workers)
+function districtWorkers(d){
+  if(!DISTRICTS||!DISTRICTS.features)return null;
+  const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
+  return f&&f.properties.real_workers!=null?f.properties.real_workers:null;
+}
+
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM).
+const K10_GROUPS=[
+  ['Collateral & finance',[
+    ['veh','Auto / vehicle shops','vehicle_commerce'],
+    ['gold','Gold dealers','gold'],
+    [['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[
+    ['fmkt','Fresh markets','fresh_market'],
+    ['super','Supermarkets','supermarket'],
+    ['cvs','Convenience','convenience'],
+    ['rest','Restaurants','restaurant']]],
+  ['Industry & services',[
+    ['ind','Factories','industrial'],
+    ['hotel','Hotels','hotel'],
+    ['sch','Schools','school'],
+    ['pharm','Pharmacies','pharmacy']]],
+];
+// establishment-mix → occupation proxy (ESTIMATED). keys sum k10 fields; color borrows the POI palette.
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
+
 function updatePanels(){
-  const r=reachable(focal.y,focal.x);
   const dist=focal.d||CA.meta.dist;
-  const inCore=r[2]>0; // buildings (and therefore the reachable estimate) only exist for the Mueang core
+  const k=focal.k10||null;
   document.getElementById('focalName').textContent=focal.n||'AutoX branch';
   document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${focal.veh!=null?focal.veh:'—'}`;
-  document.getElementById('reach15').textContent=inCore?fmt(r[2]):'—';
-  document.getElementById('reach5').textContent=inCore?fmt(r[0]):'—';
-  document.getElementById('reach10').textContent=inCore?fmt(r[1]):'—';
-  document.getElementById('reach15b').textContent=inCore?fmt(r[2]):'—';
-  document.getElementById('reachFoot').textContent=inCore
-    ?'Dasymetric estimate: OSM building floor-area within each walk radius × local occupancy (~1 person / 45 m²). Not a street-network isochrone.'
-    :'Reachable-population is only measured for the Mueang Rayong core (the 3D building footprints). Select a Mueang-core branch for the walk estimate.';
-  // competitor & own within 1.2km (province-wide sets)
-  const cNear=COMP.filter(c=>hav(focal.y,focal.x,c.lat,c.lng)<=1200).length;
-  const bNear=BR.filter(b=>b!==focal&&hav(focal.y,focal.x,b.y,b.x)<=1200).length;
-  const convNear=poiArr('convenience').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
-  const vehNear=poiArr('vehicle_commerce').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
-  const goldNear=poiArr('gold').filter(p=>hav(focal.y,focal.x,p[0],p[1])<=1200).length;
-  document.getElementById('ctx').innerHTML=[
-    ['Competitors ≤1.2km',`${cNear} <small>vs ${bNear} AutoX</small>`],
-    ['Convenience stores',`${convNear} <small>≤1.2km</small>`],
-    ['Vehicle shops ≤1.2km',`${vehNear} <small>collateral supply</small>`],
-    ['Gold dealers ≤1.2km',`${goldNear} <small>pawn competition</small>`],
-    ['District',`${dist}`],
-    ['Buildings mapped',`${fmt(CA.buildings.length)} <small>Mueang core</small>`],
-  ].map(([k,v])=>`<div class="stat"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+
+  // (C) "Within 10km of <branch>" — measured counts, grouped for a lender
+  const k10host=document.getElementById('k10panel');
+  if(!k){
+    k10host.innerHTML='<div class="foot">Select an AutoX branch from the cascade or map to see its measured 10km surroundings.</div>';
+  }else{
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    k10host.innerHTML=K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(([key,lab,col])=>{
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('')
+      +`<div class="foot">Counts are establishments mapped in OpenStreetMap within a 10 km radius of this branch — measured, not estimated.</div>`;
+  }
+
+  // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
+  const whost=document.getElementById('workpanel');
+  let html='';
+  if(EMP){
+    const inf=EMP.informal||0, frm=EMP.formal||0, tot=inf+frm;
+    const share=tot?Math.round(inf/tot*100):0;
+    html+='<div class="wbox">'
+      +`<div class="big">${share}%</div><div class="cap">of Rayong workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+      +`<div class="wr"><span class="k">Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+      +`<div class="wr"><span class="k">Formal workers</span><span class="v">${fmt(frm)}</span></div>`;
+    const dw=districtWorkers(dist);
+    if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
+    html+='</div>';
+  }
+  // occupation mix — ESTIMATED proxy from k10 establishment counts (no fabricated headcounts)
+  if(k){
+    const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/tot*100);
+        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
+  }
+  whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
 }
 
 function buildLeads(){
@@ -429,12 +514,13 @@ function buildLeads(){
   document.getElementById('verdict').innerHTML=
     `<div class="verdict hot">Contested ground — <b>${COMP.length} competitor branches</b> vs <b>${BR.length} AutoX</b> (${ratio}:1) across Rayong. Srisawad &amp; Tidlor own the Thapma–Choeng Noen corridor; AutoX is thin in the urban centre while strong on the factory edge.</div>`;
   document.getElementById('leads').innerHTML=picked.map((g,i)=>{
-    const r=reachable(g.c.lat,g.c.lng);
-    const reachTxt=r[2]>0?`~${fmt(r[2])} reachable in 15 min.`:'outside the mapped Mueang core.';
+    // vehicle shops + gold dealers within 2km = collateral supply at the contested point (measured OSM)
+    const vNear=poiArr('vehicle_commerce').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
+    const gNear=poiArr('gold').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
     return `<div class="lead" data-lat="${g.c.lat}" data-lng="${g.c.lng}">
       <div class="rank">${i+1}</div><div class="body">
       <div class="t">${g.c.name.replace(/^[^ ]+ /,'')} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
-      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km. ${reachTxt}</div>
+      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km. ${vNear} vehicle shops · ${gNear} gold dealers ≤2km.</div>
       </div></div>`;}).join('');
   document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
     const lat=+el.dataset.lat,lng=+el.dataset.lng;
@@ -444,9 +530,9 @@ function buildLeads(){
   });
   const nVeh=(POIS.vehicle_commerce||[]).length, nGold=(POIS.gold||[]).length;
   document.getElementById('recos').innerHTML=[
-    ['1','Infill the Thapma–Choeng Noen corridor: it carries the highest reachable population and the densest competitor stack, but few AutoX points. A single well-placed branch contests 4–5 rivals at once.'],
+    ['1','Infill the Thapma–Choeng Noen corridor: it carries the densest competitor stack and the most commerce in-frame, but few AutoX points. A single well-placed branch contests 4–5 rivals at once.'],
     ['2','Lead with vehicle-title + gold collateral here — '+nVeh+' vehicle shops and '+nGold+' gold dealers in-frame mean strong collateral supply and pawn competition. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
-    ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core selectively where reachable population > 8k and no AutoX within 1 km.'],
+    ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core selectively where commerce is dense and no AutoX sits within 1 km.'],
   ].map(([n,t])=>`<div class="reco"><span class="n">${n}</span><span>${t}</span></div>`).join('');
 }
 

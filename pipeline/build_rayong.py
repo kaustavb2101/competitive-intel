@@ -38,6 +38,13 @@ def hav(la1, lo1, la2, lo2):
     return 2 * R * math.asin(math.sqrt(a))
 
 
+# full within-10km POI counts per branch (short key -> master field) — sourced the
+# same way derive.py / build_province.py build k10. Measured (OSM, within 10km).
+K10 = {"ind": "ind10", "bank": "bank10", "atm": "atm10", "cvs": "cvs10", "hotel": "hotel10",
+       "civic": "civic10", "fmkt": "fmkt10", "rest": "rest10", "super": "super10",
+       "pharm": "pharm10", "gold": "gold10", "veh": "veh10", "sch": "sch10", "est": "n_estate10"}
+
+
 def short(name):
     """Strip the chain prefix to the branch's distinguishing label."""
     s = name
@@ -77,6 +84,7 @@ def build():
             "nfac": nearest(b["lat"], b["lng"], ind), "nmkt": nearest(b["lat"], b["lng"], mkt),
             "nest": b.get("nearest_km"), "ncomp": round(nc[0], 1) if nc[0] is not None else None,
             "ncompn": nc[1],
+            "k10": {sk: b.get(mk, 0) for sk, mk in K10.items()},
         })
 
     # per-district rollups: recompute numbers, carry geometry/labels/centroid/estate count
