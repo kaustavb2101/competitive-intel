@@ -55,6 +55,35 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui
 
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
 .dtt b{color:#fff}
+/* grouped within-10km establishments + occupation proxy (mirrors rayong-catchment) */
+.kgrp{margin:0 0 8px}
+.kgrp .gh{font:700 10.5px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 3px}
+.krow{display:flex;align-items:center;gap:7px;font-size:12px;padding:2px 0;color:var(--txt)}
+.krow .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.krow .lab{flex:1}
+.krow b{font-family:'IBM Plex Mono';font-size:12px}
+.tag{display:inline-block;font:600 9px 'IBM Plex Mono';padding:1px 5px;border-radius:4px;vertical-align:middle;letter-spacing:.3px}
+.tag.meas{background:rgba(28,140,125,.16);color:#46c8b2;border:1px solid rgba(28,140,125,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+.wbox{background:rgba(91,124,250,.07);border:1px solid rgba(91,124,250,.22);border-radius:9px;padding:9px 10px;margin:4px 0 8px}
+.wbox .big{font:800 26px 'IBM Plex Mono';color:var(--hi);line-height:1}
+.wbox .cap{font-size:10.5px;color:var(--mid);line-height:1.4;margin:3px 0 7px}
+.wbox .wr{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0;color:var(--txt)}
+.wbox .wr .v{font-family:'IBM Plex Mono'}
+.occ{margin:2px 0 0}
+.or{margin:0 0 5px}
+.ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt)}
+.ot b{font-family:'IBM Plex Mono';color:var(--hi)}
+.occ .bar{display:block;width:100%;height:5px;border-radius:3px;background:#1a2336;overflow:hidden;margin-top:2px}
+.occ .bar i{display:block;height:100%}
+html[data-theme="light"] .kgrp .gh{color:#5A6477}
+html[data-theme="light"] .krow{color:#2C3444}
+html[data-theme="light"] .wbox{background:rgba(91,124,250,.06);border-color:rgba(91,124,250,.25)}
+html[data-theme="light"] .wbox .big{color:#11151F}
+html[data-theme="light"] .wbox .cap{color:#5A6477}
+html[data-theme="light"] .ot{color:#2C3444}
+html[data-theme="light"] .ot b{color:#11151F}
+html[data-theme="light"] .occ .bar{background:#e3e8f1}
 /* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
 html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
 html[data-theme="light"] #nav .nb{color:#11151F}
@@ -103,7 +132,45 @@ const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
 const TILE = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 const MIRRORS = ['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
 let showRing = true, branchRec = null, buildings = [];
+let provRec = null;     // matched province row (informal/formal), if derivable
 const tileCache = {};   // bbox-keyed building cache so panning doesn't refetch
+const poiTileCache = {};// bbox-keyed POI cache
+let pois = [];          // live OSM POIs in view, {x,y,t} — empty when Overpass blocked
+
+/* ---- shared palette / groupings (same source-of-truth as rayong-catchment) ---- */
+const POI_COLORS={
+  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
+  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
+  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
+const POI_LABEL={vehicle_commerce:'Vehicle shop',gold:'Gold dealer',bank:'Bank / ATM',convenience:'Convenience',
+  fresh_market:'Fresh market',supermarket:'Supermarket',industrial:'Industrial',pharmacy:'Pharmacy',
+  restaurant:'Restaurant',hotel:'Hotel',school:'School'};
+// k10 key -> POI palette key (for swatch colour parity with the live markers)
+const K10_COL={veh:'vehicle_commerce',gold:'gold',bank:'bank',atm:'bank',fmkt:'fresh_market',
+  super:'supermarket',cvs:'convenience',rest:'restaurant',ind:'industrial',hotel:'hotel',
+  sch:'school',pharm:'pharmacy',civic:'school'};
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM).
+const K10_GROUPS=[
+  ['Collateral & finance',[['veh','Auto / vehicle shops'],['gold','Gold dealers'],[['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[['fmkt','Fresh markets'],['super','Supermarkets'],['cvs','Convenience'],['rest','Restaurants']]],
+  ['Industry & services',[['ind','Factories'],['hotel','Hotels'],['sch','Schools'],['pharm','Pharmacies']]],
+];
+// establishment-mix -> occupation proxy (ESTIMATED), same mapping as rayong-catchment
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+function poiColumnHeight(t){ // visible 3D column heights for the live markers (metres)
+  if(t==='industrial')return 90; if(t==='hotel')return 75; if(/gold|bank/.test(t))return 60;
+  if(/super|fresh_market/.test(t))return 45; return 38; }
 
 const $ = s => document.querySelector(s);
 function status(t, err){ const s=$('#status'); s.textContent=t; s.className=err?'err':''; s.style.display=t?'block':'none'; }
@@ -171,6 +238,17 @@ function layers(){
     material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
     parameters:{depthTest:true},transitions:{getElevation:600},
     _shadow:true,pickable:true}));
+  // live POI markers as 3D columns coloured by type — only when Overpass returned data
+  if(pois.length && deck.ColumnLayer){
+    L.push(new deck.ColumnLayer({id:'poi',data:pois,diskResolution:6,radius:36,
+      extruded:true,elevationScale:1,
+      getPosition:p=>[p.x,p.y],
+      getElevation:p=>poiColumnHeight(p.t),
+      getFillColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [c[0],c[1],c[2],235];},
+      stroked:false,
+      material:{ambient:0.4,diffuse:0.8,shininess:30,specularColor:[80,90,120]},
+      parameters:{depthTest:true},pickable:true}));
+  }
   if(showRing && !isNaN(LAT)){
     L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
       getPolygon:d=>d.poly,extruded:false,stroked:true,filled:false,
@@ -231,34 +309,119 @@ async function loadBuildings(){
   }
 }
 
-/* ---- branch radar panel (from branches.json) ---- */
-function barHTML(v,col,mx){return `<span class="bar"><i style="width:${Math.round(54*Math.min(v||0,mx)/mx)}px;background:${col}"></i></span>`;}
+/* ---- live OSM POI fetch (graceful: blocked Overpass -> pois stays []) ---- */
+// classify an OSM element's tags into one of our POI_COLORS keys, else null (skip)
+function poiType(t){
+  if(!t)return null;
+  if(t.shop==='car_repair'||t.shop==='car'||t.shop==='motorcycle'||t.shop==='tyres')return 'vehicle_commerce';
+  if(t.shop==='gold'||t.shop==='jewelry'||t.craft==='goldsmith')return 'gold';
+  if(t.amenity==='bank'||t.amenity==='atm'||t.office==='financial')return 'bank';
+  if(t.shop==='convenience')return 'convenience';
+  if(t.amenity==='marketplace'||t.shop==='greengrocer')return 'fresh_market';
+  if(t.shop==='supermarket'||t.shop==='department_store'||t.shop==='mall')return 'supermarket';
+  if(t.man_made==='works'||t.building==='industrial'||t.landuse==='industrial'||t.industrial)return 'industrial';
+  if(t.amenity==='pharmacy'||t.shop==='chemist')return 'pharmacy';
+  if(t.amenity==='restaurant'||t.amenity==='fast_food'||t.amenity==='cafe')return 'restaurant';
+  if(t.tourism==='hotel'||t.tourism==='motel'||t.tourism==='guest_house')return 'hotel';
+  if(t.amenity==='school'||t.amenity==='college'||t.amenity==='university')return 'school';
+  return null;
+}
+async function loadPOIs(){
+  if(isNaN(LAT)) return;
+  const b=viewBounds(); const W=b[0],S=b[1],E=b[2],N=b[3];
+  if((N-S)>0.08 || (E-W)>0.08){ return; }     // same area guard as buildings
+  const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');
+  if(poiTileCache[ckey]){ pois=poiTileCache[ckey]; render(); return; }
+  const q=`[out:json][timeout:25];(`
+    +`nwr["shop"~"car_repair|car|motorcycle|tyres|gold|jewelry|convenience|supermarket|department_store|mall|greengrocer|chemist"](${S},${W},${N},${E});`
+    +`nwr["amenity"~"bank|atm|marketplace|pharmacy|restaurant|fast_food|cafe|school|college|university"](${S},${W},${N},${E});`
+    +`nwr["tourism"~"hotel|motel|guest_house"](${S},${W},${N},${E});`
+    +`);out center 4000;`;
+  try{
+    const d=await overpass(q);
+    const out=[];
+    for(const el of (d.elements||[])){
+      const t=poiType(el.tags||{}); if(!t)continue;
+      const x=el.lon!=null?el.lon:(el.center&&el.center.lon), y=el.lat!=null?el.lat:(el.center&&el.center.lat);
+      if(x==null||y==null)continue;
+      out.push({x,y,t});
+    }
+    pois=out; poiTileCache[ckey]=out; render();
+  }catch(e){ /* Overpass blocked: leave pois=[]; scene still draws buildings/rings/branch */ }
+}
+
+/* ---- branch panel (from branches.json, offline) ---- */
+// match the focal branch's province row in provinces/index.json for informal/formal (measured · NSO)
+async function matchProvince(prov){
+  if(!prov) return null;
+  try{
+    const idx=await fetch('data/provinces/index.json').then(r=>r.json());
+    return idx.find(p=>p.th===prov || p.en===prov) || null;
+  }catch(e){ return null; }
+}
 async function loadPanel(){
   try{
     const data=await fetch('data/branches.json').then(r=>r.json());
-    // nearest branch to the given coords
-    let best=null,bd=1e9;
-    for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}}
+    // focal branch: ?n name match wins, else nearest to lat/lng (x=lng, y=lat)
+    let best=null;
+    if(NM && NM!=='Branch'){ best=data.find(d=>d.n===NM) || null; }
+    if(!best){ let bd=1e9; for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}} }
     branchRec=best;
     if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
+    // re-centre on the matched branch so the scene and panel agree
+    if(deckgl && !isNaN(best.x) && !isNaN(best.y)){
+      deckgl.setProps({initialViewState:Object.assign({},INITIAL,{longitude:best.x,latitude:best.y})});
+    }
+    $('#bnm').textContent = best.n || NM;
     $('#bsub').textContent = `${best.v}${best.d?' · '+best.d:''} · ${best.r}`;
     const k=best.k10||{};
-    const radar=[
-      ['Factories (OSM)',k.ind,60,'#E6B450'],['Vehicle/moto shops',k.veh,40,'#7A4FE0'],
-      ['Gold shops',k.gold,15,'#7A4FE0'],['Banks',k.bank,40,'#5B7CFA'],['ATMs',k.atm,60,'#5B7CFA'],
-      ['Convenience',k.cvs,80,'#1C8C7D'],['Fresh markets',k.fmkt,15,'#1C8C7D'],['Restaurants',k.rest,80,'#1C8C7D'],
-      ['Schools',k.sch,40,'#8b90a7'],['Hospitals/gov',k.civic,30,'#8b90a7'],
-    ];
-    const rr=([lab,v,mx,c])=>`<div class="pr"><span>${lab}</span>${barHTML(v,c,mx)}<b style="color:${c}">${v||0}</b></div>`;
-    const sc=(lab,v,c)=>`<div class="pr"><span>${lab}</span><b style="color:${c}">${v}</b></div>`;
+    provRec=await matchProvince(best.v);
+
+    // (1) Within 10km — grouped, every count measured OSM (k10)
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    const k10html=K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(row=>{
+        const key=row[0],lab=row[1];
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const col=row[2]||(Array.isArray(key)?K10_COL[key[0]]:K10_COL[key])||'';
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('');
+
+    // (2) Who works nearby — province informal share (measured) + occupation proxy (estimated)
+    let workhtml='';
+    if(provRec && provRec.informal!=null && provRec.formal!=null){
+      const inf=provRec.informal||0, frm=provRec.formal||0, tot=inf+frm, share=tot?Math.round(inf/tot*100):0;
+      workhtml+='<div class="wbox">'
+        +`<div class="big">${share}%</div>`
+        +`<div class="cap">of ${provRec.en} workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+        +`<div class="wr"><span>Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+        +`<div class="wr"><span>Formal workers</span><span class="v">${fmt(frm)}</span></div>`
+        +'</div>';
+    }
+    const occRows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const occTot=occRows.reduce((a,r)=>a+r.v,0)||1, occMx=occRows.length?occRows[0].v:1;
+    workhtml+=`<h3 style="margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h3>`
+      +`<div class="occ">`+occRows.map(r=>{
+        const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/occTot*100);
+        return `<div class="or"><div class="ot"><span>${r.lab}</span><b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/occMx*100))}%;background:${rgb(c)}"></i></div></div>`;
+      }).join('')+`</div>`;
+
     $('#panel').innerHTML =
       `<h3>${best.n}</h3>
        <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
        <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
        <h3>District workforce (DIW · measured)</h3>
-       ${sc('Factories',fmt(best.dfac),'#E6B450')}${sc('Factory workers',fmt(best.dwork),'#E6B450')}
-       <h3>Within 10 km (OSM · measured)</h3>${radar.map(rr).join('')}
-       <div class="note">3D buildings = live OpenStreetMap footprints (measured). Building heights are estimated from type + footprint area (OSM rarely tags height in Thailand). Rings = 3 / 5 / 10 km. Within-10km counts measured (OSM); district factories/workers measured (DIW).</div>`;
+       <div class="pr"><span>Factories</span><b style="color:#E6B450">${fmt(best.dfac)}</b></div>
+       <div class="pr"><span>Factory workers</span><b style="color:#E6B450">${fmt(best.dwork)}</b></div>
+       <h3>Within 10 km of ${best.n} <span class="tag meas">measured · OSM</span></h3>
+       ${k10html}
+       <div class="note">Establishments mapped in OpenStreetMap within 10 km of this branch — measured, not estimated.</div>
+       <h3>Who works nearby</h3>
+       ${workhtml}
+       <div class="note">Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Informal/formal split is province-level (NSO, measured). 3D buildings + coloured POI columns = live OpenStreetMap (measured) when reachable; building heights estimated from type + footprint. Rings = 3 / 5 / 10 km.</div>`;
   }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
 }
 
@@ -270,11 +433,12 @@ function init(){
     getTooltip:({object,layer})=>{
       if(!object)return null;
       if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · est. from footprint</div>`};
+      if(layer&&layer.id==='poi'){const lab=(POI_LABEL[object.t]||object.t);return {html:`<div class="dtt"><b>${lab}</b><br>live OSM POI · measured</div>`};}
       return null;},
-    onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(loadBuildings,650); }});
+    onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(()=>{loadBuildings();loadPOIs();},650); }});
   $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
-  $('#t-reload').onclick=loadBuildings;
-  loadPanel(); loadBuildings();
+  $('#t-reload').onclick=()=>{ loadBuildings(); loadPOIs(); };
+  loadPanel(); loadBuildings(); loadPOIs();
 }
 init();
 </script>
