@@ -60,6 +60,23 @@ function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Ma
 // honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
 function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
 
+// MOBILE: wrap every wide data table in a horizontal-scroll container so a many-column .tbl
+// can never push the whole page sideways on a phone. The <table> nodes persist (only their
+// innerHTML is replaced on re-render), so wrapping each once at boot is enough and stays
+// deterministic. Idempotent — skips tables already inside a .tblwrap.
+function wrapTables(){
+  document.querySelectorAll('table.tbl').forEach(t=>{
+    if(t.parentElement&&t.parentElement.classList.contains('tblwrap')) return;
+    const w=document.createElement('div'); w.className='tblwrap';
+    // a11y: a horizontally-scrollable region must be keyboard-reachable + labelled so a
+    // keyboard / screen-reader user can pan a wide table (WCAG 2.1.1 / scrollable-region-focusable).
+    w.setAttribute('role','region');
+    w.setAttribute('tabindex','0');
+    w.setAttribute('aria-label','Scrollable data table');
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  });
+}
+
 /* ---------- tabs ---------- */
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
@@ -114,6 +131,7 @@ async function boot(){
       fetch('data/meta.json').then(r=>r.json())
     ]);
     DATA=b; META=m;
+    wrapTables();
     $('#updated').textContent = META.updated || '';
     try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); PLOOK=provLookupByName(); }catch(e){}
     renderOverview(); renderAcq(); renderLenses(); renderBranchSort(); renderBranches();

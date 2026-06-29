@@ -238,7 +238,10 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .verdict b{color:var(--hi)}
 
 /* ---------- tables: raised card, zebra, right-aligned numerics, glowing bars ---------- */
-.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r)}
+/* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
+   instead of pushing the whole page sideways. app.js wraps every table.tbl in one at boot. */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
+  overscroll-behavior-x:contain}
 .tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--elev-1)}
 .tbl th{text-align:left;color:var(--mid);font-weight:600;font-size:10.5px;text-transform:uppercase;
@@ -373,11 +376,24 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
   .brand .sub{display:none}
   .grid{gap:var(--s2)}
   .tbl{font-size:12px}.tbl th,.tbl td{padding:9px 7px}
+  /* PHONE: a wrapped table keeps its natural column widths and scrolls inside .tblwrap,
+     so it never widens the page. min-width:100% keeps a narrow table flush to the card. */
+  .tblwrap>.tbl{width:max-content;min-width:100%;box-shadow:none}
+  .tblwrap{border:1px solid var(--line);box-shadow:var(--elev-1)}
   /* lens switcher → compact scroll strip; hide descriptions */
   .lenses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   .lens{min-width:auto;padding:8px 11px}
   .lens .ld{display:none}
   .mcard,.lens{box-shadow:var(--elev-1)}
+  /* PHONE tap targets ≥40px (WCAG 2.5.5): chips, jump-nav, nav links, theme toggle, stars */
+  .chip,.jumpnav .chip{padding:9px 14px;min-height:40px;display:inline-flex;align-items:center}
+  #nav a{padding:10px 12px;min-height:40px;display:inline-flex;align-items:center}
+  #themeToggle{width:40px!important;height:38px!important}
+  .cc-star{padding:6px 8px;font-size:16px}
+  .cc-link{padding:4px 2px;min-height:32px;display:inline-flex;align-items:center}
+  /* command-center header: stack the action buttons full-width so they don't crowd the title */
+  .cc-actions{width:100%}
+  .cc-actions .chip{flex:1;justify-content:center}
 }
 
 /* ============================================================
