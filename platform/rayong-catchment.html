@@ -354,28 +354,149 @@ function darkMode(){return basemap==='dark';}
 //  data/rayong_landuse.json ->  { "landuse": [ { "polygon": [[lng,lat],...], "kind": "park" }, ... ] }
 //      polygon : closed ring of [lng,lat]. kind (optional): park|forest|grass|recreation (all tint green).
 //      Rendered FLAT at ground (extruded:false).
+// Build the "full city" ground bed beneath the extruded buildings: soft-tinted landuse,
+// flat water with a darker shoreline, then roads drawn as casing + fill (a thin dark outline
+// under a brighter ribbon) so arterials read like lit asphalt — the DataProteins look.
+// All FLAT (extruded:false) and null-guarded: any missing file just drops that layer silently.
+// Scene extent (lng/lat bbox + centre) derived once from the building cluster, with margin.
+// Used to lay a continuous ground-bed plane + a radial vignette so the scene has a unified,
+// cinematic floor even where the (blocked-in-headless) basemap tiles are blank. Cached on first call.
+let _EXTENT=null;
+function sceneExtent(){
+  if(_EXTENT)return _EXTENT;
+  const b=(window.CA&&CA.buildings)||[];
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p; if(!p)continue;
+    for(const pt of p){ if(pt[0]<minX)minX=pt[0]; if(pt[0]>maxX)maxX=pt[0];
+      if(pt[1]<minY)minY=pt[1]; if(pt[1]>maxY)maxY=pt[1]; }}
+  if(!isFinite(minX)){const c=(CA&&CA.center)||{lat:12.686,lng:101.245};
+    minX=c.lng-0.06;maxX=c.lng+0.06;minY=c.lat-0.05;maxY=c.lat+0.05;}
+  const mx=(maxX-minX)*0.55+0.01, my=(maxY-minY)*0.55+0.01;  // generous margin so the bed runs past the buildings
+  _EXTENT={minX:minX-mx,maxX:maxX+mx,minY:minY-my,maxY:maxY+my,
+           cx:(minX+maxX)/2,cy:(minY+maxY)/2,w:(maxX-minX),h:(maxY-minY)};
+  return _EXTENT;
+}
+
 function groundLayers(){
   const G=[], D=darkMode();
   const WATER=window.WATER, LANDUSE=window.LANDUSE, ROADS=window.ROADS;
-  // landuse (parks/green) — flat, sits just above the basemap
+  const hasGround=(WATER&&WATER.water&&WATER.water.length)||
+                  (LANDUSE&&LANDUSE.landuse&&LANDUSE.landuse.length)||
+                  (ROADS&&ROADS.roads&&ROADS.roads.length);
+
+  // ---- (A) GROUND BED + VIGNETTE — only when we actually have ground data to dress the floor.
+  //      A continuous soft-tinted plane fills the gaps between landuse parcels so their hard
+  //      polygon edges stop popping against the blank basemap; a darker vignette ring fades the
+  //      far edges for cinematic depth (lighting is tuned for buildings, so the bed is shaded by hand). ----
+  if(hasGround&&deck.PolygonLayer){
+    const E=sceneExtent();
+    const rect=[[E.minX,E.minY],[E.maxX,E.minY],[E.maxX,E.maxY],[E.minX,E.maxY]];
+    // base floor tint — warm-neutral so green landuse + grey roads sit on a continuous bed, not voids
+    G.push(new deck.PolygonLayer({id:'ground-bed',data:[rect],getPolygon:p=>p,extruded:false,
+      filled:true,stroked:false,getFillColor:D?[24,30,42,255]:[214,210,200,255],
+      parameters:{depthTest:false},pickable:false}));
+    // vignette: concentric rings, transparent at centre -> opaque dark at the rim (radial falloff)
+    const ring=(scale,a)=>{const pts=[];for(let i=0;i<=40;i++){const ang=i/40*2*Math.PI;
+      pts.push([E.cx+Math.cos(ang)*E.w*0.5*scale, E.cy+Math.sin(ang)*E.h*0.5*scale]);}return pts;};
+    const vig=[{s:1.55,a:D?200:120},{s:1.15,a:D?120:60},{s:0.92,a:D?60:28},{s:0.7,a:0}];
+    G.push(new deck.PolygonLayer({id:'ground-vignette',data:vig,getPolygon:v=>ring(v.s),extruded:false,
+      filled:true,stroked:false,getFillColor:v=>D?[8,11,18,v.a]:[60,64,72,v.a],
+      parameters:{depthTest:false},pickable:false}));
+  }
+
+  // ---- LANDUSE: soft, low-saturation tints by kind. Greens for parks/forest, tan farmland,
+  //      muted grey industrial, warm-grey commercial/residential. Kept translucent so the
+  //      basemap/ground still breathes through and buildings clearly sit on top. ----
   const lu=LANDUSE&&Array.isArray(LANDUSE.landuse)?LANDUSE.landuse:null;
   if(lu&&lu.length&&deck.PolygonLayer){
-    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,filled:true,stroked:false,
-      getFillColor:D?[40,86,58,150]:[126,182,120,120],pickable:false}));
+    // [dark-theme rgba, light-theme rgba] per kind
+    const LU={
+      park:        [[ 52,118, 70,195],[150,196,138,165]],
+      forest:      [[ 38, 92, 56,205],[122,172,114,180]],
+      grass:       [[ 50,110, 68,180],[158,200,148,150]],
+      recreation:  [[ 52,118, 70,190],[150,196,138,160]],
+      meadow:      [[ 56,112, 70,180],[164,202,150,150]],
+      farmland:    [[ 92, 90, 52,180],[206,190,142,160]],
+      industrial:  [[ 64, 70, 86,195],[172,178,192,165]],
+      commercial:  [[ 92, 80, 62,180],[208,194,172,155]],
+      residential: [[ 66, 72, 92,170],[194,198,212,145]],
+      retail:      [[ 94, 80, 60,180],[210,194,170,155]]};
+    const luCol=f=>{const m=LU[f.kind]||LU.park;return D?m[0]:m[1];};
+    // Edges are now soft: the ground-bed plane fills the gaps between parcels, so we drop the hard
+    // outline almost entirely (a very faint same-hue stroke just keeps same-kind parcels from merging).
+    // Lower the fill alpha a touch vs the bed so parcels read as tinted overlays, not cut-outs.
+    const luEdge=f=>{const m=(LU[f.kind]||LU.park)[D?0:1];return [m[0],m[1],m[2],D?60:45];};
+    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,
+      filled:true,stroked:true,getFillColor:luCol,
+      getLineColor:luEdge,getLineWidth:1,lineWidthMinPixels:0.4,lineWidthMaxPixels:1.2,
+      parameters:{depthTest:false},pickable:false}));
   }
-  // water — flat blue at ground
+
+  // ---- WATER: flat fill + a darker, slightly inset shoreline so rivers/lakes read with depth. ----
   const wa=WATER&&Array.isArray(WATER.water)?WATER.water:null;
   if(wa&&wa.length&&deck.PolygonLayer){
-    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,filled:true,stroked:false,
-      getFillColor:D?[36,74,128,205]:[120,162,214,200],pickable:false}));
+    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,
+      filled:true,stroked:true,
+      getFillColor:D?[30,66,118,225]:[126,168,220,215],
+      getLineColor:D?[16,40,78,235]:[72,118,178,220],getLineWidth:3,lineWidthMinPixels:1,
+      parameters:{depthTest:false},pickable:false}));
   }
-  // roads — thin paths, width by highway class if present
+
+  // ---- ROADS: casing + fill. Two PathLayers per major road give the "lit asphalt" look:
+  //      a wider dark casing underneath, a brighter ribbon on top. Minor roads = single ribbon. ----
   const rd=ROADS&&Array.isArray(ROADS.roads)?ROADS.roads:null;
   if(rd&&rd.length&&deck.PathLayer){
-    const W={primary:7,secondary:5,tertiary:3.5,residential:2,service:1.5};
-    G.push(new deck.PathLayer({id:'roads',data:rd,getPath:f=>f.path,
-      getWidth:f=>W[f.cls]||2,widthUnits:'meters',widthMinPixels:0.6,widthMaxPixels:6,
-      getColor:D?[150,160,180,150]:[120,128,142,170],capRounded:true,jointRounded:true,pickable:false}));
+    const W={primary:16,secondary:11,tertiary:7,residential:3.5,service:2};      // ribbon width (m)
+    const CASE={primary:26,secondary:18,tertiary:12,residential:6,service:3.5};  // casing width (m)
+    const w=f=>W[f.cls]||3, cw=f=>CASE[f.cls]||5;
+    const major=f=>f.cls==='primary'||f.cls==='secondary'||f.cls==='tertiary';
+    const majors=rd.filter(major), minors=rd.filter(f=>!major(f));
+    // ribbon (fill) colour: warm light-grey asphalt in dark theme, mid-grey on light basemap
+    const fill=D?[196,204,220,245]:[140,148,164,225];
+    const casing=D?[8,12,22,240]:[80,88,104,220];
+    // 1) casing for majors (drawn first, sits under the fill)
+    if(majors.length){
+      G.push(new deck.PathLayer({id:'roads-case',data:majors,getPath:f=>f.path,
+        getWidth:cw,widthUnits:'meters',widthMinPixels:1.4,widthMaxPixels:16,
+        getColor:casing,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 2) minor roads — single thin ribbon. To stop the residential grid reading as a uniform mesh:
+    //    (a) vary each minor road's width by a deterministic hash of its first vertex (organic, stable),
+    //    (b) fade alpha with distance from the scene centre, so the network dissolves toward the rim
+    //        instead of a hard uniform lattice — the grid feels denser/clearer where the eye is.
+    if(minors.length){
+      const E=sceneExtent();
+      const rhash=f=>{const p=f.path&&f.path[0]||[0,0];const s=Math.sin(p[0]*91.71+p[1]*53.19)*43758.5453;return s-Math.floor(s);};
+      const minorW=f=>{const base=W[f.cls]||3; return base*(0.7+rhash(f)*0.8);}; // ±width jitter
+      const minorCol=f=>{const p=f.path&&f.path[0]||[E.cx,E.cy];
+        const dx=(p[0]-E.cx)/(E.w*0.5||1), dy=(p[1]-E.cy)/(E.h*0.5||1);
+        const dist=Math.min(1.2,Math.sqrt(dx*dx+dy*dy));
+        const fade=Math.max(0.18,1-dist*0.62);                 // 1 at centre -> ~0.18 at rim
+        const a=Math.round((D?185:170)*fade);
+        return D?[120,130,150,a]:[150,158,172,a];};
+      G.push(new deck.PathLayer({id:'roads-minor',data:minors,getPath:f=>f.path,
+        getWidth:minorW,widthUnits:'meters',widthMinPixels:0.4,widthMaxPixels:5,
+        getColor:minorCol,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 3) ribbon (fill) for majors on top of the casing
+    if(majors.length){
+      G.push(new deck.PathLayer({id:'roads-fill',data:majors,getPath:f=>f.path,
+        getWidth:w,widthUnits:'meters',widthMinPixels:0.8,widthMaxPixels:11,
+        getColor:fill,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 4) centre dashes on primary arterials — the small detail that sells "real road network".
+    //    Only drawn when PathStyleExtension is actually present (else a solid line would look wrong).
+    const prim=rd.filter(f=>f.cls==='primary');
+    if(prim.length&&deck.PathLayer&&deck.PathStyleExtension){
+      G.push(new deck.PathLayer({id:'roads-dash',data:prim,getPath:f=>f.path,
+        getWidth:1.2,widthUnits:'meters',widthMinPixels:0.5,widthMaxPixels:1.6,
+        getColor:D?[230,202,128,200]:[232,212,142,185],
+        getDashArray:[6,7],dashJustified:true,extensions:[new deck.PathStyleExtension({dash:true})],
+        capRounded:false,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    }
   }
   return G;
 }
