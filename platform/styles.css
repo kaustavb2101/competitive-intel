@@ -314,28 +314,43 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .prov.m{color:var(--up);border:1px solid rgba(35,162,143,.5)}
 .prov.e{color:var(--dim);border:1px solid var(--line)}
 
-/* ---------- lens switcher: real selected-state lift + glow ---------- */
-.lenses{display:flex;gap:var(--s2);flex-wrap:wrap;margin:0 0 var(--s3)}
-.lens{flex:1;min-width:128px;background:linear-gradient(180deg,var(--panel),#161d2c);
-  border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;cursor:pointer;text-align:left;
-  color:var(--mid);box-shadow:var(--elev-1);transition:transform .15s,box-shadow .15s,border-color .15s,background .15s}
-.lens:hover{transform:translateY(-1px);border-color:#3a4868}
-.lens.on{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--panel));
-  box-shadow:var(--elev-2),0 0 0 1px var(--accent),0 0 22px var(--accent-glow)}
-.lens .lt{font-size:13px;font-weight:600;color:var(--hi);display:flex;align-items:center;gap:var(--s2)}
-.lens .lk{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 8px 1px currentColor}
-.lens .ld{font-size:10.5px;color:var(--dim);margin-top:3px}
+/* ---------- lens PILL row: one horizontal segmented control docked over the map ---------- */
+.lenses{display:flex;gap:6px;flex-wrap:wrap;margin:0}
+.pill.lens{flex:0 0 auto;min-width:0;display:inline-flex;align-items:center;gap:7px;
+  background:rgba(20,27,42,.82);border:1px solid var(--line);border-radius:999px;
+  padding:7px 12px;cursor:pointer;text-align:left;color:var(--mid);white-space:nowrap;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .14s,box-shadow .14s,border-color .14s,background .14s,color .14s}
+.pill.lens:hover{transform:translateY(-1px);border-color:#3a4868;color:var(--hi)}
+.pill.lens.on{border-color:var(--accent);color:var(--hi);background:linear-gradient(180deg,var(--accent-soft),rgba(20,27,42,.92));
+  box-shadow:0 0 0 1px var(--accent),0 0 18px var(--accent-glow)}
+.pill.lens .lk{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 7px 1px currentColor}
+.pill.lens .pl{font-size:12.5px;font-weight:600;letter-spacing:.1px}
+.pill.lens .pi{font-size:11px;color:var(--dim);opacity:.8;cursor:help}
+.pill.lens:hover .pi,.pill.lens.on .pi{color:var(--mid);opacity:1}
 
-/* ---------- map frame + legend + popup (elevated) ---------- */
-#map{height:62vh;height:62dvh;min-height:420px;border-radius:14px;border:1px solid var(--line);
-  overflow:hidden;background:var(--panel2);
-  box-shadow:0 0 0 1px rgba(255,255,255,.02), var(--elev-2)}
-.maplegend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--mid);
-  margin-top:var(--s2);align-items:center;background:rgba(26,34,51,.6);border:1px solid var(--line2);
-  border-radius:8px;padding:7px 11px;width:fit-content;max-width:100%}
-.maplegend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px;
+/* ---------- map = hero: full-bleed frame with the pill row floated on top ---------- */
+.maphero{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 0 0 1px rgba(255,255,255,.02),var(--elev-2)}
+.maphero #map{height:78vh;height:78dvh;min-height:480px;border:0;border-radius:0;box-shadow:none}
+.maphero-top{position:absolute;top:12px;left:12px;right:12px;z-index:600;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.maphero-top>*{pointer-events:auto}
+.maphero-top .lenses{max-width:100%;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.maphero-top .chips{display:flex;gap:6px;flex-wrap:wrap;width:fit-content;max-width:100%;
+  background:rgba(20,27,42,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;padding:5px 7px}
+/* keep Leaflet's own zoom control clear of the pill row */
+.maphero .leaflet-top.leaflet-left{margin-top:56px}
+
+/* ---------- legend demoted to ONE quiet line under the map ---------- */
+.maplegend-line{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:var(--s2) 0 0}
+.maplegend{display:inline-flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--mid);
+  align-items:center}
+.maplegend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px;
   box-shadow:0 0 6px 0 currentColor}
 .maplegend .szkey i{background:var(--mid);border-radius:50%;margin:0 2px;box-shadow:none}
+.maplegend-line .sub{font-size:10.5px}
 .leaflet-popup-content-wrapper{background:var(--glass);color:var(--txt);border:var(--glass-bd);
   border-radius:var(--r-sm);box-shadow:var(--pop-sh)}
 .leaflet-popup-tip{background:#232E45;border:1px solid var(--line)}
@@ -403,6 +418,8 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
 @media(max-width:600px){
   main{padding:60px var(--s3) 80px}
   #map{height:54vh;height:54dvh;min-height:340px;box-shadow:var(--elev-1)}
+  .maphero #map{height:72vh;height:72dvh;min-height:420px}
+  .maphero-top{top:8px;left:8px;right:8px}
   .brand .sub{display:none}
   .grid{gap:var(--s2)}
   .tbl{font-size:12px}.tbl th,.tbl td{padding:9px 7px}
@@ -410,11 +427,10 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
      so it never widens the page. min-width:100% keeps a narrow table flush to the card. */
   .tblwrap>.tbl{width:max-content;min-width:100%;box-shadow:none}
   .tblwrap{border:1px solid var(--line);box-shadow:var(--elev-1)}
-  /* lens switcher → compact scroll strip; hide descriptions */
+  /* lens pill row → single-line horizontal scroll strip on phones */
   .lenses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
-  .lens{min-width:auto;padding:8px 11px}
-  .lens .ld{display:none}
-  .mcard,.lens{box-shadow:var(--elev-1)}
+  .pill.lens{min-width:auto;padding:7px 11px}
+  .mcard{box-shadow:var(--elev-1)}
   /* PHONE tap targets ≥40px (WCAG 2.5.5): chips, jump-nav, nav links, theme toggle, stars */
   .chip,.jumpnav .chip{padding:9px 14px;min-height:40px;display:inline-flex;align-items:center}
   #nav a,#nav .nav-more-btn{padding:10px 12px;min-height:40px;display:inline-flex;align-items:center}
@@ -718,10 +734,10 @@ main:has(#v-exposure.on){
   max-width:min(var(--maxw-wide,1680px), calc(100vw - 2*var(--gutter,32px)));
 }
 
-/* 3 · the National map itself goes effectively edge-to-edge inside the
-   widened column and gets a touch more height to use the recovered width. */
+/* 3 · the National map is the HERO — edge-to-edge inside the widened column,
+   tall enough to read as the front door, with the lens pills floated on top. */
 @media(min-width:1180px){
-  #v-map.on #map{height:68vh;height:68dvh;min-height:520px}
+  #v-map.on .maphero #map{height:80vh;height:80dvh;min-height:560px}
 }
 
 /* 4 · keep prose on a comfortable measure even in the widened views —

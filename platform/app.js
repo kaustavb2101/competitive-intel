@@ -4,24 +4,25 @@
 
 // Real measured quantities (no indices). val() reads measured fields; color/size scale to absolute max.
 // Portfolio-risk lens is the exception: a/m/c are ESTIMATED proxies (OSM/price-based, 0–100), not measured.
+// pill = the SHORT (≈2-word) label for the hero pill row docked over the National map.
+// label = the longer legacy label (kept for the legend + aria). desc = plain-language methodology,
+// surfaced as the per-pill "ⓘ" tooltip — NEVER name a pipeline script in copy shown in the UI.
+// Order here is the pill order; the gold "Opportunity" lens is first and is the default on open.
 const LENS = {
-  workers:  {label:'Factory workers',     desc:'DIW factory employment in the branch district', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
-  pickups:  {label:'Pickup stock',        desc:'DLT pickups in the province — title collateral', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
-  motomix:  {label:'Motorcycle-title share ▲', desc:'MEASURED (DLT) — motorcycle share of the province vehicle stock (moto ÷ total). The most volatile, lowest-recovery title collateral; higher share = more exposure to a used-motorcycle value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
-  informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
-  autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
-  estab:    {label:'Establishments ≤10km', desc:'MEASURED establishment density (Overture Maps Places, a sample/lower bound) — total points of interest within 10 km of each branch, a proxy for how much economic activity surrounds it. Lazy-loads branch_occupations.json; run pull_overture_places.py + build_occupations.py to populate.', color:'#1C8C7D', unit:'estab', val:d=>estabCount(d)},
-  comp:     {label:'Competitor density ◆', desc:'MEASURED competitor locations (Google Places, a LOWER BOUND, not a registry) — rival title-loan / vehicle-finance branches (Srisawad, Muangthai, Tidlor, Heng) within ~5km of each AutoX branch. Lazy-loads competitors_national.json; run pull_competitors.py to populate.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
-  risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
-  cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
-  hhdti:    {label:'Household debt-to-income ●', desc:"MEASURED · NSO — the branch's province household debt as a multiple of annual income (NSO SES 2566, debt ÷ income). Higher = more borrower balance-sheet stress. Lazy-loads household_risk_by_province.json; hidden if absent.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
-  occrisk:  {label:'Occupation × stress ◆▲', desc:"MEASURED occupation mix · ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a STRESSED sector (factory under industrial slowdown · agriculture under the branch's province crop-stress). Occupation shares are MEASURED (Overture Maps Places, a sample/lower bound); the 'stressed sector' weighting is ESTIMATED (editorial macro judgement). A triage flag, NOT a measured default rate. Lazy-loads occupation_risk.json; hidden if absent.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, val:d=>occriskVal(d)},
-  brisk:    {label:'Composite branch risk ▲ est', desc:"ESTIMATED COMPOSITE (0–100) — one fused 'which branches are getting riskier' read per branch, blending MEASURED province household debt-to-income (NSO) + ESTIMATED crop/drought double-stress + MEASURED occupation-sector concentration + the branch's own segment/collateral mix. A triage rank, NOT a measured default rate; each driver is shown in the popup. Lazy-loads branch_risk.json; hidden if absent.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, val:d=>briskVal(d)},
-  // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
-  // White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED (province-inherited
-  // agri-stress + local mix). Both lazy-load amphoe.json (joined per-branch via build_amphoe.py).
-  dws:  {label:'District white-space ◇', desc:"MEASURED — the branch's whole district demand (POI footfall + workers) minus AutoX saturation. Higher = underserved room around an existing branch. From amphoe.json.", color:'#E6B450', unit:'white-space (0–100)', amp:true, val:d=>d._amp?d._amp.whitespace:0},
-  drisk:{label:'District risk ▲ est', desc:"ESTIMATED — the branch's district risk proxy (province-inherited agri-stress + local collateral/merchant mix, 0–100). NOT a measured default rate. From amphoe.json.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, val:d=>d._amp?d._amp.risk_proxy:0},
+  dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, val:d=>d._amp?d._amp.whitespace:0},
+  cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
+  estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', val:d=>estabCount(d)},
+  motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
+  hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
+  occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, val:d=>occriskVal(d)},
+  brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, val:d=>briskVal(d)},
+  drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, val:d=>d._amp?d._amp.risk_proxy:0},
+  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
+  workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
+  pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
+  informal: {pill:'Informal labour', label:'Informal workforce', desc:'BORROWER BASE · MEASURED (NSO) — informal (cash-economy) workers in the province, the core title-loan customer. Brighter = a larger informal borrower base.', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
+  autox:    {pill:'AutoX density', label:'AutoX saturation', desc:'OWN FOOTPRINT · MEASURED — how many AutoX branches sit within 10 km. Brighter = more self-overlap (cannibalisation risk); dark = standalone coverage.', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
+  risk:     {pill:'Segment risk', label:'Portfolio risk ▲ est', desc:'PORTFOLIO RISK · ESTIMATED proxy (0–100) — the worst of agri-PD / merchant / collateral segment stress. Switch the sub-metric below the pills. Not a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
 };
 // per-province crop-household stress — lazy-loaded from data/crop_stress.json (objective #1).
 // CSTRESS maps Thai province name -> province record; val() returns agri_stress on a 0–100 scale.
@@ -338,7 +339,7 @@ function compCount(d){return (d._comp&&d._comp.ok)?d._comp.n:0;}
 // competitor-vs-AutoX read for a branch: ratio of nearby rivals to our own ≤10km presence.
 // High rivals + low own = contested; low rivals + demand = undercompeted white space.
 function compTooltip(d){
-  const c=d._comp; if(!c||!c.ok) return 'No competitor data — run pull_competitors.py';
+  const c=d._comp; if(!c||!c.ok) return 'Competitor census not loaded yet';
   if(!c.n) return `No rival branches ≤${COMP_RADIUS_KM}km (measured, lower bound)`;
   const parts=Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([b,n])=>`${b} ${n}`);
   return `${c.n} rival branch${c.n===1?'':'es'} ≤${COMP_RADIUS_KM}km: ${parts.join(', ')} (measured, lower bound)`;
@@ -352,7 +353,7 @@ function riskVal(d){
   return riskMetric==='a'?a : riskMetric==='m'?m : riskMetric==='c'?c : Math.max(a,m,c);
 }
 
-let DATA=null, META=null, map=null, markers=[], curLens='workers', branchSort='dwork', mapReady=false;
+let DATA=null, META=null, map=null, markers=[], curLens='dws', branchSort='dwork', mapReady=false;
 let radiusCircle=null, showRadius=true;
 
 const $ = s => document.querySelector(s);
@@ -1653,14 +1654,18 @@ function renderLenses(){
   // Hide the household debt-to-income lens once we KNOW its source is absent (loaded, empty) —
   // graceful degrade: the button never appears for a dataset that isn't there. Before load it
   // shows (warmed at map init); if the load yields no data it is filtered out on the next render.
+  // Hero pill row: one horizontal segmented control docked over the map. Each pill = colour dot +
+  // ≈2-word label; the active pill is highlighted; methodology rides on a per-pill "ⓘ" (native
+  // title tooltip on hover/tap + aria-label so it is honest on touch / for screen readers).
   $('#lenses').innerHTML = Object.entries(LENS)
     .filter(([k,l])=>!(l.hh && hhriskLoaded && !hhriskHasData()))
     .filter(([k,l])=>!(l.occr && occriskLoaded && !occriskHasData()))
     .filter(([k,l])=>!(l.brisk && briskLoaded && !briskHasData()))
-    .map(([k,l])=>
-    `<button class="lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${l.label.replace(/"/g,'&quot;')}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
-       <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
-       <div class="ld">${l.desc}</div></button>`).join('');
+    .map(([k,l])=>{
+      const lbl=(l.pill||l.label).replace(/"/g,'&quot;'), info=l.desc.replace(/"/g,'&quot;');
+      return `<button class="pill lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${lbl}. ${info}">
+       <span class="lk" style="background:${l.color};color:${l.color}"></span><span class="pl">${lbl}</span><span class="pi" title="${info}" aria-hidden="true">ⓘ</span></button>`;
+    }).join('');
   $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b)return; setLens(b.dataset.l);};
   renderRiskSub();
   renderLegend();
@@ -1691,8 +1696,8 @@ function renderLegend(){
   if(l.cmp){
     if(!compLoaded){ $('#maplegend').innerHTML='<span class="sub">Loading competitor census…</span>'; return; }
     if(!compHasData()){
-      $('#maplegend').innerHTML='<span class="sub" title="competitors_national.json not found in data/">'+
-        'No competitor data yet — run <span class="mono">pipeline/pull_competitors.py</span> (from a Thai IP) to populate the rival-branch census.</span>';
+      $('#maplegend').innerHTML='<span class="sub" title="Rival-branch census not loaded yet">'+
+        'Competitor map loading — the rival-branch census will appear once the latest census is in.</span>';
       return;
     }
     const key=Object.entries(COMP_BRAND_COLOR).map(([b,c])=>`<span><i style="background:${c};border-radius:50%"></i>${b}</span>`).join('');
