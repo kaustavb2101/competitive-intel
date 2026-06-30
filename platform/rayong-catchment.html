@@ -371,8 +371,16 @@ const CORE=(function(){
 //
 // GRACEFUL DEGRADE: if the whole file already fits in the budget (e.g. the ~3.6k OSM catchment),
 // the original array is returned UNCHANGED (same object, same order) -- byte-identical behaviour.
-const BLDG_BUDGET=30000;     // hard cap on extruded polygons (constant, tune here)
-const LOD_INNER_M=3000;      // everything within this radius of CORE is always rendered (full dense core)
+// Polygon budget is DEVICE-AWARE: desktop renders EVERYTHING (maximum DataProteins-grade density,
+// no cap); only small / low-memory phones fall back to a still-very-dense safety cap so a heavy
+// scene degrades instead of crashing the GL context (a crash = zero richness, strictly worse).
+const BLDG_BUDGET=(function(){
+  const mem=(navigator.deviceMemory||8);                       // GB; undefined on desktop -> 8
+  const small=Math.min(window.innerWidth,window.innerHeight)<700;
+  if(small||mem<=4) return 60000;                              // phone / low-mem: dense but bounded
+  return Infinity;                                             // desktop/laptop: render ALL buildings
+})();
+const LOD_INNER_M=3000;      // when capped, everything within this radius of CORE is always rendered
 const BUILDINGS=(function(){
   const all=(CA&&CA.buildings)||[];
   if(all.length<=BLDG_BUDGET)return all;          // small file (or already under budget) -> untouched
