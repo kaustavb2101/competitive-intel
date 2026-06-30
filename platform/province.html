@@ -23,17 +23,22 @@ canvas{outline:none}
    #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
           frames the province and fades the corners — the classic cinematic "look here" vignette. */
 #sky{position:fixed;inset:0;z-index:0;pointer-events:none;
- background:radial-gradient(125% 95% at 50% 4%,#202a44 0%,#161d31 34%,#0e1322 62%,#080b14 100%),
-            linear-gradient(180deg,#0b1020 0%,#121a2e 44%,#202b46 74%,#2c3450 100%);
+ background:radial-gradient(135% 100% at 50% 2%,#26314f 0%,#1a2237 30%,#10152a 58%,#080b14 100%),
+            linear-gradient(180deg,#0a0f1e 0%,#121a30 40%,#23304e 70%,#33405e 92%,#3a4868 100%);
  background-blend-mode:screen,normal}
+/* #atmos : horizon haze/fog band so the extruded relief melts into the distance — premium depth fog. */
+#atmos{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,0) 52%,rgba(60,74,108,.10) 74%,rgba(96,112,150,.20) 90%,rgba(120,136,176,.30) 100%)}
 #vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
- background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 50%,rgba(6,9,16,.28) 79%,rgba(4,6,12,.60) 100%)}
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 46%,rgba(6,9,16,.22) 72%,rgba(4,6,12,.46) 90%,rgba(2,3,8,.66) 100%)}
 html[data-theme="light"] #sky{
- background:radial-gradient(125% 95% at 50% 4%,#e3edfc 0%,#d2e0f5 40%,#bed1ed 68%,#aec2e4 100%),
-            linear-gradient(180deg,#e8effb 0%,#d8e4f6 60%,#c6d6ee 100%);
+ background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
+            linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
  background-blend-mode:multiply,normal}
+html[data-theme="light"] #atmos{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 54%,rgba(190,206,232,.14) 78%,rgba(206,220,240,.26) 100%)}
 html[data-theme="light"] #vignette{
- background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 56%,rgba(40,52,80,.09) 82%,rgba(30,40,66,.20) 100%)}
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 54%,rgba(40,52,80,.07) 80%,rgba(30,40,66,.16) 92%,rgba(24,34,58,.24) 100%)}
 
 /* top brand strip (KPI chips) */
 #strip{position:fixed;top:44px;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
@@ -148,6 +153,21 @@ td.n{color:var(--hi)}
 .lgcar{font:600 11px 'IBM Plex Mono';color:var(--mid);transition:transform .2s;flex:none}
 #legendwrap.collapsed .lgcar{transform:rotate(-90deg)}
 #legendwrap.collapsed #legend{display:none}
+#legendwrap.collapsed #bldglegend{display:none}
+/* building colour/height legend — warm sand->amber->gold height ramp + sparing landmark accent */
+#bldglegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#bldglegend .bl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#bldglegend .bl-ramp{display:inline-flex;align-items:center;gap:6px}
+#bldglegend .bl-bar{width:104px;height:9px;border-radius:5px;border:1px solid rgba(255,255,255,.22);
+ background:linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))}
+#bldglegend .bl-cap{font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+html[data-theme="light"] #bldglegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #bldglegend .bl-ttl{color:#828CA0}
+html[data-theme="light"] #bldglegend .bl-cap,html[data-theme="light"] #bldglegend .bl-acc{color:#2C3444}
+html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
 #legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}
 .lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
  font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
@@ -261,6 +281,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </script>
 <div id="sky"></div>
 <div id="map"></div>
+<div id="atmos"></div>
 <div id="vignette"></div>
 
 <div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
@@ -278,7 +299,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="ringtog" class="on">10 km reach rings</button>
-      <button id="orbittog" class="on" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
     </div>
   </div>
 </div>
@@ -327,6 +348,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="lgttl">POI types <span>· tap a chip to toggle</span></div>
     <span class="lgcar" aria-hidden="true">▾</span>
   </div>
+  <div id="bldglegend"></div>
   <div id="legend"></div>
 </div>
 
@@ -398,12 +420,14 @@ function lightMode(){return basemap==='light';}
 // the try/catch leaves LIGHTING null and the scene still renders flat-lit (unchanged behaviour).
 function buildLighting(){
   try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
-    // Intensities kept LOW so ambient + diffuse*(sun+fill) stays below ~1.0 — otherwise light parcel/
-    // building colours clamp to pure white on a real GPU (the "white blow-out"). With material
-    // ambient 0.5 / diffuse 0.34 below: max lit ≈ 0.5*0.9 + 0.34*(0.85+0.25) ≈ 0.83 -> safe.
-    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:0.85,direction:[-0.7,-2.2,-1.0]});
-    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.25,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.9});
+    // Intensities clamp-bounded so ambient + diffuse*(sun+fill) stays below ~0.9 — otherwise light parcel/
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). DataProteins depth
+    // comes from a WIDER lit/shade gap, NOT specular. With material ambient 0.42 / diffuse 0.40 below:
+    //   shade floor = 0.42*0.92 = 0.386 ; max lit = 0.386 + 0.40*(0.95+0.28) = 0.878 < 0.9 -> never clamps
+    //   contrast lit/shade = 0.878/0.386 = 2.27x (was 1.83x) -> punchier relief, still safe.
+    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0]});
+    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[230,236,255],intensity:0.92});
     return new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
   }catch(e){ return null; }
 }
@@ -418,7 +442,7 @@ const FRAMED=(function(){const v=provView();return {longitude:v.longitude,latitu
   zoom:(v.zoom||8)+0.2,pitch:54,bearing:(v.bearing||0)-18};})();
 const INTRO=Object.assign({},FRAMED,{zoom:Math.max(5.5,(FRAMED.zoom||8)-1.6),pitch:34,bearing:(FRAMED.bearing||0)+30});
 let VIEW=Object.assign({},INTRO);
-let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
 const ORBIT_DPS=2.4;                 // degrees / second — gentle (~2-3 dps target)
 function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
 function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
@@ -500,8 +524,8 @@ function streamBuildingLayer(){
     if(!url)return null;
     var LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
-    var RAMP=LIGHT?[[201,186,158],[214,168,100],[226,186,92]]
-                  :[[58,52,46],[150,104,52],[228,172,78]];
+    var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]
+                  :[[44,38,32],[156,108,50],[238,182,86]];
     var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
       return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
     var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
@@ -515,7 +539,7 @@ function streamBuildingLayer(){
       getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
       getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
+      material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
     });
@@ -566,7 +590,7 @@ function render(){
       getLineColor:LIGHT?[120,134,168,150]:[150,170,210,120],lineWidthMinPixels:1,pickable:true,
       // material tuned for cinematic depth: low ambient lets the sun carve the relief; high diffuse
       // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
+      material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
       parameters:{depthTest:true},transitions:{getElevation:600},
       updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
   }
@@ -829,6 +853,28 @@ function buildCascade(){
   if(note)note.textContent=(SLUG==='rayong')?'Rayong has the full 3D deep-dive — open Rayong 3D from the nav for extruded buildings.':'Pick a province to jump there; pick a branch to focus its 10km reach.';
 }
 
+/* ---------- relief / building colour-height legend ---------- */
+// Honest about WHAT the height encodes. Default deep-dive: each amphoe is raised + tinted by its
+// MEASURED working-age population (the title-loan base), indigo -> blue -> warm. When real building
+// tiles are streamed in (STREAMB) the scene instead shows the warm sand->amber->gold massing ramp.
+// The CSS bar gradient is set inline to match whichever ramp is live so the legend never lies.
+function buildBldgLegend(){
+  const host=document.getElementById('bldglegend'); if(!host)return;
+  const streamed=!!(window.TILECFG&&TILECFG.buildings&&TILECFG.buildings.mvtUrl&&deck.MVTLayer);
+  const light=(typeof lightMode==='function')?lightMode():false;
+  let ttl,lo,hi,grad;
+  if(streamed){ ttl='Buildings'; lo='low'; hi='tall';
+    grad=light?'linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))'
+              :'linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))';
+  }else{ ttl='Districts'; lo='fewer'; hi='more working-age';
+    grad=light?'linear-gradient(90deg,rgb(176,188,210),rgb(120,150,206),rgb(210,190,150))'
+              :'linear-gradient(90deg,rgb(44,58,92),rgb(72,104,196),rgb(180,168,128))'; }
+  host.innerHTML='<span class="bl-ttl">'+ttl+'</span>'+
+    '<span class="bl-ramp"><span class="bl-cap">'+lo+'</span>'+
+    '<span class="bl-bar" style="background:'+grad+'" title="taller relief = '+(streamed?'taller building':'more working-age population')+'"></span>'+
+    '<span class="bl-cap">'+hi+'</span></span>';
+}
+
 /* ---------- POI legend ---------- */
 function buildLegend(){
   const host=document.getElementById('legend'); if(!host)return;
@@ -865,7 +911,7 @@ document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
   head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
 })();
 
-buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
+buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
 
 // ---- MOTION BOOTSTRAP (ported from rayong-catchment): intro fly-in, then gentle auto-orbit -------
 // INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to FRAMED.

@@ -24,18 +24,24 @@ canvas{outline:none}
    #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
           frames the city and fades the corners — the classic cinematic "look here" vignette. */
 #sky{position:fixed;inset:0;z-index:0;pointer-events:none;
- background:radial-gradient(125% 95% at 50% 4%,#202a44 0%,#161d31 34%,#0e1322 62%,#080b14 100%),
-            linear-gradient(180deg,#0b1020 0%,#121a2e 44%,#202b46 74%,#2c3450 100%);
+ background:radial-gradient(135% 100% at 50% 2%,#26314f 0%,#1a2237 30%,#10152a 58%,#080b14 100%),
+            linear-gradient(180deg,#0a0f1e 0%,#121a30 40%,#23304e 70%,#33405e 92%,#3a4868 100%);
  background-blend-mode:screen,normal}
 #map{z-index:1}
+/* #atmos : a subtle horizon haze/fog band that warms the lower scene so the skyline melts into the
+   distance instead of meeting a hard edge — the premium "depth fog" read. Above the canvas, no pointer. */
+#atmos{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,0) 52%,rgba(60,74,108,.10) 74%,rgba(96,112,150,.20) 90%,rgba(120,136,176,.30) 100%)}
 #vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
- background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 50%,rgba(6,9,16,.28) 79%,rgba(4,6,12,.60) 100%)}
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 46%,rgba(6,9,16,.22) 72%,rgba(4,6,12,.46) 90%,rgba(2,3,8,.66) 100%)}
 html[data-theme="light"] #sky{
- background:radial-gradient(125% 95% at 50% 4%,#e3edfc 0%,#d2e0f5 40%,#bed1ed 68%,#aec2e4 100%),
-            linear-gradient(180deg,#e8effb 0%,#d8e4f6 60%,#c6d6ee 100%);
+ background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
+            linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
  background-blend-mode:multiply,normal}
+html[data-theme="light"] #atmos{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 54%,rgba(190,206,232,.14) 78%,rgba(206,220,240,.26) 100%)}
 html[data-theme="light"] #vignette{
- background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 56%,rgba(40,52,80,.09) 82%,rgba(30,40,66,.20) 100%)}
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 54%,rgba(40,52,80,.07) 80%,rgba(30,40,66,.16) 92%,rgba(24,34,58,.24) 100%)}
 
 /* top brand strip */
 #strip{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
@@ -171,6 +177,22 @@ html[data-theme="light"] #ctl select{background:#F5F8FD;border-color:#D3DAE6;col
 .lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
 .lg.on b{color:var(--hi)}
 
+/* building colour/height legend — explains the warm sand->amber->gold massing ramp + landmark accent.
+   A continuous gradient bar (low->tall) plus a sparing cool-accent chip, in-theme. */
+#bldglegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#bldglegend .bl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#bldglegend .bl-ramp{display:inline-flex;align-items:center;gap:6px}
+#bldglegend .bl-bar{width:104px;height:9px;border-radius:5px;border:1px solid rgba(255,255,255,.22);
+ background:linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))}
+#bldglegend .bl-cap{font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+html[data-theme="light"] #bldglegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #bldglegend .bl-ttl{color:#828CA0}
+html[data-theme="light"] #bldglegend .bl-cap,html[data-theme="light"] #bldglegend .bl-acc{color:#2C3444}
+html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
+
 /* isochrone (travel-time) legend — graded band swatches above the POI legend */
 #isolegend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
  padding-bottom:7px;border-bottom:1px solid #1c2740}
@@ -290,6 +312,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </script>
 <div id="sky"></div>
 <div id="map"></div>
+<div id="atmos"></div>
 <div id="vignette"></div>
 
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
@@ -357,6 +380,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </div>
 
 <div id="legendwrap">
+  <div id="bldglegend"></div>
   <div id="isolegend" style="display:none"></div>
   <div id="complegend" style="display:none"></div>
   <div class="lgttl">POI types <span>· tap to toggle</span></div>
@@ -478,12 +502,16 @@ const TILE_LABELS_SAT='https://a.basemaps.cartocdn.com/rastertiles/dark_only_lab
 // material + directional shading + sky/vignette still give strong depth in that fallback.
 function buildLighting(withShadow){
   try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
-    // Intensities kept low ON PURPOSE: ambient + diffuse*(sun+fill) must stay below ~1.0 or light
-    // building colours clamp to pure white on a real GPU (the "white blow-out"). With material
-    // ambient 0.5 / diffuse 0.34 below, max lit ≈ 0.5*0.9 + 0.34*(0.85+0.25) ≈ 0.83 -> never clamps.
-    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:0.85,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
-    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.25,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.9});
+    // Intensities kept clamp-bounded ON PURPOSE: ambient + diffuse*(sun+fill) must stay below ~0.9 or
+    // light building colours clamp to pure white on a real GPU (the "white blow-out"). DataProteins
+    // depth comes from a WIDER lit/shade gap (deeper ambient floor, stronger diffuse peak), NOT specular.
+    // With material ambient 0.42 / diffuse 0.40 below:
+    //   shade floor (faces away from sun) = 0.42*0.92 = 0.386
+    //   max lit (faces sun+fill)          = 0.386 + 0.40*(0.95+0.28) = 0.386 + 0.492 = 0.878 < 0.9 -> never clamps
+    //   contrast ratio lit/shade          = 0.878/0.386 = 2.27x  (was 0.824/0.45 = 1.83x) -> punchier, still safe
+    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[230,236,255],intensity:0.92});
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
     if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
@@ -868,7 +896,7 @@ function extraLayers(){
         extruded:true,elevationScale:1,getElevation:6,
         getFillColor:[green[0],green[1],green[2],225],
         stroked:false,
-        material:{ambient:0.5,diffuse:0.34,shininess:8,specularColor:[0,0,0]},
+        material:{ambient:0.42,diffuse:0.40,shininess:8,specularColor:[0,0,0]},
         parameters:{depthTest:true},pickable:false}));
     }
     if(deck.ScatterplotLayer){
@@ -933,8 +961,8 @@ function streamBuildingLayer(){
     if(!url)return null;                       // pmtilesUrl-only -> fall back until the PMTiles shim lands
     var DARK=darkMode(), LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
-    var RAMP=DARK?[[58,52,46],[150,104,52],[228,172,78]]
-                 :[[201,186,158],[214,168,100],[226,186,92]];
+    var RAMP=DARK?[[44,38,32],[156,108,50],[238,182,86]]
+                 :[[190,172,140],[216,168,92],[234,194,96]];
     var H_LO=3, H_HI=35;                        // fixed band for streamed tiles (no global sort available)
     var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
       return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -950,7 +978,7 @@ function streamBuildingLayer(){
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
       getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
       lineWidthMinPixels:0.4,
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
+      material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
@@ -1040,8 +1068,8 @@ function render(){
   const isLandmark=b=>(b.h||4)>=tallThresh;   // tallest decile = skyline punctuation (both bases)
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
-  const RAMP_DARK=[[58,52,46],[150,104,52],[228,172,78]];      // taupe -> ochre -> gold
-  const RAMP_LIGHT=[[201,186,158],[214,168,100],[226,186,92]]; // muted sand -> amber -> gold (deepened to resist sun blow-out)
+  const RAMP_DARK=[[44,38,32],[156,108,50],[238,182,86]];      // taupe -> ochre -> gold
+  const RAMP_LIGHT=[[190,172,140],[216,168,92],[234,194,96]]; // muted sand -> amber -> gold (deepened to resist sun blow-out)
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -1080,7 +1108,7 @@ function render(){
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
     // across faces. Specular ZEROED: it's the only view-dependent term, and under orbit it spiked
     // and clamped sun-facing faces to white (the "white blow-out"). Diffuse shading keeps depth.
-    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},
+    material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
@@ -1099,7 +1127,7 @@ function render(){
       getFillColor:[c[0],c[1],c[2],232],
       stroked:true, getLineColor:[Math.round(c[0]*.55),Math.round(c[1]*.55),Math.round(c[2]*.55),255],
       lineWidthMinPixels:0.5,
-      material:{ambient:0.5,diffuse:0.34,shininess:32,specularColor:[0,0,0]},
+      material:{ambient:0.42,diffuse:0.40,shininess:32,specularColor:[0,0,0]},
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true},
       pickable:true,_poiType:t}));
@@ -1115,7 +1143,7 @@ function render(){
       extruded:true, elevationScale:1, getElevation:115,
       getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],235];},
       stroked:true, getLineColor:[245,247,252,235], lineWidthMinPixels:0.6,
-      material:{ambient:0.5,diffuse:0.34,shininess:40,specularColor:[0,0,0]},  // was the worst blow-out: near-white specular on orbit
+      material:{ambient:0.42,diffuse:0.40,shininess:40,specularColor:[0,0,0]},  // was the worst blow-out: near-white specular on orbit
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:true}));
   }
@@ -1444,6 +1472,19 @@ function buildLegend(){
     const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
 }
 
+/* ---------- building colour/height legend ---------- */
+// Explains the warm height ramp (street-level sand -> mid-rise amber -> tall gold) and the sparing
+// cool accent reserved for the tallest landmark decile. Theme-aware via CSS (no inline colours that
+// would fight the light base). Always shown — buildings are the headline of every scene.
+function buildBldgLegend(){
+  const host=document.getElementById('bldglegend'); if(!host)return;
+  host.innerHTML='<span class="bl-ttl">Buildings</span>'+
+    '<span class="bl-ramp"><span class="bl-cap">low</span>'+
+    '<span class="bl-bar" title="building height: low -> tall"></span>'+
+    '<span class="bl-cap">tall</span></span>'+
+    '<span class="bl-acc"><span class="sw" style="background:rgb(91,124,250)"></span>landmark</span>';
+}
+
 /* ---------- isochrone legend (graded travel-time bands) — only shown when iso data is present ---------- */
 function buildIsoLegend(){
   const host=document.getElementById('isolegend'); if(!host)return;
@@ -1501,7 +1542,7 @@ document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
   el.classList.toggle('show');other.classList.remove('show');});
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
-buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
+buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
 
 // ---- MOTION BOOTSTRAP (Upgrade 2): intro fly-in, then continuous gentle auto-orbit -------------
 // INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to the
