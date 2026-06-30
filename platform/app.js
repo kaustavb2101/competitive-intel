@@ -194,6 +194,36 @@ function briskRec(d){
   const i=DATA.indexOf(d); if(i<0) return null;
   return BRISK[i]||null;
 }
+// human label for a composite top_driver key (household/agri/occupation/segment).
+const RISK_DRIVER_LABEL={household:'household leverage',agri:'crop / drought stress',occupation:'occupation concentration',segment:'segment / collateral mix'};
+function riskDriverLabel(k){return RISK_DRIVER_LABEL[k]||k||'mixed';}
+
+/* ---------- per-PROVINCE composite-risk rollup (data/province_risk.json, obj#1) ----------
+   Lazy-loads the worst-first province rollup built by pipeline/build_province_risk.py:
+   {meta, provinces:[{province, region, n_branches, mean_risk, p90_risk, top_driver_mix:{driver:count}}]}.
+   n_branches is MEASURED; mean_risk / p90_risk are aggregates of the ESTIMATED branch composite.
+   Fully null-guarded: absent file → PRISK_LIST stays empty and the Exposure panel + Home verdict omit
+   gracefully. Nothing is fabricated. */
+let PRISK_LIST=[], PRISK_META=null, priskLoaded=false, priskPromise=null;
+async function loadProvinceRisk(){
+  if(priskPromise) return priskPromise;
+  priskLoaded=true;
+  priskPromise=(async()=>{
+    try{ const r=await fetch('data/province_risk.json'); if(!r.ok){PRISK_LIST=[];return PRISK_LIST;}
+      const j=await r.json(); PRISK_META=j.meta||null;
+      PRISK_LIST=Array.isArray(j.provinces)?j.provinces.slice().sort((a,b)=>(b.mean_risk||0)-(a.mean_risk||0)):[]; }
+    catch(e){ PRISK_LIST=[]; PRISK_META=null; }
+    return PRISK_LIST;
+  })();
+  return priskPromise;
+}
+function priskHasData(){return !!(PRISK_LIST&&PRISK_LIST.length);}
+// dominant top_driver for a province-risk record (from top_driver_mix counts).
+function priskDom(p){
+  const m=p&&p.top_driver_mix; if(!m) return null;
+  let k=null,best=-1; for(const d in m){ if((m[d]||0)>best){best=m[d];k=d;} }
+  return k;
+}
 
 /* ---------- measured occupation mix per DISTRICT (Overture Places) ----------
    Lazy-loads data/amphoe_occupations.json — a MEASURED per-amphoe rollup of establishment
@@ -1262,6 +1292,67 @@ function renderExposure(){
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
   // OBJECTIVE #1: borrower-base concentration — is the book over-exposed to one occupation type?
   renderOccConcentration();
+  // OBJECTIVE #1: composite-risk readouts — most-stressed provinces + riskiest branches (lazy, graceful).
+  renderRiskReadouts();
+}
+
+/* ---------- composite-risk readouts on #exposure (objective #1) ----------
+   Two exec-readable panels built from the risk layers that already ship but are under-shown:
+   • Most-stressed provinces — top ~12 by mean composite_risk (province_risk.json) with a bar +
+     branch count + dominant driver.
+   • Riskiest branches — top-15 by composite_risk (branch_risk.json, index-aligned to branches.json,
+     so name=DATA[i].n / province=DATA[i].v) with the dominant driver.
+   Both are ESTIMATED COMPOSITE (mean/composite are aggregates of the estimated branch score; the bar
+   max is the worst observed mean, so bars are relative). Lazy-load on first paint, re-render when data
+   lands; render NOTHING when the source file is absent. DOM hosts are created in-JS and inserted after
+   #expoprov's container so no extra index.html wiring is needed beyond the existing dash2-main. */
+function riskHost(){
+  let h=document.getElementById('expo-risk');
+  if(h) return h;
+  const t=document.getElementById('expoprov'); if(!t) return null;
+  // attach after the provinces table inside dash2-main so it fills the widescreen right column.
+  const anchor=t; h=document.createElement('div'); h.id='expo-risk'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+  return h;
+}
+function renderRiskReadouts(){
+  const host=riskHost(); if(!host) return;
+  const onExp=()=>{const v=document.getElementById('v-exposure'); return v&&v.classList.contains('on');};
+  if(!priskLoaded) loadProvinceRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  if(!briskLoaded) loadBranchRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  let html='';
+  // 1) MOST-STRESSED PROVINCES (province_risk.json)
+  if(priskHasData()){
+    const top=PRISK_LIST.slice(0,12);
+    const max=Math.max(1,...top.map(p=>p.mean_risk||0));
+    html+=`<h2 class="risk" style="margin-top:0">Most-stressed provinces ${TAG_E}</h2>`+
+      `<p class="lead">Top ${top.length} provinces by <b>mean composite risk</b> — one fused read of "which areas are getting riskier", `+
+      `blending measured household debt + crop/drought + occupation + segment/collateral mix. `+
+      `Branch counts are <b>measured</b>; mean/p90 are aggregates of an <b>estimated composite</b> (0–100), not a measured default rate. Bars are relative to the worst.</p>`+
+      `<div class="cc-card-b">`+top.map((p,i)=>{
+        const w=Math.round(180*(p.mean_risk||0)/max);
+        const dom=priskDom(p);
+        return `<div class="cc-row"><div class="l">${i+1}. ${p.province}`+
+          `<span class="s">${p.region||''} · ${(p.n_branches||0)} branches · ${riskDriverLabel(dom)}${dom==='household'?' '+TAG_M:' '+TAG_E}</span></div>`+
+          `<div class="r" style="min-width:240px">`+
+            `<span class="bar" style="width:180px;display:inline-block"><i style="width:${w}px;background:var(--agri)"></i></span> `+
+            `<span class="mono" style="color:var(--agri)">${(p.mean_risk||0).toFixed(1)}</span>`+
+            `<span class="s">p90 ${(p.p90_risk||0).toFixed(0)}</span></div></div>`;
+      }).join('')+`</div>`;
+  }
+  // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
+  if(briskHasData()&&DATA&&DATA.length===BRISK.length){
+    const idx=BRISK.map((e,i)=>i).sort((a,b)=>(BRISK[b].composite_risk||0)-(BRISK[a].composite_risk||0)).slice(0,15);
+    html+=`<h2 class="risk" style="margin-top:18px">Riskiest branches ${TAG_E}</h2>`+
+      `<p class="lead">Top 15 branches by the same <b>estimated composite</b> (0–100). A triage rank for where to look first, <b>not</b> a measured default rate — this is the readable list of the National map's composite-risk lens.</p>`+
+      `<table class="tbl" id="expo-brisk-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
+      `<th class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th title="dominant driver of the composite">Top driver</th></tr>`+
+      idx.map((i,rank)=>{const e=BRISK[i], d=DATA[i];
+        return `<tr><td class="mono sub">${rank+1}</td><td><b>${d.n||'—'}</b></td><td class="sub">${d.v||'—'}</td>`+
+        `<td class="mono" style="color:var(--agri)">${(e.composite_risk||0).toFixed(1)}</td>`+
+        `<td class="sub">${riskDriverLabel(e.top_driver)}</td></tr>`;}).join('')+`</table>`;
+  }
+  host.innerHTML=html;
 }
 
 /* ---------- borrower-base (occupation) concentration · objective #1 ----------
@@ -2202,6 +2293,8 @@ function renderHome(){
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
     loadOppScore().then(()=>{ if(onHome()) renderHomeHero(); });
     loadHouseholdRisk().then(()=>{ if(onHome()) renderHomeHero(); });
+    // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
+    loadProvinceRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
@@ -2314,6 +2407,18 @@ function renderHomeWhitespace(){
 function renderHomeRisk(){
   const box=$('#cc-risk-body'); if(!box||!META) return;
   let html='';
+  // LEAD WITH THE VERDICT — most-stressed provinces by composite risk (province_risk.json).
+  // Pull ONLY from loaded data; omit gracefully if absent (no placeholder, no fabrication).
+  if(priskHasData()){
+    const top=PRISK_LIST.slice(0,3).filter(p=>p&&p.province);
+    if(top.length){
+      const names=top.map(p=>p.province).join(', ');
+      const dom=priskDom(top[0]);
+      html+=`<div class="cc-sub2" style="margin-top:0">Most stressed · composite risk ${TAG_E}</div>`;
+      html+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)} · mean / p90 risk 0–100`,
+        `▲ ${(top[0].mean_risk||0).toFixed(0)}`,`p90 ${(top[0].p90_risk||0).toFixed(0)}`,'var(--agri)');
+    }
+  }
   // worst crop-household stress region/province (crop_stress.json)
   if(CSTRESS_LIST&&CSTRESS_LIST.length){
     const w=CSTRESS_LIST[0]; const sv=Math.round((w.agri_stress||0)*100);
