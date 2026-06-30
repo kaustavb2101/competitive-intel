@@ -88,11 +88,22 @@ td.n{color:var(--hi)}
 .stb.on{color:var(--hi);border-bottom-color:var(--gold)}
 .view{display:none}.view.on{display:block}
 
-/* controls */
-#ctl{position:fixed;top:94px;left:50%;transform:translateX(-50%);z-index:8;display:flex;gap:5px;
- background:rgba(14,19,31,.9);border:1px solid var(--cardln);border-radius:9px;padding:4px;backdrop-filter:blur(8px)}
-#ctl button{background:none;border:none;color:var(--dim);font:500 11px 'IBM Plex Mono';padding:5px 9px;border-radius:6px;cursor:pointer}
-#ctl button.on{background:#1b2740;color:var(--hi)}
+/* controls — docked frame in the map well (between the two side cards): segmented basemap + action cluster.
+   sits to the RIGHT of the left card and clear of the right card so it never overlaps either panel. */
+#ctl{position:fixed;top:96px;left:346px;z-index:8;display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;align-items:flex-start;
+ background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:12px;padding:10px 12px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 26px rgba(0,0,0,.42)}
+#ctl .grp{display:flex;flex-direction:column;gap:5px}
+#ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+#ctl .seg{display:flex;background:#0a1018;border:1px solid #1c2740;border-radius:9px;padding:2px;gap:2px}
+#ctl .seg button{flex:1;background:none;border:none;color:var(--mid);border-radius:7px;
+ padding:6px 4px;font:600 11.5px 'IBM Plex Sans Thai';cursor:pointer;transition:background .15s,color .15s}
+#ctl .seg button.on{background:var(--blue);color:#fff}
+#ctl .acts{display:flex;flex-direction:column;gap:5px}
+#ctl .acts button{background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+ padding:7px 10px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer;text-align:left}
+#ctl .acts button.on{border-color:var(--blue);color:var(--hi)}
+#ctl .acts button:active{background:#161d2c}
 
 /* mobile toggles */
 #mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
@@ -109,13 +120,17 @@ td.n{color:var(--hi)}
 .casc select:disabled{color:var(--dim);cursor:not-allowed;opacity:.7}
 .cscnote{font-size:10px;color:var(--dim);line-height:1.4;margin-top:1px}
 
-/* POI legend overlay (bottom-center) */
-#legendwrap{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:8;max-width:min(94vw,720px);
- background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 10px 9px;
+/* POI legend — docked, COLLAPSIBLE bottom rail (centered between the side cards) so it never occludes the scene */
+#legendwrap{position:fixed;bottom:14px;left:344px;right:344px;z-index:8;margin:0 auto;max-width:min(720px,calc(100vw - 700px));
+ background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 12px 9px;
  backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
-.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.lghead{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;flex:1}
 .lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
-#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lgcar{font:600 11px 'IBM Plex Mono';color:var(--mid);transition:transform .2s;flex:none}
+#legendwrap.collapsed .lgcar{transform:rotate(-90deg)}
+#legendwrap.collapsed #legend{display:none}
+#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}
 .lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
  font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
 .lg.on{opacity:1;color:var(--hi);border-color:#33405e}
@@ -126,14 +141,27 @@ td.n{color:var(--hi)}
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:230px;line-height:1.45}
 .dtt b{color:#fff}
 .err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
+/* calm centered notice — used for load/init fallbacks so a raw red error never fronts the user */
+.notice{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+ padding:30px;text-align:center;background:var(--ink);z-index:99}
+.notice .nh{font:600 15px 'IBM Plex Sans Thai';color:var(--hi)}
+.notice .nd{font:400 12.5px 'IBM Plex Sans Thai';color:var(--mid);max-width:360px;line-height:1.5}
+.notice .sp{width:18px;height:18px;border:2px solid #2a3450;border-top-color:var(--blue);border-radius:50%;animation:nspin .8s linear infinite;margin-bottom:4px}
+@keyframes nspin{to{transform:rotate(360deg)}}
 
 @media(max-width:820px){
  .side{width:86vw;max-width:340px;top:90px;bottom:78px}
  #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
  #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
  .xbtn{display:block}#mtog{display:flex}
- #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
- #legend{max-height:88px;overflow-y:auto}
+ #ctl{top:auto;left:auto;bottom:118px;right:8px;flex-direction:row;padding:8px;gap:8px}
+ #ctl .glab{display:none}
+ #legendwrap{left:8px;right:8px;bottom:66px;max-width:none;margin:0;padding:6px 10px}
+ #legend{max-height:84px;overflow-y:auto;margin-top:6px}
+}
+/* between side cards and phones: keep the legend off the side cards */
+@media(min-width:821px) and (max-width:1180px){
+ #legendwrap{left:344px;right:344px;max-width:none}
 }
 
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
@@ -171,9 +199,13 @@ html[data-theme="light"] .wbox .wr .k{color:#5A6477}
 html[data-theme="light"] .wbox .wr .v{color:#11151F}
 html[data-theme="light"] .occ .ot{color:#2C3444}
 html[data-theme="light"] .occ .bar{background:#E4E8F1}
-html[data-theme="light"] #ctl{background:rgba(255,255,255,.92);border-color:#D3DAE6}
-html[data-theme="light"] #ctl button{color:#828CA0}
-html[data-theme="light"] #ctl button.on{background:#e7edf8;color:#11151F}
+html[data-theme="light"] #ctl{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] #ctl .glab{color:#828CA0}
+html[data-theme="light"] #ctl .seg{background:#F1F5FB;border-color:#D3DAE6}
+html[data-theme="light"] #ctl .seg button{color:#5A6477}
+html[data-theme="light"] #ctl .seg button.on{background:var(--blue);color:#fff}
+html[data-theme="light"] #ctl .acts button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] #ctl .acts button.on{border-color:var(--blue);color:#11151F}
 html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
 html[data-theme="light"] .bchip b{color:#11151F}
 html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
@@ -184,6 +216,11 @@ html[data-theme="light"] .stb.on{color:#11151F}
 html[data-theme="light"] th{border-bottom-color:#D3DAE6}
 html[data-theme="light"] #legendwrap{background:rgba(255,255,255,.94);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
 html[data-theme="light"] .lgttl{color:#828CA0}
+html[data-theme="light"] .lgcar{color:#5A6477}
+html[data-theme="light"] .notice{background:#F5F8FD}
+html[data-theme="light"] .notice .nh{color:#11151F}
+html[data-theme="light"] .notice .nd{color:#5A6477}
+html[data-theme="light"] .notice .sp{border-color:#D3DAE6;border-top-color:var(--blue)}
 html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828CA0}
 html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
 html[data-theme="light"] .lg b{color:#5A6477}
@@ -209,10 +246,20 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
 <div id="ctl">
-  <button data-b="light" class="on">Light</button>
-  <button data-b="voyager">Map</button>
-  <button data-b="dark">Dark</button>
-  <button id="ringtog" class="on">10km rings</button>
+  <div class="grp">
+    <div class="glab">Basemap</div>
+    <div class="seg">
+      <button data-b="light" class="on">Light</button>
+      <button data-b="voyager">Streets</button>
+      <button data-b="dark">Dark</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Layers</div>
+    <div class="acts">
+      <button id="ringtog" class="on">10 km reach rings</button>
+    </div>
+  </div>
 </div>
 
 <aside class="side" id="left">
@@ -255,7 +302,10 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </div>
 
 <div id="legendwrap">
-  <div class="lgttl">POI types <span>· tap to toggle</span></div>
+  <div class="lghead" id="lghead" role="button" tabindex="0" aria-expanded="true">
+    <div class="lgttl">POI types <span>· tap a chip to toggle</span></div>
+    <span class="lgcar" aria-hidden="true">▾</span>
+  </div>
   <div id="legend"></div>
 </div>
 
@@ -613,21 +663,41 @@ document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementB
 document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.stb').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));});
+// collapsible POI legend rail — tap the header to fold it away so it never occludes the scene
+(function(){const wrap=document.getElementById('legendwrap'),head=document.getElementById('lghead');
+  if(!wrap||!head)return;
+  function toggle(){const c=wrap.classList.toggle('collapsed');head.setAttribute('aria-expanded',String(!c));}
+  head.addEventListener('click',toggle);
+  head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+})();
 
 buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
-}catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed to load: '+(e&&e.message||e)+'</div>');console.error(e);}
+}catch(e){
+  // never surface a raw technical error — show a calm notice; full detail goes to the console for devs.
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="notice"><div class="nh">This deep-dive could not be displayed</div>'
+    +'<div class="nd">Something went wrong rendering the 3D scene. Try reloading, or pick another province from the menu.</div></div>');
+  console.error('province init failed:',e);
+}
 };</script>
 <script>
 (function(){
  var slug=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
- var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading province…';document.body.appendChild(box);
+ var box=document.createElement('div');box.className='notice';
+ box.innerHTML='<div class="sp"></div><div class="nd">Loading province deep-dive…</div>';
+ document.body.appendChild(box);
  Promise.all([
    fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
    fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
  ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    box.remove();window.initProvince();})
-  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load province "'+slug+'": '+e.message;});
+  .catch(function(e){
+    // calm, styled fallback — no raw error text reaches the user; detail goes to the console.
+    box.innerHTML='<div class="nh">Province data unavailable</div>'
+      +'<div class="nd">We couldn’t load the deep-dive for this province. Please check the link or pick another province from the menu.</div>';
+    console.error('province load failed ('+slug+'):',e);
+  });
 })();
 </script>
 </body>
