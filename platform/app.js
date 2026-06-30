@@ -668,7 +668,7 @@ function drawCompCoverage(){
   const rows=(COMPCOV&&Array.isArray(COMPCOV.brands))?COMPCOV.brands:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Competitor coverage not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_competitor_coverage.py</span> to populate <span class="mono">data/competitor_coverage.json</span> (needs a competitor census), then this panel fills in.</span>';
+    if(ro) ro.innerHTML='<b>Competitor coverage not yet computed.</b> <span class="sub">This layer is being prepared — it fills in once the competitor census refresh lands.</span>';
     return;
   }
   // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
@@ -720,7 +720,7 @@ function drawOppScore(){
   const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Opportunity score not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_opportunity_score.py</span> to populate <span class="mono">data/opportunity_score.json</span>, then this leaderboard fills in.</span>';
+    if(ro) ro.innerHTML='<b>Opportunity score not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh.</span>';
     return;
   }
   // already sorted (score desc) in the file, but sort defensively so the view is stable
@@ -779,7 +779,7 @@ function drawExitWhitespace(){
   const rows=(EXITWS&&Array.isArray(EXITWS.districts))?EXITWS.districts:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Competitor-exit white-space not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_exit_whitespace.py</span> to populate <span class="mono">data/exit_whitespace.json</span>, then this leaderboard fills in. The regulatory thesis above still stands.</span>';
+    if(ro) ro.innerHTML='<b>Competitor-exit white-space not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh. The regulatory thesis above still stands.</span>';
     return;
   }
   const top=rows.slice().sort((a,b)=>(b.exit_capture_score||0)-(a.exit_capture_score||0)).slice(0,EXIT_TOPN);
@@ -1028,7 +1028,7 @@ function drawAcqBoard(){
       const cn=compCount(d);
       const under = haveComp && row.s>=40 && cn===0;
       const compCell = !haveComp
-        ? '<span class="sub" title="run pipeline/pull_competitors.py">n/a</span>'
+        ? '<span class="sub" title="competitor census not loaded yet">n/a</span>'
         : (cn===0
             ? `<span style="color:${under?'var(--gold)':'var(--merch)'}">0${under?' ✦':''}</span>`
             : `<span style="color:var(--agri)">${cn}</span>`);
@@ -1046,7 +1046,7 @@ function drawAcqBoard(){
   const cnote=$('#acqcompnote');
   if(cnote){
     if(!compLoaded){ cnote.innerHTML='<span class="sub">Loading competitor census…</span>'; }
-    else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — no competitor census yet. Run <span class="mono">pipeline/pull_competitors.py</span> (from a Thai IP) and the column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
+    else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — the competitor census isn\'t loaded yet. Once it refreshes, this column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
     else {
       const flagged=acqRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
       cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>underserved AND undercompeted</b> — high white-space with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
@@ -2082,6 +2082,8 @@ function setLens(k){
   }
   if(k==='occrisk' && !occriskLoaded){
     loadOccRisk().then(()=>{ renderLenses(); if(curLens==='occrisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='brisk' && !briskLoaded){
     loadBranchRisk().then(()=>{ renderLenses(); if(curLens==='brisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
