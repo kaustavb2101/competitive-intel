@@ -82,6 +82,8 @@
       competitor density + crop-stress into one rank for "where to open next". Graceful absent. *(high, M)*
 - [ ] **Occupation × risk cross-read** — once `branch_occupations.json` is present, flag branches whose
       borrower base is concentrated in a stressed sector (factory-heavy + industrial slowdown). Graceful absent. *(high, M)*
+- [x] **Competitor coverage QA panel — DONE 2026-06-30** (#acq found-vs-expected per brand, cited expected; total coverage
+      21.9% — MTC 11.3% (978/8673), Tidlor 39%, Srisawad 49%, Heng expected uncited/null. build_competitor_coverage.py gated).
 - [ ] **Competitor coverage QA panel** — found-vs-expected per brand so the lower-bound caveat is explicit
       (Srisawad ~11%, MTC ~14%, Tidlor ~37%, Heng ~35%). *(med, S)*
 - [ ] **NSO census occupation distiller** scaffolding in `ingest_gov.py` (code only; drop-in when the
@@ -94,6 +96,8 @@
       −2.0 pts; moto/agri-vehicle/top-up compress; product mix labelled ESTIMATED, 28% cited; default OFF).
 - [ ] **★ Model the BoT 28% title-loan rate cap** in the Simulator (effective 2 Dec 2025). Add a lever/scenario
       showing book yield + which segments compress at 28%. Real regulatory constraint (obj #1). *(HIGH, M, sandbox)*
+- [x] **Competitor-exit white-space cue — DONE 2026-06-30** (#acq regulatory-tailwind card + ESTIMATED proxy: districts with
+      AutoX demand but thin big-4 footprint; honest caveat that a true rival-fragility index needs a sub-scale-operator census).
 - [ ] **Competitor-exit white-space cue** — non-compliant operators must register by Q1 2026 or exit; surface
       districts where sub-scale rivals may exit as fresh white-space (obj #2). Uses existing competitor census. *(MED, M)*
 - [x] **Rice/rubber + drought "double-stress" flag — DONE 2026-06-30** (crop_stress.json double_stress flag + score, 20 provinces
@@ -101,6 +105,8 @@
 - [ ] **Rice/rubber + drought "double-stress" flag** in crop_stress / district risk — research shows rice+rubber
       prices softening AND >80% El Niño drought prob mid-2026; flag districts with both (obj #1). Uses existing
       crop_stress signals, label estimated. *(MED, M, sandbox)*
+- [x] **Collateral-NPL context — DONE 2026-06-30** (Exposure peer-NPL benchmark: Tidlor 1.5% < MTC 2.53% < SAWAD 3.5–3.6%,
+      cited, labelled PEER-reported / not an AutoX number; peer_npl.json).
 - [ ] **Collateral-NPL context** — peer NPL ladder (Tidlor 1.5% < MTC 2.53% < SAWAD 3.5–3.6%) tracks collateral
       mix; annotate our collateral/segment views with this measured peer context (cited). *(LOW, S)*
 
@@ -116,6 +122,13 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-06-30 — White blow-out ROOT-CAUSED & fixed.** The diffuse cap wasn't enough: the culprit was the
+  view-dependent SPECULAR term, spiked by auto-orbit sweeping through the sun's reflection angle. Zeroed specular on
+  every extruded building/relief/peg across rayong-catchment/branch-explorer/province (lighting now angle-independent
+  → no orbit position can clamp to white) + defaulted auto-orbit OFF.
+- **2026-06-30 — Competitor store-locator puller** (pipeline/pull_competitor_branches.py) — --discover/--pull/--merge,
+  run-from-Thai-IP, harvests the COMPLETE census from operators' own branch-finders (the ~2.5k Google/Overture sets
+  cover only ~22% of reality). NO fabrication: brands yielding 0 omitted, coords sanity-checked.
 - **2026-06-30 — Streaming Overture building tiles (architecture).** pipeline/build_building_tiles.py (union of 10km buffers
   around all 2,015 branches + 2,556 competitors → Overture pull → tippecanoe → PMTiles/MVT; docs/BUILDING_TILES.md runbook),
   + deck.gl MVTLayer streaming-building layer in rayong-catchment/branch-explorer/province (reads platform/data/tiles_config.json;
