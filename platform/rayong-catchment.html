@@ -1477,8 +1477,36 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
  // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
  function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
  var P='data/'+CITY;
+ // CALM GRACEFUL STATE — the per-province 3D building file (<slug>_catchment.json) is pulled
+ // from the desktop per province (pull_overture_buildings.py --province <slug>) and lands over
+ // time. Until a province's file exists, do NOT crash into a broken/empty GL scene: show a quiet
+ // notice and a link to the always-available district view (province.html?p=<slug>). Rayong +
+ // Bangkok ship with their files, so this only ever fires for not-yet-pulled provinces.
+ function notPulled(){
+   box.remove();
+   var prettyP=pretty; // already title-cased from the slug
+   var href='province.html?p='+encodeURIComponent(CITY)+
+     (location.search.indexOf('theme=light')>-1?'&theme=light':'');
+   var el=document.createElement('div');el.className='err';el.style.color='#A7B0C2';
+   el.innerHTML='<div style="max-width:560px;line-height:1.6">'+
+     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+
+       '3D buildings for '+prettyP+' haven’t been pulled yet</div>'+
+     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+
+       'The Overture building scene is pulled per province from the desktop. Until then, the '+
+       'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.</div>'+
+     '<a href="'+href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
+       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;'+
+       'font:700 13px \'IBM Plex Sans Thai\'">Open the '+prettyP+' district view →</a>'+
+     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+
+       'pull command: pull_overture_buildings.py --province '+CITY+'</div>'+
+     '</div>';
+   document.body.appendChild(el);
+ }
  Promise.all([
-   fetch(P+'_catchment.json').then(function(r){if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
+   // The catchment building file is the ONE required input. .ok=false (404) => null here, and we
+   // branch to notPulled() below; a genuine network/parse error still rejects and surfaces loudly.
+   fetch(P+'_catchment.json').then(function(r){if(r.status===404)return null;
+     if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    opt(P+'_province.json'),
    opt('data/provinces/index.json'),
    opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json'),
@@ -1491,7 +1519,9 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
    // opportunity score. Both nationwide; this page filters them to the current city bbox so rivals
    // appear IN the scene even for cities without a curated per-province competitor file (e.g. Bangkok).
    opt('data/competitors_national.json'), opt('data/opportunity_score.json')
- ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
+ ]).then(function(a){
+   if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
+   window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
    window.COMPNAT=a[11];window.OPPSCORE=a[12];

@@ -38,8 +38,18 @@ deck.gl/WebGL scenes in one DOM crashed on mobile; separate routes each get a fr
   - **Simulator** (`#sim`) — client-side portfolio what-if (rate/price/drought levers → PD + exposure).
   - **Provinces** (`#provinces`) — selector into the 77-province deep-dive. **Market** (`#market`) —
     real-numbers market assessment. **Branches** (`#branches`) — search/sort.
-- `province.html?p=<slug>` — generalized deck.gl **3D district-polygon** deep-dive for ANY of 77
-  provinces (Rayong = curated pilot). Loads `data/provinces/<slug>.json`.
+    Both the Provinces and Market tables route the PRIMARY click to the 3D **building scene**
+    (`rayong-catchment.html?city=<slug>`); a secondary "▦ district" link still opens the extruded-
+    relief district view (`province.html?p=<slug>`).
+- `rayong-catchment.html?city=<slug>` — the **fancy Overture 3D building scene** for ANY province
+  (Rayong/Bangkok ship with their `data/<slug>_catchment.json`; others are pulled per-province from
+  the desktop via `pull_overture_buildings.py --province <slug>`). When a province's catchment file
+  is absent it shows a CALM "buildings haven't been pulled yet — open the district view" notice
+  (links to `province.html?p=<slug>`); it never crashes into an empty scene. This is now the primary
+  3D entry point for every province.
+- `province.html?p=<slug>` — generalized deck.gl **3D district-polygon** deep-dive (extruded relief)
+  for ANY of 77 provinces (Rayong = curated pilot). Loads `data/provinces/<slug>.json`. Now the
+  SECONDARY "district view"; its strip carries a "🏙 3D buildings" link to the building scene.
 - `branch-explorer.html?lat=&lng=&n=` — per-branch deck.gl **3D scene** (live OSM buildings, 10km
   rings, grouped establishments, who-works-nearby proxy, 3D POI columns).
 - `rayong-catchment.html` — deck.gl **3D buildings** (3,631 extruded), Mueang Rayong core.

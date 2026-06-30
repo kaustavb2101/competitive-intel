@@ -41,6 +41,30 @@ THE EXACT ONE COMMAND (owner, tonight)
         --out ../platform/data/rayong_catchment.json
 
 That OVERWRITES the baked rayong_catchment.json with the richer Overture data.
+
+PER-PROVINCE BUILDING SCENE (the "real buildings everywhere" rollout)
+---------------------------------------------------------------------
+Every one of the 77 provinces can open the SAME 3D building scene as Rayong/Bangkok
+(rayong-catchment.html?city=<slug>, which loads platform/data/<slug>_catchment.json).
+To pull the buildings for a province in ONE command (bbox auto-derived from the
+province's amphoe polygons in source-data/th_amphoe.geojson — no manual bbox):
+
+    cd pipeline && python3 pull_overture_buildings.py --province chon-buri
+
+That writes ../platform/data/chon-buri_catchment.json in the SAME catchment shape,
+so rayong-catchment.html?city=chon-buri renders it exactly like Rayong. The slug is
+the SAME slug build_province.py uses (see platform/data/provinces/index.json). Until
+a province's file is pulled, the page degrades gracefully ("not pulled yet — showing
+the district view"), so the rollout can be incremental.
+
+A small deterministic platform/data/province_bbox.json (slug -> [S,W,N,E], derived
+from the committed th_amphoe.geojson) is emitted/refreshed on every --province pull,
+and can be (re)built on its own — network-free — with:
+
+    cd pipeline && python3 pull_overture_buildings.py --bbox-only
+
+The frontend can read province_bbox.json to show coverage; the owner can batch the
+pulls slug-by-slug. --bbox-only touches no network.
 BACKUP HINT: copy the current file first so you can roll back if you don't like it:
     cp ../platform/data/rayong_catchment.json ../platform/data/rayong_catchment.bak.json
 
@@ -132,6 +156,121 @@ def _bbox_parts(bbox):
     if len(p) != 4:
         raise ValueError("--bbox must be S,W,N,E")
     return p  # s, w, n, e
+
+
+# ── per-province bbox from the amphoe polygons (TASK 1) ──────────────────────────
+# A province has NO field on the amphoe geojson (only an English shapeName), so which
+# amphoe polygons belong to a province is recovered the SAME way build_province.py
+# does it: spatial-join the master branches into amphoe polygons (point-in-polygon),
+# group by canonical province, and slug each province with the SAME rule build_province
+# uses (PROVINCE_EN override -> "Mueang <prov>" amphoe English name -> first amphoe).
+# We import build_province's helpers so the slug + geometry logic can never drift from
+# the file that actually writes platform/data/provinces/<slug>.json.
+#
+# Everything here is NETWORK-FREE and deterministic (reads only committed source-data).
+PROVINCE_BBOX_OUT = os.path.join(ROOT, "platform", "data", "province_bbox.json")
+SRC_DIR = os.path.join(ROOT, "source-data")
+# pad the union of amphoe bboxes a touch so buildings on the very rim of the rim
+# amphoe still land in the Overture pull (degrees; ~1.1km lat).
+_PROV_BBOX_PAD = 0.01
+
+
+def _slug_extents():
+    """Return {slug: {"th":prov, "en":en, "bbox":[S,W,N,E], "amphoe":n}} for every
+    province, with bbox = padded union of that province's amphoe polygon bboxes.
+    Pure / network-free; mirrors build_province.py's province->amphoe spatial join."""
+    import build_province as bp
+    from regionmap import canonical, REGION, PROVINCE_EN
+
+    master = bp._load(os.path.join(SRC_DIR, "branches_final.json"))
+    amphoe = bp._load(os.path.join(SRC_DIR, "th_amphoe.geojson"))["features"]
+    polys = [(f, bp._bbox(f["geometry"])) for f in amphoe]
+    poly_by_id = {f["properties"]["shapeID"]: f for f in amphoe}
+
+    # branch -> amphoe polygon (same PIP + bbox prefilter as build_province)
+    branch_poly = {}
+    for bi, b in enumerate(master):
+        x, y = b["lng"], b["lat"]
+        for f, (x0, y0, x1, y1) in polys:
+            if x0 <= x <= x1 and y0 <= y <= y1 and bp._contains(f["geometry"], x, y):
+                branch_poly[bi] = f["properties"]["shapeID"]
+                break
+
+    # group branch indices by canonical province
+    prov_idx = {}
+    for bi, b in enumerate(master):
+        prov_idx.setdefault(canonical(b["prov"]), []).append(bi)
+
+    out = {}
+    for prov, idxs in sorted(prov_idx.items()):
+        if prov not in REGION:
+            continue
+        # province's amphoe polygons = those containing its branches (insertion order)
+        dist_ids = []
+        seen = set()
+        for bi in idxs:
+            sid = branch_poly.get(bi)
+            if sid and sid not in seen:
+                seen.add(sid); dist_ids.append(sid)
+        if not dist_ids:
+            continue
+        feats = [poly_by_id[sid] for sid in dist_ids]
+        # slug — IDENTICAL rule to build_province.py
+        en = PROVINCE_EN.get(prov, "")
+        if not en:
+            for f in feats:
+                sn = f["properties"]["shapeName"]
+                if sn.startswith("Mueang "):
+                    en = sn[len("Mueang "):]; break
+        if not en:
+            en = feats[0]["properties"]["shapeName"]
+        slug = bp.slugify(en) or bp.slugify(prov)
+        # union of amphoe bboxes -> friendly S,W,N,E (build_province._bbox gives x0,y0,x1,y1)
+        bxs = [bp._bbox(f["geometry"]) for f in feats]
+        w = min(b[0] for b in bxs); s = min(b[1] for b in bxs)
+        e = max(b[2] for b in bxs); n = max(b[3] for b in bxs)
+        out[slug] = {
+            "th": prov, "en": en, "amphoe": len(feats),
+            "bbox": [round(s - _PROV_BBOX_PAD, 6), round(w - _PROV_BBOX_PAD, 6),
+                     round(n + _PROV_BBOX_PAD, 6), round(e + _PROV_BBOX_PAD, 6)],
+        }
+    return out
+
+
+def write_province_bbox(check=False):
+    """Build platform/data/province_bbox.json:
+        { "meta": {source, generated_by, ...},
+          "provinces": { slug -> {th, en, amphoe, bbox:[S,W,N,E]} } }
+    bbox is MEASURED — the union of the province's amphoe polygon extents in the
+    committed th_amphoe.geojson. Deterministic; --check verifies byte-for-byte."""
+    provinces = _slug_extents()
+    doc = {
+        "meta": {
+            # MEASURED geometry derivation — no estimate, no network.
+            "source": "GeoBoundaries THA ADM2 (source-data/th_amphoe.geojson) — measured polygon extents",
+            "generated_by": "pipeline/pull_overture_buildings.py (write_province_bbox)",
+            "provenance": "measured",
+            "description": "Per-province bounding box [S,W,N,E] = union of that province's amphoe "
+                           "polygon extents, padded ~1.1km. Drives per-province Overture building "
+                           "pulls and frontend coverage display. Slugs match provinces/index.json.",
+            "pad_deg": _PROV_BBOX_PAD,
+            "count": len(provinces),
+        },
+        "provinces": provinces,
+    }
+    text = json.dumps(doc, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
+    if check:
+        if not os.path.exists(PROVINCE_BBOX_OUT) or \
+                open(PROVINCE_BBOX_OUT, encoding="utf-8").read() != text:
+            print(f"DRIFT: {os.path.relpath(PROVINCE_BBOX_OUT, ROOT)}")
+            return 1, provinces
+        print(f"OK: province_bbox.json reproduces ({len(provinces)} provinces)")
+        return 0, provinces
+    with open(PROVINCE_BBOX_OUT, "w", encoding="utf-8") as f:
+        f.write(text)
+    print(f"wrote {os.path.relpath(PROVINCE_BBOX_OUT, ROOT)}  "
+          f"({len(provinces)} provinces, deterministic from th_amphoe.geojson)")
+    return 0, provinces
 
 
 def download_geojson(cli, bbox, dest):
@@ -320,13 +459,55 @@ def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--city", default="rayong")
-    ap.add_argument("--bbox", default=DEFAULT_BBOX, help="S,W,N,E (default WIDE Rayong)")
+    ap.add_argument("--bbox", default=None, help="S,W,N,E (default WIDE Rayong; auto-set by --province)")
+    ap.add_argument("--province", help="province SLUG (e.g. chon-buri) — auto-derives bbox + out "
+                                       "from th_amphoe.geojson and writes <slug>_catchment.json")
+    ap.add_argument("--bbox-only", action="store_true",
+                    help="just (re)build platform/data/province_bbox.json (network-free) and exit")
+    ap.add_argument("--bbox-check", action="store_true",
+                    help="verify province_bbox.json reproduces byte-for-byte (network-free) and exit")
     ap.add_argument("--geojson", help="use an existing Overture GeoJSON instead of downloading")
     ap.add_argument("--cli", default="overturemaps", help="Overture CLI executable name")
-    ap.add_argument("--out", default=DEFAULT_OUT)
+    ap.add_argument("--out", default=None, help="output path (default Rayong; auto-set by --province)")
     ap.add_argument("--keep-geojson", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    # network-free province_bbox.json (re)build / verify — exits without touching Overture.
+    if args.bbox_check:
+        rc, _ = write_province_bbox(check=True)
+        sys.exit(rc)
+    if args.bbox_only:
+        write_province_bbox(check=False)
+        return
+
+    # --province SLUG: derive the bbox from the amphoe polygons + set the output file, then
+    # refresh province_bbox.json so coverage stays in sync. Network is hit only for the pull.
+    if args.province:
+        slug = args.province.strip().lower()
+        write_province_bbox(check=False)   # keep coverage map current (deterministic)
+        ext = _slug_extents().get(slug)
+        if not ext:
+            print(f"ERROR: unknown province slug '{slug}'. Valid slugs are the keys in "
+                  f"platform/data/provinces/index.json (e.g. chon-buri, khon-kaen).",
+                  file=sys.stderr)
+            sys.exit(2)
+        s, w, n, e = ext["bbox"]
+        if args.bbox is None:
+            args.bbox = f"{s},{w},{n},{e}"
+        if args.out is None:
+            args.out = os.path.join(ROOT, "platform", "data", f"{slug}_catchment.json")
+            args.out = os.path.normpath(args.out)
+        if args.city == "rayong":
+            args.city = slug
+        print(f"province '{slug}' ({ext['en']} / {ext['th']}): {ext['amphoe']} amphoe  "
+              f"bbox S,W,N,E = {args.bbox}  -> {os.path.relpath(args.out, ROOT)}")
+
+    # defaults for a plain (non-province) run stay byte-identical to before.
+    if args.bbox is None:
+        args.bbox = DEFAULT_BBOX
+    if args.out is None:
+        args.out = DEFAULT_OUT
 
     tmp = None
     gj = args.geojson
@@ -350,6 +531,7 @@ def main():
         sys.exit(2)
 
     pct_meas = 100 * stats["measured"] // n
+    print(f"bbox (S,W,N,E): {args.bbox}")
     print(f"buildings: {n}  |  height MEASURED {stats['measured']} ({pct_meas}%)  "
           f"ESTIMATED {stats['estimated']} ({100 - pct_meas}%)")
     hs = sorted(b["h"] for b in buildings)
@@ -379,7 +561,9 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     kb = os.path.getsize(args.out) / 1024.0
-    print(f"wrote {args.out}  ({kb:.1f} KB)  — reload rayong-catchment.html.")
+    reload_hint = ("rayong-catchment.html" if args.city == "rayong"
+                   else f"rayong-catchment.html?city={args.city}")
+    print(f"wrote {args.out}  ({kb:.1f} KB)  — reload {reload_hint}.")
     print("NOTE: heights are MEASURED where Overture has them, ESTIMATED (type+footprint) otherwise.")
 
 
