@@ -257,16 +257,24 @@ def load_features(path):
         if isinstance(data, dict) and data.get("type") == "Feature":
             return [data]
         raise ValueError(f"{path} is not a GeoJSON FeatureCollection/Feature(s)")
-    feats = []
+    feats, skipped = [], 0
     for line in text.splitlines():
         line = line.strip()
         if not line:
             continue
-        ft = json.loads(line)
+        try:
+            ft = json.loads(line)
+        except json.JSONDecodeError:
+            # One truncated/malformed record (common at the tail of a big interrupted pull)
+            # must not kill the whole file — skip it and keep going.
+            skipped += 1
+            continue
         if isinstance(ft, dict) and ft.get("type") == "FeatureCollection":
             feats.extend(ft.get("features", []))
         else:
             feats.append(ft)
+    if skipped:
+        print(f"load_features: skipped {skipped} malformed line(s)", file=sys.stderr)
     return feats
 
 
