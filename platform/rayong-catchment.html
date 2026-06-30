@@ -826,6 +826,32 @@ const OCC=[
   ['Healthcare',['pharm'],'pharmacy'],
   ['Public sector',['civic'],'school'],
 ];
+// MEASURED occupation mix (Overture Places) — branch_occupations.json is INDEX-ALIGNED to
+// data/branches.json (the national 2,015), not to this page's province branch list. So to read
+// the measured mix for the focal AutoX branch we match its coordinates to the nearest national
+// branch and use that index. rgb colour per bucket key (parity with branch-explorer's palette).
+const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125],food:[230,180,80],
+  hospitality:[230,180,80],finance:[200,67,59],health:[91,124,250],education:[91,124,250],
+  public:[138,148,168],professional:[91,124,250],agriculture:[200,67,59],personal:[28,140,125],
+  logistics:[138,148,168],construction:[230,180,80]};
+// → the measured occupation entry for a focal branch, or null when the layer/branch is absent.
+// Matches focal (x=lng,y=lat) to the nearest national branch within ~1.5km, then reads its rollup.
+function measuredOcc(f){
+  var OD=window.OCCDATA, NB=window.NATBRANCHES;
+  if(!f||!OD||!OD.branches||!OD.buckets||!NB||!NB.length) return null;
+  if(f.x==null||f.y==null) return null;
+  var bi=-1, bd=Infinity;
+  for(var i=0;i<NB.length;i++){ var b=NB[i]; if(b.x==null||b.y==null) continue;
+    var dd=hav(f.y,f.x,b.y,b.x); if(dd<bd){bd=dd;bi=i;} }
+  if(bi<0||bd>1500) return null;            // no national branch within 1.5km → don't fabricate a match
+  var e=OD.branches[bi]; return (e&&e.t>0)?e:null;
+}
+// → sorted, non-empty {lab,col,v} rows for a measured occupation entry (top buckets first).
+function OCC_BUCKETS_FROM(e){
+  var bk=window.OCCDATA.buckets;
+  return bk.map(function(b,j){return {lab:b.label,col:OCC_BUCKET_COL[b.key]||[138,148,168],v:(e.o&&e.o[j])||0};})
+    .filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
+}
 
 function updatePanels(){
   // No branch data (a city without a province file) — leave the analysis panels in their empty state.
@@ -869,8 +895,20 @@ function updatePanels(){
     if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
     html+='</div>';
   }
-  // occupation mix — ESTIMATED proxy from k10 establishment counts (no fabricated headcounts)
-  if(k){
+  // occupation mix — prefer the MEASURED Overture-Places rollup for the focal branch (matched to
+  // the nearest national branch); fall back to the ESTIMATED k10 proxy when the layer/entry is absent.
+  const occEntry=measuredOcc(focal);
+  if(occEntry){
+    const rows=OCC_BUCKETS_FROM(occEntry);
+    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag meas">measured · Overture</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const pct=Math.round(r.v/tot*100);
+        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">${fmt(occEntry.t||0)} establishments ≤10km by category — measured (Overture Maps Places, a sample/lower bound, not a registry). What work surrounds the branch, not a headcount.</div>`;
+  }else if(k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
       .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
@@ -880,7 +918,7 @@ function updatePanels(){
         return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
       }).join('')+`</div>`
-      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
+      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py for measured Overture counts.</div>`;
   }
   whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
 }
@@ -1054,10 +1092,14 @@ buildStrip();buildLegend();buildIsoLegend();buildCascade();buildLeads();updatePa
    opt('data/provinces/index.json'),
    opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json'),
    opt(P+'_isochrone.json'),
-   opt(P+'_trees.json'), opt(P+'_rail.json')
+   opt(P+'_trees.json'), opt(P+'_rail.json'),
+   // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
+   // Both load best-effort; absent => the "who works nearby" panel keeps its estimated proxy.
+   opt('data/branch_occupations.json'), opt('data/branches.json')
  ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
-   window.TREES=a[7];window.RAIL=a[8];box.remove();window.initCatch();})
+   window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
+   box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();
 </script>

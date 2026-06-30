@@ -10,6 +10,7 @@ const LENS = {
   motomix:  {label:'Motorcycle-title share ▲', desc:'MEASURED (DLT) — motorcycle share of the province vehicle stock (moto ÷ total). The most volatile, lowest-recovery title collateral; higher share = more exposure to a used-motorcycle value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
   informal: {label:'Informal workforce',  desc:'NSO informal workers in the province — borrower base', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
   autox:    {label:'AutoX saturation',    desc:'own AutoX branches within 10 km', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
+  estab:    {label:'Establishments ≤10km', desc:'MEASURED establishment density (Overture Maps Places, a sample/lower bound) — total points of interest within 10 km of each branch, a proxy for how much economic activity surrounds it. Lazy-loads branch_occupations.json; run pull_overture_places.py + build_occupations.py to populate.', color:'#1C8C7D', unit:'estab', val:d=>estabCount(d)},
   comp:     {label:'Competitor density ◆', desc:'MEASURED competitor locations (Google Places, a LOWER BOUND, not a registry) — rival title-loan / vehicle-finance branches (Srisawad, Muangthai, Tidlor, Heng) within ~5km of each AutoX branch. Lazy-loads competitors_national.json; run pull_competitors.py to populate.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
@@ -43,6 +44,40 @@ async function loadCropStress(){
   return cstressPromise;
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
+
+/* ---------- measured occupation mix (Overture Places) ----------
+   Lazy-loads data/branch_occupations.json — a MEASURED per-branch rollup of establishment
+   points by occupation bucket within 10km, written by pipeline/build_occupations.py once
+   pull_overture_places.py has run (from a normal/Thai network). The "branches" array is
+   INDEX-ALIGNED to branches.json (entry i ↔ DATA[i]), shape:
+     { buckets:[{key,label}], branches:[{t:total, o:[counts aligned to buckets]}] }
+   Everything is null-guarded: absent file or absent branch entry → nothing extra renders,
+   the national map's "estab" lens reads 0, and the branch popup simply omits the block.
+   Mirrors the branch-explorer.html reference implementation (loadOccupations/OCC_BUCKET_COL). */
+let OCCDATA=null, occLoaded=false, occPromise=null;
+// stable colour per occupation bucket key — parity with the branch-explorer palette.
+const OCC_BUCKET_COL={factory:'#7A4FE0',auto:'#7A4FE0',retail:'#1C8C7D',food:'#E6B450',
+  hospitality:'#E6B450',finance:'#C8433B',health:'#5B7CFA',education:'#5B7CFA',
+  public:'#8b90a7',professional:'#5B7CFA',agriculture:'#C8433B',personal:'#1C8C7D',
+  logistics:'#8b90a7',construction:'#E6B450'};
+async function loadOccupations(){
+  // cache the in-flight PROMISE (mirrors loadCompetitors/loadCropStress) so concurrent callers
+  // all await the one real fetch instead of returning early with OCCDATA still null.
+  if(occPromise) return occPromise;
+  occLoaded=true;
+  occPromise=(async()=>{
+    try{ const r=await fetch('data/branch_occupations.json'); if(r.ok) OCCDATA=await r.json(); }
+    catch(e){ OCCDATA=null; }
+    return OCCDATA;
+  })();
+  return occPromise;
+}
+// total measured establishments ≤10km for a branch (0 when the file/entry is absent) — the "estab" lens val().
+function estabCount(d){
+  if(!OCCDATA||!OCCDATA.branches||!DATA) return 0;
+  const i=DATA.indexOf(d); if(i<0) return 0;
+  const e=OCCDATA.branches[i]; return (e&&e.t)||0;
+}
 
 /* ---------- competitor census (objective #2: competitor-AWARE white-space) ----------
    Lazy-loads data/competitors_national.json — a MEASURED census of rival title-loan / vehicle-
@@ -1166,6 +1201,9 @@ function initMap(){
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
   if(!ampJoinAttached) loadAmphoe().then(()=>{ if(mapReady){ renderLegend(); styleMarkers(); } });
+  // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
+  // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
+  if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -1251,6 +1289,28 @@ function cstressPopupHTML(d,sec,r){
     + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
     + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'var(--gold)':'var(--merch)');
 }
+// Occupation-mix block for a branch popup — the MEASURED Overture-Places rollup of establishments
+// by occupation bucket within 10km of this branch. Renders nothing until branch_occupations.json is
+// loaded AND this branch has a non-empty entry (entry.t>0), so it is fully graceful: absent file or
+// absent/empty entry → no block at all. Shows the top ~6 buckets as labelled percentage bars.
+function occPopupHTML(d,sec){
+  if(!OCCDATA||!OCCDATA.branches||!OCCDATA.buckets||!DATA) return '';
+  const i=DATA.indexOf(d); if(i<0) return '';
+  const e=OCCDATA.branches[i]; if(!e||!(e.t>0)) return '';
+  let rows=OCCDATA.buckets.map((bk,j)=>({lab:bk.label,col:OCC_BUCKET_COL[bk.key]||'#8b90a7',v:(e.o&&e.o[j])||0}))
+    .filter(rw=>rw.v>0).sort((a,b)=>b.v-a.v).slice(0,6);
+  if(!rows.length) return '';
+  const tot=rows.reduce((a,rw)=>a+rw.v,0)||1, mx=rows[0].v||1;
+  return sec('Occupation mix (measured · Overture)')
+    + `<div class="occ" style="margin-top:2px">`+rows.map(rw=>{
+        const pct=Math.round(rw.v/tot*100), w=Math.max(4,Math.round(rw.v/mx*100));
+        return `<div class="pr" style="gap:8px"><span style="flex:1">${rw.lab}</span>`
+          +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${rw.col}"></i></span>`
+          +`<b class="mono" style="color:${rw.col};min-width:30px;text-align:right">${pct}%</b></div>`;
+      }).join('')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">${(e.t||0).toLocaleString()} establishments ≤10km by category (Overture Maps Places — a sample/lower bound, not a registry)</div>`
+    + `</div>`;
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -1315,6 +1375,7 @@ function popupHTML(d){
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), 'var(--collat)'):''}
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
+    ${occPopupHTML(d,sec)}
     ${amphoePopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
@@ -1335,6 +1396,9 @@ function setLens(k){
   renderRiskSub();
   if(k==='cstress' && !cstressLoaded){
     loadCropStress().then(()=>{ if(curLens==='cstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='estab' && !occLoaded){
+    loadOccupations().then(()=>{ if(curLens==='estab'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
