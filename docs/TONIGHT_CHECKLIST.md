@@ -125,6 +125,31 @@ python3 bake_catchment_heights.py --check
 
 ---
 
+## 3b. Overture Places — granular occupation/employment near every branch
+
+Replaces the province-level NSO number + the OSM "who works nearby" *proxy* with a MEASURED,
+point-level establishment census (Overture Maps Places, free, no geo-block). Each place → 1 of 14
+occupation buckets; we count them within 10 km of every branch. Needs the Overture CLI
+(`pip install overturemaps`).
+
+```bash
+cd pipeline
+# 1) pull places (WIDE Rayong by default; --preset national for the whole country, large pull)
+python3 pull_overture_places.py --bbox "12.62,101.13,12.74,101.33"   # -> source-data/overture_places.json
+# 2) roll up into per-branch 10km occupation mix (deterministic, feeds the app)
+python3 build_occupations.py                                          # -> platform/data/branch_occupations.json
+python3 build_occupations.py --check                                  # must pass (gate runs this)
+# 3) commit BOTH the source layer and the derived file together:
+git add ../source-data/overture_places.json ../platform/data/branch_occupations.json
+git commit -m "data: Overture Places occupation layer + per-branch 10km rollup"
+git push origin claude/new-session-wto26j
+```
+
+The branch-explorer "Who works nearby" panel auto-switches from *estimated · proxy* to
+*measured · Overture* the moment `branch_occupations.json` is present.
+
+---
+
 ## 4. Agri ground-truth — farm-gate prices, reservoirs, flood
 
 `build_crop_stress.py` currently uses the **World Bank GLOBAL price board** as a *direction proxy* —

@@ -175,6 +175,22 @@ const OCC=[
   ['Healthcare',['pharm'],'pharmacy'],
   ['Public sector',['civic'],'school'],
 ];
+// MEASURED occupation mix (Overture Places) — lazy-loaded, optional. branch_occupations.json
+// is INDEX-ALIGNED to branches.json; built by pipeline/build_occupations.py once
+// pull_overture_places.py has been run. Absent = panel falls back to the OSM estimate below.
+let OCCDATA=null, occDataTried=false;
+async function loadOccupations(){
+  if(occDataTried) return OCCDATA;
+  occDataTried=true;
+  try{ const r=await fetch('data/branch_occupations.json'); if(r.ok) OCCDATA=await r.json(); }
+  catch(e){ OCCDATA=null; }
+  return OCCDATA;
+}
+// stable colour per occupation bucket key (parity with the platform palette where sensible)
+const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125],food:[230,180,80],
+  hospitality:[230,180,80],finance:[200,67,59],health:[91,124,250],education:[91,124,250],
+  public:[138,148,168],professional:[91,124,250],agriculture:[200,67,59],personal:[28,140,125],
+  logistics:[138,148,168],construction:[230,180,80]};
 function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 function poiColumnHeight(t){ // visible 3D column heights for the live markers (metres)
   if(t==='industrial')return 90; if(t==='hotel')return 75; if(/gold|bank/.test(t))return 60;
@@ -434,12 +450,28 @@ async function loadPanel(){
         +`<div class="wr"><span>Formal workers</span><span class="v">${fmt(frm)}</span></div>`
         +'</div>';
     }
-    const occRows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
-      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    // Occupation mix: prefer the MEASURED Overture-Places rollup for this branch; fall back
+    // to the ESTIMATED OSM proxy when the rollup file (or this branch's entry) is absent.
+    const occJson=await loadOccupations();
+    const idx=data.indexOf(best);
+    const occEntry=(occJson&&occJson.branches&&idx>=0)?occJson.branches[idx]:null;
+    let occRows, measuredOcc=false;
+    if(occEntry && occEntry.t>0){
+      measuredOcc=true;
+      occRows=occJson.buckets.map((bk,j)=>({lab:bk.label,col:OCC_BUCKET_COL[bk.key]||[138,148,168],v:occEntry.o[j]||0}))
+        .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    }else{
+      occRows=OCC.map(([lab,ks,col])=>({lab,col:POI_COLORS[col]||[138,148,168],v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+        .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    }
     const occTot=occRows.reduce((a,r)=>a+r.v,0)||1, occMx=occRows.length?occRows[0].v:1;
-    workhtml+=`<h3 style="margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h3>`
+    const occTag=measuredOcc
+      ? `<span class="tag meas">measured · Overture</span>`
+      : `<span class="tag est">estimated · proxy</span>`;
+    const occCount=measuredOcc?` <span class="cap" style="font-weight:400">(${fmt(occEntry.t)} establishments ≤10km)</span>`:'';
+    workhtml+=`<h3 style="margin-top:2px">Occupation mix ${occTag}${occCount}</h3>`
       +`<div class="occ">`+occRows.map(r=>{
-        const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/occTot*100);
+        const c=r.col, pct=Math.round(r.v/occTot*100);
         return `<div class="or"><div class="ot"><span>${r.lab}</span><b>${pct}%</b></div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/occMx*100))}%;background:${rgb(c)}"></i></div></div>`;
       }).join('')+`</div>`;
@@ -456,7 +488,7 @@ async function loadPanel(){
        <div class="note">Establishments mapped in OpenStreetMap within 10 km of this branch — measured, not estimated.</div>
        <h3>Who works nearby</h3>
        ${workhtml}
-       <div class="note">Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Informal/formal split is province-level (NSO, measured). 3D buildings + coloured POI columns = live OpenStreetMap (measured) when reachable; building heights estimated from type + footprint. Rings = 3 / 5 / 10 km.</div>`;
+       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings + coloured POI columns = live OpenStreetMap (measured) when reachable; building heights estimated from type + footprint. Rings = 3 / 5 / 10 km.</div>`;
   }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
 }
 
