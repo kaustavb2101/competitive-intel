@@ -23,6 +23,10 @@ pipeline/dgt_out/
 # tiled, resumable national Overture pull — per-tile geojsonseq cache + resume manifest
 # (pull_overture_national.py). Re-pullable raw INPUT; never commit synthetic geo or the cache.
 source-data/.overture_tiles/
+# merged national Overture PLACES layer (~54MB, pull_overture_places.py). Re-pullable raw INPUT;
+# the DERIVED, small outputs (branch_occupations.json / amphoe_occupations.json) ARE committed and
+# the gate skips the byte-check when this input is absent (CI never has it). Keep it local.
+source-data/overture_places.json
 
 # QA render temp (headless screenshots)
 platform/_qa_vendor/
