@@ -85,7 +85,7 @@ def search(query):
     return out, calls, "OK"
 
 
-def run(brands, prov_limit, check=False):
+def run(brands, prov_limit, check=False, merge=False):
     if not KEY:
         sys.exit("Set GOOGLE_PLACES_KEY in the repo-root .env (git-ignored).")
     provs = provinces(prov_limit)
@@ -111,15 +111,36 @@ def run(brands, prov_limit, check=False):
                               "lng": round(lng, 6), "prov": prov, "place_id": pid})
             print(f"  {brand} · {prov}: +{len(res)} (total {len(items)}, calls {calls})")
             time.sleep(0.2)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    path = os.path.join(OUT_DIR, "competitors_national.json")
+
+    # --merge: splice the re-pulled brand(s) into the existing file instead of overwriting it.
+    # Keep every item whose brand was NOT re-pulled this run; add the fresh ones. This lets you
+    # re-pull a single brand (e.g. Srisawad after a transient denial) without losing the others.
+    if merge and os.path.exists(path):
+        try:
+            prev = json.load(open(path, encoding="utf-8"))
+        except Exception:
+            prev = {}
+        kept = [it for it in prev.get("items", []) if it.get("brand") not in brands]
+        have = {it.get("place_id") for it in kept}
+        merged = list(kept)
+        for it in items:
+            if it["place_id"] not in have:
+                have.add(it["place_id"])
+                merged.append(it)
+        kept_brands = sorted({it["brand"] for it in kept})
+        print(f"  merge: kept {len(kept)} from {kept_brands}, "
+              f"re-pulled {sorted(set(brands))} -> {len(items)} fresh")
+        items = merged
+
     by_brand = {}
     for it in items:
         by_brand[it["brand"]] = by_brand.get(it["brand"], 0) + 1
     out = {"meta": {"source": "Google Places Text Search — measured competitor locations",
-                    "brands_queried": brands, "provinces": len(provs), "places_calls": calls,
+                    "brands_queried": sorted(by_brand.keys()), "provinces": len(provs), "places_calls": calls,
                     "note": "Coverage is best-effort (Places caps ~60/query/province); a lower bound, not a registry."},
            "brands": by_brand, "items": sorted(items, key=lambda x: (x["brand"], x["prov"]))}
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, "competitors_national.json")
     json.dump(out, open(path, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"\nwrote {path}: {len(items)} competitor branches  {by_brand}")
     return 0
@@ -129,6 +150,9 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="national competitor census via Google Places")
     ap.add_argument("--brands", default=",".join(BRANDS), help="comma list (default all)")
     ap.add_argument("--provinces", type=int, default=None, help="cap to N biggest provinces (cost control)")
+    ap.add_argument("--merge", action="store_true",
+                    help="splice the re-pulled brand(s) into the existing competitors_national.json "
+                         "instead of overwriting it (use when re-pulling a single brand)")
     a = ap.parse_args()
     bl = [b.strip() for b in a.brands.split(",") if b.strip() in BRANDS]
-    raise SystemExit(run(bl, a.provinces))
+    raise SystemExit(run(bl, a.provinces, merge=a.merge))
