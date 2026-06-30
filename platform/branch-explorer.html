@@ -87,9 +87,23 @@ html[data-theme="light"] #vignette{
 .ctl .bl .bl-acc{display:flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt)}
 .ctl .bl .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
 html[data-theme="light"] .ctl .bl .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
+/* compact POI legend: lender-relevant categories, colour swatch + label + live count; collateral &
+   finance grouped at the top. Scrolls if many types are present so it never overgrows the panel. */
+.ctl .poileg{display:flex;flex-direction:column;gap:2px;max-height:188px;overflow-y:auto;scrollbar-width:thin}
+.ctl .poileg .pl-grp{font:700 8.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:4px 0 1px}
+.ctl .poileg .pl-grp:first-child{margin-top:0}
+.ctl .poileg .pl{display:flex;align-items:center;gap:6px;font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt);padding:1px 0}
+.ctl .poileg .pl .sw{width:9px;height:9px;border-radius:2px;flex:none;border:1px solid rgba(255,255,255,.22)}
+.ctl .poileg .pl .lab{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl .poileg .pl b{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--hi)}
+.ctl .poileg .pl.off{opacity:.4}
+.ctl .poileg .pl-empty{font:500 10px 'IBM Plex Sans Thai';color:var(--dim);line-height:1.4}
+html[data-theme="light"] .ctl .poileg .pl{color:#2C3444}
+html[data-theme="light"] .ctl .poileg .pl b{color:#11151F}
+html[data-theme="light"] .ctl .poileg .pl .sw{border-color:rgba(0,0,0,.18)}
 @media(max-width:820px){.ctl{top:auto;bottom:62px;right:8px;min-width:0;padding:8px;gap:6px}
  .ctl .glab{display:none}.ctl .acts button{padding:7px 9px}
- .ctl .bl{display:none}}
+ .ctl .bl{display:none}.ctl .poileg{display:none}}
 
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
  padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
@@ -209,6 +223,10 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
       <div class="bl-acc"><span class="sw" style="background:rgb(91,124,250)"></span>landmark (tallest)</div>
     </div>
   </div>
+  <div class="grp">
+    <div class="glab">POIs · ≤10km (live OSM)</div>
+    <div class="poileg" id="poileg"><div class="pl-empty">POIs load when buildings load…</div></div>
+  </div>
 </div>
 <div id="panel"></div>
 <div id="status">Loading…</div>
@@ -230,14 +248,31 @@ const tileCache = {};   // bbox-keyed building cache so panning doesn't refetch
 const poiTileCache = {};// bbox-keyed POI cache
 let pois = [];          // live OSM POIs in view, {x,y,t} — empty when Overpass blocked
 
-/* ---- shared palette / groupings (same source-of-truth as rayong-catchment) ---- */
+/* ---- shared palette / groupings (lender-relevant; superset of rayong-catchment) ----
+   Ordered by relevance to a TITLE-LOAN lender: collateral-supply + finance signals first
+   (vehicle/gold/pawn/fuel/banks), then demand signals (markets, retail, agri supply), then
+   the surrounding economy (industry, services, civic). Each type gets a DISTINCT colour so the
+   3D columns + the legend are decodable; counts are capped per type so a dense 10km ring stays sane. */
 const POI_COLORS={
-  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
-  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
-  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
-const POI_LABEL={vehicle_commerce:'Vehicle shop',gold:'Gold dealer',bank:'Bank / ATM',convenience:'Convenience',
-  fresh_market:'Fresh market',supermarket:'Supermarket',industrial:'Industrial',pharmacy:'Pharmacy',
-  restaurant:'Restaurant',hotel:'Hotel',school:'School'};
+  // --- collateral supply + finance (the title-loan core) ---
+  vehicle_commerce:[28,140,125], vehicle_repair:[60,170,150], fuel:[20,110,98],
+  gold:[230,180,80], pawn:[224,140,40], bank:[91,124,250],
+  // --- demand signals: where cash-cycle borrowers transact ---
+  fresh_market:[224,144,47], supermarket:[224,170,90], convenience:[208,118,60],
+  agri_supply:[176,150,60], hardware:[150,128,70],
+  // --- surrounding economy / services ---
+  industrial:[123,138,166], restaurant:[133,144,166], hotel:[214,90,160],
+  school:[122,79,224], health:[200,67,59], pharmacy:[200,100,90]};
+const POI_LABEL={vehicle_commerce:'Vehicle dealer',vehicle_repair:'Auto / moto repair',fuel:'Fuel station',
+  gold:'Gold dealer',pawn:'Pawnshop',bank:'Bank / ATM',
+  fresh_market:'Fresh market',supermarket:'Supermarket',convenience:'Convenience',
+  agri_supply:'Agri supply',hardware:'Hardware',
+  industrial:'Industrial',restaurant:'Restaurant',hotel:'Hotel',
+  school:'School',health:'Hospital / clinic',pharmacy:'Pharmacy'};
+// relevance ordering for the on-screen POI legend (collateral & finance grouped first)
+const POI_LEGEND_ORDER=['vehicle_commerce','vehicle_repair','fuel','gold','pawn','bank',
+  'fresh_market','supermarket','convenience','agri_supply','hardware',
+  'industrial','restaurant','hotel','school','health','pharmacy'];
 // k10 key -> POI palette key (for swatch colour parity with the live markers)
 const K10_COL={veh:'vehicle_commerce',gold:'gold',bank:'bank',atm:'bank',fmkt:'fresh_market',
   super:'supermarket',cvs:'convenience',rest:'restaurant',ind:'industrial',hotel:'hotel',
@@ -320,8 +355,12 @@ const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125]
   logistics:[138,148,168],construction:[230,180,80]};
 function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 function poiColumnHeight(t){ // visible 3D column heights for the live markers (metres)
-  if(t==='industrial')return 90; if(t==='hotel')return 75; if(/gold|bank/.test(t))return 60;
-  if(/super|fresh_market/.test(t))return 45; return 38; }
+  // lender-relevant collateral/finance types stand tallest so they pop out of the catchment.
+  if(t==='industrial')return 90; if(t==='hotel')return 75;
+  if(/gold|pawn|bank/.test(t))return 68;                       // collateral + finance = hero columns
+  if(/vehicle_commerce|vehicle_repair|fuel/.test(t))return 60; // vehicle collateral signal
+  if(/super|fresh_market|agri_supply/.test(t))return 45;
+  if(t==='health')return 52; return 38; }
 
 const $ = s => document.querySelector(s);
 // status chip: kind = '' (calm/neutral) | 'info' (graceful degradation, amber) | 'err' (hard error, red).
@@ -516,6 +555,29 @@ function layers(){
 }
 function render(){ if(deckgl) deckgl.setProps({layers:layers()}); }
 
+/* ---- compact POI legend (collateral & finance first) — counts reflect what's live in view ---- */
+const POI_LEGEND_GROUPS=[
+  ['Collateral & finance',['vehicle_commerce','vehicle_repair','fuel','gold','pawn','bank']],
+  ['Demand signals',['fresh_market','supermarket','convenience','agri_supply','hardware']],
+  ['Economy & services',['industrial','restaurant','hotel','school','health','pharmacy']],
+];
+function buildPoiLegend(){
+  const host=document.getElementById('poileg'); if(!host)return;
+  // tally live POIs by type
+  const cnt={}; for(const p of pois){ cnt[p.t]=(cnt[p.t]||0)+1; }
+  if(!pois.length){ host.innerHTML='<div class="pl-empty">No live OSM POIs in view yet — zoom in / reload, or Overpass is unreachable.</div>'; return; }
+  let html='';
+  for(const [gh,types] of POI_LEGEND_GROUPS){
+    const present=types.filter(t=>cnt[t]>0);
+    if(!present.length)continue;
+    html+=`<div class="pl-grp">${gh}</div>`;
+    html+=present.map(t=>{const c=POI_COLORS[t]||[138,148,168];
+      return `<div class="pl"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${POI_LABEL[t]||t}</span><b>${fmt(cnt[t])}</b></div>`;
+    }).join('');
+  }
+  host.innerHTML=html||'<div class="pl-empty">No mapped POIs in view.</div>';
+}
+
 /* ---- live OSM building fetch ---- */
 function viewBounds(){
   try{ const vp=new deck.WebMercatorViewport(deckgl.viewManager._viewports[0]||INITIAL); return vp.getBounds(); }
@@ -575,17 +637,26 @@ async function loadBuildings(){
 // classify an OSM element's tags into one of our POI_COLORS keys, else null (skip)
 function poiType(t){
   if(!t)return null;
-  if(t.shop==='car_repair'||t.shop==='car'||t.shop==='motorcycle'||t.shop==='tyres')return 'vehicle_commerce';
+  // --- collateral supply + finance (classified FIRST — these are the title-loan signal) ---
+  if(t.shop==='car'||t.shop==='motorcycle'||t.shop==='truck')return 'vehicle_commerce';
+  if(t.shop==='car_repair'||t.shop==='motorcycle_repair'||t.shop==='tyres'||t.shop==='car_parts')return 'vehicle_repair';
+  if(t.amenity==='fuel')return 'fuel';
   if(t.shop==='gold'||t.shop==='jewelry'||t.craft==='goldsmith')return 'gold';
-  if(t.amenity==='bank'||t.amenity==='atm'||t.office==='financial')return 'bank';
-  if(t.shop==='convenience')return 'convenience';
-  if(t.amenity==='marketplace'||t.shop==='greengrocer')return 'fresh_market';
-  if(t.shop==='supermarket'||t.shop==='department_store'||t.shop==='mall')return 'supermarket';
+  if(t.shop==='pawnbroker'||t.office==='pawnbroker'||t.amenity==='pawnbroker')return 'pawn';
+  if(t.amenity==='bank'||t.amenity==='atm'||t.office==='financial'||t.amenity==='bureau_de_change')return 'bank';
+  // --- demand signals ---
+  if(t.amenity==='marketplace'||t.shop==='greengrocer'||t.shop==='butcher'||t.shop==='seafood')return 'fresh_market';
+  if(t.shop==='supermarket'||t.shop==='department_store'||t.shop==='mall'||t.shop==='wholesale')return 'supermarket';
+  if(t.shop==='convenience'||t.shop==='kiosk')return 'convenience';
+  if(t.shop==='agrarian'||t.shop==='farm'||t.shop==='garden_centre'||t.craft==='agricultural_engines')return 'agri_supply';
+  if(t.shop==='hardware'||t.shop==='doityourself'||t.shop==='trade'||t.shop==='building_materials'||t.shop==='paint')return 'hardware';
+  // --- surrounding economy / services ---
   if(t.man_made==='works'||t.building==='industrial'||t.landuse==='industrial'||t.industrial)return 'industrial';
-  if(t.amenity==='pharmacy'||t.shop==='chemist')return 'pharmacy';
   if(t.amenity==='restaurant'||t.amenity==='fast_food'||t.amenity==='cafe')return 'restaurant';
   if(t.tourism==='hotel'||t.tourism==='motel'||t.tourism==='guest_house')return 'hotel';
-  if(t.amenity==='school'||t.amenity==='college'||t.amenity==='university')return 'school';
+  if(t.amenity==='school'||t.amenity==='college'||t.amenity==='university'||t.amenity==='kindergarten')return 'school';
+  if(t.amenity==='hospital'||t.amenity==='clinic'||t.amenity==='doctors')return 'health';
+  if(t.amenity==='pharmacy'||t.shop==='chemist')return 'pharmacy';
   return null;
 }
 async function loadPOIs(){
@@ -594,21 +665,37 @@ async function loadPOIs(){
   if((N-S)>0.08 || (E-W)>0.08){ return; }     // same area guard as buildings
   const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');
   if(poiTileCache[ckey]){ pois=poiTileCache[ckey]; render(); return; }
+  // Lender-relevant Overpass union. ^…$-anchored alternation so e.g. "car" doesn't also pull
+  // "caravan"; the classifier (poiType) does the final exact bucketing. Covers collateral supply
+  // (vehicle/gold/pawn/fuel), finance (bank/atm), demand (markets/retail/agri/hardware) and the
+  // surrounding economy (industry/services/civic). Caps at 6000 so a dense 10km ring stays sane.
   const q=`[out:json][timeout:25];(`
-    +`nwr["shop"~"car_repair|car|motorcycle|tyres|gold|jewelry|convenience|supermarket|department_store|mall|greengrocer|chemist"](${S},${W},${N},${E});`
-    +`nwr["amenity"~"bank|atm|marketplace|pharmacy|restaurant|fast_food|cafe|school|college|university"](${S},${W},${N},${E});`
-    +`nwr["tourism"~"hotel|motel|guest_house"](${S},${W},${N},${E});`
-    +`);out center 4000;`;
+    +`nwr["shop"~"^(car|motorcycle|truck|car_repair|motorcycle_repair|tyres|car_parts|gold|jewelry|pawnbroker|convenience|kiosk|supermarket|department_store|mall|wholesale|greengrocer|butcher|seafood|agrarian|farm|garden_centre|hardware|doityourself|trade|building_materials|paint|chemist)$"](${S},${W},${N},${E});`
+    +`nwr["amenity"~"^(bank|atm|bureau_de_change|pawnbroker|fuel|marketplace|pharmacy|restaurant|fast_food|cafe|school|college|university|kindergarten|hospital|clinic|doctors)$"](${S},${W},${N},${E});`
+    +`nwr["office"~"^(financial|pawnbroker)$"](${S},${W},${N},${E});`
+    +`nwr["craft"~"^(goldsmith|agricultural_engines)$"](${S},${W},${N},${E});`
+    +`nwr["tourism"~"^(hotel|motel|guest_house)$"](${S},${W},${N},${E});`
+    +`nwr["man_made"="works"](${S},${W},${N},${E});`
+    +`);out center 6000;`;
+  // per-type render cap so a dense 10km ring stays performant — keep the LENDER-RELEVANT types
+  // generous (collateral supply + finance shown in full up to a high cap) and trim the high-volume
+  // ambient types (restaurants/convenience) that would otherwise drown the signal columns.
+  const POI_CAP={vehicle_commerce:600,vehicle_repair:600,fuel:400,gold:600,pawn:600,bank:600,
+    fresh_market:400,supermarket:400,agri_supply:400,hardware:400,industrial:500,health:400,
+    school:300,hotel:250,convenience:300,restaurant:300,pharmacy:300};
   try{
     const d=await overpass(q);
-    const out=[];
+    const out=[]; const seen={};
     for(const el of (d.elements||[])){
       const t=poiType(el.tags||{}); if(!t)continue;
+      seen[t]=(seen[t]||0)+1;
+      if(seen[t]>(POI_CAP[t]||300))continue;            // cap per type — keeps the GL column count sane
       const x=el.lon!=null?el.lon:(el.center&&el.center.lon), y=el.lat!=null?el.lat:(el.center&&el.center.lat);
       if(x==null||y==null)continue;
       out.push({x,y,t});
     }
     pois=out; poiTileCache[ckey]=out; render();
+    buildPoiLegend();                                    // refresh legend counts from what's in view
   }catch(e){ /* Overpass blocked: leave pois=[]; scene still draws buildings/rings/branch */ }
 }
 
