@@ -721,6 +721,88 @@ def check_occupation_risk(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_poi_relevance(n_branches):
+    # RELEVANT-POI DENSITY (objective #2 where-to-expand + objective #1 demand):
+    # per-branch ESTIMATED title-loan relevance weighting over MEASURED POI counts
+    # (Overture occupations + branches.json k10 OSM), index-aligned to branches.json.
+    # Optional file: SKIP-PASS when absent (build_poi_relevance.py degrades to an
+    # absent-state too when branches.json is missing).
+    hdr("poi_relevance.json (optional)")
+    if not exists("poi_relevance.json"):
+        ok("poi_relevance.json absent — skipped (optional; run build_poi_relevance.py to populate)")
+        return
+    try:
+        d = load("poi_relevance.json")
+    except Exception as e:
+        fail("poi_relevance.json loads", repr(e))
+        return
+    ok("poi_relevance.json loads")
+
+    # provenance: meta must state the MEASURED/ESTIMATED split + carry the weights.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("weights"), dict) or not meta["weights"]:
+        fail("poi_relevance meta/provenance present (generated_by + label + weights)",
+             "meta missing generated_by/label/weights")
+    else:
+        ok("poi_relevance meta/provenance present (generated_by + estimated label + weights)")
+
+    if meta and meta.get("absent"):
+        ok("poi_relevance is an honest ABSENT-state (no branches.json) — skipped value checks")
+        return
+
+    weights = (meta or {}).get("weights") or {}
+    cat_keys = set(weights.keys())
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("poi_relevance has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    # length must equal branches.json (the layer is INDEX-ALIGNED — a drift misaligns every read).
+    if n_branches is not None and len(recs) != n_branches:
+        fail("poi_relevance length == branches.json length",
+             "poi_relevance=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("poi_relevance length == branches.json length (%d)" % len(recs))
+
+    # per-record: rel in [0,100] finite; raw a non-negative finite weighted count; cat a
+    # per-category MEASURED count dict (keys == weight keys, every count a non-negative int);
+    # src one of the declared provenance tags.
+    bad = []
+    saw100 = False
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        rel = r.get("rel")
+        if not is_finite_number(rel) or not (0.0 <= rel <= 100.0):
+            bad.append("#%d rel=%r out of [0,100]" % (i, rel))
+        elif rel >= 99.999:
+            saw100 = True
+        raw = r.get("raw")
+        if not is_finite_number(raw) or raw < 0:
+            bad.append("#%d raw=%r negative/non-finite" % (i, raw))
+        cat = r.get("cat")
+        if not isinstance(cat, dict) or (cat_keys and set(cat.keys()) != cat_keys):
+            bad.append("#%d cat keys != weight keys" % i)
+        elif any((not isinstance(v, int)) or v < 0 for v in cat.values()):
+            bad.append("#%d cat has a negative/non-int count" % i)
+        if r.get("src") not in ("occ+k10", "k10"):
+            bad.append("#%d src=%r not in {occ+k10,k10}" % (i, r.get("src")))
+    if bad:
+        fail("poi_relevance records sane (rel in [0,100], raw>=0, cat counts int>=0, src tag)",
+             first_n(bad))
+    else:
+        ok("poi_relevance records sane (rel in [0,100], raw>=0, cat counts int>=0, src tag)")
+    # min-max normalization must produce at least one rel==100 across a non-trivial population.
+    if recs and not saw100:
+        fail("poi_relevance min-max normalized (a branch reaches rel=100)", "no rel==100 found")
+    elif recs:
+        ok("poi_relevance min-max normalized (a branch reaches rel=100)")
+
+
+# ---------------------------------------------------------------------------
 def check_province_risk():
     # PER-PROVINCE rollup of the branch composite risk (objective #1). Optional file: SKIP-PASS
     # when absent (build_province_risk.py degrades to an absent-state too).
@@ -1308,6 +1390,7 @@ def main():
     check_household_risk()
     check_branch_occupations(n)
     check_occupation_risk(n)
+    check_poi_relevance(n)
     check_branch_risk(n)
     check_province_risk()
     check_segment_exposure()
