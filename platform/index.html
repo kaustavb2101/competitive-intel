@@ -411,6 +411,11 @@
       defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
     <div class="insight" id="trendbaseline" style="display:none;border-left-color:var(--gold)"></div>
 
+    <!-- DESIGNED BASELINE STATE — shown until a 2nd vintage exists (no deltas yet). Reads the live
+         risk layers (province_risk / crop_stress / household_risk) to show where things stand NOW,
+         with flat sparkline-skeletons that fill in once the next snapshot lands. -->
+    <div id="trendbaselinebody" style="display:none"></div>
+
     <div id="trendbody" style="display:none">
       <h2>Region movers · proxy change vs prior vintage</h2>
       <p class="lead">Arrow + delta show how each region's mean risk proxy shifted. ▲ red = getting riskier · ▼ green = easing. All estimated.</p>
