@@ -115,13 +115,30 @@ html[data-theme="light"] #vignette{
 .reco{display:flex;gap:8px;padding:8px 0;font-size:12px;color:var(--txt);line-height:1.5;border-bottom:1px solid #161d2c}
 .reco .n{color:var(--teal);font-weight:700;flex:none}
 
-/* controls */
-#ctl{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:8;display:flex;gap:5px;
- background:rgba(13,17,27,.9);border:1px solid var(--cardln);border-radius:9px;padding:4px;backdrop-filter:blur(8px)}
-#ctl button{background:none;border:none;color:var(--dim);font:500 11px 'IBM Plex Mono';padding:5px 9px;border-radius:6px;cursor:pointer}
-#ctl button.on{background:#1c2740;color:var(--hi)}
-#ctl select{background:#0a1018;border:1px solid #1c2740;color:var(--hi);font:600 11px 'IBM Plex Mono';
- padding:4px 6px;border-radius:6px;cursor:pointer;margin-right:2px}
+/* ---- DOCKED CONTROL FRAME ---- one designed panel (top-right), a header band naming the scene,
+   then labelled clusters: city switcher, a basemap segmented control, and action pills.
+   Matches province.html / branch-explorer.html so the deck.gl pages feel in-product. */
+#ctl{position:fixed;top:96px;right:14px;z-index:8;display:flex;flex-direction:column;gap:9px;
+ background:rgba(13,17,27,.94);border:1px solid var(--cardln);border-radius:12px;padding:11px;
+ backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);min-width:172px}
+#ctl .dkhd{display:flex;align-items:center;gap:7px;padding:0 1px 8px;border-bottom:1px solid #1a2236}
+#ctl .dkhd .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none;box-shadow:0 0 8px rgba(79,123,240,.7)}
+#ctl .dkhd .t{font:700 11px 'IBM Plex Mono';color:var(--hi);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ctl .grp{display:flex;flex-direction:column;gap:5px}
+#ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+/* segmented basemap control: tabs in one pill (wraps to 2 rows for the 4th option) */
+#ctl .seg{display:flex;flex-wrap:wrap;background:#0a1018;border:1px solid #1c2740;border-radius:9px;padding:2px;gap:2px}
+#ctl .seg button{flex:1 0 40%;background:none;border:none;color:var(--mid);border-radius:7px;
+ padding:6px 4px;font:600 11px 'IBM Plex Sans Thai';cursor:pointer;transition:background .15s,color .15s}
+#ctl .seg button.on{background:var(--blue);color:#fff}
+/* action pills cluster */
+#ctl .acts{display:flex;flex-direction:column;gap:5px}
+#ctl .acts button{background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+ padding:7px 10px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer;text-align:left}
+#ctl .acts button.on{border-color:var(--blue);color:var(--hi)}
+#ctl .acts button:active{background:#161d2c}
+#ctl select{background:#0a1018;border:1px solid #1c2740;color:var(--hi);font:600 12px 'IBM Plex Sans Thai';
+ padding:7px 8px;border-radius:8px;cursor:pointer;width:100%}
 html[data-theme="light"] #ctl select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
 
 /* mobile toggles */
@@ -185,7 +202,9 @@ html[data-theme="light"] #complegend .cl b{color:#5A6477}
  .side{width:86vw;max-width:340px;top:46px;bottom:78px}
  #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
  #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
- .xbtn{display:block}#mtog{display:flex}#ctl{top:46px}
+ .xbtn{display:block}#mtog{display:flex}
+ #ctl{top:auto;bottom:118px;right:8px;left:auto;min-width:0;padding:8px;gap:6px}
+ #ctl .dkhd{display:none}#ctl .glab{display:none}#ctl .acts button{padding:7px 9px}
  #strip .ttl{font-size:12px}
  #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
  #legend{max-height:88px;overflow-y:auto}
@@ -204,9 +223,8 @@ html[data-theme="light"] #complegend .cl b{color:#5A6477}
 
 #strip{top:44px}
 .side{top:96px}
-#ctl{top:94px}
 .err{top:44px}
-@media(max-width:820px){.side{top:90px}#ctl{top:90px}}
+@media(max-width:820px){.side{top:90px}}
 
 /* theme toggle button in nav */
 #themeToggle{margin-left:auto;flex:none;background:none;border:1px solid #1d2738;color:#8a94a8;
@@ -239,9 +257,15 @@ html[data-theme="light"] .wbox .wr .k{color:#5A6477}
 html[data-theme="light"] .wbox .wr .v{color:#11151F}
 html[data-theme="light"] .occ .ot{color:#2C3444}
 html[data-theme="light"] .occ .bar{background:#E4E8F1}
-html[data-theme="light"] #ctl{background:rgba(255,255,255,.92);border-color:#D3DAE6}
-html[data-theme="light"] #ctl button{color:#828CA0}
-html[data-theme="light"] #ctl button.on{background:#e7edf8;color:#11151F}
+html[data-theme="light"] #ctl{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] #ctl .dkhd{border-bottom-color:#E4E8F1}
+html[data-theme="light"] #ctl .dkhd .t{color:#11151F}
+html[data-theme="light"] #ctl .glab{color:#828CA0}
+html[data-theme="light"] #ctl .seg{background:#F1F5FB;border-color:#D3DAE6}
+html[data-theme="light"] #ctl .seg button{color:#5A6477}
+html[data-theme="light"] #ctl .seg button.on{background:var(--blue);color:#fff}
+html[data-theme="light"] #ctl .acts button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] #ctl .acts button.on{border-color:var(--blue);color:#11151F}
 html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
 html[data-theme="light"] .bchip b{color:#11151F}
 html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
@@ -271,17 +295,31 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="ctl">
-  <select id="citySel" title="Switch city (3D showcase)" aria-label="City">
-    <option value="rayong">Rayong</option>
-    <option value="bangkok">Bangkok</option>
-  </select>
-  <button data-b="light" class="on">Light</button>
-  <button data-b="voyager">Map</button>
-  <button data-b="dark">Dark</button>
-  <button data-b="satellite">Satellite</button>
-  <button id="ringtog" class="on">Rings</button>
-  <button id="isotog" class="on">Isochrone</button>
-  <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Orbit</button>
+  <div class="dkhd"><span class="dot"></span><span class="t" id="ctlScene">Rayong 3D</span></div>
+  <div class="grp">
+    <div class="glab">City</div>
+    <select id="citySel" title="Switch city (3D showcase)" aria-label="City">
+      <option value="rayong">Rayong</option>
+      <option value="bangkok">Bangkok</option>
+    </select>
+  </div>
+  <div class="grp">
+    <div class="glab">Basemap</div>
+    <div class="seg">
+      <button data-b="light" class="on">Light</button>
+      <button data-b="voyager">Streets</button>
+      <button data-b="dark">Dark</button>
+      <button data-b="satellite">Satellite</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Layers</div>
+    <div class="acts">
+      <button id="ringtog" class="on">10 km reach rings</button>
+      <button id="isotog" class="on">Isochrone</button>
+      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+    </div>
+  </div>
 </div>
 
 <aside class="side" id="left">
@@ -336,6 +374,7 @@ const CITY_LABEL=(CA.meta&&(CA.meta.city||CA.meta.name))||
 if(CITY!=='rayong'){
   const ct=document.getElementById('cityTitle');
   if(ct)ct.innerHTML=CITY_LABEL+' 3D <b>·</b> branches · POIs · 10km reach';
+  const cs=document.getElementById('ctlScene'); if(cs)cs.textContent=CITY_LABEL+' 3D';
   try{document.title=CITY_LABEL+' 3D · เงินไชโย';}catch(e){}
   // move the active-nav highlight off Rayong onto the matching city link (Bangkok), if present.
   try{const nr=document.getElementById('navRayong');if(nr)nr.classList.remove('on');
@@ -1521,6 +1560,11 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
  window.CITY=CITY;
  var pretty=CITY.charAt(0).toUpperCase()+CITY.slice(1).replace(/[-_]/g,' ');
  var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading '+pretty+' 3D…';document.body.appendChild(box);
+ // killLoader: remove the "Loading…" overlay idempotently. Called the instant the scene is ready
+ // AND from the graceful not-pulled / error paths, so the loader can NEVER stick on screen — even
+ // if a later step throws. Once detached, re-removal is a harmless no-op.
+ var loaderDead=false;
+ function killLoader(){ if(loaderDead)return; loaderDead=true; try{box.remove();}catch(e){} }
  // catchment = city-core buildings (+reachable-pop for rayong); province = branches, full POI palette,
  // district polygons; index = nationwide cascade. For non-rayong cities the province/index files
  // usually don't exist yet — they load best-effort and the page degrades gracefully (Rayong-specific
@@ -1534,7 +1578,7 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
  // notice and a link to the always-available district view (province.html?p=<slug>). Rayong +
  // Bangkok ship with their files, so this only ever fires for not-yet-pulled provinces.
  function notPulled(){
-   box.remove();
+   killLoader();
    var prettyP=pretty; // already title-cased from the slug
    var href='province.html?p='+encodeURIComponent(CITY)+
      (location.search.indexOf('theme=light')>-1?'&theme=light':'');
@@ -1579,8 +1623,15 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
    window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
-   box.remove();window.initCatch();})
-  .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
+   killLoader();window.initCatch();})
+  .catch(function(e){
+    // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
+    // cleared (init threw downstream), show a fresh error notice instead of a stuck spinner.
+    if(!loaderDead){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;}
+    else{var el=document.createElement('div');el.className='err';el.style.color='#E0474B';
+      el.textContent='Could not load '+pretty+' 3D data: '+(e&&e.message||e);document.body.appendChild(el);}
+    try{console.error('catchment load failed ('+CITY+'):',e);}catch(_){}
+  });
 })();
 </script>
 </body>
