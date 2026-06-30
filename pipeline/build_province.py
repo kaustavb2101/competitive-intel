@@ -99,6 +99,62 @@ def slugify(en):
     return "".join(c for c in en.lower().replace(" ", "-") if c.isalnum() or c == "-")
 
 
+# ── competitors (objective #2) ────────────────────────────────────────────────
+# UNION the two measured competitor sources, dedup rivals of the SAME brand within
+# ~150m, then point-in-polygon each survivor into the province's amphoe so each
+# district feature carries a competitor count. Mirrors the frontend dedup in
+# platform/app.js (dedupComp): brand-keyed ~165m grid, 0.15km haversine threshold.
+# Graceful: when both files are absent this returns [] and every district gets 0.
+COMP_FILES = ["competitors_national.json", "competitors_overture.json"]
+_COMP_CELL = 0.0015      # ~165m grid cell (matches app.js dedupComp)
+_COMP_DEDUP_KM = 0.15    # same-brand rivals closer than this are one branch
+
+
+def _load_competitors():
+    """Union competitors_national + competitors_overture, dedup same-brand within
+    ~150m. Returns a deterministic list of {brand,lat,lng}. [] if neither exists."""
+    data_dir = os.path.join(REPO, "platform", "data")
+    raw = []
+    for fn in COMP_FILES:
+        p = os.path.join(data_dir, fn)
+        if not os.path.exists(p):
+            continue
+        try:
+            obj = _load(p)
+        except (ValueError, OSError):
+            continue
+        for it in obj.get("items", []):
+            if not it:
+                continue
+            lat, lng, brand = it.get("lat"), it.get("lng"), it.get("brand")
+            if lat is None or lng is None:
+                continue
+            raw.append({"brand": brand, "lat": lat, "lng": lng})
+    if not raw:
+        return []
+    # deterministic input order so dedup survivors are stable across the union
+    raw.sort(key=lambda it: (str(it["brand"]), it["lat"], it["lng"]))
+    seen = collections.defaultdict(list)   # (brand,gx,gy) -> [(lat,lng), ...]
+    out = []
+    for it in raw:
+        gx = round(it["lat"] / _COMP_CELL); gy = round(it["lng"] / _COMP_CELL)
+        dup = False
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for (la, lo) in seen.get((it["brand"], gx + dx, gy + dy), ()):
+                    if hav(it["lat"], it["lng"], la, lo) <= _COMP_DEDUP_KM:
+                        dup = True; break
+                if dup:
+                    break
+            if dup:
+                break
+        if dup:
+            continue
+        seen[(it["brand"], gx, gy)].append((it["lat"], it["lng"]))
+        out.append(it)
+    return out
+
+
 def build_all():
     master = _load(os.path.join(SRC, "branches_final.json"))
     amphoe = _load(os.path.join(SRC, "th_amphoe.geojson"))["features"]
@@ -124,6 +180,18 @@ def build_all():
                 break
 
     poly_by_id = {f["properties"]["shapeID"]: f for f in amphoe}
+
+    # spatial join: competitor branches -> amphoe polygon (PIP, bbox prefilter).
+    # comp_by_poly[shapeID] = count of deduped rival branches inside that amphoe.
+    # Empty (all zeros) when the competitor files are absent — never crashes.
+    competitors = _load_competitors()
+    comp_by_poly = collections.defaultdict(int)
+    for c in competitors:
+        x, y = c["lng"], c["lat"]
+        for f, (x0, y0, x1, y1) in polys:
+            if x0 <= x <= x1 and y0 <= y <= y1 and _contains(f["geometry"], x, y):
+                comp_by_poly[f["properties"]["shapeID"]] += 1
+                break
 
     # group branch indices by province
     prov_idx = collections.defaultdict(list)
@@ -160,7 +228,11 @@ def build_all():
                 "gold_avg": round(st.mean(r["gold10"] for r in rows)),
                 "market_avg": round(st.mean(r["fmkt10"] for r in rows)),
                 "own": len(rows), "cx": cx, "cy": cy,
-                "real_fac": gd["fac"], "real_workers": gd["workers"]}})
+                "real_fac": gd["fac"], "real_workers": gd["workers"],
+                # MEASURED rival title-loan/vehicle-finance branches inside this
+                # district (Google Places ∪ Overture, deduped same-brand ~150m).
+                # 0 when the competitor files are absent (graceful). Lower bound.
+                "competitors": comp_by_poly.get(sid, 0)}})
 
         # province bbox (union of district bboxes) for POI filtering
         if feats:
