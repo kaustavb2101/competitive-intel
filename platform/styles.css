@@ -266,6 +266,10 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
   border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:var(--r);
   padding:14px 16px;margin:var(--s1) 0 var(--s4);font-size:13px;color:var(--txt);box-shadow:var(--elev-2)}
 .verdict b{color:var(--hi)}
+.verdict-line{font-size:15px;font-weight:600;line-height:1.4;color:var(--txt)}
+/* tone variants for the per-section verdict cards (acquisition gold default, exposure/overview red) */
+.verdict.v-risk{background:linear-gradient(180deg,rgba(224,87,79,.13),var(--panel));border-left-color:var(--agri)}
+.verdict.v-warn{background:linear-gradient(180deg,rgba(217,116,43,.13),var(--panel));border-left-color:#D9742B}
 
 /* ---------- tables: raised card, zebra, right-aligned numerics, glowing bars ---------- */
 /* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
@@ -328,6 +332,27 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .pill.lens .pl{font-size:12.5px;font-weight:600;letter-spacing:.1px}
 .pill.lens .pi{font-size:11px;color:var(--dim);opacity:.8;cursor:help}
 .pill.lens:hover .pi,.pill.lens.on .pi{color:var(--mid);opacity:1}
+/* in-band [M] measured / [E] estimated provenance badge on each lens pill */
+.pill.lens .lpt{font:700 8.5px var(--mono);line-height:1;padding:2px 4px;border-radius:5px;flex:none}
+.pill.lens .lpt.m{color:#5fd6c2;background:rgba(35,162,143,.16);border:1px solid rgba(35,162,143,.5)}
+.pill.lens .lpt.e{color:#f2cf78;background:rgba(230,180,80,.13);border:1px solid rgba(230,180,80,.5)}
+/* a hero pill whose data is known-absent: dimmed + not clickable, but its slot is reserved */
+.pill.lens.lens-off{opacity:.42;cursor:not-allowed;filter:saturate(.4)}
+.pill.lens.lens-off:hover{transform:none;border-color:var(--line);color:var(--mid)}
+
+/* ---------- "More lenses ▾" dropdown (holds every non-hero lens) ---------- */
+.lens-more{position:relative;flex:0 0 auto}
+.lens-more-btn{font-weight:600}
+.lens-more.open .lens-more-btn{border-color:var(--accent);color:var(--hi)}
+.lens-more-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:700;
+  min-width:232px;max-height:60vh;overflow-y:auto;padding:8px;border-radius:12px;
+  background:rgba(14,19,30,.97);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 10px 32px -8px rgba(0,0,0,.6);
+  display:none;flex-direction:column;gap:6px}
+.lens-more.open .lens-more-menu{display:flex}
+.lens-more-menu .pill.lens.lens-menu{width:100%;justify-content:flex-start;border-radius:9px}
+html[data-theme="light"] .lens-more-menu{background:rgba(255,255,255,.98)}
 
 /* ---------- map = hero: full-bleed frame with the pill row floated on top ---------- */
 .maphero{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
@@ -336,7 +361,9 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .maphero-top{position:absolute;top:12px;left:12px;right:12px;z-index:600;
   display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .maphero-top>*{pointer-events:auto}
-.maphero-top .lenses{max-width:100%;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+/* tamed to 4 hero pills + a "More ▾" dropdown, so the row wraps instead of scrolling — and the
+   dropdown menu must NOT be clipped (no overflow on the row). */
+.maphero-top .lenses{max-width:100%;flex-wrap:wrap;overflow:visible;padding-bottom:2px}
 .maphero-top .chips{display:flex;gap:6px;flex-wrap:wrap;width:fit-content;max-width:100%;
   background:rgba(20,27,42,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   border:1px solid var(--line);border-radius:10px;padding:5px 7px}
@@ -429,6 +456,9 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
   .tblwrap{border:1px solid var(--line);box-shadow:var(--elev-1)}
   /* lens pill row → single-line horizontal scroll strip on phones */
   .lenses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  /* the map's hero row is only 4 pills + More ▾, so wrap (not scroll) and never clip the dropdown */
+  .maphero-top .lenses{flex-wrap:wrap;overflow:visible}
+  .lens-more-menu{min-width:200px;max-width:78vw}
   .pill.lens{min-width:auto;padding:7px 11px}
   .mcard{box-shadow:var(--elev-1)}
   /* PHONE tap targets ≥40px (WCAG 2.5.5): chips, jump-nav, nav links, theme toggle, stars */
@@ -591,6 +621,7 @@ details.acqsec>summary:focus-visible{outline:2px solid var(--accent);border-radi
 .acqsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
 .acqsub.opp{color:var(--opp)}
+.acqsub.risk{color:#ef7d76}
 .acqsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600}
 @media print{.jumpnav{display:none!important}details.acqsec>summary::after{display:none}}

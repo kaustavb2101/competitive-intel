@@ -156,6 +156,8 @@
     <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle + gold trade density.</p>
 
     <h2 class="risk">Crop-household stress · worst provinces</h2>
+    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
+    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note">Loading crop-household stress…</p>
     <table class="tbl" id="cstresstbl"></table>
   </section>
@@ -175,41 +177,20 @@
     </p>
   </section>
 
-  <!-- ACQUISITION -->
+  <!-- ACQUISITION — leads with ONE answer: the "where to open next" leaderboard. -->
   <section class="view" id="v-acq">
+    <!-- VERDICT card (generated from opportunity_score.json; omitted gracefully if absent) -->
+    <div class="verdict" id="acq-verdict" style="display:none"></div>
+
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
+      <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
-      <a class="chip" href="#acq" data-acq="sec-opp">Opportunity score</a>
-      <a class="chip" href="#acq" data-acq="sec-compcov">Competitor coverage</a>
-      <a class="chip" href="#acq" data-acq="sec-exit">Competitor-exit white-space</a>
-      <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
-      <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
-      <a class="chip" href="#acq" data-acq="sec-collateral">Collateral</a>
-      <a class="chip" href="#acq" data-acq="sec-districts">Districts</a>
-      <a class="chip" href="#acq" data-acq="sec-distrisk">District risk</a>
+      <a class="chip" href="#acq" data-acq="sec-comp">Competitor thesis</a>
+      <a class="chip" href="#acq" data-acq="sec-segments">Segment white-space</a>
     </nav>
 
-    <!-- Acquisition LEADS with the full-width Road-to-3,000 headroom bar, then the opportunity leaderboard. -->
-    <details class="acqsec acq-lead" id="sec-r3k" open>
-    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
-    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
-      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
-      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
-      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
-      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
-    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
-    <details style="margin:6px 0 10px"><summary style="cursor:pointer;color:var(--mid);font-size:12px">How the split is computed (formula)</summary>
-      <p class="lead" style="margin-top:6px">For each region:
-        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
-        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
-        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
-        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
-        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></details>
-    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
-    <table class="tbl" id="r3ktbl"></table>
-    </details>
-
-    <details class="acqsec" id="sec-opp" open>
+    <!-- 1 · HERO ANSWER — the composite opportunity leaderboard, open by default. -->
+    <details class="acqsec acq-lead" id="sec-opp" open>
     <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
     <p class="lead">One ranked list of districts (amphoe) for branch expansion. The <b>opportunity score</b> (0–100) is an
       <b>ESTIMATED COMPOSITE</b> — it blends <b style="color:var(--gold)">white-space</b> (MEASURED demand minus AutoX saturation)
@@ -221,8 +202,31 @@
     <table class="tbl" id="opptbl"></table>
     </details>
 
-    <details class="acqsec" id="sec-compcov" open>
-    <summary><h2 class="opp">Competitor coverage (lower bound) · how complete is our rival census?</h2></summary>
+    <!-- 2 · ROAD TO 3,000 headroom bar, open by default. -->
+    <details class="acqsec" id="sec-r3k" open>
+    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
+    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
+      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
+      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
+      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
+      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
+    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
+    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
+      <p>For each region:
+        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
+        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
+        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
+        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
+        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></div></details>
+    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="r3ktbl"></table>
+    </details>
+
+    <!-- 3 · COMPETITOR THESIS — coverage + exit white-space, collapsed by default. -->
+    <details class="acqsec" id="sec-comp">
+    <summary><h2 class="opp">Competitor thesis · coverage &amp; exit white-space <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+
+    <h3 class="acqsub">Competitor coverage (lower bound) · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is a <b>MEASURED but INCOMPLETE</b> census — a Google-Places pull that caps
       ~60 results per query per province, so it <b>undercounts</b>. This panel makes the gap explicit:
       <b style="color:var(--merch)">found</b> (locations we have, measured) vs <b style="color:var(--gold)">expected</b>
@@ -231,10 +235,8 @@
       The census is being expanded.</p>
     <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)">Loading competitor coverage…</div>
     <table class="tbl" id="compcovtbl"></table>
-    </details>
 
-    <details class="acqsec" id="sec-exit" open>
-    <summary><h2 class="opp">Competitor-exit white-space · regulatory tailwind <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <h3 class="acqsub">Competitor-exit white-space · regulatory tailwind</h3>
     <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory tailwind (Q1 2026):</b> under the BoT responsible-lending
       framework (notification 25680030) auto title-loan operators need a personal-loan licence (≥฿50m capital, 28% interest cap). The
       <b>registration window closes Q1 2026</b> — non-compliant, sub-scale / informal lenders risk <b>forced exit</b>. Tighter supervision
@@ -251,26 +253,21 @@
     <table class="tbl" id="exittbl"></table>
     </details>
 
-    <details class="acqsec" id="sec-estates">
-    <summary><h2>Industrial-estate white-space · worker lending</h2></summary>
+    <!-- 4 · SEGMENT-SPECIFIC white-space — every segment + district table, collapsed by default. -->
+    <details class="acqsec" id="sec-segments">
+    <summary><h2 class="opp">Segment-specific white-space · estates · merchant · collateral · districts</h2></summary>
+
+    <h3 class="acqsub">Industrial-estate white-space · worker lending</h3>
     <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
     <table class="tbl" id="estates"></table>
-    </details>
 
-    <details class="acqsec" id="sec-merchant">
-    <summary><h2>Merchant white-space · small sellers</h2></summary>
+    <h3 class="acqsub">Merchant white-space · small sellers</h3>
     <p class="lead">High vendor demand (markets + footfall + population), ≤4 AutoX branches within 10km.</p>
     <table class="tbl" id="mws"></table>
-    </details>
 
-    <details class="acqsec" id="sec-collateral">
-    <summary><h2>Collateral-rich white-space</h2></summary>
+    <h3 class="acqsub">Collateral-rich white-space</h3>
     <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
     <table class="tbl" id="cws"></table>
-    </details>
-
-    <details class="acqsec" id="sec-districts" open>
-    <summary><h2 class="opp">Where to open next · district &amp; catchment white-space</h2></summary>
 
     <h3 class="acqsub">Catchment white-space score v2 · around existing branches</h3>
     <p class="lead"><b>★ White-space score</b> is an <b>estimated screen</b> (0–100), not a site survey:
@@ -300,10 +297,8 @@
     <div class="chips" id="ampchips"></div>
     <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="amptbl"></table>
-    </details>
 
-    <details class="acqsec" id="sec-distrisk">
-    <summary><h2 class="risk">Most-stressed districts · risk readout</h2></summary>
+    <h3 class="acqsub risk">Most-stressed districts · risk readout</h3>
     <p class="lead">Top districts by an <b>ESTIMATED</b> risk proxy (0–100): half agri crop-stress, plus collateral / merchant
       pressure where we have branches inside the amphoe. <b>Agri stress is province-inherited</b> (every district takes its
       province mean), so this is a triage signal — read the province, not the exact district. Not a measured default rate.</p>
@@ -314,6 +309,8 @@
 
   <!-- EXPOSURE / CONCENTRATION -->
   <section class="view" id="v-exposure">
+    <!-- VERDICT card (generated from segment_exposure.json; omitted gracefully if absent) -->
+    <div class="verdict v-risk" id="expo-verdict" style="display:none"></div>
     <h2 class="risk">Portfolio exposure · concentration read</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
 
@@ -337,6 +334,8 @@
   <!-- SCENARIO SIMULATOR (client-side what-if) -->
   <section class="view" id="v-sim">
     <h2 class="risk">Scenario simulator · portfolio what-if</h2>
+    <!-- BASELINE verdict, ABOVE the sliders — shows the starting read before any slider moves. -->
+    <div class="verdict v-warn" id="sim-verdict" style="display:none"></div>
     <div class="insight risk" style="border-left-color:var(--gold)">
       <b>What this is — and is not.</b> Drag the sliders to stress the portfolio and watch how many
       provinces and branches tip into <b>high agri-stress</b>, and which way collateral recovery value moves.

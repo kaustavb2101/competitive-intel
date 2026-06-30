@@ -8,22 +8,26 @@
 // label = the longer legacy label (kept for the legend + aria). desc = plain-language methodology,
 // surfaced as the per-pill "ⓘ" tooltip — NEVER name a pipeline script in copy shown in the UI.
 // Order here is the pill order; the gold "Opportunity" lens is first and is the default on open.
+// hero:true  → one of the 4 ALWAYS-VISIBLE hero pills docked over the map (the rest live in "More ▾").
+// tag:'m'|'e' → the in-band [M] measured / [E] estimated badge shown on the pill (parity with the prov chips).
 const LENS = {
-  dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, val:d=>d._amp?d._amp.whitespace:0},
-  cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
-  estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', val:d=>estabCount(d)},
-  motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', val:d=>motoShare(d)},
-  hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
-  occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, val:d=>occriskVal(d)},
-  brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, val:d=>briskVal(d)},
-  drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, val:d=>d._amp?d._amp.risk_proxy:0},
-  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
-  workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', val:d=>d.dwork||0},
-  pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', val:d=>(PLOOK[d.v]||{}).pickup||0},
-  informal: {pill:'Informal labour', label:'Informal workforce', desc:'BORROWER BASE · MEASURED (NSO) — informal (cash-economy) workers in the province, the core title-loan customer. Brighter = a larger informal borrower base.', color:'#1C8C7D', unit:'workers', val:d=>(PLOOK[d.v]||{}).informal||0},
-  autox:    {pill:'AutoX density', label:'AutoX saturation', desc:'OWN FOOTPRINT · MEASURED — how many AutoX branches sit within 10 km. Brighter = more self-overlap (cannibalisation risk); dark = standalone coverage.', color:'#5B7CFA', unit:'AutoX ≤10km', val:d=>d.w||0},
-  risk:     {pill:'Segment risk', label:'Portfolio risk ▲ est', desc:'PORTFOLIO RISK · ESTIMATED proxy (0–100) — the worst of agri-PD / merchant / collateral segment stress. Switch the sub-metric below the pills. Not a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
+  dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
+  brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
+  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
+  hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
+  cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
+  estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
+  motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
+  occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
+  drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
+  workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
+  pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', tag:'m', val:d=>(PLOOK[d.v]||{}).pickup||0},
+  informal: {pill:'Informal labour', label:'Informal workforce', desc:'BORROWER BASE · MEASURED (NSO) — informal (cash-economy) workers in the province, the core title-loan customer. Brighter = a larger informal borrower base.', color:'#1C8C7D', unit:'workers', tag:'m', val:d=>(PLOOK[d.v]||{}).informal||0},
+  autox:    {pill:'AutoX density', label:'AutoX saturation', desc:'OWN FOOTPRINT · MEASURED — how many AutoX branches sit within 10 km. Brighter = more self-overlap (cannibalisation risk); dark = standalone coverage.', color:'#5B7CFA', unit:'AutoX ≤10km', tag:'m', val:d=>d.w||0},
+  risk:     {pill:'Segment risk', label:'Portfolio risk ▲ est', desc:'PORTFOLIO RISK · ESTIMATED proxy (0–100) — the worst of agri-PD / merchant / collateral segment stress. Switch the sub-metric below the pills. Not a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, tag:'e', val:d=>riskVal(d)},
 };
+// the 4 hero lens keys, in pill order (always visible; rest live in the More ▾ dropdown).
+const HERO_LENS=['dws','brisk','comp','hhdti'];
 // per-province crop-household stress — lazy-loaded from data/crop_stress.json (objective #1).
 // CSTRESS maps Thai province name -> province record; val() returns agri_stress on a 0–100 scale.
 let CSTRESS=null, cstressLoaded=false;
@@ -608,14 +612,29 @@ function renderRecoverySensitivity(){
    Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
    dominant crop + share (OAE, measured), price YoY (World Bank GLOBAL direction proxy — NOT Thai
    farm-gate), rainfall % of normal (HDX, measured). Data from data/crop_stress.json (lazy). */
+// LEAD WITH THE VERDICT — colored card above the crop-stress table, built ONLY from crop_stress.
+// w = the worst (most-stressed) province record; null → card hidden (graceful, no fabrication).
+function renderCstressVerdict(w){
+  const box=$('#cstress-verdict'); if(!box) return;
+  if(!w||!w.th){ box.style.display='none'; box.innerHTML=''; return; }
+  const dom=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'crops';
+  const sv=Math.round((w.agri_stress||0)*100);
+  const price=w.price_stress!=null?(w.price_stress>0?'+':'')+Math.round(w.price_stress)+'%':'—';
+  const drought=w.drought!=null?Math.round(w.drought*100)+'%':(w.components&&w.components.rain_pct_of_normal!=null?w.components.rain_pct_of_normal+'% of normal rain':'n/a');
+  box.style.display='block';
+  box.innerHTML=`<div class="verdict-line">⚠️ <b>Most stressed: ${w.th}</b> — ${dom.toLowerCase()}, price ${price}, drought ${drought}</div>`+
+    `<div class="sub" style="margin-top:4px">${w.region||''} · agri-stress ${sv}/100 (estimated triage) · price = World Bank global proxy ${TAG_E}</div>`;
+}
 function renderCropStress(){
   const tbl=$('#cstresstbl'), note=$('#cstress-note');
   if(!tbl) return;
   if(!CSTRESS_LIST||!CSTRESS_LIST.length){
+    renderCstressVerdict(null);
     if(note) note.textContent='Crop-household stress data not available (data/crop_stress.json missing).';
     return;
   }
   const top=CSTRESS_LIST.slice(0,8); // already sorted worst-first by agri_stress
+  renderCstressVerdict(top[0]);
   if(note) note.innerHTML='Which crop-farming provinces are squeezing borrower income most. '+
     '<b>Agri-stress</b> is an <b>estimated triage index</b> (price proxy × drought, scaled by how much the province farms). '+
     '<b>Price YoY</b> = World Bank <b>global</b> price direction proxy (<i>not</i> Thai farm-gate). '+
@@ -717,9 +736,29 @@ function renderOppScore(){
     OPPSCORE=j; oppLoaded=true; drawOppScore();
   }).catch(()=>{ OPPSCORE=null; oppLoaded=true; drawOppScore(); });
 }
+// LEAD WITH THE VERDICT — colored card at the top of the Acquisition tab, built ONLY from the loaded
+// opportunity_score data. Omits gracefully when the layer is absent (card hidden, no fabrication).
+function renderAcqVerdict(){
+  const box=$('#acq-verdict'); if(!box) return;
+  const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
+  if(!rows.length){ box.style.display='none'; box.innerHTML=''; return; }
+  const t=rows.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(!t||!t.name){ box.style.display='none'; return; }
+  const c=t.components||{};
+  // measured rival branches ≤5km of the top district (components._competitors); fall back to the
+  // competitor-gap score when the raw count isn't present.
+  const compTxt=(c._competitors!=null)
+    ? `${c._competitors} rivals ≤5km`
+    : `competitor-gap ${Math.round(c.competitor_gap||0)}/100`;
+  box.style.display='block';
+  box.innerHTML=`<div class="verdict-line">🏆 <b>Open next: ${t.name}</b> — ${Math.round(t.score||0)}/100 opportunity`+
+    ` · <span style="color:var(--gold)">${compTxt}</span></div>`+
+    `<div class="sub" style="margin-top:4px">${t.province||''}${t.region?' · '+t.region:''} · `+
+    `white-space ${Math.round(c.whitespace||0)} · competitor-gap ${Math.round(c.competitor_gap||0)} · agri-stress ${Math.round(c.agri_stress||0)} ${TAG_E}</div>`;
+}
 function drawOppScore(){
   const tbl=$('#opptbl'), ro=$('#oppreadout'); if(!tbl) return;
   const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
+  renderAcqVerdict();
   if(!rows.length){
     tbl.innerHTML='';
     if(ro) ro.innerHTML='<b>Opportunity score not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh.</span>';
@@ -1311,6 +1350,17 @@ function renderExposure(){
    concentration. Lazy-loaded once; renders nothing gracefully when the file is absent. */
 let SEGEXP=null, segexpLoaded=false;
 const SEG_LABEL={agri:'agri',merchant:'merchant',collateral:'collateral'};
+// LEAD WITH THE VERDICT — colored card at the top of the Exposure tab, built ONLY from segment_exposure.
+// top = the most-concentrated region record; null → card hidden (graceful, no fabrication).
+function renderExpoVerdict(top){
+  const box=$('#expo-verdict'); if(!box) return;
+  if(!top||!top.region){ box.style.display='none'; box.innerHTML=''; return; }
+  const hhi=(top.hhi||0).toFixed(2);
+  const dom=SEG_LABEL[top.dominant_segment]||top.dominant_segment||'mixed';
+  box.style.display='block';
+  box.innerHTML=`<div class="verdict-line">🔴 <b>${top.region}</b> is the most concentrated region — HHI ${hhi}, dominant <b>${dom}</b></div>`+
+    `<div class="sub" style="margin-top:4px">${(top.n_branches||0)} branches · higher HHI = the footprint leans on one segment ${TAG_E}</div>`;
+}
 function renderConcentration(){
   const host=document.getElementById('expoconc'); if(!host) return;
   if(!segexpLoaded){
@@ -1320,10 +1370,11 @@ function renderConcentration(){
     return;   // first paint waits for the fetch
   }
   const regions=(SEGEXP&&Array.isArray(SEGEXP.regions))?SEGEXP.regions:[];
-  if(!regions.length){ host.innerHTML=''; return; }   // graceful: render nothing when absent
+  if(!regions.length){ host.innerHTML=''; renderExpoVerdict(null); return; }   // graceful: render nothing when absent
   // headline: most- and least-concentrated regions (regions already sorted most-concentrated-first).
   const sorted=regions.slice().sort((a,b)=>(b.hhi||0)-(a.hhi||0));
   const top=sorted[0];
+  renderExpoVerdict(top);   // LEAD WITH THE VERDICT — most-concentrated region card at the top of the tab
   const agriLed=sorted.filter(r=>(r.dominant_segment==='agri')).map(r=>r.region);
   const agriTxt=agriLed.length?` ${agriLed.join(' & ')} ${agriLed.length>1?'are':'is'} agri-led.`:'';
   const head=`<b>${top.region} is near-pure ${SEG_LABEL[top.dominant_segment]||top.dominant_segment} (HHI ${(top.hhi||0).toFixed(2)})</b>`+
@@ -1566,10 +1617,29 @@ function simReset(){
   $('#sim-veh-v')&&($('#sim-veh-v').textContent='0%');
   computeSim();
 }
+// BASELINE verdict shown ABOVE the sliders so the simulator says something on load (no slider move needed).
+function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
+  const box=$('#sim-verdict'); if(!box) return;
+  box.style.display='block';
+  if(baseHiP==null){
+    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline ready.</b> The agri what-if needs crop-stress data — the BoT 28% rate-cap scenario below works without it.</div>`;
+    return;
+  }
+  if(!shocked){
+    const pct=N?((100*baseHiBr/N).toFixed(1)):'0.0';
+    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
+      `<div class="sub" style="margin-top:4px">Drag a slider to stress the book. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
+  } else {
+    const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr; const s=v=>(v>0?'+':'')+v;
+    box.innerHTML=`<div class="verdict-line">⚙️ <b>Under this shock:</b> high-stress provinces ${baseHiP} → ${scenHiP} (${s(dP)}) · exposed branches ${baseHiBr.toLocaleString()} → ${scenHiBr.toLocaleString()} (${s(dBr)})</div>`+
+      `<div class="sub" style="margin-top:4px">ILLUSTRATIVE what-if · branch counts measured, stress flag estimated ${TAG_E}</div>`;
+  }
+}
 function computeSim(){
   if(!$('#sim-cards')) return;
   if(!CSTRESS_LIST||!CSTRESS_LIST.length){
     $('#sim-cards').innerHTML='';
+    renderSimVerdict(null);
     $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it. The BoT rate-cap scenario below still works (it needs no data file).';
     $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimCap(); return;
   }
@@ -1590,6 +1660,7 @@ function computeSim(){
   const N=(DATA||[]).length||1;
   const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr;
   const shocked=(price!==0||rain!==0);
+  renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr);
   // ----- summary cards -----
   const dCol=v=>v>0?'var(--agri)':v<0?'var(--up)':'var(--mid)';
   const sign=v=>(v>0?'+':'')+v;
@@ -1808,25 +1879,67 @@ async function renderTrend(){
 }
 
 /* ---------- map ---------- */
+// one map-lens pill (used for both the hero row and the More ▾ menu). disabled = data known-absent.
+function lensPillHTML(k,opts){
+  const l=LENS[k]; if(!l) return '';
+  const menu=opts&&opts.menu;
+  const disabled=lensAbsent(k);
+  const lbl=(l.pill||l.label).replace(/"/g,'&quot;'), info=l.desc.replace(/"/g,'&quot;');
+  // in-band provenance badge: [M] measured / [E] estimated — visible, not tooltip-only.
+  const tag=l.tag==='m'
+    ? `<span class="lpt m" title="Measured value" aria-hidden="true">M</span>`
+    : `<span class="lpt e" title="Estimated / proxy — not a measured outcome" aria-hidden="true">E</span>`;
+  const cls=`pill lens${menu?' lens-menu':''}${k===curLens?' on':''}${disabled?' lens-off':''}`;
+  const dis=disabled?' disabled aria-disabled="true"':'';
+  const note=disabled?' <span class="sub" style="font-size:9.5px">· no data</span>':'';
+  return `<button class="${cls}" data-l="${k}"${dis} aria-pressed="${k===curLens}" aria-label="Map lens: ${lbl} (${l.tag==='m'?'measured':'estimated'}). ${info}">`+
+    `<span class="lk" style="background:${l.color};color:${l.color}"></span>`+
+    `<span class="pl">${lbl}</span>${tag}${note}`+
+    `<span class="pi" title="${info}" aria-hidden="true">ⓘ</span></button>`;
+}
+// true once we KNOW a lens's source is absent (loaded + empty) — used to disable (not remove) a pill so
+// the hero row never reflows. Non-data-gated lenses are never absent.
+function lensAbsent(k){
+  const l=LENS[k]; if(!l) return false;
+  if(l.hh)    return hhriskLoaded && !hhriskHasData();
+  if(l.occr)  return occriskLoaded && !occriskHasData();
+  if(l.brisk) return briskLoaded && !briskHasData();
+  return false;
+}
 function renderLenses(){
-  // Hide the household debt-to-income lens once we KNOW its source is absent (loaded, empty) —
-  // graceful degrade: the button never appears for a dataset that isn't there. Before load it
-  // shows (warmed at map init); if the load yields no data it is filtered out on the next render.
-  // Hero pill row: one horizontal segmented control docked over the map. Each pill = colour dot +
-  // ≈2-word label; the active pill is highlighted; methodology rides on a per-pill "ⓘ" (native
-  // title tooltip on hover/tap + aria-label so it is honest on touch / for screen readers).
-  $('#lenses').innerHTML = Object.entries(LENS)
-    .filter(([k,l])=>!(l.hh && hhriskLoaded && !hhriskHasData()))
-    .filter(([k,l])=>!(l.occr && occriskLoaded && !occriskHasData()))
-    .filter(([k,l])=>!(l.brisk && briskLoaded && !briskHasData()))
-    .map(([k,l])=>{
-      const lbl=(l.pill||l.label).replace(/"/g,'&quot;'), info=l.desc.replace(/"/g,'&quot;');
-      return `<button class="pill lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${lbl}. ${info}">
-       <span class="lk" style="background:${l.color};color:${l.color}"></span><span class="pl">${lbl}</span><span class="pi" title="${info}" aria-hidden="true">ⓘ</span></button>`;
-    }).join('');
-  $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b)return; setLens(b.dataset.l);};
+  // The map lens row is tamed: 4 ALWAYS-VISIBLE hero pills (Opportunity · Composite risk ·
+  // Competitors · Household DTI) cover the two objectives; every other lens lives in a "More lenses ▾"
+  // dropdown so the row never overwhelms. A data-gated lens (DTI / composite) is DISABLED in place
+  // rather than removed, so the hero slots never reflow jarringly. Each pill carries an in-band
+  // [M]/[E] provenance badge; methodology still rides the per-pill "ⓘ" tooltip + aria-label.
+  const hero=HERO_LENS.map(k=>lensPillHTML(k)).join('');
+  // any non-hero lens currently selected (e.g. via ?lens=) gets surfaced as a 5th pill so the active
+  // lens is always visible even when it lives in the menu.
+  const extraActive=(!HERO_LENS.includes(curLens)&&LENS[curLens])?lensPillHTML(curLens):'';
+  const menuKeys=Object.keys(LENS).filter(k=>!HERO_LENS.includes(k));
+  const menuItems=menuKeys.map(k=>lensPillHTML(k,{menu:true})).join('');
+  const moreOn=(!HERO_LENS.includes(curLens))?' on':'';
+  $('#lenses').innerHTML = hero + extraActive +
+    `<div class="lens-more" id="lensMore">`+
+      `<button type="button" class="pill lens lens-more-btn${moreOn}" id="lensMoreBtn" aria-haspopup="true" aria-expanded="false" aria-label="More map lenses">More lenses ▾</button>`+
+      `<div class="lens-more-menu" id="lensMoreMenu" role="menu" aria-label="More map lenses">${menuItems}</div>`+
+    `</div>`;
+  wireLensMore();
+  $('#lenses').onclick = e=>{const b=e.target.closest('.lens'); if(!b||b.id==='lensMoreBtn'||b.disabled)return; setLens(b.dataset.l);
+    const wrap=$('#lensMore'); if(wrap) wrap.classList.remove('open');};
   renderRiskSub();
   renderLegend();
+}
+// wire the "More lenses ▾" dropdown (open/close, outside-click, Escape). Idempotent per render.
+function wireLensMore(){
+  const wrap=$('#lensMore'), btn=$('#lensMoreBtn'); if(!wrap||!btn) return;
+  btn.addEventListener('click',e=>{e.stopPropagation(); const o=!wrap.classList.contains('open');
+    wrap.classList.toggle('open',o); btn.setAttribute('aria-expanded',String(o));});
+  if(!renderLenses._moreDoc){
+    renderLenses._moreDoc=true;
+    document.addEventListener('click',e=>{const w=$('#lensMore'); if(w&&!w.contains(e.target)){w.classList.remove('open'); const b=$('#lensMoreBtn'); if(b) b.setAttribute('aria-expanded','false');}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){const w=$('#lensMore'); if(w){w.classList.remove('open'); const b=$('#lensMoreBtn'); if(b) b.setAttribute('aria-expanded','false');}}});
+  }
 }
 // risk sub-metric chips — only shown when the Portfolio-risk lens is active
 function renderRiskSub(){
@@ -2141,7 +2254,9 @@ function styleMarkers(){
 }
 function setLens(k){
   curLens=k;
-  document.querySelectorAll('.lens').forEach(b=>{const on=b.dataset.l===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on));});
+  // re-render the pill row so a menu lens that becomes active surfaces as the visible 5th pill (and
+  // the "More lenses" button reflects the active state). Keeps the 4 hero slots fixed.
+  renderLenses();
   renderRiskSub();
   if(k==='cstress' && !cstressLoaded){
     loadCropStress().then(()=>{ if(curLens==='cstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
