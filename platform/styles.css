@@ -140,10 +140,18 @@ main{padding-top:56px}
   --glass-bd:1px solid var(--line);
   --glass-sh:0 12px 38px -10px rgba(0,0,0,.6);
 
-  /* ---- spacing + type scale (4px base) ---- */
-  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
-  --card-pad:13px 15px; --r:11px; --r-sm:8px;
-  --fz-xs:11px; --fz-sm:12px; --fz-base:14px; --fz-md:16px; --fz-lg:20px; --fz-xl:24px;
+  /* ---- spacing scale (4px base; roomier rungs for breathing room) ---- */
+  --s1:4px; --s2:8px; --s3:14px; --s4:20px; --s5:32px; --s6:48px;
+  --card-pad:18px 18px; --r:12px; --r-sm:9px;
+
+  /* ---- TYPE RAMP — collapsed to 4 steps + caption (was 6 ad-hoc sizes) ----
+     caption 11 · body 14 · heading 19 · display 28. Mono metrics ride the
+     display/heading steps. Everything else snaps onto these via the cascade. */
+  --fz-caption:11px; --fz-body:14px; --fz-heading:19px; --fz-display:28px;
+  /* legacy aliases kept so existing var() refs resolve onto the new ramp */
+  --fz-xs:11px; --fz-sm:13px; --fz-base:14px; --fz-md:19px; --fz-lg:22px; --fz-xl:28px;
+  /* consistent line-heights per role */
+  --lh-tight:1.18; --lh-snug:1.35; --lh-body:1.55;
 
   --mono:'IBM Plex Mono',ui-monospace,monospace;
   --sans:'IBM Plex Sans Thai',system-ui,sans-serif;
@@ -526,3 +534,114 @@ details.acqsec>summary:focus-visible{outline:2px solid var(--accent);border-radi
 .acqsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600}
 @media print{.jumpnav{display:none!important}details.acqsec>summary::after{display:none}}
+
+/* ============================================================
+   DESIGN-SYSTEM TIGHTENING (design-sys) — appended; wins via the
+   cascade. Pure refinement of the SAME class names: a collapsed
+   4-step type ramp, a roomier spacing rhythm, a dominant card
+   metric, dimmer secondary labels, calmer dividers (subtle bg
+   separation over 1px-border noise), and unified radius/shadow.
+   No markup or structure changes — every tab + deck.gl page
+   inherits this through styles.css.
+   ============================================================ */
+
+/* ---- 1 · TYPE RAMP: snap every role onto caption/body/heading/display ---- */
+body{font-size:var(--fz-body);line-height:var(--lh-body);letter-spacing:.1px}
+
+/* HEADING (19) — clear step above body; this is the section title voice */
+h2{font-size:var(--fz-heading);font-weight:650;line-height:var(--lh-snug);
+   letter-spacing:-.2px;color:var(--hi);margin:var(--s5) 0 var(--s3)}
+h2:first-child{margin-top:var(--s2)}
+.brand h1,#nav .nb{font-size:var(--fz-heading);font-weight:700;letter-spacing:-.3px;line-height:var(--lh-tight)}
+
+/* BODY (14) — leads, callouts, table cells, purpose lines all converge here */
+.lead{font-size:var(--fz-body);line-height:var(--lh-body);color:var(--mid);
+   margin:var(--s2) 0 var(--s4);max-width:76ch}
+.purpose{font-size:var(--fz-body);line-height:var(--lh-body)}
+.insight,.verdict{font-size:var(--fz-body);line-height:var(--lh-body)}
+.tbl{font-size:var(--fz-body)}
+.tbl td{line-height:var(--lh-snug)}
+.search{font-size:var(--fz-body)}
+
+/* CAPTION (11) — labels, eyebrows, sub-notes, table heads, tags: one small size */
+.mcard .k,.cc-card-h,.tbl th,.kpi .k,.acqsub,.acqsub2,.sim-ctl-h,
+.maplegend,.chip,.tag,.cc-tag,.note,.loading{font-size:var(--fz-caption);letter-spacing:.4px}
+.mcard .n,.mcard .d,.lens .ld,.cc-sub2,.cc-row .l .s,.cc-row .r .s,
+.sub,.sim-hint,.prov,.pop .pv{font-size:var(--fz-caption);letter-spacing:0}
+
+/* ---- 2 · SPACING: more breathing room around sections + card grids ---- */
+main{padding:64px var(--s5) 96px}
+.grid{gap:var(--s3)}
+.macro{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.cc-grid{gap:var(--s3);margin-top:var(--s3)}
+.mcard,.cc-card{padding:var(--s4) var(--s4)}
+.insight{padding:var(--s4) var(--s4);margin:var(--s4) 0}
+.verdict{padding:var(--s4) var(--s4);margin:var(--s2) 0 var(--s5)}
+.purpose{padding:var(--s3) var(--s4);margin:var(--s2) 0 var(--s5)}
+.note{padding:var(--s4) var(--s4);margin-top:var(--s5)}
+.lenses,.chips{gap:var(--s2);margin-bottom:var(--s4)}
+.tbl th,.tbl td{padding:13px 14px}
+.cc-row{padding:8px 0}
+
+/* ---- 3 · HIERARCHY: make the primary metric dominate; dim the labels ---- */
+/* the headline number on a card — bigger, tighter, lit */
+.mcard .v{font-size:var(--fz-display);font-weight:600;line-height:var(--lh-tight);
+   letter-spacing:-.6px;margin:6px 0 2px;color:var(--hi)}
+/* secondary labels recede: smaller weight, dimmer ink, calmer tracking */
+.mcard .k{color:var(--dim);font-weight:500;text-transform:uppercase}
+.mcard .n,.mcard .d{color:var(--dim)}
+/* command-center: the right-hand number is the answer — promote it to heading scale */
+.cc-row .r{font-size:var(--fz-heading);font-weight:650;line-height:var(--lh-tight);letter-spacing:-.3px;color:var(--hi)}
+.cc-row .r .s{font-weight:500;color:var(--dim)}
+.cc-row .l{color:var(--txt)}
+.cc-row .l .s{color:var(--dim)}
+/* card eyebrow headers read as quiet labels, not competing titles */
+.cc-card-h{color:var(--mid);font-weight:600;letter-spacing:.6px}
+/* exposure / kpi lead numbers also ride the display step */
+.kpi.lead-kpi .v{font-size:var(--fz-display);letter-spacing:-.6px}
+
+/* ---- 4 · CALMER DIVIDERS + LESS BORDER NOISE ---- */
+/* prefer subtle surface separation over a hard hairline under every h2 */
+h2{border-bottom:none;padding-bottom:0}
+h2::before{top:2px;bottom:2px;width:3px}
+/* eyebrow underline → faint, not a heavy rule */
+.cc-card-h{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);margin-bottom:var(--s3)}
+/* table: drop the column-head fill + heavy outer border; lean on the card surface */
+.tbl{border:1px solid var(--line2)}
+.tbl th{background:transparent;border-bottom:1px solid var(--line);color:var(--mid);font-weight:600}
+.tbl td{border-bottom:1px solid var(--line2)}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+/* cc-row dashed dividers → quieter dotted, less visual clutter */
+.cc-row{border-bottom:1px solid var(--line2)}
+.cc-row:last-child{border-bottom:none}
+/* acquisition sub-heads: same calm treatment, no heavy underline */
+.acqsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
+
+/* ---- 5 · POLISH: unified radius + softer, consistent shadows ---- */
+.mcard,.cc-card,.lens,.insight,.verdict,.purpose,.note,.tbl,.search,
+.sim-controls,.kpi,.bchip{border-radius:var(--r)}
+.chip,.tag,.cc-tag{border-radius:999px}
+/* one calmer elevation across cards (less contrasty than the old elev-2 on hover) */
+.mcard,.cc-card,.lens{box-shadow:0 1px 2px rgba(0,0,0,.18),0 6px 18px -8px rgba(0,0,0,.42)}
+.mcard:hover,.lens:hover{box-shadow:0 1px 2px rgba(0,0,0,.2),0 12px 28px -10px rgba(0,0,0,.5)}
+/* softer card top-light so panels read as one calm surface, not many edges */
+.mcard{border:1px solid var(--line2);border-top-color:rgba(255,255,255,.05)}
+.cc-card{border:1px solid var(--line2)}
+
+/* ---- light theme: keep the same calm treatment, no dark-only shadows ---- */
+html[data-theme="light"] .mcard,
+html[data-theme="light"] .cc-card,
+html[data-theme="light"] .lens{box-shadow:0 1px 2px rgba(16,22,40,.05),0 8px 20px -10px rgba(16,22,40,.12)}
+html[data-theme="light"] .tbl th{background:transparent}
+html[data-theme="light"] .mcard .k,
+html[data-theme="light"] .mcard .n,
+html[data-theme="light"] .cc-row .r .s,
+html[data-theme="light"] .cc-row .l .s{color:var(--dim)}
+
+/* ---- mobile: scale the display metric down a touch so it never overflows ---- */
+@media(max-width:600px){
+  main{padding:64px var(--s3) 96px}
+  .mcard .v,.kpi.lead-kpi .v{font-size:24px}
+  h2,.cc-row .r{font-size:17px}
+  .tbl th,.tbl td{padding:10px 9px}
+}
