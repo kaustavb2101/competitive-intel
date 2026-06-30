@@ -53,7 +53,7 @@ let CSTRESS_META=null, CSTRESS_LIST=[];
    + debt_to_income are MEASURED (NSO SES 2566); stress_index is an ESTIMATED 0–100 percentile rank.
    Fully null-guarded: if the file is ABSENT (or has meta.absent), HHRISK stays empty, the lens
    hides itself (see renderLenses), and the val() reads 0 — never errors. */
-let HHRISK=null, HHRISK_META=null, hhriskLoaded=false, hhriskPromise=null;
+let HHRISK=null, HHRISK_META=null, HHRISK_LIST=[], hhriskLoaded=false, hhriskPromise=null;
 async function loadHouseholdRisk(){
   if(hhriskPromise) return hhriskPromise;
   hhriskLoaded=true;
@@ -61,9 +61,14 @@ async function loadHouseholdRisk(){
     try{
       const r=await fetch('data/household_risk_by_province.json'); if(!r.ok) throw 0;
       const j=await r.json();
-      HHRISK_META=j.meta||null; HHRISK={};
-      if(!(j.meta&&j.meta.absent)) (j.provinces||[]).forEach(p=>{HHRISK[p.province]=p;});
-    }catch(e){ HHRISK={}; HHRISK_META=null; }
+      HHRISK_META=j.meta||null; HHRISK={}; HHRISK_LIST=[];
+      if(!(j.meta&&j.meta.absent)){
+        const list=(j.provinces||[]).filter(p=>p&&p.debt_to_income!=null);
+        list.forEach(p=>{HHRISK[p.province]=p;});
+        // sort by leverage so the hero/headline always names the most-stressed province.
+        HHRISK_LIST=list.slice().sort((a,b)=>(b.debt_to_income||0)-(a.debt_to_income||0));
+      }
+    }catch(e){ HHRISK={}; HHRISK_META=null; HHRISK_LIST=[]; }
     return HHRISK;
   })();
   return hhriskPromise;
@@ -2141,6 +2146,7 @@ function ccStar(item){watchToggle(item);}
 /* ---- home orchestration ---- */
 let homeBooted=false;
 function renderHome(){
+  renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
@@ -2148,16 +2154,80 @@ function renderHome(){
   renderWatchlist();
   if(!homeBooted){
     homeBooted=true;
-    loadAmphoe().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeWhitespace(); });
-    loadCropStress().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeRisk(); });
+    const onHome=()=>document.getElementById('v-home').classList.contains('on');
+    loadAmphoe().then(()=>{ if(onHome()) renderHomeWhitespace(); });
+    loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); } });
+    // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
+    loadOppScore().then(()=>{ if(onHome()) renderHomeHero(); });
+    loadHouseholdRisk().then(()=>{ if(onHome()) renderHomeHero(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
-    const reHome=()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeWhitespace(); };
+    const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
     loadCompetitors().then(reHome);
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
   }
+}
+
+/* QW5 — HOME LEADS WITH THE VERDICT.
+   2–3 BIG plain-language hero statements built ONLY from data already loaded:
+   • "Open next in …" — from the opportunity_score composite (top districts).
+   • "Watching: … household leverage (DTI …×) …" — from MEASURED household_risk (top DTI province)
+     paired with the worst crop-household double-/single-stress (crop_stress).
+   • a third drought/double-stress line when crop_stress carries a flagged province.
+   Each statement links to its detail tab. Any source that is absent is omitted gracefully —
+   never fabricated. Re-rendered as each lazy source resolves. */
+function loadOppScore(){
+  if(oppLoaded) return Promise.resolve(OPPSCORE);
+  return fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null)
+    .then(j=>{OPPSCORE=j;oppLoaded=true;return j;})
+    .catch(()=>{OPPSCORE=null;oppLoaded=true;return null;});
+}
+function renderHomeHero(){
+  const box=$('#cc-hero'); if(!box) return;
+  const heroes=[];
+  // 1) WHERE TO OPEN NEXT — top-2 opportunity districts (ESTIMATED composite).
+  const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
+  if(od&&od.length){
+    const top=od.slice().sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,2).filter(d=>d&&d.name);
+    if(top.length){
+      const names=top.map(d=>d.name).join(' & ');
+      const lead=top[0];
+      heroes.push({tone:'opp',v:'acq',
+        big:`Open next in ${names}`,
+        sub:`Top of the composite opportunity score (${top.map(d=>Math.round(d.score)).join(' & ')}/100) · ${lead.province||''}${lead.region?' · '+lead.region:''}`,
+        tag:'estimated composite', cta:'Acquisition →'});
+    }
+  }
+  // 2) WATCHING — MEASURED household leverage (top DTI province) + worst crop-household stress.
+  const hh=(Array.isArray(HHRISK_LIST)&&HHRISK_LIST.length)?HHRISK_LIST[0]:null;
+  const cs=(CSTRESS_LIST&&CSTRESS_LIST.length)?CSTRESS_LIST[0]:null;
+  if(hh||cs){
+    let big='Watching: ', subBits=[];
+    if(hh){
+      big+=`${hh.region||'household'} household leverage`;
+      subBits.push(`DTI ${(+hh.debt_to_income).toFixed(2)}× in ${hh.province} (NSO, measured)`);
+    }
+    if(cs){
+      const crop=(cs.crop_mix&&cs.crop_mix[0]&&cs.crop_mix[0].crop)||'crops';
+      const crop2=(cs.crop_mix&&cs.crop_mix[1]&&cs.crop_mix[1].crop)||null;
+      const dbl=cs.double_stress?' double-stress':'';
+      big+=`${hh?' + ':''}${crop.toLowerCase()}${crop2?'/'+crop2.toLowerCase():''}${dbl} squeeze`;
+      subBits.push(`${cs.th}: price ${cs.price_stress!=null?(cs.price_stress>0?'+':'')+Math.round(cs.price_stress)+'%':'—'}${cs.drought!=null?' · drought '+Math.round(cs.drought*100)+'%':''}${cs.double_stress?' (rice/rubber + drought)':''}`);
+    }
+    heroes.push({tone:'risk',v:hh?'map':'overview',big,sub:subBits.join(' · '),
+      tag:hh?'measured + estimated':'estimated', cta:hh?'National map →':'Overview →'});
+  }
+  if(!heroes.length){ box.innerHTML=''; return; }
+  box.innerHTML=heroes.map(h=>{
+    const col=h.tone==='opp'?'var(--gold)':'var(--agri)';
+    return `<a class="cc-hero-card ${h.tone}" data-v="${h.v}" href="#${h.v}" role="button" style="--hc:${col}">`+
+      `<div class="cc-hero-big">${h.big}</div>`+
+      `<div class="cc-hero-sub">${h.sub}</div>`+
+      `<div class="cc-hero-foot"><span class="cc-hero-tag">${h.tag}</span><span class="cc-hero-cta">${h.cta}</span></div>`+
+      `</a>`;
+  }).join('');
 }
 
 // WHERE TO EXPAND — top 3 districts (amphoe whitespace) + top 3 provinces (province whitespace avg).

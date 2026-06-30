@@ -69,6 +69,9 @@
       </div>
     </div>
 
+    <!-- QW5: the verdict, in plain language — big hero statements generated from the loaded data. -->
+    <div class="cc-hero" id="cc-hero" aria-live="polite"></div>
+
     <div class="cc-grid">
       <!-- WHERE TO EXPAND -->
       <div class="cc-card" id="cc-whitespace">
@@ -105,27 +108,33 @@
         <div class="cc-card-b" id="cc-watch-body"></div>
       </div>
     </div>
-    <p class="lead" style="margin-top:14px"><b>Provenance:</b> white-space &amp; risk scores are <b>estimated screens</b> (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are <b>measured</b>; the commodity board is World Bank <b>GLOBAL</b> price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an <b>editorial watch</b>. Confirm any expansion with a site survey.</p>
+    <p class="lead cc-provenance"><b>Provenance:</b> white-space &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any expansion with a site survey.</p>
   </section>
 
   <!-- OVERVIEW -->
   <section class="view" id="v-overview">
-    <h2>Macro overlay — current conditions</h2>
-    <div class="grid macro" id="macro"></div>
+    <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
+    <div class="dash2">
+      <div class="dash2-side">
+        <h2>Macro overlay — current conditions</h2>
+        <div class="grid macro" id="macro"></div>
 
-    <h2 class="risk">Regulatory watch · BoT hire-purchase rate cap</h2>
-    <p class="lead">Portfolio objective #1 — a sector <b>margin</b> watch item, not a portfolio-credit signal.</p>
-    <div class="insight risk" id="botcap"></div>
-
-    <h2>Commodity board — the segments diverge</h2>
-    <div class="insight">
-      <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) face
-      double-digit price declines, while livestock, fisheries &amp; forestry households see income
-      <b>rise</b> (chicken +25.6%, beef +18.4%). Gold +62.7% lifts pawn/gold-collateral value.
-    </div>
-    <div class="cols2">
-      <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
-      <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
+        <h2 class="risk">Regulatory watch · BoT hire-purchase rate cap</h2>
+        <p class="lead">Portfolio objective #1 — a sector <b>margin</b> watch item, not a portfolio-credit signal.</p>
+        <div class="insight risk" id="botcap"></div>
+      </div>
+      <div class="dash2-main">
+        <h2>Commodity board — the segments diverge</h2>
+        <div class="insight">
+          <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) face
+          double-digit price declines, while livestock, fisheries &amp; forestry households see income
+          <b>rise</b> (chicken +25.6%, beef +18.4%). Gold +62.7% lifts pawn/gold-collateral value.
+        </div>
+        <div class="cols2">
+          <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
+          <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
+        </div>
+      </div>
     </div>
 
     <h2 class="collat">Collateral outlook · the two backings diverge</h2>
@@ -163,16 +172,36 @@
   <!-- ACQUISITION -->
   <section class="view" id="v-acq">
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
+      <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
       <a class="chip" href="#acq" data-acq="sec-opp">Opportunity score</a>
       <a class="chip" href="#acq" data-acq="sec-compcov">Competitor coverage</a>
       <a class="chip" href="#acq" data-acq="sec-exit">Competitor-exit white-space</a>
-      <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
       <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
       <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
       <a class="chip" href="#acq" data-acq="sec-collateral">Collateral</a>
       <a class="chip" href="#acq" data-acq="sec-districts">Districts</a>
       <a class="chip" href="#acq" data-acq="sec-distrisk">District risk</a>
     </nav>
+
+    <!-- Acquisition LEADS with the full-width Road-to-3,000 headroom bar, then the opportunity leaderboard. -->
+    <details class="acqsec acq-lead" id="sec-r3k" open>
+    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
+    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
+      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
+      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
+      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
+      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
+    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
+    <details style="margin:6px 0 10px"><summary style="cursor:pointer;color:var(--mid);font-size:12px">How the split is computed (formula)</summary>
+      <p class="lead" style="margin-top:6px">For each region:
+        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
+        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
+        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
+        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
+        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></details>
+    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="r3ktbl"></table>
+    </details>
 
     <details class="acqsec" id="sec-opp" open>
     <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
@@ -214,25 +243,6 @@
       census — a <b>blocked desktop / Thai-IP company-registry pull</b>. Treat the score as ESTIMATED.</p>
     <div class="insight" id="exitreadout" style="border-left-color:var(--gold)">Loading competitor-exit white-space…</div>
     <table class="tbl" id="exittbl"></table>
-    </details>
-
-    <details class="acqsec" id="sec-r3k" open>
-    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
-    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
-      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
-      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
-      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
-      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
-    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
-    <details style="margin:6px 0 10px"><summary style="cursor:pointer;color:var(--mid);font-size:12px">How the split is computed (formula)</summary>
-      <p class="lead" style="margin-top:6px">For each region:
-        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
-        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
-        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
-        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
-        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></details>
-    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
-    <table class="tbl" id="r3ktbl"></table>
     </details>
 
     <details class="acqsec" id="sec-estates">
@@ -300,14 +310,21 @@
   <section class="view" id="v-exposure">
     <h2 class="risk">Portfolio exposure · concentration read</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
-    <div class="grid macro" id="expocards"></div>
-    <h2 class="risk">Top exposed provinces</h2>
-    <p class="lead">Provinces ranked by a combined stress count — branches that are in a stressed-crop region <i>and/or</i> the dry quartile <i>and/or</i> carry a high agri-PD proxy. Most branches at risk first. <b>Book proxy = branch count</b>; all stress flags estimated.</p>
-    <table class="tbl" id="expoprov"></table>
 
-    <h2 class="risk">By region</h2>
-    <p class="lead">Share of each region's branches falling in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
-    <table class="tbl" id="expotbl"></table>
+    <!-- 2-col dashboard: KPI / region strip BESIDE the lead provinces table (fills the widescreen). -->
+    <div class="dash2">
+      <div class="dash2-side">
+        <div class="grid macro" id="expocards"></div>
+        <h2 class="risk">By region</h2>
+        <p class="lead">Share of each region's branches in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
+        <table class="tbl" id="expotbl"></table>
+      </div>
+      <div class="dash2-main">
+        <h2 class="risk">Top exposed provinces</h2>
+        <p class="lead">Provinces ranked by a combined stress count — branches that are in a stressed-crop region <i>and/or</i> the dry quartile <i>and/or</i> carry a high agri-PD proxy. Most branches at risk first. <b>Book proxy = branch count</b>; all stress flags estimated.</p>
+        <table class="tbl" id="expoprov"></table>
+      </div>
+    </div>
   </section>
 
   <!-- SCENARIO SIMULATOR (client-side what-if) -->
