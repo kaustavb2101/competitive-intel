@@ -24,7 +24,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          # Pin to the SAME Python the data is generated under (the cloud build sandbox is 3.11),
+          # so the determinism --check gate mirrors the build environment. 3.11 vs 3.12 can resolve
+          # a float-rounding boundary differently and make a byte-identical generator "drift" in CI.
+          python-version: "3.11"
 
       - name: Set up Node
         uses: actions/setup-node@v4
