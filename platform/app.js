@@ -78,6 +78,80 @@ function estabCount(d){
   const i=DATA.indexOf(d); if(i<0) return 0;
   const e=OCCDATA.branches[i]; return (e&&e.t)||0;
 }
+// pretty label for an occupation-bucket key (Title Case fallback when a file omits a label).
+function occLabel(key){
+  if(!key) return '';
+  const m={factory:'Factory workers',auto:'Auto / vehicle',retail:'Retail trade',food:'Food service',
+    hospitality:'Hospitality',finance:'Finance',health:'Healthcare',education:'Education',
+    public:'Public sector',professional:'Professional',agriculture:'Agriculture',personal:'Personal services',
+    logistics:'Logistics',construction:'Construction'};
+  return m[key]||(key.charAt(0).toUpperCase()+key.slice(1));
+}
+
+/* ---------- measured occupation mix per DISTRICT (Overture Places) ----------
+   Lazy-loads data/amphoe_occupations.json — a MEASURED per-amphoe rollup of establishment
+   points by occupation bucket, keyed by the amphoe `id` (matches amphoe.json). Shape:
+     { buckets:[{key,label}], amphoe:{ "<id>": {t:total, o:[counts aligned to buckets], dom:<bucket idx>} } }
+   Null-guarded throughout: absent file or absent entry → the district leaderboard simply omits the
+   "Borrower base" cell, falling back to the existing layout. Mirrors loadOccupations/loadCompetitors. */
+let AOCC=null, aoccLoaded=false, aoccPromise=null;
+async function loadAmphoeOccupations(){
+  if(aoccPromise) return aoccPromise;
+  aoccLoaded=true;
+  aoccPromise=(async()=>{
+    try{ const r=await fetch('data/amphoe_occupations.json'); if(r.ok) AOCC=await r.json(); }
+    catch(e){ AOCC=null; }
+    return AOCC;
+  })();
+  return aoccPromise;
+}
+function aoccHasData(){return !!(AOCC&&AOCC.amphoe&&AOCC.buckets);}
+// resolved dominant-bucket index for an amphoe occupation entry (uses e.dom, else argmax of e.o).
+function aoccDomIdx(e){
+  if(!e) return null;
+  if(e.dom!=null) return e.dom;
+  if(!Array.isArray(e.o)||!e.o.length) return null;
+  let idx=0; for(let i=1;i<e.o.length;i++) if((e.o[i]||0)>(e.o[idx]||0)) idx=i; return idx;
+}
+// dominant-occupation label for an amphoe record (by its id) — '' when the file/entry is absent.
+function ampDomOcc(a){
+  if(!aoccHasData()||!a) return '';
+  const e=AOCC.amphoe[a.id]; if(!e) return '';
+  const idx=aoccDomIdx(e); if(idx==null) return '';
+  const b=AOCC.buckets[idx]; if(!b) return '';
+  return b.label||occLabel(b.key);
+}
+// share (0–1) the dominant bucket holds inside the amphoe — for a concentration hint. 0 when unknown.
+function ampDomShare(a){
+  if(!aoccHasData()||!a) return 0;
+  const e=AOCC.amphoe[a.id]; if(!e||!Array.isArray(e.o)) return 0;
+  const tot=e.t||e.o.reduce((s,v)=>s+(v||0),0); if(!tot) return 0;
+  const idx=aoccDomIdx(e); if(idx==null) return 0;
+  return (e.o[idx]||0)/tot;
+}
+// MEASURED rival branches within COMP_RADIUS_KM of an amphoe centroid (cx,cy). Uses the unioned
+// competitor census (same source the per-branch d._comp tally reads). null when the census is absent.
+function ampCompCount(a){
+  if(!compHasData()||!a||a.cy==null||a.cx==null) return null;
+  let n=0;
+  for(let j=0;j<COMP_ITEMS.length;j++){
+    const it=COMP_ITEMS[j];
+    if(havKm(a.cy,a.cx,it.lat,it.lng)<=COMP_RADIUS_KM) n++;
+  }
+  return n;
+}
+// brand-broken-down tooltip for the district competitor cell (measured, lower bound).
+function ampCompTooltip(a){
+  if(!compHasData()||!a||a.cy==null||a.cx==null) return 'no competitor data yet';
+  const by={}; let n=0;
+  for(let j=0;j<COMP_ITEMS.length;j++){
+    const it=COMP_ITEMS[j];
+    if(havKm(a.cy,a.cx,it.lat,it.lng)<=COMP_RADIUS_KM){ n++; by[it.brand]=(by[it.brand]||0)+1; }
+  }
+  if(!n) return `No rival branches ≤${COMP_RADIUS_KM}km of district centre (measured, lower bound)`;
+  const parts=Object.entries(by).sort((x,y)=>y[1]-x[1]).map(([b,c])=>`${b} ${c}`);
+  return `${n} rival branch${n===1?'':'es'} ≤${COMP_RADIUS_KM}km of district centre: ${parts.join(', ')} (measured, lower bound)`;
+}
 
 /* ---------- competitor census (objective #2: competitor-AWARE white-space) ----------
    Lazy-loads data/competitors_national.json — a MEASURED census of rival title-loan / vehicle-
@@ -734,15 +808,25 @@ function renderAmphoe(){
   ampChips('#amprchips',ampRRegion,r=>{ampRRegion=r;drawAmpRisk();});
   if($('#ampcsv')&&!$('#ampcsv').dataset.init){$('#ampcsv').onclick=ampCSV;$('#ampcsv').dataset.init='1';}
   drawAmpBoard(); drawAmpRisk();
+  // Fold in the measured borrower-base (dominant occupation) + competitor census so the white-space
+  // leaderboard reads "underserved + what borrower base + how contested". Both lazy + null-safe: if a
+  // file is absent the extra cells just don't render and the original layout stands.
+  const reAcq=()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAmpBoard(); };
+  if(!aoccLoaded) loadAmphoeOccupations().then(reAcq);
+  if(!compAttached) loadCompetitors().then(reAcq);
 }
 function drawAmpBoard(){
   ampRows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
     .sort((x,y)=>(y.whitespace||0)-(x.whitespace||0)).slice(0,25);
   const mx=Math.max(1,...ampRows.map(a=>a.whitespace||0));
+  const haveOcc=aoccHasData();      // measured dominant-occupation per district (Overture)
+  const haveComp=compHasData();     // measured rival census near the district centroid
   $('#amptbl').innerHTML=`<tr><th>#</th>`+
     `<th class="h-opp" title="ESTIMATED white-space score (0–100): district demand proxy minus an AutoX-presence penalty. Higher = more underserved.">Whitespace ★ est</th>`+
     `<th>District</th><th>Province</th><th>Region</th>`+
     `<th title="AutoX branches inside this amphoe (MEASURED, point-in-polygon). 0 = no own presence at all.">AutoX</th>`+
+    (haveOcc?`<th class="h-collat" title="MEASURED dominant occupation/establishment bucket inside the district (Overture Maps Places, a sample/lower bound) — the borrower base you'd be lending into. From amphoe_occupations.json.">Borrower base ◆ meas</th>`:'')+
+    (haveComp?`<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~${COMP_RADIUS_KM}km of the district centre (Google Places ∪ Overture, a lower bound — not a registry). Low rivals + high white-space = underserved AND undercompeted.">Rivals ≤${COMP_RADIUS_KM}km ◆ meas</th>`:'')+
     `<th class="h-opp" title="DIW factory workers in the district (MEASURED where ✓; — where the district name didn't resolve to DIW)">Workers (DIW)</th>`+
     `<th title="convenience stores + restaurants inside the amphoe (OSM, MEASURED) — merchant footfall proxy">Merchant POI ◇</th>`+
     `<th title="gold shops + vehicle dealers inside the amphoe (OSM, MEASURED) — title/gold-collateral demand proxy">Collat POI ◇</th></tr>`+
@@ -750,12 +834,28 @@ function drawAmpBoard(){
       const p=a.poi||{}; const merch=(p.cvs||0)+(p.rest||0); const collat=(p.gold||0)+(p.veh||0);
       const wkr=a.fac_measured?`<span style="color:var(--gold)">${(a.workers||0).toLocaleString()}</span> <span class="sub" title="DIW-measured at this district">✓</span>`:`<span class="sub" title="district name did not resolve to a DIW record">—</span>`;
       const hd=a.branches===0?' · no AutoX':a.branches<=1?' · thin':'';
+      // borrower-base cell: dominant occupation bucket + its share (measured). "—" where Overture is thin here.
+      let occCell='';
+      if(haveOcc){
+        const dom=ampDomOcc(a);
+        if(dom){const sh=ampDomShare(a); occCell=`<td style="color:var(--collat)">${dom}${sh>=0.2?` <span class="sub mono">${Math.round(sh*100)}%</span>`:''}</td>`;}
+        else occCell=`<td class="sub" title="no Overture establishment points landed in this district">—</td>`;
+      }
+      // contested cell: rival branches near the district centre. ✦ = underserved AND undercompeted.
+      let compCell='';
+      if(haveComp){
+        const cn=ampCompCount(a); const under=ws>=35&&cn===0;
+        compCell=`<td class="mono" title="${ampCompTooltip(a)}">`+(cn===0
+          ? `<span style="color:${under?'var(--gold)':'var(--merch)'}">0${under?' ✦':''}</span>`
+          : `<span style="color:var(--agri)">${cn}</span>`)+`</td>`;
+      }
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(ws,sc,mx)} <span class="mono" style="color:${sc}">${ws.toFixed(0)}</span></td>
         <td>${ampName(a)}<span class="sub">${hd}</span></td>
         <td class="sub">${a.province_th}</td><td class="sub">${a.region}</td>
         <td class="mono ${a.branches===0?'':'sub'}" style="${a.branches===0?'color:var(--gold)':''}">${a.branches}</td>
+        ${occCell}${compCell}
         <td class="mono">${wkr}</td>
         <td class="mono" style="color:var(--merch)">${merch.toLocaleString()}</td>
         <td class="mono" style="color:var(--collat)">${collat.toLocaleString()}</td></tr>`;}).join('');
@@ -768,10 +868,15 @@ function drawAmpBoard(){
       if(top.branches===0) drivers.push('no AutoX branch there yet');
       else drivers.push(`only ${top.branches} AutoX inside`);
       if(top.fac_measured&&(top.workers||0)>=5000) drivers.push(`${Math.round((top.workers||0)/1000)}k DIW factory workers`);
+      // borrower base + how contested — the "what + how" half of the answer (both measured when present).
+      const dom=ampDomOcc(top); if(dom) drivers.push(`borrower base mostly <b>${dom.toLowerCase()}</b>`);
+      const cn=ampCompCount(top);
+      if(cn===0) drivers.push('<b>zero</b> rival branches nearby (undercompeted)');
+      else if(cn!=null) drivers.push(`${cn} rival branch${cn===1?'':'es'} nearby`);
       $('#ampreadout').innerHTML=`<b>Most underserved district ${scope}:</b> ${top.name_measured?top.name:''} ${top.name_en} (${top.province_th}, ${top.region})
         at <b style="color:var(--gold)">★ ${(top.whitespace||0).toFixed(0)}</b> — ${drivers.join(', ')}.
         ${zeros?`<b>${zeros}</b> of the top 25 ${scope} have <b>zero AutoX presence</b>. `:''}
-        <span class="sub">Estimated screen from measured branch + POI counts; confirm with a site survey.</span>`;
+        <span class="sub">Estimated white-space; borrower base &amp; rival counts measured (Overture / Google Places, lower bounds). Confirm with a site survey.</span>`;
     }
   }
 }
@@ -797,10 +902,13 @@ function ampCSV(){
   const rows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
     .sort((x,y)=>(y.whitespace||0)-(x.whitespace||0));
   const hdr=['rank','whitespace_score_est','district_th','district_en','province','region','autox_branches_measured',
+    'dominant_occupation_measured_overture','dominant_occupation_share','rival_branches_5km_centroid_measured_lower_bound',
     'diw_workers','diw_workers_measured','merchant_poi_cvs_rest_measured','collateral_poi_gold_veh_measured',
     'demand_proxy_est','risk_proxy_est','agri_stress_province_inherited'];
   const lines=[hdr.join(',')].concat(rows.map((a,i)=>{const p=a.poi||{};
+    const dom=ampDomOcc(a); const sh=ampDomShare(a); const cn=ampCompCount(a);
     return [i+1,(a.whitespace||0).toFixed(1),a.name_measured?a.name:'',a.name_en,a.province_th,a.region,a.branches,
+      dom||'',dom?sh.toFixed(3):'',cn==null?'':cn,
       a.fac_measured?(a.workers||0):'',a.fac_measured?'true':'false',(p.cvs||0)+(p.rest||0),(p.gold||0)+(p.veh||0),
       (a.demand||0).toFixed(1),(a.risk_proxy||0).toFixed(1),(a.agri_stress||0).toFixed(1)]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
@@ -873,6 +981,62 @@ function renderExposure(){
       <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
+  // OBJECTIVE #1: borrower-base concentration — is the book over-exposed to one occupation type?
+  renderOccConcentration();
+}
+
+/* ---------- borrower-base (occupation) concentration · objective #1 ----------
+   Sums each occupation bucket across ALL branches' ≤10km establishment mix (branch_occupations.json,
+   MEASURED via Overture), normalizes to shares, and computes an HHI-style concentration so the exec
+   can see whether the book leans on ONE borrower-base type (e.g. factory workers) vs a diversified mix.
+   Lazy + graceful: with no branch_occupations.json the block renders nothing (the section just shows the
+   existing geographic concentration). The DOM host is created once and inserted after #expocards so no
+   index.html change is needed. Book proxy = establishment-mix counts, NOT ฿ balances — labelled. */
+function occHost(){
+  let h=document.getElementById('expo-occ');
+  if(h) return h;
+  const cards=$('#expocards'); if(!cards||!cards.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-occ';
+  cards.parentNode.insertBefore(h,cards.nextSibling);   // directly under the concentration cards
+  return h;
+}
+function renderOccConcentration(){
+  const host=occHost(); if(!host) return;
+  // lazy-load on first paint, then re-render once data lands.
+  if(!occLoaded){ loadOccupations().then(()=>{ if(document.getElementById('v-exposure')&&document.getElementById('v-exposure').classList.contains('on')) renderOccConcentration(); }); }
+  if(!OCCDATA||!OCCDATA.buckets||!OCCDATA.branches){ host.innerHTML=''; return; }  // graceful: render nothing
+  const buckets=OCCDATA.buckets;
+  const sums=new Array(buckets.length).fill(0); let tot=0;
+  OCCDATA.branches.forEach(e=>{ if(e&&Array.isArray(e.o)) e.o.forEach((v,i)=>{ const n=v||0; sums[i]+=n; tot+=n; }); });
+  if(!tot){ host.innerHTML=''; return; }
+  // shares (%), HHI on the 0–10,000 regulator scale (Σ share-in-%²).
+  const rows=buckets.map((b,i)=>({key:b.key,label:b.label||occLabel(b.key),n:sums[i],sh:100*sums[i]/tot}))
+    .sort((x,y)=>y.n-x.n);
+  const hhi=rows.reduce((s,r)=>s+r.sh*r.sh,0);
+  const hhiLabel=hhi<1500?'diversified borrower base':hhi<2500?'moderately concentrated':'concentrated — over-exposed to one base';
+  const hhiCol=hhi<1500?'var(--merch)':hhi<2500?'var(--gold)':'var(--agri)';
+  const top=rows[0];
+  const col=k=>OCC_BUCKET_COL[k]||'var(--accent)';
+  const barRows=rows.filter(r=>r.n>0).slice(0,10).map(r=>{
+    const w=Math.round(180*r.sh/Math.max(1,top.sh));
+    return `<div class="cc-row"><div class="l">${r.label}<span class="s">${r.n.toLocaleString()} establishments ≤10km</span></div>`+
+      `<div class="r" style="min-width:230px"><span class="bar" style="width:180px;display:inline-block"><i style="width:${w}px;background:${col(r.key)}"></i></span> `+
+      `<span class="mono" style="color:${col(r.key)}">${r.sh.toFixed(1)}%</span></div></div>`;
+  }).join('');
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:18px">Borrower-base concentration ${TAG_M}</h2>`+
+    `<p class="lead">Sum of each occupation/establishment bucket across all ${OCCDATA.branches.length.toLocaleString()} branch catchments `+
+    `(≤10km, Overture Maps Places — <b>measured</b>, a sample/lower bound). Shows whether the book leans on <i>one</i> borrower-base `+
+    `type. <b>Book proxy = establishment mix</b>, not ฿ balances. HHI on the 0–10,000 scale: &lt;1500 diversified · 1500–2500 moderate · &gt;2500 concentrated.</p>`+
+    `<div class="grid macro">`+
+      `<div class="mcard"><div class="k">◆ Borrower-base HHI</div>`+
+        `<div class="v" style="color:${hhiCol}">${Math.round(hhi).toLocaleString()}</div>`+
+        `<div class="n">${hhiLabel} · across ${rows.filter(r=>r.n>0).length} occupation buckets</div></div>`+
+      `<div class="mcard"><div class="k">▲ Largest single base</div>`+
+        `<div class="v" style="color:${col(top.key)}">${top.sh.toFixed(1)}%</div>`+
+        `<div class="n">${top.label} · ${top.n.toLocaleString()} establishments ≤10km (measured)</div></div>`+
+    `</div>`+
+    `<div class="cc-card-b" style="margin-top:10px">${barRows}</div>`;
 }
 
 /* ---------- scenario simulator (client-side what-if) ----------
@@ -1594,6 +1758,10 @@ function renderHome(){
     homeBooted=true;
     loadAmphoe().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeWhitespace(); });
     loadCropStress().then(()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeRisk(); });
+    // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
+    const reHome=()=>{ if(document.getElementById('v-home').classList.contains('on')) renderHomeWhitespace(); };
+    loadAmphoeOccupations().then(reHome);
+    loadCompetitors().then(reHome);
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -1607,11 +1775,20 @@ function renderHomeWhitespace(){
   // top districts from amphoe.json (whitespace, est) — surfaces zero-branch white space
   if(AMP&&AMP.length){
     const top=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0)).slice(0,3);
-    html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}</div>`;
+    // honest subhead: only advertise the measured extras that actually loaded.
+    const extras=[]; if(aoccHasData()) extras.push('borrower base'); if(compHasData()) extras.push('rivals');
+    const extraTag=extras.length?` <span class="sub">+ ${extras.join(' &amp; ')} ${TAG_M}</span>`:'';
+    html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}${extraTag}</div>`;
     html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
       const where=`${a.province_th} · ${a.region}`;
       const hd=a.branches===0?'no AutoX branch yet':`${a.branches} AutoX inside`;
-      return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,`${where} · ${hd}`,
+      // append the measured "what borrower base + how contested" half when those files are loaded.
+      const bits=[where,hd];
+      const dom=ampDomOcc(a); if(dom) bits.push(`base: ${dom.toLowerCase()}`);
+      const cn=ampCompCount(a);
+      if(cn===0) bits.push('0 rivals ≤5km ✦');
+      else if(cn!=null) bits.push(`${cn} rival${cn===1?'':'s'} ≤5km`);
+      return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,bits.join(' · '),
         `★ ${(a.whitespace||0).toFixed(0)}`,'whitespace','var(--gold)');}).join('');
   } else {
     html+=`<div class="cc-empty">Loading district white-space…</div>`;
