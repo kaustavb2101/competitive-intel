@@ -383,7 +383,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <div id="bldglegend"></div>
   <div id="isolegend" style="display:none"></div>
   <div id="complegend" style="display:none"></div>
-  <div class="lgttl">POI types <span>· tap to toggle</span></div>
+  <div class="lgttl">Catchment POIs · collateral & demand first <span>· tap to toggle</span></div>
   <div id="legend"></div>
 </div>
 <script>window.initCatch=function(){
@@ -445,17 +445,29 @@ function compNat(){
 function compScene(){ if(_COMP_SCENE)return _COMP_SCENE;
   _COMP_SCENE=(COMP&&COMP.length)?COMP:compNat(); return _COMP_SCENE; }
 const GOLD=[230,180,80]; // 10km collateral catchment ring
-// canonical type->color map: single source of truth for map dots AND legend AND toggles
+// canonical type->color map: single source of truth for map dots AND legend AND toggles.
+// Ordered + coloured by relevance to a TITLE-LOAN lender (collateral supply + finance first, then
+// demand signals, then surrounding economy) — distinct hues so every type is decodable. Palette is
+// kept in sync with branch-explorer.html. (supermarket/fresh_market now get DISTINCT hues.)
 const POI_COLORS={
-  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
-  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
-  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
+  // collateral supply + finance (the title-loan core)
+  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250],
+  // demand signals: where cash-cycle borrowers transact
+  fresh_market:[224,144,47], supermarket:[224,170,90], convenience:[208,118,60],
+  // surrounding economy / services
+  industrial:[123,138,166], restaurant:[133,144,166], hotel:[214,90,160],
+  school:[122,79,224], pharmacy:[200,67,59]};
 const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
   fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
   restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
-const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
-// preserve a stable legend order matching POI_COLORS keys, restricted to types actually present
-const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
+// default-on: lead with the COLLATERAL + DEMAND read so the 10km catchment looks densely populated
+// with the signals a lender cares about. Ambient types (restaurants/hotels/schools) start off so they
+// don't drown the signal; they remain one click away in the legend.
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1};
+// legend/render order by relevance (collateral & finance, then demand, then economy)
+const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy'];
+// preserve a stable, relevance-ordered legend, restricted to types actually present in the data
+const POI_TYPES=POI_ORDER.filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT. showIso gated on data presence.
 let basemap='light', showRings=true, showIso=true;
