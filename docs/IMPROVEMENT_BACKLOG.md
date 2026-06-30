@@ -108,3 +108,4 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- [ ] **P2 (QA) — Road-to-3,000 rounding mismatch.** #acq Headroom-est column rounds each region but totals the un-rounded sum → 984 in rows vs 985 in Total (app.js ~584 vs ~591). Round the total from the rounded rows. Cosmetic; +New allocation already correct. *(LOW, S)*
