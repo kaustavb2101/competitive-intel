@@ -62,6 +62,15 @@
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
 ## Queue — enrichment / capabilities (serve the two objectives)
+- [ ] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED, now unblocked.** The TMLI
+      bridge landed `source-data/household_debt_by_province.json` + `household_income_by_province.json` (real NSO
+      SES). Two steps: (1) project a province→{debt_to_income, stress_index} lookup into `platform/data/` (a small
+      `household_risk_by_province.json` via a deterministic --check'd step, or fold into derive.py) with full
+      provenance; (2) add a National map lens that colours each branch by its province household leverage,
+      labelled MEASURED · NSO. Graceful when absent. The standout measured-risk view no competitor has. *(HIGH, M)*
+- [ ] **★ Surface the opportunity score on the Acquisition tab — objective #2.** `platform/data/opportunity_score.json`
+      (928 districts) is merged but not yet shown. Render the ranked where-to-open-next leaderboard (top districts +
+      per-component breakdown: whitespace / competitor-gap / agri-stress) on #acq, labelled ESTIMATED COMPOSITE. *(HIGH, M)*
 - [ ] **Composite expansion-opportunity score** per district — combine white-space + dominant occupation +
       competitor density + crop-stress into one rank for "where to open next". Graceful absent. *(high, M)*
 - [ ] **Occupation × risk cross-read** — once `branch_occupations.json` is present, flag branches whose
