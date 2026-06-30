@@ -875,10 +875,57 @@ function isoLayers(){
     updateTriggers:{getFillColor:[feats.length],getLineColor:[feats.length]}}));
   return G;}
 
+// ---- STREAMING BUILDINGS (operator-hosted Overture vector tiles) -------------------------------
+// When building tiles are configured in platform/data/tiles_config.json (a real Overture pull,
+// clipped to the union of 10km buffers around every branch + competitor, hosted on a CDN), stream
+// them per-viewport so the FULL 10km catchment everywhere is densely populated — not just the
+// curated per-city catchment file. deck.gl 8.9.35's MVTLayer natively fetches a {z}/{x}/{y}.pbf
+// tile pyramid and forwards GeoJsonLayer props, so the streamed footprints inherit the SAME
+// cinematic warm ramp + non-linear height exaggeration + lighting-capped material (no white
+// blow-out) as the static scene. Returns null when no tiles are configured, the bundle lacks
+// MVTLayer, or only a PMTiles URL is set (PMTiles needs a vector-tile shim — a follow-up) -> the
+// scene falls back to the curated catchment buildings. NO fabricated data: this renders only the
+// footprints actually present in the hosted real-Overture tiles.
+function streamBuildingLayer(){
+  try{
+    var cfg=(window.TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    var url=cfg.mvtUrl||null;                 // prefer the native {z}/{x}/{y}.pbf path (zero extra deps)
+    if(!url)return null;                       // pmtilesUrl-only -> fall back until the PMTiles shim lands
+    var DARK=darkMode(), LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=DARK?[[58,52,46],[150,104,52],[228,172,78]]
+                 :[[201,186,158],[214,168,100],[226,186,92]];
+    var H_LO=3, H_HI=35;                        // fixed band for streamed tiles (no global sort available)
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
+      getFillColor:function(f){var h=hOf(f);var t=(h-H_LO)/(H_HI-H_LO);t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
+      getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
+      lineWidthMinPixels:0.4,
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      shadowEnabled:SHADOWS_ON,
+      parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
+
 function render(){
   // ground scaffolding first so buildings/rings/POIs draw on top of it.
   // extraLayers() (optional trees + rail) sit just above the ground bed / under buildings.
   const L=[baseLayer(), ...groundLayers(), ...extraLayers()];
+  // streamed national building tiles (null unless operator-hosted tiles are configured). When
+  // present, they SUPERSEDE the curated catchment buildings (avoids double-draw / z-fighting).
+  const STREAMB=streamBuildingLayer();
   // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
@@ -959,7 +1006,8 @@ function render(){
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
-  L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,
+  if(STREAMB)L.push(STREAMB);   // streamed national tiles render in the building slot...
+  if(!STREAMB)L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
     getPolygon:b=>b.p,
     // exaggerate height non-linearly: low-rise stays grounded, mid/tall get stretched so the skyline
     // separates. Visual only — getElevation never writes back to b.h.
@@ -1493,11 +1541,14 @@ buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();bui
    // MEASURED national competitor census (Google Places) + the ESTIMATED-composite district
    // opportunity score. Both nationwide; this page filters them to the current city bbox so rivals
    // appear IN the scene even for cities without a curated per-province competitor file (e.g. Bangkok).
-   opt('data/competitors_national.json'), opt('data/opportunity_score.json')
+   opt('data/competitors_national.json'), opt('data/opportunity_score.json'),
+   // operator-configured CDN URL for streamed Overture building tiles. Null/absent => the scene
+   // falls back to the curated per-city catchment buildings (nothing invented to fill the gap).
+   opt('data/tiles_config.json')
  ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
-   window.COMPNAT=a[11];window.OPPSCORE=a[12];
+   window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
    box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();

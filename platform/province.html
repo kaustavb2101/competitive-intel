@@ -398,9 +398,12 @@ function lightMode(){return basemap==='light';}
 // the try/catch leaves LIGHTING null and the scene still renders flat-lit (unchanged behaviour).
 function buildLighting(){
   try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
-    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:2.4,direction:[-0.7,-2.2,-1.0]});
-    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.7,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.92});
+    // Intensities kept LOW so ambient + diffuse*(sun+fill) stays below ~1.0 — otherwise light parcel/
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). With material
+    // ambient 0.5 / diffuse 0.34 below: max lit ≈ 0.5*0.9 + 0.34*(0.85+0.25) ≈ 0.83 -> safe.
+    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:0.85,direction:[-0.7,-2.2,-1.0]});
+    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.25,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.9});
     return new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
   }catch(e){ return null; }
 }
@@ -485,9 +488,47 @@ function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],min
 
 function dGeom(f){return f.geometry.type==='MultiPolygon'?f.geometry.coordinates.map(poly=>poly[0]):f.geometry.coordinates[0];}
 
+// Streamed Overture building tiles (platform/data/tiles_config.json). When configured, the deep-dive
+// SWAPS its extruded-district relief for real 3D building footprints — the "fancy building scenes"
+// across the whole province. Returns null unless an mvtUrl is set and the bundle has MVTLayer ->
+// graceful fallback to the relief. Lighting-capped material -> no white blow-out. NO fabricated data.
+function streamBuildingLayer(){
+  try{
+    var cfg=(window.TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path (PMTiles shim is a follow-up)
+    if(!url)return null;
+    var LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=LIGHT?[[201,186,158],[214,168,100],[226,186,92]]
+                  :[[58,52,46],[150,104,52],[228,172,78]];
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
+      getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
+      getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
+
 function render(){
   const L=[baseLayer()];
   const LIGHT=lightMode();
+  // streamed building tiles (null unless operator-hosted). When present, they REPLACE the extruded
+  // district relief with real footprints and the districts drop to a flat tinted context base.
+  const STREAMB=streamBuildingLayer();
+  if(STREAMB)L.push(STREAMB);
   // (0) district context — now EXTRUDED 3D relief (the cinematic upgrade). Each amphoe polygon is
   //     raised by a MEASURED quantity (working-age population, the title-loan addressable base; falls
   //     back to DIW factory workers, then branch count) and ranked p5..p95 within THIS province so a
@@ -510,7 +551,7 @@ function render(){
                                      // zoom without burying the ground markers (branch dots / POI / rings)
     const elev=f=>{ if(!anyVal)return 0; const v=dval(f.properties);
       let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t; return Math.pow(t,0.85)*MAX_ELEV; };
-    const EXTRUDE=anyVal;            // only extrude when we actually have a measured driver
+    const EXTRUDE=anyVal && !STREAMB;  // extrude relief only when we have a driver AND no streamed buildings
     // colour ramp by the SAME rank so taller (more populous/working) districts read warmer.
     const fillCol=f=>{ if(!EXTRUDE)return LIGHT?[150,164,196,30]:[91,124,250,16];
       const v=dval(f.properties); let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t;
@@ -525,7 +566,7 @@ function render(){
       getLineColor:LIGHT?[120,134,168,150]:[150,170,210,120],lineWidthMinPixels:1,pickable:true,
       // material tuned for cinematic depth: low ambient lets the sun carve the relief; high diffuse
       // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
-      material:{ambient:0.32,diffuse:0.95,shininess:36,specularColor:[150,160,190]},
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
       parameters:{depthTest:true},transitions:{getElevation:600},
       updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
   }
@@ -874,8 +915,10 @@ buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();r
  document.body.appendChild(box);
  Promise.all([
    fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
-   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];
+   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // operator-hosted Overture building tiles (null/absent => keep the extruded-relief view).
+   fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    box.remove();window.initProvince();})
   .catch(function(e){

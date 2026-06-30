@@ -248,6 +248,48 @@ async function loadOccupations(){
   catch(e){ OCCDATA=null; }
   return OCCDATA;
 }
+// operator-hosted Overture building tiles (platform/data/tiles_config.json). When configured, the
+// per-branch scene streams REAL footprints across the whole 10km catchment instead of the live
+// Overpass pull alone. Null/absent => unchanged behaviour (Overpass buildings). NO fabricated data.
+let TILECFG=null, tileCfgTried=false;
+async function loadTilesConfig(){
+  if(tileCfgTried) return TILECFG;
+  tileCfgTried=true;
+  try{ const r=await fetch('data/tiles_config.json'); if(r.ok) TILECFG=await r.json(); }
+  catch(e){ TILECFG=null; }
+  return TILECFG;
+}
+// MVTLayer of streamed buildings, styled to match (lighting-capped material -> no white blow-out).
+// Returns null unless an mvtUrl is configured and the bundle has MVTLayer -> graceful fallback.
+function streamBuildingLayer(){
+  try{
+    var cfg=(TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path (PMTiles shim is a follow-up)
+    if(!url)return null;
+    var LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=LIGHT?[[201,186,158],[214,168,100],[226,186,92]]
+                  :[[58,52,46],[150,104,52],[228,172,78]];
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
+      getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
+      getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      shadowEnabled:SHADOWS_ON, parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
 // stable colour per occupation bucket key (parity with the platform palette where sensible)
 const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125],food:[230,180,80],
   hospitality:[230,180,80],finance:[200,67,59],health:[91,124,250],education:[91,124,250],
@@ -329,9 +371,12 @@ let deckgl;
 // renderer (see init). The warm material + directional shading + sky/vignette still give depth then.
 function buildLighting(withShadow){
   try{ if(!(deck.LightingEffect && deck.AmbientLight && deck.DirectionalLight))return null;
-    const sun=new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:!!withShadow});
-    const fill=new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]});
-    const amb=new deck.AmbientLight({color:[255,255,255],intensity:withShadow?0.9:1.0});
+    // Intensities kept LOW on purpose: ambient + diffuse*(sun+fill) must stay below ~1.0 or light
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). With the building
+    // material ambient 0.5 / diffuse 0.34 below: max lit ≈ 0.5*0.9 + 0.34*(0.85+0.25) ≈ 0.83 -> safe.
+    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:0.85,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.25,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.9});
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     if(withShadow){ try{ eff.shadowColor=[10,16,34,0.46]; }catch(e){} }
     return eff;
@@ -380,11 +425,14 @@ function baseLayer(){
 function layers(){
   const L=[baseLayer()];
   const LIGHT=lightMode();
-  L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
+  // streamed national tiles supersede the live-Overpass buildings when operator-hosted tiles exist.
+  const STREAMB=streamBuildingLayer();
+  if(STREAMB)L.push(STREAMB);
+  if(!STREAMB)L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
     stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
-    material:{ambient:0.28,diffuse:0.95,shininess:28,specularColor:[90,100,130]},
+    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
     parameters:{depthTest:true},transitions:{getElevation:600},
     shadowEnabled:SHADOWS_ON,pickable:true,
     updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
@@ -639,6 +687,9 @@ async function loadPanel(){
 
 /* ---- init ---- */
 function init(){
+  // best-effort: if operator building tiles are configured, load them then re-render to stream
+  // them in. Absent/blocked => unchanged (live-Overpass buildings). Never throws.
+  loadTilesConfig().then(function(){ try{ render(); }catch(e){} });
   deckgl=new deck.DeckGL({container:'map',mapStyle:null,viewState:VIEW,
     controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
     layers:layers(),

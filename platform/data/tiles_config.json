@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "source": "operator-configured CDN URL for Overture building vector tiles",
+    "provenance": "Tile artifacts are produced by pipeline/build_building_tiles.py (a real Overture Maps buildings pull, clipped to the union of 10km buffers around all AutoX branches + competitor branches) and hosted on a CDN. No values here are fabricated; this file only records WHERE the real tiles are served from. Until tiles are hosted, urls are null and the 3D scenes fall back to the curated per-city catchment buildings — nothing is invented to fill the gap.",
+    "generated_by": "hand-configured (paste the CDN URL after running docs/BUILDING_TILES.md)",
+    "label": "configuration, not measured data"
+  },
+  "buildings": {
+    "pmtilesUrl": null,
+    "mvtUrl": null,
+    "minZoom": 9,
+    "maxZoom": 15,
+    "sourceLayer": "buildings",
+    "heightProperty": "height",
+    "attribution": "© Overture Maps Foundation"
+  },
+  "notes": "Set buildings.pmtilesUrl to a hosted .pmtiles archive (range-request CDN: Cloudflare R2 / S3 / Vercel Blob), OR buildings.mvtUrl to a {z}/{x}/{y}.pbf tile-pyramid template for a plain static host. The frontend prefers mvtUrl if present (zero extra deps), else pmtilesUrl. Leave both null to keep the curated-catchment fallback."
+}
