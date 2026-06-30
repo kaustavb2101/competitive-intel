@@ -765,6 +765,97 @@ def check_branch_risk(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_segment_exposure():
+    # PORTFOLIO SEGMENT CONCENTRATION (objective #1): per-region/province segment mix + a
+    # rescaled-Herfindahl concentration index, derived from the ESTIMATED a/m/c branch scores.
+    # Optional file: SKIP-PASS when absent (build_segment_exposure.py degrades to an absent-state).
+    hdr("segment_exposure.json (optional)")
+    if not exists("segment_exposure.json"):
+        ok("segment_exposure.json absent — skipped (optional; run build_segment_exposure.py)")
+        return
+    try:
+        d = load("segment_exposure.json")
+    except Exception as e:
+        fail("segment_exposure.json loads", repr(e))
+        return
+    ok("segment_exposure.json loads")
+
+    # provenance: meta must state the builder + the ESTIMATED structural-index label.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("segment_exposure meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+    else:
+        ok("segment_exposure meta/provenance present (generated_by + estimated label)")
+
+    # honest absent-state: file may legitimately ship empty when branches.json is missing.
+    if meta and meta.get("absent"):
+        ok("segment_exposure is an honest ABSENT-state (no branches.json) — skipped value checks")
+        return
+
+    SEGS = ("agri", "merchant", "collateral")
+
+    def _check_block(label, block, require_region):
+        # one mix/hhi summary block: shares in [0,1] summing to ~1, hhi in [0,1], counts consistent.
+        problems = []
+        if require_region and block.get("region") not in KNOWN_REGIONS:
+            problems.append("%s region=%r unknown" % (label, block.get("region")))
+        mix = block.get("segment_mix")
+        if not isinstance(mix, dict) or any(k not in mix for k in SEGS):
+            problems.append("%s segment_mix missing a segment key" % label)
+            return problems
+        shares = [mix[s] for s in SEGS]
+        if any(not is_finite_number(s) or not (0.0 <= s <= 1.0) for s in shares):
+            problems.append("%s segment_mix share out of [0,1]: %r" % (label, mix))
+        elif abs(sum(shares) - 1.0) > 0.01:
+            problems.append("%s segment_mix shares sum=%.4f (not ~1.0)" % (label, sum(shares)))
+        hhi = block.get("hhi")
+        if not is_finite_number(hhi) or not (0.0 <= hhi <= 1.0):
+            problems.append("%s hhi=%r out of [0,1]" % (label, hhi))
+        # counts consistent with n_branches
+        counts = block.get("counts")
+        n = block.get("n_branches")
+        if not (isinstance(n, int) and not isinstance(n, bool) and n >= 0):
+            problems.append("%s n_branches=%r not a non-negative int" % (label, n))
+        elif isinstance(counts, dict):
+            csum = sum(counts.get(s, 0) for s in SEGS)
+            if csum != n:
+                problems.append("%s counts sum=%d != n_branches=%d" % (label, csum, n))
+        if block.get("dominant_segment") not in SEGS:
+            problems.append("%s dominant_segment=%r not a known segment" % (label, block.get("dominant_segment")))
+        return problems
+
+    bad = []
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        bad.append("national block missing")
+    else:
+        bad += _check_block("national", nat, require_region=False)
+
+    regions = d.get("regions")
+    if not isinstance(regions, list) or not regions:
+        bad.append("regions list missing/empty")
+    else:
+        for r in regions:
+            bad += _check_block("region %s" % r.get("region"), r, require_region=True)
+
+    provinces = d.get("provinces")
+    if not isinstance(provinces, list) or not provinces:
+        bad.append("provinces list missing/empty")
+    else:
+        for p in provinces:
+            bad += _check_block("province %s" % p.get("province"), p, require_region=True)
+
+    if bad:
+        fail("segment_exposure blocks sane (mix in [0,1] sums~1, hhi in [0,1], counts==n, "
+             "known regions/segments)", first_n(bad, 8))
+    else:
+        ok("segment_exposure blocks sane (national + %d regions + %d provinces: mix sums~1, "
+           "hhi in [0,1], counts consistent, known regions/segments)"
+           % (len(regions), len(provinces)))
+
+
+# ---------------------------------------------------------------------------
 def check_amphoe_occupations(amphoe):
     # MEASURED Overture occupation mix per district, keyed by amphoe shapeID. Optional file:
     # SKIP-PASS when absent.
@@ -1123,6 +1214,7 @@ def main():
     check_occupation_risk(n)
     check_branch_risk(n)
     check_province_risk()
+    check_segment_exposure()
     check_amphoe_occupations(amphoe)
     check_competitors()
     check_competitor_coverage()
