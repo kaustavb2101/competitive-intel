@@ -64,6 +64,15 @@ W_PRICE = 0.6
 W_DROUGHT = 0.4
 TOP_CROPS = 3
 
+# --- double-stress flag (RESEARCH_DIGEST 2026-06-30, obj #1) -----------------
+# Research: rice AND rubber farm-gate prices softening into 2026 (global oversupply,
+# India white-rice exports resumed) WHILE El Niño drought probability is high from
+# mid-2026 (>80%). Flag provinces hit by BOTH at once. Uses ONLY signals already in
+# this computation (crop_mix shares, price_term, drought) — no new external numbers.
+DS_SHARE_FLOOR = 0.5     # rice+rubber must be >= half of mapped crop area to count
+DS_DROUGHT_FLOOR = 0.6   # drought signal (0..1) considered "elevated" at/above this
+RICE_RUBBER = ("Rice", "Rubber")
+
 
 def load(name):
     with open(os.path.join(SRC, name), encoding="utf-8") as f:
@@ -185,6 +194,28 @@ def build():
         hazard = W_PRICE * price_term + W_DROUGHT * drought_term
         agri_stress = round(hazard * crop_dependence, 4)
 
+        # --- double-stress: softening rice/rubber prices AND elevated drought ---
+        # rice_rubber_share = combined planting-area share of rice + rubber (the two
+        # crops the 2026 research calls out as price-softening). Drawn from crop_mix,
+        # which is already capped at TOP_CROPS, so this is the share among shown crops.
+        rice_rubber_share = round(
+            sum(c["share"] for c in crop_mix if c["crop"] in RICE_RUBBER), 4
+        )
+        drought_val = drought if drought is not None else 0.0
+        # price_term > 0 means area-weighted price YoY is negative = softening prices.
+        ds_price = price_term > 0.0
+        ds_share = rice_rubber_share >= DS_SHARE_FLOOR
+        ds_drought = drought_val >= DS_DROUGHT_FLOOR
+        double_stress = bool(ds_price and ds_share and ds_drought)
+        # double_stress_score: 0..1 severity of the overlap (only meaningful when the
+        # boolean is true). Geometric-style mean of the two stress legs, gated on the
+        # rice/rubber exposure so the score reflects "how much of the book is in the
+        # crops that are double-stressed". Built only from existing terms.
+        if double_stress:
+            double_stress_score = round(price_term * drought_val * rice_rubber_share, 4)
+        else:
+            double_stress_score = 0.0
+
         records.append({
             "th": prov,
             "en": None,  # english province name not available in source-data (honest null)
@@ -194,6 +225,8 @@ def build():
             "drought": drought,
             "crop_dependence": crop_dependence,
             "agri_stress": agri_stress,
+            "double_stress": double_stress,
+            "double_stress_score": double_stress_score,
             "components": {
                 "total_crop_rai": int(round(total_rai)),
                 "price_term": round(price_term, 4),
@@ -203,6 +236,10 @@ def build():
                 "price_coverage": price_coverage,
                 "n_branches": prov_nbranch.get(prov, 0),
                 "n_rain_branches": len(rains),
+                "rice_rubber_share": rice_rubber_share,
+                "ds_price_softening": ds_price,
+                "ds_share_qualifies": ds_share,
+                "ds_drought_elevated": ds_drought,
             },
         })
 
@@ -214,12 +251,15 @@ def build():
         r["th"],
     ))
 
+    n_double = sum(1 for r in records if r["double_stress"])
+
     meta = {
         "title": "Per-province crop-household stress (portfolio risk, objective #1)",
         "generated_by": "pipeline/build_crop_stress.py",
         "deterministic": True,
         "network_free": True,
         "n_provinces": len(records),
+        "n_double_stress": n_double,
         "sort": "worst-first by agri_stress (desc)",
         "fields": {
             "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
@@ -232,6 +272,12 @@ def build():
             "crop_dependence": "MEASURED — province total crop rai / max province crop rai (0..1).",
             "agri_stress": "ESTIMATED — composite, see meta.formula. Combines price + drought "
                            "hazard, scaled by crop_dependence. Index, not a measured outcome.",
+            "double_stress": "ESTIMATED FLAG — true when a province is rice/rubber-heavy AND its "
+                             "rice/rubber prices are softening AND its drought signal is elevated. "
+                             "See meta.double_stress for the exact rule. A triage flag, not a "
+                             "forecast.",
+            "double_stress_score": "ESTIMATED — 0..1 severity of the overlap when the flag is true "
+                                   "(0 when false). See meta.double_stress.",
         },
         "formula": {
             "price_term": "clamp(-price_stress / %g, 0, 1)" % PRICE_SCALE,
@@ -241,6 +287,27 @@ def build():
             "rationale": "Price weighted higher (0.6) — it hits cash-crop borrower income directly. "
                          "Hazard scaled by crop_dependence so a province is flagged a portfolio risk "
                          "only when borrowers there actually farm at scale.",
+        },
+        "double_stress": {
+            "what": "ESTIMATED flag for provinces hit by the 2026 rice/rubber double-stress: "
+                    "softening farm prices AND elevated drought, in places that grow rice/rubber.",
+            "rule": "double_stress = (rice_rubber_share >= %g) AND (price_term > 0, i.e. rice/rubber "
+                    "prices softening) AND (drought >= %g)." % (DS_SHARE_FLOOR, DS_DROUGHT_FLOOR),
+            "score": "double_stress_score = price_term * drought * rice_rubber_share when the flag "
+                     "is true, else 0. A 0..1 severity of the overlap, built only from existing terms.",
+            "thresholds": {
+                "rice_rubber_share_floor": DS_SHARE_FLOOR,
+                "drought_floor": DS_DROUGHT_FLOOR,
+            },
+            "inputs": "Uses ONLY signals already computed here: crop_mix shares (rice+rubber), the "
+                      "existing price_term (from the GLOBAL price proxy), and the existing drought "
+                      "signal (measured rain_3mo_anom proxy). No new external numbers introduced.",
+            "n_flagged": n_double,
+            "source": "RESEARCH_DIGEST.md 2026-06-30 Entry 1 §C — OAE 2026 outlook (rice & rubber "
+                      "softer) + El Niño drought >80% from mid-2026. INTERPRETATION (obj #1).",
+            "caveat": "price_term is a GLOBAL-price direction proxy, and in the current vintage all "
+                      "priced provinces show some rice/rubber softening, so drought is the effective "
+                      "discriminator. Treat as a triage flag, not a default forecast.",
         },
         "coverage": {
             "crops_priced": [CROP_EN[c] for c in covered_crops],
