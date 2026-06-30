@@ -515,7 +515,7 @@ function streamBuildingLayer(){
       getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
       getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
     });
@@ -566,7 +566,7 @@ function render(){
       getLineColor:LIGHT?[120,134,168,150]:[150,170,210,120],lineWidthMinPixels:1,pickable:true,
       // material tuned for cinematic depth: low ambient lets the sun carve the relief; high diffuse
       // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
       parameters:{depthTest:true},transitions:{getElevation:600},
       updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
   }

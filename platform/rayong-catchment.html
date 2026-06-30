@@ -281,7 +281,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <button data-b="satellite">Satellite</button>
   <button id="ringtog" class="on">Rings</button>
   <button id="isotog" class="on">Isochrone</button>
-  <button id="orbittog" class="on" title="Gentle auto-orbit (pauses when you move the map)">Orbit</button>
+  <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Orbit</button>
 </div>
 
 <aside class="side" id="left">
@@ -518,7 +518,7 @@ const FRAMED={longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-2
 const INTRO ={longitude:CORE.lng,latitude:CORE.lat,zoom:11.4,pitch:38,bearing:-58};
 let VIEW=Object.assign({},INTRO);
 // orbit state: enabled by default, paused on any user interaction (drag/zoom/click) until re-armed.
-let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0;
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
 const ORBIT_DPS=2.6;                 // degrees / second — gentle, not nauseating (~2-4 dps target)
 // userInteract(): called from onViewStateChange when the *user* moves the camera (not our own
 // programmatic setProps). Pauses the orbit and flips the toggle UI off until the user re-enables it.
@@ -829,7 +829,7 @@ function extraLayers(){
         extruded:true,elevationScale:1,getElevation:6,
         getFillColor:[green[0],green[1],green[2],225],
         stroked:false,
-        material:{ambient:0.5,diffuse:0.7,shininess:8,specularColor:[60,90,60]},
+        material:{ambient:0.5,diffuse:0.34,shininess:8,specularColor:[0,0,0]},
         parameters:{depthTest:true},pickable:false}));
     }
     if(deck.ScatterplotLayer){
@@ -911,7 +911,7 @@ function streamBuildingLayer(){
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
       getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
       lineWidthMinPixels:0.4,
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
@@ -1039,9 +1039,9 @@ function render(){
       return [clamp(r),clamp(g),clamp(bl),LIGHT?214:236];},
     stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[60,40,120,180]:[196,176,140,120]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
-    // across faces; high diffuse for a strong lit-side; a small, tight specular gives the gold
-    // crowns a warm sheen highlight without going plastic. Pairs with the cast-shadow sun above.
-    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+    // across faces. Specular ZEROED: it's the only view-dependent term, and under orbit it spiked
+    // and clamped sun-facing faces to white (the "white blow-out"). Diffuse shading keeps depth.
+    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
@@ -1060,7 +1060,7 @@ function render(){
       getFillColor:[c[0],c[1],c[2],232],
       stroked:true, getLineColor:[Math.round(c[0]*.55),Math.round(c[1]*.55),Math.round(c[2]*.55),255],
       lineWidthMinPixels:0.5,
-      material:{ambient:0.45,diffuse:0.8,shininess:32,specularColor:[120,130,160]},
+      material:{ambient:0.5,diffuse:0.34,shininess:32,specularColor:[0,0,0]},
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true},
       pickable:true,_poiType:t}));
@@ -1076,7 +1076,7 @@ function render(){
       extruded:true, elevationScale:1, getElevation:115,
       getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],235];},
       stroked:true, getLineColor:[245,247,252,235], lineWidthMinPixels:0.6,
-      material:{ambient:0.5,diffuse:0.85,shininess:40,specularColor:[190,195,210]},
+      material:{ambient:0.5,diffuse:0.34,shininess:40,specularColor:[0,0,0]},  // was the worst blow-out: near-white specular on orbit
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:true}));
   }

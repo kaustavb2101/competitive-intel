@@ -182,7 +182,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="t-ring" class="on">3 / 5 / 10 km rings</button>
-      <button id="t-orbit" class="on" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="t-orbit" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
       <button id="t-reload">↻ Reload buildings</button>
     </div>
   </div>
@@ -284,7 +284,7 @@ function streamBuildingLayer(){
       getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
       getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
-      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+      material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no view-dependent (orbit) white blow-out
       shadowEnabled:SHADOWS_ON, parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
     });
@@ -393,7 +393,7 @@ if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
 const FRAMED=Object.assign({},INITIAL,{pitch:58,bearing:-12});
 const INTRO=Object.assign({},FRAMED,{zoom:Math.max(11,(FRAMED.zoom||15)-2.4),pitch:36,bearing:18});
 let VIEW=Object.assign({},INTRO);
-let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF
 const ORBIT_DPS=2.5;                 // degrees / second — gentle (~2-3 dps target)
 function setOrbitUI(on){const t=document.getElementById('t-orbit'); if(t)t.classList.toggle('on',on);}
 function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
@@ -432,7 +432,7 @@ function layers(){
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
     stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
-    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
+    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no orbit blow-out
     parameters:{depthTest:true},transitions:{getElevation:600},
     shadowEnabled:SHADOWS_ON,pickable:true,
     updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
@@ -445,7 +445,7 @@ function layers(){
       getElevation:p=>poiColumnHeight(p.t),
       getFillColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [c[0],c[1],c[2],235];},
       stroked:LIGHT,getLineColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255];},lineWidthMinPixels:0.6,
-      material:{ambient:0.45,diffuse:0.8,shininess:30,specularColor:[80,90,120]},
+      material:{ambient:0.5,diffuse:0.34,shininess:30,specularColor:[0,0,0]},
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true},pickable:true,updateTriggers:{stroked:[LIGHT]}}));
   }
