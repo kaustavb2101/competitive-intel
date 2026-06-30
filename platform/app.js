@@ -19,6 +19,7 @@ const LENS = {
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
+  poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
   pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', tag:'m', val:d=>(PLOOK[d.v]||{}).pickup||0},
@@ -165,6 +166,41 @@ function occriskRec(d){
   if(!occriskHasData()||!DATA) return null;
   const i=DATA.indexOf(d); if(i<0) return null;
   return OCCRISK[i]||null;
+}
+
+/* ---------- per-branch RELEVANT-POI density (data/poi_relevance.json, obj#2) ----------
+   Lazy-loads the title-loan-relevant POI-density layer built by pipeline/build_poi_relevance.py:
+   {meta, branches:[{rel:0..100, raw, cat:{...category counts...}, src}]}, INDEX-ALIGNED to
+   branches.json (entry i ↔ DATA[i]). The category COUNTS are MEASURED (Overture/OSM, a sample /
+   lower bound); the per-category WEIGHTING that fuses them into the 0–100 `rel` score is an
+   ESTIMATED relevance model (stated in the lens tooltip + legend). Fully null-guarded: absent file
+   → POIREL stays empty, the lens hides itself (renderLenses), poiRelevanceVal() reads 0, and the
+   popup block is omitted. Nothing is fabricated. */
+let POIREL=null, poirelMeta=null, poirelLoaded=false, poirelPromise=null;
+async function loadPoiRelevance(){
+  if(poirelPromise) return poirelPromise;
+  poirelLoaded=true;
+  poirelPromise=(async()=>{
+    try{ const r=await fetch('data/poi_relevance.json'); if(!r.ok){POIREL=null;return POIREL;}
+      const j=await r.json(); poirelMeta=j.meta||null; POIREL=j.branches||null; }
+    catch(e){ POIREL=null; poirelMeta=null; }
+    return POIREL;
+  })();
+  return poirelPromise;
+}
+// true once the layer is loaded AND carries at least one branch read (i.e. not absent/empty).
+function poiRelevanceHasData(){return !!(POIREL&&POIREL.length);}
+// MEASURED-counts / ESTIMATED-weighting relevance score (0..100) for a branch — 0 when absent.
+function poiRelevanceVal(d){
+  if(!poiRelevanceHasData()||!DATA) return 0;
+  const i=DATA.indexOf(d); if(i<0) return 0;
+  const e=POIREL[i]; return (e&&e.rel)||0;
+}
+// per-branch relevant-POI record (for popups) — null when absent.
+function poiRelevanceRec(d){
+  if(!poiRelevanceHasData()||!DATA) return null;
+  const i=DATA.indexOf(d); if(i<0) return null;
+  return POIREL[i]||null;
 }
 
 /* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
@@ -395,6 +431,27 @@ const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; i
 function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Math.round(62*Math.min(v,max)/max)}px;background:${color}"></i></span>`;}
 // honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
 function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
+
+/* ---------- skeleton placeholders ----------
+   Shimmer-skeleton markup that mirrors the final layout while data loads, fading to real content
+   when it arrives (CSS @keyframes shimmer, theme-aware). Replaces the old plain "Loading…" text.
+   skelRows(n) → a list/table-shaped block (label line + value pill per row).
+   skelLines(specs) → free-form stacked shimmer lines (each spec is a width class like 'skel-w70'). */
+function skelRows(n){
+  n=n||4;
+  let rows='';
+  const w=['skel-w70','skel-w55','skel-w40','skel-w55','skel-w30'];
+  for(let i=0;i<n;i++){
+    rows+=`<div class="skel-row"><span class="skel skel-line ${w[i%w.length]} skel-grow"></span>`+
+      `<span class="skel skel-pill"></span></div>`;
+  }
+  return `<div class="skel-rows" aria-hidden="true">${rows}</div>`;
+}
+function skelLines(specs){
+  specs=specs||['skel-w70','skel-w55','skel-w40'];
+  return `<div class="skel-rows" aria-hidden="true">`+
+    specs.map(w=>`<span class="skel skel-line ${w}"></span>`).join('')+`</div>`;
+}
 
 // MOBILE: wrap every wide data table in a horizontal-scroll container so a many-column .tbl
 // can never push the whole page sideways on a phone. The <table> nodes persist (only their
@@ -1904,6 +1961,7 @@ function lensAbsent(k){
   if(l.hh)    return hhriskLoaded && !hhriskHasData();
   if(l.occr)  return occriskLoaded && !occriskHasData();
   if(l.brisk) return briskLoaded && !briskHasData();
+  if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
   return false;
 }
 function renderLenses(){
@@ -1965,7 +2023,7 @@ function renderLegend(){
   // of a meaningless 0-coloured scale, and point at the puller. Once data is in, show the scale + an
   // honest "measured, lower bound" tag and a tiny brand key for the faint rival points.
   if(l.cmp){
-    if(!compLoaded){ $('#maplegend').innerHTML='<span class="sub">Loading competitor census…</span>'; return; }
+    if(!compLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">competitor census…</span>'; return; }
     if(!compHasData()){
       $('#maplegend').innerHTML='<span class="sub" title="Rival-branch census not loaded yet">'+
         'Competitor map loading — the rival-branch census will appear once the latest census is in.</span>';
@@ -1983,13 +2041,25 @@ function renderLegend(){
   // Household debt-to-income lens: the val() is DTI×100, so present the scale in real DTI terms
   // and tag it honestly MEASURED · NSO. Absent file → the lens is already filtered out of the bar.
   if(l.hh){
-    if(!hhriskLoaded){ $('#maplegend').innerHTML='<span class="sub">Loading household debt-to-income…</span>'; return; }
+    if(!hhriskLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">household debt-to-income…</span>'; return; }
     const lo=(mx*.12/100).toFixed(2), mid=(mx*.5/100).toFixed(2), hi=(mx/100).toFixed(2);
     $('#maplegend').innerHTML =
       `<span><i style="background:${lensColor(.12,l.color)}"></i>${lo}×</span>`+
       `<span><i style="background:${lensColor(.5,l.color)}"></i>${mid}×</span>`+
       `<span><i style="background:${lensColor(1,l.color)}"></i>${hi}× debt÷annual income</span>`+
       ` <span class="sub" title="NSO SES 2566 household debt and income — province averages, measured">● measured · NSO SES</span>`;
+    return;
+  }
+  // Relevant-POI density lens: a shimmer skeleton while the (measured-counts) layer loads, then an
+  // honest "measured counts · estimated weighting" tag so the M-badged pill is not misread as a
+  // fully measured score.
+  if(l.poirel){
+    if(!poirelLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">relevant-POI density…</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`+
+      ` <span class="sub" title="POI counts measured (Overture/OSM, lower bound); the per-category relevance weighting is an estimated model">◇ measured counts · estimated weighting</span>`;
     return;
   }
   $('#maplegend').innerHTML =
@@ -2035,6 +2105,8 @@ function initMap(){
   if(!occriskLoaded) loadOccRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='occrisk'){ renderLegend(); styleMarkers(); } });
   // warm the per-branch COMPOSITE risk so its lens hides itself when absent (and is ready when picked).
   if(!briskLoaded) loadBranchRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='brisk'){ renderLegend(); styleMarkers(); } });
+  // warm the MEASURED title-loan-relevant POI density so its menu lens disables itself when absent.
+  if(!poirelLoaded) loadPoiRelevance().then(()=>{ renderLenses(); if(mapReady&&curLens==='poirel'){ renderLegend(); styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -2171,6 +2243,23 @@ function occriskPopupHTML(d,sec,r){
     + (e.f?`<div class="sub" style="margin:2px 0 0;font-size:10px;color:var(--agri)">⚠ FLAGGED — borrower base concentrated in a stressed sector (occupation shares MEASURED; stressed-sector weighting ESTIMATED). A triage flag, not a measured default rate.</div>`
           :`<div class="sub" style="margin:2px 0 0;font-size:10px">occupation shares MEASURED (Overture, lower bound); stressed-sector weighting ESTIMATED (factory slowdown · province crop-stress)</div>`);
 }
+// Relevant-POI density block for a branch popup — the MEASURED title-loan-relevant POI counts
+// within ~10km, fused into a 0–100 score by an ESTIMATED per-category relevance model. Renders
+// only once poi_relevance.json is loaded and carries this branch.
+const POIREL_CAT_LABEL={gold:'Gold shops',vehicle:'Vehicle dealers',fresh_mkt:'Fresh markets',
+  agri:'Farms / agri',factory:'Factories',commerce:'Commerce',school:'Schools'};
+function poiRelevancePopupHTML(d,sec,r){
+  const e=poiRelevanceRec(d); if(!e) return '';
+  const sc=Math.round(e.rel||0);
+  const col=sc>=60?'var(--gold)':sc>=35?'#cda23e':'#8b90a7';
+  const cat=e.cat||{};
+  const top=Object.keys(cat).filter(k=>cat[k]>0).sort((a,b)=>cat[b]-cat[a]).slice(0,3)
+    .map(k=>`${POIREL_CAT_LABEL[k]||k} ${cat[k]}`).join(' · ');
+  return sec('Relevant POI density — MEASURED counts · ESTIMATED weighting')
+    + r('Relevant-POI density ◇', `<span style="color:${col}">${sc}</span> <span class="sub">/100</span>`, col)
+    + (top?r('Top relevant POIs ≤10km', top, '#8b90a7'):'')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">POI counts MEASURED (Overture/OSM, a sample / lower bound); the per-category relevance WEIGHTING that fuses them into one score is ESTIMATED (judgement model)</div>`;
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -2238,6 +2327,7 @@ function popupHTML(d){
     ${hhriskPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
+    ${poiRelevancePopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
@@ -2272,6 +2362,9 @@ function setLens(k){
   }
   if(k==='brisk' && !briskLoaded){
     loadBranchRisk().then(()=>{ renderLenses(); if(curLens==='brisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='poirel' && !poirelLoaded){
+    loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
@@ -2592,7 +2685,7 @@ function renderHomeWhitespace(){
       return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,bits.join(' · '),
         `★ ${(a.whitespace||0).toFixed(0)}`,'whitespace','var(--gold)');}).join('');
   } else {
-    html+=`<div class="cc-empty">Loading district white-space…</div>`;
+    html+=skelRows(3);
   }
   // top provinces by mean district whitespace (rolled up from amphoe) — "which province has room"
   if(AMP&&AMP.length){
@@ -2631,7 +2724,7 @@ function renderHomeRisk(){
     html+=ccRow(`${w.th} <span class="sub">${w.region||''}</span>`,
       `${dom.crop||'crops'} ${dom.share!=null?Math.round(dom.share*100)+'%':''} · price ${w.price_stress!=null?(w.price_stress>0?'+':'')+w.price_stress+'%':'—'}`,
       `▲ ${sv}`,'agri-stress','var(--agri)');
-  } else { html+=`<div class="cc-empty">Loading crop stress…</div>`; }
+  } else { html+=skelRows(3); }
   // most motorcycle-heavy collateral provinces (DLT, measured) — lowest-recovery title collateral
   const moto=collatMixRows().slice(0,2);
   if(moto.length){
