@@ -137,10 +137,125 @@ def build_crop_prices():
             "commodities": dict(sorted(out.items()))}
 
 
+# ---------------------------------------------------------------------------
+# NSO 2022 Business & Industrial Census occupation/establishment distiller.
+#
+# SCAFFOLDING — drop-in ready, INERT until the pull lands. The NSO census is a
+# BLOCKED data.go.th pull (see docs/IMPROVEMENT_BACKLOG.md "Blocked"): it cannot
+# be fetched from the sandbox's foreign IP. This code transforms the export the
+# moment Kaustav drops it into pipeline/dgt_out/ from his Thai network — it never
+# fabricates a value and is a clean no-op (clear skip message) when the file is
+# absent (the sandbox case), so the existing four layers stay byte-identical.
+#
+# EXPECTED INPUT (drop one CSV into pipeline/dgt_out/):
+#   filename glob : nso_census__bizind__*.csv   (the largest match wins, like the
+#                   other layers, so a re-pull never double-counts)
+#   encoding      : UTF-8 (BOM tolerated — read with utf-8-sig)
+#   one row per (province, district, business-activity category), Thai headers:
+#     จังหวัด        province name (Thai, ISO code, or English — folded by canonical())
+#     อำเภอ          district/amphoe name (folded by norm_district(); MAY be blank
+#                    for province-level-only census tables — such rows still roll
+#                    up into the province total, just not into any district)
+#     ประเภทกิจกรรม  business-activity / occupation category label, e.g. a TSIC
+#                    section name ("การผลิต" manufacturing, "การขายส่งและการขายปลีก"
+#                    wholesale/retail trade, "ที่พักแรมและบริการด้านอาหาร" etc.)
+#                    Alt header accepted: หมวดธุรกิจ.
+#     จำนวนสถานประกอบการ  establishment count for that cell (int; commas tolerated).
+#                    Alt headers accepted: จำนวน, สถานประกอบการ.
+#     จำนวนคนทำงาน   (OPTIONAL) persons engaged / workers for that cell (int).
+#                    Alt headers accepted: คนทำงาน, คนงานรวม.
+#
+# OUTPUT (matches the factories_by_district / vehicles_by_province fold-in style):
+#   source-data/occupations_by_district.json
+#     {source, year_be?, n_establishments, categories:[...sorted unique labels...],
+#      districts:{ "<prov>|<district>": {"estab":N, "workers":N,
+#                  "by_category": {"<cat>": {"estab":N, "workers":N}, ...}}, ... },
+#      provinces:{ "<prov>": { ...same shape... }, ... } }
+#   Every count traces to a real census cell — nothing is invented or modelled.
+# ---------------------------------------------------------------------------
+def _first_field(row, names):
+    """Return the first present, non-None header value among aliases (or '')."""
+    for n in names:
+        if n in row and row[n] is not None:
+            return row[n]
+    return ""
+
+
+def build_occupations_census():
+    """NSO Business & Industrial Census -> per-district / per-province establishment
+    (occupation) counts by business-activity category. Returns None (skip) when the
+    census CSV has not been dropped into dgt_out/ — never crashes, never fabricates."""
+    files = glob.glob(os.path.join(DGT, "nso_census__bizind__*.csv"))
+    if not files:
+        print("skip source-data/occupations_by_district.json: no nso_census__bizind__*.csv "
+              "in dgt_out/ — drop the NSO 2022 census export there (Thai-IP pull) to build it")
+        return None
+    fp = max(files, key=os.path.getsize)   # largest = most complete (no double-count on re-pull)
+
+    def _cell():
+        return {"estab": 0, "workers": 0, "by_category": collections.defaultdict(
+            lambda: {"estab": 0, "workers": 0})}
+    districts = collections.defaultdict(_cell)
+    provinces = collections.defaultdict(_cell)
+    categories = set()
+    years = []
+    with open(fp, encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            p = canonical((_first_field(r, ("จังหวัด",)) or "").strip())
+            if not p:
+                continue
+            d = norm_district(_first_field(r, ("อำเภอ",)), p)   # may resolve to '' for province-only rows
+            cat = (_first_field(r, ("ประเภทกิจกรรม", "หมวดธุรกิจ")) or "").strip()
+            n = to_int(_first_field(r, ("จำนวนสถานประกอบการ", "จำนวน", "สถานประกอบการ")))
+            w = to_int(_first_field(r, ("จำนวนคนทำงาน", "คนทำงาน", "คนงานรวม")))
+            yr = to_int(_first_field(r, ("ปี", "ปีพ.ศ.")))
+            if yr:
+                years.append(yr)
+            if cat:
+                categories.add(cat)
+            prov = provinces[p]
+            prov["estab"] += n
+            prov["workers"] += w
+            if cat:
+                prov["by_category"][cat]["estab"] += n
+                prov["by_category"][cat]["workers"] += w
+            if d:
+                dist = districts[f"{p}|{d}"]
+                dist["estab"] += n
+                dist["workers"] += w
+                if cat:
+                    dist["by_category"][cat]["estab"] += n
+                    dist["by_category"][cat]["workers"] += w
+
+    def _freeze(d):   # defaultdict -> plain sorted dict for deterministic JSON
+        return {k: {"estab": v["estab"], "workers": v["workers"],
+                    "by_category": {c: dict(v["by_category"][c])
+                                    for c in sorted(v["by_category"])}}
+                for k, v in sorted(d.items())}
+
+    out = {
+        "source": "NSO สำมะโนธุรกิจและอุตสาหกรรม (Business & Industrial Census, data.go.th) "
+                  "— establishment counts by activity & district; measured, not OSM proxy",
+        "n_establishments": sum(v["estab"] for v in provinces.values()),
+        "categories": sorted(categories),
+        "districts": _freeze(districts),
+        "provinces": _freeze(provinces),
+    }
+    if years:
+        out["year_be"] = max(years)
+    return out
+
+
 LAYERS = {"factories_by_district.json": build_factories,
           "vehicles_by_province.json": build_vehicles,
           "employment_by_province.json": build_employment,
           "crop_prices.json": build_crop_prices}
+
+# Optional, drop-in-ready layers: built only when their source pull is present in
+# dgt_out/. Their builder returns None to signal "absent — skip" so run() leaves
+# the file untouched (the existing four mandatory LAYERS stay byte-identical when
+# the NSO census has not been dropped in). Add future blocked-pull distillers here.
+OPTIONAL_LAYERS = {"occupations_by_district.json": build_occupations_census}
 
 
 def run(check=False):
@@ -168,6 +283,27 @@ def run(check=False):
         else:
             n = len(obj.get("commodities", obj.get("districts", prov)))
             print(f"wrote source-data/{name}: {n} entries")
+
+    # Optional drop-in layers (built only when their pull is present in dgt_out/).
+    # A None return means "input absent" -> skip silently-but-clearly, leaving any
+    # committed file untouched. In --check, an absent input means there is nothing
+    # to verify, so it cannot drift the gate.
+    for name, builder in OPTIONAL_LAYERS.items():
+        obj = builder()
+        if obj is None:
+            continue
+        text = json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+        path = os.path.join(SRC, name)
+        if check:
+            if not os.path.exists(path) or open(path, encoding="utf-8").read() != text:
+                print(f"DRIFT: source-data/{name} differs from a fresh build"); drift = 1
+            else:
+                print(f"OK: source-data/{name} reproduces from dgt_out")
+            continue
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(text)
+        print(f"wrote source-data/{name}: {len(obj.get('districts', {}))} districts · "
+              f"{len(obj.get('provinces', {}))} provinces · {len(obj.get('categories', []))} categories")
     return drift
 
 
