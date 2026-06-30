@@ -505,6 +505,65 @@ function renderAcq(){
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
   renderRoad3k();
+  renderOppScore();
+}
+
+/* ---------- composite opportunity score · where to open next (item 2) ----------
+   Surfaces data/opportunity_score.json (928 districts, built by pipeline/build_opportunity_score.py):
+   an ESTIMATED COMPOSITE blending MEASURED white-space + MEASURED competitor-gap with ESTIMATED
+   province agri-stress. We DO NOT recompute it here — we just rank & show the top districts with each
+   component exposed, so the number stays honest. Lazy-loaded once; graceful if absent/empty. */
+let OPPSCORE=null, oppLoaded=false;
+const OPP_TOPN=20;
+function renderOppScore(){
+  const tbl=$('#opptbl'); if(!tbl) return;
+  if(oppLoaded){ drawOppScore(); return; }
+  fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null).then(j=>{
+    OPPSCORE=j; oppLoaded=true; drawOppScore();
+  }).catch(()=>{ OPPSCORE=null; oppLoaded=true; drawOppScore(); });
+}
+function drawOppScore(){
+  const tbl=$('#opptbl'), ro=$('#oppreadout'); if(!tbl) return;
+  const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Opportunity score not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_opportunity_score.py</span> to populate <span class="mono">data/opportunity_score.json</span>, then this leaderboard fills in.</span>';
+    return;
+  }
+  // already sorted (score desc) in the file, but sort defensively so the view is stable
+  const top=rows.slice().sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,OPP_TOPN);
+  // component colours per CLAUDE.md: white-space = gold, competitor-gap = merchant, agri-stress = agri
+  const cell=(v,color)=>{const n=Math.round(v||0); return `<td>${barHTML(n,color)} <span class="mono" style="color:${color}">${n}</span></td>`;};
+  tbl.innerHTML=`<tr><th>#</th>`+
+    `<th class="h-opp" title="ESTIMATED COMPOSITE (0–100): weighted blend of the three components. Higher = open here sooner. A ranking aid, not a measured quantity.">Opportunity ★ est</th>`+
+    `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
+    `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
+    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = more underserved.">White-space ★</th>`+
+    `<th class="h-opp" title="MEASURED — 100 minus normalised rival-branch count (0–100). Higher = fewer competitors = more room.">Competitor-gap</th>`+
+    `<th class="h-opp" title="ESTIMATED — province-inherited crop-household stress (0–100). A demand-pull signal, not a measured default rate.">Agri-stress est</th></tr>`+
+    top.map((d,i)=>{
+      const c=d.components||{};
+      const sc=Math.round(d.score||0);
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${barHTML(sc,'var(--accent)')} <span class="mono" style="color:var(--accent)"><b>${sc}</b></span></td>
+        <td><b>${d.name||'—'}</b></td>
+        <td>${d.province||'—'}</td>
+        <td class="sub">${d.region||'—'}</td>
+        <td class="mono sub">${d.branches==null?'—':d.branches}</td>
+        ${cell(c.whitespace,'var(--gold)')}
+        ${cell(c.competitor_gap,'var(--merch)')}
+        ${cell(c.agri_stress,'var(--agri)')}
+      </tr>`;}).join('');
+  if(ro){
+    const t=top[0], m=OPPSCORE.meta||{};
+    const w=m.weights_effective||m.weights_full||{};
+    const wtxt=(w.whitespace!=null)?` Weights: white-space ${Math.round(w.whitespace*100)}% · competitor-gap ${Math.round((w.competitor_gap||0)*100)}% · agri-stress ${Math.round((w.agri_stress||0)*100)}%.`:'';
+    ro.innerHTML=`<b>Open here next:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the composite at
+      <b style="color:var(--accent)">${Math.round(t.score)}</b>/100 — white-space ${Math.round((t.components||{}).whitespace||0)},
+      competitor-gap ${Math.round((t.components||{}).competitor_gap||0)}, agri-stress ${Math.round((t.components||{}).agri_stress||0)}.
+      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED COMPOSITE — a ranking aid for expansion, not a measured quantity.${wtxt}</span>`;
+  }
 }
 
 /* ---------- Road to 3,000 · regional headroom allocation ----------
