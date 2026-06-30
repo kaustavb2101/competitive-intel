@@ -439,9 +439,12 @@ const TILE_LABELS_SAT='https://a.basemaps.cartocdn.com/rastertiles/dark_only_lab
 // material + directional shading + sky/vignette still give strong depth in that fallback.
 function buildLighting(withShadow){
   try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
-    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:1.5,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
-    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.7,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[232,238,255],intensity:withShadow?0.85:0.95});
+    // Intensities kept low ON PURPOSE: ambient + diffuse*(sun+fill) must stay below ~1.0 or light
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). With material
+    // ambient 0.5 / diffuse 0.34 below, max lit ≈ 0.5*0.9 + 0.34*(0.85+0.25) ≈ 0.83 -> never clamps.
+    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:0.85,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.25,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.9});
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
     if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
@@ -990,7 +993,7 @@ function render(){
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
     // across faces; high diffuse for a strong lit-side; a small, tight specular gives the gold
     // crowns a warm sheen highlight without going plastic. Pairs with the cast-shadow sun above.
-    material:{ambient:0.42,diffuse:0.62,shininess:18,specularColor:[96,84,58]},
+    material:{ambient:0.5,diffuse:0.34,shininess:10,specularColor:[48,42,30]},
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
