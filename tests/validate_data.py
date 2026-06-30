@@ -623,6 +623,109 @@ def check_competitors():
 
 
 # ---------------------------------------------------------------------------
+# PROVENANCE GATE (data-mandate enforcement).
+#
+# Mandate: no committed data may be hallucinatory/fabricated. Every NUMERIC data layer in
+# platform/data/ must be traceable to a real source or honestly labelled estimated-with-method.
+# This check makes "unsourced numeric data" un-shippable: a numeric layer that carries NO provenance
+# signal AND is not on the documented exemption list FAILS the gate.
+#
+# Provenance signal = a non-empty value at meta.<one of these keys>. We accept several spellings
+# because different builders use different (all honest) conventions:
+#   - source / provenance / sources : explicit named source(s)
+#   - generated_by / generated_with : the deterministic builder that produced it (DERIVED, inputs sourced)
+#   - inputs_used                   : the named sourced inputs blended into a composite
+#   - label                         : an honest ESTIMATED/SYNTHETIC label (e.g. opportunity_score, loan_tape)
+# See docs/DATA_PROVENANCE.md for the full register and the rationale per file.
+PROVENANCE_KEYS = (
+    "source", "provenance", "sources",
+    "generated_by", "generated_with",
+    "inputs_used", "label",
+)
+
+# Files that legitimately carry NO in-file provenance: pure deterministic derivatives of named,
+# sourced inputs, OR OSM/Overture geometry basemap layers (not numeric decision metrics). Each is
+# justified in docs/DATA_PROVENANCE.md §1/§3. Adding a NEW numeric layer requires either real
+# provenance or a conscious entry here — keep this list narrow.
+PROVENANCE_EXEMPT = {
+    # bare derivatives of the sourced master (provenance lives in meta.json + the master + DATA_SOURCES.md)
+    "branches.json",        # list, DERIVED by derive.py from branches_final.json
+    "meta.json",            # the provenance/rollup sidecar itself; inputs sourced
+    "deltas.json",          # deterministic diff of sourced snapshots (carries from/to vintage labels)
+    "snapshots_index.json",  # structural index of vintages, no independent numeric series
+    # province deep-dives: DERIVED by build_province.py from sourced layers (no meta block yet — R1)
+    "provinces/index.json",
+    # geometry / visual catchment + basemap layers (OSM/Overture; numeric footprints, not metrics) — R2/R3/R6
+    "rayong_catchment.json",
+    "rayong_province.json",
+    "rayong_landuse.json",
+    "rayong_roads.json",
+    "rayong_water.json",
+    "rayong_rail.json",
+    "bangkok_catchment.json",
+    "bangkok_landuse.json",
+    "bangkok_roads.json",
+    "bangkok_water.json",
+}
+
+
+def _has_provenance(obj):
+    """True iff obj is a dict carrying a non-empty meta.<provenance key>."""
+    if not isinstance(obj, dict):
+        return False
+    meta = obj.get("meta")
+    if not isinstance(meta, dict):
+        return False
+    for k in PROVENANCE_KEYS:
+        v = meta.get(k)
+        if v not in (None, "", [], {}):
+            return True
+    return False
+
+
+def check_provenance():
+    hdr("provenance gate (data-mandate: no unsourced numeric data)")
+    if not os.path.isdir(DATA):
+        fail("platform/data exists", "missing %s" % DATA)
+        return
+
+    # Every committed *.json directly under platform/data/ plus provinces/*.json.
+    rels = sorted(f for f in os.listdir(DATA) if f.endswith(".json"))
+    prov_dir = os.path.join(DATA, "provinces")
+    if os.path.isdir(prov_dir):
+        rels += [os.path.join("provinces", f)
+                 for f in sorted(os.listdir(prov_dir)) if f.endswith(".json")]
+
+    violations = []
+    n_sourced = 0
+    n_exempt = 0
+    for rel in rels:
+        try:
+            d = load(rel)
+        except Exception as e:
+            fail("provenance: %s loads" % rel, repr(e))
+            continue
+        # Province deep-dives all share the build_province.py exemption (R1); match by directory.
+        is_exempt = rel in PROVENANCE_EXEMPT or rel.startswith("provinces" + os.sep)
+        if _has_provenance(d):
+            n_sourced += 1
+        elif is_exempt:
+            n_exempt += 1
+        else:
+            violations.append(rel)
+
+    if violations:
+        fail("every numeric platform/data layer carries provenance (meta.source / "
+             "meta.provenance / labelled estimate) or a documented exemption",
+             "UNSOURCED (no meta provenance, not exempt) — add a real source, an honest "
+             "estimated-label, or a documented exemption in docs/DATA_PROVENANCE.md:\n  "
+             + first_n(violations, 20))
+    else:
+        ok("every numeric platform/data layer is sourced (%d) or documented-exempt (%d) — "
+           "no unsourced data shipped" % (n_sourced, n_exempt))
+
+
+# ---------------------------------------------------------------------------
 def check_rollup(branches):
     hdr("cross-file rollup sanity")
     if branches is None:
@@ -682,6 +785,7 @@ def main():
     check_branch_occupations(n)
     check_amphoe_occupations(amphoe)
     check_competitors()
+    check_provenance()
     check_rollup(branches)
 
     print("\n" + ("=" * 40))
