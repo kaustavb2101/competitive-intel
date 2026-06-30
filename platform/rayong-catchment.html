@@ -126,7 +126,8 @@ html[data-theme="light"] #vignette{
    Matches province.html / branch-explorer.html so the deck.gl pages feel in-product. */
 #ctl{position:fixed;top:96px;right:14px;z-index:8;display:flex;flex-direction:column;gap:9px;
  background:rgba(13,17,27,.94);border:1px solid var(--cardln);border-radius:12px;padding:11px;
- backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);min-width:172px}
+ backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);min-width:172px;
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
 #ctl .dkhd{display:flex;align-items:center;gap:7px;padding:0 1px 8px;border-bottom:1px solid #1a2236}
 #ctl .dkhd .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none;box-shadow:0 0 8px rgba(79,123,240,.7)}
 #ctl .dkhd .t{font:700 11px 'IBM Plex Mono';color:var(--hi);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -220,13 +221,27 @@ html[data-theme="light"] #complegend .cl b{color:#5A6477}
 .dtt b{color:#fff}
 .err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
 
+/* TABLET (821–1200px): narrow the fixed panels + control frame a touch so the map well breathes,
+   but keep the full desktop layout (panels docked, controls + legends all visible). */
+@media(min-width:821px) and (max-width:1200px){
+ .side{width:270px}
+ #ctl{min-width:160px;padding:10px}
+}
+
+/* PHONE (<820px): map goes full-screen. The two info cards slide off-screen (left/right) and the
+   #ctl control frame slides down off the bottom; all three are reachable via the #mtog bottom-sheet
+   buttons (Analysis / Leads / Layers). Controls are NOT hidden — the .ctl legend + toggles ride in
+   on the Layers button. The POI/building legend rail stays docked + readable at the bottom. */
 @media(max-width:820px){
  .side{width:86vw;max-width:340px;top:46px;bottom:78px}
  #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
  #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
  .xbtn{display:block}#mtog{display:flex}
- #ctl{top:auto;bottom:118px;right:8px;left:auto;min-width:0;padding:8px;gap:6px}
- #ctl .dkhd{display:none}#ctl .glab{display:none}#ctl .acts button{padding:7px 9px}
+ #ctl{top:auto;bottom:0;right:8px;left:8px;min-width:0;padding:10px;gap:8px;max-height:60vh;overflow-y:auto;
+  transform:translateY(calc(100% + 24px))}
+ #ctl.show{transform:translateY(0)}
+ #ctl .dkhd{display:flex}#ctl .glab{display:block}#ctl .acts button{padding:7px 9px}
+ #ctl .seg button{flex:1 0 22%}
  #strip .ttl{font-size:12px}
  #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
  #legend{max-height:88px;overflow-y:auto}
@@ -377,6 +392,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="mtog">
   <button data-s="left">Analysis</button>
   <button data-s="right">Leads</button>
+  <button data-s="ctl">Layers</button>
 </div>
 
 <div id="legendwrap">
@@ -1549,9 +1565,16 @@ document.getElementById('isotog').onclick=function(){showIso=!showIso;this.class
 // the scene immediately resumes breathing; turning it OFF parks the camera where it sits.
 (function(){var ot=document.getElementById('orbittog');if(!ot)return;
   ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
-document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
-  const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
-  el.classList.toggle('show');other.classList.remove('show');});
+// Mobile bottom-sheet toggles: Analysis (#left) / Leads (#right) / Layers (#ctl). Opening any one
+// closes the other two so a single overlay is on screen at a time and the map stays usable.
+(function(){
+  const ids=['left','right','ctl'];
+  document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+    const s=b.dataset.s, el=document.getElementById(s);
+    const willShow=el?!el.classList.contains('show'):false;
+    ids.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('show',id===s?willShow:false);});
+  });
+})();
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
 buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
