@@ -235,6 +235,38 @@ def cmd_discover():
             except Exception as e:
                 print(f"  [ERR {type(e).__name__}: {e}] {url}")
             time.sleep(1.0)
+        # SITEMAP enumeration — SEO'd sites list every branch page here (a 6,000-branch chain
+        # exposes 6,000 <loc>s). Often the most reliable complete source. Probe robots.txt for the
+        # Sitemap: line, then common sitemap paths; report sub-sitemaps + branch-like <loc> counts.
+        try:
+            sm_urls = []
+            try:
+                rob = fetch(urllib.parse.urljoin(root, "/robots.txt"))
+                sm_urls += re.findall(r'(?im)^\s*sitemap:\s*(\S+)', rob)
+            except Exception:
+                pass
+            for p in ("/sitemap.xml", "/sitemap_index.xml", "/sitemap-index.xml", "/wp-sitemap.xml"):
+                sm_urls.append(urllib.parse.urljoin(root, p))
+            tried = set()
+            for sm in [u for u in sm_urls if not (u in tried or tried.add(u))][:6]:
+                try:
+                    xml = fetch(sm)
+                    locs = re.findall(r'<loc>\s*([^<\s]+)\s*</loc>', xml)
+                    if not locs:
+                        continue
+                    subs = [l for l in locs if l.lower().endswith(".xml")]
+                    branchish = [l for l in locs if _LINK_HINT.search(l)]
+                    print(f"  [sitemap {len(xml):>7} B] {sm}  ({len(locs)} <loc>, "
+                          f"{len(subs)} sub-sitemaps, {len(branchish)} branch-ish)")
+                    for s in subs[:8]:
+                        print(f"      → sub-sitemap: {s}")
+                    for b in branchish[:5]:
+                        print(f"      → branch page: {b}")
+                except Exception:
+                    pass
+                time.sleep(0.5)
+        except Exception:
+            pass
     print("\nNext: paste the output. The real branch endpoint is whichever line shows many lat/lng "
           "pairs, or a 'data-ish' URL containing branch/api/.json (or the __NEXT_DATA__/wp line). "
           "I'll wire it into data_urls and you run --pull --merge.")
