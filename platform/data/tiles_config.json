@@ -14,5 +14,5 @@
     "heightProperty": "height",
     "attribution": "© Overture Maps Foundation"
   },
-  "notes": "Set buildings.pmtilesUrl to a hosted .pmtiles archive (range-request CDN: Cloudflare R2 / S3 / Vercel Blob), OR buildings.mvtUrl to a {z}/{x}/{y}.pbf tile-pyramid template for a plain static host. The frontend prefers mvtUrl if present (zero extra deps), else pmtilesUrl. Leave both null to keep the curated-catchment fallback."
+  "notes": "Set buildings.pmtilesUrl to a hosted single-file .pmtiles archive (recommended — upload to Vercel Blob or Cloudflare R2; both serve HTTP range requests + CORS). The PMTiles reader is now wired in the 3D pages (platform/pmtiles-layer.js, loaded on demand), so the moment this URL is set the streamed buildings render. Alternatively set buildings.mvtUrl to a {z}/{x}/{y}.pbf tile-pyramid template for a plain static host (avoid for national scale — millions of files). The frontend prefers mvtUrl if present, else pmtilesUrl. Leave both null to keep the curated-catchment fallback. CORS must allow the Vercel site origin + the 'range' header."
 }

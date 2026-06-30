@@ -8,6 +8,7 @@
 <title>Province · เงินไชโย — Deep-Dive</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#070a11;--card:#0e131f;--cardln:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
  --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;}
@@ -532,8 +533,12 @@ function streamBuildingLayer(){
   try{
     var cfg=(window.TILECFG&&TILECFG.buildings)||null;
     if(!cfg||!deck.MVTLayer)return null;
-    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path (PMTiles shim is a follow-up)
-    if(!url)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path
+    if(!url){                            // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:!lightMode()});
+      return null;
+    }
     var LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
     var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]

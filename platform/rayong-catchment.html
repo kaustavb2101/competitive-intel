@@ -8,6 +8,7 @@
 <title>Rayong 3D · เงินไชโย</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
  --gold:#E0A93B;--red:#E0474B;--mag:#D65AA0;--blue:#4F7BF0;--orange:#E07B2F;--teal:#159b86;--purp:#9a7fd6;}
@@ -986,7 +987,11 @@ function streamBuildingLayer(){
     var cfg=(window.TILECFG&&TILECFG.buildings)||null;
     if(!cfg||!deck.MVTLayer)return null;
     var url=cfg.mvtUrl||null;                 // prefer the native {z}/{x}/{y}.pbf path (zero extra deps)
-    if(!url)return null;                       // pmtilesUrl-only -> fall back until the PMTiles shim lands
+    if(!url){                                  // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:darkMode()});
+      return null;
+    }
     var DARK=darkMode(), LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
     var RAMP=DARK?[[44,38,32],[156,108,50],[238,182,86]]

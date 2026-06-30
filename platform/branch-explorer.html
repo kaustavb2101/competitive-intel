@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Branch 3D Explorer — AutoX · เงินไชโย</title>
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -362,8 +363,12 @@ function streamBuildingLayer(){
   try{
     var cfg=(TILECFG&&TILECFG.buildings)||null;
     if(!cfg||!deck.MVTLayer)return null;
-    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path (PMTiles shim is a follow-up)
-    if(!url)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path
+    if(!url){                            // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:!lightMode()});
+      return null;
+    }
     var LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
     var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]
