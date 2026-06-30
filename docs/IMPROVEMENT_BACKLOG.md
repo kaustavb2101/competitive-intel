@@ -85,7 +85,22 @@
 - [ ] **Expand `validate_data.py`** coverage as new data layers land. *(med, S)*
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
 
+## From the research digest (docs/RESEARCH_DIGEST.md — all cited)
+- [ ] **★ Model the BoT 28% title-loan rate cap** in the Simulator (effective 2 Dec 2025). Add a lever/scenario
+      showing book yield + which segments compress at 28%. Real regulatory constraint (obj #1). *(HIGH, M, sandbox)*
+- [ ] **Competitor-exit white-space cue** — non-compliant operators must register by Q1 2026 or exit; surface
+      districts where sub-scale rivals may exit as fresh white-space (obj #2). Uses existing competitor census. *(MED, M)*
+- [ ] **Rice/rubber + drought "double-stress" flag** in crop_stress / district risk — research shows rice+rubber
+      prices softening AND >80% El Niño drought prob mid-2026; flag districts with both (obj #1). Uses existing
+      crop_stress signals, label estimated. *(MED, M, sandbox)*
+- [ ] **Collateral-NPL context** — peer NPL ladder (Tidlor 1.5% < MTC 2.53% < SAWAD 3.5–3.6%) tracks collateral
+      mix; annotate our collateral/segment views with this measured peer context (cited). *(LOW, S)*
+
 ## Blocked (need a desktop / Thai-IP pull — do NOT attempt in the loop)
+- **★ DLT vehicle registrations by province — gdcatalog.dlt.go.th/en/dataset/** (separate from data.go.th). Highest-
+  value new pull: replaces ESTIMATED collateral-supply/TAM per district with MEASURED data (both objectives).
+- **OAE farm-gate crop prices** — replace the GLOBAL World Bank price proxy in build_crop_stress.py with real Thai
+  farm-gate prices (sharpens obj #1).
 - Occupation/competitor **deltas over time** — needs ≥2 vintage snapshots with the new layers.
 - **NSO 2022 Business & Industrial Census** ingest — data is data.go.th (blocked from sandbox).
 - More **cities** for the 3D showcase (Overture/Overpass pull) — Bangkok already pulled; others need a pull.
