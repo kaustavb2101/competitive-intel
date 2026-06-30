@@ -16,6 +16,7 @@ const LENS = {
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
   hhdti:    {label:'Household debt-to-income ●', desc:"MEASURED · NSO — the branch's province household debt as a multiple of annual income (NSO SES 2566, debt ÷ income). Higher = more borrower balance-sheet stress. Lazy-loads household_risk_by_province.json; hidden if absent.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
   occrisk:  {label:'Occupation × stress ◆▲', desc:"MEASURED occupation mix · ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a STRESSED sector (factory under industrial slowdown · agriculture under the branch's province crop-stress). Occupation shares are MEASURED (Overture Maps Places, a sample/lower bound); the 'stressed sector' weighting is ESTIMATED (editorial macro judgement). A triage flag, NOT a measured default rate. Lazy-loads occupation_risk.json; hidden if absent.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, val:d=>occriskVal(d)},
+  brisk:    {label:'Composite branch risk ▲ est', desc:"ESTIMATED COMPOSITE (0–100) — one fused 'which branches are getting riskier' read per branch, blending MEASURED province household debt-to-income (NSO) + ESTIMATED crop/drought double-stress + MEASURED occupation-sector concentration + the branch's own segment/collateral mix. A triage rank, NOT a measured default rate; each driver is shown in the popup. Lazy-loads branch_risk.json; hidden if absent.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, val:d=>briskVal(d)},
   // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
   // White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED (province-inherited
   // agri-stress + local mix). Both lazy-load amphoe.json (joined per-branch via build_amphoe.py).
@@ -159,6 +160,38 @@ function occriskRec(d){
   if(!occriskHasData()||!DATA) return null;
   const i=DATA.indexOf(d); if(i<0) return null;
   return OCCRISK[i]||null;
+}
+
+/* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
+   Lazy-loads the fused composite-risk layer built by pipeline/build_branch_risk.py:
+   {meta, branches:[{code, composite_risk 0–100, components{household,agri,occupation,segment},
+   top_driver}]}, INDEX-ALIGNED to branches.json. It is an ESTIMATED composite (stated in the lens
+   tooltip). Fully null-guarded: absent file → BRISK stays empty, the lens hides itself
+   (renderLenses) and val() reads 0, the popup block is omitted. Nothing is fabricated. */
+let BRISK=null, briskMeta=null, briskLoaded=false, briskPromise=null;
+async function loadBranchRisk(){
+  if(briskPromise) return briskPromise;
+  briskLoaded=true;
+  briskPromise=(async()=>{
+    try{ const r=await fetch('data/branch_risk.json'); if(!r.ok){BRISK=null;return BRISK;}
+      const j=await r.json(); briskMeta=j.meta||null; BRISK=j.branches||null; }
+    catch(e){ BRISK=null; briskMeta=null; }
+    return BRISK;
+  })();
+  return briskPromise;
+}
+function briskHasData(){return !!(BRISK&&BRISK.length);}
+// ESTIMATED composite risk (0..100) for a branch — 0 when the file/entry is absent.
+function briskVal(d){
+  if(!briskHasData()||!DATA) return 0;
+  const i=DATA.indexOf(d); if(i<0) return 0;
+  const e=BRISK[i]; return (e&&e.composite_risk)||0;
+}
+// per-branch composite-risk record (for popups) — null when absent.
+function briskRec(d){
+  if(!briskHasData()||!DATA) return null;
+  const i=DATA.indexOf(d); if(i<0) return null;
+  return BRISK[i]||null;
 }
 
 /* ---------- measured occupation mix per DISTRICT (Overture Places) ----------
@@ -1623,6 +1656,7 @@ function renderLenses(){
   $('#lenses').innerHTML = Object.entries(LENS)
     .filter(([k,l])=>!(l.hh && hhriskLoaded && !hhriskHasData()))
     .filter(([k,l])=>!(l.occr && occriskLoaded && !occriskHasData()))
+    .filter(([k,l])=>!(l.brisk && briskLoaded && !briskHasData()))
     .map(([k,l])=>
     `<button class="lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${l.label.replace(/"/g,'&quot;')}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
        <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
@@ -1718,6 +1752,8 @@ function initMap(){
   // warm the occupation × stress cross-read so the lens hides itself when absent. Absent file
   // (build_occupation_risk.py not run / no Overture pull yet) → OCCRISK empty, lens filtered out.
   if(!occriskLoaded) loadOccRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='occrisk'){ renderLegend(); styleMarkers(); } });
+  // warm the per-branch COMPOSITE risk so its lens hides itself when absent (and is ready when picked).
+  if(!briskLoaded) loadBranchRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='brisk'){ renderLegend(); styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -1950,6 +1986,7 @@ function setLens(k){
   }
   if(k==='occrisk' && !occriskLoaded){
     loadOccRisk().then(()=>{ renderLenses(); if(curLens==='occrisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+    loadBranchRisk().then(()=>{ renderLenses(); if(curLens==='brisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
