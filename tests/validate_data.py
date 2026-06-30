@@ -33,6 +33,10 @@ TH_LNG_MIN, TH_LNG_MAX = 97.0, 106.0
 # Canonical region set, taken from the master (branches.json) — every file must agree.
 KNOWN_REGIONS = {"Isan", "North", "South", "East", "Central&BKK"}
 
+# Canonical competitor lender brands (pull_competitors.py / pull_overture_places.py emit exactly
+# these brand keys). Any other brand string in a competitor census is a data bug.
+KNOWN_COMPETITOR_BRANDS = {"Srisawad", "Muangthai", "Tidlor", "Heng"}
+
 # How many province deep-dive files to spot-check (deterministic: alphabetical).
 PROVINCE_SAMPLE = 8
 
@@ -77,6 +81,10 @@ def hdr(name):
         print("\n%s== %s ==%s" % (YLW, name, RST))
     else:
         print("\n== %s ==" % name)
+
+
+def exists(rel):
+    return os.path.exists(os.path.join(DATA, rel))
 
 
 def load(rel):
@@ -429,6 +437,192 @@ def check_crop_stress():
 
 
 # ---------------------------------------------------------------------------
+def check_branch_occupations(n_branches):
+    # MEASURED Overture occupation rollup, index-aligned to branches.json. Optional file:
+    # SKIP-PASS when absent (build_occupations.py has not been run / overture_places.json missing).
+    hdr("branch_occupations.json (optional)")
+    if not exists("branch_occupations.json"):
+        ok("branch_occupations.json absent — skipped (optional; run build_occupations.py to populate)")
+        return
+    try:
+        d = load("branch_occupations.json")
+    except Exception as e:
+        fail("branch_occupations.json loads", repr(e))
+        return
+    ok("branch_occupations.json loads")
+
+    # buckets present (label list drives the frontend's occupation bars)
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        fail("branch_occupations buckets present (non-empty list)", "got %r" % type(buckets).__name__)
+        return
+    bad_bk = [("#%d=%r" % (i, b)) for i, b in enumerate(buckets)
+              if not (isinstance(b, dict) and b.get("key") and b.get("label"))]
+    if bad_bk:
+        fail("each bucket has key+label", first_n(bad_bk))
+    else:
+        ok("branch_occupations buckets present (%d, each with key+label)" % len(buckets))
+    nbk = len(buckets)
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("branch_occupations has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    # length must equal branches.json (the layer is INDEX-ALIGNED — a length drift silently
+    # misaligns every measured occupation read in the app).
+    if n_branches is not None and len(recs) != n_branches:
+        fail("branch_occupations length == branches.json length",
+             "occupations=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("branch_occupations length == branches.json length (%d)" % len(recs))
+
+    # per-record: t is a non-negative finite total, o is a per-bucket non-negative count vector
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        t = r.get("t")
+        if not is_finite_number(t) or t < 0:
+            bad.append("#%d t=%r" % (i, t))
+        o = r.get("o")
+        if not isinstance(o, list) or len(o) != nbk:
+            bad.append("#%d o not a length-%d list" % (i, nbk))
+            continue
+        for j, v in enumerate(o):
+            if not is_finite_number(v) or v < 0:
+                bad.append("#%d o[%d]=%r" % (i, j, v))
+                break
+    if bad:
+        fail("branch_occupations counts non-negative (t + per-bucket o[])", first_n(bad))
+    else:
+        ok("branch_occupations counts non-negative (t + per-bucket o[%d] vectors)" % nbk)
+
+
+# ---------------------------------------------------------------------------
+def check_amphoe_occupations(amphoe):
+    # MEASURED Overture occupation mix per district, keyed by amphoe shapeID. Optional file:
+    # SKIP-PASS when absent.
+    hdr("amphoe_occupations.json (optional)")
+    if not exists("amphoe_occupations.json"):
+        ok("amphoe_occupations.json absent — skipped (optional; run build_amphoe_occupations.py)")
+        return
+    try:
+        d = load("amphoe_occupations.json")
+    except Exception as e:
+        fail("amphoe_occupations.json loads", repr(e))
+        return
+    ok("amphoe_occupations.json loads")
+
+    buckets = d.get("buckets")
+    if not isinstance(buckets, list) or not buckets:
+        fail("amphoe_occupations buckets present (non-empty list)", "got %r" % type(buckets).__name__)
+        return
+    nbk = len(buckets)
+    ok("amphoe_occupations buckets present (%d)" % nbk)
+
+    amap = d.get("amphoe")
+    if not isinstance(amap, dict) or not amap:
+        fail("amphoe_occupations has an 'amphoe' map", "got %s" % type(amap).__name__)
+        return
+    ok("amphoe_occupations 'amphoe' map present (%d districts)" % len(amap))
+
+    # keys valid: must be shapeIDs that exist in amphoe.json (when that loaded). The map is
+    # emitted for every amphoe, so an unknown key means the join key drifted.
+    valid_ids = None
+    if amphoe is not None:
+        recs = amphoe.get("amphoe")
+        if isinstance(recs, list):
+            valid_ids = set(r.get("id") for r in recs if r.get("id") is not None)
+    if valid_ids:
+        unknown = sorted(k for k in amap.keys() if k not in valid_ids)
+        if unknown:
+            fail("amphoe_occupations keys are known amphoe shapeIDs", first_n(unknown))
+        else:
+            ok("amphoe_occupations keys are known amphoe shapeIDs (%d valid)" % len(valid_ids))
+    else:
+        ok("amphoe.json ids unavailable — skipped key-vs-amphoe cross-check (keys checked structurally)")
+
+    # per-entry: t non-negative finite; o a length-nbk non-negative vector; dom in [-1, nbk).
+    bad = []
+    for k, e in amap.items():
+        if not isinstance(e, dict):
+            bad.append("%s not an object" % k)
+            continue
+        t = e.get("t")
+        if not is_finite_number(t) or t < 0:
+            bad.append("%s t=%r" % (k, t))
+        o = e.get("o")
+        if not isinstance(o, list) or len(o) != nbk:
+            bad.append("%s o not length-%d list" % (k, nbk))
+        else:
+            for j, v in enumerate(o):
+                if not is_finite_number(v) or v < 0:
+                    bad.append("%s o[%d]=%r" % (k, j, v))
+                    break
+        dom = e.get("dom")
+        # dom is a bucket index, or -1 when the district has no placed establishments.
+        if not (isinstance(dom, int) and not isinstance(dom, bool) and -1 <= dom < nbk):
+            bad.append("%s dom=%r out of [-1,%d)" % (k, dom, nbk))
+    if bad:
+        fail("amphoe_occupations entries sane (t>=0, o[] vector, dom in [-1,%d))" % nbk, first_n(bad))
+    else:
+        ok("amphoe_occupations entries sane (t>=0, o[%d] vectors, dom index in range)" % nbk)
+
+
+# ---------------------------------------------------------------------------
+def _check_one_competitor_census(rel):
+    # Shared shape check for a competitor census (Google-Places national + Overture national share
+    # the same {meta, brands, items[]} shape). lat/lng inside the TH bbox; brand in the known set.
+    if not exists(rel):
+        ok("%s absent — skipped (optional competitor census)" % rel)
+        return
+    try:
+        d = load(rel)
+    except Exception as e:
+        fail("%s loads" % rel, repr(e))
+        return
+    ok("%s loads" % rel)
+
+    items = d.get("items")
+    if not isinstance(items, list):
+        fail("%s has an 'items' list" % rel, "got %s" % type(items).__name__)
+        return
+    ok("%s items list present (%d)" % (rel, len(items)))
+
+    oob = []
+    badbrand = set()
+    for i, it in enumerate(items):
+        if not isinstance(it, dict):
+            oob.append("#%d not an object" % i)
+            continue
+        lat, lng = it.get("lat"), it.get("lng")
+        if not (is_finite_number(lat) and is_finite_number(lng)):
+            oob.append("#%d non-numeric lat/lng (%r,%r)" % (i, lat, lng))
+        elif not (TH_LAT_MIN <= lat <= TH_LAT_MAX and TH_LNG_MIN <= lng <= TH_LNG_MAX):
+            oob.append("#%d lat=%s lng=%s outside TH bbox" % (i, lat, lng))
+        br = it.get("brand")
+        if br not in KNOWN_COMPETITOR_BRANDS:
+            badbrand.add(repr(br))
+    if oob:
+        fail("%s lat/lng inside Thailand bbox" % rel, first_n(oob))
+    else:
+        ok("%s all lat/lng inside Thailand bbox" % rel)
+    if badbrand:
+        fail("%s brands in known set %s" % (rel, sorted(KNOWN_COMPETITOR_BRANDS)),
+             "unknown: " + first_n(sorted(badbrand)))
+    else:
+        ok("%s all brands in known set %s" % (rel, sorted(KNOWN_COMPETITOR_BRANDS)))
+
+
+def check_competitors():
+    hdr("competitors_national.json + competitors_overture.json (optional)")
+    _check_one_competitor_census("competitors_national.json")
+    _check_one_competitor_census("competitors_overture.json")
+
+
+# ---------------------------------------------------------------------------
 def check_rollup(branches):
     hdr("cross-file rollup sanity")
     if branches is None:
@@ -482,9 +676,12 @@ def main():
     print("AutoX data-integrity validator — reading %s" % DATA)
     branches = check_branches()
     n = len(branches) if branches is not None else None
-    check_amphoe(n)
+    amphoe = check_amphoe(n)
     check_provinces(n)
     check_crop_stress()
+    check_branch_occupations(n)
+    check_amphoe_occupations(amphoe)
+    check_competitors()
     check_rollup(branches)
 
     print("\n" + ("=" * 40))
