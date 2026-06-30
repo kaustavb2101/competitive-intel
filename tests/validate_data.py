@@ -626,6 +626,95 @@ def check_occupation_risk(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_branch_risk(n_branches):
+    # PER-BRANCH COMPOSITE RISK (objective #1): fuses household debt-stress (MEASURED) +
+    # crop/agri stress (ESTIMATED) + occupation-sector stress (MEASURED x ESTIMATED) + the
+    # branch's own segment/collateral signals (DERIVED) into one 0-100 triage ranking,
+    # index-aligned to branches.json. Optional file: SKIP-PASS when absent (build_branch_risk.py
+    # degrades gracefully; this layer is built from optional inputs).
+    hdr("branch_risk.json (optional)")
+    if not exists("branch_risk.json"):
+        ok("branch_risk.json absent — skipped (optional; run build_branch_risk.py to populate)")
+        return
+    try:
+        d = load("branch_risk.json")
+    except Exception as e:
+        fail("branch_risk.json loads", repr(e))
+        return
+    ok("branch_risk.json loads")
+
+    # provenance: meta must state the builder + the ESTIMATED-composite label, AND name each
+    # component's provenance (the data-mandate: measured-vs-estimated must be explicit).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("branch_risk meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+    else:
+        ok("branch_risk meta/provenance present (generated_by + estimated-composite label)")
+        comps = meta.get("components")
+        if not isinstance(comps, dict) or not comps or not all(
+                isinstance(c, dict) and c.get("provenance") for c in comps.values()):
+            fail("branch_risk meta.components each carry provenance",
+                 "components missing or some lack a provenance string")
+        else:
+            ok("branch_risk meta.components each carry provenance (%d components)" % len(comps))
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("branch_risk has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    # length must equal branches.json (the layer is INDEX-ALIGNED — a drift misaligns every read).
+    if n_branches is not None and len(recs) != n_branches:
+        fail("branch_risk length == branches.json length",
+             "branch_risk=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("branch_risk length == branches.json length (%d)" % len(recs))
+
+    # valid component keys + drivers come from meta (graceful — fall back to the known set).
+    known_comps = set((meta or {}).get("components", {}).keys()) or {
+        "household", "agri", "occupation", "segment"}
+
+    # per-record: composite_risk in [0,100] or null; components a dict of [0,100] values whose
+    # keys are known; top_driver one of the present component keys (or null iff composite null).
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        cr = r.get("composite_risk")
+        if cr is not None and (not is_finite_number(cr) or not (0.0 <= cr <= 100.0)):
+            bad.append("#%d composite_risk=%r out of [0,100]" % (i, cr))
+        comps = r.get("components")
+        if not isinstance(comps, dict):
+            bad.append("#%d components not a dict" % i)
+            continue
+        for ck, cv in comps.items():
+            if ck not in known_comps:
+                bad.append("#%d unknown component key %r" % (i, ck))
+            if not is_finite_number(cv) or not (0.0 <= cv <= 100.0):
+                bad.append("#%d components.%s=%r out of [0,100]" % (i, ck, cv))
+        td = r.get("top_driver")
+        if cr is None:
+            # null composite => no components => null driver (honest absent-state)
+            if comps:
+                bad.append("#%d composite null but components present" % i)
+            if td is not None:
+                bad.append("#%d composite null but top_driver=%r" % (i, td))
+        else:
+            if not comps:
+                bad.append("#%d composite=%s but no components" % (i, cr))
+            if td not in comps:
+                bad.append("#%d top_driver=%r not among its components" % (i, td))
+    if bad:
+        fail("branch_risk records sane (composite in [0,100], components in [0,100] with known "
+             "keys, top_driver among present components)", first_n(bad, 8))
+    else:
+        ok("branch_risk records sane (composite in [0,100], components known + in [0,100], "
+           "top_driver among present components)")
+
+
+# ---------------------------------------------------------------------------
 def check_amphoe_occupations(amphoe):
     # MEASURED Overture occupation mix per district, keyed by amphoe shapeID. Optional file:
     # SKIP-PASS when absent.
@@ -982,6 +1071,7 @@ def main():
     check_household_risk()
     check_branch_occupations(n)
     check_occupation_risk(n)
+    check_branch_risk(n)
     check_amphoe_occupations(amphoe)
     check_competitors()
     check_competitor_coverage()
