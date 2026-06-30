@@ -146,6 +146,7 @@
   <section class="view" id="v-acq">
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
       <a class="chip" href="#acq" data-acq="sec-opp">Opportunity score</a>
+      <a class="chip" href="#acq" data-acq="sec-compcov">Competitor coverage</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
       <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
       <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
@@ -164,6 +165,18 @@
       Each component is shown per district for honesty.</p>
     <div class="insight" id="oppreadout" style="border-left-color:var(--gold)">Loading opportunity score…</div>
     <table class="tbl" id="opptbl"></table>
+    </details>
+
+    <details class="acqsec" id="sec-compcov" open>
+    <summary><h2 class="opp">Competitor coverage (lower bound) · how complete is our rival census?</h2></summary>
+    <p class="lead">Our competitor map is a <b>MEASURED but INCOMPLETE</b> census — a Google-Places pull that caps
+      ~60 results per query per province, so it <b>undercounts</b>. This panel makes the gap explicit:
+      <b style="color:var(--merch)">found</b> (locations we have, measured) vs <b style="color:var(--gold)">expected</b>
+      (each brand's publicly-reported nationwide branch count — <b>ESTIMATED-from-public-reports</b>, cited company IR / annual reports).
+      Read <b>coverage %</b> as a confidence flag on our competitor-density signals, <b>not</b> as market share.
+      The census is being expanded.</p>
+    <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)">Loading competitor coverage…</div>
+    <table class="tbl" id="compcovtbl"></table>
     </details>
 
     <details class="acqsec" id="sec-r3k" open>

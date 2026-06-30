@@ -537,6 +537,58 @@ function renderAcq(){
   renderAcqBoard();
   renderRoad3k();
   renderOppScore();
+  renderCompCoverage();
+}
+
+/* ---------- Competitor coverage (lower bound) · found vs expected (obj #2) ----------
+   Surfaces data/competitor_coverage.json (built by pipeline/build_competitor_coverage.py):
+   per brand {found (MEASURED census count), expected (ESTIMATED-from-public-reports, cited),
+   coverage_pct}. Makes the census UNDERCOUNT explicit and honest. Lazy-loaded once; degrades
+   gracefully (calm notice) when the file is absent. We DO NOT compute anything here. */
+let COMPCOV=null, compcovLoaded=false;
+function renderCompCoverage(){
+  const tbl=$('#compcovtbl'); if(!tbl) return;
+  if(compcovLoaded){ drawCompCoverage(); return; }
+  fetch('data/competitor_coverage.json').then(r=>r.ok?r.json():null).then(j=>{
+    COMPCOV=j; compcovLoaded=true; drawCompCoverage();
+  }).catch(()=>{ COMPCOV=null; compcovLoaded=true; drawCompCoverage(); });
+}
+function drawCompCoverage(){
+  const tbl=$('#compcovtbl'), ro=$('#compcovreadout'); if(!tbl) return;
+  const rows=(COMPCOV&&Array.isArray(COMPCOV.brands))?COMPCOV.brands:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Competitor coverage not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_competitor_coverage.py</span> to populate <span class="mono">data/competitor_coverage.json</span> (needs a competitor census), then this panel fills in.</span>';
+    return;
+  }
+  // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
+  const list=rows.slice().sort((a,b)=>((b.coverage_pct==null?-1:b.coverage_pct)-(a.coverage_pct==null?-1:a.coverage_pct)));
+  tbl.innerHTML=`<tr><th>Brand</th>`+
+    `<th title="MEASURED — locations of this brand in our de-duplicated census (a lower bound)">Found ◆ measured</th>`+
+    `<th title="ESTIMATED-from-public-reports — the brand's publicly-reported nationwide branch count (cited company IR / annual reports)">Expected ★ public</th>`+
+    `<th title="found ÷ expected — the share of the brand's reported network we have located so far. A confidence flag, NOT market share.">Coverage</th>`+
+    `<th>Census completeness</th></tr>`+
+    list.map(b=>{
+      const exp=b.expected, cov=b.coverage_pct;
+      const covtxt=(cov==null)?'<span class="sub">n/a</span>':`<span class="mono" style="color:var(--gold)"><b>${cov.toFixed(1)}%</b></span>`;
+      const exptxt=(exp==null)?'<span class="sub" title="no nationwide branch count cited in our research — not invented">n/a (uncited)</span>':`<span class="mono">${exp.toLocaleString()}</span>`;
+      const bar=(cov==null)?'<span class="sub">—</span>':barHTML(cov,'var(--merch)');
+      return `<tr>
+        <td><b>${b.brand}</b></td>
+        <td class="mono" style="color:var(--merch)">${(b.found||0).toLocaleString()}</td>
+        <td>${exptxt}</td>
+        <td>${covtxt}</td>
+        <td>${bar}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const m=COMPCOV.meta||{}, t=m.totals||{};
+    const ttxt=(t.coverage_pct!=null)
+      ? `Overall we have located <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> of an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> reported branches — about <b style="color:var(--gold)">${t.coverage_pct.toFixed(1)}%</b> coverage.`
+      : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations (lower bound).`;
+    ro.innerHTML=`<b>Our competitor census is a LOWER BOUND.</b> ${ttxt}
+      <span class="sub">Found = MEASURED; expected = ESTIMATED-from-public-reports (cited IR / annual reports — uncited brands left blank, never invented).
+      Coverage % is a confidence flag on our competitor-density signals, not market share. The census is being expanded.</span>`;
+  }
 }
 
 /* ---------- composite opportunity score · where to open next (item 2) ----------

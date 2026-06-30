@@ -688,6 +688,78 @@ def check_competitors():
 
 
 # ---------------------------------------------------------------------------
+def check_competitor_coverage():
+    # found-vs-expected QA for the competitor census (build_competitor_coverage.py). The data-mandate
+    # bites here: `found` must be MEASURED (a non-negative int), `expected` must be a CITED public
+    # figure (positive int) OR null (never invented), and coverage_pct must = found/expected (or null).
+    # Optional file: SKIP-PASS when absent (the builder needs a census to run).
+    hdr("competitor_coverage.json (optional)")
+    if not exists("competitor_coverage.json"):
+        ok("competitor_coverage.json absent — skipped (optional; run build_competitor_coverage.py)")
+        return
+    try:
+        d = load("competitor_coverage.json")
+    except Exception as e:
+        fail("competitor_coverage.json loads", repr(e))
+        return
+    ok("competitor_coverage.json loads")
+
+    # provenance: meta must state found=MEASURED / expected=ESTIMATED-from-public-reports + cite sources.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "source" not in meta or not meta.get("expected_sources"):
+        fail("competitor_coverage meta/provenance present (source + expected_sources)",
+             "meta missing source or expected_sources citation")
+    else:
+        ok("competitor_coverage meta/provenance present (source + cited expected_sources)")
+        # the expected figures MUST be honestly labelled as estimated-from-public-reports
+        if meta.get("expected_label") == "ESTIMATED-from-public-reports":
+            ok("competitor_coverage expected labelled ESTIMATED-from-public-reports")
+        else:
+            fail("competitor_coverage expected labelled ESTIMATED-from-public-reports",
+                 "got expected_label=%r" % meta.get("expected_label"))
+
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        fail("competitor_coverage has a 'brands' list", "got %s" % type(brands).__name__)
+        return
+    ok("competitor_coverage brands list present (%d)" % len(brands))
+
+    bad = []
+    for b in brands:
+        if not isinstance(b, dict):
+            bad.append("non-object brand entry %r" % b)
+            continue
+        name = b.get("brand")
+        if name not in KNOWN_COMPETITOR_BRANDS:
+            bad.append("brand=%r not in known set" % name)
+        found = b.get("found")
+        # found is MEASURED — must be a non-negative int
+        if not (isinstance(found, int) and not isinstance(found, bool) and found >= 0):
+            bad.append("%s found=%r not a non-negative int" % (name, found))
+        exp = b.get("expected")
+        cov = b.get("coverage_pct")
+        # expected is CITED-or-null — never a fabricated 0/negative
+        if exp is not None and not (isinstance(exp, int) and not isinstance(exp, bool) and exp > 0):
+            bad.append("%s expected=%r must be a positive int or null" % (name, exp))
+        # coverage_pct must be consistent: null iff expected null; else 100*found/expected (1 dp)
+        if exp is None:
+            if cov is not None:
+                bad.append("%s coverage_pct=%r must be null when expected is null" % (name, cov))
+        else:
+            if not is_finite_number(cov):
+                bad.append("%s coverage_pct=%r not finite" % (name, cov))
+            elif isinstance(found, int) and isinstance(exp, int) and exp > 0:
+                expect = round(100.0 * found / exp, 1)
+                if abs(cov - expect) > 0.05:
+                    bad.append("%s coverage_pct=%s != 100*found/expected=%s" % (name, cov, expect))
+    if bad:
+        fail("competitor_coverage entries sane (found measured int, expected cited-or-null, "
+             "coverage_pct=100*found/expected)", first_n(bad, 8))
+    else:
+        ok("competitor_coverage entries sane (found measured, expected cited-or-null, coverage consistent)")
+
+
+# ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
 # Mandate: no committed data may be hallucinatory/fabricated. Every NUMERIC data layer in
@@ -851,6 +923,7 @@ def main():
     check_branch_occupations(n)
     check_amphoe_occupations(amphoe)
     check_competitors()
+    check_competitor_coverage()
     check_provenance()
     check_rollup(branches)
 
