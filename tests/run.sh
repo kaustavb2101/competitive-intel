@@ -76,6 +76,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_household_risk.py --check >/dev/null 2>&1 ) && ok "build_household_risk.py --check" || bad "build_household_risk.py --check (household_risk_by_province.json drifted from source-data NSO SES layers)"
   ( cd "$PIPE" && python3 build_province_risk.py --check >/dev/null 2>&1 ) && ok "build_province_risk.py --check" || bad "build_province_risk.py --check (province_risk.json drifted from branch_risk.json/branches.json)"
   ( cd "$PIPE" && python3 build_segment_exposure.py --check >/dev/null 2>&1 ) && ok "build_segment_exposure.py --check" || bad "build_segment_exposure.py --check (segment_exposure.json drifted from branches.json)"
+  ( cd "$PIPE" && python3 build_collateral_outlook.py --check >/dev/null 2>&1 ) && ok "build_collateral_outlook.py --check" || bad "build_collateral_outlook.py --check (collateral_outlook.json drifted from commodity_board/vehicles_by_province/branches.json)"
 
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 

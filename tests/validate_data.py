@@ -437,6 +437,101 @@ def check_crop_stress():
 
 
 # ---------------------------------------------------------------------------
+def check_collateral_outlook():
+    # PER-PROVINCE COLLATERAL-VALUE OUTLOOK (objective #1): a DIRECTIONAL, ESTIMATED read on whether
+    # title-loan collateral recovery value is firming/softening, built from MEASURED gold YoY (global
+    # board proxy) + MEASURED DLT moto-title share + ESTIMATED collateral segment score. Optional
+    # file: SKIP-PASS when absent (build_collateral_outlook.py degrades to an honest absent-state too).
+    hdr("collateral_outlook.json (optional)")
+    if not exists("collateral_outlook.json"):
+        ok("collateral_outlook.json absent — skipped (optional; run build_collateral_outlook.py)")
+        return
+    try:
+        d = load("collateral_outlook.json")
+    except Exception as e:
+        fail("collateral_outlook.json loads", repr(e))
+        return
+    ok("collateral_outlook.json loads")
+
+    # provenance: meta must state the builder + the ESTIMATED directional label (data-mandate).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("collateral_outlook meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+    else:
+        ok("collateral_outlook meta/provenance present (generated_by + estimated label)")
+
+    # honest absent-state: file may legitimately ship empty when branches.json is missing.
+    if meta and meta.get("absent"):
+        ok("collateral_outlook is an honest ABSENT-state (no branches.json) — skipped value checks")
+        return
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("collateral_outlook has a 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("collateral_outlook provinces list present (%d)" % len(provs))
+
+    bad = []
+    for p in provs:
+        name = p.get("province") or "?"
+        # region known (when present)
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        # gold_yoy: MEASURED/GLOBAL proxy — finite or null (never fabricated)
+        g = p.get("gold_yoy")
+        if g is not None and not is_finite_number(g):
+            bad.append("%s gold_yoy=%r not finite" % (name, g))
+        # moto_title_share: MEASURED share in [0,1] or null
+        ms = p.get("moto_title_share")
+        if ms is not None and (not is_finite_number(ms) or not (0.0 <= ms <= 1.0)):
+            bad.append("%s moto_title_share=%r out of [0,1]" % (name, ms))
+        # collateral_score: ESTIMATED non-negative finite or null
+        cs = p.get("collateral_score")
+        if cs is not None and (not is_finite_number(cs) or cs < 0):
+            bad.append("%s collateral_score=%r not non-negative finite" % (name, cs))
+        # outlook: ESTIMATED directional index in ~[-1,1] (W_GOLD+W_MOTO=1.0 bounds it)
+        out = p.get("outlook")
+        if not is_finite_number(out) or not (-1.0 <= out <= 1.0):
+            bad.append("%s outlook=%r out of [-1,1]" % (name, out))
+        # note must be a non-empty string (the honest plain-language read)
+        if not (isinstance(p.get("outlook_note"), str) and p.get("outlook_note").strip()):
+            bad.append("%s outlook_note missing/empty" % name)
+        # components.gold_term / moto_term in [-1,1] when present
+        comp = p.get("components") or {}
+        for ck in ("gold_term", "moto_term"):
+            cv = comp.get(ck)
+            if cv is not None and (not is_finite_number(cv) or not (-1.0 <= cv <= 1.0)):
+                bad.append("%s components.%s=%r out of [-1,1]" % (name, ck, cv))
+    if bad:
+        fail("collateral_outlook rows sane (region/gold/moto-share/score/outlook ranges, note present)",
+             first_n(bad, 8))
+    else:
+        ok("collateral_outlook rows sane (gold_yoy finite-or-null, moto_share in [0,1], outlook in "
+           "[-1,1], note present, known regions)")
+
+    # national summary block present + consistent
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        fail("collateral_outlook national summary present", "got %s" % type(nat).__name__)
+    else:
+        ok("collateral_outlook national summary present")
+        nb = []
+        ew = nat.get("exposure_weighted_outlook")
+        if ew is not None and (not is_finite_number(ew) or not (-1.0 <= ew <= 1.0)):
+            nb.append("exposure_weighted_outlook=%r out of [-1,1]" % ew)
+        npv = nat.get("n_provinces")
+        if npv is not None and npv != len(provs):
+            nb.append("national.n_provinces=%r != provinces count=%d" % (npv, len(provs)))
+        if not (isinstance(nat.get("headline"), str) and nat.get("headline").strip()):
+            nb.append("headline missing/empty")
+        if nb:
+            fail("collateral_outlook national summary sane", first_n(nb))
+        else:
+            ok("collateral_outlook national summary sane (weighted outlook in [-1,1], count + headline)")
+
+
+# ---------------------------------------------------------------------------
 def check_household_risk():
     # MEASURED household debt-to-income layer (NSO SES via TMLI bridge), province-keyed. Optional
     # file: SKIP-PASS when absent (build_household_risk.py degrades to an absent-state too).
@@ -1209,6 +1304,7 @@ def main():
     amphoe = check_amphoe(n)
     check_provinces(n)
     check_crop_stress()
+    check_collateral_outlook()
     check_household_risk()
     check_branch_occupations(n)
     check_occupation_risk(n)
