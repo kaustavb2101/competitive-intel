@@ -920,6 +920,11 @@ buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();r
  var box=document.createElement('div');box.className='notice';
  box.innerHTML='<div class="sp"></div><div class="nd">Loading province deep-dive…</div>';
  document.body.appendChild(box);
+ // killLoader: remove the loading spinner idempotently. Called the instant data resolves (before
+ // init runs) AND from every fallback path, so the crescent can NEVER stick on screen — even if a
+ // later step throws. Once removed, box is detached and re-removal is a harmless no-op.
+ var loaderDead=false;
+ function killLoader(){ if(loaderDead)return; loaderDead=true; try{box.remove();}catch(e){} }
  Promise.all([
    fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
    fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
@@ -927,11 +932,15 @@ buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();r
    fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
  ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
-   box.remove();window.initProvince();})
+   killLoader();            // spinner gone the moment data is in hand; init draws the scene next
+   window.initProvince();})
   .catch(function(e){
     // calm, styled fallback — no raw error text reaches the user; detail goes to the console.
-    box.innerHTML='<div class="nh">Province data unavailable</div>'
+    // Reuse the box if it's still mounted (data never loaded); otherwise add a fresh notice.
+    var n=loaderDead?document.createElement('div'):box; n.className='notice';
+    n.innerHTML='<div class="nh">Province data unavailable</div>'
       +'<div class="nd">We couldn’t load the deep-dive for this province. Please check the link or pick another province from the menu.</div>';
+    if(loaderDead)document.body.appendChild(n); else loaderDead=true;
     console.error('province load failed ('+slug+'):',e);
   });
 })();
