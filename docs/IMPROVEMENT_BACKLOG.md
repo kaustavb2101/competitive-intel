@@ -57,8 +57,11 @@
       Streets/Satellite/Dark, action pills grouped bottom-right, proper header band, kill the stuck loader crescent). *(HIGH, M)*
 - [ ] **Standardize provenance** as one quiet chip (filled dot = measured, hollow = estimated, ≥11px AA),
       one legend per page; move caveats into a consistent "Method & caveats" expander everywhere. *(MED, M)*
-- [ ] **Rebuild dense tabs as 2-col dashboards** (KPI strip + lead table side by side); Acquisition leads with
-      the full-width "Road to 3,000" headroom bar, leaderboard under it, proxy defs below. *(HIGH, M)*
+- [ ] **★ Rebuild dense tabs as 2-col dashboards — NOW THE TOP LAYOUT ITEM.** The full-bleed fix widened the
+      container (1180→1320/1680) but the KPI card ROWS still don't stretch, so Exposure/Overview/Acquisition
+      still look left-weighted with an empty right half. Real fix: lay each tab out as KPI strip BESIDE the lead
+      table/chart (2-col grid that fills the widened canvas), cards that grow, lead table to the right. Acquisition
+      leads with the full-width "Road to 3,000" headroom bar + the opportunity-score leaderboard under it. *(HIGH, M)*
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
 ## Queue — enrichment / capabilities (serve the two objectives)
