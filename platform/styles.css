@@ -20,7 +20,7 @@ header{position:sticky;top:0;z-index:1000;background:rgba(10,14,23,.96);backdrop
 .tab{flex:none;background:none;border:none;color:var(--mid);font-family:var(--sans);font-size:13px;font-weight:500;padding:9px 13px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .tab.on{color:var(--hi);border-bottom-color:var(--accent)}
 
-main{max-width:1000px;margin:0 auto;padding:16px 14px 70px}
+main{max-width:var(--maxw,1320px);margin:0 auto;padding:16px 14px 70px}
 .view{display:none}
 .view.on{display:block}
 h2{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:22px 0 10px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
@@ -143,6 +143,10 @@ main{padding-top:56px}
   /* ---- spacing scale (4px base; roomier rungs for breathing room) ---- */
   --s1:4px; --s2:8px; --s3:14px; --s4:20px; --s5:32px; --s6:48px;
   --card-pad:18px 18px; --r:12px; --r-sm:9px;
+  /* ---- content measure: comfortable widescreen column; wide views break out wider ---- */
+  --maxw:1320px;          /* standard centered content column */
+  --maxw-wide:1680px;     /* map / board / leaderboard: use the widescreen */
+  --gutter:32px;          /* min breathing room each side at any width */
 
   /* ---- TYPE RAMP — collapsed to 4 steps + caption (was 6 ad-hoc sizes) ----
      caption 11 · body 14 · heading 19 · display 28. Mono metrics ride the
@@ -194,7 +198,7 @@ header{position:sticky;top:0;z-index:1000;background:rgba(15,20,34,.85);
 .tab:hover{color:var(--txt)}
 .tab.on{color:var(--hi);border-bottom-color:var(--accent);text-shadow:0 0 12px var(--accent-glow)}
 
-main{max-width:1180px;margin:0 auto;padding:60px var(--s4) 80px}
+main{max-width:var(--maxw,1320px);margin:0 auto;padding:60px var(--s4) 80px}
 .view{display:none}.view.on{display:block}
 
 /* ---------- section headers: outrank table th, lit accent tick ---------- */
@@ -644,4 +648,49 @@ html[data-theme="light"] .cc-row .l .s{color:var(--dim)}
   .mcard .v,.kpi.lead-kpi .v{font-size:24px}
   h2,.cc-row .r{font-size:17px}
   .tbl th,.tbl td{padding:10px 9px}
+}
+
+/* ============================================================
+   FULL-BLEED 2D — recover the widescreen (ux committee fix)
+   Single canonical centered column at --maxw (1320), with the
+   data-heavy views (National map, Acquisition board/leaderboard,
+   Exposure) breaking out to --maxw-wide so the canvas fills.
+   Pure CSS — keys off the .on class app.js puts on the active
+   <section.view> via :has(); prose stays on a readable measure.
+   ============================================================ */
+
+/* 1 · the content column is always centered AND never overflows:
+   cap at the design width, but yield to the viewport (minus gutters)
+   on anything narrower than that — so no horizontal scroll, ever. */
+main{
+  width:100%;
+  max-width:min(var(--maxw,1320px), calc(100vw - 2*var(--gutter,32px)));
+  margin-inline:auto;
+}
+
+/* 2 · data-heavy views use the widescreen. The map, the acquisition
+   board (white-space leaderboard / Road-to-3000) and exposure grids
+   read as dashboards, not articles — let them breathe to --maxw-wide. */
+main:has(#v-map.on),
+main:has(#v-acq.on),
+main:has(#v-exposure.on){
+  max-width:min(var(--maxw-wide,1680px), calc(100vw - 2*var(--gutter,32px)));
+}
+
+/* 3 · the National map itself goes effectively edge-to-edge inside the
+   widened column and gets a touch more height to use the recovered width. */
+@media(min-width:1180px){
+  #v-map.on #map{height:68vh;height:68dvh;min-height:520px}
+}
+
+/* 4 · keep prose on a comfortable measure even in the widened views —
+   widen the data, not the sentences. (cards/grids/tables already flex
+   via auto-fit / 100% width, so they fill the recovered space.) */
+.lead,.purpose,.note,.verdict{max-width:90ch}
+
+/* 5 · belt-and-suspenders: graceful fallback for engines without :has()
+   — the standard column still widens to --maxw on the desktop range, so
+   the page is never narrower than before even if the breakout no-ops. */
+@supports not selector(:has(*)){
+  @media(min-width:1360px){ main{max-width:var(--maxw,1320px)} }
 }
