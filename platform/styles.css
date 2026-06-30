@@ -499,6 +499,28 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .cc-star:hover{color:var(--gold)}
 .cc-empty{font-size:12px;color:var(--dim);padding:6px 0}
 
+/* QW5 — HERO VERDICT BAND: 2–3 big plain-language statements, the front door's lead.
+   Cards stretch across the widescreen and click through to their detail tab. */
+.cc-hero{display:grid;gap:var(--s3,14px);grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  margin:var(--s3,14px) 0 var(--s2,8px)}
+.cc-hero:empty{display:none}
+.cc-hero-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;
+  background:linear-gradient(180deg,var(--raised,#232E45),var(--panel,#1A2233));
+  border:1px solid var(--line);border-left:4px solid var(--hc,var(--accent));
+  border-radius:14px;padding:16px 18px;box-shadow:var(--elev-1);transition:transform .15s,box-shadow .15s,border-color .15s}
+.cc-hero-card:hover{transform:translateY(-2px);box-shadow:var(--elev-2);border-color:var(--hc,var(--accent))}
+.cc-hero-card:focus-visible{outline:none;box-shadow:var(--ring)}
+.cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px}
+.cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid)}
+.cc-hero-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
+.cc-hero-tag{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.cc-hero-cta{font-size:12px;font-weight:600;color:var(--hc,var(--accent));white-space:nowrap}
+/* demote the measured/estimated legend to one quiet line at the bottom (QW5). */
+.cc-provenance{margin-top:18px;font-size:11px;color:var(--dim);border-top:1px solid var(--line2);padding-top:10px}
+.cc-provenance b{color:var(--mid)}
+@media(max-width:640px){.cc-hero{grid-template-columns:1fr}.cc-hero-big{font-size:18px}}
+
 /* print / PDF: only the command center, clean ink-on-paper */
 @media print{
   nav,#themeToggle,.no-print,.cc-actions{display:none!important}
@@ -691,6 +713,7 @@ main{
    read as dashboards, not articles — let them breathe to --maxw-wide. */
 main:has(#v-map.on),
 main:has(#v-acq.on),
+main:has(#v-overview.on),
 main:has(#v-exposure.on){
   max-width:min(var(--maxw-wide,1680px), calc(100vw - 2*var(--gutter,32px)));
 }
@@ -712,6 +735,29 @@ main:has(#v-exposure.on){
 @supports not selector(:has(*)){
   @media(min-width:1360px){ main{max-width:var(--maxw,1320px)} }
 }
+
+/* ============================================================
+   ★ 2-COLUMN DASHBOARD LAYOUT (top layout item)
+   The widened canvas was left-weighted because KPI card rows
+   don't stretch. Fix: lay the dense tabs out as a KPI/insight
+   STRIP beside the lead table/board — a grid that FILLS the
+   widescreen. Collapses to one column on narrow viewports.
+   Layout only; every element ID + render fn is untouched.
+   ============================================================ */
+.dash2{display:grid;gap:var(--s5,32px);align-items:start;
+  grid-template-columns:minmax(300px,360px) minmax(0,1fr)}
+/* the strip column: cards grow to fill their column width (no left-pinning). */
+.dash2-side{min-width:0}
+.dash2-side .grid.macro{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.dash2-side>h2:first-child{margin-top:0}
+/* the lead column: the wide table/board sits here and uses the recovered width. */
+.dash2-main{min-width:0}
+.dash2-main>h2:first-child{margin-top:0}
+/* first heading in each column lines up across the two columns */
+.dash2 h2{margin-top:var(--s4,20px)}
+.dash2 .dash2-side>h2:first-child,.dash2 .dash2-main>h2:first-child{margin-top:0}
+/* collapse to a single column on tablet/phone so nothing gets cramped. */
+@media(max-width:900px){.dash2{grid-template-columns:1fr;gap:var(--s4,20px)}}
 
 /* ---------- peer NPL benchmark (reported) · Exposure obj#1 ----------
    Compact labelled reference bar showing the PEER reported NPL ladder
