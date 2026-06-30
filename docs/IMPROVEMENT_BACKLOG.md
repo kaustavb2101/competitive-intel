@@ -80,8 +80,12 @@
       per-component breakdown: whitespace / competitor-gap / agri-stress) on #acq, labelled ESTIMATED COMPOSITE. *(HIGH, M)*
 - [ ] **Composite expansion-opportunity score** per district — combine white-space + dominant occupation +
       competitor density + crop-stress into one rank for "where to open next". Graceful absent. *(high, M)*
-- [ ] **Occupation × risk cross-read** — once `branch_occupations.json` is present, flag branches whose
-      borrower base is concentrated in a stressed sector (factory-heavy + industrial slowdown). Graceful absent. *(high, M)*
+- [x] **Occupation × risk cross-read — DONE 2026-06-30** (`build_occupation_risk.py` → `occupation_risk.json`,
+      index-aligned to branches.json: per-branch ESTIMATED occ-stress = MEASURED Overture occupation shares ×
+      ESTIMATED stressed-sector weighting [factory national slowdown lever + agriculture = province crop-stress],
+      flag when score≥25 & ≥20 estab≤10km. National-map lens `Occupation × stress ◆▲` + branch-popup flag, both
+      hide/omit gracefully when absent. Skip-pass `--check` when `branch_occupations.json` absent; validate_data.py
+      check + tests/run.sh gated. Dark-until-data — lights up when the Overture pull lands.)
 - [x] **Competitor coverage QA panel — DONE 2026-06-30** (#acq found-vs-expected per brand, cited expected; total coverage
       21.9% — MTC 11.3% (978/8673), Tidlor 39%, Srisawad 49%, Heng expected uncited/null. build_competitor_coverage.py gated).
 - [ ] **Competitor coverage QA panel** — found-vs-expected per brand so the lower-bound caveat is explicit

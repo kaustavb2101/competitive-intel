@@ -566,6 +566,66 @@ def check_branch_occupations(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_occupation_risk(n_branches):
+    # OCCUPATION x RISK cross-read (objective #1): per-branch ESTIMATED occupation-stress score
+    # (MEASURED Overture occupation shares x ESTIMATED stressed-sector weighting), index-aligned
+    # to branches.json. Optional file: SKIP-PASS when absent (needs branch_occupations.json /
+    # the Overture pull; build_occupation_risk.py degrades to an absent-state too).
+    hdr("occupation_risk.json (optional)")
+    if not exists("occupation_risk.json"):
+        ok("occupation_risk.json absent — skipped (optional; run build_occupation_risk.py to populate)")
+        return
+    try:
+        d = load("occupation_risk.json")
+    except Exception as e:
+        fail("occupation_risk.json loads", repr(e))
+        return
+    ok("occupation_risk.json loads")
+
+    # provenance: meta must state the MEASURED/ESTIMATED split (data-mandate).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_with") or not meta.get("label"):
+        fail("occupation_risk meta/provenance present (generated_with + label)",
+             "meta missing generated_with/label")
+    else:
+        ok("occupation_risk meta/provenance present (generated_with + estimated label)")
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("occupation_risk has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    # length must equal branches.json (the layer is INDEX-ALIGNED — a drift misaligns every read).
+    if n_branches is not None and len(recs) != n_branches:
+        fail("occupation_risk length == branches.json length",
+             "occupation_risk=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("occupation_risk length == branches.json length (%d)" % len(recs))
+
+    # per-record: s in [0,100] finite; f a bool; ds in [0,1]; t a non-negative finite total.
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        s = r.get("s")
+        if not is_finite_number(s) or not (0.0 <= s <= 100.0):
+            bad.append("#%d s=%r out of [0,100]" % (i, s))
+        if not isinstance(r.get("f"), bool):
+            bad.append("#%d f=%r not a bool" % (i, r.get("f")))
+        ds = r.get("ds")
+        if ds is not None and (not is_finite_number(ds) or not (0.0 <= ds <= 1.0)):
+            bad.append("#%d ds=%r out of [0,1]" % (i, ds))
+        t = r.get("t")
+        if not is_finite_number(t) or t < 0:
+            bad.append("#%d t=%r" % (i, t))
+    if bad:
+        fail("occupation_risk records sane (s in [0,100], f bool, ds in [0,1], t>=0)", first_n(bad))
+    else:
+        ok("occupation_risk records sane (s in [0,100], f bool, ds in [0,1], t>=0)")
+
+
+# ---------------------------------------------------------------------------
 def check_amphoe_occupations(amphoe):
     # MEASURED Overture occupation mix per district, keyed by amphoe shapeID. Optional file:
     # SKIP-PASS when absent.
@@ -921,6 +981,7 @@ def main():
     check_crop_stress()
     check_household_risk()
     check_branch_occupations(n)
+    check_occupation_risk(n)
     check_amphoe_occupations(amphoe)
     check_competitors()
     check_competitor_coverage()

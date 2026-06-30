@@ -15,6 +15,7 @@ const LENS = {
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
   hhdti:    {label:'Household debt-to-income ●', desc:"MEASURED · NSO — the branch's province household debt as a multiple of annual income (NSO SES 2566, debt ÷ income). Higher = more borrower balance-sheet stress. Lazy-loads household_risk_by_province.json; hidden if absent.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
+  occrisk:  {label:'Occupation × stress ◆▲', desc:"MEASURED occupation mix · ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a STRESSED sector (factory under industrial slowdown · agriculture under the branch's province crop-stress). Occupation shares are MEASURED (Overture Maps Places, a sample/lower bound); the 'stressed sector' weighting is ESTIMATED (editorial macro judgement). A triage flag, NOT a measured default rate. Lazy-loads occupation_risk.json; hidden if absent.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, val:d=>occriskVal(d)},
   // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
   // White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED (province-inherited
   // agri-stress + local mix). Both lazy-load amphoe.json (joined per-branch via build_amphoe.py).
@@ -114,6 +115,45 @@ function occLabel(key){
     public:'Public sector',professional:'Professional',agriculture:'Agriculture',personal:'Personal services',
     logistics:'Logistics',construction:'Construction'};
   return m[key]||(key.charAt(0).toUpperCase()+key.slice(1));
+}
+
+/* ---------- occupation × risk cross-read (objective #1) ----------
+   Lazy-loads data/occupation_risk.json — a per-branch flag for branches whose MEASURED
+   borrower base (Overture occupation shares) is concentrated in a STRESSED sector (factory
+   under industrial slowdown, agriculture under crop-stress). Shape:
+     { meta:{...}, stress_weights:{...},
+       branches:[{s:0..100 occ-risk, f:flag, d:dominant bucket key, ds:dom share, t:total}] }
+   The branches[] array is INDEX-ALIGNED to branches.json (entry i ↔ DATA[i]), so a branch's
+   read is OCCRISK[DATA.indexOf(d)]. The score is an ESTIMATED composite: MEASURED occupation
+   shares × an ESTIMATED "stressed sector" weighting (stated in the lens tooltip).
+   Fully null-guarded: absent file → OCCRISK stays empty, the lens hides itself (renderLenses),
+   val() reads 0, and nothing errors. Written by pipeline/build_occupation_risk.py, which itself
+   needs branch_occupations.json (the Overture pull) — so this is dark-until-data. */
+let OCCRISK=null, occriskMeta=null, occriskLoaded=false, occriskPromise=null;
+async function loadOccRisk(){
+  if(occriskPromise) return occriskPromise;
+  occriskLoaded=true;
+  occriskPromise=(async()=>{
+    try{ const r=await fetch('data/occupation_risk.json'); if(!r.ok) throw 0;
+      const j=await r.json(); occriskMeta=j.meta||null; OCCRISK=j.branches||null; }
+    catch(e){ OCCRISK=null; occriskMeta=null; }
+    return OCCRISK;
+  })();
+  return occriskPromise;
+}
+// true once the layer is loaded AND carries at least one branch read (i.e. not absent/empty).
+function occriskHasData(){return !!(OCCRISK&&OCCRISK.length);}
+// ESTIMATED occupation-stress score (0..100) for a branch — 0 when the file/entry is absent.
+function occriskVal(d){
+  if(!occriskHasData()||!DATA) return 0;
+  const i=DATA.indexOf(d); if(i<0) return 0;
+  const e=OCCRISK[i]; return (e&&e.s)||0;
+}
+// the per-branch occupation-risk record (for popups) — null when absent.
+function occriskRec(d){
+  if(!occriskHasData()||!DATA) return null;
+  const i=DATA.indexOf(d); if(i<0) return null;
+  return OCCRISK[i]||null;
 }
 
 /* ---------- measured occupation mix per DISTRICT (Overture Places) ----------
@@ -1577,6 +1617,7 @@ function renderLenses(){
   // shows (warmed at map init); if the load yields no data it is filtered out on the next render.
   $('#lenses').innerHTML = Object.entries(LENS)
     .filter(([k,l])=>!(l.hh && hhriskLoaded && !hhriskHasData()))
+    .filter(([k,l])=>!(l.occr && occriskLoaded && !occriskHasData()))
     .map(([k,l])=>
     `<button class="lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${l.label.replace(/"/g,'&quot;')}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
        <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
@@ -1669,6 +1710,9 @@ function initMap(){
   // popups carry the debt-to-income block. Absent file → loader leaves HHRISK empty, the lens is
   // filtered out, nothing renders.
   if(!hhriskLoaded) loadHouseholdRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='hhdti'){ renderLegend(); styleMarkers(); } });
+  // warm the occupation × stress cross-read so the lens hides itself when absent. Absent file
+  // (build_occupation_risk.py not run / no Overture pull yet) → OCCRISK empty, lens filtered out.
+  if(!occriskLoaded) loadOccRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='occrisk'){ renderLegend(); styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -1790,6 +1834,21 @@ function occPopupHTML(d,sec){
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">${(e.t||0).toLocaleString()} establishments ≤10km by category (Overture Maps Places — a sample/lower bound, not a registry)</div>`
     + `</div>`;
 }
+// Occupation × stress block for a branch popup — the occupation_risk.json cross-read. Shows the
+// ESTIMATED occupation-stress score (MEASURED shares × ESTIMATED stress weighting) and, when the
+// branch is FLAGGED, a one-line callout naming the concentrated stressed base. Fully graceful:
+// absent file / absent entry → no block. Only renders something when there is a real read (t>0).
+function occriskPopupHTML(d,sec,r){
+  const e=occriskRec(d); if(!e||!(e.t>0)) return '';
+  const sc=e.s||0;
+  const col=sc>=40?'var(--agri)':sc>=25?'var(--gold)':'#8b90a7';
+  const domLab=e.d?occLabel(e.d):'—';
+  return sec('Occupation × stress — MEASURED mix · ESTIMATED weighting')
+    + r('Occupation-stress ▲ · est', `<span style="color:${col}">${sc}</span> <span class="sub">/100</span>`, col)
+    + r('Dominant base · measured', `${domLab}${e.ds?` <span class="sub">${Math.round(e.ds*100)}%</span>`:''}`, '#8b90a7')
+    + (e.f?`<div class="sub" style="margin:2px 0 0;font-size:10px;color:var(--agri)">⚠ FLAGGED — borrower base concentrated in a stressed sector (occupation shares MEASURED; stressed-sector weighting ESTIMATED). A triage flag, not a measured default rate.</div>`
+          :`<div class="sub" style="margin:2px 0 0;font-size:10px">occupation shares MEASURED (Overture, lower bound); stressed-sector weighting ESTIMATED (factory slowdown · province crop-stress)</div>`);
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -1856,6 +1915,7 @@ function popupHTML(d){
     ${collatMixPopupHTML(d,sec,r)}
     ${hhriskPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
+    ${occriskPopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
@@ -1882,6 +1942,9 @@ function setLens(k){
   }
   if(k==='hhdti' && !hhriskLoaded){
     loadHouseholdRisk().then(()=>{ renderLenses(); if(curLens==='hhdti'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='occrisk' && !occriskLoaded){
+    loadOccRisk().then(()=>{ renderLenses(); if(curLens==='occrisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
