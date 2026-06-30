@@ -132,6 +132,8 @@ point-level establishment census (Overture Maps Places, free, no geo-block). Eac
 occupation buckets; we count them within 10 km of every branch. Needs the Overture CLI
 (`pip install overturemaps`).
 
+### A. WIDE Rayong (quick, single pull)
+
 ```bash
 cd pipeline
 # 1) pull places (WIDE Rayong by default; --preset national for the whole country, large pull)
@@ -144,6 +146,40 @@ git add ../source-data/overture_places.json ../platform/data/branch_occupations.
 git commit -m "data: Overture Places occupation layer + per-branch 10km rollup"
 git push origin claude/new-session-wto26j
 ```
+
+### B. WHOLE COUNTRY — TILED + RESUMABLE (use this for the national harvest)
+
+The plain `--preset national` pull is too slow to finish in one sitting and loses everything on
+Ctrl-C. Use `pull_overture_national.py` instead: it tiles Thailand into ~1.0-degree cells, writes
+each tile atomically into `source-data/.overture_tiles/` (gitignored), records completed tiles in a
+manifest, and SKIPS done tiles on rerun. Stop/restart as many times as you like — it resumes.
+
+```bash
+cd pipeline
+# pull incomplete tiles (resumes if interrupted); auto-merges once ALL tiles are complete.
+python3 pull_overture_national.py
+# ...if it dies or you Ctrl-C, just run it again — it picks up where it left off:
+python3 pull_overture_national.py
+# RERUN UNTIL this shows "0 remaining":
+python3 pull_overture_national.py --status
+# (if all tiles were already done before the final auto-merge, force the merge:)
+python3 pull_overture_national.py --merge-only   # -> source-data/overture_places.json
+#                                                    + platform/data/competitors_overture.json
+
+# then the SAME deterministic rollups as above (the gate runs both --check):
+python3 build_occupations.py            # -> platform/data/branch_occupations.json
+python3 build_amphoe_occupations.py     # -> platform/data/amphoe_occupations.json
+
+# commit the merged source layer + derived files (NOT the .overture_tiles/ cache — it is gitignored):
+git add ../source-data/overture_places.json ../platform/data/branch_occupations.json \
+        ../platform/data/amphoe_occupations.json ../platform/data/competitors_overture.json
+git commit -m "data: national Overture occupation layer (tiled pull) + per-branch/-district rollups"
+git push origin claude/new-session-wto26j
+```
+
+Flags: `--tile-deg N` (cell size, default 1.0), `--bbox S,W,N,E` (override national),
+`--merge-only`, `--status`. The state dir `source-data/.overture_tiles/` is gitignored —
+never commit the per-tile geojsonseq cache.
 
 The branch-explorer "Who works nearby" panel auto-switches from *estimated · proxy* to
 *measured · Overture* the moment `branch_occupations.json` is present.
