@@ -436,8 +436,28 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
 #status{background:var(--glass)!important;border:var(--glass-bd)!important}
 #status.err{color:#ef7d76;border-color:rgba(224,87,79,.4)!important}
 
+/* ---------- skeleton loaders (shimmer) ----------
+   Lightweight, theme-aware placeholders that mirror the final table/card layout while data loads.
+   A faint gradient block animated by @keyframes shimmer; fades out when real content replaces it.
+   Used in place of plain "Loading…" text on the Command center, Acquisition, Exposure & Overview
+   panels and the map legend. Reduced-motion users get a static block (no animation). */
+@keyframes shimmer{0%{background-position:-360px 0}100%{background-position:360px 0}}
+.skel{background:linear-gradient(90deg,var(--line2) 0%,var(--line) 50%,var(--line2) 100%);
+  background-size:360px 100%;border-radius:5px;animation:shimmer 1.25s ease-in-out infinite;
+  display:block;height:11px;margin:7px 0;opacity:.85}
+.skel-rows{margin:4px 0 2px}
+.skel-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2)}
+.skel-row:last-child{border-bottom:none}
+.skel-row .skel{margin:0}
+.skel-line{height:11px}
+.skel-pill{height:18px;border-radius:9px;width:46px;flex:none}
+.skel-w70{width:70%}.skel-w55{width:55%}.skel-w40{width:40%}.skel-w30{width:30%}.skel-w20{width:20%}
+.skel-grow{flex:1}
+.skel-card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px;margin:6px 0}
+[data-theme=light] .skel{background:linear-gradient(90deg,#eceef3 0%,#dde1ea 50%,#eceef3 100%);background-size:360px 100%}
+
 /* ---------- responsive ---------- */
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.skel{animation:none}}
 @media(max-width:760px){
   .cbtn,#ctl button,#elev button,.ctl button{padding:10px 12px;font-size:12px}
   .cbtn .sw{width:11px;height:11px}
@@ -567,18 +587,28 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .cc-provenance b{color:var(--mid)}
 @media(max-width:640px){.cc-hero{grid-template-columns:1fr}.cc-hero-big{font-size:18px}}
 
-/* print / PDF: only the command center, clean ink-on-paper */
+/* print / PDF: only the command center, clean ink-on-paper exec brief.
+   Hide all chrome (nav + dropdowns, lens pills, action chips, tooltips, the WebGL map & legend,
+   shimmer skeletons); white background + black text; tables go full-width with no horizontal
+   scroll; verdict cards + tables are kept and never split across a page break. */
 @media print{
-  nav,#themeToggle,.no-print,.cc-actions{display:none!important}
-  body{background:#fff;color:#111}
-  main{max-width:none;padding:0}
+  nav,#nav,#themeToggle,.no-print,.cc-actions,
+  .nav-more,.nav-more-menu,.lens-more,.lens-more-menu,
+  .lenses,.lens,.pill,.chips,.chip,.maphero,#map,.maplegend,.maplegend-line,
+  .pi,[title]:after,.tooltip,.skel,.skel-rows{display:none!important}
+  body{background:#fff!important;color:#111!important}
+  main{max-width:none!important;padding:0!important}
   .view{display:none!important}
   #v-home{display:block!important}
-  .cc-card,.mcard{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important}
-  .cc-card-h,.cc-row .l,.cc-row .r,h2,b{color:#111!important}
-  .lead,.cc-sub2,.cc-row .l .s,.cc-row .r .s{color:#444!important}
+  .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
+  .cc-card-h,.cc-row .l,.cc-row .r,h2,h3,b{color:#111!important}
+  .lead,.cc-sub2,.cc-row .l .s,.cc-row .r .s,.sub{color:#444!important}
   .cc-grid{grid-template-columns:1fr 1fr}
   a{color:#111!important;text-decoration:none}
+  /* tables full-width, no horizontal-scroll wrapper, keep on the page */
+  .tblwrap{width:100%!important;max-width:none!important;overflow:visible!important;border:none!important}
+  .tbl{width:100%!important;max-width:none!important;border-collapse:collapse!important;break-inside:avoid}
+  .tbl th,.tbl td{color:#111!important;border-color:#ccc!important}
 }
 
 /* ---------- scenario simulator ---------- */

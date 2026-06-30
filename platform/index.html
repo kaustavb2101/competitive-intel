@@ -77,28 +77,28 @@
       <div class="cc-card" id="cc-whitespace">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Where to expand
           <a class="cc-link no-print" data-v="acq">Acquisition →</a></div>
-        <div class="cc-card-b" id="cc-ws-body"><p class="lead">Loading white-space…</p></div>
+        <div class="cc-card-b" id="cc-ws-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- WHAT IS GETTING RISKIER -->
       <div class="cc-card" id="cc-risk">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>What is getting riskier
           <a class="cc-link no-print" data-v="exposure">Exposure →</a></div>
-        <div class="cc-card-b" id="cc-risk-body"><p class="lead">Loading risk signals…</p></div>
+        <div class="cc-card-b" id="cc-risk-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- MACRO / REGULATORY -->
       <div class="cc-card" id="cc-macro">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Macro &amp; regulatory
           <a class="cc-link no-print" data-v="overview">Overview →</a></div>
-        <div class="cc-card-b" id="cc-macro-body"><p class="lead">Loading macro…</p></div>
+        <div class="cc-card-b" id="cc-macro-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- RISK MOVERS -->
       <div class="cc-card" id="cc-movers">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--collat)"></span>Risk movers
           <a class="cc-link no-print" data-v="trend">Risk trend →</a></div>
-        <div class="cc-card-b" id="cc-movers-body"><p class="lead">Loading movers…</p></div>
+        <div class="cc-card-b" id="cc-movers-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- WATCHLIST -->
@@ -158,8 +158,8 @@
     <h2 class="risk">Crop-household stress · worst provinces</h2>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note">Loading crop-household stress…</p>
-    <table class="tbl" id="cstresstbl"></table>
+    <p class="lead" id="cstress-note"></p>
+    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
   </section>
 
   <!-- MAP — map is the hero: full-bleed map with the lens pill row docked on top -->
@@ -198,7 +198,7 @@
       + <b style="color:var(--agri)">agri-stress</b> (ESTIMATED, province-inherited crop-household stress).
       Higher = more underserved + undercompeted. It is a <b>ranking aid, not a measured quantity</b> — confirm with local site surveys.
       Each component is shown per district for honesty.</p>
-    <div class="insight" id="oppreadout" style="border-left-color:var(--gold)">Loading opportunity score…</div>
+    <div class="insight" id="oppreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="opptbl"></table>
     </details>
 
@@ -233,7 +233,7 @@
       (each brand's publicly-reported nationwide branch count — <b>ESTIMATED-from-public-reports</b>, cited company IR / annual reports).
       Read <b>coverage %</b> as a confidence flag on our competitor-density signals, <b>not</b> as market share.
       The census is being expanded.</p>
-    <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)">Loading competitor coverage…</div>
+    <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="compcovtbl"></table>
 
     <h3 class="acqsub">Competitor-exit white-space · regulatory tailwind</h3>
@@ -249,7 +249,7 @@
       residual market is likely served by a smaller local operator (the exit-prone player). It answers
       <b>"where could AutoX capture share if a marginal operator exits?"</b> A true rival-fragility index needs a sub-scale-operator
       census — a <b>blocked desktop / Thai-IP company-registry pull</b>. Treat the score as ESTIMATED.</p>
-    <div class="insight" id="exitreadout" style="border-left-color:var(--gold)">Loading competitor-exit white-space…</div>
+    <div class="insight" id="exitreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="exittbl"></table>
     </details>
 
@@ -293,7 +293,7 @@
       <b>measured at the amphoe</b>) minus a penalty for AutoX branches already inside it. Higher = more underserved.
       <span class="sub">Branches &amp; POI counts are MEASURED (point-in-polygon). DIW workers are measured only where the
       district name resolves (✓); vehicles / workforce are <b>province-inherited</b>, not amphoe-measured.</span></p>
-    <div class="insight" id="ampreadout" style="border-left-color:var(--gold)">Loading districts…</div>
+    <div class="insight" id="ampreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <div class="chips" id="ampchips"></div>
     <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="amptbl"></table>
