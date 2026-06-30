@@ -65,12 +65,16 @@
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
 ## Queue — enrichment / capabilities (serve the two objectives)
+- [x] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED. DONE 2026-06-30** (build_household_risk.py
+      → household_risk_by_province.json + National lens "MEASURED · NSO"; top DTI all Isan: Khon Kaen 1.15×, Amnat Charoen 1.14×).
 - [ ] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED, now unblocked.** The TMLI
       bridge landed `source-data/household_debt_by_province.json` + `household_income_by_province.json` (real NSO
       SES). Two steps: (1) project a province→{debt_to_income, stress_index} lookup into `platform/data/` (a small
       `household_risk_by_province.json` via a deterministic --check'd step, or fold into derive.py) with full
       provenance; (2) add a National map lens that colours each branch by its province household leverage,
       labelled MEASURED · NSO. Graceful when absent. The standout measured-risk view no competitor has. *(HIGH, M)*
+- [x] **★ Surface the opportunity score on the Acquisition tab — objective #2. DONE 2026-06-30** (#acq "Where to open next"
+      leaderboard: top-20 districts + whitespace/competitor-gap/agri-stress component bars; Vadhana 82, Bang Na 80).
 - [ ] **★ Surface the opportunity score on the Acquisition tab — objective #2.** `platform/data/opportunity_score.json`
       (928 districts) is merged but not yet shown. Render the ranked where-to-open-next leaderboard (top districts +
       per-component breakdown: whitespace / competitor-gap / agri-stress) on #acq, labelled ESTIMATED COMPOSITE. *(HIGH, M)*
@@ -86,10 +90,14 @@
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
 
 ## From the research digest (docs/RESEARCH_DIGEST.md — all cited)
+- [x] **★ Model the BoT 28% title-loan rate cap — DONE 2026-06-30** (Simulator lever: book yield 28.2%→26.2% under the cap,
+      −2.0 pts; moto/agri-vehicle/top-up compress; product mix labelled ESTIMATED, 28% cited; default OFF).
 - [ ] **★ Model the BoT 28% title-loan rate cap** in the Simulator (effective 2 Dec 2025). Add a lever/scenario
       showing book yield + which segments compress at 28%. Real regulatory constraint (obj #1). *(HIGH, M, sandbox)*
 - [ ] **Competitor-exit white-space cue** — non-compliant operators must register by Q1 2026 or exit; surface
       districts where sub-scale rivals may exit as fresh white-space (obj #2). Uses existing competitor census. *(MED, M)*
+- [x] **Rice/rubber + drought "double-stress" flag — DONE 2026-06-30** (crop_stress.json double_stress flag + score, 20 provinces
+      flagged; Overview badge; uses only existing signals, ESTIMATED-labelled, drought is the discriminating leg).
 - [ ] **Rice/rubber + drought "double-stress" flag** in crop_stress / district risk — research shows rice+rubber
       prices softening AND >80% El Niño drought prob mid-2026; flag districts with both (obj #1). Uses existing
       crop_stress signals, label estimated. *(MED, M, sandbox)*
@@ -108,4 +116,12 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-06-30 — Streaming Overture building tiles (architecture).** pipeline/build_building_tiles.py (union of 10km buffers
+  around all 2,015 branches + 2,556 competitors → Overture pull → tippecanoe → PMTiles/MVT; docs/BUILDING_TILES.md runbook),
+  + deck.gl MVTLayer streaming-building layer in rayong-catchment/branch-explorer/province (reads platform/data/tiles_config.json;
+  province SWAPS extruded relief for real building scenes when tiles present). Graceful no-op until operator hosts tiles. NEXT
+  (desktop, Thai-IP): run RUN_TILES.sh, host the .pmtiles/MVT on a CDN, paste the URL into tiles_config.json.
+- **2026-06-30 — White blow-out fixed on ALL 3D pages.** branch-explorer (sun 3.0→0.85, material diffuse 0.95→0.34) and
+  province (sun 2.4→0.85, diffuse 0.95→0.34) still had the un-capped lighting that clamps light building colours to white on a
+  GPU; applied the rayong-catchment cap everywhere (max lit ≈0.83×).
 - [ ] **P2 (QA) — Road-to-3,000 rounding mismatch.** #acq Headroom-est column rounds each region but totals the un-rounded sum → 984 in rows vs 985 in Total (app.js ~584 vs ~591). Round the total from the rounded rows. Cosmetic; +New allocation already correct. *(LOW, S)*
