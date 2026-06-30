@@ -776,9 +776,16 @@ function buildStrip(){
     ['Vehicle shops',(POIS.vehicle_commerce||[]).length,'#1FA38C'],
     ['Gold dealers',(POIS.gold||[]).length,'#E6B450']].filter(Boolean);
   // NOTE: chip text comes BEFORE the swatch so the QA hook's crude inner-text grab (id="kpis"> .. </) sees content
-  document.getElementById('kpis').innerHTML=
+  // This page IS the extruded-relief DISTRICT view. The fancy Overture 3D BUILDING scene for the same
+  // province is one tap away (rayong-catchment.html?city=<slug>); it degrades gracefully to a "not
+  // pulled yet" notice (linking back here) until this province's buildings have been pulled.
+  var themeQS=(document.documentElement.dataset.theme==='light'?'&theme=light':'');
+  var bldgLink=`<a class="bchip" href="rayong-catchment.html?city=${encodeURIComponent(SLUG)}${themeQS}" `+
+    `title="Open the 3D Overture building scene for ${provEn||SLUG}" `+
+    `style="text-decoration:none;color:#D7DEEC;border-color:var(--blue,#5B7CFA)">🏙 3D buildings →</a>`;
+  document.getElementById('kpis').innerHTML=bldgLink+
     items.map(([n,v,c])=>`<span class="bchip">${n}<b>${typeof v==='number'?v.toLocaleString():v}</b><span class="d" style="background:${c};margin:0 0 0 5px"></span></span>`).join('');
-  document.getElementById('stripTtl').innerHTML=`${provEn} <b>·</b> branches · POIs · 10km reach`;
+  document.getElementById('stripTtl').innerHTML=`${provEn} <b>·</b> district view <b>·</b> branches · POIs · 10km reach`;
 }
 
 /* ---------- branch selection ---------- */

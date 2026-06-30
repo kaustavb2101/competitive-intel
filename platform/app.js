@@ -1830,23 +1830,33 @@ async function renderProvinces(){
   }
   drawProv();
 }
+// Primary 3D entry per province = the Overture BUILDING scene (rayong-catchment.html?city=<slug>),
+// the same fancy scene as Rayong/Bangkok. It degrades gracefully to a "not pulled yet" notice (with
+// a link to the district view) for provinces whose <slug>_catchment.json hasn't been pulled yet.
+// The extruded-relief district view (province.html?p=<slug>) stays reachable as the secondary link.
+function bldgURL(slug){return `rayong-catchment.html?city=${slug}${themeQS()}`;}      // ?city= -> &theme=
+function distURL(slug){return `province.html?p=${slug}${themeQS()}`;}                  // ?p=   -> &theme=
 function drawProv(){
   const q=($('#provsearch').value||'').trim().toLowerCase();
   const rows=PROV.filter(p=>(provRegion==='all'||p.region===provRegion) &&
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
-  $('#provtbl').innerHTML=`<tr><th class="no-print"></th><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th></tr>`+
+  $('#provtbl').innerHTML=`<tr><th class="no-print"></th><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th><th class="no-print">View</th></tr>`+
    rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
-     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" tabindex="0" role="link" style="cursor:pointer">
+     return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
      <td class="no-print">${starBtn(id,wItem)}</td>
-     <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
+     <td><a href="${bldgURL(p.slug)}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${p.branches}</td>
      <td class="mono">${p.districts}</td>
      <td class="mono" style="color:var(--gold)">${(p.factories||0).toLocaleString()}</td>
      <td class="mono">${Math.round((p.vehicles||0)/1000)}k</td>
-     <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td></tr>`;}).join('');
+     <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td>
+     <td class="no-print sub" style="white-space:nowrap">
+       <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none">🏙 3D</a>
+       <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">▦ district</a>
+     </td></tr>`;}).join('');
 }
 
 /* ---------- market assessment (real measured numbers, no indices) ---------- */
@@ -1901,8 +1911,8 @@ function drawMarket(){
   const pct=p=>p.vehicles?Math.round(100*(p.pickup||0)/p.vehicles):0;
   $('#mkttbl').innerHTML=`<tr><th>Province</th><th>Region</th><th class="h-opp" title="DIW registered factory workers — distinct from NSO informal/formal labour">Registered factory workers (DIW)</th><th title="NSO informal workforce — borrower base proxy">Informal workforce (NSO)</th><th>Pickups</th><th>Pickup %</th><th title="World Bank global price direction proxy, region-attributed — not Thai farm-gate">Weakest crop (YoY) · est</th></tr>`+
    rows.map(p=>{const wc=regionWorstCrop(p.region);
-     return `<tr onclick="location.href='province.html?p=${p.slug}${themeQS()}'" tabindex="0" role="link" style="cursor:pointer">
-     <td><a href="province.html?p=${p.slug}${themeQS()}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a></td>
+     return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
+     <td><a href="${bldgURL(p.slug)}" style="color:inherit;text-decoration:none"><b>${p.th}</b> <span class="sub">${p.en||''}</span></a> <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" class="sub" style="text-decoration:none;margin-left:6px;color:var(--mid,#8A94A8)">▦</a></td>
      <td class="sub">${p.region}</td>
      <td class="mono">${naNum(p.workers)}</td>
      <td class="mono" style="color:var(--collat)">${naNum(p.informal)}</td>
