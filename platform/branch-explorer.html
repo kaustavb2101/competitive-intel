@@ -43,7 +43,11 @@ html[data-theme="light"] #vignette{
 #bar .nm{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
 #bar .sub{font:500 12px 'IBM Plex Sans Thai';color:var(--dim)}
 #panel{position:fixed;top:56px;left:12px;width:268px;max-height:calc(100vh - 72px);overflow:auto;z-index:40;
- background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:14px;backdrop-filter:blur(8px)}
+ background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:14px;backdrop-filter:blur(8px);
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
+/* close (✕) button for the slide-out info panel — only shown on phone; fixed to the panel's
+   top-right corner (panel content is re-rendered via innerHTML, so this lives as a sibling). */
+.pxbtn{position:fixed;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none;z-index:41}
 #panel h3{font:700 12px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px}
 #panel h3:first-child{margin-top:0}
 .pr{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;color:var(--txt)}
@@ -64,7 +68,8 @@ html[data-theme="light"] #vignette{
 /* docked control frame: ONE designed panel, top-right, grouping basemap + actions into labelled clusters */
 .ctl{position:fixed;top:94px;right:12px;z-index:40;display:flex;flex-direction:column;gap:9px;
  background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:11px;
- backdrop-filter:blur(8px);box-shadow:0 8px 26px rgba(0,0,0,.42);min-width:158px}
+ backdrop-filter:blur(8px);box-shadow:0 8px 26px rgba(0,0,0,.42);min-width:158px;
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
 .ctl .grp{display:flex;flex-direction:column;gap:5px}
 .ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
 /* segmented basemap control: 3 tabs in one pill */
@@ -101,9 +106,38 @@ html[data-theme="light"] .ctl .bl .bl-bar{background:linear-gradient(90deg,rgb(1
 html[data-theme="light"] .ctl .poileg .pl{color:#2C3444}
 html[data-theme="light"] .ctl .poileg .pl b{color:#11151F}
 html[data-theme="light"] .ctl .poileg .pl .sw{border-color:rgba(0,0,0,.18)}
-@media(max-width:820px){.ctl{top:auto;bottom:62px;right:8px;min-width:0;padding:8px;gap:6px}
- .ctl .glab{display:none}.ctl .acts button{padding:7px 9px}
- .ctl .bl{display:none}.ctl .poileg{display:none}}
+/* mobile bottom-sheet toggles: ☰ Info (the #panel) + Layers (the .ctl frame) */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:55;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(14,19,31,.95);border:1px solid var(--line);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+
+/* TABLET (821–1180px): trim the fixed info panel + control frame so the map well breathes,
+   but keep the full desktop layout (panel + controls both docked, legends visible). */
+@media(min-width:821px) and (max-width:1180px){
+ #panel{width:236px}
+ .ctl{min-width:146px;padding:10px}
+ .ctl .poileg{max-height:150px}
+}
+
+/* PHONE (<820px): map goes full-screen. The info panel slides off the left and the control
+   frame slides down off the bottom; both are reachable via the #mtog bottom-sheet buttons.
+   The building + POI legends live inside .ctl, so they ride along when Layers is opened —
+   they are NOT hidden (a regression the old rule introduced). */
+@media(max-width:820px){
+ #panel{left:8px;right:8px;width:auto;max-width:360px;top:90px;max-height:calc(100vh - 180px);
+  transform:translateX(calc(-100% - 20px))}
+ #panel.show{transform:translateX(0)}
+ /* close (✕) sits at the panel's top-right; only visible while the panel is open */
+ .pxbtn.show{display:block;top:96px;right:16px}
+ .ctl{top:auto;bottom:0;right:8px;left:8px;min-width:0;padding:10px;gap:7px;max-height:62vh;overflow-y:auto;
+  transform:translateY(calc(100% + 20px))}
+ .ctl.show{transform:translateY(0)}
+ .ctl .acts button{padding:7px 9px}
+ #mtog{display:flex}
+ /* status pill clears the bottom-sheet buttons */
+ #status{bottom:64px}
+}
 
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
  padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
@@ -229,6 +263,11 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
   </div>
 </div>
 <div id="panel"></div>
+<button class="pxbtn" id="panelClose" title="Close" aria-label="Close info panel">✕</button>
+<div id="mtog">
+  <button data-s="panel">☰ Info</button>
+  <button data-s="ctl">Layers</button>
+</div>
 <div id="status">Loading…</div>
 <script>
 'use strict';
@@ -848,6 +887,22 @@ function init(){
   Object.keys(baseBtns).forEach(k=>{ if(!baseBtns[k])return;
     baseBtns[k].onclick=()=>{ basemap=k;
       Object.keys(baseBtns).forEach(j=>baseBtns[j]&&baseBtns[j].classList.toggle('on',j===k)); render(); };});
+  // ---- MOBILE BOTTOM-SHEET TOGGLES ----------------------------------------------------------------
+  // On phone the map is full-screen; the info #panel and the .ctl control frame (which carries the
+  // building + POI legends) slide in via these buttons. Opening one closes the other so they never
+  // stack over the map. The ✕ on the panel mirrors the Info button. No-ops on desktop (buttons hidden).
+  (function(){
+    const panel=document.querySelector('#panel'), ctl=document.querySelector('.ctl'),
+          px=document.getElementById('panelClose');
+    function setPanel(on){ if(panel)panel.classList.toggle('show',on); if(px)px.classList.toggle('show',on); }
+    function setCtl(on){ if(ctl)ctl.classList.toggle('show',on); }
+    document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+      const s=b.dataset.s;
+      if(s==='panel'){ const open=!(panel&&panel.classList.contains('show')); setPanel(open); if(open)setCtl(false); }
+      else{ const open=!(ctl&&ctl.classList.contains('show')); setCtl(open); if(open)setPanel(false); }
+    });
+    if(px)px.onclick=()=>setPanel(false);
+  })();
   loadPanel(); loadBuildings(); loadPOIs();
   startMotion();
 }
