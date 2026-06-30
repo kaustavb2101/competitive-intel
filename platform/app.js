@@ -58,14 +58,38 @@ const COMP_RADIUS_KM=5;               // competitor-proximity radius (km) for th
 // brand -> dot colour for faint competitor points + tooltips (kept distinct from AutoX accent).
 const COMP_BRAND_COLOR={Srisawad:'#E0574F',Muangthai:'#E6B450',Tidlor:'#1C8C7D',Heng:'#7A4FE0'};
 function compHasData(){return !!(COMP_ITEMS&&COMP_ITEMS.length);}
+// UNION two competitor sources (Google Places census + Overture-Places harvest), deduping
+// rivals of the SAME brand within ~150m via a coarse grid (O(n)). Either source may be absent.
+function dedupComp(items){
+  const out=[], seen=new Map(); // cellKey -> array of [lat,lng]
+  const C=0.0015; // ~165m grid cell
+  for(const it of items){
+    if(!it||it.lat==null||it.lng==null) continue;
+    const gx=Math.round(it.lat/C), gy=Math.round(it.lng/C);
+    let dup=false;
+    for(let dx=-1;dx<=1&&!dup;dx++)for(let dy=-1;dy<=1&&!dup;dy++){
+      const k=it.brand+'|'+(gx+dx)+'|'+(gy+dy), arr=seen.get(k);
+      if(arr) for(const p of arr){ if(havKm(it.lat,it.lng,p[0],p[1])<=0.15){dup=true;break;} }
+    }
+    if(dup) continue;
+    const k=it.brand+'|'+gx+'|'+gy; (seen.get(k)||seen.set(k,[]).get(k)).push([it.lat,it.lng]);
+    out.push(it);
+  }
+  return out;
+}
 async function loadCompetitors(){
   if(compPromise) return compPromise;
   compLoaded=true;
   compPromise=(async()=>{
-    try{
-      const j=await fetch('data/competitors_national.json').then(r=>{if(!r.ok)throw 0;return r.json();});
-      COMP=j; COMP_META=j.meta||null; COMP_ITEMS=(j.items||[]).filter(it=>it&&it.lat!=null&&it.lng!=null);
-    }catch(e){ COMP=null; COMP_META=null; COMP_ITEMS=[]; }
+    const grab=async u=>{ try{const r=await fetch(u); if(!r.ok)return null; return await r.json();}catch(e){return null;} };
+    const [g,o]=await Promise.all([grab('data/competitors_national.json'),grab('data/competitors_overture.json')]);
+    const srcs=[]; if(g)srcs.push('Google Places'); if(o)srcs.push('Overture');
+    const items=[].concat(g&&g.items||[], o&&o.items||[]).filter(it=>it&&it.lat!=null&&it.lng!=null);
+    if(!items.length){ COMP=null; COMP_META=null; COMP_ITEMS=[]; }
+    else{
+      COMP_ITEMS=dedupComp(items);
+      COMP=g||o; COMP_META={sources:srcs, raw:items.length, deduped:COMP_ITEMS.length};
+    }
     attachCompToBranches();
     return COMP_ITEMS;
   })();
@@ -1112,7 +1136,7 @@ function renderLegend(){
       `<span><i style="background:${lensColor(.12,l.color)}"></i>0</span>`+
       `<span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>`+
       `<span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`+
-      ` <span class="sub" title="competitor locations from Google Places — a lower bound, not a registry">◆ measured · lower bound</span>`+
+      ` <span class="sub" title="${(COMP_META&&COMP_META.sources||['']).join(' + ')} — a sample/lower bound, not a registry; dense brands are undercounted">◆ measured · ${(COMP_META&&COMP_META.sources||[]).join('+')||'sample'} · lower bound</span>`+
       ` &nbsp; ${key}`;
     return;
   }
