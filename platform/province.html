@@ -13,9 +13,27 @@
  --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
-#map{position:fixed;inset:0;background:#070a11}
+#map{position:fixed;inset:0;background:transparent;z-index:1}
 .mono{font-family:'IBM Plex Mono',monospace}
 canvas{outline:none}
+
+/* ---- CINEMATIC DEPTH (ported from rayong-catchment) — purely visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient that sits BEHIND the deck.gl canvas (z below #map) so the
+          extruded districts read against an atmosphere instead of flat ink. Indigo-console tuned.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the province and fades the corners — the classic cinematic "look here" vignette. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(125% 95% at 50% 4%,#202a44 0%,#161d31 34%,#0e1322 62%,#080b14 100%),
+            linear-gradient(180deg,#0b1020 0%,#121a2e 44%,#202b46 74%,#2c3450 100%);
+ background-blend-mode:screen,normal}
+#vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 50%,rgba(6,9,16,.28) 79%,rgba(4,6,12,.60) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(125% 95% at 50% 4%,#e3edfc 0%,#d2e0f5 40%,#bed1ed 68%,#aec2e4 100%),
+            linear-gradient(180deg,#e8effb 0%,#d8e4f6 60%,#c6d6ee 100%);
+ background-blend-mode:multiply,normal}
+html[data-theme="light"] #vignette{
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 56%,rgba(40,52,80,.09) 82%,rgba(30,40,66,.20) 100%)}
 
 /* top brand strip (KPI chips) */
 #strip{position:fixed;top:44px;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
@@ -241,7 +259,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
  }
 })();
 </script>
+<div id="sky"></div>
 <div id="map"></div>
+<div id="vignette"></div>
 
 <div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
 
@@ -258,6 +278,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="ringtog" class="on">10 km reach rings</button>
+      <button id="orbittog" class="on" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
     </div>
   </div>
 </div>
@@ -365,9 +386,88 @@ const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}
 // light (Positron) gets the DataProteins white-paper treatment: orange branches/links, soft tints,
 // readable pill labels. dark keeps the original instrument-console palette.
 function lightMode(){return basemap==='light';}
+
+// ---- CINEMATIC LIGHTING (ported from rayong-catchment) -----------------------------------------
+// The district polygons are now EXTRUDED (by a measured working-age/worker quantity), so a real
+// directional sun + warm material carve light/shade across the raised parcels and the province
+// reads as a dimensional relief rather than a flat wash. Shadows are NOT needed for the polygon
+// scene (the depth comes from material + directional contrast + sky/vignette), so we build the
+// lighting without shadow casting — cheaper and stable under software WebGL.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the vendored bundle lacks lighting
+// the try/catch leaves LIGHTING null and the scene still renders flat-lit (unchanged behaviour).
+function buildLighting(){
+  try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
+    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:2.4,direction:[-0.7,-2.2,-1.0]});
+    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.7,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[232,238,255],intensity:0.92});
+    return new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+  }catch(e){ return null; }
+}
+let LIGHTING=buildLighting();
+
+// ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
+// The scene is driven by a CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and click-to-fly
+// transitions share one source of truth and never fight. FRAMED = the cinematic resting view (the
+// province framed low+wide so the extruded districts catch the light). INTRO = a higher, further-out,
+// more top-down start; on load we ease INTRO -> FRAMED.
+const FRAMED=(function(){const v=provView();return {longitude:v.longitude,latitude:v.latitude,
+  zoom:(v.zoom||8)+0.2,pitch:54,bearing:(v.bearing||0)-18};})();
+const INTRO=Object.assign({},FRAMED,{zoom:Math.max(5.5,(FRAMED.zoom||8)-1.6),pitch:34,bearing:(FRAMED.bearing||0)+30});
+let VIEW=Object.assign({},INTRO);
+let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;
+const ORBIT_DPS=2.4;                 // degrees / second — gentle (~2-3 dps target)
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+let _programmatic=false;             // guards our own setProps from being mistaken for user input
+function pushView(extra){ _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  Promise.resolve().then(()=>{_programmatic=false;});}
+// flyTo: smooth click-to-fly that REPLACES the old initialViewState+transitionDuration calls.
+function flyTo(o){
+  const dur=o.transitionDuration||850;
+  VIEW=Object.assign({},VIEW,{longitude:o.longitude,latitude:o.latitude,
+    zoom:o.zoom!=null?o.zoom:VIEW.zoom,pitch:o.pitch!=null?o.pitch:VIEW.pitch,
+    bearing:o.bearing!=null?o.bearing:VIEW.bearing});
+  _programmatic=true;
+  const tp={viewState:Object.assign({},VIEW,{transitionDuration:dur})};
+  try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.4});} }catch(e){}
+  orbitPausedByUser=false; setOrbitUI(orbitOn);
+  deckgl.setProps(tp);
+  setTimeout(()=>{_programmatic=false; lastT=0;}, dur+40);
+}
+// onWebGLInitialized: under a SOFTWARE rasteriser (swiftshader / llvmpipe — headless CI, old
+// machines) park the camera and stop the orbit so the render loop stays cold and the scene settles
+// to a clean still frame. On a real GPU this never fires; the cinematic motion stays.
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+function downgradeForSoftwareGL(){
+  SOFT_GL=true; orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  try{ console.info('[province] software WebGL detected — auto-orbit + intro disabled for performance; depth via material + sky/vignette.'); }catch(e){}
+}
 const deckgl=new deck.DeckGL({container:'map',
-  initialViewState:provView(),
-  controller:{inertia:300,dragRotate:true},
+  viewState:VIEW,
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
+  onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+  onViewStateChange:({viewState,interactionState})=>{
+    VIEW=viewState;
+    const inTrans=!!(interactionState&&interactionState.inTransition);
+    const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+       interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+    if(!_programmatic && userMoving){ userInteract(); }
+    if(userMoving && !inTrans && !_programmatic){
+      _programmatic=true; deckgl.setProps({viewState:VIEW});
+      Promise.resolve().then(()=>{_programmatic=false;});
+    }
+    return viewState;
+  },
   getTooltip:({object,layer})=>{
     if(!object)return null;
     if(layer.id==='districts'){const p=object.properties;
@@ -388,14 +488,46 @@ function dGeom(f){return f.geometry.type==='MultiPolygon'?f.geometry.coordinates
 function render(){
   const L=[baseLayer()];
   const LIGHT=lightMode();
-  // (0) district context — FLAT polygons (non-Rayong provinces have no 3D buildings; this is the geography layer).
-  //     On the light Positron base: soft warm-grey landuse-style tint + a readable mid stroke, so parcels read
-  //     as gentle context (DataProteins look) rather than the dark blue wash used on the dark base.
+  // (0) district context — now EXTRUDED 3D relief (the cinematic upgrade). Each amphoe polygon is
+  //     raised by a MEASURED quantity (working-age population, the title-loan addressable base; falls
+  //     back to DIW factory workers, then branch count) and ranked p5..p95 within THIS province so a
+  //     flat or a varied province each spread across the full elevation range. The directional sun +
+  //     warm material then carve light/shade across the raised parcels for real dimensional depth.
+  //     Height is a VISUAL transform of measured data only — nothing is fabricated; the tooltip still
+  //     surfaces the underlying real numbers. Degrades to flat (extruded:false) if a province has no
+  //     measurable per-district quantity.
   if(DISTRICTS && DISTRICTS.features && deck.GeoJsonLayer){
-    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
-      getFillColor:LIGHT?[150,164,196,30]:[91,124,250,16],
-      getLineColor:LIGHT?[120,134,168,150]:[120,140,180,95],lineWidthMinPixels:1,pickable:true,
-      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
+    // pick the measured driver per feature: working-age, else DIW workers, else branches.
+    const dval=p=>{ if(!p)return 0;
+      if(p.workingage>0)return p.workingage; if(p.real_workers>0)return p.real_workers;
+      if(p.branches>0)return p.branches*1000; return 0; };
+    // robust p5..p95 of the driver across this province's districts -> rank for the elevation ramp.
+    const vals=DISTRICTS.features.map(f=>dval(f.properties)).filter(v=>v>0).sort((a,b)=>a-b);
+    let lo=0,hi=1,anyVal=vals.length>0;
+    if(anyVal){ lo=vals[Math.floor(vals.length*0.05)]||vals[0]; hi=vals[Math.floor(vals.length*0.95)]||vals[vals.length-1];
+      if(hi<=lo)hi=lo+1; }
+    const MAX_ELEV=4200;             // metres at the p95 district — gentle relief that reads at province
+                                     // zoom without burying the ground markers (branch dots / POI / rings)
+    const elev=f=>{ if(!anyVal)return 0; const v=dval(f.properties);
+      let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t; return Math.pow(t,0.85)*MAX_ELEV; };
+    const EXTRUDE=anyVal;            // only extrude when we actually have a measured driver
+    // colour ramp by the SAME rank so taller (more populous/working) districts read warmer.
+    const fillCol=f=>{ if(!EXTRUDE)return LIGHT?[150,164,196,30]:[91,124,250,16];
+      const v=dval(f.properties); let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t;
+      // dark: deep indigo -> accent blue -> warm gold-ish; light: soft grey -> muted blue -> warm
+      const A=LIGHT?[176,188,210]:[44,58,92], B=LIGHT?[120,150,206]:[72,104,196], C=LIGHT?[210,190,150]:[180,168,128];
+      const seg=t<.5?[A,B,t*2]:[B,C,(t-.5)*2], a=seg[0],b=seg[1],lt=seg[2];
+      return [Math.round(a[0]+(b[0]-a[0])*lt),Math.round(a[1]+(b[1]-a[1])*lt),Math.round(a[2]+(b[2]-a[2])*lt),LIGHT?225:235]; };
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:EXTRUDE,wireframe:false,
+      getElevation:elev,
+      filled:true,stroked:true,
+      getFillColor:fillCol,
+      getLineColor:LIGHT?[120,134,168,150]:[150,170,210,120],lineWidthMinPixels:1,pickable:true,
+      // material tuned for cinematic depth: low ambient lets the sun carve the relief; high diffuse
+      // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
+      material:{ambient:0.32,diffuse:0.95,shininess:36,specularColor:[150,160,190]},
+      parameters:{depthTest:true},transitions:{getElevation:600},
+      updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
   }
   // (1) 10km collateral catchment rings — faint over ALL branches; bright on the selected one
   if(showRings && BR.length){
@@ -611,7 +743,7 @@ function buildStrip(){
 /* ---------- branch selection ---------- */
 function selectBranch(b,fly){
   if(!b)return; focal=b;
-  if(fly){deckgl.setProps({initialViewState:{longitude:b.x,latitude:b.y,zoom:12.0,pitch:45,bearing:8,transitionDuration:850}});}
+  if(fly){flyTo({longitude:b.x,latitude:b.y,zoom:12.0,pitch:50,bearing:8,transitionDuration:850});}
   updatePanels();render();
   const br=document.getElementById('cscBranch'); const fi=BR.indexOf(b); if(br&&fi>=0)br.value=String(fi);
   if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
@@ -666,6 +798,10 @@ function buildLegend(){
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
   basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+// Orbit toggle: master on/off. Turning it ON clears any "paused by user" state so the scene resumes
+// breathing; turning it OFF parks the camera where it sits.
+(function(){var ot=document.getElementById('orbittog');if(!ot)return;
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
 document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
   const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
   el.classList.toggle('show');other.classList.remove('show');});
@@ -682,6 +818,46 @@ document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
 })();
 
 buildStrip();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
+
+// ---- MOTION BOOTSTRAP (ported from rayong-catchment): intro fly-in, then gentle auto-orbit -------
+// INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to FRAMED.
+// A FlyToInterpolator (when present) gives a cinematic arced descent; the orbit loop holds until the
+// intro transition completes so the two motions don't overlap. Under software WebGL both are skipped
+// (camera snaps to FRAMED) so the render loop stays cold and the headless harness settles cleanly.
+(function startMotion(){
+  const INTRO_MS=2400;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
+})();
 }catch(e){
   // never surface a raw technical error — show a calm notice; full detail goes to the console for devs.
   document.body.insertAdjacentHTML('beforeend',
