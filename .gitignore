@@ -37,3 +37,7 @@ tests/node_modules/
 # loan-tape synthetic scaffold — large + deterministically regenerable (pipeline/make_synthetic_tape.py)
 source-data/loan_tape_synthetic.json
 source-data/branch_aum_monthly_synthetic.json
+
+# national building vector-tile artifacts (pipeline/build_building_tiles.py) — large, CDN-hosted,
+# NEVER committed. Re-pullable real Overture data; coverage plan + .pmtiles/tiles live here.
+pipeline/tiles_out/
