@@ -1,0 +1,541 @@
+{
+  "Bangkok": {
+    "OfficeStaff": 46076,
+    "FactoryWorkers": 27353,
+    "Transport": 22938,
+    "SMEOwners": 48801,
+    "Agriculture": 23541
+  },
+  "Samut Prakan": {
+    "OfficeStaff": 40735,
+    "FactoryWorkers": 30091,
+    "Transport": 24833,
+    "SMEOwners": 29761,
+    "Agriculture": 23523
+  },
+  "Nonthaburi": {
+    "OfficeStaff": 40943,
+    "FactoryWorkers": 24348,
+    "Transport": 19682,
+    "SMEOwners": 40798,
+    "Agriculture": 15844
+  },
+  "Pathum Thani": {
+    "OfficeStaff": 52371,
+    "FactoryWorkers": 33433,
+    "Transport": 27289,
+    "SMEOwners": 53713,
+    "Agriculture": 30671
+  },
+  "Phra Nakhon Si Ayutthaya": {
+    "OfficeStaff": 37931,
+    "FactoryWorkers": 35135,
+    "Transport": 23958,
+    "SMEOwners": 43181,
+    "Agriculture": 35484
+  },
+  "Ang Thong": {
+    "OfficeStaff": 33899,
+    "FactoryWorkers": 28223,
+    "Transport": 17156,
+    "SMEOwners": 30714,
+    "Agriculture": 26928
+  },
+  "Lop Buri": {
+    "OfficeStaff": 36135,
+    "FactoryWorkers": 26255,
+    "Transport": 20821,
+    "SMEOwners": 26831,
+    "Agriculture": 20320
+  },
+  "Sing Buri": {
+    "OfficeStaff": 44801,
+    "FactoryWorkers": 29202,
+    "Transport": 22609,
+    "SMEOwners": 28269,
+    "Agriculture": 26263
+  },
+  "Chai Nat": {
+    "OfficeStaff": 43879,
+    "FactoryWorkers": 21761,
+    "Transport": 19989,
+    "SMEOwners": 31043,
+    "Agriculture": 20273
+  },
+  "Saraburi": {
+    "OfficeStaff": 39192,
+    "FactoryWorkers": 36514,
+    "Transport": 22406,
+    "SMEOwners": 46871,
+    "Agriculture": 27632
+  },
+  "Chon Buri": {
+    "OfficeStaff": 38358,
+    "FactoryWorkers": 35095,
+    "Transport": 20681,
+    "SMEOwners": 44976,
+    "Agriculture": 40204
+  },
+  "Rayong": {
+    "OfficeStaff": 35831,
+    "FactoryWorkers": 36970,
+    "Transport": 18929,
+    "SMEOwners": 27677,
+    "Agriculture": 44041
+  },
+  "Chanthaburi": {
+    "OfficeStaff": 36675,
+    "FactoryWorkers": 25126,
+    "Transport": 20944,
+    "SMEOwners": 55751,
+    "Agriculture": 78117
+  },
+  "Trat": {
+    "OfficeStaff": 34952,
+    "FactoryWorkers": 20426,
+    "Transport": 16068,
+    "SMEOwners": 35888,
+    "Agriculture": 30008
+  },
+  "Chachoengsao": {
+    "OfficeStaff": 37923,
+    "FactoryWorkers": 25495,
+    "Transport": 29730,
+    "SMEOwners": 34652,
+    "Agriculture": 32275
+  },
+  "Prachin Buri": {
+    "OfficeStaff": 28465,
+    "FactoryWorkers": 27006,
+    "Transport": 22824,
+    "SMEOwners": 23534,
+    "Agriculture": 18556
+  },
+  "Nakhon Nayok": {
+    "OfficeStaff": 37186,
+    "FactoryWorkers": 24004,
+    "Transport": 17535,
+    "SMEOwners": 31432,
+    "Agriculture": 15439
+  },
+  "Sa Kaeo": {
+    "OfficeStaff": 29853,
+    "FactoryWorkers": 18375,
+    "Transport": 18480,
+    "SMEOwners": 24690,
+    "Agriculture": 23349
+  },
+  "Nakhon Ratchasima": {
+    "OfficeStaff": 43316,
+    "FactoryWorkers": 27790,
+    "Transport": 22933,
+    "SMEOwners": 29597,
+    "Agriculture": 24065
+  },
+  "Buri Ram": {
+    "OfficeStaff": 37315,
+    "FactoryWorkers": 17321,
+    "Transport": 20477,
+    "SMEOwners": 23966,
+    "Agriculture": 20246
+  },
+  "Surin": {
+    "OfficeStaff": 36252,
+    "FactoryWorkers": 17639,
+    "Transport": 24010,
+    "SMEOwners": 27946,
+    "Agriculture": 17443
+  },
+  "Si Sa Ket": {
+    "OfficeStaff": 28705,
+    "FactoryWorkers": 17244,
+    "Transport": 15627,
+    "SMEOwners": 26648,
+    "Agriculture": 39759
+  },
+  "Ubon Ratchathani": {
+    "OfficeStaff": 35605,
+    "FactoryWorkers": 17157,
+    "Transport": 13343,
+    "SMEOwners": 25208,
+    "Agriculture": 20798
+  },
+  "Yasothon": {
+    "OfficeStaff": 50521,
+    "FactoryWorkers": 14920,
+    "Transport": 18483,
+    "SMEOwners": 34506,
+    "Agriculture": 17639
+  },
+  "Chaiyaphum": {
+    "OfficeStaff": 36602,
+    "FactoryWorkers": 22169,
+    "Transport": 15729,
+    "SMEOwners": 35134,
+    "Agriculture": 22681
+  },
+  "Amnat Charoen": {
+    "OfficeStaff": 40992,
+    "FactoryWorkers": 18575,
+    "Transport": 18552,
+    "SMEOwners": 38718,
+    "Agriculture": 18477
+  },
+  "Bueng Kan": {
+    "OfficeStaff": 40819,
+    "FactoryWorkers": 24991,
+    "Transport": 17316,
+    "SMEOwners": 35566,
+    "Agriculture": 19548
+  },
+  "Nong Bua Lam Phu": {
+    "OfficeStaff": 31493,
+    "FactoryWorkers": 20357,
+    "Transport": 15145,
+    "SMEOwners": 28144,
+    "Agriculture": 35203
+  },
+  "Khon Kaen": {
+    "OfficeStaff": 29235,
+    "FactoryWorkers": 18030,
+    "Transport": 19730,
+    "SMEOwners": 22200,
+    "Agriculture": 12759
+  },
+  "Udon Thani": {
+    "OfficeStaff": 30008,
+    "FactoryWorkers": 14486,
+    "Transport": 14541,
+    "SMEOwners": 28534,
+    "Agriculture": 27150
+  },
+  "Loei": {
+    "OfficeStaff": 45881,
+    "FactoryWorkers": 20544,
+    "Transport": 15238,
+    "SMEOwners": 31430,
+    "Agriculture": 21750
+  },
+  "Nong Khai": {
+    "OfficeStaff": 38127,
+    "FactoryWorkers": 19345,
+    "Transport": 24912,
+    "SMEOwners": 32497,
+    "Agriculture": 20460
+  },
+  "Maha Sarakham": {
+    "OfficeStaff": 39236,
+    "FactoryWorkers": 17676,
+    "Transport": 19241,
+    "SMEOwners": 29341,
+    "Agriculture": 15297
+  },
+  "Roi Et": {
+    "OfficeStaff": 40670,
+    "FactoryWorkers": 19585,
+    "Transport": 14359,
+    "SMEOwners": 31686,
+    "Agriculture": 21349
+  },
+  "Kalasin": {
+    "OfficeStaff": 33883,
+    "FactoryWorkers": 15503,
+    "Transport": 12565,
+    "SMEOwners": 34218,
+    "Agriculture": 22225
+  },
+  "Sakon Nakhon": {
+    "OfficeStaff": 33768,
+    "FactoryWorkers": 15920,
+    "Transport": 13797,
+    "SMEOwners": 31493,
+    "Agriculture": 20307
+  },
+  "Nakhon Phanom": {
+    "OfficeStaff": 33449,
+    "FactoryWorkers": 15752,
+    "Transport": 15743,
+    "SMEOwners": 32481,
+    "Agriculture": 16238
+  },
+  "Mukdahan": {
+    "OfficeStaff": 36983,
+    "FactoryWorkers": 18604,
+    "Transport": 15790,
+    "SMEOwners": 27564,
+    "Agriculture": 16885
+  },
+  "Chiang Mai": {
+    "OfficeStaff": 38631,
+    "FactoryWorkers": 18977,
+    "Transport": 31365,
+    "SMEOwners": 50813,
+    "Agriculture": 16152
+  },
+  "Lamphun": {
+    "OfficeStaff": 35849,
+    "FactoryWorkers": 26995,
+    "Transport": 23885,
+    "SMEOwners": 30396,
+    "Agriculture": 23777
+  },
+  "Lampang": {
+    "OfficeStaff": 39050,
+    "FactoryWorkers": 20244,
+    "Transport": 16416,
+    "SMEOwners": 33895,
+    "Agriculture": 13893
+  },
+  "Uttaradit": {
+    "OfficeStaff": 38267,
+    "FactoryWorkers": 22613,
+    "Transport": 17161,
+    "SMEOwners": 27693,
+    "Agriculture": 22623
+  },
+  "Phrae": {
+    "OfficeStaff": 40493,
+    "FactoryWorkers": 16690,
+    "Transport": 16362,
+    "SMEOwners": 29670,
+    "Agriculture": 13189
+  },
+  "Nan": {
+    "OfficeStaff": 35427,
+    "FactoryWorkers": 16443,
+    "Transport": 19250,
+    "SMEOwners": 23866,
+    "Agriculture": 14684
+  },
+  "Phayao": {
+    "OfficeStaff": 30594,
+    "FactoryWorkers": 14105,
+    "Transport": 16019,
+    "SMEOwners": 20442,
+    "Agriculture": 15336
+  },
+  "Chiang Rai": {
+    "OfficeStaff": 26884,
+    "FactoryWorkers": 17697,
+    "Transport": 13085,
+    "SMEOwners": 16473,
+    "Agriculture": 15156
+  },
+  "Mae Hong Son": {
+    "OfficeStaff": 29663,
+    "FactoryWorkers": 16622,
+    "Transport": 6713,
+    "SMEOwners": 46095,
+    "Agriculture": 12435
+  },
+  "Nakhon Sawan": {
+    "OfficeStaff": 29071,
+    "FactoryWorkers": 16680,
+    "Transport": 17690,
+    "SMEOwners": 28511,
+    "Agriculture": 28874
+  },
+  "Uthai Thani": {
+    "OfficeStaff": 33864,
+    "FactoryWorkers": 18297,
+    "Transport": 12645,
+    "SMEOwners": 24928,
+    "Agriculture": 18044
+  },
+  "Kamphaeng Phet": {
+    "OfficeStaff": 29094,
+    "FactoryWorkers": 26349,
+    "Transport": 21569,
+    "SMEOwners": 25638,
+    "Agriculture": 21216
+  },
+  "Tak": {
+    "OfficeStaff": 35898,
+    "FactoryWorkers": 12557,
+    "Transport": 15108,
+    "SMEOwners": 31620,
+    "Agriculture": 18316
+  },
+  "Sukhothai": {
+    "OfficeStaff": 40603,
+    "FactoryWorkers": 20688,
+    "Transport": 18181,
+    "SMEOwners": 31186,
+    "Agriculture": 23618
+  },
+  "Phitsanulok": {
+    "OfficeStaff": 39061,
+    "FactoryWorkers": 21988,
+    "Transport": 14397,
+    "SMEOwners": 29130,
+    "Agriculture": 22335
+  },
+  "Phichit": {
+    "OfficeStaff": 33829,
+    "FactoryWorkers": 21115,
+    "Transport": 17501,
+    "SMEOwners": 22049,
+    "Agriculture": 23698
+  },
+  "Phetchabun": {
+    "OfficeStaff": 39327,
+    "FactoryWorkers": 28487,
+    "Transport": 20262,
+    "SMEOwners": 29069,
+    "Agriculture": 22633
+  },
+  "Ratchaburi": {
+    "OfficeStaff": 39552,
+    "FactoryWorkers": 22982,
+    "Transport": 14594,
+    "SMEOwners": 34175,
+    "Agriculture": 47453
+  },
+  "Kanchanaburi": {
+    "OfficeStaff": 34749,
+    "FactoryWorkers": 21192,
+    "Transport": 20441,
+    "SMEOwners": 30176,
+    "Agriculture": 24630
+  },
+  "Suphan Buri": {
+    "OfficeStaff": 36396,
+    "FactoryWorkers": 24760,
+    "Transport": 14463,
+    "SMEOwners": 27352,
+    "Agriculture": 16772
+  },
+  "Nakhon Pathom": {
+    "OfficeStaff": 37004,
+    "FactoryWorkers": 23111,
+    "Transport": 20244,
+    "SMEOwners": 46995,
+    "Agriculture": 36969
+  },
+  "Samut Sakhon": {
+    "OfficeStaff": 45011,
+    "FactoryWorkers": 23018,
+    "Transport": 21573,
+    "SMEOwners": 38787,
+    "Agriculture": 22843
+  },
+  "Samut Songkhram": {
+    "OfficeStaff": 36854,
+    "FactoryWorkers": 23259,
+    "Transport": 18222,
+    "SMEOwners": 37042,
+    "Agriculture": 21477
+  },
+  "Phetchaburi": {
+    "OfficeStaff": 37995,
+    "FactoryWorkers": 21697,
+    "Transport": 18306,
+    "SMEOwners": 34651,
+    "Agriculture": 28985
+  },
+  "Prachuap Khiri Khan": {
+    "OfficeStaff": 36005,
+    "FactoryWorkers": 18860,
+    "Transport": 20335,
+    "SMEOwners": 27114,
+    "Agriculture": 21556
+  },
+  "Nakhon Si Thammarat": {
+    "OfficeStaff": 44296,
+    "FactoryWorkers": 24236,
+    "Transport": 16058,
+    "SMEOwners": 57308,
+    "Agriculture": 28500
+  },
+  "Krabi": {
+    "OfficeStaff": 40589,
+    "FactoryWorkers": 20281,
+    "Transport": 21537,
+    "SMEOwners": 31978,
+    "Agriculture": 20734
+  },
+  "Phangnga": {
+    "OfficeStaff": 34294,
+    "FactoryWorkers": 26318,
+    "Transport": 13865,
+    "SMEOwners": 29351,
+    "Agriculture": 18399
+  },
+  "Phuket": {
+    "OfficeStaff": 48403,
+    "FactoryWorkers": 29715,
+    "Transport": 27115,
+    "SMEOwners": 45410,
+    "Agriculture": 34694
+  },
+  "Surat Thani": {
+    "OfficeStaff": 37724,
+    "FactoryWorkers": 23259,
+    "Transport": 19652,
+    "SMEOwners": 37719,
+    "Agriculture": 30614
+  },
+  "Ranong": {
+    "OfficeStaff": 34457,
+    "FactoryWorkers": 18948,
+    "Transport": 19437,
+    "SMEOwners": 39451,
+    "Agriculture": 20472
+  },
+  "Chumphon": {
+    "OfficeStaff": 34578,
+    "FactoryWorkers": 20155,
+    "Transport": 21182,
+    "SMEOwners": 49226,
+    "Agriculture": 28285
+  },
+  "Songkhla": {
+    "OfficeStaff": 31625,
+    "FactoryWorkers": 22415,
+    "Transport": 18741,
+    "SMEOwners": 29431,
+    "Agriculture": 19749
+  },
+  "Satun": {
+    "OfficeStaff": 30992,
+    "FactoryWorkers": 18349,
+    "Transport": 13778,
+    "SMEOwners": 34103,
+    "Agriculture": 19101
+  },
+  "Trang": {
+    "OfficeStaff": 38760,
+    "FactoryWorkers": 21299,
+    "Transport": 16793,
+    "SMEOwners": 38894,
+    "Agriculture": 21151
+  },
+  "Phatthalung": {
+    "OfficeStaff": 39943,
+    "FactoryWorkers": 21501,
+    "Transport": 16213,
+    "SMEOwners": 33144,
+    "Agriculture": 18998
+  },
+  "Pattani": {
+    "OfficeStaff": 29457,
+    "FactoryWorkers": 16663,
+    "Transport": 14379,
+    "SMEOwners": 22112,
+    "Agriculture": 17496
+  },
+  "Yala": {
+    "OfficeStaff": 33675,
+    "FactoryWorkers": 19434,
+    "Transport": 14905,
+    "SMEOwners": 51466,
+    "Agriculture": 13507
+  },
+  "Narathiwat": {
+    "OfficeStaff": 32120,
+    "FactoryWorkers": 15359,
+    "Transport": 14300,
+    "SMEOwners": 21175,
+    "Agriculture": 7347
+  }
+}

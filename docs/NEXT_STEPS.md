@@ -3,6 +3,29 @@
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
 **For the exact Thai-laptop pulls (copy-pasteable), see `docs/TONIGHT_CHECKLIST.md`.**
 
+## 0a. Fold the MEASURED TMLI province layers into the risk read  ⟶ NOW UNBLOCKED (objective #1)
+The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling are now vendored
+(measured, from the Thai-network TMLI platform) and projected into clean province-keyed layers — no
+desktop pull needed. `pipeline/ingest_tmli.py` (deterministic, network-free, `--check`-gated in
+`tests/run.sh check`) reads `source-data/tmli/` and writes, keyed by the canonical 77 Thai names:
+- `source-data/household_debt_by_province.json` — `debt_to_income`, `stress_index` (BOT Q4/2024) +
+  `debt_per_household` THB (NSO SES 2566). **MEASURED.**
+- `source-data/household_income_by_province.json` — monthly income by occupation + `avg_monthly_income`
+  (NSO SES 2566). **MEASURED.**
+- `source-data/unemployment_by_province.json` — employed/unemployed/labor-force (thousands) +
+  `unemployment_rate` (NSO LFS Q3/2025). **MEASURED.**
+- `source-data/gpp_by_province.json` — GPP (million THB) + sector shares + hub type (NESDC 2566). **MEASURED.**
+
+- **Why this matters (objective #1):** household **debt-to-income is a direct portfolio-risk signal** —
+  it ranks borrower stress by province (e.g. Si Sa Ket DTI 18.2, Surin 17.5, Amnat Charoen 17.1 — Isan
+  rural over-indebtedness). Pairing debt with `household_income_by_province` (esp. the Agriculture
+  occupation row) and `unemployment_by_province` gives a measured province stress read that can replace
+  estimated proxies in the district/province risk score.
+- **Next concrete step (NOT done this cycle — left for the build_province / build_amphoe / app owners):**
+  join these layers into `build_province.py` (province deep-dive risk panel) and `build_amphoe.py`
+  `risk_proxy` (currently estimated), and surface debt-to-income on the National risk lens + Provinces
+  deep-dive. Refresh path: re-vendor `source-data/tmli/` from the TMLI repo, re-run `ingest_tmli.py`.
+
 ## 0. Replicate the Rayong deep-dive by province, then by region  ⟶ DONE (engine), refine with data
 Rayong was the pilot template; the goal was the same deep-dive for every province, rolled up by region.
 
