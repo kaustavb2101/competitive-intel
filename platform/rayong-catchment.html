@@ -360,6 +360,42 @@ const CORE=(function(){
     if(pt[0]<minX)minX=pt[0];if(pt[0]>maxX)maxX=pt[0];if(pt[1]<minY)minY=pt[1];if(pt[1]>maxY)maxY=pt[1];}}
   if(!isFinite(minX))return {lat:13.75,lng:100.5};   // last-resort fallback (Bangkok-ish)
   return {lat:(minY+maxY)/2,lng:(minX+maxX)/2};})();
+
+// ---- LEVEL-OF-DETAIL CAP for the extruded building layer ----------------------------------------
+// The Overture pull can carry ~124k footprints (24MB). Extruding all of them under software/mobile
+// WebGL is janky. We cap the polygon count WITHOUT thinning the part of the scene the eye actually
+// reads: EVERY building inside the inner catchment (<= LOD_INNER_M of the centre) is always kept;
+// beyond that we keep only the visually heaviest (largest-footprint, then tallest) up to a total
+// budget. The dense low-rise mat near the centre stays intact; the far fringe is pruned to the most
+// salient structures so the skyline still reads dense but the GL load is bounded.
+//
+// GRACEFUL DEGRADE: if the whole file already fits in the budget (e.g. the ~3.6k OSM catchment),
+// the original array is returned UNCHANGED (same object, same order) -- byte-identical behaviour.
+const BLDG_BUDGET=30000;     // hard cap on extruded polygons (constant, tune here)
+const LOD_INNER_M=3000;      // everything within this radius of CORE is always rendered (full dense core)
+const BUILDINGS=(function(){
+  const all=(CA&&CA.buildings)||[];
+  if(all.length<=BLDG_BUDGET)return all;          // small file (or already under budget) -> untouched
+  // squared-metre distance of a building centroid from CORE (cheap local planar approx).
+  const cosLat=Math.cos(CORE.lat*Math.PI/180);
+  const d2=b=>{const cy=(b.cy!=null?b.cy:CORE.lat), cx=(b.cx!=null?b.cx:CORE.lng);
+    const dy=(cy-CORE.lat)*111320, dx=(cx-CORE.lng)*111320*cosLat; return dx*dx+dy*dy;};
+  const innerR2=LOD_INNER_M*LOD_INNER_M;
+  const inner=[], outer=[];
+  for(const b of all){ (d2(b)<=innerR2?inner:outer).push(b); }
+  if(inner.length>=BLDG_BUDGET)return inner;       // inner alone already saturates the budget
+  // salience score for the OUTER fringe: footprint area first (fa), height as the tiebreak. Both
+  // make a building "read" from distance, so we keep the ones that carry the skyline.
+  const sal=b=>{const fa=(b.fa!=null&&isFinite(b.fa))?b.fa:0; const h=(b.h!=null&&isFinite(b.h))?b.h:0;
+    return fa*1000+h;};                            // fa dominates; h breaks ties
+  outer.sort((a,b)=>sal(b)-sal(a));
+  const room=BLDG_BUDGET-inner.length;
+  return inner.concat(outer.slice(0,room));
+})();
+if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
+  try{console.info('[catchment LOD] '+(CA.buildings.length)+' buildings -> '+BUILDINGS.length
+    +' rendered (budget '+BLDG_BUDGET+', inner '+LOD_INNER_M+'m kept in full)');}catch(e){}
+}
 const deckgl=new deck.DeckGL({container:'map',
   initialViewState:{longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-26},
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
@@ -677,8 +713,8 @@ function render(){
   // The two accents come from the existing palette: collateral purple #7A4FE0 + accent blue #5B7CFA.
   const PURP=[122,79,224], BLUE=[91,124,250], GREY=[206,210,218];
   let tallThresh=Infinity;
-  if(LIGHT&&CA.buildings&&CA.buildings.length){
-    const hs=CA.buildings.map(b=>b.h||4).sort((a,b)=>a-b);
+  if(LIGHT&&BUILDINGS&&BUILDINGS.length){
+    const hs=BUILDINGS.map(b=>b.h||4).sort((a,b)=>a-b);
     tallThresh=hs[Math.floor(hs.length*0.9)]||Infinity;   // 90th-pct height = tallest decile
   }
   // is a building inside the focal branch's 10km catchment? (cheap squared-degree test on centroid)
@@ -686,7 +722,7 @@ function render(){
     const dy=(b.cy-focal.y)*111320, dx=(b.cx-focal.x)*111320*Math.cos(focal.y*Math.PI/180);
     return (dx*dx+dy*dy)<=(10000*10000); };
   const isKey=b=>LIGHT&&((b.h||4)>=tallThresh||inFocalRing(b));
-  L.push(new deck.PolygonLayer({id:'bldg',data:CA.buildings,extruded:true,wireframe:false,
+  L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,
     getPolygon:b=>b.p,
     // exaggerate height non-linearly: low-rise stays low, mid/tall get stretched so the skyline separates.
     getElevation:b=>{const h=b.h||4;return h*(h<10?1.35:h<22?1.9:2.6);},
