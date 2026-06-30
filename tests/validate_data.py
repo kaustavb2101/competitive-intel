@@ -626,6 +626,56 @@ def check_occupation_risk(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_province_risk():
+    # PER-PROVINCE rollup of the branch composite risk (objective #1). Optional file: SKIP-PASS
+    # when absent (build_province_risk.py degrades to an absent-state too).
+    hdr("province_risk.json (optional)")
+    if not exists("province_risk.json"):
+        ok("province_risk.json absent — skipped (optional; run build_province_risk.py)")
+        return
+    try:
+        d = load("province_risk.json")
+    except Exception as e:
+        fail("province_risk.json loads", repr(e))
+        return
+    ok("province_risk.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("source"):
+        fail("province_risk meta/provenance present", "meta missing generated_by/source")
+    else:
+        ok("province_risk meta/provenance present")
+
+    if meta and meta.get("absent"):
+        ok("province_risk is an honest ABSENT-state (no inputs) — skipped value checks")
+        return
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("province_risk has a 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("province_risk provinces list present (%d)" % len(provs))
+
+    bad = []
+    for p in provs:
+        name = p.get("province") or "?"
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        n = p.get("n_branches")
+        if not isinstance(n, int) or n < 0:
+            bad.append("%s n_branches=%r not a non-negative int" % (name, n))
+        for fld in ("mean_risk", "p90_risk"):
+            v = p.get(fld)
+            if not is_finite_number(v) or v < 0 or v > 100:
+                bad.append("%s %s=%r out of 0..100" % (name, fld, v))
+        if not isinstance(p.get("top_driver_mix"), dict):
+            bad.append("%s top_driver_mix not a dict" % name)
+    if bad:
+        fail("province_risk rows sane (region/n_branches/mean/p90/drivers)", first_n(bad))
+    else:
+        ok("province_risk rows sane (%d provinces, mean+p90 in 0..100, known regions)" % len(provs))
+
+
 def check_branch_risk(n_branches):
     # PER-BRANCH COMPOSITE RISK (objective #1): fuses household debt-stress (MEASURED) +
     # crop/agri stress (ESTIMATED) + occupation-sector stress (MEASURED x ESTIMATED) + the
@@ -1072,6 +1122,7 @@ def main():
     check_branch_occupations(n)
     check_occupation_risk(n)
     check_branch_risk(n)
+    check_province_risk()
     check_amphoe_occupations(amphoe)
     check_competitors()
     check_competitor_coverage()
