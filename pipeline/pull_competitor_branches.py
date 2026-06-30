@@ -34,7 +34,7 @@ reveals the real endpoint, drop it into `data_urls` and re-run --pull.
 
 stdlib only (urllib). Polite: a browser UA + a short delay between requests.
 """
-import os, sys, json, re, time, argparse, urllib.request, urllib.error
+import os, sys, json, re, time, argparse, ssl, urllib.request, urllib.error, urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_LOCATOR = os.path.join(ROOT, "platform", "data", "competitors_locator.json")
@@ -43,6 +43,23 @@ OVERTURE = os.path.join(ROOT, "platform", "data", "competitors_overture.json")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+# Full browser header set — beats naive bot-blocks (the Heng 403). Referer is set per-request.
+BASE_HEADERS = {
+    "User-Agent": UA,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.9,*/*;q=0.8",
+    "Accept-Language": "th,en-US;q=0.9,en;q=0.8",
+    "Accept-Encoding": "identity",  # no gzip — keep decode simple/stdlib
+    "Connection": "close",
+}
+# Some Thai corporate sites present a cert chain Windows-Python can't verify (the SSL errors in
+# --discover). These are PUBLIC pages with no secrets, so on a verify failure we retry with an
+# unverified context (noted in output). Prefer certifi's bundle when installed.
+try:
+    import certifi
+    _SSL_VERIFIED = ssl.create_default_context(cafile=certifi.where())
+except Exception:
+    _SSL_VERIFIED = ssl.create_default_context()
+_SSL_UNVERIFIED = ssl._create_unverified_context()
 
 # Thailand bounding box — sanity filter so a stray coordinate never enters the census.
 TH_BBOX = (5.4, 97.2, 20.7, 105.8)  # minlat, minlng, maxlat, maxlng
@@ -53,30 +70,33 @@ TH_BBOX = (5.4, 97.2, 20.7, 105.8)  # minlat, minlng, maxlat, maxlng
 BRANDS = {
     "Muangthai": {
         "label": "Muang Thai Capital (MTC)",
+        "root_url": "https://www.muangthaicap.com/",
         "page_url": "https://www.muangthaicap.com/en/branch/",
         "data_urls": [
-            # candidates to try; --discover will confirm the real one
             "https://www.muangthaicap.com/wp-admin/admin-ajax.php?action=get_branch",
             "https://www.muangthaicap.com/api/branch",
         ],
     },
     "Srisawad": {
         "label": "Srisawad (SAWAD)",
-        "page_url": "https://www.srisawad.com/branch",
+        # srisawad.com timed out in --discover; sawad.co.th is the reachable corporate domain.
+        "root_url": "https://www.sawad.co.th/",
+        "page_url": "https://www.sawad.co.th/th/branch",
         "data_urls": [
-            "https://www.srisawad.com/api/branch",
             "https://www.sawad.co.th/api/branch",
         ],
     },
     "Tidlor": {
         "label": "Ngern Tid Lor (TIDLOR)",
-        "page_url": "https://www.tidlor.com/en/find-branch",
+        "root_url": "https://www.tidlor.com/",
+        "page_url": "https://www.tidlor.com/branches",
         "data_urls": [
             "https://www.tidlor.com/api/branches",
         ],
     },
     "Heng": {
         "label": "Heng Leasing (HENGX)",
+        "root_url": "https://www.hengleasing.com/",
         "page_url": "https://www.hengleasing.com/en/branch",
         "data_urls": [
             "https://www.hengleasing.com/api/branch",
@@ -86,13 +106,25 @@ BRANDS = {
 
 # ---------------------------------------------------------------------------
 def fetch(url, timeout=40):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        raw = r.read()
-    try:
-        return raw.decode("utf-8")
-    except UnicodeDecodeError:
-        return raw.decode("utf-8", "replace")
+    """Return decoded body text. Tries verified SSL, falls back to unverified on a cert error
+    (public pages, no secrets). Sends a Referer of the site root + full browser headers."""
+    parts = urllib.parse.urlsplit(url)
+    headers = dict(BASE_HEADERS)
+    headers["Referer"] = f"{parts.scheme}://{parts.netloc}/"
+    req = urllib.request.Request(url, headers=headers)
+    for ctx in (_SSL_VERIFIED, _SSL_UNVERIFIED):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
+                raw = r.read()
+            try:
+                return raw.decode("utf-8")
+            except UnicodeDecodeError:
+                return raw.decode("utf-8", "replace")
+        except urllib.error.URLError as e:
+            if isinstance(getattr(e, "reason", None), ssl.SSLError) and ctx is _SSL_VERIFIED:
+                continue  # retry unverified
+            raise
+    return ""  # unreachable
 
 def in_th(lat, lng):
     return TH_BBOX[0] <= lat <= TH_BBOX[2] and TH_BBOX[1] <= lng <= TH_BBOX[3]
@@ -157,34 +189,55 @@ def dedupe(items):
         seen.add(k); out.append(it)
     return out
 
-# ---------------------------------------------------------------------------
+# find links/script-srcs/api-calls on a page that look like a branch finder or its data source.
+_LINK_HINT = re.compile(r'(branch|สาขา|locat|store|find|map|dealer|contact)', re.I)
+_API_HINT = re.compile(r'(api|branch|store|locat|wp-json|admin-ajax|\.json|graphql)', re.I)
+def _probe(url, referer_root):
+    """Fetch a URL and report size, coord count, framework hints, and candidate sub-URLs."""
+    txt = fetch(url)
+    coords = extract_coords(txt)
+    # absolutize hrefs/srcs/fetch targets found in the page
+    raw = re.findall(r'(?:href|src|action|fetch\(|url:)\s*["\']?([^"\'\s)>]+)', txt, re.I)
+    raw += re.findall(r'https?://[^\s"\'<>]+', txt)
+    cand = set()
+    for u in raw:
+        if not u or u.startswith(("data:", "#", "mailto:", "tel:", "javascript:")):
+            continue
+        full = urllib.parse.urljoin(referer_root, u)
+        if _API_HINT.search(full) or _LINK_HINT.search(full):
+            cand.add(full.split("#")[0])
+    return txt, coords, sorted(cand)
+
 def cmd_discover():
-    print("DISCOVERY — paste this whole block back so the exact endpoints can be locked in.\n")
+    print("DISCOVERY v2 — paste this whole block back so the exact endpoints can be locked in.\n")
     for brand, cfg in BRANDS.items():
-        print("=" * 64)
+        print("=" * 70)
         print(f"{brand}  ({cfg['label']})")
-        # probe the finder page
-        for url in [cfg["page_url"]] + cfg["data_urls"]:
+        root = cfg.get("root_url") or cfg["page_url"]
+        probe_urls = [cfg.get("root_url"), cfg["page_url"]] + cfg["data_urls"]
+        seen = set()
+        for url in [u for u in probe_urls if u and not (u in seen or seen.add(u))]:
             try:
-                txt = fetch(url)
-                coords = extract_coords(txt)
-                # surface candidate data URLs embedded in the page
-                apis = sorted(set(re.findall(r'https?://[^\s"\'<>]+?(?:api|branch|store|locat|\.json)[^\s"\'<>]*', txt, re.I)))[:12]
+                txt, coords, cand = _probe(url, root)
                 has_next = "__NEXT_DATA__" in txt
                 has_wp = "admin-ajax.php" in txt or "/wp-json/" in txt
+                tag = (("  · Next.js __NEXT_DATA__" if has_next else "")
+                       + ("  · WordPress(wp-json/admin-ajax)" if has_wp else ""))
                 print(f"  [{len(txt):>7} B] {url}")
-                print(f"      lat/lng pairs visible: {len(coords)}"
-                      f"{'  · Next.js __NEXT_DATA__' if has_next else ''}"
-                      f"{'  · WordPress store-locator' if has_wp else ''}")
-                for a in apis:
-                    print(f"      candidate data URL: {a}")
+                print(f"      lat/lng pairs visible: {len(coords)}{tag}")
+                # show the most promising candidate links (branch/locator/api), capped
+                for c in [c for c in cand if _API_HINT.search(c)][:8]:
+                    print(f"      → data-ish: {c}")
+                for c in [c for c in cand if _LINK_HINT.search(c) and not _API_HINT.search(c)][:6]:
+                    print(f"      → page-ish: {c}")
             except urllib.error.HTTPError as e:
                 print(f"  [HTTP {e.code}] {url}")
             except Exception as e:
                 print(f"  [ERR {type(e).__name__}: {e}] {url}")
             time.sleep(1.0)
-    print("\nNext: send the output above. The real branch endpoint is the URL with the most lat/lng "
-          "pairs (or the __NEXT_DATA__ / admin-ajax line). I'll wire it into data_urls.")
+    print("\nNext: paste the output. The real branch endpoint is whichever line shows many lat/lng "
+          "pairs, or a 'data-ish' URL containing branch/api/.json (or the __NEXT_DATA__/wp line). "
+          "I'll wire it into data_urls and you run --pull --merge.")
 
 def cmd_pull(merge):
     all_items, per_brand = [], {}
