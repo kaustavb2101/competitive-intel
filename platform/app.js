@@ -751,7 +751,16 @@ function renderAcq(){
    per brand {found (MEASURED census count), expected (ESTIMATED-from-public-reports, cited),
    coverage_pct}. Makes the census UNDERCOUNT explicit and honest. Lazy-loaded once; degrades
    gracefully (calm notice) when the file is absent. We DO NOT compute anything here. */
-let COMPCOV=null, compcovLoaded=false;
+let COMPCOV=null, compcovLoaded=false, compcovPromise=null;
+// promise-cached loader so the Home command center can read the national coverage % without
+// duplicating the fetch the Overview table already issues. Null-safe; never throws.
+function loadCompCoverage(){
+  if(compcovPromise) return compcovPromise;
+  compcovPromise=fetch('data/competitor_coverage.json').then(r=>r.ok?r.json():null)
+    .then(j=>{COMPCOV=j||null;compcovLoaded=true;return COMPCOV;})
+    .catch(()=>{COMPCOV=null;compcovLoaded=true;return null;});
+  return compcovPromise;
+}
 function renderCompCoverage(){
   const tbl=$('#compcovtbl'); if(!tbl) return;
   if(compcovLoaded){ drawCompCoverage(); return; }
@@ -1893,27 +1902,21 @@ async function renderTrend(){
     try{ DELTAS = await fetch('data/deltas.json').then(r=>r.json()); }
     catch(e){ DELTAS=null; }
   }
-  const baseEl=$('#trendbaseline'), bodyEl=$('#trendbody'), vintEl=$('#trendvint');
-  if(!DELTAS){
-    if(baseEl){ baseEl.style.display='block';
-      baseEl.innerHTML='Trend data not available yet (<b>data/deltas.json</b> missing).'; }
+  const baseEl=$('#trendbaseline'), bodyEl=$('#trendbody'), vintEl=$('#trendvint'),
+        baseBodyEl=$('#trendbaselinebody');
+  // No deltas file at all, OR a single-vintage baseline: BOTH render the DESIGNED baseline state
+  // (never a raw apology). The baseline shows where risk stands NOW + flat sparkline skeletons.
+  if(!DELTAS || DELTAS.baseline){
+    if(vintEl) vintEl.textContent = (DELTAS&&DELTAS.to)?`Baseline vintage: ${DELTAS.to}.`:'';
+    if(baseEl) baseEl.style.display='none';
     if(bodyEl) bodyEl.style.display='none';
+    if(baseBodyEl) baseBodyEl.style.display='block';
+    renderTrendBaseline(DELTAS);
     return;
   }
-  if(vintEl){
-    vintEl.textContent = DELTAS.baseline
-      ? (DELTAS.to?`Baseline vintage: ${DELTAS.to}.`:'')
-      : `Comparing ${DELTAS.from} → ${DELTAS.to}.`;
-  }
-  if(DELTAS.baseline){
-    if(baseEl){ baseEl.style.display='block';
-      baseEl.innerHTML=`<b>Baseline captured${DELTAS.to?` (${DELTAS.to})`:''}.</b> Trends appear after the next data refresh —
-        once a second vintage is snapshotted, this tab fills in with region movers, commodity re-rating and per-branch risk shifts.
-        <span class="sub">The plumbing is live; it just needs one more data point.</span>`; }
-    if(bodyEl) bodyEl.style.display='none';
-    return;
-  }
+  if(vintEl) vintEl.textContent = `Comparing ${DELTAS.from} → ${DELTAS.to}.`;
   if(baseEl) baseEl.style.display='none';
+  if(baseBodyEl) baseBodyEl.style.display='none';
   if(bodyEl) bodyEl.style.display='block';
 
   // region mover cards — composite arrow led by the worst-moving leg
@@ -1953,6 +1956,102 @@ async function renderTrend(){
         <td>${deltaPill(d.d_a)}</td><td>${deltaPill(d.d_m)}</td><td>${deltaPill(d.d_c)}</td></tr>`;}).join('')
         :'<tr><td class="sub" colspan="9">No branch-level movement between these vintages.</td></tr>');
   }
+}
+
+/* QW8 — DESIGNED RISK-TREND BASELINE.
+   Until a SECOND vintage is snapshotted there are no deltas, so the time tab would otherwise be
+   blank. Instead we render a CALM "baseline captured" readout of where stress stands NOW, pulled
+   ONLY from the already-built risk layers (province_risk / crop_stress / household_risk). Each row
+   carries a FLAT sparkline-skeleton — a single anchored point that will extend into a real trend
+   line at the next refresh — plus a "Δ at next refresh" chip. Every source is null-safe: a missing
+   layer simply omits its block; nothing is fabricated, and we never show a raw apology. */
+let trendBaselineBooted=false;
+// a flat sparkline skeleton: one solid baseline dot on the left, a dashed track to the right that
+// fills once a second vintage lands. Purely decorative (aria-hidden).
+function flatSpark(color){
+  return `<span class="tspark" aria-hidden="true" title="One vintage captured — the trend line draws in at the next refresh">`+
+    `<i class="tspark-track" style="--c:${color||'var(--mid)'}"></i>`+
+    `<i class="tspark-dot" style="background:${color||'var(--mid)'}"></i></span>`;
+}
+function trendBaseChip(){
+  return `<span class="tchip" title="A delta needs two vintages. The next snapshot fills this in.">Δ at next refresh</span>`;
+}
+function renderTrendBaseline(deltas){
+  const box=$('#trendbaselinebody'); if(!box) return;
+  const vint=(deltas&&deltas.to)||(snapVintage())||null;
+  // warm the three risk layers once; re-render as each resolves (null-safe).
+  if(!trendBaselineBooted){
+    trendBaselineBooted=true;
+    const re=()=>{ if(document.getElementById('v-trend').classList.contains('on')) renderTrendBaseline(deltas); };
+    loadProvinceRisk().then(re); loadCropStress().then(re); loadHouseholdRisk().then(re);
+  }
+  let html='';
+  // header / chip strip
+  html+=`<div class="insight" style="border-left-color:var(--gold)">`+
+    `<b>Baseline captured${vint?` (${vint})`:''}.</b> This is where portfolio stress stands <b>right now</b> — `+
+    `the time-series plumbing is live and will draw movers, commodity re-rating and per-branch shifts `+
+    `the moment a second vintage is snapshotted. <span class="sub">One data point in; deltas appear at the next refresh.</span> `+
+    trendBaseChip()+`</div>`;
+
+  // 1) MOST-STRESSED PROVINCES NOW (province_risk.json, composite — estimated)
+  if(priskHasData()){
+    const top=PRISK_LIST.slice(0,6).filter(p=>p&&p.province);
+    if(top.length){
+      html+=`<h2 class="risk" style="margin-top:18px">Most-stressed provinces now ${TAG_E}</h2>`+
+        `<p class="lead">Top provinces by mean composite risk (0–100) at the current vintage. The flat marker becomes a trend line at the next refresh.</p>`+
+        `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches (measured)">Branches</th><th title="mean of the estimated per-branch composite, 0–100">Mean risk ▲</th><th>p90</th><th>Trend</th></tr>`+
+        top.map((p,i)=>{const mr=p.mean_risk||0; const rc=mr>=60?'var(--agri)':mr>=45?'var(--gold)':'var(--merch)';
+          return `<tr><td class="mono sub">${i+1}</td><td><b>${p.province}</b></td><td class="sub">${p.region||''}</td>`+
+            `<td class="mono">${p.n_branches||0}</td>`+
+            `<td>${barHTML(mr,rc)} <span class="mono" style="color:${rc}">${mr.toFixed(0)}</span></td>`+
+            `<td class="mono sub">${(p.p90_risk||0).toFixed(0)}</td>`+
+            `<td>${flatSpark(rc)}</td></tr>`;}).join('')+`</table>`;
+    }
+  }
+
+  // 2) WORST CROP-HOUSEHOLD STRESS NOW (crop_stress.json — estimated proxy)
+  if(CSTRESS_LIST&&CSTRESS_LIST.length){
+    const top=CSTRESS_LIST.slice(0,6);
+    html+=`<h2 class="risk" style="margin-top:18px">Worst crop-household stress now ${TAG_E}</h2>`+
+      `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (World Bank global proxy) × drought × crop dependence.</p>`+
+      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY, global proxy">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
+      top.map((w,i)=>{const sv=Math.round((w.agri_stress||0)*100); const sc=sv>=60?'var(--agri)':sv>=40?'var(--gold)':'var(--merch)';
+        const crop=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'—';
+        return `<tr><td class="mono sub">${i+1}</td><td><b>${w.th}</b></td><td class="sub">${w.region||''}</td>`+
+          `<td class="sub">${crop}</td>`+
+          `<td class="mono sub">${w.price_stress!=null?(w.price_stress>0?'+':'')+w.price_stress+'%':'—'}</td>`+
+          `<td>${barHTML(sv,sc)} <span class="mono" style="color:${sc}">${sv}</span></td>`+
+          `<td>${flatSpark(sc)}</td></tr>`;}).join('')+`</table>`;
+  }
+
+  // 3) HIGHEST HOUSEHOLD LEVERAGE NOW (household_risk_by_province.json — MEASURED, NSO)
+  if(hhriskHasData()&&HHRISK_LIST.length){
+    const top=HHRISK_LIST.slice(0,6);
+    html+=`<h2 class="risk" style="margin-top:18px">Highest household leverage now ${TAG_M}</h2>`+
+      `<p class="lead">Debt-to-income per province (NSO SES, measured). Higher leverage = thinner repayment buffer on the title book.</p>`+
+      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th title="household debt ÷ annual income, NSO measured">DTI ▲</th><th>Trend</th></tr>`+
+      top.map((p,i)=>{const dti=p.debt_to_income||0; const dc=dti>=1?'var(--agri)':dti>=0.7?'var(--gold)':'var(--merch)';
+        return `<tr><td class="mono sub">${i+1}</td><td><b>${p.province}</b></td><td class="sub">${p.region||''}</td>`+
+          `<td>${barHTML(Math.min(dti*60,100),dc)} <span class="mono" style="color:${dc}">${dti.toFixed(2)}×</span></td>`+
+          `<td>${flatSpark(dc)}</td></tr>`;}).join('')+`</table>`;
+  }
+
+  // nothing loaded yet (all three layers still in flight or absent) — calm placeholder, never an apology.
+  if(!priskHasData() && !(CSTRESS_LIST&&CSTRESS_LIST.length) && !(hhriskHasData()&&HHRISK_LIST.length)){
+    html+=`<div class="cc-empty" style="margin-top:14px">Loading the current risk snapshot…</div>`;
+  }
+  box.innerHTML=html;
+}
+// best-effort current vintage label from the snapshots index (loaded lazily; null until then).
+let SNAPIDX=null, snapIdxLoaded=false;
+function snapVintage(){
+  if(!snapIdxLoaded){ snapIdxLoaded=true;
+    fetch('data/snapshots_index.json').then(r=>r.ok?r.json():null).then(j=>{ SNAPIDX=j||null;
+      if(document.getElementById('v-trend')&&document.getElementById('v-trend').classList.contains('on')) renderTrendBaseline(DELTAS);
+    }).catch(()=>{SNAPIDX=null;});
+  }
+  const s=SNAPIDX&&Array.isArray(SNAPIDX.snapshots)&&SNAPIDX.snapshots.length?SNAPIDX.snapshots[SNAPIDX.snapshots.length-1]:null;
+  return s?(s.label||null):null;
 }
 
 /* ---------- map ---------- */
@@ -2612,10 +2711,16 @@ function renderHome(){
     loadHouseholdRisk().then(()=>{ if(onHome()) renderHomeHero(); });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
     loadProvinceRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // obj#1 — collateral RECOVERY outlook (national, collateral_outlook.json) into the risk card.
+    loadCollatOutlookData().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // obj#1 — per-branch composite to name the single riskiest branch in the risk card (null-safe).
+    loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
     loadCompetitors().then(reHome);
+    // obj#2 — national competitor-coverage % chip in the where-to-expand card (null-safe).
+    loadCompCoverage().then(reHome);
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -2717,6 +2822,15 @@ function renderHomeWhitespace(){
     html+=provs.map(o=>ccRow(`${o.th}`,`${o.region} · ${o.zero} district${o.zero===1?'':'s'} with no AutoX`,
       `★ ${o.avg.toFixed(0)}`,'avg','var(--gold)')).join('');
   }
+  // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
+  // flag on every density/white-space signal above, not market share. Omitted gracefully if absent.
+  const cct=(COMPCOV&&COMPCOV.meta&&COMPCOV.meta.totals)||null;
+  if(cct&&cct.coverage_pct!=null){
+    html+=`<div class="cc-sub2">Competitor coverage · census completeness ${TAG_M}</div>`;
+    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
+      'lower-bound census · a confidence flag on the white-space above, not market share',
+      `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
+  }
   box.innerHTML=html;
 }
 
@@ -2736,6 +2850,16 @@ function renderHomeRisk(){
         `▲ ${(top[0].mean_risk||0).toFixed(0)}`,`p90 ${(top[0].p90_risk||0).toFixed(0)}`,'var(--agri)');
     }
   }
+  // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
+  if(briskHasData()&&DATA&&DATA.length===BRISK.length){
+    let bi=-1,bv=-1; for(let i=0;i<BRISK.length;i++){const v=(BRISK[i]&&BRISK[i].composite_risk)||0; if(v>bv){bv=v;bi=i;}}
+    if(bi>=0){const e=BRISK[bi], d=DATA[bi];
+      html+=`<div class="cc-sub2">Riskiest single branch ${TAG_E}</div>`;
+      html+=ccRow(`${d.n||e.code} <span class="sub">${d.v||''}${d.r?' · '+d.r:''}</span>`,
+        `driven by ${riskDriverLabel(e.top_driver)} · composite 0–100`,
+        `▲ ${(e.composite_risk||0).toFixed(0)}`,'composite','var(--agri)');
+    }
+  }
   // worst crop-household stress region/province (crop_stress.json)
   if(CSTRESS_LIST&&CSTRESS_LIST.length){
     const w=CSTRESS_LIST[0]; const sv=Math.round((w.agri_stress||0)*100);
@@ -2753,9 +2877,18 @@ function renderHomeRisk(){
       `${p.branches} branches · lowest-recovery title collateral`,
       `${p.moto}%`,'moto share','var(--agri)')).join('');
   }
-  // gold-up vs pickup-pressure collateral read (board measured + editorial pickup watch)
+  // COLLATERAL RECOVERY OUTLOOK — lead with the national read from collateral_outlook.json when
+  // loaded (firming vs softening + most-at-risk province), then the two diverging backings.
   const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
   const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
+  const nat=COLLO&&COLLO.national;
+  if(nat&&nat.exposure_weighted_outlook!=null){
+    const o=nat.exposure_weighted_outlook, firm=o>=0;
+    html+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
+    html+=ccRow(firm?'Recovery value firming':'Recovery value softening',
+      `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`,
+      `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
+  }
   html+=`<div class="cc-sub2">Collateral value · the two backings diverge</div>`;
   html+=ccRow(`Gold collateral ${TAG_M}`,'pawn / gold-backed recovery value ↑',gy,'value ↑','var(--up)');
   html+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');

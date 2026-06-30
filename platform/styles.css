@@ -912,3 +912,11 @@ html[data-theme="light"] details.method{background:#f4f6fb;border-color:#d6dbe6}
 #expoconc .conc-legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--dim);margin:6px 0 2px;align-items:center}
 #expoconc .conc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
 html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
+
+/* QW8 — Risk-trend baseline: flat sparkline skeleton + "Δ at next refresh" chip.
+   The track is a dashed line that will become a real trend line once a 2nd vintage lands;
+   the dot anchors the single point we have today. Purely decorative. */
+.tspark{display:inline-flex;align-items:center;width:54px;height:14px;position:relative}
+.tspark-track{position:absolute;left:5px;right:0;top:50%;height:0;border-top:1.5px dashed var(--c);opacity:.45}
+.tspark-dot{position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;box-shadow:0 0 0 2px var(--panel)}
+.tchip{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:6px;white-space:nowrap;vertical-align:middle}
