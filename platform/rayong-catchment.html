@@ -13,9 +13,29 @@
  --gold:#E0A93B;--red:#E0474B;--mag:#D65AA0;--blue:#4F7BF0;--orange:#E07B2F;--teal:#159b86;--purp:#9a7fd6;}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink)}
-#map{position:fixed;inset:0;background:#e9e6df}
+#map{position:fixed;inset:0;background:transparent}
 .mono{font-family:'IBM Plex Mono',monospace}
 canvas{outline:none}
+
+/* ---- CINEMATIC DEPTH (Upgrade 1) — purely visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient that sits BEHIND the deck.gl canvas (z below #map) so the
+          scene reads against an atmosphere instead of flat ink. Indigo-console tuned: deep indigo
+          zenith -> warmer haze at the horizon band. Light theme gets a soft daylight sky.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the city and fades the corners — the classic cinematic "look here" vignette. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(125% 95% at 50% 4%,#202a44 0%,#161d31 34%,#0e1322 62%,#080b14 100%),
+            linear-gradient(180deg,#0b1020 0%,#121a2e 44%,#202b46 74%,#2c3450 100%);
+ background-blend-mode:screen,normal}
+#map{z-index:1}
+#vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 50%,rgba(6,9,16,.28) 79%,rgba(4,6,12,.60) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(125% 95% at 50% 4%,#e3edfc 0%,#d2e0f5 40%,#bed1ed 68%,#aec2e4 100%),
+            linear-gradient(180deg,#e8effb 0%,#d8e4f6 60%,#c6d6ee 100%);
+ background-blend-mode:multiply,normal}
+html[data-theme="light"] #vignette{
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 56%,rgba(40,52,80,.09) 82%,rgba(30,40,66,.20) 100%)}
 
 /* top brand strip */
 #strip{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
@@ -144,6 +164,19 @@ html[data-theme="light"] #isolegend{border-bottom-color:#D3DAE6}
 html[data-theme="light"] #isolegend .il-ttl{color:#828CA0}
 html[data-theme="light"] #isolegend .il{color:#2C3444}
 
+/* competitor-brand legend (Upgrade 3) — measured rival brands present in this scene */
+#complegend{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#complegend .cl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#complegend .cl{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#complegend .cl .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+#complegend .cl b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+#complegend .cl-tag{font:600 9px 'IBM Plex Mono';color:#3fc4ab;letter-spacing:.3px}
+html[data-theme="light"] #complegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #complegend .cl-ttl{color:#828CA0}
+html[data-theme="light"] #complegend .cl{color:#2C3444}
+html[data-theme="light"] #complegend .cl b{color:#5A6477}
+
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
 .dtt b{color:#fff}
 .err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
@@ -231,7 +264,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
  sync();
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
+<div id="sky"></div>
 <div id="map"></div>
+<div id="vignette"></div>
 
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
@@ -246,6 +281,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <button data-b="satellite">Satellite</button>
   <button id="ringtog" class="on">Rings</button>
   <button id="isotog" class="on">Isochrone</button>
+  <button id="orbittog" class="on" title="Gentle auto-orbit (pauses when you move the map)">Orbit</button>
 </div>
 
 <aside class="side" id="left">
@@ -284,6 +320,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 
 <div id="legendwrap">
   <div id="isolegend" style="display:none"></div>
+  <div id="complegend" style="display:none"></div>
   <div class="lgttl">POI types <span>· tap to toggle</span></div>
   <div id="legend"></div>
 </div>
@@ -314,7 +351,36 @@ const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:(CA.comp
 // full POI palette comes from the province file ([lat,lng]); fall back to the catchment POIs if missing.
 const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:(CA.poi||{});
 const DISTRICTS=PROV.districts||null;
-const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47]};
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47],Heng:[224,180,80]};
+// ---- MEASURED competitor brands IN the scene (Upgrade 3) ----------------------------------------
+// competitors_national.json is the nationwide Google-Places census (brand,name,lat,lng,prov). We
+// filter it to the current scene bbox (padded) so rival branches appear AS markers inside the 3D
+// city — including for cities with no curated per-province competitor file (e.g. Bangkok). This is
+// MEASURED data; we never synthesise a location. Empty + harmless when the file is absent.
+//
+// LAZY + MEMOISED: this depends on sceneExtent(), which reads the `let _EXTENT` declared further
+// down — so it must NOT be evaluated during this const-init phase (that line is still in its
+// temporal dead zone). compScene() is only ever called from render()/buildCompLegend(), by which
+// point every declaration is live. The result is cached after the first call.
+let _COMP_SCENE=null;
+function compNat(){
+  const CN=window.COMPNAT, items=CN&&Array.isArray(CN.items)?CN.items:null;
+  if(!items||!items.length)return [];
+  let E; try{E=sceneExtent();}catch(e){return [];}
+  if(!E||!isFinite(E.minX))return [];
+  // pad the bbox a touch beyond the building extent so rivals on the immediate fringe still show.
+  const padX=(E.maxX-E.minX)*0.12+0.01, padY=(E.maxY-E.minY)*0.12+0.01;
+  const x0=E.minX-padX,x1=E.maxX+padX,y0=E.minY-padY,y1=E.maxY+padY;
+  const out=[];
+  for(const it of items){ if(it==null)continue;
+    const la=+it.lat, ln=+it.lng; if(!isFinite(la)||!isFinite(ln))continue;
+    if(ln<x0||ln>x1||la<y0||la>y1)continue;
+    out.push({brand:it.brand||'?',name:it.name||'',lat:la,lng:ln});}
+  return out;}
+// Use the curated per-province competitor set when present (Rayong); otherwise fall back to the
+// measured national census filtered to the scene — so every city shows real rivals in-frame.
+function compScene(){ if(_COMP_SCENE)return _COMP_SCENE;
+  _COMP_SCENE=(COMP&&COMP.length)?COMP:compNat(); return _COMP_SCENE; }
 const GOLD=[230,180,80]; // 10km collateral catchment ring
 // canonical type->color map: single source of truth for map dots AND legend AND toggles
 const POI_COLORS={
@@ -350,15 +416,41 @@ const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}
             voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
             dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
             satellite:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'};
-let LIGHTING=null;
-try{ if(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight){
-  // shadows OFF: the cast shadow of ~3,631 thin footprints smeared into a grey dome under software WebGL.
-  // Keep the directional lights (face-shading still reads buildings as 3D); no shadow map, no shadowColor.
-  LIGHTING=new deck.LightingEffect({
-    ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-    sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:false}),
-    fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
-} }catch(e){ LIGHTING=null; }
+// Satellite imagery (Esri) ships with NO place labels — over a dark photo the city is hard to read.
+// Overlay CARTO's dark labels-only raster on top so roads/place names stay LEGIBLE on satellite
+// (Upgrade 4). Null-guarded by basemap==='satellite'; absent/blocked tiles just don't draw.
+const TILE_LABELS_SAT='https://a.basemaps.cartocdn.com/rastertiles/dark_only_labels/{z}/{x}/{y}.png';
+// ---- CINEMATIC LIGHTING (Upgrade 1) ----------------------------------------------------------
+// A real sun that CASTS SHADOWS so the extruded skyline reads as a grounded, dimensional city
+// rather than flat boxes. deck.gl 8.9.35 enables shadow maps when a DirectionalLight carries
+// _shadow:true and the LightingEffect.shadowColor is set; layers opt in via shadowEnabled (default
+// true for SolidPolygonLayer/PolygonLayer). The sun is angled low (long, readable shadows) and
+// warm; a cool fill light keeps the shadowed faces from going black. Ambient is dropped a touch
+// vs the old flat 1.0 so the directional contrast (the thing that sells depth) actually shows.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the vendored bundle lacks shadow
+// support the try/catch leaves LIGHTING usable without shadows, and SHADOWS_ON gates the per-layer
+// shadow flags so nothing throws.
+//
+// SOFTWARE-WEBGL SAFETY: shadow maps are an extra full render pass per frame. On a real GPU that's
+// cheap and gives the big depth win; under SOFTWARE WebGL (swiftshader/llvmpipe — headless CI, very
+// old machines) it can be so slow the scene never settles. So shadows are enabled by default but
+// AUTO-DISABLED at runtime if onWebGLInitialized detects a software renderer (see below). The warm
+// material + directional shading + sky/vignette still give strong depth in that fallback.
+function buildLighting(withShadow){
+  try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
+    const sun=new deck.DirectionalLight({color:[255,243,222],intensity:2.6,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[176,198,248],intensity:0.7,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[232,238,255],intensity:withShadow?0.85:0.95});
+    const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+    // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
+    if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
+    return eff;
+  }catch(e){ return null; }
+}
+let SHADOWS_ON=true;
+let LIGHTING=buildLighting(true);
+if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
 // cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
 // Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
@@ -414,14 +506,95 @@ if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
   try{console.info('[catchment LOD] '+(CA.buildings.length)+' buildings -> '+BUILDINGS.length
     +' rendered (budget '+BLDG_BUDGET+', inner '+LOD_INNER_M+'m kept in full)');}catch(e){}
 }
+// ---- MOTION (Upgrade 2) — controlled view state for intro fly-in + gentle auto-orbit -----------
+// The scene is now driven by a CONTROLLED viewState (VIEW) instead of an uncontrolled
+// initialViewState, so the auto-orbit rAF loop and the click-to-fly transitions share one source of
+// truth and never fight. FRAMED = the cinematic resting view (low+wide, skyline catches the light).
+// INTRO = a higher, further-out, more top-down start; on load we ease from INTRO -> FRAMED.
+const FRAMED={longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-26};
+const INTRO ={longitude:CORE.lng,latitude:CORE.lat,zoom:11.4,pitch:38,bearing:-58};
+let VIEW=Object.assign({},INTRO);
+// orbit state: enabled by default, paused on any user interaction (drag/zoom/click) until re-armed.
+let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0;
+const ORBIT_DPS=2.6;                 // degrees / second — gentle, not nauseating (~2-4 dps target)
+// userInteract(): called from onViewStateChange when the *user* moves the camera (not our own
+// programmatic setProps). Pauses the orbit and flips the toggle UI off until the user re-enables it.
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+let _programmatic=false;             // guards our own setProps from being mistaken for user input
+function pushView(extra){ _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  // clear the programmatic flag on the next tick (after deck fires onViewStateChange synchronously)
+  Promise.resolve().then(()=>{_programmatic=false;});}
+// flyTo: a smooth click-to-fly that REPLACES the old initialViewState+transitionDuration calls.
+// Uses deck's FlyToInterpolator when present (nice arc), else a plain eased transition. Always
+// re-arms orbit at the destination so the scene keeps breathing after the user lands somewhere.
+function flyTo(o){
+  const dur=o.transitionDuration||900;
+  VIEW=Object.assign({},VIEW,{longitude:o.longitude,latitude:o.latitude,
+    zoom:o.zoom!=null?o.zoom:VIEW.zoom,pitch:o.pitch!=null?o.pitch:VIEW.pitch,
+    bearing:o.bearing!=null?o.bearing:VIEW.bearing});
+  _programmatic=true;
+  const tp={viewState:Object.assign({},VIEW,{transitionDuration:dur})};
+  try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.4});} }catch(e){}
+  // a click-to-fly is a deliberate reframe, not an orbit-cancel: keep orbiting once we arrive.
+  orbitPausedByUser=false; setOrbitUI(orbitOn);
+  deckgl.setProps(tp);
+  setTimeout(()=>{_programmatic=false; lastT=0;}, dur+40);
+}
+// onWebGLInitialized: inspect the live GL renderer string. Under a SOFTWARE rasteriser
+// (swiftshader / llvmpipe / "software"), drop shadow casting so the heavy shadow pass can't stall
+// the scene; rebuild the LightingEffect without shadow and re-render. On a real GPU this never fires
+// the downgrade, so the full cinematic shadows stay. Wrapped in try/catch — purely additive.
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+let SOFT_GL=false;
+function downgradeForSoftwareGL(){
+  SOFT_GL=true;
+  // continuous motion keeps the render loop hot — under software WebGL that prevents the scene from
+  // ever settling (and a still screenshot doesn't need it). Park the camera at the framed view.
+  orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  if(SHADOWS_ON){
+    SHADOWS_ON=false;
+    const noShadow=buildLighting(false);
+    try{ deckgl.setProps({effects:noShadow?[noShadow]:[]}); }catch(e){}
+  }
+  try{ if(typeof render==='function')render(); }catch(e){}   // rebuild layers so shadowEnabled flags clear
+  try{ console.info('[catchment] software WebGL detected — shadows + auto-orbit disabled for performance; depth via material + sky/vignette.'); }catch(e){}
+}
 const deckgl=new deck.DeckGL({container:'map',
-  initialViewState:{longitude:CORE.lng,latitude:CORE.lat,zoom:13.9,pitch:60,bearing:-26},
+  viewState:VIEW,
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
+  onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+  onViewStateChange:({viewState,interactionState})=>{
+    VIEW=viewState;
+    const inTrans=!!(interactionState&&interactionState.inTransition);
+    const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+       interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+    // any pan/zoom/rotate the USER drives (pointer down or inertial fling) pauses the orbit.
+    if(!_programmatic && userMoving){ userInteract(); }
+    // CONTROLLED viewState: a user-driven change must be reflected straight back to deck or the map
+    // would appear frozen. We re-push only for genuine user moves — NOT during a programmatic
+    // transition (deck owns that interpolation) and NOT for our own orbit/flyTo (already pushed).
+    // Guard with _programmatic so the re-push can't be mistaken for fresh user input (no loop).
+    if(userMoving && !inTrans && !_programmatic){
+      _programmatic=true; deckgl.setProps({viewState:VIEW});
+      Promise.resolve().then(()=>{_programmatic=false;});
+    }
+    return viewState;
+  },
   getTooltip:({object,layer})=>{
     if(!object)return null;
     // buildings are non-interactive scenery — no per-building readout (owner request)
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||'Rayong'} · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
-    if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name}</div>`};
+    if(layer.id==='comp'||layer.id==='comp-peg')return {html:`<div class="dtt"><b>${object.brand}</b>${object.name?'<br>'+object.name:''}<br><span style="color:#8a94a8">competitor branch · measured</span></div>`};
     if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
     if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
       const nm=Array.isArray(object)?object[2]:null;
@@ -431,6 +604,13 @@ const deckgl=new deck.DeckGL({container:'map',
 function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
   renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
     bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
+// Labels-only overlay — drawn ON TOP of the building scene only in satellite mode, so place names
+// and roads stay legible over the dark Esri photo (Upgrade 4). Returns null for non-satellite bases.
+function labelOverlayLayer(){
+  if(basemap!=='satellite'||!deck.TileLayer)return null;
+  return new deck.TileLayer({id:'sat-labels',data:TILE_LABELS_SAT,minZoom:0,maxZoom:19,tileSize:256,
+    renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+      bounds:[b[0][0],b[0][1],b[1][0],b[1][1]],parameters:{depthTest:false}});}});}
 
 // satellite imagery reads as a dark base, so style buildings/ground with the dark palette over it.
 function darkMode(){return basemap==='dark'||basemap==='satellite';}
@@ -807,7 +987,11 @@ function render(){
       if(c){const cw=LIGHT?0.3:0.32; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}
       return [clamp(r),clamp(g),clamp(bl),LIGHT?214:236];},
     stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[60,40,120,180]:[196,176,140,120]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
-    material:{ambient:0.28,diffuse:0.95,shininess:30,specularColor:[150,130,90]},
+    // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
+    // across faces; high diffuse for a strong lit-side; a small, tight specular gives the gold
+    // crowns a warm sheen highlight without going plastic. Pairs with the cast-shadow sun above.
+    material:{ambient:0.22,diffuse:1.0,shininess:48,specularColor:[176,150,96]},
+    shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
   // (4) color-coded POIs — one ColumnLayer per type (short EXTRUDED hexagonal stubs, not flat dots),
@@ -826,11 +1010,26 @@ function render(){
       stroked:true, getLineColor:[Math.round(c[0]*.55),Math.round(c[1]*.55),Math.round(c[2]*.55),255],
       lineWidthMinPixels:0.5,
       material:{ambient:0.45,diffuse:0.8,shininess:32,specularColor:[120,130,160]},
+      shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true},
       pickable:true,_poiType:t}));
   });
-  // (5) competitors
-  L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
+  // (5) competitors — MEASURED rival branches IN the scene (curated for Rayong, else national census
+  //     filtered to the city bbox). A brand-coloured 3D ColumnLayer "peg" makes each rival stand up
+  //     in the city (and cast a shadow, grounding it), with the flat dot kept for crisp read at any
+  //     zoom. Both null-safe: compScene() is [] when no competitor data exists for the city.
+  const COMPS=compScene();
+  if(deck.ColumnLayer && COMPS.length){
+    L.push(new deck.ColumnLayer({id:'comp-peg',data:COMPS,getPosition:d=>[d.lng,d.lat],
+      diskResolution:8, radius:55, radiusUnits:'meters',
+      extruded:true, elevationScale:1, getElevation:115,
+      getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],235];},
+      stroked:true, getLineColor:[245,247,252,235], lineWidthMinPixels:0.6,
+      material:{ambient:0.5,diffuse:0.85,shininess:40,specularColor:[190,195,210]},
+      shadowEnabled:SHADOWS_ON,
+      parameters:{depthTest:true}, pickable:true}));
+  }
+  L.push(new deck.ScatterplotLayer({id:'comp',data:COMPS,getPosition:d=>[d.lng,d.lat],
     getRadius:95,radiusMinPixels:7,radiusMaxPixels:15,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
     getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
   // (6) AutoX branches (all 59) — selected one is white
@@ -853,7 +1052,7 @@ function render(){
       updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[onLight]}}));
   }
   // competitor pills — brand-coloured chip + brand initial glyph; white text reads on the chip
-  L.push(new deck.TextLayer({id:'comp-labels',data:COMP,getPosition:d=>[d.lng,d.lat],
+  L.push(new deck.TextLayer({id:'comp-labels',data:COMPS,getPosition:d=>[d.lng,d.lat],
     getText:d=>(d.brand||'?').charAt(0),getSize:9.5,getColor:[255,255,255,255],
     getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),240],
     getBorderColor:[255,255,255,210],getBorderWidth:onLight?1:0,
@@ -869,6 +1068,9 @@ function render(){
     background:true,backgroundPadding:[6,3,6,3],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
     getTextAnchor:'middle',characterSet:'auto',sizeUnits:'pixels',pickable:true,
     updateTriggers:{getColor:[onLight],getBackgroundColor:[onLight],getBorderWidth:[onLight]}}));
+  // (8) satellite place-name overlay — TOP of the stack so labels read over the dark photo (Upgrade 4).
+  //     Only present in satellite mode; null otherwise. depthTest off so it isn't culled by buildings.
+  const labelLyr=labelOverlayLayer(); if(labelLyr)L.push(labelLyr);
   deckgl.setProps({layers:L,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
@@ -1044,7 +1246,7 @@ function buildLeads(){
       </div></div>`;}).join('');
   document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
     const lat=+el.dataset.lat,lng=+el.dataset.lng;
-    deckgl.setProps({initialViewState:{longitude:lng,latitude:lat,zoom:14.6,pitch:55,bearing:18,transitionDuration:900}});
+    flyTo({longitude:lng,latitude:lat,zoom:14.6,pitch:55,bearing:18,transitionDuration:900});
     focal={n:'Gap (competitor-held)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
     if(window.innerWidth<=820){document.getElementById('left').classList.add('show');document.getElementById('right').classList.remove('show');}
   });
@@ -1065,12 +1267,35 @@ function buildStrip(){
     ['Markets',(POIS.fresh_market||[]).length,'#E0C850']];
   document.getElementById('strip').insertAdjacentHTML('beforeend',
     items.map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));
+  // OPPORTUNITY CUE (Upgrade 3, optional): the top-scoring acquisition district for THIS city's
+  // province from opportunity_score.json — an ESTIMATED composite over MEASURED white-space +
+  // competitor gap + estimated crop-stress. Subtle, labelled, and skipped when the file is absent
+  // or no district matches the city. Provenance is honoured: the score is a composite ranking aid.
+  try{
+    const OS=window.OPPSCORE, ds=OS&&Array.isArray(OS.districts)?OS.districts:null;
+    if(ds&&ds.length){
+      const provTH=(CA.meta&&(CA.meta.province_th||CA.meta.prov))||OPP_PROV[CITY]||null;
+      const provEN=(CA.meta&&CA.meta.province)||CITY_LABEL;
+      const pool=provTH?ds.filter(d=>d.province===provTH):
+                 ds.filter(d=>(d.province||'').indexOf(provEN)>=0);
+      pool.sort((a,b)=>(b.score||0)-(a.score||0));
+      const top=pool[0];
+      if(top){
+        document.getElementById('strip').insertAdjacentHTML('beforeend',
+          `<span class="bchip" title="Top acquisition district for ${provEN} — composite opportunity score (estimated, measured inputs)">`
+          +`<span class="d" style="background:#E6B450"></span>Top opp · ${top.name||'—'}<b>${(top.score||0).toFixed(0)}</b></span>`);
+      }
+    }
+  }catch(e){}
 }
+// city slug -> Thai province name, to match opportunity_score.json (which keys by Thai province).
+// Only used as a fallback when the catchment meta doesn't carry the province name.
+const OPP_PROV={rayong:'ระยอง',bangkok:'กรุงเทพมหานคร'};
 
 /* ---------- branch selection (drives the camera + focus ring + panels) ---------- */
 function selectBranch(b,fly){
   if(!b)return; focal=b;
-  if(fly){deckgl.setProps({initialViewState:{longitude:b.x,latitude:b.y,zoom:12.5,pitch:55,bearing:18,transitionDuration:900}});}
+  if(fly){flyTo({longitude:b.x,latitude:b.y,zoom:12.5,pitch:55,bearing:18,transitionDuration:900});}
   updatePanels();render();
   const sum=document.getElementById('cascSummary'); if(sum)sum.textContent='Rayong · '+(b.n||'branch');
   if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
@@ -1146,6 +1371,24 @@ function buildIsoLegend(){
   }).join('');
 }
 
+/* ---------- competitor-brand legend (measured rivals in this scene) ---------- */
+function buildCompLegend(){
+  const host=document.getElementById('complegend'); if(!host)return;
+  const SC=compScene();
+  if(!SC||!SC.length){host.style.display='none';return;}
+  // count rivals by brand, present-brands only, ordered by count desc.
+  const byB={}; SC.forEach(c=>{const b=c.brand||'?';byB[b]=(byB[b]||0)+1;});
+  const brands=Object.keys(byB).sort((a,b)=>byB[b]-byB[a]);
+  if(!brands.length){host.style.display='none';return;}
+  // provenance: curated for Rayong, national Google-Places census elsewhere.
+  const measured=(COMP&&COMP.length)?'measured · curated':'measured · Google Places';
+  host.style.display='flex';
+  host.innerHTML='<span class="cl-ttl">Competitors</span>'+brands.map(b=>{
+    const c=BRAND[b]||[150,150,150];
+    return `<span class="cl"><span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${b}<b>${byB[b]}</b></span>`;
+  }).join('')+`<span class="cl-tag">${measured}</span>`;
+}
+
 /* controls */
 // city switcher — reflect the current city, then navigate on change (each city gets a fresh GL context).
 (function(){var sel=document.getElementById('citySel');if(!sel)return;
@@ -1159,12 +1402,62 @@ document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
   basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
 document.getElementById('isotog').onclick=function(){showIso=!showIso;this.classList.toggle('on',showIso);render();};
+// Orbit toggle: master on/off. Turning it ON also clears any "paused by user interaction" state so
+// the scene immediately resumes breathing; turning it OFF parks the camera where it sits.
+(function(){var ot=document.getElementById('orbittog');if(!ot)return;
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
 document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
   const s=b.dataset.s,el=document.getElementById(s),other=document.getElementById(s==='left'?'right':'left');
   el.classList.toggle('show');other.classList.remove('show');});
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
-buildStrip();buildLegend();buildIsoLegend();buildCascade();buildLeads();updatePanels();render();
+buildStrip();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
+
+// ---- MOTION BOOTSTRAP (Upgrade 2): intro fly-in, then continuous gentle auto-orbit -------------
+// INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to the
+// framed FRAMED view. A FlyToInterpolator (when present) gives a cinematic arced descent; the orbit
+// loop holds until the intro transition completes so the two motions don't overlap.
+(function startMotion(){
+  const INTRO_MS=2600;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit, even if
+  // deck's interactionState flags are missed under software WebGL in the headless harness.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  // SOFTWARE-WEBGL FALLBACK: onWebGLInitialized (fired during deck construction, above) may have set
+  // SOFT_GL — in that case skip BOTH the intro transition and the continuous orbit so the render loop
+  // stays cold and the scene settles to a clean still frame. Snap straight to the framed view.
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  // kick the intro on the next animation frame so the INTRO view paints first.
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  // ORBIT LOOP: slow bearing increment, frame-rate independent. Skips while a transition is running,
+  // while the orbit is off, or while the user has paused it. Pure rotation around the current centre.
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
+})();
 }catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
 };</script>
 <script>
@@ -1193,10 +1486,15 @@ buildStrip();buildLegend();buildIsoLegend();buildCascade();buildLeads();updatePa
    opt(P+'_trees.json'), opt(P+'_rail.json'),
    // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
    // Both load best-effort; absent => the "who works nearby" panel keeps its estimated proxy.
-   opt('data/branch_occupations.json'), opt('data/branches.json')
+   opt('data/branch_occupations.json'), opt('data/branches.json'),
+   // MEASURED national competitor census (Google Places) + the ESTIMATED-composite district
+   // opportunity score. Both nationwide; this page filters them to the current city bbox so rivals
+   // appear IN the scene even for cities without a curated per-province competitor file (e.g. Bangkok).
+   opt('data/competitors_national.json'), opt('data/opportunity_score.json')
  ]).then(function(a){window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
+   window.COMPNAT=a[11];window.OPPSCORE=a[12];
    box.remove();window.initCatch();})
   .catch(function(e){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;});
 })();
