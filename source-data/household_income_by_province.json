@@ -1,0 +1,629 @@
+{
+  "meta": {
+    "source": "NSO SES 2566 — monthly income by occupation (THB/month), via data.go.th / TMLI",
+    "provenance": "MEASURED. Vendored from kaustavb2101/watcher source-data/tmli/nso-ses-income-2566.json. NSO SES 2566 (2023 CE).",
+    "fields": {
+      "OfficeStaff/FactoryWorkers/Transport/SMEOwners/Agriculture": "average monthly income for that occupation, THB (NSO SES 2566)",
+      "avg_monthly_income": "unweighted mean across the five occupations, THB (derived)"
+    },
+    "n_provinces": 77
+  },
+  "provinces": {
+    "กระบี่": {
+      "Agriculture": 20734,
+      "FactoryWorkers": 20281,
+      "OfficeStaff": 40589,
+      "SMEOwners": 31978,
+      "Transport": 21537,
+      "avg_monthly_income": 27024
+    },
+    "กรุงเทพมหานคร": {
+      "Agriculture": 23541,
+      "FactoryWorkers": 27353,
+      "OfficeStaff": 46076,
+      "SMEOwners": 48801,
+      "Transport": 22938,
+      "avg_monthly_income": 33742
+    },
+    "กาญจนบุรี": {
+      "Agriculture": 24630,
+      "FactoryWorkers": 21192,
+      "OfficeStaff": 34749,
+      "SMEOwners": 30176,
+      "Transport": 20441,
+      "avg_monthly_income": 26238
+    },
+    "กาฬสินธุ์": {
+      "Agriculture": 22225,
+      "FactoryWorkers": 15503,
+      "OfficeStaff": 33883,
+      "SMEOwners": 34218,
+      "Transport": 12565,
+      "avg_monthly_income": 23679
+    },
+    "กำแพงเพชร": {
+      "Agriculture": 21216,
+      "FactoryWorkers": 26349,
+      "OfficeStaff": 29094,
+      "SMEOwners": 25638,
+      "Transport": 21569,
+      "avg_monthly_income": 24773
+    },
+    "ขอนแก่น": {
+      "Agriculture": 12759,
+      "FactoryWorkers": 18030,
+      "OfficeStaff": 29235,
+      "SMEOwners": 22200,
+      "Transport": 19730,
+      "avg_monthly_income": 20391
+    },
+    "จันทบุรี": {
+      "Agriculture": 78117,
+      "FactoryWorkers": 25126,
+      "OfficeStaff": 36675,
+      "SMEOwners": 55751,
+      "Transport": 20944,
+      "avg_monthly_income": 43323
+    },
+    "ฉะเชิงเทรา": {
+      "Agriculture": 32275,
+      "FactoryWorkers": 25495,
+      "OfficeStaff": 37923,
+      "SMEOwners": 34652,
+      "Transport": 29730,
+      "avg_monthly_income": 32015
+    },
+    "ชลบุรี": {
+      "Agriculture": 40204,
+      "FactoryWorkers": 35095,
+      "OfficeStaff": 38358,
+      "SMEOwners": 44976,
+      "Transport": 20681,
+      "avg_monthly_income": 35863
+    },
+    "ชัยนาท": {
+      "Agriculture": 20273,
+      "FactoryWorkers": 21761,
+      "OfficeStaff": 43879,
+      "SMEOwners": 31043,
+      "Transport": 19989,
+      "avg_monthly_income": 27389
+    },
+    "ชัยภูมิ": {
+      "Agriculture": 22681,
+      "FactoryWorkers": 22169,
+      "OfficeStaff": 36602,
+      "SMEOwners": 35134,
+      "Transport": 15729,
+      "avg_monthly_income": 26463
+    },
+    "ชุมพร": {
+      "Agriculture": 28285,
+      "FactoryWorkers": 20155,
+      "OfficeStaff": 34578,
+      "SMEOwners": 49226,
+      "Transport": 21182,
+      "avg_monthly_income": 30685
+    },
+    "ตรัง": {
+      "Agriculture": 21151,
+      "FactoryWorkers": 21299,
+      "OfficeStaff": 38760,
+      "SMEOwners": 38894,
+      "Transport": 16793,
+      "avg_monthly_income": 27379
+    },
+    "ตราด": {
+      "Agriculture": 30008,
+      "FactoryWorkers": 20426,
+      "OfficeStaff": 34952,
+      "SMEOwners": 35888,
+      "Transport": 16068,
+      "avg_monthly_income": 27468
+    },
+    "ตาก": {
+      "Agriculture": 18316,
+      "FactoryWorkers": 12557,
+      "OfficeStaff": 35898,
+      "SMEOwners": 31620,
+      "Transport": 15108,
+      "avg_monthly_income": 22700
+    },
+    "นครนายก": {
+      "Agriculture": 15439,
+      "FactoryWorkers": 24004,
+      "OfficeStaff": 37186,
+      "SMEOwners": 31432,
+      "Transport": 17535,
+      "avg_monthly_income": 25119
+    },
+    "นครปฐม": {
+      "Agriculture": 36969,
+      "FactoryWorkers": 23111,
+      "OfficeStaff": 37004,
+      "SMEOwners": 46995,
+      "Transport": 20244,
+      "avg_monthly_income": 32865
+    },
+    "นครพนม": {
+      "Agriculture": 16238,
+      "FactoryWorkers": 15752,
+      "OfficeStaff": 33449,
+      "SMEOwners": 32481,
+      "Transport": 15743,
+      "avg_monthly_income": 22733
+    },
+    "นครราชสีมา": {
+      "Agriculture": 24065,
+      "FactoryWorkers": 27790,
+      "OfficeStaff": 43316,
+      "SMEOwners": 29597,
+      "Transport": 22933,
+      "avg_monthly_income": 29540
+    },
+    "นครศรีธรรมราช": {
+      "Agriculture": 28500,
+      "FactoryWorkers": 24236,
+      "OfficeStaff": 44296,
+      "SMEOwners": 57308,
+      "Transport": 16058,
+      "avg_monthly_income": 34080
+    },
+    "นครสวรรค์": {
+      "Agriculture": 28874,
+      "FactoryWorkers": 16680,
+      "OfficeStaff": 29071,
+      "SMEOwners": 28511,
+      "Transport": 17690,
+      "avg_monthly_income": 24165
+    },
+    "นนทบุรี": {
+      "Agriculture": 15844,
+      "FactoryWorkers": 24348,
+      "OfficeStaff": 40943,
+      "SMEOwners": 40798,
+      "Transport": 19682,
+      "avg_monthly_income": 28323
+    },
+    "นราธิวาส": {
+      "Agriculture": 7347,
+      "FactoryWorkers": 15359,
+      "OfficeStaff": 32120,
+      "SMEOwners": 21175,
+      "Transport": 14300,
+      "avg_monthly_income": 18060
+    },
+    "น่าน": {
+      "Agriculture": 14684,
+      "FactoryWorkers": 16443,
+      "OfficeStaff": 35427,
+      "SMEOwners": 23866,
+      "Transport": 19250,
+      "avg_monthly_income": 21934
+    },
+    "บึงกาฬ": {
+      "Agriculture": 19548,
+      "FactoryWorkers": 24991,
+      "OfficeStaff": 40819,
+      "SMEOwners": 35566,
+      "Transport": 17316,
+      "avg_monthly_income": 27648
+    },
+    "บุรีรัมย์": {
+      "Agriculture": 20246,
+      "FactoryWorkers": 17321,
+      "OfficeStaff": 37315,
+      "SMEOwners": 23966,
+      "Transport": 20477,
+      "avg_monthly_income": 23865
+    },
+    "ปทุมธานี": {
+      "Agriculture": 30671,
+      "FactoryWorkers": 33433,
+      "OfficeStaff": 52371,
+      "SMEOwners": 53713,
+      "Transport": 27289,
+      "avg_monthly_income": 39495
+    },
+    "ประจวบคีรีขันธ์": {
+      "Agriculture": 21556,
+      "FactoryWorkers": 18860,
+      "OfficeStaff": 36005,
+      "SMEOwners": 27114,
+      "Transport": 20335,
+      "avg_monthly_income": 24774
+    },
+    "ปราจีนบุรี": {
+      "Agriculture": 18556,
+      "FactoryWorkers": 27006,
+      "OfficeStaff": 28465,
+      "SMEOwners": 23534,
+      "Transport": 22824,
+      "avg_monthly_income": 24077
+    },
+    "ปัตตานี": {
+      "Agriculture": 17496,
+      "FactoryWorkers": 16663,
+      "OfficeStaff": 29457,
+      "SMEOwners": 22112,
+      "Transport": 14379,
+      "avg_monthly_income": 20021
+    },
+    "พระนครศรีอยุธยา": {
+      "Agriculture": 35484,
+      "FactoryWorkers": 35135,
+      "OfficeStaff": 37931,
+      "SMEOwners": 43181,
+      "Transport": 23958,
+      "avg_monthly_income": 35138
+    },
+    "พะเยา": {
+      "Agriculture": 15336,
+      "FactoryWorkers": 14105,
+      "OfficeStaff": 30594,
+      "SMEOwners": 20442,
+      "Transport": 16019,
+      "avg_monthly_income": 19299
+    },
+    "พังงา": {
+      "Agriculture": 18399,
+      "FactoryWorkers": 26318,
+      "OfficeStaff": 34294,
+      "SMEOwners": 29351,
+      "Transport": 13865,
+      "avg_monthly_income": 24445
+    },
+    "พัทลุง": {
+      "Agriculture": 18998,
+      "FactoryWorkers": 21501,
+      "OfficeStaff": 39943,
+      "SMEOwners": 33144,
+      "Transport": 16213,
+      "avg_monthly_income": 25960
+    },
+    "พิจิตร": {
+      "Agriculture": 23698,
+      "FactoryWorkers": 21115,
+      "OfficeStaff": 33829,
+      "SMEOwners": 22049,
+      "Transport": 17501,
+      "avg_monthly_income": 23638
+    },
+    "พิษณุโลก": {
+      "Agriculture": 22335,
+      "FactoryWorkers": 21988,
+      "OfficeStaff": 39061,
+      "SMEOwners": 29130,
+      "Transport": 14397,
+      "avg_monthly_income": 25382
+    },
+    "ภูเก็ต": {
+      "Agriculture": 34694,
+      "FactoryWorkers": 29715,
+      "OfficeStaff": 48403,
+      "SMEOwners": 45410,
+      "Transport": 27115,
+      "avg_monthly_income": 37067
+    },
+    "มหาสารคาม": {
+      "Agriculture": 15297,
+      "FactoryWorkers": 17676,
+      "OfficeStaff": 39236,
+      "SMEOwners": 29341,
+      "Transport": 19241,
+      "avg_monthly_income": 24158
+    },
+    "มุกดาหาร": {
+      "Agriculture": 16885,
+      "FactoryWorkers": 18604,
+      "OfficeStaff": 36983,
+      "SMEOwners": 27564,
+      "Transport": 15790,
+      "avg_monthly_income": 23165
+    },
+    "ยะลา": {
+      "Agriculture": 13507,
+      "FactoryWorkers": 19434,
+      "OfficeStaff": 33675,
+      "SMEOwners": 51466,
+      "Transport": 14905,
+      "avg_monthly_income": 26597
+    },
+    "ยโสธร": {
+      "Agriculture": 17639,
+      "FactoryWorkers": 14920,
+      "OfficeStaff": 50521,
+      "SMEOwners": 34506,
+      "Transport": 18483,
+      "avg_monthly_income": 27214
+    },
+    "ระนอง": {
+      "Agriculture": 20472,
+      "FactoryWorkers": 18948,
+      "OfficeStaff": 34457,
+      "SMEOwners": 39451,
+      "Transport": 19437,
+      "avg_monthly_income": 26553
+    },
+    "ระยอง": {
+      "Agriculture": 44041,
+      "FactoryWorkers": 36970,
+      "OfficeStaff": 35831,
+      "SMEOwners": 27677,
+      "Transport": 18929,
+      "avg_monthly_income": 32690
+    },
+    "ราชบุรี": {
+      "Agriculture": 47453,
+      "FactoryWorkers": 22982,
+      "OfficeStaff": 39552,
+      "SMEOwners": 34175,
+      "Transport": 14594,
+      "avg_monthly_income": 31751
+    },
+    "ร้อยเอ็ด": {
+      "Agriculture": 21349,
+      "FactoryWorkers": 19585,
+      "OfficeStaff": 40670,
+      "SMEOwners": 31686,
+      "Transport": 14359,
+      "avg_monthly_income": 25530
+    },
+    "ลพบุรี": {
+      "Agriculture": 20320,
+      "FactoryWorkers": 26255,
+      "OfficeStaff": 36135,
+      "SMEOwners": 26831,
+      "Transport": 20821,
+      "avg_monthly_income": 26072
+    },
+    "ลำปาง": {
+      "Agriculture": 13893,
+      "FactoryWorkers": 20244,
+      "OfficeStaff": 39050,
+      "SMEOwners": 33895,
+      "Transport": 16416,
+      "avg_monthly_income": 24700
+    },
+    "ลำพูน": {
+      "Agriculture": 23777,
+      "FactoryWorkers": 26995,
+      "OfficeStaff": 35849,
+      "SMEOwners": 30396,
+      "Transport": 23885,
+      "avg_monthly_income": 28180
+    },
+    "ศรีสะเกษ": {
+      "Agriculture": 39759,
+      "FactoryWorkers": 17244,
+      "OfficeStaff": 28705,
+      "SMEOwners": 26648,
+      "Transport": 15627,
+      "avg_monthly_income": 25597
+    },
+    "สกลนคร": {
+      "Agriculture": 20307,
+      "FactoryWorkers": 15920,
+      "OfficeStaff": 33768,
+      "SMEOwners": 31493,
+      "Transport": 13797,
+      "avg_monthly_income": 23057
+    },
+    "สงขลา": {
+      "Agriculture": 19749,
+      "FactoryWorkers": 22415,
+      "OfficeStaff": 31625,
+      "SMEOwners": 29431,
+      "Transport": 18741,
+      "avg_monthly_income": 24392
+    },
+    "สตูล": {
+      "Agriculture": 19101,
+      "FactoryWorkers": 18349,
+      "OfficeStaff": 30992,
+      "SMEOwners": 34103,
+      "Transport": 13778,
+      "avg_monthly_income": 23265
+    },
+    "สมุทรปราการ": {
+      "Agriculture": 23523,
+      "FactoryWorkers": 30091,
+      "OfficeStaff": 40735,
+      "SMEOwners": 29761,
+      "Transport": 24833,
+      "avg_monthly_income": 29789
+    },
+    "สมุทรสงคราม": {
+      "Agriculture": 21477,
+      "FactoryWorkers": 23259,
+      "OfficeStaff": 36854,
+      "SMEOwners": 37042,
+      "Transport": 18222,
+      "avg_monthly_income": 27371
+    },
+    "สมุทรสาคร": {
+      "Agriculture": 22843,
+      "FactoryWorkers": 23018,
+      "OfficeStaff": 45011,
+      "SMEOwners": 38787,
+      "Transport": 21573,
+      "avg_monthly_income": 30246
+    },
+    "สระบุรี": {
+      "Agriculture": 27632,
+      "FactoryWorkers": 36514,
+      "OfficeStaff": 39192,
+      "SMEOwners": 46871,
+      "Transport": 22406,
+      "avg_monthly_income": 34523
+    },
+    "สระแก้ว": {
+      "Agriculture": 23349,
+      "FactoryWorkers": 18375,
+      "OfficeStaff": 29853,
+      "SMEOwners": 24690,
+      "Transport": 18480,
+      "avg_monthly_income": 22949
+    },
+    "สิงห์บุรี": {
+      "Agriculture": 26263,
+      "FactoryWorkers": 29202,
+      "OfficeStaff": 44801,
+      "SMEOwners": 28269,
+      "Transport": 22609,
+      "avg_monthly_income": 30229
+    },
+    "สุพรรณบุรี": {
+      "Agriculture": 16772,
+      "FactoryWorkers": 24760,
+      "OfficeStaff": 36396,
+      "SMEOwners": 27352,
+      "Transport": 14463,
+      "avg_monthly_income": 23949
+    },
+    "สุราษฎร์ธานี": {
+      "Agriculture": 30614,
+      "FactoryWorkers": 23259,
+      "OfficeStaff": 37724,
+      "SMEOwners": 37719,
+      "Transport": 19652,
+      "avg_monthly_income": 29794
+    },
+    "สุรินทร์": {
+      "Agriculture": 17443,
+      "FactoryWorkers": 17639,
+      "OfficeStaff": 36252,
+      "SMEOwners": 27946,
+      "Transport": 24010,
+      "avg_monthly_income": 24658
+    },
+    "สุโขทัย": {
+      "Agriculture": 23618,
+      "FactoryWorkers": 20688,
+      "OfficeStaff": 40603,
+      "SMEOwners": 31186,
+      "Transport": 18181,
+      "avg_monthly_income": 26855
+    },
+    "หนองคาย": {
+      "Agriculture": 20460,
+      "FactoryWorkers": 19345,
+      "OfficeStaff": 38127,
+      "SMEOwners": 32497,
+      "Transport": 24912,
+      "avg_monthly_income": 27068
+    },
+    "หนองบัวลำภู": {
+      "Agriculture": 35203,
+      "FactoryWorkers": 20357,
+      "OfficeStaff": 31493,
+      "SMEOwners": 28144,
+      "Transport": 15145,
+      "avg_monthly_income": 26068
+    },
+    "อำนาจเจริญ": {
+      "Agriculture": 18477,
+      "FactoryWorkers": 18575,
+      "OfficeStaff": 40992,
+      "SMEOwners": 38718,
+      "Transport": 18552,
+      "avg_monthly_income": 27063
+    },
+    "อุดรธานี": {
+      "Agriculture": 27150,
+      "FactoryWorkers": 14486,
+      "OfficeStaff": 30008,
+      "SMEOwners": 28534,
+      "Transport": 14541,
+      "avg_monthly_income": 22944
+    },
+    "อุตรดิตถ์": {
+      "Agriculture": 22623,
+      "FactoryWorkers": 22613,
+      "OfficeStaff": 38267,
+      "SMEOwners": 27693,
+      "Transport": 17161,
+      "avg_monthly_income": 25671
+    },
+    "อุทัยธานี": {
+      "Agriculture": 18044,
+      "FactoryWorkers": 18297,
+      "OfficeStaff": 33864,
+      "SMEOwners": 24928,
+      "Transport": 12645,
+      "avg_monthly_income": 21556
+    },
+    "อุบลราชธานี": {
+      "Agriculture": 20798,
+      "FactoryWorkers": 17157,
+      "OfficeStaff": 35605,
+      "SMEOwners": 25208,
+      "Transport": 13343,
+      "avg_monthly_income": 22422
+    },
+    "อ่างทอง": {
+      "Agriculture": 26928,
+      "FactoryWorkers": 28223,
+      "OfficeStaff": 33899,
+      "SMEOwners": 30714,
+      "Transport": 17156,
+      "avg_monthly_income": 27384
+    },
+    "เชียงราย": {
+      "Agriculture": 15156,
+      "FactoryWorkers": 17697,
+      "OfficeStaff": 26884,
+      "SMEOwners": 16473,
+      "Transport": 13085,
+      "avg_monthly_income": 17859
+    },
+    "เชียงใหม่": {
+      "Agriculture": 16152,
+      "FactoryWorkers": 18977,
+      "OfficeStaff": 38631,
+      "SMEOwners": 50813,
+      "Transport": 31365,
+      "avg_monthly_income": 31188
+    },
+    "เพชรบุรี": {
+      "Agriculture": 28985,
+      "FactoryWorkers": 21697,
+      "OfficeStaff": 37995,
+      "SMEOwners": 34651,
+      "Transport": 18306,
+      "avg_monthly_income": 28327
+    },
+    "เพชรบูรณ์": {
+      "Agriculture": 22633,
+      "FactoryWorkers": 28487,
+      "OfficeStaff": 39327,
+      "SMEOwners": 29069,
+      "Transport": 20262,
+      "avg_monthly_income": 27956
+    },
+    "เลย": {
+      "Agriculture": 21750,
+      "FactoryWorkers": 20544,
+      "OfficeStaff": 45881,
+      "SMEOwners": 31430,
+      "Transport": 15238,
+      "avg_monthly_income": 26969
+    },
+    "แพร่": {
+      "Agriculture": 13189,
+      "FactoryWorkers": 16690,
+      "OfficeStaff": 40493,
+      "SMEOwners": 29670,
+      "Transport": 16362,
+      "avg_monthly_income": 23281
+    },
+    "แม่ฮ่องสอน": {
+      "Agriculture": 12435,
+      "FactoryWorkers": 16622,
+      "OfficeStaff": 29663,
+      "SMEOwners": 46095,
+      "Transport": 6713,
+      "avg_monthly_income": 22306
+    }
+  }
+}

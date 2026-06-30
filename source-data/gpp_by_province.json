@@ -1,0 +1,631 @@
+{
+  "meta": {
+    "source": "NESDC Provincial Accounts (GPP) — via data.go.th / TMLI",
+    "provenance": "MEASURED. Vendored from kaustavb2101/watcher source-data/tmli/provincial-gpp.js. NESDC 2566 B.E. (2023 CE) estimate.",
+    "fields": {
+      "gpp_million_thb": "total Gross Provincial Product, million THB (NESDC 2566)",
+      "manufacturing_share/agri_share/services_share": "sector share of GPP, 0..1",
+      "hub_type": "IND | AGRI | SVC | TOUR | MIX",
+      "confidence": "0..1 data confidence (1.0 = CKAN-verified)"
+    },
+    "n_provinces": 77
+  },
+  "provinces": {
+    "กระบี่": {
+      "gpp_million_thb": 55000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.2,
+      "services_share": 0.7,
+      "hub_type": "TOUR",
+      "confidence": 0.82
+    },
+    "กรุงเทพมหานคร": {
+      "gpp_million_thb": 7200000,
+      "manufacturing_share": 0.25,
+      "agri_share": 0.01,
+      "services_share": 0.74,
+      "hub_type": "MIX",
+      "confidence": 0.97
+    },
+    "กาญจนบุรี": {
+      "gpp_million_thb": 58000,
+      "manufacturing_share": 0.25,
+      "agri_share": 0.35,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.8
+    },
+    "กาฬสินธุ์": {
+      "gpp_million_thb": 38000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.65,
+      "services_share": 0.2,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "กำแพงเพชร": {
+      "gpp_million_thb": 55000,
+      "manufacturing_share": 0.2,
+      "agri_share": 0.42,
+      "services_share": 0.38,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ขอนแก่น": {
+      "gpp_million_thb": 125000,
+      "manufacturing_share": 0.32,
+      "agri_share": 0.28,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.86
+    },
+    "จันทบุรี": {
+      "gpp_million_thb": 45000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.4,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ฉะเชิงเทรา": {
+      "gpp_million_thb": 95000,
+      "manufacturing_share": 0.48,
+      "agri_share": 0.14,
+      "services_share": 0.38,
+      "hub_type": "IND",
+      "confidence": 0.85
+    },
+    "ชลบุรี": {
+      "gpp_million_thb": 820000,
+      "manufacturing_share": 0.72,
+      "agri_share": 0.08,
+      "services_share": 0.2,
+      "hub_type": "IND",
+      "confidence": 0.95
+    },
+    "ชัยนาท": {
+      "gpp_million_thb": 35000,
+      "manufacturing_share": 0.2,
+      "agri_share": 0.38,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ชัยภูมิ": {
+      "gpp_million_thb": 45000,
+      "manufacturing_share": 0.22,
+      "agri_share": 0.48,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ชุมพร": {
+      "gpp_million_thb": 45000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.55,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ตรัง": {
+      "gpp_million_thb": 48000,
+      "manufacturing_share": 0.25,
+      "agri_share": 0.45,
+      "services_share": 0.3,
+      "hub_type": "MIX",
+      "confidence": 0.8
+    },
+    "ตราด": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.48,
+      "services_share": 0.4,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "ตาก": {
+      "gpp_million_thb": 38000,
+      "manufacturing_share": 0.28,
+      "agri_share": 0.3,
+      "services_share": 0.42,
+      "hub_type": "MIX",
+      "confidence": 0.78
+    },
+    "นครนายก": {
+      "gpp_million_thb": 30000,
+      "manufacturing_share": 0.22,
+      "agri_share": 0.28,
+      "services_share": 0.5,
+      "hub_type": "MIX",
+      "confidence": 0.78
+    },
+    "นครปฐม": {
+      "gpp_million_thb": 125000,
+      "manufacturing_share": 0.42,
+      "agri_share": 0.12,
+      "services_share": 0.46,
+      "hub_type": "MIX",
+      "confidence": 0.85
+    },
+    "นครพนม": {
+      "gpp_million_thb": 30000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.62,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "นครราชสีมา": {
+      "gpp_million_thb": 165000,
+      "manufacturing_share": 0.25,
+      "agri_share": 0.45,
+      "services_share": 0.3,
+      "hub_type": "MIX",
+      "confidence": 0.87
+    },
+    "นครศรีธรรมราช": {
+      "gpp_million_thb": 82000,
+      "manufacturing_share": 0.22,
+      "agri_share": 0.38,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.82
+    },
+    "นครสวรรค์": {
+      "gpp_million_thb": 95000,
+      "manufacturing_share": 0.28,
+      "agri_share": 0.32,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.82
+    },
+    "นนทบุรี": {
+      "gpp_million_thb": 285000,
+      "manufacturing_share": 0.38,
+      "agri_share": 0.04,
+      "services_share": 0.58,
+      "hub_type": "MIX",
+      "confidence": 0.9
+    },
+    "นราธิวาส": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.45,
+      "services_share": 0.4,
+      "hub_type": "AGRI",
+      "confidence": 0.75
+    },
+    "น่าน": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.65,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "บึงกาฬ": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.82,
+      "services_share": 0.13,
+      "hub_type": "AGRI",
+      "confidence": 0.75
+    },
+    "บุรีรัมย์": {
+      "gpp_million_thb": 58000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.62,
+      "services_share": 0.26,
+      "hub_type": "AGRI",
+      "confidence": 0.82
+    },
+    "ปทุมธานี": {
+      "gpp_million_thb": 310000,
+      "manufacturing_share": 0.52,
+      "agri_share": 0.06,
+      "services_share": 0.42,
+      "hub_type": "IND",
+      "confidence": 0.9
+    },
+    "ประจวบคีรีขันธ์": {
+      "gpp_million_thb": 55000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.22,
+      "services_share": 0.66,
+      "hub_type": "TOUR",
+      "confidence": 0.8
+    },
+    "ปราจีนบุรี": {
+      "gpp_million_thb": 75000,
+      "manufacturing_share": 0.45,
+      "agri_share": 0.16,
+      "services_share": 0.39,
+      "hub_type": "IND",
+      "confidence": 0.84
+    },
+    "ปัตตานี": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.28,
+      "agri_share": 0.32,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.75
+    },
+    "พระนครศรีอยุธยา": {
+      "gpp_million_thb": 480000,
+      "manufacturing_share": 0.68,
+      "agri_share": 0.08,
+      "services_share": 0.24,
+      "hub_type": "IND",
+      "confidence": 0.9
+    },
+    "พะเยา": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.07,
+      "agri_share": 0.58,
+      "services_share": 0.35,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "พังงา": {
+      "gpp_million_thb": 42000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.25,
+      "services_share": 0.7,
+      "hub_type": "TOUR",
+      "confidence": 0.8
+    },
+    "พัทลุง": {
+      "gpp_million_thb": 28000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.55,
+      "services_share": 0.37,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "พิจิตร": {
+      "gpp_million_thb": 40000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.4,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "พิษณุโลก": {
+      "gpp_million_thb": 80000,
+      "manufacturing_share": 0.24,
+      "agri_share": 0.28,
+      "services_share": 0.48,
+      "hub_type": "MIX",
+      "confidence": 0.82
+    },
+    "ภูเก็ต": {
+      "gpp_million_thb": 185000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.05,
+      "services_share": 0.9,
+      "hub_type": "TOUR",
+      "confidence": 0.92
+    },
+    "มหาสารคาม": {
+      "gpp_million_thb": 38000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.45,
+      "services_share": 0.45,
+      "hub_type": "MIX",
+      "confidence": 0.8
+    },
+    "มุกดาหาร": {
+      "gpp_million_thb": 31000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.38,
+      "services_share": 0.5,
+      "hub_type": "MIX",
+      "confidence": 0.95
+    },
+    "ยะลา": {
+      "gpp_million_thb": 25000,
+      "manufacturing_share": 0.2,
+      "agri_share": 0.5,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.75
+    },
+    "ยโสธร": {
+      "gpp_million_thb": 28000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.78,
+      "services_share": 0.17,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "ระนอง": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.4,
+      "services_share": 0.5,
+      "hub_type": "TOUR",
+      "confidence": 0.76
+    },
+    "ระยอง": {
+      "gpp_million_thb": 950000,
+      "manufacturing_share": 0.85,
+      "agri_share": 0.05,
+      "services_share": 0.1,
+      "hub_type": "IND",
+      "confidence": 0.96
+    },
+    "ราชบุรี": {
+      "gpp_million_thb": 85000,
+      "manufacturing_share": 0.45,
+      "agri_share": 0.25,
+      "services_share": 0.3,
+      "hub_type": "IND",
+      "confidence": 0.82
+    },
+    "ร้อยเอ็ด": {
+      "gpp_million_thb": 45000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.75,
+      "services_share": 0.17,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "ลพบุรี": {
+      "gpp_million_thb": 85000,
+      "manufacturing_share": 0.3,
+      "agri_share": 0.28,
+      "services_share": 0.42,
+      "hub_type": "MIX",
+      "confidence": 0.82
+    },
+    "ลำปาง": {
+      "gpp_million_thb": 50000,
+      "manufacturing_share": 0.35,
+      "agri_share": 0.15,
+      "services_share": 0.5,
+      "hub_type": "IND",
+      "confidence": 0.8
+    },
+    "ลำพูน": {
+      "gpp_million_thb": 65000,
+      "manufacturing_share": 0.68,
+      "agri_share": 0.1,
+      "services_share": 0.22,
+      "hub_type": "IND",
+      "confidence": 0.82
+    },
+    "ศรีสะเกษ": {
+      "gpp_million_thb": 42000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.72,
+      "services_share": 0.2,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "สกลนคร": {
+      "gpp_million_thb": 38000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.6,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "สงขลา": {
+      "gpp_million_thb": 130000,
+      "manufacturing_share": 0.35,
+      "agri_share": 0.25,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.86
+    },
+    "สตูล": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.5,
+      "services_share": 0.4,
+      "hub_type": "AGRI",
+      "confidence": 0.75
+    },
+    "สมุทรปราการ": {
+      "gpp_million_thb": 580000,
+      "manufacturing_share": 0.6,
+      "agri_share": 0.02,
+      "services_share": 0.38,
+      "hub_type": "IND",
+      "confidence": 0.92
+    },
+    "สมุทรสงคราม": {
+      "gpp_million_thb": 38000,
+      "manufacturing_share": 0.22,
+      "agri_share": 0.3,
+      "services_share": 0.48,
+      "hub_type": "AGRI",
+      "confidence": 0.82
+    },
+    "สมุทรสาคร": {
+      "gpp_million_thb": 220000,
+      "manufacturing_share": 0.55,
+      "agri_share": 0.08,
+      "services_share": 0.37,
+      "hub_type": "IND",
+      "confidence": 0.88
+    },
+    "สระบุรี": {
+      "gpp_million_thb": 180000,
+      "manufacturing_share": 0.55,
+      "agri_share": 0.1,
+      "services_share": 0.35,
+      "hub_type": "IND",
+      "confidence": 0.86
+    },
+    "สระแก้ว": {
+      "gpp_million_thb": 30000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.4,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "สิงห์บุรี": {
+      "gpp_million_thb": 28000,
+      "manufacturing_share": 0.28,
+      "agri_share": 0.3,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "สุพรรณบุรี": {
+      "gpp_million_thb": 68000,
+      "manufacturing_share": 0.22,
+      "agri_share": 0.4,
+      "services_share": 0.38,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "สุราษฎร์ธานี": {
+      "gpp_million_thb": 110000,
+      "manufacturing_share": 0.2,
+      "agri_share": 0.25,
+      "services_share": 0.55,
+      "hub_type": "TOUR",
+      "confidence": 0.85
+    },
+    "สุรินทร์": {
+      "gpp_million_thb": 40000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.68,
+      "services_share": 0.22,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "สุโขทัย": {
+      "gpp_million_thb": 42000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.35,
+      "services_share": 0.47,
+      "hub_type": "AGRI",
+      "confidence": 0.8
+    },
+    "หนองคาย": {
+      "gpp_million_thb": 32000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.35,
+      "services_share": 0.53,
+      "hub_type": "MIX",
+      "confidence": 0.78
+    },
+    "หนองบัวลำภู": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.72,
+      "services_share": 0.2,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "อำนาจเจริญ": {
+      "gpp_million_thb": 25000,
+      "manufacturing_share": 0.05,
+      "agri_share": 0.75,
+      "services_share": 0.2,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "อุดรธานี": {
+      "gpp_million_thb": 75000,
+      "manufacturing_share": 0.28,
+      "agri_share": 0.32,
+      "services_share": 0.4,
+      "hub_type": "MIX",
+      "confidence": 0.84
+    },
+    "อุตรดิตถ์": {
+      "gpp_million_thb": 28000,
+      "manufacturing_share": 0.1,
+      "agri_share": 0.6,
+      "services_share": 0.3,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "อุทัยธานี": {
+      "gpp_million_thb": 28000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.38,
+      "services_share": 0.44,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "อุบลราชธานี": {
+      "gpp_million_thb": 80000,
+      "manufacturing_share": 0.16,
+      "agri_share": 0.38,
+      "services_share": 0.46,
+      "hub_type": "MIX",
+      "confidence": 0.84
+    },
+    "อ่างทอง": {
+      "gpp_million_thb": 42000,
+      "manufacturing_share": 0.35,
+      "agri_share": 0.24,
+      "services_share": 0.41,
+      "hub_type": "MIX",
+      "confidence": 0.8
+    },
+    "เชียงราย": {
+      "gpp_million_thb": 65000,
+      "manufacturing_share": 0.12,
+      "agri_share": 0.35,
+      "services_share": 0.53,
+      "hub_type": "TOUR",
+      "confidence": 0.84
+    },
+    "เชียงใหม่": {
+      "gpp_million_thb": 155000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.15,
+      "services_share": 0.7,
+      "hub_type": "TOUR",
+      "confidence": 0.88
+    },
+    "เพชรบุรี": {
+      "gpp_million_thb": 48000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.25,
+      "services_share": 0.6,
+      "hub_type": "TOUR",
+      "confidence": 0.8
+    },
+    "เพชรบูรณ์": {
+      "gpp_million_thb": 55000,
+      "manufacturing_share": 0.18,
+      "agri_share": 0.4,
+      "services_share": 0.42,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "เลย": {
+      "gpp_million_thb": 32000,
+      "manufacturing_share": 0.15,
+      "agri_share": 0.45,
+      "services_share": 0.4,
+      "hub_type": "AGRI",
+      "confidence": 0.78
+    },
+    "แพร่": {
+      "gpp_million_thb": 22000,
+      "manufacturing_share": 0.08,
+      "agri_share": 0.55,
+      "services_share": 0.37,
+      "hub_type": "AGRI",
+      "confidence": 0.76
+    },
+    "แม่ฮ่องสอน": {
+      "gpp_million_thb": 12000,
+      "manufacturing_share": 0.02,
+      "agri_share": 0.45,
+      "services_share": 0.53,
+      "hub_type": "TOUR",
+      "confidence": 0.75
+    }
+  }
+}
