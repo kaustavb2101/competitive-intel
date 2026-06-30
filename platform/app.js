@@ -581,8 +581,20 @@ function renderBotCap(){
    backing most title loans is under depreciation pressure (used-pickup glut + EV/PHEV
    transition). We have NO live Thai used-pickup index, so the pickup card is labelled an
    EDITORIAL / ESTIMATED WATCH — said plainly in the note. */
+// per-province collateral recovery-value outlook (data/collateral_outlook.json, obj#1). Lazy-loaded
+// once; feeds a national-summary card into the Overview collateral board. Graceful when absent.
+let COLLO=null, colloLoaded=false, colloPromise=null;
+function loadCollatOutlookData(){
+  if(colloPromise) return colloPromise;
+  colloLoaded=true;
+  colloPromise=fetch('data/collateral_outlook.json').then(r=>r.ok?r.json():null)
+    .then(j=>{COLLO=j||null;return COLLO;}).catch(()=>{COLLO=null;return null;});
+  return colloPromise;
+}
 function renderCollatOutlook(){
   const el=$('#collat-outlook'); if(!el) return;
+  // warm the per-province outlook layer; re-render once it lands so the national card appears.
+  if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
   const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
   const cards=[
@@ -591,6 +603,14 @@ function renderCollatOutlook(){
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
   ];
+  // national recovery-value outlook (from collateral_outlook.json) — firming vs softening + most-at-risk.
+  const nat=COLLO&&COLLO.national;
+  if(nat&&nat.exposure_weighted_outlook!=null){
+    const o=nat.exposure_weighted_outlook, firm=o>=0;
+    cards.push({k:'Recovery outlook (national)', v:firm?'firming':'softening', d:(firm?'+':'')+o.toFixed(2)+' index', cls:firm?'up':'down',
+      n:'Estimated directional read · '+(nat.n_firming||0)+'/'+(nat.n_provinces||0)+' provinces firming; most at-risk '+(nat.most_at_risk_province||'—')+
+        ' (highest motorcycle-title share). Combines measured DLT moto share + gold (global proxy). NOT a measured recovery rate.'});
+  }
   el.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
