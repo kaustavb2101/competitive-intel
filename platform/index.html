@@ -14,18 +14,23 @@
 <body>
 <nav id="nav" role="tablist" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
-  <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Command center</a>
+  <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Home</a>
   <a data-v="overview" href="#overview" role="tab" aria-selected="false">Overview</a>
   <a data-v="map" href="#map" role="tab" aria-selected="false">National</a>
+  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Acquire</a>
+  <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
+  <a data-v="trend" href="#trend" role="tab" aria-selected="false">Trend</a>
   <a href="rayong-catchment.html">Rayong 3D</a>
   <a href="rayong-catchment.html?city=bangkok">Bangkok 3D</a>
-  <a data-v="trend" href="#trend" role="tab" aria-selected="false">Risk trend</a>
-  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Acquisition</a>
-  <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
-  <a data-v="sim" href="#sim" role="tab" aria-selected="false">Simulator</a>
-  <a data-v="provinces" href="#provinces" role="tab" aria-selected="false">Provinces</a>
-  <a data-v="market" href="#market" role="tab" aria-selected="false">Market</a>
-  <a data-v="branches" href="#branches" role="tab" aria-selected="false">Branches</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
+      <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
+      <a data-v="market" href="#market" role="menuitem">Market</a>
+      <a data-v="branches" href="#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
     style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
 </nav>
@@ -34,6 +39,19 @@
  function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
  sync();
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
+<script>/* "More ▾" nav dropdown — pure UI; routing stays in app.js (menu links carry data-v inside #nav). */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);}); /* picking a view closes it; app.js handles the route */
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ /* mirror active state onto the More button when one of its views is selected */
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
 </script>
 <div id="updated" style="display:none"></div>
 
