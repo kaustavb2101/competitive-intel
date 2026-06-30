@@ -160,13 +160,19 @@
     <table class="tbl" id="cstresstbl"></table>
   </section>
 
-  <!-- MAP -->
+  <!-- MAP — map is the hero: full-bleed map with the lens pill row docked on top -->
   <section class="view" id="v-map">
-    <div class="lenses" id="lenses"></div>
-    <div class="chips" id="riskSub" style="display:none"></div>
-    <div id="map"></div>
-    <div class="maplegend" id="maplegend"></div>
-    <p class="lead">Tap any branch for its scores. Dot colour and size scale with the selected lens. The <b>Portfolio risk</b> lens is an <b>estimated proxy</b> (OSM/price-based, 0–100), not a measured default rate. The <b>Competitor density</b> lens colours each branch by <b>measured</b> rival branches within ~5km (Google Places — a <b>lower bound</b>, not a registry) and plots them faintly; it is blank until <span class="mono">pipeline/pull_competitors.py</span> runs.</p>
+    <div class="maphero">
+      <div id="map"></div>
+      <div class="maphero-top">
+        <div class="lenses" id="lenses" role="group" aria-label="Map lens — colour the 2,015 branches by"></div>
+        <div class="chips" id="riskSub" style="display:none"></div>
+      </div>
+    </div>
+    <p class="maplegend-line">
+      <span class="maplegend" id="maplegend"></span>
+      <span class="sub">Tap any branch for its scores · dot colour + size scale with the lens · ● measured · ▲ estimated proxy</span>
+    </p>
   </section>
 
   <!-- ACQUISITION -->
