@@ -695,9 +695,11 @@ function drawCompCoverage(){
     const ttxt=(t.coverage_pct!=null)
       ? `Overall we have located <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> of an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> reported branches — about <b style="color:var(--gold)">${t.coverage_pct.toFixed(1)}%</b> coverage.`
       : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations (lower bound).`;
-    ro.innerHTML=`<b>Our competitor census is a LOWER BOUND.</b> ${ttxt}
-      <span class="sub">Found = MEASURED; expected = ESTIMATED-from-public-reports (cited IR / annual reports — uncited brands left blank, never invented).
-      Coverage % is a confidence flag on our competitor-density signals, not market share. The census is being expanded.</span>`;
+    ro.innerHTML=`<b>Our competitor census is a LOWER BOUND.</b> ${ttxt} ${TAG_M} ${TAG_E}`+
+      methodBox(null,
+        ['Found = <b>MEASURED</b> census count; expected = <b>ESTIMATED</b>-from-public-reports (cited IR / annual reports — uncited brands left blank, never invented).',
+         'Coverage % is a confidence flag on our competitor-density signals, <b>not</b> market share.',
+         'The census is being expanded; today’s coverage understates the true rival footprint.']);
   }
 }
 
@@ -754,8 +756,10 @@ function drawOppScore(){
     const wtxt=(w.whitespace!=null)?` Weights: white-space ${Math.round(w.whitespace*100)}% · competitor-gap ${Math.round((w.competitor_gap||0)*100)}% · agri-stress ${Math.round((w.agri_stress||0)*100)}%.`:'';
     ro.innerHTML=`<b>Open here next:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the composite at
       <b style="color:var(--accent)">${Math.round(t.score)}</b>/100 — white-space ${Math.round((t.components||{}).whitespace||0)},
-      competitor-gap ${Math.round((t.components||{}).competitor_gap||0)}, agri-stress ${Math.round((t.components||{}).agri_stress||0)}.
-      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED COMPOSITE — a ranking aid for expansion, not a measured quantity.${wtxt}</span>`;
+      competitor-gap ${Math.round((t.components||{}).competitor_gap||0)}, agri-stress ${Math.round((t.components||{}).agri_stress||0)}. ${TAG_E}`+
+      methodBox(`Top ${top.length} of ${rows.length} districts.${wtxt}`,
+        ['<b>ESTIMATED COMPOSITE</b> — a ranking aid for expansion, not a measured quantity.',
+         'White-space &amp; competitor-gap components are <b>measured</b>; agri-stress is <b>province-inherited estimated</b>.']);
   }
 }
 
@@ -1290,11 +1294,69 @@ function renderExposure(){
       <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
+  // OBJECTIVE #1: portfolio concentration by region (segment mix + HHI) — lead with the headline.
+  renderConcentration();
   // OBJECTIVE #1: borrower-base concentration — is the book over-exposed to one occupation type?
   renderOccConcentration();
   // OBJECTIVE #1: composite-risk readouts — most-stressed provinces + riskiest branches (lazy, graceful).
   renderRiskReadouts();
 }
+
+/* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
+   Surfaces data/segment_exposure.json (national + 5 regions + 77 provinces; built by
+   pipeline/build_segment_exposure.py). For each region we show its dominant segment, a stacked
+   agri/merchant/collateral mix bar (CLAUDE.md colours), and the rescaled HHI 0–1 concentration.
+   We DO NOT recompute anything — just read & display. ESTIMATED: the a/m/c segment scores are
+   estimated proxies, so this is a STRUCTURAL footprint concentration, not a measured loss/AUM
+   concentration. Lazy-loaded once; renders nothing gracefully when the file is absent. */
+let SEGEXP=null, segexpLoaded=false;
+const SEG_LABEL={agri:'agri',merchant:'merchant',collateral:'collateral'};
+function renderConcentration(){
+  const host=document.getElementById('expoconc'); if(!host) return;
+  if(!segexpLoaded){
+    segexpLoaded=true;
+    fetch('data/segment_exposure.json').then(r=>r.ok?r.json():null).then(j=>{ SEGEXP=j; if(onExposureView()) renderConcentration(); })
+      .catch(()=>{ SEGEXP=null; if(onExposureView()) renderConcentration(); });
+    return;   // first paint waits for the fetch
+  }
+  const regions=(SEGEXP&&Array.isArray(SEGEXP.regions))?SEGEXP.regions:[];
+  if(!regions.length){ host.innerHTML=''; return; }   // graceful: render nothing when absent
+  // headline: most- and least-concentrated regions (regions already sorted most-concentrated-first).
+  const sorted=regions.slice().sort((a,b)=>(b.hhi||0)-(a.hhi||0));
+  const top=sorted[0];
+  const agriLed=sorted.filter(r=>(r.dominant_segment==='agri')).map(r=>r.region);
+  const agriTxt=agriLed.length?` ${agriLed.join(' & ')} ${agriLed.length>1?'are':'is'} agri-led.`:'';
+  const head=`<b>${top.region} is near-pure ${SEG_LABEL[top.dominant_segment]||top.dominant_segment} (HHI ${(top.hhi||0).toFixed(2)})</b>`+
+    (top.dominant_segment==='collateral'?' — the least-diversified region':'')+`.${agriTxt}`+
+    ` Higher HHI = the footprint leans on one segment.`;
+  const seg=(o,k)=>Math.round(100*((o.segment_mix||{})[k]||0));
+  const rowsHtml=regions.map(o=>{
+    const a=seg(o,'agri'),m=seg(o,'merchant'),c=seg(o,'collateral');
+    const hhi=(o.hhi||0).toFixed(2);
+    const hcol=(o.hhi||0)>=0.5?'var(--agri)':(o.hhi||0)>=0.25?'var(--gold)':'var(--merch)';
+    const segCol=o.dominant_segment==='agri'?'var(--agri)':o.dominant_segment==='merchant'?'var(--merch)':'var(--collat)';
+    return `<div class="conc-row">`+
+      `<div class="conc-hd"><span class="conc-name">${o.region}</span>`+
+        `<span class="conc-dom">${(o.n_branches||0)} branches · dominant <b style="color:${segCol}">${SEG_LABEL[o.dominant_segment]||o.dominant_segment}</b></span>`+
+        `<span class="conc-hhi" style="color:${hcol}">${hhi}<span class="s"> HHI</span></span></div>`+
+      `<div class="mix" title="agri ${a}% · merchant ${m}% · collateral ${c}%">`+
+        (a?`<span class="ma" style="width:${a}%"></span>`:'')+
+        (m?`<span class="mm" style="width:${m}%"></span>`:'')+
+        (c?`<span class="mc" style="width:${c}%"></span>`:'')+`</div></div>`;
+  }).join('');
+  const nat=SEGEXP.national||{};
+  const cav=(SEGEXP.meta&&Array.isArray(SEGEXP.meta.caveats))?SEGEXP.meta.caveats:[];
+  host.innerHTML=`<h2 class="risk" style="margin-top:0">Portfolio concentration by region ${TAG_E}</h2>`+
+    `<p class="conc-lead">${head}</p>`+
+    `<div class="conc-legend"><span><i style="background:var(--agri)"></i>agri</span>`+
+      `<span><i style="background:var(--merch)"></i>merchant</span>`+
+      `<span><i style="background:var(--collat)"></i>collateral</span>`+
+      (nat.hhi!=null?`<span style="margin-left:auto">national HHI ${(nat.hhi||0).toFixed(2)} · dominant ${SEG_LABEL[nat.dominant_segment]||nat.dominant_segment||'—'}</span>`:'')+`</div>`+
+    rowsHtml+
+    methodBox('HHI is a rescaled Herfindahl of the segment mix: 0 = balanced across agri/merchant/collateral, 1 = a single segment. The mix is the share of a region’s branches whose dominant segment (argmax of the a/m/c scores) is each of the three.',
+      cav.concat(['Per-region segment mix and HHI are derived from <b>estimated</b> segment proxy scores — a structural footprint read, labelled est.']));
+}
+function onExposureView(){const v=document.getElementById('v-exposure'); return v&&v.classList.contains('on');}
 
 /* ---------- composite-risk readouts on #exposure (objective #1) ----------
    Two exec-readable panels built from the risk layers that already ship but are under-shown:
@@ -1326,9 +1388,11 @@ function renderRiskReadouts(){
     const top=PRISK_LIST.slice(0,12);
     const max=Math.max(1,...top.map(p=>p.mean_risk||0));
     html+=`<h2 class="risk" style="margin-top:0">Most-stressed provinces ${TAG_E}</h2>`+
-      `<p class="lead">Top ${top.length} provinces by <b>mean composite risk</b> — one fused read of "which areas are getting riskier", `+
-      `blending measured household debt + crop/drought + occupation + segment/collateral mix. `+
-      `Branch counts are <b>measured</b>; mean/p90 are aggregates of an <b>estimated composite</b> (0–100), not a measured default rate. Bars are relative to the worst.</p>`+
+      `<p class="lead">Top ${top.length} provinces by <b>mean composite risk</b> — one fused read of "which areas are getting riskier". Bars are relative to the worst.</p>`+
+      methodBox('One fused read blending measured household debt + crop/drought + occupation + segment/collateral mix.',
+        ['Branch counts are <b>measured</b>.',
+         'Mean / p90 are aggregates of an <b>estimated composite</b> (0–100), <b>not</b> a measured default rate.',
+         'Bars are relative to the worst-observed mean, so they rank — they are not an absolute scale.'])+
       `<div class="cc-card-b">`+top.map((p,i)=>{
         const w=Math.round(180*(p.mean_risk||0)/max);
         const dom=priskDom(p);
@@ -1344,7 +1408,10 @@ function renderRiskReadouts(){
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
     const idx=BRISK.map((e,i)=>i).sort((a,b)=>(BRISK[b].composite_risk||0)-(BRISK[a].composite_risk||0)).slice(0,15);
     html+=`<h2 class="risk" style="margin-top:18px">Riskiest branches ${TAG_E}</h2>`+
-      `<p class="lead">Top 15 branches by the same <b>estimated composite</b> (0–100). A triage rank for where to look first, <b>not</b> a measured default rate — this is the readable list of the National map's composite-risk lens.</p>`+
+      `<p class="lead">Top 15 branches by the same <b>estimated composite</b> (0–100). — a triage rank for where to look first.</p>`+
+      methodBox('The readable list of the National map composite-risk lens.',
+        ['A triage rank, <b>not</b> a measured default rate.',
+         'Composite is index-aligned to the branch list; driver = the dominant component of the score.'])+
       `<table class="tbl" id="expo-brisk-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
       `<th class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th title="dominant driver of the composite">Top driver</th></tr>`+
       idx.map((i,rank)=>{const e=BRISK[i], d=DATA[i];
@@ -1834,7 +1901,12 @@ function initMap(){
   });
   map.on('popupclose', clearRadius);
   addRadiusToggle();
-  styleMarkers();
+  // P1: the district lenses (dws/drisk) read d._amp, which only exists after amphoe.json is joined.
+  // Painting now would flash every branch pale (val 0) then snap when the join lands. So when we open
+  // directly on a district lens, defer the first paint to the loadAmphoe().then below; otherwise paint
+  // immediately as before. renderLegend() still runs so the legend isn't blank in the gap.
+  const deferForAmp=(curLens==='dws'||curLens==='drisk')&&!ampJoinAttached;
+  if(deferForAmp) renderLegend(); else styleMarkers();
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
   if(!ampJoinAttached) loadAmphoe().then(()=>{ if(mapReady){ renderLegend(); styleMarkers(); } });
@@ -2250,8 +2322,23 @@ function drawMarket(){
    macro/regulatory read, risk movers (when ≥2 vintages exist), a localStorage watchlist, and
    CSV + print export. Every figure is tagged measured (m) or estimated/proxy (e). No new data
    files — it reuses branches.json, meta.json, amphoe.json, crop_stress.json, deltas.json. */
-const TAG_M='<span class="cc-tag m" title="Measured">measured</span>';
-const TAG_E='<span class="cc-tag e" title="Estimated / proxy — not a measured outcome">est</span>';
+// Standardized provenance chip (one consistent marker everywhere): filled dot = MEASURED,
+// hollow dot = ESTIMATED. ≥11px, AA-contrast text on a tinted pill (see .prov in styles.css).
+// provChip(kind[,label]) is the helper; TAG_M / TAG_E are the canonical short chips used inline.
+function provChip(kind,label){
+  const m=kind==='m';
+  return `<span class="prov ${m?'m':'e'}" title="${m?'Measured value':'Estimated / proxy — not a measured outcome'}">`+
+    `<span class="pd" aria-hidden="true"></span>${label||(m?'measured':'est')}</span>`;
+}
+const TAG_M=provChip('m');
+const TAG_E=provChip('e');
+// Reusable "Method & caveats" expander — keeps the honesty but moves long inline caveat prose into one
+// consistent collapsed disclosure. items = array of HTML strings (rendered as a list); intro optional.
+function methodBox(intro,items){
+  const li=(items||[]).filter(Boolean).map(t=>`<li>${t}</li>`).join('');
+  return `<details class="method"><summary>Method &amp; caveats</summary><div class="mb">`+
+    (intro?`<p style="margin:6px 0 4px">${intro}</p>`:'')+(li?`<ul>${li}</ul>`:'')+`</div></details>`;
+}
 function ccRow(l,sub,r,rsub,col){
   return `<div class="cc-row"><div class="l">${l}${sub?`<span class="s">${sub}</span>`:''}</div>`+
     `<div class="r" ${col?`style="color:${col}"`:''}>${r}${rsub?`<span class="s">${rsub}</span>`:''}</div></div>`;
