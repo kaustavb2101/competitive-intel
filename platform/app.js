@@ -100,46 +100,6 @@ async function loadOccupations(){
   })();
   return occPromise;
 }
-/* ---------- peer NPL benchmark (reported) · objective #1 ----------
-   Loads data/peer_npl.json — listed title-loan peers' REPORTED NPL ratios (TIDLOR/MTC/SAWAD),
-   cited to docs/RESEARCH_DIGEST.md §B. PEER figures only; we surface NO AutoX NPL (none measured).
-   Lazy + graceful (mirrors loadOccupations): absent file → the annotation simply doesn't render. */
-let PEERNPL=null, peerNplLoaded=false, peerNplPromise=null;
-async function loadPeerNpl(){
-  if(peerNplPromise) return peerNplPromise;
-  peerNplLoaded=true;
-  peerNplPromise=(async()=>{
-    try{ const r=await fetch('data/peer_npl.json'); if(r.ok) PEERNPL=await r.json(); }
-    catch(e){ PEERNPL=null; }
-    return PEERNPL;
-  })();
-  return peerNplPromise;
-}
-// Render the compact peer-NPL benchmark bar into a host id. Graceful: no data → host cleared.
-function renderPeerNpl(host){
-  if(!host) return;
-  if(!PEERNPL||!Array.isArray(PEERNPL.peers)||!PEERNPL.peers.length){
-    if(!peerNplLoaded) loadPeerNpl().then(()=>renderPeerNpl(host));
-    else host.innerHTML='';   // graceful: nothing reported → render nothing
-    return;
-  }
-  const peers=PEERNPL.peers.slice().sort((a,b)=>(a.npl||0)-(b.npl||0));
-  const col=v=>v<2?'var(--merch)':v<3?'var(--gold)':'var(--agri)';
-  const cells=peers.map(p=>{
-    const disp=p.npl_label||(p.npl!=null?p.npl.toFixed(2):'—');
-    return `<div class="pnpl-cell" title="${(p.source||'').replace(/"/g,'&quot;')} · collateral: ${(p.collateral||'').replace(/"/g,'&quot;')}">
-      <div class="pnpl-tk">${p.ticker||p.name||'—'}</div>
-      <div class="pnpl-v" style="color:${col(p.npl||0)}">${disp}%</div>
-      <div class="pnpl-c sub">${p.collateral||''}</div></div>`;
-  }).join('<span class="pnpl-lt sub">&lt;</span>');
-  const src=(PEERNPL.meta&&PEERNPL.meta.source)||'docs/RESEARCH_DIGEST.md §B';
-  host.innerHTML=`<div class="pnpl-wrap">
-    <div class="pnpl-hd"><span class="pnpl-title">Peer NPL benchmark (reported)</span>
-      <span class="sub">PEER figures — not an AutoX number</span></div>
-    <div class="pnpl-row">${cells}</div>
-    <div class="pnpl-ft sub">Listed title-loan peers' <b>reported</b> NPL ladder; the spread tracks <b>collateral mix</b> — vehicle/gold titles (low) vs land/agri/heavy-vehicle (high). Watch land/agri/heavy-vehicle as the stressed end of our own book. Source: ${src}.</div>
-  </div>`;
-}
 // total measured establishments ≤10km for a branch (0 when the file/entry is absent) — the "estab" lens val().
 function estabCount(d){
   if(!OCCDATA||!OCCDATA.branches||!DATA) return 0;
@@ -577,6 +537,7 @@ function renderAcq(){
   renderAcqBoard();
   renderRoad3k();
   renderOppScore();
+  renderExitWhitespace();
 }
 
 /* ---------- composite opportunity score · where to open next (item 2) ----------
@@ -634,6 +595,63 @@ function drawOppScore(){
       <b style="color:var(--accent)">${Math.round(t.score)}</b>/100 — white-space ${Math.round((t.components||{}).whitespace||0)},
       competitor-gap ${Math.round((t.components||{}).competitor_gap||0)}, agri-stress ${Math.round((t.components||{}).agri_stress||0)}.
       <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED COMPOSITE — a ranking aid for expansion, not a measured quantity.${wtxt}</span>`;
+  }
+}
+
+/* ---------- competitor-exit white-space · regulatory tailwind (obj #2) ----------
+   Surfaces data/exit_whitespace.json (928 districts, built by pipeline/build_exit_whitespace.py).
+   ESTIMATED PROXY: where AutoX could CAPTURE SHARE if marginal sub-scale operators exit under the
+   Q1-2026 BoT registration deadline. We do NOT census the sub-scale operators that would exit (only
+   the big-4 compliant brands), so this is INFERRED from big-4 scarcity × our demand/white-space —
+   labelled ESTIMATED. We don't recompute here; just rank & expose each component. Graceful if absent. */
+let EXITWS=null, exitLoaded=false;
+const EXIT_TOPN=20;
+function renderExitWhitespace(){
+  const tbl=$('#exittbl'); if(!tbl) return;
+  if(exitLoaded){ drawExitWhitespace(); return; }
+  fetch('data/exit_whitespace.json').then(r=>r.ok?r.json():null).then(j=>{
+    EXITWS=j; exitLoaded=true; drawExitWhitespace();
+  }).catch(()=>{ EXITWS=null; exitLoaded=true; drawExitWhitespace(); });
+}
+function drawExitWhitespace(){
+  const tbl=$('#exittbl'), ro=$('#exitreadout'); if(!tbl) return;
+  const rows=(EXITWS&&Array.isArray(EXITWS.districts))?EXITWS.districts:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Competitor-exit white-space not yet computed.</b> <span class="sub">Run <span class="mono">pipeline/build_exit_whitespace.py</span> to populate <span class="mono">data/exit_whitespace.json</span>, then this leaderboard fills in. The regulatory thesis above still stands.</span>';
+    return;
+  }
+  const top=rows.slice().sort((a,b)=>(b.exit_capture_score||0)-(a.exit_capture_score||0)).slice(0,EXIT_TOPN);
+  const cell=(v,color)=>{const n=Math.round(v||0); return `<td>${barHTML(n,color)} <span class="mono" style="color:${color}">${n}</span></td>`;};
+  tbl.innerHTML=`<tr><th>#</th>`+
+    `<th class="h-opp" title="ESTIMATED capture cue (0–100): residual sub-scale demand + AutoX white-space. Higher = best place to win share if a marginal local operator exits under Q1-2026. NOT a measurement.">Exit-capture ★ est</th>`+
+    `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
+    `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
+    `<th class="h-opp" title="ESTIMATED — demand the big-4 do NOT cover (demand × thin-big-4). Higher = residual market likely served by sub-scale, exit-prone operators.">Sub-scale residual est</th>`+
+    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = more underserved.">White-space ★</th>`+
+    `<th title="MEASURED — big-4 rival branches inside the district (Google Places, lower bound). Lower = thinner surviving-incumbent footprint.">Big-4 ≤district</th></tr>`+
+    top.map((d,i)=>{
+      const c=d.components||{};
+      const sc=Math.round(d.exit_capture_score||0);
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${barHTML(sc,'var(--accent)')} <span class="mono" style="color:var(--accent)"><b>${sc}</b></span></td>
+        <td><b>${d.name||'—'}</b></td>
+        <td>${d.province||'—'}</td>
+        <td class="sub">${d.region||'—'}</td>
+        <td class="mono sub">${d.branches==null?'—':d.branches}</td>
+        ${cell(c.sub_scale_proxy,'var(--gold)')}
+        ${cell(c.whitespace,'var(--merch)')}
+        <td class="mono sub">${c.big4_competitors==null?'—':c.big4_competitors}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const t=top[0], m=EXITWS.meta||{}, cc=m.competitor_census||{};
+    const t0=t.components||{};
+    const dl=(m.regulatory_citation||{}).deadline||'Q1 2026';
+    ro.innerHTML=`<b>Capture target if rivals exit:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the cue at
+      <b style="color:var(--accent)">${Math.round(t.exit_capture_score)}</b>/100 — sub-scale residual ${Math.round(t0.sub_scale_proxy||0)},
+      white-space ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.
+      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × our white-space, NOT a measurement of sub-scale operators. Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
   }
 }
 
@@ -1111,19 +1129,8 @@ function renderExposure(){
       <td class="mono" style="color:${o.str/o.n>0.5?'var(--agri)':'var(--mid)'}">${(100*o.str/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.dry/o.n>0.3?'var(--gold)':'var(--mid)'}">${(100*o.dry/o.n).toFixed(0)}%</td>
       <td class="mono" style="color:${o.agri/o.n>0.3?'var(--agri)':'var(--mid)'}">${(100*o.agri/o.n).toFixed(0)}%</td></tr>`;}).join('');
-  // OBJECTIVE #1: peer NPL benchmark (reported) — industry context for the collateral risk read.
-  renderPeerNpl(peerNplHost());
   // OBJECTIVE #1: borrower-base concentration — is the book over-exposed to one occupation type?
   renderOccConcentration();
-}
-// host for the peer-NPL bar, inserted once directly under the concentration cards (no index.html edit).
-function peerNplHost(){
-  let h=document.getElementById('expo-peernpl');
-  if(h) return h;
-  const cards=$('#expocards'); if(!cards||!cards.parentNode) return null;
-  h=document.createElement('div'); h.id='expo-peernpl';
-  cards.parentNode.insertBefore(h,cards.nextSibling);   // directly under the concentration cards
-  return h;
 }
 
 /* ---------- borrower-base (occupation) concentration · objective #1 ----------

@@ -146,6 +146,7 @@
   <section class="view" id="v-acq">
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
       <a class="chip" href="#acq" data-acq="sec-opp">Opportunity score</a>
+      <a class="chip" href="#acq" data-acq="sec-exit">Competitor-exit white-space</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
       <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
       <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
@@ -164,6 +165,24 @@
       Each component is shown per district for honesty.</p>
     <div class="insight" id="oppreadout" style="border-left-color:var(--gold)">Loading opportunity score…</div>
     <table class="tbl" id="opptbl"></table>
+    </details>
+
+    <details class="acqsec" id="sec-exit" open>
+    <summary><h2 class="opp">Competitor-exit white-space · regulatory tailwind <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory tailwind (Q1 2026):</b> under the BoT responsible-lending
+      framework (notification 25680030) auto title-loan operators need a personal-loan licence (≥฿50m capital, 28% interest cap). The
+      <b>registration window closes Q1 2026</b> — non-compliant, sub-scale / informal lenders risk <b>forced exit</b>. Tighter supervision
+      favours scaled compliant incumbents (MTC, SAWAD, Tidlor, Heng — and AutoX) and squeezes small operators out, so <b>white-space may
+      open as sub-scale rivals retreat</b>. <span class="sub">Source: docs/RESEARCH_DIGEST.md §A (Conf: High) · BoT 25680030.</span></div>
+    <p class="lead"><b>Honest caveat — this is an ESTIMATED PROXY, not a measurement.</b> The operators that will <b>exit</b> are exactly the
+      sub-scale / informal lenders we do <b>not</b> census. Our competitor census covers only the <b>four big, compliant brands</b>
+      (Heng · Muangthai · Tidlor · Srisawad) — the incumbents who will <b>survive</b>. So we cannot directly measure exit; we
+      <b>infer</b> the opportunity surface: districts where AutoX demand / white-space exists but the big-4 are <b>absent or thin</b>, so the
+      residual market is likely served by a smaller local operator (the exit-prone player). It answers
+      <b>"where could AutoX capture share if a marginal operator exits?"</b> A true rival-fragility index needs a sub-scale-operator
+      census — a <b>blocked desktop / Thai-IP company-registry pull</b>. Treat the score as ESTIMATED.</p>
+    <div class="insight" id="exitreadout" style="border-left-color:var(--gold)">Loading competitor-exit white-space…</div>
+    <table class="tbl" id="exittbl"></table>
     </details>
 
     <details class="acqsec" id="sec-r3k" open>

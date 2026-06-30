@@ -80,6 +80,13 @@ timeseries `--check` plus `node --check` on every page's JS.*
   (incl. 0-branch white-space) → `platform/data/amphoe.json` (whitespace + risk_proxy + raw components).
 - `build_crop_stress.py` — per-province crop-household stress (objective #1) → `platform/data/crop_stress.json`
   (crop mix, price_stress [GLOBAL proxy], drought, agri_stress + components).
+- `build_exit_whitespace.py` — **competitor-exit white-space cue** (objective #2, regulatory-tailwind lens) →
+  `platform/data/exit_whitespace.json`. ESTIMATED PROXY: per-amphoe "where AutoX could capture share if
+  marginal sub-scale operators exit under the Q1-2026 BoT registration deadline", inferred from big-4
+  competitor scarcity (PIP of `competitors_national.json`) × our demand/white-space (`amphoe.json`). We do
+  NOT census the sub-scale operators that would actually exit (only the 4 big compliant brands), so the
+  score is inferred, not measured — full caveat + regulatory citation in `meta`. Surfaces on `#acq` (labelled
+  ESTIMATED). A true rival-fragility index needs a sub-scale-operator census (blocked Thai-IP registry pull).
 - `timeseries.py` — captures a per-vintage SNAPSHOT (label from `meta.updated`, never wall clock) +
   diffs → `source-data/snapshots/`, `platform/data/snapshots_index.json` + `deltas.json` (Risk-trend tab).
 - **Loan-tape bridge** (objective #1; synthetic until a real export lands):
