@@ -215,15 +215,20 @@ def download_seq(cli, bbox, dest):
     cmd = [cli, "download", f"--bbox={ovt_bbox}", "-f", "geojsonseq",
            "--type=place", "-o", dest]
     print("running:", " ".join(cmd), file=sys.stderr)
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    # Force the overturemaps subprocess into UTF-8 mode. Its GeoJSON writer does open(out,'w')
+    # without an encoding, so on Windows it defaults to cp1252 and dies with a UnicodeEncodeError
+    # ('charmap' codec) the moment it writes a Thai place name. PYTHONUTF8=1 fixes that.
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
+    proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
     if proc.returncode != 0:
         tail = (proc.stderr or proc.stdout or "").strip()
         raise RuntimeError(
             f"overturemaps download failed (exit {proc.returncode}).\n"
             f"--- CLI output ---\n{tail or '(no output captured)'}\n"
             f"------------------\n"
-            f"Common causes: no network reach to the Overture S3 bucket, an outdated "
-            f"pyarrow, or too-large a bbox timing out. Try a smaller bbox first.")
+            f"If you see a UnicodeEncodeError ('charmap' codec), the overturemaps CLI is writing "
+            f"in Windows cp1252 — set PYTHONUTF8=1 in the shell and retry. Otherwise: no network "
+            f"reach to Overture S3, an outdated pyarrow, or too-large a bbox timing out.")
     return dest
 
 

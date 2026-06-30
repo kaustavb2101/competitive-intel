@@ -149,18 +149,20 @@ def download_geojson(cli, bbox, dest):
     cmd = [cli, "download", f"--bbox={ovt_bbox}", "-f", "geojsonseq",
            "--type=building", "-o", dest]
     print("running:", " ".join(cmd), file=sys.stderr)
-    # Capture stderr so the CLI's real failure (S3/network/pyarrow) is surfaced,
-    # not swallowed behind a bare CalledProcessError traceback.
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    # Capture stderr so the CLI's real failure is surfaced, not swallowed behind a bare traceback.
+    # Force UTF-8: the overturemaps GeoJSON writer does open(out,'w') without an encoding, so on
+    # Windows it defaults to cp1252 and dies with UnicodeEncodeError ('charmap') on Thai names.
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
+    proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
     if proc.returncode != 0:
         tail = (proc.stderr or proc.stdout or "").strip()
         raise RuntimeError(
             f"overturemaps download failed (exit {proc.returncode}).\n"
             f"--- CLI output ---\n{tail or '(no output captured)'}\n"
             f"------------------\n"
-            f"Common causes: no network reach to the Overture S3 bucket, an outdated "
-            f"pyarrow, or too-large a bbox timing out. Try a tiny bbox first to confirm "
-            f"reachability, e.g. --bbox 12.68,101.27,12.70,101.29")
+            f"If you see a UnicodeEncodeError ('charmap' codec), set PYTHONUTF8=1 in the shell and "
+            f"retry. Otherwise: no network reach to Overture S3, an outdated pyarrow, or too-large "
+            f"a bbox timing out. Try a tiny bbox first, e.g. --bbox 12.68,101.27,12.70,101.29")
     return dest
 
 
