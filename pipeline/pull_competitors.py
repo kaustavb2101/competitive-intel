@@ -122,16 +122,24 @@ def run(brands, prov_limit, check=False, merge=False):
             prev = json.load(open(path, encoding="utf-8"))
         except Exception:
             prev = {}
-        kept = [it for it in prev.get("items", []) if it.get("brand") not in brands]
+        # Only REPLACE a brand if this run actually returned rows for it. A brand that came back
+        # empty (e.g. a transient REQUEST_DENIED) keeps its existing rows — a failed re-pull must
+        # never silently delete good data.
+        fresh_brands = {it["brand"] for it in items}
+        replace = set(brands) & fresh_brands
+        skipped = set(brands) - fresh_brands
+        kept = [it for it in prev.get("items", []) if it.get("brand") not in replace]
         have = {it.get("place_id") for it in kept}
         merged = list(kept)
         for it in items:
-            if it["place_id"] not in have:
+            if it["brand"] in replace and it["place_id"] not in have:
                 have.add(it["place_id"])
                 merged.append(it)
-        kept_brands = sorted({it["brand"] for it in kept})
-        print(f"  merge: kept {len(kept)} from {kept_brands}, "
-              f"re-pulled {sorted(set(brands))} -> {len(items)} fresh")
+        if skipped:
+            print(f"  merge: WARNING re-pull returned nothing for {sorted(skipped)} — kept their "
+                  f"existing rows (no data lost).")
+        print(f"  merge: replaced {sorted(replace) or '[]'}, "
+              f"kept everything else -> {len(merged)} total")
         items = merged
 
     by_brand = {}
