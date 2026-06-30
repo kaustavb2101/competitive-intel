@@ -13,6 +13,11 @@
   pick a smaller item.
 - **Shared working tree.** Other sessions may share this checkout — NEVER run `git clean -fd` or
   `git checkout -- .` (they destroy others' uncommitted work). Revert only files you yourself modified.
+- **⛔ NO FABRICATION (absolute).** Never invent, guess, hallucinate, or synthesize a data value. Every
+  number in `platform/data` must trace to a real source (committed `source-data/`, a real gov/OSM/Overture/TMLI
+  pull) OR be explicitly labelled an ESTIMATED proxy/model with its method in the file's `meta`. If a value
+  can't be sourced, leave it absent and log it — never fill a gap with a made-up number. When unsure if
+  something is real, treat it as not-real and flag it rather than ship it.
 - **Honest provenance.** Always label measured vs estimated (see CLAUDE.md).
 - **Never** commit secrets or synthetic/generated geographic data; **only** push `claude/new-session-wto26j`.
 - **Scope discipline.** Large/architectural/ambiguous ideas → write them here as a recommendation
