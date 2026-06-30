@@ -145,6 +145,7 @@
   <!-- ACQUISITION -->
   <section class="view" id="v-acq">
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
+      <a class="chip" href="#acq" data-acq="sec-opp">Opportunity score</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
       <a class="chip" href="#acq" data-acq="sec-estates">Estates</a>
       <a class="chip" href="#acq" data-acq="sec-merchant">Merchant</a>
@@ -152,6 +153,18 @@
       <a class="chip" href="#acq" data-acq="sec-districts">Districts</a>
       <a class="chip" href="#acq" data-acq="sec-distrisk">District risk</a>
     </nav>
+
+    <details class="acqsec" id="sec-opp" open>
+    <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
+    <p class="lead">One ranked list of districts (amphoe) for branch expansion. The <b>opportunity score</b> (0–100) is an
+      <b>ESTIMATED COMPOSITE</b> — it blends <b style="color:var(--gold)">white-space</b> (MEASURED demand minus AutoX saturation)
+      + <b style="color:var(--merch)">competitor-gap</b> (MEASURED, fewer rival branches = more room)
+      + <b style="color:var(--agri)">agri-stress</b> (ESTIMATED, province-inherited crop-household stress).
+      Higher = more underserved + undercompeted. It is a <b>ranking aid, not a measured quantity</b> — confirm with local site surveys.
+      Each component is shown per district for honesty.</p>
+    <div class="insight" id="oppreadout" style="border-left-color:var(--gold)">Loading opportunity score…</div>
+    <table class="tbl" id="opptbl"></table>
+    </details>
 
     <details class="acqsec" id="sec-r3k" open>
     <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
