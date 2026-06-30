@@ -386,7 +386,7 @@ function streamBuildingLayer(){
       getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
       getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
-      material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no view-dependent (orbit) white blow-out
+      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no view-dependent (orbit) white blow-out
       shadowEnabled:SHADOWS_ON, parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
     });
@@ -491,7 +491,7 @@ function buildLighting(withShadow){
     //   contrast lit/shade = 0.878/0.386 = 2.27x (was 1.83x) -> punchier skyline, still safe.
     const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
     const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[230,236,255],intensity:0.92});
+    const amb=new deck.AmbientLight({color:[235,238,255],intensity:1.0});
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     if(withShadow){ try{ eff.shadowColor=[10,16,34,0.46]; }catch(e){} }
     return eff;
@@ -547,7 +547,7 @@ function layers(){
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
     stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
-    material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no orbit blow-out
+    material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no orbit blow-out
     parameters:{depthTest:true},transitions:{getElevation:600},
     shadowEnabled:SHADOWS_ON,pickable:true,
     updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));

@@ -540,7 +540,7 @@ function buildLighting(withShadow){
     //   contrast ratio lit/shade          = 0.878/0.386 = 2.27x  (was 0.824/0.45 = 1.83x) -> punchier, still safe
     const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
     const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[230,236,255],intensity:0.92});
+    const amb=new deck.AmbientLight({color:[235,238,255],intensity:1.0});
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
     if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
@@ -1011,7 +1011,7 @@ function streamBuildingLayer(){
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
       getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
       lineWidthMinPixels:0.4,
-      material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
+      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
@@ -1141,7 +1141,7 @@ function render(){
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
     // across faces. Specular ZEROED: it's the only view-dependent term, and under orbit it spiked
     // and clamped sun-facing faces to white (the "white blow-out"). Diffuse shading keeps depth.
-    material:{ambient:0.42,diffuse:0.40,shininess:10,specularColor:[0,0,0]},
+    material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
