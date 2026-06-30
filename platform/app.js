@@ -1109,6 +1109,39 @@ function renderOccConcentration(){
 const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
 const simState={price:0,rain:0,gold:0,veh:0,botcap:false};
 let simWired=false;
+
+/* ---------- BoT 28% title-loan rate-cap scenario (objective #1) ----------
+   REGULATORY FACT (cited): the Bank of Thailand title-loan / personal-loan interest ceiling is
+   28% APR, effective 2 Dec 2025 (Royal Decree 5 Jun 2025 → FIBA / direct BoT supervision; BoT
+   notification 25680030). Source: docs/RESEARCH_DIGEST.md (2026-06-30, Entry 1A); primary:
+   https://www.bot.or.th/content/dam/bot/fipcs/documents/FPG/2568/EngPDF/25680030.pdf
+   ⛔ NOT a measured book. This is a SCENARIO MODEL: the product buckets below — their assumed
+   effective APR and assumed share of the book — are ESTIMATED illustrative LEVERS the exec can
+   reason about, NOT AutoX's actual loan tape. When a real loan tape lands (loan_tape_derived.json),
+   replace SIM_CAP_BOOK with measured product yields + balances. Math is deliberately simple:
+   book yield = share-weighted APR; under the cap each bucket's APR = min(APR, 28). Buckets ALREADY
+   at/below 28% are unaffected; only the high-rate tail compresses. */
+const SIM_CAP_RATE=28; // % APR — the BoT title-loan ceiling (cited fact, not an assumption)
+// Illustrative title-loan book mix. share = % of book; apr = assumed effective APR (%). ASSUMPTIONS.
+const SIM_CAP_BOOK=[
+  {seg:'Motorcycle title',     apr:33, share:30},
+  {seg:'Pickup / car title',   apr:26, share:34},
+  {seg:'Land / house title',   apr:22, share:18},
+  {seg:'Agri-vehicle title',   apr:31, share:10},
+  {seg:'Top-up / small-ticket',apr:30, share:8},
+];
+// Compute book yield before vs after the 28% cap from the illustrative mix above. Pure + deterministic.
+function simCapModel(){
+  const tot=SIM_CAP_BOOK.reduce((s,b)=>s+b.share,0)||1;
+  let yBase=0, yCap=0;
+  const rows=SIM_CAP_BOOK.map(b=>{
+    const w=b.share/tot;
+    const capped=Math.min(b.apr,SIM_CAP_RATE);
+    yBase+=w*b.apr; yCap+=w*capped;
+    return {seg:b.seg,share:b.share,apr:b.apr,capped,compress:b.apr>SIM_CAP_RATE,drop:b.apr-capped};
+  });
+  return {rows,yBase,yCap,drop:yBase-yCap};
+}
 // recompute one province's agri_stress (0..1) from its published components under a price/rain shock.
 // Mirrors crop_stress.json meta.formula EXACTLY so the baseline (shock=0) reproduces the shipped value.
 function simAgriStress(p,priceShock,rainShock){
@@ -1159,8 +1192,8 @@ function computeSim(){
   if(!$('#sim-cards')) return;
   if(!CSTRESS_LIST||!CSTRESS_LIST.length){
     $('#sim-cards').innerHTML='';
-    $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the what-if needs it.';
-    $('#sim-prov').innerHTML=''; renderSimCollat(); return;
+    $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it. The BoT rate-cap scenario below still works (it needs no data file).';
+    $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimCap(); return;
   }
   const brn=simBranchByProv();
   const {price,rain}=simState;
@@ -1210,9 +1243,22 @@ function computeSim(){
       `(<b>${(100*scenHiBr/N).toFixed(1)}%</b> of the network). `+
       (lead?`<b>${worse.length}</b> province${worse.length===1?'':'s'} newly tip in — worst is <b>${lead.th}</b> (${lead.region||'—'}, +${lead.delta.toFixed(0)} pts). `:`No new province crosses the high-stress line. `);
   }
-  if(simState.botcap) read+=`<br><span class="sub">⚑ BoT rate/fee cap flagged: a sector <b>margin</b> compression on auto/moto hire-purchase — pricing-headroom watch, not a borrower-credit signal. AutoX core is title loans, so the direct hit is limited.</span>`;
+  if(simState.botcap){
+    const cap=simCapModel();
+    const compress=cap.rows.filter(r=>r.compress).sort((a,b)=>b.drop-a.drop);
+    const segList=compress.map(r=>`<b>${r.seg}</b> (${r.apr}%→28%)`).join(', ');
+    read+=`<br><br><b style="color:var(--gold)">⚖ BoT 28% rate cap (effective 2 Dec 2025):</b> `+
+      `book yield <b>${cap.yBase.toFixed(1)}%</b> → <b style="color:var(--agri)">${cap.yCap.toFixed(1)}%</b> `+
+      `(<b style="color:var(--agri)">−${cap.drop.toFixed(1)} pts</b> of yield). `+
+      (compress.length
+        ? `Products priced above 28% compress to the ceiling: ${segList}. Buckets already ≤28% are unaffected.`
+        : `No product is priced above 28% in this illustrative mix — the cap is non-binding.`);
+    read+=`<br><span class="sub">⛔ SCENARIO MODEL — illustrative product mix &amp; APRs are ASSUMPTIONS (levers), not AutoX's measured loan tape. `+
+      `28% ceiling is a cited regulatory fact (BoT notification 25680030 · Royal Decree 5 Jun 2025).</span>`;
+  }
   read+=`<br><span class="sub">ILLUSTRATIVE sensitivity — same estimated proxy, no measured elasticities / loan balances / LTV. A direction, not a number.</span>`;
   $('#sim-readout').innerHTML=read;
+  renderSimCap();
   // ----- worsening provinces table -----
   const tbl=$('#sim-prov');
   if(tbl){
@@ -1263,6 +1309,40 @@ function renderSimCollat(){
     <div class="v" style="color:${c.col}">${c.v}</div>
     <div class="d" style="color:${c.col}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
+}
+// BoT 28% rate-cap readout: headline yield cards + which products compress. Only shown when toggled ON.
+function renderSimCap(){
+  const wrap=$('#sim-cap'); const outer=$('#sim-cap-wrap'); if(!wrap) return;
+  if(!simState.botcap){ if(outer) outer.style.display='none'; wrap.innerHTML=''; return; }
+  if(outer) outer.style.display='block';
+  const m=simCapModel();
+  const cards=[
+    {k:'Book yield — before cap',v:m.yBase.toFixed(1)+'%',col:'var(--mid)',
+     n:'Share-weighted effective APR of the illustrative title-loan mix. ASSUMED rates, not measured.'},
+    {k:'Book yield — under 28% cap',v:m.yCap.toFixed(1)+'%',col:'var(--agri)',
+     n:'Each product capped at the BoT 28% ceiling, re-weighted by the same illustrative shares.'},
+    {k:'Yield compression',v:'−'+m.drop.toFixed(1)+' pts',col:'var(--agri)',
+     d:m.rows.filter(r=>r.compress).length+' of '+m.rows.length+' products bind',
+     n:'Lost yield from clipping the high-rate tail to 28%. Pre-tax, pre-volume — a pricing ceiling, not a credit-loss figure.'},
+  ];
+  const ch=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v" style="color:${c.col}">${c.v}</div>
+    ${c.d?`<div class="d" style="color:${c.col}">${c.d}</div>`:''}
+    <div class="n">${c.n}</div></div>`).join('');
+  const rows=m.rows.slice().sort((a,b)=>b.apr-a.apr).map(r=>{
+    const col=r.compress?'var(--agri)':'var(--up)';
+    const tag=r.compress?`<span class="mono" style="color:var(--agri)">▼ caps to 28%</span>`:`<span class="mono" style="color:var(--up)">unaffected</span>`;
+    return `<tr><td><b>${r.seg}</b></td><td class="mono">${r.share}%</td>
+      <td class="mono">${r.apr}%</td><td class="mono" style="color:${col}">${r.capped.toFixed(0)}%</td>
+      <td class="mono" style="color:${r.compress?'var(--agri)':'var(--mid)'}">${r.drop>0?'−'+r.drop.toFixed(0):'—'}</td>
+      <td>${tag}</td></tr>`;}).join('');
+  wrap.innerHTML=`<div class="grid macro">${ch}</div>
+    <table class="tbl" style="margin-top:12px">
+      <tr><th>Product</th><th title="ASSUMED share of the book">Share · est</th>
+      <th title="ASSUMED effective APR">APR now · est</th><th title="APR after the 28% cap">Under cap</th>
+      <th title="APR points lost to the cap">Δ pts</th><th>Status</th></tr>${rows}</table>
+    <p class="lead" style="margin-top:6px">⛔ <b>Scenario model.</b> Product shares &amp; APRs are <b>ASSUMPTIONS</b> (levers) until a real loan tape lands — not AutoX's measured book.
+      The <b>28% ceiling is a cited regulatory fact</b>: BoT title-loan rate cap, effective <b>2 Dec 2025</b> (notification 25680030 · Royal Decree 5 Jun 2025).</p>`;
 }
 
 /* ---------- risk trend (time dimension, Phase 3) ----------
