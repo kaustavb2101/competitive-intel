@@ -11,7 +11,26 @@
 :root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
-#map{position:fixed;inset:0;top:44px;background:var(--ink)}
+#map{position:fixed;inset:0;top:44px;background:transparent;z-index:1}
+
+/* ---- CINEMATIC DEPTH (ported from rayong-catchment) — visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient BEHIND the deck.gl canvas (z below #map) so the extruded OSM
+          buildings read against an atmosphere instead of flat ink. Indigo-console tuned.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the branch and fades the corners — the classic cinematic "look here" vignette.
+   Both are pinned to the map region (below the nav + branch bar) so they don't tint the chrome. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(125% 95% at 50% 4%,#202a44 0%,#161d31 34%,#0e1322 62%,#080b14 100%),
+            linear-gradient(180deg,#0b1020 0%,#121a2e 44%,#202b46 74%,#2c3450 100%);
+ background-blend-mode:screen,normal}
+#vignette{position:fixed;inset:0;top:82px;z-index:7;pointer-events:none;
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 50%,rgba(6,9,16,.28) 79%,rgba(4,6,12,.60) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(125% 95% at 50% 4%,#e3edfc 0%,#d2e0f5 40%,#bed1ed 68%,#aec2e4 100%),
+            linear-gradient(180deg,#e8effb 0%,#d8e4f6 60%,#c6d6ee 100%);
+ background-blend-mode:multiply,normal}
+html[data-theme="light"] #vignette{
+ background:radial-gradient(132% 108% at 50% 47%,rgba(0,0,0,0) 56%,rgba(40,52,80,.09) 82%,rgba(30,40,66,.20) 100%)}
 #bar{position:fixed;top:0;left:0;right:0;height:44px;z-index:50;display:flex;align-items:center;gap:12px;
  padding:0 14px;background:rgba(8,11,18,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
 #bar a{color:var(--mid);text-decoration:none;font:600 13px 'IBM Plex Sans Thai'}
@@ -147,7 +166,9 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
   <a href="index.html#map">← National</a>
   <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span>
 </div>
+<div id="sky"></div>
 <div id="map"></div>
+<div id="vignette"></div>
 <div class="ctl">
   <div class="grp">
     <div class="glab">Basemap</div>
@@ -161,6 +182,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="t-ring" class="on">3 / 5 / 10 km rings</button>
+      <button id="t-orbit" class="on" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
       <button id="t-reload">↻ Reload buildings</button>
     </div>
   </div>
@@ -292,18 +314,64 @@ function heightColorLight(h){
 /* ---- deck.gl ---- */
 const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15.2, pitch:58, bearing:-12, maxZoom:19, minZoom:9};
 let deckgl;
-// directional sun + ambient + fill, with shadows on desktop (the DataProteins look)
-let LIGHTING=null;
-try{
-  if(deck.LightingEffect && deck.AmbientLight && deck.DirectionalLight){
-    const useShadow=!/Mobi|Android/i.test(navigator.userAgent) && window.innerWidth>900;
-    LIGHTING=new deck.LightingEffect({
-      ambient:new deck.AmbientLight({color:[255,255,255],intensity:1.0}),
-      sun:new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:useShadow}),
-      fill:new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]})});
-    LIGHTING.shadowColor=[0,0,0,0.50];
-  }
-}catch(e){ LIGHTING=null; }
+// ---- CINEMATIC LIGHTING (ported from rayong-catchment) -----------------------------------------
+// A real sun that CASTS SHADOWS so the extruded OSM skyline reads as a grounded, dimensional city.
+// deck.gl 8.9.35 enables shadow maps when a DirectionalLight carries _shadow:true and the
+// LightingEffect.shadowColor is set; SolidPolygon/Column layers opt in via shadowEnabled. The sun is
+// angled low (long, readable shadows) and warm; a cool fill keeps shadowed faces from going black.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the bundle lacks shadow support the
+// try/catch leaves LIGHTING usable without shadows, and SHADOWS_ON gates the per-layer flags.
+//
+// SOFTWARE-WEBGL SAFETY: shadow maps are an extra render pass per frame — cheap on a GPU, but under
+// SOFTWARE WebGL (swiftshader/llvmpipe — headless CI, old machines) so slow the scene never settles.
+// So shadows are on by default but AUTO-DISABLED at runtime if onWebGLInitialized detects a software
+// renderer (see init). The warm material + directional shading + sky/vignette still give depth then.
+function buildLighting(withShadow){
+  try{ if(!(deck.LightingEffect && deck.AmbientLight && deck.DirectionalLight))return null;
+    const sun=new deck.DirectionalLight({color:[255,245,225],intensity:3.0,direction:[-1,-3,-1],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[200,215,255],intensity:0.6,direction:[1,1,-0.5]});
+    const amb=new deck.AmbientLight({color:[255,255,255],intensity:withShadow?0.9:1.0});
+    const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+    if(withShadow){ try{ eff.shadowColor=[10,16,34,0.46]; }catch(e){} }
+    return eff;
+  }catch(e){ return null; }
+}
+let SHADOWS_ON=true;
+let LIGHTING=buildLighting(true);
+if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
+
+// ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
+// A CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and re-centre transitions share one
+// source of truth. FRAMED = the cinematic resting view; INTRO = a higher/wider/top-down start eased
+// down on load. Building/POI re-fetches still fire on user view changes (debounced, as before).
+const FRAMED=Object.assign({},INITIAL,{pitch:58,bearing:-12});
+const INTRO=Object.assign({},FRAMED,{zoom:Math.max(11,(FRAMED.zoom||15)-2.4),pitch:36,bearing:18});
+let VIEW=Object.assign({},INTRO);
+let orbitOn=true, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;
+const ORBIT_DPS=2.5;                 // degrees / second — gentle (~2-3 dps target)
+function setOrbitUI(on){const t=document.getElementById('t-orbit'); if(t)t.classList.toggle('on',on);}
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+let _programmatic=false;
+function pushView(extra){ if(!deckgl)return; _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  Promise.resolve().then(()=>{_programmatic=false;});}
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+function downgradeForSoftwareGL(){
+  SOFT_GL=true; orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  if(SHADOWS_ON){ SHADOWS_ON=false; const ns=buildLighting(false);
+    try{ deckgl.setProps({effects:ns?[ns]:[]}); }catch(e){} }
+  try{ render(); }catch(e){}
+  try{ console.info('[branch-explorer] software WebGL detected — shadows + auto-orbit disabled; depth via material + sky/vignette.'); }catch(e){}
+}
 function baseLayer(){
   return new deck.TileLayer({id:'base',data:TILE_SRC[basemap]||TILE_SRC.light,minZoom:0,maxZoom:19,tileSize:256,
     renderSubLayers:p=>{const{west,south,east,north}=p.tile.bbox;
@@ -316,9 +384,10 @@ function layers(){
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
     stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
-    material:{ambient:0.35,diffuse:0.85,shininess:22,specularColor:[70,80,110]},
+    material:{ambient:0.28,diffuse:0.95,shininess:28,specularColor:[90,100,130]},
     parameters:{depthTest:true},transitions:{getElevation:600},
-    _shadow:true,pickable:true,updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
+    shadowEnabled:SHADOWS_ON,pickable:true,
+    updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
   // live POI markers as 3D columns coloured by type — only when Overpass returned data. On the light
   // base give each column a darker same-hue rim so the shared palette stays legible on white.
   if(pois.length && deck.ColumnLayer){
@@ -328,7 +397,8 @@ function layers(){
       getElevation:p=>poiColumnHeight(p.t),
       getFillColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [c[0],c[1],c[2],235];},
       stroked:LIGHT,getLineColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255];},lineWidthMinPixels:0.6,
-      material:{ambient:0.4,diffuse:0.8,shininess:30,specularColor:[80,90,120]},
+      material:{ambient:0.45,diffuse:0.8,shininess:30,specularColor:[80,90,120]},
+      shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true},pickable:true,updateTriggers:{stroked:[LIGHT]}}));
   }
   if(showRing && !isNaN(LAT)){
@@ -480,9 +550,22 @@ async function loadPanel(){
     if(!best){ let bd=1e9; for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}} }
     branchRec=best;
     if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
-    // re-centre on the matched branch so the scene and panel agree
+    // re-centre on the matched branch so the scene and panel agree. Use the controlled VIEW so the
+    // orbit/intro machinery stays the single source of truth.
     if(deckgl && !isNaN(best.x) && !isNaN(best.y)){
-      deckgl.setProps({initialViewState:Object.assign({},INITIAL,{longitude:best.x,latitude:best.y})});
+      // retarget the cinematic frames so the intro fly-in / orbit centre on the matched branch.
+      FRAMED.longitude=best.x; FRAMED.latitude=best.y; INTRO.longitude=best.x; INTRO.latitude=best.y;
+      if(!introDone && !SOFT_GL){
+        // intro still in flight — just re-aim it at the branch (the rAF intro reads FRAMED below).
+        _programmatic=true;
+        const tp={viewState:Object.assign({},FRAMED,{transitionDuration:1200})};
+        try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2});} }catch(e){}
+        VIEW=Object.assign({},FRAMED);
+        deckgl.setProps(tp);
+        setTimeout(()=>{ _programmatic=false; lastT=0; },1240);
+      }else{
+        VIEW=Object.assign({},VIEW,{longitude:best.x,latitude:best.y}); pushView();
+      }
       render(); // re-evaluate layers so the branch-label pill shows the matched name, not the URL ?n=
     }
     $('#bnm').textContent = best.n || NM;
@@ -556,16 +639,39 @@ async function loadPanel(){
 
 /* ---- init ---- */
 function init(){
-  deckgl=new deck.DeckGL({container:'map',mapStyle:null,initialViewState:INITIAL,
+  deckgl=new deck.DeckGL({container:'map',mapStyle:null,viewState:VIEW,
     controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
     layers:layers(),
+    onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
     getTooltip:({object,layer})=>{
       if(!object)return null;
       if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · est. from footprint</div>`};
       if(layer&&layer.id==='poi'){const lab=(POI_LABEL[object.t]||object.t);return {html:`<div class="dtt"><b>${lab}</b><br>live OSM POI · measured</div>`};}
       return null;},
-    onViewStateChange:()=>{ clearTimeout(window._t); window._t=setTimeout(()=>{loadBuildings();loadPOIs();},650); }});
+    onViewStateChange:({viewState,interactionState})=>{
+      VIEW=viewState;
+      const inTrans=!!(interactionState&&interactionState.inTransition);
+      const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+         interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+      // any pan/zoom/rotate the USER drives pauses the orbit; our own orbit/recenter pushes don't.
+      if(!_programmatic && userMoving){ userInteract(); }
+      // CONTROLLED viewState: reflect genuine user moves straight back to deck (else it looks frozen),
+      // guarded so the re-push isn't mistaken for fresh user input.
+      if(userMoving && !inTrans && !_programmatic){
+        _programmatic=true; deckgl.setProps({viewState:VIEW});
+        Promise.resolve().then(()=>{_programmatic=false;});
+      }
+      // re-fetch buildings/POIs only for USER-driven moves (debounced) — the orbit (bearing-only) and
+      // intro fly-in don't change the footprint set, so they must NOT thrash Overpass.
+      if(!_programmatic && userMoving){
+        clearTimeout(window._t); window._t=setTimeout(()=>{loadBuildings();loadPOIs();},650);
+      }
+      return viewState;
+    }});
   $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
+  // Orbit toggle: master on/off; turning ON clears the user-pause so the scene resumes breathing.
+  (function(){var ot=$('#t-orbit');if(!ot)return;
+    ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; ot.classList.toggle('on',orbitOn); lastT=0;};})();
   $('#t-reload').onclick=()=>{ loadBuildings(); loadPOIs(); };
   // basemap toggle (light Positron default / voyager / dark) — re-styles buildings + markers for the base.
   const baseBtns={light:$('#b-light'),voyager:$('#b-voyager'),dark:$('#b-dark')};
@@ -573,6 +679,46 @@ function init(){
     baseBtns[k].onclick=()=>{ basemap=k;
       Object.keys(baseBtns).forEach(j=>baseBtns[j]&&baseBtns[j].classList.toggle('on',j===k)); render(); };});
   loadPanel(); loadBuildings(); loadPOIs();
+  startMotion();
+}
+
+// ---- MOTION BOOTSTRAP (ported from rayong-catchment): intro fly-in, then gentle auto-orbit -------
+// Start parked at the high/wide INTRO view, then ease down to FRAMED. The orbit loop holds until the
+// intro completes so the two motions don't overlap. Under software WebGL both are skipped (camera
+// snaps to FRAMED) so the render loop stays cold and the headless harness settles to a clean frame.
+function startMotion(){
+  const INTRO_MS=2400;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
 }
 init();
 </script>
