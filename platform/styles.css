@@ -791,3 +791,63 @@ main:has(#v-exposure.on){
 #expo-peernpl .pnpl-c{font-size:10px;line-height:1.25}
 #expo-peernpl .pnpl-lt{align-self:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--dim);padding:0 1px}
 #expo-peernpl .pnpl-ft{margin-top:8px;font-size:10.5px;line-height:1.45;max-width:90ch}
+
+/* ============================================================
+   ★ STANDARDIZED PROVENANCE (one consistent chip + one expander)
+   The honesty stays — it just gets consistent. One chip with a
+   filled dot = MEASURED, hollow dot = ESTIMATED (≥11px, AA contrast
+   text on a tinted pill), used everywhere via TAG_M / TAG_E. Long
+   inline caveats move into a reusable "Method & caveats" expander.
+   ============================================================ */
+.prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;padding:2px 8px 2px 7px;border-radius:999px;
+  border:1px solid;vertical-align:middle;white-space:nowrap;letter-spacing:.2px}
+.prov .pd{width:8px;height:8px;border-radius:50%;flex:none;box-sizing:border-box}
+/* MEASURED — teal, filled dot. #5fd6c2 on the dark tint clears AA (≈7:1). */
+.prov.m{color:#5fd6c2;border-color:rgba(35,162,143,.55);background:rgba(35,162,143,.14)}
+.prov.m .pd{background:#5fd6c2}
+/* ESTIMATED — gold, hollow dot (ring only). #f2cf78 clears AA on the dark tint. */
+.prov.e{color:#f2cf78;border-color:rgba(230,180,80,.55);background:rgba(230,180,80,.13)}
+.prov.e .pd{background:transparent;border:1.5px solid #f2cf78}
+html[data-theme="light"] .prov.m{color:#0c6a5b;background:rgba(28,140,125,.13);border-color:rgba(28,140,125,.45)}
+html[data-theme="light"] .prov.m .pd{background:#0c6a5b}
+html[data-theme="light"] .prov.e{color:#8a6300;background:rgba(176,130,20,.13);border-color:rgba(176,130,20,.45)}
+html[data-theme="light"] .prov.e .pd{border-color:#8a6300}
+
+/* Reusable "Method & caveats" disclosure — one quiet expander so caveats
+   live in a consistent place instead of long inline sentences. */
+details.method{margin:8px 0 2px;border:1px solid var(--line2);border-radius:8px;
+  background:var(--panel2,var(--panel));overflow:hidden}
+details.method>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+  padding:7px 11px;font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.3px;
+  text-transform:uppercase}
+details.method>summary::-webkit-details-marker{display:none}
+details.method>summary::after{content:'▸';margin-left:auto;color:var(--dim);font-size:10px;
+  transition:transform .15s}
+details.method[open]>summary::after{transform:rotate(90deg)}
+details.method>summary:hover,details.method[open]>summary{color:var(--txt)}
+details.method>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+details.method .mb{padding:2px 12px 11px;font-size:11.5px;line-height:1.55;color:var(--mid)}
+details.method .mb ul{margin:0;padding-left:16px}
+details.method .mb li{margin:4px 0}
+details.method .mb li b{color:var(--txt)}
+html[data-theme="light"] details.method{background:#f4f6fb;border-color:#d6dbe6}
+
+/* ---------- Portfolio concentration by region (Exposure obj#1) ----------
+   Each region: dominant segment + a stacked agri/merchant/collateral mix bar
+   + the rescaled HHI 0–1. Lead with the headline. */
+#expoconc .conc-lead{font-size:13px;line-height:1.5;color:var(--txt);margin:0 0 10px}
+#expoconc .conc-lead b{color:var(--hi)}
+#expoconc .conc-row{padding:9px 0;border-bottom:1px dashed var(--line2)}
+#expoconc .conc-row:last-child{border-bottom:none}
+#expoconc .conc-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+#expoconc .conc-name{font-size:13px;font-weight:650;color:var(--hi)}
+#expoconc .conc-dom{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px}
+#expoconc .conc-hhi{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap}
+#expoconc .conc-hhi .s{font-size:9.5px;color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.3px}
+#expoconc .mix{display:flex;height:11px;width:100%;border-radius:4px;overflow:hidden;background:#10182A}
+#expoconc .mix>span{height:100%;min-width:0}
+#expoconc .mix .ma{background:var(--agri)} #expoconc .mix .mm{background:var(--merch)} #expoconc .mix .mc{background:var(--collat)}
+#expoconc .conc-legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--dim);margin:6px 0 2px;align-items:center}
+#expoconc .conc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
