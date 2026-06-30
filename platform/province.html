@@ -404,9 +404,19 @@ function render(){
       getFillColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?14:8],getLineColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?110:60],
       lineWidthMinPixels:1,pickable:false,updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
     if(focal){
+      // focal-glow halo: three concentric soft-fill discs around the selected branch lift its 10km
+      // catchment out of the overlapping ring cloud, so the hero branch reads with depth/focus.
+      // Purely visual (gold accent); inner discs are denser so the centre glows toward the pin.
+      const GLOW=[[10000,LIGHT?20:14],[6600,LIGHT?26:20],[3400,LIGHT?34:30]];
+      GLOW.forEach(([r,a],i)=>{
+        L.push(new deck.PolygonLayer({id:'ring10-glow'+i,data:[focal],getPolygon:b=>circle(b.y,b.x,r),
+          extruded:false,stroked:false,filled:true,
+          getFillColor:[GOLD[0],GOLD[1],GOLD[2],a],pickable:false,
+          updateTriggers:{getPolygon:[focal,r]}}));
+      });
       L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
-        extruded:false,stroked:true,filled:true,
-        getFillColor:[GOLD[0],GOLD[1],GOLD[2],26],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
+        extruded:false,stroked:true,filled:false,
+        getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
         lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
     }
   }

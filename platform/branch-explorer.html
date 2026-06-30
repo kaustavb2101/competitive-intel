@@ -338,6 +338,14 @@ function layers(){
       getLineWidth:18,lineWidthMinPixels:1.2}));
   }
   if(!isNaN(LAT)){
+    // focal ground-glow: three concentric soft-fill discs anchor the branch with a grounded gold
+    // halo — gives the scene depth and a clear hero even before buildings load (the graceful
+    // no-Overpass state). Purely visual; flat under the pin & 3D columns, never intercepts picks.
+    [[1.6,LIGHT?22:16],[1.0,LIGHT?30:24],[0.5,LIGHT?40:34]].forEach(([km,a],i)=>{
+      L.push(new deck.PolygonLayer({id:'branch-glow'+i,data:[{lat:LAT,lng:LNG}],
+        getPolygon:d=>circle(d.lat,d.lng,km),extruded:false,stroked:false,filled:true,
+        getFillColor:[224,169,59,a],pickable:false,parameters:{depthTest:false}}));
+    });
     // gold branch dot — dark outline on the light base so it separates from white; white outline on dark.
     L.push(new deck.ScatterplotLayer({id:'branch',data:[{x:LNG,y:LAT}],getPosition:d=>[d.x,d.y],
       getRadius:90,radiusMinPixels:6,radiusMaxPixels:13,getFillColor:[224,169,59,255],
