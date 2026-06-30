@@ -142,12 +142,23 @@ def build():
         occ = _load(occ_path)
         occ_recs = occ.get("districts") or occ.get("amphoe") or []
         tmp = {}
-        for r in occ_recs:
-            sid = r.get("id")
-            if sid is None:
-                continue
-            tmp[sid] = (r.get("establishments") or r.get("estab_total")
-                        or r.get("total") or r.get("n_estab") or 0)
+        def _estab(r):
+            # establishment total per district; current schema uses "t", older guesses fall back.
+            return (r.get("t") or r.get("establishments") or r.get("estab_total")
+                    or r.get("total") or r.get("n_estab") or 0)
+        if isinstance(occ_recs, dict):
+            # "amphoe" is a MAP {shapeID: record} (the shipped schema).
+            for sid, r in occ_recs.items():
+                if isinstance(r, dict):
+                    tmp[sid] = _estab(r)
+        else:
+            # list-of-records fallback (each record carries its own id).
+            for r in occ_recs:
+                if not isinstance(r, dict):
+                    continue
+                sid = r.get("id")
+                if sid is not None:
+                    tmp[sid] = _estab(r)
         if tmp:
             occ_total = tmp
 
