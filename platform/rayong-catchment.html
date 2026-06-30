@@ -100,6 +100,9 @@ canvas{outline:none}
  background:rgba(13,17,27,.9);border:1px solid var(--cardln);border-radius:9px;padding:4px;backdrop-filter:blur(8px)}
 #ctl button{background:none;border:none;color:var(--dim);font:500 11px 'IBM Plex Mono';padding:5px 9px;border-radius:6px;cursor:pointer}
 #ctl button.on{background:#1c2740;color:var(--hi)}
+#ctl select{background:#0a1018;border:1px solid #1c2740;color:var(--hi);font:600 11px 'IBM Plex Mono';
+ padding:4px 6px;border-radius:6px;cursor:pointer;margin-right:2px}
+html[data-theme="light"] #ctl select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
 
 /* mobile toggles */
 #mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
@@ -221,7 +224,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </style>
 </head>
 <body>
-<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-catchment.html" class="on">Rayong 3D</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
+<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-catchment.html" class="on" id="navRayong">Rayong 3D</a><a href="rayong-catchment.html?city=bangkok" id="navBangkok">Bangkok 3D</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
 <script>
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
  function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
@@ -233,6 +236,10 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
 
 <div id="ctl">
+  <select id="citySel" title="Switch city (3D showcase)" aria-label="City">
+    <option value="rayong">Rayong</option>
+    <option value="bangkok">Bangkok</option>
+  </select>
   <button data-b="light" class="on">Light</button>
   <button data-b="voyager">Map</button>
   <button data-b="dark">Dark</button>
@@ -293,6 +300,9 @@ if(CITY!=='rayong'){
   const ct=document.getElementById('cityTitle');
   if(ct)ct.innerHTML=CITY_LABEL+' 3D <b>·</b> branches · POIs · 10km reach';
   try{document.title=CITY_LABEL+' 3D · เงินไชโย';}catch(e){}
+  // move the active-nav highlight off Rayong onto the matching city link (Bangkok), if present.
+  try{const nr=document.getElementById('navRayong');if(nr)nr.classList.remove('on');
+    const nb=document.getElementById('nav'+CITY.charAt(0).toUpperCase()+CITY.slice(1));if(nb)nb.classList.add('on');}catch(e){}
 }
 const PROV=window.PROV||{};
 const IDX=window.PROV_INDEX||null;
@@ -706,64 +716,100 @@ function render(){
         lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
     }
   }
-  // (2) extruded buildings — Mueang-core scenery, non-interactive, no shadow.
-  //     Granularity comes from: a stronger height->color ramp (deep base -> blue -> gold crown),
-  //     per-type tint, a touch of deterministic per-building jitter (so a block isn't one flat slab),
-  //     a height EXAGGERATION so the few tall buildings punch above the low-rise mat (skyline reads).
+  // (2) extruded buildings — city-core scenery, non-interactive, no shadow.
+  //     RICH, HEIGHT-DRIVEN look (replaces the old blue-dominant ramp). The body colour is a WARM
+  //     gradient — sand/taupe at street level, amber/ochre in the mid-rise, bright gold for the tall
+  //     mat — so the massing reads as a premium, varied cityscape rather than a flat blue carpet.
+  //     Blue/purple survive ONLY as a sparing cool accent on the tallest landmarks / in-catchment key
+  //     buildings, never as the body colour.
+  //
+  //     HEIGHT DRAMA (visual only — the data h is never mutated): two render-side transforms make the
+  //     low-rise variation legible even where the city is genuinely flat (Rayong p90 is just ~9m):
+  //       (a) a PER-CITY percentile normalisation (p5..p95) of height -> the colour ramp uses the
+  //           building's RANK within this city, so a narrow 3-13m spread still travels the full warm
+  //           ramp instead of bunching at the dark end;
+  //       (b) a non-linear elevation exaggeration so the few taller structures punch above the mat.
   const DARK=darkMode(), LIGHT=lightMode();
   // deterministic per-building hash in [0,1) from its centroid — gives stable variation, no Math.random churn.
   const jit=b=>{const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453;return s-Math.floor(s);};
-  const TINT={residential:[96,126,206],commercial:[228,172,66],hotel:[224,150,90],
-    industrial:[200,80,68],office:[140,96,228],school:[120,150,180]};
-  // ---- DataProteins selective highlight (light base only) ----
-  // KEY buildings = inside the SELECTED branch's 10km catchment ring OR in the tallest height decile;
-  // everything else renders soft light-grey, low-saturation, slightly translucent (muted context).
-  // The two accents come from the existing palette: collateral purple #7A4FE0 + accent blue #5B7CFA.
-  const PURP=[122,79,224], BLUE=[91,124,250], GREY=[206,210,218];
-  let tallThresh=Infinity;
-  if(LIGHT&&BUILDINGS&&BUILDINGS.length){
+  // per-type WARM tints (used to nudge the body hue by use) — kept warm/neutral, no dominant blue.
+  const TINT={residential:[206,176,128],commercial:[230,182,96],hotel:[228,150,86],
+    industrial:[178,138,112],office:[214,168,108],school:[196,176,150]};
+  // ---- PER-CITY height normalisation (visual transform; data untouched) ----
+  // Robust p5/p95 of the rendered building heights, computed ONCE, so the colour ramp + height-shade
+  // are relative to THIS city's range. A flat low-rise city (Rayong) and a tall one (Bangkok) each
+  // spread across the full warm ramp; similar heights still differentiate because they map to
+  // different ranks. One sort of the rendered set — cheap.
+  let H_LO=0, H_HI=20;
+  if(BUILDINGS&&BUILDINGS.length){
     const hs=BUILDINGS.map(b=>b.h||4).sort((a,b)=>a-b);
-    tallThresh=hs[Math.floor(hs.length*0.9)]||Infinity;   // 90th-pct height = tallest decile
+    H_LO=hs[Math.floor(hs.length*0.05)]||0;
+    H_HI=hs[Math.floor(hs.length*0.95)]||20;
+    if(H_HI<=H_LO)H_HI=H_LO+1;   // guard a degenerate flat distribution
   }
-  // is a building inside the focal branch's 10km catchment? (cheap squared-degree test on centroid)
+  // height -> [0,1] rank within the city's p5..p95 band (clamped). The colour + shade driver.
+  const hNorm=b=>{const t=((b.h||4)-H_LO)/(H_HI-H_LO);return t<0?0:t>1?1:t;};
+  // ---- selective accent (SPARING cool punctuation) ----
+  // The cool accent (collateral purple #7A4FE0 + accent blue #5B7CFA) is reserved for genuine
+  // LANDMARKS only — the tallest decile (95th+ pct gets purple, 90-95th gets blue). NOT the whole
+  // in-catchment core (the 10km ring covers nearly the entire Mueang-Rayong scene, so accenting it
+  // would re-create the old "blue carpet"). The body is always the warm ramp; the accent is a few
+  // towers that punctuate the skyline, on BOTH light and dark bases.
+  const PURP=[122,79,224], BLUE=[91,124,250];
+  let tallThresh=Infinity, vtallThresh=Infinity;
+  if(BUILDINGS&&BUILDINGS.length){
+    const hs2=BUILDINGS.map(b=>b.h||4).sort((a,b)=>a-b);
+    tallThresh=hs2[Math.floor(hs2.length*0.9)]||Infinity;    // 90th-pct: a landmark
+    vtallThresh=hs2[Math.floor(hs2.length*0.97)]||Infinity;  // 97th-pct: the very tallest -> purple
+  }
+  // is a building inside the focal branch's 10km catchment? (cheap squared-degree test on centroid).
+  // Used ONLY for a subtle warm brightness lift in light mode (NOT a colour swap) so the in-reach
+  // core reads a touch warmer/brighter without flooding the scene cool.
   const inFocalRing=b=>{ if(!focal)return false;
     const dy=(b.cy-focal.y)*111320, dx=(b.cx-focal.x)*111320*Math.cos(focal.y*Math.PI/180);
     return (dx*dx+dy*dy)<=(10000*10000); };
-  const isKey=b=>LIGHT&&((b.h||4)>=tallThresh||inFocalRing(b));
+  const isLandmark=b=>(b.h||4)>=tallThresh;   // tallest decile = skyline punctuation (both bases)
+  // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
+  // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
+  const RAMP_DARK=[[58,52,46],[150,104,52],[228,172,78]];      // taupe -> ochre -> gold
+  const RAMP_LIGHT=[[224,210,184],[226,176,104],[236,196,96]]; // sand -> amber -> bright gold
+  const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
+    const a=stops[seg],b2=stops[seg+1];
+    return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
   L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,
     getPolygon:b=>b.p,
-    // exaggerate height non-linearly: low-rise stays low, mid/tall get stretched so the skyline separates.
-    getElevation:b=>{const h=b.h||4;return h*(h<10?1.35:h<22?1.9:2.6);},
+    // exaggerate height non-linearly: low-rise stays grounded, mid/tall get stretched so the skyline
+    // separates. Visual only — getElevation never writes back to b.h.
+    getElevation:b=>{const h=b.h||4;return h*(h<10?1.5:h<22?2.1:2.8);},
     getFillColor:b=>{
-      // LIGHT (DataProteins) path: muted grey context, saturated accent for KEY buildings only.
-      if(LIGHT){
-        const j=(jit(b)-0.5)*14;
-        const clampL=v=>Math.max(0,Math.min(255,Math.round(v)));
-        if(isKey(b)){
-          // tall ones get the purple crown, ring-only ones the blue — both saturated, opaque.
-          const acc=((b.h||4)>=tallThresh)?PURP:BLUE;
-          // lift accent with height so taller key buildings read brighter
-          const t=Math.min(1,(b.h||4)/40), lift=t*40;
-          return [clampL(acc[0]+lift*0.2+j),clampL(acc[1]+lift*0.3+j),clampL(acc[2]+lift*0.1+j),238];
-        }
-        // muted light-grey context, slightly translucent so the white base breathes through
-        return [clampL(GREY[0]+j),clampL(GREY[1]+j),clampL(GREY[2]+j),176];
-      }
-      const t=Math.pow(Math.max(0,Math.min(1,(b.h||4)/34)),0.85); // height fraction, eased
-      // 3-stop ramp: deep slate base -> mid blue -> warm gold crown (strong tonal travel = visible relief)
-      const lo=DARK?[34,46,72]:[170,182,210], mid=[78,116,236], hi=[232,176,72];
-      const m=t<.5?lo.map((v,i)=>Math.round(v+(mid[i]-v)*t*2)):mid.map((v,i)=>Math.round(v+(hi[i]-v)*(t-.5)*2));
-      // per-building brightness jitter (+/-) so neighbouring footprints don't merge into one mass
-      const j=(jit(b)-0.5)*(DARK?26:20);
-      let r=m[0]+j, g=m[1]+j, bl=m[2]+j;
-      const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
-      if(c){r=r*.62+c[0]*.38; g=g*.62+c[1]*.38; bl=bl*.62+c[2]*.38;}
+      const t=hNorm(b);                         // rank within this city's height band [0,1]
       const clamp=v=>Math.max(0,Math.min(255,Math.round(v)));
-      return [clamp(r),clamp(g),clamp(bl),DARK?236:220];},
-    stroked:true,getLineColor:LIGHT?(b=>isKey(b)?[60,40,120,180]:[176,182,194,120]):(DARK?[16,22,36,210]:[120,130,150,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
-    material:{ambient:0.30,diffuse:0.92,shininess:28,specularColor:[90,100,135]},
+      const h=b.h||4;
+      // ---- SPARING cool accent: tallest decile only (the body stays warm everywhere else) ----
+      // The very tallest (97th+ pct) get the collateral purple crown; the rest of the top decile a
+      // blue accent. Both bases. A handful of towers, not the whole core -> no blue carpet.
+      if(isLandmark(b)){
+        const acc=(h>=vtallThresh)?PURP:BLUE;
+        const g0=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,1);    // gold top of the warm ramp
+        // blend the gold crown toward the cool accent; lighter blend on the light base so it stays tasteful.
+        const w=LIGHT?0.5:0.55;
+        const j=(jit(b)-0.5)*(LIGHT?12:20);
+        const r=g0[0]*(1-w)+acc[0]*w, g=g0[1]*(1-w)+acc[1]*w, bl=g0[2]*(1-w)+acc[2]*w;
+        return [clamp(r+j),clamp(g+j),clamp(bl+j),LIGHT?238:240];
+      }
+      // ---- warm body: sand/taupe -> amber/ochre -> gold along the height rank ----
+      const j=(jit(b)-0.5)*(LIGHT?12:22);
+      const m=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,t);
+      let r=m[0]+j, g=m[1]+j, bl=m[2]+j;
+      // light-mode only: a subtle WARM brightness lift for in-reach buildings (not a colour swap).
+      if(LIGHT&&inFocalRing(b)){r+=10; g+=7; bl+=2;}
+      const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
+      if(c){const cw=LIGHT?0.3:0.32; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}
+      return [clamp(r),clamp(g),clamp(bl),LIGHT?214:236];},
+    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[60,40,120,180]:[196,176,140,120]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
+    material:{ambient:0.28,diffuse:0.95,shininess:30,specularColor:[150,130,90]},
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
-    updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh],getLineColor:[DARK,LIGHT,focal,tallThresh]}}));
+    updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
   // (4) color-coded POIs — one ColumnLayer per type (short EXTRUDED hexagonal stubs, not flat dots),
   //     each toggleable; POIS items are [lat,lng] (optionally [lat,lng,name]). The little 3D pegs read
   //     as granular detail standing on the ground between the buildings. Capped short so they don't
@@ -1101,6 +1147,14 @@ function buildIsoLegend(){
 }
 
 /* controls */
+// city switcher — reflect the current city, then navigate on change (each city gets a fresh GL context).
+(function(){var sel=document.getElementById('citySel');if(!sel)return;
+  try{sel.value=CITY;}catch(e){}
+  // if the current city isn't one of the listed options, add it so the control still shows it.
+  if(sel.value!==CITY){var o=document.createElement('option');o.value=CITY;o.textContent=CITY_LABEL;sel.appendChild(o);sel.value=CITY;}
+  sel.onchange=function(){var c=sel.value;if(!c||c===CITY)return;
+    location.href='rayong-catchment.html'+(c==='rayong'?'':'?city='+encodeURIComponent(c));};
+})();
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
   basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
