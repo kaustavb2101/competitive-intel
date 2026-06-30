@@ -71,7 +71,9 @@ def search(query):
         calls += 1
         st = d.get("status")
         if st in ("REQUEST_DENIED", "OVER_QUERY_LIMIT", "INVALID_REQUEST") and not token:
-            return out, calls, st
+            # Surface Google's exact reason (it sits in error_message) instead of just the status.
+            em = d.get("error_message")
+            return out, calls, (f"{st}: {em}" if em else st)
         for r in d.get("results", []):
             loc = r.get("geometry", {}).get("location", {})
             if loc.get("lat") and loc.get("lng"):
