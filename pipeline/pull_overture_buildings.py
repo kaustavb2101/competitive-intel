@@ -470,6 +470,11 @@ def main():
     ap.add_argument("--cli", default="overturemaps", help="Overture CLI executable name")
     ap.add_argument("--out", default=None, help="output path (default Rayong; auto-set by --province)")
     ap.add_argument("--keep-geojson", action="store_true")
+    ap.add_argument("--max-buildings", type=int, default=180000,
+                    help="cap the output to keep the catchment file web-sized: keeps the dense core "
+                         "(~6km of centre) + the largest-floor-area buildings beyond, up to this many. "
+                         "A whole-province pull can yield millions of buildings (hundreds of MB) that "
+                         "can't be committed/served; this keeps it ~Rayong scale. 0 = no cap.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -529,6 +534,32 @@ def main():
     if n == 0:
         print("ERROR: no buildings produced — check the bbox / GeoJSON.", file=sys.stderr)
         sys.exit(2)
+
+    # SIZE CAP: a whole-province bbox can yield millions of buildings (hundreds of MB) that can't be
+    # committed/served and crash the browser. Keep the dense CORE (~6km of the bbox centre) + the
+    # largest-floor-area buildings beyond, up to --max-buildings, so the file stays ~Rayong scale.
+    # The renderer already LOD-caps for the GPU; this caps the FILE. Deterministic (re-sorted by centroid).
+    if args.max_buildings and n > args.max_buildings:
+        s0, w0, n0, e0 = _bbox_parts(args.bbox)
+        clat, clng = (s0 + n0) / 2.0, (w0 + e0) / 2.0
+        cosl = math.cos(math.radians(clat)) or 1.0
+        INNER = 0.054  # ~6 km in degrees
+        inner, outer = [], []
+        for b in buildings:
+            dx = (b["cx"] - clng) * cosl
+            dy = (b["cy"] - clat)
+            (inner if dx * dx + dy * dy <= INNER * INNER else outer).append(b)
+        if len(inner) >= args.max_buildings:
+            inner.sort(key=lambda b: -b.get("fa", 0))
+            kept = inner[:args.max_buildings]
+        else:
+            outer.sort(key=lambda b: -b.get("fa", 0))
+            kept = inner + outer[:args.max_buildings - len(inner)]
+        kept.sort(key=lambda b: (b["cx"], b["cy"]))   # restore deterministic order
+        print(f"size cap: {n} -> {len(kept)} buildings (dense core within ~6km + largest beyond; "
+              f"--max-buildings {args.max_buildings})", file=sys.stderr)
+        buildings = kept
+        n = len(buildings)
 
     pct_meas = 100 * stats["measured"] // n
     print(f"bbox (S,W,N,E): {args.bbox}")
