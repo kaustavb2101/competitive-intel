@@ -437,6 +437,71 @@ def check_crop_stress():
 
 
 # ---------------------------------------------------------------------------
+def check_household_risk():
+    # MEASURED household debt-to-income layer (NSO SES via TMLI bridge), province-keyed. Optional
+    # file: SKIP-PASS when absent (build_household_risk.py degrades to an absent-state too).
+    hdr("household_risk_by_province.json (optional)")
+    if not exists("household_risk_by_province.json"):
+        ok("household_risk_by_province.json absent — skipped (optional; run build_household_risk.py)")
+        return
+    try:
+        d = load("household_risk_by_province.json")
+    except Exception as e:
+        fail("household_risk_by_province.json loads", repr(e))
+        return
+    ok("household_risk_by_province.json loads")
+
+    # meta / provenance present (the data-mandate: MEASURED vs ESTIMATED must be stated)
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "generated_by" not in meta or "source" not in meta:
+        fail("household_risk meta/provenance present", "meta missing generated_by/source")
+    else:
+        ok("household_risk meta/provenance present")
+
+    # honest absent-state: file may legitimately ship empty when the source layers are missing.
+    if meta and meta.get("absent"):
+        ok("household_risk is an honest ABSENT-state (no sources) — skipped value checks")
+        return
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("household_risk has a 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("household_risk provinces list present (%d)" % len(provs))
+
+    bad = []
+    for p in provs:
+        name = p.get("province") or "?"
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        debt = p.get("debt")
+        income = p.get("income")
+        dti = p.get("debt_to_income")
+        si = p.get("stress_index")
+        # debt + income: MEASURED, must be positive finite
+        if not is_finite_number(debt) or debt <= 0:
+            bad.append("%s debt=%r not positive" % (name, debt))
+        if not is_finite_number(income) or income <= 0:
+            bad.append("%s income=%r not positive" % (name, income))
+        # debt_to_income: must equal debt/income within rounding (the MEASURED ratio is consistent)
+        if dti is not None:
+            if not is_finite_number(dti) or dti < 0:
+                bad.append("%s debt_to_income=%r invalid" % (name, dti))
+            elif is_finite_number(debt) and is_finite_number(income) and income > 0:
+                expect = round(debt / income, 2)
+                if abs(dti - expect) > 0.01:
+                    bad.append("%s debt_to_income=%s != debt/income=%s" % (name, dti, expect))
+        # stress_index: ESTIMATED 0..100 percentile rank
+        if si is not None and (not is_finite_number(si) or not (0.0 <= si <= 100.0)):
+            bad.append("%s stress_index=%r out of [0,100]" % (name, si))
+    if bad:
+        fail("household_risk values sane (debt/income>0, DTI=debt/income, stress in [0,100])",
+             first_n(bad, 8))
+    else:
+        ok("household_risk values sane (debt/income measured>0, DTI consistent, stress in [0,100])")
+
+
+# ---------------------------------------------------------------------------
 def check_branch_occupations(n_branches):
     # MEASURED Overture occupation rollup, index-aligned to branches.json. Optional file:
     # SKIP-PASS when absent (build_occupations.py has not been run / overture_places.json missing).
@@ -782,6 +847,7 @@ def main():
     amphoe = check_amphoe(n)
     check_provinces(n)
     check_crop_stress()
+    check_household_risk()
     check_branch_occupations(n)
     check_amphoe_occupations(amphoe)
     check_competitors()

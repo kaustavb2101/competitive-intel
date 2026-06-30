@@ -14,6 +14,7 @@ const LENS = {
   comp:     {label:'Competitor density ◆', desc:'MEASURED competitor locations (Google Places, a LOWER BOUND, not a registry) — rival title-loan / vehicle-finance branches (Srisawad, Muangthai, Tidlor, Heng) within ~5km of each AutoX branch. Lazy-loads competitors_national.json; run pull_competitors.py to populate.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, val:d=>compCount(d)},
   risk:     {label:'Portfolio risk ▲ est', desc:'ESTIMATED proxy (OSM/price-based, 0–100) — composite of agri-PD / merchant / collateral. NOT a measured default rate.', color:'#E0574F', unit:'risk (est)', est:true, val:d=>riskVal(d)},
   cstress:  {label:'Agri crop-stress ▲ est', desc:"ESTIMATED triage index (0–100) — the branch's province crop-household stress (price proxy × drought, scaled by crop dependence). Lazy-loaded.", color:'#C8433B', unit:'crop-stress (est)', est:true, val:d=>cstressVal(d)},
+  hhdti:    {label:'Household debt-to-income ●', desc:"MEASURED · NSO — the branch's province household debt as a multiple of annual income (NSO SES 2566, debt ÷ income). Higher = more borrower balance-sheet stress. Lazy-loads household_risk_by_province.json; hidden if absent.", color:'#C8433B', unit:'×100 DTI', hh:true, val:d=>hhriskVal(d)},
   // District (amphoe) lenses — colour each branch by its district's score from amphoe.json.
   // White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED (province-inherited
   // agri-stress + local mix). Both lazy-load amphoe.json (joined per-branch via build_amphoe.py).
@@ -44,6 +45,33 @@ async function loadCropStress(){
   return cstressPromise;
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
+
+/* ---------- household debt-to-income (MEASURED · NSO SES, objective #1) ----------
+   Lazy-loaded from data/household_risk_by_province.json (pipeline/build_household_risk.py).
+   HHRISK maps Thai province name -> {debt, income, debt_to_income, stress_index}. debt + income
+   + debt_to_income are MEASURED (NSO SES 2566); stress_index is an ESTIMATED 0–100 percentile rank.
+   Fully null-guarded: if the file is ABSENT (or has meta.absent), HHRISK stays empty, the lens
+   hides itself (see renderLenses), and the val() reads 0 — never errors. */
+let HHRISK=null, HHRISK_META=null, hhriskLoaded=false, hhriskPromise=null;
+async function loadHouseholdRisk(){
+  if(hhriskPromise) return hhriskPromise;
+  hhriskLoaded=true;
+  hhriskPromise=(async()=>{
+    try{
+      const r=await fetch('data/household_risk_by_province.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      HHRISK_META=j.meta||null; HHRISK={};
+      if(!(j.meta&&j.meta.absent)) (j.provinces||[]).forEach(p=>{HHRISK[p.province]=p;});
+    }catch(e){ HHRISK={}; HHRISK_META=null; }
+    return HHRISK;
+  })();
+  return hhriskPromise;
+}
+// true once the layer is loaded AND carries at least one province (i.e. not absent/empty).
+function hhriskHasData(){return !!(HHRISK&&Object.keys(HHRISK).length);}
+// MEASURED debt-to-income for a branch's province, scaled ×100 so the lens shares the integer
+// colour scale of the other lenses (e.g. DTI 1.15 -> 115). 0 when unknown.
+function hhriskVal(d){const p=HHRISK&&HHRISK[d.v]; return p&&p.debt_to_income!=null?Math.round(p.debt_to_income*100):0;}
 
 /* ---------- measured occupation mix (Overture Places) ----------
    Lazy-loads data/branch_occupations.json — a MEASURED per-branch rollup of establishment
@@ -1292,7 +1320,12 @@ async function renderTrend(){
 
 /* ---------- map ---------- */
 function renderLenses(){
-  $('#lenses').innerHTML = Object.entries(LENS).map(([k,l])=>
+  // Hide the household debt-to-income lens once we KNOW its source is absent (loaded, empty) —
+  // graceful degrade: the button never appears for a dataset that isn't there. Before load it
+  // shows (warmed at map init); if the load yields no data it is filtered out on the next render.
+  $('#lenses').innerHTML = Object.entries(LENS)
+    .filter(([k,l])=>!(l.hh && hhriskLoaded && !hhriskHasData()))
+    .map(([k,l])=>
     `<button class="lens ${k===curLens?'on':''}" data-l="${k}" aria-pressed="${k===curLens}" aria-label="Map lens: ${l.label.replace(/"/g,'&quot;')}" ${l.est?`title="${l.desc.replace(/"/g,'&quot;')}"`:''}>
        <div class="lt"><span class="lk" style="background:${l.color}"></span>${l.label}</div>
        <div class="ld">${l.desc}</div></button>`).join('');
@@ -1339,6 +1372,18 @@ function renderLegend(){
       ` &nbsp; ${key}`;
     return;
   }
+  // Household debt-to-income lens: the val() is DTI×100, so present the scale in real DTI terms
+  // and tag it honestly MEASURED · NSO. Absent file → the lens is already filtered out of the bar.
+  if(l.hh){
+    if(!hhriskLoaded){ $('#maplegend').innerHTML='<span class="sub">Loading household debt-to-income…</span>'; return; }
+    const lo=(mx*.12/100).toFixed(2), mid=(mx*.5/100).toFixed(2), hi=(mx/100).toFixed(2);
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${lo}×</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${mid}×</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${hi}× debt÷annual income</span>`+
+      ` <span class="sub" title="NSO SES 2566 household debt and income — province averages, measured">● measured · NSO SES</span>`;
+    return;
+  }
   $('#maplegend').innerHTML =
     `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
      <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
@@ -1368,6 +1413,10 @@ function initMap(){
   // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
   // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
   if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
+  // warm the MEASURED household debt-to-income layer so the lens hides itself when absent and
+  // popups carry the debt-to-income block. Absent file → loader leaves HHRISK empty, the lens is
+  // filtered out, nothing renders.
+  if(!hhriskLoaded) loadHouseholdRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='hhdti'){ renderLegend(); styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -1452,6 +1501,20 @@ function cstressPopupHTML(d,sec,r){
     + (dom?r('Dominant crop (OAE · measured)', `${dom.crop} ${Math.round((dom.share||0)*100)}%`, '#c7cedd'):'')
     + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
     + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'var(--gold)':'var(--merch)');
+}
+// Household debt-to-income block for a branch popup — the MEASURED NSO SES province balance-sheet
+// read. debt + income + ratio are measured; stress_index is an ESTIMATED percentile rank. Renders
+// nothing until household_risk_by_province.json is loaded and this province has an entry.
+function hhriskPopupHTML(d,sec,r){
+  const p=HHRISK&&HHRISK[d.v]; if(!p||p.debt_to_income==null) return '';
+  const dti=p.debt_to_income, si=p.stress_index;
+  const dc=dti>=1.0?'var(--agri)':dti>=0.7?'var(--gold)':'var(--merch)';
+  return sec('Household debt-to-income — measured (NSO SES)')
+    + r('Debt ÷ annual income', `<span style="color:${dc}">${dti.toFixed(2)}×</span>`, dc)
+    + r('Avg household debt (THB)', (p.debt||0).toLocaleString(), '#c7cedd')
+    + r('Avg annual income (THB)', (p.income||0).toLocaleString(), '#c7cedd')
+    + (si!=null?r('Stress rank ▲ · est', `${Math.round(si)} <span class="sub">/100 pct</span>`, dc):'')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">debt &amp; income measured (NSO SES 2566, province average); stress rank = percentile of DTI across provinces (estimated)</div>`;
 }
 // Occupation-mix block for a branch popup — the MEASURED Overture-Places rollup of establishments
 // by occupation bucket within 10km of this branch. Renders nothing until branch_occupations.json is
@@ -1539,6 +1602,7 @@ function popupHTML(d){
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), 'var(--collat)'):''}
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
+    ${hhriskPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${amphoePopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
@@ -1563,6 +1627,9 @@ function setLens(k){
   }
   if(k==='estab' && !occLoaded){
     loadOccupations().then(()=>{ if(curLens==='estab'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='hhdti' && !hhriskLoaded){
+    loadHouseholdRisk().then(()=>{ renderLenses(); if(curLens==='hhdti'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
