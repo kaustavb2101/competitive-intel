@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Peer NPL benchmark (reported)",
+    "note": "Listed title-loan peers' reported NPL ratios. PEER figures only — NOT an AutoX/Ngern Chaiyo number (we have no measured AutoX NPL). The spread tracks collateral mix: gold/vehicle (lower NPL) vs land/agri/heavy-vehicle (higher NPL).",
+    "measured": "reported by the companies (peer figures)",
+    "source": "docs/RESEARCH_DIGEST.md §B — companies' reported NPL (FY2025 / 2025 IR)",
+    "updated": "2026-06"
+  },
+  "peers": [
+    {
+      "ticker": "TIDLOR",
+      "name": "Ngern Tid Lor",
+      "npl": 1.5,
+      "collateral": "vehicle title (best-in-class)",
+      "source": "FY2025 company / thaipr — NPL 1.5%"
+    },
+    {
+      "ticker": "MTC",
+      "name": "Muangthai Capital",
+      "npl": 2.53,
+      "collateral": "vehicle / motorcycle title",
+      "source": "FY2025 company IR / kaohoon — NPL 2.53% (target <2.7%)"
+    },
+    {
+      "ticker": "SAWAD",
+      "name": "Srisawad",
+      "npl": 3.55,
+      "npl_label": "3.5–3.6",
+      "collateral": "cars/pickups/heavy-vehicle + land/house/condo",
+      "source": "2025 IR oppday deck — NPL guidance 3.5–3.6%"
+    }
+  ]
+}
