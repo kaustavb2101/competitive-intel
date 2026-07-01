@@ -324,9 +324,9 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .tag.demand{background:rgba(35,162,143,.14);color:#3fc1ac;border-color:rgba(35,162,143,.35)}
 .tag.collat{background:rgba(142,99,232,.14);color:#a684ef;border-color:rgba(142,99,232,.35)}
 .tag.opp{background:rgba(230,180,80,.14);color:#f0c869;border-color:rgba(230,180,80,.35)}
-.prov{font:600 9px var(--mono);padding:1px 5px;border-radius:8px;vertical-align:1px;margin-left:5px}
-.prov.m{color:var(--up);border:1px solid rgba(35,162,143,.5)}
-.prov.e{color:var(--dim);border:1px solid var(--line)}
+/* .prov (measured/estimated provenance chip) is defined ONCE — the premium pill in the
+   "STANDARDIZED PROVENANCE" block below. Only the inline left-gap lives here. */
+.prov{margin-left:5px}
 
 /* ---------- lens PILL row: one horizontal segmented control docked over the map ---------- */
 .lenses{display:flex;gap:6px;flex-wrap:wrap;margin:0}
@@ -580,9 +580,20 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .cc-row .l .s{display:block;font-size:10.5px;color:var(--dim)}
 .cc-row .r{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
 .cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
-.cc-tag{font-family:var(--mono);font-size:9px;font-weight:600;padding:1px 5px;border-radius:9px;border:1px solid;vertical-align:middle;white-space:nowrap}
-.cc-tag.m{color:#3fc1ac;border-color:rgba(35,162,143,.4);background:rgba(35,162,143,.10)}
-.cc-tag.e{color:#f0c869;border-color:rgba(230,180,80,.4);background:rgba(230,180,80,.10)}
+/* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
+   teal=measured / gold=estimated tint, hairline border). Colors resolve via .prov.m/.e below. */
+.cc-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;padding:2px 8px 2px 7px;border-radius:999px;
+  border:1px solid;vertical-align:middle;white-space:nowrap;letter-spacing:.2px}
+.cc-tag::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;box-sizing:border-box}
+.cc-tag.m{color:#5fd6c2;border-color:rgba(35,162,143,.55);background:rgba(35,162,143,.14)}
+.cc-tag.m::before{background:#5fd6c2}
+.cc-tag.e{color:#f2cf78;border-color:rgba(230,180,80,.55);background:rgba(230,180,80,.13)}
+.cc-tag.e::before{background:transparent;border:1.5px solid #f2cf78}
+html[data-theme="light"] .cc-tag.m{color:#0c6a5b;background:rgba(28,140,125,.13);border-color:rgba(28,140,125,.45)}
+html[data-theme="light"] .cc-tag.m::before{background:#0c6a5b}
+html[data-theme="light"] .cc-tag.e{color:#8a6300;background:rgba(176,130,20,.13);border-color:rgba(176,130,20,.45)}
+html[data-theme="light"] .cc-tag.e::before{border-color:#8a6300}
 .cc-sub2{font-size:10.5px;color:var(--dim);margin:8px 0 0}
 .cc-star{background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;line-height:1;padding:0 2px;vertical-align:middle}
 .cc-star.on{color:var(--gold)}
@@ -617,8 +628,14 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px}
 .cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid)}
 .cc-hero-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
-.cc-hero-tag{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);
-  border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+/* .cc-hero-tag is a provenance chip too (text can be mixed "measured + estimated"), so it wears
+   the same pill language as .prov / .cc-tag — mono 11px, leading dot, hairline border. Kept
+   neutral-ink because the value may span both states. */
+.cc-hero-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;letter-spacing:.2px;color:var(--mid);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 7px;white-space:nowrap}
+.cc-hero-tag::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;
+  background:var(--dim);box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
 .cc-hero-cta{font-size:12px;font-weight:600;color:var(--hc,var(--accent));white-space:nowrap}
 /* demote the measured/estimated legend to one quiet line at the bottom (QW5). */
 .cc-provenance{margin-top:18px;font-size:11px;color:var(--dim);border-top:1px solid var(--line2);padding-top:10px}
@@ -908,6 +925,8 @@ main:has(#v-exposure.on){
   font-size:11px;font-weight:600;line-height:1;padding:2px 8px 2px 7px;border-radius:999px;
   border:1px solid;vertical-align:middle;white-space:nowrap;letter-spacing:.2px}
 .prov .pd{width:8px;height:8px;border-radius:50%;flex:none;box-sizing:border-box}
+/* source suffix (· OSM / · NSO / · Google Places) sits inside the pill in muted ink */
+.prov .src,.cc-tag .src{color:var(--dim);font-weight:500;margin-left:1px}
 /* MEASURED — teal, filled dot. #5fd6c2 on the dark tint clears AA (≈7:1). */
 .prov.m{color:#5fd6c2;border-color:rgba(35,162,143,.55);background:rgba(35,162,143,.14)}
 .prov.m .pd{background:#5fd6c2}
