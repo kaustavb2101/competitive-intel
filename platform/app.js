@@ -2910,10 +2910,13 @@ function drawMarket(){
 // Standardized provenance chip (one consistent marker everywhere): filled dot = MEASURED,
 // hollow dot = ESTIMATED. ≥11px, AA-contrast text on a tinted pill (see .prov in styles.css).
 // provChip(kind[,label]) is the helper; TAG_M / TAG_E are the canonical short chips used inline.
-function provChip(kind,label){
+// provChip(kind[,label[,src]]) — the ONE provenance pill. `src` (e.g. 'OSM','NSO','Google Places')
+// renders as a muted "· src" suffix inside the same pill; omitted when absent (every existing call).
+function provChip(kind,label,src){
   const m=kind==='m';
   return `<span class="prov ${m?'m':'e'}" title="${m?'Measured value':'Estimated / proxy — not a measured outcome'}">`+
-    `<span class="pd" aria-hidden="true"></span>${label||(m?'measured':'est')}</span>`;
+    `<span class="pd" aria-hidden="true"></span>${label||(m?'measured':'est')}`+
+    (src?`<span class="src">· ${src}</span>`:'')+`</span>`;
 }
 const TAG_M=provChip('m');
 const TAG_E=provChip('e');

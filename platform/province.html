@@ -224,6 +224,25 @@ html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rg
  padding:6px 11px;border-radius:7px;white-space:nowrap}
 #nav a.on{color:#fff;background:#1a2336}
 #nav a:active{background:#161d2c}
+
+/* "More ▾" dropdown (matches styles.css .nav-more) */
+.nav-more{position:relative;flex:none}
+.nav-more-btn{color:#8a94a8;background:none;border:none;cursor:pointer;
+  font:500 12.5px 'IBM Plex Sans Thai',sans-serif;padding:6px 11px;border-radius:7px;white-space:nowrap;
+  transition:color .15s,background .15s}
+.nav-more-btn:hover{color:#e6ecf5;background:rgba(255,255,255,.045)}
+#nav .nav-more-btn.on{color:#fff;background:#1a2336}
+.nav-more-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:160px;display:none;
+  flex-direction:column;gap:2px;padding:6px;z-index:2100;
+  background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid #1d2738;border-radius:10px;box-shadow:0 14px 38px rgba(0,0,0,.55)}
+.nav-more.open .nav-more-menu{display:flex}
+.nav-more-menu a{display:block;flex:none}
+html[data-theme="light"] .nav-more-btn{color:#5A6477}
+html[data-theme="light"] .nav-more-btn:hover{color:#11151F;background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 14px 38px rgba(16,22,40,.18)}
+
 .err{top:44px}
 
 #themeToggle{margin-left:auto;flex:none;background:none;border:1px solid var(--cardln);color:var(--mid);
@@ -278,7 +297,39 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </style>
 </head>
 <body>
-<nav id="nav"><span class="nb">AutoX<b>·</b>เงินไชโย</span><a href="index.html#overview">Overview</a><a href="index.html#map">National</a><a href="rayong-catchment.html" data-nav="rayong">Rayong 3D</a><a href="index.html#acq">Acquisition</a><a href="index.html#exposure">Exposure</a><a href="index.html#provinces" data-nav="provinces">Provinces</a><a href="index.html#market">Market</a><a href="index.html#branches">Branches</a><button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button></nav>
+<nav id="nav" aria-label="Main views">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a href="index.html#home">Home</a>
+  <a href="index.html#overview">Overview</a>
+  <a href="index.html#map">National</a>
+  <a href="index.html#acq">Acquire</a>
+  <a href="index.html#exposure">Exposure</a>
+  <a href="index.html#trend">Trend</a>
+  <a href="rayong-catchment.html" data-nav="rayong">Rayong 3D</a>
+  <a href="rayong-catchment.html?city=bangkok">Bangkok 3D</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="index.html#provinces" data-nav="provinces" role="menuitem">Provinces</a>
+      <a href="index.html#market" role="menuitem">Market</a>
+      <a href="index.html#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>
+</nav>
+<script>/* "More ▾" nav dropdown — pure UI (copied from index.html) */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
+</script>
 <script>
 (function(){
  var slug=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
