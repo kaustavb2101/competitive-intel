@@ -620,6 +620,12 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
   .view{display:none!important}
   #v-home{display:block!important}
   .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
+  /* board thesis: whiten the band, darken the sentence, keep the Road-to-3,000 bar readable. */
+  .cc-thesis{background:#fff!important;border:1px solid #bbb!important;border-left:4px solid #b88a2e!important;break-inside:avoid;box-shadow:none!important}
+  .cc-thesis-line,.cc-thesis-line b{color:#111!important}
+  .cc-thesis-bar{background:#eee!important;border-color:#bbb!important}
+  .cc-thesis-fill{background:#b88a2e!important}
+  .cc-thesis-barlab{color:#111!important;text-shadow:none!important}
   .cc-card-h,.cc-row .l,.cc-row .r,h2,h3,b{color:#111!important}
   .lead,.cc-sub2,.cc-row .l .s,.cc-row .r .s,.sub{color:#444!important}
   .cc-grid{grid-template-columns:1fr 1fr}
