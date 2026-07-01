@@ -1287,7 +1287,8 @@ function drawAmpBoard(){
           ? `<span style="color:${under?'var(--gold)':'var(--merch)'}">0${under?' ✦':''}</span>`
           : `<span style="color:var(--agri)">${cn}</span>`)+`</td>`;
       }
-      return `<tr>
+      const clk=(a.cy!=null&&a.cx!=null)?` onclick="focusDistrictOnMap(${i},'ws')" tabindex="0" role="link" style="cursor:pointer" title="Show this district on the national map →"`:'';
+      return `<tr${clk}>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(ws,sc,mx)} <span class="mono" style="color:${sc}">${ws.toFixed(0)}</span></td>
         <td>${ampName(a)}<span class="sub">${hd}</span></td>
@@ -1318,6 +1319,34 @@ function drawAmpBoard(){
     }
   }
 }
+/* ---------- district → national-map drill-down (interaction spine) ----------
+   Click a white-space leaderboard row → jump to the National map, switch to the district
+   white-space lens, fly to the district centroid (cx,cy from amphoe.json, MEASURED polygon
+   centroid), and drop a gold ping + label so the underserved district is unmistakable on the
+   map. Deferred via pendingMapFocus because the map may not be initialised yet (lazy tab).
+   Fully null-guarded: no centroid → row isn't clickable; every Leaflet call is try/caught. */
+let pendingMapFocus=null, focusMarker=null;
+function focusDistrictOnMap(i,kind){
+  const risk=(kind==='risk');
+  const a=((risk?ampRRows:ampRows)||[])[i]||null; if(!a||a.cy==null||a.cx==null) return;
+  const val=risk?(a.risk_proxy||0):(a.whitespace||0);
+  pendingMapFocus={lat:a.cy,lng:a.cx,name:a.name_measured?a.name:a.name_en,val,label:risk?'risk ▲':'white-space ★'};
+  const lens=risk?'drisk':'dws';
+  if(curLens!==lens){ curLens=lens; if(typeof renderLenses==='function') try{renderLenses();}catch(e){} }
+  history.replaceState(null,'','#map'); showTab('map');
+}
+function applyMapFocus(){
+  if(!pendingMapFocus||!mapReady||!map||!window.L) return;
+  const f=pendingMapFocus; pendingMapFocus=null;
+  try{
+    if(focusMarker){ try{map.removeLayer(focusMarker);}catch(e){} focusMarker=null; }
+    map.flyTo([f.lat,f.lng], 12, {duration:0.9});
+    focusMarker=L.circleMarker([f.lat,f.lng],{radius:12,weight:2.5,color:'#E6B450',opacity:0.95,fill:false});
+    focusMarker.addTo(map);
+    focusMarker.bindTooltip(`${f.name} · ${f.label||'white-space ★'} ${Math.round(f.val!=null?f.val:(f.ws||0))}`,
+      {permanent:true,direction:'top',offset:[0,-8],className:'focus-tip'}).openTooltip();
+  }catch(e){}
+}
 function drawAmpRisk(){
   ampRRows=AMP.filter(a=>ampRRegion==='all'||a.region===ampRRegion)
     .sort((x,y)=>(y.risk_proxy||0)-(x.risk_proxy||0)).slice(0,25);
@@ -1328,7 +1357,8 @@ function drawAmpRisk(){
     `<th title="province-mean agri crop-stress (price proxy × drought) — PROVINCE-INHERITED, not amphoe-measured">Agri stress ▲ est</th>`+
     `<th title="AutoX branches inside this amphoe (MEASURED) — footprint exposed to the stress">AutoX</th></tr>`+
     ampRRows.map((a,i)=>{const rk=a.risk_proxy||0; const sc=rk>=60?'var(--agri)':rk>=45?'#D9742B':'var(--mid)';
-      return `<tr>
+      const clk=(a.cy!=null&&a.cx!=null)?` onclick="focusDistrictOnMap(${i},'risk')" tabindex="0" role="link" style="cursor:pointer" title="Show this district on the national map →"`:'';
+      return `<tr${clk}>
         <td class="mono sub">${i+1}</td>
         <td>${barHTML(rk,sc,mx)} <span class="mono" style="color:${sc}">${rk.toFixed(0)}</span></td>
         <td>${ampName(a)}</td>
@@ -2187,7 +2217,7 @@ function renderLegend(){
      <span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>${est}`;
 }
 function initMap(){
-  if(mapReady){ map.invalidateSize(); return; }
+  if(mapReady){ map.invalidateSize(); applyMapFocus(); return; }
   if(!DATA) return;
   mapReady=true;
   // optional ?lens=<key> deep-link: pick the starting map lens (validated against LENS).
@@ -2230,6 +2260,8 @@ function initMap(){
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
   }
+  // if we arrived here from a district leaderboard row, fly to + ping that district now.
+  applyMapFocus();
 }
 function selectBranch(d,m){
   m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
