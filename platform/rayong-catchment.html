@@ -798,7 +798,7 @@ function groundLayers(){
       recreation:  [[ 40, 96, 58,148],[150,196,138,160]],
       meadow:      [[ 44, 92, 58,140],[164,202,150,150]],
       farmland:    [[ 92, 90, 52,110],[206,190,142,160]],
-      industrial:  [[ 64, 70, 86,120],[172,178,192,165]],
+      industrial:  [[ 74, 72, 72,110],[172,178,192,165]],
       commercial:  [[ 92, 80, 62,110],[208,194,172,155]],
       residential: [[ 66, 72, 92,105],[194,198,212,145]],
       retail:      [[ 94, 80, 60,110],[210,194,170,155]]};  // dark land-use alphas cut ~35-45% + greens deepened: the ground recedes so buildings win figure-ground
@@ -1080,7 +1080,7 @@ function render(){
     if(H_HI<=H_LO)H_HI=H_LO+1;   // guard a degenerate flat distribution
   }
   // height -> [0,1] rank within the city's p5..p95 band (clamped). The colour + shade driver.
-  const hNorm=b=>{const t=((b.h||4)-H_LO)/(H_HI-H_LO);return t<0?0:t>1?1:t;};
+  const hNorm=b=>{let t=((b.h||4)-H_LO)/(H_HI-H_LO);t=t<0?0:t>1?1:t;return Math.pow(t,0.72);};  // gamma<1 lifts mid/tall into amber/gold so a dense low-rise mat doesn't bunch at the dark end
   // ---- selective accent (SPARING cool punctuation) ----
   // The cool accent (collateral purple #7A4FE0 + accent blue #5B7CFA) is reserved for genuine
   // LANDMARKS only — the tallest decile (95th+ pct gets purple, 90-95th gets blue). NOT the whole
@@ -1103,7 +1103,7 @@ function render(){
   const isLandmark=b=>(b.h||4)>=tallThresh;   // tallest decile = skyline punctuation (both bases)
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
-  const RAMP_DARK=[[20,17,14],[150,96,40],[248,196,104]];      // deep near-black base -> ochre -> bright gold crown (deeper travel = DataProteins glow)
+  const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
   const RAMP_LIGHT=[[190,172,140],[216,168,92],[234,194,96]]; // muted sand -> amber -> gold (deepened to resist sun blow-out)
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
@@ -1304,9 +1304,9 @@ function updatePanels(){
     // City with buildings but no branch/analysis stack (e.g. Bangkok): give it a real title and a
     // single confident note — don't leave an em-dash title and orphan empty section headers ("looks broken").
     const fn=document.getElementById('focalName'); if(fn)fn.textContent=CITY_LABEL;
-    const fs=document.getElementById('focalSub'); if(fs)fs.textContent='3D buildings & ground · full branch analysis on Rayong';
+    const fs=document.getElementById('focalSub'); if(fs)fs.textContent='3D massing view — branch & competitor overlays roll out next';
     const k10host=document.getElementById('k10panel');
-    if(k10host)k10host.innerHTML='<div class="foot">Branch + POI overlays for this city are not loaded yet — the 3D buildings and ground render from the catchment pull. Rayong has the full analysis stack.</div>';
+    if(k10host)k10host.innerHTML='<div class="foot">3D buildings & ground for this city, from the catchment pull. Branch + POI overlays roll out next; Rayong carries the full analysis stack today.</div>';
     const whost=document.getElementById('workpanel'); if(whost)whost.innerHTML='';
     const workH=document.getElementById('workH'); if(workH)workH.style.display='none';  // hide the orphan empty header
     return;
@@ -1380,7 +1380,7 @@ function buildLeads(){
   // for cities without that data (the right-hand card just shows a short note).
   if(!COMP.length||!BR.length){
     const v=document.getElementById('verdict');
-    if(v)v.innerHTML='<div class="foot">Competitor + branch overlays for this city are not loaded yet. The 3D scene (buildings + ground) renders from the catchment pull; the full acquisition read is available for Rayong.</div>';
+    if(v)v.innerHTML='<div class="foot">3D massing view for this city. Competitor & branch acquisition overlays roll out next; the full acquisition read is live for Rayong today.</div>';
     const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
     const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
     // hide the now-orphan "Top gaps" / "Recommendations" headers so the panel is one clean note, not empty scaffolding
