@@ -59,6 +59,7 @@ phase_check(){
   ( cd "$PIPE" && python3 derive.py --check >/dev/null 2>&1 ) && ok "derive.py --check" || bad "derive.py --check (platform/data drifted from source-data)"
   ( cd "$PIPE" && python3 build_province.py --check >/dev/null 2>&1 ) && ok "build_province.py --check" || bad "build_province.py --check (province files drifted)"
   ( cd "$PIPE" && python3 build_amphoe.py --check >/dev/null 2>&1 ) && ok "build_amphoe.py --check" || bad "build_amphoe.py --check (amphoe.json drifted from source-data)"
+  ( cd "$PIPE" && python3 build_amphoe_geo.py --check >/dev/null 2>&1 ) && ok "build_amphoe_geo.py --check" || bad "build_amphoe_geo.py --check (amphoe_geo.json drifted from th_amphoe.geojson)"
   # NOTE: bake_catchment_heights.py --check was removed from the gate once rayong_catchment.json
   # became an Overture PULL artifact (pull_overture_buildings.py, ~124k buildings). Like branches.json
   # and the competitor census, a network-pulled file is not byte-reproducible offline, so it does not
