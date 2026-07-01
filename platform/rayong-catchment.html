@@ -818,7 +818,7 @@ function groundLayers(){
   if(wa&&wa.length&&deck.PolygonLayer){
     G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,
       filled:true,stroked:true,
-      getFillColor:D?[30,66,118,225]:[126,168,220,215],
+      getFillColor:D?[30,66,118,225]:[150,196,236,220],
       getLineColor:D?[16,40,78,235]:[72,118,178,220],getLineWidth:3,lineWidthMinPixels:1,
       parameters:{depthTest:false},pickable:false}));
   }
@@ -1104,7 +1104,7 @@ function render(){
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
   const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
-  const RAMP_LIGHT=[[190,172,140],[216,168,92],[234,194,96]]; // muted sand -> amber -> gold (deepened to resist sun blow-out)
+  const RAMP_LIGHT=[[214,220,230],[188,198,214],[150,166,190]]; // pale cool-grey -> mid slate -> deeper slate-blue: on a light basemap height reads as VALUE, hue stays near-neutral (DataProteins clean)
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -1125,7 +1125,7 @@ function render(){
         const acc=(h>=vtallThresh)?PURP:BLUE;
         const g0=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,1);    // gold top of the warm ramp
         // blend the gold crown toward the cool accent; lighter blend on the light base so it stays tasteful.
-        const w=LIGHT?0.32:0.30;   // accent weight cut 0.55->0.30: landmarks read as bright gold with a cool TIP, not a mauve carpet
+        const w=LIGHT?0.28:0.30;   // accent weight: landmarks read as a clean cool/gold TIP, not a smear
         const j=(jit(b)-0.5)*(LIGHT?10:14);
         const r=g0[0]*(1-w)+acc[0]*w, g=g0[1]*(1-w)+acc[1]*w, bl=g0[2]*(1-w)+acc[2]*w;
         return [clamp(r+j),clamp(g+j),clamp(bl+j),LIGHT?238:240];
@@ -1138,8 +1138,8 @@ function render(){
       if(LIGHT&&inFocalRing(b)){r+=10; g+=7; bl+=2;}
       const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
       if(c){const cw=LIGHT?0.3:0.18; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}  // dark tint weight 0.32->0.18: let the height ramp dominate the hue (was muddying towers)
-      return [clamp(r),clamp(g),clamp(bl),LIGHT?214:236];},
-    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[60,40,120,180]:[196,176,140,120]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
+      return [clamp(r),clamp(g),clamp(bl),LIGHT?232:236];},
+    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[70,54,140,210]:[120,134,158,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
     // across faces. Specular ZEROED: it's the only view-dependent term, and under orbit it spiked
     // and clamped sun-facing faces to white (the "white blow-out"). Diffuse shading keeps depth.
