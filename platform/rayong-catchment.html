@@ -550,39 +550,6 @@ function buildLighting(withShadow){
 let SHADOWS_ON=true;
 let LIGHTING=buildLighting(true);
 if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
-// ---- CINEMATIC POST-PROCESS (in-GL colour grade + vignette) --------------------------------
-// The thing that reads as "DataProteins-grade": a full-frame grade applied AFTER the scene renders.
-// Deliberately DARKENING/grading only — vignette darkens the edges, contrast deepens the mids,
-// saturation enriches the golds. It NEVER brightens a pixel past where it already was (every channel
-// is clamped and the mid-contrast pivot leaves near-white where it is), so it CANNOT reintroduce the
-// white blow-out that lighting did. Fully feature-detected: if deck.PostProcessEffect is absent or the
-// module fails to build, POST is null and the effects array just omits it (scene unchanged).
-// luma.gl v8 screen-space convention: <name>_sampleColor(color,texSize,texCoord) + passes:[{sampler:true}].
-function buildPost(){
-  try{
-    if(!(deck.PostProcessEffect)) return null;
-    const CINE={ name:'cine',
-      uniforms:{ uVigR:{value:0.86,min:0,max:1}, uVigA:{value:0.34,min:0,max:1},
-        uContrast:{value:1.09,min:0,max:2}, uSat:{value:1.14,min:0,max:2}, uWarm:{value:0.03,min:0,max:1} },
-      fs:`uniform float uVigR; uniform float uVigA; uniform float uContrast; uniform float uSat; uniform float uWarm;
-        vec4 cine_sampleColor(vec4 color, vec2 texSize, vec2 texCoord){
-          vec3 c = color.rgb;
-          c = (c - 0.5) * uContrast + 0.5;                 // deepen mids (pivot at 0.5)
-          float l = dot(c, vec3(0.299,0.587,0.114));
-          c = mix(vec3(l), c, uSat);                        // enrich saturation
-          c.r += uWarm * l; c.b -= uWarm * l * 0.6;         // whisper of warmth into the grade
-          float d = distance(texCoord, vec2(0.5));
-          float vig = smoothstep(0.9, uVigR*0.78, d*(uVigA+uVigR));  // darken toward the frame edge
-          c *= vig;
-          return vec4(clamp(c,0.0,1.0), color.a);
-        }`,
-      passes:[{sampler:true}] };
-    return new deck.PostProcessEffect(CINE,{uVigR:0.86,uVigA:0.34,uContrast:1.09,uSat:1.14,uWarm:0.03});
-  }catch(e){ return null; }
-}
-let POST=buildPost();
-// effects composer — lighting (may be null) + the cinematic grade (may be null), in render order.
-function fxList(light){ return [light,POST].filter(Boolean); }
 // cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
 // Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
@@ -696,14 +663,14 @@ function downgradeForSoftwareGL(){
   if(SHADOWS_ON){
     SHADOWS_ON=false;
     const noShadow=buildLighting(false);
-    try{ deckgl.setProps({effects:fxList(noShadow)}); }catch(e){}
+    try{ deckgl.setProps({effects:noShadow?[noShadow]:[]}); }catch(e){}
   }
   try{ if(typeof render==='function')render(); }catch(e){}   // rebuild layers so shadowEnabled flags clear
   try{ console.info('[catchment] software WebGL detected — shadows + auto-orbit disabled for performance; depth via material + sky/vignette.'); }catch(e){}
 }
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
-  controller:{inertia:300,dragRotate:true}, effects:fxList(LIGHTING),
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
   onViewStateChange:({viewState,interactionState})=>{
     VIEW=viewState;
