@@ -1104,7 +1104,7 @@ function render(){
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
   const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
-  const RAMP_LIGHT=[[214,220,230],[188,198,214],[150,166,190]]; // pale cool-grey -> mid slate -> deeper slate-blue: on a light basemap height reads as VALUE, hue stays near-neutral (DataProteins clean)
+  const RAMP_LIGHT=[[228,232,240],[201,210,224],[166,182,206]]; // brighter cool-white massing: airy near-white low -> soft slate -> mid slate-blue tall (DataProteins-bright; height still reads as value)
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};

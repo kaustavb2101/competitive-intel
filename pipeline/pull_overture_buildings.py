@@ -94,7 +94,7 @@ Flags:
   --keep-geojson     don't delete the downloaded temp GeoJSON
   --dry-run          fetch + summarise but DO NOT write the output file
 """
-import argparse, json, math, os, shutil, subprocess, sys, tempfile
+import argparse, json, math, os, shutil, subprocess, sys, tempfile, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -292,17 +292,31 @@ def download_geojson(cli, bbox, dest):
     # Force UTF-8: the overturemaps GeoJSON writer does open(out,'w') without an encoding, so on
     # Windows it defaults to cp1252 and dies with UnicodeEncodeError ('charmap') on Thai names.
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
-    proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
-    if proc.returncode != 0:
+    # Overture's S3 occasionally throws transient network errors ("AWS Error NETWORK_CONNECTION
+    # during GetObject"). Retry a few times with backoff before giving up, so a flaky connection
+    # doesn't fail an otherwise-good province (esp. in the all-provinces batch).
+    tail = ""
+    for attempt in range(1, 4):  # up to 3 tries
+        proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
+        if proc.returncode == 0:
+            return dest
         tail = (proc.stderr or proc.stdout or "").strip()
-        raise RuntimeError(
-            f"overturemaps download failed (exit {proc.returncode}).\n"
-            f"--- CLI output ---\n{tail or '(no output captured)'}\n"
-            f"------------------\n"
-            f"If you see a UnicodeEncodeError ('charmap' codec), set PYTHONUTF8=1 in the shell and "
-            f"retry. Otherwise: no network reach to Overture S3, an outdated pyarrow, or too-large "
-            f"a bbox timing out. Try a tiny bbox first, e.g. --bbox 12.68,101.27,12.70,101.29")
-    return dest
+        transient = ("NETWORK_CONNECTION" in tail or "network error" in tail
+                     or "timed out" in tail or "Timeout" in tail or "Connection" in tail)
+        if attempt < 3 and transient:
+            wait = 4 * attempt  # 4s, 8s
+            print(f"  transient network error (attempt {attempt}/3) — retrying in {wait}s ...",
+                  file=sys.stderr)
+            time.sleep(wait)
+            continue
+        break
+    raise RuntimeError(
+        f"overturemaps download failed (exit {proc.returncode}) after retries.\n"
+        f"--- CLI output ---\n{tail or '(no output captured)'}\n"
+        f"------------------\n"
+        f"If you see a UnicodeEncodeError ('charmap' codec), set PYTHONUTF8=1 in the shell and "
+        f"retry. Otherwise: no network reach to Overture S3, an outdated pyarrow, or too-large "
+        f"a bbox timing out. Try a tiny bbox first, e.g. --bbox 12.68,101.27,12.70,101.29")
 
 
 def _outer_rings(geom):
