@@ -1432,7 +1432,7 @@ function buildStrip(){
     ['7-Eleven+',(POIS.convenience||[]).length,'#E07B2F'],['Vehicle',(POIS.vehicle_commerce||[]).length,'#159b86'],
     ['Markets',(POIS.fresh_market||[]).length,'#E0C850']];
   document.getElementById('strip').insertAdjacentHTML('beforeend',
-    items.map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));
+    items.filter(([n,v])=>v>0).map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));  // hide 0-count chips (a city with no branch/competitor/POI data shows a clean strip, not "AutoX 0 · Srisawad 0 ...")
   // OPPORTUNITY CUE (Upgrade 3, optional): the top-scoring acquisition district for THIS city's
   // province from opportunity_score.json — an ESTIMATED composite over MEASURED white-space +
   // competitor gap + estimated crop-stress. Subtle, labelled, and skipped when the file is absent
@@ -1475,18 +1475,24 @@ function buildCascade(){
   // keep a sensible region order with East first (it holds Rayong)
   regions.sort((a,b)=>(a==='East'?-1:b==='East'?1:a.localeCompare(b)));
   reg.innerHTML=regions.map(r=>`<option value="${r}">${r}</option>`).join('');
-  reg.value='East';
+  // default the cascade to the ACTIVE city (so the Bangkok tab reads "Bangkok", not "Rayong (59)"),
+  // falling back to East/Rayong when the city isn't in the index.
+  const cityEntry=IDX?IDX.find(p=>p.slug===CITY):null;
+  reg.value=(cityEntry&&cityEntry.region)||'East';
   function fillProv(){
     const r=reg.value;
     const list=IDX?IDX.filter(p=>p.region===r):[{slug:'rayong',th:'ระยอง',en:'Rayong'}];
     list.sort((a,b)=>(b.branches||0)-(a.branches||0));
     prov.innerHTML=list.map(p=>{
       const isR=p.slug==='rayong';
+      const isActive=p.slug===CITY;         // the city we're actually rendering 3D for
+      const enabled=isR||isActive;          // Rayong (full stack) + the active city (3D shown) are selectable
       const lbl=`${p.en||p.th} (${p.branches||0})`;
-      return `<option value="${p.slug}" ${isR?'':'disabled'}>${lbl}${isR?'':' · 3D: Rayong only'}</option>`;
+      return `<option value="${p.slug}" ${enabled?'':'disabled'}>${lbl}${enabled?'':' · 3D: Rayong only'}</option>`;
     }).join('');
-    // pick Rayong if present, else the first enabled, else first
-    if(list.some(p=>p.slug==='rayong'))prov.value='rayong';
+    // prefer the active city, else Rayong, else leave the first
+    if(list.some(p=>p.slug===CITY))prov.value=CITY;
+    else if(list.some(p=>p.slug==='rayong'))prov.value='rayong';
     fillBranch();
   }
   function fillBranch(){
@@ -1497,7 +1503,7 @@ function buildCascade(){
       const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
     }else{
       br.disabled=true;
-      br.innerHTML=`<option>— buildings: Rayong only —</option>`;
+      br.innerHTML=`<option>— branch drilldown: Rayong only —</option>`;
     }
   }
   reg.onchange=fillProv;
