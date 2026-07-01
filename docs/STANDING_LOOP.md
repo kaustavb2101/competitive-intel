@@ -28,6 +28,28 @@ reset --hard (shared tree). Only push claude/new-session-wto26j.
 Each firing spawns a clean server-side session, advances the backlog by one item, and pushes — with
 the QA gate (now 20 checks) as the safety rail and the no-fabrication provenance gate enforced in CI.
 
+## ⚠️ If a scheduled run fails with "no repository checked out / wrong GitHub token"
+Symptom (seen 2026-07-01): the scheduled session reports the container was **empty**
+(`/home/user` not a git repo), it **couldn't find this repo**, the **GitHub token belonged to an
+unrelated personal account**, and it gave up after a wrong-name clone guess (`autox-calibration`) was
+rejected. That is a **provisioning/config problem in the schedule itself**, not a code problem — the
+loop never got the repo or the right credentials, so it correctly refused to guess further.
+
+Fix (all in **claude.ai/code**, ~2 min — nothing to change in this repo):
+1. **Delete the broken schedule** ("Standing improvement loop").
+2. **Open `kaustavb2101/competitive-intel` FIRST** in Claude Code on the web, then create the schedule
+   **from inside the repo view** — this is what binds the recurring session to *this* repo. A schedule
+   created from the global/home view has no repo attached and lands in an empty container.
+3. Confirm the **GitHub connection** is the account that owns `kaustavb2101/competitive-intel`
+   (the failure shows a *different* account's token was attached — re-authorize the Claude Code GitHub
+   App for this repo/account if the picker doesn't list it).
+4. Set the **base branch** to `claude/new-session-wto26j` (or `main`) and re-paste the scheduled prompt
+   below. Save, then use "Run now" once to verify it clones the repo and the gate passes before trusting
+   the cadence.
+
+If the web Schedule feature still won't attach the repo, the loop can't run devices-off yet — there is
+no in-session substitute (see below). Ping me and we treat the backlog by hand each session instead.
+
 ## Why not the in-session scheduler
 `CronCreate` (the only scheduler exposed inside a chat session) fires into the *current* session and
 dies when that session ends — it is **not** devices-off. Use it only as a same-session stopgap; the
