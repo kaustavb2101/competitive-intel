@@ -132,6 +132,31 @@ function occLabel(key){
   return m[key]||(key.charAt(0).toUpperCase()+key.slice(1));
 }
 
+/* ---------- per-branch EMPLOYMENT & LABOUR (data/branch_labor.json) ----------
+   Lazy-loads the MEASURED per-branch labour layer built by pipeline/build_branch_labor.py:
+   top-3 catchment occupation buckets (Overture), district factory workers (DIW), province
+   informal share + Labour-Force-Survey summary (NSO), all joined onto each branch by index/
+   province. Shape: { meta, buckets, branches:[{occ_top:[{label,share_pct}], estab_total,
+   factory_workers|null, informal_pct|null, prov_employed_k|null, prov_labor_force_k|null,
+   prov_unemployment_rate|null}] } — branches[] is INDEX-ALIGNED to branches.json (entry i ↔ DATA[i]).
+   Fully null-guarded: absent file/entry → nothing renders (the popup section is simply omitted). */
+let LABORDATA=null, laborLoaded=false, laborPromise=null;
+async function loadBranchLabor(){
+  if(laborPromise) return laborPromise;
+  laborLoaded=true;
+  laborPromise=(async()=>{
+    try{ const r=await fetch('data/branch_labor.json'); if(r.ok) LABORDATA=await r.json(); }
+    catch(e){ LABORDATA=null; }
+    return LABORDATA;
+  })();
+  return laborPromise;
+}
+function laborRec(d){
+  if(!LABORDATA||!LABORDATA.branches||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return LABORDATA.branches[i]||null;
+}
+
 /* ---------- occupation × risk cross-read (objective #1) ----------
    Lazy-loads data/occupation_risk.json — a per-branch flag for branches whose MEASURED
    borrower base (Overture occupation shares) is concentrated in a STRESSED sector (factory
@@ -2396,6 +2421,10 @@ function initMap(){
   // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
   // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
   if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
+  // warm the MEASURED per-branch employment & labour layer so branch popups carry the "Employment &
+  // labour" section (occupation top-3, DIW factory workers, informal share, NSO province LFS) when
+  // present. Optional + null-safe: absent file → LABORDATA stays null and the popup omits the block.
+  if(!laborLoaded) loadBranchLabor();
   // warm the MEASURED household debt-to-income layer so the lens hides itself when absent and
   // popups carry the debt-to-income block. Absent file → loader leaves HHRISK empty, the lens is
   // filtered out, nothing renders.
@@ -2530,6 +2559,45 @@ function occPopupHTML(d,sec){
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">${(e.t||0).toLocaleString()} establishments ≤10km by category (Overture Maps Places — a sample/lower bound, not a registry)</div>`
     + `</div>`;
 }
+// Employment & labour block for a branch popup — the MEASURED per-branch labour layer
+// (data/branch_labor.json). Shows the top-3 catchment occupation buckets with small share bars
+// (MEASURED · Overture), factory workers in the branch's district (MEASURED · DIW), the province
+// informal share, and a one-line province Labour-Force-Survey readout (MEASURED · NSO). Fully
+// graceful: absent file/entry → no block; each sub-line only renders when its measured value exists.
+function laborPopupHTML(d,sec,r){
+  const e=laborRec(d); if(!e) return '';
+  const ot=Array.isArray(e.occ_top)?e.occ_top:[];
+  // If the fuller occupation-mix block (occPopupHTML, OCCDATA) will render its own top-6 bars for
+  // this branch, skip our top-3 bars here to avoid a duplicate list — we keep the labour-market
+  // lines (factory workers, informal, province LFS) which that block does NOT show.
+  const occElsewhere = estabCount(d)>0;
+  const hasOcc=ot.length>0 && !occElsewhere;
+  const hasFac=e.factory_workers!=null;
+  const hasInf=e.informal_pct!=null;
+  const hasLfs=e.prov_employed_k!=null;
+  if(!hasOcc&&!hasFac&&!hasInf&&!hasLfs) return '';
+  const occCol=['var(--accent)','#7f93d6','#8b90a7'];
+  let html=sec('Employment & labour');
+  if(hasOcc){
+    const mx=ot[0].share_pct||1;
+    html+=`<div class="occ" style="margin-top:2px">`+ot.map((rw,i)=>{
+        const col=occCol[i]||'#8b90a7', w=Math.max(4,Math.round((rw.share_pct||0)/mx*100));
+        return `<div class="pr" style="gap:8px"><span style="flex:1">${rw.label||'—'}</span>`
+          +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${col}"></i></span>`
+          +`<b class="mono" style="color:${col};min-width:34px;text-align:right">${rw.share_pct}%</b></div>`;
+      }).join('')
+      +`<div class="sub" style="margin:2px 0 3px;font-size:10px">top-3 of ${(e.estab_total||0).toLocaleString()} establishments ≤10km by category (MEASURED · Overture · a sample/lower bound) ${TAG_M}</div>`
+      +`</div>`;
+  }
+  if(hasFac) html+=r('Factory workers in district', e.factory_workers.toLocaleString()+' '+TAG_M, 'var(--gold)');
+  if(hasInf) html+=r('Province informal share', e.informal_pct+'% '+TAG_M, 'var(--collat)');
+  if(hasLfs){
+    const ur=e.prov_unemployment_rate;
+    html+=r('Province labour force', `${(e.prov_labor_force_k||0).toLocaleString()}k`+(ur!=null?` · ${ur}% unemp`:'')+' '+TAG_M, '#c7cedd');
+    html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">province: ${(e.prov_employed_k||0).toLocaleString()}k employed${ur!=null?`, unemployment ${ur}%`:''} — MEASURED · NSO Labour Force Survey. Factory workers MEASURED · DIW (district); informal share MEASURED · NSO (province).</div>`;
+  }
+  return html;
+}
 // Occupation × stress block for a branch popup — the occupation_risk.json cross-read. Shows the
 // ESTIMATED occupation-stress score (MEASURED shares × ESTIMATED stress weighting) and, when the
 // branch is FLAGGED, a one-line callout naming the concentrated stressed base. Fully graceful:
@@ -2627,6 +2695,7 @@ function popupHTML(d){
     ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
     ${hhriskPopupHTML(d,sec,r)}
+    ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
     ${poiRelevancePopupHTML(d,sec,r)}
