@@ -1598,6 +1598,67 @@ def check_provenance():
 
 
 # ---------------------------------------------------------------------------
+# INDEX-ALIGNMENT GATE (consolidated).
+#
+# Several platform/data layers are INDEX-ALIGNED to branches.json: entry i corresponds to branch i,
+# and the National-map lenses in app.js read them positionally (e.g. BR[i] <-> DATA[i], BAMP[i] <->
+# DATA[i]). If a future data refresh ever emits one of these layers at a DIFFERENT length than
+# branches.json, nothing crashes — the lenses silently mis-color every branch. That is a subtle,
+# high-blast-radius data bug.
+#
+# The per-layer checks above each assert their own alignment, but they can be short-circuited by an
+# early absent-state return. This ONE consolidated gate is the authoritative guard: for every
+# index-aligned layer that EXISTS, it re-derives the ALIGNED array (some layers wrap it under a key
+# like 'branches'; amphoe.json carries it as 'branch_amphoe') and asserts its length == the actual
+# branches.json length. Absent layers SKIP-PASS (the enrichment loop ships without some pulls).
+# We read the real branches length (never hard-code 2,015) so the gate survives a legitimate
+# branch-count change.
+#
+# Each entry: (filename, aligned-array accessor). The accessor returns the aligned list, or None
+# if the file's shape doesn't expose one (which itself is a failure worth surfacing).
+_INDEX_ALIGNED_LAYERS = (
+    ("branch_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("occupation_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
+    ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
+)
+
+
+def check_index_alignment(n_branches):
+    hdr("index-alignment gate (layers aligned to branches.json)")
+    if n_branches is None:
+        fail("index-alignment gate needs branches.json length", "branches did not load")
+        return
+
+    for rel, accessor in _INDEX_ALIGNED_LAYERS:
+        if not exists(rel):
+            ok("%s absent — skipped (optional index-aligned layer)" % rel)
+            continue
+        try:
+            d = load(rel)
+        except Exception as e:
+            fail("%s loads (for index-alignment)" % rel, repr(e))
+            continue
+        arr = accessor(d)
+        if arr is None:
+            # The aligned array a layer promises is not present — some absent-state files legitimately
+            # omit it. Honor that: if there is no aligned array at all, there is nothing to misalign.
+            ok("%s has no aligned array — skipped (absent-state or non-aligned shape)" % rel)
+            continue
+        if not isinstance(arr, list):
+            fail("%s aligned array is a list" % rel, "got %s" % type(arr).__name__)
+            continue
+        if len(arr) == n_branches:
+            ok("%s aligned length == branches.json length (%d)" % (rel, len(arr)))
+        else:
+            fail("%s aligned length == branches.json length" % rel,
+                 "%s=%d branches=%d (index-aligned layer would silently mis-color every branch)"
+                 % (rel, len(arr), n_branches))
+
+
+# ---------------------------------------------------------------------------
 def check_rollup(branches):
     hdr("cross-file rollup sanity")
     if branches is None:
@@ -1669,6 +1730,7 @@ def main():
     check_exit_whitespace()
     check_peer_npl()
     check_provenance()
+    check_index_alignment(n)
     check_rollup(branches)
 
     print("\n" + ("=" * 40))
