@@ -945,3 +945,47 @@ html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
 .tspark-track{position:absolute;left:5px;right:0;top:50%;height:0;border-top:1.5px dashed var(--c);opacity:.45}
 .tspark-dot{position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;box-shadow:0 0 0 2px var(--panel)}
 .tchip{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:6px;white-space:nowrap;vertical-align:middle}
+
+/* ============================================================
+   TOUCH-TARGET A11Y — coarse-pointer only (touch laptops/tablets
+   at ANY width). Raises interactive hit areas to a comfortable
+   ~44px min (WCAG 2.5.5) via padding + min-height/min-width, never
+   font-size. Gated on @media(pointer:coarse) so a mouse/desktop
+   (fine pointer) layout is completely unaffected. Additive: colors,
+   theme and the fine-pointer geometry are all left untouched.
+   ============================================================ */
+@media(pointer:coarse){
+  /* nav tabs / links + the "More ▾" button and its menu items */
+  #nav a,#nav .nav-more-btn,.nav-more-menu a,.tab{
+    min-height:44px;display:inline-flex;align-items:center;padding-top:10px;padding-bottom:10px}
+  .nav-more-menu a{width:100%}
+
+  /* chips (filter + sort chips live in #sortchips as .chip), jump-nav chips */
+  .chip,.jumpnav .chip{
+    min-height:44px;padding-top:11px;padding-bottom:11px;
+    display:inline-flex;align-items:center}
+
+  /* lens buttons — pill lens row + legacy .lens cards */
+  .pill.lens,.lens{min-height:44px}
+  .pill.lens{padding-top:11px;padding-bottom:11px;align-items:center}
+  .lens-more-btn{min-height:44px;display:inline-flex;align-items:center}
+  .lens-more-menu .pill.lens.lens-menu{min-height:44px}
+
+  /* theme toggle (inline-styled 32x30 → comfortable coarse tap area) */
+  #themeToggle{min-width:44px!important;min-height:44px!important}
+
+  /* clickable table rows — a bit more vertical padding for the tap band */
+  .tbl tr[role="link"] td{padding-top:14px;padding-bottom:14px}
+
+  /* command-center stars + inline links get a real tap band */
+  .cc-star{min-width:44px;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+  .cc-link{min-height:44px;display:inline-flex;align-items:center}
+
+  /* small icon buttons: CSV/print action chips, deck.gl close (×) + control buttons */
+  .cc-actions .chip{min-height:44px}
+  .cbtn,.ctl button,#ctl button{min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+  .xbtn,.pxbtn{min-width:44px;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+}
