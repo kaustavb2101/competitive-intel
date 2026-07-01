@@ -486,8 +486,10 @@ const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','
 // preserve a stable, relevance-ordered legend, restricted to types actually present in the data
 const POI_TYPES=POI_ORDER.filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
-// DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT. showIso gated on data presence.
-let basemap='light', showRings=true, showIso=true;
+// DARK (CARTO dark_all) basemap is the DEFAULT: the gold-ramp buildings pop against black (the
+// DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
+// wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
+let basemap='dark', showRings=true, showIso=true;
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;

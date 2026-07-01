@@ -391,7 +391,7 @@ const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
 const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT (matches rayong-catchment).
-let basemap='light', showRings=true;
+let basemap='dark', showRings=true;  // dark default: gold buildings pop on black; no white basemap to wash into
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
