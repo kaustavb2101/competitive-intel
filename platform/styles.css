@@ -330,8 +330,8 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
   box-shadow:0 0 0 1px var(--accent),0 0 18px var(--accent-glow)}
 .pill.lens .lk{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 7px 1px currentColor}
 .pill.lens .pl{font-size:12.5px;font-weight:600;letter-spacing:.1px}
-.pill.lens .pi{font-size:11px;color:var(--dim);opacity:.8;cursor:help}
-.pill.lens:hover .pi,.pill.lens.on .pi{color:var(--mid);opacity:1}
+.pill.lens .pi{font-size:11px;color:var(--mid);opacity:.95;cursor:help}
+.pill.lens:hover .pi,.pill.lens.on .pi{color:var(--hi);opacity:1}
 /* in-band [M] measured / [E] estimated provenance badge on each lens pill */
 .pill.lens .lpt{font:700 8.5px var(--mono);line-height:1;padding:2px 4px;border-radius:5px;flex:none}
 .pill.lens .lpt.m{color:#5fd6c2;background:rgba(35,162,143,.16);border:1px solid rgba(35,162,143,.5)}
