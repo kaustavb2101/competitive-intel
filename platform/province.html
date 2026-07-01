@@ -445,33 +445,6 @@ function buildLighting(){
   }catch(e){ return null; }
 }
 let LIGHTING=buildLighting();
-// ---- CINEMATIC POST-PROCESS (in-GL colour grade + vignette) — see rayong-catchment.html ----
-// Darkening/grading only (vignette + contrast + saturation): CANNOT reintroduce the white blow-out.
-// Feature-detected; POST is null if deck.PostProcessEffect is absent or the module fails to build.
-function buildPost(){
-  try{
-    if(!(deck.PostProcessEffect)) return null;
-    const CINE={ name:'cine',
-      uniforms:{ uVigR:{value:0.86,min:0,max:1}, uVigA:{value:0.34,min:0,max:1},
-        uContrast:{value:1.09,min:0,max:2}, uSat:{value:1.14,min:0,max:2}, uWarm:{value:0.03,min:0,max:1} },
-      fs:`uniform float uVigR; uniform float uVigA; uniform float uContrast; uniform float uSat; uniform float uWarm;
-        vec4 cine_sampleColor(vec4 color, vec2 texSize, vec2 texCoord){
-          vec3 c = color.rgb;
-          c = (c - 0.5) * uContrast + 0.5;
-          float l = dot(c, vec3(0.299,0.587,0.114));
-          c = mix(vec3(l), c, uSat);
-          c.r += uWarm * l; c.b -= uWarm * l * 0.6;
-          float d = distance(texCoord, vec2(0.5));
-          float vig = smoothstep(0.9, uVigR*0.78, d*(uVigA+uVigR));
-          c *= vig;
-          return vec4(clamp(c,0.0,1.0), color.a);
-        }`,
-      passes:[{sampler:true}] };
-    return new deck.PostProcessEffect(CINE,{uVigR:0.86,uVigA:0.34,uContrast:1.09,uSat:1.14,uWarm:0.03});
-  }catch(e){ return null; }
-}
-let POST=buildPost();
-function fxList(light){ return [light,POST].filter(Boolean); }
 
 // ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
 // The scene is driven by a CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and click-to-fly
@@ -521,7 +494,7 @@ function downgradeForSoftwareGL(){
 }
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
-  controller:{inertia:300,dragRotate:true}, effects:fxList(LIGHTING),
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
   onViewStateChange:({viewState,interactionState})=>{
     VIEW=viewState;
