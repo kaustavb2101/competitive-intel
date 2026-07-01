@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
-(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Rayong 3D · เงินไชโย</title>
@@ -345,9 +345,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <div class="grp">
     <div class="glab">Basemap</div>
     <div class="seg">
-      <button data-b="light">Light</button>
+      <button data-b="light" class="on">Light</button>
       <button data-b="voyager">Streets</button>
-      <button data-b="dark" class="on">Dark</button>
+      <button data-b="dark">Dark</button>
       <button data-b="satellite">Satellite</button>
     </div>
   </div>
@@ -489,7 +489,7 @@ const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DARK (CARTO dark_all) basemap is the DEFAULT: the gold-ramp buildings pop against black (the
 // DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
 // wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
-let basemap='dark', showRings=true, showIso=true;
+let basemap='light', showRings=true, showIso=true;
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
