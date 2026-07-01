@@ -887,6 +887,92 @@ def check_poi_relevance(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_branch_labor(n_branches):
+    # MEASURED per-branch EMPLOYMENT & LABOUR layer, index-aligned to branches.json (built by
+    # build_branch_labor.py from Overture occupations + DIW factory workers + NSO province LFS/
+    # employment). Optional file: SKIP-PASS when absent.
+    hdr("branch_labor.json (optional)")
+    if not exists("branch_labor.json"):
+        ok("branch_labor.json absent — skipped (optional; run build_branch_labor.py to populate)")
+        return
+    try:
+        d = load("branch_labor.json")
+    except Exception as e:
+        fail("branch_labor.json loads", repr(e))
+        return
+    ok("branch_labor.json loads")
+
+    # provenance: meta must carry a real provenance string + per-field labels (data mandate).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not (isinstance(meta.get("provenance"), str) and meta["provenance"].strip()):
+        fail("branch_labor meta carries provenance", "meta.provenance missing/blank")
+    else:
+        ok("branch_labor meta carries provenance")
+    if not (isinstance(meta, dict) and isinstance(meta.get("fields"), dict) and meta["fields"]):
+        fail("branch_labor meta.fields documents each field's source + measured/estimated label",
+             "meta.fields missing/empty")
+    else:
+        ok("branch_labor meta.fields documents %d field groups (source + label)" % len(meta["fields"]))
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("branch_labor has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    # length must equal branches.json (INDEX-ALIGNED — a drift silently misattributes labour to branches)
+    if n_branches is not None and len(recs) != n_branches:
+        fail("branch_labor length == branches.json length",
+             "labor=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("branch_labor length == branches.json length (%d)" % len(recs))
+
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        # occ_top: list of {label, share_pct in 0..100}
+        ot = r.get("occ_top")
+        if not isinstance(ot, list):
+            bad.append("#%d occ_top not a list" % i)
+        else:
+            if len(ot) > 3:
+                bad.append("#%d occ_top has %d entries (>3)" % (i, len(ot)))
+            for e in ot:
+                sp = e.get("share_pct") if isinstance(e, dict) else None
+                if not is_finite_number(sp) or sp < 0 or sp > 100:
+                    bad.append("#%d occ_top share_pct=%r out of [0,100]" % (i, sp))
+                    break
+                if not (isinstance(e.get("label"), str) and e["label"]):
+                    bad.append("#%d occ_top entry missing label" % i)
+                    break
+        # estab_total: non-negative finite int
+        et = r.get("estab_total")
+        if not is_finite_number(et) or et < 0:
+            bad.append("#%d estab_total=%r" % (i, et))
+        # nullable measured fields: if present, must be sane (never fabricated -> null allowed)
+        fw = r.get("factory_workers")
+        if fw is not None and (not is_finite_number(fw) or fw < 0):
+            bad.append("#%d factory_workers=%r" % (i, fw))
+        ip = r.get("informal_pct")
+        if ip is not None and (not is_finite_number(ip) or ip < 0 or ip > 100):
+            bad.append("#%d informal_pct=%r out of [0,100]" % (i, ip))
+        for k in ("prov_employed_k", "prov_labor_force_k"):
+            v = r.get(k)
+            if v is not None and (not is_finite_number(v) or v < 0):
+                bad.append("#%d %s=%r" % (i, k, v))
+        ur = r.get("prov_unemployment_rate")
+        if ur is not None and (not is_finite_number(ur) or ur < 0 or ur > 100):
+            bad.append("#%d prov_unemployment_rate=%r out of [0,100]" % (i, ur))
+        if len(bad) >= 10:
+            break
+    if bad:
+        fail("branch_labor per-branch fields sane (nullable-but-never-fabricated)", first_n(bad))
+    else:
+        ok("branch_labor per-branch fields sane (occ_top/estab_total + nullable measured fields)")
+
+
+# ---------------------------------------------------------------------------
 def check_province_risk():
     # PER-PROVINCE rollup of the branch composite risk (objective #1). Optional file: SKIP-PASS
     # when absent (build_province_risk.py degrades to an absent-state too).
@@ -1704,6 +1790,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("branch_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("occupation_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
     ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
@@ -1805,6 +1892,7 @@ def main():
     check_branch_occupations(n)
     check_occupation_risk(n)
     check_poi_relevance(n)
+    check_branch_labor(n)
     check_branch_risk(n)
     check_province_risk()
     check_segment_exposure()
