@@ -113,10 +113,13 @@ async function loadOccupations(){
   })();
   return occPromise;
 }
+// O(1) branch index for the index-aligned lens data files. boot() stamps d._i on every branch;
+// fall back to a linear scan only if that ever didn't run (defensive — keeps behaviour identical).
+function idxOf(d){ return (d&&d._i!=null)?d._i:(DATA?DATA.indexOf(d):-1); }
 // total measured establishments ≤10km for a branch (0 when the file/entry is absent) — the "estab" lens val().
 function estabCount(d){
   if(!OCCDATA||!OCCDATA.branches||!DATA) return 0;
-  const i=DATA.indexOf(d); if(i<0) return 0;
+  const i=idxOf(d); if(i<0) return 0;
   const e=OCCDATA.branches[i]; return (e&&e.t)||0;
 }
 // pretty label for an occupation-bucket key (Title Case fallback when a file omits a label).
@@ -158,13 +161,13 @@ function occriskHasData(){return !!(OCCRISK&&OCCRISK.length);}
 // ESTIMATED occupation-stress score (0..100) for a branch — 0 when the file/entry is absent.
 function occriskVal(d){
   if(!occriskHasData()||!DATA) return 0;
-  const i=DATA.indexOf(d); if(i<0) return 0;
+  const i=idxOf(d); if(i<0) return 0;
   const e=OCCRISK[i]; return (e&&e.s)||0;
 }
 // the per-branch occupation-risk record (for popups) — null when absent.
 function occriskRec(d){
   if(!occriskHasData()||!DATA) return null;
-  const i=DATA.indexOf(d); if(i<0) return null;
+  const i=idxOf(d); if(i<0) return null;
   return OCCRISK[i]||null;
 }
 
@@ -193,13 +196,13 @@ function poiRelevanceHasData(){return !!(POIREL&&POIREL.length);}
 // MEASURED-counts / ESTIMATED-weighting relevance score (0..100) for a branch — 0 when absent.
 function poiRelevanceVal(d){
   if(!poiRelevanceHasData()||!DATA) return 0;
-  const i=DATA.indexOf(d); if(i<0) return 0;
+  const i=idxOf(d); if(i<0) return 0;
   const e=POIREL[i]; return (e&&e.rel)||0;
 }
 // per-branch relevant-POI record (for popups) — null when absent.
 function poiRelevanceRec(d){
   if(!poiRelevanceHasData()||!DATA) return null;
-  const i=DATA.indexOf(d); if(i<0) return null;
+  const i=idxOf(d); if(i<0) return null;
   return POIREL[i]||null;
 }
 
@@ -225,13 +228,13 @@ function briskHasData(){return !!(BRISK&&BRISK.length);}
 // ESTIMATED composite risk (0..100) for a branch — 0 when the file/entry is absent.
 function briskVal(d){
   if(!briskHasData()||!DATA) return 0;
-  const i=DATA.indexOf(d); if(i<0) return 0;
+  const i=idxOf(d); if(i<0) return 0;
   const e=BRISK[i]; return (e&&e.composite_risk)||0;
 }
 // per-branch composite-risk record (for popups) — null when absent.
 function briskRec(d){
   if(!briskHasData()||!DATA) return null;
-  const i=DATA.indexOf(d); if(i<0) return null;
+  const i=idxOf(d); if(i<0) return null;
   return BRISK[i]||null;
 }
 // human label for a composite top_driver key (household/agri/occupation/segment).
@@ -524,6 +527,10 @@ async function boot(){
       fetch('data/meta.json').then(r=>r.json())
     ]);
     DATA=b; META=m;
+    // stamp each branch with its index once so the index-aligned lens accessors (branch-risk,
+    // occupation-risk, poi-relevance, occupation-mix) can read d._i in O(1) instead of an
+    // O(n) DATA.indexOf on every marker repaint (2,015 markers → O(n²) per lens switch/paint).
+    if(Array.isArray(DATA)) DATA.forEach((d,i)=>{ if(d) d._i=i; });
     wrapTables();
     $('#updated').textContent = META.updated || '';
     try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); PLOOK=provLookupByName(); }catch(e){}
@@ -2363,7 +2370,7 @@ function hhriskPopupHTML(d,sec,r){
 // absent/empty entry → no block at all. Shows the top ~6 buckets as labelled percentage bars.
 function occPopupHTML(d,sec){
   if(!OCCDATA||!OCCDATA.branches||!OCCDATA.buckets||!DATA) return '';
-  const i=DATA.indexOf(d); if(i<0) return '';
+  const i=idxOf(d); if(i<0) return '';
   const e=OCCDATA.branches[i]; if(!e||!(e.t>0)) return '';
   let rows=OCCDATA.buckets.map((bk,j)=>({lab:bk.label,col:OCC_BUCKET_COL[bk.key]||'#8b90a7',v:(e.o&&e.o[j])||0}))
     .filter(rw=>rw.v>0).sort((a,b)=>b.v-a.v).slice(0,6);
