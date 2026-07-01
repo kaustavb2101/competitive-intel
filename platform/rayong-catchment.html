@@ -834,11 +834,11 @@ function groundLayers(){
     const majors=rd.filter(major), minors=rd.filter(f=>!major(f));
     // ribbon (fill) colour:
     //  - dark / satellite : warm light-grey asphalt
-    //  - light (Positron, DataProteins look) : ORANGE arterials (~#F2A65A) on a soft tan casing
+    //  - light (Positron, DataProteins look) : near-white warm-grey ribbon on a soft grey casing
     //  - voyager : the original mid-grey
     const L=lightMode();
-    const fill=D?[196,204,220,245]:(L?[242,166,90,250]:[140,148,164,225]);
-    const casing=D?[8,12,22,240]:(L?[214,138,72,220]:[80,88,104,220]);
+    const fill=D?[196,204,220,245]:(L?[249,247,243,250]:[140,148,164,225]);
+    const casing=D?[8,12,22,240]:(L?[221,220,214,225]:[80,88,104,220]);
     // 1) casing for majors (drawn first, sits under the fill)
     if(majors.length){
       G.push(new deck.PathLayer({id:'roads-case',data:majors,getPath:f=>f.path,
