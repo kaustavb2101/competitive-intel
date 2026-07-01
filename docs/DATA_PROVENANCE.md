@@ -15,7 +15,11 @@
 > - **DERIVED** — produced deterministically by a named script from named inputs that are themselves sourced.
 > - **UNKNOWN / REVIEW** — provenance could NOT be determined from the file or its generating script. **Do not ship these as fact.** Listed as RISK.
 
-Audit date: 2026-06-30. Branch: `prov-guard`. Auditor scope: `platform/data/` + `source-data/`.
+Audit date: 2026-07-01 (re-audit; supersedes 2026-06-30 `prov-guard`). Branch: `agent/provenance-ledger`.
+Auditor scope: every JSON under `platform/data/` (top-level + `provinces/`) + `source-data/`.
+This pass added the risk / occupation / exposure / collateral / competitor layers that shipped after the
+first audit, and corrected the stale `ingest_tmli.py` / "absent today" entries. The ledger now covers
+**all 34 top-level `platform/data/*.json` layers** plus the 78-file `provinces/` subtree.
 
 ---
 
@@ -29,6 +33,19 @@ Audit date: 2026-06-30. Branch: `prov-guard`. Auditor scope: `platform/data/` + 
 | `crop_stress.json` | ESTIMATED (labelled) | `pipeline/build_crop_stress.py`. crop area = OAE (MEASURED); price_stress = World Bank Pink Sheet GLOBAL YoY (PROXY for direction); drought = HDX rainfall. Output `agri_stress` is a composite index in [0,1]. | YES `meta.provenance` + `meta.formula` + `meta.caveats` | Honest proxy. price_stress explicitly flagged as GLOBAL proxy, not Thai farmgate. |
 | `opportunity_score.json` | ESTIMATED COMPOSITE (labelled) | `pipeline/build_opportunity_score.py`. Blends whitespace (amphoe, MEASURED) + competitor_gap (Google Places PIP, MEASURED) + agri_stress (crop_stress, ESTIMATED). Score 0-100 per district. | YES `meta.label` (states ESTIMATED), `meta.inputs_used`, `meta.score_formula`, `meta.generated_with` | **NB:** uses `generated_with` + `inputs_used` rather than the literal key `source`/`provenance`. The gate accepts `inputs_used`/`generated_with`/`label` as valid provenance signals so this passes honestly. |
 | `competitors_national.json` | MEASURED | `pipeline/pull_competitors.py` — Google Places Text Search (real competitor locations). | YES `meta.source` + `meta.note` (coverage is a lower bound) | Honest: note states Places caps coverage; a lower bound, not a registry. |
+| `competitors_overture.json` | MEASURED (lower bound) | `pipeline/pull_overture_national.py` — Overture Maps Places, competitor lenders matched by brand name over the national bbox. | YES `meta.source` + `meta.generated_with` + `meta.count`/`bbox` | Honest: `meta.source` states it is "a sample/lower bound, not a registry". |
+| `competitor_coverage.json` | MEASURED found + ESTIMATED expected | `pipeline/build_competitor_coverage.py` — `found` = de-duplicated count across `competitors_national.json` + `competitors_overture.json` (MEASURED); `expected` = per-brand nationwide branch counts ESTIMATED-from-public-reports (company IR / annual reports, cited in `meta.expected_sources`). | YES `meta.source` + `meta.generated_by` + `meta.expected_sources` (per-brand citations; Heng left null, not invented) | Honest: found=measured vs expected=cited-public-report clearly split; a brand with no cited count is left null. |
+| `branch_occupations.json` | MEASURED (lower bound) | `pipeline/build_occupations.py` — share of Overture Maps Places within ≤10km of each branch, bucketed into 14 occupation categories; index-aligned to `branches.json`. | YES `meta.source` + `meta.measured=true` + `meta.buckets`/`radius_km` | Honest: `meta.source` states Overture Places is "a sample/lower bound, not a registry". |
+| `amphoe_occupations.json` | MEASURED (lower bound) | `pipeline/build_amphoe_occupations.py` — Overture Maps Places occupation mix per amphoe (point-in-polygon into `th_amphoe.geojson`), 14 buckets. | YES `meta.source` + `meta.measured=true` + `meta.buckets` | Honest: same Overture lower-bound caveat as branch_occupations. |
+| `poi_relevance.json` | ESTIMATED weighting over MEASURED counts | `pipeline/build_poi_relevance.py` — MEASURED per-branch POI COUNTS (Overture/OSM, ≤10km) weighted by an ESTIMATED per-category title-loan relevance MODEL (`meta.weights` + `meta.weight_rationale`). | YES `meta.label` (states ESTIMATED weighting) + `meta.generated_by` + `meta.measured`/`estimated` split | Honest: counts measured, weights are judgement — both stated explicitly. |
+| `occupation_risk.json` | ESTIMATED COMPOSITE (labelled) | `pipeline/build_occupation_risk.py` — MEASURED occupation shares (from `branch_occupations.json`) × an ESTIMATED "stressed sector" weighting (fixed factory macro lever + province crop-household stress from `crop_stress.json`). Index-aligned to `branches.json`. | YES `meta.label` (states ESTIMATED, "NOT a measured default rate") + `meta.generated_with` + `meta.measured`/`estimated` split | Honest triage flag; measured-vs-estimated split spelled out. |
+| `household_risk_by_province.json` | MEASURED | `pipeline/build_household_risk.py` — per-province household debt / income and debt-to-income from NSO SES 2566 (2023 CE) via the vendored TMLI layers (`pipeline/ingest_tmli.py`; see `source-data/tmli/PROVENANCE.md`). | YES `meta.source` + `meta.provenance` (states MEASURED · NSO SES) + per-field labels | Honest: named NSO SES source; debt/income/DTI all MEASURED. |
+| `branch_risk.json` | ESTIMATED COMPOSITE (labelled) | `pipeline/build_branch_risk.py` — fuses household DTI (MEASURED · NSO, province-inherited) + crop/drought stress (ESTIMATED) + occupation concentration (MEASURED mix × ESTIMATED weight) + branch segment/collateral mix into one 0-100 triage score. Index-aligned to `branches.json`. | YES `meta.label` (states ESTIMATED COMPOSITE, "NOT a measured default rate") + `meta.generated_by` + per-component `provenance` | Honest: each of the 4 components carries its own MEASURED/ESTIMATED provenance in `meta.components`. |
+| `province_risk.json` | ESTIMATED COMPOSITE (rollup) | `pipeline/build_province_risk.py` — per-province rollup (mean/p90) of `branch_risk.json` over `branches.json` provinces; inherits that composite's provenance. | YES `meta.source` + `meta.provenance` (states `n_branches` MEASURED; `mean_risk`/`p90_risk` are aggregates of the ESTIMATED composite, NOT default rates) | Honest: measured count vs estimated aggregate clearly separated. |
+| `segment_exposure.json` | ESTIMATED (structural) | `pipeline/build_segment_exposure.py` — portfolio concentration (dominant segment, mix, HHI) computed from the per-branch a/m/c ESTIMATED segment scores in `branches.json`. | YES `meta.label` (states ESTIMATED) + `meta.source` + `meta.method` | Honest: labelled a structural concentration read over estimated segment scores, not a measured book. |
+| `collateral_outlook.json` | ESTIMATED directional (labelled) | `pipeline/build_collateral_outlook.py` — per-province directional collateral-recovery outlook. Inputs incl. gold YoY (World Bank Pink Sheet GLOBAL, applied nationally) + segment/collateral mix. | YES `meta.label` (states ESTIMATED, "NOT a measured recovery rate") + `meta.generated_by` + `meta.what_this_is` + per-field provenance | Honest: explicitly "a DIRECTIONAL read … NOT a measured loss-given-default or recovery rate, and no price is invented". |
+| `peer_npl.json` | MEASURED (reported peer figures) | Hand-compiled from `docs/RESEARCH_DIGEST.md` §B — listed title-loan peers' reported NPL ratios (FY2025 / 2025 IR). | YES `meta.source` + `meta.note` ("PEER figures only — NOT an AutoX number; we have no measured AutoX NPL") | Honest: explicitly peer-reported, not an AutoX number. |
+| `tiles_config.json` | CONFIG (not data) | Hand-configured CDN URL for Overture building vector tiles produced by `pipeline/build_building_tiles.py` (real Overture pull, clipped to 10km buffers). No values here; records only WHERE real tiles are served. | YES `meta.source` + `meta.provenance` + `meta.label="configuration, not measured data"` | Honest: URLs are null until tiles are hosted; scenes fall back to curated catchments — nothing invented. |
 | `loan_tape_derived.json` | SYNTHETIC (labelled) | `pipeline/ingest_loan_tape.py`. **NOT real customer data.** Deterministic synthetic tape (vintage aging, ROI, HHI, PD calibration). | YES `meta.SYNTHETIC=true` + `meta.provenance` ("SYNTHETIC placeholder — NOT real customer data") | Correctly self-labelled. Will become MEASURED only when ingested with `--real` against a true export. |
 | `deltas.json` | DERIVED | `pipeline/timeseries.py` — diff of two committed snapshots (`from`/`to` vintage labels). | NO own meta, but carries `from`/`to`/`baseline`/`updated_to` vintage stamps | **Exempt**: a deterministic diff of snapshots whose inputs are branches/meta (sourced). Vintage labels self-document. |
 | `snapshots_index.json` | DERIVED | `pipeline/timeseries.py` — index of captured vintage snapshots (`count` + labels). | NO meta; is itself an index of vintages | **Exempt**: structural index, no independent numeric series. |
@@ -44,10 +61,12 @@ Audit date: 2026-06-30. Branch: `prov-guard`. Auditor scope: `platform/data/` + 
 ### Optional layers (absent today; SKIP-PASS in the gate when not present)
 | Layer | Kind | Source / method | Notes |
 |---|---|---|---|
-| `branch_occupations.json` | MEASURED | `pipeline/build_occupations.py` — Overture places occupation rollup, index-aligned to branches. | Not committed today. When present, must carry provenance (gate-checked). |
-| `amphoe_occupations.json` | MEASURED | `pipeline/build_amphoe_occupations.py` — Overture occupation mix per district. | Not committed today. Gate-checked when present. |
-| `competitors_overture.json` | MEASURED | Overture places competitor census. | Not committed today. Gate-checked when present. |
-| tmli layers (`ingest_tmli.py`) | — | **No `ingest_tmli.py` exists in this tree.** | No tmli data layer present. `refresh_all.sh` skips it gracefully. |
+| *(none currently absent)* | — | — | As of the 2026-07-01 re-audit, all previously-optional layers (`branch_occupations.json`, `amphoe_occupations.json`, `competitors_overture.json`) are now committed and moved into the main §1 table. The gate still SKIP-PASSes any of them if a future refresh drops them. |
+
+> **Correction (was stale as of 2026-06-30):** the prior audit stated "No `ingest_tmli.py` exists in this
+> tree." It DOES exist now — `pipeline/ingest_tmli.py` vendors the NSO SES / LFS layers under
+> `source-data/tmli/` (see `source-data/tmli/PROVENANCE.md`), and `household_risk_by_province.json` is
+> built from them. See §2.
 
 ---
 
@@ -72,6 +91,7 @@ because the DERIVED platform layers inherit it.
 | `bldg_wide.json` | MEASURED | Overpass building footprints (Rayong wide pull). | |
 | `th_amphoe.geojson` | MEASURED | Nationwide 928 amphoe (district) polygons (gov boundaries). | Drives all spatial joins. |
 | `province_narratives.json` | EDITORIAL | Hand-written "what impacts them" narratives (Rayong curated). | **EDITORIAL, not data** — labelled as such. Not a numeric series. |
+| `tmli/` (`nso-ses-debt-2566.json`, `nso-ses-income-2566.json`, `nso-lfs-provincial-summary.json`, `provincial-gpp.js`, `household-debt.js`, `provinces.js`) | MEASURED | NSO SES 2566 (household debt + income) + NSO LFS provincial summary, vendored via `pipeline/ingest_tmli.py` (from `kaustavb2101/watcher`). Provenance recorded in `source-data/tmli/PROVENANCE.md`. | Drives `household_risk_by_province.json` (and thereby the `branch_risk`/`province_risk` composites). |
 | `snapshots/` | DERIVED | Per-vintage snapshots written by `timeseries.py`. | |
 
 ---
@@ -95,6 +115,13 @@ the gap by adding a `meta.source` / `meta.provenance` to the generating script's
 **No UNKNOWN-and-unattributable layer was found.** Every numeric layer either (a) carries provenance,
 (b) is a deterministic derivative of named sourced inputs, or (c) is OSM/Overture geometry. The gaps
 above are missing *in-file stamps*, not missing *sources* — none required inventing a source.
+
+**2026-07-01 re-audit note:** the risk / occupation / exposure / collateral / competitor family added since
+the first audit (`branch_risk`, `province_risk`, `segment_exposure`, `collateral_outlook`, `occupation_risk`,
+`poi_relevance`, `household_risk_by_province`, `branch_occupations`, `amphoe_occupations`,
+`competitors_overture`, `competitor_coverage`, `peer_npl`, `tiles_config`) all ship **with** an in-file
+`meta` provenance/label block (verified against each file), so they added **no new RISK-register items** —
+R1–R6 are unchanged.
 
 ---
 
