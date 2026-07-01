@@ -126,6 +126,23 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-01 — Recursive-loop wave (3 concurrent agents, disjoint files, all gate 24/0):**
+  (1) **QW2 canvas-fill cleanup** — removed two redundant/conflicting `main{max-width}` rules so the
+  already-present full-bleed block (line ~807, `--maxw:1320`) is the single source of truth (behaviour-preserving).
+  (2) **Simulator factory-slowdown lever** — new severity slider on `#sim` driving an ESTIMATED occupation-stress
+  uplift on manufacturing-dominant branches off the MEASURED `occupation_risk.json` (honest: only 2 branches are
+  factory-dominant today; null-safe hide when absent). (3) **P2 Road-to-3,000 rounding** — Total now sums the
+  rounded rows (984↔985 fixed). (4) **validate_data +12 checks** for opportunity_score / exit_whitespace / peer_npl
+  (98 data checks now). (5) **NSO occupation-distiller** scaffold log-line aligned (inert until the pull lands).
+- **2026-07-01 — 3D beauty round (reverted → root-caused):** an in-GL `PostProcessEffect` cinematic grade
+  blanked the canvas on real GPU (compiled clean but failed at render) → reverted all 3 pages. Real cause of the
+  "white" scene was the DEFAULT basemap being LIGHT (near-white) with pale light-mode building fills washing into
+  it → switched all 3 3D pages to the DARK basemap by default (gold buildings pop on black; no white surface).
+  LESSON: never ship an in-GL shader change without live visual verification (gate/node --check can't catch a
+  runtime shader-compile blank).
+- **2026-07-01 — Exec-narrative + interaction + perf:** Home board-thesis sentence + Road-to-3,000 bar; district
+  white-space/risk leaderboard rows drill into the National map (fly-to + gold ping); O(1) branch-index for map
+  lens repaints (killed O(n²)); print one-pager coverage for the thesis strip; lens help-icon contrast bump.
 - **2026-06-30 — White blow-out ROOT-CAUSED & fixed.** The diffuse cap wasn't enough: the culprit was the
   view-dependent SPECULAR term, spiked by auto-orbit sweeping through the sun's reflection angle. Zeroed specular on
   every extruded building/relief/peg across rayong-catchment/branch-explorer/province (lighting now angle-independent
