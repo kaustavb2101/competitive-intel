@@ -296,16 +296,22 @@ def download_geojson(cli, bbox, dest):
     # during GetObject"). Retry a few times with backoff before giving up, so a flaky connection
     # doesn't fail an otherwise-good province (esp. in the all-provinces batch).
     tail = ""
-    for attempt in range(1, 4):  # up to 3 tries
+    TRIES = 5
+    for attempt in range(1, TRIES + 1):
         proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
         if proc.returncode == 0:
             return dest
         tail = (proc.stderr or proc.stdout or "").strip()
-        transient = ("NETWORK_CONNECTION" in tail or "network error" in tail
-                     or "timed out" in tail or "Timeout" in tail or "Connection" in tail)
-        if attempt < 3 and transient:
-            wait = 4 * attempt  # 4s, 8s
-            print(f"  transient network error (attempt {attempt}/3) — retrying in {wait}s ...",
+        # Treat network / DNS / STAC-catalog reachability errors as transient and retry — on a flaky
+        # connection to Overture's S3/catalog these often succeed on a later attempt (a whole run can
+        # go from getaddrinfo-fail to success minutes later).
+        transient = any(s in tail for s in (
+            "NETWORK_CONNECTION", "network error", "timed out", "Timeout", "Connection",
+            "getaddrinfo", "Errno 11001", "Could not fetch STAC catalog", "Temporary failure",
+            "Name or service not known", "Max retries", "getaddrinfo failed"))
+        if attempt < TRIES and transient:
+            wait = min(30, 5 * attempt)  # 5,10,15,20s
+            print(f"  transient network/DNS error (attempt {attempt}/{TRIES}) — retrying in {wait}s ...",
                   file=sys.stderr)
             time.sleep(wait)
             continue
