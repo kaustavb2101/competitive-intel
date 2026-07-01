@@ -345,7 +345,8 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <div class="grp">
     <div class="glab">Basemap</div>
     <div class="seg">
-      <button data-b="light" class="on">Light</button>
+      <button data-b="studio" class="on">Studio</button>
+      <button data-b="light">Light</button>
       <button data-b="voyager">Streets</button>
       <button data-b="dark">Dark</button>
       <button data-b="satellite">Satellite</button>
@@ -489,7 +490,7 @@ const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DARK (CARTO dark_all) basemap is the DEFAULT: the gold-ramp buildings pop against black (the
 // DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
 // wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
-let basemap='light', showRings=true, showIso=true;
+let basemap='studio', showRings=true, showIso=true;  // clean no-raster default (scene draws its own ground)
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -702,7 +703,11 @@ const deckgl=new deck.DeckGL({container:'map',
       return {html:`<div class="dtt"><b>${POI_LABEL[t]||t}</b>${nm?'<br>'+nm:''}<br><span style="color:#8a94a8">OSM point · within view</span></div>`};}
     return null;}});
 
-function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
+// 'studio' = NO raster basemap: the scene draws its own ground (land-use/water/roads) on the #sky
+// gradient, so a redundant basemap doesn't wash it out. This is the clean, high-contrast look;
+// Light/Streets/Dark/Satellite still available in the control for a geographic backdrop.
+function baseLayer(){if(basemap==='studio'||!TILE[basemap])return null;
+  return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
   renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
     bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
 // Labels-only overlay — drawn ON TOP of the building scene only in satellite mode, so place names
@@ -717,7 +722,7 @@ function labelOverlayLayer(){
 function darkMode(){return basemap==='dark'||basemap==='satellite';}
 // the DataProteins "white paper" look — muted-grey context buildings, ORANGE roads, selective
 // accent highlight — is reserved for the light CARTO Positron base. voyager keeps its old styling.
-function lightMode(){return basemap==='light';}
+function lightMode(){return basemap==='light'||basemap==='studio';}
 
 // ---- OPTIONAL ground layers (future OSM pull) — render UNDER buildings; absent file => skipped silently. ----
 // These are populated by a later Overpass pull on Kaustav's Thai laptop (network-blocked in this sandbox).
