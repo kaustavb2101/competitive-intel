@@ -885,9 +885,9 @@ function drawOppScore(){
     const t=top[0], m=OPPSCORE.meta||{};
     const w=m.weights_effective||m.weights_full||{};
     const wtxt=(w.whitespace!=null)?` Weights: white-space ${Math.round(w.whitespace*100)}% · competitor-gap ${Math.round((w.competitor_gap||0)*100)}% · agri-stress ${Math.round((w.agri_stress||0)*100)}%.`:'';
-    ro.innerHTML=`<b>Open here next:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the composite at
-      <b style="color:var(--accent)">${Math.round(t.score)}</b>/100 — white-space ${Math.round((t.components||{}).whitespace||0)},
-      competitor-gap ${Math.round((t.components||{}).competitor_gap||0)}, agri-stress ${Math.round((t.components||{}).agri_stress||0)}. ${TAG_E}`+
+    // The gold hero banner (#acq-verdict) already states the answer — here just frame the table columns
+    // (avoids stating "open next: X" three times before the ranked evidence).
+    ro.innerHTML=`Ranked by an <b>estimated composite</b> (0–100): white-space + competitor-gap <b>measured</b>, agri-stress province-inherited <b>estimated</b> — each component shown per row. ${TAG_E}`+
       methodBox(`Top ${top.length} of ${rows.length} districts.${wtxt}`,
         ['<b>ESTIMATED COMPOSITE</b> — a ranking aid for expansion, not a measured quantity.',
          'White-space &amp; competitor-gap components are <b>measured</b>; agri-stress is <b>province-inherited estimated</b>.']);
