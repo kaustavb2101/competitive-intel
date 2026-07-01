@@ -2296,12 +2296,15 @@ function initMap(){
   mapReady=true;
   // optional ?lens=<key> deep-link: pick the starting map lens (validated against LENS).
   try{ const ql=new URLSearchParams(location.search).get('lens'); if(ql&&LENS[ql]&&ql!==curLens){ curLens=ql; renderLenses(); } }catch(e){}
-  map = L.map('map',{preferCanvas:true, attributionControl:true, zoomControl:true}).setView([13.4,101.2], window.innerWidth<600?5:6);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  map = L.map('map',{preferCanvas:true, attributionControl:true, zoomControl:true, scrollWheelZoom:true}).setView([13.4,101.2], window.innerWidth<600?5:6);
+  // Light CARTO Positron basemap (marketing committee): a quiet, de-emphasized light map so the branch
+  // data is the only saturated thing on screen — "quiet map, loud data" (Mapbox Light / CARTO recipe).
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
     attribution:'&copy; OpenStreetMap &copy; CARTO', subdomains:'abcd', maxZoom:19}).addTo(map);
   const renderer = L.canvas({padding:0.5});
   markers = DATA.map(d=>{
-    const m = L.circleMarker([d.y,d.x], {renderer, radius:4, weight:0.4, color:'#0c1118', fillOpacity:0.85});
+    // dark thin stroke gives every dot a crisp edge on the light basemap (committee: 3:1 stroke)
+    const m = L.circleMarker([d.y,d.x], {renderer, radius:4, weight:0.6, color:'rgba(20,26,34,.55)', fillOpacity:0.9});
     m._d=d; m.on('click',()=>selectBranch(d,m));
     return m.addTo(map);
   });

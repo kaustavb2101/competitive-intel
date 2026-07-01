@@ -52,6 +52,7 @@ h2:first-child{margin-top:4px}
 
 /* map */
 #map{height:62vh;min-height:420px;border-radius:12px;border:1px solid var(--line);overflow:hidden;background:#0c111a}
+html[data-theme="light"] #map{background:#e8ecf2}  /* light loading bg so the map well matches the light basemap before tiles paint */
 .leaflet-popup-content-wrapper{background:#0d1218;color:var(--txt);border:1px solid var(--line);border-radius:9px}
 .leaflet-popup-tip{background:#0d1218;border:1px solid var(--line)}
 .leaflet-popup-content{margin:10px 12px;font-family:var(--sans)}
