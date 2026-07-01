@@ -2695,6 +2695,7 @@ function ccStar(item){watchToggle(item);}
 /* ---- home orchestration ---- */
 let homeBooted=false;
 function renderHome(){
+  renderHomeThesis();       // ONE board-ready sentence + Road-to-3,000 strip (synthesized, null-safe)
   renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
@@ -2704,11 +2705,11 @@ function renderHome(){
   if(!homeBooted){
     homeBooted=true;
     const onHome=()=>document.getElementById('v-home').classList.contains('on');
-    loadAmphoe().then(()=>{ if(onHome()) renderHomeWhitespace(); });
-    loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); } });
+    loadAmphoe().then(()=>{ if(onHome()){ renderHomeWhitespace(); renderHomeThesis(); } });
+    loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
-    loadOppScore().then(()=>{ if(onHome()) renderHomeHero(); });
-    loadHouseholdRisk().then(()=>{ if(onHome()) renderHomeHero(); });
+    loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
+    loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
     loadProvinceRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — collateral RECOVERY outlook (national, collateral_outlook.json) into the risk card.
@@ -2740,6 +2741,53 @@ function loadOppScore(){
   return fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null)
     .then(j=>{OPPSCORE=j;oppLoaded=true;return j;})
     .catch(()=>{OPPSCORE=null;oppLoaded=true;return null;});
+}
+/* BOARD THESIS — one spoken-English sentence a director could read aloud, plus a Road-to-3,000
+   headroom strip. Synthesized ONLY from data already in memory (DATA/META/AMP/OPPSCORE/HHRISK/
+   CSTRESS); every clause is dropped if its source is absent, so it never fabricates. Re-rendered
+   as lazy sources resolve (same lazy chain as the hero). The sentence names: how many districts
+   have room, where to open next, and what is stressing — the two standing objectives in one line. */
+const TARGET_BRANCHES=3000;
+function renderHomeThesis(){
+  const box=$('#cc-thesis'); if(!box) return;
+  const have=(Array.isArray(DATA)?DATA.length:0);
+  // zero-branch (white-space) district count — measured PIP from amphoe.json.
+  const zeroDist=(AMP&&AMP.length)?AMP.filter(a=>a.branches===0).length:null;
+  // where to open next — top opportunity district (estimated composite) else top white-space district.
+  let openNext=null;
+  const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
+  if(od&&od.length){const t=od.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(t&&t.name) openNext=t.name;}
+  if(!openNext&&AMP&&AMP.length){const t=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0))[0]; if(t) openNext=t.name_measured?t.name:t.name_en;}
+  // what is stressing — measured household leverage (top DTI) else worst crop-stress province.
+  const hh=(Array.isArray(HHRISK_LIST)&&HHRISK_LIST.length)?HHRISK_LIST[0]:null;
+  const cs=(CSTRESS_LIST&&CSTRESS_LIST.length)?CSTRESS_LIST[0]:null;
+  // ---- assemble the sentence, clause by clause, skipping any absent source ----
+  const clauses=[];
+  if(have){
+    const gap=Math.max(0,TARGET_BRANCHES-have);
+    clauses.push(`AutoX runs <b>${have.toLocaleString()}</b> branches today — <b>${gap.toLocaleString()}</b> short of the ${TARGET_BRANCHES.toLocaleString()} target`);
+  }
+  if(zeroDist!=null){
+    clauses.push(`<b>${zeroDist.toLocaleString()}</b> district${zeroDist===1?'':'s'} still have no branch at all${openNext?`, and the strongest single opening is <b>${openNext}</b>`:''}`);
+  } else if(openNext){
+    clauses.push(`the strongest single opening is <b>${openNext}</b>`);
+  }
+  if(hh){
+    clauses.push(`the risk to watch is <b>${hh.region||hh.province} household leverage</b> (DTI ${(+hh.debt_to_income).toFixed(2)}× in ${hh.province}, measured)`);
+  } else if(cs){
+    clauses.push(`the risk to watch is a <b>${cs.th}</b> crop-income squeeze`);
+  }
+  if(!clauses.length){ box.innerHTML=''; return; }
+  const sentence=clauses.join('; ')+'.';
+  // Road-to-3,000 mini progress bar (measured count vs target) — only when we know the count.
+  let bar='';
+  if(have){
+    const pct=Math.min(100,Math.round(have/TARGET_BRANCHES*100));
+    bar=`<div class="cc-thesis-bar" title="${have.toLocaleString()} of ${TARGET_BRANCHES.toLocaleString()} branches">`+
+      `<div class="cc-thesis-fill" style="width:${pct}%"></div>`+
+      `<span class="cc-thesis-barlab">Road to ${TARGET_BRANCHES.toLocaleString()} · ${pct}%</span></div>`;
+  }
+  box.innerHTML=`<div class="cc-thesis-line">▶ ${sentence}</div>${bar}`;
 }
 function renderHomeHero(){
   const box=$('#cc-hero'); if(!box) return;
