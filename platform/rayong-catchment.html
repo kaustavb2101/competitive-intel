@@ -371,9 +371,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="cscnote" id="cscNote"></div>
   </div>
   <div class="scroll">
-    <h2 style="padding:0 0 6px">Within 10km <span class="tag meas">measured · OSM</span></h2>
+    <h2 id="k10H" style="padding:0 0 6px">Within 10km <span class="tag meas">measured · OSM</span></h2>
     <div id="k10panel"></div>
-    <h2 style="padding:14px 0 6px">Who works nearby</h2>
+    <h2 id="workH" style="padding:14px 0 6px">Who works nearby</h2>
     <div id="workpanel"></div>
   </div>
 </aside>
@@ -383,9 +383,9 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <div class="cardttl"><div class="a">Acquisition leads</div><div class="b">Where competitors own ground you don't</div></div>
   <div class="scroll">
     <div id="verdict"></div>
-    <h2 style="padding:0 0 4px">Top gaps</h2>
+    <h2 id="gapsH" style="padding:0 0 4px">Top gaps</h2>
     <div id="leads"></div>
-    <h2 style="padding:10px 0 4px">Recommendations</h2>
+    <h2 id="recosH" style="padding:10px 0 4px">Recommendations</h2>
     <div id="recos"></div>
   </div>
 </aside>
@@ -1301,11 +1301,18 @@ function OCC_BUCKETS_FROM(e){
 function updatePanels(){
   // No branch data (a city without a province file) — leave the analysis panels in their empty state.
   if(!focal){
+    // City with buildings but no branch/analysis stack (e.g. Bangkok): give it a real title and a
+    // single confident note — don't leave an em-dash title and orphan empty section headers ("looks broken").
+    const fn=document.getElementById('focalName'); if(fn)fn.textContent=CITY_LABEL;
+    const fs=document.getElementById('focalSub'); if(fs)fs.textContent='3D buildings & ground · full branch analysis on Rayong';
     const k10host=document.getElementById('k10panel');
     if(k10host)k10host.innerHTML='<div class="foot">Branch + POI overlays for this city are not loaded yet — the 3D buildings and ground render from the catchment pull. Rayong has the full analysis stack.</div>';
     const whost=document.getElementById('workpanel'); if(whost)whost.innerHTML='';
+    const workH=document.getElementById('workH'); if(workH)workH.style.display='none';  // hide the orphan empty header
     return;
   }
+  // a branch IS selected — make sure the (possibly hidden) left header is visible
+  const workHv=document.getElementById('workH'); if(workHv)workHv.style.display='';
   const dist=focal.d||(CA.meta&&CA.meta.dist)||CITY_LABEL;
   const k=focal.k10||null;
   document.getElementById('focalName').textContent=focal.n||'AutoX branch';
@@ -1376,8 +1383,14 @@ function buildLeads(){
     if(v)v.innerHTML='<div class="foot">Competitor + branch overlays for this city are not loaded yet. The 3D scene (buildings + ground) renders from the catchment pull; the full acquisition read is available for Rayong.</div>';
     const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
     const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
+    // hide the now-orphan "Top gaps" / "Recommendations" headers so the panel is one clean note, not empty scaffolding
+    const gH=document.getElementById('gapsH'); if(gH)gH.style.display='none';
+    const rH=document.getElementById('recosH'); if(rH)rH.style.display='none';
     return;
   }
+  // data present — ensure the section headers are visible
+  const gHv=document.getElementById('gapsH'); if(gHv)gHv.style.display='';
+  const rHv=document.getElementById('recosH'); if(rHv)rHv.style.display='';
   // gaps: competitors whose nearest AutoX branch is far -> contested ground we don't hold
   const gaps=COMP.map(c=>{
     const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
