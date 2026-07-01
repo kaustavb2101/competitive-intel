@@ -600,8 +600,17 @@ function buildLighting(withShadow){
     return eff;
   }catch(e){ return null; }
 }
-let SHADOWS_ON=true;
-let LIGHTING=buildLighting(true);
+// MOBILE detection — iOS Safari / Android render this heavy scene at device-pixel-ratio 2–3, which
+// makes the WebGL framebuffer ~4–9× larger and (with shadow-map passes) blows the mobile GL memory
+// budget → the canvas comes up BLANK WHITE. So on mobile we (a) cap device pixels to 1 and (b) drop
+// shadows. Renders slightly less crisp but actually renders. (Desktop keeps full crispness + shadows.)
+const IS_MOBILE = (function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform)); // iPadOS masquerades as Mac
+}catch(e){return false;}})();
+let SHADOWS_ON=!IS_MOBILE;
+let LIGHTING=buildLighting(SHADOWS_ON);
 if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
 // cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
@@ -723,6 +732,8 @@ function downgradeForSoftwareGL(){
 }
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
+  // cap the framebuffer on mobile (DPR 1) so iOS/Android WebGL doesn't run out of memory and blank out
+  useDevicePixels: IS_MOBILE ? false : true,
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
   onViewStateChange:({viewState,interactionState})=>{
