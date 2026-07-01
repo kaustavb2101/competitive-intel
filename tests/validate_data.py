@@ -1466,39 +1466,86 @@ PROVENANCE_KEYS = (
 # justified in docs/DATA_PROVENANCE.md §1/§3. Adding a NEW numeric layer requires either real
 # provenance or a conscious entry here — keep this list narrow.
 PROVENANCE_EXEMPT = {
-    # bare derivatives of the sourced master (provenance lives in meta.json + the master + DATA_SOURCES.md)
-    "branches.json",        # list, DERIVED by derive.py from branches_final.json
-    "meta.json",            # the provenance/rollup sidecar itself; inputs sourced
-    "deltas.json",          # deterministic diff of sourced snapshots (carries from/to vintage labels)
-    "snapshots_index.json",  # structural index of vintages, no independent numeric series
-    # province deep-dives: DERIVED by build_province.py from sourced layers (no meta block yet — R1)
+    # --- (a) bare deterministic derivatives of the sourced master (DATA_PROVENANCE.md §1, R4) ---
+    # These carry no in-file meta because their provenance lives in meta.json + branches_final.json
+    # (the master) + docs/DATA_SOURCES.md. All are byte-exact reproducible by their --check builders.
+    "branches.json",        # a bare LIST, DERIVED by derive.py from branches_final.json (sourced master)
+    "meta.json",            # IS the provenance/rollup sidecar for branches; its inputs are sourced
+    "deltas.json",          # deterministic diff of two sourced snapshots; carries from/to vintage stamps
+    "snapshots_index.json",  # structural index of captured vintages; no independent numeric series
+    # --- (b) province deep-dives (DATA_PROVENANCE.md R1) ---
+    # DERIVED by build_province.py from named sourced layers (DIW/DLT/NSO/OSM via spatial join),
+    # --check byte-exact, but the builder does not yet emit a meta block. The whole provinces/
+    # subtree is matched by prefix in _is_exempt(); only the index is named literally here.
     "provinces/index.json",
-    # geometry / visual catchment + basemap layers (OSM/Overture; numeric footprints, not metrics) — R2/R3/R6
-    "rayong_catchment.json",
-    "rayong_province.json",
-    "rayong_landuse.json",
-    "rayong_roads.json",
-    "rayong_water.json",
-    "rayong_rail.json",
-    "bangkok_catchment.json",
-    "bangkok_landuse.json",
-    "bangkok_roads.json",
-    "bangkok_water.json",
+    # --- (c) geometry / basemap layers: OSM (Overpass) + Overture footprints (DATA_PROVENANCE.md R2/R3/R6) ---
+    # Numeric building/road/water/landuse GEOMETRY for the 3D scenes — coordinates & footprints, NOT
+    # decision metrics. Source is OSM/Overture by construction (via the pull_* scripts) though not all
+    # carry an in-file meta.source stamp yet. Exempt as visual basemap, flagged in the register.
+    "rayong_catchment.json",   # Overture building footprints (Rayong), heights baked by bake_catchment_heights.py
+    "rayong_province.json",    # curated Rayong pilot deep-dive; inputs are sourced layers + curated list
+    "rayong_landuse.json",     # OSM/Overpass landuse polygons (basemap)
+    "rayong_roads.json",       # OSM/Overpass road lines (basemap)
+    "rayong_water.json",       # OSM/Overpass water polygons (basemap)
+    "rayong_rail.json",        # OSM/Overpass rail lines (basemap)
+    "bangkok_catchment.json",  # Overture building footprints (Bangkok); meta has city/n_bldg but no source
+    "bangkok_landuse.json",    # OSM/Overpass landuse polygons (basemap)
+    "bangkok_roads.json",      # OSM/Overpass road lines (basemap)
+    "bangkok_water.json",      # OSM/Overpass water polygons (basemap)
 }
 
 
+def _nonempty_prov_value(v):
+    """True iff v is a usable provenance value: a non-blank STRING, or a non-empty
+    list/dict that contains at least one non-blank string somewhere.
+
+    Rationale (hardening): the data-mandate requires a provenance *label* — a human-readable
+    string naming a source / builder / honest estimate. A truthy-but-meaningless value
+    (a bare number like meta.label=1, a whitespace-only "   ", or an empty/[] {} container,
+    or a list of blanks like ["", null]) is NOT provenance and must not satisfy the gate.
+    """
+    if isinstance(v, str):
+        return bool(v.strip())
+    if isinstance(v, (list, tuple)):
+        return any(_nonempty_prov_value(x) for x in v)
+    if isinstance(v, dict):
+        return any(_nonempty_prov_value(x) for x in v.values())
+    # numbers / bools / None are not a provenance label.
+    return False
+
+
 def _has_provenance(obj):
-    """True iff obj is a dict carrying a non-empty meta.<provenance key>."""
+    """True iff obj is a dict carrying a meta.<provenance key> with a non-blank string value
+    (or a container of such). See _nonempty_prov_value for what counts."""
     if not isinstance(obj, dict):
         return False
     meta = obj.get("meta")
     if not isinstance(meta, dict):
         return False
     for k in PROVENANCE_KEYS:
-        v = meta.get(k)
-        if v not in (None, "", [], {}):
+        if _nonempty_prov_value(meta.get(k)):
             return True
     return False
+
+
+def _all_data_json_rels():
+    """Every committed *.json under platform/data/, RECURSIVELY (incl. provinces/ and any
+    future subdirectory), as DATA-relative paths with '/' separators. A recursive walk
+    future-proofs the gate: a new subfolder of numeric data cannot slip through unchecked."""
+    rels = []
+    for root, _dirs, files in os.walk(DATA):
+        for f in files:
+            if f.endswith(".json"):
+                rel = os.path.relpath(os.path.join(root, f), DATA)
+                rels.append(rel.replace(os.sep, "/"))
+    return sorted(rels)
+
+
+def _is_exempt(rel):
+    """rel uses '/' separators. Province deep-dives all share the build_province.py
+    exemption (R1); match the whole provinces/ subtree by prefix. Everything else must be
+    named literally in PROVENANCE_EXEMPT (kept narrow on purpose)."""
+    return rel in PROVENANCE_EXEMPT or rel.startswith("provinces/")
 
 
 def check_provenance():
@@ -1507,27 +1554,33 @@ def check_provenance():
         fail("platform/data exists", "missing %s" % DATA)
         return
 
-    # Every committed *.json directly under platform/data/ plus provinces/*.json.
-    rels = sorted(f for f in os.listdir(DATA) if f.endswith(".json"))
-    prov_dir = os.path.join(DATA, "provinces")
-    if os.path.isdir(prov_dir):
-        rels += [os.path.join("provinces", f)
-                 for f in sorted(os.listdir(prov_dir)) if f.endswith(".json")]
+    # Guard the exemption list itself: every literally-named exempt file must still exist.
+    # A stale exemption silently widens the gate (a file could be renamed/removed and its
+    # replacement never re-audited), so a dangling entry is a real regression to fix.
+    stale = sorted(rel for rel in PROVENANCE_EXEMPT if not exists(rel))
+    if stale:
+        fail("PROVENANCE_EXEMPT entries all still exist (no stale/dangling exemptions)",
+             "these exempt files are gone — remove the exemption or restore the file:\n  "
+             + first_n(stale, 20))
+    else:
+        ok("PROVENANCE_EXEMPT entries all still exist (%d, none stale)" % len(PROVENANCE_EXEMPT))
+
+    # Every committed *.json under platform/data/, recursively (top level + provinces/ + any
+    # future subdirectory). Each must carry provenance OR be documented-exempt.
+    rels = _all_data_json_rels()
 
     violations = []
     n_sourced = 0
     n_exempt = 0
     for rel in rels:
         try:
-            d = load(rel)
+            d = load(rel.replace("/", os.sep))
         except Exception as e:
             fail("provenance: %s loads" % rel, repr(e))
             continue
-        # Province deep-dives all share the build_province.py exemption (R1); match by directory.
-        is_exempt = rel in PROVENANCE_EXEMPT or rel.startswith("provinces" + os.sep)
         if _has_provenance(d):
             n_sourced += 1
-        elif is_exempt:
+        elif _is_exempt(rel):
             n_exempt += 1
         else:
             violations.append(rel)
@@ -1535,12 +1588,13 @@ def check_provenance():
     if violations:
         fail("every numeric platform/data layer carries provenance (meta.source / "
              "meta.provenance / labelled estimate) or a documented exemption",
-             "UNSOURCED (no meta provenance, not exempt) — add a real source, an honest "
+             "UNSOURCED (no meta provenance string, not exempt) — add a real source, an honest "
              "estimated-label, or a documented exemption in docs/DATA_PROVENANCE.md:\n  "
              + first_n(violations, 20))
     else:
-        ok("every numeric platform/data layer is sourced (%d) or documented-exempt (%d) — "
-           "no unsourced data shipped" % (n_sourced, n_exempt))
+        ok("every numeric platform/data layer (%d scanned, recursive) is sourced (%d) or "
+           "documented-exempt (%d) — no unsourced data shipped"
+           % (len(rels), n_sourced, n_exempt))
 
 
 # ---------------------------------------------------------------------------
