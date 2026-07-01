@@ -1227,6 +1227,220 @@ def check_competitor_coverage():
 
 
 # ---------------------------------------------------------------------------
+def check_opportunity_score():
+    # COMPOSITE EXPANSION-OPPORTUNITY score per amphoe (objective #2): blends MEASURED white-space +
+    # competitor density with ESTIMATED province crop-stress + occupation pull into a 0-100 ranking.
+    # Optional file: SKIP-PASS when absent (build_opportunity_score.py degrades gracefully).
+    hdr("opportunity_score.json (optional)")
+    if not exists("opportunity_score.json"):
+        ok("opportunity_score.json absent — skipped (optional; run build_opportunity_score.py)")
+        return
+    try:
+        d = load("opportunity_score.json")
+    except Exception as e:
+        fail("opportunity_score.json loads", repr(e))
+        return
+    ok("opportunity_score.json loads")
+
+    # provenance: meta must state the builder + the ESTIMATED-COMPOSITE label + the blend weights.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_with") or not meta.get("label"):
+        fail("opportunity_score meta/provenance present (generated_with + label)",
+             "meta missing generated_with/label")
+    else:
+        ok("opportunity_score meta/provenance present (generated_with + estimated-composite label)")
+        w = meta.get("weights_full")
+        if not isinstance(w, dict) or not w or not all(is_finite_number(v) and v >= 0 for v in w.values()):
+            fail("opportunity_score meta.weights_full present (non-negative finite)",
+                 "weights_full missing/invalid: %r" % w)
+        else:
+            ok("opportunity_score meta.weights_full present (%d components, non-negative)" % len(w))
+
+    if meta and meta.get("absent"):
+        ok("opportunity_score is an honest ABSENT-state — skipped value checks")
+        return
+
+    recs = d.get("districts")
+    if not isinstance(recs, list) or not recs:
+        fail("opportunity_score has a 'districts' list", "got %s" % type(recs).__name__)
+        return
+    ok("opportunity_score districts list present (%d)" % len(recs))
+
+    # the composite is built from the declared component weights; every district exposes those
+    # components for honesty. score + each component must sit in [0,100]; branches a non-neg int.
+    comp_keys = set((meta or {}).get("weights_full", {}).keys())
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        name = r.get("name") or r.get("id") or "#%d" % i
+        if r.get("region") is not None and r.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, r.get("region")))
+        sc = r.get("score")
+        if not is_finite_number(sc) or not (0.0 <= sc <= 100.0):
+            bad.append("%s score=%r out of [0,100]" % (name, sc))
+        br = r.get("branches")
+        if not (isinstance(br, int) and not isinstance(br, bool) and br >= 0):
+            bad.append("%s branches=%r not a non-negative int" % (name, br))
+        comps = r.get("components")
+        if not isinstance(comps, dict):
+            bad.append("%s components not a dict" % name)
+            continue
+        # every declared weighted component must be present + in [0,100] (audit fields prefixed
+        # with '_' — e.g. _competitors — are raw counts, only required to be non-negative finite).
+        for ck in comp_keys:
+            cv = comps.get(ck)
+            if cv is None:
+                # occupation_pull is present only when amphoe_occupations.json exists; tolerate absence.
+                continue
+            if not is_finite_number(cv) or not (0.0 <= cv <= 100.0):
+                bad.append("%s components.%s=%r out of [0,100]" % (name, ck, cv))
+        for ck, cv in comps.items():
+            if ck.startswith("_"):
+                if not is_finite_number(cv) or cv < 0:
+                    bad.append("%s audit %s=%r not non-negative finite" % (name, ck, cv))
+    if bad:
+        fail("opportunity_score districts sane (score/components in [0,100], branches>=0, known regions)",
+             first_n(bad, 8))
+    else:
+        ok("opportunity_score districts sane (score + weighted components in [0,100], branches>=0, "
+           "audit counts non-negative, known regions)")
+
+
+# ---------------------------------------------------------------------------
+def check_exit_whitespace():
+    # COMPETITOR-EXIT white-space cue (objective #2, regulatory-tailwind lens). ESTIMATED PROXY per
+    # amphoe: where AutoX could capture share if sub-scale operators exit under the Q1-2026 BoT
+    # deadline, inferred from big-4 scarcity x demand/white-space. The data-mandate bites: this is an
+    # inferred surface, so meta MUST carry the honesty caveat + the regulatory citation. Optional
+    # file: SKIP-PASS when absent (build_exit_whitespace.py degrades gracefully).
+    hdr("exit_whitespace.json (optional)")
+    if not exists("exit_whitespace.json"):
+        ok("exit_whitespace.json absent — skipped (optional; run build_exit_whitespace.py)")
+        return
+    try:
+        d = load("exit_whitespace.json")
+    except Exception as e:
+        fail("exit_whitespace.json loads", repr(e))
+        return
+    ok("exit_whitespace.json loads")
+
+    # provenance: meta must state the builder + the ESTIMATED-PROXY label AND (because this is an
+    # inferred surface) the honesty caveat + the cited regulatory basis — never present it as measured.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_with") or not meta.get("label"):
+        fail("exit_whitespace meta/provenance present (generated_with + label)",
+             "meta missing generated_with/label")
+    else:
+        ok("exit_whitespace meta/provenance present (generated_with + estimated-proxy label)")
+        if not (isinstance(meta.get("honesty_caveat"), str) and meta.get("honesty_caveat").strip()):
+            fail("exit_whitespace meta.honesty_caveat present (inferred, not measured)",
+                 "honesty_caveat missing/empty")
+        else:
+            ok("exit_whitespace meta.honesty_caveat present (inferred-not-measured)")
+        reg = meta.get("regulatory_citation")
+        if not isinstance(reg, dict) or not reg.get("sources"):
+            fail("exit_whitespace meta.regulatory_citation cites sources",
+                 "regulatory_citation missing sources")
+        else:
+            ok("exit_whitespace meta.regulatory_citation cites sources (%d)" % len(reg["sources"]))
+
+    if meta and meta.get("absent"):
+        ok("exit_whitespace is an honest ABSENT-state — skipped value checks")
+        return
+
+    recs = d.get("districts")
+    if not isinstance(recs, list) or not recs:
+        fail("exit_whitespace has a 'districts' list", "got %s" % type(recs).__name__)
+        return
+    ok("exit_whitespace districts list present (%d)" % len(recs))
+
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        name = r.get("name") or r.get("id") or "#%d" % i
+        if r.get("region") is not None and r.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, r.get("region")))
+        es = r.get("exit_capture_score")
+        if not is_finite_number(es) or not (0.0 <= es <= 100.0):
+            bad.append("%s exit_capture_score=%r out of [0,100]" % (name, es))
+        br = r.get("branches")
+        if not (isinstance(br, int) and not isinstance(br, bool) and br >= 0):
+            bad.append("%s branches=%r not a non-negative int" % (name, br))
+        comps = r.get("components")
+        if not isinstance(comps, dict):
+            bad.append("%s components not a dict" % name)
+            continue
+        # 0-100 estimated proxies
+        for ck in ("sub_scale_proxy", "whitespace", "demand"):
+            cv = comps.get(ck)
+            if cv is not None and (not is_finite_number(cv) or not (0.0 <= cv <= 100.0)):
+                bad.append("%s components.%s=%r out of [0,100]" % (name, ck, cv))
+        # big4_competitors: MEASURED raw count, non-negative int
+        b4 = comps.get("big4_competitors")
+        if b4 is not None and not (isinstance(b4, int) and not isinstance(b4, bool) and b4 >= 0):
+            bad.append("%s big4_competitors=%r not a non-negative int" % (name, b4))
+    if bad:
+        fail("exit_whitespace districts sane (score/proxies in [0,100], big4 count int>=0, known regions)",
+             first_n(bad, 8))
+    else:
+        ok("exit_whitespace districts sane (exit_capture_score + proxies in [0,100], big4 measured "
+           "count>=0, branches>=0, known regions)")
+
+
+# ---------------------------------------------------------------------------
+def check_peer_npl():
+    # PEER NPL benchmark (objective #1 collateral context). These are PEER-reported figures, NOT an
+    # AutoX number — the data-mandate requires meta to say so explicitly and each row to cite its
+    # source. Optional file: SKIP-PASS when absent.
+    hdr("peer_npl.json (optional)")
+    if not exists("peer_npl.json"):
+        ok("peer_npl.json absent — skipped (optional peer benchmark)")
+        return
+    try:
+        d = load("peer_npl.json")
+    except Exception as e:
+        fail("peer_npl.json loads", repr(e))
+        return
+    ok("peer_npl.json loads")
+
+    # provenance: meta must cite the source AND make the peer-not-AutoX caveat explicit (the note).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("source") or not meta.get("note"):
+        fail("peer_npl meta/provenance present (source + peer-not-AutoX note)",
+             "meta missing source/note")
+    else:
+        ok("peer_npl meta/provenance present (source + peer-reported caveat)")
+
+    peers = d.get("peers")
+    if not isinstance(peers, list) or not peers:
+        fail("peer_npl has a 'peers' list", "got %s" % type(peers).__name__)
+        return
+    ok("peer_npl peers list present (%d)" % len(peers))
+
+    bad = []
+    for i, p in enumerate(peers):
+        if not isinstance(p, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        name = p.get("ticker") or p.get("name") or "#%d" % i
+        # npl: a reported percentage — positive finite, sanity-bounded (0..100)
+        npl = p.get("npl")
+        if not is_finite_number(npl) or not (0.0 < npl <= 100.0):
+            bad.append("%s npl=%r out of (0,100]" % (name, npl))
+        # every peer figure must cite its source (no fabricated ratios)
+        if not (isinstance(p.get("source"), str) and p.get("source").strip()):
+            bad.append("%s source missing/empty (peer figure must be cited)" % name)
+    if bad:
+        fail("peer_npl rows sane (npl in (0,100], each cites a source)", first_n(bad))
+    else:
+        ok("peer_npl rows sane (npl in (0,100], every peer figure cites a source)")
+
+
+# ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
 # Mandate: no committed data may be hallucinatory/fabricated. Every NUMERIC data layer in
@@ -1397,6 +1611,9 @@ def main():
     check_amphoe_occupations(amphoe)
     check_competitors()
     check_competitor_coverage()
+    check_opportunity_score()
+    check_exit_whitespace()
+    check_peer_npl()
     check_provenance()
     check_rollup(branches)
 

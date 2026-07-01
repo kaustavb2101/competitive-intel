@@ -187,8 +187,9 @@ def build_occupations_census():
     census CSV has not been dropped into dgt_out/ — never crashes, never fabricates."""
     files = glob.glob(os.path.join(DGT, "nso_census__bizind__*.csv"))
     if not files:
-        print("skip source-data/occupations_by_district.json: no nso_census__bizind__*.csv "
-              "in dgt_out/ — drop the NSO 2022 census export there (Thai-IP pull) to build it")
+        print("NSO occupation source absent (data.go.th blocked from sandbox) — no "
+              "nso_census__bizind__*.csv in dgt_out/; skipping occupations_by_district.json. "
+              "Drop the NSO 2022 census export there (Thai-IP pull) to build it.")
         return None
     fp = max(files, key=os.path.getsize)   # largest = most complete (no double-count on re-pull)
 
