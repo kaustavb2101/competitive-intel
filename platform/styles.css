@@ -512,19 +512,25 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
    (per the light-slate panel verdict). Default remains dark.
    ============================================================ */
 html[data-theme="light"]{
-  --bg:#EEF1F6; --bg-top:#EEF1F6;
-  --panel2:#E7ECF3; --panel:#FFFFFF; --raised:#F5F8FD;
-  --line:#D3DAE6; --line2:#E4E8F1;
-  --hi:#11151F; --txt:#2C3444; --mid:#5A6477; --dim:#828CA0;
-  --accent:#5B7CFA; --accent-soft:rgba(91,124,250,.10); --accent-glow:rgba(91,124,250,.16);
-  --agri:#B53A33; --merch:#15705F; --collat:#5E3DB0; --opp:#B8862B; --gold:#B8862B;
-  --up:#15705F; --down:#B53A33;
-  --elev-1:0 1px 2px rgba(16,22,40,.06),0 2px 8px rgba(16,22,40,.05);
-  --elev-2:0 1px 2px rgba(16,22,40,.06),0 12px 28px rgba(16,22,40,.10);
-  --pop-sh:0 14px 38px rgba(16,22,40,.18);
+  --bg:#F4F6FA; --bg-top:#FBFCFE;
+  --panel2:#ECEFF5; --panel:#FFFFFF; --raised:#F7F9FD;
+  --line:#DCE1EB; --line2:#EBEEF4;
+  --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#7A8598;
+  --accent:#4C6EF0; --accent-soft:rgba(76,110,240,.12); --accent-glow:rgba(76,110,240,.28);
+  --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --opp:#A67714; --gold:#A67714;
+  --up:#0E7C68; --down:#C0392F;
+  --elev-1:0 1px 2px rgba(16,22,40,.05),0 4px 14px rgba(16,22,40,.07);
+  --elev-2:0 1px 2px rgba(16,22,40,.06),0 16px 36px rgba(16,22,40,.13);
+  --pop-sh:0 18px 46px rgba(16,22,40,.20);
   --glass:linear-gradient(180deg,#ffffff,#f5f8fd); --glass-sh:0 12px 30px -10px rgba(16,22,40,.22);
 }
 html[data-theme="light"] body{background:var(--bg)}
+/* Light cards need real elevation — on the near-white canvas the dark-theme inset highlights vanish,
+   leaving flat separationless boxes. A soft drop shadow is the single biggest light-mode polish fix. */
+html[data-theme="light"] .cc-card,html[data-theme="light"] .mcard,
+html[data-theme="light"] .cc-hero-card,html[data-theme="light"] .side,
+html[data-theme="light"] .insight,html[data-theme="light"] .cc-thesis{box-shadow:var(--elev-1)}
+html[data-theme="light"] body{-webkit-font-smoothing:auto;text-rendering:optimizeLegibility}
 html[data-theme="light"] #nav{background:rgba(255,255,255,.92);box-shadow:0 1px 8px rgba(16,22,40,.06)}
 html[data-theme="light"] #nav a:hover{background:rgba(16,22,40,.05)}
 html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
