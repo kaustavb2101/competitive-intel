@@ -1033,7 +1033,7 @@ function renderRoad3k(){
     `<tr style="border-top:2px solid var(--line)"><td><b>Total</b></td>`+
       `<td class="mono"><b>${totBr.toLocaleString()}</b></td>`+
       `<td class="mono sub">${(c.totWf/1e6).toFixed(1)}M</td><td></td>`+
-      `<td class="mono" style="color:var(--gold)"><b>${Math.round(c.totHr).toLocaleString()}</b></td>`+
+      `<td class="mono" style="color:var(--gold)"><b>${regs.reduce((s,o)=>s+Math.round(o.headroom),0).toLocaleString()}</b></td>`+
       `<td class="mono" style="color:var(--gold)"><b>+${net.toLocaleString()}</b></td><td></td>`+
       `<td class="mono" style="color:var(--gold)"><b>${(totBr+net).toLocaleString()}</b></td></tr>`;
   if($('#r3kreadout')){
@@ -1659,7 +1659,7 @@ function renderOccConcentration(){
    provinces that worsen most. Deterministic. Exposure = branch footprint (no per-branch ฿ balance / LTV /
    elasticities — all stated). Reuses crop_stress.json (lazy) + branches.json; no new data, no server. */
 const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
-const simState={price:0,rain:0,gold:0,veh:0,botcap:false};
+const simState={price:0,rain:0,gold:0,veh:0,factory:0,botcap:false};
 let simWired=false;
 
 /* ---------- BoT 28% title-loan rate-cap scenario (objective #1) ----------
@@ -1694,6 +1694,58 @@ function simCapModel(){
   });
   return {rows,yBase,yCap,drop:yBase-yCap};
 }
+/* ---------- factory / manufacturing slowdown lever (objective #1) ----------
+   Reuses the MEASURED occupation-risk layer already loaded client-side (OCCRISK, index-aligned to
+   DATA). "Manufacturing base" = branches whose MEASURED dominant occupation bucket is factory or
+   auto/vehicle work (OCC_BUCKET_COL groups both as the purple industrial bucket). The severity
+   lever (0–100%) applies an ESTIMATED linear uplift to those branches' occupation-stress score,
+   capped at 100. Everything is ESTIMATED except the branch counts + occupation shares (measured).
+   Null-guarded: returns null when the occupation-risk pull is absent (lever is hidden then). */
+const SIM_FACTORY_KEYS={factory:1,auto:1}; // measured dominant-bucket keys treated as manufacturing base
+// max ESTIMATED occupation-stress uplift (points) at 100% slowdown severity — an illustrative lever, not calibrated.
+const SIM_FACTORY_MAX_UPLIFT=35;
+function simFactoryModel(){
+  if(!occriskHasData()||!DATA) return null;
+  const sev=Math.max(0,Math.min(100,simState.factory))/100;   // 0..1
+  let mfgBr=0, baseSum=0, scenSum=0, worstDelta=0;
+  DATA.forEach((d,i)=>{
+    const e=OCCRISK[i]; if(!e||!SIM_FACTORY_KEYS[e.d]) return; // only manufacturing-dominant branches
+    mfgBr++;
+    const base=e.s||0;
+    const scen=Math.min(100,base+sev*SIM_FACTORY_MAX_UPLIFT);
+    baseSum+=base; scenSum+=scen;
+    if(scen-base>worstDelta) worstDelta=scen-base;
+  });
+  if(!mfgBr) return {mfgBr:0,sev};
+  const N=(DATA||[]).length||1;
+  return {mfgBr,sev,N,
+    baseAvg:baseSum/mfgBr, scenAvg:scenSum/mfgBr, delta:(scenSum-baseSum)/mfgBr,
+    share:100*mfgBr/N, worstDelta};
+}
+// render the factory-slowdown output cards. Hidden when the occupation-risk pull is absent.
+function renderSimFactory(){
+  const wrap=$('#sim-factory-out-wrap'), box=$('#sim-factory-out'); if(!box) return;
+  const m=simFactoryModel();
+  if(!m){ if(wrap) wrap.style.display='none'; box.innerHTML=''; return; }
+  if(wrap) wrap.style.display='block';
+  const shocked=simState.factory>0;
+  const col=shocked?'var(--agri)':'var(--mid)';
+  const cards=[
+    {k:'Manufacturing-base branches',v:m.mfgBr.toLocaleString(),
+     d:`${m.share.toFixed(1)}% of the network`,col:'var(--mid)',
+     n:'Branches whose MEASURED dominant borrower base is factory / auto work (Overture occupation mix). Branch counts measured.'},
+    {k:'Avg occupation-stress · est',v:m.scenAvg.toFixed(0),
+     d:shocked?`+${m.delta.toFixed(0)} vs base (${m.baseAvg.toFixed(0)})`:`baseline (${m.baseAvg.toFixed(0)})`,col,
+     n:'ESTIMATED occupation-stress (0–100) across the manufacturing-base branches under the slowdown lever. A triage direction, not a measured default rate.'},
+    {k:'Peak branch uplift · est',v:shocked?`+${m.worstDelta.toFixed(0)}`:'—',
+     d:shocked?'points on the most exposed branch':'set the slowdown lever',col:shocked?'var(--agri)':'var(--mid)',
+     n:'Largest ESTIMATED occupation-stress rise on a single manufacturing-base branch under this severity. Illustrative — no loan balances.'},
+  ];
+  box.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v" style="color:${c.col}">${c.v}</div>
+    <div class="d" style="color:${c.col}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+}
 // recompute one province's agri_stress (0..1) from its published components under a price/rain shock.
 // Mirrors crop_stress.json meta.formula EXACTLY so the baseline (shock=0) reproduces the shipped value.
 function simAgriStress(p,priceShock,rainShock){
@@ -1716,7 +1768,20 @@ function simBranchByProv(){
 }
 function renderSim(){
   if(!simWired) wireSim();
-  loadCropStress().then(()=>{ if(document.getElementById('v-sim').classList.contains('on')) computeSim(); });
+  // load the crop-stress + occupation-risk layers, then (re)compute once either lands.
+  const active=()=>document.getElementById('v-sim').classList.contains('on');
+  loadCropStress().then(()=>{ if(active()) computeSim(); });
+  loadOccRisk().then(()=>{ if(active()){ syncSimFactoryVisibility(); computeSim(); } });
+  syncSimFactoryVisibility();
+}
+// show the factory-slowdown lever only when the Overture occupation-risk pull is present; otherwise
+// hide the slider and show the quiet "needs the pull" note. NEVER fabricates. Reset lever when hidden.
+function syncSimFactoryVisibility(){
+  const has=occriskHasData();
+  const wrap=$('#sim-factory-wrap'), note=$('#sim-factory-note');
+  if(wrap) wrap.style.display=has?'':'none';
+  if(note) note.style.display=has?'none':'';
+  if(!has){ simState.factory=0; const inp=$('#sim-factory'); if(inp) inp.value=0; const lab=$('#sim-factory-v'); if(lab) lab.textContent='0%'; }
 }
 function wireSim(){
   simWired=true;
@@ -1726,18 +1791,20 @@ function wireSim(){
   bind('#sim-rain','rain',v=>v===0?'normal':(v>0?'wetter +':'drier ')+v+'%');
   bind('#sim-gold','gold',v=>(v>0?'+':'')+v+'%');
   bind('#sim-veh','veh',v=>(v>0?'+':'')+v+'%');
+  bind('#sim-factory','factory',v=>v+'%');
   const bot=$('#sim-botcap'); if(bot) bot.onchange=()=>{simState.botcap=bot.checked; computeSim();};
   const rs=$('#sim-reset'); if(rs) rs.onclick=simReset;
 }
 function simReset(){
-  simState.price=0; simState.rain=0; simState.gold=0; simState.veh=0; simState.botcap=false;
+  simState.price=0; simState.rain=0; simState.gold=0; simState.veh=0; simState.factory=0; simState.botcap=false;
   const set=(id,v)=>{const e=$(id); if(e) e.value=v;};
-  set('#sim-price',0); set('#sim-rain',0); set('#sim-gold',0); set('#sim-veh',0);
+  set('#sim-price',0); set('#sim-rain',0); set('#sim-gold',0); set('#sim-veh',0); set('#sim-factory',0);
   const bot=$('#sim-botcap'); if(bot) bot.checked=false;
   $('#sim-price-v')&&($('#sim-price-v').textContent='0%');
   $('#sim-rain-v')&&($('#sim-rain-v').textContent='normal');
   $('#sim-gold-v')&&($('#sim-gold-v').textContent='0%');
   $('#sim-veh-v')&&($('#sim-veh-v').textContent='0%');
+  $('#sim-factory-v')&&($('#sim-factory-v').textContent='0%');
   computeSim();
 }
 // BASELINE verdict shown ABOVE the sliders so the simulator says something on load (no slider move needed).
@@ -1764,7 +1831,7 @@ function computeSim(){
     $('#sim-cards').innerHTML='';
     renderSimVerdict(null);
     $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it. The BoT rate-cap scenario below still works (it needs no data file).';
-    $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimCap(); return;
+    $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimFactory(); renderSimCap(); return;
   }
   const brn=simBranchByProv();
   const {price,rain}=simState;
@@ -1856,6 +1923,7 @@ function computeSim(){
     }
   }
   renderSimCollat();
+  renderSimFactory();
 }
 // collateral recovery-value DIRECTION from the gold + used-vehicle sliders (illustrative, no balances).
 function renderSimCollat(){
