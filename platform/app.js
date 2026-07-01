@@ -1235,6 +1235,77 @@ function attachAmpToBranches(){
   for(let i=0;i<DATA.length;i++){ DATA[i]._amp = AMP[BAMP[i]] || null; }
   ampJoinAttached=true;
 }
+
+/* ---------- district (amphoe) CHOROPLETH polygons (National map) ----------
+   Lazy-loads data/amphoe_geo.json — the SIMPLIFIED 928 amphoe boundary polygons
+   (pipeline/build_amphoe_geo.py, Douglas–Peucker of th_amphoe.geojson, ~1.3MB). Each
+   feature carries only properties.id (== amphoe.json id == shapeID). We paint them as a
+   Leaflet choropleth UNDER the branch dots when a district lens (dws/drisk) is active,
+   colouring each polygon by lensColor() of its lens value. Fully optional + null-safe:
+   if the file is absent or fails to load the map behaves exactly as today (dots only). */
+let AGEO=null, ageoLoaded=false, ageoPromise=null, ampById=null, ampChoroLayer=null;
+function loadAmphoeGeo(){
+  if(ageoPromise) return ageoPromise;
+  ageoLoaded=true;
+  ageoPromise=(async()=>{
+    try{
+      const j=await fetch('data/amphoe_geo.json').then(r=>r.ok?r.json():null);
+      AGEO=(j&&Array.isArray(j.features))?j.features:null;
+    }catch(e){ AGEO=null; }
+    return AGEO;
+  })();
+  return ageoPromise;
+}
+// id -> amphoe record lookup, built once from AMP (the scored districts).
+function ampIndex(){
+  if(ampById||!AMP) return ampById;
+  ampById={}; for(const a of AMP){ if(a&&a.id!=null) ampById[a.id]=a; }
+  return ampById;
+}
+// add / refresh / remove the choropleth to match the active lens. Idempotent + guarded:
+// requires the map, the polygon file (AGEO) and the scored records (AMP). On a non-district
+// lens it simply removes the layer, so branch lenses look exactly as before.
+function drawAmphoeChoropleth(){
+  if(!mapReady||!map||typeof L==='undefined'||!L.geoJSON) return;
+  const on=(curLens==='dws'||curLens==='drisk');
+  if(!on||!AGEO||!AMP){
+    if(ampChoroLayer){ map.removeLayer(ampChoroLayer); ampChoroLayer=null; }
+    return;
+  }
+  const l=LENS[curLens], idx=ampIndex();
+  if(!l||!idx) return;
+  // colour scale: max lens value across the SCORED districts (not the polygons) so the
+  // ramp matches the dot legend. sqrt easing to match styleMarkers().
+  const mx=Math.max(1,...AMP.map(a=>{ const v=l.val({_amp:a}); return (typeof v==='number'&&isFinite(v))?v:0; }));
+  // rebuild fresh each time the lens changes (cheap; 928 light polygons, canvas-rendered)
+  if(ampChoroLayer){ map.removeLayer(ampChoroLayer); ampChoroLayer=null; }
+  const renderer=L.canvas({padding:0.5});
+  ampChoroLayer=L.geoJSON({type:'FeatureCollection',features:AGEO},{
+    renderer,
+    style:f=>{
+      const a=idx[f.properties&&f.properties.id];
+      const v=a?l.val({_amp:a}):0;
+      const t=Math.max(0,Math.min(1,(typeof v==='number'&&isFinite(v)?v:0)/mx));
+      return {fillColor:lensColor(Math.sqrt(t),l.color), fillOpacity:0.5,
+              color:'rgba(20,26,34,.28)', weight:0.4, interactive:true};
+    },
+    onEachFeature:(f,layer)=>{
+      const a=idx[f.properties&&f.properties.id]; if(!a) return;
+      const v=l.val({_amp:a});
+      const nm=a.name_measured?`${a.name} <span class="sub">${a.name_en||''}</span>`:(a.name_en||a.name||'');
+      const unit=l.unit||'';
+      const vtxt=(typeof v==='number'&&isFinite(v))?Math.round(v):'n/a';
+      layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${l.color}">◇ ${nm}</div>`+
+        `<div class="pv">${a.province_th||''}${a.region?' · '+a.region:''}</div>`+
+        `<div class="sub" style="margin-top:4px"><b style="color:${l.color}">${vtxt}</b> ${unit}</div>`+
+        `<div class="sub">AutoX branches inside: ${a.branches!=null?a.branches:'n/a'}</div></div>`,
+        {closeButton:true,maxWidth:260});
+    }
+  });
+  ampChoroLayer.addTo(map);
+  // keep the choropleth BENEATH the branch dots (canvas markers) so dots stay clickable on top.
+  if(ampChoroLayer.bringToBack) ampChoroLayer.bringToBack();
+}
 function ampChips(id,cur,onPick){
   const box=$(id); if(!box||box.dataset.init) return;
   const regions=['all',...Array.from(new Set(AMP.map(a=>a.region)))];
@@ -2319,6 +2390,9 @@ function initMap(){
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
   if(!ampJoinAttached) loadAmphoe().then(()=>{ if(mapReady){ renderLegend(); styleMarkers(); } });
+  // warm the simplified amphoe polygons so the district lenses can paint the choropleth. Optional
+  // + null-safe: absent/failed file leaves AGEO null and drawAmphoeChoropleth() is a no-op (dots only).
+  if(!ageoLoaded) loadAmphoeGeo().then(()=>{ if(mapReady) drawAmphoeChoropleth(); });
   // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
   // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
   if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
@@ -2569,6 +2643,9 @@ function styleMarkers(){
     const v=l.val(m._d), t=v/mx;
     m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7});
   });
+  // paint (or clear) the district choropleth to match the active lens — null-safe no-op
+  // on a branch lens or when the polygon file is absent.
+  drawAmphoeChoropleth();
 }
 function setLens(k){
   curLens=k;
@@ -2596,6 +2673,9 @@ function setLens(k){
   }
   if((k==='dws'||k==='drisk') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if((k==='dws'||k==='drisk') && !ageoLoaded){
+    loadAmphoeGeo().then(()=>{ if((curLens==='dws'||curLens==='drisk')&&mapReady) drawAmphoeChoropleth(); });
   }
   if(k==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'){ renderLegend(); if(mapReady){ drawCompPoints(); styleMarkers(); } } });

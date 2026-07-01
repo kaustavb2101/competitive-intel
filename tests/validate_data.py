@@ -287,6 +287,90 @@ def check_amphoe(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_amphoe_geo(amphoe):
+    """amphoe_geo.json — the simplified boundary polygons for the National choropleth.
+    OPTIONAL layer (the map degrades to dots without it), so absence is a PASS. When
+    present it must be a valid FeatureCollection, carry provenance, and every polygon
+    must join to an amphoe.json record on properties.id."""
+    hdr("amphoe_geo.json")
+    path = os.path.join(DATA, "amphoe_geo.json")
+    if not os.path.exists(path):
+        ok("amphoe_geo.json absent (optional map layer) — skipped")
+        return
+    try:
+        g = load("amphoe_geo.json")
+    except Exception as e:
+        fail("amphoe_geo.json loads", repr(e))
+        return
+    ok("amphoe_geo.json loads")
+
+    if g.get("type") == "FeatureCollection" and isinstance(g.get("features"), list):
+        ok("amphoe_geo is a FeatureCollection with features[]")
+    else:
+        fail("amphoe_geo is a FeatureCollection with features[]", "bad top-level shape")
+        return
+    feats = g["features"]
+
+    # provenance: meta must state the source + the simplified/geometry-only label (data-mandate:
+    # this is MEASURED boundaries, decimated — no fabricated attributes).
+    meta = g.get("meta", {})
+    if meta.get("generated_by") and meta.get("source") and meta.get("label"):
+        ok("amphoe_geo meta/provenance present (generated_by + source + label)")
+    else:
+        fail("amphoe_geo meta/provenance present (generated_by + source + label)",
+             "meta missing generated_by/source/label")
+
+    # geometry sanity: every feature is a Polygon/MultiPolygon with a valid closed outer ring,
+    # all coords inside the Thailand bbox.
+    bad_geom = []
+    oob = 0
+    for i, f in enumerate(feats):
+        geom = (f or {}).get("geometry") or {}
+        t = geom.get("type")
+        coords = geom.get("coordinates")
+        if t not in ("Polygon", "MultiPolygon") or not isinstance(coords, list):
+            bad_geom.append("#%d type=%r" % (i, t)); continue
+        polys = coords if t == "MultiPolygon" else [coords]
+        okgeom = True
+        for poly in polys:
+            if not poly or not isinstance(poly[0], list) or len(poly[0]) < 4:
+                okgeom = False; break
+            ring = poly[0]
+            if ring[0] != ring[-1]:
+                okgeom = False; break
+            for pt in ring:
+                lng, lat = pt[0], pt[1]
+                if not (TH_LNG_MIN <= lng <= TH_LNG_MAX and TH_LAT_MIN <= lat <= TH_LAT_MAX):
+                    oob += 1
+        if not okgeom:
+            bad_geom.append("#%d bad/short/open ring" % i)
+    if bad_geom:
+        fail("amphoe_geo every feature has a valid closed outer ring", first_n(bad_geom))
+    else:
+        ok("amphoe_geo every feature has a valid closed outer ring")
+    if oob == 0:
+        ok("amphoe_geo all vertices inside Thailand bbox")
+    else:
+        fail("amphoe_geo all vertices inside Thailand bbox", "%d out-of-bbox vertices" % oob)
+
+    # join: every polygon id must resolve to an amphoe.json record (1:1 map — the choropleth
+    # colours each polygon by its amphoe lens value).
+    gids = [((f or {}).get("properties") or {}).get("id") for f in feats]
+    if all(isinstance(i, str) and i for i in gids):
+        ok("amphoe_geo every feature carries a string properties.id")
+    else:
+        fail("amphoe_geo every feature carries a string properties.id",
+             "some features missing id")
+    if amphoe and isinstance(amphoe.get("amphoe"), list):
+        aids = {r.get("id") for r in amphoe["amphoe"]}
+        unmatched = [i for i in gids if i not in aids]
+        if unmatched:
+            fail("amphoe_geo ids all join to amphoe.json", first_n(unmatched))
+        else:
+            ok("amphoe_geo ids all join to amphoe.json (%d polygons)" % len(gids))
+
+
+# ---------------------------------------------------------------------------
 def check_provinces(n_branches):
     hdr("provinces/")
     try:
@@ -1713,6 +1797,7 @@ def main():
     branches = check_branches()
     n = len(branches) if branches is not None else None
     amphoe = check_amphoe(n)
+    check_amphoe_geo(amphoe)
     check_provinces(n)
     check_crop_stress()
     check_collateral_outlook()
