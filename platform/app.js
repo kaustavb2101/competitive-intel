@@ -573,13 +573,12 @@ function renderOverview(){
    borrower-credit signal. Clearly dated and labelled editorial. */
 function renderBotCap(){
   const el=$('#botcap'); if(!el) return;
-  el.innerHTML=`<b>Bank of Thailand hire-purchase rate/fee cap</b> on car &amp; motorcycle lending —
-    effective <b>~Dec 2025</b>. Ceiling on interest + fees compresses yields across the auto &amp;
-    motorcycle hire-purchase sector, a <b>margin watch</b> for lenders. AutoX's core is
-    <b>title loans</b> (not hire-purchase), so the direct hit is limited — but it signals a
-    <b>tightening regulatory posture</b> on vehicle-secured consumer credit and caps pricing
-    headroom across the segment.
-    <span class="sub" style="display:block;margin-top:6px">Editorial / regulatory · no precise rate stated · dated ~Dec 2025 · sector-margin item, not a portfolio-credit signal.</span>`;
+  // Lead with a one-line verdict; tuck the reasoning into a method expander (scannable, caveats kept).
+  el.innerHTML=`<div class="verdict-line"><b>BoT hire-purchase rate/fee cap</b> — effective <b>~Dec 2025</b>. A sector <b>margin</b> watch, not a portfolio-credit signal.</div>`+
+    `<div class="sub" style="margin-top:4px">AutoX core is <b>title loans</b> (not hire-purchase) — direct hit limited. <span class="sub">Editorial / regulatory · no precise rate stated</span></div>`+
+    `<details class="method"><summary>Why it still matters</summary><div class="mb">`+
+    `Ceiling on interest + fees compresses yields across the auto &amp; motorcycle hire-purchase sector, and signals a <b>tightening regulatory posture</b> on vehicle-secured consumer credit — capping pricing headroom across the segment.`+
+    `</div></details>`;
 }
 
 /* ---------- Collateral outlook board (objective #1, portfolio risk) ----------

@@ -119,7 +119,7 @@ main{padding-top:56px}
   --line2:#202A40;       /* quiet in-card divider */
 
   /* ---- text contrast tiers (AA on every surface) ---- */
-  --hi:#F1F4FA; --txt:#CDD5E4; --mid:#97A2B9; --dim:#7B879F;
+  --hi:#F1F4FA; --txt:#D2DAE8; --mid:#A6B0C4; --dim:#909CB2;  /* lifted muted text one step toward white — the low-contrast grey read "internal tool" */
 
   /* ---- accent + segment data-ink (one canonical set) ---- */
   --accent:#5B7CFA;
@@ -306,6 +306,15 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .cols2{display:flex;gap:var(--s5);flex-wrap:wrap}
 .cols2>div{flex:1;min-width:300px}
 @media(min-width:900px){.cols2{gap:var(--s5)}.cols2>div{min-width:360px}}
+/* Overview: fixed calm macro/regulatory rail, let the two commodity tables claim the widescreen
+   (removes the dead right-gutter and finishes the columns closer). */
+@media(min-width:900px){#v-overview .cols2>div:first-child{flex:0 1 340px}#v-overview .cols2>div:last-child{flex:2 1 520px}}
+/* Exposure KPI cards: sentence-case labels (read faster than tracked caps here), one reserved label
+   height, and the big number pinned to a shared baseline so the 2x2 row scans as one set. */
+#expocards .mcard{display:flex;flex-direction:column}
+#expocards .mcard .k{text-transform:none;letter-spacing:.2px;min-height:2.5em;line-height:1.3}
+#expocards .mcard .v{margin-top:auto}
+#expocards .mcard .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
 /* ---------- provenance + status tags ---------- */
 .tag{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;
@@ -547,6 +556,9 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 .cc-actions{display:flex;gap:8px;flex:none}
 .cc-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:8px}
 @media(max-width:340px){.cc-grid{grid-template-columns:1fr}}
+/* Home focal hierarchy: on wide screens the two standing-objective cards own row 1, macro+movers
+   sit on row 2 (supporting) — a clear primary->secondary read instead of four competing peers. */
+@media(min-width:1000px){.cc-grid{grid-template-columns:1fr 1fr}}
 .cc-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
 .cc-card-wide{grid-column:1/-1}
 .cc-card-h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--hi);
@@ -587,7 +599,7 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
   font-size:10.5px;font-weight:600;letter-spacing:.3px;color:#1a1305;text-shadow:0 0 4px rgba(255,255,255,.4)}
 @media(max-width:640px){.cc-thesis-bar{flex-basis:100%}}
 .cc-hero{display:grid;gap:var(--s3,14px);grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
-  margin:var(--s3,14px) 0 var(--s2,8px)}
+  margin:var(--s3,14px) 0 var(--s5,32px)}  /* more air below the hero so the card strip reads as a new section, not crowded against it */
 .cc-hero:empty{display:none}
 .cc-hero-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;
   background:linear-gradient(180deg,var(--raised,#232E45),var(--panel,#1A2233));
