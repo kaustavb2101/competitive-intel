@@ -92,6 +92,9 @@ html[data-theme="light"] #vignette{
 .ctl .bl .bl-cap{font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt)}
 .ctl .bl .bl-acc{display:flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt)}
 .ctl .bl .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+/* data-provenance line: which building source is live (Overture catchment vs live-OSM Overpass) */
+.ctl .bl .bl-src{font:500 9px 'IBM Plex Mono';color:var(--dim);letter-spacing:.2px}
+html[data-theme="light"] .ctl .bl .bl-src{color:#828CA0}
 html[data-theme="light"] .ctl .bl .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
 /* compact POI legend: lender-relevant categories, colour swatch + label + live count; collateral &
    finance grouped at the top. Scrolls if many types are present so it never overgrows the panel. */
@@ -245,8 +248,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
   <a href="index.html#acq">Acquire</a>
   <a href="index.html#exposure">Exposure</a>
   <a href="index.html#trend">Trend</a>
-  <a href="rayong-catchment.html">Rayong 3D</a>
-  <a href="rayong-catchment.html?city=bangkok">Bangkok 3D</a>
+  <a href="index.html#provinces">3D map</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
@@ -306,6 +308,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
     <div class="bl">
       <div class="bl-ramp"><span class="bl-cap">low</span><span class="bl-bar" title="building height: low → tall"></span><span class="bl-cap">tall</span></div>
       <div class="bl-acc"><span class="sw" style="background:rgb(91,124,250)"></span>landmark (tallest)</div>
+      <div class="bl-src" id="bsrc" title="Where the extruded footprints come from">buildings: —</div>
     </div>
   </div>
   <div class="grp">
@@ -406,6 +409,66 @@ async function loadTilesConfig(){
   try{ const r=await fetch('data/tiles_config.json'); if(r.ok) TILECFG=await r.json(); }
   catch(e){ TILECFG=null; }
   return TILECFG;
+}
+// ---- PREFERRED building source: the province's Overture catchment (MEASURED footprints) ---------
+// The 77 per-province <slug>_catchment.json pulls (real Overture buildings, baked h/fa/cx/cy) beat
+// the live Overpass pull: no network flakiness, whole-perimeter coverage, measured heights. Flow:
+//   1. resolve the branch's province by point-in-bbox over data/province_bbox.json
+//      (province bboxes OVERLAP — the smallest-area hit wins);
+//   2. fetch data/<slug>_catchment.json locally, else <catchments.baseUrl>/<slug>_catchment.json
+//      (operator R2 CDN — same local→CDN pattern as rayong-catchment.html);
+//   3. filter its buildings to the 10km bbox around the BRANCH (cx/cy centroids) and hand them to
+//      the SAME PolygonLayer the Overpass path feeds ({p,h,fa} is a superset match).
+// The catchment is fetched ONCE per page (catchPromise) so panning never refetches; <50 buildings
+// in the perimeter, or ANY failure, falls back to the live-Overpass path below UNCHANGED. Nothing
+// is fabricated — a miss degrades to the existing behaviour.
+let catchPerim=null;     // filtered perimeter buildings; false after a definitive miss
+let catchPromise=null;   // in-flight resolve+fetch+filter, shared by concurrent callers
+let catchProv=null;      // resolved province slug (for the status line)
+function setBldgSource(s){ // 'catchment' | 'osm' | '' -> the provenance line in the Buildings legend
+  const el=document.getElementById('bsrc'); if(!el)return;
+  el.textContent=s==='catchment'?'buildings: Overture catchment (measured)'
+    :s==='osm'?'buildings: OSM live (Overpass)':'buildings: —';
+}
+async function resolveProvinceSlug(){
+  try{
+    const r=await fetch('data/province_bbox.json'); if(!r.ok)return null;
+    const j=await r.json(); const provs=(j&&j.provinces)||{};
+    let best=null,bestA=Infinity;
+    for(const slug in provs){
+      const bb=provs[slug]&&provs[slug].bbox; if(!bb||bb.length!==4)continue;
+      const S=bb[0],W=bb[1],N=bb[2],E=bb[3];             // [S,W,N,E]
+      if(LAT<S||LAT>N||LNG<W||LNG>E)continue;
+      const a=(N-S)*(E-W); if(a<bestA){bestA=a;best=slug;}  // overlapping boxes: smallest wins
+    }
+    return best;
+  }catch(e){ return null; }
+}
+async function fetchCatchment(slug){
+  try{ const r=await fetch('data/'+slug+'_catchment.json'); if(r.ok)return await r.json(); }catch(e){}
+  try{
+    const cfg=await loadTilesConfig();
+    let base=cfg&&cfg.catchments&&cfg.catchments.baseUrl; if(!base)return null;
+    base=String(base).replace(/\/+$/,'');
+    const r=await fetch(base+'/'+slug+'_catchment.json'); if(r.ok)return await r.json();
+  }catch(e){}
+  return null;
+}
+function loadCatchmentPerimeter(){
+  if(catchPerim===false)return Promise.resolve(null);   // known miss -> straight to Overpass
+  if(catchPerim)return Promise.resolve(catchPerim);
+  if(!catchPromise)catchPromise=(async()=>{
+    catchProv=await resolveProvinceSlug(); if(!catchProv)return null;
+    const ca=await fetchCatchment(catchProv);
+    if(!ca||!Array.isArray(ca.buildings))return null;
+    const dLat=10/111, dLng=10/(111*Math.cos(LAT*D2R));  // 10km bbox around the branch
+    const S=LAT-dLat,N=LAT+dLat,W=LNG-dLng,E=LNG+dLng;
+    const out=[];
+    for(const b of ca.buildings){ if(b&&b.cy>=S&&b.cy<=N&&b.cx>=W&&b.cx<=E)out.push(b); }
+    return out.length>=50?out:null;                      // too sparse here -> let Overpass try
+  })().then(out=>{ catchPerim=out||false; return out; },
+            ()=>{ catchPerim=false; return null; });
+  return catchPromise;
 }
 // MVTLayer of streamed buildings, styled to match (lighting-capped material -> no white blow-out).
 // Returns null unless an mvtUrl is configured and the bundle has MVTLayer -> graceful fallback.
@@ -696,12 +759,26 @@ async function overpass(q){
 }
 async function loadBuildings(){
   if(isNaN(LAT)) return;
+  // PREFERRED: the province's Overture catchment (measured footprints, local file → operator CDN),
+  // filtered once to the 10km branch perimeter and cached in-page — panning never refetches. Any
+  // miss (no bbox match / no file / <50 buildings here) falls through to live Overpass unchanged.
+  try{
+    const cb=await loadCatchmentPerimeter();
+    if(cb&&cb.length){
+      const fresh=(buildings!==cb);
+      buildings=cb; if(fresh)render();
+      setBldgSource('catchment');
+      status(`${fmt(cb.length)} buildings · Overture catchment (measured)`);
+      clearTimeout(window._statusT); window._statusT=setTimeout(()=>status(''),3200);
+      return;
+    }
+  }catch(e){ /* never let the preferred path break the fallback */ }
   const b=viewBounds();              // [W,S,E,N]
   const W=b[0],S=b[1],E=b[2],N=b[3];
   // guard: only fetch when the box is small enough to be sane (≈ <6km across)
   if((N-S)>0.08 || (E-W)>0.08){ status('Zoom in to load buildings (area too large)'); return; }
   const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');     // bbox cache so panning doesn't refetch
-  if(tileCache[ckey]){ buildings=tileCache[ckey]; render(); status(`${fmt(buildings.length)} buildings in view`); return; }
+  if(tileCache[ckey]){ buildings=tileCache[ckey]; render(); setBldgSource('osm'); status(`${fmt(buildings.length)} buildings in view`); return; }
   status('Loading buildings…');
   const q=`[out:json][timeout:25];(way["building"](${S},${W},${N},${E}););out body geom 7000;`;
   try{
@@ -719,8 +796,9 @@ async function loadBuildings(){
     }
     buildings=out; tileCache[ckey]=out; render();
     if(out.length){
+      setBldgSource('osm');
       // success: show the count briefly, then clear so no chip lingers over the scene.
-      status(`${fmt(out.length)} buildings · heights estimated from type + footprint`);
+      status(`${fmt(out.length)} buildings · OSM live · heights estimated from type + footprint`);
       clearTimeout(window._statusT); window._statusT=setTimeout(()=>status(''),3200);
     }else{
       status('No OSM buildings mapped here (rural / factory zone)', 'info');
@@ -948,7 +1026,7 @@ async function loadPanel(){
        <div class="note">Establishments mapped in OpenStreetMap within 10 km of this branch — measured, not estimated.</div>
        <h3>Who works nearby</h3>
        ${workhtml}
-       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings + coloured POI columns = live OpenStreetMap (measured) when reachable; building heights estimated from type + footprint. Rings = 3 / 5 / 10 km.</div>`;
+       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings = the province's Overture catchment (measured) when available, else live OpenStreetMap with heights estimated from type + footprint — the Buildings legend says which source is live. Coloured POI columns = live OSM (measured) when reachable. Rings = 3 / 5 / 10 km.</div>`;
   }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
 }
 
@@ -964,7 +1042,7 @@ function init(){
     onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
     getTooltip:({object,layer})=>{
       if(!object)return null;
-      if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · est. from footprint</div>`};
+      if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · ${(catchPerim&&buildings===catchPerim)?'Overture catchment (measured)':'est. from footprint'}</div>`};
       if(layer&&layer.id==='poi'){const lab=(POI_LABEL[object.t]||object.t);return {html:`<div class="dtt"><b>${lab}</b><br>live OSM POI · measured</div>`};}
       return null;},
     onViewStateChange:({viewState,interactionState})=>{

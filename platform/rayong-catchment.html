@@ -355,8 +355,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   <a href="index.html#acq">Acquire</a>
   <a href="index.html#exposure">Exposure</a>
   <a href="index.html#trend">Trend</a>
-  <a href="rayong-catchment.html" class="on" id="navRayong">Rayong 3D</a>
-  <a href="rayong-catchment.html?city=bangkok" id="navBangkok">Bangkok 3D</a>
+  <a href="rayong-catchment.html" class="on" id="nav3d">3D map</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
@@ -490,9 +489,8 @@ if(CITY!=='rayong'){
   if(ct)ct.innerHTML=CITY_LABEL+' 3D <b>·</b> branches · POIs · 10km reach';
   const cs=document.getElementById('ctlScene'); if(cs)cs.textContent=CITY_LABEL+' 3D';
   try{document.title=CITY_LABEL+' 3D · เงินไชโย';}catch(e){}
-  // move the active-nav highlight off Rayong onto the matching city link (Bangkok), if present.
-  try{const nr=document.getElementById('navRayong');if(nr)nr.classList.remove('on');
-    const nb=document.getElementById('nav'+CITY.charAt(0).toUpperCase()+CITY.slice(1));if(nb)nb.classList.add('on');}catch(e){}
+  // The nav carries ONE "3D map" self-link (#nav3d) that stays highlighted for EVERY city —
+  // the strip/ctl city label above already says which province is open, so nothing to juggle.
 }
 const PROV=window.PROV||{};
 const IDX=window.PROV_INDEX||null;
