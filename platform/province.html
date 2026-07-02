@@ -733,6 +733,7 @@ function fmt(n){return (n==null?0:n).toLocaleString();}
 function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 
 const EMP=(RY.gov&&RY.gov.employment)||null;
+const UNEMP=(RY.gov&&RY.gov.unemployment&&RY.gov.unemployment.unemployment_rate!=null)?RY.gov.unemployment:null;
 function districtWorkers(d){
   if(!DISTRICTS||!DISTRICTS.features)return null;
   const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
@@ -802,6 +803,7 @@ function updatePanels(){
       +`<div class="wr"><span class="k">Formal workers</span><span class="v">${fmt(frm)}</span></div>`;
     const dw=districtWorkers(dist);
     if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
+    if(UNEMP)html+=`<div class="wr"><span class="k">Unemployment rate <small>(province, NSO LFS)</small></span><span class="v">${UNEMP.unemployment_rate}%</span></div>`;
     html+='</div>';
   }
   if(k){
