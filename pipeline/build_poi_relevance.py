@@ -71,13 +71,23 @@ OUT = os.path.join(DATA, "poi_relevance.json")
 #   vehicle   1.4  COLLATERAL supply: car/motorbike dealers & mechanics = where
 #                  pledgeable vehicles concentrate (AutoX's core book is vehicles).
 #   fresh_mkt 1.1  DEMAND: wet-market vendors are the canonical informal-cash,
-#                  thin-file borrower who can't get a bank loan.
+#                  thin-file borrower who can't get a bank loan. OSM fmkt ONLY —
+#                  the Overture `retail` bucket is EVERY shop type, not fresh
+#                  markets, so mapping it here would inflate the count ~100x
+#                  (that broad signal is scored separately as retail_general).
 #   agri      1.0  DEMAND: farm households — seasonal cash gaps, title-loan heavy
 #                  (objective #1's stressed segment).
 #   factory   0.9  DEMAND: wage earners with lumpy needs; industrial estates anchor
 #                  a working-class borrower base.
-#   commerce  0.6  DEMAND/footfall: convenience+supermarket+food service = general
-#                  retail vibrancy; weaker, broader proxy for spendable households.
+#   commerce  0.6  DEMAND/footfall: convenience+supermarket = general retail
+#                  vibrancy; weaker, broader proxy for spendable households.
+#   retail_general 0.5  DEMAND/footfall: the WHOLE Overture retail bucket (every
+#                  shop type). Broad and undiscriminating, so it carries a LOW
+#                  weight — it must never masquerade as the fresh-market signal.
+#   food_service   0.5  DEMAND/footfall: restaurants / street-food (OSM rest,
+#                  Overture food). Informal food operators are real title-loan
+#                  demand but the bucket is broad, so it is down-weighted and
+#                  scored on its own instead of being folded into commerce.
 #   school    0.4  DEMAND: schools proxy HOUSEHOLD FORMATION / family expenses
 #                  (fees, uniforms) — a softer borrowing trigger.
 # Finance/pawn establishments are deliberately EXCLUDED from the demand score:
@@ -86,13 +96,15 @@ OUT = os.path.join(DATA, "poi_relevance.json")
 # construction are NOT title-loan-relevant and contribute 0.
 CATEGORIES = [
     # name        weight  k10 keys (summed, MEASURED OSM)   overture bucket keys (summed, MEASURED)
-    ("gold",      1.5, ["gold"],             []),            # gold: OSM only (no Overture gold bucket)
-    ("vehicle",   1.4, ["veh"],              ["auto"]),
-    ("fresh_mkt", 1.1, ["fmkt"],             ["retail"]),
-    ("agri",      1.0, [],                    ["agriculture"]),
-    ("factory",   0.9, ["ind"],              ["factory"]),
-    ("commerce",  0.6, ["cvs", "super"],     ["food"]),
-    ("school",    0.4, ["sch"],              ["education"]),
+    ("gold",           1.5, ["gold"],         []),            # gold: OSM only (no Overture gold bucket)
+    ("vehicle",        1.4, ["veh"],          ["auto"]),
+    ("fresh_mkt",      1.1, ["fmkt"],         []),            # OSM fmkt ONLY — honest measured fresh-market count
+    ("agri",           1.0, [],               ["agriculture"]),
+    ("factory",        0.9, ["ind"],          ["factory"]),
+    ("commerce",       0.6, ["cvs", "super"], []),            # cvs+super ONLY (food scored as food_service)
+    ("retail_general", 0.5, [],               ["retail"]),    # whole Overture retail bucket — broad, LOW weight
+    ("food_service",   0.5, ["rest"],         ["food"]),      # restaurants / street food — broad, LOW weight
+    ("school",         0.4, ["sch"],          ["education"]),
 ]
 
 WEIGHTS = {name: w for (name, w, _k, _o) in CATEGORIES}
@@ -197,10 +209,18 @@ def build():
             "weight_rationale": {
                 "gold": "collateral + pawn-adjacent culture; strongest title/pawn co-location signal",
                 "vehicle": "collateral supply (vehicle dealers/mechanics) — AutoX's core book",
-                "fresh_mkt": "informal cash, thin-file market vendors — canonical title borrower",
+                "fresh_mkt": "informal cash, thin-file market vendors — canonical title borrower; "
+                             "OSM fresh/wet-market count ONLY (the broad Overture retail bucket is "
+                             "scored separately as retail_general, not passed off as fresh markets)",
                 "agri": "farm households with seasonal cash gaps (objective #1 stressed segment)",
                 "factory": "wage earners / industrial-estate working-class borrower base",
-                "commerce": "convenience+supermarket+food footfall — broad household-spend proxy",
+                "commerce": "convenience+supermarket footfall — broad household-spend proxy",
+                "retail_general": "the WHOLE Overture retail bucket (every shop type) — broad, "
+                                  "undiscriminating footfall signal, so deliberately LOW-weighted "
+                                  "(0.5) vs the specific fresh-market and commerce signals",
+                "food_service": "restaurants / street food (OSM rest, Overture food) — informal "
+                                "food operators are real demand but the bucket is broad, so it is "
+                                "LOW-weighted (0.5) and kept separate from commerce",
                 "school": "household formation / family expenses — softer borrowing trigger",
                 "excluded": "finance & pawn = competitor supply (scored in competitor_coverage); "
                             "hospitality/health/public/professional/logistics/construction not relevant",
