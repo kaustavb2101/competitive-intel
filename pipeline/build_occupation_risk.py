@@ -44,8 +44,13 @@ FORMULA (per branch, all transparent)
                       where stress_weight[factory]      = FACTORY_STRESS (national, ESTIMATED)
                             stress_weight[agriculture]  = province agri_stress (ESTIMATED, varies)
   occ_risk          = round(100 · stressed_share)             (0..100 ESTIMATED index)
-  flag              = occ_risk >= FLAG_THRESHOLD AND t >= MIN_ESTAB
+  flag              = occ_risk >= p95(nonzero occ_risk) AND t >= MIN_ESTAB
                       (only flag branches with a real, concentrated, stressed base — not noise)
+  The flag threshold is the 95th percentile (nearest-rank) of the NONZERO score
+  distribution, resolved deterministically from the data itself at build time and
+  recorded in meta.flag_threshold. (A fixed absolute cutoff proved inert: the
+  achievable score ceiling — bounded by Overture factory/agriculture share ceilings ×
+  the stress weights — sat below it, so 0 of 2,015 branches could ever flag.)
 
 DETERMINISTIC + NETWORK-FREE
 ----------------------------
@@ -75,7 +80,7 @@ Usage:
   python3 build_occupation_risk.py --check    # verify byte-exact (skip-passes when the
                                               # MEASURED input is absent)
 """
-import argparse, json, os, sys
+import argparse, json, math, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -95,10 +100,26 @@ FACTORY_STRESS = 0.5     # 0..1 — "how stressed is the factory borrower base, 
 # crop-household stress (crop_stress.json agri_stress, 0..1). Branches in a province with no
 # crop_stress entry (e.g. Bueng Kan) get 0 agri stress (graceful).
 
-# Flag thresholds — a branch is flagged only when its occupation_risk is high AND its
-# catchment carries enough measured establishments to trust the share (not a 2-point fluke).
-FLAG_THRESHOLD = 25.0    # 0..100 occ_risk
+# Flag rule — a branch is flagged only when its occupation_risk sits in the TOP TAIL of the
+# achievable distribution AND its catchment carries enough measured establishments to trust the
+# share (not a 2-point fluke). The score ceiling is bounded by the Overture factory/agriculture
+# share ceilings × the stress weights (max observed ≈ 5.5/100), so any fixed absolute cutoff is
+# fragile — the threshold is therefore resolved from the data: the 95th percentile (nearest-rank,
+# deterministic) of the NONZERO scores. The resolved value is recorded in meta.flag_threshold.
+FLAG_PERCENTILE = 0.95   # p95 of the nonzero score distribution
 MIN_ESTAB = 20           # measured establishments ≤10km required to flag
+
+
+def _p95_nonzero(scores):
+    """Nearest-rank p95 of the nonzero scores — deterministic, no interpolation.
+
+    Returns None when the distribution is degenerate (no nonzero scores), in which
+    case nothing can be flagged (graceful: empty/absent catchments everywhere)."""
+    nz = sorted(s for s in scores if s > 0)
+    if not nz:
+        return None
+    k = math.ceil(FLAG_PERCENTILE * len(nz)) - 1  # nearest-rank index (0-based)
+    return nz[max(0, min(k, len(nz) - 1))]
 
 # Stable bucket keys we attach a stress weight to. agriculture is province-resolved.
 STRESS_BUCKETS = ("factory", "agriculture")
@@ -129,8 +150,9 @@ def build():
     factory_i = bkeys.index("factory") if "factory" in bkeys else -1
     agri_i = bkeys.index("agriculture") if "agriculture" in bkeys else -1
 
+    # PASS 1 — compute every branch's score (the threshold is resolved from the full
+    # distribution, so flags can only be assigned once all scores exist).
     out = []
-    n_flagged = 0
     for i, b in enumerate(branches):
         e = recs[i] if i < len(recs) else None
         t = (e.get("t") if isinstance(e, dict) else 0) or 0
@@ -154,16 +176,23 @@ def build():
             dom_share = 0.0
 
         score = round(100.0 * stressed_share, 1)
-        flag = bool(score >= FLAG_THRESHOLD and t >= MIN_ESTAB)
-        if flag:
-            n_flagged += 1
         out.append({
             "s": score,
-            "f": flag,
+            "f": False,  # resolved in pass 2 (needs the full score distribution)
             "d": dom_key,
             "ds": round(dom_share, 3),
             "t": t,
         })
+
+    # PASS 2 — resolve the flag threshold from the data (p95 of the NONZERO scores,
+    # nearest-rank, deterministic) and assign flags. None ⇒ degenerate ⇒ nothing flags.
+    flag_threshold = _p95_nonzero(r["s"] for r in out)
+    n_flagged = 0
+    for r in out:
+        r["f"] = bool(flag_threshold is not None
+                      and r["s"] >= flag_threshold and r["t"] >= MIN_ESTAB)
+        if r["f"]:
+            n_flagged += 1
 
     meta = {
         "generated_with": "pipeline/build_occupation_risk.py",
@@ -187,9 +216,14 @@ def build():
                                  "as stressed).",
         },
         "formula": "occ_risk = 100 * sum_k share_k * stress_weight_k  (k in {factory, agriculture}); "
-                   "flag = occ_risk >= %.0f AND total_estab >= %d." % (FLAG_THRESHOLD, MIN_ESTAB),
+                   "flag = occ_risk >= p95(nonzero occ_risk) AND total_estab >= %d." % MIN_ESTAB,
         "factory_stress": FACTORY_STRESS,
-        "flag_threshold": FLAG_THRESHOLD,
+        "flag_threshold": flag_threshold,
+        "flag_threshold_rule": "p95 (nearest-rank) of the NONZERO score distribution, resolved "
+                               "deterministically from the data at build time — a fixed absolute "
+                               "cutoff sat above the achievable score ceiling and flagged nothing. "
+                               "null when the distribution is degenerate (no nonzero scores).",
+        "flag_percentile": FLAG_PERCENTILE,
         "min_estab": MIN_ESTAB,
         "source_occupations": occ.get("meta", {}).get("source", "Overture Maps Places"),
         "n_branches": len(out),
@@ -198,7 +232,8 @@ def build():
                       "branch i), identical to branch_occupations.json.",
         "fields": {
             "s": "ESTIMATED occupation-stress score 0..100 (measured shares x estimated weights).",
-            "f": "flag — true when s >= flag_threshold AND total establishments >= min_estab.",
+            "f": "flag — true when s >= flag_threshold (the resolved p95 of the nonzero score "
+                 "distribution) AND total establishments >= min_estab.",
             "d": "MEASURED dominant occupation bucket key for the branch's ≤10km catchment (or null).",
             "ds": "MEASURED dominant-bucket share 0..1.",
             "t": "MEASURED total establishments ≤10km (the denominator; 0 = empty/unknown catchment).",
@@ -250,8 +285,10 @@ def main():
     m = obj["meta"]
     kb = os.path.getsize(OUT) / 1024.0
     print(f"wrote {OUT}  ({kb:.1f} KB)")
+    thr = m["flag_threshold"]
+    thr_s = "n/a (degenerate distribution)" if thr is None else f"{thr} (p95 of nonzero scores)"
     print(f"  {m['n_flagged']}/{m['n_branches']} branches flagged "
-          f"(occ_risk >= {int(m['flag_threshold'])} & >= {m['min_estab']} estab ≤10km)")
+          f"(occ_risk >= {thr_s} & >= {m['min_estab']} estab ≤10km)")
 
 
 if __name__ == "__main__":
