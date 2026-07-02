@@ -2037,6 +2037,88 @@ def check_macro_exposure(n_branches):
             ok("macro_exposure vector index-aligned + sane (%d entries)" % len(vec))
 
 
+def check_lead_sites(n_branches):
+    # LEAD-SITE PINS per branch (objective #2, local): MEASURED OSM coordinates of the K
+    # nearest lead-relevant establishments within 10km of each branch, index-aligned to
+    # branches.json, compact [cat_idx, lng, lat, dist_km] arrays + a categories[] legend.
+    # Optional file: SKIP-PASS when absent (run build_lead_sites.py to populate).
+    hdr("lead_sites.json (optional)")
+    if not exists("lead_sites.json"):
+        ok("lead_sites.json absent — skipped (optional; run build_lead_sites.py to populate)")
+        return
+    try:
+        d = load("lead_sites.json")
+    except Exception as e:
+        fail("lead_sites.json loads", repr(e))
+        return
+    ok("lead_sites.json loads")
+
+    # provenance: builder + label + a categories legend (the cat_idx space) + K + radius.
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("categories"), list) or not meta["categories"] \
+            or not isinstance(meta.get("k"), int) or not is_finite_number(meta.get("radius_km")):
+        fail("lead_sites meta/provenance present (generated_by + label + categories + k + radius_km)",
+             "meta missing generated_by/label/categories/k/radius_km")
+        return
+    ok("lead_sites meta/provenance present (generated_by + measured-coordinates label + legend)")
+
+    cats = meta["categories"]
+    bad_cat = [i for i, c in enumerate(cats)
+               if not (isinstance(c, dict) and c.get("k") and c.get("label") and c.get("osm_layer"))]
+    if bad_cat:
+        fail("lead_sites categories legend entries carry k/label/osm_layer", "bad at " + first_n(bad_cat))
+    else:
+        ok("lead_sites categories legend sane (%d categories)" % len(cats))
+    n_cats = len(cats)
+    k_max = meta["k"]
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("lead_sites has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+    # length must equal branches.json (INDEX-ALIGNED — a drift misaligns every pin-drop).
+    if n_branches is not None and len(recs) != n_branches:
+        fail("lead_sites length == branches.json length",
+             "lead_sites=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("lead_sites length == branches.json length (%d)" % len(recs))
+
+    # per-site: [cat_idx, lng, lat, dist_km] — cat_idx valid, coords inside the Thailand
+    # bbox [97..106, 5..21] (measured points can't leave the country), dist <= 10.05
+    # (radius 10 + 0.1-rounding headroom), <= K sites, sorted nearest-first.
+    bad = []
+    n_sites = 0
+    for i, row in enumerate(recs):
+        if not isinstance(row, list) or len(row) > k_max:
+            bad.append("#%d not a list of <=%d sites" % (i, k_max))
+            continue
+        prev = None
+        for s in row:
+            if not (isinstance(s, list) and len(s) == 4):
+                bad.append("#%d site malformed: %r" % (i, s))
+                continue
+            ci, lng, lat, dist = s
+            if not (isinstance(ci, int) and 0 <= ci < n_cats):
+                bad.append("#%d cat_idx %r invalid" % (i, ci))
+            if not (is_finite_number(lng) and is_finite_number(lat)
+                    and 97.0 <= lng <= 106.0 and 5.0 <= lat <= 21.0):
+                bad.append("#%d coords outside Thailand bbox: %r,%r" % (i, lng, lat))
+            if not (is_finite_number(dist) and 0.0 <= dist <= 10.05):
+                bad.append("#%d dist %r outside [0, 10.05]" % (i, dist))
+            else:
+                if prev is not None and dist < prev:
+                    bad.append("#%d sites not sorted nearest-first" % i)
+                prev = dist
+            n_sites += 1
+    if bad:
+        fail("lead_sites records sane (<=K sites of [cat_idx, lng, lat, dist]; coords in "
+             "Thailand bbox; dist <= 10.05; sorted nearest-first)", first_n(bad, 8))
+    else:
+        ok("lead_sites records sane (%d sites; coords in Thailand bbox, dist <= 10.05 km, "
+           "cat_idx valid, nearest-first)" % n_sites)
+
+
 # ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
@@ -2220,6 +2302,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("lead_sites.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
     ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
 )
@@ -2334,6 +2417,7 @@ def main():
     check_branch_leads(n)
     check_peer_npl()
     check_macro_exposure(n)
+    check_lead_sites(n)
     check_provenance()
     check_index_alignment(n)
     check_rollup(branches)
