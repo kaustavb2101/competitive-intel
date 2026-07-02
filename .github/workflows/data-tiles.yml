@@ -1,0 +1,137 @@
+name: Data — national building tiles (PMTiles)
+
+# Builds the NATIONAL streaming building-tile archive (buildings.pmtiles) that the 3D map
+# streams via platform/pmtiles-layer.js — RUN FROM YOUR PHONE via Actions → "Run workflow".
+#
+# WHY THIS WORKS HERE: GitHub-hosted runners have unrestricted internet, so the Overture
+# S3 download (blocked from the cloud sandbox) works. tippecanoe builds cleanly on
+# ubuntu-latest. No Thai-IP-only source is touched.
+#
+# WHAT IT DOES (mirrors docs/BUILDING_TILES.md, steps 1–2):
+#   1. python3 pipeline/build_building_tiles.py   → the coverage plan (bbox around the
+#      10 km catchment of all 2,015 branches + competitors) in pipeline/tiles_out/.
+#   2. overturemaps download (real footprints)    → buildings.geojsonseq
+#   3. tippecanoe                                  → buildings.pmtiles  (z9–z15)
+#
+# OUTPUT = a workflow ARTIFACT (retention 7 days), because the file can be multi-GB and
+# must NOT be committed to git. AFTER THE RUN, on any device:
+#   1. Open the run → Artifacts → download "buildings-pmtiles".
+#   2. Upload buildings.pmtiles to Vercel Blob or Cloudflare R2 (both serve the HTTP
+#      range requests + CORS that .pmtiles needs).
+#   3. Paste the public URL into platform/data/tiles_config.json → buildings.pmtilesUrl.
+#      The 3D pages start streaming national buildings the moment that URL is set.
+#
+# HONEST LIMIT: the FULL national bbox may exceed the runner's disk (~30–60 GB free after
+# cleanup) or the 6 h job limit. If it fails, it fails visibly — nothing is half-committed.
+# Prove the pipeline first with a region-sized `bbox_override` (W,S,E,N — Overture order),
+# e.g. Bangkok metro: 100.3,13.5,100.9,14.0
+
+on:
+  workflow_dispatch:
+    inputs:
+      bbox_override:
+        description: "Optional bbox W,S,E,N (Overture order) for a region-sized test build; empty = full national coverage bbox"
+        required: false
+        default: ""
+        type: string
+
+env:
+  # felt/tippecanoe release tag to build (cached between runs).
+  TIPPECANOE_VERSION: "2.62.0"
+
+jobs:
+  tiles:
+    runs-on: ubuntu-latest
+    # a national pull + tiling can legitimately take hours
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free runner disk (the national download is large)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          df -h /
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Same pin as qa.yml: match the Python the committed data is generated under.
+          python-version: "3.11"
+
+      - name: Install Overture CLI
+        run: pip install overturemaps
+
+      - name: Cache tippecanoe build
+        id: tippecanoe-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/tippecanoe-bin
+          key: tippecanoe-${{ env.TIPPECANOE_VERSION }}-${{ runner.os }}
+
+      - name: Build tippecanoe (cache miss only)
+        if: steps.tippecanoe-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libsqlite3-dev zlib1g-dev
+          git clone --depth 1 --branch "$TIPPECANOE_VERSION" https://github.com/felt/tippecanoe /tmp/tippecanoe
+          make -C /tmp/tippecanoe -j"$(nproc)"
+          mkdir -p ~/tippecanoe-bin
+          cp /tmp/tippecanoe/tippecanoe /tmp/tippecanoe/tile-join ~/tippecanoe-bin/
+
+      - name: Install tippecanoe on PATH
+        run: |
+          sudo cp ~/tippecanoe-bin/tippecanoe ~/tippecanoe-bin/tile-join /usr/local/bin/
+          tippecanoe --version
+
+      - name: Emit the coverage plan (network-free)
+        run: python3 pipeline/build_building_tiles.py
+
+      - name: Download Overture buildings + build PMTiles
+        env:
+          BBOX_OVERRIDE: ${{ inputs.bbox_override }}
+        run: |
+          # Replicates the two load-bearing commands of the emitted pipeline/tiles_out/RUN_TILES.sh
+          # (download + PMTiles). The optional third command there (an MVT {z}/{x}/{y} pyramid)
+          # is skipped: it doubles disk/time and PMTiles is what tiles_config.json prefers.
+          if [ -n "$BBOX_OVERRIDE" ]; then
+            BBOX="$BBOX_OVERRIDE"
+            echo "::notice::using bbox_override (region-sized test build): $BBOX"
+          else
+            BBOX="$(python3 -c "import json; print(json.load(open('pipeline/tiles_out/coverage_bbox.json'))['bbox_overture'])")"
+            echo "::notice::using full national coverage bbox: $BBOX"
+          fi
+
+          # 1) DOWNLOAD real Overture building footprints (W,S,E,N). geojsonseq streams
+          #    per-feature and avoids the FeatureCollection writer crash on newer pyarrow.
+          PYTHONUTF8=1 overturemaps download \
+              --bbox="$BBOX" \
+              -f geojsonseq \
+              --type=building \
+              -o pipeline/tiles_out/buildings.geojsonseq
+          ls -lh pipeline/tiles_out/buildings.geojsonseq
+          df -h /
+
+          # 2) BUILD the single-file PMTiles archive. z9–z15, dropping densest features only
+          #    when a tile overflows, so height/class attributes survive for the 3D extrusion.
+          tippecanoe \
+              -o pipeline/tiles_out/buildings.pmtiles \
+              -l buildings \
+              -Z9 -z15 \
+              --drop-densest-as-needed \
+              --extend-zooms-if-still-dropping \
+              --read-parallel \
+              --force \
+              pipeline/tiles_out/buildings.geojsonseq
+
+          # free the intermediate before the artifact upload
+          rm -f pipeline/tiles_out/buildings.geojsonseq
+          ls -lh pipeline/tiles_out/buildings.pmtiles
+
+      - name: Upload buildings.pmtiles as an artifact (NOT committed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildings-pmtiles
+          path: pipeline/tiles_out/buildings.pmtiles
+          retention-days: 7
+          if-no-files-found: error
