@@ -64,6 +64,33 @@ cap — if that happens the run **fails visibly** (red X) and nothing is half-do
 That's the signal to run it region-by-region with `bbox_override`, or on the laptop
 per `docs/BUILDING_TILES.md`.
 
+## Workflow 3 — "Site health — nightly live check"
+
+**What it does:** every night at **05:30 Bangkok** (22:30 UTC) GitHub probes the
+**live Vercel site**: the 4 entry pages must serve with the AutoX wordmark, and the
+7 critical data files (`branches.json`, `meta.json`, `amphoe.json`, `amphoe_geo.json`,
+`crop_stress.json`, `branch_labor.json`, `opportunity_score.json`) must download,
+parse, and have the shapes the app expects (2,015 branches, 928 districts, ...).
+
+**Where alerts land:** if the site is broken you get a **GitHub issue** titled
+`🚨 Site health check failed <date>` — it shows up in the GitHub app on your phone.
+The full pass/fail report is in the issue body. Repeat failures **comment on the
+same issue** (no duplicate spam), and the issue **closes itself automatically**
+the first night the site is healthy again. The Actions run also goes red.
+
+**Run it manually (phone):** Actions → **Site health — nightly live check** →
+**Run workflow**. One box, **base_url** — leave the default (the stable branch
+alias) or paste the production domain once one exists.
+
+**Run it locally (laptop):** the same checker validates the repo's own files
+offline — `python3 pipeline/check_site_health.py --local platform` — or probes any
+deployment: `python3 pipeline/check_site_health.py --base-url https://<app>.vercel.app`.
+Exit 0 = healthy, 1 = broken; `--json out.json` writes a machine-readable report.
+
+**Honest limit:** this checks that the site *serves sane files* — it does not run
+the JavaScript, so a rendering bug with intact data won't trip it (that's what the
+QA workflow's render phase and your own eyes are for).
+
 ## Watching a run / if something fails
 
 - Actions tab → tap the running workflow → live log. A red step tells you exactly
