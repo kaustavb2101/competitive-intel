@@ -21,6 +21,7 @@ const LENS = {
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
+  peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
   pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', tag:'m', val:d=>(PLOOK[d.v]||{}).pickup||0},
   informal: {pill:'Informal labour', label:'Informal workforce', desc:'BORROWER BASE · MEASURED (NSO) — informal (cash-economy) workers in the province, the core title-loan customer. Brighter = a larger informal borrower base.', color:'#1C8C7D', unit:'workers', tag:'m', val:d=>(PLOOK[d.v]||{}).informal||0},
@@ -2260,13 +2261,29 @@ function trendBaseChip(){
    against its 15 statistical twins (measured market fingerprint + NSO leverage backdrop,
    >=25km away). ESTIMATED — deviation of the estimated composite risk vs the twin group.
    Vintage-independent (works before a 2nd snapshot exists). Graceful when absent. */
-let PEERS=null, peersLoaded=false;
+let PEERS=null, peersLoaded=false, peersPromise=null;
+async function loadBranchPeers(){
+  if(peersPromise) return peersPromise;
+  peersLoaded=true;
+  peersPromise=(async()=>{
+    try{ const r=await fetch('data/branch_peers.json'); PEERS=r.ok?await r.json():null; }
+    catch(e){ PEERS=null; }
+    return PEERS;
+  })();
+  return peersPromise;
+}
+function peerHasData(){return !!(PEERS&&Array.isArray(PEERS.branches)&&PEERS.branches.length);}
+// per-branch peer record {dev, rz, pm} — null when absent. Positive dev = risk above the twins.
+function peerRec(d){
+  if(!peerHasData()||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return PEERS.branches[i]||null;
+}
+// lens value: points ABOVE the twin median (0 when at/below — the lens flags anomalies, not comfort).
+function peerDevVal(d){const e=peerRec(d); return e?Math.max(0,e.dev||0):0;}
 function renderPeerOutliers(){
   const tbl=$('#peertbl'); if(!tbl) return;
-  if(peersLoaded){ drawPeerOutliers(); return; }
-  fetch('data/branch_peers.json').then(r=>r.ok?r.json():null).then(j=>{
-    PEERS=j; peersLoaded=true; drawPeerOutliers();
-  }).catch(()=>{ PEERS=null; peersLoaded=true; drawPeerOutliers(); });
+  loadBranchPeers().then(drawPeerOutliers);  // promise is cached; repeat calls are cheap
 }
 function drawPeerOutliers(){
   const tbl=$('#peertbl'), ro=$('#peerreadout'); if(!tbl) return;
@@ -2409,6 +2426,7 @@ function lensAbsent(k){
   if(l.occr)  return occriskLoaded && !occriskHasData();
   if(l.brisk) return briskLoaded && !briskHasData();
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
+  if(l.peers) return peersLoaded && !peerHasData();
   return false;
 }
 function renderLenses(){
@@ -2564,6 +2582,8 @@ function initMap(){
   if(!briskLoaded) loadBranchRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='brisk'){ renderLegend(); styleMarkers(); } });
   // warm the MEASURED title-loan-relevant POI density so its menu lens disables itself when absent.
   if(!poirelLoaded) loadPoiRelevance().then(()=>{ renderLenses(); if(mapReady&&curLens==='poirel'){ renderLegend(); styleMarkers(); } });
+  // warm the peer-twin deviation layer (vs-twins lens + popup line) — disables its pill when absent.
+  if(!peersLoaded) loadBranchPeers().then(()=>{ renderLenses(); if(mapReady&&curLens==='peerdev'){ renderLegend(); styleMarkers(); } });
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -2785,6 +2805,16 @@ function amphoePopupHTML(d,sec,r){
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
 }
+// "vs statistical twins" popup section — empty string when the peer layer is absent (no fabrication).
+function peerPopupHTML(d,sec,r){
+  const e=peerRec(d); if(!e) return '';
+  const above=(e.dev||0)>0;
+  const col=above?'var(--agri)':'var(--merch)';
+  const sig=(e.rz!=null&&e.rz>=2)?' · ≥2σ — audit first':'';
+  return sec('Vs statistical twins — ESTIMATED benchmark')
+    + r('Twin-median risk (15 twins)', e.pm==null?'n/a':e.pm, '#8b90a7')
+    + r('This branch vs twins', (above?'+':'')+(e.dev==null?'n/a':e.dev)+' pts'+sig, col);
+}
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
@@ -2826,6 +2856,7 @@ function popupHTML(d){
     ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
+    ${peerPopupHTML(d,sec,r)}
     ${poiRelevancePopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
@@ -2864,6 +2895,9 @@ function setLens(k){
   }
   if(k==='brisk' && !briskLoaded){
     loadBranchRisk().then(()=>{ renderLenses(); if(curLens==='brisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='peerdev' && !peersLoaded){
+    loadBranchPeers().then(()=>{ renderLenses(); if(curLens==='peerdev'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(k==='poirel' && !poirelLoaded){
     loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
