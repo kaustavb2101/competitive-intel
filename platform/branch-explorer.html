@@ -494,7 +494,7 @@ function bldgHeight(tags,fa){            // measured tag if present, else estima
 // amber/ochre -> tall gold, so the skyline reads as a premium, dimensional cityscape. A sparing COOL
 // accent (blue, purple crown on the very tallest) punctuates the tallest decile only — never the body.
 const RAMP_DARK_BE=[[44,38,32],[156,108,50],[238,182,86]];      // taupe -> ochre -> gold
-const RAMP_LIGHT_BE=[[190,172,140],[216,168,92],[234,194,96]];  // sand -> amber -> gold
+const RAMP_LIGHT_BE=[[181,171,155],[150,138,120],[116,102,82]];  // warm mid-tone taupe->umber: clearly darker than the light ground so buildings can't wash to white on a bright GPU (matches rayong-catchment)
 const PURP=[122,79,224], BLUE=[91,124,250];
 function rampBE(stops,t){const seg=t<.5?0:1,lt=t<.5?t*2:(t-.5)*2,a=stops[seg],b=stops[seg+1];
   return [a[0]+(b[0]-a[0])*lt,a[1]+(b[1]-a[1])*lt,a[2]+(b[2]-a[2])*lt];}
@@ -546,8 +546,15 @@ function buildLighting(withShadow){
     return eff;
   }catch(e){ return null; }
 }
-let SHADOWS_ON=true;
-let LIGHTING=buildLighting(true);
+// MOBILE: DPR 2-3 framebuffers + shadow-map passes blow the mobile GL memory budget -> blank canvas
+// (seen on iOS). Cap device pixels and drop shadows on phones; desktop keeps full crispness + shadows.
+const IS_MOBILE=(function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform));
+}catch(e){return false;}})();
+let SHADOWS_ON=!IS_MOBILE;
+let LIGHTING=buildLighting(SHADOWS_ON);
 if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
 
 // ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
@@ -903,6 +910,7 @@ function init(){
   // them in. Absent/blocked => unchanged (live-Overpass buildings). Never throws.
   loadTilesConfig().then(function(){ try{ render(); }catch(e){} });
   deckgl=new deck.DeckGL({container:'map',mapStyle:null,viewState:VIEW,
+    useDevicePixels: IS_MOBILE ? false : true,  // cap the framebuffer on phones so mobile WebGL doesn't blank
     controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
     layers:layers(),
     onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },

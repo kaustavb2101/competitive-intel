@@ -496,6 +496,13 @@ function buildLighting(){
   }catch(e){ return null; }
 }
 let LIGHTING=buildLighting();
+// MOBILE: at device-pixel-ratio 2-3 the WebGL framebuffer is 4-9x larger and can blow the mobile GL
+// memory budget -> blank canvas (seen on iOS). Cap device pixels to 1 on phones; desktop stays crisp.
+const IS_MOBILE=(function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform));
+}catch(e){return false;}})();
 
 // ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
 // The scene is driven by a CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and click-to-fly
@@ -545,6 +552,7 @@ function downgradeForSoftwareGL(){
 }
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
+  useDevicePixels: IS_MOBILE ? false : true,  // cap the framebuffer on phones so mobile WebGL doesn't blank
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
   onViewStateChange:({viewState,interactionState})=>{
