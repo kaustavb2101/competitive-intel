@@ -267,6 +267,66 @@ function briskRec(d){
 const RISK_DRIVER_LABEL={household:'household leverage',agri:'crop / drought stress',occupation:'occupation concentration',segment:'segment / collateral mix'};
 function riskDriverLabel(k){return RISK_DRIVER_LABEL[k]||k||'mixed';}
 
+/* ---------- WHO-TO-ACQUIRE lead board (data/branch_leads.json, obj#2) ----------
+   Lazy-loads the per-branch occupation lead board built by pipeline/build_branch_leads.py:
+   {meta, buckets:[{k,label,fit,w,seg,why}], branches:[{leads:[{k,n,f,rf}], u:[...], inf, fw}]},
+   INDEX-ALIGNED to branches.json (entry i ↔ DATA[i]). The counts (n) are MEASURED (Overture
+   establishments ≤10km, a sample / lower bound); the high/med/low fit ranking, the ⚠ stressed-
+   sector flag (rf) and the "untapped" inference (u[]) are ESTIMATED (editorial fit map + segment-
+   score quartiles — stated in the popup). Fully null-guarded: absent file → LEADS stays null and
+   the popup block is omitted. Nothing is fabricated. */
+let LEADS=null, leadsBK=null, leadsMeta=null, leadsLoaded=false, leadsPromise=null;
+async function loadBranchLeads(){
+  if(leadsPromise) return leadsPromise;
+  leadsLoaded=true;
+  leadsPromise=(async()=>{
+    try{ const r=await fetch('data/branch_leads.json'); if(!r.ok){LEADS=null;return LEADS;}
+      const j=await r.json(); leadsMeta=j.meta||null; LEADS=j.branches||null;
+      leadsBK={}; (j.buckets||[]).forEach(b=>{ if(b&&b.k) leadsBK[b.k]=b; }); }
+    catch(e){ LEADS=null; leadsBK=null; leadsMeta=null; }
+    return LEADS;
+  })();
+  return leadsPromise;
+}
+// per-branch lead-board record (for popups) — null when the file/entry is absent.
+function leadsRec(d){
+  if(!LEADS||!LEADS.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return LEADS[i]||null;
+}
+
+/* ---------- MACRO-EXPOSURE profile (data/macro_exposure.json, obj#1) ----------
+   Lazy-loads the per-branch macro-factor exposure built by pipeline/build_macro_exposure.py:
+   {meta:{factors:[{key,label,signal,severity,direction}],…}, branches:[{t3:[[factor,score,dir]…], d}]},
+   INDEX-ALIGNED to branches.json. Scores are ESTIMATED composites (MEASURED occupation shares ×
+   ESTIMATED sensitivity weights × MEASURED macro signals) and are SHARE-DILUTED (meta.score_scale:
+   typical range 0–25, not 0–100) — so the popup presents them RELATIVELY (chip order), never as
+   0–100 bars. Fully null-guarded: absent file → MACX stays null and the chip strip is omitted. */
+let MACX=null, macxMeta=null, macxLoaded=false, macxPromise=null;
+async function loadMacroExposure(){
+  if(macxPromise) return macxPromise;
+  macxLoaded=true;
+  macxPromise=(async()=>{
+    try{ const r=await fetch('data/macro_exposure.json'); if(!r.ok){MACX=null;return MACX;}
+      const j=await r.json(); macxMeta=j.meta||null; MACX=j.branches||null; }
+    catch(e){ MACX=null; macxMeta=null; }
+    return MACX;
+  })();
+  return macxPromise;
+}
+// per-branch macro-exposure record (for popups) — null when the file/entry is absent.
+function macxRec(d){
+  if(!MACX||!MACX.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return MACX[i]||null;
+}
+// the factor definition (label/signal/direction) for a factor key — null when meta is absent.
+function macxFactor(k){
+  const fs=(macxMeta&&macxMeta.factors)||[];
+  for(const f of fs) if(f&&f.key===k) return f;
+  return null;
+}
+
 /* ---------- per-PROVINCE composite-risk rollup (data/province_risk.json, obj#1) ----------
    Lazy-loads the worst-first province rollup built by pipeline/build_province_risk.py:
    {meta, provinces:[{province, region, n_branches, mean_risk, p90_risk, top_driver_mix:{driver:count}}]}.
@@ -2584,6 +2644,10 @@ function initMap(){
   if(!poirelLoaded) loadPoiRelevance().then(()=>{ renderLenses(); if(mapReady&&curLens==='poirel'){ renderLegend(); styleMarkers(); } });
   // warm the peer-twin deviation layer (vs-twins lens + popup line) — disables its pill when absent.
   if(!peersLoaded) loadBranchPeers().then(()=>{ renderLenses(); if(mapReady&&curLens==='peerdev'){ renderLegend(); styleMarkers(); } });
+  // warm the ANSWER-FIRST popup layers (who-to-acquire lead board + macro-exposure chips) so the
+  // first branch tap already carries them; selectBranch refreshes an open popup if they land late.
+  if(!leadsLoaded) loadBranchLeads();
+  if(!macxLoaded) loadMacroExposure();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -2594,6 +2658,14 @@ function initMap(){
 function selectBranch(d,m){
   m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
   drawRadius(d);
+  // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
+  // re-render the still-open popup once they land so the FIRST read answers acquire + macro.
+  // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
+  if(!LEADS||!MACX){
+    Promise.all([loadBranchLeads(),loadMacroExposure()]).then(()=>{
+      const p=m.getPopup(); if(p&&p.isOpen&&p.isOpen()) p.setContent(popupHTML(d));
+    });
+  }
 }
 function drawRadius(d){
   clearRadius();
@@ -2753,7 +2825,13 @@ function laborPopupHTML(d,sec,r){
 function occriskPopupHTML(d,sec,r){
   const e=occriskRec(d); if(!e||!(e.t>0)) return '';
   const sc=e.s||0;
-  const col=sc>=40?'var(--agri)':sc>=25?'var(--gold)':'#8b90a7';
+  // data-driven colour ramp: red at ≥ meta.flag_threshold (the build-time p95 of nonzero scores,
+  // ~2.4 in the current vintage), amber at ≥ half of it. The old hardcoded 25/40 cutpoints sat far
+  // above the achievable score ceiling, so even FLAGGED branches showed grey score text. Falls back
+  // to the old cutpoints only when meta is absent.
+  const th=(occriskMeta&&typeof occriskMeta.flag_threshold==='number')?occriskMeta.flag_threshold:null;
+  const col=th!=null?(sc>=th?'var(--agri)':sc>=th/2?'var(--gold)':'#8b90a7')
+                    :(sc>=40?'var(--agri)':sc>=25?'var(--gold)':'#8b90a7');
   const domLab=e.d?occLabel(e.d):'—';
   return sec('Occupation × stress — MEASURED mix · ESTIMATED weighting')
     + r('Occupation-stress ▲ · est', `<span style="color:${col}">${sc}</span> <span class="sub">/100</span>`, col)
@@ -2806,6 +2884,56 @@ function amphoePopupHTML(d,sec,r){
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
 }
+// ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
+// branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
+// the high/med/low fit tag and the ⚠ stressed-sector flag are ESTIMATED (editorial fit map,
+// rationale surfaced as the row tooltip). One "untapped" line when u[] is non-empty (big measured
+// presence, bottom-quartile segment score — an inference, stated as est). Empty when absent.
+const LEAD_FIT_LAB={h:'high fit',m:'med fit',l:'low fit'};
+const LEAD_FIT_COL={h:'var(--merch)',m:'var(--gold)',l:'var(--mid)'};
+function leadsPopupHTML(d,sec,r){
+  const e=leadsRec(d); if(!e||!e.leads||!e.leads.length) return '';
+  const esc=s=>String(s||'').replace(/"/g,'&quot;');
+  let h=sec('Who to acquire here — top leads (measured nearby)');
+  e.leads.slice(0,3).forEach(L=>{
+    const bk=(leadsBK&&leadsBK[L.k])||{};
+    const tip=esc((bk.why||'')+(L.rf?' ⚠ Stressed sector — court with careful underwriting, never exclude (est).':''));
+    h+=r(`<span title="${tip}">${bk.label||L.k}${L.rf?' <span style="color:var(--agri)" title="stressed sector — underwrite carefully (est)">⚠</span>':''}</span>`,
+         `${(L.n||0).toLocaleString()} <span class="sub" style="color:${LEAD_FIT_COL[L.f]||'var(--mid)'};font-size:10px">${LEAD_FIT_LAB[L.f]||''}</span>`,
+         'var(--hi)');
+  });
+  if(e.u&&e.u.length){
+    const u=e.u[0], ub=(leadsBK&&leadsBK[u.k])||{};
+    h+=`<div class="sub" style="margin:2px 0 0;font-size:10px;color:var(--gold)">Untapped: ${ub.label||u.k} — big presence (${(u.n||0).toLocaleString()} measured), low segment score (est)</div>`;
+  }
+  h+=`<div class="sub" style="margin:2px 0 0;font-size:10px">counts MEASURED (Overture ≤10km, a sample / lower bound); fit ranking + ⚠ stress flag ESTIMATED (editorial fit map)</div>`;
+  return h;
+}
+// ANSWER-FIRST §2 — macro-exposure chip strip from macro_exposure.json: the top-3 macro factors
+// hitting THIS branch's customer mix, as compact chips [rice ▼] [leverage ▲] — headwind red /
+// tailwind green, arrow = the measured signal's direction (price YoY sign; rainfall below normal ▼;
+// household debt ▲). Scores are share-diluted (meta.score_scale) so ORDER carries the message —
+// no 0–100 bars, no absolute readout. Tooltip carries the factor definition + provenance.
+const MACX_ARROW={drought:'▼',leverage:'▲',mfg:'▼'};   // non-price factors: fixed signal direction
+function macxPopupHTML(d,sec){
+  const e=macxRec(d); if(!e||!e.t3||!e.t3.length) return '';
+  const esc=s=>String(s||'').replace(/"/g,'&quot;');
+  const chips=e.t3.map(t=>{
+    const k=t[0], s=t[1], head=t[2]!=='t';
+    const f=macxFactor(k)||{}, sig=f.signal||{};
+    const col=head?'var(--agri)':'var(--merch)';
+    const arrow=(typeof sig.yoy_pct==='number')?(sig.yoy_pct>0?'▲':'▼'):(MACX_ARROW[k]||(head?'▼':'▲'));
+    const tip=esc(`${f.label||k} — ${head?'HEADWIND':'TAILWIND'} for this branch's customer mix. `
+      +(typeof sig.yoy_pct==='number'?`YoY ${sig.yoy_pct>0?'+':''}${sig.yoy_pct}% (${sig.vintage||'—'}). `:'')
+      +(sig.provenance||'')+` Relative exposure rank ${s} (share-diluted, est — compare order, not magnitude).`);
+    return `<span class="mxchip" style="color:${col}" title="${tip}">${k} ${arrow}</span>`;
+  }).join('');
+  const dom=macxFactor(e.d);
+  return sec('Macro exposure — what hits these customers (est)')
+    + `<div class="mxstrip">${chips}</div>`
+    + (e.d?`<div class="sub" style="margin:3px 0 0;font-size:10px">Customers most exposed to: <b style="color:var(--hi)">${dom?dom.label:e.d}</b> (est)</div>`:'')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate</div>`;
+}
 // "vs statistical twins" popup section — empty string when the peer layer is absent (no fabrication).
 function peerPopupHTML(d,sec,r){
   const e=peerRec(d); if(!e) return '';
@@ -2843,6 +2971,8 @@ function popupHTML(d){
     <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:var(--accent);color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
+    ${leadsPopupHTML(d,sec,r)}
+    ${macxPopupHTML(d,sec)}
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
     ${r('Agri-PD ● (est)', d.a==null?'n/a':d.a, 'var(--agri)')}
     ${r('Merchant ◆ (est)', d.m==null?'n/a':d.m, 'var(--merch)')}
