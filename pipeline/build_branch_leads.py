@@ -48,6 +48,8 @@ Deterministic + network-free. Pure stdlib.
 """
 import os, json, argparse
 
+from fingerprint import branches_fingerprint
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
@@ -181,6 +183,7 @@ def build():
                  "ACQUISITION at an existing branch — NOT a branch-expansion layer.",
         "objective": "Acquisition (objective #2, local flavor): which occupations near THIS branch to court first.",
         "n_branches": len(out_rows),
+        "branches_fingerprint": branches_fingerprint(branches),
         "index_note": "branches[] is INDEX-ALIGNED to platform/data/branches.json (entry i <-> branch i), "
                       "identical to branch_occupations.json / branch_labor.json / occupation_risk.json.",
         "ranking": "lead_score = n (MEASURED catchment establishment count, <=10km) x fit weight "

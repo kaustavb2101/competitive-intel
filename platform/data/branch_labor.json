@@ -2,6 +2,7 @@
   "meta": {
     "generated_by": "pipeline/build_branch_labor.py",
     "n_branches": 2015,
+    "branches_fingerprint": "e25867ab0c76d8889774a91b4c6bb9a890acd7929ca737dbbb36ff46bf9be786",
     "index_aligned_to": "platform/data/branches.json (entry i <-> branch i)",
     "join_key_province": "branches_final.json `prov` (Thai province name); matches all 77 keys in employment_by_province.json and unemployment_by_province.json.",
     "fields": {

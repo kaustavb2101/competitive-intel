@@ -38,6 +38,8 @@ import os
 import sys
 import argparse
 
+from fingerprint import branches_fingerprint_from_file
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(ROOT, "source-data")
@@ -146,6 +148,8 @@ def build():
     meta = {
         "generated_by": "pipeline/build_branch_labor.py",
         "n_branches": n,
+        "branches_fingerprint": branches_fingerprint_from_file(
+            os.path.join(PDATA, "branches.json")),
         "index_aligned_to": "platform/data/branches.json (entry i <-> branch i)",
         "join_key_province": "branches_final.json `prov` (Thai province name); matches all 77 "
                              "keys in employment_by_province.json and unemployment_by_province.json.",

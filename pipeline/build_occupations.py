@@ -35,6 +35,8 @@ Usage:
 """
 import argparse, json, math, os, sys
 
+from fingerprint import branches_fingerprint
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(ROOT, "source-data", "overture_places.json")
@@ -95,6 +97,7 @@ def build():
             "source": src.get("meta", {}).get("source", "Overture Maps Places"),
             "radius_km": RADIUS_KM,
             "n_branches": len(branches),
+            "branches_fingerprint": branches_fingerprint(branches),
             "n_places": len(places),
             "buckets": [bk["label"] for bk in buckets],
             "measured": True,

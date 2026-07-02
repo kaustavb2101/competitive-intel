@@ -48,6 +48,8 @@ import os
 
 import numpy as np
 
+from fingerprint import branches_fingerprint
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BRANCHES = os.path.join(REPO, "platform", "data", "branches.json")
 BRISK = os.path.join(REPO, "platform", "data", "branch_risk.json")
@@ -143,6 +145,7 @@ def build():
         "features": K10_KEYS + ["dfac(log1p)", "dwork(log1p)", "rain", "w", "prov_dti(NSO,x%g)" % DTI_W],
         "params": {"k": K, "geo_excl_km": GEO_EXCL_KM, "out_n": OUT_N, "rz_min": RZ_MIN, "dti_w": DTI_W},
         "n_branches": n,
+        "branches_fingerprint": branches_fingerprint(br),
         "n_outliers": len(outliers),
         "index_note": "branches[] is INDEX-ALIGNED to platform/data/branches.json (entry i <-> branch i). "
                       "dev = composite_risk minus twin median; rz = robust z vs twins; pm = twin median risk.",

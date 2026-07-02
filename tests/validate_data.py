@@ -17,6 +17,7 @@
 # Usage:  python3 tests/validate_data.py           (from anywhere; paths are resolved)
 #         tests/run.sh check                         (runs it as the 'data' sub-check)
 
+import hashlib
 import json
 import math
 import os
@@ -2124,6 +2125,89 @@ def check_index_alignment(n_branches):
 
 
 # ---------------------------------------------------------------------------
+# BRANCHES-FINGERPRINT GATE (tamper-evident index alignment).
+#
+# The length gate above catches a layer built against a DIFFERENT NUMBER of branches, but not
+# a REORDERED or partially-swapped branches.json — every index-aligned layer would still be the
+# right length while silently describing the WRONG branches. So derive.py stamps meta.json with
+# branches_fingerprint = sha256 hex over the ordered [[x, y, n], ...] sequence of branches.json
+# (json.dumps separators=(",",":"), ensure_ascii=False, utf-8 — see pipeline/fingerprint.py),
+# and every index-aligned builder stamps the CURRENT fingerprint into its own output meta.
+#
+# This gate recomputes the fingerprint INDEPENDENTLY from branches.json (deliberately re-
+# implemented here, not imported — an independent implementation is what makes tampering
+# evident) and asserts:
+#   1. meta.json carries branches_fingerprint and it matches the recomputation;
+#   2. every present aligned layer whose meta carries branches_fingerprint matches it
+#      (mismatch = "stale layer — re-run its builder");
+#   3. layers without the field (predating the stamp) SKIP-PASS with a note (graceful rollout).
+_FINGERPRINTED_LAYERS = (
+    "branch_occupations.json",   # build_occupations.py
+    "branch_labor.json",         # build_branch_labor.py
+    "occupation_risk.json",      # build_occupation_risk.py
+    "poi_relevance.json",        # build_poi_relevance.py
+    "branch_peers.json",         # build_branch_peers.py
+    "branch_leads.json",         # build_branch_leads.py
+)
+
+
+def _branches_fingerprint(branches):
+    """sha256 hex over the ordered (x,y,n) identity sequence — must mirror
+    pipeline/fingerprint.py byte-for-byte (same serialization contract)."""
+    seq = [[b.get("x"), b.get("y"), b.get("n")] for b in branches]
+    blob = json.dumps(seq, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(blob).hexdigest()
+
+
+def check_branches_fingerprint(branches):
+    hdr("branches-fingerprint gate (tamper-evident index alignment)")
+    if branches is None:
+        fail("branches-fingerprint gate needs branches.json", "branches did not load")
+        return
+    fp = _branches_fingerprint(branches)
+
+    # 1. meta.json must carry the matching stamp (derive.py writes both files together).
+    try:
+        meta = load("meta.json")
+    except Exception as e:
+        fail("meta.json loads (for branches_fingerprint)", repr(e))
+        return
+    mfp = meta.get("branches_fingerprint") if isinstance(meta, dict) else None
+    if mfp is None:
+        fail("meta.json carries branches_fingerprint",
+             "meta.json has no branches_fingerprint — re-run pipeline/derive.py to stamp it")
+    elif mfp != fp:
+        fail("meta.json branches_fingerprint matches branches.json",
+             "recomputed %s\nmeta.json  %s\nbranches.json and meta.json disagree — "
+             "branches.json was reordered/edited outside derive.py, or meta.json is stale; "
+             "re-run pipeline/derive.py" % (fp, mfp))
+    else:
+        ok("meta.json branches_fingerprint matches branches.json (%s…)" % fp[:16])
+
+    # 2./3. every present aligned layer: stamped -> must match; unstamped -> skip-pass note.
+    for rel in _FINGERPRINTED_LAYERS:
+        if not exists(rel):
+            ok("%s absent — skipped (optional fingerprinted layer)" % rel)
+            continue
+        try:
+            d = load(rel)
+        except Exception as e:
+            fail("%s loads (for branches_fingerprint)" % rel, repr(e))
+            continue
+        lmeta = d.get("meta") if isinstance(d, dict) else None
+        lfp = lmeta.get("branches_fingerprint") if isinstance(lmeta, dict) else None
+        if lfp is None:
+            ok("%s has no branches_fingerprint (predates the stamp) — skipped; "
+               "re-run its builder to stamp it" % rel)
+        elif lfp == fp:
+            ok("%s branches_fingerprint matches branches.json" % rel)
+        else:
+            fail("%s branches_fingerprint matches branches.json" % rel,
+                 "stale layer — re-run its builder (layer stamped %s, branches.json is %s)"
+                 % (lfp, fp))
+
+
+# ---------------------------------------------------------------------------
 def check_rollup(branches):
     hdr("cross-file rollup sanity")
     if branches is None:
@@ -2201,6 +2285,7 @@ def main():
     check_peer_npl()
     check_provenance()
     check_index_alignment(n)
+    check_branches_fingerprint(branches)
     check_rollup(branches)
 
     print("\n" + ("=" * 40))
