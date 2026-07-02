@@ -94,6 +94,11 @@
       data.go.th pull lands) — improves data availability. *(med, M)*
 - [ ] **Expand `validate_data.py`** coverage as new data layers land. *(med, S)*
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
+- [ ] **Fold NSO LFS `unemployment_rate` into `build_amphoe.py`'s `risk_proxy`** (objective #1) — it's
+      now in every province's `gov.unemployment` (landed 2026-07-02 (2)) but only rendered as a fact,
+      not yet used as a risk-score input. A high provincial unemployment rate is a direct portfolio-
+      stress signal alongside the existing household-DTI component. *(MED, S — join by province, same
+      pattern as the existing `informal`/`formal` join in `build_amphoe.py`.)*
 
 ## From the research digest (docs/RESEARCH_DIGEST.md — all cited)
 - [x] **★ Model the BoT 28% title-loan rate cap — DONE 2026-06-30** (Simulator lever: book yield 28.2%→26.2% under the cap,
@@ -126,6 +131,13 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-02 (2) — ENRICH: NSO Labour Force Survey unemployment rate → province deep-dive.**
+  `unemployment_by_province.json` (already vendored + MEASURED, previously only surfaced per-branch
+  in `branch_labor.json`) is now joined into `build_province.py`'s `gov` block for all 77 provinces
+  and rendered in `province.html`'s "Who works nearby" panel (measured · NSO LFS tag). No fabrication
+  — byte-identical source values, `build_province.py --check` 0 drift. Gate: 28/0, validate_data
+  125/125. Rendered + DOM-verified `province.html?p=rayong` (0.72% Rayong). Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-02 (2) entry).
 - **2026-07-02 — AUDIT: corrected a mislabelled-MEASURED layer before it reached the app.**
   `source-data/gpp_by_province.json` (TMLI-vendored NESDC GPP) claimed MEASURED but only 1/77 rows
   (Mukdahan) is actually CKAN-verified; the other 76 are round-number estimates. Fixed
