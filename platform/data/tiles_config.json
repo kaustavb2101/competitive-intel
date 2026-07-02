@@ -5,6 +5,10 @@
     "generated_by": "hand-configured (paste the CDN URL after running docs/BUILDING_TILES.md)",
     "label": "configuration, not measured data"
   },
+  "catchments": {
+    "baseUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev",
+    "note": "operator CDN (Cloudflare R2) hosting the 77 per-province <slug>_catchment.json Overture pulls (real building footprints, ~35MB each — too large for git). rayong-catchment.html falls back to <baseUrl>/<slug>_catchment.json when the local file is absent; a CDN miss degrades to the calm not-pulled notice."
+  },
   "buildings": {
     "pmtilesUrl": null,
     "mvtUrl": null,

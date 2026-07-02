@@ -1787,10 +1787,23 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
      '</div>';
    document.body.appendChild(el);
  }
- Promise.all([
-   // The catchment building file is the ONE required input. .ok=false (404) => null here, and we
-   // branch to notPulled() below; a genuine network/parse error still rejects and surfaces loudly.
-   fetch(P+'_catchment.json').then(function(r){if(r.status===404)return null;
+ // tiles_config first: it may carry catchments.baseUrl (operator CDN, e.g. Cloudflare R2 with all
+ // 77 province pulls). The catchment loader below falls back to it on a local 404, so provinces
+ // too big to commit to git still render their real buildings. CDN miss => same calm notPulled().
+ opt('data/tiles_config.json').then(function(TILECFG){
+ var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
+ if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
+ return Promise.all([
+   // The catchment building file is the ONE required input. .ok=false (404) => null-or-CDN here,
+   // and we branch to notPulled() below; a genuine network/parse error still rejects loudly.
+   fetch(P+'_catchment.json').then(function(r){
+     if(r.status===404){
+       if(!cdnBase)return null;
+       box.textContent='Loading '+pretty+' 3D from CDN…';
+       return fetch(cdnBase+'/'+CITY+'_catchment.json')
+         .then(function(r2){return r2.ok?r2.json():null;})
+         .catch(function(){return null;});   // CDN unreachable => calm not-pulled state, never a crash
+     }
      if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    opt(P+'_province.json'),
    opt('data/provinces/index.json'),
@@ -1804,10 +1817,11 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    // opportunity score. Both nationwide; this page filters them to the current city bbox so rivals
    // appear IN the scene even for cities without a curated per-province competitor file (e.g. Bangkok).
    opt('data/competitors_national.json'), opt('data/opportunity_score.json'),
-   // operator-configured CDN URL for streamed Overture building tiles. Null/absent => the scene
-   // falls back to the curated per-city catchment buildings (nothing invented to fill the gap).
-   opt('data/tiles_config.json')
- ]).then(function(a){
+   // operator-configured CDN config (already fetched above) — kept in the same array slot so the
+   // a[13] consumer below is unchanged.
+   Promise.resolve(TILECFG)
+ ]);
+ }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
    window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
