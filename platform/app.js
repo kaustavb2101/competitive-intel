@@ -772,6 +772,7 @@ function renderAcq(){
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
   renderRoad3k();
+  renderExpansionPlan();
   renderOppScore();
   renderCompCoverage();
   renderExitWhitespace();
@@ -1082,6 +1083,83 @@ function road3kCSV(){
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_road_to_3000.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- Road to 3,000 · SEQUENCED district plan (obj #2) ----------
+   Surfaces data/expansion_plan.json (pipeline/build_expansion_plan.py): all 985 net-new branches
+   placed one at a time by greedy divisor allocation (D'Hondt) over risk-adjusted district demand,
+   with 15km neighbor cannibalization. ESTIMATED planning order over MEASURED demand inputs.
+   We don't recompute here; just rank & expose. Graceful when the file is absent. */
+let EXPLAN=null, explanLoaded=false;
+const EXPLAN_TOPN=25;
+function renderExpansionPlan(){
+  const tbl=$('#r3kseqtbl'); if(!tbl) return;
+  if(explanLoaded){ drawExpansionPlan(); return; }
+  fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null).then(j=>{
+    EXPLAN=j; explanLoaded=true; drawExpansionPlan();
+  }).catch(()=>{ EXPLAN=null; explanLoaded=true; drawExpansionPlan(); });
+}
+function focusExpansionOnMap(i){
+  const d=((EXPLAN||{}).by_amphoe||[])[i]; if(!d||d.cy==null||d.cx==null) return;
+  pendingMapFocus={lat:d.cy,lng:d.cx,name:d.name,val:d.ws||0,label:'white-space ★'};
+  if(curLens!=='dws'){ curLens='dws'; if(typeof renderLenses==='function') try{renderLenses();}catch(e){} }
+  history.replaceState(null,'','#map'); showTab('map');
+}
+function drawExpansionPlan(){
+  const tbl=$('#r3kseqtbl'), ro=$('#r3kseqreadout'); if(!tbl) return;
+  const rows=(EXPLAN&&Array.isArray(EXPLAN.by_amphoe))?EXPLAN.by_amphoe:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Sequenced plan not yet computed.</b> <span class="sub">Run pipeline/build_expansion_plan.py — the leaderboard fills in on the next data refresh. The regional split above still stands.</span>';
+    return;
+  }
+  const top=rows.slice(0,EXPLAN_TOPN);
+  const mxAdd=Math.max(1,...top.map(d=>d.add||0));
+  tbl.innerHTML=`<tr><th>#</th><th>District (amphoe)</th><th>Province</th><th>Region</th>`+
+    `<th title="AutoX branches in the district today (measured, PIP-joined)">Now</th>`+
+    `<th class="h-opp" title="ESTIMATED — net-new branches the sequence places here (of 985)">+ New</th>`+
+    `<th class="h-opp" title="Position of this district's FIRST branch in the 985-placement sequence — lower = open sooner">First at #</th>`+
+    `<th title="MEASURED-derived district demand leg (0–100): OSM footfall + DIW workers + vehicles">Demand</th>`+
+    `<th title="ESTIMATED district risk proxy (0–100) — already discounts demand in the sequence">Risk ▲</th></tr>`+
+    top.map((d,i)=>{
+      const clk=(d.cy!=null&&d.cx!=null)?` onclick="focusExpansionOnMap(${i})" tabindex="0" role="link" style="cursor:pointer" title="Show this district on the national map →"`:'';
+      return `<tr${clk}>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${d.name||'—'}</b></td>
+        <td>${d.prov||'—'}</td>
+        <td class="sub">${d.region||'—'}</td>
+        <td class="mono sub">${d.now}</td>
+        <td>${barHTML(d.add,'var(--gold)',mxAdd)} <span class="mono" style="color:var(--gold)"><b>+${d.add}</b></span></td>
+        <td class="mono" style="color:var(--accent)">#${d.first_rank}</td>
+        <td class="mono sub">${Math.round(d.demand)}</td>
+        <td class="mono" style="color:${d.risk>=60?'var(--agri)':'var(--ink,inherit)'}">${Math.round(d.risk)}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const seq=(EXPLAN.sequence||[]);
+    const first=seq[0], m=EXPLAN.meta||{}, p=m.params||{};
+    const regs=(EXPLAN.by_region||[]).map(r=>`${r.name} +${r.add}`).join(' · ');
+    const n100=new Set(seq.slice(0,100).map(s=>s.id)).size;
+    ro.innerHTML=`<b>Open next:</b> <b style="color:var(--gold)">${first?first.name:'—'}</b>${first?` (${first.region})`:''} is placement
+      <b>#1</b> of ${(p.net_new||985).toLocaleString()} — the highest remaining demand-per-outlet in the country.
+      The first 100 placements spread across <b>${n100}</b> districts; ${rows.length} districts get at least one branch in the full plan.
+      Regional totals from this model: ${regs} — <b>cross-check them against the workforce-headroom split above</b>; where the two models
+      agree, confidence is higher.
+      <span class="sub">ESTIMATED planning order (divisor method over measured demand, risk-adjusted, 15 km cannibalization) — not a committed plan; confirm sites with local surveys.</span>`;
+  }
+  const btn=$('#r3kseqcsv');
+  if(btn&&!btn.dataset.init){ btn.onclick=expansionPlanCSV; btn.dataset.init='1'; }
+}
+function expansionPlanCSV(){
+  const rows=(EXPLAN&&EXPLAN.by_amphoe)||[]; if(!rows.length) return;
+  const hdr=['district_en','province_th','region','branches_now_measured','net_new_est','first_placement_rank',
+    'marginal_value_at_first','demand_measured_derived','risk_proxy_est','whitespace','lat','lng'];
+  const lines=[hdr.join(',')].concat(rows.map(d=>
+    [d.name,d.prov,d.region,d.now,d.add,d.first_rank,d.first_v,d.demand,d.risk,d.ws,d.cy,d.cx]
+      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')));
+  lines.push(['Total','','',rows.reduce((s,d)=>s+d.now,0),rows.reduce((s,d)=>s+d.add,0),'','','','','','',''].map(v=>`"${v}"`).join(','));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_expansion_plan_sequenced.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- nationwide acquisition leaderboard (item 2) ----------

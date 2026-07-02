@@ -74,6 +74,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_opportunity_score.py --check >/dev/null 2>&1 ) && ok "build_opportunity_score.py --check" || bad "build_opportunity_score.py --check (opportunity_score.json drifted from amphoe.json/crop_stress.json/competitors)"
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"
   ( cd "$PIPE" && python3 build_exit_whitespace.py --check >/dev/null 2>&1 ) && ok "build_exit_whitespace.py --check" || bad "build_exit_whitespace.py --check (exit_whitespace.json drifted from amphoe.json/competitors)"
+  ( cd "$PIPE" && python3 build_expansion_plan.py --check >/dev/null 2>&1 ) && ok "build_expansion_plan.py --check" || bad "build_expansion_plan.py --check (expansion_plan.json drifted from amphoe.json/branches.json)"
   ( cd "$PIPE" && python3 ingest_tmli.py --check >/dev/null 2>&1 ) && ok "ingest_tmli.py --check" || bad "ingest_tmli.py --check (TMLI measured province layers drifted from source-data/tmli/)"
   ( cd "$PIPE" && python3 build_household_risk.py --check >/dev/null 2>&1 ) && ok "build_household_risk.py --check" || bad "build_household_risk.py --check (household_risk_by_province.json drifted from source-data NSO SES layers)"
   ( cd "$PIPE" && python3 build_province_risk.py --check >/dev/null 2>&1 ) && ok "build_province_risk.py --check" || bad "build_province_risk.py --check (province_risk.json drifted from branch_risk.json/branches.json)"

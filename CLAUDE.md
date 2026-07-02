@@ -87,6 +87,10 @@ timeseries `--check` plus `node --check` on every page's JS.*
   NOT census the sub-scale operators that would actually exit (only the 4 big compliant brands), so the
   score is inferred, not measured — full caveat + regulatory citation in `meta`. Surfaces on `#acq` (labelled
   ESTIMATED). A true rival-fragility index needs a sub-scale-operator census (blocked Thai-IP registry pull).
+- `build_expansion_plan.py` — **sequenced Road-to-3,000 plan** (objective #2) → `platform/data/expansion_plan.json`.
+  Places all ~985 net-new branches ONE AT A TIME by greedy divisor allocation (D'Hondt) over risk-adjusted
+  district demand, with 15km neighbor cannibalization (ESTIMATED planning order over measured demand inputs;
+  ≤8/district). Surfaces on `#acq` under Road to 3,000 (top-25 table + full-plan CSV + map drill-down).
 - `timeseries.py` — captures a per-vintage SNAPSHOT (label from `meta.updated`, never wall clock) +
   diffs → `source-data/snapshots/`, `platform/data/snapshots_index.json` + `deltas.json` (Risk-trend tab).
 - **Loan-tape bridge** (objective #1; synthetic until a real export lands):

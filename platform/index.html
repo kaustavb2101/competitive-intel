@@ -218,6 +218,23 @@
         Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></div></details>
     <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="r3ktbl"></table>
+
+    <h3 class="acqsub" style="margin-top:18px">Sequenced district plan · which branch to open <i>next</i> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
+    <p class="lead">The regional split above says <i>how many</i>; this says <b>where, in what order</b>. All 985 net-new branches are
+      placed one at a time, each going to the district with the highest remaining <b>demand per outlet</b> — the same divisor method
+      used to allocate parliamentary seats (D'Hondt), so diminishing returns are built in. Placements within 15&nbsp;km of each other
+      <b>cannibalize</b>: a new branch also shrinks the value of its neighbors' next branch. Demand is risk-adjusted
+      (a high district risk-proxy trims its pull by up to 25%). Click a row to see the district on the national map.</p>
+    <div class="insight" id="r3kseqreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
+      <p>Marginal value of the next branch in district i: <code>v = D / (1 + e)</code> where
+        <code>D = demand × (1 − 0.25 × risk_proxy/100)</code> (demand: OSM footfall + DIW workers + vehicles, measured-derived; risk-proxy: estimated) and
+        <code>e = own + placed + 0.35 × Σ distance-weighted neighbor outlets within 15 km</code>.
+        Greedy placement of all net-new branches; ≤8 per district. Without the neighbor term this greedy is the provably optimal
+        allocation of total demand-per-outlet (classic divisor-method result). The sequence is an <b>ESTIMATED planning order</b>,
+        not a committed plan — every site needs a local survey. Built by <code>pipeline/build_expansion_plan.py</code> (deterministic, offline).</p></div></details>
+    <button id="r3kseqcsv" class="chip" style="margin-bottom:10px">⬇ Download full plan CSV</button>
+    <table class="tbl" id="r3kseqtbl"></table>
     </details>
 
     <!-- 3 · COMPETITOR THESIS — coverage + exit white-space, collapsed by default. -->

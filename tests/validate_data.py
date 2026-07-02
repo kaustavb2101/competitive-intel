@@ -1562,6 +1562,69 @@ def check_exit_whitespace():
 
 
 # ---------------------------------------------------------------------------
+def check_expansion_plan(amphoe, n_branches):
+    # SEQUENCED Road-to-3,000 plan (objective #2). ESTIMATED planning order (greedy divisor method)
+    # over MEASURED demand inputs — meta must say so, the arithmetic must reconcile exactly (every
+    # net-new branch placed once, rollups sum to the same total), and every district id must exist
+    # in amphoe.json (no fabricated geography). Optional file: SKIP-PASS when absent.
+    hdr("expansion_plan.json (optional)")
+    if not exists("expansion_plan.json"):
+        ok("expansion_plan.json absent — skipped (optional; run build_expansion_plan.py)")
+        return
+    try:
+        d = load("expansion_plan.json")
+    except Exception as e:
+        fail("expansion_plan.json loads", repr(e))
+        return
+    ok("expansion_plan.json loads")
+
+    meta = d.get("meta") or {}
+    prov = str(meta.get("provenance") or "")
+    if not meta.get("generated_by") or "ESTIMATED" not in prov or "survey" not in prov:
+        fail("expansion_plan meta/provenance (generated_by + ESTIMATED label + survey caveat)",
+             "meta missing generated_by, ESTIMATED label, or the confirm-with-survey caveat")
+    else:
+        ok("expansion_plan meta/provenance present (ESTIMATED planning sequence + survey caveat)")
+
+    params = meta.get("params") or {}
+    net = params.get("net_new")
+    placed = meta.get("n_placed")
+    seq = d.get("sequence") or []
+    by_am = d.get("by_amphoe") or []
+    by_reg = d.get("by_region") or []
+    problems = []
+    if n_branches is not None and net != params.get("target", 3000) - n_branches:
+        problems.append("net_new %r != target-branches (%r-%r)" % (net, params.get("target"), n_branches))
+    if placed != net:
+        problems.append("n_placed %r != net_new %r (plan incomplete)" % (placed, net))
+    if sum(r.get("add", 0) for r in by_am) != placed:
+        problems.append("sum(by_amphoe.add) != n_placed")
+    if sum(r.get("add", 0) for r in by_reg) != placed:
+        problems.append("sum(by_region.add) != n_placed")
+    if [p.get("rank") for p in seq] != list(range(1, len(seq) + 1)):
+        problems.append("sequence ranks not contiguous 1..%d" % len(seq))
+    cap = params.get("max_add_per_district", 8)
+    over = [r.get("name") for r in by_am if r.get("add", 0) > cap or r.get("add", 0) < 1]
+    if over:
+        problems.append("by_amphoe add out of [1,%s]: %s" % (cap, first_n(over, 5)))
+    if problems:
+        fail("expansion_plan arithmetic reconciles (985 placed once; rollups + ranks consistent)",
+             "; ".join(problems))
+    else:
+        ok("expansion_plan arithmetic reconciles (n_placed==net_new; by_amphoe/by_region sums match; "
+           "ranks contiguous; per-district adds within cap)")
+
+    if isinstance(amphoe, dict) and isinstance(amphoe.get("amphoe"), list):
+        ids = {r.get("id") for r in amphoe["amphoe"]}
+        orphans = [r.get("name") for r in by_am if r.get("id") not in ids]
+        if orphans:
+            fail("expansion_plan district ids all exist in amphoe.json (no fabricated geography)",
+                 first_n(orphans, 8))
+        else:
+            ok("expansion_plan district ids all exist in amphoe.json (%d receiving districts)" % len(by_am))
+
+
+# ---------------------------------------------------------------------------
 def check_peer_npl():
     # PEER NPL benchmark (objective #1 collateral context). These are PEER-reported figures, NOT an
     # AutoX number — the data-mandate requires meta to say so explicitly and each row to cite its
@@ -1901,6 +1964,7 @@ def main():
     check_competitor_coverage()
     check_opportunity_score()
     check_exit_whitespace()
+    check_expansion_plan(amphoe, n)
     check_peer_npl()
     check_provenance()
     check_index_alignment(n)
