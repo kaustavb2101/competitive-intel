@@ -3048,6 +3048,7 @@ function renderHome(){
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
     loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
+    loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
     loadProvinceRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
@@ -3081,6 +3082,12 @@ function loadOppScore(){
     .then(j=>{OPPSCORE=j;oppLoaded=true;return j;})
     .catch(()=>{OPPSCORE=null;oppLoaded=true;return null;});
 }
+function loadExpansionPlan(){
+  if(explanLoaded) return Promise.resolve(EXPLAN);
+  return fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null)
+    .then(j=>{EXPLAN=j;explanLoaded=true;return j;})
+    .catch(()=>{EXPLAN=null;explanLoaded=true;return null;});
+}
 /* BOARD THESIS — one spoken-English sentence a director could read aloud, plus a Road-to-3,000
    headroom strip. Synthesized ONLY from data already in memory (DATA/META/AMP/OPPSCORE/HHRISK/
    CSTRESS); every clause is dropped if its source is absent, so it never fabricates. Re-rendered
@@ -3092,10 +3099,13 @@ function renderHomeThesis(){
   const have=(Array.isArray(DATA)?DATA.length:0);
   // zero-branch (white-space) district count — measured PIP from amphoe.json.
   const zeroDist=(AMP&&AMP.length)?AMP.filter(a=>a.branches===0).length:null;
-  // where to open next — top opportunity district (estimated composite) else top white-space district.
+  // where to open next — sequenced plan #1 (purpose-built for exactly this question) else top
+  // opportunity district (estimated composite) else top white-space district.
   let openNext=null;
+  const sq=(EXPLAN&&Array.isArray(EXPLAN.sequence)&&EXPLAN.sequence[0])?EXPLAN.sequence[0]:null;
+  if(sq&&sq.name) openNext=sq.name;
   const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
-  if(od&&od.length){const t=od.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(t&&t.name) openNext=t.name;}
+  if(!openNext&&od&&od.length){const t=od.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(t&&t.name) openNext=t.name;}
   if(!openNext&&AMP&&AMP.length){const t=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0))[0]; if(t) openNext=t.name_measured?t.name:t.name_en;}
   // what is stressing — measured household leverage (top DTI) else worst crop-stress province.
   const hh=(Array.isArray(HHRISK_LIST)&&HHRISK_LIST.length)?HHRISK_LIST[0]:null;
@@ -3131,9 +3141,20 @@ function renderHomeThesis(){
 function renderHomeHero(){
   const box=$('#cc-hero'); if(!box) return;
   const heroes=[];
-  // 1) WHERE TO OPEN NEXT — top-2 opportunity districts (ESTIMATED composite).
+  // 1) WHERE TO OPEN NEXT — sequenced-plan first placements (purpose-built ranking with
+  //    cannibalization + risk adjustment); composite opportunity score as the fallback.
+  const sq=(EXPLAN&&Array.isArray(EXPLAN.sequence))?EXPLAN.sequence:null;
   const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
-  if(od&&od.length){
+  if(sq&&sq.length){
+    const firsts=[]; const seen=new Set();
+    for(const p of sq){ if(!seen.has(p.id)){ seen.add(p.id); firsts.push(p); if(firsts.length===2) break; } }
+    const names=firsts.map(p=>p.name).join(' then ');
+    const lead=firsts[0];
+    heroes.push({tone:'opp',v:'acq',
+      big:`Open next in ${names}`,
+      sub:`Placements #${firsts.map(p=>p.rank).join(' & #')} of the sequenced Road-to-3,000 plan (demand-per-outlet, risk-adjusted, 15 km cannibalization) · ${lead.region||''}`,
+      tag:'estimated sequence', cta:'Acquisition →'});
+  } else if(od&&od.length){
     const top=od.slice().sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,2).filter(d=>d&&d.name);
     if(top.length){
       const names=top.map(d=>d.name).join(' & ');
