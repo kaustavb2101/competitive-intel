@@ -174,6 +174,13 @@ Segment colors: agri/PD `#C8433B`, merchant `#1C8C7D`, collateral `#7A4FE0`, opp
 Always state whether a number is measured or estimated. Read the matching SKILL.md before generating
 docx/pptx/xlsx/pdf.
 
+## Operating model (how work happens here)
+Three nested loops — see `docs/OPERATING_MODEL.md`: (1) agentic coding ~minutes (agent vs written
+spec, evals = gate REAL exit + headless render, worktree branches, incremental commits on long
+batches); (2) developer feedback ~hours (owner directive → committee → ranked waves → plain-language
+digest back); (3) external feedback ~days (phone use / preview comments / nightly site-health →
+`docs/FEEDBACK_LOG.md`; feedback outranks backlog; only this loop edits the vision).
+
 ## Where to go next
 See `docs/NEXT_STEPS.md` (prioritized) and `docs/PROGRESS_LOG.md` (what's done + decisions).
 The top three: (1) deploy and verify on Vercel, (2) run the blocked gov data from the Thai IP and
