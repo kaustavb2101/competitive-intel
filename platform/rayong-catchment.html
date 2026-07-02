@@ -169,6 +169,16 @@ html[data-theme="light"] #ctl select{background:#F5F8FD;border-color:#D3DAE6;col
 #legendwrap{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:8;max-width:min(94vw,720px);
  background:rgba(13,17,27,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 10px 9px;
  backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+/* collapsible legend header — tap to minimize so the 3D stays viewable (esp. on phones) */
+.lg-head{display:flex;align-items:center;gap:7px;width:100%;background:none;border:0;cursor:pointer;
+  padding:2px 2px 8px;color:var(--txt);font:700 11px 'IBM Plex Sans Thai';letter-spacing:.2px}
+.lg-head .lg-dot{width:8px;height:8px;border-radius:50%;background:var(--gold,#E6B450);flex:none}
+.lg-head .lg-label{flex:1;text-align:left;text-transform:uppercase;letter-spacing:.6px;font-size:10px;color:var(--dim)}
+.lg-head .lg-caret{transition:transform .18s;color:var(--dim);font-size:11px}
+#legendwrap.collapsed .lg-caret{transform:rotate(-90deg)}
+#legendwrap.collapsed .lg-head{padding-bottom:2px}
+#legendwrap.collapsed #lgBody{display:none}
+#legendwrap.collapsed{padding:6px 12px}
 .lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
 #legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
@@ -448,12 +458,24 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 </div>
 
 <div id="legendwrap">
-  <div id="bldglegend"></div>
-  <div id="isolegend" style="display:none"></div>
-  <div id="complegend" style="display:none"></div>
-  <div class="lgttl">Catchment POIs · collateral & demand first <span>· tap to toggle</span></div>
-  <div id="legend"></div>
+  <button id="lgToggle" class="lg-head" aria-expanded="true" aria-controls="lgBody">
+    <span class="lg-dot"></span><span class="lg-label">Legend</span><span class="lg-caret">▾</span>
+  </button>
+  <div id="lgBody">
+    <div id="bldglegend"></div>
+    <div id="isolegend" style="display:none"></div>
+    <div id="complegend" style="display:none"></div>
+    <div class="lgttl">Catchment POIs · collateral & demand first <span>· tap to toggle</span></div>
+    <div id="legend"></div>
+  </div>
 </div>
+<script>/* legend collapse — tap the header to minimize; default COLLAPSED on phones so the map is viewable. */
+(function(){var w=document.getElementById('legendwrap'),h=document.getElementById('lgToggle');if(!w||!h)return;
+  function set(c){w.classList.toggle('collapsed',c);h.setAttribute('aria-expanded',String(!c));
+    var l=w.querySelector('.lg-label');if(l)l.textContent=c?'Legend — tap to show':'Legend';}
+  var small=(matchMedia&&matchMedia('(pointer:coarse)').matches)||(window.innerWidth||999)<820;
+  set(small);   // minimized on phones, open on desktop
+  h.addEventListener('click',function(){set(!w.classList.contains('collapsed'));});})();</script>
 <script>window.initCatch=function(){
 'use strict';
 try{
