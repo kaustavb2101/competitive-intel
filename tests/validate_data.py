@@ -1625,6 +1625,58 @@ def check_expansion_plan(amphoe, n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_branch_peers(n_branches):
+    # Peer-twin benchmark (objective #1). ESTIMATED deviation of estimated composite risk vs
+    # measured-feature twins — meta must label it, branches[] must stay index-aligned to
+    # branches.json, and every published outlier must satisfy its own gates (rz >= rz_min,
+    # dev consistent with risk - peer_median). Optional file: SKIP-PASS when absent.
+    hdr("branch_peers.json (optional)")
+    if not exists("branch_peers.json"):
+        ok("branch_peers.json absent — skipped (optional; run build_branch_peers.py)")
+        return
+    try:
+        d = load("branch_peers.json")
+    except Exception as e:
+        fail("branch_peers.json loads", repr(e))
+        return
+    ok("branch_peers.json loads")
+
+    meta = d.get("meta") or {}
+    lab = str(meta.get("label") or "")
+    if not meta.get("generated_by") or "ESTIMATED" not in lab or "NOT a measured" not in lab:
+        fail("branch_peers meta/provenance (generated_by + ESTIMATED label + not-measured caveat)",
+             "meta missing generated_by / ESTIMATED / not-measured caveat")
+    else:
+        ok("branch_peers meta/provenance present (ESTIMATED peer benchmark, not-measured caveat)")
+
+    rows = d.get("branches")
+    if not isinstance(rows, list) or (n_branches is not None and len(rows) != n_branches):
+        fail("branch_peers.branches index-aligned to branches.json",
+             "len %s != %s" % (len(rows) if isinstance(rows, list) else None, n_branches))
+    else:
+        ok("branch_peers.branches index-aligned to branches.json (%d rows)" % len(rows))
+
+    outs = d.get("outliers") or []
+    rz_min = ((meta.get("params") or {}).get("rz_min")) or 2.0
+    problems = []
+    for o in outs:
+        if not isinstance(o.get("i"), int) or not (0 <= o["i"] < (n_branches or 10**9)):
+            problems.append("outlier index %r out of range" % o.get("i"))
+        if (o.get("rz") or 0) < rz_min:
+            problems.append("%s rz %.2f below gate %.1f" % (o.get("name"), o.get("rz") or 0, rz_min))
+        if abs((o.get("risk") or 0) - (o.get("peer_median") or 0) - (o.get("dev") or 0)) > 0.15:
+            problems.append("%s dev inconsistent with risk-peer_median" % o.get("name"))
+        if len(o.get("twins") or []) < 3:
+            problems.append("%s has <3 named twins" % o.get("name"))
+    if problems:
+        fail("branch_peers outliers sane (index in range, rz gate, dev arithmetic, 3 named twins)",
+             first_n(problems, 6))
+    else:
+        ok("branch_peers outliers sane (%d rows: rz>=%.1f, dev==risk-peer_median, 3 named twins)"
+           % (len(outs), rz_min))
+
+
+# ---------------------------------------------------------------------------
 def check_peer_npl():
     # PEER NPL benchmark (objective #1 collateral context). These are PEER-reported figures, NOT an
     # AutoX number — the data-mandate requires meta to say so explicitly and each row to cite its
@@ -1965,6 +2017,7 @@ def main():
     check_opportunity_score()
     check_exit_whitespace()
     check_expansion_plan(amphoe, n)
+    check_branch_peers(n)
     check_peer_npl()
     check_provenance()
     check_index_alignment(n)

@@ -448,6 +448,16 @@
          with flat sparkline-skeletons that fill in once the next snapshot lands. -->
     <div id="trendbaselinebody" style="display:none"></div>
 
+    <!-- PEER-TWIN OUTLIERS — vintage-independent: compares each branch against its statistical twins
+         (similar measured market fingerprint elsewhere in the country, same NSO leverage backdrop). -->
+    <h2 class="risk" style="margin-top:18px">Out of line vs statistical twins · audit-first list <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2>
+    <p class="lead">Every branch is benchmarked against its <b>15 statistical twins</b> — the branches with the most similar
+      <b>measured</b> market fingerprint (10&nbsp;km POI mix, district factories &amp; workers, rainfall, own density,
+      same NSO household-leverage backdrop) at least 25&nbsp;km away. A branch whose risk proxy sits far <b>above</b> its twins
+      is not just "in a risky market" — something <b>local</b> is different. Audit these first.</p>
+    <div class="insight" id="peerreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="peertbl"></table>
+
     <div id="trendbody" style="display:none">
       <h2>Region movers · proxy change vs prior vintage</h2>
       <p class="lead">Arrow + delta show how each region's mean risk proxy shifted. ▲ red = getting riskier · ▼ green = easing. All estimated.</p>

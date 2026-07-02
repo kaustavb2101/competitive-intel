@@ -2175,6 +2175,7 @@ function deltaPill(d,invert){
   return `<span class="mono" style="color:${col}" title="change vs prior vintage">${arr} ${txt}</span>`;
 }
 async function renderTrend(){
+  renderPeerOutliers();
   if(!trendLoaded){
     trendLoaded=true;
     try{ DELTAS = await fetch('data/deltas.json').then(r=>r.json()); }
@@ -2253,6 +2254,55 @@ function flatSpark(color){
 }
 function trendBaseChip(){
   return `<span class="tchip" title="A delta needs two vintages. The next snapshot fills this in.">Δ at next refresh</span>`;
+}
+/* ---------- peer-twin outliers · audit-first list (obj #1) ----------
+   Surfaces data/branch_peers.json (pipeline/build_branch_peers.py): each branch benchmarked
+   against its 15 statistical twins (measured market fingerprint + NSO leverage backdrop,
+   >=25km away). ESTIMATED — deviation of the estimated composite risk vs the twin group.
+   Vintage-independent (works before a 2nd snapshot exists). Graceful when absent. */
+let PEERS=null, peersLoaded=false;
+function renderPeerOutliers(){
+  const tbl=$('#peertbl'); if(!tbl) return;
+  if(peersLoaded){ drawPeerOutliers(); return; }
+  fetch('data/branch_peers.json').then(r=>r.ok?r.json():null).then(j=>{
+    PEERS=j; peersLoaded=true; drawPeerOutliers();
+  }).catch(()=>{ PEERS=null; peersLoaded=true; drawPeerOutliers(); });
+}
+function drawPeerOutliers(){
+  const tbl=$('#peertbl'), ro=$('#peerreadout'); if(!tbl) return;
+  const rows=(PEERS&&Array.isArray(PEERS.outliers))?PEERS.outliers:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Peer benchmark not yet computed.</b> <span class="sub">Run pipeline/build_branch_peers.py — the audit-first list fills in on the next data refresh.</span>';
+    return;
+  }
+  tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
+    `<th class="h-risk" title="ESTIMATED composite risk proxy (0–100) from branch_risk.json">Risk ▲</th>`+
+    `<th title="Median composite risk of the 15 statistical twins">Twins</th>`+
+    `<th class="h-risk" title="Points above the twin median — the branch-local anomaly">+ vs twins</th>`+
+    `<th title="Component driving the branch's composite (household / agri / occupation / segment)">Driver</th>`+
+    `<th title="The 3 nearest twins (name · risk) — similar measured markets elsewhere">Closest twins</th></tr>`+
+    rows.map((o,i)=>{
+      const tw=(o.twins||[]).map(t=>`${t.name} <span class="mono sub">${t.risk}</span>`).join('<br>');
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${o.name||'—'}</b><div class="sub">${o.district||''}</div></td>
+        <td>${o.prov||'—'}</td>
+        <td class="sub">${o.region||'—'}</td>
+        <td class="mono" style="color:var(--agri)"><b>${o.risk}</b></td>
+        <td class="mono sub">${o.peer_median}</td>
+        <td>${barHTML(o.dev,'var(--agri)',25)} <span class="mono" style="color:var(--agri)"><b>+${o.dev}</b></span></td>
+        <td class="sub">${o.top_driver||'—'}</td>
+        <td class="sub" style="font-size:11px">${tw}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const t=rows[0], m=PEERS.meta||{};
+    ro.innerHTML=`<b>Audit first:</b> <b style="color:var(--agri)">${t.name}</b> (${t.prov}, ${t.region}) carries risk
+      <b style="color:var(--agri)">${t.risk}</b> while its statistical twins sit at <b>${t.peer_median}</b> —
+      <b style="color:var(--agri)">+${t.dev} points</b> above comparable markets, so the driver is likely <b>local</b>
+      (${t.top_driver||'mixed'}), not the market. ${rows.length} branches sit ≥2 robust-σ above their twins.
+      <span class="sub">ESTIMATED — twins matched on measured features (${(m.params||{}).k||15} twins, ≥${(m.params||{}).geo_excl_km||25} km away, same NSO leverage backdrop); deviation uses the estimated composite risk. Not a measured default rate.</span>`;
+  }
 }
 function renderTrendBaseline(deltas){
   const box=$('#trendbaselinebody'); if(!box) return;

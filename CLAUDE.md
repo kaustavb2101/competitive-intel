@@ -91,6 +91,11 @@ timeseries `--check` plus `node --check` on every page's JS.*
   Places all ~985 net-new branches ONE AT A TIME by greedy divisor allocation (D'Hondt) over risk-adjusted
   district demand, with 15km neighbor cannibalization (ESTIMATED planning order over measured demand inputs;
   ≤8/district). Surfaces on `#acq` under Road to 3,000 (top-25 table + full-plan CSV + map drill-down).
+- `build_branch_peers.py` — **peer-twin outlier benchmark** (objective #1) → `platform/data/branch_peers.json`.
+  Benchmarks every branch against its 15 statistical twins (measured market fingerprint: 10km POI mix +
+  DIW/workers + rain + own density + NSO province-DTI backdrop, ≥25km away) and flags branches whose
+  ESTIMATED composite risk sits ≥2 robust-σ above the twin median — "risky vs its market twins" ≠ "risky
+  market". Audit-first list on `#trend` (vintage-independent, labelled ESTIMATED).
 - `timeseries.py` — captures a per-vintage SNAPSHOT (label from `meta.updated`, never wall clock) +
   diffs → `source-data/snapshots/`, `platform/data/snapshots_index.json` + `deltas.json` (Risk-trend tab).
 - **Loan-tape bridge** (objective #1; synthetic until a real export lands):
