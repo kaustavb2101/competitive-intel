@@ -43,7 +43,14 @@
 <script>/* "More ▾" nav dropdown — pure UI; routing stays in app.js (menu links carry data-v inside #nav). */
 (function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
  if(!wrap||!btn||!menu)return;
- function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ /* the nav's backdrop-filter makes it the containing block for position:fixed children, so the
+    menu must live under <body> and be placed from the button's viewport rect on each open —
+    otherwise the horizontal nav scroll drags/clips the dropdown. */
+ document.body.appendChild(menu);
+ function place(){var r=btn.getBoundingClientRect();
+   menu.style.top=(r.bottom+6)+'px';
+   menu.style.right=Math.max(10,window.innerWidth-r.right)+'px';menu.style.left='auto';}
+ function open(o){if(o)place();menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
  btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
  menu.addEventListener('click',function(){open(false);}); /* picking a view closes it; app.js handles the route */
  document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});

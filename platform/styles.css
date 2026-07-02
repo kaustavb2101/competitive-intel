@@ -180,11 +180,13 @@ body{
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
 /* ---------- shared fixed nav (the one canonical bar) ----------
-   QW3: fit ALL tabs (shortened labels + a "More ▾" tuck), no silent
-   fade mask. The bar wraps to a 2nd line if a viewport is too narrow
-   rather than hiding tabs behind a gradient. */
+   QW3: fit ALL tabs (shortened labels + a "More ▾" tuck). On narrow
+   viewports the bar SWIPE-SCROLLS horizontally (nowrap): the earlier
+   wrap-to-2nd-line variant clipped rows 2+ under the fixed 48px bar on
+   phones, leaving most tabs unreachable. */
 #nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;
-  flex-wrap:wrap;row-gap:2px;gap:var(--s1);
+  flex-wrap:nowrap;gap:var(--s1);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
   padding:6px var(--s2);min-height:48px;
   background:rgba(15,20,34,.85);backdrop-filter:blur(14px) saturate(140%);
   border-bottom:1px solid var(--line);box-shadow:0 1px 12px rgba(0,0,0,.35);}
@@ -203,12 +205,21 @@ body{
   font:500 12.5px var(--sans);padding:7px 10px;border-radius:8px;white-space:nowrap;
   transition:color .15s,background .15s}
 .nav-more-btn:hover{color:var(--txt);background:rgba(255,255,255,.045)}
-.nav-more-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:160px;display:none;
+/* position:fixed (not absolute): the nav is now an overflow-x scroll container, which would
+   clip an absolutely-positioned child dropdown. Fixed = anchored under the fixed 48px bar. */
+.nav-more-menu{position:fixed;top:54px;right:10px;left:auto;min-width:160px;display:none;
   flex-direction:column;gap:2px;padding:6px;z-index:2100;
   background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
   border:1px solid var(--line);border-radius:10px;box-shadow:var(--pop-sh,0 14px 38px rgba(0,0,0,.55))}
-.nav-more.open .nav-more-menu{display:flex}
-.nav-more-menu a{display:block;flex:none}
+.nav-more.open .nav-more-menu,.nav-more-menu.open{display:flex}  /* .open on the menu itself: it is re-parented to <body> (see index.html nav script) */
+/* self-contained link styling: the menu is re-parented to <body>, so #nav a rules no longer reach it */
+.nav-more-menu a{display:block;flex:none;color:var(--mid);text-decoration:none;
+  font:500 12.5px var(--sans);padding:9px 12px;border-radius:8px;white-space:nowrap;cursor:pointer}
+.nav-more-menu a:hover{color:var(--txt);background:rgba(255,255,255,.045)}
+.nav-more-menu a.on{color:#fff;background:linear-gradient(180deg,var(--raised),#19223a)}
+html[data-theme="light"] .nav-more-menu a{color:#3D4557}
+html[data-theme="light"] .nav-more-menu a:hover{background:rgba(16,22,40,.06);color:#11151F}
+html[data-theme="light"] .nav-more-menu a.on{color:#fff}
 html[data-theme="light"] .nav-more-btn:hover{background:rgba(16,22,40,.05)}
 html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98)}
 html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
