@@ -93,12 +93,25 @@
 - [ ] **NSO census occupation distiller** scaffolding in `ingest_gov.py` (code only; drop-in when the
       data.go.th pull lands) — improves data availability. *(med, M)*
 - [ ] **Expand `validate_data.py`** coverage as new data layers land. *(med, S)*
+- [ ] **National map: dedicated "Unemployment ▲" district lens.** `amphoe.json` now carries a
+      province-inherited `unemployment_rate` (MEASURED · NSO LFS, landed this cycle) that's currently
+      only baked into the composite `risk_proxy`. Surface it standalone (mirrors the household-DTI
+      lens pattern) so Kaustav can see raw unemployment separate from the blended estimate. *(MED, S)*
+- [ ] **Combine household DTI + unemployment into one province portfolio-stress index.**
+      `household_risk_by_province.json` (DTI) and `unemployment_by_province.json` are both MEASURED
+      province-level risk signals but feed different views (a National lens vs `build_amphoe.py`'s
+      risk_proxy) with no single combined read. A blended province stress score would give one number
+      for "which provinces are structurally riskiest" (objective #1). *(MED, M)*
+- [ ] **Backlog hygiene pass.** Two stale entries found this cycle: (1) the "Household debt-to-income
+      RISK LENS" item appears twice — once `[x]` DONE 2026-06-30, once still `[ ]` describing work
+      already shipped; (2) the "P2 Road-to-3,000 rounding" item near the bottom of this file is still
+      `[ ]` even though the 2026-07-01 Done entry says it was fixed. Dedupe/checkbox them. *(LOW, S —
+      doc-only, no code.)*
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
-- [ ] **Fold NSO LFS `unemployment_rate` into `build_amphoe.py`'s `risk_proxy`** (objective #1) — it's
-      now in every province's `gov.unemployment` (landed 2026-07-02 (2)) but only rendered as a fact,
-      not yet used as a risk-score input. A high provincial unemployment rate is a direct portfolio-
-      stress signal alongside the existing household-DTI component. *(MED, S — join by province, same
-      pattern as the existing `informal`/`formal` join in `build_amphoe.py`.)*
+- [x] **Fold NSO LFS `unemployment_rate` into `build_amphoe.py`'s `risk_proxy` — DONE 2026-07-02 (3)**
+      (province-inherited `unemployment_rate` field + risk_proxy now 0.4·agri_stress + 0.25·collateral +
+      0.15·merchant + 0.2·unemployment_stress [scaled 0-3.0%->0-100, clipped]; #acq risk table gained an
+      Unemployment column; expansion_plan.json regenerated to match; gate 31/0).
 
 ## From the research digest (docs/RESEARCH_DIGEST.md — all cited)
 - [x] **★ Model the BoT 28% title-loan rate cap — DONE 2026-06-30** (Simulator lever: book yield 28.2%→26.2% under the cap,
@@ -131,6 +144,13 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-02 (3) — ENRICH: NSO unemployment_rate folded into `build_amphoe.py`'s `risk_proxy`.**
+  Province-inherited `unemployment_rate` field added to every amphoe record; risk_proxy reweighted to
+  0.4·agri_stress + 0.25·collateral + 0.15·merchant + 0.2·unemployment_stress (unemployment scaled
+  0-3.0%→0-100, clipped), falling back to 2/3·agri + 1/3·unemployment for zero-branch amphoe.
+  `expansion_plan.json` regenerated to match (drift); `branch_peers.json` reproduced byte-identical.
+  #acq district-risk table gained an Unemployment column + updated formula copy. Gate: 31/0. Full
+  writeup: `docs/PROGRESS_LOG.md` (2026-07-02 (3) entry).
 - **2026-07-02 (2) — ENRICH: NSO Labour Force Survey unemployment rate → province deep-dive.**
   `unemployment_by_province.json` (already vendored + MEASURED, previously only surfaced per-branch
   in `branch_labor.json`) is now joined into `build_province.py`'s `gov` block for all 77 provinces

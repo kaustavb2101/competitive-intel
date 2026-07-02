@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-02 (3) — ENRICH: NSO unemployment_rate folded into build_amphoe.py's district risk_proxy
+
+Loop cycle. `unemployment_by_province.json` (MEASURED · NSO Labour Force Survey, already vendored and
+joined into `build_province.py`'s per-province `gov` block) was landed but only rendered as a fact —
+not used as a risk input anywhere. Folded it into `build_amphoe.py`'s `risk_proxy` (objective #1, district
+risk triage): every amphoe now carries a province-inherited `unemployment_rate` field, and risk_proxy is
+`0.4*agri_stress + 0.25*collateral_density + 0.15*merchant_pd + 0.2*unemployment_stress` (unemployment
+linearly scaled 0-3.0% -> 0-100, clipped; 3.0% chosen as a round cap above the observed national max of
+3.59%), falling back to `2/3*agri_stress + 1/3*unemployment_stress` for zero-branch amphoe (no
+collateral/merchant signal there). Regenerated `amphoe.json` + its two downstream `--check`'d consumers
+(`expansion_plan.json` drifted and was rebuilt; `branch_peers.json` reproduced byte-identical — needed
+`numpy` installed in the sandbox, unrelated to this change). Updated the Acquisition tab's district-risk
+table (`platform/index.html` + `app.js`): new **Unemployment** column, updated formula tooltip/caption
+copy, unemployment added to the district CSV export.
+
+Verification: `bash tests/run.sh check` → **31 passed, 0 failed**. Rendered `index.html#acq` headless
+(temporarily forced the collapsed `sec-segments` `<details>` open for the screenshot, then reverted before
+committing) and confirmed the risk-readout table renders the new column with real values (e.g. Warin
+Chamrap 0.16%, Mueang Buri Ram 1.87%) and no layout regression.
+
+---
+
 ## 2026-06-29 — Decision layer: command center, time dimension, district engine, loan-tape bridge
 
 Big session (~80 commits on `claude/new-session-wto26j`). The platform moved from "branch map +
