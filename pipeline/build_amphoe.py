@@ -17,11 +17,13 @@ For each amphoe polygon it computes, deterministically and network-free:
   - DIW factories + workers (prov|norm_district join — MEASURED at amphoe, but
     only resolvable for amphoe whose Thai district name we can read off branches)
   - province-inherited vehicles{car,pickup,moto,ev}, informal/formal employment,
-    and an agri_stress proxy (clearly tagged province-inherited, NOT amphoe-measured)
+    unemployment_rate (NSO Labour Force Survey), and an agri_stress proxy (clearly
+    tagged province-inherited, NOT amphoe-measured)
 Then two scores:
   - whitespace : demand proxy (POI footfall + DIW workers, log-normalized) MINUS
     AutoX saturation (branch count). Higher = more underserved. Works for 0-branch amphoe.
-  - risk_proxy : province agri_stress + local collateral/merchant mix (ESTIMATED).
+  - risk_proxy : province agri_stress + province unemployment + local collateral/merchant
+    mix (ESTIMATED weighting over MEASURED unemployment_rate + agri_stress inputs).
 
 Output: platform/data/amphoe.json, sorted by whitespace desc.
 
@@ -103,6 +105,8 @@ def build():
     fbd    = _load(os.path.join(SRC, "factories_by_district.json"))["districts"]
     veh    = _load(os.path.join(SRC, "vehicles_by_province.json"))["provinces"]
     emp    = _load(os.path.join(SRC, "employment_by_province.json"))["provinces"]
+    unemp_f = os.path.join(SRC, "unemployment_by_province.json")
+    unemp  = _load(unemp_f)["provinces"] if os.path.exists(unemp_f) else {}
     osm    = _load(os.path.join(SRC, "osm_layers.json"))
 
     polys = [(f, _bbox(f["geometry"])) for f in amphoe]
@@ -218,6 +222,7 @@ def build():
             "veh": {"car": pv.get("car"), "pickup": pv.get("pickup"),
                     "moto": pv.get("moto"), "ev": pv.get("ev")},
             "informal": ev.get("informal"), "formal": ev.get("formal"),
+            "unemployment_rate": (unemp.get(prov) or {}).get("unemployment_rate"),
             "agri_stress": prov_agri.get(prov),
             # local merchant/collateral mix (mean of branch features in this amphoe,
             # if any) — used by risk_proxy. None when no branch sits here.
@@ -244,13 +249,17 @@ def build():
         sat = round(min(100, 28 * math.log1p(r["branches"])), 1)
         r["demand"] = demand100
         r["whitespace"] = round(max(0.0, demand100 - sat), 1)
-        # risk_proxy (ESTIMATED): province agri_stress + local collateral/merchant mix.
-        # When no branch sits in the amphoe, fall back to province agri_stress alone.
+        # risk_proxy (ESTIMATED weighting): province agri_stress + province unemployment
+        # stress (NSO LFS unemployment_rate, capped at 3.0% -> 100 and scaled linearly —
+        # 3.0% is above the observed national max of 3.59% is clipped, not extrapolated)
+        # + local collateral/merchant mix. When no branch sits in the amphoe, fall back
+        # to agri_stress + unemployment alone (same 2:1 ratio as the branch case's 0.4:0.2).
         ag = r["agri_stress"] or 0
+        un = round(min(100.0, (r["unemployment_rate"] or 0) / 3.0 * 100), 1)
         if r["_coll"] is not None:
-            r["risk_proxy"] = round(0.5 * ag + 0.3 * r["_coll"] + 0.2 * r["_merch"], 1)
+            r["risk_proxy"] = round(0.4 * ag + 0.25 * r["_coll"] + 0.15 * r["_merch"] + 0.2 * un, 1)
         else:
-            r["risk_proxy"] = round(ag, 1)
+            r["risk_proxy"] = round(2 / 3 * ag + 1 / 3 * un, 1)
         del r["_coll"]; del r["_merch"]
 
     recs.sort(key=lambda r: -r["whitespace"])
@@ -281,6 +290,8 @@ def build():
             "province_inherited": [
                 "veh{car,pickup,moto,ev} (DLT vehicles_by_province — every amphoe inherits its province total)",
                 "informal/formal (NSO employment_by_province — province-inherited)",
+                "unemployment_rate (NSO Labour Force Survey unemployment_by_province.json, percent, "
+                "province-inherited, MEASURED; null when the source file is absent — graceful)",
                 "agri_stress (platform/data/crop_stress.json per-province crop-household stress index — "
                 "price proxy x drought scaled by crop_dependence, rescaled 0..1 -> 0-100; province-inherited, "
                 "ESTIMATED. Provinces absent from crop_stress.json fall back to the province mean of branch "
@@ -295,8 +306,10 @@ def build():
             "demand": "0-100 norm of log1p(sum(w*poi)) + 0.5*log1p(workers); "
                       "w = " + json.dumps(DEMAND_W, ensure_ascii=False),
             "whitespace": "max(0, demand - 28*log1p(branches)); higher = more underserved opportunity",
-            "risk_proxy": "ESTIMATED. 0.5*agri_stress + 0.3*collateral_density + 0.2*merchant_pd "
-                          "(branch-mean in amphoe); falls back to agri_stress alone for zero-branch amphoe",
+            "risk_proxy": "ESTIMATED weighting. 0.4*agri_stress + 0.25*collateral_density + 0.15*merchant_pd "
+                          "(branch-mean in amphoe) + 0.2*unemployment_stress (MEASURED NSO unemployment_rate, "
+                          "linearly scaled 0-3.0% -> 0-100, clipped); falls back to (2/3)*agri_stress + "
+                          "(1/3)*unemployment_stress for zero-branch amphoe (no collateral/merchant signal)",
         },
         "join_rates": {
             "branch_to_amphoe": f"{branch_join}/{len(master)}",
@@ -304,6 +317,8 @@ def build():
             "factories_to_amphoe": f"{fac_join}/{fac_attempt} (attempted only on branch amphoe with a Thai district name)",
             "agri_stress_from_crop_stress": f"{n_cropstress} provinces from crop_stress.json, "
                                             f"{n_fallback_prov} provinces fell back to branch agri_pd mean",
+            "unemployment_to_province": f"{sum(1 for r in recs if r['unemployment_rate'] is not None)}/{len(recs)} "
+                                        "amphoe with a province unemployment_rate (0 when unemployment_by_province.json is absent)",
         },
         "branch_amphoe_note": "branch_amphoe[i] = index into amphoe[] for the i-th branch in "
                               "platform/data/branches.json (same order as branches_final.json). "
