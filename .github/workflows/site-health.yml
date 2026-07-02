@@ -1,0 +1,130 @@
+name: Site health — nightly live check
+
+# Probes the LIVE Vercel deployment every night and files a GitHub issue when it
+# breaks — so the owner finds out on his phone, not from a broken demo.
+#
+# WHY THIS RUNS HERE: GitHub-hosted runners have normal internet and can reach
+# the Vercel deployment (the cloud sandbox cannot). The checker itself is
+# pipeline/check_site_health.py — same validation code path is testable offline
+# with `--local platform`.
+#
+# WHAT IT CHECKS: the 4 entry pages serve 200 + the AutoX wordmark; the 7
+# critical data files download, parse as JSON, and have the shapes the frontend
+# expects (2,015 branches, 928 amphoe, ...). Shallow by design — deep data
+# integrity stays in tests/validate_data.py, which gates the REPO, not the site.
+#
+# ALERT FLOW (single rolling issue, no duplicate spam):
+#   FAIL  -> comment on the open "Site health check failed" issue if one exists,
+#            otherwise create it (title carries the date it first broke).
+#   PASS  -> close any open health issue with a recovery comment.
+
+on:
+  schedule:
+    - cron: "30 22 * * *"   # 22:30 UTC = 05:30 Bangkok — report ready pre-work
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Deployment root to check (override with the production domain if it changes)"
+        required: false
+        default: "https://competitive-intel-git-claude-ne-6e11a7-kaustav-bagchis-projects.vercel.app"
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Same pin as qa.yml — matches the environment the pipeline targets.
+          python-version: "3.11"
+
+      - name: Run site-health check
+        id: health
+        env:
+          # scheduled runs have no inputs -> fall back to the stable branch alias
+          BASE_URL: ${{ inputs.base_url || 'https://competitive-intel-git-claude-ne-6e11a7-kaustav-bagchis-projects.vercel.app' }}
+        run: |
+          echo "base_url=$BASE_URL" >> "$GITHUB_OUTPUT"
+          set +e
+          python pipeline/check_site_health.py --base-url "$BASE_URL" \
+            --json /tmp/health.json | tee /tmp/health_report.txt
+          CODE=${PIPESTATUS[0]}
+          set -e
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          # Don't fail the step yet — the alerting steps below need to run first.
+
+      - name: Alert on failure (create or update the health issue)
+        if: steps.health.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_URL: ${{ steps.health.outputs.base_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "Nightly site-health check **FAILED** against \`$BASE_URL\`."
+            echo
+            echo "Run: $RUN_URL"
+            echo
+            echo '```'
+            cat /tmp/health_report.txt
+            echo '```'
+            echo
+            echo "To re-check after a fix: Actions → \"Site health — nightly live check\" → Run workflow."
+            echo "This issue closes itself automatically on the next passing check."
+          } > /tmp/issue_body.md
+          # One rolling issue — comment on the existing open one instead of duplicating.
+          EXISTING="$(gh issue list --state open --search 'Site health check failed in:title' \
+                        --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            echo "Updating existing health issue #$EXISTING"
+            gh issue comment "$EXISTING" --body-file /tmp/issue_body.md
+          else
+            gh issue create \
+              --title "🚨 Site health check failed $(date -u +%Y-%m-%d)" \
+              --body-file /tmp/issue_body.md
+          fi
+
+      - name: Close health issue on success
+        if: steps.health.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_URL: ${{ steps.health.outputs.base_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          EXISTING="$(gh issue list --state open --search 'Site health check failed in:title' \
+                        --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            gh issue close "$EXISTING" \
+              --comment "Recovered — site health check passed against \`$BASE_URL\` ($RUN_URL)."
+          else
+            echo "Healthy and no open health issue — nothing to do."
+          fi
+
+      - name: Upload health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-health-report
+          path: |
+            /tmp/health_report.txt
+            /tmp/health.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # Fail the workflow run itself when the site is broken, so the Actions
+      # tab shows a red X in addition to the issue.
+      - name: Propagate check result
+        if: steps.health.outputs.exit_code != '0'
+        run: |
+          echo "Site health check failed (exit ${{ steps.health.outputs.exit_code }}) — see report above."
+          exit 1
