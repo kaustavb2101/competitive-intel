@@ -1677,6 +1677,72 @@ def check_branch_peers(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_branch_leads(n_branches):
+    # Occupation lead board per branch (objective #2, local-acquisition flavor). MEASURED
+    # nearby counts ranked by an ESTIMATED editorial fit map — meta must say the fit is
+    # ESTIMATED, branches[] must stay index-aligned to branches.json, every lead must use a
+    # known bucket key with a non-negative measured count, and lead boards cap at top-5.
+    # Optional file: SKIP-PASS when absent.
+    hdr("branch_leads.json (optional)")
+    if not exists("branch_leads.json"):
+        ok("branch_leads.json absent — skipped (optional; run build_branch_leads.py)")
+        return
+    try:
+        d = load("branch_leads.json")
+    except Exception as e:
+        fail("branch_leads.json loads", repr(e))
+        return
+    ok("branch_leads.json loads")
+
+    meta = d.get("meta") or {}
+    prov_blob = str(meta.get("label") or "") + str(meta.get("fit_map_provenance") or "")
+    if not meta.get("generated_by") or "ESTIMATED" not in prov_blob or "MEASURED" not in prov_blob:
+        fail("branch_leads meta/provenance (generated_by + ESTIMATED fit label + MEASURED counts note)",
+             "meta missing generated_by / ESTIMATED / MEASURED provenance text")
+    else:
+        ok("branch_leads meta/provenance present (MEASURED counts x ESTIMATED editorial fit)")
+
+    buckets = d.get("buckets") or []
+    known = {b.get("k") for b in buckets if isinstance(b, dict)}
+    if len(buckets) != 14 or len(known) != 14 or not all(
+            b.get("label") and b.get("fit") in ("high", "med", "low") and b.get("why")
+            for b in buckets):
+        fail("branch_leads fit map embedded (14 buckets, each with label + high/med/low fit + why)",
+             "buckets malformed: n=%d known=%d" % (len(buckets), len(known)))
+    else:
+        ok("branch_leads fit map embedded (14 buckets with auditable fit rating + rationale)")
+
+    rows = d.get("branches")
+    if not isinstance(rows, list) or (n_branches is not None and len(rows) != n_branches):
+        fail("branch_leads.branches index-aligned to branches.json",
+             "len %s != %s" % (len(rows) if isinstance(rows, list) else None, n_branches))
+        return
+    ok("branch_leads.branches index-aligned to branches.json (%d rows)" % len(rows))
+
+    problems = []
+    for i, r in enumerate(rows):
+        leads = r.get("leads")
+        if not isinstance(leads, list) or len(leads) > 5:
+            problems.append("row %d: leads not a list or >5" % i)
+            continue
+        for l in leads:
+            if l.get("k") not in known:
+                problems.append("row %d: unknown lead bucket %r" % (i, l.get("k")))
+            if not isinstance(l.get("n"), int) or l["n"] < 0:
+                problems.append("row %d: lead %s count %r not a non-negative int" % (i, l.get("k"), l.get("n")))
+        for u in (r.get("u") or []):
+            if u.get("k") not in known:
+                problems.append("row %d: unknown untapped bucket %r" % (i, u.get("k")))
+        if problems:
+            break  # one bad row is enough evidence; keep the report readable
+    if problems:
+        fail("branch_leads rows sane (known bucket keys, counts >= 0, top-5 max)",
+             first_n(problems, 6))
+    else:
+        ok("branch_leads rows sane (%d rows: known bucket keys, counts >= 0, <=5 leads each)" % len(rows))
+
+
+# ---------------------------------------------------------------------------
 def check_peer_npl():
     # PEER NPL benchmark (objective #1 collateral context). These are PEER-reported figures, NOT an
     # AutoX number — the data-mandate requires meta to say so explicitly and each row to cite its
@@ -2018,6 +2084,7 @@ def main():
     check_exit_whitespace()
     check_expansion_plan(amphoe, n)
     check_branch_peers(n)
+    check_branch_leads(n)
     check_peer_npl()
     check_provenance()
     check_index_alignment(n)
