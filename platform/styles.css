@@ -1045,3 +1045,27 @@ html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
   .xbtn,.pxbtn{min-width:44px;min-height:44px;display:inline-flex;
     align-items:center;justify-content:center}
 }
+
+/* ---------- mobile bottom sheet (branch detail on the National map, ≤600px) ----------
+   Replaces the clipping Leaflet popup on phones: fixed full-width sheet, max 62vh, internal
+   scroll, drag handle. Theme-token surfaces so it reads correctly in dark AND light.
+   z-index: above the map + nav bar (2000), below the nav More menu (2100). */
+#msheet-backdrop{position:fixed;inset:0;z-index:2040;background:rgba(4,7,12,.45);
+  opacity:0;transition:opacity .18s ease}
+#msheet-backdrop.open{opacity:1}
+#msheet{position:fixed;left:0;right:0;bottom:0;z-index:2050;max-height:62vh;
+  display:flex;flex-direction:column;background:var(--panel);
+  border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;
+  box-shadow:0 -12px 34px rgba(0,0,0,.45);
+  transform:translateY(102%);transition:transform .2s ease}
+#msheet.open{transform:translateY(0)}
+#msheet-handle{flex:0 0 auto;display:flex;justify-content:center;
+  padding:10px 0 8px;cursor:pointer;touch-action:none}
+#msheet-handle span{display:block;width:44px;height:4px;border-radius:2px;background:var(--line)}
+#msheet-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding:0 14px calc(14px + env(safe-area-inset-bottom))}
+/* popupHTML's root carries an inline max-height/overflow sized for the Leaflet popup — inside
+   the sheet the BODY is the scroller, so neutralize it to avoid a nested scroll trap. */
+#msheet-body .pop{max-height:none!important;overflow:visible!important}
+html[data-theme="light"] #msheet-backdrop{background:rgba(24,32,48,.32)}
+html[data-theme="light"] #msheet{box-shadow:0 -12px 34px rgba(24,32,48,.22)}
