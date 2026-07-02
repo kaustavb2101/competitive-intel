@@ -637,6 +637,7 @@ function showTab(v){
   if(v==='sim') renderSim();
   if(v==='trend') renderTrend();
   if(v==='acq') loadAmphoe();
+  closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
@@ -2757,23 +2758,85 @@ function initMap(){
   applyMapFocus();
 }
 function selectBranch(d,m){
-  m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
+  // On phones the tall answer-first popup clips badly inside the small map, so route the SAME
+  // popupHTML into a fixed bottom sheet instead of a Leaflet popup. Desktop path unchanged.
+  const sheet=isMobileSheet();
+  if(sheet) openBranchSheet(d);
+  else m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
+  // "is this branch still the selected one?" — sheet path checks the sheet, popup path the popup.
+  const stillOpen=()=>{ if(sheet) return isSheetOpenFor(d);
+    const p=m.getPopup(); return !!(p&&p.isOpen&&p.isOpen()); };
   drawRadius(d);
   // MEASURED lead-site pins (WHERE the who-to-acquire leads physically are) — drawn only while
-  // this popup is open; the previous branch's pins are cleared inside drawLeadSites. If the tap
-  // beat the lazy fetch, draw once it lands (only if this branch's popup is still the open one).
+  // this popup/sheet is open; the previous branch's pins are cleared inside drawLeadSites. If the
+  // tap beat the lazy fetch, draw once it lands (only if this branch is still the open one).
   if(LSITES) drawLeadSites(d);
-  else loadLeadSites().then(()=>{
-    const p=m.getPopup(); if(p&&p.isOpen&&p.isOpen()) drawLeadSites(d);
-  });
+  else loadLeadSites().then(()=>{ if(stillOpen()) drawLeadSites(d); });
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
-  // re-render the still-open popup once they land so the FIRST read answers acquire + macro.
+  // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
   if(!LEADS||!MACX){
     Promise.all([loadBranchLeads(),loadMacroExposure()]).then(()=>{
-      const p=m.getPopup(); if(p&&p.isOpen&&p.isOpen()) p.setContent(popupHTML(d));
+      if(!stillOpen()) return;
+      if(sheet) setSheetBody(popupHTML(d));
+      else m.getPopup().setContent(popupHTML(d));
     });
   }
+}
+/* ---------- mobile bottom sheet (branch detail on the National map, ≤600px) ----------
+   The Leaflet popup clips on small screens, so selectBranch routes popupHTML(d) into this fixed
+   full-width sheet instead (max-height 62vh, internal scroll). Closes on handle tap, swipe-down,
+   backdrop tap and Escape; closing performs the SAME cleanup the map 'popupclose' event does on
+   desktop (clearRadius + clearLeadSites) so lead-site pins never outlive the sheet. Null-guarded:
+   absent #msheet nodes (older HTML) → falls back to the Leaflet popup. z-index sits above the map
+   (nav bar 2000) but below the nav More menu (2100). */
+let sheetBranchIdx=-1, sheetTouchY=null;
+function isMobileSheet(){
+  try{ return matchMedia('(max-width:600px)').matches ||
+       (matchMedia('(pointer:coarse)').matches && window.innerWidth<=700); }
+  catch(e){ return false; }
+}
+function sheetEl(){ return document.getElementById('msheet'); }
+function openBranchSheet(d){
+  const s=sheetEl(), b=document.getElementById('msheet-backdrop'),
+        body=document.getElementById('msheet-body');
+  if(!s||!b||!body) return;                      // nodes absent → selectBranch's popup path still works
+  sheetBranchIdx=idxOf(d);
+  body.innerHTML=popupHTML(d);
+  body.scrollTop=0;
+  b.hidden=false; s.hidden=false;
+  requestAnimationFrame(()=>{ s.classList.add('open'); b.classList.add('open'); });
+  if(!s._wired){ wireBranchSheet(s,b,body); s._wired=true; }
+}
+function isSheetOpenFor(d){ const s=sheetEl(); return !!(s&&!s.hidden&&sheetBranchIdx===idxOf(d)); }
+function setSheetBody(html){ const body=document.getElementById('msheet-body'); if(body) body.innerHTML=html; }
+function closeBranchSheet(){
+  const s=sheetEl(), b=document.getElementById('msheet-backdrop');
+  if(!s||s.hidden) return;
+  sheetBranchIdx=-1;
+  s.classList.remove('open'); if(b) b.classList.remove('open');
+  setTimeout(()=>{ s.hidden=true; if(b) b.hidden=true; },180);   // let the slide-down play
+  // same cleanup the Leaflet popupclose handlers perform on desktop
+  try{ clearRadius(); }catch(e){}
+  try{ clearLeadSites(); }catch(e){}
+}
+function wireBranchSheet(s,b,body){
+  b.addEventListener('click',closeBranchSheet);
+  const h=document.getElementById('msheet-handle');
+  if(h) h.addEventListener('click',closeBranchSheet);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBranchSheet(); });
+  // simple swipe-down-to-close: arm on touchstart unless the body is mid-scroll (so internal
+  // scrolling never fights the gesture); a downward drag past the threshold closes the sheet.
+  s.addEventListener('touchstart',e=>{
+    const t=e.touches[0]; if(!t){ sheetTouchY=null; return; }
+    sheetTouchY=(body.contains(e.target)&&body.scrollTop>2)?null:t.clientY;
+  },{passive:true});
+  s.addEventListener('touchmove',e=>{
+    if(sheetTouchY==null) return;
+    const t=e.touches[0]; if(!t) return;
+    if(t.clientY-sheetTouchY>60){ sheetTouchY=null; closeBranchSheet(); }
+  },{passive:true});
+  s.addEventListener('touchend',()=>{ sheetTouchY=null; });
 }
 // lead-site pin layer — tiny category-coloured circleMarkers around the SELECTED branch only
 // (≤12, MEASURED OSM coordinates from lead_sites.json). Rebuilt per selection, cleared on
