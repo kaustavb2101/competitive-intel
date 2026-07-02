@@ -1726,6 +1726,139 @@ def check_peer_npl():
 
 
 # ---------------------------------------------------------------------------
+def check_macro_exposure(n_branches):
+    # MACRO-FACTOR EXPOSURE per customer cluster per branch (objective #1): MEASURED occupation
+    # shares × ESTIMATED sensitivity weights × MEASURED macro signals (prices/DTI/drought), index-
+    # aligned to branches.json. Optional file: SKIP-PASS when absent (needs the Overture occupation
+    # layer; build_macro_exposure.py skip-passes without it too).
+    hdr("macro_exposure.json (optional)")
+    if not exists("macro_exposure.json"):
+        ok("macro_exposure.json absent — skipped (optional; run build_macro_exposure.py to populate)")
+        return
+    try:
+        d = load("macro_exposure.json")
+    except Exception as e:
+        fail("macro_exposure.json loads", repr(e))
+        return
+    ok("macro_exposure.json loads")
+
+    # provenance: meta must carry the builder, the sensitivity MATRIX itself (auditable editorial
+    # judgement), an explicit ESTIMATED label on the weights, and a measured-signal provenance per
+    # factor (the data-mandate: measured-vs-estimated must be explicit everywhere).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("macro_exposure meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+        return
+    ok("macro_exposure meta/provenance present (generated_by + composite label)")
+
+    matrix = meta.get("matrix")
+    if not isinstance(matrix, dict) or not matrix or not all(
+            isinstance(row, dict) and all(
+                isinstance(c, dict) and is_finite_number(c.get("w")) and 0.0 <= c["w"] <= 1.0
+                and isinstance(c.get("why"), str) and c["why"].strip()
+                for c in row.values())
+            for row in matrix.values()):
+        fail("macro_exposure meta.matrix present (bucket × factor, w in [0,1], rationale per cell)",
+             "matrix missing, or a cell lacks a finite w in [0,1] / a non-empty 'why' rationale")
+    else:
+        n_cells = sum(len(r) for r in matrix.values())
+        ok("macro_exposure meta.matrix present (%d buckets, %d rationale-carrying cells)"
+           % (len(matrix), n_cells))
+
+    weights_prov = (meta.get("provenance") or {}).get("sensitivity_weights") \
+        if isinstance(meta.get("provenance"), dict) else None
+    if not (isinstance(weights_prov, str) and "ESTIMATED" in weights_prov):
+        fail("macro_exposure sensitivity weights explicitly labelled ESTIMATED",
+             "meta.provenance.sensitivity_weights missing or lacks the ESTIMATED label")
+    else:
+        ok("macro_exposure sensitivity weights explicitly labelled ESTIMATED")
+
+    factors = meta.get("factors")
+    fkeys = meta.get("factor_keys")
+    if (not isinstance(factors, list) or not factors or not isinstance(fkeys, list)
+            or [f.get("key") for f in factors] != fkeys):
+        fail("macro_exposure meta.factors defined + consistent with factor_keys",
+             "factors/factor_keys missing or inconsistent")
+        return
+    no_prov = [f.get("key") for f in factors
+               if not (isinstance((f.get("signal") or {}).get("provenance"), str)
+                       and f["signal"]["provenance"].strip())]
+    if no_prov:
+        fail("macro_exposure each factor's signal carries provenance", "missing: " + first_n(no_prov))
+    else:
+        ok("macro_exposure each factor's signal carries provenance (%d factors)" % len(factors))
+    # matrix columns must only reference defined factors
+    fset = set(fkeys)
+    bad_cols = sorted({f for row in (matrix or {}).values() for f in row if f not in fset})
+    if bad_cols:
+        fail("macro_exposure matrix columns are defined factor keys", "unknown: " + first_n(bad_cols))
+    else:
+        ok("macro_exposure matrix columns are defined factor keys")
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("macro_exposure has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+    if n_branches is not None and len(recs) != n_branches:
+        fail("macro_exposure length == branches.json length",
+             "macro_exposure=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("macro_exposure length == branches.json length (%d)" % len(recs))
+
+    # per-record: t3 = up-to-3 [factor_key, score 0..100, dir 'h'|'t'] sorted score desc;
+    # d (dominant) a defined factor key equal to t3[0][0], or null iff t3 is empty.
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        t3 = r.get("t3")
+        if not isinstance(t3, list) or len(t3) > 3:
+            bad.append("#%d t3 not a list of <=3" % i)
+            continue
+        prev = None
+        for e in t3:
+            if (not isinstance(e, list) or len(e) != 3 or e[0] not in fset
+                    or not is_finite_number(e[1]) or not (0.0 <= e[1] <= 100.0)
+                    or e[2] not in ("h", "t")):
+                bad.append("#%d t3 entry malformed: %r" % (i, e))
+                continue
+            if prev is not None and e[1] > prev:
+                bad.append("#%d t3 not sorted score desc" % i)
+            prev = e[1]
+        dom = r.get("d")
+        if t3:
+            if dom != t3[0][0]:
+                bad.append("#%d dominant %r != t3[0][0] %r" % (i, dom, t3[0][0]))
+        elif dom is not None:
+            bad.append("#%d empty t3 but dominant=%r" % (i, dom))
+        if dom is not None and dom not in fset:
+            bad.append("#%d dominant %r not a defined factor" % (i, dom))
+    if bad:
+        fail("macro_exposure records sane (t3 <=3 well-formed [key, 0..100, h|t] desc; "
+             "dominant a defined factor key consistent with t3)", first_n(bad, 8))
+    else:
+        ok("macro_exposure records sane (t3 well-formed + sorted, scores in [0,100], "
+           "dominant a defined factor key)")
+
+    # compact vector (map-lens read): index-aligned, [factor_index or -1, score 0..100].
+    vec = d.get("vector")
+    if not isinstance(vec, list) or (n_branches is not None and len(vec) != n_branches):
+        fail("macro_exposure vector index-aligned", "missing or wrong length")
+    else:
+        vbad = [i for i, v in enumerate(vec)
+                if not (isinstance(v, list) and len(v) == 2
+                        and isinstance(v[0], int) and -1 <= v[0] < len(fkeys)
+                        and is_finite_number(v[1]) and 0.0 <= v[1] <= 100.0)]
+        if vbad:
+            fail("macro_exposure vector entries sane ([factor_index|-1, score 0..100])",
+                 "bad at " + first_n(vbad))
+        else:
+            ok("macro_exposure vector index-aligned + sane (%d entries)" % len(vec))
+
+
+# ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
 # Mandate: no committed data may be hallucinatory/fabricated. Every NUMERIC data layer in
@@ -1907,6 +2040,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
     ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
 )
@@ -2019,6 +2153,7 @@ def main():
     check_expansion_plan(amphoe, n)
     check_branch_peers(n)
     check_peer_npl()
+    check_macro_exposure(n)
     check_provenance()
     check_index_alignment(n)
     check_rollup(branches)
