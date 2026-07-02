@@ -2169,6 +2169,7 @@ PROVENANCE_EXEMPT = {
     "rayong_water.json",       # OSM/Overpass water polygons (basemap)
     "rayong_rail.json",        # OSM/Overpass rail lines (basemap)
     "bangkok_catchment.json",  # Overture building footprints (Bangkok); meta has city/n_bldg but no source
+    "chiang-mai_catchment.json",  # Overture building footprints (Chiang Mai), pull_overture_buildings.py, 180k cap
     "bangkok_landuse.json",    # OSM/Overpass landuse polygons (basemap)
     "bangkok_roads.json",      # OSM/Overpass road lines (basemap)
     "bangkok_water.json",      # OSM/Overpass water polygons (basemap)
