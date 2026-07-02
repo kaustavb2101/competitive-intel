@@ -16,6 +16,9 @@ pipeline/iteration_log.json
 pipeline/autox-branch-features.csv
 pipeline/deck_payload.json
 
+# desktop autopilot session log (pipeline/desktop_autopilot.ps1) — local-only, delete any time
+pipeline/autopilot_log.txt
+
 # raw gov-data pull — re-pullable INPUT CSVs (autox_dgt_ingest.py), never served.
 # distilled layers live in source-data/; keep the bulk out of the tree.
 pipeline/dgt_out/
