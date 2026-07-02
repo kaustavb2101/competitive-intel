@@ -82,6 +82,8 @@ Usage:
 """
 import argparse, json, math, os, sys
 
+from fingerprint import branches_fingerprint
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 OCC = os.path.join(ROOT, "platform", "data", "branch_occupations.json")
@@ -227,6 +229,7 @@ def build():
         "min_estab": MIN_ESTAB,
         "source_occupations": occ.get("meta", {}).get("source", "Overture Maps Places"),
         "n_branches": len(out),
+        "branches_fingerprint": branches_fingerprint(branches),
         "n_flagged": n_flagged,
         "index_note": "branches[] is INDEX-ALIGNED to platform/data/branches.json (entry i <-> "
                       "branch i), identical to branch_occupations.json.",

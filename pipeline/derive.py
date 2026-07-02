@@ -32,6 +32,7 @@ SRC  = os.path.join(REPO, "source-data")
 OUT  = os.path.join(REPO, "platform", "data")
 sys.path.insert(0, ROOT)
 from regionmap import norm_district   # shared district normalizer (Thai SARA-AM safe)
+from fingerprint import branches_fingerprint  # tamper-evident branch-order fingerprint
 
 # fields carried straight from the master record into the compact branch record.
 # NOTE: tourism_score/demand/fmkt10/veh10 were dropped from the per-branch record
@@ -124,6 +125,7 @@ def build_meta(master, prev):
     for k in CARRY:
         meta[k] = prev[k]
     # key order in the committed file: board, region, estates, mws, cws, macro, n_agri, updated
+    # (run() appends branches_fingerprint last — derived, not carried)
     return {"board": meta["board"], "region": meta["region"], "estates": meta["estates"],
             "mws": meta["mws"], "cws": meta["cws"], "macro": meta["macro"],
             "n_agri": meta["n_agri"], "updated": meta["updated"]}
@@ -135,6 +137,10 @@ def run(check=False):
 
     branches = build_branches(master)
     meta = build_meta(master, prev_meta)
+    # tamper-evident index-alignment stamp: sha256 over the ordered (x,y,n) sequence of the
+    # branches written above. Every index-aligned builder stamps the CURRENT value into its
+    # own meta; tests/validate_data.py recomputes it and fails any stale layer.
+    meta["branches_fingerprint"] = branches_fingerprint(branches)
 
     # branches.json is stored compact (no whitespace); meta.json uses default spacing
     targets = [(os.path.join(OUT, "branches.json"),

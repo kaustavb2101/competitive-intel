@@ -50,6 +50,8 @@ then skip-passes.
 """
 import os, json, argparse, sys
 
+from fingerprint import branches_fingerprint
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
@@ -204,6 +206,7 @@ def build():
             "estimated": "the per-category WEIGHTS are a relevance MODEL (judgement), see weights",
             "radius_km": 10.0,
             "n_branches": n,
+            "branches_fingerprint": branches_fingerprint(branches),
             "source_occupations": bool(occ_aligned),
             "weights": WEIGHTS,
             "weight_rationale": {

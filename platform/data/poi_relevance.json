@@ -6,6 +6,7 @@
     "estimated": "the per-category WEIGHTS are a relevance MODEL (judgement), see weights",
     "radius_km": 10.0,
     "n_branches": 2015,
+    "branches_fingerprint": "e25867ab0c76d8889774a91b4c6bb9a890acd7929ca737dbbb36ff46bf9be786",
     "source_occupations": true,
     "weights": {
       "gold": 1.5,
