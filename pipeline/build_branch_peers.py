@@ -91,18 +91,18 @@ def build():
     Z = (X - mu) / sd
     Z[:, -1] *= DTI_W  # leverage backdrop must match harder than any single POI count
 
-    # feature distance (squared euclidean) + geographic distance for the exclusion
-    sq = (Z * Z).sum(axis=1)
-    D = sq[:, None] + sq[None, :] - 2.0 * (Z @ Z.T)
+    # feature distance (squared euclidean) + geographic exclusion, computed row-by-row with
+    # elementwise ops only — NO matmul/BLAS, whose SIMD reduction order varies across CPUs and
+    # would break the byte-exact --check gate between machines.
     lat = np.radians(np.array([b["y"] for b in br], dtype=np.float64))
     lng = np.radians(np.array([b["x"] for b in br], dtype=np.float64))
     clat = np.cos(lat)
-    dlat = (lat[:, None] - lat[None, :])
-    dlng = (lng[:, None] - lng[None, :])
-    geo_km = 6371.0 * np.sqrt(dlat ** 2 + (clat[:, None] * dlng) ** 2)  # equirect; fine at this scale
-    D[geo_km < GEO_EXCL_KM] = np.inf  # excludes self (distance 0) too
-
-    order = np.argsort(D, axis=1, kind="stable")[:, :K]
+    order = np.empty((n, K), dtype=np.int64)
+    for i in range(n):
+        d = ((Z - Z[i]) ** 2).sum(axis=1)
+        geo_km = 6371.0 * np.sqrt((lat - lat[i]) ** 2 + (clat[i] * (lng - lng[i])) ** 2)  # equirect
+        d[geo_km < GEO_EXCL_KM] = np.inf  # excludes self (distance 0) too
+        order[i] = np.argsort(d, kind="stable")[:K]
 
     rows, cand = [], []
     for i in range(n):

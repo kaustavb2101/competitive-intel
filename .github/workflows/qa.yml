@@ -35,6 +35,11 @@ jobs:
           node-version: "22"
 
       # --- Phase 1: offline determinism + syntax gate (no chromium needed) ---
+      # numpy is pinned for the same reason Python is: build_branch_peers.py --check reproduces
+      # byte-for-byte only under the version the artifact was generated with. The builder avoids
+      # BLAS (matmul) on purpose; elementwise numpy reductions are stable across machines.
+      - name: Install pipeline deps
+        run: pip install numpy==2.4.6
       - name: Determinism + syntax gate
         run: bash tests/run.sh check
 
