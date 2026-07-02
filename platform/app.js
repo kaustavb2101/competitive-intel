@@ -2765,7 +2765,8 @@ function occriskPopupHTML(d,sec,r){
 // within ~10km, fused into a 0–100 score by an ESTIMATED per-category relevance model. Renders
 // only once poi_relevance.json is loaded and carries this branch.
 const POIREL_CAT_LABEL={gold:'Gold shops',vehicle:'Vehicle dealers',fresh_mkt:'Fresh markets',
-  agri:'Farms / agri',factory:'Factories',commerce:'Commerce',school:'Schools'};
+  agri:'Farms / agri',factory:'Factories',commerce:'Convenience & supers',
+  retail_general:'Retail (all shops)',food_service:'Food service',school:'Schools'};
 function poiRelevancePopupHTML(d,sec,r){
   const e=poiRelevanceRec(d); if(!e) return '';
   const sc=Math.round(e.rel||0);

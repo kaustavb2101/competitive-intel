@@ -936,6 +936,68 @@ def check_poi_relevance(n_branches):
     elif recs:
         ok("poi_relevance min-max normalized (a branch reaches rel=100)")
 
+    # HONESTY GUARDS (2026-07 committee audit): fresh_mkt must be the OSM fmkt count and
+    # nothing else — the broad Overture retail bucket once leaked in here, inflating ~2,004
+    # branches' "fresh market" lead count ~100x. retail_general (its honest new home) must
+    # equal the Overture retail bucket count wherever occupations were joined.
+    if exists("branches.json"):
+        try:
+            brs = load("branches.json")
+        except Exception as e:
+            brs = None
+            fail("poi_relevance fresh_mkt == branches.json k10.fmkt", "branches.json load: %r" % e)
+        if isinstance(brs, list) and len(brs) == len(recs):
+            bad = []
+            for i, (r, br) in enumerate(zip(recs, brs)):
+                cat = r.get("cat") if isinstance(r, dict) else None
+                if not isinstance(cat, dict) or not isinstance(br, dict):
+                    continue
+                fmkt = int((br.get("k10") or {}).get("fmkt", 0) or 0)
+                if cat.get("fresh_mkt") != fmkt:
+                    bad.append("#%d fresh_mkt=%r != k10.fmkt=%d" % (i, cat.get("fresh_mkt"), fmkt))
+            if bad:
+                fail("poi_relevance fresh_mkt == branches.json k10.fmkt (OSM only, no retail leak)",
+                     first_n(bad))
+            else:
+                ok("poi_relevance fresh_mkt == branches.json k10.fmkt (OSM only, no retail leak)")
+        elif isinstance(brs, list):
+            fail("poi_relevance fresh_mkt == branches.json k10.fmkt",
+                 "length mismatch: branches=%d poi_relevance=%d" % (len(brs), len(recs)))
+    if exists("branch_occupations.json"):
+        try:
+            occ = load("branch_occupations.json")
+        except Exception as e:
+            occ = None
+            fail("poi_relevance retail_general == Overture retail bucket",
+                 "branch_occupations.json load: %r" % e)
+        occ_recs = (occ or {}).get("branches") or []
+        keys = [b.get("key") for b in (occ or {}).get("buckets", []) if isinstance(b, dict)]
+        ri = keys.index("retail") if "retail" in keys else -1
+        if ri >= 0 and len(occ_recs) == len(recs):
+            bad = []
+            for i, (r, orc) in enumerate(zip(recs, occ_recs)):
+                if not isinstance(r, dict) or r.get("src") != "occ+k10":
+                    continue  # occupations not joined for this branch — nothing to compare
+                cat = r.get("cat") or {}
+                ovec = orc.get("o") if isinstance(orc, dict) else None
+                if not isinstance(ovec, list) or ri >= len(ovec):
+                    continue
+                retail = int(ovec[ri] or 0)
+                if cat.get("retail_general") != retail:
+                    bad.append("#%d retail_general=%r != overture retail=%d"
+                               % (i, cat.get("retail_general"), retail))
+            if bad:
+                fail("poi_relevance retail_general == Overture retail bucket (where occ joined)",
+                     first_n(bad))
+            else:
+                ok("poi_relevance retail_general == Overture retail bucket (where occ joined)")
+        elif ri < 0:
+            fail("poi_relevance retail_general == Overture retail bucket",
+                 "branch_occupations.json has no 'retail' bucket")
+        else:
+            fail("poi_relevance retail_general == Overture retail bucket",
+                 "length mismatch: occ=%d poi_relevance=%d" % (len(occ_recs), len(recs)))
+
 
 # ---------------------------------------------------------------------------
 def check_branch_labor(n_branches):
