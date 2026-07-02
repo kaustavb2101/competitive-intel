@@ -3109,10 +3109,10 @@ function renderHomeWhitespace(){
     html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}${extraTag}</div>`;
     html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
       const where=`${a.province_th} · ${a.region}`;
-      const hd=a.branches===0?'no AutoX branch yet':`${a.branches} AutoX inside`;
-      // append the measured "what borrower base + how contested" half when those files are loaded.
-      const bits=[where,hd];
-      const dom=ampDomOcc(a); if(dom) bits.push(`base: ${dom.toLowerCase()}`);
+      // committee trim: max ~2-3 short bits so the gold score leads the row. Keep the zero-branch
+      // flag (real signal); drop the occupation-base phrase (it lives in the branch popup).
+      const bits=[where];
+      if(a.branches===0) bits.push('no AutoX yet');
       const cn=ampCompCount(a);
       if(cn===0) bits.push('0 rivals ≤5km ✦');
       else if(cn!=null) bits.push(`${cn} rival${cn===1?'':'s'} ≤5km`);
@@ -3155,7 +3155,7 @@ function renderHomeRisk(){
       const names=top.map(p=>p.province).join(', ');
       const dom=priskDom(top[0]);
       html+=`<div class="cc-sub2" style="margin-top:0">Most stressed · composite risk ${TAG_E}</div>`;
-      html+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)} · mean / p90 risk 0–100`,
+      html+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)}`,
         `▲ ${(top[0].mean_risk||0).toFixed(0)}`,`p90 ${(top[0].p90_risk||0).toFixed(0)}`,'var(--agri)');
     }
   }
@@ -3165,7 +3165,7 @@ function renderHomeRisk(){
     if(bi>=0){const e=BRISK[bi], d=DATA[bi];
       html+=`<div class="cc-sub2">Riskiest single branch ${TAG_E}</div>`;
       html+=ccRow(`${d.n||e.code} <span class="sub">${d.v||''}${d.r?' · '+d.r:''}</span>`,
-        `driven by ${riskDriverLabel(e.top_driver)} · composite 0–100`,
+        `driven by ${riskDriverLabel(e.top_driver)}`,
         `▲ ${(e.composite_risk||0).toFixed(0)}`,'composite','var(--agri)');
     }
   }
