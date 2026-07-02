@@ -9,7 +9,7 @@
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
-:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA}
+:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
 #map{position:fixed;inset:0;top:44px;background:transparent;z-index:1}
@@ -219,6 +219,7 @@ html[data-theme="light"] #bar a:hover{color:#11151F}
 html[data-theme="light"] #bar .nm{color:#11151F}
 html[data-theme="light"] #panel{background:rgba(255,255,255,.95);border-color:#D3DAE6}
 html[data-theme="light"] #panel h3{color:#5A6477}
+html[data-theme="light"]{--agri:#C0392F;--merch:#0E7C68;--hi:#0F1420}   /* AA on the light panel */
 html[data-theme="light"] .pr{color:#2C3444}
 html[data-theme="light"] .bar{background:#e3e8f1}
 html[data-theme="light"] .note{color:#828CA0}
@@ -888,10 +889,57 @@ async function loadPanel(){
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/occMx*100))}%;background:${rgb(c)}"></i></div></div>`;
       }).join('')+`</div>`;
 
+    // ANSWER-FIRST: who to acquire + macro exposure (index-aligned layers, same join as the
+    // occupation rollup above; both graceful — absent file / entry → block omitted, no fabrication).
+    const esc=s=>String(s||'').replace(/"/g,'&quot;');
+    let leadsJ=null, macxJ=null;
+    try{ const rl=await fetch('data/branch_leads.json'); if(rl.ok) leadsJ=await rl.json(); }catch(e){}
+    try{ const rm=await fetch('data/macro_exposure.json'); if(rm.ok) macxJ=await rm.json(); }catch(e){}
+    let acqHtml='';
+    const leadsE=(leadsJ&&leadsJ.branches&&idx>=0)?leadsJ.branches[idx]:null;
+    if(leadsE&&leadsE.leads&&leadsE.leads.length){
+      const bkm={}; (leadsJ.buckets||[]).forEach(b=>{ if(b&&b.k) bkm[b.k]=b; });
+      const FITL={h:'high fit',m:'med fit',l:'low fit'};
+      acqHtml+=`<h3>Who to acquire here <span class="tag meas">measured counts</span></h3>`
+        +leadsE.leads.slice(0,3).map(L=>{
+          const b=bkm[L.k]||{};
+          const tip=esc((b.why||'')+(L.rf?' ⚠ Stressed sector — court with careful underwriting, never exclude (est).':''));
+          return `<div class="pr" title="${tip}"><span>${b.label||L.k}${L.rf?' <b style="color:var(--agri);min-width:0">⚠</b>':''}</span>`
+            +`<b>${fmt(L.n)} <span style="color:var(--mid);font:600 9px 'IBM Plex Mono'">${FITL[L.f]||''}</span></b></div>`;
+        }).join('');
+      if(leadsE.u&&leadsE.u.length){
+        const u=leadsE.u[0], ub=bkm[u.k]||{};
+        acqHtml+=`<div class="note" style="margin-top:4px;color:var(--gold)">Untapped: ${ub.label||u.k} — big presence (${fmt(u.n)} measured), low segment score (est)</div>`;
+      }
+      acqHtml+=`<div class="note" style="margin-top:4px">Counts MEASURED (Overture ≤10km, a sample / lower bound); fit ranking + ⚠ stressed-sector flag ESTIMATED (editorial fit map).</div>`;
+    }
+    let macxHtml='';
+    const macxE=(macxJ&&macxJ.branches&&idx>=0)?macxJ.branches[idx]:null;
+    if(macxE&&macxE.t3&&macxE.t3.length){
+      const fx={}; ((macxJ.meta&&macxJ.meta.factors)||[]).forEach(f=>{ if(f&&f.key) fx[f.key]=f; });
+      const ARW={drought:'▼',leverage:'▲',mfg:'▼'};   // non-price factors: fixed signal direction
+      const chips=macxE.t3.map(t=>{
+        const k=t[0], s=t[1], head=t[2]!=='t';
+        const f=fx[k]||{}, sig=f.signal||{};
+        const col=head?'var(--agri)':'var(--merch)';
+        const arrow=(typeof sig.yoy_pct==='number')?(sig.yoy_pct>0?'▲':'▼'):(ARW[k]||(head?'▼':'▲'));
+        const tip=esc(`${f.label||k} — ${head?'HEADWIND':'TAILWIND'} for this branch's customer mix. `
+          +(typeof sig.yoy_pct==='number'?`YoY ${sig.yoy_pct>0?'+':''}${sig.yoy_pct}% (${sig.vintage||'—'}). `:'')
+          +(sig.provenance||'')+` Relative exposure rank ${s} (share-diluted, est — compare order, not magnitude).`);
+        return `<span title="${tip}" style="display:inline-flex;align-items:center;gap:3px;font:600 10.5px 'IBM Plex Mono';padding:2px 7px;border-radius:10px;border:1px solid currentColor;color:${col};cursor:help">${k} ${arrow}</span>`;
+      }).join('');
+      const dom=fx[macxE.d];
+      macxHtml=`<h3>Macro exposure <span class="tag est">estimated</span></h3>`
+        +`<div style="display:flex;flex-wrap:wrap;gap:4px;margin:2px 0">${chips}</div>`
+        +(macxE.d?`<div class="note" style="margin-top:4px">Customers most exposed to: <b style="color:var(--hi)">${dom?dom.label:macxE.d}</b> (est). Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate.</div>`:'');
+    }
+
     $('#panel').innerHTML =
       `<h3>${best.n}</h3>
        <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
        <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
+       ${acqHtml}
+       ${macxHtml}
        <h3>District workforce (DIW · measured)</h3>
        <div class="pr"><span>Factories</span><b style="color:#E6B450">${fmt(best.dfac)}</b></div>
        <div class="pr"><span>Factory workers</span><b style="color:#E6B450">${fmt(best.dwork)}</b></div>
