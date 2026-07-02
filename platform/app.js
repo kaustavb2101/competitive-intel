@@ -22,6 +22,7 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
+  macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
   pickups:  {pill:'Pickup stock', label:'Pickup stock', desc:'COLLATERAL SUPPLY · MEASURED (DLT) — pickup trucks registered in the province, the higher-recovery title collateral. Brighter = more pickup collateral to lend against.', color:'#7A4FE0', unit:'pickups', tag:'m', val:d=>(PLOOK[d.v]||{}).pickup||0},
   informal: {pill:'Informal labour', label:'Informal workforce', desc:'BORROWER BASE · MEASURED (NSO) — informal (cash-economy) workers in the province, the core title-loan customer. Brighter = a larger informal borrower base.', color:'#1C8C7D', unit:'workers', tag:'m', val:d=>(PLOOK[d.v]||{}).informal||0},
@@ -302,17 +303,55 @@ function leadsRec(d){
    ESTIMATED sensitivity weights × MEASURED macro signals) and are SHARE-DILUTED (meta.score_scale:
    typical range 0–25, not 0–100) — so the popup presents them RELATIVELY (chip order), never as
    0–100 bars. Fully null-guarded: absent file → MACX stays null and the chip strip is omitted. */
-let MACX=null, macxMeta=null, macxLoaded=false, macxPromise=null;
+let MACX=null, macxMeta=null, macxVec=null, macxLoaded=false, macxDone=false, macxPromise=null;
 async function loadMacroExposure(){
   if(macxPromise) return macxPromise;
   macxLoaded=true;
   macxPromise=(async()=>{
-    try{ const r=await fetch('data/macro_exposure.json'); if(!r.ok){MACX=null;return MACX;}
-      const j=await r.json(); macxMeta=j.meta||null; MACX=j.branches||null; }
-    catch(e){ MACX=null; macxMeta=null; }
+    try{ const r=await fetch('data/macro_exposure.json'); if(!r.ok){MACX=null;macxDone=true;return MACX;}
+      const j=await r.json(); macxMeta=j.meta||null; MACX=j.branches||null;
+      // compact per-branch [dominant factor idx, score] vector — feeds the 'macx' map lens.
+      macxVec=Array.isArray(j.vector)?j.vector:null; _macxTally=null; }
+    catch(e){ MACX=null; macxMeta=null; macxVec=null; }
+    // macxDone = the fetch SETTLED (vs macxLoaded = the fetch was merely kicked off — this loader
+    // is warmed for popups on every map open, so lensAbsent must not read the in-flight gap as absent).
+    macxDone=true;
     return MACX;
   })();
   return macxPromise;
+}
+// true once the layer is loaded AND carries branch reads (drives lensAbsent for the macx lens).
+function macxHasData(){return !!(MACX&&MACX.length&&macxVec&&macxVec.length);}
+// 'Macro headwind' lens val() — the branch's dominant-factor share-diluted score (ESTIMATED,
+// relative ~0–25 range) but ONLY when that dominant exposure is a HEADWIND (t3[0][2]!=='t').
+// Tailwind-dominant branches read 0: the lens flags customers a macro move is hurting, not helping.
+function macxHeadwindVal(d){
+  if(!macxHasData()||!DATA) return 0;
+  const i=idxOf(d); if(i<0) return 0;
+  const v=macxVec[i]; if(!v||v[0]==null||v[0]<0) return 0;
+  const e=MACX[i]; if(!e||!e.t3||!e.t3.length||e.t3[0][2]==='t') return 0;
+  return v[1]||0;
+}
+// dominant-factor tally over the whole network, computed once from the vector (~2,015 rows, cheap).
+// Returns {head:{key:n} headwind-dominant counts, all:{key:n} any-direction counts, top:{key,label,n}
+// the headwind factor hitting the most branches' customers} — null until the layer loads.
+let _macxTally=null;
+function macxDomTally(){
+  if(_macxTally!==null) return _macxTally;
+  if(!macxHasData()) return null;
+  const keys=(macxMeta&&macxMeta.factor_keys)||[];
+  const head={}, all={};
+  macxVec.forEach((v,i)=>{
+    if(!v||v[0]==null||v[0]<0) return;
+    const k=keys[v[0]]; if(!k) return;
+    all[k]=(all[k]||0)+1;
+    const e=MACX[i];
+    if(e&&e.t3&&e.t3.length&&e.t3[0][2]!=='t') head[k]=(head[k]||0)+1;
+  });
+  let top=null;
+  Object.keys(head).forEach(k=>{ if(!top||head[k]>top.n){ const f=macxFactor(k); top={key:k,label:(f&&f.label)||k,n:head[k]}; } });
+  _macxTally={head,all,top};
+  return _macxTally;
 }
 // per-branch macro-exposure record (for popups) — null when the file/entry is absent.
 function macxRec(d){
@@ -326,6 +365,30 @@ function macxFactor(k){
   for(const f of fs) if(f&&f.key===k) return f;
   return null;
 }
+
+/* ---------- MEASURED lead-site coordinates (data/lead_sites.json, obj#2) ----------
+   Lazy-loads the per-branch nearest lead SITES behind the who-to-acquire board (built by
+   pipeline/build_lead_sites.py): {meta:{categories:[{k,label,…}]}, branches:[[cat_idx,lng,lat,dist_km]…]},
+   INDEX-ALIGNED to branches.json, ≤12 sites/branch. Every point is a MEASURED OSM coordinate —
+   drawn as tiny category-coloured pins around a branch WHILE its popup is open (selectBranch),
+   cleared on popupclose / next selection. Fully null-guarded: absent file → LSITES stays null
+   and no pins draw. Nothing is fabricated. */
+let LSITES=null, lsitesMeta=null, lsitesLoaded=false, lsitesPromise=null;
+async function loadLeadSites(){
+  if(lsitesPromise) return lsitesPromise;
+  lsitesLoaded=true;
+  lsitesPromise=(async()=>{
+    try{ const r=await fetch('data/lead_sites.json'); if(!r.ok){LSITES=null;return LSITES;}
+      const j=await r.json(); lsitesMeta=j.meta||null; LSITES=j.branches||null; }
+    catch(e){ LSITES=null; lsitesMeta=null; }
+    return LSITES;
+  })();
+  return lsitesPromise;
+}
+// segment-palette colour per lead-site category key (gold/collateral/merchant/neutral families).
+const LEADSITE_COL={gold:'#E6B450',industrial:'#E6B450',vehicle:'#7A4FE0',
+  fresh_mkt:'#1C8C7D',supermarket:'#1C8C7D',convenience:'#1C8C7D',restaurant:'#1C8C7D',
+  hotel:'#8b90a7',school:'#8b90a7'};
 
 /* ---------- per-PROVINCE composite-risk rollup (data/province_risk.json, obj#1) ----------
    Lazy-loads the worst-first province rollup built by pipeline/build_province_risk.py:
@@ -632,11 +695,10 @@ async function boot(){
 function renderOverview(){
   $('#macro').innerHTML = META.macro.map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
-  const cls=b=> (b.yoy||0)>5?'var(--up)':(b.yoy||0)<-8?'var(--agri)':(b.yoy||0)<0?'#D9742B':'#C9A227';
-  const row=b=>`<tr><td>${b.lab}</td><td class="mono" style="color:${cls(b)}">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td><td class="sub">${b.reg}</td><td class="sub">${b.note}</td></tr>`;
-  const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
-  $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
-  $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops').map(row).join('');
+  renderCommodityBoard();
+  // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
+  // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.
+  loadMacroExposure().then(()=>{ if(macxHasData()) renderCommodityBoard(); });
   const rc={Isan:'var(--agri)',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'var(--accent)'};
   $('#region').innerHTML = `<tr><th>Region</th><th>Branches</th><th>Agri-PD</th><th>Elevated</th><th>Merchant</th><th>Collateral</th></tr>`+
     META.region.map(r=>`<tr><td><b>${r.r}</b></td><td class="mono">${r.n}</td>
@@ -650,6 +712,26 @@ function renderOverview(){
   renderRecoverySensitivity();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
+}
+// commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
+const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
+function renderCommodityBoard(){
+  if(!META||!META.board) return;
+  const cls=b=> (b.yoy||0)>5?'var(--up)':(b.yoy||0)<-8?'var(--agri)':(b.yoy||0)<0?'#D9742B':'#C9A227';
+  // per-row macro footprint: how many branches' customer mixes have THIS commodity's factor as
+  // their DOMINANT macro exposure (tallied from macro_exposure.json vector — count MEASURED-per-model,
+  // the exposure model itself ESTIMATED). Empty until the layer loads / when the factor tops nowhere.
+  const tally=macxLoaded?macxDomTally():null;
+  const mnote=b=>{
+    const k=BOARD_MACX_KEY[b.lab]; if(!k||!tally) return '';
+    const n=tally.all[k]||0; if(!n) return '';
+    const head=(b.yoy!=null&&b.yoy>0)?false:true;  // price up = tailwind for borrower income/collateral
+    return ` <span class="sub" style="color:${head?'var(--agri)':'var(--merch)'};font-size:10px">· ${head?'hits':'supports'} customers at ${n.toLocaleString()} branch${n===1?'':'es'} (est)</span>`;
+  };
+  const row=b=>`<tr><td>${b.lab}</td><td class="mono" style="color:${cls(b)}">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td><td class="sub">${b.reg}</td><td class="sub">${b.note}${mnote(b)}</td></tr>`;
+  const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
+  $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
+  $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops').map(row).join('');
 }
 
 /* ---------- BoT hire-purchase rate-cap macro card (objective #1, margin watch) ----------
@@ -2487,6 +2569,7 @@ function lensAbsent(k){
   if(l.brisk) return briskLoaded && !briskHasData();
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
   if(l.peers) return peersLoaded && !peerHasData();
+  if(l.macx)  return macxDone && !macxHasData();
   return false;
 }
 function renderLenses(){
@@ -2587,6 +2670,17 @@ function renderLegend(){
       ` <span class="sub" title="POI counts measured (Overture/OSM, lower bound); the per-category relevance weighting is an estimated model">◇ measured counts · estimated weighting</span>`;
     return;
   }
+  // Macro-headwind lens: skeleton while the exposure layer loads, then an honest RELATIVE scale —
+  // the scores are share-diluted (compare branches, not magnitudes) and tailwind-dominant reads 0.
+  if(l.macx){
+    if(!macxDone){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">macro exposure…</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${fmtK(mx)} ${l.unit}</span>`+
+      ` <span class="sub" title="Occupation mix measured × sensitivity weights estimated × macro signals measured; share-diluted scores — compare branches relatively. Branches whose dominant macro factor is a tailwind read 0.">▲ estimated · relative · headwinds only</span>`;
+    return;
+  }
   $('#maplegend').innerHTML =
     `<span><i style="background:${lensColor(.12,l.color)}"></i>~0</span>
      <span><i style="background:${lensColor(.5,l.color)}"></i>${fmtK(mx/2)}</span>
@@ -2611,6 +2705,7 @@ function initMap(){
     return m.addTo(map);
   });
   map.on('popupclose', clearRadius);
+  map.on('popupclose', clearLeadSites);   // lead-site pins live only while a branch popup is open
   addRadiusToggle();
   // P1: the district lenses (dws/drisk) read d._amp, which only exists after amphoe.json is joined.
   // Painting now would flash every branch pale (val 0) then snap when the join lands. So when we open
@@ -2646,8 +2741,14 @@ function initMap(){
   if(!peersLoaded) loadBranchPeers().then(()=>{ renderLenses(); if(mapReady&&curLens==='peerdev'){ renderLegend(); styleMarkers(); } });
   // warm the ANSWER-FIRST popup layers (who-to-acquire lead board + macro-exposure chips) so the
   // first branch tap already carries them; selectBranch refreshes an open popup if they land late.
+  // The macro layer also feeds the 'Macro headwind' lens, so on resolve re-render the pill row and
+  // (if the lens is active, e.g. via ?lens=macx) repaint — otherwise the markers would stay pale 0s.
   if(!leadsLoaded) loadBranchLeads();
-  if(!macxLoaded) loadMacroExposure();
+  if(!macxDone) loadMacroExposure().then(()=>{ renderLenses(); if(mapReady&&curLens==='macx'){ renderLegend(); styleMarkers(); } });
+  // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
+  // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
+  // selectBranch simply draws nothing.
+  if(!lsitesLoaded) loadLeadSites();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -2658,6 +2759,13 @@ function initMap(){
 function selectBranch(d,m){
   m.bindPopup(popupHTML(d),{closeButton:true, maxWidth:320, minWidth:260}).openPopup();
   drawRadius(d);
+  // MEASURED lead-site pins (WHERE the who-to-acquire leads physically are) — drawn only while
+  // this popup is open; the previous branch's pins are cleared inside drawLeadSites. If the tap
+  // beat the lazy fetch, draw once it lands (only if this branch's popup is still the open one).
+  if(LSITES) drawLeadSites(d);
+  else loadLeadSites().then(()=>{
+    const p=m.getPopup(); if(p&&p.isOpen&&p.isOpen()) drawLeadSites(d);
+  });
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
@@ -2666,6 +2774,29 @@ function selectBranch(d,m){
       const p=m.getPopup(); if(p&&p.isOpen&&p.isOpen()) p.setContent(popupHTML(d));
     });
   }
+}
+// lead-site pin layer — tiny category-coloured circleMarkers around the SELECTED branch only
+// (≤12, MEASURED OSM coordinates from lead_sites.json). Rebuilt per selection, cleared on
+// popupclose. Null-safe: absent file/entry → draws nothing, returns 0.
+let leadSiteLayer=null;
+function clearLeadSites(){ if(leadSiteLayer&&map){ map.removeLayer(leadSiteLayer); } leadSiteLayer=null; }
+function drawLeadSites(d){
+  clearLeadSites();
+  if(!mapReady||!map||!LSITES||!LSITES.length||!DATA) return 0;
+  const i=idxOf(d); if(i<0) return 0;
+  const sites=LSITES[i]; if(!Array.isArray(sites)||!sites.length) return 0;
+  const cats=(lsitesMeta&&lsitesMeta.categories)||[];
+  leadSiteLayer=L.layerGroup();
+  sites.forEach(s=>{
+    if(!Array.isArray(s)||s.length<4) return;
+    const c=cats[s[0]]||{};
+    const col=LEADSITE_COL[c.k]||'#8b90a7';
+    L.circleMarker([s[2],s[1]],{radius:4,weight:1,color:col,fillColor:col,fillOpacity:.8,opacity:.95})
+      .bindTooltip(`${c.label||'Lead site'} · ${s[3]} km (measured OSM)`,{direction:'top',opacity:.92})
+      .addTo(leadSiteLayer);
+  });
+  leadSiteLayer.addTo(map);
+  return sites.length;
 }
 function drawRadius(d){
   clearRadius();
@@ -3030,6 +3161,9 @@ function setLens(k){
   if(k==='peerdev' && !peersLoaded){
     loadBranchPeers().then(()=>{ renderLenses(); if(curLens==='peerdev'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
+  if(k==='macx' && !macxDone){
+    loadMacroExposure().then(()=>{ renderLenses(); if(curLens==='macx'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
   if(k==='poirel' && !poirelLoaded){
     loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
@@ -3265,6 +3399,8 @@ function renderHome(){
     loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
+    // obj#1 — macro-exposure dominant-factor headline in the thesis sentence (null-safe, est).
+    loadMacroExposure().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
     loadProvinceRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — collateral RECOVERY outlook (national, collateral_outlook.json) into the risk card.
@@ -3340,6 +3476,12 @@ function renderHomeThesis(){
     clauses.push(`the risk to watch is <b>${hh.region||hh.province} household leverage</b> (DTI ${(+hh.debt_to_income).toFixed(2)}× in ${hh.province}, measured)`);
   } else if(cs){
     clauses.push(`the risk to watch is a <b>${cs.th}</b> crop-income squeeze`);
+  }
+  // macro headline (obj#1) — the deteriorating macro factor DOMINANT at the most branches, tallied
+  // client-side from the macro-exposure vector (ESTIMATED composite; omitted until the layer loads).
+  const mt=macxLoaded?macxDomTally():null;
+  if(mt&&mt.top){
+    clauses.push(`the macro factor hitting the most branches' customers is <b>${mt.top.label}</b> (${mt.top.n.toLocaleString()} branches, est)`);
   }
   if(!clauses.length){ box.innerHTML=''; return; }
   const sentence=clauses.join('; ')+'.';
