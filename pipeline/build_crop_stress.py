@@ -7,6 +7,14 @@ Network-free, deterministic. Joins three LOCAL source-data files:
   - commodity_board.json   price board rows (crop label + YoY %); GLOBAL price direction proxy
   - branches_final.json    per-branch rain_3mo_anom (drought proxy) + prov/region
 
+PLUS one OPTIONAL measured upgrade (docs/DATA_ACQUISITION_PLAN.md P3):
+  - oae_farmgate_prices.json  MEASURED Thai farm-gate YoY per crop, landed by
+    pipeline/pull_oae_prices.py. When present AND current-vintage, its per-crop
+    YoY REPLACES the World Bank GLOBAL proxy for matching crops and the labels
+    flip to MEASURED-OAE for those crops (meta.price_sources says which). When
+    ABSENT (or stale — the BE-2562 crop_prices.json lesson), the output is
+    BYTE-IDENTICAL to the proxy-only build, so `--check` stays green either way.
+
 It computes, PER PROVINCE:
   crop_mix       dominant crops by planting-area share (top 3), with share + raw rai.
   price_stress   planting-area-weighted price YoY across the province's crops
@@ -53,6 +61,19 @@ CROP_TO_BOARD = {
     "rubber": "Rubber",
     "oilpalm": "Palm oil",
 }
+# crop key in crop_prov_area.json -> commodity key in oae_farmgate_prices.json
+# (only crops with planting area can be area-weighted; the OAE landing file may
+# also carry sugarcane/cassava/maize, unusable here until area data lands)
+CROP_TO_OAE = {
+    "rice": "rice",
+    "rubber": "rubber",
+    "oilpalm": "oilpalm",
+}
+OAE_FILE = "oae_farmgate_prices.json"
+# staleness guard: the OAE vintage may lag the commodity board's own vintage by
+# at most this many months, else the file is treated as absent (the crop_prices
+# BE-2562 lesson: a measured-but-7-years-stale series is WORSE than the proxy).
+OAE_MAX_LAG_MONTHS = 12
 # human-readable crop labels (en) for the UI
 CROP_EN = {"rice": "Rice", "rubber": "Rubber", "oilpalm": "Oil palm"}
 
@@ -83,6 +104,54 @@ def clamp(x, lo, hi):
     return max(lo, min(hi, x))
 
 
+def _months(y, m):
+    return int(y) * 12 + int(m)
+
+
+def _board_vintage_months(board):
+    """Newest 'stale' vintage on the board ('2025M12' -> months since year 0)."""
+    best = None
+    for row in board:
+        m = None
+        s = str(row.get("stale") or "")
+        parts = s.split("M")
+        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit():
+            m = _months(parts[0], parts[1])
+        if m is not None and (best is None or m > best):
+            best = m
+    return best
+
+
+def load_oae(board):
+    """Load the OPTIONAL measured OAE farm-gate file (pull_oae_prices.py).
+
+    Returns the parsed doc, or None when the file is absent, malformed, or
+    STALE (more than OAE_MAX_LAG_MONTHS behind the commodity board's own
+    vintage — deterministic: compared against an input, never the wall clock).
+    None => build proceeds exactly as before, byte-identical output.
+    """
+    path = os.path.join(SRC, OAE_FILE)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            doc = json.load(f)
+        vc = doc["meta"]["vintage_ce"]
+        oae_m = _months(vc["year"], vc["month"] or 12)
+    except (KeyError, TypeError, ValueError) as e:
+        print("WARNING: %s present but unreadable (%s) — falling back to the "
+              "GLOBAL proxy for all crops" % (OAE_FILE, e), file=sys.stderr)
+        return None
+    board_m = _board_vintage_months(board)
+    if board_m is not None and oae_m < board_m - OAE_MAX_LAG_MONTHS:
+        print("WARNING: %s vintage %s lags the commodity board by >%d months — "
+              "treating as absent (stale-file guard; the BE-2562 lesson)"
+              % (OAE_FILE, doc["meta"].get("vintage"), OAE_MAX_LAG_MONTHS),
+              file=sys.stderr)
+        return None
+    return doc
+
+
 def build():
     crop_area = load("crop_prov_area.json")   # {crop: {prov_th: rai}}
     board = load("commodity_board.json")       # list of rows
@@ -91,9 +160,27 @@ def build():
     # --- board lookup: crop key -> yoy % (only crops we have planting area for) ---
     board_by_label = {row["lab"]: row for row in board}
     crop_yoy = {}
+    crop_src = {}   # crop key -> "board" (GLOBAL proxy) | "oae" (MEASURED Thai)
     for ckey, blabel in CROP_TO_BOARD.items():
         if blabel in board_by_label:
             crop_yoy[ckey] = float(board_by_label[blabel]["yoy"])
+            crop_src[ckey] = "board"
+
+    # --- PREFER measured Thai farm-gate YoY (OAE) where the file is present ---
+    # Absent/stale file => oae is None and NOTHING below changes: the output
+    # stays byte-identical to the proxy-only build (--check green either way).
+    oae = load_oae(board)
+    oae_used = []
+    if oae is not None:
+        oae_comm = oae.get("commodities") or {}
+        for ckey in sorted(CROP_TO_OAE):
+            entry = oae_comm.get(CROP_TO_OAE[ckey])
+            if entry and entry.get("yoy") is not None:
+                crop_yoy[ckey] = float(entry["yoy"])
+                crop_src[ckey] = "oae"
+                oae_used.append(ckey)
+        if not oae_used:
+            oae = None  # file matched no priceable crop — behave as absent
 
     covered_crops = sorted(crop_yoy.keys())
     # crops with planting-area data but no usable board price (coverage gap)
@@ -335,6 +422,39 @@ def build():
             "agri_stress is an index for triage, not a forecast of defaults.",
         ],
     }
+
+    # --- MEASURED-OAE relabel: ONLY when the measured file was actually used ---
+    # Every mutation of meta lives inside this guard so the absent-file output
+    # is byte-identical to the historical proxy-only build.
+    if oae is not None:
+        om = oae.get("meta", {})
+        oae_vintage = om.get("vintage")
+        meta["fields"]["price_stress"] = (
+            "MIXED — planting-area-weighted price YoY %% across the province's "
+            "covered crops. Per-crop source in meta.price_sources: MEASURED-OAE "
+            "Thai farm-gate (ราคาที่เกษตรกรขายได้) where matched, World Bank "
+            "GLOBAL proxy otherwise.")
+        meta["price_sources"] = {
+            CROP_EN.get(c, c): (
+                "MEASURED-OAE — Thai farm-gate YoY %% (vintage %s)" % oae_vintage
+                if crop_src.get(c) == "oae"
+                else "PROXY — World Bank Pink Sheet GLOBAL YoY %% (direction only)")
+            for c in covered_crops}
+        meta["provenance"]["oae_farmgate_prices.json"] = (
+            "OAE farm-gate prices (ราคาที่เกษตรกรขายได้), pulled by "
+            "pipeline/pull_oae_prices.py — MEASURED. vintage %s, dataset %s." % (
+                oae_vintage, om.get("dataset_id")))
+        measured_en = [CROP_EN.get(c, c) for c in oae_used]
+        meta["caveats"][0] = (
+            "Price sources are MIXED per crop (see meta.price_sources): %s use "
+            "MEASURED Thai farm-gate YoY (OAE); any other priced crop still uses "
+            "the GLOBAL World Bank proxy (direction signal only)." %
+            ", ".join(measured_en))
+        if "rice" in oae_used and "rubber" in oae_used:
+            meta["double_stress"]["caveat"] = (
+                "price_term for rice/rubber now uses MEASURED Thai farm-gate YoY "
+                "(OAE, vintage %s), not the GLOBAL proxy. Still treat the flag as "
+                "a triage flag, not a default forecast." % oae_vintage)
 
     return {"meta": meta, "provinces": records}
 
