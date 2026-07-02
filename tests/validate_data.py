@@ -803,6 +803,57 @@ def check_occupation_risk(n_branches):
     else:
         ok("occupation_risk records sane (s in [0,100], f bool, ds in [0,1], t>=0)")
 
+    # FLAG LIVENESS (regression guard): a fixed absolute FLAG_THRESHOLD once sat ABOVE the
+    # achievable score ceiling (Overture factory/agriculture share ceilings x stress weights),
+    # so 0/2015 branches could ever flag — the layer was silently inert. The builder now resolves
+    # the threshold from the data itself (p95 of the NONZERO scores, recorded in
+    # meta.flag_threshold), so here we assert the flag is ALIVE and CONSISTENT:
+    #   1. every flagged record satisfies the RECORDED threshold + min_estab guard;
+    #   2. meta.n_flagged equals the actual count of f=true records;
+    #   3. whenever the MEASURED input (branch_occupations.json) is present and the score
+    #      distribution is non-degenerate (some branch has s>0), n_flagged must be > 0.
+    if isinstance(meta, dict):
+        thr = meta.get("flag_threshold")
+        min_estab = meta.get("min_estab")
+        n_flag_meta = meta.get("n_flagged")
+        flagged = [(i, r) for i, r in enumerate(recs) if isinstance(r, dict) and r.get("f") is True]
+
+        bad = []
+        if is_finite_number(thr) and is_finite_number(min_estab):
+            for i, r in flagged:
+                s, t = r.get("s"), r.get("t")
+                if not (is_finite_number(s) and s >= thr):
+                    bad.append("#%d flagged but s=%r < threshold %r" % (i, s, thr))
+                if not (is_finite_number(t) and t >= min_estab):
+                    bad.append("#%d flagged but t=%r < min_estab %r" % (i, t, min_estab))
+        elif flagged:
+            bad.append("records flagged but meta.flag_threshold/min_estab not numeric "
+                       "(thr=%r min_estab=%r)" % (thr, min_estab))
+        if bad:
+            fail("occupation_risk flagged records satisfy meta.flag_threshold + min_estab", first_n(bad))
+        else:
+            ok("occupation_risk flagged records satisfy meta.flag_threshold (%r) + min_estab (%r)"
+               % (thr, min_estab))
+
+        if n_flag_meta != len(flagged):
+            fail("occupation_risk meta.n_flagged matches records",
+                 "meta.n_flagged=%r but %d records have f=true" % (n_flag_meta, len(flagged)))
+        else:
+            ok("occupation_risk meta.n_flagged matches records (%d)" % len(flagged))
+
+        nonzero = any(isinstance(r, dict) and is_finite_number(r.get("s")) and r.get("s") > 0
+                      for r in recs)
+        if exists("branch_occupations.json") and nonzero:
+            if not (isinstance(n_flag_meta, int) and n_flag_meta > 0):
+                fail("occupation_risk flag is ALIVE (n_flagged > 0 with non-degenerate measured input)",
+                     "branch_occupations.json present and scores are non-degenerate, but "
+                     "meta.n_flagged=%r — the flag threshold is inert again" % n_flag_meta)
+            else:
+                ok("occupation_risk flag is ALIVE (n_flagged=%d > 0 with non-degenerate measured input)"
+                   % n_flag_meta)
+        else:
+            ok("occupation_risk flag-liveness skipped (measured input absent or all-zero scores)")
+
 
 # ---------------------------------------------------------------------------
 def check_poi_relevance(n_branches):
