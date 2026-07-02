@@ -212,11 +212,11 @@ def build_gpp(en2th):
     rows = re.findall(
         r'"([^"]+)":\s*\{\s*gpp:\s*([0-9]+),\s*manufacturing:\s*([0-9.]+),'
         r'\s*agri:\s*([0-9.]+),\s*services:\s*([0-9.]+),\s*hubType:\s*\'([^\']+)\','
-        r'\s*confidence:\s*([0-9.]+)',
+        r'\s*confidence:\s*([0-9.]+),\s*source:\s*\'([^\']+)\'',
         txt,
     )
     provinces = {}
-    for en, gpp, manu, agri, svc, hub, conf in rows:
+    for en, gpp, manu, agri, svc, hub, conf, src in rows:
         th = en2th.get(en)
         if not th:
             raise SystemExit("ingest_tmli gpp: unmapped province %r" % en)
@@ -228,6 +228,7 @@ def build_gpp(en2th):
             "services_share": _round(svc, 3),
             "hub_type": hub,
             "confidence": _round(conf, 3),
+            "source": src,
         }
         # alias rows (Bangkok Metropolis, Buriram, Sisaket, Phetchuri) carry identical
         # values; keep the first and assert any later row agrees.
@@ -237,15 +238,30 @@ def build_gpp(en2th):
     provinces = _sort(provinces)
     meta = {
         "source": "NESDC Provincial Accounts (GPP) — via data.go.th / TMLI",
-        "provenance": "MEASURED. Vendored from kaustavb2101/watcher source-data/tmli/"
-                      "provincial-gpp.js. NESDC 2566 B.E. (2023 CE) estimate.",
+        "provenance": "MIXED — NOT predominantly measured, despite the source file's own "
+                      "'NESDC OFFICIAL DATA' framing. Vendored from kaustavb2101/watcher "
+                      "source-data/tmli/provincial-gpp.js, whose own header/GPP_META confirms "
+                      "only ONE row (Mukdahan, confidence 0.95, source 'CKAN-NESDC-2566', CKAN "
+                      "resource ffabdf4f-b326-4d2d-8ede-a4514bf20339) was independently verified "
+                      "against a real NESDC CKAN dataset. The other 76 provinces carry generic "
+                      "source 'NESDC-2566', round-number GPP figures (multiples of 1,000-5,000 "
+                      "THB million), and hand-assigned confidence 0.75-0.97 — i.e. a plausibility "
+                      "knowledge base, NOT a per-province CKAN pull. Treat every row with "
+                      "confidence < 0.95 / source != 'CKAN-NESDC-2566' as ESTIMATED, not measured. "
+                      "Flagged during the 2026-07-02 audit cycle; see docs/DATA_REFRESH_LOG.md. Do "
+                      "NOT surface this layer as MEASURED in the app until re-pulled per-province "
+                      "from NESDC's CKAN resource on data.go.th.",
         "fields": {
             "gpp_million_thb": "total Gross Provincial Product, million THB (NESDC 2566)",
             "manufacturing_share/agri_share/services_share": "sector share of GPP, 0..1",
             "hub_type": "IND | AGRI | SVC | TOUR | MIX",
-            "confidence": "0..1 data confidence (1.0 = CKAN-verified)",
+            "confidence": "0..1 data confidence per TMLI source (1.0 = CKAN-verified; only "
+                          "Mukdahan actually reaches CKAN-verified status here)",
+            "source": "per-row provenance tag from provincial-gpp.js — 'CKAN-NESDC-2566' "
+                      "(verified) vs generic 'NESDC-2566' (unverified estimate)",
         },
         "n_provinces": len(provinces),
+        "n_ckan_verified": sum(1 for r in provinces.values() if r.get("source") == "CKAN-NESDC-2566"),
     }
     return "gpp_by_province.json", {"meta": meta, "provinces": provinces}
 

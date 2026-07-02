@@ -274,3 +274,28 @@ the Places key, or any real loan tape** — the synthetic tape and tokens are gi
 ## ⏰ Deferred reminder (set 2026-07-01)
 - **Rotate DATA_GO_TH_TOKEN** — user deferred on 2026-06-29; revisit ~2 days later. (Old token was exposed in chat.)
 - **Regenerate the OpenRouteService key** — it was pasted in chat on 2026-06-29; regenerate after the isochrone is wired.
+
+---
+## 8. Real per-province GPP (NESDC) — replace the vendored TMLI knowledge-base guess
+
+**Found 2026-07-02 audit:** `source-data/tmli/provincial-gpp.js` claims "NESDC OFFICIAL DATA" but
+its own metadata admits only **1 of 77** provinces (Mukdahan) is CKAN-verified; the other 76 are
+round-number estimates. `gpp_by_province.json` is corrected to label this MIXED/mostly-ESTIMATED and
+is **not** wired into any `platform/data` layer. To make it real:
+
+```bash
+# from a Thai IP — same CKAN dataset family as the verified Mukdahan resource
+# (resource ffabdf4f-b326-4d2d-8ede-a4514bf20339), browse:
+#   https://data.go.th/api/3/action/package_search?q=GPP   (44 datasets, NESDC Provincial Accounts)
+# find the resource_id for EACH province's GPP table (or a single national table keyed by province),
+# pull via the same datastore_search snippet as §2 (Census Table 6), save to
+#   pipeline/dgt_out/nesdc_gpp_by_province.json
+# then extend ingest_gov.py (or ingest_tmli.py) with a real distiller that overwrites
+# source-data/gpp_by_province.json with per-province CKAN-verified rows (source: 'CKAN-NESDC-2566'
+# for every row, not just Mukdahan), and re-run:
+cd pipeline
+python3 derive.py
+python3 build_province.py
+```
+
+Only after every row carries a genuine CKAN resource id should the app surface GPP as MEASURED.

@@ -126,6 +126,13 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-02 — AUDIT: corrected a mislabelled-MEASURED layer before it reached the app.**
+  `source-data/gpp_by_province.json` (TMLI-vendored NESDC GPP) claimed MEASURED but only 1/77 rows
+  (Mukdahan) is actually CKAN-verified; the other 76 are round-number estimates. Fixed
+  `ingest_tmli.py` provenance + added per-row `source` field (values unchanged, byte-diff confirms
+  only meta/source changed); corrected `docs/NEXT_STEPS.md` + `docs/DATA_PROVENANCE.md`; logged real
+  per-province NESDC pull command in `docs/TONIGHT_CHECKLIST.md` §8. Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-02 entry). Gate: 28/0, validate_data 125/125.
 - **2026-07-01 — Recursive-loop wave (3 concurrent agents, disjoint files, all gate 24/0):**
   (1) **QW2 canvas-fill cleanup** — removed two redundant/conflicting `main{max-width}` rules so the
   already-present full-bleed block (line ~807, `--maxw:1320`) is the single source of truth (behaviour-preserving).

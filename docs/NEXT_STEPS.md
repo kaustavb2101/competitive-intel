@@ -14,7 +14,16 @@ desktop pull needed. `pipeline/ingest_tmli.py` (deterministic, network-free, `--
   (NSO SES 2566). **MEASURED.**
 - `source-data/unemployment_by_province.json` — employed/unemployed/labor-force (thousands) +
   `unemployment_rate` (NSO LFS Q3/2025). **MEASURED.**
-- `source-data/gpp_by_province.json` — GPP (million THB) + sector shares + hub type (NESDC 2566). **MEASURED.**
+- `source-data/gpp_by_province.json` — GPP (million THB) + sector shares + hub type (NESDC 2566).
+  **⚠ NOT MEASURED (corrected 2026-07-02 audit).** The vendored `provincial-gpp.js` labels itself
+  "NESDC OFFICIAL DATA" but its own header/`GPP_META` admit only **1 of 77** provinces (Mukdahan,
+  `source: 'CKAN-NESDC-2566'`) is actually CKAN-verified against a real NESDC dataset; the other 76
+  rows are round-number figures (multiples of 1,000–5,000 THB million) with generic `source:
+  'NESDC-2566'` and hand-assigned confidence 0.75–0.97 — an ESTIMATED plausibility knowledge base,
+  not a per-province pull. `ingest_tmli.py` now carries the corrected provenance + a per-row `source`
+  field and `n_ckan_verified`. **Do not wire this into `platform/data` labelled MEASURED** — it is
+  not yet integrated into any `platform/data` layer, which is why this was caught before it reached
+  the app. A real fix needs a per-province NESDC CKAN pull (see `docs/DATA_REFRESH_LOG.md`).
 
 - **Why this matters (objective #1):** household **debt-to-income is a direct portfolio-risk signal** —
   it ranks borrower stress by province (e.g. Si Sa Ket DTI 18.2, Surin 17.5, Amnat Charoen 17.1 — Isan
