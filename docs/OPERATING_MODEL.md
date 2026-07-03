@@ -42,6 +42,17 @@ its written spec, and the EVALS decide — never vibes:
 - Cadence: reviewed at least daily while in active development; the vision (CLAUDE.md "two
   standing objectives") is only edited from THIS loop.
 
+## Recurring drivers (the loops as live, concurrent processes)
+Each loop has an actual scheduled driver so all three run concurrently, not just when prompted:
+
+| Loop | Cadence | Driver (durable) | Driver (session) | Duty |
+|---|---|---|---|---|
+| 1 · Agentic coding | minutes | `qa.yml` CI gate on every push | `/loop` dynamic heartbeat | **SHIP** — merge landed agents → gate → push → launch next wave |
+| 2 · Developer feedback | ~3 h | `data-oae-prices.yml` (weekly data refresh feeds specs) | cron `23 */3 * * *` | **PLAN** — review backlog + feedback, rank, queue specs, launch one agent, digest |
+| 3 · External feedback | daily | `site-health.yml` nightly (05:30 Bangkok) + Vercel webhooks | cron `12 6 * * *` | **LISTEN** — synthesize live-site + preview + comments into FEEDBACK_LOG/backlog, digest |
+
+**Durable vs session:** the CI crons (site-health, OAE, QA) survive session death and are the backbone. The session crons (Loop 2/3 planners) run only while this Claude session is alive and auto-expire after 7 days — re-arm them at the start of a new working session, or promote them to CI workflows for permanence. Separation of duties (SHIP / PLAN / LISTEN on mostly disjoint files) is what lets the three run concurrently without git collisions; every driver fetch+ff's before committing.
+
 ## Rules that keep the loops honest
 1. A slower loop's output is a faster loop's input — never skip inward (no coding without a spec;
    no spec without the current vision).
