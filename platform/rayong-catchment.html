@@ -1791,6 +1791,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
  opt('data/tiles_config.json').then(function(TILECFG){
  var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
  if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
+ var gopt=function(sfx){return fetch(P+sfx).then(function(r){
+   if(r.ok)return r.json();
+   if(r.status===404&&cdnBase)return fetch(cdnBase+'/'+CITY+sfx).then(function(r2){return r2.ok?r2.json():null;}).catch(function(){return null;});
+   return null;}).catch(function(){return null;});};
  return Promise.all([
    // The catchment building file is the ONE required input. .ok=false (404) => null-or-CDN here,
    // and we branch to notPulled() below; a genuine network/parse error still rejects loudly.
@@ -1805,7 +1809,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
      if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    opt(P+'_province.json'),
    opt('data/provinces/index.json'),
-   opt(P+'_roads.json'), opt(P+'_water.json'), opt(P+'_landuse.json'),
+   // ground layers: local file first; ONLY on a local 404 fall back to the catchments CDN
+   // (committed files serve most provinces; R2 serves any too big to commit — see
+   // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
+   gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
    opt(P+'_isochrone.json'),
    opt(P+'_trees.json'), opt(P+'_rail.json'),
    // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
