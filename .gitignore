@@ -51,3 +51,9 @@ source-data/branch_aum_monthly_synthetic.json
 # national building vector-tile artifacts (pipeline/build_building_tiles.py) — large, CDN-hosted,
 # NEVER committed. Re-pullable real Overture data; coverage plan + .pmtiles/tiles live here.
 pipeline/tiles_out/
+
+# secrets — never commit (any .env or .env.txt anywhere)
+.env
+.env.txt
+**/.env
+**/.env.txt
