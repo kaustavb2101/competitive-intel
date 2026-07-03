@@ -618,6 +618,31 @@ html[data-theme="light"] .cc-tag.e::before{border-color:#8a6300}
 .cc-star:hover{color:var(--gold)}
 .cc-empty{font-size:12px;color:var(--dim);padding:6px 0}
 
+/* EXEC DECISION QUEUE — "This week — do these first" (#cc-queue, data/decision_queue.json).
+   Numbered rows + type-color chips: defend=red(agri) / expand=gold / tighten=orange / audit=purple.
+   Chip text colors are LIGHTENED tints in dark theme and DARKENED in light theme (explicit
+   html[data-theme="light"] overrides below) so both directions hold AA contrast. */
+.cc-qrow{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line2)}
+.cc-qrow:last-of-type{border-bottom:none}
+.cc-qnum{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--hi);background:var(--raised,#232E45);border:1px solid var(--line)}
+.cc-qchip{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;line-height:1;padding:4px 8px;border-radius:999px;border:1px solid;margin-top:3px}
+.cc-qchip.q-defend{color:#ff9b93;border-color:rgba(200,67,59,.55);background:rgba(200,67,59,.14)}
+.cc-qchip.q-expand{color:#f2cf78;border-color:rgba(230,180,80,.55);background:rgba(230,180,80,.13)}
+.cc-qchip.q-tighten{color:#f0a468;border-color:rgba(217,116,43,.55);background:rgba(217,116,43,.14)}
+.cc-qchip.q-audit{color:#b79cf5;border-color:rgba(122,79,224,.55);background:rgba(122,79,224,.16)}
+html[data-theme="light"] .cc-qchip.q-defend{color:#B53A33;background:rgba(200,67,59,.10);border-color:rgba(200,67,59,.45)}
+html[data-theme="light"] .cc-qchip.q-expand{color:#8a6300;background:rgba(176,130,20,.12);border-color:rgba(176,130,20,.45)}
+html[data-theme="light"] .cc-qchip.q-tighten{color:#a2521a;background:rgba(217,116,43,.10);border-color:rgba(217,116,43,.45)}
+html[data-theme="light"] .cc-qchip.q-audit{color:#5b3ab8;background:rgba(122,79,224,.10);border-color:rgba(122,79,224,.40)}
+html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
+.cc-qtxt{font-size:12.5px;line-height:1.55;color:var(--txt);min-width:0}
+.cc-qmeta a{color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none}
+.cc-qmeta a:hover{text-decoration:underline}
+.cc-qfoot{margin-top:8px;line-height:1.5;border-top:1px solid var(--line2);padding-top:7px}
+@media(max-width:640px){.cc-qrow{flex-wrap:wrap}.cc-qtxt{flex-basis:100%}}
+
 /* QW5 — HERO VERDICT BAND: 2–3 big plain-language statements, the front door's lead.
    Cards stretch across the widescreen and click through to their detail tab. */
 /* BOARD THESIS — one spoken sentence + Road-to-3,000 bar. A quiet, wide band above the hero cards. */

@@ -5,7 +5,21 @@ don't re-litigate settled choices.
 
 ---
 
-## 2026-07-03 (9) — UX: thinned branch-dot opacity so the province choropleth reads through
+## 2026-07-03 (10) — Exec decision queue: "This week — do these first" leads the Command Center
+
+New synthesis layer + first card on `#home`. `pipeline/build_decision_queue.py` →
+`platform/data/decision_queue.json`: 8 ranked weekly actions built ONLY from existing committed
+layers — defend (rival_pressure besieged, MEASURED), audit (branch_peers twin outliers, EST),
+tighten/watch (macro_sensitivity headwind province + crop_stress worst province, EST), expand/scout
+(opportunity_score + exit_whitespace top districts, EST). Every sentence carries the real numbers
+copied from the source layer; each row shows its measured/estimated tag, source file and detail-tab
+link. **Decision:** ranking is an openly stated EDITORIAL rule (defend 40 > audit 30 > tighten 20 >
+expand 10, + 10× the layer's own normalized magnitude) because cross-layer scores are not
+commensurable — we never pretend an opportunity score and a rival count live on one measured scale.
+Deterministic, network-free, `--check`; gated in `tests/run.sh` + `check_decision_queue()` in
+`tests/validate_data.py` (ranks 1..n, known type/basis/go, numbers inline, priority desc). UI:
+numbered rows + type-color chips (defend red / expand gold / tighten orange / audit purple) with
+explicit light-theme contrast overrides.
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (6)): the `hhdti`/`pstress` province-resolution
 lenses paint a polygon fill under the branch dots (`drawProvinceChoropleth()`, landed 2026-07-03 (7)),

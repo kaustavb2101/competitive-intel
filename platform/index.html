@@ -82,6 +82,16 @@
     <div class="cc-hero" id="cc-hero" aria-live="polite"></div>
 
     <div class="cc-grid">
+      <!-- THIS WEEK — DO THESE FIRST (exec decision queue, data/decision_queue.json).
+           Ranked weekly actions synthesized from committed layers only; each row carries its
+           type chip (defend/expand/tighten/audit), measured/estimated tag, source file and a
+           link to the detail tab. Skeleton until the layer loads; calm note if absent. -->
+      <div class="cc-card cc-card-wide" id="cc-queue">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>This week — do these first
+          <span class="cc-link sub no-print">ranked from the committed data layers — each row names its source</span></div>
+        <div class="cc-card-b" id="cc-queue-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
+
       <!-- WHERE TO EXPAND -->
       <div class="cc-card" id="cc-whitespace">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Where to expand

@@ -1856,6 +1856,98 @@ def check_exit_whitespace():
 
 
 # ---------------------------------------------------------------------------
+def check_decision_queue():
+    # EXEC DECISION QUEUE (#home "This week — do these first"). A SYNTHESIS layer: it copies
+    # numbers from other committed layers into ~8 ranked action sentences. The data-mandate
+    # bites twice: (a) meta must state that the RANKING is an editorial rule (type precedence +
+    # within-layer intensity, no wall clock), and (b) every item must carry its own
+    # measured/estimated basis + the source file it copied its numbers from. Optional file:
+    # SKIP-PASS when absent (build_decision_queue.py degrades gracefully).
+    hdr("decision_queue.json (optional)")
+    if not exists("decision_queue.json"):
+        ok("decision_queue.json absent — skipped (optional; run build_decision_queue.py)")
+        return
+    try:
+        d = load("decision_queue.json")
+    except Exception as e:
+        fail("decision_queue.json loads", repr(e))
+        return
+    ok("decision_queue.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_with") or not meta.get("label"):
+        fail("decision_queue meta/provenance present (generated_with + label)",
+             "meta missing generated_with/label")
+    else:
+        ok("decision_queue meta/provenance present (generated_with + label)")
+        rk = meta.get("ranking")
+        if not isinstance(rk, dict) or not rk.get("rule") or not isinstance(rk.get("type_base"), dict):
+            fail("decision_queue meta.ranking documents the deterministic rule",
+                 "ranking missing rule/type_base")
+        else:
+            ok("decision_queue meta.ranking documents the deterministic rule (editorial, no wall clock)")
+        if not (isinstance(meta.get("inputs_used"), list) and meta["inputs_used"]):
+            fail("decision_queue meta.inputs_used names the source layers", "inputs_used missing/empty")
+        else:
+            ok("decision_queue meta.inputs_used names the source layers (%d)" % len(meta["inputs_used"]))
+
+    if meta and meta.get("absent"):
+        ok("decision_queue is an honest ABSENT-state — skipped item checks")
+        return
+
+    items = d.get("items")
+    if not isinstance(items, list) or not items:
+        fail("decision_queue has an 'items' list", "got %s" % type(items).__name__)
+        return
+    if not (1 <= len(items) <= 12):
+        fail("decision_queue item count sane (1..12)", "got %d" % len(items))
+        return
+    ok("decision_queue items list present (%d)" % len(items))
+
+    KNOWN_TYPES = {"defend", "expand", "tighten", "audit"}
+    KNOWN_BASIS = {"measured", "estimated"}
+    KNOWN_GO = {"trend", "overview", "acq"}
+    bad = []
+    prev_pri = None
+    for i, it in enumerate(items):
+        if not isinstance(it, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        tag = it.get("name") or "#%d" % i
+        if it.get("rank") != i + 1:
+            bad.append("%s rank=%r, expected %d (ranks must be 1..n in order)" % (tag, it.get("rank"), i + 1))
+        if it.get("type") not in KNOWN_TYPES:
+            bad.append("%s type=%r not in %s" % (tag, it.get("type"), sorted(KNOWN_TYPES)))
+        if it.get("basis") not in KNOWN_BASIS:
+            bad.append("%s basis=%r not measured/estimated" % (tag, it.get("basis")))
+        if it.get("go") not in KNOWN_GO:
+            bad.append("%s go=%r not a known tab hash" % (tag, it.get("go")))
+        act = it.get("act")
+        if not (isinstance(act, str) and act.strip()):
+            bad.append("%s act sentence missing/empty" % tag)
+        elif not any(ch.isdigit() for ch in act):
+            bad.append("%s act carries no inline number (the spec: real numbers inline)" % tag)
+        src = it.get("source")
+        if not (isinstance(src, str) and src.endswith(".json")):
+            bad.append("%s source=%r not a .json layer name" % (tag, src))
+        elif not exists(src):
+            bad.append("%s source %s does not exist under platform/data" % (tag, src))
+        pri = it.get("priority")
+        if not is_finite_number(pri):
+            bad.append("%s priority=%r not finite" % (tag, pri))
+        else:
+            if prev_pri is not None and pri > prev_pri + 1e-9:
+                bad.append("%s priority %r > previous %r (list must be sorted desc)" % (tag, pri, prev_pri))
+            prev_pri = pri
+    if bad:
+        fail("decision_queue items sane (ranks 1..n, known type/basis/go, numbered sentence, "
+             "existing source layer, priority desc)", first_n(bad, 8))
+    else:
+        ok("decision_queue items sane (ranks 1..n, known type/basis/go, real numbers inline, "
+           "source layers exist, priority sorted desc)")
+
+
+# ---------------------------------------------------------------------------
 def check_expansion_plan(amphoe, n_branches):
     # SEQUENCED Road-to-3,000 plan (objective #2). ESTIMATED planning order (greedy divisor method)
     # over MEASURED demand inputs — meta must say so, the arithmetic must reconcile exactly (every
@@ -3223,6 +3315,7 @@ def main():
     check_competitor_coverage()
     check_opportunity_score()
     check_exit_whitespace()
+    check_decision_queue()
     check_expansion_plan(amphoe, n)
     check_branch_peers(n)
     check_branch_leads(n)

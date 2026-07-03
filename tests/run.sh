@@ -105,6 +105,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_segment_exposure.py --check >/dev/null 2>&1 ) && ok "build_segment_exposure.py --check" || bad "build_segment_exposure.py --check (segment_exposure.json drifted from branches.json)"
   ( cd "$PIPE" && python3 build_collateral_outlook.py --check >/dev/null 2>&1 ) && ok "build_collateral_outlook.py --check" || bad "build_collateral_outlook.py --check (collateral_outlook.json drifted from commodity_board/vehicles_by_province/branches.json)"
   ( cd "$PIPE" && python3 build_branch_labor.py --check >/dev/null 2>&1 ) && ok "build_branch_labor.py --check" || bad "build_branch_labor.py --check (branch_labor.json drifted from branch_occupations/amphoe/NSO province layers)"
+  ( cd "$PIPE" && python3 build_decision_queue.py --check >/dev/null 2>&1 ) && ok "build_decision_queue.py --check" || bad "build_decision_queue.py --check (decision_queue.json drifted from rival_pressure/branch_peers/macro_sensitivity/crop_stress/opportunity_score/exit_whitespace)"
 
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 

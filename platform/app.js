@@ -3976,9 +3976,44 @@ function starBtn(id,item){
 }
 function ccStar(item){watchToggle(item);}
 
+/* ---- EXEC DECISION QUEUE — "This week — do these first" (data/decision_queue.json) ----
+   ~8 ranked weekly actions built by pipeline/build_decision_queue.py from committed layers
+   ONLY (rival_pressure / branch_peers / macro_sensitivity / crop_stress / opportunity_score /
+   exit_whitespace). Each row: number, type chip (defend/expand/tighten/audit), one plain
+   sentence with the real numbers inline, measured/estimated tag + source file + detail-tab
+   link. The RANKING is an editorial rule stated in the file's meta — surfaced in the footer.
+   Null-safe: absent file → calm note, never fabricated rows. */
+let DQUEUE=null,dqLoaded=false;
+function loadDecisionQueue(){
+  if(dqLoaded) return Promise.resolve(DQUEUE);
+  return fetch('data/decision_queue.json').then(r=>r.ok?r.json():null)
+    .then(j=>{DQUEUE=j;dqLoaded=true;return j;})
+    .catch(()=>{DQUEUE=null;dqLoaded=true;return null;});
+}
+function dqEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderHomeQueue(){
+  const box=$('#cc-queue-body'); if(!box) return;
+  if(!dqLoaded){ return; }                                   // skeleton stays until the fetch resolves
+  const items=(DQUEUE&&Array.isArray(DQUEUE.items))?DQUEUE.items:[];
+  if(!items.length){
+    box.innerHTML=`<div class="cc-empty">Decision queue not yet computed — run <span class="mono">pipeline/build_decision_queue.py</span>. The ranked weekly actions fill in on the next data refresh.</div>`;
+    return;
+  }
+  box.innerHTML=items.map(it=>{
+    const tag=it.basis==='measured'?TAG_M:TAG_E;
+    return `<div class="cc-qrow">`+
+      `<span class="cc-qnum mono">${it.rank}</span>`+
+      `<span class="cc-qchip q-${dqEsc(it.type)}">${dqEsc(it.type)}</span>`+
+      `<div class="cc-qtxt">${dqEsc(it.act)}`+
+      ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a></span></div></div>`;
+  }).join('')+
+  `<div class="cc-qfoot sub">Ranking is a stated editorial rule (defend &gt; audit &gt; tighten &gt; expand, then each layer's own magnitude) — see <span class="mono">decision_queue.json</span> meta. Defend rows are measured rival geometry; the rest are estimated screens, not measured outcomes.</div>`;
+}
+
 /* ---- home orchestration ---- */
 let homeBooted=false;
 function renderHome(){
+  renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready sentence + Road-to-3,000 strip (synthesized, null-safe)
   renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
@@ -3989,6 +4024,8 @@ function renderHome(){
   if(!homeBooted){
     homeBooted=true;
     const onHome=()=>document.getElementById('v-home').classList.contains('on');
+    // exec decision queue — the FIRST card: ranked weekly actions (null-safe, calm when absent).
+    loadDecisionQueue().then(()=>{ if(onHome()) renderHomeQueue(); });
     loadAmphoe().then(()=>{ if(onHome()){ renderHomeWhitespace(); renderHomeThesis(); } });
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
