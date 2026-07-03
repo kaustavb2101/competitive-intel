@@ -5,6 +5,20 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 (9) — UX: thinned branch-dot opacity so the province choropleth reads through
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (6)): the `hhdti`/`pstress` province-resolution
+lenses paint a polygon fill under the branch dots (`drawProvinceChoropleth()`, landed 2026-07-03 (7)),
+but the dots' fixed 0.9 fill-opacity fully tiled over that fill in denser provinces (Bangkok, the
+East), making the new choropleth invisible at the National map's default zoom.
+
+`platform/app.js`'s `styleMarkers()` now checks `isProvLens(curLens)` and drops dot `fillOpacity` to
+0.6 specifically on `hhdti`/`pstress`; every other lens is untouched at 0.9. Two-line change, no new
+data, no new files. Gate: 40/0 (`validate_data.py` 211/211, unchanged — no data touched). Headless-
+rendered `index.html?lens=pstress#map`: the grey/pink province fill now reads clearly through the
+dot layer, including in the dense Bangkok/East cluster; a control render of the default `opportunity`
+lens confirms the other lenses are pixel-behaviour-unchanged at full 0.9 opacity.
+
 ## 2026-07-03 (7) — ENRICH: province polygon choropleth for the hhdti/pstress lenses
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (2)/(5)): the two PROVINCE-resolution map

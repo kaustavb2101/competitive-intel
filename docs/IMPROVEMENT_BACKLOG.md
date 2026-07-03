@@ -214,12 +214,9 @@
       amphoe `id` vs province name) — now that there are two resolutions of choropleth, a shared
       `drawChoropleth({features, keyFn, valFn, ...})` helper would remove the duplication before a
       3rd resolution (e.g. region-level) ever gets added. *(LOW, S, pure refactor)*
-- [ ] **The new province choropleth is effectively invisible at the National map's default
-      country-wide zoom** because the opaque branch dots (fillOpacity 0.9) fully tile over the
-      denser provinces (Bangkok, the East) — it only becomes visible once zoomed into a
-      sparser-branch province, or if the dots were made semi-transparent on `prov:true` lenses. A
-      quick win: drop marker `fillOpacity` to ~0.55-0.65 (or shrink radius) specifically when
-      `isProvLens(curLens)` is true, so the polygon fill reads through immediately. *(MED, S)*
+- [x] **The new province choropleth is effectively invisible at the National map's default
+      country-wide zoom — DONE 2026-07-03 (9)** (`styleMarkers()` drops marker `fillOpacity` to 0.6
+      specifically when `isProvLens(curLens)` is true; every other lens unchanged at 0.9).
 
 ## Queue — follow-ups noticed 2026-07-03 (7)
 - [ ] **`household_debt_by_province.json` carries its OWN `debt_to_income` + `stress_index` (BOT
@@ -235,8 +232,33 @@
       tabs** — same rank-1-surfacing pattern used for `PSTRESS_LIST[0]`/`HHRISK_LIST[0]` on Home
       could add "lowest-paid occupation nationally" as a portfolio-risk callout. *(LOW, S)*
 
+## Queue — follow-ups noticed 2026-07-03 (9)
+- [ ] **The same "opaque dots tile over a polygon fill" issue likely applies to the amphoe
+      (district) choropleth too** (`dws`/`drisk`/`unemp`) — `drawAmphoeChoropleth()` shares the exact
+      same paint-under-dots pattern as `drawProvinceChoropleth()`, and district polygons are smaller
+      than province polygons, so the tiling problem should be *worse* there, not better. Extend the
+      same `fillOpacity` thinning to `isAmpLens(curLens)` in `styleMarkers()` (or fold both flags into
+      one `isPolyLens()` check) once someone confirms the district fill is actually being hidden the
+      same way. *(MED, S — mirrors this cycle's fix)*
+- [ ] **0.6 opacity was picked from the backlog's suggested 0.55–0.65 range, not measured against a
+      contrast/legibility bar** — worth a quick visual check that dot fill-color is still readable at
+      0.6 against both the light basemap and the reddest end of the stress ramp before calling the
+      choropleth-visibility problem fully closed. *(LOW, trivial)*
+- [ ] **`drawAmphoeChoropleth()` and `drawProvinceChoropleth()` are near-duplicate functions** — see
+      the existing 2026-07-03 (6) backlog entry above; now that dot-opacity handling has ALSO grown a
+      parallel `isAmpLens`/`isProvLens` branch in `styleMarkers()`, a shared `isPolyLens(k)` +
+      `drawChoropleth({...})` helper would collapse three duplicated call-sites at once instead of one.
+      *(LOW, S, pure refactor)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (9) — UX: thinned branch-dot opacity so the province choropleth reads through.**
+  `platform/app.js`'s `styleMarkers()` drops marker `fillOpacity` to 0.6 specifically when
+  `isProvLens(curLens)` is true (`hhdti`/`pstress`); every other lens keeps 0.9, unchanged. Two-line
+  change, no new data/files. Gate 40/0 (`validate_data.py` 211/211, untouched). Headless-rendered
+  `index.html?lens=pstress#map` confirms the province fill now reads through the dot layer; a control
+  render of the default `opportunity` lens confirms no regression elsewhere. Full writeup:
+  `docs/PROGRESS_LOG.md` (2026-07-03 (9) entry).
 - **2026-07-03 (8) — ENRICH: NSO SES 2566 per-occupation income surfaced on the province deep-dive.**
   `source-data/household_income_by_province.json` (already vendored + MEASURED, previously only
   consumed as an unweighted mean by `build_household_risk.py`) is now joined into
