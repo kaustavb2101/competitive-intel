@@ -39,8 +39,10 @@ REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
 OUT  = os.path.join(DATA, "competitor_coverage.json")
 
-# Census inputs (lower-bound, network-pulled). _overture is optional.
-CENSUS_FILES = ["competitors_national.json", "competitors_overture.json"]
+# The MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor + Google/Overture
+# sample for Heng — already deduped). For 3 of 4 brands this is now the near-COMPLETE network, so
+# found ≈ (often ≥) the public headline; Heng alone remains a partial sample.
+CENSUS_FILES = ["competitors_census.json"]
 
 # Canonical brand order (matches validate_data.KNOWN_COMPETITOR_BRANDS).
 BRANDS = ["Muangthai", "Tidlor", "Srisawad", "Heng"]
@@ -122,12 +124,19 @@ def build():
         "expected_sources": {b: EXPECTED_SOURCES[b] for b in BRANDS},
         "totals": {"found": total_found, "expected": total_expected or None,
                    "coverage_pct": overall_cov},
-        "caveat": "The competitor census is a LOWER BOUND, not a registry: Google Places caps "
-                  "~60 results/query/province, so found counts undercount reality. coverage_pct is "
-                  "the share of each brand's publicly-reported branch network we have located so far; "
-                  "the census is being expanded. Use coverage as a confidence flag, not a market share.",
+        "caveat": "found now comes from each operator's OFFICIAL store-locator for Muangthai, "
+                  "Srisawad and Tidlor (the near-complete network), so coverage_pct is ~100% and "
+                  "can exceed 100% because a locator lists every service point / sub-branch beyond "
+                  "the company's headline branch count. Heng is the ONE exception — still a Google/"
+                  "Overture SAMPLE (its locator is behind a Cloudflare challenge), so Heng's count is "
+                  "a genuine lower bound. Read coverage as a data-completeness flag, not market share.",
         "note": "expected counts are CITED real figures (not modelled); Heng expected is null because "
-                "no nationwide branch count was cited in our research — never invented.",
+                "no nationwide branch count was cited in our research — never invented. coverage_pct "
+                ">100% for the official-locator brands is expected, not an error: a locator lists every "
+                "service point, and for a GROUP brand it covers the whole retail network while the IR "
+                "'branches' figure counts only the LISTED ENTITY. Srisawad is the clearest case — the "
+                "sawad.co.th locator returns 5,203 measured points vs the 1,138 listed-entity IR "
+                "figure, i.e. the SAWAD group's retail footprint is ~4.6x its reported branch count.",
     }
     return {"meta": meta, "brands": brands}
 

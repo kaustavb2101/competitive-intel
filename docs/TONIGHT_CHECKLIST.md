@@ -10,6 +10,37 @@
 
 ---
 
+## ★ NEW (flagged 2026-07-03) — two items that need your machine / a Thai browser
+
+### A. Buildings around EVERY branch (the "more tiles" ask)
+The 3D scene already streams Overture building tiles when `platform/data/tiles_config.json` has URLs —
+but generating them is too big for Claude's sandbox (no tippecanoe, ~40 GB disk). Do it on your laptop:
+```bash
+# 1. pull Overture buildings for the whole country (~16 GB geojsonseq, ~20 min)
+# 2. tippecanoe -> buildings.pmtiles (~1.5–3 GB, the only file hosted)
+# 3. upload buildings.pmtiles to Cloudflare R2 (same bucket as the catchment files)
+# 4. put the R2 URL into platform/data/tiles_config.json (pmtilesUrl), commit, redeploy
+```
+**Full copy-paste runbook:** `docs/BUILDING_TILES_RUNBOOK.md`. Measured sizes are in there
+(Rayong 820k buildings, Bangkok metro 3.6M, national ~30–35M). Result: every branch renders real
+buildings around it, not just the province capital.
+
+### B. Heng Leasing full branch list (the one rival we couldn't pull)
+Muangthai (8,931), Srisawad (5,203) and Tidlor (1,919) were pulled from the cloud and are LIVE.
+Heng's locator sits behind a Cloudflare Turnstile challenge that a headless cloud IP can't solve —
+its archived count is ~852 branches. From a **real browser on your Thai connection**:
+```bash
+# open https://www.hengleasing.com/en/branch , let the Cloudflare challenge pass, then in the
+# browser devtools Network tab watch the calls as you pick each province — the coordinate call is
+#   /branch/searchBranch.php?prov=<province>&bra=<branch>
+# save the responses, or run pipeline/pull_competitor_branches.py --discover from that machine.
+# Then drop Heng's coords into source-data/competitors_official.json (brands.Heng.coords) and:
+cd pipeline && python3 build_competitor_census.py     # Heng jumps from the 340 sample to ~852 real
+```
+Today Heng stays a 340-point Google/Overture **sample** (flagged in `competitors_census.json` meta.gaps).
+
+---
+
 ## 0. One-time setup (do this before any pull)
 
 ```bash

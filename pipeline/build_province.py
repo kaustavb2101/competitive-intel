@@ -106,7 +106,9 @@ def slugify(en):
 # district feature carries a competitor count. Mirrors the frontend dedup in
 # platform/app.js (dedupComp): brand-keyed ~165m grid, 0.15km haversine threshold.
 # Graceful: when both files are absent this returns [] and every district gets 0.
-COMP_FILES = ["competitors_national.json", "competitors_overture.json"]
+# MERGED full census (official store-locators + Heng sample, ~16,393 MEASURED rivals, already
+# deduped). The dedup below is now a near-no-op but harmless; do NOT add the raw samples back.
+COMP_FILES = ["competitors_census.json"]
 _COMP_CELL = 0.0015      # ~165m grid cell (matches app.js dedupComp)
 _COMP_DEDUP_KM = 0.15    # same-brand rivals closer than this are one branch
 

@@ -63,7 +63,10 @@ WEIGHTS = {
     "occupation_pull": 0.10,   # MEASURED — establishment density (commercial pull)
 }
 
-COMPETITOR_FILES = ["competitors_national.json", "competitors_overture.json"]
+# The MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor + Google/Overture
+# sample for Heng — ~16,393 MEASURED rival branches), already deduped. Do NOT also list the raw
+# national/overture samples — the census already contains them (would double-count).
+COMPETITOR_FILES = ["competitors_census.json"]
 
 
 def _load(p):
