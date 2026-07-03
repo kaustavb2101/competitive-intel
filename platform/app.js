@@ -21,6 +21,7 @@ const LENS = {
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
+  unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
@@ -2662,6 +2663,17 @@ function renderLegend(){
       ` <span class="sub" title="NSO SES 2566 household debt and income — province averages, measured">● measured · NSO SES</span>`;
     return;
   }
+  // District unemployment lens: raw MEASURED percentage (NSO LFS), shown to one decimal rather than
+  // the generic fmtK rounding (which would collapse e.g. 0.67% and 1.2% to the same integer "1").
+  if(l.unemp){
+    const lo=(mx*.12).toFixed(1), mid=(mx*.5).toFixed(1), hi=mx.toFixed(1);
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${lo}%</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${mid}%</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${hi}% unemployment</span>`+
+      ` <span class="sub" title="NSO Labour Force Survey — province-inherited district rate, measured">● measured · NSO LFS</span>`;
+    return;
+  }
   // Relevant-POI density lens: a shimmer skeleton while the (measured-counts) layer loads, then an
   // honest "measured counts · estimated weighting" tag so the M-badged pill is not misread as a
   // fully measured score.
@@ -2715,7 +2727,7 @@ function initMap(){
   // Painting now would flash every branch pale (val 0) then snap when the join lands. So when we open
   // directly on a district lens, defer the first paint to the loadAmphoe().then below; otherwise paint
   // immediately as before. renderLegend() still runs so the legend isn't blank in the gap.
-  const deferForAmp=(curLens==='dws'||curLens==='drisk')&&!ampJoinAttached;
+  const deferForAmp=(curLens==='dws'||curLens==='drisk'||curLens==='unemp')&&!ampJoinAttached;
   if(deferForAmp) renderLegend(); else styleMarkers();
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
@@ -3233,8 +3245,8 @@ function setLens(k){
   if(k==='poirel' && !poirelLoaded){
     loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
-  if((k==='dws'||k==='drisk') && !ampJoinAttached){
-    loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  if((k==='dws'||k==='drisk'||k==='unemp') && !ampJoinAttached){
+    loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'||curLens==='unemp'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if((k==='dws'||k==='drisk') && !ageoLoaded){
     loadAmphoeGeo().then(()=>{ if((curLens==='dws'||curLens==='drisk')&&mapReady) drawAmphoeChoropleth(); });
