@@ -2314,6 +2314,82 @@ def check_competitor_census():
         ok("competitors_census rivals sane (%d rivals, known brands, coords in bbox)" % len(items))
 
 
+def check_rival_density(amphoe):
+    # RIVAL DENSITY per district — MEASURED AutoX vs MEASURED rival branch counts + ratio + ceded-ground
+    # flags. Optional file: SKIP-PASS when absent (run build_rival_density.py).
+    hdr("rival_density.json (optional)")
+    if not exists("rival_density.json"):
+        ok("rival_density.json absent — skipped (optional; run build_rival_density.py)")
+        return
+    try:
+        d = load("rival_density.json")
+    except Exception as e:
+        fail("rival_density.json loads", repr(e))
+        return
+    ok("rival_density.json loads")
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("provenance"), dict):
+        fail("rival_density meta/provenance present (generated_by + label + provenance)",
+             "meta missing generated_by/label/provenance")
+        return
+    ok("rival_density meta/provenance present (generated_by + measured-vs-computed provenance)")
+    recs = d.get("records")
+    if not isinstance(recs, list) or not recs:
+        fail("rival_density has a non-empty 'records' list", "got %s" % type(recs).__name__)
+        return
+    arecs = amphoe.get("amphoe") if isinstance(amphoe, dict) else None
+    if isinstance(arecs, list) and len(arecs) == len(recs):
+        misalign = [i for i in range(len(recs)) if recs[i].get("id") != arecs[i].get("id")]
+        if misalign:
+            fail("rival_density index-aligned to amphoe.json (same id per position)", first_n(misalign))
+        else:
+            ok("rival_density index-aligned to amphoe.json (%d districts, same id per position)" % len(recs))
+    else:
+        ok("rival_density loaded (%d districts; amphoe alignment check skipped)" % len(recs))
+    bad = [i for i, r in enumerate(recs)
+           if not (isinstance(r.get("autox"), int) and r["autox"] >= 0
+                   and isinstance(r.get("rivals"), int) and r["rivals"] >= 0)]
+    if bad:
+        fail("rival_density autox/rivals are non-negative ints", first_n(bad, 8))
+    else:
+        ok("rival_density records sane (autox/rivals non-negative ints, %d districts)" % len(recs))
+
+
+def check_cluster_brief(n_branches, branches):
+    # PER-BRANCH MACRO CLUSTER BRIEF — a one-line plain-language macro read per branch, index-aligned
+    # to branches.json, templated from measured board/crop/occupation signals. Optional: SKIP if absent.
+    hdr("cluster_brief.json (optional)")
+    if not exists("cluster_brief.json"):
+        ok("cluster_brief.json absent — skipped (optional; run build_cluster_brief.py)")
+        return
+    try:
+        d = load("cluster_brief.json")
+    except Exception as e:
+        fail("cluster_brief.json loads", repr(e))
+        return
+    ok("cluster_brief.json loads")
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("cluster_brief meta/provenance present (generated_by + label)", "meta missing generated_by/label")
+        return
+    ok("cluster_brief meta/provenance present (generated_by + templated-over-measured label)")
+    briefs = d.get("briefs")
+    if not isinstance(briefs, list):
+        fail("cluster_brief has a 'briefs' list", "got %s" % type(briefs).__name__)
+        return
+    if n_branches is not None and len(briefs) != n_branches:
+        fail("cluster_brief length == branches.json length", "cluster_brief=%d branches=%d" % (len(briefs), n_branches))
+    else:
+        ok("cluster_brief length == branches.json length (%d)" % len(briefs))
+    bad = [i for i, b in enumerate(briefs)
+           if not (isinstance(b, dict) and isinstance(b.get("line"), str) and b["line"].strip())]
+    if bad:
+        fail("cluster_brief every entry carries a non-empty 'line'", first_n(bad, 8))
+    else:
+        ok("cluster_brief entries sane (non-empty templated line each, %d branches)" % len(briefs))
+
+
 def check_branch_population(n_branches):
     # TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
     # branches.json. Optional file: SKIP-PASS when absent (shapely dep).
@@ -2740,6 +2816,8 @@ def main():
     check_lead_sites(n)
     check_catchment_poi()
     check_competitor_census()
+    check_rival_density(amphoe)
+    check_cluster_brief(n, branches)
     check_branch_population(n)
     check_provenance()
     check_index_alignment(n)

@@ -597,6 +597,53 @@ function compTooltip(d){
   const parts=Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([b,n])=>`${b} ${n}`);
   return `${c.n} rival branch${c.n===1?'':'es'} ≤${COMP_RADIUS_KM}km: ${parts.join(', ')} (measured, lower bound)`;
 }
+
+/* ---------- catchment block (per-branch popup, all three numbers MEASURED) ----------
+   Two extra MEASURED layers behind each branch popup's "Catchment ≤10km" block, both lazy-loaded
+   with the same cached-promise pattern used across this file and both fully null-guarded (absent
+   file → the line, or the whole block, is simply omitted — nothing is fabricated):
+   (a) data/branch_population.json .values[i] — the TRUE ~10km-perimeter WorldPop 2020 population
+       INSIDE this branch's 10km circle (MEASURED, index-aligned to branches.json).
+   (b) data/competitors_census.json .items — the MERGED measured rival-branch census (Google Places
+       UNION Overture, ~4,384 points); we count how many sit within CATCH_RADIUS_KM of this branch
+       (client-side haversine, reusing havKm). This is the merged census (a fuller count than the
+       5km per-brand COMP_ITEMS tally), so it gets its own 10km read to match the ≤10km framing.
+   The third number — total establishments ≤10km — is just the sum of this branch's own k10 OSM
+   counts already in branches.json, so it needs no extra fetch. */
+const CATCH_RADIUS_KM=10;                                   // radius (km) for the catchment population / establishments / rival read
+let BPOP=null, bpopLoaded=false, bpopPromise=null;          // MEASURED ~10km WorldPop population per branch (index-aligned .values)
+async function loadBranchPopulation(){
+  if(bpopPromise) return bpopPromise;
+  bpopLoaded=true;
+  bpopPromise=(async()=>{
+    try{ const r=await fetch('data/branch_population.json'); if(r.ok){ const j=await r.json(); BPOP=Array.isArray(j&&j.values)?j.values:null; } }
+    catch(e){ BPOP=null; }
+    return BPOP;
+  })();
+  return bpopPromise;
+}
+let CCEN=null, ccenItems=[], ccenLoaded=false, ccenPromise=null;   // MEASURED merged rival-branch census (.items with lat/lng)
+async function loadCompetitorCensus(){
+  if(ccenPromise) return ccenPromise;
+  ccenLoaded=true;
+  ccenPromise=(async()=>{
+    try{ const r=await fetch('data/competitors_census.json'); if(r.ok){ const j=await r.json();
+      ccenItems=((j&&j.items)||[]).filter(it=>it&&it.lat!=null&&it.lng!=null); CCEN=ccenItems.length?j:null; } }
+    catch(e){ CCEN=null; ccenItems=[]; }
+    return ccenItems;
+  })();
+  return ccenPromise;
+}
+// MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
+// census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
+// null when the census is absent so the popup omits the line rather than show a fabricated 0.
+function catchRivalCount(d){
+  if(!ccenItems.length) return null;
+  let n=0;
+  for(let j=0;j<ccenItems.length;j++){ const it=ccenItems[j];
+    if(havKm(d.y,d.x,it.lat,it.lng)<=CATCH_RADIUS_KM) n++; }
+  return n;
+}
 // risk sub-metric: composite (max of the three proxies) or a single selectable score.
 let riskMetric='composite';
 // carry the current light/dark theme over to the standalone 3D/map pages
@@ -2824,6 +2871,11 @@ function initMap(){
   // (if the lens is active, e.g. via ?lens=macx) repaint — otherwise the markers would stay pale 0s.
   if(!leadsLoaded) loadBranchLeads();
   if(!macxDone) loadMacroExposure().then(()=>{ renderLenses(); if(mapReady&&curLens==='macx'){ renderLegend(); styleMarkers(); } });
+  // warm the MEASURED catchment layers (10km WorldPop population + merged rival census) so the first
+  // branch tap already carries the "Catchment ≤10km" block; selectBranch refreshes an open popup if
+  // they land late. Optional + null-safe: absent file → BPOP/CCEN stay null and the block is omitted.
+  if(!bpopLoaded) loadBranchPopulation();
+  if(!ccenLoaded) loadCompetitorCensus();
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
@@ -2853,8 +2905,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX){
-    Promise.all([loadBranchLeads(),loadMacroExposure()]).then(()=>{
+  if(!LEADS||!MACX||!BPOP||!CCEN){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3000,6 +3052,26 @@ function compPopupHTML(d,sec,r){
     + (brands?r('By brand', brands, '#c7cedd'):'')
     + r('Own AutoX ≤10km', (d.w||0), 'var(--accent)')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">${verdict} · Places coverage is a lower bound, not a lender registry</div>`;
+}
+// Catchment block for a branch popup — three MEASURED numbers about this branch's ~10km catchment:
+// (1) reachable population INSIDE the 10km circle (WorldPop 2020, data/branch_population.json .values[i]);
+// (2) total establishments ≤10km = sum of this branch's OSM k10 counts (branches.json); (3) rival
+// branches ≤10km from the merged competitor census (data/competitors_census.json, client-side haversine).
+// Fully null-guarded: each line renders only when its measured value exists, and the whole block is
+// omitted when none of the three are available. Nothing is fabricated.
+function catchmentPopupHTML(d,sec,r){
+  const i=idxOf(d);
+  const pop=(BPOP&&i>=0&&i<BPOP.length&&BPOP[i]!=null)?BPOP[i]:null;
+  const hasK=d.k10&&typeof d.k10==='object';
+  const estab=hasK?Object.values(d.k10).reduce((a,v)=>a+(v||0),0):null;
+  const rivals=catchRivalCount(d);
+  if(pop==null && estab==null && rivals==null) return '';     // nothing measured to show → omit block
+  const rc=rivals!=null&&rivals>0?'var(--agri)':'var(--merch)';
+  return sec('Catchment ≤10km — measured')
+    + (pop!=null?r('Reachable population', pop.toLocaleString(), 'var(--accent)'):'')
+    + (estab!=null?r('Establishments ≤10km (OSM)', estab.toLocaleString(), 'var(--merch)'):'')
+    + (rivals!=null?r('Rival branches ≤10km', `<span style="color:${rc}">${rivals}</span>`, rc):'')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle; establishments = sum of OSM POI counts ≤10km; rivals = merged Places/Overture census (measured, lower bound)</div>`;
 }
 // crop-household stress block for a branch popup — only the cstress lens loads the data,
 // so render nothing until it's available. Shows the REAL components, honestly labelled.
@@ -3267,6 +3339,7 @@ function popupHTML(d){
     ${peerPopupHTML(d,sec,r)}
     ${poiRelevancePopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
+    ${catchmentPopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
