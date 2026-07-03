@@ -517,18 +517,28 @@ function _normNat(b){const k=b.k10||{};
     gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
     pop:(b.pop!=null?b.pop:null),
     k10:b.k10||null};}
-// district population for a focal branch: prefer the carried `pop` (branches.json, MEASURED NSO);
-// for curated provinces (Rayong) whose branch file predates the field, match into the nationwide
-// tape by nearest coordinate (~1km) so the catchment summary still shows a measured population.
+// population for a focal branch's catchment. PREFER the true ~10km-perimeter figure
+// (branch_population.json, area-weighted district pop — index-aligned to branches.json/NATBRANCHES).
+// Fall back to the branch's DISTRICT population (branches.json `pop`, MEASURED NSO) if the perimeter
+// layer isn't built. Returns {v:number, scope:'10km'|'district'} or null.
+function branchPopIndex(f){
+  const NB=window.NATBRANCHES; if(!NB||!NB.length)return -1;
+  // _normNat branches ARE NATBRANCHES entries; curated ones aren't — match by nearest coordinate.
+  let bi=-1,bd=1e9;
+  for(let i=0;i<NB.length;i++){ const b=NB[i]; if(!b)continue;
+    const dx=(b.x-f.x),dy=(b.y-f.y),d2=dx*dx+dy*dy;
+    if(d2<bd){bd=d2;bi=i;} }
+  return bd<0.0001?bi:-1;   // ~<1.1km — same branch site
+}
 function branchPop(f){
   if(!f)return null;
-  if(f.pop!=null&&f.pop>0)return f.pop;
-  const NB=window.NATBRANCHES; if(!NB||!NB.length)return null;
-  let best=null,bd=1e9;
-  for(const b of NB){ if(!b||b.pop==null)continue;
-    const dx=(b.x-f.x),dy=(b.y-f.y),d2=dx*dx+dy*dy;
-    if(d2<bd){bd=d2;best=b;} }
-  return (best&&bd<0.0001)?best.pop:null;   // ~<1.1km — same branch site
+  const idx=branchPopIndex(f);
+  const BP=window.BRANCHPOP;
+  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km'};
+  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district'};
+  const NB=window.NATBRANCHES;
+  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district'};
+  return null;
 }
 // BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
 //  - Rayong (and any city shipping a curated province file): the curated PROV.branches — UNCHANGED
@@ -1501,9 +1511,11 @@ function updatePanels(){
     // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
     const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
     const pop=branchPop(focal);
+    const popScope=pop&&pop.scope==='10km'?'people ≤10km':'people in district';
+    const popTag=pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>';
     const headline=`<div class="cat10">`
-      +`<div class="c pop"><div class="n">${pop?fmt(pop):'—'}</div>`
-      +`<div class="l">people in district${pop?'':' · n/a'} <span class="tag meas">NSO</span></div></div>`
+      +`<div class="c pop"><div class="n">${pop?fmt(pop.v):'—'}</div>`
+      +`<div class="l">${pop?popScope:'people · n/a'} ${pop?popTag:''}</div></div>`
       +`<div class="c poi"><div class="n">${fmt(totalPOI)}</div>`
       +`<div class="l">establishments ≤10km <span class="tag meas">OSM</span></div></div>`
       +`</div>`;
@@ -1513,7 +1525,7 @@ function updatePanels(){
         const c=POI_COLORS[col]||[138,148,168];
         return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
       }).join('')+`</div>`).join('')
-      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population is the branch's district total (UNFPA/NSO), not a 10&nbsp;km circle.</div>`;
+      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population ≤10&nbsp;km = measured UNFPA/NSO district populations area-weighted over the 10&nbsp;km circle (assumes even density within a district — an estimate, not a raster count).</div>`;
   }
 
   // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
@@ -1952,7 +1964,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    Promise.resolve(TILECFG),
    // MEASURED nationwide POI pins (OSM, all 11 scene types). The scene bbox-filters this to the
    // current city extent so EVERY province's 3D scene gets POI columns — not just curated Rayong.
-   opt('data/catchment_poi.json')
+   opt('data/catchment_poi.json'),
+   // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
+   // branches.json — the "people" headline the catchment card shows.
+   opt('data/branch_population.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -1961,6 +1976,7 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
    window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
    window.POINAT=(a[14]&&a[14].poi)||null;
+   window.BRANCHPOP=(a[15]&&a[15].values)||null;
    killLoader();window.initCatch();})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already

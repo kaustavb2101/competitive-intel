@@ -86,6 +86,11 @@ phase_check(){
   ( cd "$PIPE" && python3 build_macro_exposure.py --check >/dev/null 2>&1 ) && ok "build_macro_exposure.py --check" || bad "build_macro_exposure.py --check (macro_exposure.json drifted from branch_occupations/commodity_board/crop_stress/household_risk)"
   ( cd "$PIPE" && python3 build_lead_sites.py --check >/dev/null 2>&1 ) && ok "build_lead_sites.py --check" || bad "build_lead_sites.py --check (lead_sites.json drifted from osm_layers.json/branches.json/branch_leads.json)"
   ( cd "$PIPE" && python3 build_catchment_poi.py --check >/dev/null 2>&1 ) && ok "build_catchment_poi.py --check" || bad "build_catchment_poi.py --check (catchment_poi.json drifted from osm_layers.json)"
+  ( cd "$PIPE" && python3 build_branch_population.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_population.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_population.py --check (shapely not installed — pip install --break-system-packages shapely)"
+  else bad "build_branch_population.py --check (branch_population.json drifted from th_amphoe.geojson/amphoe.json/master)"
+  fi
   ( cd "$PIPE" && python3 ingest_tmli.py --check >/dev/null 2>&1 ) && ok "ingest_tmli.py --check" || bad "ingest_tmli.py --check (TMLI measured province layers drifted from source-data/tmli/)"
   ( cd "$PIPE" && python3 build_household_risk.py --check >/dev/null 2>&1 ) && ok "build_household_risk.py --check" || bad "build_household_risk.py --check (household_risk_by_province.json drifted from source-data NSO SES layers)"
   ( cd "$PIPE" && python3 build_province_stress.py --check >/dev/null 2>&1 ) && ok "build_province_stress.py --check" || bad "build_province_stress.py --check (province_stress_index.json drifted from household_risk_by_province.json/unemployment_by_province.json)"

@@ -2314,6 +2314,46 @@ def check_competitor_census():
         ok("competitors_census rivals sane (%d rivals, known brands, coords in bbox)" % len(items))
 
 
+def check_branch_population(n_branches):
+    # TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
+    # branches.json. Optional file: SKIP-PASS when absent (shapely dep).
+    hdr("branch_population.json (optional)")
+    if not exists("branch_population.json"):
+        ok("branch_population.json absent — skipped (optional; run build_branch_population.py)")
+        return
+    try:
+        d = load("branch_population.json")
+    except Exception as e:
+        fail("branch_population.json loads", repr(e))
+        return
+    ok("branch_population.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not is_finite_number(meta.get("radius_km")):
+        fail("branch_population meta/provenance present (generated_by + label + radius_km)",
+             "meta missing generated_by/label/radius_km")
+        return
+    ok("branch_population meta/provenance present (generated_by + area-weighted label + radius_km)")
+
+    vals = d.get("values")
+    if not isinstance(vals, list):
+        fail("branch_population has a 'values' list", "got %s" % type(vals).__name__)
+        return
+    if n_branches is not None and len(vals) != n_branches:
+        fail("branch_population length == branches.json length",
+             "branch_population=%d branches=%d" % (len(vals), n_branches))
+    else:
+        ok("branch_population length == branches.json length (%d)" % len(vals))
+    # every value a non-negative int under a sane national ceiling (Bangkok core ~a few million).
+    bad = [i for i, v in enumerate(vals)
+           if not (isinstance(v, int) and 0 <= v <= 12_000_000)]
+    if bad:
+        fail("branch_population values are non-negative ints <= 12M", first_n(bad, 8))
+    else:
+        ok("branch_population values sane (0 <= pop <= 12M, %d branches)" % len(vals))
+
+
 # ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
@@ -2700,6 +2740,7 @@ def main():
     check_lead_sites(n)
     check_catchment_poi()
     check_competitor_census()
+    check_branch_population(n)
     check_provenance()
     check_index_alignment(n)
     check_branches_fingerprint(branches)
