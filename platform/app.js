@@ -1677,6 +1677,10 @@ function loadAmphoeGeo(){
   })();
   return ageoPromise;
 }
+// true when lens k is amphoe-keyed (reads d._amp / paints the district choropleth) — read off the
+// LENS registry's own amp:true flag instead of a hand-maintained list of lens keys, so a future
+// amp lens (LENS.foo={amp:true,...}) wires into the choropleth + join-warming automatically.
+function isAmpLens(k){ return !!(LENS[k]&&LENS[k].amp); }
 // id -> amphoe record lookup, built once from AMP (the scored districts).
 function ampIndex(){
   if(ampById||!AMP) return ampById;
@@ -1688,7 +1692,7 @@ function ampIndex(){
 // lens it simply removes the layer, so branch lenses look exactly as before.
 function drawAmphoeChoropleth(){
   if(!mapReady||!map||typeof L==='undefined'||!L.geoJSON) return;
-  const on=(curLens==='dws'||curLens==='drisk'||curLens==='unemp');
+  const on=isAmpLens(curLens);
   if(!on||!AGEO||!AMP){
     if(ampChoroLayer){ map.removeLayer(ampChoroLayer); ampChoroLayer=null; }
     return;
@@ -2912,7 +2916,7 @@ function initMap(){
   // Painting now would flash every branch pale (val 0) then snap when the join lands. So when we open
   // directly on a district lens, defer the first paint to the loadAmphoe().then below; otherwise paint
   // immediately as before. renderLegend() still runs so the legend isn't blank in the gap.
-  const deferForAmp=(curLens==='dws'||curLens==='drisk'||curLens==='unemp')&&!ampJoinAttached;
+  const deferForAmp=isAmpLens(curLens)&&!ampJoinAttached;
   if(deferForAmp) renderLegend(); else styleMarkers();
   // warm the district join so popups always carry the amphoe white-space/risk block and the
   // district lenses recolour instantly. Small file, also used by the Acquisition tab.
@@ -3482,11 +3486,11 @@ function setLens(k){
   if(k==='poirel' && !poirelLoaded){
     loadPoiRelevance().then(()=>{ renderLenses(); if(curLens==='poirel'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
-  if((k==='dws'||k==='drisk'||k==='unemp') && !ampJoinAttached){
-    loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'||curLens==='unemp'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  if(isAmpLens(k) && !ampJoinAttached){
+    loadAmphoe().then(()=>{ if(isAmpLens(curLens)){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
-  if((k==='dws'||k==='drisk'||k==='unemp') && !ageoLoaded){
-    loadAmphoeGeo().then(()=>{ if((curLens==='dws'||curLens==='drisk'||curLens==='unemp')&&mapReady) drawAmphoeChoropleth(); });
+  if(isAmpLens(k) && !ageoLoaded){
+    loadAmphoeGeo().then(()=>{ if(isAmpLens(curLens)&&mapReady) drawAmphoeChoropleth(); });
   }
   if(k==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'){ renderLegend(); if(mapReady){ drawCompPoints(); styleMarkers(); } } });
