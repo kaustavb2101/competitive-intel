@@ -5,6 +5,30 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 — UX: dedicated "Unemployment ▲" National-map district lens
+
+Loop cycle. `amphoe.json` has carried a province-inherited `unemployment_rate` (MEASURED · NSO Labour
+Force Survey) since 2026-07-02, but it was only visible baked into the blended `risk_proxy` composite —
+Kaustav couldn't see raw district unemployment on its own. Added a standalone `unemp` lens to
+`platform/app.js`'s `LENS` registry (mirrors the household-DTI dot-lens pattern: reads `d._amp.unemployment_rate`
+straight off the existing amphoe join, no new data file, no new pipeline step). Lives in the "More lenses ▾"
+menu (not a hero pill — the 4 hero slots are reserved). Own legend branch renders the raw percentage to 1
+decimal (`0.4% → 1.8% → 3.6% unemployment`) tagged "● measured · NSO LFS", rather than the generic legend's
+integer rounding which would have collapsed most districts to "0%"/"1%"/"4%". Extended the existing
+amphoe-join defer/repaint logic (`deferForAmp`, the `setLens` eager-load branch) to include `unemp` alongside
+`dws`/`drisk` so a `?lens=unemp` deep-link repaints correctly once the join lands.
+
+**Verification:** `node --check platform/app.js` clean. `bash tests/run.sh check` → 31 passed, 0 failed
+(158/158 data-integrity checks). Note: the `numpy` package was missing from this sandbox, which made
+`build_branch_peers.py --check` throw and report as a false "drift" — installed it
+(`pip install --break-system-packages numpy`), confirmed the check then passes cleanly on an untouched
+checkout (pre-existing environment gap, not a repo bug, not caused by this cycle's change). Rendered
+`index.html?lens=unemp#map` headless (`tests/lib/render.sh`) — the "Unemployment" pill appears active with
+its `M` badge, markers colour by district rate, and the legend/DOM dump confirms the exact expected
+`0.4%/1.8%/3.6% unemployment … measured · NSO LFS` string. No regression on the default `#map` render.
+
+---
+
 ## 2026-07-02 (3) — ENRICH: NSO unemployment_rate folded into build_amphoe.py's district risk_proxy
 
 Loop cycle. `unemployment_by_province.json` (MEASURED · NSO Labour Force Survey, already vendored and

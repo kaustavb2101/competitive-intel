@@ -67,17 +67,8 @@
 ## Queue — enrichment / capabilities (serve the two objectives)
 - [x] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED. DONE 2026-06-30** (build_household_risk.py
       → household_risk_by_province.json + National lens "MEASURED · NSO"; top DTI all Isan: Khon Kaen 1.15×, Amnat Charoen 1.14×).
-- [ ] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED, now unblocked.** The TMLI
-      bridge landed `source-data/household_debt_by_province.json` + `household_income_by_province.json` (real NSO
-      SES). Two steps: (1) project a province→{debt_to_income, stress_index} lookup into `platform/data/` (a small
-      `household_risk_by_province.json` via a deterministic --check'd step, or fold into derive.py) with full
-      provenance; (2) add a National map lens that colours each branch by its province household leverage,
-      labelled MEASURED · NSO. Graceful when absent. The standout measured-risk view no competitor has. *(HIGH, M)*
 - [x] **★ Surface the opportunity score on the Acquisition tab — objective #2. DONE 2026-06-30** (#acq "Where to open next"
       leaderboard: top-20 districts + whitespace/competitor-gap/agri-stress component bars; Vadhana 82, Bang Na 80).
-- [ ] **★ Surface the opportunity score on the Acquisition tab — objective #2.** `platform/data/opportunity_score.json`
-      (928 districts) is merged but not yet shown. Render the ranked where-to-open-next leaderboard (top districts +
-      per-component breakdown: whitespace / competitor-gap / agri-stress) on #acq, labelled ESTIMATED COMPOSITE. *(HIGH, M)*
 - [ ] **Composite expansion-opportunity score** per district — combine white-space + dominant occupation +
       competitor density + crop-stress into one rank for "where to open next". Graceful absent. *(high, M)*
 - [x] **Occupation × risk cross-read — DONE 2026-06-30** (`build_occupation_risk.py` → `occupation_risk.json`,
@@ -93,21 +84,36 @@
 - [ ] **NSO census occupation distiller** scaffolding in `ingest_gov.py` (code only; drop-in when the
       data.go.th pull lands) — improves data availability. *(med, M)*
 - [ ] **Expand `validate_data.py`** coverage as new data layers land. *(med, S)*
-- [ ] **National map: dedicated "Unemployment ▲" district lens.** `amphoe.json` now carries a
-      province-inherited `unemployment_rate` (MEASURED · NSO LFS, landed this cycle) that's currently
-      only baked into the composite `risk_proxy`. Surface it standalone (mirrors the household-DTI
-      lens pattern) so Kaustav can see raw unemployment separate from the blended estimate. *(MED, S)*
+- [x] **National map: dedicated "Unemployment ▲" district lens — DONE 2026-07-03** (new `unemp` lens
+      in `platform/app.js`'s `LENS` registry, mirrors the household-DTI dot-lens pattern; reads
+      `d._amp.unemployment_rate` off the existing amphoe join, own 1-decimal-percent legend tagged
+      measured · NSO LFS, lives in "More lenses ▾"; gate 31/0, headless-rendered + DOM-verified).
 - [ ] **Combine household DTI + unemployment into one province portfolio-stress index.**
       `household_risk_by_province.json` (DTI) and `unemployment_by_province.json` are both MEASURED
       province-level risk signals but feed different views (a National lens vs `build_amphoe.py`'s
       risk_proxy) with no single combined read. A blended province stress score would give one number
       for "which provinces are structurally riskiest" (objective #1). *(MED, M)*
-- [ ] **Backlog hygiene pass.** Two stale entries found this cycle: (1) the "Household debt-to-income
-      RISK LENS" item appears twice — once `[x]` DONE 2026-06-30, once still `[ ]` describing work
-      already shipped; (2) the "P2 Road-to-3,000 rounding" item near the bottom of this file is still
-      `[ ]` even though the 2026-07-01 Done entry says it was fixed. Dedupe/checkbox them. *(LOW, S —
-      doc-only, no code.)*
+- [x] **Backlog hygiene pass — DONE 2026-07-03** (deduped the stale `[ ]` Household-DTI-lens and
+      `[ ]` opportunity-score entries that were describing work already shipped `[x]`; removed the
+      stale `[ ]` P2 Road-to-3,000 rounding item at the bottom of this file, already fixed per the
+      2026-07-01 Done entry).
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
+- [ ] **`unemp` lens: add a district (amphoe) polygon choropleth**, mirroring `dws`/`drisk`'s
+      `drawAmphoeChoropleth()` fill so the raw unemployment rate paints the district shape itself (not
+      just branch dots) — sharper for sparsely-branched high-unemployment districts where dots alone
+      under-represent the area. Needs adding `unemp` to the `on` check in `drawAmphoeChoropleth()` +
+      picking its own fill scale (reuse the amphoe-geo layer already warmed for dws/drisk). *(MED, S)*
+- [ ] **Sandbox setup gap: `numpy` isn't installed by default**, which makes `build_branch_peers.py
+      --check` throw and get misreported by `tests/run.sh` as "branch_peers.json drifted" (it's an
+      ImportError, not real data drift) — a fresh loop session hits a false-red gate on cycle 1.
+      Either vendor `numpy` into the environment's default setup (session-start hook / Dockerfile) or
+      have `build_branch_peers.py` degrade to a clearer error message distinguishing "dependency
+      missing" from "check failed" so the loop doesn't waste a cycle diagnosing it. *(MED, S)*
+- [ ] **Combine household DTI + unemployment into a single province stress score for the National map**
+      (not just `build_amphoe.py`'s internal `risk_proxy` blend) — today `hhdti` and the new `unemp`
+      are two separate lenses a viewer must flip between; a 3rd composite lens (or a small badge on
+      each) showing "both elevated" districts would directly answer objective #1's "where is risk
+      compounding" question. *(MED, M)*
 - [x] **Fold NSO LFS `unemployment_rate` into `build_amphoe.py`'s `risk_proxy` — DONE 2026-07-02 (3)**
       (province-inherited `unemployment_rate` field + risk_proxy now 0.4·agri_stress + 0.25·collateral +
       0.15·merchant + 0.2·unemployment_stress [scaled 0-3.0%->0-100, clipped]; #acq risk table gained an
@@ -197,4 +203,3 @@
 - **2026-06-30 — White blow-out fixed on ALL 3D pages.** branch-explorer (sun 3.0→0.85, material diffuse 0.95→0.34) and
   province (sun 2.4→0.85, diffuse 0.95→0.34) still had the un-capped lighting that clamps light building colours to white on a
   GPU; applied the rayong-catchment cap everywhere (max lit ≈0.83×).
-- [ ] **P2 (QA) — Road-to-3,000 rounding mismatch.** #acq Headroom-est column rounds each region but totals the un-rounded sum → 984 in rows vs 985 in Total (app.js ~584 vs ~591). Round the total from the rounded rows. Cosmetic; +New allocation already correct. *(LOW, S)*
