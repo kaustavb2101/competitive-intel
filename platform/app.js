@@ -3714,9 +3714,12 @@ function popupHTML(d){
 }
 function styleMarkers(){
   const l=LENS[curLens], mx=lensMax(l);
+  // province-resolution lenses (hhdti/pstress) paint a polygon fill under the dots; the default
+  // 0.9 dot opacity fully tiles over it in denser provinces, so thin the dots when that fill is live.
+  const provDots=isProvLens(curLens);
   markers.forEach(m=>{
     const v=l.val(m._d), t=v/mx;
-    m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7});
+    m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7, fillOpacity:provDots?0.6:0.9});
   });
   // paint (or clear) the district choropleth to match the active lens — null-safe no-op
   // on a branch lens or when the polygon file is absent.
