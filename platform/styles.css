@@ -1,0 +1,1071 @@
+:root{
+  --bg:#0a0e17; --panel:#111622; --panel2:#0f1420; --line:#1e2636; --line2:#141a26;
+  --hi:#eef1f7; --txt:#cdd3e0; --mid:#8590a6; --dim:#6b7790; --accent:#5B7CFA;
+  --agri:#C8433B; --merch:#1C8C7D; --collat:#7A4FE0; --opp:#E6B450; --up:#1C8C7D;
+  --mono:'IBM Plex Mono',ui-monospace,monospace; --sans:'IBM Plex Sans Thai',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
+.mono{font-family:var(--mono)}
+
+/* header + tabs */
+header{position:sticky;top:0;z-index:1000;background:rgba(10,14,23,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{padding:11px 16px 7px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.brand h1{font-size:15px;font-weight:700;color:var(--hi);letter-spacing:-.2px}
+.brand h1 b{color:var(--accent)}
+.brand .sub{font-size:11px;color:var(--dim)}
+.tabs{display:flex;gap:2px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;background:none;border:none;color:var(--mid);font-family:var(--sans);font-size:13px;font-weight:500;padding:9px 13px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.on{color:var(--hi);border-bottom-color:var(--accent)}
+
+main{margin-inline:auto;padding:16px 14px 70px} /* max-width consolidated below (FULL-BLEED 2D) */
+.view{display:none}
+.view.on{display:block}
+h2{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:22px 0 10px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
+h2:first-child{margin-top:4px}
+.lead{font-size:12.5px;color:var(--mid);margin:2px 0 4px}
+
+/* macro cards */
+.grid{display:grid;gap:8px}
+.macro{grid-template-columns:repeat(auto-fit,minmax(108px,1fr))}
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+.mcard .k{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px}
+.mcard .v{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--hi);margin:2px 0}
+.mcard .n{font-size:10px;color:var(--dim)}
+
+/* insight callout */
+.insight{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:8px;padding:11px 13px;margin:10px 0;font-size:12.5px;color:#aab3c6}
+.insight b{color:var(--hi)}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{text-align:left;color:var(--dim);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:7px 7px;border-bottom:1px solid var(--line)}
+.tbl td{padding:7px 7px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:active{background:#141b28}
+.sub{color:var(--mid);font-size:11px}
+.bar{display:inline-block;background:#1a1f2e;border-radius:3px;height:7px;width:62px;vertical-align:middle}
+.bar>i{display:block;height:7px;border-radius:3px}
+.cols2{display:flex;gap:18px;flex-wrap:wrap}
+.cols2>div{flex:1;min-width:300px}
+
+/* map */
+#map{height:62vh;min-height:420px;border-radius:12px;border:1px solid var(--line);overflow:hidden;background:#0c111a}
+html[data-theme="light"] #map{background:#e8ecf2}  /* light loading bg so the map well matches the light basemap before tiles paint */
+.leaflet-popup-content-wrapper{background:#0d1218;color:var(--txt);border:1px solid var(--line);border-radius:9px}
+.leaflet-popup-tip{background:#0d1218;border:1px solid var(--line)}
+.leaflet-popup-content{margin:10px 12px;font-family:var(--sans)}
+.pop .pn{font-weight:700;color:var(--hi);font-size:13px}
+.pop .pv{color:var(--mid);font-size:11px;font-family:var(--mono);margin-bottom:6px}
+.pop .pr{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0}
+.pop .pr b{font-family:var(--mono)}
+/* macro-exposure chip strip (branch popup): compact factor pills. The chip COLOUR carries
+   headwind (--agri) vs tailwind (--merch); the chip ORDER carries magnitude — the underlying
+   scores are share-diluted (macro_exposure.json meta.score_scale), so no 0–100 bars. Theme-token
+   colours only: currentColor borders inherit the inline --agri/--merch and follow light mode. */
+.mxstrip{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0}
+.mxchip{display:inline-flex;align-items:center;gap:3px;font:600 10.5px var(--mono);
+  padding:2px 7px;border-radius:10px;border:1px solid currentColor;background:transparent;cursor:help}
+.leaflet-control-attribution{background:rgba(10,14,23,.7)!important;color:#5a6678!important}
+.leaflet-control-attribution a{color:#7a8aa3!important}
+
+/* lens switcher */
+.lenses{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 11px}
+.lens{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;text-align:left;color:var(--mid)}
+.lens.on{border-color:var(--accent);background:#15203a}
+.lens .lt{font-size:12.5px;font-weight:600;color:var(--hi);display:flex;align-items:center;gap:7px}
+.lens .lk{width:9px;height:9px;border-radius:50%;flex:none}
+.lens .ld{font-size:10.5px;color:var(--dim);margin-top:2px}
+.maplegend{display:flex;gap:13px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:9px;align-items:center}
+.maplegend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:-1px}
+
+/* search */
+.search{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;color:var(--hi);font-family:var(--sans);font-size:13px;padding:10px 12px;margin-bottom:10px}
+.search::placeholder{color:var(--dim)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--panel);border:1px solid var(--line);color:var(--mid);font-size:11.5px;padding:5px 11px;border-radius:20px;cursor:pointer}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.note{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin-top:20px;font-size:11.5px;color:var(--mid);line-height:1.65}
+.note b{color:var(--txt)}
+.tag{font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:10px;white-space:nowrap}
+.loading{color:var(--dim);padding:40px 0;text-align:center;font-family:var(--mono);font-size:12px}
+@media(max-width:600px){#map{height:54vh;min-height:340px}.brand .sub{display:none}}
+
+/* shared cross-page nav */
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px var(--sans);color:var(--hi);white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:var(--opp);margin:0 1px}
+#nav a{flex:none;color:var(--mid);text-decoration:none;font:500 12.5px var(--sans);
+ padding:6px 11px;border-radius:7px;white-space:nowrap;cursor:pointer}
+#nav a.on{color:#fff;background:#1a2336}
+main{padding-top:56px}
+
+/* ============================================================
+   INDIGO CONSOLE THEME (ux-uplift workflow) — appended; overrides
+   the tokens + core components above via the cascade.
+   ============================================================ */
+/* ============================================================
+   AutoX · เงินไชโย — "INDIGO CONSOLE" unified theme
+   Vanilla CSS, no build. Drop-in over existing class names.
+   One canonical token set: link this file from every page
+   (index, rayong-province, rayong-catchment, branch-explorer)
+   and delete the per-page inline :root color blocks.
+   ============================================================ */
+:root{
+  /* ---- elevation ladder: canvas < sunken < panel < raised ---- */
+  --bg:#121826;          /* deep blue-slate canvas, NOT pure black */
+  --bg-top:#19223a;      /* top vignette terminus */
+  --panel2:#0F1422;      /* sunken well: maps, notes, inset stat blocks */
+  --panel:#1A2233;       /* default card surface (the key lift) */
+  --raised:#232E45;      /* hover / active / popups / selected */
+  --line:#2C3650;        /* primary hairline — now catches light */
+  --line2:#202A40;       /* quiet in-card divider */
+
+  /* ---- text contrast tiers (AA on every surface) ---- */
+  --hi:#F1F4FA; --txt:#D2DAE8; --mid:#A6B0C4; --dim:#909CB2;  /* lifted muted text one step toward white — the low-contrast grey read "internal tool" */
+
+  /* ---- accent + segment data-ink (one canonical set) ---- */
+  --accent:#5B7CFA;
+  --accent-soft:rgba(91,124,250,.14);
+  --accent-glow:rgba(91,124,250,.34);
+  --agri:#E0574F;        /* brightened C8433B for AA on dark */
+  --merch:#23A28F;       /* brightened 1C8C7D */
+  --collat:#8E63E8;      /* brightened 7A4FE0 */
+  --opp:#E6B450; --gold:#E6B450;   /* canonical gold */
+  --up:#23A28F; --down:#E0574F;
+
+  /* ---- shared depth + glass tokens (reused everywhere) ---- */
+  --elev-1:0 1px 0 rgba(255,255,255,.04) inset, 0 2px 8px rgba(0,0,0,.34);
+  --elev-2:0 1px 0 rgba(255,255,255,.06) inset, 0 10px 26px rgba(0,0,0,.46);
+  --pop-sh:0 14px 38px rgba(0,0,0,.55);
+  --ring:0 0 0 1px var(--accent), 0 0 0 4px var(--accent-soft);
+  --glass:linear-gradient(180deg,rgba(35,46,69,.92),rgba(26,34,51,.92));
+  --glass-bd:1px solid var(--line);
+  --glass-sh:0 12px 38px -10px rgba(0,0,0,.6);
+
+  /* ---- spacing scale (4px base; roomier rungs for breathing room) ---- */
+  --s1:4px; --s2:8px; --s3:14px; --s4:20px; --s5:32px; --s6:48px;
+  --card-pad:18px 18px; --r:12px; --r-sm:9px;
+  /* ---- content measure: comfortable widescreen column; wide views break out wider ---- */
+  --maxw:1320px;          /* standard centered content column */
+  --maxw-wide:1680px;     /* map / board / leaderboard: use the widescreen */
+  --gutter:32px;          /* min breathing room each side at any width */
+
+  /* ---- TYPE RAMP — collapsed to 4 steps + caption (was 6 ad-hoc sizes) ----
+     caption 11 · body 14 · heading 19 · display 28. Mono metrics ride the
+     display/heading steps. Everything else snaps onto these via the cascade. */
+  --fz-caption:11px; --fz-body:14px; --fz-heading:19px; --fz-display:28px;
+  /* legacy aliases kept so existing var() refs resolve onto the new ramp */
+  --fz-xs:11px; --fz-sm:13px; --fz-base:14px; --fz-md:19px; --fz-lg:22px; --fz-xl:28px;
+  /* consistent line-heights per role */
+  --lh-tight:1.18; --lh-snug:1.35; --lh-body:1.55;
+
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans Thai',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  /* top-down vignette so the canvas reads as designed, not "screen off" */
+  background:radial-gradient(1200px 520px at 50% -8%, var(--bg-top), transparent 70%), var(--bg);
+  background-attachment:fixed;
+  color:var(--txt);font-family:var(--sans);font-size:var(--fz-base);line-height:1.55;
+  -webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- shared fixed nav (the one canonical bar) ----------
+   QW3: fit ALL tabs (shortened labels + a "More ▾" tuck). On narrow
+   viewports the bar SWIPE-SCROLLS horizontally (nowrap): the earlier
+   wrap-to-2nd-line variant clipped rows 2+ under the fixed 48px bar on
+   phones, leaving most tabs unreachable. */
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;
+  flex-wrap:nowrap;gap:var(--s1);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  padding:6px var(--s2);min-height:48px;
+  background:rgba(15,20,34,.85);backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--line);box-shadow:0 1px 12px rgba(0,0,0,.35);}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 14px var(--sans);color:var(--hi);white-space:nowrap;padding:0 8px 0 var(--s1);flex:none;letter-spacing:-.2px}
+#nav .nb b{color:var(--gold);margin:0 1px;text-shadow:0 0 12px rgba(230,180,80,.4)}
+#nav a{flex:none;color:var(--mid);text-decoration:none;font:500 12.5px var(--sans);
+  padding:7px 10px;border-radius:8px;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+#nav a:hover{color:var(--txt);background:rgba(255,255,255,.045)}
+#nav a.on,#nav .nav-more-btn.on{color:#fff;background:linear-gradient(180deg,var(--raised),#19223a);
+  box-shadow:inset 0 0 0 1px var(--line),0 0 16px rgba(91,124,250,.18)}
+
+/* ---------- "More ▾" dropdown (tucks Simulator/Provinces/Market/Branches) ---------- */
+.nav-more{position:relative;flex:none}
+.nav-more-btn{color:var(--mid);background:none;border:none;cursor:pointer;
+  font:500 12.5px var(--sans);padding:7px 10px;border-radius:8px;white-space:nowrap;
+  transition:color .15s,background .15s}
+.nav-more-btn:hover{color:var(--txt);background:rgba(255,255,255,.045)}
+/* position:fixed (not absolute): the nav is now an overflow-x scroll container, which would
+   clip an absolutely-positioned child dropdown. Fixed = anchored under the fixed 48px bar. */
+.nav-more-menu{position:fixed;top:54px;right:10px;left:auto;min-width:160px;display:none;
+  flex-direction:column;gap:2px;padding:6px;z-index:2100;
+  background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid var(--line);border-radius:10px;box-shadow:var(--pop-sh,0 14px 38px rgba(0,0,0,.55))}
+.nav-more.open .nav-more-menu,.nav-more-menu.open{display:flex}  /* .open on the menu itself: it is re-parented to <body> (see index.html nav script) */
+/* self-contained link styling: the menu is re-parented to <body>, so #nav a rules no longer reach it */
+.nav-more-menu a{display:block;flex:none;color:var(--mid);text-decoration:none;
+  font:500 12.5px var(--sans);padding:9px 12px;border-radius:8px;white-space:nowrap;cursor:pointer}
+.nav-more-menu a:hover{color:var(--txt);background:rgba(255,255,255,.045)}
+.nav-more-menu a.on{color:#fff;background:linear-gradient(180deg,var(--raised),#19223a)}
+html[data-theme="light"] .nav-more-menu a{color:#3D4557}
+html[data-theme="light"] .nav-more-menu a:hover{background:rgba(16,22,40,.06);color:#11151F}
+html[data-theme="light"] .nav-more-menu a.on{color:#fff}
+html[data-theme="light"] .nav-more-btn:hover{background:rgba(16,22,40,.05)}
+html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98)}
+html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
+
+/* legacy sticky header/tabs (index uses #nav, but keep these coherent if present) */
+header{position:sticky;top:0;z-index:1000;background:rgba(15,20,34,.85);
+  backdrop-filter:blur(12px) saturate(140%);border-bottom:1px solid var(--line)}
+.brand h1{font-size:var(--fz-lg);font-weight:700;color:var(--hi);letter-spacing:-.2px}
+.brand h1 b{color:var(--accent);text-shadow:0 0 14px var(--accent-glow)}
+.brand .sub{font-size:var(--fz-xs);color:var(--mid)}
+.tab{flex:none;background:none;border:none;color:var(--mid);font:500 13px var(--sans);
+  padding:9px 13px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--hi);border-bottom-color:var(--accent);text-shadow:0 0 12px var(--accent-glow)}
+
+main{margin-inline:auto;padding:60px var(--s4) 80px} /* max-width consolidated below (FULL-BLEED 2D) */
+.view{display:none}.view.on{display:block}
+
+/* ---------- section headers: outrank table th, lit accent tick ---------- */
+h2{font-size:var(--fz-md);color:var(--hi);font-weight:600;letter-spacing:0;text-transform:none;
+  margin:var(--s5) 0 var(--s3);padding-left:11px;position:relative;line-height:1.3}
+h2::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;
+  background:linear-gradient(var(--accent),#3a55c9);box-shadow:0 0 10px var(--accent-glow)}
+h2:first-child{margin-top:var(--s1)}
+.lead{font-size:var(--fz-sm);color:var(--mid);margin:var(--s1) 0 var(--s2);max-width:74ch;line-height:1.55}
+
+/* optional per-section meaning accents (add class in markup if desired) */
+h2.risk::before{background:linear-gradient(var(--agri),#a9322b)}
+h2.demand::before{background:linear-gradient(var(--merch),#16705f)}
+h2.collat::before{background:linear-gradient(var(--collat),#5d3aa6)}
+h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
+
+/* purpose line (IA: "what this view answers") */
+.purpose{font-size:13px;color:var(--txt);background:var(--panel);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:11px 14px;margin:var(--s1) 0 var(--s4);line-height:1.55;box-shadow:var(--elev-1)}
+
+/* ---------- KPI / macro cards: float + lit number + trend ---------- */
+.grid{display:grid;gap:var(--s2)}
+.macro{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.mcard{background:linear-gradient(180deg,var(--panel),#161d2c);border:1px solid var(--line);
+  border-top:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:var(--card-pad);
+  box-shadow:var(--elev-1);transition:transform .15s,box-shadow .15s,border-color .15s}
+.mcard:hover{transform:translateY(-1px);border-color:#3a4868;box-shadow:var(--elev-2)}
+.mcard .k{font-size:var(--fz-xs);color:var(--mid);text-transform:uppercase;letter-spacing:.4px;font-weight:500}
+.mcard .v{font-family:var(--mono);font-size:var(--fz-xl);font-weight:600;color:var(--hi);
+  margin:var(--s1) 0 2px;letter-spacing:-.4px;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 18px rgba(91,124,250,.16)}
+.mcard .n{font-size:10.5px;color:var(--dim);margin-top:var(--s1)}
+.mcard .d{font:600 11px var(--mono);margin-top:2px}
+.mcard .d.up,.mcard .v.up{color:var(--up)} .mcard .d.dn,.mcard .v.down{color:var(--down)}
+
+/* ---------- insight callout: tinted glass, segment-coded ---------- */
+.insight{background:linear-gradient(180deg,rgba(35,162,143,.10),var(--panel));
+  border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:var(--r);
+  padding:13px 15px;margin:var(--s3) 0;font-size:12.5px;color:var(--txt);box-shadow:var(--elev-1)}
+.insight b{color:var(--hi)}
+.insight.risk{background:linear-gradient(180deg,rgba(224,87,79,.10),var(--panel));border-left-color:var(--agri)}
+.insight.opp{background:linear-gradient(180deg,rgba(230,180,80,.10),var(--panel));border-left-color:var(--gold)}
+
+/* verdict / hero answer block (acquisition top-pick, catchment) */
+.verdict{background:linear-gradient(180deg,rgba(230,180,80,.12),var(--panel));
+  border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:var(--r);
+  padding:14px 16px;margin:var(--s1) 0 var(--s4);font-size:13px;color:var(--txt);box-shadow:var(--elev-2)}
+.verdict b{color:var(--hi)}
+.verdict-line{font-size:15px;font-weight:600;line-height:1.4;color:var(--txt)}
+/* tone variants for the per-section verdict cards (acquisition gold default, exposure/overview red) */
+.verdict.v-risk{background:linear-gradient(180deg,rgba(224,87,79,.13),var(--panel));border-left-color:var(--agri)}
+.verdict.v-warn{background:linear-gradient(180deg,rgba(217,116,43,.13),var(--panel));border-left-color:#D9742B}
+
+/* ---------- tables: raised card, zebra, right-aligned numerics, glowing bars ---------- */
+/* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
+   instead of pushing the whole page sideways. app.js wraps every table.tbl in one at boot. */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
+  overscroll-behavior-x:contain}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--elev-1)}
+.tbl th{text-align:left;color:var(--mid);font-weight:600;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.4px;padding:10px 10px;background:#202A3E;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 10px;border-bottom:1px solid var(--line2);vertical-align:middle;color:var(--txt)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.014)}
+@media(hover:hover){.tbl tbody tr:hover td{background:rgba(91,124,250,.07)}}
+.tbl tr:active td{background:rgba(91,124,250,.11)}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl .mono,.tbl td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+/* colored metric headers map to segment meaning */
+.tbl th.h-agri{color:#ef7d76} .tbl th.h-merch{color:#3fc1ac}
+.tbl th.h-collat{color:#a684ef} .tbl th.h-opp{color:#f0c869}
+.sub{color:var(--mid);font-size:var(--fz-xs)}
+
+/* risk-trend tab: region mover cards lead with the delta pill; legs wrap on the .n line */
+#v-trend .mcard .v{font-size:var(--fz-lg)}
+#v-trend .mcard .n{line-height:1.7}
+
+/* inline data bars: visible track + colored glowing fill */
+.bar{display:inline-block;background:#10182A;border-radius:4px;height:8px;width:64px;vertical-align:middle;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+.bar>i{display:block;height:8px;border-radius:4px;box-shadow:0 0 8px -1px currentColor;filter:saturate(1.12)}
+.bar.agri>i{background:var(--agri)} .bar.merch>i{background:var(--merch)}
+.bar.collat>i{background:var(--collat)} .bar.opp>i{background:var(--gold)}
+
+.cols2{display:flex;gap:var(--s5);flex-wrap:wrap}
+.cols2>div{flex:1;min-width:300px}
+@media(min-width:900px){.cols2{gap:var(--s5)}.cols2>div{min-width:360px}}
+/* Overview: fixed calm macro/regulatory rail, let the two commodity tables claim the widescreen
+   (removes the dead right-gutter and finishes the columns closer). */
+@media(min-width:900px){#v-overview .cols2>div:first-child{flex:0 1 340px}#v-overview .cols2>div:last-child{flex:2 1 520px}}
+/* Exposure KPI cards: sentence-case labels (read faster than tracked caps here), one reserved label
+   height, and the big number pinned to a shared baseline so the 2x2 row scans as one set. */
+#expocards .mcard{display:flex;flex-direction:column}
+#expocards .mcard .k{text-transform:none;letter-spacing:.2px;min-height:2.5em;line-height:1.3}
+#expocards .mcard .v{margin-top:auto}
+#expocards .mcard .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ---------- provenance + status tags ---------- */
+.tag{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;
+  background:var(--accent-soft);color:var(--accent);border:1px solid rgba(91,124,250,.35)}
+.tag.risk{background:rgba(224,87,79,.14);color:#ef7d76;border-color:rgba(224,87,79,.35)}
+.tag.demand{background:rgba(35,162,143,.14);color:#3fc1ac;border-color:rgba(35,162,143,.35)}
+.tag.collat{background:rgba(142,99,232,.14);color:#a684ef;border-color:rgba(142,99,232,.35)}
+.tag.opp{background:rgba(230,180,80,.14);color:#f0c869;border-color:rgba(230,180,80,.35)}
+/* .prov (measured/estimated provenance chip) is defined ONCE — the premium pill in the
+   "STANDARDIZED PROVENANCE" block below. Only the inline left-gap lives here. */
+.prov{margin-left:5px}
+
+/* ---------- lens PILL row: one horizontal segmented control docked over the map ---------- */
+.lenses{display:flex;gap:6px;flex-wrap:wrap;margin:0}
+.pill.lens{flex:0 0 auto;min-width:0;display:inline-flex;align-items:center;gap:7px;
+  background:rgba(20,27,42,.82);border:1px solid var(--line);border-radius:999px;
+  padding:7px 12px;cursor:pointer;text-align:left;color:var(--mid);white-space:nowrap;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .14s,box-shadow .14s,border-color .14s,background .14s,color .14s}
+.pill.lens:hover{transform:translateY(-1px);border-color:#3a4868;color:var(--hi)}
+.pill.lens.on{border-color:var(--accent);color:var(--hi);background:linear-gradient(180deg,var(--accent-soft),rgba(20,27,42,.92));
+  box-shadow:0 0 0 1px var(--accent),0 0 18px var(--accent-glow)}
+.pill.lens .lk{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 7px 1px currentColor}
+.pill.lens .pl{font-size:12.5px;font-weight:600;letter-spacing:.1px}
+.pill.lens .pi{font-size:11px;color:var(--mid);opacity:.95;cursor:help}
+.pill.lens:hover .pi,.pill.lens.on .pi{color:var(--hi);opacity:1}
+/* in-band [M] measured / [E] estimated provenance badge on each lens pill */
+.pill.lens .lpt{font:700 8.5px var(--mono);line-height:1;padding:2px 4px;border-radius:5px;flex:none}
+.pill.lens .lpt.m{color:#5fd6c2;background:rgba(35,162,143,.16);border:1px solid rgba(35,162,143,.5)}
+.pill.lens .lpt.e{color:#f2cf78;background:rgba(230,180,80,.13);border:1px solid rgba(230,180,80,.5)}
+/* a hero pill whose data is known-absent: dimmed + not clickable, but its slot is reserved */
+.pill.lens.lens-off{opacity:.42;cursor:not-allowed;filter:saturate(.4)}
+.pill.lens.lens-off:hover{transform:none;border-color:var(--line);color:var(--mid)}
+
+/* ---------- "More lenses ▾" dropdown (holds every non-hero lens) ---------- */
+.lens-more{position:relative;flex:0 0 auto}
+.lens-more-btn{font-weight:600}
+.lens-more.open .lens-more-btn{border-color:var(--accent);color:var(--hi)}
+.lens-more-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:700;
+  min-width:232px;max-height:60vh;overflow-y:auto;padding:8px;border-radius:12px;
+  background:rgba(14,19,30,.97);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 10px 32px -8px rgba(0,0,0,.6);
+  display:none;flex-direction:column;gap:6px}
+.lens-more.open .lens-more-menu{display:flex}
+.lens-more-menu .pill.lens.lens-menu{width:100%;justify-content:flex-start;border-radius:9px}
+html[data-theme="light"] .lens-more-menu{background:rgba(255,255,255,.98)}
+
+/* ---------- map = hero: full-bleed frame with the pill row floated on top ---------- */
+.maphero{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 0 0 1px rgba(255,255,255,.02),var(--elev-2)}
+.maphero #map{height:78vh;height:78dvh;min-height:480px;border:0;border-radius:0;box-shadow:none}
+.maphero-top{position:absolute;top:12px;left:12px;right:12px;z-index:600;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.maphero-top>*{pointer-events:auto}
+/* tamed to 4 hero pills + a "More ▾" dropdown, so the row wraps instead of scrolling — and the
+   dropdown menu must NOT be clipped (no overflow on the row). */
+.maphero-top .lenses{max-width:100%;flex-wrap:wrap;overflow:visible;padding-bottom:2px}
+.maphero-top .chips{display:flex;gap:6px;flex-wrap:wrap;width:fit-content;max-width:100%;
+  background:rgba(20,27,42,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;padding:5px 7px}
+/* keep Leaflet's own zoom control clear of the pill row */
+.maphero .leaflet-top.leaflet-left{margin-top:56px}
+
+/* ---------- legend demoted to ONE quiet line under the map ---------- */
+.maplegend-line{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:var(--s2) 0 0}
+.maplegend{display:inline-flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--mid);
+  align-items:center}
+.maplegend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px;
+  box-shadow:0 0 6px 0 currentColor}
+.maplegend .szkey i{background:var(--mid);border-radius:50%;margin:0 2px;box-shadow:none}
+.maplegend-line .sub{font-size:10.5px}
+.leaflet-popup-content-wrapper{background:var(--glass);color:var(--txt);border:var(--glass-bd);
+  border-radius:var(--r-sm);box-shadow:var(--pop-sh)}
+.leaflet-popup-tip{background:#232E45;border:1px solid var(--line)}
+.leaflet-popup-content{margin:11px 13px;font-family:var(--sans)}
+/* district drill-down ping label (focusDistrictOnMap) — gold, on the console dark. */
+.leaflet-tooltip.focus-tip{background:#1A2233;color:var(--gold);border:1px solid var(--gold);
+  border-radius:8px;font-family:var(--sans);font-size:12px;font-weight:700;padding:4px 9px;
+  box-shadow:0 0 14px rgba(230,180,80,.35)}
+.leaflet-tooltip.focus-tip::before{border-top-color:var(--gold)}
+.pop .pn{font-weight:700;color:var(--hi);font-size:13.5px}
+.pop .pv{color:var(--mid);font-size:11px;font-family:var(--mono);margin-bottom:7px}
+.pop .pr{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:3px 0}
+.pop .pr b{font-family:var(--mono);color:var(--hi);font-variant-numeric:tabular-nums}
+.pop .seg .pr b{font-size:13px}
+.pop details summary{cursor:pointer;color:var(--mid);font-size:11px;padding:6px 0;list-style:none}
+.pop details summary::-webkit-details-marker{display:none}
+.leaflet-control-attribution{background:rgba(15,20,34,.7)!important;color:#5a6678!important}
+.leaflet-control-attribution a{color:#7a8aa3!important}
+.leaflet-bar a{width:32px;height:32px;line-height:32px}
+
+/* ---------- search + chips + buttons ---------- */
+.search{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--hi);font-family:var(--sans);font-size:14px;padding:12px 14px;margin-bottom:var(--s3);
+  box-shadow:var(--elev-1);transition:box-shadow .15s,border-color .15s}
+.search::placeholder{color:var(--dim)}
+.search:focus{outline:none;border-color:var(--accent);box-shadow:var(--ring)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:var(--s3)}
+.chip{background:var(--panel);border:1px solid var(--line);color:var(--mid);font-size:11.5px;
+  padding:6px 13px;border-radius:20px;cursor:pointer;transition:all .12s}
+.chip:hover{color:var(--txt);border-color:#3a4868}
+.chip.on{background:linear-gradient(180deg,var(--accent),#3f5fe0);color:#fff;border-color:var(--accent);
+  box-shadow:0 4px 14px -4px var(--accent-glow)}
+button.btn,.ctl button,.cbtn{font-family:var(--sans);cursor:pointer}
+
+/* ---------- note / loading / a11y ---------- */
+.note{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;margin-top:var(--s5);font-size:11.5px;color:var(--mid);line-height:1.7;box-shadow:var(--elev-1)}
+.note b{color:var(--txt)}
+.loading{color:var(--dim);padding:48px 0;text-align:center;font-family:var(--mono);font-size:12px}
+a:focus-visible,button:focus-visible,.lens:focus-visible,.chip:focus-visible,.search:focus-visible,
+tr[role="link"]:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px}
+tr[role="link"]:focus-visible{outline-offset:-2px}
+
+/* ============================================================
+   deck.gl pages: shared glass for #panel / #sheet / .side /
+   #ctl / .cbtn / .kpi — unify the five floating surfaces.
+   ============================================================ */
+#panel,#sheet,.side{background:var(--glass)!important;border:var(--glass-bd)!important;
+  box-shadow:var(--glass-sh)!important;backdrop-filter:blur(12px) saturate(140%)}
+.cbtn,.ctl button,#ctl button{background:rgba(35,46,69,.9)!important;border:1px solid var(--line)!important;
+  color:var(--txt)!important;border-radius:var(--r-sm);padding:8px 11px;backdrop-filter:blur(8px)}
+.cbtn.on,.ctl button.on,#ctl button.on{border-color:var(--accent)!important;color:#fff!important;
+  box-shadow:0 0 14px var(--accent-glow)}
+.kpi,.bchip{background:linear-gradient(180deg,var(--panel),#161d2c)!important;border:1px solid var(--line)!important;border-radius:9px}
+.kpi .v{font-family:var(--mono);color:var(--hi);font-variant-numeric:tabular-nums}
+.kpi .k{font-size:10.5px;color:var(--mid)}
+.kpi.lead-kpi{border-left:2px solid var(--gold)!important}
+.kpi.lead-kpi .v{font-size:20px}
+.tb.on{border-bottom-color:var(--gold)}
+#status{background:var(--glass)!important;border:var(--glass-bd)!important}
+#status.err{color:#ef7d76;border-color:rgba(224,87,79,.4)!important}
+
+/* ---------- skeleton loaders (shimmer) ----------
+   Lightweight, theme-aware placeholders that mirror the final table/card layout while data loads.
+   A faint gradient block animated by @keyframes shimmer; fades out when real content replaces it.
+   Used in place of plain "Loading…" text on the Command center, Acquisition, Exposure & Overview
+   panels and the map legend. Reduced-motion users get a static block (no animation). */
+@keyframes shimmer{0%{background-position:-360px 0}100%{background-position:360px 0}}
+.skel{background:linear-gradient(90deg,var(--line2) 0%,var(--line) 50%,var(--line2) 100%);
+  background-size:360px 100%;border-radius:5px;animation:shimmer 1.25s ease-in-out infinite;
+  display:block;height:11px;margin:7px 0;opacity:.85}
+.skel-rows{margin:4px 0 2px}
+.skel-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2)}
+.skel-row:last-child{border-bottom:none}
+.skel-row .skel{margin:0}
+.skel-line{height:11px}
+.skel-pill{height:18px;border-radius:9px;width:46px;flex:none}
+.skel-w70{width:70%}.skel-w55{width:55%}.skel-w40{width:40%}.skel-w30{width:30%}.skel-w20{width:20%}
+.skel-grow{flex:1}
+.skel-card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px;margin:6px 0}
+[data-theme=light] .skel{background:linear-gradient(90deg,#eceef3 0%,#dde1ea 50%,#eceef3 100%);background-size:360px 100%}
+
+/* ---------- responsive ---------- */
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.skel{animation:none}}
+@media(max-width:760px){
+  .cbtn,#ctl button,#elev button,.ctl button{padding:10px 12px;font-size:12px}
+  .cbtn .sw{width:11px;height:11px}
+}
+@media(max-width:600px){
+  main{padding:60px var(--s3) 80px}
+  #map{height:54vh;height:54dvh;min-height:340px;box-shadow:var(--elev-1)}
+  .maphero #map{height:72vh;height:72dvh;min-height:420px}
+  .maphero-top{top:8px;left:8px;right:8px}
+  .brand .sub{display:none}
+  .grid{gap:var(--s2)}
+  .tbl{font-size:12px}.tbl th,.tbl td{padding:9px 7px}
+  /* PHONE: a wrapped table keeps its natural column widths and scrolls inside .tblwrap,
+     so it never widens the page. min-width:100% keeps a narrow table flush to the card. */
+  .tblwrap>.tbl{width:max-content;min-width:100%;box-shadow:none}
+  .tblwrap{border:1px solid var(--line);box-shadow:var(--elev-1)}
+  /* lens pill row → single-line horizontal scroll strip on phones */
+  .lenses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  /* the map's hero row is only 4 pills + More ▾, so wrap (not scroll) and never clip the dropdown */
+  .maphero-top .lenses{flex-wrap:wrap;overflow:visible}
+  .lens-more-menu{min-width:200px;max-width:78vw}
+  .pill.lens{min-width:auto;padding:7px 11px}
+  .mcard{box-shadow:var(--elev-1)}
+  /* PHONE tap targets ≥40px (WCAG 2.5.5): chips, jump-nav, nav links, theme toggle, stars */
+  .chip,.jumpnav .chip{padding:9px 14px;min-height:40px;display:inline-flex;align-items:center}
+  #nav a,#nav .nav-more-btn{padding:10px 12px;min-height:40px;display:inline-flex;align-items:center}
+  #themeToggle{width:40px!important;height:38px!important}
+  .cc-star{padding:6px 8px;font-size:16px}
+  .cc-link{padding:4px 2px;min-height:32px;display:inline-flex;align-items:center}
+  /* command-center header: stack the action buttons full-width so they don't crowd the title */
+  .cc-actions{width:100%}
+  .cc-actions .chip{flex:1;justify-content:center}
+}
+
+/* ============================================================
+   LIGHT / "Paper Console" theme — toggle via html[data-theme="light"].
+   Light reading chrome; maps/3D stay DARK inside a light-framed well
+   (per the light-slate panel verdict). Default remains dark.
+   ============================================================ */
+html[data-theme="light"]{
+  --bg:#F4F6FA; --bg-top:#FBFCFE;
+  --panel2:#ECEFF5; --panel:#FFFFFF; --raised:#F7F9FD;
+  --line:#DCE1EB; --line2:#EBEEF4;
+  --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#7A8598;
+  --accent:#4C6EF0; --accent-soft:rgba(76,110,240,.12); --accent-glow:rgba(76,110,240,.28);
+  --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --opp:#A67714; --gold:#A67714;
+  --up:#0E7C68; --down:#C0392F;
+  --elev-1:0 1px 2px rgba(16,22,40,.05),0 4px 14px rgba(16,22,40,.07);
+  --elev-2:0 1px 2px rgba(16,22,40,.06),0 16px 36px rgba(16,22,40,.13);
+  --pop-sh:0 18px 46px rgba(16,22,40,.20);
+  --glass:linear-gradient(180deg,#ffffff,#f5f8fd); --glass-sh:0 12px 30px -10px rgba(16,22,40,.22);
+}
+html[data-theme="light"] body{background:var(--bg)}
+/* Light cards need real elevation — on the near-white canvas the dark-theme inset highlights vanish,
+   leaving flat separationless boxes. A soft drop shadow is the single biggest light-mode polish fix. */
+html[data-theme="light"] .cc-card,html[data-theme="light"] .mcard,
+html[data-theme="light"] .cc-hero-card,html[data-theme="light"] .side,
+html[data-theme="light"] .insight,html[data-theme="light"] .cc-thesis{box-shadow:var(--elev-1)}
+html[data-theme="light"] body{-webkit-font-smoothing:auto;text-rendering:optimizeLegibility}
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);box-shadow:0 1px 8px rgba(16,22,40,.06)}
+html[data-theme="light"] #nav a:hover{background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
+html[data-theme="light"] #nav .nb b,html[data-theme="light"] .brand h1 b,
+html[data-theme="light"] .tab.on,html[data-theme="light"] .mcard .v{text-shadow:none}
+html[data-theme="light"] h2::before,html[data-theme="light"] .bar>i{box-shadow:none}
+html[data-theme="light"] .bar{background:#e3e8f1}
+html[data-theme="light"] .tbl th{background:#f3f6fb}
+html[data-theme="light"] .tbl tr:active{background:#eef2f8}
+html[data-theme="light"] .tbl tbody tr:nth-child(even) td{background:rgba(16,22,40,.025)}
+html[data-theme="light"] .tbl th.h-agri{color:#B53A33}
+html[data-theme="light"] .tbl th.h-merch{color:#15705F}
+html[data-theme="light"] .lens.on{background:#e7edf8}
+html[data-theme="light"] .insight,html[data-theme="light"] .purpose{color:var(--txt)}
+/* maps stay DARK inside a light-framed well */
+html[data-theme="light"] #map{box-shadow:0 2px 12px rgba(16,22,40,.10)}
+html[data-theme="light"] .leaflet-popup-content-wrapper,
+html[data-theme="light"] .leaflet-popup-tip{background:#fff;color:var(--txt);border:1px solid var(--line)}
+html[data-theme="light"] .leaflet-control-attribution{background:rgba(255,255,255,.82)!important;color:#5a6678!important}
+html[data-theme="light"] #status{background:#fff;color:var(--mid)}
+/* cards that hardcode a dark gradient end (#161d2c) — flip to light */
+html[data-theme="light"] .mcard,
+html[data-theme="light"] .lens,
+html[data-theme="light"] .kpi,
+html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6fc)!important}
+
+/* ===== Command center (Step 1) ===== */
+.cc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.cc-actions{display:flex;gap:8px;flex:none}
+.cc-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:8px}
+@media(max-width:340px){.cc-grid{grid-template-columns:1fr}}
+/* Home focal hierarchy: on wide screens the two standing-objective cards own row 1, macro+movers
+   sit on row 2 (supporting) — a clear primary->secondary read instead of four competing peers. */
+@media(min-width:1000px){.cc-grid{grid-template-columns:1fr 1fr}}
+.cc-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+.cc-card-wide{grid-column:1/-1}
+.cc-card-h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--hi);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--line2)}
+.cc-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.cc-link{margin-left:auto;font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;text-transform:none;letter-spacing:0;cursor:pointer}
+.cc-link.sub{color:var(--dim);cursor:default;font-weight:500}
+.cc-link:hover{text-decoration:underline}
+.cc-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line2)}
+.cc-row:last-child{border-bottom:none}
+.cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0}
+.cc-row .l .s{display:block;font-size:10.5px;color:var(--dim)}
+.cc-row .r{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
+.cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
+/* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
+   teal=measured / gold=estimated tint, hairline border). Colors resolve via .prov.m/.e below. */
+.cc-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;padding:2px 8px 2px 7px;border-radius:999px;
+  border:1px solid;vertical-align:middle;white-space:nowrap;letter-spacing:.2px}
+.cc-tag::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;box-sizing:border-box}
+.cc-tag.m{color:#5fd6c2;border-color:rgba(35,162,143,.55);background:rgba(35,162,143,.14)}
+.cc-tag.m::before{background:#5fd6c2}
+.cc-tag.e{color:#f2cf78;border-color:rgba(230,180,80,.55);background:rgba(230,180,80,.13)}
+.cc-tag.e::before{background:transparent;border:1.5px solid #f2cf78}
+html[data-theme="light"] .cc-tag.m{color:#0c6a5b;background:rgba(28,140,125,.13);border-color:rgba(28,140,125,.45)}
+html[data-theme="light"] .cc-tag.m::before{background:#0c6a5b}
+html[data-theme="light"] .cc-tag.e{color:#8a6300;background:rgba(176,130,20,.13);border-color:rgba(176,130,20,.45)}
+html[data-theme="light"] .cc-tag.e::before{border-color:#8a6300}
+.cc-sub2{font-size:10.5px;color:var(--dim);margin:8px 0 0}
+.cc-star{background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;line-height:1;padding:0 2px;vertical-align:middle}
+.cc-star.on{color:var(--gold)}
+.cc-star:hover{color:var(--gold)}
+.cc-empty{font-size:12px;color:var(--dim);padding:6px 0}
+
+/* QW5 — HERO VERDICT BAND: 2–3 big plain-language statements, the front door's lead.
+   Cards stretch across the widescreen and click through to their detail tab. */
+/* BOARD THESIS — one spoken sentence + Road-to-3,000 bar. A quiet, wide band above the hero cards. */
+.cc-thesis{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin:var(--s3,14px) 0 2px;
+  background:linear-gradient(180deg,rgba(230,180,80,.07),var(--panel,#1A2233));
+  border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:13px 18px}
+.cc-thesis:empty{display:none}
+.cc-thesis-line{flex:1 1 340px;font-size:14px;line-height:1.5;color:var(--txt);letter-spacing:-.1px}
+.cc-thesis-line b{color:var(--hi);font-weight:700}
+.cc-thesis-bar{position:relative;flex:0 0 220px;height:22px;background:var(--raised,#232E45);
+  border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.cc-thesis-fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--gold),#b88a2e);
+  border-radius:999px;transition:width .6s ease}
+.cc-thesis-barlab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:600;letter-spacing:.3px;color:#1a1305;text-shadow:0 0 4px rgba(255,255,255,.4)}
+@media(max-width:640px){.cc-thesis-bar{flex-basis:100%}}
+.cc-hero{display:grid;gap:var(--s3,14px);grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  margin:var(--s3,14px) 0 var(--s5,32px)}  /* more air below the hero so the card strip reads as a new section, not crowded against it */
+.cc-hero:empty{display:none}
+.cc-hero-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;
+  background:linear-gradient(180deg,var(--raised,#232E45),var(--panel,#1A2233));
+  border:1px solid var(--line);border-left:4px solid var(--hc,var(--accent));
+  border-radius:14px;padding:16px 18px;box-shadow:var(--elev-1);transition:transform .15s,box-shadow .15s,border-color .15s}
+.cc-hero-card:hover{transform:translateY(-2px);box-shadow:var(--elev-2);border-color:var(--hc,var(--accent))}
+.cc-hero-card:focus-visible{outline:none;box-shadow:var(--ring)}
+.cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px}
+.cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid)}
+.cc-hero-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
+/* .cc-hero-tag is a provenance chip too (text can be mixed "measured + estimated"), so it wears
+   the same pill language as .prov / .cc-tag — mono 11px, leading dot, hairline border. Kept
+   neutral-ink because the value may span both states. */
+.cc-hero-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;letter-spacing:.2px;color:var(--mid);
+  border:1px solid var(--line);border-radius:999px;padding:2px 8px 2px 7px;white-space:nowrap}
+.cc-hero-tag::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;
+  background:var(--dim);box-shadow:0 0 0 1px rgba(255,255,255,.06) inset}
+.cc-hero-cta{font-size:12px;font-weight:600;color:var(--hc,var(--accent));white-space:nowrap}
+/* demote the measured/estimated legend to one quiet line at the bottom (QW5). */
+.cc-provenance{margin-top:18px;font-size:11px;color:var(--dim);border-top:1px solid var(--line2);padding-top:10px}
+.cc-provenance b{color:var(--mid)}
+@media(max-width:640px){.cc-hero{grid-template-columns:1fr}.cc-hero-big{font-size:18px}}
+
+/* print / PDF: only the command center, clean ink-on-paper exec brief.
+   Hide all chrome (nav + dropdowns, lens pills, action chips, tooltips, the WebGL map & legend,
+   shimmer skeletons); white background + black text; tables go full-width with no horizontal
+   scroll; verdict cards + tables are kept and never split across a page break. */
+@media print{
+  nav,#nav,#themeToggle,.no-print,.cc-actions,
+  .nav-more,.nav-more-menu,.lens-more,.lens-more-menu,
+  .lenses,.lens,.pill,.chips,.chip,.maphero,#map,.maplegend,.maplegend-line,
+  .pi,[title]:after,.tooltip,.skel,.skel-rows{display:none!important}
+  body{background:#fff!important;color:#111!important}
+  main{max-width:none!important;padding:0!important}
+  .view{display:none!important}
+  #v-home{display:block!important}
+  .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
+  /* board thesis: whiten the band, darken the sentence, keep the Road-to-3,000 bar readable. */
+  .cc-thesis{background:#fff!important;border:1px solid #bbb!important;border-left:4px solid #b88a2e!important;break-inside:avoid;box-shadow:none!important}
+  .cc-thesis-line,.cc-thesis-line b{color:#111!important}
+  .cc-thesis-bar{background:#eee!important;border-color:#bbb!important}
+  .cc-thesis-fill{background:#b88a2e!important}
+  .cc-thesis-barlab{color:#111!important;text-shadow:none!important}
+  .cc-card-h,.cc-row .l,.cc-row .r,h2,h3,b{color:#111!important}
+  .lead,.cc-sub2,.cc-row .l .s,.cc-row .r .s,.sub{color:#444!important}
+  .cc-grid{grid-template-columns:1fr 1fr}
+  a{color:#111!important;text-decoration:none}
+  /* tables full-width, no horizontal-scroll wrapper, keep on the page */
+  .tblwrap{width:100%!important;max-width:none!important;overflow:visible!important;border:none!important}
+  .tbl{width:100%!important;max-width:none!important;border-collapse:collapse!important;break-inside:avoid}
+  .tbl th,.tbl td{color:#111!important;border-color:#ccc!important}
+}
+
+/* ---------- scenario simulator ---------- */
+.sim-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin:10px 0 4px}
+@media(max-width:760px){.sim-grid{grid-template-columns:1fr}}
+.sim-controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.sim-ctl-h{display:flex;align-items:center;justify-content:space-between;font:600 11px var(--sans);
+  text-transform:uppercase;letter-spacing:.5px;color:var(--mid);margin-bottom:12px}
+.sim-slider{margin-bottom:16px}
+.sim-slider:last-child{margin-bottom:0}
+.sim-slider label{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font:500 12.5px var(--sans);color:var(--txt);margin-bottom:6px}
+.sim-slider label .mono{color:var(--gold);font-weight:600}
+.sim-slider input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.sim-hint{font-size:10.5px;color:var(--dim);margin-top:4px;line-height:1.45}
+.sim-toggle{cursor:pointer}
+.sim-toggle input{accent-color:var(--agri);margin-right:6px}
+.sim-out .grid.macro{margin-bottom:6px}
+
+/* ---------- Acquisition: in-tab jump-nav + collapsible sections ---------- */
+.jumpnav{display:flex;gap:7px;flex-wrap:wrap;position:sticky;top:48px;z-index:20;
+  background:rgba(10,14,23,.92);backdrop-filter:blur(8px);padding:8px 0 9px;margin:0 0 6px;
+  border-bottom:1px solid var(--line2)}
+.jumpnav .chip{text-decoration:none}
+[data-theme=light] .jumpnav{background:rgba(247,248,251,.92)}
+/* collapsible sections — keep the h2 look, add a disclosure caret to summary */
+details.acqsec{border-top:1px solid var(--line2);margin:0}
+details.acqsec:first-of-type{border-top:none}
+details.acqsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  outline-offset:2px}
+details.acqsec>summary::-webkit-details-marker{display:none}
+details.acqsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
+details.acqsec:first-of-type>summary>h2{margin-top:4px}
+details.acqsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
+  margin-top:2px}
+details.acqsec[open]>summary::after{transform:rotate(90deg)}
+details.acqsec>summary:hover::after,details.acqsec>summary:hover>h2{color:var(--txt)}
+details.acqsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
+details.acqsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
+.acqsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+  margin:18px 0 8px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
+.acqsub.opp{color:var(--opp)}
+.acqsub.risk{color:#ef7d76}
+.acqsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+  margin:18px 0 8px;font-weight:600}
+@media print{.jumpnav{display:none!important}details.acqsec>summary::after{display:none}}
+
+/* ============================================================
+   DESIGN-SYSTEM TIGHTENING (design-sys) — appended; wins via the
+   cascade. Pure refinement of the SAME class names: a collapsed
+   4-step type ramp, a roomier spacing rhythm, a dominant card
+   metric, dimmer secondary labels, calmer dividers (subtle bg
+   separation over 1px-border noise), and unified radius/shadow.
+   No markup or structure changes — every tab + deck.gl page
+   inherits this through styles.css.
+   ============================================================ */
+
+/* ---- 1 · TYPE RAMP: snap every role onto caption/body/heading/display ---- */
+body{font-size:var(--fz-body);line-height:var(--lh-body);letter-spacing:.1px}
+
+/* HEADING (19) — clear step above body; this is the section title voice */
+h2{font-size:var(--fz-heading);font-weight:650;line-height:var(--lh-snug);
+   letter-spacing:-.2px;color:var(--hi);margin:var(--s5) 0 var(--s3)}
+h2:first-child{margin-top:var(--s2)}
+.brand h1,#nav .nb{font-size:var(--fz-heading);font-weight:700;letter-spacing:-.3px;line-height:var(--lh-tight)}
+
+/* BODY (14) — leads, callouts, table cells, purpose lines all converge here */
+.lead{font-size:var(--fz-body);line-height:var(--lh-body);color:var(--mid);
+   margin:var(--s2) 0 var(--s4);max-width:76ch}
+.purpose{font-size:var(--fz-body);line-height:var(--lh-body)}
+.insight,.verdict{font-size:var(--fz-body);line-height:var(--lh-body)}
+.tbl{font-size:var(--fz-body)}
+.tbl td{line-height:var(--lh-snug)}
+.search{font-size:var(--fz-body)}
+
+/* CAPTION (11) — labels, eyebrows, sub-notes, table heads, tags: one small size */
+.mcard .k,.cc-card-h,.tbl th,.kpi .k,.acqsub,.acqsub2,.sim-ctl-h,
+.maplegend,.chip,.tag,.cc-tag,.note,.loading{font-size:var(--fz-caption);letter-spacing:.4px}
+.mcard .n,.mcard .d,.lens .ld,.cc-sub2,.cc-row .l .s,.cc-row .r .s,
+.sub,.sim-hint,.prov,.pop .pv{font-size:var(--fz-caption);letter-spacing:0}
+
+/* ---- 2 · SPACING: more breathing room around sections + card grids ---- */
+main{padding:64px var(--s5) 96px}
+.grid{gap:var(--s3)}
+.macro{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.cc-grid{gap:var(--s3);margin-top:var(--s3)}
+.mcard,.cc-card{padding:var(--s4) var(--s4)}
+.insight{padding:var(--s4) var(--s4);margin:var(--s4) 0}
+.verdict{padding:var(--s4) var(--s4);margin:var(--s2) 0 var(--s5)}
+.purpose{padding:var(--s3) var(--s4);margin:var(--s2) 0 var(--s5)}
+.note{padding:var(--s4) var(--s4);margin-top:var(--s5)}
+.lenses,.chips{gap:var(--s2);margin-bottom:var(--s4)}
+.tbl th,.tbl td{padding:13px 14px}
+.cc-row{padding:8px 0}
+
+/* ---- 3 · HIERARCHY: make the primary metric dominate; dim the labels ---- */
+/* the headline number on a card — bigger, tighter, lit */
+.mcard .v{font-size:var(--fz-display);font-weight:600;line-height:var(--lh-tight);
+   letter-spacing:-.6px;margin:6px 0 2px;color:var(--hi)}
+/* secondary labels recede: smaller weight, dimmer ink, calmer tracking */
+.mcard .k{color:var(--dim);font-weight:500;text-transform:uppercase}
+.mcard .n,.mcard .d{color:var(--dim)}
+/* command-center: the right-hand number is the answer — promote it to heading scale */
+.cc-row .r{font-size:var(--fz-heading);font-weight:650;line-height:var(--lh-tight);letter-spacing:-.3px;color:var(--hi)}
+.cc-row .r .s{font-weight:500;color:var(--dim)}
+.cc-row .l{color:var(--txt)}
+.cc-row .l .s{color:var(--dim)}
+/* card eyebrow headers read as quiet labels, not competing titles */
+.cc-card-h{color:var(--mid);font-weight:600;letter-spacing:.6px}
+/* exposure / kpi lead numbers also ride the display step */
+.kpi.lead-kpi .v{font-size:var(--fz-display);letter-spacing:-.6px}
+
+/* ---- 4 · CALMER DIVIDERS + LESS BORDER NOISE ---- */
+/* prefer subtle surface separation over a hard hairline under every h2 */
+h2{border-bottom:none;padding-bottom:0}
+h2::before{top:2px;bottom:2px;width:3px}
+/* eyebrow underline → faint, not a heavy rule */
+.cc-card-h{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);margin-bottom:var(--s3)}
+/* table: drop the column-head fill + heavy outer border; lean on the card surface */
+.tbl{border:1px solid var(--line2)}
+.tbl th{background:transparent;border-bottom:1px solid var(--line);color:var(--mid);font-weight:600}
+.tbl td{border-bottom:1px solid var(--line2)}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+/* cc-row dashed dividers → quieter dotted, less visual clutter */
+.cc-row{border-bottom:1px solid var(--line2)}
+.cc-row:last-child{border-bottom:none}
+/* acquisition sub-heads: same calm treatment, no heavy underline */
+.acqsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
+
+/* ---- 5 · POLISH: unified radius + softer, consistent shadows ---- */
+.mcard,.cc-card,.lens,.insight,.verdict,.purpose,.note,.tbl,.search,
+.sim-controls,.kpi,.bchip{border-radius:var(--r)}
+.chip,.tag,.cc-tag{border-radius:999px}
+/* one calmer elevation across cards (less contrasty than the old elev-2 on hover) */
+.mcard,.cc-card,.lens{box-shadow:0 1px 2px rgba(0,0,0,.18),0 6px 18px -8px rgba(0,0,0,.42)}
+.mcard:hover,.lens:hover{box-shadow:0 1px 2px rgba(0,0,0,.2),0 12px 28px -10px rgba(0,0,0,.5)}
+/* softer card top-light so panels read as one calm surface, not many edges */
+.mcard{border:1px solid var(--line2);border-top-color:rgba(255,255,255,.05)}
+.cc-card{border:1px solid var(--line2)}
+
+/* ---- light theme: keep the same calm treatment, no dark-only shadows ---- */
+html[data-theme="light"] .mcard,
+html[data-theme="light"] .cc-card,
+html[data-theme="light"] .lens{box-shadow:0 1px 2px rgba(16,22,40,.05),0 8px 20px -10px rgba(16,22,40,.12)}
+html[data-theme="light"] .tbl th{background:transparent}
+html[data-theme="light"] .mcard .k,
+html[data-theme="light"] .mcard .n,
+html[data-theme="light"] .cc-row .r .s,
+html[data-theme="light"] .cc-row .l .s{color:var(--dim)}
+
+/* ---- mobile: scale the display metric down a touch so it never overflows ---- */
+@media(max-width:600px){
+  main{padding:64px var(--s3) 96px}
+  .mcard .v,.kpi.lead-kpi .v{font-size:24px}
+  h2,.cc-row .r{font-size:17px}
+  .tbl th,.tbl td{padding:10px 9px}
+}
+
+/* ============================================================
+   FULL-BLEED 2D — recover the widescreen (ux committee fix)
+   Single canonical centered column at --maxw (1320), with the
+   data-heavy views (National map, Acquisition board/leaderboard,
+   Exposure) breaking out to --maxw-wide so the canvas fills.
+   Pure CSS — keys off the .on class app.js puts on the active
+   <section.view> via :has(); prose stays on a readable measure.
+   ============================================================ */
+
+/* 1 · the content column is always centered AND never overflows:
+   cap at the design width, but yield to the viewport (minus gutters)
+   on anything narrower than that — so no horizontal scroll, ever. */
+main{
+  width:100%;
+  max-width:min(var(--maxw,1320px), calc(100vw - 2*var(--gutter,32px)));
+  margin-inline:auto;
+}
+
+/* 2 · data-heavy views use the widescreen. The map, the acquisition
+   board (white-space leaderboard / Road-to-3000) and exposure grids
+   read as dashboards, not articles — let them breathe to --maxw-wide. */
+main:has(#v-map.on),
+main:has(#v-acq.on),
+main:has(#v-overview.on),
+main:has(#v-exposure.on){
+  max-width:min(var(--maxw-wide,1680px), calc(100vw - 2*var(--gutter,32px)));
+}
+
+/* 3 · the National map is the HERO — edge-to-edge inside the widened column,
+   tall enough to read as the front door, with the lens pills floated on top. */
+@media(min-width:1180px){
+  #v-map.on .maphero #map{height:80vh;height:80dvh;min-height:560px}
+}
+
+/* 4 · keep prose on a comfortable measure even in the widened views —
+   widen the data, not the sentences. (cards/grids/tables already flex
+   via auto-fit / 100% width, so they fill the recovered space.) */
+.lead,.purpose,.note,.verdict{max-width:90ch}
+
+/* 5 · belt-and-suspenders: graceful fallback for engines without :has()
+   — the standard column still widens to --maxw on the desktop range, so
+   the page is never narrower than before even if the breakout no-ops. */
+@supports not selector(:has(*)){
+  @media(min-width:1360px){ main{max-width:var(--maxw,1320px)} }
+}
+
+/* ============================================================
+   ★ 2-COLUMN DASHBOARD LAYOUT (top layout item)
+   The widened canvas was left-weighted because KPI card rows
+   don't stretch. Fix: lay the dense tabs out as a KPI/insight
+   STRIP beside the lead table/board — a grid that FILLS the
+   widescreen. Collapses to one column on narrow viewports.
+   Layout only; every element ID + render fn is untouched.
+   ============================================================ */
+.dash2{display:grid;gap:var(--s5,32px);align-items:start;
+  grid-template-columns:minmax(300px,360px) minmax(0,1fr)}
+/* the strip column: cards grow to fill their column width (no left-pinning). */
+.dash2-side{min-width:0}
+.dash2-side .grid.macro{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.dash2-side>h2:first-child{margin-top:0}
+/* the lead column: the wide table/board sits here and uses the recovered width. */
+.dash2-main{min-width:0}
+.dash2-main>h2:first-child{margin-top:0}
+/* first heading in each column lines up across the two columns */
+.dash2 h2{margin-top:var(--s4,20px)}
+.dash2 .dash2-side>h2:first-child,.dash2 .dash2-main>h2:first-child{margin-top:0}
+/* collapse to a single column on tablet/phone so nothing gets cramped. */
+@media(max-width:900px){.dash2{grid-template-columns:1fr;gap:var(--s4,20px)}}
+
+/* ---------- peer NPL benchmark (reported) · Exposure obj#1 ----------
+   Compact labelled reference bar showing the PEER reported NPL ladder
+   (TIDLOR < MTC < SAWAD). PEER figures only — never an AutoX number. */
+#expo-peernpl .pnpl-wrap{background:var(--panel);border:1px solid var(--line);
+  border-left:3px solid var(--gold);border-radius:9px;padding:10px 12px;margin:10px 0}
+#expo-peernpl .pnpl-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#expo-peernpl .pnpl-title{font-size:11px;color:var(--hi);text-transform:uppercase;
+  letter-spacing:.5px;font-weight:600}
+#expo-peernpl .pnpl-row{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap}
+#expo-peernpl .pnpl-cell{flex:1 1 120px;min-width:110px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:7px 9px}
+#expo-peernpl .pnpl-tk{font-size:10.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.3px}
+#expo-peernpl .pnpl-v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;line-height:1.1;margin:1px 0}
+#expo-peernpl .pnpl-c{font-size:10px;line-height:1.25}
+#expo-peernpl .pnpl-lt{align-self:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--dim);padding:0 1px}
+#expo-peernpl .pnpl-ft{margin-top:8px;font-size:10.5px;line-height:1.45;max-width:90ch}
+
+/* ============================================================
+   ★ STANDARDIZED PROVENANCE (one consistent chip + one expander)
+   The honesty stays — it just gets consistent. One chip with a
+   filled dot = MEASURED, hollow dot = ESTIMATED (≥11px, AA contrast
+   text on a tinted pill), used everywhere via TAG_M / TAG_E. Long
+   inline caveats move into a reusable "Method & caveats" expander.
+   ============================================================ */
+.prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:11px;font-weight:600;line-height:1;padding:2px 8px 2px 7px;border-radius:999px;
+  border:1px solid;vertical-align:middle;white-space:nowrap;letter-spacing:.2px}
+.prov .pd{width:8px;height:8px;border-radius:50%;flex:none;box-sizing:border-box}
+/* source suffix (· OSM / · NSO / · Google Places) sits inside the pill in muted ink */
+.prov .src,.cc-tag .src{color:var(--dim);font-weight:500;margin-left:1px}
+/* MEASURED — teal, filled dot. #5fd6c2 on the dark tint clears AA (≈7:1). */
+.prov.m{color:#5fd6c2;border-color:rgba(35,162,143,.55);background:rgba(35,162,143,.14)}
+.prov.m .pd{background:#5fd6c2}
+/* ESTIMATED — gold, hollow dot (ring only). #f2cf78 clears AA on the dark tint. */
+.prov.e{color:#f2cf78;border-color:rgba(230,180,80,.55);background:rgba(230,180,80,.13)}
+.prov.e .pd{background:transparent;border:1.5px solid #f2cf78}
+html[data-theme="light"] .prov.m{color:#0c6a5b;background:rgba(28,140,125,.13);border-color:rgba(28,140,125,.45)}
+html[data-theme="light"] .prov.m .pd{background:#0c6a5b}
+html[data-theme="light"] .prov.e{color:#8a6300;background:rgba(176,130,20,.13);border-color:rgba(176,130,20,.45)}
+html[data-theme="light"] .prov.e .pd{border-color:#8a6300}
+
+/* Reusable "Method & caveats" disclosure — one quiet expander so caveats
+   live in a consistent place instead of long inline sentences. */
+details.method{margin:8px 0 2px;border:1px solid var(--line2);border-radius:8px;
+  background:var(--panel2,var(--panel));overflow:hidden}
+details.method>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+  padding:7px 11px;font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.3px;
+  text-transform:uppercase}
+details.method>summary::-webkit-details-marker{display:none}
+details.method>summary::after{content:'▸';margin-left:auto;color:var(--dim);font-size:10px;
+  transition:transform .15s}
+details.method[open]>summary::after{transform:rotate(90deg)}
+details.method>summary:hover,details.method[open]>summary{color:var(--txt)}
+details.method>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+details.method .mb{padding:2px 12px 11px;font-size:11.5px;line-height:1.55;color:var(--mid)}
+details.method .mb ul{margin:0;padding-left:16px}
+details.method .mb li{margin:4px 0}
+details.method .mb li b{color:var(--txt)}
+html[data-theme="light"] details.method{background:#f4f6fb;border-color:#d6dbe6}
+
+/* ---------- Portfolio concentration by region (Exposure obj#1) ----------
+   Each region: dominant segment + a stacked agri/merchant/collateral mix bar
+   + the rescaled HHI 0–1. Lead with the headline. */
+#expoconc .conc-lead{font-size:13px;line-height:1.5;color:var(--txt);margin:0 0 10px}
+#expoconc .conc-lead b{color:var(--hi)}
+#expoconc .conc-row{padding:9px 0;border-bottom:1px dashed var(--line2)}
+#expoconc .conc-row:last-child{border-bottom:none}
+#expoconc .conc-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+#expoconc .conc-name{font-size:13px;font-weight:650;color:var(--hi)}
+#expoconc .conc-dom{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px}
+#expoconc .conc-hhi{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap}
+#expoconc .conc-hhi .s{font-size:9.5px;color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.3px}
+#expoconc .mix{display:flex;height:11px;width:100%;border-radius:4px;overflow:hidden;background:#10182A}
+#expoconc .mix>span{height:100%;min-width:0}
+#expoconc .mix .ma{background:var(--agri)} #expoconc .mix .mm{background:var(--merch)} #expoconc .mix .mc{background:var(--collat)}
+#expoconc .conc-legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--dim);margin:6px 0 2px;align-items:center}
+#expoconc .conc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
+
+/* QW8 — Risk-trend baseline: flat sparkline skeleton + "Δ at next refresh" chip.
+   The track is a dashed line that will become a real trend line once a 2nd vintage lands;
+   the dot anchors the single point we have today. Purely decorative. */
+.tspark{display:inline-flex;align-items:center;width:54px;height:14px;position:relative}
+.tspark-track{position:absolute;left:5px;right:0;top:50%;height:0;border-top:1.5px dashed var(--c);opacity:.45}
+.tspark-dot{position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;box-shadow:0 0 0 2px var(--panel)}
+.tchip{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:6px;white-space:nowrap;vertical-align:middle}
+
+/* ============================================================
+   TOUCH-TARGET A11Y — coarse-pointer only (touch laptops/tablets
+   at ANY width). Raises interactive hit areas to a comfortable
+   ~44px min (WCAG 2.5.5) via padding + min-height/min-width, never
+   font-size. Gated on @media(pointer:coarse) so a mouse/desktop
+   (fine pointer) layout is completely unaffected. Additive: colors,
+   theme and the fine-pointer geometry are all left untouched.
+   ============================================================ */
+@media(pointer:coarse){
+  /* nav tabs / links + the "More ▾" button and its menu items */
+  #nav a,#nav .nav-more-btn,.nav-more-menu a,.tab{
+    min-height:44px;display:inline-flex;align-items:center;padding-top:10px;padding-bottom:10px}
+  .nav-more-menu a{width:100%}
+
+  /* chips (filter + sort chips live in #sortchips as .chip), jump-nav chips */
+  .chip,.jumpnav .chip{
+    min-height:44px;padding-top:11px;padding-bottom:11px;
+    display:inline-flex;align-items:center}
+
+  /* lens buttons — pill lens row + legacy .lens cards */
+  .pill.lens,.lens{min-height:44px}
+  .pill.lens{padding-top:11px;padding-bottom:11px;align-items:center}
+  .lens-more-btn{min-height:44px;display:inline-flex;align-items:center}
+  .lens-more-menu .pill.lens.lens-menu{min-height:44px}
+
+  /* theme toggle (inline-styled 32x30 → comfortable coarse tap area) */
+  #themeToggle{min-width:44px!important;min-height:44px!important}
+
+  /* clickable table rows — a bit more vertical padding for the tap band */
+  .tbl tr[role="link"] td{padding-top:14px;padding-bottom:14px}
+
+  /* command-center stars + inline links get a real tap band */
+  .cc-star{min-width:44px;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+  .cc-link{min-height:44px;display:inline-flex;align-items:center}
+
+  /* small icon buttons: CSV/print action chips, deck.gl close (×) + control buttons */
+  .cc-actions .chip{min-height:44px}
+  .cbtn,.ctl button,#ctl button{min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+  .xbtn,.pxbtn{min-width:44px;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}
+}
+
+/* ---------- mobile bottom sheet (branch detail on the National map, ≤600px) ----------
+   Replaces the clipping Leaflet popup on phones: fixed full-width sheet, max 62vh, internal
+   scroll, drag handle. Theme-token surfaces so it reads correctly in dark AND light.
+   z-index: above the map + nav bar (2000), below the nav More menu (2100). */
+#msheet-backdrop{position:fixed;inset:0;z-index:2040;background:rgba(4,7,12,.45);
+  opacity:0;transition:opacity .18s ease}
+#msheet-backdrop.open{opacity:1}
+#msheet{position:fixed;left:0;right:0;bottom:0;z-index:2050;max-height:62vh;
+  display:flex;flex-direction:column;background:var(--panel);
+  border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0;
+  box-shadow:0 -12px 34px rgba(0,0,0,.45);
+  transform:translateY(102%);transition:transform .2s ease}
+#msheet.open{transform:translateY(0)}
+#msheet-handle{flex:0 0 auto;display:flex;justify-content:center;
+  padding:10px 0 8px;cursor:pointer;touch-action:none}
+#msheet-handle span{display:block;width:44px;height:4px;border-radius:2px;background:var(--line)}
+#msheet-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding:0 14px calc(14px + env(safe-area-inset-bottom))}
+/* popupHTML's root carries an inline max-height/overflow sized for the Leaflet popup — inside
+   the sheet the BODY is the scroller, so neutralize it to avoid a nested scroll trap. */
+#msheet-body .pop{max-height:none!important;overflow:visible!important}
+html[data-theme="light"] #msheet-backdrop{background:rgba(24,32,48,.32)}
+html[data-theme="light"] #msheet{box-shadow:0 -12px 34px rgba(24,32,48,.22)}

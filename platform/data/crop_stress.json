@@ -1,0 +1,3215 @@
+{
+  "meta": {
+    "title": "Per-province crop-household stress (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_crop_stress.py",
+    "deterministic": true,
+    "network_free": true,
+    "n_provinces": 76,
+    "n_double_stress": 0,
+    "sort": "worst-first by agri_stress (desc)",
+    "fields": {
+      "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
+      "price_stress": "PROXY/ESTIMATED — planting-area-weighted price YoY %% across the province's covered crops. Source = commodity_board (World Bank Pink Sheet GLOBAL prices). This is a DIRECTION proxy, NOT Thai farm-gate.",
+      "drought": "MEASURED PROXY — derived from branch rain_3mo_anom (3-month rainfall as %% of normal). 0..1 where 1 = driest. See components.rain_pct_of_normal for the underlying measured value.",
+      "crop_dependence": "MEASURED — province total crop rai / max province crop rai (0..1).",
+      "agri_stress": "ESTIMATED — composite, see meta.formula. Combines price + drought hazard, scaled by crop_dependence. Index, not a measured outcome.",
+      "double_stress": "ESTIMATED FLAG — true when a province is rice/rubber-heavy AND its rice/rubber prices are softening AND its drought signal is elevated. See meta.double_stress for the exact rule. A triage flag, not a forecast.",
+      "double_stress_score": "ESTIMATED — 0..1 severity of the overlap when the flag is true (0 when false). See meta.double_stress."
+    },
+    "formula": {
+      "price_term": "clamp(-price_stress / 25, 0, 1)",
+      "drought_term": "clamp((100 - rain_pct_of_normal) / 40, 0, 1)",
+      "hazard": "0.6*price_term + 0.4*drought_term",
+      "agri_stress": "round(hazard * crop_dependence, 4)",
+      "rationale": "Price weighted higher (0.6) — it hits cash-crop borrower income directly. Hazard scaled by crop_dependence so a province is flagged a portfolio risk only when borrowers there actually farm at scale."
+    },
+    "double_stress": {
+      "what": "ESTIMATED flag for provinces hit by the 2026 rice/rubber double-stress: softening farm prices AND elevated drought, in places that grow rice/rubber.",
+      "rule": "double_stress = (rice_rubber_share >= 0.5) AND (price_term > 0, i.e. rice/rubber prices softening) AND (drought >= 0.6).",
+      "score": "double_stress_score = price_term * drought * rice_rubber_share when the flag is true, else 0. A 0..1 severity of the overlap, built only from existing terms.",
+      "thresholds": {
+        "rice_rubber_share_floor": 0.5,
+        "drought_floor": 0.6
+      },
+      "inputs": "Uses ONLY signals already computed here: crop_mix shares (rice+rubber), the existing price_term (from the GLOBAL price proxy), and the existing drought signal (measured rain_3mo_anom proxy). No new external numbers introduced.",
+      "n_flagged": 0,
+      "source": "RESEARCH_DIGEST.md 2026-06-30 Entry 1 §C — OAE 2026 outlook (rice & rubber softer) + El Niño drought >80% from mid-2026. INTERPRETATION (obj #1).",
+      "caveat": "price_term is a GLOBAL-price direction proxy, and in the current vintage all priced provinces show some rice/rubber softening, so drought is the effective discriminator. Treat as a triage flag, not a default forecast."
+    },
+    "coverage": {
+      "crops_priced": [
+        "Oil palm",
+        "Rice",
+        "Rubber"
+      ],
+      "board_crops_no_planting_area": [
+        "Maize",
+        "Sugar"
+      ],
+      "planting_area_crops_no_price": [],
+      "note": "price_stress only covers crops with BOTH planting area and a board price. components.price_coverage = share of province crop rai that was priceable.",
+      "unallocated_rai_excluded": 8018496,
+      "unallocated_note": "rai in crop_prov_area.json under a blank/non-portfolio province key (not in the AutoX branch network) — excluded from all stats."
+    },
+    "provenance": {
+      "crop_prov_area.json": "OAE planting area (rai) per crop per province — MEASURED.",
+      "commodity_board.json": "World Bank Pink Sheet GLOBAL commodity prices, YoY %% — PROXY for direction of Thai farm-gate, not farm-gate itself.",
+      "branches_final.json": "rain_3mo_anom per branch — MEASURED rainfall anomaly proxy."
+    },
+    "caveats": [
+      "Global prices move with, but are not equal to, Thai farm-gate prices; treat price_stress as a direction signal only.",
+      "Only rice / rubber / oil palm are both area-mapped and priced; sugar, maize and other crops in a province are shown in crop_mix but NOT in price_stress.",
+      "drought uses each province's own branch network; provinces with few branches have a thinner rainfall sample (see components.n_rain_branches).",
+      "agri_stress is an index for triage, not a forecast of defaults."
+    ]
+  },
+  "provinces": [
+    {
+      "th": "อุบลราชธานี",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.865,
+          "area": 4125528
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.13,
+          "area": 619844
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0051,
+          "area": 24221
+        }
+      ],
+      "price_stress": 19.79,
+      "drought": 0.52,
+      "crop_dependence": 1.0,
+      "agri_stress": 0.208,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 4769593,
+        "price_term": 0.0,
+        "drought_term": 0.52,
+        "hazard": 0.208,
+        "rain_pct_of_normal": 79.2,
+        "price_coverage": 1.0,
+        "n_branches": 46,
+        "n_rain_branches": 46,
+        "rice_rubber_share": 0.995,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ร้อยเอ็ด",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.967,
+          "area": 3094018
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0324,
+          "area": 103629
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0006,
+          "area": 2040
+        }
+      ],
+      "price_stress": 18.37,
+      "drought": 0.7375,
+      "crop_dependence": 0.6709,
+      "agri_stress": 0.1979,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3199687,
+        "price_term": 0.0,
+        "drought_term": 0.7375,
+        "hazard": 0.295,
+        "rain_pct_of_normal": 70.5,
+        "price_coverage": 1.0,
+        "n_branches": 39,
+        "n_rain_branches": 39,
+        "rice_rubber_share": 0.9994,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สุรินทร์",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.926,
+          "area": 3133327
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0724,
+          "area": 245108
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0016,
+          "area": 5293
+        }
+      ],
+      "price_stress": 18.95,
+      "drought": 0.5875,
+      "crop_dependence": 0.7094,
+      "agri_stress": 0.1667,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3383728,
+        "price_term": 0.0,
+        "drought_term": 0.5875,
+        "hazard": 0.235,
+        "rain_pct_of_normal": 76.5,
+        "price_coverage": 1.0,
+        "n_branches": 30,
+        "n_rain_branches": 30,
+        "rice_rubber_share": 0.9984,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ศรีสะเกษ",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8899,
+          "area": 3028471
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1077,
+          "area": 366569
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0023,
+          "area": 7963
+        }
+      ],
+      "price_stress": 19.46,
+      "drought": 0.5475,
+      "crop_dependence": 0.7135,
+      "agri_stress": 0.1563,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3403003,
+        "price_term": 0.0,
+        "drought_term": 0.5475,
+        "hazard": 0.219,
+        "rain_pct_of_normal": 78.1,
+        "price_coverage": 1.0,
+        "n_branches": 31,
+        "n_rain_branches": 31,
+        "rice_rubber_share": 0.9976,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "บุรีรัมย์",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9059,
+          "area": 2998520
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0917,
+          "area": 303666
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0024,
+          "area": 7802
+        }
+      ],
+      "price_stress": 19.23,
+      "drought": 0.3942,
+      "crop_dependence": 0.694,
+      "agri_stress": 0.1094,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3309988,
+        "price_term": 0.0,
+        "drought_term": 0.3942,
+        "hazard": 0.1577,
+        "rain_pct_of_normal": 84.23,
+        "price_coverage": 1.0,
+        "n_branches": 53,
+        "n_rain_branches": 53,
+        "rice_rubber_share": 0.9976,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "มหาสารคาม",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9947,
+          "area": 2130023
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0052,
+          "area": 11105
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0001,
+          "area": 185
+        }
+      ],
+      "price_stress": 17.98,
+      "drought": 0.605,
+      "crop_dependence": 0.449,
+      "agri_stress": 0.1087,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2141313,
+        "price_term": 0.0,
+        "drought_term": 0.605,
+        "hazard": 0.242,
+        "rain_pct_of_normal": 75.8,
+        "price_coverage": 1.0,
+        "n_branches": 32,
+        "n_rain_branches": 32,
+        "rice_rubber_share": 0.9999,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สุพรรณบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9928,
+          "area": 1261740
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0052,
+          "area": 6623
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.002,
+          "area": 2492
+        }
+      ],
+      "price_stress": 17.98,
+      "drought": 0.9525,
+      "crop_dependence": 0.2664,
+      "agri_stress": 0.1015,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1270855,
+        "price_term": 0.0,
+        "drought_term": 0.9525,
+        "hazard": 0.381,
+        "rain_pct_of_normal": 61.9,
+        "price_coverage": 1.0,
+        "n_branches": 22,
+        "n_rain_branches": 22,
+        "rice_rubber_share": 0.998,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "นครสวรรค์",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9963,
+          "area": 2559275
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0025,
+          "area": 6506
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0012,
+          "area": 2982
+        }
+      ],
+      "price_stress": 17.94,
+      "drought": 0.465,
+      "crop_dependence": 0.5386,
+      "agri_stress": 0.1002,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2568763,
+        "price_term": 0.0,
+        "drought_term": 0.465,
+        "hazard": 0.186,
+        "rain_pct_of_normal": 81.4,
+        "price_coverage": 1.0,
+        "n_branches": 31,
+        "n_rain_branches": 31,
+        "rice_rubber_share": 0.9988,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ชุมพร",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Oil palm",
+          "share": 0.6125,
+          "area": 1037226
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.3861,
+          "area": 653875
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0013,
+          "area": 2222
+        }
+      ],
+      "price_stress": 23.68,
+      "drought": 0.69,
+      "crop_dependence": 0.355,
+      "agri_stress": 0.098,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1693323,
+        "price_term": 0.0,
+        "drought_term": 0.69,
+        "hazard": 0.276,
+        "rain_pct_of_normal": 72.4,
+        "price_coverage": 1.0,
+        "n_branches": 18,
+        "n_rain_branches": 17,
+        "rice_rubber_share": 0.3874,
+        "ds_price_softening": false,
+        "ds_share_qualifies": false,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สุโขทัย",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9525,
+          "area": 1183502
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0419,
+          "area": 52119
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0055,
+          "area": 6839
+        }
+      ],
+      "price_stress": 18.51,
+      "drought": 0.7,
+      "crop_dependence": 0.2605,
+      "agri_stress": 0.0729,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1242460,
+        "price_term": 0.0,
+        "drought_term": 0.7,
+        "hazard": 0.28,
+        "rain_pct_of_normal": 72.0,
+        "price_coverage": 1.0,
+        "n_branches": 14,
+        "n_rain_branches": 14,
+        "rice_rubber_share": 0.9944,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "กาฬสินธุ์",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.88,
+          "area": 1505471
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1162,
+          "area": 198829
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0037,
+          "area": 6374
+        }
+      ],
+      "price_stress": 19.59,
+      "drought": 0.485,
+      "crop_dependence": 0.3587,
+      "agri_stress": 0.0696,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1710674,
+        "price_term": 0.0,
+        "drought_term": 0.485,
+        "hazard": 0.194,
+        "rain_pct_of_normal": 80.6,
+        "price_coverage": 1.0,
+        "n_branches": 32,
+        "n_rain_branches": 32,
+        "rice_rubber_share": 0.9962,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พิษณุโลก",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8073,
+          "area": 1485281
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1829,
+          "area": 336538
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0098,
+          "area": 18104
+        }
+      ],
+      "price_stress": 20.56,
+      "drought": 0.4175,
+      "crop_dependence": 0.3858,
+      "agri_stress": 0.0644,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1839923,
+        "price_term": 0.0,
+        "drought_term": 0.4175,
+        "hazard": 0.167,
+        "rain_pct_of_normal": 83.3,
+        "price_coverage": 1.0,
+        "n_branches": 30,
+        "n_rain_branches": 30,
+        "rice_rubber_share": 0.9902,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ยโสธร",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9168,
+          "area": 1364345
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0805,
+          "area": 119776
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0028,
+          "area": 4119
+        }
+      ],
+      "price_stress": 19.07,
+      "drought": 0.495,
+      "crop_dependence": 0.312,
+      "agri_stress": 0.0618,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1488240,
+        "price_term": 0.0,
+        "drought_term": 0.495,
+        "hazard": 0.198,
+        "rain_pct_of_normal": 80.2,
+        "price_coverage": 1.0,
+        "n_branches": 19,
+        "n_rain_branches": 19,
+        "rice_rubber_share": 0.9973,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ชัยนาท",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9975,
+          "area": 846347
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0015,
+          "area": 1277
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.001,
+          "area": 845
+        }
+      ],
+      "price_stress": 17.91,
+      "drought": 0.83,
+      "crop_dependence": 0.1779,
+      "agri_stress": 0.0591,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 848469,
+        "price_term": 0.0,
+        "drought_term": 0.83,
+        "hazard": 0.332,
+        "rain_pct_of_normal": 66.8,
+        "price_coverage": 1.0,
+        "n_branches": 15,
+        "n_rain_branches": 15,
+        "rice_rubber_share": 0.9985,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "เชียงราย",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.7647,
+          "area": 1293948
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.2286,
+          "area": 386855
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0067,
+          "area": 11333
+        }
+      ],
+      "price_stress": 21.22,
+      "drought": 0.4025,
+      "crop_dependence": 0.3548,
+      "agri_stress": 0.0571,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1692136,
+        "price_term": 0.0,
+        "drought_term": 0.4025,
+        "hazard": 0.161,
+        "rain_pct_of_normal": 83.9,
+        "price_coverage": 1.0,
+        "n_branches": 22,
+        "n_rain_branches": 22,
+        "rice_rubber_share": 0.9933,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สกลนคร",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8334,
+          "area": 2162686
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1546,
+          "area": 401287
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.012,
+          "area": 31162
+        }
+      ],
+      "price_stress": 20.15,
+      "drought": 0.2575,
+      "crop_dependence": 0.5441,
+      "agri_stress": 0.056,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2595135,
+        "price_term": 0.0,
+        "drought_term": 0.2575,
+        "hazard": 0.103,
+        "rain_pct_of_normal": 89.7,
+        "price_coverage": 1.0,
+        "n_branches": 30,
+        "n_rain_branches": 30,
+        "rice_rubber_share": 0.988,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พิจิตร",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9975,
+          "area": 1807669
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0015,
+          "area": 2650
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.001,
+          "area": 1792
+        }
+      ],
+      "price_stress": 17.92,
+      "drought": 0.2875,
+      "crop_dependence": 0.3799,
+      "agri_stress": 0.0437,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1812111,
+        "price_term": 0.0,
+        "drought_term": 0.2875,
+        "hazard": 0.115,
+        "rain_pct_of_normal": 88.5,
+        "price_coverage": 1.0,
+        "n_branches": 17,
+        "n_rain_branches": 17,
+        "rice_rubber_share": 0.999,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ฉะเชิงเทรา",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.6998,
+          "area": 634824
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.2567,
+          "area": 232824
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0435,
+          "area": 39471
+        }
+      ],
+      "price_stress": 21.63,
+      "drought": 0.5425,
+      "crop_dependence": 0.1902,
+      "agri_stress": 0.0413,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 907119,
+        "price_term": 0.0,
+        "drought_term": 0.5425,
+        "hazard": 0.217,
+        "rain_pct_of_normal": 78.3,
+        "price_coverage": 1.0,
+        "n_branches": 35,
+        "n_rain_branches": 35,
+        "rice_rubber_share": 0.9565,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ลพบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9949,
+          "area": 807018
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0031,
+          "area": 2519
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.002,
+          "area": 1617
+        }
+      ],
+      "price_stress": 17.93,
+      "drought": 0.5825,
+      "crop_dependence": 0.1701,
+      "agri_stress": 0.0396,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 811154,
+        "price_term": 0.0,
+        "drought_term": 0.5825,
+        "hazard": 0.233,
+        "rain_pct_of_normal": 76.7,
+        "price_coverage": 1.0,
+        "n_branches": 29,
+        "n_rain_branches": 29,
+        "rice_rubber_share": 0.9969,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พระนครศรีอยุธยา",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9992,
+          "area": 813855
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0008,
+          "area": 612
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.5675,
+      "crop_dependence": 0.1708,
+      "agri_stress": 0.0388,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 814467,
+        "price_term": 0.0,
+        "drought_term": 0.5675,
+        "hazard": 0.227,
+        "rain_pct_of_normal": 77.3,
+        "price_coverage": 1.0,
+        "n_branches": 27,
+        "n_rain_branches": 27,
+        "rice_rubber_share": 0.9992,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "กาญจนบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.7096,
+          "area": 365616
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.2478,
+          "area": 127697
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0426,
+          "area": 21930
+        }
+      ],
+      "price_stress": 21.51,
+      "drought": 0.87,
+      "crop_dependence": 0.108,
+      "agri_stress": 0.0376,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 515243,
+        "price_term": 0.0,
+        "drought_term": 0.87,
+        "hazard": 0.348,
+        "rain_pct_of_normal": 65.2,
+        "price_coverage": 1.0,
+        "n_branches": 32,
+        "n_rain_branches": 32,
+        "rice_rubber_share": 0.9574,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "อุตรดิตถ์",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9513,
+          "area": 623563
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0434,
+          "area": 28467
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0053,
+          "area": 3443
+        }
+      ],
+      "price_stress": 18.53,
+      "drought": 0.67,
+      "crop_dependence": 0.1374,
+      "agri_stress": 0.0368,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 655473,
+        "price_term": 0.0,
+        "drought_term": 0.67,
+        "hazard": 0.268,
+        "rain_pct_of_normal": 73.2,
+        "price_coverage": 1.0,
+        "n_branches": 9,
+        "n_rain_branches": 9,
+        "rice_rubber_share": 0.9947,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "ระยอง",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.9266,
+          "area": 568464
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0576,
+          "area": 35331
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0159,
+          "area": 9725
+        }
+      ],
+      "price_stress": 31.35,
+      "drought": 0.705,
+      "crop_dependence": 0.1286,
+      "agri_stress": 0.0363,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 613520,
+        "price_term": 0.0,
+        "drought_term": 0.705,
+        "hazard": 0.282,
+        "rain_pct_of_normal": 71.8,
+        "price_coverage": 1.0,
+        "n_branches": 59,
+        "n_rain_branches": 54,
+        "rice_rubber_share": 0.9425,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "อำนาจเจริญ",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9142,
+          "area": 1077763
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0791,
+          "area": 93229
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0067,
+          "area": 7921
+        }
+      ],
+      "price_stress": 19.05,
+      "drought": 0.3425,
+      "crop_dependence": 0.2472,
+      "agri_stress": 0.0339,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1178913,
+        "price_term": 0.0,
+        "drought_term": 0.3425,
+        "hazard": 0.137,
+        "rain_pct_of_normal": 86.3,
+        "price_coverage": 1.0,
+        "n_branches": 14,
+        "n_rain_branches": 14,
+        "rice_rubber_share": 0.9933,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นครราชสีมา",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9758,
+          "area": 3531915
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0211,
+          "area": 76404
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.003,
+          "area": 11007
+        }
+      ],
+      "price_stress": 18.21,
+      "drought": 0.109,
+      "crop_dependence": 0.7588,
+      "agri_stress": 0.0331,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3619326,
+        "price_term": 0.0,
+        "drought_term": 0.109,
+        "hazard": 0.0436,
+        "rain_pct_of_normal": 95.64,
+        "price_coverage": 1.0,
+        "n_branches": 81,
+        "n_rain_branches": 81,
+        "rice_rubber_share": 0.9969,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ชัยภูมิ",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9336,
+          "area": 1784176
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0634,
+          "area": 121236
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.003,
+          "area": 5718
+        }
+      ],
+      "price_stress": 18.82,
+      "drought": 0.205,
+      "crop_dependence": 0.4007,
+      "agri_stress": 0.0329,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1911130,
+        "price_term": 0.0,
+        "drought_term": 0.205,
+        "hazard": 0.082,
+        "rain_pct_of_normal": 91.8,
+        "price_coverage": 1.0,
+        "n_branches": 30,
+        "n_rain_branches": 30,
+        "rice_rubber_share": 0.997,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ชลบุรี",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.5588,
+          "area": 229588
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.2738,
+          "area": 112503
+        },
+        {
+          "crop": "Rice",
+          "share": 0.1674,
+          "area": 68756
+        }
+      ],
+      "price_stress": 26.08,
+      "drought": 0.8225,
+      "crop_dependence": 0.0861,
+      "agri_stress": 0.0283,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 410847,
+        "price_term": 0.0,
+        "drought_term": 0.8225,
+        "hazard": 0.329,
+        "rain_pct_of_normal": 67.1,
+        "price_coverage": 1.0,
+        "n_branches": 103,
+        "n_rain_branches": 100,
+        "rice_rubber_share": 0.7262,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "เพชรบูรณ์",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9187,
+          "area": 1230036
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0689,
+          "area": 92269
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0124,
+          "area": 16554
+        }
+      ],
+      "price_stress": 18.9,
+      "drought": 0.245,
+      "crop_dependence": 0.2807,
+      "agri_stress": 0.0275,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1338859,
+        "price_term": 0.0,
+        "drought_term": 0.245,
+        "hazard": 0.098,
+        "rain_pct_of_normal": 90.2,
+        "price_coverage": 1.0,
+        "n_branches": 23,
+        "n_rain_branches": 23,
+        "rice_rubber_share": 0.9876,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "อุทัยธานี",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9313,
+          "area": 621706
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0548,
+          "area": 36564
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0139,
+          "area": 9265
+        }
+      ],
+      "price_stress": 18.7,
+      "drought": 0.4825,
+      "crop_dependence": 0.14,
+      "agri_stress": 0.027,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 667535,
+        "price_term": 0.0,
+        "drought_term": 0.4825,
+        "hazard": 0.193,
+        "rain_pct_of_normal": 80.7,
+        "price_coverage": 1.0,
+        "n_branches": 18,
+        "n_rain_branches": 18,
+        "rice_rubber_share": 0.9861,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นครพนม",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.7972,
+          "area": 1483507
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1972,
+          "area": 367013
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0056,
+          "area": 10351
+        }
+      ],
+      "price_stress": 20.76,
+      "drought": 0.1525,
+      "crop_dependence": 0.3902,
+      "agri_stress": 0.0238,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1860871,
+        "price_term": 0.0,
+        "drought_term": 0.1525,
+        "hazard": 0.061,
+        "rain_pct_of_normal": 93.9,
+        "price_coverage": 1.0,
+        "n_branches": 21,
+        "n_rain_branches": 21,
+        "rice_rubber_share": 0.9944,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "เพชรบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8952,
+          "area": 272518
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0572,
+          "area": 17409
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0476,
+          "area": 14492
+        }
+      ],
+      "price_stress": 18.74,
+      "drought": 0.9225,
+      "crop_dependence": 0.0638,
+      "agri_stress": 0.0235,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 304419,
+        "price_term": 0.0,
+        "drought_term": 0.9225,
+        "hazard": 0.369,
+        "rain_pct_of_normal": 63.1,
+        "price_coverage": 1.0,
+        "n_branches": 20,
+        "n_rain_branches": 20,
+        "rice_rubber_share": 0.9524,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "ราชบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.7986,
+          "area": 223532
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1591,
+          "area": 44528
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0423,
+          "area": 11850
+        }
+      ],
+      "price_stress": 20.22,
+      "drought": 1.0,
+      "crop_dependence": 0.0587,
+      "agri_stress": 0.0235,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 279910,
+        "price_term": 0.0,
+        "drought_term": 1.0,
+        "hazard": 0.4,
+        "rain_pct_of_normal": 56.3,
+        "price_coverage": 1.0,
+        "n_branches": 27,
+        "n_rain_branches": 27,
+        "rice_rubber_share": 0.9577,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "อุดรธานี",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.7677,
+          "area": 2027391
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.22,
+          "area": 580859
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0123,
+          "area": 32507
+        }
+      ],
+      "price_stress": 21.09,
+      "drought": 0.1025,
+      "crop_dependence": 0.5537,
+      "agri_stress": 0.0227,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2640757,
+        "price_term": 0.0,
+        "drought_term": 0.1025,
+        "hazard": 0.041,
+        "rain_pct_of_normal": 95.9,
+        "price_coverage": 1.0,
+        "n_branches": 38,
+        "n_rain_branches": 38,
+        "rice_rubber_share": 0.9877,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ระนอง",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6753,
+          "area": 341307
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.3237,
+          "area": 163586
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0011,
+          "area": 539
+        }
+      ],
+      "price_stress": 27.79,
+      "drought": 0.5,
+      "crop_dependence": 0.106,
+      "agri_stress": 0.0212,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 505432,
+        "price_term": 0.0,
+        "drought_term": 0.5,
+        "hazard": 0.2,
+        "rain_pct_of_normal": 80.0,
+        "price_coverage": 1.0,
+        "n_branches": 4,
+        "n_rain_branches": 4,
+        "rice_rubber_share": 0.6764,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "อ่างทอง",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 1.0,
+          "area": 344353
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.7175,
+      "crop_dependence": 0.0722,
+      "agri_stress": 0.0207,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 344353,
+        "price_term": 0.0,
+        "drought_term": 0.7175,
+        "hazard": 0.287,
+        "rain_pct_of_normal": 71.3,
+        "price_coverage": 1.0,
+        "n_branches": 8,
+        "n_rain_branches": 8,
+        "rice_rubber_share": 1.0,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "เลย",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6702,
+          "area": 938069
+        },
+        {
+          "crop": "Rice",
+          "share": 0.3122,
+          "area": 436985
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0175,
+          "area": 24536
+        }
+      ],
+      "price_stress": 27.62,
+      "drought": 0.175,
+      "crop_dependence": 0.2934,
+      "agri_stress": 0.0205,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1399590,
+        "price_term": 0.0,
+        "drought_term": 0.175,
+        "hazard": 0.07,
+        "rain_pct_of_normal": 93.0,
+        "price_coverage": 1.0,
+        "n_branches": 21,
+        "n_rain_branches": 21,
+        "rice_rubber_share": 0.9824,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "มุกดาหาร",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.6274,
+          "area": 461032
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.3664,
+          "area": 269239
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0063,
+          "area": 4611
+        }
+      ],
+      "price_stress": 23.21,
+      "drought": 0.3275,
+      "crop_dependence": 0.1541,
+      "agri_stress": 0.0202,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 734882,
+        "price_term": 0.0,
+        "drought_term": 0.3275,
+        "hazard": 0.131,
+        "rain_pct_of_normal": 86.9,
+        "price_coverage": 1.0,
+        "n_branches": 9,
+        "n_rain_branches": 9,
+        "rice_rubber_share": 0.9938,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ปทุมธานี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9679,
+          "area": 295153
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0312,
+          "area": 9529
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0009,
+          "area": 267
+        }
+      ],
+      "price_stress": 17.92,
+      "drought": 0.7325,
+      "crop_dependence": 0.0639,
+      "agri_stress": 0.0187,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 304949,
+        "price_term": 0.0,
+        "drought_term": 0.7325,
+        "hazard": 0.293,
+        "rain_pct_of_normal": 70.7,
+        "price_coverage": 1.0,
+        "n_branches": 39,
+        "n_rain_branches": 39,
+        "rice_rubber_share": 0.9688,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "ประจวบคีรีขันธ์",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6094,
+          "area": 272009
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.3418,
+          "area": 152584
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0488,
+          "area": 21793
+        }
+      ],
+      "price_stress": 26.84,
+      "drought": 0.49,
+      "crop_dependence": 0.0936,
+      "agri_stress": 0.0183,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 446386,
+        "price_term": 0.0,
+        "drought_term": 0.49,
+        "hazard": 0.196,
+        "rain_pct_of_normal": 80.4,
+        "price_coverage": 1.0,
+        "n_branches": 33,
+        "n_rain_branches": 33,
+        "rice_rubber_share": 0.6582,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "กำแพงเพชร",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9696,
+          "area": 1265783
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0243,
+          "area": 31709
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0062,
+          "area": 8038
+        }
+      ],
+      "price_stress": 18.25,
+      "drought": 0.1625,
+      "crop_dependence": 0.2737,
+      "agri_stress": 0.0178,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1305530,
+        "price_term": 0.0,
+        "drought_term": 0.1625,
+        "hazard": 0.065,
+        "rain_pct_of_normal": 93.5,
+        "price_coverage": 1.0,
+        "n_branches": 30,
+        "n_rain_branches": 30,
+        "rice_rubber_share": 0.9939,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นครปฐม",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9982,
+          "area": 257472
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0018,
+          "area": 454
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0001,
+          "area": 18
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.8075,
+      "crop_dependence": 0.0541,
+      "agri_stress": 0.0175,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 257944,
+        "price_term": 0.0,
+        "drought_term": 0.8075,
+        "hazard": 0.323,
+        "rain_pct_of_normal": 67.7,
+        "price_coverage": 1.0,
+        "n_branches": 22,
+        "n_rain_branches": 22,
+        "rice_rubber_share": 0.9983,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สิงห์บุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9999,
+          "area": 307545
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0001,
+          "area": 29
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.6512,
+      "crop_dependence": 0.0645,
+      "agri_stress": 0.0168,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 307574,
+        "price_term": 0.0,
+        "drought_term": 0.6512,
+        "hazard": 0.2605,
+        "rain_pct_of_normal": 73.95,
+        "price_coverage": 1.0,
+        "n_branches": 8,
+        "n_rain_branches": 8,
+        "rice_rubber_share": 0.9999,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สระแก้ว",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.875,
+          "area": 761423
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0765,
+          "area": 66538
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0486,
+          "area": 42271
+        }
+      ],
+      "price_stress": 19.02,
+      "drought": 0.1975,
+      "crop_dependence": 0.1825,
+      "agri_stress": 0.0144,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 870232,
+        "price_term": 0.0,
+        "drought_term": 0.1975,
+        "hazard": 0.079,
+        "rain_pct_of_normal": 92.1,
+        "price_coverage": 1.0,
+        "n_branches": 20,
+        "n_rain_branches": 20,
+        "rice_rubber_share": 0.9515,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ตราด",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.7958,
+          "area": 295081
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.1697,
+          "area": 62929
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0345,
+          "area": 12781
+        }
+      ],
+      "price_stress": 29.49,
+      "drought": 0.4425,
+      "crop_dependence": 0.0777,
+      "agri_stress": 0.0138,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 370791,
+        "price_term": 0.0,
+        "drought_term": 0.4425,
+        "hazard": 0.177,
+        "rain_pct_of_normal": 82.3,
+        "price_coverage": 1.0,
+        "n_branches": 13,
+        "n_rain_branches": 13,
+        "rice_rubber_share": 0.8303,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "จันทบุรี",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.9355,
+          "area": 470586
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0414,
+          "area": 20808
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0231,
+          "area": 11622
+        }
+      ],
+      "price_stress": 31.48,
+      "drought": 0.3025,
+      "crop_dependence": 0.1055,
+      "agri_stress": 0.0128,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 503016,
+        "price_term": 0.0,
+        "drought_term": 0.3025,
+        "hazard": 0.121,
+        "rain_pct_of_normal": 87.9,
+        "price_coverage": 1.0,
+        "n_branches": 25,
+        "n_rain_branches": 25,
+        "rice_rubber_share": 0.9586,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "น่าน",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.5143,
+          "area": 332949
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.4808,
+          "area": 311299
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0049,
+          "area": 3168
+        }
+      ],
+      "price_stress": 24.87,
+      "drought": 0.2227,
+      "crop_dependence": 0.1357,
+      "agri_stress": 0.0121,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 647416,
+        "price_term": 0.0,
+        "drought_term": 0.2227,
+        "hazard": 0.0891,
+        "rain_pct_of_normal": 91.09,
+        "price_coverage": 1.0,
+        "n_branches": 7,
+        "n_rain_branches": 7,
+        "rice_rubber_share": 0.9951,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นครนายก",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9855,
+          "area": 363813
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0131,
+          "area": 4824
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0015,
+          "area": 540
+        }
+      ],
+      "price_stress": 17.93,
+      "drought": 0.3425,
+      "crop_dependence": 0.0774,
+      "agri_stress": 0.0106,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 369177,
+        "price_term": 0.0,
+        "drought_term": 0.3425,
+        "hazard": 0.137,
+        "rain_pct_of_normal": 86.3,
+        "price_coverage": 1.0,
+        "n_branches": 7,
+        "n_rain_branches": 7,
+        "rice_rubber_share": 0.987,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พะเยา",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8032,
+          "area": 638352
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1935,
+          "area": 153801
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0033,
+          "area": 2585
+        }
+      ],
+      "price_stress": 20.71,
+      "drought": 0.1575,
+      "crop_dependence": 0.1666,
+      "agri_stress": 0.0105,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 794738,
+        "price_term": 0.0,
+        "drought_term": 0.1575,
+        "hazard": 0.063,
+        "rain_pct_of_normal": 93.7,
+        "price_coverage": 1.0,
+        "n_branches": 11,
+        "n_rain_branches": 11,
+        "rice_rubber_share": 0.9967,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "แพร่",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8937,
+          "area": 290055
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0996,
+          "area": 32317
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0067,
+          "area": 2172
+        }
+      ],
+      "price_stress": 19.35,
+      "drought": 0.355,
+      "crop_dependence": 0.068,
+      "agri_stress": 0.0097,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 324544,
+        "price_term": 0.0,
+        "drought_term": 0.355,
+        "hazard": 0.142,
+        "rain_pct_of_normal": 85.8,
+        "price_coverage": 1.0,
+        "n_branches": 9,
+        "n_rain_branches": 9,
+        "rice_rubber_share": 0.9933,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สุราษฎร์ธานี",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6071,
+          "area": 2287004
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.3885,
+          "area": 1463697
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0044,
+          "area": 16677
+        }
+      ],
+      "price_stress": 26.82,
+      "drought": 0.03,
+      "crop_dependence": 0.7899,
+      "agri_stress": 0.0095,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3767378,
+        "price_term": 0.0,
+        "drought_term": 0.03,
+        "hazard": 0.012,
+        "rain_pct_of_normal": 98.8,
+        "price_coverage": 1.0,
+        "n_branches": 43,
+        "n_rain_branches": 42,
+        "rice_rubber_share": 0.6115,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "หนองคาย",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.6218,
+          "area": 601167
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.3524,
+          "area": 340742
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0258,
+          "area": 24976
+        }
+      ],
+      "price_stress": 23.02,
+      "drought": 0.1025,
+      "crop_dependence": 0.2027,
+      "agri_stress": 0.0083,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 966885,
+        "price_term": 0.0,
+        "drought_term": 0.1025,
+        "hazard": 0.041,
+        "rain_pct_of_normal": 95.9,
+        "price_coverage": 1.0,
+        "n_branches": 15,
+        "n_rain_branches": 2,
+        "rice_rubber_share": 0.9742,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ปราจีนบุรี",
+      "en": null,
+      "region": "East",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8827,
+          "area": 428068
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.078,
+          "area": 37825
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0393,
+          "area": 19067
+        }
+      ],
+      "price_stress": 19.04,
+      "drought": 0.1625,
+      "crop_dependence": 0.1017,
+      "agri_stress": 0.0066,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 484960,
+        "price_term": 0.0,
+        "drought_term": 0.1625,
+        "hazard": 0.065,
+        "rain_pct_of_normal": 93.5,
+        "price_coverage": 1.0,
+        "n_branches": 18,
+        "n_rain_branches": 18,
+        "rice_rubber_share": 0.9607,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สระบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9805,
+          "area": 326548
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0141,
+          "area": 4691
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0055,
+          "area": 1818
+        }
+      ],
+      "price_stress": 17.98,
+      "drought": 0.2177,
+      "crop_dependence": 0.0698,
+      "agri_stress": 0.0061,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 333057,
+        "price_term": 0.0,
+        "drought_term": 0.2177,
+        "hazard": 0.0871,
+        "rain_pct_of_normal": 91.29,
+        "price_coverage": 1.0,
+        "n_branches": 24,
+        "n_rain_branches": 24,
+        "rice_rubber_share": 0.986,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "กรุงเทพมหานคร",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9953,
+          "area": 81743
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0047,
+          "area": 386
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.8733,
+      "crop_dependence": 0.0172,
+      "agri_stress": 0.006,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 82129,
+        "price_term": 0.0,
+        "drought_term": 0.8733,
+        "hazard": 0.3493,
+        "rain_pct_of_normal": 65.07,
+        "price_coverage": 1.0,
+        "n_branches": 170,
+        "n_rain_branches": 170,
+        "rice_rubber_share": 0.9953,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "นนทบุรี",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9998,
+          "area": 82839
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0002,
+          "area": 18
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 0.7975,
+      "crop_dependence": 0.0174,
+      "agri_stress": 0.0056,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 82857,
+        "price_term": 0.0,
+        "drought_term": 0.7975,
+        "hazard": 0.319,
+        "rain_pct_of_normal": 68.1,
+        "price_coverage": 1.0,
+        "n_branches": 39,
+        "n_rain_branches": 39,
+        "rice_rubber_share": 0.9998,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "ตาก",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9642,
+          "area": 384705
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0312,
+          "area": 12440
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0046,
+          "area": 1848
+        }
+      ],
+      "price_stress": 18.35,
+      "drought": 0.0725,
+      "crop_dependence": 0.0837,
+      "agri_stress": 0.0024,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 398993,
+        "price_term": 0.0,
+        "drought_term": 0.0725,
+        "hazard": 0.029,
+        "rain_pct_of_normal": 97.1,
+        "price_coverage": 1.0,
+        "n_branches": 9,
+        "n_rain_branches": 9,
+        "rice_rubber_share": 0.9954,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สมุทรปราการ",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9944,
+          "area": 16931
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0056,
+          "area": 95
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 1.0,
+      "crop_dependence": 0.0036,
+      "agri_stress": 0.0014,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 17026,
+        "price_term": 0.0,
+        "drought_term": 1.0,
+        "hazard": 0.4,
+        "rain_pct_of_normal": 59.0,
+        "price_coverage": 1.0,
+        "n_branches": 40,
+        "n_rain_branches": 40,
+        "rice_rubber_share": 0.9944,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สมุทรสาคร",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9864,
+          "area": 3857
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0136,
+          "area": 53
+        }
+      ],
+      "price_stress": 17.9,
+      "drought": 1.0,
+      "crop_dependence": 0.0008,
+      "agri_stress": 0.0003,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 3910,
+        "price_term": 0.0,
+        "drought_term": 1.0,
+        "hazard": 0.4,
+        "rain_pct_of_normal": 56.9,
+        "price_coverage": 1.0,
+        "n_branches": 13,
+        "n_rain_branches": 13,
+        "rice_rubber_share": 0.9864,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "สมุทรสงคราม",
+      "en": null,
+      "region": "Central&BKK",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9751,
+          "area": 1843
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0249,
+          "area": 47
+        }
+      ],
+      "price_stress": 17.91,
+      "drought": 1.0,
+      "crop_dependence": 0.0004,
+      "agri_stress": 0.0002,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1890,
+        "price_term": 0.0,
+        "drought_term": 1.0,
+        "hazard": 0.4,
+        "rain_pct_of_normal": 56.6,
+        "price_coverage": 1.0,
+        "n_branches": 5,
+        "n_rain_branches": 5,
+        "rice_rubber_share": 0.9751,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": true
+      }
+    },
+    {
+      "th": "แม่ฮ่องสอน",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9945,
+          "area": 218173
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0053,
+          "area": 1163
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0002,
+          "area": 36
+        }
+      ],
+      "price_stress": 17.98,
+      "drought": 0.0,
+      "crop_dependence": 0.046,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 219372,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 129.7,
+        "price_coverage": 1.0,
+        "n_branches": 4,
+        "n_rain_branches": 4,
+        "rice_rubber_share": 0.9998,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ขอนแก่น",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9654,
+          "area": 2402112
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0338,
+          "area": 83977
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0008,
+          "area": 2049
+        }
+      ],
+      "price_stress": 18.39,
+      "drought": 0.0,
+      "crop_dependence": 0.5217,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2488138,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 102.6,
+        "price_coverage": 1.0,
+        "n_branches": 35,
+        "n_rain_branches": 35,
+        "rice_rubber_share": 0.9992,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "เชียงใหม่",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9559,
+          "area": 554465
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0434,
+          "area": 25165
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0007,
+          "area": 408
+        }
+      ],
+      "price_stress": 18.53,
+      "drought": 0.0,
+      "crop_dependence": 0.1216,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 580038,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 116.3,
+        "price_coverage": 1.0,
+        "n_branches": 45,
+        "n_rain_branches": 45,
+        "rice_rubber_share": 0.9993,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ลำพูน",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9242,
+          "area": 99627
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.0702,
+          "area": 7566
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0057,
+          "area": 610
+        }
+      ],
+      "price_stress": 18.92,
+      "drought": 0.0,
+      "crop_dependence": 0.0226,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 107803,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 111.7,
+        "price_coverage": 1.0,
+        "n_branches": 14,
+        "n_rain_branches": 14,
+        "rice_rubber_share": 0.9944,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ลำปาง",
+      "en": null,
+      "region": "North",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.9152,
+          "area": 444761
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.08,
+          "area": 38884
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0048,
+          "area": 2312
+        }
+      ],
+      "price_stress": 19.06,
+      "drought": 0.0,
+      "crop_dependence": 0.1019,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 485957,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 103.11,
+        "price_coverage": 1.0,
+        "n_branches": 18,
+        "n_rain_branches": 18,
+        "rice_rubber_share": 0.9952,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "หนองบัวลำภู",
+      "en": null,
+      "region": "Isan",
+      "crop_mix": [
+        {
+          "crop": "Rice",
+          "share": 0.8605,
+          "area": 747136
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.1307,
+          "area": 113486
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0088,
+          "area": 7637
+        }
+      ],
+      "price_stress": 19.8,
+      "drought": 0.0,
+      "crop_dependence": 0.182,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 868259,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 102.0,
+        "price_coverage": 1.0,
+        "n_branches": 10,
+        "n_rain_branches": 10,
+        "rice_rubber_share": 0.9912,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "กระบี่",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Oil palm",
+          "share": 0.6652,
+          "area": 1208594
+        },
+        {
+          "crop": "Rubber",
+          "share": 0.3313,
+          "area": 601923
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0034,
+          "area": 6257
+        }
+      ],
+      "price_stress": 22.9,
+      "drought": 0.0,
+      "crop_dependence": 0.3809,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1816774,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 126.8,
+        "price_coverage": 1.0,
+        "n_branches": 14,
+        "n_rain_branches": 14,
+        "rice_rubber_share": 0.3347,
+        "ds_price_softening": false,
+        "ds_share_qualifies": false,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พังงา",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6554,
+          "area": 535810
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.3421,
+          "area": 279713
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0025,
+          "area": 2039
+        }
+      ],
+      "price_stress": 27.51,
+      "drought": 0.0,
+      "crop_dependence": 0.1714,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 817562,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 120.4,
+        "price_coverage": 1.0,
+        "n_branches": 13,
+        "n_rain_branches": 13,
+        "rice_rubber_share": 0.6579,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นครศรีธรรมราช",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.6812,
+          "area": 1871745
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.2559,
+          "area": 703222
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0629,
+          "area": 172946
+        }
+      ],
+      "price_stress": 27.85,
+      "drought": 0.0,
+      "crop_dependence": 0.5761,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2747913,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 119.8,
+        "price_coverage": 1.0,
+        "n_branches": 42,
+        "n_rain_branches": 42,
+        "rice_rubber_share": 0.7441,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สตูล",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.7767,
+          "area": 525022
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.2017,
+          "area": 136327
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0217,
+          "area": 14658
+        }
+      ],
+      "price_stress": 29.22,
+      "drought": 0.0,
+      "crop_dependence": 0.1417,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 676007,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 127.5,
+        "price_coverage": 1.0,
+        "n_branches": 9,
+        "n_rain_branches": 9,
+        "rice_rubber_share": 0.7984,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ตรัง",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.7977,
+          "area": 1323297
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.1966,
+          "area": 326116
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0057,
+          "area": 9487
+        }
+      ],
+      "price_stress": 29.53,
+      "drought": 0.0,
+      "crop_dependence": 0.3478,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1658900,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 133.5,
+        "price_coverage": 1.0,
+        "n_branches": 23,
+        "n_rain_branches": 23,
+        "rice_rubber_share": 0.8034,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "พัทลุง",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.8104,
+          "area": 980522
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0967,
+          "area": 117026
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0929,
+          "area": 112418
+        }
+      ],
+      "price_stress": 29.68,
+      "drought": 0.0,
+      "crop_dependence": 0.2537,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1209966,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 116.8,
+        "price_coverage": 1.0,
+        "n_branches": 13,
+        "n_rain_branches": 13,
+        "rice_rubber_share": 0.9033,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ปัตตานี",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.8141,
+          "area": 403977
+        },
+        {
+          "crop": "Rice",
+          "share": 0.134,
+          "area": 66478
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0519,
+          "area": 25742
+        }
+      ],
+      "price_stress": 29.72,
+      "drought": 0.0,
+      "crop_dependence": 0.104,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 496197,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 115.6,
+        "price_coverage": 1.0,
+        "n_branches": 11,
+        "n_rain_branches": 11,
+        "rice_rubber_share": 0.9481,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "สงขลา",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.8977,
+          "area": 2192446
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0629,
+          "area": 153596
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0394,
+          "area": 96221
+        }
+      ],
+      "price_stress": 30.93,
+      "drought": 0.0,
+      "crop_dependence": 0.512,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 2442263,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 128.0,
+        "price_coverage": 1.0,
+        "n_branches": 20,
+        "n_rain_branches": 20,
+        "rice_rubber_share": 0.9606,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "นราธิวาส",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.8991,
+          "area": 922442
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0723,
+          "area": 74209
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0286,
+          "area": 29356
+        }
+      ],
+      "price_stress": 30.96,
+      "drought": 0.0,
+      "crop_dependence": 0.2151,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1026007,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 130.6,
+        "price_coverage": 1.0,
+        "n_branches": 11,
+        "n_rain_branches": 11,
+        "rice_rubber_share": 0.9277,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ภูเก็ต",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.9557,
+          "area": 69254
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0437,
+          "area": 3168
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0006,
+          "area": 45
+        }
+      ],
+      "price_stress": 31.77,
+      "drought": 0.0,
+      "crop_dependence": 0.0152,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 72467,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 172.4,
+        "price_coverage": 1.0,
+        "n_branches": 21,
+        "n_rain_branches": 16,
+        "rice_rubber_share": 0.9563,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    },
+    {
+      "th": "ยะลา",
+      "en": null,
+      "region": "South",
+      "crop_mix": [
+        {
+          "crop": "Rubber",
+          "share": 0.9766,
+          "area": 1174340
+        },
+        {
+          "crop": "Rice",
+          "share": 0.0156,
+          "area": 18764
+        },
+        {
+          "crop": "Oil palm",
+          "share": 0.0078,
+          "area": 9372
+        }
+      ],
+      "price_stress": 32.06,
+      "drought": 0.0,
+      "crop_dependence": 0.2521,
+      "agri_stress": 0.0,
+      "double_stress": false,
+      "double_stress_score": 0.0,
+      "components": {
+        "total_crop_rai": 1202476,
+        "price_term": 0.0,
+        "drought_term": 0.0,
+        "hazard": 0.0,
+        "rain_pct_of_normal": 123.4,
+        "price_coverage": 1.0,
+        "n_branches": 8,
+        "n_rain_branches": 8,
+        "rice_rubber_share": 0.9922,
+        "ds_price_softening": false,
+        "ds_share_qualifies": true,
+        "ds_drought_elevated": false
+      }
+    }
+  ]
+}

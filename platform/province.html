@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Province · เงินไชโย — Deep-Dive</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
+<style>
+:root{--ink:#070a11;--card:#0e131f;--cardln:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;
+ --gold:#E6B450;--red:#E0474B;--mag:#D65AA0;--blue:#5B7CFA;--orange:#E0902F;--teal:#1FA38C;--purp:#9a7fd6;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
+#map{position:fixed;inset:0;background:transparent;z-index:1}
+.mono{font-family:'IBM Plex Mono',monospace}
+canvas{outline:none}
+
+/* ---- CINEMATIC DEPTH (ported from rayong-catchment) — purely visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient that sits BEHIND the deck.gl canvas (z below #map) so the
+          extruded districts read against an atmosphere instead of flat ink. Indigo-console tuned.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the province and fades the corners — the classic cinematic "look here" vignette. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(135% 100% at 50% 2%,#26314f 0%,#1a2237 30%,#10152a 58%,#080b14 100%),
+            linear-gradient(180deg,#0a0f1e 0%,#121a30 40%,#23304e 70%,#33405e 92%,#3a4868 100%);
+ background-blend-mode:screen,normal}
+/* #atmos : horizon haze/fog band so the extruded relief melts into the distance — premium depth fog. */
+#atmos{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,0) 52%,rgba(60,74,108,.10) 74%,rgba(96,112,150,.20) 90%,rgba(120,136,176,.30) 100%)}
+#vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 46%,rgba(6,9,16,.22) 72%,rgba(4,6,12,.46) 90%,rgba(2,3,8,.66) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
+            linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
+ background-blend-mode:multiply,normal}
+html[data-theme="light"] #atmos{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 54%,rgba(190,206,232,.14) 78%,rgba(206,220,240,.26) 100%)}
+html[data-theme="light"] #vignette{
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 54%,rgba(40,52,80,.07) 80%,rgba(30,40,66,.16) 92%,rgba(24,34,58,.24) 100%)}
+
+/* top brand strip (KPI chips) */
+#strip{position:fixed;top:44px;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
+ background:linear-gradient(180deg,rgba(7,10,17,.88),rgba(7,10,17,0));scrollbar-width:none;align-items:center}
+#strip::-webkit-scrollbar{display:none}
+#strip .ttl{font:700 13px 'IBM Plex Sans Thai';color:#fff;white-space:nowrap;margin-right:4px}
+#strip .ttl b{color:var(--gold)}
+.bchip{flex:none;background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;
+ font:600 11px 'IBM Plex Mono';color:var(--txt);backdrop-filter:blur(6px);white-space:nowrap}
+.bchip b{color:#fff;margin-left:3px}
+.bchip .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+
+/* side cards */
+.side{position:fixed;top:96px;bottom:14px;width:316px;z-index:8;background:rgba(14,19,31,.93);
+ border:1px solid var(--cardln);border-radius:13px;backdrop-filter:blur(13px);display:flex;flex-direction:column;
+ box-shadow:0 12px 40px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#left{left:14px}#right{right:14px}
+.side h2{font:600 11px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;padding:13px 15px 0}
+.side .scroll{overflow-y:auto;padding:11px 15px 16px;flex:1}
+.cardttl{padding:13px 15px 4px;border-bottom:1px solid #1a2236}
+.cardttl .a{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+.cardttl .b{font-size:11px;color:var(--mid);margin-top:1px}
+
+.stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
+
+/* provenance tags */
+.tag{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;padding:2px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.tag.meas{background:rgba(31,163,140,.16);color:#3fc4ab;border:1px solid rgba(31,163,140,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+
+/* within-10km grouped count rows */
+.kgrp{margin-bottom:11px}
+.kgrp .gh{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 3px}
+.krow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.krow .sw{width:8px;height:8px;border-radius:50%;flex:none}
+.krow .lab{color:var(--txt);flex:1}
+.krow b{font-family:'IBM Plex Mono';color:var(--hi);font-weight:600}
+
+/* workforce measured block + occupation proxy bars */
+.wbox{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:11px 12px;margin-bottom:11px}
+.wbox .wr{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:12.5px}
+.wbox .wr .k{color:var(--mid)}
+.wbox .wr .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.wbox .wr .v small{color:var(--dim)}
+.wbox .big{font:600 23px 'IBM Plex Mono';color:var(--gold);line-height:1.1}
+.wbox .cap{font-size:11px;color:var(--mid);margin:1px 0 7px}
+.occ .or{margin:6px 0}
+.occ .ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt);margin-bottom:2px}
+.occ .ot b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+.occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
+.occ .bar i{display:block;height:100%;border-radius:4px}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+
+/* right card: impacts + tables */
+.imp{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #131b2a}
+.imp .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
+.imp .t{font-size:12.5px;font-weight:600;color:var(--hi)}
+.imp .d{font-size:11.5px;color:var(--mid);margin-top:1px;line-height:1.5}
+.imp .tg{font:600 9px 'IBM Plex Mono';padding:1px 6px;border-radius:9px;margin-left:6px;vertical-align:1px}
+.lead{font-size:12px;color:var(--mid);margin:2px 0 9px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+th{text-align:left;color:var(--dim);font:600 10px 'IBM Plex Mono';text-transform:uppercase;padding:6px 6px;border-bottom:1px solid var(--cardln)}
+td{padding:6px 6px;border-bottom:1px solid #121a28}
+td.n{color:var(--hi)}
+.subtabs{display:flex;gap:3px;padding:8px 15px 0;border-bottom:1px solid #1a2236;flex:none;overflow-x:auto;scrollbar-width:none}
+.subtabs::-webkit-scrollbar{display:none}
+.stb{flex:none;background:none;border:none;border-bottom:2px solid transparent;color:var(--mid);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;cursor:pointer;white-space:nowrap}
+.stb.on{color:var(--hi);border-bottom-color:var(--gold)}
+.view{display:none}.view.on{display:block}
+
+/* controls — docked frame in the map well (between the two side cards): segmented basemap + action cluster.
+   sits to the RIGHT of the left card and clear of the right card so it never overlaps either panel. */
+#ctl{position:fixed;top:96px;left:346px;z-index:8;display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;align-items:flex-start;
+ background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:12px;padding:10px 12px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 26px rgba(0,0,0,.42);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#ctl .grp{display:flex;flex-direction:column;gap:5px}
+#ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+#ctl .seg{display:flex;background:#0a1018;border:1px solid #1c2740;border-radius:9px;padding:2px;gap:2px}
+#ctl .seg button{flex:1;background:none;border:none;color:var(--mid);border-radius:7px;
+ padding:6px 4px;font:600 11.5px 'IBM Plex Sans Thai';cursor:pointer;transition:background .15s,color .15s}
+#ctl .seg button.on{background:var(--blue);color:#fff}
+#ctl .acts{display:flex;flex-direction:column;gap:5px}
+#ctl .acts button{background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+ padding:7px 10px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer;text-align:left}
+#ctl .acts button.on{border-color:var(--blue);color:var(--hi)}
+#ctl .acts button:active{background:#161d2c}
+
+/* mobile toggles */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(14,19,31,.95);border:1px solid var(--cardln);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.xbtn{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none}
+
+/* cascade (Region>Province>Branch) */
+.casc{padding:10px 15px 11px;border-bottom:1px solid #1a2236;display:flex;flex-direction:column;gap:6px}
+.cscrow{display:flex;align-items:center;gap:8px}
+.cscrow label{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;width:62px;flex:none}
+.casc select{flex:1;min-width:0;background:#0a1018;border:1px solid #1c2740;color:var(--hi);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;border-radius:7px;cursor:pointer}
+.casc select:disabled{color:var(--dim);cursor:not-allowed;opacity:.7}
+.cscnote{font-size:10px;color:var(--dim);line-height:1.4;margin-top:1px}
+
+/* POI legend — docked, COLLAPSIBLE bottom rail (centered between the side cards) so it never occludes the scene */
+#legendwrap{position:fixed;bottom:14px;left:344px;right:344px;z-index:8;margin:0 auto;max-width:min(720px,calc(100vw - 700px));
+ background:rgba(14,19,31,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 12px 9px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.lghead{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;flex:1}
+.lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
+.lgcar{font:600 11px 'IBM Plex Mono';color:var(--mid);transition:transform .2s;flex:none}
+#legendwrap.collapsed .lgcar{transform:rotate(-90deg)}
+#legendwrap.collapsed #legend{display:none}
+#legendwrap.collapsed #bldglegend{display:none}
+/* building colour/height legend — warm sand->amber->gold height ramp + sparing landmark accent */
+#bldglegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#bldglegend .bl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#bldglegend .bl-ramp{display:inline-flex;align-items:center;gap:6px}
+#bldglegend .bl-bar{width:104px;height:9px;border-radius:5px;border:1px solid rgba(255,255,255,.22);
+ background:linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))}
+#bldglegend .bl-cap{font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+html[data-theme="light"] #bldglegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #bldglegend .bl-ttl{color:#828CA0}
+html[data-theme="light"] #bldglegend .bl-cap,html[data-theme="light"] #bldglegend .bl-acc{color:#2C3444}
+html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
+#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}
+.lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
+ font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
+.lg.on{opacity:1;color:var(--hi);border-color:#33405e}
+.lg .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
+.lg.on b{color:var(--hi)}
+
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:230px;line-height:1.45}
+.dtt b{color:#fff}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
+/* calm centered notice — used for load/init fallbacks so a raw red error never fronts the user */
+.notice{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+ padding:30px;text-align:center;background:var(--ink);z-index:99}
+.notice .nh{font:600 15px 'IBM Plex Sans Thai';color:var(--hi)}
+.notice .nd{font:400 12.5px 'IBM Plex Sans Thai';color:var(--mid);max-width:360px;line-height:1.5}
+.notice .sp{width:18px;height:18px;border:2px solid #2a3450;border-top-color:var(--blue);border-radius:50%;animation:nspin .8s linear infinite;margin-bottom:4px}
+@keyframes nspin{to{transform:rotate(360deg)}}
+
+/* TABLET (821–1180px): narrow the fixed panels a touch so the map well breathes; reflow the docked
+   control frame + legend to clear the (now narrower) side cards. Full desktop layout otherwise. */
+@media(min-width:821px) and (max-width:1180px){
+ .side{width:286px}
+ #left{left:12px}#right{right:12px}
+ #ctl{left:308px}
+ #legendwrap{left:308px;right:308px;max-width:none}
+}
+
+/* PHONE (<820px): map goes full-screen. The two info cards slide off-screen (left/right) and the
+   #ctl control frame slides down off the bottom; all three are reachable via the #mtog bottom-sheet
+   buttons (Branch reach / Province / Layers). Controls are NOT hidden. The collapsible POI/building
+   legend rail stays docked + readable at the bottom. */
+@media(max-width:820px){
+ .side{width:86vw;max-width:340px;top:90px;bottom:78px}
+ #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
+ #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
+ .xbtn{display:block}#mtog{display:flex}
+ #ctl{top:auto;left:8px;right:8px;bottom:0;flex-direction:row;flex-wrap:wrap;padding:10px;gap:10px;
+  max-height:60vh;overflow-y:auto;transform:translateY(calc(100% + 24px))}
+ #ctl.show{transform:translateY(0)}
+ #ctl .glab{display:block}
+ #legendwrap{left:8px;right:8px;bottom:66px;max-width:none;margin:0;padding:6px 10px}
+ #legend{max-height:84px;overflow-y:auto;margin-top:6px}
+}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:#E0A93B;margin:0 1px}
+#nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
+ padding:6px 11px;border-radius:7px;white-space:nowrap}
+#nav a.on{color:#fff;background:#1a2336}
+#nav a:active{background:#161d2c}
+
+/* "More ▾" dropdown (matches styles.css .nav-more) */
+.nav-more{position:relative;flex:none}
+.nav-more-btn{color:#8a94a8;background:none;border:none;cursor:pointer;
+  font:500 12.5px 'IBM Plex Sans Thai',sans-serif;padding:6px 11px;border-radius:7px;white-space:nowrap;
+  transition:color .15s,background .15s}
+.nav-more-btn:hover{color:#e6ecf5;background:rgba(255,255,255,.045)}
+#nav .nav-more-btn.on{color:#fff;background:#1a2336}
+.nav-more-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:160px;display:none;
+  flex-direction:column;gap:2px;padding:6px;z-index:2100;
+  background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid #1d2738;border-radius:10px;box-shadow:0 14px 38px rgba(0,0,0,.55)}
+.nav-more.open .nav-more-menu{display:flex}
+.nav-more-menu a{display:block;flex:none}
+html[data-theme="light"] .nav-more-btn{color:#5A6477}
+html[data-theme="light"] .nav-more-btn:hover{color:#11151F;background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 14px 38px rgba(16,22,40,.18)}
+
+.err{top:44px}
+
+#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid var(--cardln);color:var(--mid);
+ border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px}
+
+/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
+html[data-theme="light"] #nav .nb{color:#11151F}
+html[data-theme="light"] #nav a{color:#5A6477}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] #themeToggle{border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] .side{background:rgba(255,255,255,.95);border-color:#D3DAE6;box-shadow:0 12px 40px rgba(16,22,40,.16)}
+html[data-theme="light"] .cardttl{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cardttl .a,html[data-theme="light"] .stat .v,html[data-theme="light"] .imp .t,html[data-theme="light"] td.n{color:#11151F}
+html[data-theme="light"] .cardttl .b,html[data-theme="light"] .side h2,html[data-theme="light"] .stat .k,html[data-theme="light"] .imp .d,html[data-theme="light"] .lead{color:#5A6477}
+html[data-theme="light"] .stat,html[data-theme="light"] .imp,html[data-theme="light"] td{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow .lab{color:#2C3444}
+html[data-theme="light"] .krow b,html[data-theme="light"] .kgrp .gh{color:#11151F}
+html[data-theme="light"] .wbox{background:#F5F8FD;border-color:#D3DAE6}
+html[data-theme="light"] .wbox .big{color:#B8862B}
+html[data-theme="light"] .wbox .wr .k{color:#5A6477}
+html[data-theme="light"] .wbox .wr .v{color:#11151F}
+html[data-theme="light"] .occ .ot{color:#2C3444}
+html[data-theme="light"] .occ .bar{background:#E4E8F1}
+html[data-theme="light"] #ctl{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] #ctl .glab{color:#828CA0}
+html[data-theme="light"] #ctl .seg{background:#F1F5FB;border-color:#D3DAE6}
+html[data-theme="light"] #ctl .seg button{color:#5A6477}
+html[data-theme="light"] #ctl .seg button.on{background:var(--blue);color:#fff}
+html[data-theme="light"] #ctl .acts button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] #ctl .acts button.on{border-color:var(--blue);color:#11151F}
+html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .bchip b{color:#11151F}
+html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .casc,html[data-theme="light"] .subtabs{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cscrow label,html[data-theme="light"] .cscnote{color:#828CA0}
+html[data-theme="light"] .casc select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .stb.on{color:#11151F}
+html[data-theme="light"] th{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #legendwrap{background:rgba(255,255,255,.94);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] .lgttl{color:#828CA0}
+html[data-theme="light"] .lgcar{color:#5A6477}
+html[data-theme="light"] .notice{background:#F5F8FD}
+html[data-theme="light"] .notice .nh{color:#11151F}
+html[data-theme="light"] .notice .nd{color:#5A6477}
+html[data-theme="light"] .notice .sp{border-color:#D3DAE6;border-top-color:var(--blue)}
+html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828CA0}
+html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
+html[data-theme="light"] .lg b{color:#5A6477}
+html[data-theme="light"] .lg.on b{color:#11151F}
+</style>
+</head>
+<body>
+<nav id="nav" aria-label="Main views">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a href="index.html#home">Home</a>
+  <a href="index.html#overview">Overview</a>
+  <a href="index.html#map">National</a>
+  <a href="index.html#acq">Acquire</a>
+  <a href="index.html#exposure">Exposure</a>
+  <a href="index.html#trend">Trend</a>
+  <a href="index.html#provinces">3D map</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="index.html#provinces" data-nav="provinces" role="menuitem">Provinces</a>
+      <a href="index.html#market" role="menuitem">Market</a>
+      <a href="index.html#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>
+</nav>
+<script>/* "More ▾" nav dropdown — pure UI (copied from index.html) */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
+</script>
+<script>
+(function(){
+ /* every province (Rayong included) is reached via the Provinces selector now — one highlight rule */
+ var sel=document.querySelector('#nav a[data-nav="provinces"]');
+ if(sel)sel.classList.add('on');
+ var b=document.getElementById('themeToggle');if(b){
+  function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+  sync();
+  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});
+ }
+})();
+</script>
+<div id="sky"></div>
+<div id="map"></div>
+<div id="atmos"></div>
+<div id="vignette"></div>
+
+<div id="strip"><span class="ttl" id="stripTtl">Province <b>·</b> branches · POIs · 10km reach</span><span id="kpis"></span></div>
+
+<div id="ctl">
+  <div class="grp">
+    <div class="glab">Basemap</div>
+    <div class="seg">
+      <button data-b="light">Light</button>
+      <button data-b="voyager">Streets</button>
+      <button data-b="dark" class="on">Dark</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Layers</div>
+    <div class="acts">
+      <button id="ringtog" class="on">10 km reach rings</button>
+      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+    </div>
+  </div>
+</div>
+
+<aside class="side" id="left">
+  <button class="xbtn" data-x="left">✕</button>
+  <div class="cardttl"><div class="a" id="focalName">—</div><div class="b" id="focalSub">Tap a gold branch to refocus</div></div>
+  <div class="casc">
+    <div class="cscrow"><label>Region</label><select id="cscRegion"></select></div>
+    <div class="cscrow"><label>Province</label><select id="cscProv"></select></div>
+    <div class="cscrow"><label>Branch</label><select id="cscBranch"></select></div>
+    <div class="cscnote" id="cscNote"></div>
+  </div>
+  <div class="scroll">
+    <h2 style="padding:0 0 6px">Within 10km of branch <span class="tag meas">measured · OSM</span></h2>
+    <div id="k10panel"></div>
+    <h2 style="padding:14px 0 6px">Who works nearby</h2>
+    <div id="workpanel"></div>
+  </div>
+</aside>
+
+<aside class="side" id="right">
+  <button class="xbtn" data-x="right">✕</button>
+  <div class="cardttl"><div class="a" id="provTitle">Province</div><div class="b" id="provSub">—</div></div>
+  <div class="subtabs">
+    <button class="stb on" data-v="impacts">What moves incomes</button>
+    <button class="stb" data-v="districts">Districts</button>
+    <button class="stb" data-v="near">Nearest</button>
+    <button class="stb" data-v="comp">Competitors</button>
+  </div>
+  <div class="scroll">
+    <div class="view on" id="v-impacts"></div>
+    <div class="view" id="v-districts"></div>
+    <div class="view" id="v-near"></div>
+    <div class="view" id="v-comp"></div>
+  </div>
+</aside>
+
+<div id="mtog">
+  <button data-s="left">Branch reach</button>
+  <button data-s="right">Province</button>
+  <button data-s="ctl">Layers</button>
+</div>
+
+<div id="legendwrap">
+  <div class="lghead" id="lghead" role="button" tabindex="0" aria-expanded="true">
+    <div class="lgttl">POI types <span>· tap a chip to toggle</span></div>
+    <span class="lgcar" aria-hidden="true">▾</span>
+  </div>
+  <div id="bldglegend"></div>
+  <div id="legend"></div>
+</div>
+
+<script>window.initProvince=function(){
+'use strict';
+try{
+const RY=window.RY;
+const IDX=window.PROV_INDEX||null;
+const SLUG=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
+const BR=RY.branches||[];
+const COMP=RY.competitors||[];
+const POIS=RY.poi||{};
+const DISTRICTS=RY.districts||null;
+const provEn=RY.province_en||'', provTh=RY.province_th||'', reg=RY.region||'';
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[91,124,250],Krungsri:[224,123,47]};
+const GOLD=[230,180,80];
+
+// canonical type->color map: single source of truth for map dots AND legend AND toggles (Rayong palette)
+const POI_COLORS={
+  vehicle_commerce:[31,163,140], gold:[230,180,80], bank:[91,124,250], convenience:[224,123,47],
+  fresh_market:[224,144,47], supermarket:[224,144,47], industrial:[123,138,166],
+  pharmacy:[200,67,59], restaurant:[133,144,166], hotel:[214,90,160], school:[122,79,224]};
+const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
+  fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
+  restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,fresh_market:1,bank:1};
+const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
+const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
+// DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT (matches rayong-catchment).
+let basemap='dark', showRings=true;  // dark default: gold buildings pop on black; no white basemap to wash into
+
+function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
+  const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));}
+function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
+  for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+
+// default focal = the branch with the richest measured surroundings (most vehicle shops in 10km), else first
+let focal=(function(){if(!BR.length)return null;
+  let best=BR[0],bv=-1;for(const b of BR){const v=(b.k10&&b.k10.veh)||b.veh||0;if(v>bv){bv=v;best=b;}}return best;})();
+
+// view bounds from branches
+function provView(){
+  if(!BR.length){return {longitude:101,latitude:14,zoom:7,pitch:40,bearing:0};}
+  const xs=BR.map(b=>b.x),ys=BR.map(b=>b.y);
+  const lng=(Math.max.apply(null,xs)+Math.min.apply(null,xs))/2;
+  const lat=(Math.max.apply(null,ys)+Math.min.apply(null,ys))/2;
+  const span=Math.max((Math.max.apply(null,xs)-Math.min.apply(null,xs))||0.3,(Math.max.apply(null,ys)-Math.min.apply(null,ys))||0.3);
+  const z=span>1.8?7.4:span>1.1?8.0:span>0.6?8.6:9.2;
+  return {longitude:lng,latitude:lat,zoom:z,pitch:42,bearing:8};
+}
+
+// Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
+const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+            voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+// light (Positron) gets the DataProteins white-paper treatment: orange branches/links, soft tints,
+// readable pill labels. dark keeps the original instrument-console palette.
+function lightMode(){return basemap==='light';}
+
+// ---- CINEMATIC LIGHTING (ported from rayong-catchment) -----------------------------------------
+// The district polygons are now EXTRUDED (by a measured working-age/worker quantity), so a real
+// directional sun + warm material carve light/shade across the raised parcels and the province
+// reads as a dimensional relief rather than a flat wash. Shadows are NOT needed for the polygon
+// scene (the depth comes from material + directional contrast + sky/vignette), so we build the
+// lighting without shadow casting — cheaper and stable under software WebGL.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the vendored bundle lacks lighting
+// the try/catch leaves LIGHTING null and the scene still renders flat-lit (unchanged behaviour).
+function buildLighting(){
+  try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
+    // Intensities clamp-bounded so ambient + diffuse*(sun+fill) stays below ~0.9 — otherwise light parcel/
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). DataProteins depth
+    // comes from a WIDER lit/shade gap, NOT specular. With material ambient 0.42 / diffuse 0.40 below:
+    //   shade floor = 0.42*0.92 = 0.386 ; max lit = 0.386 + 0.40*(0.95+0.28) = 0.878 < 0.9 -> never clamps
+    //   contrast lit/shade = 0.878/0.386 = 2.27x (was 1.83x) -> punchier relief, still safe.
+    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0]});
+    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[235,238,255],intensity:1.0});
+    return new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+  }catch(e){ return null; }
+}
+let LIGHTING=buildLighting();
+// MOBILE: at device-pixel-ratio 2-3 the WebGL framebuffer is 4-9x larger and can blow the mobile GL
+// memory budget -> blank canvas (seen on iOS). Cap device pixels to 1 on phones; desktop stays crisp.
+const IS_MOBILE=(function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform));
+}catch(e){return false;}})();
+
+// ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
+// The scene is driven by a CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and click-to-fly
+// transitions share one source of truth and never fight. FRAMED = the cinematic resting view (the
+// province framed low+wide so the extruded districts catch the light). INTRO = a higher, further-out,
+// more top-down start; on load we ease INTRO -> FRAMED.
+const FRAMED=(function(){const v=provView();return {longitude:v.longitude,latitude:v.latitude,
+  zoom:(v.zoom||8)+0.2,pitch:54,bearing:(v.bearing||0)-18};})();
+const INTRO=Object.assign({},FRAMED,{zoom:Math.max(5.5,(FRAMED.zoom||8)-1.6),pitch:34,bearing:(FRAMED.bearing||0)+30});
+let VIEW=Object.assign({},INTRO);
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
+const ORBIT_DPS=2.4;                 // degrees / second — gentle (~2-3 dps target)
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+let _programmatic=false;             // guards our own setProps from being mistaken for user input
+function pushView(extra){ _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  Promise.resolve().then(()=>{_programmatic=false;});}
+// flyTo: smooth click-to-fly that REPLACES the old initialViewState+transitionDuration calls.
+function flyTo(o){
+  const dur=o.transitionDuration||850;
+  VIEW=Object.assign({},VIEW,{longitude:o.longitude,latitude:o.latitude,
+    zoom:o.zoom!=null?o.zoom:VIEW.zoom,pitch:o.pitch!=null?o.pitch:VIEW.pitch,
+    bearing:o.bearing!=null?o.bearing:VIEW.bearing});
+  _programmatic=true;
+  const tp={viewState:Object.assign({},VIEW,{transitionDuration:dur})};
+  try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.4});} }catch(e){}
+  orbitPausedByUser=false; setOrbitUI(orbitOn);
+  deckgl.setProps(tp);
+  setTimeout(()=>{_programmatic=false; lastT=0;}, dur+40);
+}
+// onWebGLInitialized: under a SOFTWARE rasteriser (swiftshader / llvmpipe — headless CI, old
+// machines) park the camera and stop the orbit so the render loop stays cold and the scene settles
+// to a clean still frame. On a real GPU this never fires; the cinematic motion stays.
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+function downgradeForSoftwareGL(){
+  SOFT_GL=true; orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  try{ console.info('[province] software WebGL detected — auto-orbit + intro disabled for performance; depth via material + sky/vignette.'); }catch(e){}
+}
+const deckgl=new deck.DeckGL({container:'map',
+  viewState:VIEW,
+  useDevicePixels: IS_MOBILE ? false : true,  // cap the framebuffer on phones so mobile WebGL doesn't blank
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
+  onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+  onViewStateChange:({viewState,interactionState})=>{
+    VIEW=viewState;
+    const inTrans=!!(interactionState&&interactionState.inTransition);
+    const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+       interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+    if(!_programmatic && userMoving){ userInteract(); }
+    if(userMoving && !inTrans && !_programmatic){
+      _programmatic=true; deckgl.setProps({viewState:VIEW});
+      Promise.resolve().then(()=>{_programmatic=false;});
+    }
+    return viewState;
+  },
+  getTooltip:({object,layer})=>{
+    if(!object)return null;
+    if(layer.id==='districts'){const p=object.properties;
+      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Branches: <b>${p.branches}</b> · DIW workers: <b>${(p.real_workers||0).toLocaleString()}</b></div>`};}
+    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||provEn} · vehicle shops ${object.veh!=null?object.veh:'—'} · gold ${object.gold!=null?object.gold:'—'}</div>`};
+    if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name||''}</div>`};
+    if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
+      const nm=Array.isArray(object)?object[2]:null;
+      return {html:`<div class="dtt"><b>${POI_LABEL[t]||t}</b>${nm?'<br>'+nm:''}<br><span style="color:#8a94a8">OSM point · in view</span></div>`};}
+    return null;}});
+
+function baseLayer(){return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
+  renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+    bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
+
+function dGeom(f){return f.geometry.type==='MultiPolygon'?f.geometry.coordinates.map(poly=>poly[0]):f.geometry.coordinates[0];}
+
+// Streamed Overture building tiles (platform/data/tiles_config.json). When configured, the deep-dive
+// SWAPS its extruded-district relief for real 3D building footprints — the "fancy building scenes"
+// across the whole province. Returns null unless an mvtUrl is set and the bundle has MVTLayer ->
+// graceful fallback to the relief. Lighting-capped material -> no white blow-out. NO fabricated data.
+function streamBuildingLayer(){
+  try{
+    var cfg=(window.TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path
+    if(!url){                            // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:!lightMode()});
+      return null;
+    }
+    var LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]
+                  :[[44,38,32],[156,108,50],[238,182,86]];
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
+      getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
+      getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
+      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
+      parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
+
+function render(){
+  const L=[baseLayer()];
+  const LIGHT=lightMode();
+  // streamed building tiles (null unless operator-hosted). When present, they REPLACE the extruded
+  // district relief with real footprints and the districts drop to a flat tinted context base.
+  const STREAMB=streamBuildingLayer();
+  if(STREAMB)L.push(STREAMB);
+  // (0) district context — now EXTRUDED 3D relief (the cinematic upgrade). Each amphoe polygon is
+  //     raised by a MEASURED quantity (working-age population, the title-loan addressable base; falls
+  //     back to DIW factory workers, then branch count) and ranked p5..p95 within THIS province so a
+  //     flat or a varied province each spread across the full elevation range. The directional sun +
+  //     warm material then carve light/shade across the raised parcels for real dimensional depth.
+  //     Height is a VISUAL transform of measured data only — nothing is fabricated; the tooltip still
+  //     surfaces the underlying real numbers. Degrades to flat (extruded:false) if a province has no
+  //     measurable per-district quantity.
+  if(DISTRICTS && DISTRICTS.features && deck.GeoJsonLayer){
+    // pick the measured driver per feature: working-age, else DIW workers, else branches.
+    const dval=p=>{ if(!p)return 0;
+      if(p.workingage>0)return p.workingage; if(p.real_workers>0)return p.real_workers;
+      if(p.branches>0)return p.branches*1000; return 0; };
+    // robust p5..p95 of the driver across this province's districts -> rank for the elevation ramp.
+    const vals=DISTRICTS.features.map(f=>dval(f.properties)).filter(v=>v>0).sort((a,b)=>a-b);
+    let lo=0,hi=1,anyVal=vals.length>0;
+    if(anyVal){ lo=vals[Math.floor(vals.length*0.05)]||vals[0]; hi=vals[Math.floor(vals.length*0.95)]||vals[vals.length-1];
+      if(hi<=lo)hi=lo+1; }
+    const MAX_ELEV=4200;             // metres at the p95 district — gentle relief that reads at province
+                                     // zoom without burying the ground markers (branch dots / POI / rings)
+    const elev=f=>{ if(!anyVal)return 0; const v=dval(f.properties);
+      let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t; return Math.pow(t,0.85)*MAX_ELEV; };
+    const EXTRUDE=anyVal && !STREAMB;  // extrude relief only when we have a driver AND no streamed buildings
+    // colour ramp by the SAME rank so taller (more populous/working) districts read warmer.
+    const fillCol=f=>{ if(!EXTRUDE)return LIGHT?[150,164,196,30]:[91,124,250,16];
+      const v=dval(f.properties); let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t;
+      // dark: deep indigo -> accent blue -> warm gold-ish; light: soft grey -> muted blue -> warm
+      const A=LIGHT?[176,188,210]:[44,58,92], B=LIGHT?[120,150,206]:[72,104,196], C=LIGHT?[210,190,150]:[180,168,128];
+      const seg=t<.5?[A,B,t*2]:[B,C,(t-.5)*2], a=seg[0],b=seg[1],lt=seg[2];
+      return [Math.round(a[0]+(b[0]-a[0])*lt),Math.round(a[1]+(b[1]-a[1])*lt),Math.round(a[2]+(b[2]-a[2])*lt),LIGHT?225:235]; };
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:EXTRUDE,wireframe:false,
+      getElevation:elev,
+      filled:true,stroked:true,
+      getFillColor:fillCol,
+      getLineColor:LIGHT?[120,134,168,150]:[150,170,210,120],lineWidthMinPixels:1,pickable:true,
+      // material tuned for cinematic depth: low ambient lets the sun carve the relief; high diffuse
+      // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
+      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
+      parameters:{depthTest:true},transitions:{getElevation:600},
+      updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
+  }
+  // (1) 10km collateral catchment rings — faint over ALL branches; bright on the selected one
+  if(showRings && BR.length){
+    L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
+      extruded:false,stroked:true,filled:true,
+      getFillColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?14:8],getLineColor:[GOLD[0],GOLD[1],GOLD[2],LIGHT?110:60],
+      lineWidthMinPixels:1,pickable:false,updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
+    if(focal){
+      // focal-glow halo: three concentric soft-fill discs around the selected branch lift its 10km
+      // catchment out of the overlapping ring cloud, so the hero branch reads with depth/focus.
+      // Purely visual (gold accent); inner discs are denser so the centre glows toward the pin.
+      const GLOW=[[10000,LIGHT?20:14],[6600,LIGHT?26:20],[3400,LIGHT?34:30]];
+      GLOW.forEach(([r,a],i)=>{
+        L.push(new deck.PolygonLayer({id:'ring10-glow'+i,data:[focal],getPolygon:b=>circle(b.y,b.x,r),
+          extruded:false,stroked:false,filled:true,
+          getFillColor:[GOLD[0],GOLD[1],GOLD[2],a],pickable:false,
+          updateTriggers:{getPolygon:[focal,r]}}));
+      });
+      L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
+        extruded:false,stroked:true,filled:false,
+        getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
+        lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
+    }
+  }
+  // (2) color-coded POIs — one ScatterplotLayer per type, each toggleable; POIS items are [lat,lng].
+  //     On the light base give each dot a darker same-hue ring so the shared palette stays legible on white.
+  POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
+    const c=POI_COLORS[t];
+    L.push(new deck.ScatterplotLayer({id:'poi-'+t,data:POIS[t],getPosition:p=>[p[1],p[0]],
+      getRadius:90,radiusMinPixels:LIGHT?2:1.6,radiusMaxPixels:5,getFillColor:[c[0],c[1],c[2],LIGHT?235:210],
+      stroked:LIGHT,getLineColor:[Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255],lineWidthMinPixels:0.6,
+      pickable:true,_poiType:t,updateTriggers:{getFillColor:[LIGHT],stroked:[LIGHT]}}));
+  });
+  // (3) competitors (graceful: empty for most provinces today)
+  if(COMP.length){
+    L.push(new deck.ScatterplotLayer({id:'comp',data:COMP,getPosition:d=>[d.lng,d.lat],
+      getRadius:170,radiusMinPixels:4,radiusMaxPixels:10,stroked:true,
+      getLineColor:LIGHT?[255,255,255,255]:[210,210,220,255],lineWidthMinPixels:1.6,
+      getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true,updateTriggers:{getLineColor:[LIGHT]}}));
+  }
+  // (4) AutoX branches — gold (brand) markers; selected one is white. Dark outline reads on the white base.
+  L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
+    getRadius:230,radiusMinPixels:5,radiusMaxPixels:12,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.4,
+    getFillColor:d=>d===focal?[255,255,255,255]:[230,180,80,255],pickable:true,
+    updateTriggers:{getFillColor:[focal]}}));
+  // (5) only the SELECTED branch is labelled — pill+icon chip (DataProteins look). On the light base the
+  //     chip gets a gold border so the white pill separates from the white paper.
+  if(focal){
+    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],getText:d=>'◉ '+(d.n||'AutoX'),
+      getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
+      getBorderColor:[224,169,59,255],getBorderWidth:LIGHT?1.5:0,
+      background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+      getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+      updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[LIGHT]}}));
+  }
+  deckgl.setProps({layers:L,
+    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
+}
+
+/* ---------- panels ---------- */
+function fmt(n){return (n==null?0:n).toLocaleString();}
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+
+const EMP=(RY.gov&&RY.gov.employment)||null;
+const UNEMP=(RY.gov&&RY.gov.unemployment&&RY.gov.unemployment.unemployment_rate!=null)?RY.gov.unemployment:null;
+const INCOME=(RY.gov&&RY.gov.income&&RY.gov.income.avg_monthly_income!=null)?RY.gov.income:null;
+function districtWorkers(d){
+  if(!DISTRICTS||!DISTRICTS.features)return null;
+  const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
+  return f&&f.properties.real_workers!=null?f.properties.real_workers:null;
+}
+
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM)
+const K10_GROUPS=[
+  ['Collateral & finance',[
+    ['veh','Auto / vehicle shops','vehicle_commerce'],
+    ['gold','Gold dealers','gold'],
+    [['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[
+    ['fmkt','Fresh markets','fresh_market'],
+    ['super','Supermarkets','supermarket'],
+    ['cvs','Convenience','convenience'],
+    ['rest','Restaurants','restaurant']]],
+  ['Industry & services',[
+    ['ind','Factories','industrial'],
+    ['hotel','Hotels','hotel'],
+    ['sch','Schools','school'],
+    ['pharm','Pharmacies','pharmacy']]],
+];
+// establishment-mix -> occupation proxy (ESTIMATED). same mapping as Rayong.
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
+
+function updatePanels(){
+  const dist=(focal&&focal.d)||provEn;
+  const k=(focal&&focal.k10)||null;
+  document.getElementById('focalName').textContent=(focal&&focal.n)||'AutoX branch';
+  document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${(focal&&focal.veh!=null)?focal.veh:'—'}`;
+
+  // (C) "Within 10km of <branch>" — measured counts, grouped for a lender
+  const k10host=document.getElementById('k10panel');
+  if(!k){
+    k10host.innerHTML='<div class="foot">Select an AutoX branch from the cascade or map to see its measured 10km surroundings.</div>';
+  }else{
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    k10host.innerHTML=K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(([key,lab,col])=>{
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('')
+      +`<div class="foot">Counts are establishments mapped in OpenStreetMap within a 10 km radius of this branch — measured, not estimated.</div>`;
+  }
+
+  // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
+  const whost=document.getElementById('workpanel');
+  let html='';
+  if(EMP){
+    const inf=EMP.informal||0, frm=EMP.formal||0, tot=inf+frm;
+    const share=tot?Math.round(inf/tot*100):0;
+    html+='<div class="wbox">'
+      +`<div class="big">${share}%</div><div class="cap">of ${provEn} workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+      +`<div class="wr"><span class="k">Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+      +`<div class="wr"><span class="k">Formal workers</span><span class="v">${fmt(frm)}</span></div>`;
+    const dw=districtWorkers(dist);
+    if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
+    if(UNEMP)html+=`<div class="wr"><span class="k">Unemployment rate <small>(province, NSO LFS)</small></span><span class="v">${UNEMP.unemployment_rate}%</span></div>`;
+    if(INCOME)html+=`<div class="wr"><span class="k">Avg household income <small>(province, NSO SES 2566)</small></span><span class="v">฿${fmt(INCOME.avg_monthly_income)}/mo</span></div>`;
+    html+='</div>';
+  }
+  if(INCOME){
+    const OCC_INC=[['Agriculture','Agriculture'],['Factory workers','FactoryWorkers'],
+      ['Transport','Transport'],['SME owners','SMEOwners'],['Office staff','OfficeStaff']]
+      .map(([lab,kk])=>({lab,v:INCOME[kk]})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
+    if(OCC_INC.length){
+      const mx=OCC_INC[0].v;
+      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Income by occupation <span class="tag meas">measured · NSO SES 2566</span></h2>`
+        +`<div class="occ">`+OCC_INC.map(r=>
+          `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div></div>`
+        ).join('')+`</div>`
+        +`<div class="foot">NSO Socio-Economic Survey 2566 (2023) average monthly income by occupation — province-level, measured.</div>`;
+    }
+  }
+  if(k){
+    const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    if(rows.length){
+      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h2>`
+        +`<div class="occ">`+rows.map(r=>{
+          const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/tot*100);
+          return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+            +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
+        }).join('')+`</div>`
+        +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
+    }
+  }
+  whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
+}
+
+/* ---------- right card: province context ---------- */
+function buildProvincePanels(){
+  document.getElementById('provTitle').textContent=provEn+(provTh?' · '+provTh:'');
+  document.getElementById('provSub').textContent=`${reg} region · ${BR.length} branches · ${DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0} districts`;
+  const f=RY.facts||{}, gov=RY.gov||{};
+  const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};
+  function autoImpacts(){
+    const out=[], v=gov.vehicles||{}, e=gov.employment||{};
+    const tot=v.total||0, inf=e.informal||0, form=e.formal||0, infShare=(inf+form)?Math.round(100*inf/(inf+form)):0;
+    if(infShare>=55) out.push(['Informal-income base',infShare+'% of workers are informal/own-account — variable, underbanked income; the core title-loan borrower.','risk']);
+    if(tot){const ms=Math.round(100*(v.moto||0)/tot); if(ms>=60) out.push(['Motorcycle-heavy collateral',ms+'% of registered vehicles are motorcycles — high volume, weaker loss-given-default; price on speed, watch LTV.','watch']);}
+    if((v.ev||0)>0) out.push(['EV transition',(v.ev).toLocaleString()+' EVs registered and rising — watch ICE auto-parts jobs where factories are auto-supply.','watch']);
+    if((gov.factories||0)>1500) out.push(['Industrial payroll dependence',(gov.factories).toLocaleString()+' factories — incomes track factory demand and export cycles.','risk']);
+    if(!out.length) out.push(['Vehicle-dependent daily life','Households rely on a motorbike or pickup for work — title-loan relevant.','opp']);
+    return out;
+  }
+  const editorial=f.impacts&&f.impacts.length;
+  const impacts=editorial?f.impacts:autoImpacts();
+  document.getElementById('v-impacts').innerHTML=
+    `<p class="lead">What moves local incomes${editorial?'':' (auto-derived from measured DLT/NSO/DIW data; editorial narrative pending)'}:</p>`+
+    impacts.map(([t,d,k])=>`<div class="imp"><span class="dot" style="background:${tagcol[k]}"></span><div><div class="t">${t}<span class="tg" style="color:${tagcol[k]};border:1px solid ${tagcol[k]}">${(k||'').toUpperCase()}</span></div><div class="d">${d}</div></div></div>`).join('');
+
+  // districts table (id v-districts MUST stay non-empty for the QA hooks)
+  const ds=(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.map(x=>x.properties):[]).sort((a,b)=>(b.workingage||0)-(a.workingage||0));
+  document.getElementById('v-districts').innerHTML= ds.length?
+    (`<p class="lead">Working-age, branches and measured DIW factory workers per district.</p>`+
+    `<table><tr><th>District</th><th>Br</th><th>Working-age</th><th>DIW workers</th></tr>`+
+    ds.map(p=>`<tr><td class="n">${p.district}</td><td class="mono">${p.branches||0}</td><td class="mono">${(p.workingage||0).toLocaleString()}</td><td class="mono">${(p.real_workers||0).toLocaleString()}</td></tr>`).join('')+`</table>`)
+    : `<p class="lead">No district breakdown available for this province.</p>`;
+
+  // nearest table
+  document.getElementById('v-near').innerHTML=
+    `<p class="lead">For each branch: distance to nearest factory and market (measured).</p>`+
+    `<table><tr><th>Branch</th><th>Fac km</th><th>Mkt km</th></tr>`+
+    BR.map(d=>`<tr><td class="n">${d.n||'—'}</td><td class="mono">${d.nfac!=null?d.nfac:'–'}</td><td class="mono">${d.nmkt!=null?d.nmkt:'–'}</td></tr>`).join('')+`</table>`;
+
+  // competitors
+  const byBrand={};COMP.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
+  document.getElementById('v-comp').innerHTML= COMP.length?
+    (`<p class="lead">Competitor branches (live pull).</p>`+
+    `<table><tr><th>Brand</th><th>Branch</th></tr>`+COMP.map(c=>`<tr><td style="color:rgb(${(BRAND[c.brand]||[200,200,200]).join(',')})">${c.brand}</td><td>${(c.name||'').replace(/^[^ ]+ /,'')}</td></tr>`).join('')+`</table>`)
+    : `<p class="lead">Competitor locations not yet pulled for this province — Rayong has a live set; others pending a Google Places pull. The map and panels still show your branches, POIs and 10km reach.</p>`;
+}
+
+/* strip KPI chips (id kpis MUST stay non-empty for the QA hooks) */
+function buildStrip(){
+  const gov=RY.gov||{}, emp=gov.employment||{}, veh=gov.vehicles||{};
+  const items=[['Branches',BR.length,'#E6B450'],
+    ['Districts',(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0),'#5B7CFA'],
+    ['Factories',(gov.factories!=null?gov.factories:(POIS.industrial?POIS.industrial.length:0)),'#7b8aa6'],
+    (veh.total?['Vehicles',Math.round(veh.total/1000)+'k','#1FA38C']:null),
+    (emp.informal?['Informal',Math.round(emp.informal/1000)+'k','#E0902F']:null),
+    ['Vehicle shops',(POIS.vehicle_commerce||[]).length,'#1FA38C'],
+    ['Gold dealers',(POIS.gold||[]).length,'#E6B450']].filter(Boolean);
+  // NOTE: chip text comes BEFORE the swatch so the QA hook's crude inner-text grab (id="kpis"> .. </) sees content
+  // This page IS the extruded-relief DISTRICT view. The fancy Overture 3D BUILDING scene for the same
+  // province is one tap away (rayong-catchment.html?city=<slug>); it degrades gracefully to a "not
+  // pulled yet" notice (linking back here) until this province's buildings have been pulled.
+  var themeQS=(document.documentElement.dataset.theme==='light'?'&theme=light':'');
+  var bldgLink=`<a class="bchip" href="rayong-catchment.html?city=${encodeURIComponent(SLUG)}${themeQS}" `+
+    `title="Open the 3D Overture building scene for ${provEn||SLUG}" `+
+    `style="text-decoration:none;color:#D7DEEC;border-color:var(--blue,#5B7CFA)">🏙 3D buildings →</a>`;
+  document.getElementById('kpis').innerHTML=bldgLink+
+    items.map(([n,v,c])=>`<span class="bchip">${n}<b>${typeof v==='number'?v.toLocaleString():v}</b><span class="d" style="background:${c};margin:0 0 0 5px"></span></span>`).join('');
+  document.getElementById('stripTtl').innerHTML=`${provEn} <b>·</b> district view <b>·</b> branches · POIs · 10km reach`;
+}
+
+/* ---------- branch selection ---------- */
+function selectBranch(b,fly){
+  if(!b)return; focal=b;
+  if(fly){flyTo({longitude:b.x,latitude:b.y,zoom:12.0,pitch:50,bearing:8,transitionDuration:850});}
+  updatePanels();render();
+  const br=document.getElementById('cscBranch'); const fi=BR.indexOf(b); if(br&&fi>=0)br.value=String(fi);
+  if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
+}
+
+/* ---------- Region > Province > Branch cascade (nationwide index; selecting a province navigates) ---------- */
+function buildCascade(){
+  const reg=document.getElementById('cscRegion'), prov=document.getElementById('cscProv'), br=document.getElementById('cscBranch');
+  if(!reg||!prov||!br)return;
+  const myReg=RY.region||(IDX?(IDX.find(p=>p.slug===SLUG)||{}).region:null)||'East';
+  const regions=IDX?[...new Set(IDX.map(p=>p.region))]:[myReg];
+  const order=['Central&BKK','East','North','Isan','South'];
+  regions.sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+  reg.innerHTML=regions.map(r=>`<option value="${r}">${r}</option>`).join('');
+  reg.value=myReg;
+  function fillProv(){
+    const r=reg.value;
+    const list=IDX?IDX.filter(p=>p.region===r):[{slug:SLUG,en:provEn,th:provTh,branches:BR.length}];
+    list.sort((a,b)=>(b.branches||0)-(a.branches||0));
+    prov.innerHTML=list.map(p=>`<option value="${p.slug}">${p.en||p.th} (${p.branches||0})</option>`).join('');
+    if(list.some(p=>p.slug===SLUG))prov.value=SLUG;
+  }
+  function fillBranch(){
+    br.disabled=!BR.length;
+    if(!BR.length){br.innerHTML='<option>— no branches —</option>';return;}
+    br.innerHTML=BR.map((b,i)=>`<option value="${i}">${b.n||('Branch '+(i+1))}${b.d?' · '+b.d:''}</option>`).join('');
+    const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
+  }
+  reg.onchange=()=>{fillProv();};
+  // selecting a different province navigates (?p=slug); same province re-fills branches
+  prov.onchange=()=>{const s=prov.value; if(s&&s!==SLUG){location.search='?p='+s;}};
+  br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
+  fillProv();fillBranch();
+  const note=document.getElementById('cscNote');
+  if(note)note.textContent='Pick a province to jump there; pick a branch to focus its 10km reach. Every province has a 3D building scene — use 🏙 3D buildings above, or 3D map in the nav.';
+}
+
+/* ---------- relief / building colour-height legend ---------- */
+// Honest about WHAT the height encodes. Default deep-dive: each amphoe is raised + tinted by its
+// MEASURED working-age population (the title-loan base), indigo -> blue -> warm. When real building
+// tiles are streamed in (STREAMB) the scene instead shows the warm sand->amber->gold massing ramp.
+// The CSS bar gradient is set inline to match whichever ramp is live so the legend never lies.
+function buildBldgLegend(){
+  const host=document.getElementById('bldglegend'); if(!host)return;
+  const streamed=!!(window.TILECFG&&TILECFG.buildings&&TILECFG.buildings.mvtUrl&&deck.MVTLayer);
+  const light=(typeof lightMode==='function')?lightMode():false;
+  let ttl,lo,hi,grad;
+  if(streamed){ ttl='Buildings'; lo='low'; hi='tall';
+    grad=light?'linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))'
+              :'linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))';
+  }else{ ttl='Districts'; lo='fewer'; hi='more working-age';
+    grad=light?'linear-gradient(90deg,rgb(176,188,210),rgb(120,150,206),rgb(210,190,150))'
+              :'linear-gradient(90deg,rgb(44,58,92),rgb(72,104,196),rgb(180,168,128))'; }
+  host.innerHTML='<span class="bl-ttl">'+ttl+'</span>'+
+    '<span class="bl-ramp"><span class="bl-cap">'+lo+'</span>'+
+    '<span class="bl-bar" style="background:'+grad+'" title="taller relief = '+(streamed?'taller building':'more working-age population')+'"></span>'+
+    '<span class="bl-cap">'+hi+'</span></span>';
+}
+
+/* ---------- POI legend ---------- */
+function buildLegend(){
+  const host=document.getElementById('legend'); if(!host)return;
+  if(!POI_TYPES.length){host.innerHTML='<span class="lgttl" style="margin:0">No mapped POI layers for this province</span>';return;}
+  host.innerHTML=POI_TYPES.map(t=>{
+    const c=POI_COLORS[t], n=(POIS[t]||[]).length;
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+      <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
+  }).join('');
+  host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
+}
+
+/* controls */
+document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+// Orbit toggle: master on/off. Turning it ON clears any "paused by user" state so the scene resumes
+// breathing; turning it OFF parks the camera where it sits.
+(function(){var ot=document.getElementById('orbittog');if(!ot)return;
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
+// Mobile bottom-sheet toggles: Branch reach (#left) / Province (#right) / Layers (#ctl). Opening any
+// one closes the other two so a single overlay shows at a time and the map stays usable full-screen.
+(function(){
+  const ids=['left','right','ctl'];
+  document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+    const s=b.dataset.s, el=document.getElementById(s);
+    const willShow=el?!el.classList.contains('show'):false;
+    ids.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('show',id===s?willShow:false);});
+  });
+})();
+document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+document.querySelectorAll('.stb').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.stb').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));});
+// collapsible POI legend rail — tap the header to fold it away so it never occludes the scene
+(function(){const wrap=document.getElementById('legendwrap'),head=document.getElementById('lghead');
+  if(!wrap||!head)return;
+  function toggle(){const c=wrap.classList.toggle('collapsed');head.setAttribute('aria-expanded',String(!c));}
+  head.addEventListener('click',toggle);
+  head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+})();
+
+buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels();updatePanels();render();
+
+// ---- MOTION BOOTSTRAP (ported from rayong-catchment): intro fly-in, then gentle auto-orbit -------
+// INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to FRAMED.
+// A FlyToInterpolator (when present) gives a cinematic arced descent; the orbit loop holds until the
+// intro transition completes so the two motions don't overlap. Under software WebGL both are skipped
+// (camera snaps to FRAMED) so the render loop stays cold and the headless harness settles cleanly.
+(function startMotion(){
+  const INTRO_MS=2400;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
+})();
+}catch(e){
+  // never surface a raw technical error — show a calm notice; full detail goes to the console for devs.
+  document.body.insertAdjacentHTML('beforeend',
+    '<div class="notice"><div class="nh">This deep-dive could not be displayed</div>'
+    +'<div class="nd">Something went wrong rendering the 3D scene. Try reloading, or pick another province from the menu.</div></div>');
+  console.error('province init failed:',e);
+}
+};</script>
+<script>
+(function(){
+ var slug=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
+ var box=document.createElement('div');box.className='notice';
+ box.innerHTML='<div class="sp"></div><div class="nd">Loading province deep-dive…</div>';
+ document.body.appendChild(box);
+ // killLoader: remove the loading spinner idempotently. Called the instant data resolves (before
+ // init runs) AND from every fallback path, so the crescent can NEVER stick on screen — even if a
+ // later step throws. Once removed, box is detached and re-removal is a harmless no-op.
+ var loaderDead=false;
+ function killLoader(){ if(loaderDead)return; loaderDead=true; try{box.remove();}catch(e){} }
+ Promise.all([
+   fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
+   fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // operator-hosted Overture building tiles (null/absent => keep the extruded-relief view).
+   fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];
+   document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
+   killLoader();            // spinner gone the moment data is in hand; init draws the scene next
+   window.initProvince();})
+  .catch(function(e){
+    // calm, styled fallback — no raw error text reaches the user; detail goes to the console.
+    // Reuse the box if it's still mounted (data never loaded); otherwise add a fresh notice.
+    var n=loaderDead?document.createElement('div'):box; n.className='notice';
+    n.innerHTML='<div class="nh">Province data unavailable</div>'
+      +'<div class="nd">We couldn’t load the deep-dive for this province. Please check the link or pick another province from the menu.</div>';
+    if(loaderDead)document.body.appendChild(n); else loaderDead=true;
+    console.error('province load failed ('+slug+'):',e);
+  });
+})();
+</script>
+</body>
+</html>

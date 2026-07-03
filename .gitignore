@@ -1,0 +1,59 @@
+node_modules/
+.vercel/
+
+# local secrets — NEVER commit real keys (use .env.example as the template)
+.env
+*.env
+!.env.example
+__pycache__/
+*.pyc
+.DS_Store
+.cache/
+
+# enrichment-loop build artifacts (regenerate with pipeline/autox_enrich_loop.py)
+pipeline/cache/
+pipeline/iteration_log.json
+pipeline/autox-branch-features.csv
+pipeline/deck_payload.json
+
+# desktop autopilot session log (pipeline/desktop_autopilot.ps1) — local-only, delete any time
+pipeline/autopilot_log.txt
+
+# raw gov-data pull — re-pullable INPUT CSVs (autox_dgt_ingest.py), never served.
+# distilled layers live in source-data/; keep the bulk out of the tree.
+pipeline/dgt_out/
+
+# tiled, resumable national Overture pull — per-tile geojsonseq cache + resume manifest
+# (pull_overture_national.py). Re-pullable raw INPUT; never commit synthetic geo or the cache.
+source-data/.overture_tiles/
+# merged national Overture PLACES layer (~54MB, pull_overture_places.py). Re-pullable raw INPUT;
+# the DERIVED, small outputs (branch_occupations.json / amphoe_occupations.json) ARE committed and
+# the gate skips the byte-check when this input is absent (CI never has it). Keep it local.
+source-data/overture_places.json
+# named-places bulk pull (pull_places_strip.py strips, merged) — raw INPUT for occupation_leads.json
+# (the small DERIVED output IS committed). Re-pullable; keep local.
+source-data/occupation_places_named.json
+
+# QA render temp (headless screenshots)
+platform/_qa_vendor/
+platform/_qa_*.html
+
+# test harness caches/work — regenerate with tests/run.sh (npm-installed deps + fresh renders).
+# tests/baseline/*.png IS committed (visual-regression reference); everything else here is not.
+tests/.cache/
+tests/.work/
+tests/node_modules/
+
+# loan-tape synthetic scaffold — large + deterministically regenerable (pipeline/make_synthetic_tape.py)
+source-data/loan_tape_synthetic.json
+source-data/branch_aum_monthly_synthetic.json
+
+# national building vector-tile artifacts (pipeline/build_building_tiles.py) — large, CDN-hosted,
+# NEVER committed. Re-pullable real Overture data; coverage plan + .pmtiles/tiles live here.
+pipeline/tiles_out/
+
+# secrets — never commit (any .env or .env.txt anywhere)
+.env
+.env.txt
+**/.env
+**/.env.txt

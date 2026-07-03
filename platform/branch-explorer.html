@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Branch 3D Explorer — AutoX · เงินไชโย</title>
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
+<style>
+:root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink);color:var(--txt)}
+#map{position:fixed;inset:0;top:44px;background:transparent;z-index:1}
+
+/* ---- CINEMATIC DEPTH (ported from rayong-catchment) — visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient BEHIND the deck.gl canvas (z below #map) so the extruded OSM
+          buildings read against an atmosphere instead of flat ink. Indigo-console tuned.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the branch and fades the corners — the classic cinematic "look here" vignette.
+   Both are pinned to the map region (below the nav + branch bar) so they don't tint the chrome. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(135% 100% at 50% 2%,#26314f 0%,#1a2237 30%,#10152a 58%,#080b14 100%),
+            linear-gradient(180deg,#0a0f1e 0%,#121a30 40%,#23304e 70%,#33405e 92%,#3a4868 100%);
+ background-blend-mode:screen,normal}
+/* #atmos : horizon haze/fog band so the extruded OSM skyline melts into the distance — premium depth fog. */
+#atmos{position:fixed;inset:0;top:82px;z-index:6;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,0) 52%,rgba(60,74,108,.10) 74%,rgba(96,112,150,.20) 90%,rgba(120,136,176,.30) 100%)}
+#vignette{position:fixed;inset:0;top:82px;z-index:7;pointer-events:none;
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 46%,rgba(6,9,16,.22) 72%,rgba(4,6,12,.46) 90%,rgba(2,3,8,.66) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
+            linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
+ background-blend-mode:multiply,normal}
+html[data-theme="light"] #atmos{
+ background:linear-gradient(180deg,rgba(0,0,0,0) 54%,rgba(190,206,232,.14) 78%,rgba(206,220,240,.26) 100%)}
+html[data-theme="light"] #vignette{
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 54%,rgba(40,52,80,.07) 80%,rgba(30,40,66,.16) 92%,rgba(24,34,58,.24) 100%)}
+#bar{position:fixed;top:0;left:0;right:0;height:44px;z-index:50;display:flex;align-items:center;gap:12px;
+ padding:0 14px;background:rgba(8,11,18,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+#bar a{color:var(--mid);text-decoration:none;font:600 13px 'IBM Plex Sans Thai'}
+#bar a:hover{color:var(--hi)}
+#bar .nm{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+#bar .sub{font:500 12px 'IBM Plex Sans Thai';color:var(--dim)}
+#panel{position:fixed;top:56px;left:12px;width:268px;max-height:calc(100vh - 72px);overflow:auto;z-index:40;
+ background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:14px;backdrop-filter:blur(8px);
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
+/* close (✕) button for the slide-out info panel — only shown on phone; fixed to the panel's
+   top-right corner (panel content is re-rendered via innerHTML, so this lives as a sibling). */
+.pxbtn{position:fixed;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none;z-index:41}
+#panel h3{font:700 12px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px}
+#panel h3:first-child{margin-top:0}
+.pr{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;color:var(--txt)}
+.pr span{flex:1}.pr b{font-family:'IBM Plex Mono';min-width:30px;text-align:right}
+.bar{display:inline-block;width:54px;height:6px;border-radius:3px;background:#1a2336;overflow:hidden}
+.bar i{display:block;height:100%}
+.note{font-size:10.5px;color:var(--dim);line-height:1.5;margin-top:10px}
+#status{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:7px;
+ background:rgba(14,19,31,.95);border:1px solid var(--line);border-radius:20px;padding:8px 15px;font:500 12px 'IBM Plex Sans Thai';color:var(--mid);
+ backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4);max-width:min(92vw,520px)}
+#status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mid);flex:none}
+/* calm "info" state for graceful degradation (e.g. building footprints unavailable) — amber, never red/raw */
+#status.info{color:var(--gold);border-color:rgba(224,169,59,.4)}
+#status.info::before{background:var(--gold)}
+#status.err{color:#E0474B;border-color:#5b2330}
+#status.err::before{background:#E0474B}
+
+/* docked control frame: ONE designed panel, top-right, grouping basemap + actions into labelled clusters */
+.ctl{position:fixed;top:94px;right:12px;z-index:40;display:flex;flex-direction:column;gap:9px;
+ background:rgba(14,19,31,.94);border:1px solid var(--line);border-radius:12px;padding:11px;
+ backdrop-filter:blur(8px);box-shadow:0 8px 26px rgba(0,0,0,.42);min-width:158px;
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.ctl .grp{display:flex;flex-direction:column;gap:5px}
+.ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+/* segmented basemap control: 3 tabs in one pill */
+.ctl .seg{display:flex;background:#0a1018;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px}
+.ctl .seg button{flex:1;background:none;border:none;color:var(--mid);border-radius:7px;
+ padding:6px 4px;font:600 11.5px 'IBM Plex Sans Thai';cursor:pointer;transition:background .15s,color .15s}
+.ctl .seg button.on{background:var(--accent);color:#fff}
+/* action pills cluster */
+.ctl .acts{display:flex;flex-direction:column;gap:5px}
+.ctl .acts button{background:#0a1018;border:1px solid var(--line);color:var(--txt);border-radius:8px;
+ padding:7px 10px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer;text-align:left}
+.ctl .acts button.on{border-color:var(--accent);color:#fff}
+.ctl .acts button:active{background:#161d2c}
+/* building colour/height legend — explains the warm sand->amber->gold massing ramp + landmark accent */
+.ctl .bl{display:flex;flex-direction:column;gap:5px}
+.ctl .bl .bl-ramp{display:flex;align-items:center;gap:6px}
+.ctl .bl .bl-bar{flex:1;height:9px;border-radius:5px;border:1px solid rgba(255,255,255,.22);
+ background:linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))}
+.ctl .bl .bl-cap{font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt)}
+.ctl .bl .bl-acc{display:flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt)}
+.ctl .bl .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+/* data-provenance line: which building source is live (Overture catchment vs live-OSM Overpass) */
+.ctl .bl .bl-src{font:500 9px 'IBM Plex Mono';color:var(--dim);letter-spacing:.2px}
+html[data-theme="light"] .ctl .bl .bl-src{color:#828CA0}
+html[data-theme="light"] .ctl .bl .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
+/* compact POI legend: lender-relevant categories, colour swatch + label + live count; collateral &
+   finance grouped at the top. Scrolls if many types are present so it never overgrows the panel. */
+.ctl .poileg{display:flex;flex-direction:column;gap:2px;max-height:188px;overflow-y:auto;scrollbar-width:thin}
+.ctl .poileg .pl-grp{font:700 8.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:4px 0 1px}
+.ctl .poileg .pl-grp:first-child{margin-top:0}
+.ctl .poileg .pl{display:flex;align-items:center;gap:6px;font:600 10.5px 'IBM Plex Sans Thai';color:var(--txt);padding:1px 0}
+.ctl .poileg .pl .sw{width:9px;height:9px;border-radius:2px;flex:none;border:1px solid rgba(255,255,255,.22)}
+.ctl .poileg .pl .lab{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl .poileg .pl b{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--hi)}
+.ctl .poileg .pl.off{opacity:.4}
+.ctl .poileg .pl-empty{font:500 10px 'IBM Plex Sans Thai';color:var(--dim);line-height:1.4}
+html[data-theme="light"] .ctl .poileg .pl{color:#2C3444}
+html[data-theme="light"] .ctl .poileg .pl b{color:#11151F}
+html[data-theme="light"] .ctl .poileg .pl .sw{border-color:rgba(0,0,0,.18)}
+/* mobile bottom-sheet toggles: ☰ Info (the #panel) + Layers (the .ctl frame) */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:55;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(14,19,31,.95);border:1px solid var(--line);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+
+/* TABLET (821–1180px): trim the fixed info panel + control frame so the map well breathes,
+   but keep the full desktop layout (panel + controls both docked, legends visible). */
+@media(min-width:821px) and (max-width:1180px){
+ #panel{width:236px}
+ .ctl{min-width:146px;padding:10px}
+ .ctl .poileg{max-height:150px}
+}
+
+/* PHONE (<820px): map goes full-screen. The info panel slides off the left and the control
+   frame slides down off the bottom; both are reachable via the #mtog bottom-sheet buttons.
+   The building + POI legends live inside .ctl, so they ride along when Layers is opened —
+   they are NOT hidden (a regression the old rule introduced). */
+@media(max-width:820px){
+ #panel{left:8px;right:8px;width:auto;max-width:360px;top:90px;max-height:calc(100vh - 180px);
+  transform:translateX(calc(-100% - 20px))}
+ #panel.show{transform:translateX(0)}
+ /* close (✕) sits at the panel's top-right; only visible while the panel is open */
+ .pxbtn.show{display:block;top:96px;right:16px}
+ .ctl{top:auto;bottom:0;right:8px;left:8px;min-width:0;padding:10px;gap:7px;max-height:62vh;overflow-y:auto;
+  transform:translateY(calc(100% + 20px))}
+ .ctl.show{transform:translateY(0)}
+ .ctl .acts button{padding:7px 9px}
+ #mtog{display:flex}
+ /* status pill clears the bottom-sheet buttons */
+ #status{bottom:64px}
+}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:#E0A93B;margin:0 1px}
+#nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
+ padding:6px 11px;border-radius:7px;white-space:nowrap}
+#nav a.on{color:#fff;background:#1a2336}
+#nav a:active{background:#161d2c}
+/* "More ▾" dropdown (matches styles.css .nav-more) */
+.nav-more{position:relative;flex:none}
+.nav-more-btn{color:#8a94a8;background:none;border:none;cursor:pointer;
+  font:500 12.5px 'IBM Plex Sans Thai',sans-serif;padding:6px 11px;border-radius:7px;white-space:nowrap;
+  transition:color .15s,background .15s}
+.nav-more-btn:hover{color:#e6ecf5;background:rgba(255,255,255,.045)}
+#nav .nav-more-btn.on{color:#fff;background:#1a2336}
+.nav-more-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:160px;display:none;
+  flex-direction:column;gap:2px;padding:6px;z-index:2100;
+  background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid #1d2738;border-radius:10px;box-shadow:0 14px 38px rgba(0,0,0,.55)}
+.nav-more.open .nav-more-menu{display:flex}
+.nav-more-menu a{display:block;flex:none}
+html[data-theme="light"] .nav-more-btn{color:#5A6477}
+html[data-theme="light"] .nav-more-btn:hover{color:#11151F;background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 14px 38px rgba(16,22,40,.18)}
+#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid #1d2738;color:#8a94a8;
+ border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px}
+/* branch-info strip drops below the nav */
+#bar{top:44px;height:38px}
+#map{top:82px}
+#panel{top:94px;max-height:calc(100vh - 110px)}
+.ctl{top:94px}
+
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
+.dtt b{color:#fff}
+/* grouped within-10km establishments + occupation proxy (mirrors rayong-catchment) */
+.kgrp{margin:0 0 8px}
+.kgrp .gh{font:700 10.5px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 3px}
+.krow{display:flex;align-items:center;gap:7px;font-size:12px;padding:2px 0;color:var(--txt)}
+.krow .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.krow .lab{flex:1}
+.krow b{font-family:'IBM Plex Mono';font-size:12px}
+.tag{display:inline-block;font:600 9px 'IBM Plex Mono';padding:1px 5px;border-radius:4px;vertical-align:middle;letter-spacing:.3px}
+.tag.meas{background:rgba(28,140,125,.16);color:#46c8b2;border:1px solid rgba(28,140,125,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+.wbox{background:rgba(91,124,250,.07);border:1px solid rgba(91,124,250,.22);border-radius:9px;padding:9px 10px;margin:4px 0 8px}
+.wbox .big{font:800 26px 'IBM Plex Mono';color:var(--hi);line-height:1}
+.wbox .cap{font-size:10.5px;color:var(--mid);line-height:1.4;margin:3px 0 7px}
+.wbox .wr{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0;color:var(--txt)}
+.wbox .wr .v{font-family:'IBM Plex Mono'}
+.occ{margin:2px 0 0}
+.or{margin:0 0 5px}
+.ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt)}
+.ot b{font-family:'IBM Plex Mono';color:var(--hi)}
+.occ .bar{display:block;width:100%;height:5px;border-radius:3px;background:#1a2336;overflow:hidden;margin-top:2px}
+.occ .bar i{display:block;height:100%}
+html[data-theme="light"] .kgrp .gh{color:#5A6477}
+html[data-theme="light"] .krow{color:#2C3444}
+html[data-theme="light"] .wbox{background:rgba(91,124,250,.06);border-color:rgba(91,124,250,.25)}
+html[data-theme="light"] .wbox .big{color:#11151F}
+html[data-theme="light"] .wbox .cap{color:#5A6477}
+html[data-theme="light"] .ot{color:#2C3444}
+html[data-theme="light"] .ot b{color:#11151F}
+html[data-theme="light"] .occ .bar{background:#e3e8f1}
+/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
+html[data-theme="light"] #nav .nb{color:#11151F}
+html[data-theme="light"] #nav a{color:#5A6477}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] #nav a:active{background:#e2e8f4}
+html[data-theme="light"] #themeToggle{border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] #bar{background:rgba(255,255,255,.92);border-bottom-color:#D3DAE6}
+html[data-theme="light"] #bar a{color:#5A6477}
+html[data-theme="light"] #bar a:hover{color:#11151F}
+html[data-theme="light"] #bar .nm{color:#11151F}
+html[data-theme="light"] #panel{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] #panel h3{color:#5A6477}
+html[data-theme="light"]{--agri:#C0392F;--merch:#0E7C68;--hi:#0F1420}   /* AA on the light panel */
+html[data-theme="light"] .pr{color:#2C3444}
+html[data-theme="light"] .bar{background:#e3e8f1}
+html[data-theme="light"] .note{color:#828CA0}
+html[data-theme="light"] #status{background:#fff;border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] #status::before{background:#828CA0}
+html[data-theme="light"] #status.info{color:#B8862B;border-color:rgba(184,134,43,.4)}
+html[data-theme="light"] #status.info::before{background:#B8862B}
+html[data-theme="light"] .ctl{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] .ctl .glab{color:#828CA0}
+html[data-theme="light"] .ctl .seg{background:#F1F5FB;border-color:#D3DAE6}
+html[data-theme="light"] .ctl .seg button{color:#5A6477}
+html[data-theme="light"] .ctl .seg button.on{background:var(--accent);color:#fff}
+html[data-theme="light"] .ctl .acts button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#11151F}
+</style>
+</head>
+<body>
+<nav id="nav" aria-label="Main views">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a href="index.html#home">Home</a>
+  <a href="index.html#overview">Overview</a>
+  <a href="index.html#map" class="on">National</a>
+  <a href="index.html#acq">Acquire</a>
+  <a href="index.html#exposure">Exposure</a>
+  <a href="index.html#trend">Trend</a>
+  <a href="index.html#provinces">3D map</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="index.html#provinces" role="menuitem">Provinces</a>
+      <a href="index.html#market" role="menuitem">Market</a>
+      <a href="index.html#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>
+</nav>
+<script>/* "More ▾" nav dropdown — pure UI (copied from index.html) */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
+</script>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
+<div id="bar">
+  <a href="index.html#map">← National</a>
+  <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span>
+</div>
+<div id="sky"></div>
+<div id="map"></div>
+<div id="atmos"></div>
+<div id="vignette"></div>
+<div class="ctl">
+  <div class="grp">
+    <div class="glab">Basemap</div>
+    <div class="seg">
+      <button id="b-light" class="base on">Light</button>
+      <button id="b-voyager" class="base">Streets</button>
+      <button id="b-dark" class="base">Dark</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Layers</div>
+    <div class="acts">
+      <button id="t-ring" class="on">3 / 5 / 10 km rings</button>
+      <button id="t-orbit" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="t-reload">↻ Reload buildings</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Buildings</div>
+    <div class="bl">
+      <div class="bl-ramp"><span class="bl-cap">low</span><span class="bl-bar" title="building height: low → tall"></span><span class="bl-cap">tall</span></div>
+      <div class="bl-acc"><span class="sw" style="background:rgb(91,124,250)"></span>landmark (tallest)</div>
+      <div class="bl-src" id="bsrc" title="Where the extruded footprints come from">buildings: —</div>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">POIs · ≤10km (live OSM)</div>
+    <div class="poileg" id="poileg"><div class="pl-empty">POIs load when buildings load…</div></div>
+  </div>
+</div>
+<div id="panel"></div>
+<button class="pxbtn" id="panelClose" title="Close" aria-label="Close info panel">✕</button>
+<div id="mtog">
+  <button data-s="panel">☰ Info</button>
+  <button data-s="ctl">Layers</button>
+</div>
+<div id="status">Loading…</div>
+<script>
+'use strict';
+const Q = new URLSearchParams(location.search);
+const LAT = parseFloat(Q.get('lat')), LNG = parseFloat(Q.get('lng'));
+const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
+// Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
+const TILE_SRC={light:'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+                voyager:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                dark:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'};
+let basemap='dark';  // dark default: gold buildings pop on black; no white basemap to wash into
+function lightMode(){return basemap==='light';}
+const MIRRORS = ['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+let showRing = true, branchRec = null, buildings = [];
+let provRec = null;     // matched province row (informal/formal), if derivable
+const tileCache = {};   // bbox-keyed building cache so panning doesn't refetch
+const poiTileCache = {};// bbox-keyed POI cache
+let pois = [];          // live OSM POIs in view, {x,y,t} — empty when Overpass blocked
+
+/* ---- shared palette / groupings (lender-relevant; superset of rayong-catchment) ----
+   Ordered by relevance to a TITLE-LOAN lender: collateral-supply + finance signals first
+   (vehicle/gold/pawn/fuel/banks), then demand signals (markets, retail, agri supply), then
+   the surrounding economy (industry, services, civic). Each type gets a DISTINCT colour so the
+   3D columns + the legend are decodable; counts are capped per type so a dense 10km ring stays sane. */
+const POI_COLORS={
+  // --- collateral supply + finance (the title-loan core) ---
+  vehicle_commerce:[28,140,125], vehicle_repair:[60,170,150], fuel:[20,110,98],
+  gold:[230,180,80], pawn:[224,140,40], bank:[91,124,250],
+  // --- demand signals: where cash-cycle borrowers transact ---
+  fresh_market:[224,144,47], supermarket:[224,170,90], convenience:[208,118,60],
+  agri_supply:[176,150,60], hardware:[150,128,70],
+  // --- surrounding economy / services ---
+  industrial:[123,138,166], restaurant:[133,144,166], hotel:[214,90,160],
+  school:[122,79,224], health:[200,67,59], pharmacy:[200,100,90]};
+const POI_LABEL={vehicle_commerce:'Vehicle dealer',vehicle_repair:'Auto / moto repair',fuel:'Fuel station',
+  gold:'Gold dealer',pawn:'Pawnshop',bank:'Bank / ATM',
+  fresh_market:'Fresh market',supermarket:'Supermarket',convenience:'Convenience',
+  agri_supply:'Agri supply',hardware:'Hardware',
+  industrial:'Industrial',restaurant:'Restaurant',hotel:'Hotel',
+  school:'School',health:'Hospital / clinic',pharmacy:'Pharmacy'};
+// relevance ordering for the on-screen POI legend (collateral & finance grouped first)
+const POI_LEGEND_ORDER=['vehicle_commerce','vehicle_repair','fuel','gold','pawn','bank',
+  'fresh_market','supermarket','convenience','agri_supply','hardware',
+  'industrial','restaurant','hotel','school','health','pharmacy'];
+// k10 key -> POI palette key (for swatch colour parity with the live markers)
+const K10_COL={veh:'vehicle_commerce',gold:'gold',bank:'bank',atm:'bank',fmkt:'fresh_market',
+  super:'supermarket',cvs:'convenience',rest:'restaurant',ind:'industrial',hotel:'hotel',
+  sch:'school',pharm:'pharmacy',civic:'school'};
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM).
+const K10_GROUPS=[
+  ['Collateral & finance',[['veh','Auto / vehicle shops'],['gold','Gold dealers'],[['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[['fmkt','Fresh markets'],['super','Supermarkets'],['cvs','Convenience'],['rest','Restaurants']]],
+  ['Industry & services',[['ind','Factories'],['hotel','Hotels'],['sch','Schools'],['pharm','Pharmacies']]],
+];
+// establishment-mix -> occupation proxy (ESTIMATED), same mapping as rayong-catchment
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
+// MEASURED occupation mix (Overture Places) — lazy-loaded, optional. branch_occupations.json
+// is INDEX-ALIGNED to branches.json; built by pipeline/build_occupations.py once
+// pull_overture_places.py has been run. Absent = panel falls back to the OSM estimate below.
+let OCCDATA=null, occDataTried=false;
+async function loadOccupations(){
+  if(occDataTried) return OCCDATA;
+  occDataTried=true;
+  try{ const r=await fetch('data/branch_occupations.json'); if(r.ok) OCCDATA=await r.json(); }
+  catch(e){ OCCDATA=null; }
+  return OCCDATA;
+}
+// operator-hosted Overture building tiles (platform/data/tiles_config.json). When configured, the
+// per-branch scene streams REAL footprints across the whole 10km catchment instead of the live
+// Overpass pull alone. Null/absent => unchanged behaviour (Overpass buildings). NO fabricated data.
+let TILECFG=null, tileCfgTried=false;
+async function loadTilesConfig(){
+  if(tileCfgTried) return TILECFG;
+  tileCfgTried=true;
+  try{ const r=await fetch('data/tiles_config.json'); if(r.ok) TILECFG=await r.json(); }
+  catch(e){ TILECFG=null; }
+  return TILECFG;
+}
+// ---- PREFERRED building source: the province's Overture catchment (MEASURED footprints) ---------
+// The 77 per-province <slug>_catchment.json pulls (real Overture buildings, baked h/fa/cx/cy) beat
+// the live Overpass pull: no network flakiness, whole-perimeter coverage, measured heights. Flow:
+//   1. resolve the branch's province by point-in-bbox over data/province_bbox.json
+//      (province bboxes OVERLAP — the smallest-area hit wins);
+//   2. fetch data/<slug>_catchment.json locally, else <catchments.baseUrl>/<slug>_catchment.json
+//      (operator R2 CDN — same local→CDN pattern as rayong-catchment.html);
+//   3. filter its buildings to the 10km bbox around the BRANCH (cx/cy centroids) and hand them to
+//      the SAME PolygonLayer the Overpass path feeds ({p,h,fa} is a superset match).
+// The catchment is fetched ONCE per page (catchPromise) so panning never refetches; <50 buildings
+// in the perimeter, or ANY failure, falls back to the live-Overpass path below UNCHANGED. Nothing
+// is fabricated — a miss degrades to the existing behaviour.
+let catchPerim=null;     // filtered perimeter buildings; false after a definitive miss
+let catchPromise=null;   // in-flight resolve+fetch+filter, shared by concurrent callers
+let catchProv=null;      // resolved province slug (for the status line)
+function setBldgSource(s){ // 'catchment' | 'osm' | '' -> the provenance line in the Buildings legend
+  const el=document.getElementById('bsrc'); if(!el)return;
+  el.textContent=s==='catchment'?'buildings: Overture catchment (measured)'
+    :s==='osm'?'buildings: OSM live (Overpass)':'buildings: —';
+}
+async function resolveProvinceSlug(){
+  try{
+    const r=await fetch('data/province_bbox.json'); if(!r.ok)return null;
+    const j=await r.json(); const provs=(j&&j.provinces)||{};
+    let best=null,bestA=Infinity;
+    for(const slug in provs){
+      const bb=provs[slug]&&provs[slug].bbox; if(!bb||bb.length!==4)continue;
+      const S=bb[0],W=bb[1],N=bb[2],E=bb[3];             // [S,W,N,E]
+      if(LAT<S||LAT>N||LNG<W||LNG>E)continue;
+      const a=(N-S)*(E-W); if(a<bestA){bestA=a;best=slug;}  // overlapping boxes: smallest wins
+    }
+    return best;
+  }catch(e){ return null; }
+}
+async function fetchCatchment(slug){
+  try{ const r=await fetch('data/'+slug+'_catchment.json'); if(r.ok)return await r.json(); }catch(e){}
+  try{
+    const cfg=await loadTilesConfig();
+    let base=cfg&&cfg.catchments&&cfg.catchments.baseUrl; if(!base)return null;
+    base=String(base).replace(/\/+$/,'');
+    const r=await fetch(base+'/'+slug+'_catchment.json'); if(r.ok)return await r.json();
+  }catch(e){}
+  return null;
+}
+function loadCatchmentPerimeter(){
+  if(catchPerim===false)return Promise.resolve(null);   // known miss -> straight to Overpass
+  if(catchPerim)return Promise.resolve(catchPerim);
+  if(!catchPromise)catchPromise=(async()=>{
+    catchProv=await resolveProvinceSlug(); if(!catchProv)return null;
+    const ca=await fetchCatchment(catchProv);
+    if(!ca||!Array.isArray(ca.buildings))return null;
+    const dLat=10/111, dLng=10/(111*Math.cos(LAT*D2R));  // 10km bbox around the branch
+    const S=LAT-dLat,N=LAT+dLat,W=LNG-dLng,E=LNG+dLng;
+    const out=[];
+    for(const b of ca.buildings){ if(b&&b.cy>=S&&b.cy<=N&&b.cx>=W&&b.cx<=E)out.push(b); }
+    return out.length>=50?out:null;                      // too sparse here -> let Overpass try
+  })().then(out=>{ catchPerim=out||false; return out; },
+            ()=>{ catchPerim=false; return null; });
+  return catchPromise;
+}
+// MVTLayer of streamed buildings, styled to match (lighting-capped material -> no white blow-out).
+// Returns null unless an mvtUrl is configured and the bundle has MVTLayer -> graceful fallback.
+function streamBuildingLayer(){
+  try{
+    var cfg=(TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    var url=cfg.mvtUrl||null;            // native {z}/{x}/{y}.pbf path
+    if(!url){                            // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:!lightMode()});
+      return null;
+    }
+    var LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]
+                  :[[44,38,32],[156,108,50],[238,182,86]];
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
+      getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
+      getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
+      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no view-dependent (orbit) white blow-out
+      shadowEnabled:SHADOWS_ON, parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
+// stable colour per occupation bucket key (parity with the platform palette where sensible)
+const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125],food:[230,180,80],
+  hospitality:[230,180,80],finance:[200,67,59],health:[91,124,250],education:[91,124,250],
+  public:[138,148,168],professional:[91,124,250],agriculture:[200,67,59],personal:[28,140,125],
+  logistics:[138,148,168],construction:[230,180,80]};
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+function poiColumnHeight(t){ // visible 3D column heights for the live markers (metres)
+  // lender-relevant collateral/finance types stand tallest so they pop out of the catchment.
+  if(t==='industrial')return 90; if(t==='hotel')return 75;
+  if(/gold|pawn|bank/.test(t))return 68;                       // collateral + finance = hero columns
+  if(/vehicle_commerce|vehicle_repair|fuel/.test(t))return 60; // vehicle collateral signal
+  if(/super|fresh_market|agri_supply/.test(t))return 45;
+  if(t==='health')return 52; return 38; }
+
+const $ = s => document.querySelector(s);
+// status chip: kind = '' (calm/neutral) | 'info' (graceful degradation, amber) | 'err' (hard error, red).
+// Backward-compatible: a truthy 2nd arg still maps to the red 'err' state.
+function status(t, kind){ const s=$('#status'); if(!s)return;
+  const k=(kind===true)?'err':(kind||'');
+  s.textContent=t; s.className=k; s.style.display=t?'flex':'none'; }
+function fmt(n){ return (n||0).toLocaleString(); }
+
+if(isNaN(LAT)||isNaN(LNG)){ status('No branch coordinates in the link.', true); }
+$('#bnm').textContent = NM;
+
+/* ---- geometry helpers ---- */
+const D2R=Math.PI/180;
+function circle(lat,lng,km,steps=64){const pts=[];const dLat=km/111;const dLng=km/(111*Math.cos(lat*D2R));
+  for(let i=0;i<=steps;i++){const a=2*Math.PI*i/steps;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+function ringAreaM2(ring){               // approx footprint area (m²) from a lon/lat ring
+  let a=0; for(let i=0,j=ring.length-1;i<ring.length;j=i++){a+=(ring[j][0]-ring[i][0])*(ring[j][1]+ring[i][1]);}
+  const latm=111320, lngm=111320*Math.cos((LAT||13.5)*D2R);
+  return Math.abs(a/2)*latm*lngm;
+}
+function bldgHeight(tags,fa){            // measured tag if present, else estimate by type + footprint
+  tags=tags||{};
+  if(tags.height){const h=parseFloat(tags.height); if(h>0)return Math.min(h,60);}
+  if(tags['building:levels']){const l=parseFloat(tags['building:levels']); if(l>0)return Math.min(l*3.2,60);}
+  const b=tags.building||'yes', L=Math.log2(Math.max(fa||60,30));
+  if(b==='house')return 6;
+  if(/residential|apartments/.test(b))return Math.max(12,Math.min(45,14+L*2));
+  if(/retail|commercial|shop/.test(b))return 8;
+  if(b==='office')return 24;
+  if(/industrial|warehouse/.test(b))return 11;
+  if(b==='school')return 9;
+  if(b==='hotel')return Math.max(14,Math.min(45,18+L*2));
+  if(b==='roof')return 4;
+  return fa<120?6:fa<400?9:fa<800?11:13;
+}
+// Shared WARM height ramp (matches rayong-catchment / province): street-level sand/taupe -> mid-rise
+// amber/ochre -> tall gold, so the skyline reads as a premium, dimensional cityscape. A sparing COOL
+// accent (blue, purple crown on the very tallest) punctuates the tallest decile only — never the body.
+const RAMP_DARK_BE=[[44,38,32],[156,108,50],[238,182,86]];      // taupe -> ochre -> gold
+const RAMP_LIGHT_BE=[[181,171,155],[150,138,120],[116,102,82]];  // warm mid-tone taupe->umber: clearly darker than the light ground so buildings can't wash to white on a bright GPU (matches rayong-catchment)
+const PURP=[122,79,224], BLUE=[91,124,250];
+function rampBE(stops,t){const seg=t<.5?0:1,lt=t<.5?t*2:(t-.5)*2,a=stops[seg],b=stops[seg+1];
+  return [a[0]+(b[0]-a[0])*lt,a[1]+(b[1]-a[1])*lt,a[2]+(b[2]-a[2])*lt];}
+function heightColor(h){                  // warm ramp + sparing cool landmark accent (dark/voyager base)
+  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+  const t=Math.pow(Math.max(0,Math.min(1,h/40)),0.9);
+  if(t>=0.78){const acc=t>=0.92?PURP:BLUE,g=rampBE(RAMP_DARK_BE,1),w=0.55;
+    return [cl(g[0]*(1-w)+acc[0]*w),cl(g[1]*(1-w)+acc[1]*w),cl(g[2]*(1-w)+acc[2]*w),240];}
+  const m=rampBE(RAMP_DARK_BE,t); return [cl(m[0]),cl(m[1]),cl(m[2]),236];
+}
+// DataProteins light path: warm sand->amber->gold context buildings; the tallest decile lifts toward
+// the cool collateral accent so the few landmarks read against the white Positron base.
+function heightColorLight(h){
+  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+  const t=Math.pow(Math.max(0,Math.min(1,h/40)),0.9);
+  if(t>=0.78){const acc=t>=0.92?PURP:BLUE,g=rampBE(RAMP_LIGHT_BE,1),w=0.5;
+    return [cl(g[0]*(1-w)+acc[0]*w),cl(g[1]*(1-w)+acc[1]*w),cl(g[2]*(1-w)+acc[2]*w),238];}
+  const m=rampBE(RAMP_LIGHT_BE,t); return [cl(m[0]),cl(m[1]),cl(m[2]),214];
+}
+
+/* ---- deck.gl ---- */
+const INITIAL={longitude:LNG||101, latitude:LAT||13.5, zoom:15.2, pitch:58, bearing:-12, maxZoom:19, minZoom:9};
+let deckgl;
+// ---- CINEMATIC LIGHTING (ported from rayong-catchment) -----------------------------------------
+// A real sun that CASTS SHADOWS so the extruded OSM skyline reads as a grounded, dimensional city.
+// deck.gl 8.9.35 enables shadow maps when a DirectionalLight carries _shadow:true and the
+// LightingEffect.shadowColor is set; SolidPolygon/Column layers opt in via shadowEnabled. The sun is
+// angled low (long, readable shadows) and warm; a cool fill keeps shadowed faces from going black.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the bundle lacks shadow support the
+// try/catch leaves LIGHTING usable without shadows, and SHADOWS_ON gates the per-layer flags.
+//
+// SOFTWARE-WEBGL SAFETY: shadow maps are an extra render pass per frame — cheap on a GPU, but under
+// SOFTWARE WebGL (swiftshader/llvmpipe — headless CI, old machines) so slow the scene never settles.
+// So shadows are on by default but AUTO-DISABLED at runtime if onWebGLInitialized detects a software
+// renderer (see init). The warm material + directional shading + sky/vignette still give depth then.
+function buildLighting(withShadow){
+  try{ if(!(deck.LightingEffect && deck.AmbientLight && deck.DirectionalLight))return null;
+    // Intensities clamp-bounded on purpose: ambient + diffuse*(sun+fill) must stay below ~0.9 or light
+    // building colours clamp to pure white on a real GPU (the "white blow-out"). DataProteins depth
+    // comes from a WIDER lit/shade gap, NOT specular. With the building material ambient 0.42 / diffuse 0.40:
+    //   shade floor = 0.42*0.92 = 0.386 ; max lit = 0.386 + 0.40*(0.95+0.28) = 0.878 < 0.9 -> never clamps
+    //   contrast lit/shade = 0.878/0.386 = 2.27x (was 1.83x) -> punchier skyline, still safe.
+    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[235,238,255],intensity:1.0});
+    const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+    if(withShadow){ try{ eff.shadowColor=[10,16,34,0.46]; }catch(e){} }
+    return eff;
+  }catch(e){ return null; }
+}
+// MOBILE: DPR 2-3 framebuffers + shadow-map passes blow the mobile GL memory budget -> blank canvas
+// (seen on iOS). Cap device pixels and drop shadows on phones; desktop keeps full crispness + shadows.
+const IS_MOBILE=(function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform));
+}catch(e){return false;}})();
+// SHADOW PASS OFF EVERYWHERE (2026-07-03): the shadow render pass was the root cause of the
+// persistent real-GPU building whiteout on the catchment scene — and it was auto-disabled under
+// software GL, so headless verification could never see it. Non-shadow lighting is the exact path
+// headless runs, so what gets verified is what every GPU renders.
+let SHADOWS_ON=false;
+let LIGHTING=buildLighting(false);
+
+// ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
+// A CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and re-centre transitions share one
+// source of truth. FRAMED = the cinematic resting view; INTRO = a higher/wider/top-down start eased
+// down on load. Building/POI re-fetches still fire on user view changes (debounced, as before).
+const FRAMED=Object.assign({},INITIAL,{pitch:58,bearing:-12});
+const INTRO=Object.assign({},FRAMED,{zoom:Math.max(11,(FRAMED.zoom||15)-2.4),pitch:36,bearing:18});
+let VIEW=Object.assign({},INTRO);
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0, SOFT_GL=false;  // default OFF
+const ORBIT_DPS=2.5;                 // degrees / second — gentle (~2-3 dps target)
+function setOrbitUI(on){const t=document.getElementById('t-orbit'); if(t)t.classList.toggle('on',on);}
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+let _programmatic=false;
+function pushView(extra){ if(!deckgl)return; _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  Promise.resolve().then(()=>{_programmatic=false;});}
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+function downgradeForSoftwareGL(){
+  SOFT_GL=true; orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  if(SHADOWS_ON){ SHADOWS_ON=false; const ns=buildLighting(false);
+    try{ deckgl.setProps({effects:ns?[ns]:[]}); }catch(e){} }
+  try{ render(); }catch(e){}
+  try{ console.info('[branch-explorer] software WebGL detected — shadows + auto-orbit disabled; depth via material + sky/vignette.'); }catch(e){}
+}
+function baseLayer(){
+  return new deck.TileLayer({id:'base',data:TILE_SRC[basemap]||TILE_SRC.light,minZoom:0,maxZoom:19,tileSize:256,
+    renderSubLayers:p=>{const{west,south,east,north}=p.tile.bbox;
+      return new deck.BitmapLayer(p,{data:null,image:p.data,bounds:[west,south,east,north]});}});
+}
+function layers(){
+  const L=[baseLayer()];
+  const LIGHT=lightMode();
+  // streamed national tiles supersede the live-Overpass buildings when operator-hosted tiles exist.
+  const STREAMB=streamBuildingLayer();
+  if(STREAMB)L.push(STREAMB);
+  if(!STREAMB)L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
+    getPolygon:b=>b.p,getElevation:b=>b.h,
+    getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
+    stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no orbit blow-out
+    parameters:{depthTest:true},transitions:{getElevation:600},
+    shadowEnabled:SHADOWS_ON,pickable:true,
+    updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
+  // live POI markers as 3D columns coloured by type — only when Overpass returned data. On the light
+  // base give each column a darker same-hue rim so the shared palette stays legible on white.
+  if(pois.length && deck.ColumnLayer){
+    L.push(new deck.ColumnLayer({id:'poi',data:pois,diskResolution:6,radius:36,
+      extruded:true,elevationScale:1,
+      getPosition:p=>[p.x,p.y],
+      getElevation:p=>poiColumnHeight(p.t),
+      getFillColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [c[0],c[1],c[2],235];},
+      stroked:LIGHT,getLineColor:p=>{const c=POI_COLORS[p.t]||[138,148,168];return [Math.round(c[0]*.5),Math.round(c[1]*.5),Math.round(c[2]*.5),255];},lineWidthMinPixels:0.6,
+      material:{ambient:0.42,diffuse:0.40,shininess:30,specularColor:[0,0,0]},
+      shadowEnabled:SHADOWS_ON,
+      parameters:{depthTest:true},pickable:true,updateTriggers:{stroked:[LIGHT]}}));
+  }
+  if(showRing && !isNaN(LAT)){
+    L.push(new deck.PolygonLayer({id:'rings',data:[[10,'#5B7CFA'],[5,'#1C8C7D'],[3,'#E6B450']].map(([km,c])=>({km,c,poly:circle(LAT,LNG,km)})),
+      getPolygon:d=>d.poly,extruded:false,stroked:true,filled:false,
+      getLineColor:d=>{const h=d.c;return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16),180];},
+      getLineWidth:18,lineWidthMinPixels:1.2}));
+  }
+  if(!isNaN(LAT)){
+    // focal ground-glow: three concentric soft-fill discs anchor the branch with a grounded gold
+    // halo — gives the scene depth and a clear hero even before buildings load (the graceful
+    // no-Overpass state). Purely visual; flat under the pin & 3D columns, never intercepts picks.
+    [[1.6,LIGHT?22:16],[1.0,LIGHT?30:24],[0.5,LIGHT?40:34]].forEach(([km,a],i)=>{
+      L.push(new deck.PolygonLayer({id:'branch-glow'+i,data:[{lat:LAT,lng:LNG}],
+        getPolygon:d=>circle(d.lat,d.lng,km),extruded:false,stroked:false,filled:true,
+        getFillColor:[224,169,59,a],pickable:false,parameters:{depthTest:false}}));
+    });
+    // gold branch dot — dark outline on the light base so it separates from white; white outline on dark.
+    L.push(new deck.ScatterplotLayer({id:'branch',data:[{x:LNG,y:LAT}],getPosition:d=>[d.x,d.y],
+      getRadius:90,radiusMinPixels:6,radiusMaxPixels:13,getFillColor:[224,169,59,255],
+      stroked:true,getLineColor:LIGHT?[40,28,8,255]:[255,255,255,230],lineWidthMinPixels:2,
+      updateTriggers:{getLineColor:[LIGHT]}}));
+    // pill+icon label (DataProteins look) — white chip with a gold border on the light base.
+    if(deck.TextLayer){
+      const nm=(branchRec&&branchRec.n)||NM||'AutoX';
+      L.push(new deck.TextLayer({id:'branch-label',data:[{x:LNG,y:LAT,n:nm}],getPosition:d=>[d.x,d.y],
+        getText:d=>'◉ '+d.n,getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
+        getBorderColor:[224,169,59,255],getBorderWidth:LIGHT?1.5:0,
+        background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+        getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+        updateTriggers:{getText:[nm],getBorderWidth:[LIGHT]}}));
+    }
+  }
+  return L;
+}
+function render(){ if(deckgl) deckgl.setProps({layers:layers()}); }
+
+/* ---- compact POI legend (collateral & finance first) — counts reflect what's live in view ---- */
+const POI_LEGEND_GROUPS=[
+  ['Collateral & finance',['vehicle_commerce','vehicle_repair','fuel','gold','pawn','bank']],
+  ['Demand signals',['fresh_market','supermarket','convenience','agri_supply','hardware']],
+  ['Economy & services',['industrial','restaurant','hotel','school','health','pharmacy']],
+];
+function buildPoiLegend(){
+  const host=document.getElementById('poileg'); if(!host)return;
+  // tally live POIs by type
+  const cnt={}; for(const p of pois){ cnt[p.t]=(cnt[p.t]||0)+1; }
+  if(!pois.length){ host.innerHTML='<div class="pl-empty">No live OSM POIs in view yet — zoom in / reload, or Overpass is unreachable.</div>'; return; }
+  let html='';
+  for(const [gh,types] of POI_LEGEND_GROUPS){
+    const present=types.filter(t=>cnt[t]>0);
+    if(!present.length)continue;
+    html+=`<div class="pl-grp">${gh}</div>`;
+    html+=present.map(t=>{const c=POI_COLORS[t]||[138,148,168];
+      return `<div class="pl"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${POI_LABEL[t]||t}</span><b>${fmt(cnt[t])}</b></div>`;
+    }).join('');
+  }
+  host.innerHTML=html||'<div class="pl-empty">No mapped POIs in view.</div>';
+}
+
+/* ---- live OSM building fetch ---- */
+function viewBounds(){
+  try{ const vp=new deck.WebMercatorViewport(deckgl.viewManager._viewports[0]||INITIAL); return vp.getBounds(); }
+  catch(e){ const d=0.012; return [LNG-d,LAT-d,LNG+d,LAT+d]; }
+}
+async function overpass(q){
+  for(const ep of MIRRORS){
+    try{
+      const r=await fetch(ep,{method:'POST',body:'data='+encodeURIComponent(q),
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      if(r.ok) return await r.json();
+    }catch(e){/* try next mirror */}
+  }
+  throw new Error('all Overpass mirrors failed');
+}
+async function loadBuildings(){
+  if(isNaN(LAT)) return;
+  // PREFERRED: the province's Overture catchment (measured footprints, local file → operator CDN),
+  // filtered once to the 10km branch perimeter and cached in-page — panning never refetches. Any
+  // miss (no bbox match / no file / <50 buildings here) falls through to live Overpass unchanged.
+  try{
+    const cb=await loadCatchmentPerimeter();
+    if(cb&&cb.length){
+      const fresh=(buildings!==cb);
+      buildings=cb; if(fresh)render();
+      setBldgSource('catchment');
+      status(`${fmt(cb.length)} buildings · Overture catchment (measured)`);
+      clearTimeout(window._statusT); window._statusT=setTimeout(()=>status(''),3200);
+      return;
+    }
+  }catch(e){ /* never let the preferred path break the fallback */ }
+  const b=viewBounds();              // [W,S,E,N]
+  const W=b[0],S=b[1],E=b[2],N=b[3];
+  // guard: only fetch when the box is small enough to be sane (≈ <6km across)
+  if((N-S)>0.08 || (E-W)>0.08){ status('Zoom in to load buildings (area too large)'); return; }
+  const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');     // bbox cache so panning doesn't refetch
+  if(tileCache[ckey]){ buildings=tileCache[ckey]; render(); setBldgSource('osm'); status(`${fmt(buildings.length)} buildings in view`); return; }
+  status('Loading buildings…');
+  const q=`[out:json][timeout:25];(way["building"](${S},${W},${N},${E}););out body geom 7000;`;
+  try{
+    const d=await overpass(q);
+    const out=[];
+    for(const el of (d.elements||[])){
+      if(el.type==='way' && el.geometry && el.geometry.length>2){
+        const ring=el.geometry.map(g=>[g.lon,g.lat]);
+        const fa=ringAreaM2(ring);
+        let h=bldgHeight(el.tags,fa);
+        const seed=Math.abs(Math.sin(ring[0][0]*12.9898+ring[0][1]*78.233))%1;   // deterministic ±8% jitter
+        h=Math.min(60,h*(0.92+0.16*seed));
+        out.push({p:ring,h,fa});
+      }
+    }
+    buildings=out; tileCache[ckey]=out; render();
+    if(out.length){
+      setBldgSource('osm');
+      // success: show the count briefly, then clear so no chip lingers over the scene.
+      status(`${fmt(out.length)} buildings · OSM live · heights estimated from type + footprint`);
+      clearTimeout(window._statusT); window._statusT=setTimeout(()=>status(''),3200);
+    }else{
+      status('No OSM buildings mapped here (rural / factory zone)', 'info');
+    }
+  }catch(e){
+    // GRACEFUL: building footprints couldn't be fetched (Overpass blocked / offline). The rest of the
+    // scene (10km rings, branch pin, POI columns) is still drawn — never a raw error, never a blank page.
+    console.warn('buildings unavailable:', e&&e.message||e);
+    render();
+    status('Building footprints unavailable — showing branch + POI layer', 'info');
+  }
+}
+
+/* ---- live OSM POI fetch (graceful: blocked Overpass -> pois stays []) ---- */
+// classify an OSM element's tags into one of our POI_COLORS keys, else null (skip)
+function poiType(t){
+  if(!t)return null;
+  // --- collateral supply + finance (classified FIRST — these are the title-loan signal) ---
+  if(t.shop==='car'||t.shop==='motorcycle'||t.shop==='truck')return 'vehicle_commerce';
+  if(t.shop==='car_repair'||t.shop==='motorcycle_repair'||t.shop==='tyres'||t.shop==='car_parts')return 'vehicle_repair';
+  if(t.amenity==='fuel')return 'fuel';
+  if(t.shop==='gold'||t.shop==='jewelry'||t.craft==='goldsmith')return 'gold';
+  if(t.shop==='pawnbroker'||t.office==='pawnbroker'||t.amenity==='pawnbroker')return 'pawn';
+  if(t.amenity==='bank'||t.amenity==='atm'||t.office==='financial'||t.amenity==='bureau_de_change')return 'bank';
+  // --- demand signals ---
+  if(t.amenity==='marketplace'||t.shop==='greengrocer'||t.shop==='butcher'||t.shop==='seafood')return 'fresh_market';
+  if(t.shop==='supermarket'||t.shop==='department_store'||t.shop==='mall'||t.shop==='wholesale')return 'supermarket';
+  if(t.shop==='convenience'||t.shop==='kiosk')return 'convenience';
+  if(t.shop==='agrarian'||t.shop==='farm'||t.shop==='garden_centre'||t.craft==='agricultural_engines')return 'agri_supply';
+  if(t.shop==='hardware'||t.shop==='doityourself'||t.shop==='trade'||t.shop==='building_materials'||t.shop==='paint')return 'hardware';
+  // --- surrounding economy / services ---
+  if(t.man_made==='works'||t.building==='industrial'||t.landuse==='industrial'||t.industrial)return 'industrial';
+  if(t.amenity==='restaurant'||t.amenity==='fast_food'||t.amenity==='cafe')return 'restaurant';
+  if(t.tourism==='hotel'||t.tourism==='motel'||t.tourism==='guest_house')return 'hotel';
+  if(t.amenity==='school'||t.amenity==='college'||t.amenity==='university'||t.amenity==='kindergarten')return 'school';
+  if(t.amenity==='hospital'||t.amenity==='clinic'||t.amenity==='doctors')return 'health';
+  if(t.amenity==='pharmacy'||t.shop==='chemist')return 'pharmacy';
+  return null;
+}
+async function loadPOIs(){
+  if(isNaN(LAT)) return;
+  const b=viewBounds(); const W=b[0],S=b[1],E=b[2],N=b[3];
+  if((N-S)>0.08 || (E-W)>0.08){ return; }     // same area guard as buildings
+  const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');
+  if(poiTileCache[ckey]){ pois=poiTileCache[ckey]; render(); return; }
+  // Lender-relevant Overpass union. ^…$-anchored alternation so e.g. "car" doesn't also pull
+  // "caravan"; the classifier (poiType) does the final exact bucketing. Covers collateral supply
+  // (vehicle/gold/pawn/fuel), finance (bank/atm), demand (markets/retail/agri/hardware) and the
+  // surrounding economy (industry/services/civic). Caps at 6000 so a dense 10km ring stays sane.
+  const q=`[out:json][timeout:25];(`
+    +`nwr["shop"~"^(car|motorcycle|truck|car_repair|motorcycle_repair|tyres|car_parts|gold|jewelry|pawnbroker|convenience|kiosk|supermarket|department_store|mall|wholesale|greengrocer|butcher|seafood|agrarian|farm|garden_centre|hardware|doityourself|trade|building_materials|paint|chemist)$"](${S},${W},${N},${E});`
+    +`nwr["amenity"~"^(bank|atm|bureau_de_change|pawnbroker|fuel|marketplace|pharmacy|restaurant|fast_food|cafe|school|college|university|kindergarten|hospital|clinic|doctors)$"](${S},${W},${N},${E});`
+    +`nwr["office"~"^(financial|pawnbroker)$"](${S},${W},${N},${E});`
+    +`nwr["craft"~"^(goldsmith|agricultural_engines)$"](${S},${W},${N},${E});`
+    +`nwr["tourism"~"^(hotel|motel|guest_house)$"](${S},${W},${N},${E});`
+    +`nwr["man_made"="works"](${S},${W},${N},${E});`
+    +`);out center 6000;`;
+  // per-type render cap so a dense 10km ring stays performant — keep the LENDER-RELEVANT types
+  // generous (collateral supply + finance shown in full up to a high cap) and trim the high-volume
+  // ambient types (restaurants/convenience) that would otherwise drown the signal columns.
+  const POI_CAP={vehicle_commerce:600,vehicle_repair:600,fuel:400,gold:600,pawn:600,bank:600,
+    fresh_market:400,supermarket:400,agri_supply:400,hardware:400,industrial:500,health:400,
+    school:300,hotel:250,convenience:300,restaurant:300,pharmacy:300};
+  try{
+    const d=await overpass(q);
+    const out=[]; const seen={};
+    for(const el of (d.elements||[])){
+      const t=poiType(el.tags||{}); if(!t)continue;
+      seen[t]=(seen[t]||0)+1;
+      if(seen[t]>(POI_CAP[t]||300))continue;            // cap per type — keeps the GL column count sane
+      const x=el.lon!=null?el.lon:(el.center&&el.center.lon), y=el.lat!=null?el.lat:(el.center&&el.center.lat);
+      if(x==null||y==null)continue;
+      out.push({x,y,t});
+    }
+    pois=out; poiTileCache[ckey]=out; render();
+    buildPoiLegend();                                    // refresh legend counts from what's in view
+  }catch(e){ /* Overpass blocked: leave pois=[]; scene still draws buildings/rings/branch */ }
+}
+
+/* ---- branch panel (from branches.json, offline) ---- */
+// match the focal branch's province row in provinces/index.json for informal/formal (measured · NSO)
+async function matchProvince(prov){
+  if(!prov) return null;
+  try{
+    const idx=await fetch('data/provinces/index.json').then(r=>r.json());
+    return idx.find(p=>p.th===prov || p.en===prov) || null;
+  }catch(e){ return null; }
+}
+async function loadPanel(){
+  try{
+    const data=await fetch('data/branches.json').then(r=>r.json());
+    // focal branch: ?n name match wins, else nearest to lat/lng (x=lng, y=lat)
+    let best=null;
+    if(NM && NM!=='Branch'){ best=data.find(d=>d.n===NM) || null; }
+    if(!best){ let bd=1e9; for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}} }
+    branchRec=best;
+    if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
+    // re-centre on the matched branch so the scene and panel agree. Use the controlled VIEW so the
+    // orbit/intro machinery stays the single source of truth.
+    if(deckgl && !isNaN(best.x) && !isNaN(best.y)){
+      // retarget the cinematic frames so the intro fly-in / orbit centre on the matched branch.
+      FRAMED.longitude=best.x; FRAMED.latitude=best.y; INTRO.longitude=best.x; INTRO.latitude=best.y;
+      if(!introDone && !SOFT_GL){
+        // intro still in flight — just re-aim it at the branch (the rAF intro reads FRAMED below).
+        _programmatic=true;
+        const tp={viewState:Object.assign({},FRAMED,{transitionDuration:1200})};
+        try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2});} }catch(e){}
+        VIEW=Object.assign({},FRAMED);
+        deckgl.setProps(tp);
+        setTimeout(()=>{ _programmatic=false; lastT=0; },1240);
+      }else{
+        VIEW=Object.assign({},VIEW,{longitude:best.x,latitude:best.y}); pushView();
+      }
+      render(); // re-evaluate layers so the branch-label pill shows the matched name, not the URL ?n=
+    }
+    $('#bnm').textContent = best.n || NM;
+    $('#bsub').textContent = `${best.v}${best.d?' · '+best.d:''} · ${best.r}`;
+    const k=best.k10||{};
+    provRec=await matchProvince(best.v);
+
+    // (1) Within 10km — grouped, every count measured OSM (k10)
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    const k10html=K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(row=>{
+        const key=row[0],lab=row[1];
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const col=row[2]||(Array.isArray(key)?K10_COL[key[0]]:K10_COL[key])||'';
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('');
+
+    // (2) Who works nearby — province informal share (measured) + occupation proxy (estimated)
+    let workhtml='';
+    if(provRec && provRec.informal!=null && provRec.formal!=null){
+      const inf=provRec.informal||0, frm=provRec.formal||0, tot=inf+frm, share=tot?Math.round(inf/tot*100):0;
+      workhtml+='<div class="wbox">'
+        +`<div class="big">${share}%</div>`
+        +`<div class="cap">of ${provRec.en} workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+        +`<div class="wr"><span>Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+        +`<div class="wr"><span>Formal workers</span><span class="v">${fmt(frm)}</span></div>`
+        +'</div>';
+    }
+    // Occupation mix: prefer the MEASURED Overture-Places rollup for this branch; fall back
+    // to the ESTIMATED OSM proxy when the rollup file (or this branch's entry) is absent.
+    const occJson=await loadOccupations();
+    const idx=data.indexOf(best);
+    const occEntry=(occJson&&occJson.branches&&idx>=0)?occJson.branches[idx]:null;
+    let occRows, measuredOcc=false;
+    if(occEntry && occEntry.t>0){
+      measuredOcc=true;
+      occRows=occJson.buckets.map((bk,j)=>({lab:bk.label,col:OCC_BUCKET_COL[bk.key]||[138,148,168],v:occEntry.o[j]||0}))
+        .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    }else{
+      occRows=OCC.map(([lab,ks,col])=>({lab,col:POI_COLORS[col]||[138,148,168],v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+        .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    }
+    const occTot=occRows.reduce((a,r)=>a+r.v,0)||1, occMx=occRows.length?occRows[0].v:1;
+    const occTag=measuredOcc
+      ? `<span class="tag meas">measured · Overture</span>`
+      : `<span class="tag est">estimated · proxy</span>`;
+    const occCount=measuredOcc?` <span class="cap" style="font-weight:400">(${fmt(occEntry.t)} establishments ≤10km)</span>`:'';
+    workhtml+=`<h3 style="margin-top:2px">Occupation mix ${occTag}${occCount}</h3>`
+      +`<div class="occ">`+occRows.map(r=>{
+        const c=r.col, pct=Math.round(r.v/occTot*100);
+        return `<div class="or"><div class="ot"><span>${r.lab}</span><b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/occMx*100))}%;background:${rgb(c)}"></i></div></div>`;
+      }).join('')+`</div>`;
+
+    // ANSWER-FIRST: who to acquire + macro exposure (index-aligned layers, same join as the
+    // occupation rollup above; both graceful — absent file / entry → block omitted, no fabrication).
+    const esc=s=>String(s||'').replace(/"/g,'&quot;');
+    let leadsJ=null, macxJ=null;
+    try{ const rl=await fetch('data/branch_leads.json'); if(rl.ok) leadsJ=await rl.json(); }catch(e){}
+    try{ const rm=await fetch('data/macro_exposure.json'); if(rm.ok) macxJ=await rm.json(); }catch(e){}
+    let acqHtml='';
+    const leadsE=(leadsJ&&leadsJ.branches&&idx>=0)?leadsJ.branches[idx]:null;
+    if(leadsE&&leadsE.leads&&leadsE.leads.length){
+      const bkm={}; (leadsJ.buckets||[]).forEach(b=>{ if(b&&b.k) bkm[b.k]=b; });
+      const FITL={h:'high fit',m:'med fit',l:'low fit'};
+      acqHtml+=`<h3>Who to acquire here <span class="tag meas">measured counts</span></h3>`
+        +leadsE.leads.slice(0,3).map(L=>{
+          const b=bkm[L.k]||{};
+          const tip=esc((b.why||'')+(L.rf?' ⚠ Stressed sector — court with careful underwriting, never exclude (est).':''));
+          return `<div class="pr" title="${tip}"><span>${b.label||L.k}${L.rf?' <b style="color:var(--agri);min-width:0">⚠</b>':''}</span>`
+            +`<b>${fmt(L.n)} <span style="color:var(--mid);font:600 9px 'IBM Plex Mono'">${FITL[L.f]||''}</span></b></div>`;
+        }).join('');
+      if(leadsE.u&&leadsE.u.length){
+        const u=leadsE.u[0], ub=bkm[u.k]||{};
+        acqHtml+=`<div class="note" style="margin-top:4px;color:var(--gold)">Untapped: ${ub.label||u.k} — big presence (${fmt(u.n)} measured), low segment score (est)</div>`;
+      }
+      acqHtml+=`<div class="note" style="margin-top:4px">Counts MEASURED (Overture ≤10km, a sample / lower bound); fit ranking + ⚠ stressed-sector flag ESTIMATED (editorial fit map).</div>`;
+    }
+    let macxHtml='';
+    const macxE=(macxJ&&macxJ.branches&&idx>=0)?macxJ.branches[idx]:null;
+    if(macxE&&macxE.t3&&macxE.t3.length){
+      const fx={}; ((macxJ.meta&&macxJ.meta.factors)||[]).forEach(f=>{ if(f&&f.key) fx[f.key]=f; });
+      const ARW={drought:'▼',leverage:'▲',mfg:'▼'};   // non-price factors: fixed signal direction
+      const chips=macxE.t3.map(t=>{
+        const k=t[0], s=t[1], head=t[2]!=='t';
+        const f=fx[k]||{}, sig=f.signal||{};
+        const col=head?'var(--agri)':'var(--merch)';
+        const arrow=(typeof sig.yoy_pct==='number')?(sig.yoy_pct>0?'▲':'▼'):(ARW[k]||(head?'▼':'▲'));
+        const tip=esc(`${f.label||k} — ${head?'HEADWIND':'TAILWIND'} for this branch's customer mix. `
+          +(typeof sig.yoy_pct==='number'?`YoY ${sig.yoy_pct>0?'+':''}${sig.yoy_pct}% (${sig.vintage||'—'}). `:'')
+          +(sig.provenance||'')+` Relative exposure rank ${s} (share-diluted, est — compare order, not magnitude).`);
+        return `<span title="${tip}" style="display:inline-flex;align-items:center;gap:3px;font:600 10.5px 'IBM Plex Mono';padding:2px 7px;border-radius:10px;border:1px solid currentColor;color:${col};cursor:help">${k} ${arrow}</span>`;
+      }).join('');
+      const dom=fx[macxE.d];
+      macxHtml=`<h3>Macro exposure <span class="tag est">estimated</span></h3>`
+        +`<div style="display:flex;flex-wrap:wrap;gap:4px;margin:2px 0">${chips}</div>`
+        +(macxE.d?`<div class="note" style="margin-top:4px">Customers most exposed to: <b style="color:var(--hi)">${dom?dom.label:macxE.d}</b> (est). Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate.</div>`:'');
+    }
+
+    $('#panel').innerHTML =
+      `<h3>${best.n}</h3>
+       <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
+       <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
+       ${acqHtml}
+       ${macxHtml}
+       <h3>District workforce (DIW · measured)</h3>
+       <div class="pr"><span>Factories</span><b style="color:#E6B450">${fmt(best.dfac)}</b></div>
+       <div class="pr"><span>Factory workers</span><b style="color:#E6B450">${fmt(best.dwork)}</b></div>
+       <h3>Within 10 km of ${best.n} <span class="tag meas">measured · OSM</span></h3>
+       ${k10html}
+       <div class="note">Establishments mapped in OpenStreetMap within 10 km of this branch — measured, not estimated.</div>
+       <h3>Who works nearby</h3>
+       ${workhtml}
+       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings = the province's Overture catchment (measured) when available, else live OpenStreetMap with heights estimated from type + footprint — the Buildings legend says which source is live. Coloured POI columns = live OSM (measured) when reachable. Rings = 3 / 5 / 10 km.</div>`;
+  }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
+}
+
+/* ---- init ---- */
+function init(){
+  // best-effort: if operator building tiles are configured, load them then re-render to stream
+  // them in. Absent/blocked => unchanged (live-Overpass buildings). Never throws.
+  loadTilesConfig().then(function(){ try{ render(); }catch(e){} });
+  deckgl=new deck.DeckGL({container:'map',mapStyle:null,viewState:VIEW,
+    useDevicePixels: IS_MOBILE ? false : true,  // cap the framebuffer on phones so mobile WebGL doesn't blank
+    controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
+    layers:layers(),
+    onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+    getTooltip:({object,layer})=>{
+      if(!object)return null;
+      if(layer&&layer.id==='bldg')return {html:`<div class="dtt"><b>${object.h.toFixed(1)}m</b><br>~${Math.round(object.fa)} m² · ${(catchPerim&&buildings===catchPerim)?'Overture catchment (measured)':'est. from footprint'}</div>`};
+      if(layer&&layer.id==='poi'){const lab=(POI_LABEL[object.t]||object.t);return {html:`<div class="dtt"><b>${lab}</b><br>live OSM POI · measured</div>`};}
+      return null;},
+    onViewStateChange:({viewState,interactionState})=>{
+      VIEW=viewState;
+      const inTrans=!!(interactionState&&interactionState.inTransition);
+      const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+         interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+      // any pan/zoom/rotate the USER drives pauses the orbit; our own orbit/recenter pushes don't.
+      if(!_programmatic && userMoving){ userInteract(); }
+      // CONTROLLED viewState: reflect genuine user moves straight back to deck (else it looks frozen),
+      // guarded so the re-push isn't mistaken for fresh user input.
+      if(userMoving && !inTrans && !_programmatic){
+        _programmatic=true; deckgl.setProps({viewState:VIEW});
+        Promise.resolve().then(()=>{_programmatic=false;});
+      }
+      // re-fetch buildings/POIs only for USER-driven moves (debounced) — the orbit (bearing-only) and
+      // intro fly-in don't change the footprint set, so they must NOT thrash Overpass.
+      if(!_programmatic && userMoving){
+        clearTimeout(window._t); window._t=setTimeout(()=>{loadBuildings();loadPOIs();},650);
+      }
+      return viewState;
+    }});
+  $('#t-ring').onclick=()=>{ showRing=!showRing; $('#t-ring').classList.toggle('on',showRing); render(); };
+  // Orbit toggle: master on/off; turning ON clears the user-pause so the scene resumes breathing.
+  (function(){var ot=$('#t-orbit');if(!ot)return;
+    ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; ot.classList.toggle('on',orbitOn); lastT=0;};})();
+  $('#t-reload').onclick=()=>{ loadBuildings(); loadPOIs(); };
+  // basemap toggle (light Positron default / voyager / dark) — re-styles buildings + markers for the base.
+  const baseBtns={light:$('#b-light'),voyager:$('#b-voyager'),dark:$('#b-dark')};
+  Object.keys(baseBtns).forEach(k=>{ if(!baseBtns[k])return;
+    baseBtns[k].onclick=()=>{ basemap=k;
+      Object.keys(baseBtns).forEach(j=>baseBtns[j]&&baseBtns[j].classList.toggle('on',j===k)); render(); };});
+  // ---- MOBILE BOTTOM-SHEET TOGGLES ----------------------------------------------------------------
+  // On phone the map is full-screen; the info #panel and the .ctl control frame (which carries the
+  // building + POI legends) slide in via these buttons. Opening one closes the other so they never
+  // stack over the map. The ✕ on the panel mirrors the Info button. No-ops on desktop (buttons hidden).
+  (function(){
+    const panel=document.querySelector('#panel'), ctl=document.querySelector('.ctl'),
+          px=document.getElementById('panelClose');
+    function setPanel(on){ if(panel)panel.classList.toggle('show',on); if(px)px.classList.toggle('show',on); }
+    function setCtl(on){ if(ctl)ctl.classList.toggle('show',on); }
+    document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+      const s=b.dataset.s;
+      if(s==='panel'){ const open=!(panel&&panel.classList.contains('show')); setPanel(open); if(open)setCtl(false); }
+      else{ const open=!(ctl&&ctl.classList.contains('show')); setCtl(open); if(open)setPanel(false); }
+    });
+    if(px)px.onclick=()=>setPanel(false);
+  })();
+  loadPanel(); loadBuildings(); loadPOIs();
+  startMotion();
+}
+
+// ---- MOTION BOOTSTRAP (ported from rayong-catchment): intro fly-in, then gentle auto-orbit -------
+// Start parked at the high/wide INTRO view, then ease down to FRAMED. The orbit loop holds until the
+// intro completes so the two motions don't overlap. Under software WebGL both are skipped (camera
+// snaps to FRAMED) so the render loop stays cold and the headless harness settles to a clean frame.
+function startMotion(){
+  const INTRO_MS=2400;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
+}
+init();
+</script>
+</body>
+</html>
