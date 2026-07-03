@@ -617,9 +617,12 @@ const IS_MOBILE=(function(){try{
     || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
     || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform));
 }catch(e){return false;}})();
-let SHADOWS_ON=!IS_MOBILE;
-let LIGHTING=buildLighting(SHADOWS_ON);
-if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
+// SHADOW PASS OFF EVERYWHERE (2026-07-03): the shadow render pass was the root cause of the
+// persistent real-GPU building whiteout on the catchment scene — and it was auto-disabled under
+// software GL, so headless verification could never see it. Non-shadow lighting is the exact path
+// headless runs, so what gets verified is what every GPU renders.
+let SHADOWS_ON=false;
+let LIGHTING=buildLighting(false);
 
 // ---- MOTION (ported from rayong-catchment) — controlled viewState for intro fly-in + auto-orbit --
 // A CONTROLLED viewState (VIEW) so the auto-orbit rAF loop and re-centre transitions share one

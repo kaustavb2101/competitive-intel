@@ -722,9 +722,14 @@ const IS_MOBILE = (function(){try{
     || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
     || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform)); // iPadOS masquerades as Mac
 }catch(e){return false;}})();
-let SHADOWS_ON=!IS_MOBILE;
-let LIGHTING=buildLighting(SHADOWS_ON);
-if(!LIGHTING){ SHADOWS_ON=false; LIGHTING=buildLighting(false); }
+// FLAT RENDER — shadows AND the LightingEffect are disabled EVERYWHERE, permanently (2026-07-03).
+// Root cause of the persistent real-GPU whiteout: the software-GL path (headless verification)
+// auto-disabled this very effect, so every screenshot used to validate a "fix" was rendered
+// WITHOUT the one thing that differed on real hardware — the shadow pass. With no lighting or
+// shadow pass at all, every GPU rasterises the same flat, capped, warm fill colors (deterministic
+// by construction). Depth reads from the height ramp, extrusion parallax, strokes and vignette.
+let SHADOWS_ON=false;
+let LIGHTING=null;   // buildLighting() kept above for reference; deliberately not attached.
 // cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
 // Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
@@ -1356,7 +1361,10 @@ function render(){
       // a face cannot approach white. Caps the DATA so a hot GPU can't blow low buildings out.
       const cap=LIGHT?150:255;
       return [Math.min(cap,clamp(r)),Math.min(cap,clamp(g)),Math.min(cap,clamp(bl)),LIGHT?232:236];},
-    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[70,54,140,210]:[120,134,158,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
+    // Light-mode stroke is WARM DARK, not cool gray-blue: at city zoom a Thai shophouse footprint
+    // is 1–4 px, so the stroke IS the visible building — a light cool outline over 180k tiny
+    // footprints reads as a frosted white carpet. Dark warm outlines keep the mat warm + defined.
+    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[70,54,140,210]:[96,84,68,145]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
     // LIGHTING OFF for the building fill. Any lighting model (ambient + directional/point terms)
     // SUMS per-face and can exceed 1.0 on a real GPU -> the "white blow-out" that never reproduces
     // on the sandbox's dimmer SwiftShader renderer. With material:false there is NO lighting term
