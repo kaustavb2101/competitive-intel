@@ -1511,8 +1511,10 @@ function updatePanels(){
     // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
     const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
     const pop=branchPop(focal);
+    const popMeas=(pop&&pop.scope==='10km'&&window.BRANCHPOP_MEAS);   // 10km figure from the WorldPop raster
     const popScope=pop&&pop.scope==='10km'?'people ≤10km':'people in district';
-    const popTag=pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>';
+    const popTag=popMeas?'<span class="tag meas">WorldPop</span>'
+      :(pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>');
     const headline=`<div class="cat10">`
       +`<div class="c pop"><div class="n">${pop?fmt(pop.v):'—'}</div>`
       +`<div class="l">${pop?popScope:'people · n/a'} ${pop?popTag:''}</div></div>`
@@ -1525,7 +1527,7 @@ function updatePanels(){
         const c=POI_COLORS[col]||[138,148,168];
         return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
       }).join('')+`</div>`).join('')
-      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population ≤10&nbsp;km = measured UNFPA/NSO district populations area-weighted over the 10&nbsp;km circle (assumes even density within a district — an estimate, not a raster count).</div>`;
+      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population ≤10&nbsp;km = ${popMeas?'WorldPop 2020 gridded population (1&nbsp;km, UN-adjusted) summed over the 10&nbsp;km circle — measured':'measured UNFPA/NSO district populations area-weighted over the circle — estimated'}.</div>`;
   }
 
   // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
@@ -1977,6 +1979,7 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
    window.POINAT=(a[14]&&a[14].poi)||null;
    window.BRANCHPOP=(a[15]&&a[15].values)||null;
+   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
    killLoader();window.initCatch();})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
