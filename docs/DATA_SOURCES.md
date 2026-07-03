@@ -1,0 +1,85 @@
+# DATA SOURCES — provenance, reachability, field dictionary
+
+## Reachability matrix (from THIS build environment — a foreign datacenter IP)
+
+| Source | Host | Status | Notes |
+|---|---|---|---|
+| OpenStreetMap / Overpass | `maps.mail.ru/osm/tools/overpass/api/interpreter` | ✅ REACHABLE (fast mirror) | also `overpass.kumi.systems`. National query: `area["ISO3166-1"="TH"][admin_level=2]` |
+| Google Places | (places_search tool) | ✅ | coords + reviews; best for live competitors |
+| HDX (HumData) | `data.humdata.org/api/3/action/...` | ✅ | CKAN. UNFPA pop, WFP rainfall, geoBoundaries |
+| OAE agriculture | `catalog.oae.go.th/api/3/action/...` | ✅ | CKAN/nginx, not Cloudflare-blocked. `www.oae.go.th`=200 |
+| World Bank Pink Sheet | `thedocs.worldbank.org` | ✅ | Apache. Monthly commodity prices (xlsx) |
+| **data.go.th (all hosts)** | data.go.th, opend., api. | ❌ BLOCKED | Cloudflare "Access Denied" — **IP geo-block, not auth.** Token is valid but useless from here |
+| **DLT (vehicles)** | stat.dlt.go.th, web.dlt.go.th | ❌ BLOCKED | DNS-fail / 503 |
+| IMF / FRED / dataforthai / gdcatalog / competitor sites | various | ❌ | 403 / 503 / WAF |
+
+**The single most important fact for the handoff:** the blocked sources are blocked because this
+sandbox runs on a foreign (Chicago) datacenter IP. **They should work from Kaustav's Thai residential
+connection.** Running `pipeline/autox_dgt_ingest.py` from his laptop is expected to unblock DLT vehicle
+registrations and DIW factories.
+
+### data.go.th token
+- Lives in Vercel env var `DATA_GO_TH_TOKEN` on project **thailand-labor-intel**
+  (`prj_VLpR8SIHOSwe5NXuqMjQaTBwwJFc`).
+- Valid, but Cloudflare IP-blocks the sandbox regardless of token.
+- **Security:** it was exposed in chat — mark Sensitive in Vercel and **rotate it**. Don't hardcode it;
+  read from env (`os.environ["DATA_GO_TH_TOKEN"]`).
+
+## World Bank Pink Sheet — current read (Dec 2025 prices)
+- **Crops DOWN:** rice −19.5%, rubber −13.5%, sugar −25.9%, palm −17.6%, maize +1.5%.
+- **Protein/forestry UP:** chicken +25.6%, beef +18.4%, lamb +9.1%, fishmeal +14.1%, logs +11.9%,
+  sawnwood +5.9%. **Gold +62.7%** (matters to a title/gold-collateral lender). Shrimp data stale (2023).
+- OAE Dec-2025 outlook: rice + rubber = 2026 RISK crops; cassava (Laos curbs → prices rise), palm,
+  chicken, durian = firmer.
+- Pink Sheet URL: `https://thedocs.worldbank.org/en/doc/18675f1d1639c7a34d463f59263ba0a2-0050012025/related/CMO-Historical-Data-Monthly.xlsx`
+
+## Macro (current, citable — for the Overview panel)
+GDP 2026 ~1.6%; household debt 86.8% (Sep 2025); inflation ~0.3% (near-zero); tourists 2025 32.9M
+(−7.2% YoY, first drop; 2026 target 35.5M); retail +2%; ฿44bn Khon La Khrueng co-payment scheme; credit contracting.
+
+## `branches_final.json` field dictionary (the master, 2,015 records)
+Identity: `code, name, prov, district, subdistrict, zip, lat, lng, prec` (geocode precision),
+`phone, region` (Isan/North/South/East/Central&BKK).
+Demand/POI within 10km: `demand` (f10 fuel + v10 vehicle + m10 market composite), `ind10` (industrial),
+`bank10, atm10, cvs10, hotel10, civic10, fmkt10` (fresh market), `rest10` (restaurant), `super10`,
+`pharm10, gold10, veh10` (vehicle commerce), `sch10` (school).
+Estates: `n_estate10, nearest_estate, nearest_km, worker_demand`.
+Footprint: `own10` (AutoX branches within 10km — competition-with-self).
+Joined context: `dist_pop, dist_workingage` (district, ~99% joined), `rain_3mo_anom` (drought %; <100 = drier than normal).
+Scores: `demand_decile, comp_model, opportunity, lead_type, lead_priority`,
+**`agri_pd, merchant_demand, merchant_pd, collateral_density, tourism_score`**.
+
+### Score definitions
+- **agri_pd** = province crop-price-stress × drought, urban-suppressed, **minus** a regional livestock-income
+  buffer (Isan .10, Central/East .06, North .05, South .04). Region means: Isan 61, North 56, East 34,
+  South 25, Central&BKK 43. ~730–791 branches elevated. *This is the score Kaustav called "far-fetched"
+  for a single province — keep it national-level, don't lead Rayong with it.*
+- **merchant_demand** = z-scored (fresh_market + restaurant + supermarket + working-age-pop + tourism).
+  Concentrates Central/Bangkok.
+- **merchant_pd** = consumption-strain proxy (household debt, near-zero inflation, tourism dip).
+- **collateral_density** = z-scored (vehicle_commerce .6 + gold .4). Proxy for title/gold collateral supply
+  (DLT-blocked stand-in). Bangkok Lat Phrao is the extreme.
+- **tourism_score** = per-branch, from MOTS 2024 province tourism revenue (Phuket 497, Chonburi 317,
+  Bangkok ~550 volume, Surat Thani 119, Chiang Mai 104, Krabi 91 ฿bn …).
+
+## OSM layers (`osm_layers.json`) — items are `[lng, lat]`
+industrial 4789, bank 1991, atm 3274, convenience 8831, hotel 6784, civic 6751, vehicle_commerce 3382,
+fresh_market 1965, supermarket 2344, pharmacy 1522, gold 769, restaurant 19409, school 17160.
+(Pawnbroker too sparse at 56 to use.)
+
+## Rayong-specific data
+- `rayong_districts.geojson` — 8 amphoe polygons (geoBoundaries ADM2, matched by branch containment) +
+  per-district rollups (branches, working-age, factories_avg, vehicle_avg, estates).
+- `rayong_competitors.json` — 30 live competitor branches (Google Places, hand-curated). Brands:
+  Srisawad / Muangthai / Tidlor / Krungsri.
+- `bldg_wide.json` — 3,633 raw OSM buildings for the Mueang Rayong urban box
+  (lat 12.655–12.725, lng 101.155–101.310). Pulled via Overpass. **Factory zones have ~no OSM buildings.**
+- `platform/data/rayong_province.json` / `rayong_catchment.json` — the rendered payloads (derived).
+
+## Caveats to always state
+- Reachable population in the catchment view = **dasymetric estimate** (floor-area × occupancy), not a
+  street-network isochrone.
+- Factory/POI points are **OSM** — directionally right, not a census (Map Ta Phut shows as a cluster,
+  not every unit).
+- `collateral_density` and the catchment vehicle layer are **proxies** until DLT vehicle data is pulled
+  from the Thai IP.

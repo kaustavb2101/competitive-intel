@@ -1,0 +1,121 @@
+name: Data — Overture province catchments
+
+# Pulls the per-province 3D building catchments (platform/data/<slug>_catchment.json)
+# from Overture Maps — RUN FROM YOUR PHONE via Actions → "Run workflow".
+#
+# WHY THIS WORKS HERE: GitHub-hosted runners have unrestricted internet, so Overture's
+# S3 (blocked from the cloud sandbox's IP) downloads fine. This workflow does NOT touch
+# the Thai-IP-only sources (data.go.th, DLT) — those are geo-blocked from Actions too
+# and still need the owner's Thai laptop.
+#
+# WHAT IT PRODUCES: real Overture building footprints (nothing fabricated), converted by
+# pipeline/pull_overture_buildings.py into the exact catchment shape the 3D scene reads
+# (rayong-catchment.html?city=<slug>). Results are committed to a fresh data/overture-<run_id>
+# branch and opened as a DRAFT PR back to the branch you dispatched from — this workflow
+# NEVER pushes to your working branch, so it can't race a concurrent session. Review the
+# PR on your phone, then merge.
+#
+# INPUTS
+#   provinces      comma-separated slugs (same slugs as platform/data/provinces/index.json)
+#   max_buildings  per-province size cap; 60000 keeps files web-sized (~12 MB)
+#   all            true = every province missing a catchment file (long run; failures per
+#                  province are non-fatal — whatever succeeded still lands in the PR)
+
+on:
+  workflow_dispatch:
+    inputs:
+      provinces:
+        description: "Province slugs, comma-separated (ignored when all=true)"
+        required: false
+        default: "chon-buri,phuket"
+        type: string
+      max_buildings:
+        description: "Per-province building cap (keeps files web-sized; ~12 MB at 60000)"
+        required: false
+        default: "60000"
+        type: string
+      all:
+        description: "Pull EVERY province missing a catchment file (long run)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    # a full 77-province run can take hours (per-province Overture download + convert)
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Same pin as qa.yml: match the Python the committed data is generated under.
+          python-version: "3.11"
+
+      - name: Install Overture CLI
+        run: pip install overturemaps
+
+      - name: Pull Overture catchments
+        env:
+          PROVINCES: ${{ inputs.provinces }}
+          MAX_BUILDINGS: ${{ inputs.max_buildings }}
+          PULL_ALL: ${{ inputs.all }}
+        run: |
+          ARGS=(--max-buildings "$MAX_BUILDINGS")
+          if [ "$PULL_ALL" != "true" ]; then
+            ARGS+=(--only "$PROVINCES")
+          fi
+          echo "running: python pipeline/pull_all_provinces.py ${ARGS[*]}"
+          # Per-province failures are NON-FATAL: the batch script already continues past a
+          # failed slug and exits 2 if any failed. We still commit whatever succeeded.
+          python pipeline/pull_all_provinces.py "${ARGS[@]}" || \
+            echo "::warning::some provinces failed to pull — committing the ones that succeeded (see log above)"
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/overture-${{ github.run_id }}
+        run: |
+          # Only the pulled data files — never anything else.
+          git add platform/data/province_bbox.json
+          git add platform/data/*_catchment.json
+          if git diff --cached --quiet; then
+            echo "No new or changed catchment files (all requested provinces were already pulled?)."
+            echo "Nothing to commit — no PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          SUMMARY="$(git diff --cached --stat | tail -1)"
+          git commit -m "data: Overture province catchments (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-overture.yml — real Overture building footprints, converted by pipeline/pull_overture_buildings.py."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated Overture catchment pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Files** ($SUMMARY):"
+            echo '```'
+            git diff --name-only HEAD~1 | while read -r f; do
+              printf '%s  (%s)\n' "$f" "$(du -h "$f" | cut -f1)"
+            done
+            echo '```'
+            echo
+            echo "Provenance: MEASURED Overture Maps building footprints (heights measured where"
+            echo "Overture has them, estimated from type+footprint otherwise — same model as the"
+            echo "committed Rayong catchment). Nothing fabricated."
+            echo
+            echo "Merge this and every listed province's 3D scene (rayong-catchment.html?city=slug) lights up."
+          } > /tmp/pr_body.md
+          gh pr create --draft \
+            --base "$BASE_BRANCH" \
+            --head "$DATA_BRANCH" \
+            --title "data: Overture catchments (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

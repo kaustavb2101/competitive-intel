@@ -1,0 +1,80 @@
+name: QA
+
+# Verifies every change against the committed test suite.
+#   - determinism gate (pipeline --check + JS syntax) — no network
+#   - headless render of every platform/ page with self-hosted deck.gl/leaflet — npm registry only
+#   - page-health smoke + visual regression vs tests/baseline/*.png
+#
+# NETWORK POLICY: the runner can reach the npm registry (to install deck.gl/leaflet) but the suite
+# performs NO data pulls (Overpass/Google/HDX/data.go.th are never contacted). Basemap raster tiles
+# are intentionally blank in renders. This mirrors what the sandbox can do.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Pin to the SAME Python the data is generated under (the cloud build sandbox is 3.11),
+          # so the determinism --check gate mirrors the build environment. 3.11 vs 3.12 can resolve
+          # a float-rounding boundary differently and make a byte-identical generator "drift" in CI.
+          python-version: "3.11"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # --- Phase 1: offline determinism + syntax gate (no chromium needed) ---
+      # numpy is pinned for the same reason Python is: build_branch_peers.py --check reproduces
+      # byte-for-byte only under the version the artifact was generated with. The builder avoids
+      # BLAS (matmul) on purpose; elementwise numpy reductions are stable across machines.
+      - name: Install pipeline deps
+        run: pip install numpy==2.4.6
+      - name: Determinism + syntax gate
+        run: bash tests/run.sh check
+
+      # --- Headless Chromium for the render phase ---
+      # The render/health/visual phases use software-WebGL headless Chromium, which is
+      # environment-sensitive (canvas init + pixel baselines differ across machines), so they
+      # run NON-BLOCKING: they still execute and upload artifacts for inspection, but only the
+      # deterministic check gate above can fail the build. Visual regression is a LOCAL dev tool.
+      - name: Install Chromium (Playwright)
+        continue-on-error: true
+        run: |
+          npx --yes playwright@1.49.1 install --with-deps chromium
+          # expose the installed chrome where render.sh looks (/opt/pw-browsers/chromium-*/...)
+          PW_DIR="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
+          sudo mkdir -p /opt/pw-browsers
+          CH="$(ls -d "$PW_DIR"/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)"
+          if [ -z "$CH" ]; then echo "chromium not found under $PW_DIR" >&2; exit 1; fi
+          VER="$(basename "$(dirname "$(dirname "$CH")")")"
+          sudo cp -r "$PW_DIR/$VER" "/opt/pw-browsers/$VER"
+          ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome
+
+      # --- Phase 2+3+4: render, health smoke, visual regression (npm registry only) ---
+      - name: Render + health + visual (non-blocking)
+        continue-on-error: true
+        run: |
+          bash tests/run.sh render
+          bash tests/run.sh health
+          bash tests/run.sh visual
+
+      # Always upload fresh renders so a visual-regression failure is inspectable.
+      - name: Upload renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-renders
+          path: tests/.work/render/*.png
+          if-no-files-found: ignore
+          retention-days: 14

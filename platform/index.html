@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="th">
+<head>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AutoX · เงินไชโย — Credit Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav id="nav" role="tablist" aria-label="Main views">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Home</a>
+  <a data-v="overview" href="#overview" role="tab" aria-selected="false">Overview</a>
+  <a data-v="map" href="#map" role="tab" aria-selected="false">National</a>
+  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Acquire</a>
+  <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
+  <a data-v="trend" href="#trend" role="tab" aria-selected="false">Trend</a>
+  <a data-v="provinces" href="#provinces" role="tab" aria-selected="false">3D map</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
+      <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
+      <a data-v="market" href="#market" role="menuitem">Market</a>
+      <a data-v="branches" href="#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
+    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
+</nav>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
+<script>/* "More ▾" nav dropdown — pure UI; routing stays in app.js (menu links carry data-v inside #nav). */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ /* the nav's backdrop-filter makes it the containing block for position:fixed children, so the
+    menu must live under <body> and be placed from the button's viewport rect on each open —
+    otherwise the horizontal nav scroll drags/clips the dropdown. */
+ document.body.appendChild(menu);
+ function place(){var r=btn.getBoundingClientRect();
+   menu.style.top=(r.bottom+6)+'px';
+   menu.style.right=Math.max(10,window.innerWidth-r.right)+'px';menu.style.left='auto';}
+ function open(o){if(o)place();menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);}); /* picking a view closes it; app.js handles the route */
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ /* mirror active state onto the More button when one of its views is selected */
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
+</script>
+<div id="updated" style="display:none"></div>
+
+<main>
+  <!-- COMMAND CENTER (daily-use front door) -->
+  <section class="view on" id="v-home">
+    <div class="cc-head">
+      <div>
+        <h2 style="margin:0">Command center</h2>
+        <p class="lead" id="cc-sub">The two questions, on one screen: where to expand, and what is getting riskier. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>.</p>
+      </div>
+      <div class="cc-actions no-print">
+        <button class="chip" id="cc-csv">⬇ Download brief (CSV)</button>
+        <button class="chip" id="cc-print">🖨 Print / PDF</button>
+      </div>
+    </div>
+
+    <!-- Board thesis: ONE spoken-English sentence + Road-to-3,000 strip, synthesized from loaded data. -->
+    <div class="cc-thesis" id="cc-thesis" aria-live="polite"></div>
+
+    <!-- QW5: the verdict, in plain language — big hero statements generated from the loaded data. -->
+    <div class="cc-hero" id="cc-hero" aria-live="polite"></div>
+
+    <div class="cc-grid">
+      <!-- WHERE TO EXPAND -->
+      <div class="cc-card" id="cc-whitespace">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Where to expand
+          <a class="cc-link no-print" data-v="acq">Acquisition →</a></div>
+        <div class="cc-card-b" id="cc-ws-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
+
+      <!-- WHAT IS GETTING RISKIER -->
+      <div class="cc-card" id="cc-risk">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>What is getting riskier
+          <a class="cc-link no-print" data-v="exposure">Exposure →</a></div>
+        <div class="cc-card-b" id="cc-risk-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
+
+      <!-- MACRO / REGULATORY -->
+      <div class="cc-card" id="cc-macro">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Macro &amp; regulatory
+          <a class="cc-link no-print" data-v="overview">Overview →</a></div>
+        <div class="cc-card-b" id="cc-macro-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
+
+      <!-- RISK MOVERS -->
+      <div class="cc-card" id="cc-movers">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--collat)"></span>Risk movers
+          <a class="cc-link no-print" data-v="trend">Risk trend →</a></div>
+        <div class="cc-card-b" id="cc-movers-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
+
+      <!-- WATCHLIST -->
+      <div class="cc-card cc-card-wide" id="cc-watch">
+        <div class="cc-card-h"><span class="cc-dot" style="background:#E6B450"></span>Watchlist
+          <span class="cc-link sub no-print">★ star branches &amp; provinces to pin them here</span></div>
+        <div class="cc-card-b" id="cc-watch-body"></div>
+      </div>
+    </div>
+    <p class="lead cc-provenance"><b>Provenance:</b> white-space &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any expansion with a site survey.</p>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section class="view" id="v-overview">
+    <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
+    <div class="dash2">
+      <div class="dash2-side">
+        <h2>Macro overlay — current conditions</h2>
+        <div class="grid macro" id="macro"></div>
+
+        <h2 class="risk">Regulatory watch · BoT hire-purchase rate cap</h2>
+        <p class="lead">Portfolio objective #1 — a sector <b>margin</b> watch item, not a portfolio-credit signal.</p>
+        <div class="insight risk" id="botcap"></div>
+      </div>
+      <div class="dash2-main">
+        <h2>Commodity board — the segments diverge</h2>
+        <div class="insight" id="ov-keyread">
+          <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) and
+          livestock/forestry households move on different price cycles — see the board for current directions.
+        </div>
+        <div class="cols2">
+          <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
+          <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
+        </div>
+
+        <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
+             omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
+        <div id="mwatch-wrap" style="display:none">
+          <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
+          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / gold trade / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first.</p>
+          <div class="grid macro" id="mwatch"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="collat">Collateral outlook · the two backings diverge</h2>
+    <p class="lead">What is happening to the value of what AutoX lends against (portfolio objective #1). Gold is <b>measured</b> (commodity board); the pickup signal is an <b>editorial / estimated watch</b> — see note.</p>
+    <div class="grid macro" id="collat-outlook"></div>
+    <p class="lead" id="collat-note"></p>
+
+    <h2 class="collat">Collateral mix · most motorcycle-heavy provinces</h2>
+    <p class="lead" id="collatmix-note"></p>
+    <table class="tbl" id="collatmixtbl"></table>
+
+    <h2 class="collat">Collateral recovery-value sensitivity · illustrative</h2>
+    <p class="lead" id="recovery-note"></p>
+    <div class="grid macro" id="recovery-cards"></div>
+    <table class="tbl" id="recoverytbl"></table>
+
+    <h2>Segment signals by region</h2>
+    <table class="tbl" id="region"></table>
+    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle + gold trade density.</p>
+
+    <h2 class="risk">Crop-household stress · worst provinces</h2>
+    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
+    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
+    <p class="lead" id="cstress-note"></p>
+    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+  </section>
+
+  <!-- MAP — map is the hero: full-bleed map with the lens pill row docked on top -->
+  <section class="view" id="v-map">
+    <div class="maphero">
+      <div id="map"></div>
+      <div class="maphero-top">
+        <div class="lenses" id="lenses" role="group" aria-label="Map lens — colour the 2,015 branches by"></div>
+        <div class="chips" id="riskSub" style="display:none"></div>
+      </div>
+    </div>
+    <p class="maplegend-line">
+      <span class="maplegend" id="maplegend"></span>
+      <span class="sub">Tap any branch for its scores · dot colour + size scale with the lens · ● measured · ▲ estimated proxy</span>
+    </p>
+  </section>
+
+  <!-- ACQUISITION — leads with ONE answer: the "where to open next" leaderboard. -->
+  <section class="view" id="v-acq">
+    <!-- VERDICT card (generated from opportunity_score.json; omitted gracefully if absent) -->
+    <div class="verdict" id="acq-verdict" style="display:none"></div>
+
+    <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
+      <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
+      <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
+      <a class="chip" href="#acq" data-acq="sec-comp">Competitor thesis</a>
+      <a class="chip" href="#acq" data-acq="sec-segments">Segment white-space</a>
+    </nav>
+
+    <!-- 1 · HERO ANSWER — the composite opportunity leaderboard, open by default. -->
+    <details class="acqsec acq-lead" id="sec-opp" open>
+    <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
+    <p class="lead">Districts (amphoe) ranked for branch expansion — higher = more underserved and undercompeted. Full method &amp; caveats below the table.</p>
+    <div id="oppreadout" class="sub" style="margin:2px 0 10px"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="opptbl"></table>
+    </details>
+
+    <!-- 2 · ROAD TO 3,000 headroom bar, open by default. -->
+    <details class="acqsec" id="sec-r3k" open>
+    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
+    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
+      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
+      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
+      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
+      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
+    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
+    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
+      <p>For each region:
+        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
+        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
+        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
+        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
+        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></div></details>
+    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="r3ktbl"></table>
+
+    <h3 class="acqsub" style="margin-top:18px">Sequenced district plan · which branch to open <i>next</i> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
+    <p class="lead">The regional split above says <i>how many</i>; this says <b>where, in what order</b>. All 985 net-new branches are
+      placed one at a time, each going to the district with the highest remaining <b>demand per outlet</b> — the same divisor method
+      used to allocate parliamentary seats (D'Hondt), so diminishing returns are built in. Placements within 15&nbsp;km of each other
+      <b>cannibalize</b>: a new branch also shrinks the value of its neighbors' next branch. Demand is risk-adjusted
+      (a high district risk-proxy trims its pull by up to 25%). Click a row to see the district on the national map.</p>
+    <div class="insight" id="r3kseqreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
+      <p>Marginal value of the next branch in district i: <code>v = D / (1 + e)</code> where
+        <code>D = demand × (1 − 0.25 × risk_proxy/100)</code> (demand: OSM footfall + DIW workers + vehicles, measured-derived; risk-proxy: estimated) and
+        <code>e = own + placed + 0.35 × Σ distance-weighted neighbor outlets within 15 km</code>.
+        Greedy placement of all net-new branches; ≤8 per district. Without the neighbor term this greedy is the provably optimal
+        allocation of total demand-per-outlet (classic divisor-method result). The sequence is an <b>ESTIMATED planning order</b>,
+        not a committed plan — every site needs a local survey. Built by <code>pipeline/build_expansion_plan.py</code> (deterministic, offline).</p></div></details>
+    <button id="r3kseqcsv" class="chip" style="margin-bottom:10px">⬇ Download full plan CSV</button>
+    <table class="tbl" id="r3kseqtbl"></table>
+    </details>
+
+    <!-- 3 · COMPETITOR THESIS — coverage + exit white-space, collapsed by default. -->
+    <details class="acqsec" id="sec-comp">
+    <summary><h2 class="opp">Competitor thesis · coverage &amp; exit white-space <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+
+    <h3 class="acqsub">Competitor coverage · how complete is our rival census?</h3>
+    <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
+      from each operator's <b>official store-locator</b> (16,053 real branches); only Heng remains a Google/Overture sample.
+      This panel shows <b style="color:var(--merch)">found</b> (locations we hold, measured) vs <b style="color:var(--gold)">expected</b>
+      (each brand's publicly-reported branch count — <b>ESTIMATED-from-public-reports</b>, cited company IR).
+      Coverage &gt;100% is expected — a locator lists every service point beyond the IR headline. Read it as a data-completeness flag, <b>not</b> market share.</p>
+    <div class="insight" id="compcovreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="compcovtbl"></table>
+
+    <h3 class="acqsub" style="margin-top:18px">Where rivals own ground · districts where AutoX is outnumbered <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <p class="lead">The full official-locator census (16,393 rival branches) makes this concrete: the districts where the big-4
+      out-station AutoX the most. Ranked by raw branch deficit — <b>defend or concede deliberately</b>. These are measured
+      counts (point-in-district), not a proxy.</p>
+    <div class="insight" id="rivdenreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="rivdentbl"></table>
+
+    <h3 class="acqsub">Competitor-exit white-space · regulatory tailwind</h3>
+    <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory tailwind (Q1 2026):</b> under the BoT responsible-lending
+      framework (notification 25680030) auto title-loan operators need a personal-loan licence (≥฿50m capital, 28% interest cap). The
+      <b>registration window closes Q1 2026</b> — non-compliant, sub-scale / informal lenders risk <b>forced exit</b>. Tighter supervision
+      favours scaled compliant incumbents (MTC, SAWAD, Tidlor, Heng — and AutoX) and squeezes small operators out, so <b>white-space may
+      open as sub-scale rivals retreat</b>. <span class="sub">Source: docs/RESEARCH_DIGEST.md §A (Conf: High) · BoT 25680030.</span></div>
+    <p class="lead"><b>Honest caveat — this is an ESTIMATED PROXY, not a measurement.</b> The operators that will <b>exit</b> are exactly the
+      sub-scale / informal lenders we do <b>not</b> census. Our competitor census covers only the <b>four big, compliant brands</b>
+      (Heng · Muangthai · Tidlor · Srisawad) — the incumbents who will <b>survive</b>. So we cannot directly measure exit; we
+      <b>infer</b> the opportunity surface: districts where AutoX demand / white-space exists but the big-4 are <b>absent or thin</b>, so the
+      residual market is likely served by a smaller local operator (the exit-prone player). It answers
+      <b>"where could AutoX capture share if a marginal operator exits?"</b> A true rival-fragility index needs a sub-scale-operator
+      census — a <b>blocked desktop / Thai-IP company-registry pull</b>. Treat the score as ESTIMATED.</p>
+    <div class="insight" id="exitreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="exittbl"></table>
+    </details>
+
+    <!-- 4 · SEGMENT-SPECIFIC white-space — every segment + district table, collapsed by default. -->
+    <details class="acqsec" id="sec-segments">
+    <summary><h2 class="opp">Segment-specific white-space · estates · merchant · collateral · districts</h2></summary>
+
+    <h3 class="acqsub">Industrial-estate white-space · worker lending</h3>
+    <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
+    <table class="tbl" id="estates"></table>
+
+    <h3 class="acqsub">Merchant white-space · small sellers</h3>
+    <p class="lead">High vendor demand (markets + footfall + population), ≤4 AutoX branches within 10km.</p>
+    <table class="tbl" id="mws"></table>
+
+    <h3 class="acqsub">Collateral-rich white-space</h3>
+    <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
+    <table class="tbl" id="cws"></table>
+
+    <h3 class="acqsub">Catchment white-space score v2 · around existing branches</h3>
+    <p class="lead"><b>★ White-space score</b> is an <b>estimated screen</b> (0–100), not a site survey:
+      <b>demand</b> (footfall + DIW factory workers + province pickups + precomputed opportunity)
+      × <b>own-AutoX headroom</b> (fewer of our branches ≤10km = more room)
+      × <b>competitor-proxy headroom</b> (fewer banks+ATMs ≤10km — an OSM financial-density proxy, <i>not</i> a lender census). Computed client-side, CSV-exportable.
+      The <b>Rivals ≤5km</b> column adds a <b>measured</b> count of actual competitor branches (Srisawad, Muangthai, Tidlor, Heng) from Google Places — a <b>lower bound</b>, not a registry — so an underserved catchment can be read as <b>underserved AND undercompeted</b> (<b>✦</b> = high white-space with zero nearby rivals). Populated by <span class="mono">pipeline/pull_competitors.py</span>; blank until that runs.</p>
+    <div class="insight" id="acqreadout" style="border-left-color:var(--gold)">Computing the screen…</div>
+
+    <h4 class="acqsub2">Region ranking · average white space</h4>
+    <table class="tbl" id="acqregions"></table>
+
+    <h4 class="acqsub2">Top catchments</h4>
+    <div class="chips" id="acqchips"></div>
+    <button id="acqcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
+    <p class="lead" id="acqcompnote" style="margin-top:6px"></p>
+
+    <h3 class="acqsub">District white-space leaderboard · all 928 amphoe</h3>
+    <p class="lead">The catchment screen above ranks <i>around our existing branches</i>. This ranks <b>every district in Thailand</b> —
+      including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so true
+      white space surfaces. <b>★ Whitespace</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
+      <b>measured at the amphoe</b>) minus a penalty for AutoX branches already inside it. Higher = more underserved.
+      <span class="sub">Branches &amp; POI counts are MEASURED (point-in-polygon). DIW workers are measured only where the
+      district name resolves (✓); vehicles / workforce are <b>province-inherited</b>, not amphoe-measured.</span></p>
+    <div class="insight" id="ampreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <div class="chips" id="ampchips"></div>
+    <button id="ampcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="amptbl"></table>
+
+    <h3 class="acqsub risk">Most-stressed districts · risk readout</h3>
+    <p class="lead">Top districts by an <b>ESTIMATED</b> risk proxy (0–100): agri crop-stress + province unemployment
+      (<b>MEASURED · NSO Labour Force Survey</b>), plus collateral / merchant pressure where we have branches inside the
+      amphoe. <b>Agri stress and unemployment are province-inherited</b> (every district takes its province value), so this
+      is a triage signal — read the province, not the exact district. Not a measured default rate.</p>
+    <div class="chips" id="amprchips"></div>
+    <table class="tbl" id="amprtbl"></table>
+    </details>
+  </section>
+
+  <!-- EXPOSURE / CONCENTRATION -->
+  <section class="view" id="v-exposure">
+    <!-- VERDICT card (generated from segment_exposure.json; omitted gracefully if absent) -->
+    <div class="verdict v-risk" id="expo-verdict" style="display:none"></div>
+    <h2 class="risk">Portfolio exposure · concentration read</h2>
+    <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
+
+    <!-- 2-col dashboard: KPI / region strip BESIDE the lead provinces table (fills the widescreen). -->
+    <div class="dash2">
+      <div class="dash2-side">
+        <div class="grid macro" id="expocards"></div>
+        <h2 class="risk">By region</h2>
+        <p class="lead">Share of each region's branches in a stressed bucket. ▼ stressed-crop · ☀ drought (dry quartile) · ▲ high agri-PD proxy. All estimated.</p>
+        <table class="tbl" id="expotbl"></table>
+      </div>
+      <div class="dash2-main">
+        <div id="expoconc"></div>
+        <h2 class="risk">Top exposed provinces</h2>
+        <p class="lead">Provinces ranked by a combined stress count — branches that are in a stressed-crop region <i>and/or</i> the dry quartile <i>and/or</i> carry a high agri-PD proxy. Most branches at risk first. <b>Book proxy = branch count</b>; all stress flags estimated.</p>
+        <table class="tbl" id="expoprov"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENARIO SIMULATOR (client-side what-if) -->
+  <section class="view" id="v-sim">
+    <h2 class="risk">Scenario simulator · portfolio what-if</h2>
+    <!-- BASELINE verdict, ABOVE the sliders — shows the starting read before any slider moves. -->
+    <div class="verdict v-warn" id="sim-verdict" style="display:none"></div>
+    <div class="insight risk" style="border-left-color:var(--gold)">
+      <b>What this is — and is not.</b> Drag the sliders to stress the portfolio and watch how many
+      provinces and branches tip into <b>high agri-stress</b>, and which way collateral recovery value moves.
+      This is an <b>ILLUSTRATIVE sensitivity / what-if</b>, <b>not a forecast</b>. It re-runs the same
+      <b>estimated proxy scores</b> already on this site (the crop-stress index) under the shock you set —
+      it uses <b>no measured price elasticities, no loan balances, no LTV</b>. "Exposure" is counted as
+      <b>branch footprint</b> (we have no per-branch ฿ balance). Treat every number as a direction, not a number.
+    </div>
+
+    <div class="sim-grid">
+      <div class="sim-controls">
+        <div class="sim-ctl-h">Shocks <button id="sim-reset" class="chip no-print">↺ Reset</button></div>
+
+        <div class="sim-slider">
+          <label>Crop-price shock <span class="mono" id="sim-price-v">0%</span></label>
+          <input type="range" id="sim-price" min="-30" max="10" step="5" value="0">
+          <div class="sim-hint">Move global crop prices (World Bank direction proxy). Lower = farm-gate income squeeze.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Rainfall / drought <span class="mono" id="sim-rain-v">normal</span></label>
+          <input type="range" id="sim-rain" min="-30" max="20" step="5" value="0">
+          <div class="sim-hint">Shift rainfall vs normal. Drier (left) raises drought hazard on crop households.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Gold price move <span class="mono" id="sim-gold-v">0%</span></label>
+          <input type="range" id="sim-gold" min="-30" max="30" step="5" value="0">
+          <div class="sim-hint">Gold-backed collateral recovery value. Up = stronger recovery on pawn/gold loans.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label>Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
+          <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0">
+          <div class="sim-hint">Used motorcycle/pickup resale value. Down = lower recovery on the title book (LGD up).</div>
+        </div>
+
+        <div class="sim-slider" id="sim-factory-wrap" style="display:none">
+          <label>Factory / manufacturing slowdown <span class="mono" id="sim-factory-v">0%</span></label>
+          <input type="range" id="sim-factory" min="0" max="100" step="10" value="0">
+          <div class="sim-hint">Severity of a manufacturing-sector shock on branches whose <b>measured</b> dominant borrower base is factory / auto work (Overture occupation mix). Raises the <b>estimated</b> occupation-stress on those branches. Illustrative — no loan balances.</div>
+        </div>
+        <div class="sim-slider" id="sim-factory-note" style="display:none">
+          <div class="sim-hint">Factory-slowdown lever needs the Overture occupation pull (data/occupation_risk.json) — dark until it lands.</div>
+        </div>
+
+        <div class="sim-slider">
+          <label class="sim-toggle"><input type="checkbox" id="sim-botcap"> Apply BoT 28% rate cap</label>
+          <div class="sim-hint">Title-loan APR ceiling, effective <b>2 Dec 2025</b> (cited). Clips products priced above 28% to the cap and shows the book-yield hit. Scenario model — illustrative product mix, not the measured book.</div>
+        </div>
+      </div>
+
+      <div class="sim-out">
+        <div class="grid macro" id="sim-cards"></div>
+        <div class="insight" id="sim-readout" style="border-left-color:var(--gold)">Set a shock to see the impact…</div>
+      </div>
+    </div>
+
+    <h2 class="risk">Provinces that worsen most under this scenario</h2>
+    <p class="lead">Ranked by the biggest rise in the <b>estimated</b> agri-stress proxy under the shock you set.
+      <b>↑ NEW</b> = crosses into high stress (≥45/100) only because of the scenario. Branch counts are
+      <b>measured</b> (footprint); the stress index is an <b>estimated</b> what-if. Empty until you move a slider.</p>
+    <table class="tbl" id="sim-prov"></table>
+
+    <h2 class="collat">Collateral recovery-value direction</h2>
+    <p class="lead">Direction only, from the gold &amp; used-vehicle sliders — <b>illustrative</b>, no loan balances or LTV.</p>
+    <div class="grid macro" id="sim-collat"></div>
+
+    <div id="sim-factory-out-wrap" style="display:none;margin-top:20px">
+      <h2 class="risk">Factory / manufacturing slowdown · borrower-base impact</h2>
+      <p class="lead">Branches whose <b>measured</b> dominant borrower base is factory / auto work, stressed by the
+        slowdown-severity lever. Branch counts are <b>measured</b>; the stress uplift is an <b>estimated</b> what-if
+        (no loan balances, no measured elasticities).</p>
+      <div class="grid macro" id="sim-factory-out"></div>
+    </div>
+
+    <div id="sim-cap-wrap" style="display:none;margin-top:20px">
+      <h2 class="risk">BoT 28% rate cap · book-yield impact</h2>
+      <p class="lead">Headline first: book yield before vs after the 28% ceiling. The table shows which products
+        compress (priced above 28%) and which are unaffected (already at/below).</p>
+      <div id="sim-cap"></div>
+    </div>
+  </section>
+
+  <!-- RISK TREND (time dimension) -->
+  <section class="view" id="v-trend">
+    <h2 class="risk">Risk trend · what's getting riskier over time</h2>
+    <p class="lead">Compares the latest data vintage against the previous one. Region cards and branch movers
+      use the <b>estimated agri-PD / merchant / collateral proxies</b> (OSM/price-based, 0–100) — not measured
+      defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
+    <div class="insight" id="trendbaseline" style="display:none;border-left-color:var(--gold)"></div>
+
+    <!-- DESIGNED BASELINE STATE — shown until a 2nd vintage exists (no deltas yet). Reads the live
+         risk layers (province_risk / crop_stress / household_risk) to show where things stand NOW,
+         with flat sparkline-skeletons that fill in once the next snapshot lands. -->
+    <div id="trendbaselinebody" style="display:none"></div>
+
+    <!-- PEER-TWIN OUTLIERS — vintage-independent: compares each branch against its statistical twins
+         (similar measured market fingerprint elsewhere in the country, same NSO leverage backdrop). -->
+    <h2 class="risk" style="margin-top:18px">Out of line vs statistical twins · audit-first list <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2>
+    <p class="lead">Every branch is benchmarked against its <b>15 statistical twins</b> — the branches with the most similar
+      <b>measured</b> market fingerprint (10&nbsp;km POI mix, district factories &amp; workers, rainfall, own density,
+      same NSO household-leverage backdrop) at least 25&nbsp;km away. A branch whose risk proxy sits far <b>above</b> its twins
+      is not just "in a risky market" — something <b>local</b> is different. Audit these first.</p>
+    <div class="insight" id="peerreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="peertbl"></table>
+
+    <!-- MOST BESIEGED BRANCHES — measured rival pressure: rivals within 2 km of each branch
+         (merged competitor census), the same-street fights for the same walk-in borrower. -->
+    <h2 class="risk" style="margin-top:18px">Most besieged branches · rivals on the doorstep <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2>
+    <p class="lead">Every branch is checked against the <b>merged competitor census</b> (Muangthai / Srisawad / Tidlor
+      official store locators — measured-complete; Heng a sample). A branch is <b>under siege</b> when
+      <b>&ge;3 rival branches sit within 2&nbsp;km</b> — these locations fight for the same walk-in borrower on the
+      same street, so pricing and LTV pressure bite here first. Distances and counts are measured geometry;
+      the &ge;3 cutoff is a stated rule.</p>
+    <div class="insight" id="siegereadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="siegetbl"></table>
+
+    <div id="trendbody" style="display:none">
+      <h2>Region movers · proxy change vs prior vintage</h2>
+      <p class="lead">Arrow + delta show how each region's mean risk proxy shifted. ▲ red = getting riskier · ▼ green = easing. All estimated.</p>
+      <div class="grid macro" id="trendregions"></div>
+
+      <h2>Commodity board · YoY re-rating</h2>
+      <p class="lead">How the year-on-year price move itself changed between vintages — a falling YoY means the income squeeze on that segment is deepening. Editorial/measured (World Bank direction proxy).</p>
+      <table class="tbl" id="trendboard"></table>
+
+      <h2 class="risk">Branch movers · biggest risk-proxy shifts</h2>
+      <p class="lead">Branches whose composite risk proxy (worst of agri/merchant/collateral) moved the most. ▲ = riskier. Estimated screen.</p>
+      <table class="tbl" id="trendbranches"></table>
+    </div>
+  </section>
+
+  <!-- BRANCHES -->
+  <section class="view" id="v-branches">
+    <input class="search" id="search" placeholder="Search branch or province…">
+    <div class="chips" id="sortchips"></div>
+    <table class="tbl" id="branches"></table>
+  </section>
+
+  <section class="view" id="v-provinces">
+    <h2 class="opp">Provinces · 77 deep-dives</h2>
+    <p class="lead">Tap a province for its 3D district deep-dive. <b>Fac/br</b> = DIW factories per AutoX branch — high with few branches = industrial white-space.</p>
+    <input class="search" id="provsearch" placeholder="Search province (Thai or English)…">
+    <div class="chips" id="provchips"></div>
+    <table class="tbl" id="provtbl"></table>
+  </section>
+
+  <section class="view" id="v-market">
+    <h2 class="risk">Market assessment · measured numbers</h2>
+    <p class="lead">Real figures per province — no indices. Factory &amp; informal workforce (NSO/DIW), pickup-truck stock (DLT, the title-loan collateral), and the region's weakest crop price (World Bank). <span id="mktnote" class="sub"></span></p>
+    <input class="search" id="mktsearch" placeholder="Search province…">
+    <div class="chips" id="mktchips"></div>
+    <button id="mktcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
+    <table class="tbl" id="mkttbl"></table>
+  </section>
+
+  <div class="note">
+    <b>One platform, live data.</b> Branch features, commodities, climate and macro are computed by the
+    enrichment loop and served as data files. Provenance: World Bank Pink Sheet (prices), OAE planting-area
+    (crops), WFP/HDX (drought), UNFPA (population), OpenStreetMap (13 POI layers), IMF/OECD/BoT/MOTS (macro).
+    Pending the data.go.th run: DIW factories, DLT vehicle registrations.
+  </div>
+</main>
+
+<!-- Mobile bottom sheet: branch detail on the National map at ≤600px, where the tall Leaflet
+     popup clips. Filled + shown by selectBranch() in app.js; closes on handle tap, swipe-down,
+     backdrop tap or Escape (closing also clears the lead-site pins + 10km ring). -->
+<div id="msheet-backdrop" hidden></div>
+<div id="msheet" role="dialog" aria-modal="true" aria-label="Branch detail" hidden>
+  <div id="msheet-handle" title="Close" role="button" aria-label="Close branch detail" tabindex="0"><span></span></div>
+  <div id="msheet-body"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

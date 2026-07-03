@@ -1,0 +1,5 @@
+# keep the Vercel upload small — only platform/ is served (outputDirectory)
+pipeline
+source-data
+docs
+*.md
