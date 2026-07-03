@@ -781,24 +781,38 @@ if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
     +' rendered (budget '+BLDG_BUDGET+', inner '+LOD_INNER_M+'m kept in full)');}catch(e){}
 }
 // ---- FLAT-MAT GUARD (fixes the "white/cream slab" render on some provinces) --------------------
-// The 74 R2-hosted province catchments were pulled BEFORE height-jitter existed, so their building
-// heights are near-uniform (a handful of discrete values). The per-city p5/p95 height normalisation
-// below then collapses (H_LO≈H_HI) and pushes the whole set to the BRIGHT top of the warm ramp
-// ([255,214,120]) — reading as a flat white/cream mat. If heights are too clustered, apply a
-// DETERMINISTIC per-building jitter (seeded from the centroid, byte-stable — the SAME model the
-// Bangkok pull bakes in) so the distribution regains a natural spread and the ramp lands warm and
-// varied. Visual only (mutates the local render copy's h); deck lighting/material are NOT touched.
+// The R2-hosted province catchments were pulled with Overture's default ~9m storey height, so a huge
+// share of their buildings sit at ONE value. The per-city p5..p95 height normalisation below then
+// anchors H_LO at that value, mapping the majority to rank t=0 — the bottom of the warm ramp — so the
+// whole mass renders as ONE flat tone (on a real GPU it washes to the reported white/cream slab).
+// FIX: if the distribution is degenerate, apply a DETERMINISTIC per-building jitter (seeded from the
+// centroid, byte-stable — the SAME model the Bangkok pull bakes in) so heights regain a natural spread
+// and the ramp travels warm + varied. Visual only (mutates the local render copy's h); deck
+// lighting/material are NOT touched.
+//
+// Degeneracy is detected by TWO independent signals — a city tripping EITHER gets jittered:
+//   (1) too FEW distinct heights (<=60 buckets) — the original narrow-distinct case (Rayong: 50), and
+//   (2) too much mass ON THE FLOOR — a large share sits at/below the p5 anchor H_LO (Khon Kaen 78%,
+//       Chiang Mai 69%), which is what actually collapses the ramp. These provinces carry a HIGH
+//       distinct-count (87 / 143), so signal (1) alone silently missed them and they went flat.
+// Signal (2) is the direct measure of the slab (share rendering as the single floor tone); Bangkok's
+// genuine spread leaves only ~5% on the floor, so it trips NEITHER test and is byte-for-byte untouched.
+// Rayong still trips (1) and its jitter output is unchanged.
 (function(){
   const bs=BUILDINGS; if(!bs||bs.length<20)return;
-  const seen=new Set();
-  for(const b of bs){ seen.add(Math.round((b.h||0)*10)); if(seen.size>60)break; }
-  if(seen.size>60)return;   // already a rich height distribution (Bangkok/Rayong/Chiang Mai) — leave as-is
+  const seen=new Set(); const hs=[];
+  for(const b of bs){ const h=b.h||0; seen.add(Math.round(h*10)); hs.push(h); }
+  hs.sort((a,b)=>a-b);
+  const H_LO=hs[Math.floor(hs.length*0.05)]||0;                 // the same p5 anchor render() normalises against
+  let floor=0; for(const h of hs){ if(h<=H_LO)floor++; else break; }  // hs sorted asc -> share on/under the floor
+  const floorFrac=floor/hs.length;
+  if(seen.size>60 && floorFrac<0.30)return;   // rich AND spread off the floor (Bangkok) -> nothing to fix, leave as-is
   for(const b of bs){
     const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453; const f=s-Math.floor(s);
     const h=(b.h&&b.h>0)?b.h:4;
     b.h=Math.round(h*(0.78+0.44*f)*100)/100;   // ±~22% deterministic spread → discrete values become a continuum
   }
-  try{console.info('[catchment] flat-mat guard: jittered '+bs.length+' near-uniform heights ('+seen.size+' distinct)');}catch(e){}
+  try{console.info('[catchment] flat-mat guard: jittered '+bs.length+' concentrated heights ('+seen.size+' distinct, '+(floorFrac*100).toFixed(0)+'% on floor)');}catch(e){}
 })();
 // ---- MOTION (Upgrade 2) — controlled view state for intro fly-in + gentle auto-orbit -----------
 // The scene is now driven by a CONTROLLED viewState (VIEW) instead of an uncontrolled
