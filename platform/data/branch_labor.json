@@ -4,7 +4,7 @@
     "n_branches": 2015,
     "branches_fingerprint": "e25867ab0c76d8889774a91b4c6bb9a890acd7929ca737dbbb36ff46bf9be786",
     "index_aligned_to": "platform/data/branches.json (entry i <-> branch i)",
-    "join_key_province": "branches_final.json `prov` (Thai province name); matches all 77 keys in employment_by_province.json and unemployment_by_province.json.",
+    "join_key_province": "branches_final.json `prov` folded through regionmap.canonical() (catches ISO-code / English-name / 'จังหวัด ' stragglers) before joining the NSO province layers. All 2,015 branch provinces already resolve to the 77 canonical Thai names; see meta.gaps for provinces absent from a source layer.",
     "fields": {
       "occ_top": {
         "label": "MEASURED",
@@ -40,6 +40,28 @@
       "branches_with_factory_workers": 2010,
       "branches_with_informal_pct": 1845,
       "branches_with_province_lfs": 2015
+    },
+    "gaps": {
+      "informal_pct": {
+        "affected_branches": 170,
+        "provinces_absent_from_source": [
+          "กรุงเทพมหานคร"
+        ],
+        "affected_branches_by_province": {
+          "กรุงเทพมหานคร": 170
+        },
+        "source_file": "source-data/employment_by_province.json (NSO informal/formal)",
+        "policy": "HONEST NULL — no region-median or any fabricated value is substituted; the field is null for these branches. Any fallback added in future MUST be per-row flagged ESTIMATED.",
+        "note": "employment_by_province.json covers 76/77 canonical provinces; the absent province(s) — notably กรุงเทพมหานคร (Bangkok) — leave informal_pct null. NSO does not publish Bangkok in the informal/formal workers-by-province table we ingest; a Thai-IP repull may list it under a variant key (กทม.)."
+      },
+      "province_lfs": {
+        "affected_branches": 0,
+        "provinces_absent_from_source": [],
+        "affected_branches_by_province": {},
+        "source_file": "source-data/unemployment_by_province.json (NSO Labour Force Survey)",
+        "policy": "HONEST NULL — no region-median or any fabricated value is substituted; the field is null for these branches. Any fallback added in future MUST be per-row flagged ESTIMATED.",
+        "note": "unemployment_by_province.json covers 77/77 canonical provinces; prov_employed_k / prov_labor_force_k / prov_unemployment_rate are null for any absent province."
+      }
     },
     "provenance": "MEASURED assembly. No index or synthetic value is introduced here — this layer only re-projects existing MEASURED source layers (Overture Places, DIW factory workers, NSO employment & Labour Force Survey) onto each branch by index/province. Any field that cannot be sourced for a branch is null."
   },

@@ -1085,6 +1085,37 @@ def check_branch_labor(n_branches):
     else:
         ok("branch_labor per-branch fields sane (occ_top/estab_total + nullable measured fields)")
 
+    # HONEST-GAP contract: any null measured field must be EXPLAINED in meta.gaps, not silently blank.
+    # This STRENGTHENS the gate — a regression that drops NSO coverage (more nulls) without documenting
+    # it, or that fabricates a value to hide a gap, now fails here. Bangkok's informal_pct is the
+    # canonical case: 170 nulls, all documented. (Does not weaken any existing assertion.)
+    gaps = meta.get("gaps") if isinstance(meta, dict) else None
+    if not isinstance(gaps, dict) or not gaps:
+        fail("branch_labor meta.gaps documents the HONEST nulls", "meta.gaps missing/empty")
+    else:
+        null_inf = sum(1 for r in recs if isinstance(r, dict) and r.get("informal_pct") is None)
+        null_lfs = sum(1 for r in recs if isinstance(r, dict) and r.get("prov_employed_k") is None)
+        gbad = []
+        for key, actual in (("informal_pct", null_inf), ("province_lfs", null_lfs)):
+            g = gaps.get(key)
+            if not isinstance(g, dict):
+                gbad.append("meta.gaps.%s missing" % key); continue
+            claimed = g.get("affected_branches")
+            if claimed != actual:
+                gbad.append("meta.gaps.%s.affected_branches=%r but %d rows are null"
+                            % (key, claimed, actual))
+            if not (isinstance(g.get("policy"), str) and g["policy"].strip()):
+                gbad.append("meta.gaps.%s.policy missing (must state HONEST NULL, no fabrication)" % key)
+            # If any branch is null, at least one province must be named as absent from the source.
+            if actual > 0 and not (isinstance(g.get("provinces_absent_from_source"), list)
+                                   and g["provinces_absent_from_source"]):
+                gbad.append("meta.gaps.%s has %d nulls but names no absent province" % (key, actual))
+        if gbad:
+            fail("branch_labor meta.gaps reconciles with the actual null census", first_n(gbad))
+        else:
+            ok("branch_labor meta.gaps reconciles null census (informal_pct=%d, province_lfs=%d — all explained)"
+               % (null_inf, null_lfs))
+
 
 # ---------------------------------------------------------------------------
 def check_province_risk():
