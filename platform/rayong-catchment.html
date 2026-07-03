@@ -1214,7 +1214,7 @@ function render(){
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
   const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
-  const RAMP_LIGHT=[[181,171,155],[150,138,120],[116,102,82]]; // WARM MID-TONE massing (taupe->umber): clearly darker than the light ground so buildings read as solid masses even on a bright GPU (near-white washed out). Contrast carries the form (no GPU shadows).
+  const RAMP_LIGHT=[[150,138,120],[122,110,92],[92,80,64]]; // WARM MID-TONE massing (taupe->umber), DARKENED low end: low buildings washed to near-white on real GPUs, so the whole ramp is pulled down ~30 levels — buildings now read as solid warm masses against the light ground (contrast carries the form; no GPU shadows). Tune here if still too light/dark.
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
