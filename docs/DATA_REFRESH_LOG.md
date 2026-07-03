@@ -4,6 +4,56 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-03 — AUDIT: fixed a false-red gate (missing `numpy` misreported as data drift)
+
+**Task type:** AUDIT (gate integrity, not a data value change — no `platform/data` or `source-data`
+file content was touched).
+
+**Finding:** `bash tests/run.sh check` reported `build_branch_peers.py --check` as **FAIL** ("drifted
+from branches.json/branch_risk.json/household_risk") on a clean checkout with no data changes. Root
+cause: `pipeline/build_branch_peers.py` does `import numpy as np` unconditionally; `numpy` is not
+installed by default in this sandbox, so the script raised `ModuleNotFoundError` before it could even
+attempt the byte-comparison, and `tests/run.sh` treated the non-zero exit as "drifted". This is the
+gap already flagged (unactioned) in `docs/IMPROVEMENT_BACKLOG.md`: *"Sandbox setup gap: numpy isn't
+installed by default... a fresh loop session hits a false-red gate on cycle 1."* Confirmed by
+installing `numpy` (`pip install --break-system-packages numpy`) — the same script then reproduces
+`platform/data/branch_peers.json` byte-exact (0 drift), proving the data itself was never wrong; only
+the gate's error reporting was misleading.
+
+**Why this matters for the no-fabrication mandate:** a false "drift" failure is exactly the kind of
+signal that could tempt a future cycle to "fix" the gate by regenerating/overwriting
+`branch_peers.json` from whatever inputs happen to be lying around — which would risk silently
+changing a MEASURED-input-derived file for a reason that has nothing to do with the actual data. Fixing
+the gate to fail for the right reason (or not fail at all when the reason is a missing dependency)
+protects against that.
+
+**Fix applied (code only, zero data changes):**
+- `pipeline/build_branch_peers.py`: wrapped `import numpy as np` in `try/except ImportError`; on
+  failure it now prints `SKIP: numpy not installed ... — dependency missing, NOT data drift` to
+  stderr and exits `3` (a distinct code from the `1` used for genuine `--check` drift).
+- `tests/run.sh` `phase_check()`: added a `skip()` reporter (yellow `[SKIP]`, not counted in
+  `failc`) and special-cased the `build_branch_peers.py --check` call to read its exit code — `0` →
+  `[PASS]`, `3` → `[SKIP]` (numpy missing, gate stays green), anything else → `[FAIL]` (real drift).
+
+**Verification (this sandbox has no numpy by default):**
+- With `numpy` absent: `bash tests/run.sh check` → `30 passed, 0 failed` with a `[SKIP]` line for
+  `build_branch_peers.py --check` (previously: `1 failed`).
+- With `numpy` installed (`pip install --break-system-packages numpy`): `31 passed, 0 failed`,
+  `build_branch_peers.py --check` reports `[PASS]` — confirms the real gate still runs and passes
+  when the dependency is present.
+- Regression check: hand-corrupted one field in the committed `platform/data/branch_peers.json` and
+  reran `build_branch_peers.py --check` with numpy installed → correctly printed `DRIFT:
+  platform/data/branch_peers.json` and exited `1` (still `[FAIL]`, not swallowed by the new skip
+  path); restored the file from git afterward (verified `git status` clean before committing).
+- `validate_data.py`: 158/158 (unaffected — this cycle touched no `platform/data` or `source-data`
+  file).
+
+**Source:** no external data pulled this cycle; this was a pipeline/tooling integrity fix per the
+AUDIT task type, addressing an already-logged backlog gap. `docs/IMPROVEMENT_BACKLOG.md` item checked
+off below.
+
+---
+
 ## 2026-07-02 (2) — ENRICH: NSO Labour Force Survey unemployment rate wired into the province deep-dive
 
 **Task type:** ENRICH (fold an already-vendored MEASURED layer into a view that didn't use it yet).

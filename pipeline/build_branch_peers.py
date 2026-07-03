@@ -45,8 +45,15 @@ import argparse
 import json
 import math
 import os
+import sys
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    print("SKIP: numpy not installed (pip install --break-system-packages numpy) — "
+          "cannot run build_branch_peers.py; this is a missing dependency, NOT data drift.",
+          file=sys.stderr)
+    raise SystemExit(3)
 
 from fingerprint import branches_fingerprint
 

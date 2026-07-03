@@ -34,6 +34,7 @@ RED=$'\033[31m'; GRN=$'\033[32m'; YLW=$'\033[33m'; RST=$'\033[0m'
 pass=0; failc=0
 ok(){ printf '%s[PASS]%s %s\n' "$GRN" "$RST" "$1"; pass=$((pass+1)); }
 bad(){ printf '%s[FAIL]%s %s\n' "$RED" "$RST" "$1"; failc=$((failc+1)); }
+skip(){ printf '%s[SKIP]%s %s\n' "$YLW" "$RST" "$1"; }
 hdr(){ printf '\n%s== %s ==%s\n' "$YLW" "$1" "$RST"; }
 
 manifest_rows(){ grep -vE '^\s*#' "$MANIFEST" | grep -vE '^\s*$'; }
@@ -75,7 +76,11 @@ phase_check(){
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"
   ( cd "$PIPE" && python3 build_exit_whitespace.py --check >/dev/null 2>&1 ) && ok "build_exit_whitespace.py --check" || bad "build_exit_whitespace.py --check (exit_whitespace.json drifted from amphoe.json/competitors)"
   ( cd "$PIPE" && python3 build_expansion_plan.py --check >/dev/null 2>&1 ) && ok "build_expansion_plan.py --check" || bad "build_expansion_plan.py --check (expansion_plan.json drifted from amphoe.json/branches.json)"
-  ( cd "$PIPE" && python3 build_branch_peers.py --check >/dev/null 2>&1 ) && ok "build_branch_peers.py --check" || bad "build_branch_peers.py --check (branch_peers.json drifted from branches.json/branch_risk.json/household_risk)"
+  ( cd "$PIPE" && python3 build_branch_peers.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_peers.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_peers.py --check (numpy not installed — dependency missing, not data drift; pip install --break-system-packages numpy)"
+  else bad "build_branch_peers.py --check (branch_peers.json drifted from branches.json/branch_risk.json/household_risk)"
+  fi
   ( cd "$PIPE" && python3 build_branch_leads.py --check >/dev/null 2>&1 ) && ok "build_branch_leads.py --check" || bad "build_branch_leads.py --check (branch_leads.json drifted from branch_occupations/branches/branch_labor/occupation_risk/crop_stress)"
   ( cd "$PIPE" && python3 build_macro_exposure.py --check >/dev/null 2>&1 ) && ok "build_macro_exposure.py --check" || bad "build_macro_exposure.py --check (macro_exposure.json drifted from branch_occupations/commodity_board/crop_stress/household_risk)"
   ( cd "$PIPE" && python3 build_lead_sites.py --check >/dev/null 2>&1 ) && ok "build_lead_sites.py --check" || bad "build_lead_sites.py --check (lead_sites.json drifted from osm_layers.json/branches.json/branch_leads.json)"

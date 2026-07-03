@@ -97,18 +97,26 @@
       `[ ]` opportunity-score entries that were describing work already shipped `[x]`; removed the
       stale `[ ]` P2 Road-to-3,000 rounding item at the bottom of this file, already fixed per the
       2026-07-01 Done entry).
+- [ ] **Vendor `numpy` into the sandbox's default setup** (session-start hook or environment Dockerfile)
+      so `build_branch_peers.py --check` runs for real on cycle 1 instead of hitting the new `[SKIP]`
+      path (2026-07-03 fix stops it being misreported as a failure, but a `[SKIP]`'d check still isn't
+      as good as one that actually ran). *(LOW, S)*
+- [ ] **Document the "optional heavy dependency" pattern** (try/except ImportError → distinct exit code
+      → `tests/run.sh` reports `[SKIP]` not `[FAIL]`) in `CLAUDE.md`'s pipeline conventions, so if a
+      future script adds `scipy`/`pandas`/etc. it follows `build_branch_peers.py`'s 2026-07-03 fix
+      instead of reintroducing a false-red gate. *(LOW, S)*
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
 - [ ] **`unemp` lens: add a district (amphoe) polygon choropleth**, mirroring `dws`/`drisk`'s
       `drawAmphoeChoropleth()` fill so the raw unemployment rate paints the district shape itself (not
       just branch dots) — sharper for sparsely-branched high-unemployment districts where dots alone
       under-represent the area. Needs adding `unemp` to the `on` check in `drawAmphoeChoropleth()` +
       picking its own fill scale (reuse the amphoe-geo layer already warmed for dws/drisk). *(MED, S)*
-- [ ] **Sandbox setup gap: `numpy` isn't installed by default**, which makes `build_branch_peers.py
-      --check` throw and get misreported by `tests/run.sh` as "branch_peers.json drifted" (it's an
-      ImportError, not real data drift) — a fresh loop session hits a false-red gate on cycle 1.
-      Either vendor `numpy` into the environment's default setup (session-start hook / Dockerfile) or
-      have `build_branch_peers.py` degrade to a clearer error message distinguishing "dependency
-      missing" from "check failed" so the loop doesn't waste a cycle diagnosing it. *(MED, S)*
+- [x] **Sandbox setup gap: `numpy` isn't installed by default — DONE 2026-07-03** (`build_branch_peers.py`
+      now catches `ImportError` and exits `3` with a clear "dependency missing, NOT data drift" message;
+      `tests/run.sh` reads that exit code and reports `[SKIP]` instead of `[FAIL]`, so a fresh loop
+      session without `numpy` no longer hits a false-red gate on cycle 1. Real drift still fails
+      correctly — verified by hand-corrupting `branch_peers.json` and re-running with `numpy` installed.
+      Vendoring `numpy` into the environment's default setup itself is still open — see below.)
 - [ ] **Combine household DTI + unemployment into a single province stress score for the National map**
       (not just `build_amphoe.py`'s internal `risk_proxy` blend) — today `hhdti` and the new `unemp`
       are two separate lenses a viewer must flip between; a 3rd composite lens (or a small badge on
@@ -150,6 +158,13 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (2) — AUDIT: fixed the `numpy`-missing false-red gate.** `build_branch_peers.py` now
+  catches `ImportError` on `numpy` and exits `3` with a "dependency missing, not data drift" message
+  instead of an uncaught traceback; `tests/run.sh` reads that code and reports `[SKIP]` (not
+  `[FAIL]`), so a fresh sandbox session without `numpy` no longer misreports `branch_peers.json` as
+  drifted on cycle 1. Zero data values changed (verified: hand-corrupting `branch_peers.json` and
+  re-running with `numpy` installed still correctly fails as `DRIFT`/exit 1). Gate: 30/0 without
+  `numpy`, 31/0 with it. Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-03 entry).
 - **2026-07-02 (3) — ENRICH: NSO unemployment_rate folded into `build_amphoe.py`'s `risk_proxy`.**
   Province-inherited `unemployment_rate` field added to every amphoe record; risk_proxy reweighted to
   0.4·agri_stress + 0.25·collateral + 0.15·merchant + 0.2·unemployment_stress (unemployment scaled
