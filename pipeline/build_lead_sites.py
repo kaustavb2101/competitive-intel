@@ -62,6 +62,7 @@ OSM = os.path.join(ROOT, "source-data", "osm_layers.json")
 BRANCHES = os.path.join(DATA, "branches.json")
 LEADS = os.path.join(DATA, "branch_leads.json")
 META = os.path.join(DATA, "meta.json")
+GAPCHECK = os.path.join(ROOT, "source-data", "osm_gapcheck.json")  # provenance of re-queried gaps
 OUT = os.path.join(DATA, "lead_sites.json")
 
 K = 12                 # pins per branch
@@ -167,6 +168,35 @@ def build():
         n_sites += len(sites)
         out.append(sites)
 
+    # ── verified-sparse stamp ────────────────────────────────────────────────
+    # A branch with NO lead-relevant OSM point within 10 km (out[i] == []) is either a real
+    # measured-zero rural catchment or a hole in the national pull. pull_osm_gapcheck.py
+    # re-queries every such branch per-branch against Overpass; source-data/osm_gapcheck.json
+    # records which branch indices were re-queried and at which network vintage. Here we mark
+    # every still-empty branch that WAS re-queried as 'verified sparse — measured zero', so the
+    # UI/audit can tell a measured zero apart from a never-pulled gap. Deterministic (reads only
+    # the committed sidecar); if the sidecar is absent the stamp is simply omitted.
+    empty_now = [i for i, s in enumerate(out) if not s]
+    verified_sparse = None
+    if os.path.exists(GAPCHECK):
+        gc = _load(GAPCHECK)
+        requeried = set(gc.get("requeried_idx", []))
+        gc_vintage = gc.get("vintage") or vintage or "unknown"
+        vs_idx = sorted(i for i in empty_now if i in requeried)
+        if vs_idx:
+            verified_sparse = {
+                "note": "MEASURED ZERO, re-queried %s — Overpass returned no lead-relevant OSM "
+                        "establishment within 10 km after a per-branch bbox re-query "
+                        "(pipeline/pull_osm_gapcheck.py). These empty branches are a genuine "
+                        "sparse rural catchment, NOT a missing pull. Absence of a pin is still "
+                        "not proof of absence of an establishment (OSM is a sample)." % gc_vintage,
+                "vintage": gc_vintage,
+                "source": "pipeline/pull_osm_gapcheck.py -> source-data/osm_gapcheck.json",
+                "n": len(vs_idx),
+                "branch_indices": vs_idx,
+                "still_empty_not_requeried": sorted(i for i in empty_now if i not in requeried),
+            }
+
     meta = {
         "generated_by": "pipeline/build_lead_sites.py",
         "label": "LEAD-SITE PINS per branch — MEASURED OSM establishment coordinates: the K nearest "
@@ -211,8 +241,11 @@ def build():
         ],
         "n_branches": len(out),
         "n_sites": n_sites,
+        "n_empty_branches": len(empty_now),
         "sites_by_category": {CATEGORIES[i][0]: cat_tally[i] for i in range(len(CATEGORIES)) if cat_tally[i]},
     }
+    if verified_sparse is not None:
+        meta["verified_sparse"] = verified_sparse
     return {"meta": meta, "branches": out}
 
 
