@@ -482,7 +482,7 @@ const CA=window.CA;
 const CITY=window.CITY||'rayong';
 // Human label for the city: prefer the catchment meta name, else title-case the slug.
 const CITY_LABEL=(CA.meta&&(CA.meta.city||CA.meta.name))||
-  (CITY.charAt(0).toUpperCase()+CITY.slice(1).replace(/[-_]/g,' '));
+  CITY.split(/[-_]/).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');  // title-case EVERY word (was 'Chiang mai')
 // Header + tab title. For Rayong the strip text is unchanged (byte-equivalent default view).
 if(CITY!=='rayong'){
   const ct=document.getElementById('cityTitle');
@@ -1800,7 +1800,9 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
  try{var q=new URLSearchParams(location.search).get('city');if(q)CITY=q.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');}catch(e){}
  if(!CITY)CITY='rayong';
  window.CITY=CITY;
- var pretty=CITY.charAt(0).toUpperCase()+CITY.slice(1).replace(/[-_]/g,' ');
+ var pretty=CITY.split(/[-_]/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');  // title-case EVERY word (was 'Chiang mai')
+ // set the tab title up-front so EVERY path (loaded, not-pulled, error) shows the right province, not 'Rayong 3D'
+ if(CITY!=='rayong'){try{document.title=pretty+' 3D · เงินไชโย';}catch(e){}}
  var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading '+pretty+' 3D…';document.body.appendChild(box);
  // killLoader: remove the "Loading…" overlay idempotently. Called the instant the scene is ready
  // AND from the graceful not-pulled / error paths, so the loader can NEVER stick on screen — even

@@ -738,6 +738,19 @@ function renderCommodityBoard(){
   const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
   $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
   $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops').map(row).join('');
+  // Key-read prose: inject LIVE numbers from the board so it can never contradict the table beside it
+  // (was hardcoded chicken +25.6/beef +18.4/gold +62.7, stale after the vintage refresh).
+  const kr=$('#ov-keyread');
+  if(kr){
+    const pick=re=>{const b=META.board.find(x=>re.test(x.lab||'')&&x.yoy!=null);return b?{v:b.yoy,s:(b.yoy>0?'+':'')+b.yoy+'%'}:null;};
+    const gold=pick(/gold/i), chick=pick(/chicken|poultry/i), beef=pick(/beef|cattle/i);
+    const live=[chick&&('chicken '+chick.s), beef&&('beef '+beef.s)].filter(Boolean).join(', ');
+    const anyUp=(chick&&chick.v>0)||(beef&&beef.v>0);
+    kr.innerHTML='<b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) '+
+      'ride crop-price cycles, while livestock &amp; forestry households move on their own'+
+      (live?(' ('+live+', '+(anyUp?'holding up better':'also under pressure')+')'):'')+'. '+
+      (gold?('Gold '+gold.s+(gold.v>0?' lifts':' softens')+' pawn/gold-collateral value.'):'');
+  }
 }
 
 /* ---------- BoT hire-purchase rate-cap macro card (objective #1, margin watch) ----------
@@ -852,7 +865,7 @@ function renderRecoverySensitivity(){
   ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
-  if(note) note.innerHTML='<b>Read:</b> gold collateral is appreciating (measured, +62.7%) while motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
+  if(note) note.innerHTML='<b>Read:</b> gold collateral '+((gold&&gold.yoy!=null&&gold.yoy<0)?'is softening ':'is appreciating ')+'(measured, '+gy+') while motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
     'A <b>10% fall in used-motorcycle values</b> most exposes the provinces below, which carry the highest motorcycle-title share. '+
     'This is an <b>ESTIMATED / illustrative sensitivity</b>: we have <b>no loan balances and no LTV</b>, so we rank by motorcycle-share exposure and deliberately show <b>no LTV-breach counts</b>. Shares are measured (DLT).';
   const rows=collatMixRows().slice(0,8); if(!tbl||!rows.length) return;
@@ -1366,7 +1379,7 @@ function renderAcqBoard(){
   drawAcqBoard();
   // lazily fold the competitor census into the board so "underserved" can be re-read as
   // "underserved AND undercompeted". Null-safe: if the file is absent the column shows "n/a".
-  if(!compAttached) loadCompetitors().then(()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAcqBoard(); });
+  if(!compAttached) loadCompetitors().then(()=>{ drawAcqBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
 }
 // Per-region ranking: which region has the most white space on average + the single best opening.
 function drawAcqRegions(){
@@ -2256,12 +2269,12 @@ function renderSimCollat(){
   const {gold,veh}=simState;
   const dir=(v,upTxt,dnTxt)=>v>0?{t:upTxt,cls:'up',col:'var(--up)',a:'▲'}:v<0?{t:dnTxt,cls:'down',col:'var(--agri)',a:'▼'}:{t:'unchanged',cls:'',col:'var(--mid)',a:'•'};
   const g=dir(gold,'recovery value ↑','recovery value ↓');
-  const v=dir(veh,'recovery value ↓ · LGD ↑','recovery value ↑ · LGD ↓');
+  const v=dir(veh,'recovery value ↑ · LGD ↓','recovery value ↓ · LGD ↑');  // +move=resale up=>recovery up/LGD down (was inverted)
   // for vehicles a NEGATIVE move is the bad case, so flip the colour logic
   const vCol=veh<0?'var(--agri)':veh>0?'var(--up)':'var(--mid)';
   const cards=[
     {k:'Gold collateral',v:(gold>0?'+':'')+gold+'%',d:g.a+' '+g.t,col:g.col,
-     n:'ILLUSTRATIVE move applied to gold-backed recovery value. Baseline gold direction (measured) is +62.7% YoY on the board.'},
+     n:'ILLUSTRATIVE move applied to gold-backed recovery value. Baseline gold direction (measured) is '+(function(){var gb=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));return gb&&gb.yoy!=null?((gb.yoy>0?'+':'')+gb.yoy+'%'):'—';})()+' YoY on the board.'},
     {k:'Used-vehicle collateral',v:(veh>0?'+':'')+veh+'%',d:(veh<0?'▼':veh>0?'▲':'•')+' '+v.t,col:vCol,
      n:'ILLUSTRATIVE move on used motorcycle/pickup resale — the title-book backing. Down lowers recovery (loss-given-default rises). No LTV/balances.'},
     {k:'Net collateral read',
@@ -3280,7 +3293,8 @@ function branchSortVal(d,k){ return k==='ind'?((d.k10&&d.k10.ind)||0) : k==='ris
 function branchHref(d){return `branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}`;}
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
-  let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q));
+  let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q)
+    || ((PLOOK[d.v]&&PLOOK[d.v].en)?PLOOK[d.v].en.toLowerCase().includes(q):false));  // also match English province name (was Thai-only: 'rayong' returned 0)
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
   $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
