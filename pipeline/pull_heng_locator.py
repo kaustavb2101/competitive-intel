@@ -29,18 +29,23 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT  = os.path.join(ROOT, "source-data", "heng_branches.json")
 
 BASE = "https://www.hengleasing.com"
-PROVINCE_LIST_URL = BASE + "/branch/selectprovince.php"
+# CASE-SENSITIVE on the Linux host: selectProvince.php (capital P) is the real path —
+# the all-lowercase form 404s. Verified from Kaustav's Thai laptop 2026-07-03.
+PROVINCE_LIST_URL = BASE + "/branch/selectProvince.php"
 # pages likely to reference the province-result endpoint (form action / ajax url / onchange)
 FINDER_PAGES = [BASE + "/branch/", BASE + "/branch/index.php", BASE + "/en/branch", BASE + "/en/branch/"]
 # fallback candidate result-endpoint templates (used if page-scan finds none). {p}=url-encoded province.
+# camelCase first — the host is case-sensitive and its real files are camelCase (selectProvince.php)
 FALLBACK_TEMPLATES = [
-    BASE + "/branch/selectbranch.php?province={p}",
-    BASE + "/branch/showbranch.php?province={p}",
+    BASE + "/branch/selectBranch.php?province={p}",
+    BASE + "/branch/showBranch.php?province={p}",
+    BASE + "/branch/getBranch.php?province={p}",
+    BASE + "/branch/branchList.php?province={p}",
+    BASE + "/branch/searchBranch.php?province={p}",
+    BASE + "/branch/selectAmphur.php?province={p}",
+    BASE + "/branch/selectAmphoe.php?province={p}",
     BASE + "/branch/branch.php?province={p}",
-    BASE + "/branch/list.php?province={p}",
     BASE + "/branch/map.php?province={p}",
-    BASE + "/branch/searchbranch.php?province={p}",
-    BASE + "/branch/selectamphoe.php?province={p}",
 ]
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
