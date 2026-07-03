@@ -64,6 +64,21 @@
       leads with the full-width "Road to 3,000" headroom bar + the opportunity-score leaderboard under it. *(HIGH, M)*
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
+## Queue — UX follow-ups noticed 2026-07-03 (2)
+- [ ] **Derive `drawAmphoeChoropleth()`'s `on` check from `LENS[curLens].amp` instead of a hardcoded
+      `curLens==='dws'||curLens==='drisk'||curLens==='unemp'` OR-chain.** Same for the `ageoLoaded`/
+      `ampJoinAttached` lazy-load triggers in `setLens()`. Every amphoe-keyed lens (`amp:true` in the
+      `LENS` registry) has now needed this same 3-line wiring added by hand twice (drisk, then unemp);
+      a future amp lens will hit the identical "dots paint, polygon doesn't" bug until someone remembers
+      to extend 3 separate OR-chains. Refactoring to read the flag off `LENS` removes the whole bug
+      class. Pure refactor, behaviour-identical — verify via `?lens=dws|drisk|unemp` renders unchanged. *(LOW, S)*
+- [ ] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots** — every branch
+      in a province shares one DTI value, so today's map shows many same-coloured dots per province
+      instead of one clean shape. A province-polygon choropleth (dissolve `th_amphoe.geojson` amphoe →
+      province, or add a lightweight province boundary layer) would read as sharply as the district
+      lenses and better communicate "this is a province-level signal, not a per-branch one" — ties into
+      the existing backlog idea to combine DTI+unemployment into one province stress score. *(MED, M)*
+
 ## Queue — enrichment / capabilities (serve the two objectives)
 - [x] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED. DONE 2026-06-30** (build_household_risk.py
       → household_risk_by_province.json + National lens "MEASURED · NSO"; top DTI all Isan: Khon Kaen 1.15×, Amnat Charoen 1.14×).
@@ -106,11 +121,11 @@
       future script adds `scipy`/`pandas`/etc. it follows `build_branch_peers.py`'s 2026-07-03 fix
       instead of reintroducing a false-red gate. *(LOW, S)*
 - [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
-- [ ] **`unemp` lens: add a district (amphoe) polygon choropleth**, mirroring `dws`/`drisk`'s
-      `drawAmphoeChoropleth()` fill so the raw unemployment rate paints the district shape itself (not
-      just branch dots) — sharper for sparsely-branched high-unemployment districts where dots alone
-      under-represent the area. Needs adding `unemp` to the `on` check in `drawAmphoeChoropleth()` +
-      picking its own fill scale (reuse the amphoe-geo layer already warmed for dws/drisk). *(MED, S)*
+- [x] **`unemp` lens: add a district (amphoe) polygon choropleth — DONE 2026-07-03 (2)** (added `unemp`
+      to `drawAmphoeChoropleth()`'s `on` check + the `ageoLoaded` lazy-load trigger in `setLens()`;
+      reuses `unemp`'s existing color/val from `LENS` and the amphoe-geo layer already warmed for
+      dws/drisk — 2-line change, no new data. Gate 30/0; headless-rendered `?lens=unemp` confirms the
+      district polygons now paint alongside branch dots).
 - [x] **Sandbox setup gap: `numpy` isn't installed by default — DONE 2026-07-03** (`build_branch_peers.py`
       now catches `ImportError` and exits `3` with a clear "dependency missing, NOT data drift" message;
       `tests/run.sh` reads that exit code and reports `[SKIP]` instead of `[FAIL]`, so a fresh loop

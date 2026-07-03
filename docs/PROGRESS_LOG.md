@@ -5,6 +5,25 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 (2) — UX: `unemp` lens gets its own district (amphoe) polygon choropleth
+
+Loop cycle. Backlog item: the `unemp` lens (added earlier the same day) only painted branch dots —
+`dws`/`drisk` also paint the underlying amphoe polygon itself via `drawAmphoeChoropleth()`, which is
+sharper for sparsely-branched high-unemployment districts where dots under-represent the district area.
+Added `unemp` to `drawAmphoeChoropleth()`'s `on` check and to the `ageoLoaded` lazy-load trigger in
+`setLens()` (both previously only listed `dws`/`drisk`); the fill colour/scale is free — it reuses
+`unemp`'s own `color`/`val` already registered in `LENS`, and the amphoe-geo polygon layer that dws/drisk
+already warm. Two-line change in `platform/app.js`, no new data file, no pipeline change, fully
+backward-compatible (dws/drisk behaviour untouched; other lenses still clear the layer as before).
+
+Verification: `bash tests/run.sh check` → 30 passed, 0 failed (both before and after merging a concurrent
+push from another session). Installed the render deps (`tests/.cache`) and headless-rendered
+`index.html?lens=unemp#map` — the district polygons now paint alongside the branch dots (basemap tiles
+blank headlessly, as expected; geometry/fill renders). No regression to `dws`/`drisk` (same code path,
+just widened the lens-key check).
+
+---
+
 ## 2026-07-03 — UX: dedicated "Unemployment ▲" National-map district lens
 
 Loop cycle. `amphoe.json` has carried a province-inherited `unemployment_rate` (MEASURED · NSO Labour
