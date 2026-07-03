@@ -494,10 +494,34 @@ if(CITY!=='rayong'){
 }
 const PROV=window.PROV||{};
 const IDX=window.PROV_INDEX||null;
-// 59 province branches drive the dropdown, dots, labels and 10km rings; catchment buildings stay as city-core scenery.
-// Each falls back to [] / {} for cities whose province/competitor/POI files don't exist yet — the
-// scene still renders (buildings + ground); the Rayong-only panels just stay empty and degrade.
-const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:(CA.branches||[]);
+// The ACTIVE province's Thai name — used to slice the nationwide branch tape (window.NATBRANCHES,
+// keyed by field `v`) when this city ships no curated per-province branch file. Prefer the nationwide
+// index (slug -> th); fall back to the catchment meta if it ever carries a province name.
+const CITY_TH=(function(){
+  if(IDX){const e=IDX.find(p=>p&&p.slug===CITY); if(e&&e.th)return e.th;}
+  return (CA.meta&&(CA.meta.province_th||CA.meta.prov))||null;
+})();
+// normalise a nationwide branch (branches.json: x,y,n,v,r,d,k10{...}) into the shape the branch
+// marker layer + panels expect — top-level veh/gold, same as the curated Rayong province branches.
+function _normNat(b){const k=b.k10||{};
+  return {x:b.x,y:b.y,n:b.n,d:b.d||'',v:b.v,r:b.r,
+    veh:(b.veh!=null?b.veh:(k.veh!=null?k.veh:null)),
+    gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
+    k10:b.k10||null};}
+// BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
+//  - Rayong (and any city shipping a curated province file): the curated PROV.branches — UNCHANGED
+//    (byte-for-byte for ?city=rayong / no city param).
+//  - every OTHER province: slice the nationwide tape to this province's Thai name so its REAL
+//    branches drive the scene (fly-to zoom + 10km rings + markers), not an empty set.
+//  - last resort (no province name / no tape): the catchment's own branches, or [].
+const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:(function(){
+  const NB=window.NATBRANCHES;
+  if(CITY_TH&&NB&&NB.length){
+    const out=[]; for(const b of NB){ if(b&&b.v===CITY_TH)out.push(_normNat(b)); }
+    if(out.length)return out;
+  }
+  return CA.branches||[];
+})();
 const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:(CA.competitors||[]);
 // full POI palette comes from the province file ([lat,lng]); fall back to the catchment POIs if missing.
 const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:(CA.poi||{});
@@ -1271,7 +1295,7 @@ function render(){
   L.push(new deck.ScatterplotLayer({id:'comp',data:COMPS,getPosition:d=>[d.lng,d.lat],
     getRadius:95,radiusMinPixels:7,radiusMaxPixels:15,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
     getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
-  // (6) AutoX branches (all 59) — selected one is white
+  // (6) AutoX branches (all of this province's branches) — selected one is white
   L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
     getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
     getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
@@ -1392,7 +1416,7 @@ function updatePanels(){
     const fn=document.getElementById('focalName'); if(fn)fn.textContent=CITY_LABEL;
     const fs=document.getElementById('focalSub'); if(fs)fs.textContent='3D massing view — branch & competitor overlays roll out next';
     const k10host=document.getElementById('k10panel');
-    if(k10host)k10host.innerHTML='<div class="foot">3D buildings & ground for this city, from the catchment pull. Branch + POI overlays roll out next; Rayong carries the full analysis stack today.</div>';
+    if(k10host)k10host.innerHTML='<div class="foot">3D buildings & ground for this city. This province has no AutoX branches in the tape yet — the branch, 10&nbsp;km reach and POI panels populate wherever branches exist.</div>';
     const whost=document.getElementById('workpanel'); if(whost)whost.innerHTML='';
     const workH=document.getElementById('workH'); if(workH)workH.style.display='none';  // hide the orphan empty header
     return;
@@ -1466,7 +1490,7 @@ function buildLeads(){
   // for cities without that data (the right-hand card just shows a short note).
   if(!COMP.length||!BR.length){
     const v=document.getElementById('verdict');
-    if(v)v.innerHTML='<div class="foot">3D massing view for this city. Competitor & branch acquisition overlays roll out next; the full acquisition read is live for Rayong today.</div>';
+    if(v)v.innerHTML='<div class="foot">Branches and 10&nbsp;km reach are live for this province; national rival markers show in the scene. The curated competitor gap-lead read (which rivals hold ground you don&rsquo;t) is Rayong today.</div>';
     const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
     const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
     // hide the now-orphan "Top gaps" / "Recommendations" headers so the panel is one clean note, not empty scaffolding
@@ -1549,11 +1573,13 @@ function selectBranch(b,fly){
   if(!b)return; focal=b;
   if(fly){flyTo({longitude:b.x,latitude:b.y,zoom:12.5,pitch:55,bearing:18,transitionDuration:900});}
   updatePanels();render();
-  const sum=document.getElementById('cascSummary'); if(sum)sum.textContent='Rayong · '+(b.n||'branch');
+  const sum=document.getElementById('cascSummary'); if(sum)sum.textContent=CITY_LABEL+' · '+(b.n||'branch');
   if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
 }
 
-/* ---------- Region > Province > Branch cascade (populated from nationwide index.json; interactive for Rayong only now) ---------- */
+/* ---------- Region > Province > Branch cascade (populated from the nationwide index.json; every
+   province with branches is selectable — the ACTIVE province drills into its loaded branches in
+   place with a fly-to zoom, other provinces switch the 3D scene to that province) ---------- */
 function buildCascade(){
   const reg=document.getElementById('cscRegion'), prov=document.getElementById('cscProv'), br=document.getElementById('cscBranch');
   if(!reg||!prov||!br)return;
@@ -1569,12 +1595,11 @@ function buildCascade(){
     const r=reg.value;
     const list=IDX?IDX.filter(p=>p.region===r):[{slug:'rayong',th:'ระยอง',en:'Rayong'}];
     list.sort((a,b)=>(b.branches||0)-(a.branches||0));
+    // every province with at least one branch is selectable; 0-branch provinces (nothing to drill into) disabled.
     prov.innerHTML=list.map(p=>{
-      const isR=p.slug==='rayong';
-      const isActive=p.slug===CITY;         // the city we're actually rendering 3D for
-      const enabled=isR||isActive;          // Rayong (full stack) + the active city (3D shown) are selectable
+      const enabled=(p.branches||0)>0 || p.slug===CITY;
       const lbl=`${p.en||p.th} (${p.branches||0})`;
-      return `<option value="${p.slug}" ${enabled?'':'disabled'}>${lbl}${enabled?'':' · 3D: Rayong only'}</option>`;
+      return `<option value="${p.slug}" ${enabled?'':'disabled'}>${lbl}</option>`;
     }).join('');
     // prefer the active city, else Rayong, else leave the first
     if(list.some(p=>p.slug===CITY))prov.value=CITY;
@@ -1582,22 +1607,32 @@ function buildCascade(){
     fillBranch();
   }
   function fillBranch(){
-    // branches only available for Rayong (the loaded set). key by positional index to avoid short-name collisions.
-    if(prov.value==='rayong'){
+    // the ACTIVE province's branches are loaded (BR) — list + wire them for in-place fly-to zoom.
+    // key by positional index to avoid short-name collisions. A different province in the dropdown
+    // isn't loaded on this page; changing to it (prov.onchange below) navigates to its 3D scene.
+    if(prov.value===CITY && BR.length){
       br.disabled=false;
       br.innerHTML=BR.map((b,i)=>`<option value="${i}">${b.n||('Branch '+(i+1))}${b.d?' · '+b.d:''}</option>`).join('');
       const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
     }else{
       br.disabled=true;
-      br.innerHTML=`<option>— branch drilldown: Rayong only —</option>`;
+      br.innerHTML=`<option>— open this province to drill into its branches —</option>`;
     }
   }
   reg.onchange=fillProv;
-  prov.onchange=fillBranch;
+  // picking a DIFFERENT province loads its 3D scene (each city gets a fresh GL context, per the map
+  // tech split); re-selecting the active province just refreshes its branch list.
+  prov.onchange=function(){
+    if(prov.value && prov.value!==CITY){
+      location.href='rayong-catchment.html'+(prov.value==='rayong'?'':'?city='+encodeURIComponent(prov.value));
+      return;
+    }
+    fillBranch();
+  };
   br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
   fillProv();
   const note=document.getElementById('cscNote');
-  if(note)note.textContent='3D buildings: Rayong only — points & 10km rings nationwide (coming).';
+  if(note)note.textContent='Region › province › branch — pick a branch to fly in. Switch province to load its 3D scene.';
 }
 
 /* ---------- POI legend (swatch + label + count) — single source of truth = POI_COLORS; click toggles the layer ---------- */
