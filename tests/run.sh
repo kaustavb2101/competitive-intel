@@ -68,6 +68,7 @@ phase_check(){
   # Overture puller imports for estimated heights).
   ( cd "$PIPE" && python3 timeseries.py --check >/dev/null 2>&1 ) && ok "timeseries.py --check" || bad "timeseries.py --check (snapshot/deltas drifted from source-data)"
   ( cd "$PIPE" && python3 build_occupations.py --check >/dev/null 2>&1 ) && ok "build_occupations.py --check" || bad "build_occupations.py --check (branch_occupations.json drifted from overture_places.json)"
+  ( cd "$PIPE" && python3 build_occupation_leads.py --check >/dev/null 2>&1 ) && ok "build_occupation_leads.py --check" || bad "build_occupation_leads.py --check (occupation_leads.json drifted from occupation_places_named.json)"
   ( cd "$PIPE" && python3 build_amphoe_occupations.py --check >/dev/null 2>&1 ) && ok "build_amphoe_occupations.py --check" || bad "build_amphoe_occupations.py --check (amphoe_occupations.json drifted from overture_places.json)"
   ( cd "$PIPE" && python3 build_occupation_risk.py --check >/dev/null 2>&1 ) && ok "build_occupation_risk.py --check" || bad "build_occupation_risk.py --check (occupation_risk.json drifted from branch_occupations.json/crop_stress.json)"
   ( cd "$PIPE" && python3 build_poi_relevance.py --check >/dev/null 2>&1 ) && ok "build_poi_relevance.py --check" || bad "build_poi_relevance.py --check (poi_relevance.json drifted from branch_occupations.json/branches.json k10)"

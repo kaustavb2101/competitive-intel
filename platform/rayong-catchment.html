@@ -1610,6 +1610,28 @@ function updatePanels(){
       }).join('')+`</div>`
       +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py for measured Overture counts.</div>`;
   }
+  // NAMED occupation leads — the actual businesses to CALL near this branch, by occupation
+  // (occupation_leads.json, MEASURED Overture Places name+phone). The reframed core objective made
+  // actionable. Null-guarded: renders nothing when the layer/branch is absent.
+  (function(){
+    const idx=branchPopIndex(focal); const LD=window.OCCLEADS, BK=window.OCCLEADS_BUCKETS;
+    if(!LD||idx<0||!LD[idx]||!LD[idx].L||!LD[idx].L.length||!BK)return;
+    const byB={}; LD[idx].L.forEach(function(e){(byB[e[0]]=byB[e[0]]||[]).push(e);});
+    const order=Object.keys(byB).map(Number).sort(function(a,b){return byB[b].length-byB[a].length;});
+    html+=`<h2 style="padding:12px 0 4px;margin-top:6px">Leads to call · by occupation <span class="tag meas">measured · Overture</span></h2>`
+      +order.slice(0,6).map(function(bi){
+        const lab=(BK[bi]&&BK[bi].label)||'—', items=byB[bi].slice(0,2);
+        return `<div style="margin:5px 0"><div style="font-size:11px;color:var(--mid);font-weight:600;margin-bottom:2px">${lab}</div>`
+          +items.map(function(e){
+            const nm=e[1], phr=(e[2]||'').replace(/\s/g,'');
+            return `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:1px 0;align-items:baseline">`
+              +`<span style="color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm}</span>`
+              +(phr?`<a href="tel:${phr}" style="font-family:'IBM Plex Mono';color:var(--accent);text-decoration:none;white-space:nowrap">${e[2]}</a>`:`<span class="sub" style="white-space:nowrap;font-size:10px">no phone</span>`)
+              +`</div>`;
+          }).join('')+`</div>`;
+      }).join('')
+      +`<div class="foot">Nearest named establishments by occupation ≤10&nbsp;km — Overture Places (measured, a lower bound). Phones as published; tap to call.</div>`;
+  })();
   whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
 }
 
@@ -2010,7 +2032,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    opt('data/catchment_poi.json'),
    // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
    // branches.json — the "people" headline the catchment card shows.
-   opt('data/branch_population.json')
+   opt('data/branch_population.json'),
+   // NAMED occupation leads per branch (Overture Places, name+phone by occupation ≤10km) — the
+   // "who to call near this branch" list, index-aligned to branches.json.
+   opt('data/occupation_leads.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -2021,6 +2046,8 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.POINAT=(a[14]&&a[14].poi)||null;
    window.BRANCHPOP=(a[15]&&a[15].values)||null;
    window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
+   window.OCCLEADS=(a[16]&&a[16].branches)||null;
+   window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
    killLoader();window.initCatch();})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already

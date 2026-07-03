@@ -2430,6 +2430,59 @@ def check_branch_population(n_branches):
         ok("branch_population values sane (0 <= pop <= 12M, %d branches)" % len(vals))
 
 
+def check_occupation_leads(n_branches):
+    # NAMED occupation leads per branch (nearest establishments by occupation within 10km, name +
+    # phone). Index-aligned to branches.json. Optional file: SKIP-PASS when absent (bulk pull).
+    hdr("occupation_leads.json (optional)")
+    if not exists("occupation_leads.json"):
+        ok("occupation_leads.json absent — skipped (optional; run pull_places_strip.py + build_occupation_leads.py)")
+        return
+    try:
+        d = load("occupation_leads.json")
+    except Exception as e:
+        fail("occupation_leads.json loads", repr(e))
+        return
+    ok("occupation_leads.json loads")
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("buckets"), list) or not meta["buckets"]:
+        fail("occupation_leads meta/provenance present (generated_by + label + buckets)",
+             "meta missing generated_by/label/buckets")
+        return
+    ok("occupation_leads meta/provenance present (generated_by + measured-Places label + buckets)")
+    nb = len(meta["buckets"])
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("occupation_leads has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+    if n_branches is not None and len(recs) != n_branches:
+        fail("occupation_leads length == branches.json length", "occ=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("occupation_leads length == branches.json length (%d)" % len(recs))
+    # each lead is [bucket_idx (valid), name (non-empty str), phone (str), dist_km (0..~10.1)]
+    bad = []
+    n_leads = 0
+    for i, r in enumerate(recs):
+        L = r.get("L") if isinstance(r, dict) else None
+        if not isinstance(L, list):
+            bad.append("#%d no L list" % i); continue
+        for e in L:
+            n_leads += 1
+            if not (isinstance(e, list) and len(e) == 4):
+                bad.append("#%d malformed lead %r" % (i, e)); continue
+            bi, name, phone, dist = e
+            if not (isinstance(bi, int) and 0 <= bi < nb):
+                bad.append("#%d bad bucket %r" % (i, bi))
+            if not (isinstance(name, str) and name.strip()):
+                bad.append("#%d empty lead name" % i)
+            if not (is_finite_number(dist) and 0.0 <= dist <= 10.1):
+                bad.append("#%d dist %r out of range" % (i, dist))
+    if bad:
+        fail("occupation_leads records sane ([bucket, name, phone, dist]; named; dist<=10.1)", first_n(bad, 8))
+    else:
+        ok("occupation_leads records sane (%d named leads; valid bucket/name/dist)" % n_leads)
+
+
 # ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
@@ -2819,6 +2872,7 @@ def main():
     check_rival_density(amphoe)
     check_cluster_brief(n, branches)
     check_branch_population(n)
+    check_occupation_leads(n)
     check_provenance()
     check_index_alignment(n)
     check_branches_fingerprint(branches)
