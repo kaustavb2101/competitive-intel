@@ -556,6 +556,32 @@ function compNat(){
 // measured national census filtered to the scene — so every city shows real rivals in-frame.
 function compScene(){ if(_COMP_SCENE)return _COMP_SCENE;
   _COMP_SCENE=(COMP&&COMP.length)?COMP:compNat(); return _COMP_SCENE; }
+// ---- MEASURED nationwide POI pins, bbox-filtered to the scene (parity with compNat) ----------
+// window.POINAT (catchment_poi.json .poi) is the national OSM POI set, [lat,lng] per point, keyed
+// by the scene's 11 pin types. Curated per-province .poi (Rayong) always wins; every OTHER province
+// falls back to POINAT sliced to this city's building extent — so the scene gets POI columns
+// everywhere, not only Rayong. Lazy + memoised: sceneExtent() is in its temporal dead zone during
+// const-init, so this is only ever called from render()/legend, after every declaration is live.
+let _POI_SCENE=null;
+function poiScene(){ if(_POI_SCENE)return _POI_SCENE;
+  _POI_SCENE={};
+  const PN=window.POINAT;
+  if(!PN){return _POI_SCENE;}
+  let E; try{E=sceneExtent();}catch(e){return _POI_SCENE;}
+  if(!E||!isFinite(E.minX)){_POI_SCENE=null;return {};}   // extent not ready yet — don't memoise empty
+  const padX=(E.maxX-E.minX)*0.12+0.01, padY=(E.maxY-E.minY)*0.12+0.01;
+  const x0=E.minX-padX,x1=E.maxX+padX,y0=E.minY-padY,y1=E.maxY+padY;
+  for(const t in PN){ const src=PN[t]; if(!Array.isArray(src))continue;
+    const out=[];
+    for(let i=0;i<src.length;i++){ const p=src[i]; if(!p)continue;
+      const la=+p[0], ln=+p[1]; if(!isFinite(la)||!isFinite(ln))continue;
+      if(ln<x0||ln>x1||la<y0||la>y1)continue;
+      out.push(p);}
+    _POI_SCENE[t]=out;}
+  return _POI_SCENE; }
+// resolve a pin type's points: curated province set when present, else the bbox-filtered national set.
+function poiGet(t){ if(POIS[t]&&POIS[t].length)return POIS[t];
+  const ps=poiScene(); return (ps&&ps[t])||[]; }
 const GOLD=[230,180,80]; // 10km collateral catchment ring
 // canonical type->color map: single source of truth for map dots AND legend AND toggles.
 // Ordered + coloured by relevance to a TITLE-LOAN lender (collateral supply + finance first, then
@@ -578,9 +604,16 @@ const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Bank
 const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1};
 // legend/render order by relevance (collateral & finance, then demand, then economy)
 const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy'];
-// preserve a stable, relevance-ordered legend, restricted to types actually present in the data
-const POI_TYPES=POI_ORDER.filter(t=>POIS[t]&&POIS[t].length);
-const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
+// preserve a stable, relevance-ordered legend, restricted to types actually present in the scene.
+// LET (not const) + refreshed once the scene extent is known: for curated provinces the curated
+// POIS decides; for every other province poiGet() falls back to the bbox-filtered national POI, so
+// a type only lists if it actually has a pin in THIS city's viewport. refreshPoiTypes() runs at the
+// top of the init tail (after sceneExtent is available) and is cheap/idempotent (poiScene memoised).
+let POI_TYPES=POI_ORDER.filter(t=>POIS[t]&&POIS[t].length);
+function refreshPoiTypes(){ POI_TYPES=POI_ORDER.filter(t=>poiGet(t).length); }
+// poiOn defaults are keyed on the FULL order (not POI_TYPES) so toggling works no matter when a
+// type first appears in the bbox-filtered set.
+const poiOn={}; POI_ORDER.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DARK (CARTO dark_all) basemap is the DEFAULT: the gold-ramp buildings pop against black (the
 // DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
 // wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
@@ -1136,6 +1169,7 @@ function streamBuildingLayer(){
 }
 
 function render(){
+  refreshPoiTypes();   // keep the pin type set current (bbox-filtered national POI for non-Rayong)
   // ground scaffolding first so buildings/rings/POIs draw on top of it.
   // extraLayers() (optional trees + rail) sit just above the ground bed / under buildings.
   const L=[baseLayer(), ...groundLayers(), ...extraLayers()];
@@ -1272,7 +1306,7 @@ function render(){
     industrial:62,convenience:48,restaurant:42,hotel:55,school:52,pharmacy:45};
   POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
     const c=POI_COLORS[t], e=POI_ELEV[t]||70;
-    L.push(new deck.ColumnLayer({id:'poi-'+t,data:POIS[t],
+    L.push(new deck.ColumnLayer({id:'poi-'+t,data:poiGet(t),
       getPosition:p=>[p[1],p[0]],
       diskResolution:6, radius:42, radiusUnits:'meters',
       extruded:true, elevationScale:1, getElevation:e,
@@ -1347,7 +1381,7 @@ function render(){
 
 /* ---------- panels ---------- */
 function fmt(n){return n.toLocaleString();}
-function poiArr(t){return (POIS[t]&&POIS[t].length)?POIS[t]:[];}
+function poiArr(t){return poiGet(t);}
 function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 
 // province workforce (MEASURED, NSO via gov.employment) — informal share is the core title-loan base
@@ -1558,8 +1592,8 @@ function buildStrip(){
   const byB={};COMP.forEach(c=>byB[c.brand]=(byB[c.brand]||0)+1);
   const items=[['AutoX',BR.length,'#E0A93B'],['Srisawad',byB.Srisawad||0,'#E0474B'],
     ['Tidlor',byB.Tidlor||0,'#4F7BF0'],['Muangthai',byB.Muangthai||0,'#D65AA0'],
-    ['7-Eleven+',(POIS.convenience||[]).length,'#E07B2F'],['Vehicle',(POIS.vehicle_commerce||[]).length,'#159b86'],
-    ['Markets',(POIS.fresh_market||[]).length,'#E0C850']];
+    ['7-Eleven+',poiGet('convenience').length,'#E07B2F'],['Vehicle',poiGet('vehicle_commerce').length,'#159b86'],
+    ['Markets',poiGet('fresh_market').length,'#E0C850']];
   document.getElementById('strip').insertAdjacentHTML('beforeend',
     items.filter(([n,v])=>v>0).map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));  // hide 0-count chips (a city with no branch/competitor/POI data shows a clean strip, not "AutoX 0 · Srisawad 0 ...")
   // OPPORTUNITY CUE (Upgrade 3, optional): the top-scoring acquisition district for THIS city's
@@ -1657,8 +1691,9 @@ function buildCascade(){
 /* ---------- POI legend (swatch + label + count) — single source of truth = POI_COLORS; click toggles the layer ---------- */
 function buildLegend(){
   const host=document.getElementById('legend'); if(!host)return;
+  refreshPoiTypes();
   host.innerHTML=POI_TYPES.map(t=>{
-    const c=POI_COLORS[t], n=(POIS[t]||[]).length;
+    const c=POI_COLORS[t], n=poiGet(t).length;
     return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
       <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
   }).join('');
@@ -1880,7 +1915,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    opt('data/competitors_national.json'), opt('data/opportunity_score.json'),
    // operator-configured CDN config (already fetched above) — kept in the same array slot so the
    // a[13] consumer below is unchanged.
-   Promise.resolve(TILECFG)
+   Promise.resolve(TILECFG),
+   // MEASURED nationwide POI pins (OSM, all 11 scene types). The scene bbox-filters this to the
+   // current city extent so EVERY province's 3D scene gets POI columns — not just curated Rayong.
+   opt('data/catchment_poi.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -1888,6 +1926,7 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
    window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
+   window.POINAT=(a[14]&&a[14].poi)||null;
    killLoader();window.initCatch();})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already

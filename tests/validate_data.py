@@ -2151,6 +2151,60 @@ def check_lead_sites(n_branches):
            "cat_idx valid, nearest-first)" % n_sites)
 
 
+def check_catchment_poi():
+    # NATIONWIDE POI PINS for the 3D catchment scene: MEASURED OSM coordinates for all 11 scene
+    # pin types, [lat,lng] per point (the order the scene ColumnLayer expects — this check guards
+    # the swap), bbox-filtered client-side. Optional file: SKIP-PASS when absent.
+    hdr("catchment_poi.json (optional)")
+    if not exists("catchment_poi.json"):
+        ok("catchment_poi.json absent — skipped (optional; run build_catchment_poi.py to populate)")
+        return
+    try:
+        d = load("catchment_poi.json")
+    except Exception as e:
+        fail("catchment_poi.json loads", repr(e))
+        return
+    ok("catchment_poi.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("type_map"), dict) or not meta["type_map"]:
+        fail("catchment_poi meta/provenance present (generated_by + label + type_map)",
+             "meta missing generated_by/label/type_map")
+        return
+    ok("catchment_poi meta/provenance present (generated_by + measured-coordinates label + type_map)")
+
+    poi = d.get("poi")
+    if not isinstance(poi, dict) or not poi:
+        fail("catchment_poi has a non-empty 'poi' map", "got %s" % type(poi).__name__)
+        return
+    # every declared type must be a list of [lat,lng] inside the Thailand bbox. The lat/lng
+    # ORDER matters: a [lng,lat] slip would put lat~100 (outside [5,21]) — this catches it.
+    bad = []
+    n_pts = 0
+    for t, arr in poi.items():
+        if not isinstance(arr, list):
+            bad.append("%s not a list" % t)
+            continue
+        for p in arr:
+            if not (isinstance(p, list) and len(p) == 2):
+                bad.append("%s malformed point %r" % (t, p)); continue
+            lat, lng = p
+            if not (is_finite_number(lat) and is_finite_number(lng)
+                    and 5.0 <= lat <= 21.0 and 97.0 <= lng <= 106.0):
+                bad.append("%s point outside Thailand bbox (lat,lng order?): %r" % (t, p))
+            n_pts += 1
+    # be tolerant of a small number of stray points but fail on systemic order/bbox errors
+    if len(bad) > 20:
+        fail("catchment_poi points are [lat,lng] inside the Thailand bbox", first_n(bad, 8))
+    elif bad:
+        # a few strays are logged but don't fail the gate (OSM has occasional bad coords)
+        ok("catchment_poi points [lat,lng] in bbox (%d points; %d stray logged: %s)"
+           % (n_pts, len(bad), first_n(bad, 3)))
+    else:
+        ok("catchment_poi points [lat,lng] in Thailand bbox (%d points, %d types)" % (n_pts, len(poi)))
+
+
 # ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
@@ -2534,6 +2588,7 @@ def main():
     check_peer_npl()
     check_macro_exposure(n)
     check_lead_sites(n)
+    check_catchment_poi()
     check_provenance()
     check_index_alignment(n)
     check_branches_fingerprint(branches)
