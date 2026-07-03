@@ -14,7 +14,7 @@ const LENS = {
   dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
   brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
   comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
-  hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
+  hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, prov:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
   cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
@@ -22,7 +22,7 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
-  pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, est:true, tag:'e', val:d=>pstressVal(d)},
+  pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
@@ -1744,6 +1744,68 @@ function drawAmphoeChoropleth(){
   // keep the choropleth BENEATH the branch dots (canvas markers) so dots stay clickable on top.
   if(ampChoroLayer.bringToBack) ampChoroLayer.bringToBack();
 }
+
+/* ---------- province CHOROPLETH polygons (National map) ----------
+   hhdti/pstress are PROVINCE-resolution values (one number per province, not per district),
+   so every branch in a province used to share a colour and paint as many same-coloured dots —
+   read as noise instead of one clean shape (docs/IMPROVEMENT_BACKLOG.md, 2026-07-03 (2)/(5)).
+   Lazy-loads data/province_geo.json (pipeline/build_province_geo.py — the amphoe polygons
+   regrouped by province, no new geometry). Paints UNDER the branch dots exactly like the
+   amphoe choropleth. Optional + null-safe: absent/failed file leaves PGEO null and this is a
+   no-op (dots only, unchanged behaviour). */
+let PGEO=null, pgeoLoaded=false, pgeoPromise=null, provChoroLayer=null;
+function loadProvinceGeo(){
+  if(pgeoPromise) return pgeoPromise;
+  pgeoLoaded=true;
+  pgeoPromise=(async()=>{
+    try{
+      const j=await fetch('data/province_geo.json').then(r=>r.ok?r.json():null);
+      PGEO=(j&&Array.isArray(j.features))?j.features:null;
+    }catch(e){ PGEO=null; }
+    return PGEO;
+  })();
+  return pgeoPromise;
+}
+// true when lens k is province-keyed (reads d.v directly, one value per province) — same
+// registry-flag pattern as isAmpLens so a future province lens wires in automatically.
+function isProvLens(k){ return !!(LENS[k]&&LENS[k].prov); }
+function drawProvinceChoropleth(){
+  if(!mapReady||!map||typeof L==='undefined'||!L.geoJSON) return;
+  const on=isProvLens(curLens);
+  if(!on||!PGEO){
+    if(provChoroLayer){ map.removeLayer(provChoroLayer); provChoroLayer=null; }
+    return;
+  }
+  const l=LENS[curLens];
+  if(!l) return;
+  // colour scale keyed off the same per-province lists the lens itself reads (HHRISK_LIST /
+  // PSTRESS_LIST), so the ramp matches the dot legend exactly.
+  const mx=Math.max(1,...(PGEO.map(f=>{ const v=l.val({v:(f.properties||{}).province}); return (typeof v==='number'&&isFinite(v))?v:0; })));
+  if(provChoroLayer){ map.removeLayer(provChoroLayer); provChoroLayer=null; }
+  const renderer=L.canvas({padding:0.5});
+  provChoroLayer=L.geoJSON({type:'FeatureCollection',features:PGEO},{
+    renderer,
+    style:f=>{
+      const prov=(f.properties||{}).province;
+      const v=l.val({v:prov});
+      const t=Math.max(0,Math.min(1,(typeof v==='number'&&isFinite(v)?v:0)/mx));
+      return {fillColor:lensColor(Math.sqrt(t),l.color), fillOpacity:0.45,
+              color:'rgba(20,26,34,.28)', weight:0.4, interactive:true};
+    },
+    onEachFeature:(f,layer)=>{
+      const prov=(f.properties||{}).province; if(!prov) return;
+      const v=l.val({v:prov});
+      const unit=l.unit||'';
+      const vtxt=(typeof v==='number'&&isFinite(v))?v:'n/a';
+      layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${l.color}">● ${prov}</div>`+
+        `<div class="sub" style="margin-top:4px"><b style="color:${l.color}">${vtxt}</b> ${unit}</div></div>`,
+        {closeButton:true,maxWidth:260});
+    }
+  });
+  provChoroLayer.addTo(map);
+  // keep the choropleth BENEATH the branch dots (canvas markers) so dots stay clickable on top.
+  if(provChoroLayer.bringToBack) provChoroLayer.bringToBack();
+}
 function ampChips(id,cur,onPick){
   const box=$(id); if(!box||box.dataset.init) return;
   const regions=['all',...Array.from(new Set(AMP.map(a=>a.region)))];
@@ -2937,6 +2999,9 @@ function initMap(){
   // warm the simplified amphoe polygons so the district lenses can paint the choropleth. Optional
   // + null-safe: absent/failed file leaves AGEO null and drawAmphoeChoropleth() is a no-op (dots only).
   if(!ageoLoaded) loadAmphoeGeo().then(()=>{ if(mapReady) drawAmphoeChoropleth(); });
+  // warm the province polygons so hhdti/pstress can paint one shape per province instead of many
+  // same-coloured dots. Optional + null-safe: absent/failed file leaves PGEO null (dots only).
+  if(!pgeoLoaded) loadProvinceGeo().then(()=>{ if(mapReady) drawProvinceChoropleth(); });
   // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
   // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
   if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
@@ -3487,6 +3552,7 @@ function styleMarkers(){
   // paint (or clear) the district choropleth to match the active lens — null-safe no-op
   // on a branch lens or when the polygon file is absent.
   drawAmphoeChoropleth();
+  drawProvinceChoropleth();
 }
 function setLens(k){
   curLens=k;
@@ -3526,6 +3592,9 @@ function setLens(k){
   }
   if(isAmpLens(k) && !ageoLoaded){
     loadAmphoeGeo().then(()=>{ if(isAmpLens(curLens)&&mapReady) drawAmphoeChoropleth(); });
+  }
+  if(isProvLens(k) && !pgeoLoaded){
+    loadProvinceGeo().then(()=>{ if(isProvLens(curLens)&&mapReady) drawProvinceChoropleth(); });
   }
   if(k==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'){ renderLegend(); if(mapReady){ drawCompPoints(); styleMarkers(); } } });

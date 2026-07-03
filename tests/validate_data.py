@@ -372,6 +372,90 @@ def check_amphoe_geo(amphoe):
 
 
 # ---------------------------------------------------------------------------
+def check_province_geo(branches):
+    """province_geo.json — province polygons (amphoe polygons regrouped) for the
+    PROVINCE-resolution map lenses (hhdti/pstress). OPTIONAL layer (the map degrades to
+    dots without it), so absence is a PASS. When present it must be a valid
+    FeatureCollection, carry provenance, and every polygon must carry a province name
+    that actually appears on a real branch (branches.json `v`)."""
+    hdr("province_geo.json")
+    path = os.path.join(DATA, "province_geo.json")
+    if not os.path.exists(path):
+        ok("province_geo.json absent (optional map layer) — skipped")
+        return
+    try:
+        g = load("province_geo.json")
+    except Exception as e:
+        fail("province_geo.json loads", repr(e))
+        return
+    ok("province_geo.json loads")
+
+    if g.get("type") == "FeatureCollection" and isinstance(g.get("features"), list):
+        ok("province_geo is a FeatureCollection with features[]")
+    else:
+        fail("province_geo is a FeatureCollection with features[]", "bad top-level shape")
+        return
+    feats = g["features"]
+
+    meta = g.get("meta", {})
+    if meta.get("generated_by") and meta.get("source") and meta.get("label"):
+        ok("province_geo meta/provenance present (generated_by + source + label)")
+    else:
+        fail("province_geo meta/provenance present (generated_by + source + label)",
+             "meta missing generated_by/source/label")
+
+    bad_geom = []
+    oob = 0
+    for i, f in enumerate(feats):
+        geom = (f or {}).get("geometry") or {}
+        t = geom.get("type")
+        coords = geom.get("coordinates")
+        if t not in ("Polygon", "MultiPolygon") or not isinstance(coords, list):
+            bad_geom.append("#%d type=%r" % (i, t)); continue
+        polys = coords if t == "MultiPolygon" else [coords]
+        okgeom = True
+        for poly in polys:
+            if not poly or not isinstance(poly[0], list) or len(poly[0]) < 4:
+                okgeom = False; break
+            ring = poly[0]
+            if ring[0] != ring[-1]:
+                okgeom = False; break
+            for pt in ring:
+                lng, lat = pt[0], pt[1]
+                if not (TH_LNG_MIN <= lng <= TH_LNG_MAX and TH_LAT_MIN <= lat <= TH_LAT_MAX):
+                    oob += 1
+        if not okgeom:
+            bad_geom.append("#%d bad/short/open ring" % i)
+    if bad_geom:
+        fail("province_geo every feature has a valid closed outer ring", first_n(bad_geom))
+    else:
+        ok("province_geo every feature has a valid closed outer ring")
+    if oob == 0:
+        ok("province_geo all vertices inside Thailand bbox")
+    else:
+        fail("province_geo all vertices inside Thailand bbox", "%d out-of-bbox vertices" % oob)
+
+    provs = [((f or {}).get("properties") or {}).get("province") for f in feats]
+    if all(isinstance(p, str) and p for p in provs):
+        ok("province_geo every feature carries a string properties.province")
+    else:
+        fail("province_geo every feature carries a string properties.province",
+             "some features missing province")
+    if len(set(provs)) != len(provs):
+        fail("province_geo province names are unique (one polygon per province)",
+             "duplicate province name(s)")
+    else:
+        ok("province_geo province names are unique (one polygon per province)")
+    if branches:
+        real_provs = {rec.get("v") for rec in branches if rec.get("v")}
+        unmatched = [p for p in provs if p not in real_provs]
+        if unmatched:
+            fail("province_geo province names all join to a real branch province", first_n(unmatched))
+        else:
+            ok("province_geo province names all join to a real branch province (%d provinces)" % len(provs))
+
+
+# ---------------------------------------------------------------------------
 def check_provinces(n_branches):
     hdr("provinces/")
     try:
@@ -2844,6 +2928,7 @@ def main():
     n = len(branches) if branches is not None else None
     amphoe = check_amphoe(n)
     check_amphoe_geo(amphoe)
+    check_province_geo(branches)
     check_provinces(n)
     check_crop_stress()
     check_collateral_outlook()

@@ -5,6 +5,45 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 (7) — ENRICH: province polygon choropleth for the hhdti/pstress lenses
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (2)/(5)): the two PROVINCE-resolution map
+lenses — `hhdti` (household debt-to-income) and `pstress` (province structural stress) — key off
+`d.v` (the branch's province name), so every branch in a province shared one colour and painted as
+many same-coloured overlapping dots instead of one clean province shape, unlike the district
+(amphoe) lenses (`dws`/`drisk`/`unemp`) which already paint a polygon choropleth via
+`drawAmphoeChoropleth()`.
+
+New `pipeline/build_province_geo.py` → `platform/data/province_geo.json` (77 provinces). Avoids a
+second Douglas–Peucker simplification pass or a `shapely` polygon dissolve: it GROUPS the
+already-simplified, already-committed `amphoe_geo.json` polygons by `amphoe.json`'s
+`province_th`, re-emitting each province's constituent amphoe rings as one `MultiPolygon` feature
+(no new geometry invented, no vertices changed — same convention as `build_amphoe_geo.py`, which
+this reuses as input instead of re-touching `th_amphoe.geojson`). Deterministic + network-free,
+`--check`-gated (byte-exact reproduce), degrades gracefully (`SKIP`, exit 0) if `amphoe_geo.json`/
+`amphoe.json` are absent.
+
+Wired into `platform/app.js`: `hhdti`/`pstress` gained a `prov:true` flag on the `LENS` registry
+(mirrors the existing `amp:true` pattern); new `isProvLens(k)` + `loadProvinceGeo()` +
+`drawProvinceChoropleth()` (parallel to `isAmpLens`/`loadAmphoeGeo`/`drawAmphoeChoropleth`, painted
+UNDER the branch dots, same canvas-renderer / colour-ramp / legend conventions) — reads the lens's
+own `val()` against `{v: province}` so it needs no new join logic. Wired into `initMap()`'s warm-up
+and `setLens()`'s lazy-load triggers, and into `styleMarkers()` alongside the existing amphoe-draw
+call. Purely additive: every other lens is untouched, and the file degrades to dots-only if
+`province_geo.json` is absent (same optional-layer convention as `amphoe_geo.json`).
+
+`tests/validate_data.py` gained `check_province_geo()` (FeatureCollection shape, provenance, valid
+closed rings, Thailand-bbox sanity, unique province names, and a join check against real branch
+provinces — mirrors `check_amphoe_geo()`); `tests/run.sh` gates `build_province_geo.py --check`.
+Gate: 37/0 (`validate_data.py` 193/193, was 185/185). Verified with a headless Playwright load of
+`index.html?lens=hhdti#map` and `?lens=pstress#map` against the local vendored bundles: `PGEO`
+resolves to 77 features and `provChoroLayer` attaches all 77 province polygons on both lenses, zero
+JS errors (only the expected blocked basemap-tile/Google-Fonts network calls). A full-country
+screenshot at branch-dot zoom can't visually distinguish the polygons under the dense, opaque dot
+layer — confirmed via direct DOM/JS inspection instead. `bash tests/run.sh render` also caught a
+pre-existing, unrelated `rayong-catchment.html` render failure (deck.gl 3D page owned by a
+different in-flight workflow; untouched by this change).
+
 ## 2026-07-03 (5) — REFACTOR: amp-lens gating reads `LENS[k].amp` instead of a hand-maintained OR-chain
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (2)): `drawAmphoeChoropleth()`'s district-lens

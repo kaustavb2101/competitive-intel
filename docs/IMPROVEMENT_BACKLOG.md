@@ -65,12 +65,10 @@
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
 ## Queue — UX follow-ups noticed 2026-07-03 (2)
-- [ ] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots** — every branch
-      in a province shares one DTI value, so today's map shows many same-coloured dots per province
-      instead of one clean shape. A province-polygon choropleth (dissolve `th_amphoe.geojson` amphoe →
-      province, or add a lightweight province boundary layer) would read as sharply as the district
-      lenses and better communicate "this is a province-level signal, not a per-branch one" — ties into
-      the existing backlog idea to combine DTI+unemployment into one province stress score. *(MED, M)*
+- [x] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots — DONE
+      2026-07-03 (7)** (`build_province_geo.py` groups the existing `amphoe_geo.json` polygons by
+      province → `province_geo.json`; `hhdti`/`pstress` gained `prov:true` + a
+      `drawProvinceChoropleth()` layer, same pattern as the district choropleth).
 
 ## Queue — enrichment / capabilities (serve the two objectives)
 - [x] **★ Household debt-to-income RISK LENS (National map) — objective #1, MEASURED. DONE 2026-06-30** (build_household_risk.py
@@ -194,20 +192,50 @@
       original ask. *(LOW, S)*
 
 ## Queue — follow-ups noticed 2026-07-03 (5)
-- [ ] **`pstress` (province structural-stress) lens has the same "province-resolution but only
-      branch dots" issue already tracked for `hhdti`** above — it reads `PSTRESS[d.v]` (province
-      name), so every branch in a province shares one value and paints as many same-coloured dots
-      instead of one clean province shape. Since both `hhdti` and `pstress` key off `d.v` (not an
-      amphoe id), a single province-boundary choropleth layer (dissolve `th_amphoe.geojson` amphoe →
-      province once) could serve both lenses instead of building it twice. *(MED, M)*
+- [x] **`pstress` lens has the same "province-resolution but only branch dots" issue as `hhdti` —
+      DONE 2026-07-03 (7), duplicate of the entry fixed above** (one `province_geo.json` +
+      `drawProvinceChoropleth()` serves both lenses via the shared `prov:true` flag).
 - [ ] **Stale comment at `platform/app.js`'s `initMap()` `deferForAmp` line ("the district lenses
       (dws/drisk) read d._amp") predates the `unemp` amp lens** and now also `isAmpLens()` — the
       comment still names only 2 of the (now 3, growing) amp lenses. Reword to describe the
       mechanism ("any amp:true lens") instead of enumerating keys, so it doesn't go stale again
       next time one is added. *(LOW, trivial)*
 
+## Queue — follow-ups noticed 2026-07-03 (6)
+- [ ] **`province_geo.json`'s province shapes are amphoe polygons GROUPED (not dissolved)** —
+      internal amphoe boundary seams render as thin lines within a province (cosmetic only, the
+      fill colour is uniform per province so it still reads as one shape at the National map's
+      normal zoom). If `shapely` ever lands in the default sandbox setup (see the existing
+      "vendor numpy/shapely/rasterio" backlog item), a true `unary_union` dissolve would produce
+      cleaner single-ring province outlines — low priority, purely cosmetic. *(LOW, S,
+      blocked-ish on shapely)*
+- [ ] **`drawAmphoeChoropleth()` and `drawProvinceChoropleth()` are near-duplicate functions**
+      (same canvas-layer lifecycle, colour-ramp, popup-binding shape, only the join key differs —
+      amphoe `id` vs province name) — now that there are two resolutions of choropleth, a shared
+      `drawChoropleth({features, keyFn, valFn, ...})` helper would remove the duplication before a
+      3rd resolution (e.g. region-level) ever gets added. *(LOW, S, pure refactor)*
+- [ ] **The new province choropleth is effectively invisible at the National map's default
+      country-wide zoom** because the opaque branch dots (fillOpacity 0.9) fully tile over the
+      denser provinces (Bangkok, the East) — it only becomes visible once zoomed into a
+      sparser-branch province, or if the dots were made semi-transparent on `prov:true` lenses. A
+      quick win: drop marker `fillOpacity` to ~0.55-0.65 (or shrink radius) specifically when
+      `isProvLens(curLens)` is true, so the polygon fill reads through immediately. *(MED, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (7) — ENRICH: province polygon choropleth for the hhdti/pstress lenses.** New
+  `pipeline/build_province_geo.py` groups the already-committed `amphoe_geo.json` polygons by
+  `amphoe.json` province_th (no dissolve, no re-simplification) → `platform/data/province_geo.json`
+  (77 provinces, `--check`-gated, degrades to SKIP when inputs absent). `hhdti`/`pstress` gained a
+  `prov:true` LENS flag + `isProvLens()`/`loadProvinceGeo()`/`drawProvinceChoropleth()` (mirrors the
+  amphoe-choropleth pattern), wired into `initMap()`/`setLens()`/`styleMarkers()`. Purely additive,
+  null-safe when the file is absent. `validate_data.py` gained `check_province_geo()` (193/193, was
+  185/185); gate 37/0. Verified via headless Playwright load (not just a screenshot, since the
+  dense opaque branch dots hide the polygon fill at country zoom): `PGEO` = 77 features and
+  `provChoroLayer` attaches all 77 province polygons on both `?lens=hhdti` and `?lens=pstress`,
+  zero JS errors. `tests/run.sh render` also surfaced a pre-existing, unrelated
+  `rayong-catchment.html` render failure (3D page owned by a different in-flight workflow, not
+  touched this cycle). Full writeup: `docs/PROGRESS_LOG.md` (2026-07-03 (7) entry).
 - **2026-07-03 (6) — AUDIT: fixed a second false-red/false-green gate gap in
   `build_branch_population.py --check` (same bug class as the 2026-07-03 numpy fix, one level
   subtler).** The script has two valid build methods — MEASURED raster sum (needs `rasterio` + the
