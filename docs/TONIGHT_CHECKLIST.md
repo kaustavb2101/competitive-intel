@@ -67,6 +67,8 @@ python3 build_province.py             # provinces pick up the new vehicle/factor
 python3 build_amphoe.py               # district whitespace/risk pick up new gov counts
 ```
 
+> **Bangkok labor gap (170 branches):** `employment_by_province.json` currently covers only 76/77 provinces — **กรุงเทพมหานคร (Bangkok) has no key**, so `informal_pct` is an honest null for its 170 branches. On this repull, check whether the NSO raw names Bangkok differently (e.g. **กทม.**) and, if so, add that alias to `regionmap.ALIAS`; then `ingest_gov.build_employment`'s new `coverage.missing_provinces` should come back empty and `build_branch_labor.py`'s `meta.gaps.informal_pct` closes.
+
 ---
 
 ## 2. NSO Census Table 6 — occupations by district

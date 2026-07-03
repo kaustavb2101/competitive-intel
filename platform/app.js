@@ -584,6 +584,10 @@ const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; i
 function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Math.round(62*Math.min(v,max)/max)}px;background:${color}"></i></span>`;}
 // honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
 function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
+// honest renderer for NSO province fields NOT published for a province (e.g. กรุงเทพมหานคร/Bangkok has
+// no key in the NSO informal/formal table → 170 branches). Show 'not published (NSO)', never blank.
+// See branch_labor.json meta.gaps + docs/TONIGHT_CHECKLIST.md (a Thai-IP repull may list it as กทม.).
+function nsoNum(v){return v==null?'<span class="sub" title="Not published by NSO for this province (see branch_labor meta.gaps)">not published (NSO)</span>':v.toLocaleString();}
 
 /* ---------- skeleton placeholders ----------
    Shimmer-skeleton markup that mirrors the final layout while data loads, fading to real content
@@ -3004,6 +3008,10 @@ function laborPopupHTML(d,sec,r){
   const hasFac=e.factory_workers!=null;
   const hasInf=e.informal_pct!=null;
   const hasLfs=e.prov_employed_k!=null;
+  // informal_pct is an HONEST NULL for provinces NSO doesn't publish (Bangkok's 170 branches). If we
+  // have any other labour signal for this branch, still show the informal line as 'not published (NSO)'
+  // rather than silently dropping it — a gap named is more honest than a gap hidden.
+  const showInfGap = !hasInf && (hasOcc||hasFac||hasLfs);
   if(!hasOcc&&!hasFac&&!hasInf&&!hasLfs) return '';
   const occCol=['var(--accent)','#7f93d6','#8b90a7'];
   let html=sec('Employment & labour');
@@ -3020,6 +3028,7 @@ function laborPopupHTML(d,sec,r){
   }
   if(hasFac) html+=r('Factory workers in district', e.factory_workers.toLocaleString()+' '+TAG_M, 'var(--gold)');
   if(hasInf) html+=r('Province informal share', e.informal_pct+'% '+TAG_M, 'var(--collat)');
+  else if(showInfGap) html+=r('Province informal share', nsoNum(null), 'var(--collat)');
   if(hasLfs){
     const ur=e.prov_unemployment_rate;
     html+=r('Province labour force', `${(e.prov_labor_force_k||0).toLocaleString()}k`+(ur!=null?` · ${ur}% unemp`:'')+' '+TAG_M, '#c7cedd');
@@ -3190,7 +3199,7 @@ function popupHTML(d){
     ${r('District factories (DIW)', naNum(d.dfac), 'var(--gold)')}
     ${r('District factory workers (DIW)', naNum(d.dwork), 'var(--gold)')}
     ${pl?r('Province pickups (DLT)', naNum(pl.pickup), 'var(--collat)'):''}
-    ${pl?r('Province informal workers (NSO)', naNum(pl.informal), 'var(--collat)'):''}
+    ${pl?r('Province informal workers (NSO)', nsoNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
     ${hhriskPopupHTML(d,sec,r)}
     ${laborPopupHTML(d,sec,r)}
@@ -3284,7 +3293,7 @@ function renderBranches(){
       <td>${d.n}</td><td class="sub">${d.v}</td>
       <td class="mono" style="color:var(--gold)">${naNum(d.dwork)}</td>
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
-      <td class="mono" style="color:var(--collat)">${naNum(pl.informal)}</td>
+      <td class="mono" style="color:var(--collat)">${nsoNum(pl.informal)}</td>
       <td class="mono sub">${d.w}</td></tr>`;}).join('');
 }
 

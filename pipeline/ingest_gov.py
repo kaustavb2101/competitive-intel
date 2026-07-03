@@ -107,8 +107,20 @@ def build_employment():
             prov[p]["informal"] += n
         else:
             prov[p]["formal"] += n
+    # Coverage diagnostic: diff the province keys we actually captured against regionmap's canonical
+    # 77 so a missing province is NAMED in the output (not silently a downstream null). The known gap
+    # is กรุงเทพมหานคร (Bangkok) — NSO does not publish it in this informal/formal table under that
+    # key; a Thai-IP repull should check whether the raw names it differently (กทม.). This is what
+    # leaves Bangkok's 170 branches with an HONEST NULL informal_pct in build_branch_labor.py.
+    present = set(prov.keys())
+    missing = sorted(set(REGION.keys()) - present)
+    extra = sorted(present - set(REGION.keys()))
     return {"source": "NSO ภาวะการทำงานของประชากร (data.go.th) — workers by province; measured",
-            "year_be": latest, "provinces": dict(sorted(prov.items()))}
+            "year_be": latest, "provinces": dict(sorted(prov.items())),
+            "coverage": {"n_provinces": len(prov), "n_canonical": len(REGION),
+                         "missing_provinces": missing, "extra_provinces": extra,
+                         "note": "provinces in regionmap's canonical 77 absent from this NSO pull; "
+                                 "branches in a missing province keep an HONEST NULL informal_pct."}}
 
 
 def build_crop_prices():

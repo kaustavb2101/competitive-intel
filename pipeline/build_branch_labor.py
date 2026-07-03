@@ -37,8 +37,10 @@ import json
 import os
 import sys
 import argparse
+import collections
 
 from fingerprint import branches_fingerprint_from_file
+from regionmap import canonical, REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -81,8 +83,15 @@ def build():
     n_informal = 0
     n_lfs = 0
     n_occ = 0
+    # HONEST-GAP bookkeeping (objective: never fabricate a province value we do not have).
+    # Every province join runs through regionmap.canonical() so a raw ISO-code / English-name /
+    # "จังหวัด " straggler still resolves to the same key the NSO layers use. Any branch whose
+    # canonical province is genuinely absent from a source layer keeps a null (no fallback) and is
+    # counted here so meta.gaps can name exactly which provinces + how many branches are affected.
+    gap_informal = collections.Counter()   # canonical prov -> #branches with null informal_pct
+    gap_lfs = collections.Counter()         # canonical prov -> #branches with null province LFS
     for i in range(n):
-        prov = master[i].get("prov")
+        prov = canonical(master[i].get("prov"), master[i].get("district"))
 
         # --- occupation mix (MEASURED, Overture) ---
         rec = occ_recs[i]
@@ -122,6 +131,8 @@ def build():
                 informal_pct = round(100.0 * inf / (inf + frm), 1)
         if informal_pct is not None:
             n_informal += 1
+        else:
+            gap_informal[prov] += 1   # HONEST NULL — province absent from employment layer
 
         # --- province labour-force summary (MEASURED NSO LFS) ---
         prov_employed_k = None
@@ -134,6 +145,8 @@ def build():
             prov_unemployment_rate = up.get("unemployment_rate")
         if prov_employed_k is not None:
             n_lfs += 1
+        else:
+            gap_lfs[prov] += 1   # HONEST NULL — province absent from LFS layer
 
         branches.append({
             "occ_top": occ_top,
@@ -145,14 +158,54 @@ def build():
             "prov_unemployment_rate": prov_unemployment_rate,
         })
 
+    # ── HONEST-GAP diagnostic ─────────────────────────────────────────────────
+    # Name exactly which provinces are absent from each NSO source layer and how many branches that
+    # leaves with a null. The dominant case is กรุงเทพมหานคร (Bangkok): the NSO informal/formal table
+    # in employment_by_province.json covers 76 of the 77 canonical provinces and has NO Bangkok key,
+    # so informal_pct is an HONEST NULL for every Bangkok branch. No region-median/any fallback is
+    # substituted (a fabricated Bangkok value would be worse than an honest gap). If a future Thai-IP
+    # repull surfaces Bangkok under a variant name (กทม.), regionmap.canonical() should fold it in and
+    # this gap closes automatically — see docs/TONIGHT_CHECKLIST.md.
+    canon77 = set(REGION.keys())
+    emp_missing = sorted(canon77 - set(emp_prov.keys()))       # provinces in the 77 absent from employment layer
+    lfs_missing = sorted(canon77 - set(unemp_prov.keys()))     # provinces in the 77 absent from LFS layer
+
+    def _gap_block(counter, layer_missing, source_file, field_desc):
+        by_prov = dict(sorted(counter.items()))
+        return {
+            "affected_branches": sum(by_prov.values()),
+            "provinces_absent_from_source": layer_missing,
+            "affected_branches_by_province": by_prov,
+            "source_file": source_file,
+            "policy": "HONEST NULL — no region-median or any fabricated value is substituted; the "
+                      "field is null for these branches. Any fallback added in future MUST be "
+                      "per-row flagged ESTIMATED.",
+            "note": field_desc,
+        }
+
+    gaps = {
+        "informal_pct": _gap_block(
+            gap_informal, emp_missing, "source-data/employment_by_province.json (NSO informal/formal)",
+            "employment_by_province.json covers %d/77 canonical provinces; the absent province(s) — "
+            "notably กรุงเทพมหานคร (Bangkok) — leave informal_pct null. NSO does not publish Bangkok in "
+            "the informal/formal workers-by-province table we ingest; a Thai-IP repull may list it under "
+            "a variant key (กทม.)." % len(emp_prov)),
+        "province_lfs": _gap_block(
+            gap_lfs, lfs_missing, "source-data/unemployment_by_province.json (NSO Labour Force Survey)",
+            "unemployment_by_province.json covers %d/77 canonical provinces; prov_employed_k / "
+            "prov_labor_force_k / prov_unemployment_rate are null for any absent province." % len(unemp_prov)),
+    }
+
     meta = {
         "generated_by": "pipeline/build_branch_labor.py",
         "n_branches": n,
         "branches_fingerprint": branches_fingerprint_from_file(
             os.path.join(PDATA, "branches.json")),
         "index_aligned_to": "platform/data/branches.json (entry i <-> branch i)",
-        "join_key_province": "branches_final.json `prov` (Thai province name); matches all 77 "
-                             "keys in employment_by_province.json and unemployment_by_province.json.",
+        "join_key_province": "branches_final.json `prov` folded through regionmap.canonical() (catches "
+                             "ISO-code / English-name / 'จังหวัด ' stragglers) before joining the NSO "
+                             "province layers. All 2,015 branch provinces already resolve to the 77 "
+                             "canonical Thai names; see meta.gaps for provinces absent from a source layer.",
         "fields": {
             "occ_top": {
                 "label": "MEASURED",
@@ -196,6 +249,7 @@ def build():
             "branches_with_informal_pct": n_informal,
             "branches_with_province_lfs": n_lfs,
         },
+        "gaps": gaps,
         "provenance": "MEASURED assembly. No index or synthetic value is introduced here — this layer "
                       "only re-projects existing MEASURED source layers (Overture Places, DIW factory "
                       "workers, NSO employment & Labour Force Survey) onto each branch by index/province. "
