@@ -4,6 +4,57 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-03 (8) — ENRICH: NSO SES 2566 per-occupation income folded into the province deep-dive
+
+**Task type:** ENRICH. `/workspace/watcher` was not present this cycle, so no cross-repo TMLI pull
+was possible. A RE-DERIVE pass first confirmed the working tree was already fully in sync (`bash
+tests/run.sh check` — 40 passed, 0 failed, no drift) before picking this task.
+
+**What was found.** `source-data/household_income_by_province.json` — already vendored, MEASURED,
+provenance-documented (NSO SES 2566, via `kaustavb2101/watcher`/`ingest_tmli.py`, all 77 provinces
+carry non-round per-occupation figures) — has been in the repo since at least the 2026-07-02 GPP
+audit, but only its **unweighted mean** (`avg_monthly_income`) is consumed, by
+`build_household_risk.py`, to form the province debt-to-income ratio. The underlying **per-occupation
+breakdown** (`Agriculture` / `FactoryWorkers` / `OfficeStaff` / `SMEOwners` / `Transport`, THB/month)
+was never surfaced anywhere in the app — a real, already-sourced, already-audited layer sitting
+unused. These are NSO's own five occupation categories (not an invented crosswalk against the
+Overture 14-bucket occupation mix, which uses a different taxonomy and would require an editorial
+mapping this cycle avoided).
+
+**What changed (zero fabrication — pure projection of an already-MEASURED, already-provenance-labelled
+source):**
+- `pipeline/build_province.py`: loads `household_income_by_province.json` and adds
+  `gov.income = {Agriculture, FactoryWorkers, OfficeStaff, SMEOwners, Transport, avg_monthly_income}`
+  per province (graceful `{}` fallback if the source file is ever absent, matching the existing
+  `unemployment` pattern), and updated `gov.src` to name the new input. Regenerated all 77
+  `platform/data/provinces/<slug>.json` (+`index.json`) via `python3 build_province.py` — only the
+  new `gov.income` block was added; every other field byte-identical (spot-checked via diff).
+- `platform/province.html`: "Who works nearby" panel gained (a) an "Avg household income" row next to
+  the existing informal/formal/unemployment rows, and (b) a new "Income by occupation" mini-chart
+  (NSO's 5 categories, sorted highest-first, THB/month), both tagged `measured · NSO SES 2566` (not
+  `estimated` — distinct from the existing OSM-proxy "Occupation mix" section directly below it,
+  which stays labelled `estimated · proxy`).
+- Serves objective #1 (portfolio risk): which occupations in a province earn least (Transport,
+  Agriculture in most provinces) is a direct affordability signal for the title-loan borrower base,
+  now visible per-province instead of buried in an unused source file.
+
+**Verification.** `bash tests/run.sh check` — 40 passed, 0 failed (`validate_data.py` 211/211, no
+schema assumption broken — `check_provinces()` only spot-checks slug/branches/k10/NaN, no rigid field
+list). Headless-rendered `province.html?p=rayong`: the WebGL **screenshot** pass failed (known
+pre-existing swiftshader/3D flakiness in this sandbox, unrelated — logged in `IMPROVEMENT_BACKLOG.md`
+2026-07-03 (7)'s render note), but the **DOM dump** pass succeeded and confirms `data-errors="[]"`
+(zero JS errors) + `data-deck="1"` (deck.gl initialized) + the new panel rendering real, correctly
+THB-sorted values (Agriculture ฿44,041/mo > Factory workers ฿36,970/mo > Office staff ฿35,831/mo >
+SME owners ฿27,677/mo > Transport ฿18,929/mo for Rayong — matches the source file exactly).
+
+**Source:** `source-data/household_income_by_province.json` `meta` — "NSO SES 2566 — monthly income
+by occupation (THB/month), via data.go.th / TMLI"; vendored from `kaustavb2101/watcher
+source-data/tmli/nso-ses-income-2566.json`. No external pull performed this cycle — this is a
+re-projection of an already-committed, already-audited MEASURED source into a second (previously
+unserved) view.
+
+---
+
 ## 2026-07-03 (6) — AUDIT: fixed a second false-drift gate gap (`build_branch_population.py --check`)
 
 **Task type:** AUDIT (gate integrity, not a data value change — no `platform/data` or `source-data`

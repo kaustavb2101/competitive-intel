@@ -221,8 +221,35 @@
       quick win: drop marker `fillOpacity` to ~0.55-0.65 (or shrink radius) specifically when
       `isProvLens(curLens)` is true, so the polygon fill reads through immediately. *(MED, S)*
 
+## Queue — follow-ups noticed 2026-07-03 (7)
+- [ ] **`household_debt_by_province.json` carries its OWN `debt_to_income` + `stress_index` (BOT
+      Q4/2024 regional)** that is never surfaced — only `build_household_risk.py`'s own computed
+      DTI (debt ÷ NSO SES annualized income) is. The two could disagree (different vintages/methods:
+      BOT regional vs NSO SES-derived); worth an AUDIT pass comparing them and either reconciling or
+      explicitly captioning "two independent DTI estimates" if they diverge materially. *(MED, S)*
+- [ ] **The new `gov.income` per-occupation breakdown (2026-07-03 (8)) could feed the Simulator's
+      occupation-sensitivity lever** — a sector shock that also discounts by the province's
+      lowest-earning-occupation share would sharpen the existing ESTIMATED factory-slowdown lever
+      with a real NSO income floor. *(LOW, M)*
+- [ ] **`province.html`'s new "Income by occupation" panel has no equivalent on the Overview/Exposure
+      tabs** — same rank-1-surfacing pattern used for `PSTRESS_LIST[0]`/`HHRISK_LIST[0]` on Home
+      could add "lowest-paid occupation nationally" as a portfolio-risk callout. *(LOW, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (8) — ENRICH: NSO SES 2566 per-occupation income surfaced on the province deep-dive.**
+  `source-data/household_income_by_province.json` (already vendored + MEASURED, previously only
+  consumed as an unweighted mean by `build_household_risk.py`) is now joined into
+  `build_province.py`'s `gov` block (`gov.income`, per-province, all 5 NSO occupation categories +
+  the existing mean) and rendered in `province.html`'s "Who works nearby" panel: an "Avg household
+  income" row + a new "Income by occupation" mini-chart, tagged `measured · NSO SES 2566`
+  (deliberately not crossed against the Overture 14-bucket occupation-mix taxonomy — different
+  categories, would require an editorial mapping this cycle avoided). No fabrication — byte-identical
+  source values; `build_province.py --check` 0 drift; gate 40/0. Headless dump-dom on
+  `province.html?p=rayong` confirms `data-errors="[]"` + real sorted THB values render (the WebGL
+  screenshot pass hit the known pre-existing swiftshader flakiness, unrelated to this change — see
+  the 2026-07-03 (7) render note below). Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-03 (8)
+  entry).
 - **2026-07-03 (7) — ENRICH: province polygon choropleth for the hhdti/pstress lenses.** New
   `pipeline/build_province_geo.py` groups the already-committed `amphoe_geo.json` polygons by
   `amphoe.json` province_th (no dissolve, no re-simplification) → `platform/data/province_geo.json`

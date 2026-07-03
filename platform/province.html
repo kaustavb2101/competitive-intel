@@ -733,6 +733,7 @@ function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 
 const EMP=(RY.gov&&RY.gov.employment)||null;
 const UNEMP=(RY.gov&&RY.gov.unemployment&&RY.gov.unemployment.unemployment_rate!=null)?RY.gov.unemployment:null;
+const INCOME=(RY.gov&&RY.gov.income&&RY.gov.income.avg_monthly_income!=null)?RY.gov.income:null;
 function districtWorkers(d){
   if(!DISTRICTS||!DISTRICTS.features)return null;
   const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
@@ -803,7 +804,22 @@ function updatePanels(){
     const dw=districtWorkers(dist);
     if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
     if(UNEMP)html+=`<div class="wr"><span class="k">Unemployment rate <small>(province, NSO LFS)</small></span><span class="v">${UNEMP.unemployment_rate}%</span></div>`;
+    if(INCOME)html+=`<div class="wr"><span class="k">Avg household income <small>(province, NSO SES 2566)</small></span><span class="v">฿${fmt(INCOME.avg_monthly_income)}/mo</span></div>`;
     html+='</div>';
+  }
+  if(INCOME){
+    const OCC_INC=[['Agriculture','Agriculture'],['Factory workers','FactoryWorkers'],
+      ['Transport','Transport'],['SME owners','SMEOwners'],['Office staff','OfficeStaff']]
+      .map(([lab,kk])=>({lab,v:INCOME[kk]})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
+    if(OCC_INC.length){
+      const mx=OCC_INC[0].v;
+      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Income by occupation <span class="tag meas">measured · NSO SES 2566</span></h2>`
+        +`<div class="occ">`+OCC_INC.map(r=>
+          `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div></div>`
+        ).join('')+`</div>`
+        +`<div class="foot">NSO Socio-Economic Survey 2566 (2023) average monthly income by occupation — province-level, measured.</div>`;
+    }
   }
   if(k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))

@@ -166,6 +166,8 @@ def build_all():
     emp = _load(os.path.join(SRC, "employment_by_province.json"))["provinces"]
     unemp_f = os.path.join(SRC, "unemployment_by_province.json")
     unemp = _load(unemp_f)["provinces"] if os.path.exists(unemp_f) else {}
+    income_f = os.path.join(SRC, "household_income_by_province.json")
+    income = _load(income_f)["provinces"] if os.path.exists(income_f) else {}
     osm = _load(os.path.join(SRC, "osm_layers.json"))
     narr = _load(os.path.join(SRC, "province_narratives.json")).get("provinces", {})
     EMPTY_FACTS = {"minwage": "", "minwage_mo": "", "natl_avg": "", "premium": "",
@@ -286,8 +288,9 @@ def build_all():
                "gov": {"factories": gp["fac"], "workers": gp["workers"],
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "unemployment": unemp.get(prov) or {},
+                       "income": income.get(prov) or {},
                        "src": "DIW factories · DLT vehicles · NSO labour + NSO Labour Force Survey "
-                              "(data.go.th) — measured"}}
+                              "+ NSO SES 2566 income by occupation (data.go.th / TMLI) — measured"}}
         out[slug] = obj
         # null (not 0) when a province is genuinely ABSENT from the measured source —
         # a real measured 0 in the file is preserved. Mis-ranking BKK (no NSO labour
