@@ -1036,6 +1036,7 @@ function renderAcq(){
   renderExpansionPlan();
   renderOppScore();
   renderCompCoverage();
+  renderRivalDensity();
   renderExitWhitespace();
 }
 
@@ -1091,13 +1092,69 @@ function drawCompCoverage(){
   if(ro){
     const m=COMPCOV.meta||{}, t=m.totals||{};
     const ttxt=(t.coverage_pct!=null)
-      ? `Overall we have located <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> of an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> reported branches — about <b style="color:var(--gold)">${t.coverage_pct.toFixed(1)}%</b> coverage.`
-      : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations (lower bound).`;
-    ro.innerHTML=`<b>Our competitor census is a LOWER BOUND.</b> ${ttxt} ${TAG_M} ${TAG_E}`+
+      ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches vs an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> from public reports.`
+      : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations.`;
+    ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}`+
       methodBox(null,
-        ['Found = <b>MEASURED</b> census count; expected = <b>ESTIMATED</b>-from-public-reports (cited IR / annual reports — uncited brands left blank, never invented).',
-         'Coverage % is a confidence flag on our competitor-density signals, <b>not</b> market share.',
-         'The census is being expanded; today’s coverage understates the true rival footprint.']);
+        ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
+         'Heng is the one exception — still a Google/Overture <b>SAMPLE</b> (its locator is Cloudflare-blocked), so Heng alone is a lower bound.',
+         'Coverage % is a data-completeness flag, <b>not</b> market share.']);
+  }
+}
+
+/* ---------- where rivals own ground · districts where AutoX is outnumbered ----------
+   Surfaces data/rival_density.json (928 districts, pipeline/build_rival_density.py): per-district
+   AutoX vs the FULL official-locator rival census (16,393 measured branches), with a ceded-ground
+   flag. Objective #2 — the actionable payoff of the full competitor pull. Lazy, graceful if absent. */
+let RIVDEN=null, rivdenLoaded=false;
+const RIVDEN_TOPN=20;
+function renderRivalDensity(){
+  const tbl=$('#rivdentbl'); if(!tbl) return;
+  if(rivdenLoaded){ drawRivalDensity(); return; }
+  fetch('data/rival_density.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVDEN=j; rivdenLoaded=true; drawRivalDensity();
+  }).catch(()=>{ RIVDEN=null; rivdenLoaded=true; drawRivalDensity(); });
+}
+function drawRivalDensity(){
+  const tbl=$('#rivdentbl'), ro=$('#rivdenreadout'); if(!tbl) return;
+  const recs=(RIVDEN&&Array.isArray(RIVDEN.records))?RIVDEN.records:[];
+  if(!recs.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rival-density board not yet computed.</b> <span class="sub">Run pipeline/build_rival_density.py — it fills in on the next data refresh.</span>';
+    return;
+  }
+  // most-outnumbered first: rank by (rivals − autox), i.e. the raw branch deficit vs the big-4.
+  const list=recs.slice().filter(r=>(r.rivals||0)>(r.autox||0))
+    .sort((a,b)=>((b.rivals-b.autox)-(a.rivals-a.autox))).slice(0,RIVDEN_TOPN);
+  const brandStr=bb=>{ if(!bb||typeof bb!=='object')return ''; return Object.entries(bb)
+    .sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} ${v}`).join(', '); };
+  tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th>`+
+    `<th title="AutoX branches in this district (MEASURED)">AutoX</th>`+
+    `<th title="Big-4 rival branches in this district, from the full official-locator census (MEASURED)">Rivals ◆</th>`+
+    `<th title="rivals ÷ AutoX">Ratio</th>`+
+    `<th>Who holds it</th></tr>`+
+    list.map((r,i)=>{
+      const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
+      const rc=(r.rivals-r.autox)>=40?'var(--agri)':'var(--gold)';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.name||'—'}</b></td>
+        <td class="sub">${r.province_th||''}</td>
+        <td class="mono">${(r.autox||0).toLocaleString()}</td>
+        <td class="mono" style="color:${rc}"><b>${(r.rivals||0).toLocaleString()}</b></td>
+        <td class="mono" style="color:${rc}">${ratio}</td>
+        <td class="sub">${brandStr(r.by_brand)}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const m=RIVDEN.meta||{};
+    const nOut=m.n_outnumbered!=null?m.n_outnumbered:recs.filter(r=>r.flag==='outnumbered').length;
+    ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> districts.</b> `+
+      `Ranked by raw branch deficit against the FULL official-locator census (${(m.total_rivals||16393).toLocaleString()} measured rival branches). `+
+      `These are the districts where competitors already own the ground — defend or concede deliberately. ${TAG_M}`+
+      methodBox(null,
+        ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
+         'Rivals = the merged census (official store-locators for Muangthai/Srisawad/Tidlor; Heng is a sample).',
+         'A high ratio is a competitive-density signal, not a verdict — some dense districts are worth contesting, others conceding.']);
   }
 }
 
