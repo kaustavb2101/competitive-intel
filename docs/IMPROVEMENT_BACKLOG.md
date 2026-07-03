@@ -168,11 +168,6 @@
 - Real **farm-gate** prices, isochrones (ORS/GISTDA), DLT/DIW gov refresh.
 
 ## Queue — follow-ups noticed 2026-07-03 (3)
-- [ ] **Surface `province_stress_index.json`'s rank-1 province (composite_stress) on the Command
-      Center hero / Exposure tab**, the same way `HHRISK_LIST[0]` already seeds the DTI headline —
-      today the new composite only lives on the National map's "Province stress" menu lens; a
-      one-line "structurally riskiest: <province>, composite NN (DTI+unemployment)" would put it in
-      front of the exec front door too. *(MED, S)*
 - [ ] **`province_stress_index.json`'s equal 50/50 DTI/unemployment weighting is an editorial
       choice** (documented honestly in `meta.caveats`, not calibrated to realized loss) — once the
       real loan tape lands (`docs/TONIGHT_CHECKLIST.md` §6), correlate `composite_stress` against
@@ -183,8 +178,37 @@
       (motorcycle share of the province vehicle stock is already a MEASURED lens, `motomix`) is a
       third structurally-relevant, already-sourced signal that isn't in the composite yet. *(LOW, S)*
 
+## Queue — follow-ups noticed 2026-07-03 (4)
+- [ ] **`renderHomeThesis()`'s one-sentence board thesis still doesn't cite `PSTRESS_LIST[0]`** —
+      only the risk CARD got the new "structurally riskiest" row this cycle; the top-of-page
+      sentence's "risk to watch" clause still only checks `HHRISK_LIST[0]`/`CSTRESS_LIST[0]`. Once
+      `province_stress_index.json` is the more defensible read (it blends two NSO legs, not one),
+      consider swapping the thesis clause to lead with the composite instead of raw DTI, or adding a
+      4th clause — small, same lazy-load chain (`loadProvinceStress` is already warmed on Home).
+      *(LOW, S)*
+- [ ] **`PSTRESS_LIST[0]` and `HHRISK_LIST[0]` can point at different provinces** (composite blends
+      DTI+unemployment, DTI alone is unemployment-blind) — today's data has them agree
+      (อำนาจเจริญ/ขอนแก่น both Isan, no direct clash visible on the rendered card), but nothing
+      guards against the two rows reading as contradictory "riskiest province" claims if the two
+      legs diverge on a future NSO refresh. Worth a short explanatory caption distinguishing
+      "composite structural stress" from "raw household leverage" if it ever looks confusing in
+      review. *(LOW, S)*
+- [ ] **Same rank-1-surfacing pattern could extend to the Exposure tab** (`#exposure`) — the
+      backlog item this cycle closed named "Command Center hero / Exposure tab" but only Command
+      Center got built (smaller, more central surface). Exposure's portfolio-concentration view has
+      no province-level structural-stress context yet; a compact callout there would round out the
+      original ask. *(LOW, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (4) — UX: structurally-riskiest province surfaced on the Command Center hero.**
+  Added a "Structurally riskiest · DTI + unemployment" row to `renderHomeRisk()`'s risk card
+  (`platform/app.js`) using `province_stress_index.json`'s rank-1 province (`PSTRESS_LIST[0]`),
+  the same pattern `HHRISK_LIST[0]` already uses for the household-leverage hero line. Wired
+  `loadProvinceStress()` into Home's lazy-load chain so it's no longer only reachable via the
+  National map's pstress lens. Purely additive, null-safe when the file is absent. Gate: 33/0.
+  Headless-rendered `index.html#home` confirms the row (อำนาจเจริญ, composite 98) renders cleanly
+  with no JS errors. Full writeup: `docs/PROGRESS_LOG.md` (2026-07-03 (4) entry).
 - **2026-07-03 (3) — ENRICH: combined province structural-stress index (household DTI +
   unemployment).** New `pipeline/build_province_stress.py` joins two already-committed MEASURED
   layers — `household_risk_by_province.json` (NSO SES 2566 debt-to-income, itself

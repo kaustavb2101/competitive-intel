@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 (4) — UX: structurally-riskiest province surfaced on the Command Center hero
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (3)): `province_stress_index.json`
+(household DTI + unemployment composite, `build_province_stress.py`, already shipped) only lived
+behind the National map's "Province stress" menu lens — it never reached the exec front door.
+Added a "Structurally riskiest · DTI + unemployment" row to `renderHomeRisk()`'s "What is getting
+riskier" card on Command Center (`platform/app.js`), directly under the existing composite-risk
+verdict, using `PSTRESS_LIST[0]` (rank-1 by `composite_stress`) the same way `HHRISK_LIST[0]`
+already seeds the household-leverage hero line. Shows province + region, the two MEASURED NSO
+inputs (DTI ×, unemployment %) and the ESTIMATED composite score, correctly tagged `est`. Wired
+`loadProvinceStress()` into the Home page's lazy-load chain (`homeBooted`) so it warms alongside
+the other Home data sources instead of only loading when a user opens the National map's pstress
+lens. Purely additive: 12-line render block + 2-line lazy-load wire; no data file changed, no
+existing row touched, renders nothing when the file is absent (`pstressHasData()` guard, same
+null-safe pattern as every other Home card).
+
+Verification: `bash tests/run.sh check` → 33 passed, 0 failed. `node --check platform/app.js` OK.
+Installed render deps and headless-rendered `index.html#home` (1400×1800) — screenshot confirms
+the new row (อำนาจเจริญ, Isan, DTI 1.14× · unemployment 2.8%, composite ▲98) sits cleanly between
+"Most stressed · composite risk" and "Riskiest single branch" with no layout shift elsewhere on
+the page; DOM probe shows `data-errors="[]"` (no uncaught JS).
+
 ## 2026-07-03 (2) — UX: `unemp` lens gets its own district (amphoe) polygon choropleth
 
 Loop cycle. Backlog item: the `unemp` lens (added earlier the same day) only painted branch dots —

@@ -3549,6 +3549,8 @@ function renderHome(){
     loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
+    // obj#1 — structurally riskiest province (DTI+unemployment composite) into the risk card (null-safe).
+    loadProvinceStress().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — macro-exposure dominant-factor headline in the thesis sentence (null-safe, est).
     loadMacroExposure().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
@@ -3764,6 +3766,17 @@ function renderHomeRisk(){
       html+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)}`,
         `▲ ${(top[0].mean_risk||0).toFixed(0)}`,`p90 ${(top[0].p90_risk||0).toFixed(0)}`,'var(--agri)');
     }
+  }
+  // structurally riskiest province — composite of MEASURED household DTI + unemployment percentiles
+  // (province_stress_index.json, build_province_stress.py). Distinct from the composite-risk verdict
+  // above (that one blends agri/collateral/merchant/unemployment at province level); this one is the
+  // pure household-leverage read. Omitted gracefully when the file hasn't loaded yet / is absent.
+  if(pstressHasData()&&PSTRESS_LIST.length){
+    const p=PSTRESS_LIST[0];
+    html+=`<div class="cc-sub2">Structurally riskiest · DTI + unemployment ${TAG_E}</div>`;
+    html+=ccRow(`${p.province} <span class="sub">${p.region||''}</span>`,
+      `DTI ${p.debt_to_income!=null?(+p.debt_to_income).toFixed(2)+'×':'—'} · unemployment ${p.unemployment_rate!=null?(+p.unemployment_rate).toFixed(1)+'%':'—'} (NSO, measured)`,
+      `▲ ${(p.composite_stress||0).toFixed(0)}`,'composite','var(--agri)');
   }
   // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
