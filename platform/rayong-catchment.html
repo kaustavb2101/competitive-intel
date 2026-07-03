@@ -121,6 +121,10 @@ html[data-theme="light"] .cat10 .c{background:#F4F6FB;border-color:#D7DEEA}
 .verdict{border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5}
 .verdict.hot{background:rgba(224,71,75,.12);border:1px solid rgba(224,71,75,.4);color:#f0b9bb}
 .verdict.hot b{color:#fff}
+/* light theme: the dark-theme pink-on-dark palette is ILLEGIBLE on the white panel (pale pink text,
+   WHITE bold numbers). Deep red-browns on a faint red wash keep the "hot" read with real contrast. */
+html[data-theme="light"] .verdict.hot{background:#FBECEC;border-color:rgba(176,30,38,.45);color:#6E2226}
+html[data-theme="light"] .verdict.hot b{color:#A31D24}
 .lead{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #161d2c;cursor:pointer}
 .lead:active{background:#121a28}
 .lead .rank{font:700 12px 'IBM Plex Mono';color:var(--gold);width:18px;flex:none}
