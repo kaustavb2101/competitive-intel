@@ -551,13 +551,24 @@ async function loadCompetitors(){
   compLoaded=true;
   compPromise=(async()=>{
     const grab=async u=>{ try{const r=await fetch(u); if(!r.ok)return null; return await r.json();}catch(e){return null;} };
-    const [g,o]=await Promise.all([grab('data/competitors_national.json'),grab('data/competitors_overture.json')]);
-    const srcs=[]; if(g)srcs.push('Google Places'); if(o)srcs.push('Overture');
-    const items=[].concat(g&&g.items||[], o&&o.items||[]).filter(it=>it&&it.lat!=null&&it.lng!=null);
+    // Prefer the MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor +
+    // Google/Overture sample for Heng — ~16,393 MEASURED rivals, already deduped). Fall back to the
+    // raw Google∪Overture samples only if the census isn't built.
+    const cen=await grab('data/competitors_census.json');
+    let items, srcs;
+    if(cen&&Array.isArray(cen.items)&&cen.items.length){
+      items=cen.items.filter(it=>it&&it.lat!=null&&it.lng!=null);
+      srcs=['official store-locators + sample']; COMP=cen;
+    }else{
+      const [g,o]=await Promise.all([grab('data/competitors_national.json'),grab('data/competitors_overture.json')]);
+      srcs=[]; if(g)srcs.push('Google Places'); if(o)srcs.push('Overture');
+      items=[].concat(g&&g.items||[], o&&o.items||[]).filter(it=>it&&it.lat!=null&&it.lng!=null);
+      COMP=g||o;
+    }
     if(!items.length){ COMP=null; COMP_META=null; COMP_ITEMS=[]; }
     else{
-      COMP_ITEMS=dedupComp(items);
-      COMP=g||o; COMP_META={sources:srcs, raw:items.length, deduped:COMP_ITEMS.length};
+      COMP_ITEMS=cen?items:dedupComp(items);   // census is pre-deduped; only the raw samples need dedupComp
+      COMP_META={sources:srcs, raw:items.length, deduped:COMP_ITEMS.length};
     }
     attachCompToBranches();
     return COMP_ITEMS;
@@ -633,6 +644,17 @@ async function loadCompetitorCensus(){
     return ccenItems;
   })();
   return ccenPromise;
+}
+let CBRF=null, cbrfLoaded=false, cbrfPromise=null;   // per-branch macro cluster brief (.briefs, index-aligned)
+async function loadClusterBrief(){
+  if(cbrfPromise) return cbrfPromise;
+  cbrfLoaded=true;
+  cbrfPromise=(async()=>{
+    try{ const r=await fetch('data/cluster_brief.json'); if(r.ok){ const j=await r.json(); CBRF=Array.isArray(j&&j.briefs)?j.briefs:null; } }
+    catch(e){ CBRF=null; }
+    return CBRF;
+  })();
+  return cbrfPromise;
 }
 // MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
 // census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
@@ -2876,6 +2898,7 @@ function initMap(){
   // they land late. Optional + null-safe: absent file → BPOP/CCEN stay null and the block is omitted.
   if(!bpopLoaded) loadBranchPopulation();
   if(!ccenLoaded) loadCompetitorCensus();
+  if(!cbrfLoaded) loadClusterBrief();
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
@@ -2905,8 +2928,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!BPOP||!CCEN){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus()]).then(()=>{
+  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3071,7 +3094,19 @@ function catchmentPopupHTML(d,sec,r){
     + (pop!=null?r('Reachable population', pop.toLocaleString(), 'var(--accent)'):'')
     + (estab!=null?r('Establishments ≤10km (OSM)', estab.toLocaleString(), 'var(--merch)'):'')
     + (rivals!=null?r('Rival branches ≤10km', `<span style="color:${rc}">${rivals}</span>`, rc):'')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle; establishments = sum of OSM POI counts ≤10km; rivals = merged Places/Overture census (measured, lower bound)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
+}
+// Macro cluster brief — a one-line plain-language read of the macro forces on this branch's customer
+// cluster (cluster_brief.json, index-aligned; templated from measured board/crop/occupation signals).
+// Loaded by boot() warming; renders nothing until available. Objective #1 made human-readable.
+function briefPopupHTML(d,sec,r){
+  const i=idxOf(d);
+  const b=(CBRF&&i>=0&&i<CBRF.length)?CBRF[i]:null;
+  const line=b&&typeof b.line==='string'?b.line.trim():'';
+  if(!line) return '';
+  return sec('Macro read — this cluster')
+    + `<div style="font-size:12px;line-height:1.5;color:#c7cedd;padding:2px 0">${line}</div>`
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">templated from measured commodity-board YoY, crop-stress and occupation mix</div>`;
 }
 // crop-household stress block for a branch popup — only the cstress lens loads the data,
 // so render nothing until it's available. Shows the REAL components, honestly labelled.
@@ -3320,6 +3355,7 @@ function popupHTML(d){
     <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}"
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:var(--accent);color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
+    ${briefPopupHTML(d,sec,r)}
     ${leadsPopupHTML(d,sec,r)}
     ${macxPopupHTML(d,sec)}
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
