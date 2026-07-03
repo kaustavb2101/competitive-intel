@@ -68,6 +68,7 @@ phase_check(){
   # belong in the determinism gate. The baker remains as a tool (and exports bldg_height, which the
   # Overture puller imports for estimated heights).
   ( cd "$PIPE" && python3 timeseries.py --check >/dev/null 2>&1 ) && ok "timeseries.py --check" || bad "timeseries.py --check (snapshot/deltas drifted from source-data)"
+  ( cd "$PIPE" && python3 build_vintage_digest.py --check >/dev/null 2>&1 ) && ok "build_vintage_digest.py --check" || bad "build_vintage_digest.py --check (vintage_digest.json drifted from deltas.json/snapshots_index.json — run: python3 pipeline/build_vintage_digest.py)"
   ( cd "$PIPE" && python3 build_occupations.py --check >/dev/null 2>&1 ) && ok "build_occupations.py --check" || bad "build_occupations.py --check (branch_occupations.json drifted from overture_places.json)"
   ( cd "$PIPE" && python3 build_occupation_leads.py --check >/dev/null 2>&1 ) && ok "build_occupation_leads.py --check" || bad "build_occupation_leads.py --check (occupation_leads.json drifted from occupation_places_named.json)"
   ( cd "$PIPE" && python3 build_amphoe_occupations.py --check >/dev/null 2>&1 ) && ok "build_amphoe_occupations.py --check" || bad "build_amphoe_occupations.py --check (amphoe_occupations.json drifted from overture_places.json)"

@@ -471,6 +471,17 @@
     <p class="lead">Compares the latest data vintage against the previous one. Region cards and branch movers
       use the <b>estimated agri-PD / merchant / collateral proxies</b> (OSM/price-based, 0–100) — not measured
       defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
+
+    <!-- SINCE LAST VINTAGE — plain-language digest (pipeline/build_vintage_digest.py →
+         data/vintage_digest.json). Headline + 4-8 one-sentence findings, worst first;
+         every number is read from deltas.json. Calm one-liner when only one vintage exists. -->
+    <div class="vdg" id="vdigest" style="display:none">
+      <div class="vdg-head"><span class="vdg-kicker">Since last vintage</span><span class="vdg-vint mono" id="vdgvint"></span></div>
+      <div class="vdg-headline" id="vdgheadline"></div>
+      <ul class="vdg-list" id="vdglist"></ul>
+      <div class="sub vdg-note" id="vdgnote"></div>
+    </div>
+
     <div class="insight" id="trendbaseline" style="display:none;border-left-color:var(--gold)"></div>
 
     <!-- DESIGNED BASELINE STATE — shown until a 2nd vintage exists (no deltas yet). Reads the live
