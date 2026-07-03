@@ -1014,16 +1014,20 @@ function groundLayers(){
   if(lu&&lu.length&&deck.PolygonLayer){
     // [dark-theme rgba, light-theme rgba] per kind
     const LU={
-      park:        [[ 40, 96, 58,150],[150,196,138,165]],
-      forest:      [[ 30, 76, 46,160],[122,172,114,180]],
-      grass:       [[ 40, 90, 56,140],[158,200,148,150]],
-      recreation:  [[ 40, 96, 58,148],[150,196,138,160]],
-      meadow:      [[ 44, 92, 58,140],[164,202,150,150]],
-      farmland:    [[ 92, 90, 52,110],[206,190,142,160]],
-      industrial:  [[ 74, 72, 72,110],[172,178,192,165]],
-      commercial:  [[ 92, 80, 62,110],[208,194,172,155]],
-      residential: [[ 66, 72, 92,105],[194,198,212,145]],
-      retail:      [[ 94, 80, 60,110],[210,194,170,155]]};  // dark land-use alphas cut ~35-45% + greens deepened: the ground recedes so buildings win figure-ground
+      // light-theme tints WARMED + DEEPENED (2026-07-03): residential/industrial were cool light
+      // blue-grays that read as washed-out white patches next to the taupe ground — the opposite
+      // of the muted DataProteins bed. All light values now sit in the warm gray/green family,
+      // a step darker than the ground bed so parcels recede instead of glowing.
+      park:        [[ 40, 96, 58,150],[134,178,122,170]],
+      forest:      [[ 30, 76, 46,160],[110,156,102,185]],
+      grass:       [[ 40, 90, 56,140],[140,182,130,155]],
+      recreation:  [[ 40, 96, 58,148],[134,178,122,165]],
+      meadow:      [[ 44, 92, 58,140],[146,184,134,155]],
+      farmland:    [[ 92, 90, 52,110],[186,168,124,165]],
+      industrial:  [[ 74, 72, 72,110],[168,160,148,160]],
+      commercial:  [[ 92, 80, 62,110],[188,172,148,160]],
+      residential: [[ 66, 72, 92,105],[180,172,158,150]],
+      retail:      [[ 94, 80, 60,110],[190,174,150,160]]};  // dark land-use alphas cut ~35-45% + greens deepened: the ground recedes so buildings win figure-ground
     const luCol=f=>{const m=LU[f.kind]||LU.park;return D?m[0]:m[1];};
     // Edges are now soft: the ground-bed plane fills the gaps between parcels, so we drop the hard
     // outline almost entirely (a very faint same-hue stroke just keeps same-kind parcels from merging).
