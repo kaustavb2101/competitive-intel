@@ -116,6 +116,15 @@ html[data-theme="light"] .cat10 .c{background:#F4F6FB;border-color:#D7DEEA}
 .occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
 .occ .bar i{display:block;height:100%;border-radius:4px}
 .foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+/* call-sheet export buttons (leads panel) — styled like #ctl .acts buttons, both themes */
+.cshrow{display:flex;gap:6px;margin-top:8px}
+.cshrow button{flex:1;background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+  font:600 11px 'IBM Plex Sans Thai';padding:6px 8px;cursor:pointer;text-align:center;white-space:nowrap}
+.cshrow button:hover{border-color:var(--blue);color:var(--hi)}
+.cshrow button:active{background:#161d2c}
+html[data-theme="light"] .cshrow button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .cshrow button:hover{border-color:var(--blue);color:#11151F}
+html[data-theme="light"] .cshrow button:active{background:#E8EEF8}
 
 /* leads */
 .verdict{border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5}
@@ -1547,6 +1556,70 @@ function OCC_BUCKETS_FROM(e){
     .filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
 }
 
+// ---- Call-sheet export (leads panel) --------------------------------------------------------
+// ALL leads for the focal branch, flattened from occupation_leads.json (window.OCCLEADS —
+// MEASURED Overture Places; lead = [bucket_idx, name, phone, dist_km], already grouped by bucket
+// then nearest-first). Returns [{occ,name,phone,km}] or null when the layer/branch is absent.
+function callSheetRows(){
+  if(!focal)return null;
+  const idx=branchPopIndex(focal); const LD=window.OCCLEADS, BK=window.OCCLEADS_BUCKETS;
+  if(!LD||idx<0||!LD[idx]||!LD[idx].L||!LD[idx].L.length||!BK)return null;
+  return LD[idx].L.map(function(e){
+    return {occ:(BK[e[0]]&&BK[e[0]].label)||'—', name:e[1]||'', phone:e[2]||'', km:(e[3]!=null&&isFinite(+e[3]))?+e[3]:null};});
+}
+// Blob-CSV of every lead near the focal branch — occupation, name, phone, distance. Client-side
+// only (no new data files); UTF-8 BOM so Thai names open cleanly in Excel.
+function callSheetCSV(){
+  const rows=callSheetRows(); if(!rows||!rows.length)return;
+  const bn=(focal&&focal.n)||CITY_LABEL;
+  const hdr=['occupation','name','phone','distance_km'];
+  const lines=[hdr.join(',')].concat(rows.map(function(r){
+    return [r.occ,r.name,r.phone,(r.km!=null?r.km.toFixed(1):'')]
+      .map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}).join(',');}));
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_call_sheet_'+String(bn).replace(/[^\w\u0E00-\u0E7F-]+/g,'_')+'.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+// Printable call sheet: a minimal print-styled popup (branch name + date header, leads grouped
+// by occupation). Same measured rows as the CSV; popup-blocked → silently no-op.
+function callSheetPrint(){
+  const rows=callSheetRows(); if(!rows||!rows.length)return;
+  const bn=(focal&&focal.n)||CITY_LABEL;
+  const esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  const d=new Date();
+  const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  let body='', cur=null;
+  rows.forEach(function(r){
+    if(r.occ!==cur){cur=r.occ; body+='<tr class="grp"><td colspan="3">'+esc(cur)+'</td></tr>';}
+    body+='<tr><td>'+esc(r.name)+'</td><td class="ph">'+(r.phone?esc(r.phone):'—')
+      +'</td><td class="km">'+(r.km!=null?r.km.toFixed(1)+' km':'')+'</td></tr>';});
+  const w=window.open('','_blank'); if(!w)return;
+  // NOTE: assembled from parts; never emit a literal closing-script sequence inside this block.
+  const doc=['<!doctype html><html><head><meta charset="utf-8">',
+    '<title>Call sheet · '+esc(bn)+'</title>',
+    '<style>',
+    "body{font:13px/1.5 'IBM Plex Sans Thai','IBM Plex Sans',system-ui,sans-serif;color:#111;background:#fff;margin:26px}",
+    'h1{font-size:17px;margin:0 0 2px}',
+    '.sub{color:#555;font-size:11px;margin:0 0 14px}',
+    'table{width:100%;border-collapse:collapse}',
+    'td{padding:4px 8px;border-bottom:1px solid #ddd;font-size:12px;vertical-align:baseline}',
+    'tr.grp td{background:#f0f2f6;font-weight:700;padding-top:8px;font-size:11px;text-transform:uppercase;letter-spacing:.4px}',
+    ".ph{font-family:'IBM Plex Mono',monospace;white-space:nowrap}",
+    '.km{text-align:right;color:#555;white-space:nowrap}',
+    '.prov{color:#777;font-size:10px;margin-top:12px}',
+    '@page{margin:14mm}',
+    '@media print{tr.grp td{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}}',
+    '</style></head><body>',
+    '<h1>Call sheet · '+esc(bn)+'</h1>',
+    '<div class="sub">เงินไชโย · leads to call by occupation ≤10 km · printed '+ds+' · '+rows.length+' leads</div>',
+    '<table>'+body+'</table>',
+    '<div class="prov">Measured Overture Maps Places — names &amp; phones as published (a lower bound, not a census). Distances from the branch coordinate.</div>',
+    '</body></html>'].join('');
+  w.document.write(doc); w.document.close(); w.focus();
+  setTimeout(function(){try{w.print();}catch(e){}},300);
+}
+
 function updatePanels(){
   // No branch data (a city without a province file) — leave the analysis panels in their empty state.
   if(!focal){
@@ -1662,9 +1735,14 @@ function updatePanels(){
               +`</div>`;
           }).join('')+`</div>`;
       }).join('')
-      +`<div class="foot">Nearest named establishments by occupation ≤10&nbsp;km — Overture Places (measured, a lower bound). Phones as published; tap to call.</div>`;
+      +`<div class="foot">Nearest named establishments by occupation ≤10&nbsp;km — Overture Places (measured, a lower bound). Phones as published; tap to call.</div>`
+      +`<div class="cshrow"><button id="cshCsv" type="button">⬇ Download call sheet (CSV)</button>`
+      +`<button id="cshPrint" type="button">🖨 Print</button></div>`;
   })();
   whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
+  // wire the call-sheet buttons (rendered only when the leads layer has entries for this branch)
+  const _bc=document.getElementById('cshCsv'); if(_bc)_bc.onclick=callSheetCSV;
+  const _bp=document.getElementById('cshPrint'); if(_bp)_bp.onclick=callSheetPrint;
 }
 
 function buildLeads(){
