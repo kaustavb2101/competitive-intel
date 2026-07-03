@@ -1357,10 +1357,12 @@ function render(){
       const cap=LIGHT?150:255;
       return [Math.min(cap,clamp(r)),Math.min(cap,clamp(g)),Math.min(cap,clamp(bl)),LIGHT?232:236];},
     stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[70,54,140,210]:[120,134,158,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
-    // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
-    // across faces. Specular ZEROED: it's the only view-dependent term, and under orbit it spiked
-    // and clamped sun-facing faces to white (the "white blow-out"). Diffuse shading keeps depth.
-    material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},
+    // LIGHTING OFF for the building fill. Any lighting model (ambient + directional/point terms)
+    // SUMS per-face and can exceed 1.0 on a real GPU -> the "white blow-out" that never reproduces
+    // on the sandbox's dimmer SwiftShader renderer. With material:false there is NO lighting term
+    // left to blow out: faces render flat at the fill color, which is already height-ramped (warm
+    // taupe->gold) and HARD-capped anti-white above. GPU-independent by construction.
+    material:false,
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
