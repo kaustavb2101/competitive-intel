@@ -2398,6 +2398,84 @@ def check_competitor_census():
         ok("competitors_census rivals sane (%d rivals, known brands, coords in bbox)" % len(items))
 
 
+def check_heng_branches():
+    # Heng official-locator UPLOAD (source-data/heng_branches.json) — produced by
+    # pull_heng_locator.py on the Thai laptop, merged into the census by ingest_heng.py.
+    # Optional file: SKIP-PASS when absent (the upload hasn't landed yet). Runs only when present.
+    hdr("source-data/heng_branches.json (optional; Heng official-locator upload)")
+    path = os.path.join(REPO, "source-data", "heng_branches.json")
+    if not os.path.exists(path):
+        ok("heng_branches.json absent — skipped (optional; run pull_heng_locator.py on the Thai laptop)")
+        return
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            d = json.load(f)
+    except Exception as e:
+        fail("heng_branches.json loads", repr(e))
+        return
+    ok("heng_branches.json loads")
+
+    if not isinstance(d.get("meta"), dict):
+        fail("heng_branches meta present", "got %s" % type(d.get("meta")).__name__)
+        return
+    ok("heng_branches meta present")
+
+    items = d.get("items")
+    if not isinstance(items, list) or not items:
+        fail("heng_branches has a non-empty 'items' list", "got %s" % type(items).__name__)
+        return
+    bad = []
+    for i, it in enumerate(items):
+        if not isinstance(it, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        if it.get("brand") != "Heng":
+            bad.append("#%d brand %r (expected 'Heng')" % (i, it.get("brand")))
+        if not it.get("source"):
+            bad.append("#%d source missing" % i)
+        if not isinstance(it.get("name", ""), str) or not isinstance(it.get("prov", ""), str):
+            bad.append("#%d name/prov not strings" % i)
+        la, ln = it.get("lat"), it.get("lng")
+        if not (is_finite_number(la) and is_finite_number(ln)
+                and 5.4 <= la <= 20.7 and 97.2 <= ln <= 105.8):
+            bad.append("#%d coords outside Thailand bbox: %r,%r" % (i, la, ln))
+    if bad:
+        fail("heng_branches items sane (brand='Heng', source, coords in Thailand bbox)", first_n(bad, 8))
+    else:
+        ok("heng_branches items sane (%d branches, all 'Heng', coords in bbox)" % len(items))
+
+    # plausibility band around the ~450-branch headline (WARN-style: surfaced, not fatal —
+    # the count is measured off the locator; a miss means re-check the pull, not fake the data)
+    if 300 <= len(items) <= 600:
+        ok("heng_branches count %d inside the 300–600 plausibility band (~450 headline)" % len(items))
+    else:
+        ok("heng_branches count %d OUTSIDE the 300–600 plausibility band (~450 headline; archived "
+           "countBranch.php said 852) — WARN, verify the pull walked the right endpoint" % len(items))
+
+    # if the merge has run, the official file's Heng set must reconcile (<= items; 5dp de-dupe)
+    off_path = os.path.join(REPO, "source-data", "competitors_official.json")
+    if os.path.exists(off_path):
+        try:
+            with open(off_path, "r", encoding="utf-8") as f:
+                off = json.load(f)
+        except Exception as e:
+            fail("competitors_official.json loads (Heng reconcile)", repr(e))
+            return
+        heng_entry = (off.get("brands") or {}).get("Heng")
+        if heng_entry is None:
+            fail("competitors_official.json contains the merged Heng entry",
+                 "upload present but not merged — run: python3 pipeline/ingest_heng.py")
+        else:
+            n_off = len(heng_entry.get("coords") or [])
+            if 0 < n_off <= len(items):
+                ok("competitors_official Heng entry reconciles (%d official coords <= %d uploaded "
+                   "items after 5dp de-dupe)" % (n_off, len(items)))
+            else:
+                fail("competitors_official Heng entry reconciles with the upload",
+                     "official=%d uploaded=%d — re-run: python3 pipeline/ingest_heng.py"
+                     % (n_off, len(items)))
+
+
 def check_rival_density(amphoe):
     # RIVAL DENSITY per district — MEASURED AutoX vs MEASURED rival branch counts + ratio + ceded-ground
     # flags. Optional file: SKIP-PASS when absent (run build_rival_density.py).
@@ -2954,6 +3032,7 @@ def main():
     check_lead_sites(n)
     check_catchment_poi()
     check_competitor_census()
+    check_heng_branches()
     check_rival_density(amphoe)
     check_cluster_brief(n, branches)
     check_branch_population(n)

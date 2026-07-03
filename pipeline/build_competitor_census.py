@@ -121,11 +121,25 @@ def build():
 
     by_brand = Counter(r["brand"] for r in out)
     by_src = Counter(r["src"] for r in out)
+    heng_official = "Heng" in official_brands
+    if heng_official:
+        label = ("MERGED measured competitor census — official store-locator networks for all four "
+                 "big brands (Srisawad, Tidlor, Muangthai, Heng — the FULL networks; Heng ingested "
+                 "from its own branch-finder via ingest_heng.py). Any remaining sample rows are "
+                 "minor brands only. This is what the 3D scene / map load.")
+        heng_gap = ("Heng is now the OFFICIAL locator set (province-walk of hengleasing.com from a "
+                    "Thai IP via pull_heng_locator.py, merged by ingest_heng.py) — the earlier "
+                    "Google∪Overture sample was replaced, not unioned.")
+    else:
+        label = ("MERGED measured competitor census — official store-locator networks where we could "
+                 "pull them (Srisawad, Tidlor, Muangthai — the FULL networks), plus a Google∪Overture "
+                 "sample for brands we couldn't (Heng). This is what the 3D scene / map load.")
+        heng_gap = ("Heng Leasing is a SAMPLE (Google∪Overture), not its full network — its official locator "
+                    "sits behind a Cloudflare challenge unsolvable from a headless cloud IP (archived "
+                    "countBranch.php reported ~852 branches). Needs a residential/Thai browser session.")
     meta = {
         "generated_by": "pipeline/build_competitor_census.py",
-        "label": "MERGED measured competitor census — official store-locator networks where we could "
-                 "pull them (Srisawad, Tidlor, Muangthai — the FULL networks), plus a Google∪Overture "
-                 "sample for brands we couldn't (Heng). This is what the 3D scene / map load.",
+        "label": label,
         "source": "MEASURED. Official-locator brands: each operator's live branch endpoint "
                   "(source-data/competitors_official.json). Sample brands: competitors_national.json "
                   "(Google Places) ∪ competitors_overture.json (Overture Places), deduped by proximity. "
@@ -136,9 +150,7 @@ def build():
                   "deduped within-brand at %dm." % int(DEDUPE_M),
         "counts": {"total": len(out), "by_brand": dict(sorted(by_brand.items())), "by_source": dict(by_src)},
         "gaps": [
-            "Heng Leasing is a SAMPLE (Google∪Overture), not its full network — its official locator "
-            "sits behind a Cloudflare challenge unsolvable from a headless cloud IP (archived "
-            "countBranch.php reported ~852 branches). Needs a residential/Thai browser session.",
+            heng_gap,
             "Official-locator counts list every service point/sub-branch, so they can slightly exceed "
             "a company's headline branch count (e.g. Muangthai 8,931 vs FY2025 headline 8,673).",
         ],
