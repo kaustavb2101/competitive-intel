@@ -75,12 +75,15 @@ def build_branches(master):
         if key not in fbd:
             misses[key] = misses.get(key, 0) + 1
         gd = fbd.get(key, {"fac": 0, "workers": 0})
-        # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,rain,k10,dfac,dwork,d
+        # insertion order must match the committed file: x,y,n,v,r,o,a,m,c,w,rain,k10,dfac,dwork,d,pop
+        # `pop` = the branch's district population (MEASURED — UNFPA/NSO district population, carried on
+        # the master as dist_pop). District-scoped, not a 10km circle; the scene labels it as such.
         rec = {"x": round(b["lng"], 4), "y": round(b["lat"], 4), "n": b["name"][:34],
                "v": b["prov"], "r": b["region"], "o": round(b["opportunity"], 1),
                "a": b["agri_pd"], "m": b["merchant_demand"], "c": b["collateral_density"],
                "w": b["own10"], "rain": b["rain_3mo_anom"],
-               "k10": k10, "dfac": gd["fac"], "dwork": gd["workers"], "d": b.get("district", "")}
+               "k10": k10, "dfac": gd["fac"], "dwork": gd["workers"], "d": b.get("district", ""),
+               "pop": int(b.get("dist_pop") or 0)}
         out.append(rec)
     if misses:
         n = sum(misses.values())

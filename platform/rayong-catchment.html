@@ -77,6 +77,14 @@ html[data-theme="light"] #vignette{
 .reach .r b{font-family:'IBM Plex Mono';color:#fff}
 .foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
 
+/* catchment headline: population + total establishments in the perimeter (two MEASURED stats) */
+.cat10{display:flex;gap:8px;margin:2px 0 12px}
+.cat10 .c{flex:1;background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:9px 10px}
+.cat10 .c .n{font:600 20px 'IBM Plex Mono';line-height:1.05;color:var(--gold)}
+.cat10 .c.poi .n{color:#5B7CFA}
+.cat10 .c .l{font-size:10px;color:var(--mid);margin-top:4px;line-height:1.35}
+html[data-theme="light"] .cat10 .c{background:#F4F6FB;border-color:#D7DEEA}
+
 .stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
 .stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
 .stat .v small{color:var(--dim)}
@@ -507,7 +515,21 @@ function _normNat(b){const k=b.k10||{};
   return {x:b.x,y:b.y,n:b.n,d:b.d||'',v:b.v,r:b.r,
     veh:(b.veh!=null?b.veh:(k.veh!=null?k.veh:null)),
     gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
+    pop:(b.pop!=null?b.pop:null),
     k10:b.k10||null};}
+// district population for a focal branch: prefer the carried `pop` (branches.json, MEASURED NSO);
+// for curated provinces (Rayong) whose branch file predates the field, match into the nationwide
+// tape by nearest coordinate (~1km) so the catchment summary still shows a measured population.
+function branchPop(f){
+  if(!f)return null;
+  if(f.pop!=null&&f.pop>0)return f.pop;
+  const NB=window.NATBRANCHES; if(!NB||!NB.length)return null;
+  let best=null,bd=1e9;
+  for(const b of NB){ if(!b||b.pop==null)continue;
+    const dx=(b.x-f.x),dy=(b.y-f.y),d2=dx*dx+dy*dy;
+    if(d2<bd){bd=d2;best=b;} }
+  return (best&&bd<0.0001)?best.pop:null;   // ~<1.1km — same branch site
+}
 // BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
 //  - Rayong (and any city shipping a curated province file): the curated PROV.branches — UNCHANGED
 //    (byte-for-byte for ?city=rayong / no city param).
@@ -1475,13 +1497,23 @@ function updatePanels(){
     k10host.innerHTML='<div class="foot">Select an AutoX branch from the cascade or map to see its measured 10km surroundings.</div>';
   }else{
     const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
-    k10host.innerHTML=K10_GROUPS.map(([gh,rows])=>
+    // headline the catchment: PEOPLE (district population, MEASURED NSO) + total ESTABLISHMENTS
+    // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
+    const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
+    const pop=branchPop(focal);
+    const headline=`<div class="cat10">`
+      +`<div class="c pop"><div class="n">${pop?fmt(pop):'—'}</div>`
+      +`<div class="l">people in district${pop?'':' · n/a'} <span class="tag meas">NSO</span></div></div>`
+      +`<div class="c poi"><div class="n">${fmt(totalPOI)}</div>`
+      +`<div class="l">establishments ≤10km <span class="tag meas">OSM</span></div></div>`
+      +`</div>`;
+    k10host.innerHTML=headline+K10_GROUPS.map(([gh,rows])=>
       `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(([key,lab,col])=>{
         const v=Array.isArray(key)?sum(key):(k[key]||0);
         const c=POI_COLORS[col]||[138,148,168];
         return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
       }).join('')+`</div>`).join('')
-      +`<div class="foot">Counts are establishments mapped in OpenStreetMap within a 10 km radius of this branch — measured, not estimated.</div>`;
+      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population is the branch's district total (UNFPA/NSO), not a 10&nbsp;km circle.</div>`;
   }
 
   // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
