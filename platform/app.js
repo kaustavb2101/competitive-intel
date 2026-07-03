@@ -656,6 +656,19 @@ async function loadClusterBrief(){
   })();
   return cbrfPromise;
 }
+// NAMED occupation leads per branch (occupation_leads.json .branches[i].L, index-aligned; buckets in meta).
+let OCCL=null, OCCLB=null, occlLoaded=false, occlPromise=null;
+async function loadOccLeads(){
+  if(occlPromise) return occlPromise;
+  occlLoaded=true;
+  occlPromise=(async()=>{
+    try{ const r=await fetch('data/occupation_leads.json'); if(r.ok){ const j=await r.json();
+      OCCL=Array.isArray(j&&j.branches)?j.branches:null; OCCLB=(j&&j.meta&&j.meta.buckets)||null; } }
+    catch(e){ OCCL=null; OCCLB=null; }
+    return OCCL;
+  })();
+  return occlPromise;
+}
 // MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
 // census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
 // null when the census is absent so the popup omits the line rather than show a fabricated 0.
@@ -2960,6 +2973,7 @@ function initMap(){
   if(!bpopLoaded) loadBranchPopulation();
   if(!ccenLoaded) loadCompetitorCensus();
   if(!cbrfLoaded) loadClusterBrief();
+  if(!occlLoaded) loadOccLeads();
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
@@ -2989,8 +3003,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief()]).then(()=>{
+  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF||!OCCL){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3168,6 +3182,26 @@ function briefPopupHTML(d,sec,r){
   return sec('Macro read — this cluster')
     + `<div style="font-size:12px;line-height:1.5;color:#c7cedd;padding:2px 0">${line}</div>`
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">templated from measured commodity-board YoY, crop-stress and occupation mix</div>`;
+}
+// NAMED occupation leads — the actual businesses to CALL near this branch, by occupation (Overture
+// Places, name+phone). occupation_leads.json .branches[i].L = [[bucket_idx, name, phone, dist_km],...].
+// The reframed core objective, on the front-door map. Null-guarded; renders nothing when absent.
+function occLeadsPopupHTML(d,sec,r){
+  const i=idxOf(d);
+  const L=(OCCL&&i>=0&&i<OCCL.length&&OCCL[i]&&Array.isArray(OCCL[i].L))?OCCL[i].L:null;
+  if(!L||!L.length||!OCCLB) return '';
+  const byB={}; L.forEach(function(e){(byB[e[0]]=byB[e[0]]||[]).push(e);});
+  const order=Object.keys(byB).map(Number).sort(function(a,b){return byB[b].length-byB[a].length;}).slice(0,5);
+  const rows=order.map(function(bi){
+    const lab=(OCCLB[bi]&&OCCLB[bi].label)||'—', e=byB[bi][0];  // nearest lead in this bucket
+    const ph=(e[2]||'').replace(/\s/g,'');
+    const call=ph?`<a href="tel:${ph}" style="color:var(--accent);text-decoration:none;font-family:'IBM Plex Mono'">${e[2]}</a>`:'<span class="sub">—</span>';
+    return `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:1px 0">`
+      +`<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b style="color:var(--mid);font-weight:600">${lab.split(' ')[0]}</b> · ${e[1]}</span>${call}</div>`;
+  }).join('');
+  return sec('Leads to call — by occupation (measured)')
+    + rows
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">nearest named establishment per occupation ≤10km (Overture Places); tap phone to call. Full list in the branch 3D scene.</div>`;
 }
 // crop-household stress block for a branch popup — only the cstress lens loads the data,
 // so render nothing until it's available. Shows the REAL components, honestly labelled.
@@ -3417,6 +3451,7 @@ function popupHTML(d){
        style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
        background:var(--accent);color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
     ${briefPopupHTML(d,sec,r)}
+    ${occLeadsPopupHTML(d,sec,r)}
     ${leadsPopupHTML(d,sec,r)}
     ${macxPopupHTML(d,sec)}
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
