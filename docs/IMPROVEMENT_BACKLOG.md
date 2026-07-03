@@ -65,13 +65,6 @@
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
 
 ## Queue — UX follow-ups noticed 2026-07-03 (2)
-- [ ] **Derive `drawAmphoeChoropleth()`'s `on` check from `LENS[curLens].amp` instead of a hardcoded
-      `curLens==='dws'||curLens==='drisk'||curLens==='unemp'` OR-chain.** Same for the `ageoLoaded`/
-      `ampJoinAttached` lazy-load triggers in `setLens()`. Every amphoe-keyed lens (`amp:true` in the
-      `LENS` registry) has now needed this same 3-line wiring added by hand twice (drisk, then unemp);
-      a future amp lens will hit the identical "dots paint, polygon doesn't" bug until someone remembers
-      to extend 3 separate OR-chains. Refactoring to read the flag off `LENS` removes the whole bug
-      class. Pure refactor, behaviour-identical — verify via `?lens=dws|drisk|unemp` renders unchanged. *(LOW, S)*
 - [ ] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots** — every branch
       in a province shares one DTI value, so today's map shows many same-coloured dots per province
       instead of one clean shape. A province-polygon choropleth (dissolve `th_amphoe.geojson` amphoe →
@@ -199,8 +192,29 @@
       no province-level structural-stress context yet; a compact callout there would round out the
       original ask. *(LOW, S)*
 
+## Queue — follow-ups noticed 2026-07-03 (5)
+- [ ] **`pstress` (province structural-stress) lens has the same "province-resolution but only
+      branch dots" issue already tracked for `hhdti`** above — it reads `PSTRESS[d.v]` (province
+      name), so every branch in a province shares one value and paints as many same-coloured dots
+      instead of one clean province shape. Since both `hhdti` and `pstress` key off `d.v` (not an
+      amphoe id), a single province-boundary choropleth layer (dissolve `th_amphoe.geojson` amphoe →
+      province once) could serve both lenses instead of building it twice. *(MED, M)*
+- [ ] **Stale comment at `platform/app.js`'s `initMap()` `deferForAmp` line ("the district lenses
+      (dws/drisk) read d._amp") predates the `unemp` amp lens** and now also `isAmpLens()` — the
+      comment still names only 2 of the (now 3, growing) amp lenses. Reword to describe the
+      mechanism ("any amp:true lens") instead of enumerating keys, so it doesn't go stale again
+      next time one is added. *(LOW, trivial)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (5) — REFACTOR: amp-lens gating now reads `LENS[k].amp` instead of a 4-site
+  hand-maintained OR-chain.** New `isAmpLens(k)` helper in `platform/app.js`; replaced the
+  `curLens==='dws'||curLens==='drisk'||curLens==='unemp'` (and `k===` equivalent) checks in
+  `drawAmphoeChoropleth()`, `initMap()`'s `deferForAmp`, and both lazy-load triggers in `setLens()`.
+  Pure refactor, behaviour-identical (today's `amp:true` lens set already equals the old hardcoded
+  list). Removes the whole "dots paint, polygon doesn't" bug class for future amp lenses. Gate:
+  35/0 (validate_data 181/181). Headless-rendered `?lens=unemp#map` + `?lens=drisk#map` confirm the
+  choropleth still paints, no JS errors. Full writeup: `docs/PROGRESS_LOG.md` (2026-07-03 (5) entry).
 - **2026-07-03 (4) — UX: structurally-riskiest province surfaced on the Command Center hero.**
   Added a "Structurally riskiest · DTI + unemployment" row to `renderHomeRisk()`'s risk card
   (`platform/app.js`) using `province_stress_index.json`'s rank-1 province (`PSTRESS_LIST[0]`),

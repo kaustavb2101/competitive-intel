@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-03 (5) — REFACTOR: amp-lens gating reads `LENS[k].amp` instead of a hand-maintained OR-chain
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (2)): `drawAmphoeChoropleth()`'s district-lens
+gate and `setLens()`'s amphoe-join/amphoe-geo lazy-load triggers all hardcoded
+`curLens==='dws'||curLens==='drisk'||curLens==='unemp'` (or the `k===` equivalent) across 4 separate
+call sites in `platform/app.js`. Every amphoe-keyed lens shipped so far (`drisk`, then `unemp`) had
+needed this same 3-key OR-chain extended by hand in all 4 places — a bug class ("dots paint, polygon
+doesn't") the backlog flagged as likely to bite a future amp lens if someone forgot one site.
+
+Added `isAmpLens(k)` — reads the lens's own `amp:true` flag off the `LENS` registry (the flag already
+exists and is used by the `dws`/`drisk`/`unemp` entries) — and replaced all 4 OR-chains with calls to
+it: `drawAmphoeChoropleth()`'s `on` check, the branch-popup `deferForAmp` gate in `initMap()`, and both
+the amphoe-join and amphoe-geo lazy-load triggers in `setLens()`. Pure refactor, behaviour-identical
+(confirmed: the `amp:true` lens set is exactly `{dws, drisk, unemp}` today, matching the old hardcoded
+list). A future `LENS.foo={amp:true,...}` now wires into the choropleth + join-warming automatically —
+no 4-site OR-chain to remember.
+
+Verification: `bash tests/run.sh check` → 35/0 (validate_data 181/181). Headless-rendered
+`index.html?lens=unemp#map` and `index.html?lens=drisk#map` (`tests/lib/render.sh`) — both still paint
+the district choropleth under the branch dots with no uncaught JS errors, pixel-identical in shape to
+the pre-refactor renders (basemap raster blank headless, expected).
+
 ## 2026-07-03 (4) — UX: structurally-riskiest province surfaced on the Command Center hero
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (3)): `province_stress_index.json`
