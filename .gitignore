@@ -30,6 +30,9 @@ source-data/.overture_tiles/
 # the DERIVED, small outputs (branch_occupations.json / amphoe_occupations.json) ARE committed and
 # the gate skips the byte-check when this input is absent (CI never has it). Keep it local.
 source-data/overture_places.json
+# named-places bulk pull (pull_places_strip.py strips, merged) — raw INPUT for occupation_leads.json
+# (the small DERIVED output IS committed). Re-pullable; keep local.
+source-data/occupation_places_named.json
 
 # QA render temp (headless screenshots)
 platform/_qa_vendor/
