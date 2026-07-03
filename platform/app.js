@@ -1519,7 +1519,7 @@ function ampIndex(){
 // lens it simply removes the layer, so branch lenses look exactly as before.
 function drawAmphoeChoropleth(){
   if(!mapReady||!map||typeof L==='undefined'||!L.geoJSON) return;
-  const on=(curLens==='dws'||curLens==='drisk');
+  const on=(curLens==='dws'||curLens==='drisk'||curLens==='unemp');
   if(!on||!AGEO||!AMP){
     if(ampChoroLayer){ map.removeLayer(ampChoroLayer); ampChoroLayer=null; }
     return;
@@ -3257,8 +3257,8 @@ function setLens(k){
   if((k==='dws'||k==='drisk'||k==='unemp') && !ampJoinAttached){
     loadAmphoe().then(()=>{ if(curLens==='dws'||curLens==='drisk'||curLens==='unemp'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
-  if((k==='dws'||k==='drisk') && !ageoLoaded){
-    loadAmphoeGeo().then(()=>{ if((curLens==='dws'||curLens==='drisk')&&mapReady) drawAmphoeChoropleth(); });
+  if((k==='dws'||k==='drisk'||k==='unemp') && !ageoLoaded){
+    loadAmphoeGeo().then(()=>{ if((curLens==='dws'||curLens==='drisk'||curLens==='unemp')&&mapReady) drawAmphoeChoropleth(); });
   }
   if(k==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'){ renderLegend(); if(mapReady){ drawCompPoints(); styleMarkers(); } } });
