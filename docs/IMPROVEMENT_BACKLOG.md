@@ -103,11 +103,10 @@
       in `platform/app.js`'s `LENS` registry, mirrors the household-DTI dot-lens pattern; reads
       `d._amp.unemployment_rate` off the existing amphoe join, own 1-decimal-percent legend tagged
       measured · NSO LFS, lives in "More lenses ▾"; gate 31/0, headless-rendered + DOM-verified).
-- [ ] **Combine household DTI + unemployment into one province portfolio-stress index.**
-      `household_risk_by_province.json` (DTI) and `unemployment_by_province.json` are both MEASURED
-      province-level risk signals but feed different views (a National lens vs `build_amphoe.py`'s
-      risk_proxy) with no single combined read. A blended province stress score would give one number
-      for "which provinces are structurally riskiest" (objective #1). *(MED, M)*
+- [x] **Combine household DTI + unemployment into one province portfolio-stress index — DONE
+      2026-07-03 (3)** (`build_province_stress.py` → `province_stress_index.json`: 0.5×DTI-percentile
+      + 0.5×unemployment-percentile composite over the two already-MEASURED NSO layers; new National
+      map lens "Province stress ▲ est" — #1 อำนาจเจริญ composite 98.05, #2 นครพนม 90.58).
 - [x] **Backlog hygiene pass — DONE 2026-07-03** (deduped the stale `[ ]` Household-DTI-lens and
       `[ ]` opportunity-score entries that were describing work already shipped `[x]`; removed the
       stale `[ ]` P2 Road-to-3,000 rounding item at the bottom of this file, already fixed per the
@@ -132,11 +131,8 @@
       session without `numpy` no longer hits a false-red gate on cycle 1. Real drift still fails
       correctly — verified by hand-corrupting `branch_peers.json` and re-running with `numpy` installed.
       Vendoring `numpy` into the environment's default setup itself is still open — see below.)
-- [ ] **Combine household DTI + unemployment into a single province stress score for the National map**
-      (not just `build_amphoe.py`'s internal `risk_proxy` blend) — today `hhdti` and the new `unemp`
-      are two separate lenses a viewer must flip between; a 3rd composite lens (or a small badge on
-      each) showing "both elevated" districts would directly answer objective #1's "where is risk
-      compounding" question. *(MED, M)*
+- [x] **Combine household DTI + unemployment into a single province stress score for the National
+      map — DONE 2026-07-03 (3), duplicate of the entry above** (same delivery: `pstress` lens).
 - [x] **Fold NSO LFS `unemployment_rate` into `build_amphoe.py`'s `risk_proxy` — DONE 2026-07-02 (3)**
       (province-inherited `unemployment_rate` field + risk_proxy now 0.4·agri_stress + 0.25·collateral +
       0.15·merchant + 0.2·unemployment_stress [scaled 0-3.0%->0-100, clipped]; #acq risk table gained an
@@ -171,8 +167,46 @@
 - More **cities** for the 3D showcase (Overture/Overpass pull) — Bangkok already pulled; others need a pull.
 - Real **farm-gate** prices, isochrones (ORS/GISTDA), DLT/DIW gov refresh.
 
+## Queue — follow-ups noticed 2026-07-03 (3)
+- [ ] **Surface `province_stress_index.json`'s rank-1 province (composite_stress) on the Command
+      Center hero / Exposure tab**, the same way `HHRISK_LIST[0]` already seeds the DTI headline —
+      today the new composite only lives on the National map's "Province stress" menu lens; a
+      one-line "structurally riskiest: <province>, composite NN (DTI+unemployment)" would put it in
+      front of the exec front door too. *(MED, S)*
+- [ ] **`province_stress_index.json`'s equal 50/50 DTI/unemployment weighting is an editorial
+      choice** (documented honestly in `meta.caveats`, not calibrated to realized loss) — once the
+      real loan tape lands (`docs/TONIGHT_CHECKLIST.md` §6), correlate `composite_stress` against
+      actual branch-level 90+ delinquency by province and re-weight if one leg dominates. *(LOW, S,
+      blocked until real loan tape)*
+- [ ] **`build_province_stress.py` could add a 3rd leg** once DLT vehicle registrations (the
+      highest-value blocked pull, `docs/TONIGHT_CHECKLIST.md` §1) land — collateral-supply stress
+      (motorcycle share of the province vehicle stock is already a MEASURED lens, `motomix`) is a
+      third structurally-relevant, already-sourced signal that isn't in the composite yet. *(LOW, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (3) — ENRICH: combined province structural-stress index (household DTI +
+  unemployment).** New `pipeline/build_province_stress.py` joins two already-committed MEASURED
+  layers — `household_risk_by_province.json` (NSO SES 2566 debt-to-income, itself
+  `build_household_risk.py`'s output) and `source-data/unemployment_by_province.json` (NSO Labour
+  Force Survey) — into `platform/data/province_stress_index.json`: per province, `composite_stress`
+  = 0.5×(DTI percentile) + 0.5×(unemployment percentile), 0–100, worst-first + ranked. All 77
+  provinces joined cleanly (both sources already share the canonical 77 Thai-name key). Every
+  MEASURED vs ESTIMATED distinction is explicit in `meta` (debt_to_income/unemployment_rate
+  MEASURED; both percentiles + the composite ESTIMATED, equal-weighting called out as an editorial
+  choice in `meta.caveats`, not calibrated to realized loss). Wired into the National map as a new
+  "Province stress ▲ est" menu lens (`pstress` key in `app.js`'s `LENS` registry), following the
+  exact `hhdti` lazy-load/legend/absent-guard pattern (own loader, own `lensAbsent` branch, own
+  legend block honestly tagged "estimated · NSO SES + NSO LFS blend", warmed unconditionally in
+  `initMap()` so `?lens=pstress` deep-links resolve — caught and fixed a first-pass bug via headless
+  render where the deep-link path set `curLens` but never called the loader, leaving the legend
+  stuck on its loading skeleton). `tests/validate_data.py` gained `check_province_stress()` (meta
+  provenance, DTI/unemployment ≥0, percentiles+composite in [0,100], composite formula recomputed
+  and compared, rank is a unique 1..77 sequence); `tests/run.sh` gates `build_province_stress.py
+  --check`. Headless-rendered `index.html?lens=pstress#map` (screenshot + DOM) confirms the lens
+  paints branch dots by composite score and the legend reads correctly — no uncaught JS errors.
+  Gate: 32/0, `validate_data.py` 166/166 (was 162/162). Two near-duplicate backlog entries for this
+  same idea both checked off. Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-03 (3) entry).
 - **2026-07-03 (2) — AUDIT: fixed the `numpy`-missing false-red gate.** `build_branch_peers.py` now
   catches `ImportError` on `numpy` and exits `3` with a "dependency missing, not data drift" message
   instead of an uncaught traceback; `tests/run.sh` reads that code and reports `[SKIP]` (not

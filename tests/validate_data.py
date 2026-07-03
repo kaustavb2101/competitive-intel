@@ -682,6 +682,71 @@ def check_household_risk():
 
 
 # ---------------------------------------------------------------------------
+def check_province_stress():
+    # Combined household-DTI + unemployment province structural-stress index
+    # (pipeline/build_province_stress.py). Optional file: SKIP-PASS when absent.
+    hdr("province_stress_index.json (optional)")
+    if not exists("province_stress_index.json"):
+        ok("province_stress_index.json absent — skipped (optional; run build_province_stress.py)")
+        return
+    try:
+        d = load("province_stress_index.json")
+    except Exception as e:
+        fail("province_stress_index.json loads", repr(e))
+        return
+    ok("province_stress_index.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "generated_by" not in meta or "source" not in meta:
+        fail("province_stress meta/provenance present", "meta missing generated_by/source")
+    else:
+        ok("province_stress meta/provenance present")
+
+    if meta and meta.get("absent"):
+        ok("province_stress is an honest ABSENT-state (inputs missing) — skipped value checks")
+        return
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("province_stress has a 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("province_stress provinces list present (%d)" % len(provs))
+
+    bad = []
+    seen_ranks = set()
+    for p in provs:
+        name = p.get("province") or "?"
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        dti = p.get("debt_to_income")
+        if not is_finite_number(dti) or dti < 0:
+            bad.append("%s debt_to_income=%r invalid" % (name, dti))
+        ur = p.get("unemployment_rate")
+        if not is_finite_number(ur) or ur < 0:
+            bad.append("%s unemployment_rate=%r invalid" % (name, ur))
+        for fld in ("dti_percentile", "unemployment_percentile", "composite_stress"):
+            v = p.get(fld)
+            if not is_finite_number(v) or not (0.0 <= v <= 100.0):
+                bad.append("%s %s=%r out of [0,100]" % (name, fld, v))
+        dtip, unp, comp = p.get("dti_percentile"), p.get("unemployment_percentile"), p.get("composite_stress")
+        if is_finite_number(dtip) and is_finite_number(unp) and is_finite_number(comp):
+            expect = round(0.5 * dtip + 0.5 * unp, 2)
+            if abs(comp - expect) > 0.01:
+                bad.append("%s composite_stress=%s != 0.5*dti+0.5*unemp=%s" % (name, comp, expect))
+        rank = p.get("rank")
+        if not isinstance(rank, int) or rank <= 0:
+            bad.append("%s rank=%r invalid" % (name, rank))
+        seen_ranks.add(rank)
+    if len(seen_ranks) != len(provs):
+        bad.append("rank is not a unique 1..N sequence (%d ranks for %d provinces)" % (len(seen_ranks), len(provs)))
+    if bad:
+        fail("province_stress values sane (DTI/unemp>=0, percentiles+composite in [0,100], "
+             "composite formula consistent, rank unique)", first_n(bad, 8))
+    else:
+        ok("province_stress values sane (DTI/unemp measured>=0, composite = 0.5*dti_pct+0.5*unemp_pct, rank unique 1..N)")
+
+
+# ---------------------------------------------------------------------------
 def check_branch_occupations(n_branches):
     # MEASURED Overture occupation rollup, index-aligned to branches.json. Optional file:
     # SKIP-PASS when absent (build_occupations.py has not been run / overture_places.json missing).
@@ -2570,6 +2635,7 @@ def main():
     check_crop_stress()
     check_collateral_outlook()
     check_household_risk()
+    check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)
     check_poi_relevance(n)

@@ -22,6 +22,7 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
+  pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, est:true, tag:'e', val:d=>pstressVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
@@ -88,6 +89,35 @@ function hhriskHasData(){return !!(HHRISK&&Object.keys(HHRISK).length);}
 // MEASURED debt-to-income for a branch's province, scaled ×100 so the lens shares the integer
 // colour scale of the other lenses (e.g. DTI 1.15 -> 115). 0 when unknown.
 function hhriskVal(d){const p=HHRISK&&HHRISK[d.v]; return p&&p.debt_to_income!=null?Math.round(p.debt_to_income*100):0;}
+
+/* ---------- combined province structural stress (household DTI + unemployment, objective #1) ----------
+   Lazy-loaded from data/province_stress_index.json (pipeline/build_province_stress.py). PSTRESS maps
+   Thai province name -> {debt_to_income, dti_percentile, unemployment_rate, unemployment_percentile,
+   composite_stress, rank}. debt_to_income + unemployment_rate are MEASURED (NSO SES / NSO LFS);
+   the two percentiles + composite_stress are an ESTIMATED equal-weighted blend. Null-guarded: if the
+   file is ABSENT, PSTRESS stays empty, the lens hides itself, val() reads 0 — never errors. */
+let PSTRESS=null, PSTRESS_META=null, PSTRESS_LIST=[], pstressLoaded=false, pstressPromise=null;
+async function loadProvinceStress(){
+  if(pstressPromise) return pstressPromise;
+  pstressLoaded=true;
+  pstressPromise=(async()=>{
+    try{
+      const r=await fetch('data/province_stress_index.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      PSTRESS_META=j.meta||null; PSTRESS={}; PSTRESS_LIST=[];
+      if(!(j.meta&&j.meta.absent)){
+        const list=(j.provinces||[]).filter(p=>p&&p.composite_stress!=null);
+        list.forEach(p=>{PSTRESS[p.province]=p;});
+        PSTRESS_LIST=list.slice().sort((a,b)=>(b.composite_stress||0)-(a.composite_stress||0));
+      }
+    }catch(e){ PSTRESS={}; PSTRESS_META=null; PSTRESS_LIST=[]; }
+    return PSTRESS;
+  })();
+  return pstressPromise;
+}
+function pstressHasData(){return !!(PSTRESS&&Object.keys(PSTRESS).length);}
+// ESTIMATED composite_stress (0-100) for a branch's province. 0 when unknown.
+function pstressVal(d){const p=PSTRESS&&PSTRESS[d.v]; return p&&p.composite_stress!=null?Math.round(p.composite_stress):0;}
 
 /* ---------- measured occupation mix (Overture Places) ----------
    Lazy-loads data/branch_occupations.json — a MEASURED per-branch rollup of establishment
@@ -2587,6 +2617,7 @@ function lensPillHTML(k,opts){
 function lensAbsent(k){
   const l=LENS[k]; if(!l) return false;
   if(l.hh)    return hhriskLoaded && !hhriskHasData();
+  if(l.pstr)  return pstressLoaded && !pstressHasData();
   if(l.occr)  return occriskLoaded && !occriskHasData();
   if(l.brisk) return briskLoaded && !briskHasData();
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
@@ -2691,6 +2722,17 @@ function renderLegend(){
       ` <span class="sub" title="NSO Labour Force Survey — province-inherited district rate, measured">● measured · NSO LFS</span>`;
     return;
   }
+  // Combined province structural-stress lens: ESTIMATED composite (0-100) of two MEASURED
+  // percentile ranks — tag it 'estimated' honestly, unlike the plain-MEASURED hhdti/unemp legends.
+  if(l.pstr){
+    if(!pstressLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">province structural stress…</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${Math.round(mx*.12)}</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${Math.round(mx*.5)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${Math.round(mx)} ${l.unit}</span>`+
+      ` <span class="sub" title="0.5×household-DTI percentile (NSO SES) + 0.5×unemployment percentile (NSO LFS), both measured inputs, equal-weighted blend">▲ estimated · NSO SES + NSO LFS blend</span>`;
+    return;
+  }
   // Relevant-POI density lens: a shimmer skeleton while the (measured-counts) layer loads, then an
   // honest "measured counts · estimated weighting" tag so the M-badged pill is not misread as a
   // fully measured score.
@@ -2763,6 +2805,10 @@ function initMap(){
   // popups carry the debt-to-income block. Absent file → loader leaves HHRISK empty, the lens is
   // filtered out, nothing renders.
   if(!hhriskLoaded) loadHouseholdRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='hhdti'){ renderLegend(); styleMarkers(); } });
+  // warm the combined province structural-stress index (DTI + unemployment) so its lens hides
+  // itself when absent. Absent file (build_province_stress.py not run / inputs missing) → PSTRESS
+  // empty, lens filtered out.
+  if(!pstressLoaded) loadProvinceStress().then(()=>{ renderLenses(); if(mapReady&&curLens==='pstress'){ renderLegend(); styleMarkers(); } });
   // warm the occupation × stress cross-read so the lens hides itself when absent. Absent file
   // (build_occupation_risk.py not run / no Overture pull yet) → OCCRISK empty, lens filtered out.
   if(!occriskLoaded) loadOccRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='occrisk'){ renderLegend(); styleMarkers(); } });
@@ -3251,6 +3297,9 @@ function setLens(k){
   }
   if(k==='hhdti' && !hhriskLoaded){
     loadHouseholdRisk().then(()=>{ renderLenses(); if(curLens==='hhdti'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='pstress' && !pstressLoaded){
+    loadProvinceStress().then(()=>{ renderLenses(); if(curLens==='pstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(k==='occrisk' && !occriskLoaded){
     loadOccRisk().then(()=>{ renderLenses(); if(curLens==='occrisk'){ renderLegend(); if(mapReady) styleMarkers(); } });

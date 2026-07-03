@@ -4,6 +4,76 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-03 (3) — ENRICH: combined province structural-stress index (household DTI + unemployment)
+
+**Task type:** ENRICH (fold two already-vendored MEASURED layers into a single new composite view;
+no external data pulled — `/workspace/watcher` [TMLI blueprint] was not present in this sandbox this
+cycle, so no cross-repo pull was possible; this task was picked from the sandbox-safe backlog
+instead, per the rule to prefer keeping existing real data provably-sourced over adding new things).
+
+**What was found.** The backlog (`docs/IMPROVEMENT_BACKLOG.md`) carried two near-duplicate open
+items asking for the same thing: combine `household_risk_by_province.json` (NSO SES 2566
+debt-to-income) and `source-data/unemployment_by_province.json` (NSO Labour Force Survey) — both
+already-committed, already-audited MEASURED province-level risk signals — into ONE "which provinces
+are structurally riskiest" number. Today they feed two separate mechanisms: `hhdti` (a direct
+province-keyed National-map lens) and `unemp` (an amphoe-join lens, province-inherited), with no
+single combined read.
+
+**What changed:**
+- New `pipeline/build_province_stress.py` (network-free, deterministic, `--check` byte-exact) loads
+  `platform/data/household_risk_by_province.json` (itself `build_household_risk.py`'s MEASURED-input
+  output — `debt_to_income` + its 0–100 percentile `stress_index`) and
+  `source-data/unemployment_by_province.json` (`unemployment_rate`, MEASURED). Computes an
+  `unemployment_percentile` using the exact same percentile-rank method as the existing DTI
+  percentile (for comparability), then `composite_stress = 0.5*dti_percentile +
+  0.5*unemployment_percentile`, 0–100, ranked worst-first. All 77 provinces joined cleanly (both
+  sources already use the canonical 77 Thai-name key) — 0 provinces dropped.
+- Every field is labelled MEASURED or ESTIMATED in `meta.fields`; `meta.caveats` states plainly that
+  the 50/50 weighting is an editorial triage choice, NOT calibrated against realized AutoX default
+  data (no loan tape exists yet to calibrate against — see `docs/TONIGHT_CHECKLIST.md` §6).
+  Top of the list: อำนาจเจริญ (Amnat Charoen) composite 98.05 (DTI 1.14×, unemployment 2.84% — both
+  already-known Isan stress leaders from the individual `hhdti`/`unemp` lenses), นครพนม 90.58,
+  กำแพงเพชร 83.12.
+- `platform/app.js`: new National-map menu lens `pstress` ("Province stress ▲ est") in the `LENS`
+  registry, following the exact `hhdti` pattern — own lazy loader (`loadProvinceStress`), own
+  `lensAbsent` branch (hides the pill if the file is absent/empty), own legend block honestly tagged
+  "▲ estimated · NSO SES + NSO LFS blend" (unlike `hhdti`/`unemp`'s plain "measured" tags, since this
+  one blends two percentiles into a composite), warmed unconditionally in `initMap()` (not just on
+  `setLens`) so a `?lens=pstress` deep link resolves on first load.
+- `tests/validate_data.py`: new `check_province_stress()` — meta/provenance present, honest
+  ABSENT-state handling, `debt_to_income`/`unemployment_rate` ≥0, all three of
+  `dti_percentile`/`unemployment_percentile`/`composite_stress` in [0,100], `composite_stress`
+  recomputed from the two percentiles and compared (±0.01 tolerance), `rank` is a unique 1..N
+  sequence. `tests/run.sh` gates `build_province_stress.py --check`.
+
+**Verification:**
+- `bash tests/run.sh check` — 32 passed, 0 failed (`validate_data.py`: 166/166, up from 162/162 —
+  4 new checks for the new file). `node --check platform/app.js` clean.
+- `python3 build_province_stress.py --check` reproduces byte-exact (0 drift).
+- Headless-rendered `index.html?lens=pstress#map` (`tests/lib/render.sh`, screenshot + settled DOM):
+  **first pass caught a real bug** — the `?lens=` deep-link handler in `initMap()` only sets
+  `curLens` and re-renders the pill row; it does not itself trigger a lens's lazy loader (that's
+  normally `setLens()`'s job, which only fires on a user click). Every other data-gated lens
+  (`hhdti`, `occrisk`, `brisk`, `poirel`, `peerdev`) has its own unconditional warm-load line inside
+  `initMap()` to cover exactly this deep-link case; the new `pstress` lens was missing the
+  equivalent line, so a `?lens=pstress` deep-link render left the legend stuck on its loading
+  skeleton forever (branch dots never colored/sized). Added the matching
+  `if(!pstressLoaded) loadProvinceStress().then(...)` line in `initMap()` (mirroring `hhdti`'s at
+  the same call site) and re-rendered: the fix confirmed — dots now colour/size by
+  `composite_stress`, legend reads "12 / 49 / 98 stress (0–100, est) · estimated · NSO SES + NSO LFS
+  blend", pill shows the honest `E` provenance badge, `data-errors="[]"` in the QA probe (no
+  uncaught JS). Re-ran `tests/run.sh check` after the fix — still 32/0.
+
+**Source:** `platform/data/household_risk_by_province.json` (NSO SES 2566, via `build_household_risk.py`,
+already-audited MEASURED) + `source-data/unemployment_by_province.json` (NSO Labour Force Survey,
+via the TMLI bridge / `ingest_tmli.py`, already-audited MEASURED). No external pull performed this
+cycle — this is a re-projection/composite of two already-committed, already-sourced MEASURED layers.
+Two near-duplicate `docs/IMPROVEMENT_BACKLOG.md` entries for this idea checked off; 3 follow-up ideas
+logged (surface on Command Center hero; re-weight once a real loan tape exists to calibrate against;
+add a 3rd DLT-collateral leg once that blocked pull lands).
+
+---
+
 ## 2026-07-03 — AUDIT: fixed a false-red gate (missing `numpy` misreported as data drift)
 
 **Task type:** AUDIT (gate integrity, not a data value change — no `platform/data` or `source-data`
