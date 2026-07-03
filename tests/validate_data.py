@@ -2218,6 +2218,120 @@ def check_macro_exposure(n_branches):
             ok("macro_exposure vector index-aligned + sane (%d entries)" % len(vec))
 
 
+def check_macro_sensitivity(n_branches):
+    # WHAT MOVES THIS BRANCH (objective #1): top-2 macro drivers per branch — real Pink Sheet
+    # price YoY × measured crop shares / gold shops / rain, scaled by estimated segment scores.
+    # ESTIMATED PROXY over measured inputs; must say so. Optional file: SKIP-PASS when absent
+    # (run build_macro_sensitivity.py to populate).
+    hdr("macro_sensitivity.json (optional)")
+    if not exists("macro_sensitivity.json"):
+        ok("macro_sensitivity.json absent — skipped (optional; run build_macro_sensitivity.py to populate)")
+        return
+    try:
+        d = load("macro_sensitivity.json")
+    except Exception as e:
+        fail("macro_sensitivity.json loads", repr(e))
+        return
+    ok("macro_sensitivity.json loads")
+
+    meta = d.get("meta") or {}
+    label = meta.get("label") or ""
+    if not (meta.get("generated_by") and "ESTIMATED" in label and "MEASURED" in label.upper()):
+        fail("macro_sensitivity meta/provenance present (generated_by + ESTIMATED-proxy label)",
+             "generated_by=%r label=%r" % (meta.get("generated_by"), label[:80]))
+        return
+    ok("macro_sensitivity meta/provenance present (generated_by + ESTIMATED-proxy label)")
+
+    dkeys = meta.get("driver_keys") or []
+    drivers = meta.get("drivers") or {}
+    if not (isinstance(dkeys, list) and dkeys and isinstance(drivers, dict)
+            and set(dkeys) == set(drivers.keys())):
+        fail("macro_sensitivity meta.drivers defined + consistent with driver_keys",
+             "driver_keys=%r drivers=%r" % (dkeys, sorted(drivers.keys())))
+        return
+    no_prov = [k for k in dkeys
+               if not ((drivers[k] or {}).get("source") and (drivers[k] or {}).get("provenance"))]
+    if no_prov:
+        fail("macro_sensitivity each driver's signal carries provenance", "missing: " + first_n(no_prov))
+    else:
+        ok("macro_sensitivity each driver's signal carries provenance (%d drivers)" % len(dkeys))
+    # price drivers must carry a finite YoY traceable to the committed commodity board.
+    bad_yoy = [k for k in dkeys if k != "drought"
+               and not is_finite_number((drivers[k] or {}).get("yoy_pct"))]
+    if bad_yoy:
+        fail("macro_sensitivity price drivers carry a finite Pink Sheet yoy_pct", first_n(bad_yoy))
+    else:
+        ok("macro_sensitivity price drivers carry a finite Pink Sheet yoy_pct")
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("macro_sensitivity has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+    if n_branches is not None and len(recs) != n_branches:
+        fail("macro_sensitivity length == branches.json length",
+             "macro_sensitivity=%d branches=%d" % (len(recs), n_branches))
+        return
+    ok("macro_sensitivity length == branches.json length (%d)" % len(recs))
+
+    known = set(dkeys)
+    bad = []
+    for i, t2 in enumerate(recs):
+        if not (isinstance(t2, list) and len(t2) <= 2):
+            bad.append("#%d not a <=2 list" % i)
+            continue
+        prev = None
+        for e in t2:
+            if not (isinstance(e, list) and len(e) == 4):
+                bad.append("#%d malformed entry %r" % (i, e)); continue
+            k, score, dr, ctx = e
+            if k not in known:
+                bad.append("#%d unknown driver %r" % (i, k))
+            if not (isinstance(score, int) and 1 <= score <= 100):
+                bad.append("#%d score %r out of [1,100]" % (i, score))
+            if dr not in ("h", "t"):
+                bad.append("#%d dir %r" % (i, dr))
+            if ctx is not None and not is_finite_number(ctx):
+                bad.append("#%d ctx %r" % (i, ctx))
+            if prev is not None and isinstance(score, int) and score > prev:
+                bad.append("#%d not sorted desc" % i)
+            prev = score if isinstance(score, int) else prev
+    if bad:
+        fail("macro_sensitivity records sane (t2 <=2 of [key, 1..100, h|t, ctx], sorted desc)",
+             first_n(bad, 8))
+    else:
+        ok("macro_sensitivity records sane (t2 well-formed + sorted, drivers known, scores in [1,100])")
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("macro_sensitivity has a non-empty 'provinces' watchlist", "got %r" % type(provs).__name__)
+        return
+    pbad = []
+    for p in provs:
+        if not isinstance(p, dict):
+            pbad.append(repr(p)[:40]); continue
+        if p.get("driver") not in known:
+            pbad.append("%s unknown driver %r" % (p.get("th"), p.get("driver")))
+        if p.get("dir") not in ("h", "t"):
+            pbad.append("%s dir %r" % (p.get("th"), p.get("dir")))
+        if not (isinstance(p.get("hits"), int) and isinstance(p.get("n"), int)
+                and 1 <= p["hits"] <= p["n"]):
+            pbad.append("%s hits/n %r/%r" % (p.get("th"), p.get("hits"), p.get("n")))
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            pbad.append("%s region %r" % (p.get("th"), p.get("region")))
+    if pbad:
+        fail("macro_sensitivity province watchlist sane (known driver/dir/region, hits<=n)", first_n(pbad, 8))
+    else:
+        ok("macro_sensitivity province watchlist sane (%d provinces)" % len(provs))
+    # headwind-first builder sort (the watchlist contract the Overview card relies on).
+    first_t = next((i for i, p in enumerate(provs) if isinstance(p, dict) and p.get("dir") == "t"), None)
+    late_h = (first_t is not None
+              and any(isinstance(p, dict) and p.get("dir") == "h" for p in provs[first_t:]))
+    if late_h:
+        fail("macro_sensitivity provinces sorted headwind-first", "a headwind row follows a tailwind row")
+    else:
+        ok("macro_sensitivity provinces sorted headwind-first")
+
+
 def check_lead_sites(n_branches):
     # LEAD-SITE PINS per branch (objective #2, local): MEASURED OSM coordinates of the K
     # nearest lead-relevant establishments within 10km of each branch, index-aligned to
@@ -2833,6 +2947,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("macro_sensitivity.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("lead_sites.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
     ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
@@ -2896,6 +3011,7 @@ _FINGERPRINTED_LAYERS = (
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
     "rival_pressure.json",       # build_rival_pressure.py
+    "macro_sensitivity.json",    # build_macro_sensitivity.py
 )
 
 
@@ -3034,6 +3150,7 @@ def main():
     check_branch_leads(n)
     check_peer_npl()
     check_macro_exposure(n)
+    check_macro_sensitivity(n)
     check_lead_sites(n)
     check_catchment_poi()
     check_competitor_census()

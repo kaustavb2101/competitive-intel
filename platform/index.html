@@ -142,6 +142,14 @@
           <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
           <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
         </div>
+
+        <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
+             omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
+        <div id="mwatch-wrap" style="display:none">
+          <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
+          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / gold trade / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first.</p>
+          <div class="grid macro" id="mwatch"></div>
+        </div>
       </div>
     </div>
 
