@@ -780,6 +780,26 @@ if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
   try{console.info('[catchment LOD] '+(CA.buildings.length)+' buildings -> '+BUILDINGS.length
     +' rendered (budget '+BLDG_BUDGET+', inner '+LOD_INNER_M+'m kept in full)');}catch(e){}
 }
+// ---- FLAT-MAT GUARD (fixes the "white/cream slab" render on some provinces) --------------------
+// The 74 R2-hosted province catchments were pulled BEFORE height-jitter existed, so their building
+// heights are near-uniform (a handful of discrete values). The per-city p5/p95 height normalisation
+// below then collapses (H_LO≈H_HI) and pushes the whole set to the BRIGHT top of the warm ramp
+// ([255,214,120]) — reading as a flat white/cream mat. If heights are too clustered, apply a
+// DETERMINISTIC per-building jitter (seeded from the centroid, byte-stable — the SAME model the
+// Bangkok pull bakes in) so the distribution regains a natural spread and the ramp lands warm and
+// varied. Visual only (mutates the local render copy's h); deck lighting/material are NOT touched.
+(function(){
+  const bs=BUILDINGS; if(!bs||bs.length<20)return;
+  const seen=new Set();
+  for(const b of bs){ seen.add(Math.round((b.h||0)*10)); if(seen.size>60)break; }
+  if(seen.size>60)return;   // already a rich height distribution (Bangkok/Rayong/Chiang Mai) — leave as-is
+  for(const b of bs){
+    const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453; const f=s-Math.floor(s);
+    const h=(b.h&&b.h>0)?b.h:4;
+    b.h=Math.round(h*(0.78+0.44*f)*100)/100;   // ±~22% deterministic spread → discrete values become a continuum
+  }
+  try{console.info('[catchment] flat-mat guard: jittered '+bs.length+' near-uniform heights ('+seen.size+' distinct)');}catch(e){}
+})();
 // ---- MOTION (Upgrade 2) — controlled view state for intro fly-in + gentle auto-orbit -----------
 // The scene is now driven by a CONTROLLED viewState (VIEW) instead of an uncontrolled
 // initialViewState, so the auto-orbit rAF loop and the click-to-fly transitions share one source of
@@ -1550,13 +1570,20 @@ function updatePanels(){
   if(occEntry){
     const rows=OCC_BUCKETS_FROM(occEntry);
     const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    // people-per-sector = the branch's MEASURED 10km population × employed share, split by the
+    // measured occupation mix. EMP_SHARE = employed / total population (NSO LFS: working-age ~71% ×
+    // employment-to-population ~66% ≈ 0.47). ESTIMATED (mix is an establishment proxy for workers).
+    const _pop=branchPop(focal); const EMP_SHARE=0.47;
+    const workforce=(_pop&&_pop.v)?Math.round(_pop.v*EMP_SHARE):null;
     html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag meas">measured · Overture</span></h2>`
       +`<div class="occ">`+rows.map(r=>{
         const pct=Math.round(r.v/tot*100);
-        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+        const ppl=workforce!=null?Math.round(workforce*r.v/tot):null;
+        const badge=ppl!=null?`<b>${fmt(ppl)} <span style="color:var(--dim);font-weight:500">· ${pct}%</span></b>`:`<b>${pct}%</b>`;
+        return `<div class="or"><div class="ot">${r.lab}${badge}</div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
       }).join('')+`</div>`
-      +`<div class="foot">${fmt(occEntry.t||0)} establishments ≤10km by category — measured (Overture Maps Places, a sample/lower bound, not a registry). What work surrounds the branch, not a headcount.</div>`;
+      +`<div class="foot">${workforce!=null?'≈ '+fmt(workforce)+' workers in the 10&nbsp;km catchment (measured '+(_pop.scope==='10km'&&window.BRANCHPOP_MEAS?'WorldPop':'')+' population × ~47% employed), split by the measured Overture occupation mix — the per-sector head-counts are ESTIMATED. ':''}${fmt(occEntry.t||0)} establishments ≤10&nbsp;km measured (Overture Places, a sample/lower bound).</div>`;
   }else if(k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
       .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
