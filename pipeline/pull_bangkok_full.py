@@ -29,15 +29,57 @@ CAP = 180000          # global building cap (web-sized, ~40MB)
 CLI = os.environ.get("OVERTURE_CLI", "overturemaps")
 
 
-def height_of(props):
-    for k in ("height", "roof_height"):
-        v = props.get(k)
-        if isinstance(v, (int, float)) and v > 0:
-            return float(v)
+def ring_area_m2(ring, lat):
+    # shoelace in local metres (mirrors bake_catchment_heights.ring_area_m2)
+    mlat = 111320.0; mlon = 111320.0 * math.cos(math.radians(lat))
+    a = 0.0
+    for i in range(len(ring) - 1):
+        x0, y0 = ring[i][0] * mlon, ring[i][1] * mlat
+        x1, y1 = ring[i + 1][0] * mlon, ring[i + 1][1] * mlat
+        a += x0 * y1 - x1 * y0
+    return abs(a) / 2.0
+
+
+def bldg_type(props):
+    # Overture subtype/class -> the short bucket the scene's TINT + estimator use.
+    b = (props.get("subtype") or props.get("class") or "yes").lower()
+    if b == "house":
+        return "house"
+    if "residential" in b or "apartments" in b or "dormitory" in b:
+        return "residential"
+    if any(k in b for k in ("retail", "commercial", "shop")):
+        return "commercial"
+    if "office" in b:
+        return "office"
+    if "industrial" in b or "warehouse" in b:
+        return "industrial"
+    if "school" in b or "education" in b:
+        return "school"
+    if "hotel" in b:
+        return "hotel"
+    return "mixed"
+
+
+def height_of(props, fa):
+    # Overture rarely carries measured height in TH; estimate from floors, else type+footprint —
+    # the SAME model bake_catchment_heights.bldg_height uses, so Bangkok gets a real skyline.
     lv = props.get("num_floors") or props.get("levels")
     if isinstance(lv, (int, float)) and lv > 0:
-        return float(lv) * 3.2
-    return 4.0  # 1-storey default (same as the baker)
+        return min(lv * 3.2, 60.0)
+    t = bldg_type(props); L = math.log2(max(fa or 60.0, 30.0))
+    if t == "house": return 6.0
+    if t == "residential": return max(12.0, min(45.0, 14.0 + L * 2.0))
+    if t == "commercial": return 8.0
+    if t == "office": return 24.0
+    if t == "industrial": return 11.0
+    if t == "school": return 9.0
+    if t == "hotel": return max(14.0, min(45.0, 18.0 + L * 2.0))
+    return 6.0 if fa < 120 else (9.0 if fa < 400 else (11.0 if fa < 800 else 13.0))
+
+
+def jitter(h, ring):
+    seed = abs(math.sin(ring[0][0] * 12.9898 + ring[0][1] * 78.233)) % 1.0
+    return min(60.0, h * (0.92 + 0.16 * seed))
 
 
 def centroid(ring):
@@ -78,11 +120,12 @@ def run():
                         continue
                     props = feat.get("properties") or {}
                     cx, cy = centroid(ring)
+                    fp = ring_area_m2(ring, cy)                 # footprint m2 for the height estimate
                     rec = {"p": [[round(x, 6), round(y, 6)] for x, y in ring],
-                           "h": round(height_of(props), 2),
-                           "fa": int(props.get("area") or 0),
+                           "h": round(jitter(height_of(props, fp), ring), 2),
+                           "fa": int(fp),
                            "cx": cx, "cy": cy,
-                           "ty": (props.get("subtype") or props.get("class") or "mixed")}
+                           "ty": bldg_type(props)}
                 except Exception:
                     continue
                 seen += 1
