@@ -1226,7 +1226,7 @@ function streamBuildingLayer(){
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
       getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
       lineWidthMinPixels:0.4,
-      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular ZEROED: it's the view-dependent term; under orbit it spiked and blew sun-facing faces to white
+      material:{ambient:0.50,diffuse:0,shininess:10,specularColor:[0,0,0]},  // ambient 0.72->0.50: buildings' LIGHT taupe base × high ambient blew to white on real GPUs (pins use 0.42 and stayed fine); specular/diffuse ZEROED so no directional blow-out
       shadowEnabled:SHADOWS_ON,
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
@@ -1318,7 +1318,7 @@ function render(){
   // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
   // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
   const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
-  const RAMP_LIGHT=[[150,138,120],[122,110,92],[92,80,64]]; // WARM MID-TONE massing (taupe->umber), DARKENED low end: low buildings washed to near-white on real GPUs, so the whole ramp is pulled down ~30 levels — buildings now read as solid warm masses against the light ground (contrast carries the form; no GPU shadows). Tune here if still too light/dark.
+  const RAMP_LIGHT=[[132,120,104],[108,96,78],[84,72,56]]; // WARM MID-TONE massing (taupe->umber), pulled down another ~18 levels after real-GPU whiteout reports — low buildings read as solid warm masses against the light ground. Tune here if still too light/dark.
   const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -1354,7 +1354,7 @@ function render(){
       if(c){const cw=LIGHT?0.3:0.18; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}  // dark tint weight 0.32->0.18: let the height ramp dominate the hue (was muddying towers)
       // HARD anti-white ceiling in light mode: even after the reduced lighting multiplies these,
       // a face cannot approach white. Caps the DATA so a hot GPU can't blow low buildings out.
-      const cap=LIGHT?168:255;
+      const cap=LIGHT?150:255;
       return [Math.min(cap,clamp(r)),Math.min(cap,clamp(g)),Math.min(cap,clamp(bl)),LIGHT?232:236];},
     stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[70,54,140,210]:[120,134,158,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
     // Material tuned for cinematic depth: low ambient lets the directional sun carve light/shade
