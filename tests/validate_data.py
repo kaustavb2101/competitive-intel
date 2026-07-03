@@ -2086,6 +2086,103 @@ def check_peer_npl():
 
 
 # ---------------------------------------------------------------------------
+def check_vintage_digest():
+    # SINCE-LAST-VINTAGE DIGEST (objective #1 exec readout, top of #trend). Plain-language
+    # findings over deltas.json — the builder may only add direction/magnitude wording, so the
+    # gate cross-checks the vintage stamps against deltas.json and the structural contract:
+    # valid tones, worst-first ordering, tone tallies, non-empty text + traceable metric key.
+    hdr("vintage_digest.json (since-last-vintage exec digest)")
+    try:
+        d = load("vintage_digest.json")
+    except Exception as e:
+        fail("vintage_digest.json loads", repr(e))
+        return
+    ok("vintage_digest.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not (isinstance(meta.get("source"), str) and meta["source"].strip()):
+        fail("vintage_digest meta/provenance present (source names deltas.json)",
+             "meta.source missing/empty")
+    else:
+        ok("vintage_digest meta/provenance present (source names deltas.json)")
+
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        fail("vintage_digest headline is a non-empty sentence", repr(d.get("headline")))
+    else:
+        ok("vintage_digest headline is a non-empty sentence")
+
+    findings = d.get("findings")
+    if not isinstance(findings, list):
+        fail("vintage_digest findings is a list", "got %s" % type(findings).__name__)
+        return
+
+    if d.get("baseline"):
+        # 0/1-snapshot mode: a calm no-comparison payload, no findings to invent numbers from
+        if findings:
+            fail("baseline digest carries no findings", "%d findings on baseline" % len(findings))
+        else:
+            ok("baseline digest carries no findings (calm first-vintage payload)")
+        return
+
+    # cross-file: the comparison window must be exactly the deltas.json vintage stamps
+    try:
+        deltas = load("deltas.json")
+    except Exception as e:
+        fail("deltas.json loads (digest cross-check)", repr(e))
+        deltas = None
+    if deltas is not None:
+        if d.get("from") == deltas.get("from") and d.get("to") == deltas.get("to"):
+            ok("digest vintages match deltas.json (%s -> %s)" % (d.get("from"), d.get("to")))
+        else:
+            fail("digest vintages match deltas.json",
+                 "digest %r->%r vs deltas %r->%r"
+                 % (d.get("from"), d.get("to"), deltas.get("from"), deltas.get("to")))
+
+    if not (1 <= len(findings) <= 8):
+        fail("digest carries 1-8 findings", "%d findings" % len(findings))
+    else:
+        ok("digest carries 1-8 findings (%d)" % len(findings))
+
+    tones = {"worse": 0, "neutral": 1, "better": 2}
+    bad = []
+    prev_rank = -1
+    for i, f in enumerate(findings):
+        if not isinstance(f, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        t = f.get("tone")
+        if t not in tones:
+            bad.append("#%d tone=%r not in worse/neutral/better" % (i, t))
+            continue
+        if not (isinstance(f.get("text"), str) and f["text"].strip()):
+            bad.append("#%d text missing/empty" % i)
+        if not (isinstance(f.get("metric"), str) and f["metric"].strip()):
+            bad.append("#%d metric missing/empty (must name the deltas.json series)" % i)
+        if not is_finite_number(f.get("mag")) or f["mag"] < 0:
+            bad.append("#%d mag=%r not a finite >=0 number" % (i, f.get("mag")))
+        if tones[t] < prev_rank:
+            bad.append("#%d tone %s appears after a better tone (order must be worst-first)" % (i, t))
+        prev_rank = max(prev_rank, tones[t])
+    if bad:
+        fail("digest findings sane (tone/text/metric/mag + worst-first ordering)", first_n(bad))
+    else:
+        ok("digest findings sane (tone/text/metric/mag + worst-first ordering)")
+
+    tally = {"worse": 0, "neutral": 0, "better": 0}
+    for f in findings:
+        if isinstance(f, dict) and f.get("tone") in tally:
+            tally[f["tone"]] += 1
+    if (d.get("n_worse") == tally["worse"] and d.get("n_neutral") == tally["neutral"]
+            and d.get("n_better") == tally["better"]):
+        ok("digest tone tallies match findings (%d worse / %d neutral / %d better)"
+           % (tally["worse"], tally["neutral"], tally["better"]))
+    else:
+        fail("digest tone tallies match findings",
+             "n_worse/n_neutral/n_better=%r/%r/%r vs actual %r"
+             % (d.get("n_worse"), d.get("n_neutral"), d.get("n_better"), tally))
+
+
+# ---------------------------------------------------------------------------
 def check_macro_exposure(n_branches):
     # MACRO-FACTOR EXPOSURE per customer cluster per branch (objective #1): MEASURED occupation
     # shares × ESTIMATED sensitivity weights × MEASURED macro signals (prices/DTI/drought), index-
@@ -3227,6 +3324,7 @@ def main():
     check_branch_peers(n)
     check_branch_leads(n)
     check_peer_npl()
+    check_vintage_digest()
     check_macro_exposure(n)
     check_macro_sensitivity(n)
     check_lead_sites(n)

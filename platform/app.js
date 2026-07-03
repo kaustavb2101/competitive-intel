@@ -2664,7 +2664,35 @@ function deltaPill(d,invert){
   const txt = d==null?'n/a':(v>0?'+':'')+v;
   return `<span class="mono" style="color:${col}" title="change vs prior vintage">${arr} ${txt}</span>`;
 }
+/* ---------- "Since last vintage" digest (top of #trend) ----------
+   Lazy-loads data/vintage_digest.json (pipeline/build_vintage_digest.py): one exec headline +
+   4-8 one-sentence findings, worst first, each chip-tagged better/worse/neutral. Every number
+   is read from deltas.json by the builder — the card adds no interpretation of its own.
+   With 0/1 snapshots it shows the calm "first vintage — no comparison yet" one-liner. */
+let VDIGEST=null, vdigestLoaded=false;
+async function renderVintageDigest(){
+  if(!vdigestLoaded){
+    vdigestLoaded=true;
+    try{ VDIGEST = await fetch('data/vintage_digest.json').then(r=>r.ok?r.json():null); }
+    catch(e){ VDIGEST=null; }
+  }
+  const box=$('#vdigest'); if(!box) return;
+  if(!VDIGEST){ box.style.display='none'; return; }   // file absent → card simply stays hidden
+  box.style.display='block';
+  const vint=$('#vdgvint');
+  if(vint) vint.textContent = VDIGEST.baseline ? (VDIGEST.to?`baseline ${VDIGEST.to}`:'') : `${VDIGEST.from} → ${VDIGEST.to}`;
+  const hl=$('#vdgheadline'); if(hl) hl.textContent = VDIGEST.headline||'';
+  const chip=t=>`<span class="vdg-chip ${t}">${t==='worse'?'▲ worse':t==='better'?'▼ better':'• flat'}</span>`;
+  const list=$('#vdglist');
+  if(list) list.innerHTML=(VDIGEST.findings||[]).map(f=>
+    `<li>${chip(f.tone)}<span>${f.text}</span><span class="vdg-metric mono" title="underlying metric in deltas.json">${f.metric||''}</span></li>`).join('');
+  const note=$('#vdgnote');
+  if(note) note.textContent = VDIGEST.baseline
+    ? 'Findings appear automatically once a second vintage is snapshotted.'
+    : 'Every figure is read from deltas.json (the snapshot diff). Region/branch proxies are ESTIMATED; the commodity board is measured/editorial price direction (World Bank).';
+}
 async function renderTrend(){
+  renderVintageDigest();
   renderPeerOutliers();
   renderSiegeTable();
   if(!trendLoaded){

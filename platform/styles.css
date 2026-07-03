@@ -1069,3 +1069,29 @@ html[data-theme="light"] #expoconc .mix{background:#e3e8f1}
 #msheet-body .pop{max-height:none!important;overflow:visible!important}
 html[data-theme="light"] #msheet-backdrop{background:rgba(24,32,48,.32)}
 html[data-theme="light"] #msheet{box-shadow:0 -12px 34px rgba(24,32,48,.22)}
+
+/* ---------- "Since last vintage" digest card (top of #trend) ----------
+   All colors via theme vars so the light theme (html[data-theme="light"]) re-skins it
+   automatically; explicit light overrides below only soften the chip tints. */
+.vdg{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:10px;padding:13px 15px;margin:12px 0}
+.vdg-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.vdg-kicker{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.vdg-vint{font-size:11px;color:var(--mid)}
+.vdg-headline{font-size:14.5px;color:var(--hi);margin:7px 0 9px;line-height:1.45}
+.vdg-list{list-style:none;margin:0;padding:0}
+.vdg-list li{display:flex;gap:9px;align-items:flex-start;padding:6px 0;border-top:1px dashed var(--line);
+  font-size:12.5px;color:var(--txt);line-height:1.5}
+.vdg-list li>span:nth-child(2){flex:1 1 auto;min-width:0}
+.vdg-chip{flex:0 0 auto;font-family:var(--mono);font-size:10px;font-weight:600;line-height:1;
+  letter-spacing:.06em;text-transform:uppercase;border:1px solid;border-radius:999px;padding:4px 8px;margin-top:2px}
+.vdg-chip.worse{color:var(--agri);border-color:var(--agri);background:rgba(200,67,59,.12)}
+.vdg-chip.better{color:var(--up);border-color:var(--up);background:rgba(28,140,125,.12)}
+.vdg-chip.neutral{color:var(--mid);border-color:var(--mid);background:transparent}
+.vdg-metric{flex:0 0 auto;color:var(--dim);font-size:10px;margin-top:4px;padding-left:8px;max-width:34%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vdg-note{margin-top:8px}
+@media (max-width:640px){ .vdg-metric{display:none} }
+html[data-theme="light"] .vdg{background:#fff;box-shadow:var(--elev-1,none)}
+html[data-theme="light"] .vdg-chip.worse{background:rgba(192,57,47,.08)}
+html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
