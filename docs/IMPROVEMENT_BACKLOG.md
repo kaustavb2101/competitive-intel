@@ -104,10 +104,11 @@
       `[ ]` opportunity-score entries that were describing work already shipped `[x]`; removed the
       stale `[ ]` P2 Road-to-3,000 rounding item at the bottom of this file, already fixed per the
       2026-07-01 Done entry).
-- [ ] **Vendor `numpy` into the sandbox's default setup** (session-start hook or environment Dockerfile)
-      so `build_branch_peers.py --check` runs for real on cycle 1 instead of hitting the new `[SKIP]`
-      path (2026-07-03 fix stops it being misreported as a failure, but a `[SKIP]`'d check still isn't
-      as good as one that actually ran). *(LOW, S)*
+- [ ] **Vendor `numpy`/`shapely`/`rasterio` into the sandbox's default setup** (session-start hook or
+      environment Dockerfile) so `build_branch_peers.py --check` and `build_branch_population.py
+      --check` run for real on cycle 1 instead of hitting `[SKIP]` (2026-07-03/2026-07-03(6) fixes stop
+      them being misreported as failures, but a `[SKIP]`'d check still isn't as good as one that
+      actually ran). *(LOW, S)*
 - [ ] **Document the "optional heavy dependency" pattern** (try/except ImportError → distinct exit code
       → `tests/run.sh` reports `[SKIP]` not `[FAIL]`) in `CLAUDE.md`'s pipeline conventions, so if a
       future script adds `scipy`/`pandas`/etc. it follows `build_branch_peers.py`'s 2026-07-03 fix
@@ -207,6 +208,33 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-03 (6) — AUDIT: fixed a second false-red/false-green gate gap in
+  `build_branch_population.py --check` (same bug class as the 2026-07-03 numpy fix, one level
+  subtler).** The script has two valid build methods — MEASURED raster sum (needs `rasterio` + the
+  committed WorldPop GeoTIFF) preferred, ESTIMATED area-weight (needs only `shapely`) as fallback —
+  and only skip-passed `--check` when **both** were unavailable. With `shapely` installed but
+  `rasterio` absent (a real sandbox state — `shapely` is a lighter, more commonly pre-installed
+  dependency), `build()` silently succeeds via the areaweight fallback and produces a **different but
+  valid** JSON than the raster-built file already committed, which `--check` then reported as
+  `DRIFT` — a false failure that could have tempted a future cycle to "fix" it by overwriting the
+  committed MEASURED file with an ESTIMATED one (exactly the kind of silent regression the
+  no-fabrication mandate exists to prevent). Confirmed by installing `rasterio`
+  (`pip install --break-system-packages rasterio`): `build_branch_population.py --check` then
+  reproduces byte-exact (`method=raster`, 0 drift) — the committed data was never wrong, only the
+  gate's partial-dependency handling was blind to a real environment configuration. Fix (code only,
+  zero data changed): `run(check=True)` now compares the *committed* file's `meta.method` against
+  what this environment can produce; on a method mismatch it prints a distinct `SKIP` (exit 3, same
+  convention as the numpy fix) naming exactly which dependency to install to verify for real, instead
+  of a `DRIFT` (exit 1); a genuine same-method byte mismatch still fails correctly (hand-corrupted the
+  committed file with `rasterio` present and confirmed `--check` still reports `DRIFT`/exit 1, then
+  restored from git). `tests/run.sh` now echoes the script's own `SKIP` reason instead of a hardcoded
+  (now-inaccurate) "shapely not installed" message, since the missing dependency could be `rasterio`
+  instead. Verified all three dependency states by hand (blocking `rasterio` only, blocking both,
+  blocking neither) via `builtins.__import__` interception. Gate: 37/0 with `numpy`+`shapely`+
+  `rasterio` all installed this cycle (both previously-`[SKIP]`'d checks — `build_branch_peers.py`
+  and `build_branch_population.py` — ran for real and passed; was 35/0 with 2 `[SKIP]`s before).
+  `validate_data.py` unaffected (181/181, no `platform/data`/`source-data` file touched). Full
+  writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-03 (6) entry).
 - **2026-07-03 (5) — REFACTOR: amp-lens gating now reads `LENS[k].amp` instead of a 4-site
   hand-maintained OR-chain.** New `isAmpLens(k)` helper in `platform/app.js`; replaced the
   `curLens==='dws'||curLens==='drisk'||curLens==='unemp'` (and `k===` equivalent) checks in

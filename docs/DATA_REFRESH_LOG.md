@@ -4,6 +4,75 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-03 (6) — AUDIT: fixed a second false-drift gate gap (`build_branch_population.py --check`)
+
+**Task type:** AUDIT (gate integrity, not a data value change — no `platform/data` or `source-data`
+file content was touched). `/workspace/watcher` [TMLI blueprint] was not present in this sandbox this
+cycle, so no cross-repo ENRICH pull was possible; started with a RE-DERIVE pass instead (re-running
+`bash tests/run.sh check` on a clean pull) and it surfaced a real gate bug worth fixing over forcing a
+new data layer.
+
+**What was found.** `bash tests/run.sh check` on a clean checkout reported 35 passed / 0 failed but
+with 2 `[SKIP]`s: `build_branch_peers.py --check` (needs `numpy`) and `build_branch_population.py
+--check` (needs `shapely`/`rasterio`) — both already-known sandbox dependency gaps
+(`docs/IMPROVEMENT_BACKLOG.md`). Installing `numpy` + `shapely` + `rasterio`
+(`pip install --break-system-packages numpy shapely rasterio`) to actually exercise both skipped
+checks turned up a **real bug**, not just a missing package: with `shapely` installed but `rasterio`
+absent, `bash tests/run.sh check` went to **36 passed, 1 FAILED** —
+`build_branch_population.py --check` reported `DRIFT: platform/data/branch_population.json`.
+
+Root cause: `build_branch_population.py` has two valid build methods — MEASURED raster sum (needs
+`rasterio` + the committed `source-data/worldpop_tha_2020_1km.tif`), preferred; ESTIMATED
+area-weight (needs only `shapely`), fallback. `run(check=True)` only returned the distinct "can't
+verify" exit code (3) when **both** methods' dependencies were absent (`build()` returns `None`). With
+only `shapely` present, `build()` **succeeds** via the areaweight fallback and produces a different
+but internally-valid JSON, which the byte-compare against the committed **raster**-built file then
+reported as `DRIFT` — a false failure. Installing `rasterio` too confirmed the committed file was
+never wrong: `build_branch_population.py --check` then reproduces byte-exact (`method=raster`, 0
+drift). This is the same bug class the 2026-07-03 numpy/`build_branch_peers.py` fix addressed, one
+level subtler — that fix only needed "both-deps-absent → SKIP"; this script needed "committed method
+≠ locally-producible method → SKIP" because it has two independently-satisfiable dependency paths, not
+one all-or-nothing import.
+
+**Why this matters for the no-fabrication mandate:** an unexplained `DRIFT` on a MEASURED file is
+exactly the kind of red herring that could tempt a future cycle to "fix" the gate by regenerating
+`branch_population.json` from whatever pipeline path the local environment happens to support —
+which here would silently **downgrade a MEASURED raster-sum population count to an ESTIMATED
+area-weight proxy** and commit it as if nothing changed. Catching this before that happens is the
+point of the audit.
+
+**Fix applied (code only, zero data changes):**
+- `pipeline/build_branch_population.py` `run(check=True)`: now reads the *committed* file's
+  `meta.method` and compares it against what this environment's `build()` actually produced. On a
+  mismatch it prints `SKIP: committed ... was built with method=X but this environment can only
+  produce method=Y (install <dep> to verify byte-for-byte)` and exits `3` (same convention as the
+  numpy fix) instead of `DRIFT`/exit `1`. A genuine same-method byte mismatch still fails correctly —
+  the byte-compare only runs once methods are confirmed equal.
+- `tests/run.sh`: the `build_branch_population.py --check` phase now echoes the script's own `SKIP`
+  message instead of a hardcoded "shapely not installed" string (which would have been actively wrong
+  in the rasterio-missing-only case — shapely IS installed, rasterio isn't).
+
+**Verification:**
+- Hand-verified all three dependency states via `builtins.__import__` interception (no real
+  uninstall, to avoid disturbing the shared sandbox): (1) `rasterio` blocked, `shapely` present →
+  new `SKIP` naming `rasterio + worldpop_tha_2020_1km.tif`, exit 3 (previously: `DRIFT`, exit 1 —
+  the bug). (2) both blocked → original `SKIP` path, exit 3 (unchanged). (3) neither blocked → `OK ...
+  method=raster`, exit 0 (unchanged).
+- Regression check: hand-corrupted one value in the committed `platform/data/branch_population.json`
+  with `rasterio` present (real import, not mocked) → correctly printed `DRIFT:
+  platform/data/branch_population.json`, exit 1 (not swallowed by the new skip path); restored from
+  git (`git status` clean before committing).
+- `bash tests/run.sh check` with `numpy`+`shapely`+`rasterio` all installed this cycle: **37 passed, 0
+  failed** — both previously-`[SKIP]`'d checks (`build_branch_peers.py`, `build_branch_population.py`)
+  now ran for real and passed (`validate_data.py`: 181/181, unaffected — no `platform/data` or
+  `source-data` file touched by this diff).
+
+**Source:** no external data pulled this cycle; pipeline/tooling integrity fix per the AUDIT task
+type, same pattern as the already-logged 2026-07-03 numpy fix. `docs/IMPROVEMENT_BACKLOG.md` updated
+(existing "vendor numpy" item broadened to also name shapely/rasterio; new Done entry added).
+
+---
+
 ## 2026-07-03 (3) — ENRICH: combined province structural-stress index (household DTI + unemployment)
 
 **Task type:** ENRICH (fold two already-vendored MEASURED layers into a single new composite view;

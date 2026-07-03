@@ -230,7 +230,22 @@ def run(check=False):
         return 1
     text = json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
     if check:
-        if not os.path.exists(OUT) or open(OUT, encoding="utf-8").read() != text:
+        if not os.path.exists(OUT):
+            print("DRIFT: %s" % os.path.relpath(OUT, ROOT))
+            return 1
+        committed_raw = open(OUT, encoding="utf-8").read()
+        committed_method = json.loads(committed_raw).get("meta", {}).get("method")
+        if committed_method != obj["meta"]["method"]:
+            # Two valid methods exist (raster preferred, areaweight fallback); this environment has
+            # only the dependency for one of them, so it cannot reproduce a file built with the other
+            # method byte-for-byte. That is a missing-dependency gap, NOT evidence the committed data
+            # drifted — distinguish it from a real same-method mismatch below.
+            missing = "rasterio + worldpop_tha_2020_1km.tif" if obj["meta"]["method"] == "areaweight" else "shapely"
+            print("SKIP: committed branch_population.json was built with method=%s but this "
+                  "environment can only produce method=%s (install %s to verify byte-for-byte) — "
+                  "dependency gap, not data drift" % (committed_method, obj["meta"]["method"], missing))
+            return 3
+        if committed_raw != text:
             print("DRIFT: %s" % os.path.relpath(OUT, ROOT))
             return 1
         print("OK: branch_population.json reproduces (%d branches, method=%s)"
