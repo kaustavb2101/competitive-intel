@@ -635,9 +635,13 @@ function buildLighting(withShadow){
     //   shade floor (faces away from sun) = 0.42*0.92 = 0.386
     //   max lit (faces sun+fill)          = 0.386 + 0.40*(0.95+0.28) = 0.386 + 0.492 = 0.878 < 0.9 -> never clamps
     //   contrast ratio lit/shade          = 0.878/0.386 = 2.27x  (was 0.824/0.45 = 1.83x) -> punchier, still safe
-    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.95,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
-    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.28,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[245,238,222],intensity:0.95});  // warm-neutral: was blue-white [235,238,255]@1.0 which pushed the gold ramp to pink/lilac across thousands of faces (the "pink confetti" bug)
+    // INTENSITIES REDUCED (2026-07-03, user-verified on real GPU): sun 0.95->0.55, fill 0.28->0.18,
+    // ambient 0.95->0.70. On the reporter's GPU the province building faces blew to pure white — the
+    // headless SwiftShader renderer never reproduced it, so this is tuned against real screenshots.
+    // Max-lit now ~0.42*0.70 + 0.40*(0.55+0.18) = 0.294 + 0.292 = 0.586 (was 0.878) — no clamp headroom.
+    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.55,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.18,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[245,238,222],intensity:0.70});  // warm-neutral
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
     if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
