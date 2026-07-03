@@ -397,6 +397,51 @@ function macxFactor(k){
   return null;
 }
 
+/* ---------- MACRO SENSITIVITY — what moves this branch (data/macro_sensitivity.json, obj#1) ----------
+   Lazy-loads the per-branch top-2 macro drivers built by pipeline/build_macro_sensitivity.py:
+   {meta:{drivers:{key:{label,yoy_pct,dir,…}},…}, branches:[[[key,score,dir,ctx]…]…], provinces:[…]}
+   INDEX-ALIGNED to branches.json. ESTIMATED PROXY over measured inputs: real Pink Sheet price YoY
+   (GLOBAL direction proxy) × measured OAE crop shares / rainfall / OSM gold shops, scaled by the
+   ESTIMATED branch segment scores (a/c). Feeds the one-line "What moves this branch" popup read and
+   the Overview province macro watchlist. Fully null-guarded: absent file → both surfaces are omitted. */
+let MSENS=null, msensMeta=null, msensProv=null, msensLoaded=false, msensPromise=null;
+function loadMacroSens(){
+  if(msensPromise) return msensPromise;
+  msensLoaded=true;
+  msensPromise=fetch('data/macro_sensitivity.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ if(j){msensMeta=j.meta||null;MSENS=j.branches||null;msensProv=j.provinces||null;} return MSENS; })
+    .catch(()=>{ MSENS=null; msensMeta=null; msensProv=null; return null; });
+  return msensPromise;
+}
+// per-branch top-2 driver record — null when the file/entry is absent (no fabrication).
+function msensRec(d){
+  if(!MSENS||!MSENS.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  const t2=MSENS[i];
+  return (Array.isArray(t2)&&t2.length)?t2:null;
+}
+// ctx phrasing per driver — ctx is the MEASURED branch/province quantity behind the driver
+// (meta.drivers[key].ctx_label): crop share %, OSM gold-shop count, or rain % of normal.
+const MSENS_CTX={
+  rice:c=>c+'% of province crop area', rubber:c=>c+'% of province crop area',
+  palm:c=>c+'% of province crop area',
+  gold:c=>c+' gold shop'+(c===1?'':'s')+' ≤10km',
+  drought:c=>'rain '+c+'% of normal',
+};
+// one driver → a compact phrase: "Rubber price ▲ +32.4% YoY × 13% of province crop area".
+// Headwind red / tailwind green (theme-safe CSS vars). Returns '' on malformed entries.
+function msensPhrase(t){
+  if(!Array.isArray(t)||t.length<4) return '';
+  const k=t[0], dir=t[2], ctx=t[3];
+  const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[k])||{};
+  const col=dir==='h'?'var(--agri)':'var(--merch)';
+  const arrow=(typeof drv.yoy_pct==='number')?(drv.yoy_pct>0?'▲':'▼'):'▼';
+  const yoy=(typeof drv.yoy_pct==='number')?((drv.yoy_pct>0?'+':'')+drv.yoy_pct+'% YoY'):'';
+  const ctxs=(ctx!=null&&MSENS_CTX[k])?MSENS_CTX[k](ctx):'';
+  const join=k==='drought'?' — ':' × ';   // "Drought ▼ — rain 88% of normal" reads better than "×"
+  return `<b style="color:${col}">${drv.label||k} ${arrow}${yoy?' '+yoy:''}</b>${ctxs?join+ctxs:''}`;
+}
+
 /* ---------- MEASURED lead-site coordinates (data/lead_sites.json, obj#2) ----------
    Lazy-loads the per-branch nearest lead SITES behind the who-to-acquire board (built by
    pipeline/build_lead_sites.py): {meta:{categories:[{k,label,…}]}, branches:[[cat_idx,lng,lat,dist_km]…]},
@@ -825,6 +870,9 @@ function renderOverview(){
       <td>${barHTML(r.md,'var(--merch)')} <span class="mono">${r.md}</span></td>
       <td>${barHTML(r.col,'var(--collat)')} <span class="mono">${r.col}</span></td></tr>`).join('');
   renderBotCap();
+  // lazy-load + render the province macro watchlist (macro_sensitivity.json, obj#1) — null-safe:
+  // absent file → the wrap stays display:none and the Overview reads exactly as before.
+  loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
   renderCollatMix();
   renderRecoverySensitivity();
@@ -863,6 +911,29 @@ function renderCommodityBoard(){
       (live?(' ('+live+', '+(anyUp?'holding up better':'also under pressure')+')'):'')+'. '+
       (gold?('Gold '+gold.s+(gold.v>0?' lifts':' softens')+' pawn/gold-collateral value.'):'');
   }
+}
+
+/* ---------- Province macro watchlist (objective #1, data/macro_sensitivity.json) ----------
+   One .mcard per province (same styling as the macro KPI cards beside the commodity board):
+   the macro driver that is the #1 mover for the MOST branches in that province, with the real
+   Pink Sheet YoY move and how much of the province's book it moves. Headwind provinces surface
+   first (builder sort). ESTIMATED proxy over measured inputs — said in the section lead and per
+   card. Null-safe: absent file → the wrap stays hidden. */
+function renderMacroWatchlist(){
+  const wrap=$('#mwatch-wrap'), grid=$('#mwatch');
+  if(!wrap||!grid||!msensProv||!msensProv.length) return;
+  grid.innerHTML=msensProv.slice(0,8).map(p=>{
+    const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[p.driver])||{};
+    const head=p.dir==='h';
+    const col=head?'var(--agri)':'var(--merch)';
+    const hasYoy=(typeof drv.yoy_pct==='number');
+    const arrow=hasYoy?(drv.yoy_pct>0?'▲':'▼'):'▼';
+    const sig=hasYoy?((drv.yoy_pct>0?'+':'')+drv.yoy_pct+'% YoY'):'rain below normal';
+    return `<div class="mcard"><div class="k">${p.th}${p.region?' · '+p.region:''}</div>`
+      +`<div class="v" style="color:${col};font-size:15px">${drv.label||p.driver} ${arrow} <span style="font-size:12px">${sig}</span></div>`
+      +`<div class="n">${head?'Hits':'Supports'} borrower cash flow · #1 driver at ${p.hits}/${p.n} branches (est)</div></div>`;
+  }).join('');
+  wrap.style.display='';
 }
 
 /* ---------- BoT hire-purchase rate-cap macro card (objective #1, margin watch) ----------
@@ -3031,6 +3102,8 @@ function initMap(){
   // The macro layer also feeds the 'Macro headwind' lens, so on resolve re-render the pill row and
   // (if the lens is active, e.g. via ?lens=macx) repaint — otherwise the markers would stay pale 0s.
   if(!leadsLoaded) loadBranchLeads();
+  // warm the "What moves this branch" top-2 macro drivers (est proxy) for the popup one-liner.
+  if(!msensLoaded) loadMacroSens();
   if(!macxDone) loadMacroExposure().then(()=>{ renderLenses(); if(mapReady&&curLens==='macx'){ renderLegend(); styleMarkers(); } });
   // warm the MEASURED catchment layers (10km WorldPop population + merged rival census) so the first
   // branch tap already carries the "Catchment ≤10km" block; selectBranch refreshes an open popup if
@@ -3068,8 +3141,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF||!OCCL){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CCEN||!CBRF||!OCCL){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3478,6 +3551,19 @@ function macxPopupHTML(d,sec){
     + (e.d?`<div class="sub" style="margin:3px 0 0;font-size:10px">Customers most exposed to: <b style="color:var(--hi)">${dom?dom.label:e.d}</b> (est)</div>`:'')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate</div>`;
 }
+// ANSWER-FIRST §2b — "What moves this branch": ONE line naming the branch's top-2 macro drivers
+// with real numbers (macro_sensitivity.json) — e.g. "Rubber price ▲ +32.4% YoY × 93% of province
+// crop area · Gold price ▲ +26.1% YoY × 2 gold shops ≤10km". Prices are MEASURED (Pink Sheet
+// GLOBAL proxy); crop shares / gold-shop counts / rain are MEASURED; the ranking itself is an
+// ESTIMATED proxy (segment scores scale relevance) — the chip says so. Empty when absent.
+function msensPopupHTML(d,sec){
+  const t2=msensRec(d); if(!t2) return '';
+  const line=t2.map(msensPhrase).filter(Boolean).join(' <span style="color:var(--dim)">·</span> ');
+  if(!line) return '';
+  return sec('What moves this branch — top macro drivers')
+    + `<div style="font-size:11.5px;line-height:1.5">${line}</div>`
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">ESTIMATED proxy over measured inputs — global price YoY (not Thai farm-gate) × measured crop share / gold shops / rain, scaled by estimated segment scores. Rank, not elasticity.</div>`;
+}
 // "vs statistical twins" popup section — empty string when the peer layer is absent (no fabrication).
 function peerPopupHTML(d,sec,r){
   const e=peerRec(d); if(!e) return '';
@@ -3518,6 +3604,7 @@ function popupHTML(d){
     ${briefPopupHTML(d,sec,r)}
     ${occLeadsPopupHTML(d,sec,r)}
     ${leadsPopupHTML(d,sec,r)}
+    ${msensPopupHTML(d,sec)}
     ${macxPopupHTML(d,sec)}
     ${sec('Portfolio risk — ESTIMATED proxy (OSM/price, 0–100)')}
     ${r('Agri-PD ● (est)', d.a==null?'n/a':d.a, 'var(--agri)')}

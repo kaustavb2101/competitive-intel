@@ -88,6 +88,7 @@ phase_check(){
   fi
   ( cd "$PIPE" && python3 build_branch_leads.py --check >/dev/null 2>&1 ) && ok "build_branch_leads.py --check" || bad "build_branch_leads.py --check (branch_leads.json drifted from branch_occupations/branches/branch_labor/occupation_risk/crop_stress)"
   ( cd "$PIPE" && python3 build_macro_exposure.py --check >/dev/null 2>&1 ) && ok "build_macro_exposure.py --check" || bad "build_macro_exposure.py --check (macro_exposure.json drifted from branch_occupations/commodity_board/crop_stress/household_risk)"
+  ( cd "$PIPE" && python3 build_macro_sensitivity.py --check >/dev/null 2>&1 ) && ok "build_macro_sensitivity.py --check" || bad "build_macro_sensitivity.py --check (macro_sensitivity.json drifted from branches.json/crop_stress.json/commodity_board.json)"
   ( cd "$PIPE" && python3 build_lead_sites.py --check >/dev/null 2>&1 ) && ok "build_lead_sites.py --check" || bad "build_lead_sites.py --check (lead_sites.json drifted from osm_layers.json/branches.json/branch_leads.json)"
   ( cd "$PIPE" && python3 build_catchment_poi.py --check >/dev/null 2>&1 ) && ok "build_catchment_poi.py --check" || bad "build_catchment_poi.py --check (catchment_poi.json drifted from osm_layers.json)"
   bp_out=$( cd "$PIPE" && python3 build_branch_population.py --check 2>&1 ); rc=$?
