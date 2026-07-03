@@ -669,6 +669,25 @@ async function loadOccLeads(){
   })();
   return occlPromise;
 }
+// PER-BRANCH RIVAL PRESSURE (rival_pressure.json, index-aligned; pipeline/build_rival_pressure.py):
+// MEASURED nearest-rival km per brand (.branches[i].d aligned to .brands), rivals within 2/5 km
+// (n2/n5) and the stated siege flag (s:1 when >=3 rivals within 2 km). Same cached-promise pattern.
+let RIVP=null, rivpLoaded=false, rivpPromise=null;
+async function loadRivalPressure(){
+  if(rivpPromise) return rivpPromise;
+  rivpLoaded=true;
+  rivpPromise=(async()=>{
+    try{ const r=await fetch('data/rival_pressure.json'); if(r.ok){ const j=await r.json();
+      RIVP=(j&&Array.isArray(j.branches)&&Array.isArray(j.brands))?j:null; } }
+    catch(e){ RIVP=null; }
+    return RIVP;
+  })();
+  return rivpPromise;
+}
+function rivpRec(d){
+  if(!RIVP) return null;
+  const i=idxOf(d); return (i>=0&&i<RIVP.branches.length)?RIVP.branches[i]:null;
+}
 // MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
 // census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
 // null when the census is absent so the popup omits the line rather than show a fabricated 0.
@@ -2576,6 +2595,7 @@ function deltaPill(d,invert){
 }
 async function renderTrend(){
   renderPeerOutliers();
+  renderSiegeTable();
   if(!trendLoaded){
     trendLoaded=true;
     try{ DELTAS = await fetch('data/deltas.json').then(r=>r.json()); }
@@ -2718,6 +2738,52 @@ function drawPeerOutliers(){
       <b style="color:var(--agri)">+${t.dev} points</b> above comparable markets, so the driver is likely <b>local</b>
       (${t.top_driver||'mixed'}), not the market. ${rows.length} branches sit ≥2 robust-σ above their twins.
       <span class="sub">ESTIMATED — twins matched on measured features (${(m.params||{}).k||15} twins, ≥${(m.params||{}).geo_excl_km||25} km away, same NSO leverage backdrop); deviation uses the estimated composite risk. Not a measured default rate.</span>`;
+  }
+}
+/* ---------- most besieged branches · rival-pressure top-10 (obj #1 + #2, MEASURED) ----------
+   Surfaces data/rival_pressure.json .besieged (pipeline/build_rival_pressure.py): the branches
+   with the most rival branches within 2 km — same-street fights for the same walk-in borrower.
+   All counts/distances MEASURED geometry over the merged competitor census; the only rule is the
+   stated siege cutoff (>=3 rivals within 2 km). Graceful when the file is absent. */
+function renderSiegeTable(){
+  const tbl=$('#siegetbl'); if(!tbl) return;
+  loadRivalPressure().then(drawSiegeTable);   // promise is cached; repeat calls are cheap
+}
+function drawSiegeTable(){
+  const tbl=$('#siegetbl'), ro=$('#siegereadout'); if(!tbl) return;
+  const rows=(RIVP&&Array.isArray(RIVP.besieged))?RIVP.besieged.slice(0,10):[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rival pressure not yet computed.</b> <span class="sub">Run pipeline/build_rival_pressure.py — the besieged list fills in on the next data refresh.</span>';
+    return;
+  }
+  tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
+    `<th class="h-risk" title="MEASURED — rival branches within 2 km (merged competitor census)">Rivals ≤2 km</th>`+
+    `<th title="MEASURED — rival branches within 5 km">≤5 km</th>`+
+    `<th title="MEASURED — the closest rival brand and its distance (haversine)">Nearest rival</th>`+
+    `<th title="MEASURED — which brands hold the 2 km ring (brand · count)">Who surrounds it</th></tr>`+
+    rows.map((o,i)=>{
+      const by=(o.by2||[]).map(p=>`${p[0]} <span class="mono sub">${p[1]}</span>`).join(' · ');
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${o.name||'—'}</b><div class="sub">${o.district||''}</div></td>
+        <td>${o.prov||'—'}</td>
+        <td class="sub">${o.region||'—'}</td>
+        <td>${barHTML(o.n2,'var(--agri)',(rows[0].n2||1))} <span class="mono" style="color:var(--agri)"><b>${o.n2}</b></span></td>
+        <td class="mono sub">${o.n5}</td>
+        <td class="mono">${o.nb||'—'} <span style="color:var(--gold)">${o.nd} km</span></td>
+        <td class="sub" style="font-size:11px">${by}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const t=rows[0], m=RIVP.meta||{};
+    ro.innerHTML=`<b>Most besieged:</b> <b style="color:var(--agri)">${t.name}</b> (${t.prov}, ${t.region}) has
+      <b style="color:var(--agri)">${t.n2} rival branches within 2 km</b> (${t.n5} within 5 km) — the nearest is
+      <b>${t.nb}</b> at <b style="color:var(--gold)">${t.nd} km</b>. ${m.n_siege||'—'} of ${m.n_branches||'—'} branches
+      are under siege (≥3 rivals ≤2 km) — these fight for the same walk-in borrower on the same street, so watch
+      pricing/LTV pressure here first.
+      <span class="sub">MEASURED — haversine over the merged competitor census (Muangthai/Srisawad/Tidlor official
+      store locators, measured-complete; Heng is a sample, so pressure is a lower bound). The ≥3 cutoff is a stated
+      rule, not a model.</span>`;
   }
 }
 function renderTrendBaseline(deltas){
@@ -3039,6 +3105,7 @@ function initMap(){
   if(!ccenLoaded) loadCompetitorCensus();
   if(!cbrfLoaded) loadClusterBrief();
   if(!occlLoaded) loadOccLeads();
+  if(!rivpLoaded) loadRivalPressure();
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
@@ -3068,8 +3135,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF||!OCCL){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads()]).then(()=>{
+  if(!LEADS||!MACX||!BPOP||!CCEN||!CBRF||!OCCL||!RIVP){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3215,6 +3282,20 @@ function compPopupHTML(d,sec,r){
     + (brands?r('By brand', brands, '#c7cedd'):'')
     + r('Own AutoX ≤10km', (d.w||0), 'var(--accent)')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">${verdict} · Places coverage is a lower bound, not a lender registry</div>`;
+}
+// Rival-pressure line for a branch popup — ONE compact MEASURED line from the precomputed
+// rival_pressure.json (nearest-rival km per brand + 2km/5km counts + stated siege rule), e.g.
+// "Rivals: 4 within 2 km · 9 ≤5 km · nearest Srisawad 0.4 km". Null-guarded: absent file or
+// entry → empty string, nothing fabricated. Loaded by the same warm path as the other layers.
+function rivalPressureLineHTML(d){
+  const e=rivpRec(d); if(!e||!Array.isArray(e.d)) return '';
+  let nb=-1;
+  for(let j=0;j<e.d.length;j++){ if(e.d[j]!=null&&(nb<0||e.d[j]<e.d[nb])) nb=j; }
+  const near=nb>=0?`nearest ${RIVP.brands[nb]} ${e.d[nb]} km`:'no rival located';
+  const col=e.s?'var(--agri)':(e.n2>0?'var(--gold)':'var(--merch)');
+  const siege=e.s?` <span style="color:var(--agri);font-weight:700" title="siege = ≥3 rivals within 2 km (stated rule over measured counts)">⚑ under siege</span>`:'';
+  return `<div class="pr" style="margin-top:4px"><span title="measured — haversine vs the merged competitor census (official locators; Heng sample)">Rival pressure (measured)</span>`
+    +`<b style="color:${col}">${e.n2} ≤2 km · ${e.n5} ≤5 km · ${near}${siege}</b></div>`;
 }
 // Catchment block for a branch popup — three MEASURED numbers about this branch's ~10km catchment:
 // (1) reachable population INSIDE the 10km circle (WorldPop 2020, data/branch_population.json .values[i]);
@@ -3538,6 +3619,7 @@ function popupHTML(d){
     ${amphoePopupHTML(d,sec,r)}
     ${catchmentPopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
+    ${rivalPressureLineHTML(d)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}

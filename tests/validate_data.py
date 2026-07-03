@@ -2474,6 +2474,88 @@ def check_cluster_brief(n_branches, branches):
         ok("cluster_brief entries sane (non-empty templated line each, %d branches)" % len(briefs))
 
 
+def check_rival_pressure(n_branches):
+    # PER-BRANCH RIVAL PRESSURE — measured nearest-rival distance per brand + 2km/5km rival
+    # counts + the stated siege rule, index-aligned to branches.json. Optional: SKIP if absent.
+    hdr("rival_pressure.json (optional)")
+    if not exists("rival_pressure.json"):
+        ok("rival_pressure.json absent — skipped (optional; run build_rival_pressure.py)")
+        return
+    try:
+        d = load("rival_pressure.json")
+    except Exception as e:
+        fail("rival_pressure.json loads", repr(e))
+        return
+    ok("rival_pressure.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not meta.get("siege_rule") or not isinstance(meta.get("provenance"), dict):
+        fail("rival_pressure meta/provenance present (generated_by + label + siege_rule + provenance)",
+             "meta missing generated_by/label/siege_rule/provenance")
+        return
+    ok("rival_pressure meta/provenance present (generated_by + measured-geometry provenance + stated siege rule)")
+
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands or brands != sorted(brands):
+        fail("rival_pressure brands is a non-empty SORTED list (stable d[] alignment)",
+             "got %r" % (brands,))
+        return
+    ok("rival_pressure brands sorted + non-empty (%s)" % ", ".join(brands))
+
+    rows = d.get("branches")
+    if not isinstance(rows, list):
+        fail("rival_pressure has a 'branches' list", "got %s" % type(rows).__name__)
+        return
+    if n_branches is not None and len(rows) != n_branches:
+        fail("rival_pressure length == branches.json length",
+             "rival_pressure=%d branches=%d" % (len(rows), n_branches))
+    else:
+        ok("rival_pressure length == branches.json length (%d)" % len(rows))
+
+    nb = len(brands)
+    bad = []
+    n_siege = 0
+    for i, r in enumerate(rows):
+        if not isinstance(r, dict):
+            bad.append("#%d not a dict" % i); continue
+        n2, n5, dl = r.get("n2"), r.get("n5"), r.get("d")
+        if not (isinstance(n2, int) and isinstance(n5, int) and 0 <= n2 <= n5):
+            bad.append("#%d n2/n5 bad: %r/%r" % (i, n2, n5)); continue
+        if not (isinstance(dl, list) and len(dl) == nb):
+            bad.append("#%d d[] not len %d" % (i, nb)); continue
+        if any(v is not None and not (is_finite_number(v) and 0 <= v <= 2500) for v in dl):
+            bad.append("#%d d[] out of range" % i); continue
+        # siege flag must match the stated rule over the measured count (n2 >= 3)
+        if (r.get("s") == 1) != (n2 >= 3):
+            bad.append("#%d siege flag inconsistent (s=%r n2=%d)" % (i, r.get("s"), n2)); continue
+        if r.get("s") == 1:
+            n_siege += 1
+    if bad:
+        fail("rival_pressure rows sane (n2<=n5, d[] per-brand km, siege flag == rule)", first_n(bad, 8))
+    else:
+        ok("rival_pressure rows sane (n2<=n5 ints, d[] aligned to brands, siege == n2>=3; %d besieged)" % n_siege)
+
+    bes = d.get("besieged")
+    if not isinstance(bes, list):
+        fail("rival_pressure has a 'besieged' list", "got %s" % type(bes).__name__)
+        return
+    bad = []
+    prev = None
+    for j, s in enumerate(bes):
+        if not (isinstance(s, dict) and isinstance(s.get("name"), str) and s["name"].strip()
+                and isinstance(s.get("n2"), int) and s["n2"] >= 3
+                and isinstance(s.get("i"), int) and 0 <= s["i"] < len(rows)):
+            bad.append("#%d malformed besieged record" % j); continue
+        if prev is not None and s["n2"] > prev:
+            bad.append("#%d not sorted by n2 desc" % j)
+        prev = s["n2"]
+    if bad:
+        fail("rival_pressure besieged records sane (named, n2>=3, valid index, n2 desc)", first_n(bad, 8))
+    else:
+        ok("rival_pressure besieged records sane (%d records, named + sorted n2 desc)" % len(bes))
+
+
 def check_branch_population(n_branches):
     # TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
     # branches.json. Optional file: SKIP-PASS when absent (shapely dep).
@@ -2813,6 +2895,7 @@ _FINGERPRINTED_LAYERS = (
     "poi_relevance.json",        # build_poi_relevance.py
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
+    "rival_pressure.json",       # build_rival_pressure.py
 )
 
 
@@ -2955,6 +3038,7 @@ def main():
     check_catchment_poi()
     check_competitor_census()
     check_rival_density(amphoe)
+    check_rival_pressure(n)
     check_cluster_brief(n, branches)
     check_branch_population(n)
     check_occupation_leads(n)
