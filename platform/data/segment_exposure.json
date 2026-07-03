@@ -34,20 +34,54 @@
   "national": {
     "n_branches": 2015,
     "segment_mix": {
-      "agri": 0.3811,
-      "merchant": 0.0759,
-      "collateral": 0.5429
+      "agri": 0.0,
+      "merchant": 0.0804,
+      "collateral": 0.9196
     },
     "counts": {
-      "agri": 768,
-      "merchant": 153,
-      "collateral": 1094
+      "agri": 0,
+      "merchant": 162,
+      "collateral": 1853
     },
-    "hhi": 0.1687,
-    "raw_hhi": 0.4458,
+    "hhi": 0.7782,
+    "raw_hhi": 0.8521,
     "dominant_segment": "collateral"
   },
   "regions": [
+    {
+      "region": "North",
+      "n_branches": 311,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0032,
+        "collateral": 0.9968
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 1,
+        "collateral": 310
+      },
+      "hhi": 0.9904,
+      "raw_hhi": 0.9936,
+      "dominant_segment": "collateral"
+    },
+    {
+      "region": "Isan",
+      "n_branches": 601,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0067,
+        "collateral": 0.9933
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 4,
+        "collateral": 597
+      },
+      "hhi": 0.9802,
+      "raw_hhi": 0.9868,
+      "dominant_segment": "collateral"
+    },
     {
       "region": "South",
       "n_branches": 250,
@@ -66,71 +100,37 @@
       "dominant_segment": "collateral"
     },
     {
-      "region": "Isan",
-      "n_branches": 601,
-      "segment_mix": {
-        "agri": 0.6389,
-        "merchant": 0.005,
-        "collateral": 0.3561
-      },
-      "counts": {
-        "agri": 384,
-        "merchant": 3,
-        "collateral": 214
-      },
-      "hhi": 0.3026,
-      "raw_hhi": 0.5351,
-      "dominant_segment": "agri"
-    },
-    {
-      "region": "North",
-      "n_branches": 311,
-      "segment_mix": {
-        "agri": 0.5531,
-        "merchant": 0.0,
-        "collateral": 0.4469
-      },
-      "counts": {
-        "agri": 172,
-        "merchant": 0,
-        "collateral": 139
-      },
-      "hhi": 0.2584,
-      "raw_hhi": 0.5056,
-      "dominant_segment": "agri"
-    },
-    {
       "region": "Central&BKK",
       "n_branches": 580,
       "segment_mix": {
-        "agri": 0.2534,
-        "merchant": 0.1172,
-        "collateral": 0.6293
+        "agri": 0.0,
+        "merchant": 0.1276,
+        "collateral": 0.8724
       },
       "counts": {
-        "agri": 147,
-        "merchant": 68,
-        "collateral": 365
+        "agri": 0,
+        "merchant": 74,
+        "collateral": 506
       },
-      "hhi": 0.211,
-      "raw_hhi": 0.474,
+      "hhi": 0.6661,
+      "raw_hhi": 0.7774,
       "dominant_segment": "collateral"
     },
     {
       "region": "East",
       "n_branches": 273,
       "segment_mix": {
-        "agri": 0.2381,
-        "merchant": 0.1868,
-        "collateral": 0.5751
+        "agri": 0.0,
+        "merchant": 0.1905,
+        "collateral": 0.8095
       },
       "counts": {
-        "agri": 65,
-        "merchant": 51,
-        "collateral": 157
+        "agri": 0,
+        "merchant": 52,
+        "collateral": 221
       },
-      "hhi": 0.1335,
-      "raw_hhi": 0.4223,
+      "hhi": 0.5374,
+      "raw_hhi": 0.6916,
       "dominant_segment": "collateral"
     }
   ],
@@ -148,6 +148,132 @@
         "agri": 0,
         "merchant": 0,
         "collateral": 14
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "n_branches": 32,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 32
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "กาฬสินธุ์",
+      "region": "Isan",
+      "n_branches": 32,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 32
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ขอนแก่น",
+      "region": "Isan",
+      "n_branches": 35,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 35
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "จันทบุรี",
+      "region": "East",
+      "n_branches": 25,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 25
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ฉะเชิงเทรา",
+      "region": "East",
+      "n_branches": 35,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 35
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ชัยนาท",
+      "region": "Central&BKK",
+      "n_branches": 15,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 15
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ชัยภูมิ",
+      "region": "Isan",
+      "n_branches": 30,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 30
       },
       "hhi": 1.0,
       "raw_hhi": 1.0,
@@ -208,6 +334,96 @@
       "dominant_segment": "collateral"
     },
     {
+      "province": "ตาก",
+      "region": "North",
+      "n_branches": 9,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 9
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นครนายก",
+      "region": "Central&BKK",
+      "n_branches": 7,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 7
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นครปฐม",
+      "region": "Central&BKK",
+      "n_branches": 22,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 22
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นครพนม",
+      "region": "Isan",
+      "n_branches": 21,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 21
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นครสวรรค์",
+      "region": "North",
+      "n_branches": 31,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 31
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
       "province": "นราธิวาส",
       "region": "South",
       "n_branches": 11,
@@ -220,6 +436,24 @@
         "agri": 0,
         "merchant": 0,
         "collateral": 11
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "น่าน",
+      "region": "North",
+      "n_branches": 7,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 7
       },
       "hhi": 1.0,
       "raw_hhi": 1.0,
@@ -244,6 +478,24 @@
       "dominant_segment": "collateral"
     },
     {
+      "province": "บุรีรัมย์",
+      "region": "Isan",
+      "n_branches": 53,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 53
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
       "province": "ประจวบคีรีขันธ์",
       "region": "Central&BKK",
       "n_branches": 33,
@@ -262,8 +514,44 @@
       "dominant_segment": "collateral"
     },
     {
+      "province": "ปราจีนบุรี",
+      "region": "East",
+      "n_branches": 18,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 18
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
       "province": "ปัตตานี",
       "region": "South",
+      "n_branches": 11,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 11
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "พะเยา",
+      "region": "North",
       "n_branches": 11,
       "segment_mix": {
         "agri": 0.0,
@@ -302,18 +590,72 @@
       "region": "North",
       "n_branches": 17,
       "segment_mix": {
-        "agri": 1.0,
+        "agri": 0.0,
         "merchant": 0.0,
-        "collateral": 0.0
+        "collateral": 1.0
       },
       "counts": {
-        "agri": 17,
+        "agri": 0,
         "merchant": 0,
-        "collateral": 0
+        "collateral": 17
       },
       "hhi": 1.0,
       "raw_hhi": 1.0,
-      "dominant_segment": "agri"
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "พิษณุโลก",
+      "region": "North",
+      "n_branches": 30,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 30
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "มหาสารคาม",
+      "region": "Isan",
+      "n_branches": 32,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 32
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "มุกดาหาร",
+      "region": "Isan",
+      "n_branches": 9,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 9
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
     },
     {
       "province": "ยะลา",
@@ -328,6 +670,132 @@
         "agri": 0,
         "merchant": 0,
         "collateral": 8
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ยโสธร",
+      "region": "Isan",
+      "n_branches": 19,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 19
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ราชบุรี",
+      "region": "Central&BKK",
+      "n_branches": 27,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 27
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ลพบุรี",
+      "region": "Central&BKK",
+      "n_branches": 29,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 29
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ลำปาง",
+      "region": "North",
+      "n_branches": 18,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 18
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ลำพูน",
+      "region": "North",
+      "n_branches": 14,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 14
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ศรีสะเกษ",
+      "region": "Isan",
+      "n_branches": 31,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 31
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สกลนคร",
+      "region": "Isan",
+      "n_branches": 30,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 30
       },
       "hhi": 1.0,
       "raw_hhi": 1.0,
@@ -370,40 +838,490 @@
       "dominant_segment": "collateral"
     },
     {
+      "province": "สระบุรี",
+      "region": "Central&BKK",
+      "n_branches": 24,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 24
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สระแก้ว",
+      "region": "East",
+      "n_branches": 20,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 20
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สิงห์บุรี",
+      "region": "Central&BKK",
+      "n_branches": 8,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 8
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "n_branches": 22,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 22
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สุรินทร์",
+      "region": "Isan",
+      "n_branches": 30,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 30
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "สุโขทัย",
+      "region": "North",
+      "n_branches": 14,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 14
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "หนองคาย",
+      "region": "Isan",
+      "n_branches": 15,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 15
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "หนองบัวลำภู",
+      "region": "Isan",
+      "n_branches": 10,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 10
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
       "province": "อำนาจเจริญ",
       "region": "Isan",
       "n_branches": 14,
       "segment_mix": {
-        "agri": 1.0,
+        "agri": 0.0,
         "merchant": 0.0,
-        "collateral": 0.0
+        "collateral": 1.0
       },
       "counts": {
-        "agri": 14,
+        "agri": 0,
         "merchant": 0,
-        "collateral": 0
+        "collateral": 14
       },
       "hhi": 1.0,
       "raw_hhi": 1.0,
-      "dominant_segment": "agri"
+      "dominant_segment": "collateral"
     },
     {
-      "province": "มหาสารคาม",
+      "province": "อุดรธานี",
       "region": "Isan",
-      "n_branches": 32,
+      "n_branches": 38,
       "segment_mix": {
-        "agri": 0.9688,
+        "agri": 0.0,
         "merchant": 0.0,
-        "collateral": 0.0312
+        "collateral": 1.0
       },
       "counts": {
-        "agri": 31,
+        "agri": 0,
         "merchant": 0,
-        "collateral": 1
+        "collateral": 38
       },
-      "hhi": 0.9092,
-      "raw_hhi": 0.9395,
-      "dominant_segment": "agri"
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "อุตรดิตถ์",
+      "region": "North",
+      "n_branches": 9,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 9
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "อุทัยธานี",
+      "region": "North",
+      "n_branches": 18,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 18
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "อุบลราชธานี",
+      "region": "Isan",
+      "n_branches": 46,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 46
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "อ่างทอง",
+      "region": "Central&BKK",
+      "n_branches": 8,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 8
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "เชียงราย",
+      "region": "North",
+      "n_branches": 22,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 22
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "เชียงใหม่",
+      "region": "North",
+      "n_branches": 45,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 45
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "เพชรบุรี",
+      "region": "Central&BKK",
+      "n_branches": 20,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 20
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "เพชรบูรณ์",
+      "region": "North",
+      "n_branches": 23,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 23
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "เลย",
+      "region": "Isan",
+      "n_branches": 21,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 21
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "แพร่",
+      "region": "North",
+      "n_branches": 9,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 9
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "แม่ฮ่องสอน",
+      "region": "North",
+      "n_branches": 4,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0,
+        "collateral": 1.0
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 0,
+        "collateral": 4
+      },
+      "hhi": 1.0,
+      "raw_hhi": 1.0,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ร้อยเอ็ด",
+      "region": "Isan",
+      "n_branches": 39,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0256,
+        "collateral": 0.9744
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 1,
+        "collateral": 38
+      },
+      "hhi": 0.925,
+      "raw_hhi": 0.95,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "กำแพงเพชร",
+      "region": "North",
+      "n_branches": 30,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0333,
+        "collateral": 0.9667
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 1,
+        "collateral": 29
+      },
+      "hhi": 0.9033,
+      "raw_hhi": 0.9356,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นครราชสีมา",
+      "region": "Isan",
+      "n_branches": 81,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.037,
+        "collateral": 0.963
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 3,
+        "collateral": 78
+      },
+      "hhi": 0.893,
+      "raw_hhi": 0.9287,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "พระนครศรีอยุธยา",
+      "region": "Central&BKK",
+      "n_branches": 27,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.037,
+        "collateral": 0.963
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 1,
+        "collateral": 26
+      },
+      "hhi": 0.893,
+      "raw_hhi": 0.9287,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "นนทบุรี",
+      "region": "Central&BKK",
+      "n_branches": 39,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0513,
+        "collateral": 0.9487
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 2,
+        "collateral": 37
+      },
+      "hhi": 0.854,
+      "raw_hhi": 0.9027,
+      "dominant_segment": "collateral"
+    },
+    {
+      "province": "ระยอง",
+      "region": "East",
+      "n_branches": 59,
+      "segment_mix": {
+        "agri": 0.0,
+        "merchant": 0.0678,
+        "collateral": 0.9322
+      },
+      "counts": {
+        "agri": 0,
+        "merchant": 4,
+        "collateral": 55
+      },
+      "hhi": 0.8104,
+      "raw_hhi": 0.8736,
+      "dominant_segment": "collateral"
     },
     {
       "province": "พังงา",
@@ -478,94 +1396,22 @@
       "dominant_segment": "collateral"
     },
     {
-      "province": "อุทัยธานี",
-      "region": "North",
-      "n_branches": 18,
-      "segment_mix": {
-        "agri": 0.8889,
-        "merchant": 0.0,
-        "collateral": 0.1111
-      },
-      "counts": {
-        "agri": 16,
-        "merchant": 0,
-        "collateral": 2
-      },
-      "hhi": 0.7037,
-      "raw_hhi": 0.8025,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "นนทบุรี",
+      "province": "สมุทรสาคร",
       "region": "Central&BKK",
-      "n_branches": 39,
+      "n_branches": 13,
       "segment_mix": {
-        "agri": 0.0769,
-        "merchant": 0.0513,
-        "collateral": 0.8718
+        "agri": 0.0,
+        "merchant": 0.1538,
+        "collateral": 0.8462
       },
       "counts": {
-        "agri": 3,
+        "agri": 0,
         "merchant": 2,
-        "collateral": 34
+        "collateral": 11
       },
-      "hhi": 0.6529,
-      "raw_hhi": 0.7686,
+      "hhi": 0.6095,
+      "raw_hhi": 0.7396,
       "dominant_segment": "collateral"
-    },
-    {
-      "province": "นครนายก",
-      "region": "Central&BKK",
-      "n_branches": 7,
-      "segment_mix": {
-        "agri": 0.8571,
-        "merchant": 0.0,
-        "collateral": 0.1429
-      },
-      "counts": {
-        "agri": 6,
-        "merchant": 0,
-        "collateral": 1
-      },
-      "hhi": 0.6327,
-      "raw_hhi": 0.7551,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "ระยอง",
-      "region": "East",
-      "n_branches": 59,
-      "segment_mix": {
-        "agri": 0.1017,
-        "merchant": 0.0508,
-        "collateral": 0.8475
-      },
-      "counts": {
-        "agri": 6,
-        "merchant": 3,
-        "collateral": 50
-      },
-      "hhi": 0.5967,
-      "raw_hhi": 0.7311,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ชัยภูมิ",
-      "region": "Isan",
-      "n_branches": 30,
-      "segment_mix": {
-        "agri": 0.8333,
-        "merchant": 0.0,
-        "collateral": 0.1667
-      },
-      "counts": {
-        "agri": 25,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.5833,
-      "raw_hhi": 0.7222,
-      "dominant_segment": "agri"
     },
     {
       "province": "นครศรีธรรมราช",
@@ -583,132 +1429,6 @@
       },
       "hhi": 0.5833,
       "raw_hhi": 0.7222,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ปราจีนบุรี",
-      "region": "East",
-      "n_branches": 18,
-      "segment_mix": {
-        "agri": 0.8333,
-        "merchant": 0.0,
-        "collateral": 0.1667
-      },
-      "counts": {
-        "agri": 15,
-        "merchant": 0,
-        "collateral": 3
-      },
-      "hhi": 0.5833,
-      "raw_hhi": 0.7222,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "นครพนม",
-      "region": "Isan",
-      "n_branches": 21,
-      "segment_mix": {
-        "agri": 0.8095,
-        "merchant": 0.0,
-        "collateral": 0.1905
-      },
-      "counts": {
-        "agri": 17,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.5374,
-      "raw_hhi": 0.6916,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "สกลนคร",
-      "region": "Isan",
-      "n_branches": 30,
-      "segment_mix": {
-        "agri": 0.8,
-        "merchant": 0.0,
-        "collateral": 0.2
-      },
-      "counts": {
-        "agri": 24,
-        "merchant": 0,
-        "collateral": 6
-      },
-      "hhi": 0.52,
-      "raw_hhi": 0.68,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "เพชรบูรณ์",
-      "region": "North",
-      "n_branches": 23,
-      "segment_mix": {
-        "agri": 0.7826,
-        "merchant": 0.0,
-        "collateral": 0.2174
-      },
-      "counts": {
-        "agri": 18,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.4896,
-      "raw_hhi": 0.6597,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "ตาก",
-      "region": "North",
-      "n_branches": 9,
-      "segment_mix": {
-        "agri": 0.7778,
-        "merchant": 0.0,
-        "collateral": 0.2222
-      },
-      "counts": {
-        "agri": 7,
-        "merchant": 0,
-        "collateral": 2
-      },
-      "hhi": 0.4815,
-      "raw_hhi": 0.6543,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "มุกดาหาร",
-      "region": "Isan",
-      "n_branches": 9,
-      "segment_mix": {
-        "agri": 0.7778,
-        "merchant": 0.0,
-        "collateral": 0.2222
-      },
-      "counts": {
-        "agri": 7,
-        "merchant": 0,
-        "collateral": 2
-      },
-      "hhi": 0.4815,
-      "raw_hhi": 0.6543,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "เชียงใหม่",
-      "region": "North",
-      "n_branches": 45,
-      "segment_mix": {
-        "agri": 0.2222,
-        "merchant": 0.0,
-        "collateral": 0.7778
-      },
-      "counts": {
-        "agri": 10,
-        "merchant": 0,
-        "collateral": 35
-      },
-      "hhi": 0.4815,
-      "raw_hhi": 0.6543,
       "dominant_segment": "collateral"
     },
     {
@@ -730,114 +1450,6 @@
       "dominant_segment": "collateral"
     },
     {
-      "province": "สระแก้ว",
-      "region": "East",
-      "n_branches": 20,
-      "segment_mix": {
-        "agri": 0.75,
-        "merchant": 0.0,
-        "collateral": 0.25
-      },
-      "counts": {
-        "agri": 15,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.4375,
-      "raw_hhi": 0.625,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "สิงห์บุรี",
-      "region": "Central&BKK",
-      "n_branches": 8,
-      "segment_mix": {
-        "agri": 0.25,
-        "merchant": 0.0,
-        "collateral": 0.75
-      },
-      "counts": {
-        "agri": 2,
-        "merchant": 0,
-        "collateral": 6
-      },
-      "hhi": 0.4375,
-      "raw_hhi": 0.625,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "แม่ฮ่องสอน",
-      "region": "North",
-      "n_branches": 4,
-      "segment_mix": {
-        "agri": 0.25,
-        "merchant": 0.0,
-        "collateral": 0.75
-      },
-      "counts": {
-        "agri": 1,
-        "merchant": 0,
-        "collateral": 3
-      },
-      "hhi": 0.4375,
-      "raw_hhi": 0.625,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ยโสธร",
-      "region": "Isan",
-      "n_branches": 19,
-      "segment_mix": {
-        "agri": 0.7368,
-        "merchant": 0.0,
-        "collateral": 0.2632
-      },
-      "counts": {
-        "agri": 14,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.4183,
-      "raw_hhi": 0.6122,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "ชัยนาท",
-      "region": "Central&BKK",
-      "n_branches": 15,
-      "segment_mix": {
-        "agri": 0.7333,
-        "merchant": 0.0,
-        "collateral": 0.2667
-      },
-      "counts": {
-        "agri": 11,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.4133,
-      "raw_hhi": 0.6089,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "ลพบุรี",
-      "region": "Central&BKK",
-      "n_branches": 29,
-      "segment_mix": {
-        "agri": 0.7241,
-        "merchant": 0.0,
-        "collateral": 0.2759
-      },
-      "counts": {
-        "agri": 21,
-        "merchant": 0,
-        "collateral": 8
-      },
-      "hhi": 0.4007,
-      "raw_hhi": 0.6005,
-      "dominant_segment": "agri"
-    },
-    {
       "province": "ภูเก็ต",
       "region": "South",
       "n_branches": 21,
@@ -856,165 +1468,21 @@
       "dominant_segment": "merchant"
     },
     {
-      "province": "ศรีสะเกษ",
-      "region": "Isan",
-      "n_branches": 31,
-      "segment_mix": {
-        "agri": 0.7097,
-        "merchant": 0.0,
-        "collateral": 0.2903
-      },
-      "counts": {
-        "agri": 22,
-        "merchant": 0,
-        "collateral": 9
-      },
-      "hhi": 0.3819,
-      "raw_hhi": 0.5879,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "กำแพงเพชร",
-      "region": "North",
-      "n_branches": 30,
-      "segment_mix": {
-        "agri": 0.7,
-        "merchant": 0.0,
-        "collateral": 0.3
-      },
-      "counts": {
-        "agri": 21,
-        "merchant": 0,
-        "collateral": 9
-      },
-      "hhi": 0.37,
-      "raw_hhi": 0.58,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "กาญจนบุรี",
+      "province": "ปทุมธานี",
       "region": "Central&BKK",
-      "n_branches": 32,
+      "n_branches": 39,
       "segment_mix": {
-        "agri": 0.6875,
-        "merchant": 0.0,
-        "collateral": 0.3125
+        "agri": 0.0,
+        "merchant": 0.3077,
+        "collateral": 0.6923
       },
       "counts": {
-        "agri": 22,
-        "merchant": 0,
-        "collateral": 10
+        "agri": 0,
+        "merchant": 12,
+        "collateral": 27
       },
-      "hhi": 0.3555,
-      "raw_hhi": 0.5703,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "นครปฐม",
-      "region": "Central&BKK",
-      "n_branches": 22,
-      "segment_mix": {
-        "agri": 0.3182,
-        "merchant": 0.0,
-        "collateral": 0.6818
-      },
-      "counts": {
-        "agri": 7,
-        "merchant": 0,
-        "collateral": 15
-      },
-      "hhi": 0.3492,
-      "raw_hhi": 0.5661,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "สุพรรณบุรี",
-      "region": "Central&BKK",
-      "n_branches": 22,
-      "segment_mix": {
-        "agri": 0.6818,
-        "merchant": 0.0,
-        "collateral": 0.3182
-      },
-      "counts": {
-        "agri": 15,
-        "merchant": 0,
-        "collateral": 7
-      },
-      "hhi": 0.3492,
-      "raw_hhi": 0.5661,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "บุรีรัมย์",
-      "region": "Isan",
-      "n_branches": 53,
-      "segment_mix": {
-        "agri": 0.6792,
-        "merchant": 0.0,
-        "collateral": 0.3208
-      },
-      "counts": {
-        "agri": 36,
-        "merchant": 0,
-        "collateral": 17
-      },
-      "hhi": 0.3464,
-      "raw_hhi": 0.5643,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "หนองคาย",
-      "region": "Isan",
-      "n_branches": 15,
-      "segment_mix": {
-        "agri": 0.6667,
-        "merchant": 0.0,
-        "collateral": 0.3333
-      },
-      "counts": {
-        "agri": 10,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.3333,
-      "raw_hhi": 0.5556,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "พะเยา",
-      "region": "North",
-      "n_branches": 11,
-      "segment_mix": {
-        "agri": 0.3636,
-        "merchant": 0.0,
-        "collateral": 0.6364
-      },
-      "counts": {
-        "agri": 4,
-        "merchant": 0,
-        "collateral": 7
-      },
-      "hhi": 0.3058,
-      "raw_hhi": 0.5372,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "เชียงราย",
-      "region": "North",
-      "n_branches": 22,
-      "segment_mix": {
-        "agri": 0.3636,
-        "merchant": 0.0,
-        "collateral": 0.6364
-      },
-      "counts": {
-        "agri": 8,
-        "merchant": 0,
-        "collateral": 14
-      },
-      "hhi": 0.3058,
-      "raw_hhi": 0.5372,
+      "hhi": 0.3609,
+      "raw_hhi": 0.574,
       "dominant_segment": "collateral"
     },
     {
@@ -1022,342 +1490,18 @@
       "region": "Central&BKK",
       "n_branches": 170,
       "segment_mix": {
-        "agri": 0.0294,
-        "merchant": 0.3059,
+        "agri": 0.0,
+        "merchant": 0.3353,
         "collateral": 0.6647
       },
       "counts": {
-        "agri": 5,
-        "merchant": 52,
+        "agri": 0,
+        "merchant": 57,
         "collateral": 113
       },
-      "hhi": 0.3044,
-      "raw_hhi": 0.5363,
+      "hhi": 0.3314,
+      "raw_hhi": 0.5543,
       "dominant_segment": "collateral"
-    },
-    {
-      "province": "สระบุรี",
-      "region": "Central&BKK",
-      "n_branches": 24,
-      "segment_mix": {
-        "agri": 0.625,
-        "merchant": 0.0,
-        "collateral": 0.375
-      },
-      "counts": {
-        "agri": 15,
-        "merchant": 0,
-        "collateral": 9
-      },
-      "hhi": 0.2969,
-      "raw_hhi": 0.5312,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "อ่างทอง",
-      "region": "Central&BKK",
-      "n_branches": 8,
-      "segment_mix": {
-        "agri": 0.375,
-        "merchant": 0.0,
-        "collateral": 0.625
-      },
-      "counts": {
-        "agri": 3,
-        "merchant": 0,
-        "collateral": 5
-      },
-      "hhi": 0.2969,
-      "raw_hhi": 0.5312,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "สมุทรสาคร",
-      "region": "Central&BKK",
-      "n_branches": 13,
-      "segment_mix": {
-        "agri": 0.1538,
-        "merchant": 0.1538,
-        "collateral": 0.6923
-      },
-      "counts": {
-        "agri": 2,
-        "merchant": 2,
-        "collateral": 9
-      },
-      "hhi": 0.2899,
-      "raw_hhi": 0.5266,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "นครสวรรค์",
-      "region": "North",
-      "n_branches": 31,
-      "segment_mix": {
-        "agri": 0.6129,
-        "merchant": 0.0,
-        "collateral": 0.3871
-      },
-      "counts": {
-        "agri": 19,
-        "merchant": 0,
-        "collateral": 12
-      },
-      "hhi": 0.2882,
-      "raw_hhi": 0.5255,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "สุรินทร์",
-      "region": "Isan",
-      "n_branches": 30,
-      "segment_mix": {
-        "agri": 0.6,
-        "merchant": 0.0,
-        "collateral": 0.4
-      },
-      "counts": {
-        "agri": 18,
-        "merchant": 0,
-        "collateral": 12
-      },
-      "hhi": 0.28,
-      "raw_hhi": 0.52,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "หนองบัวลำภู",
-      "region": "Isan",
-      "n_branches": 10,
-      "segment_mix": {
-        "agri": 0.6,
-        "merchant": 0.0,
-        "collateral": 0.4
-      },
-      "counts": {
-        "agri": 6,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.28,
-      "raw_hhi": 0.52,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "กาฬสินธุ์",
-      "region": "Isan",
-      "n_branches": 32,
-      "segment_mix": {
-        "agri": 0.5938,
-        "merchant": 0.0,
-        "collateral": 0.4062
-      },
-      "counts": {
-        "agri": 19,
-        "merchant": 0,
-        "collateral": 13
-      },
-      "hhi": 0.2764,
-      "raw_hhi": 0.5176,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "อุบลราชธานี",
-      "region": "Isan",
-      "n_branches": 46,
-      "segment_mix": {
-        "agri": 0.587,
-        "merchant": 0.0,
-        "collateral": 0.413
-      },
-      "counts": {
-        "agri": 27,
-        "merchant": 0,
-        "collateral": 19
-      },
-      "hhi": 0.2727,
-      "raw_hhi": 0.5151,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "น่าน",
-      "region": "North",
-      "n_branches": 7,
-      "segment_mix": {
-        "agri": 0.4286,
-        "merchant": 0.0,
-        "collateral": 0.5714
-      },
-      "counts": {
-        "agri": 3,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.2653,
-      "raw_hhi": 0.5102,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ลำพูน",
-      "region": "North",
-      "n_branches": 14,
-      "segment_mix": {
-        "agri": 0.4286,
-        "merchant": 0.0,
-        "collateral": 0.5714
-      },
-      "counts": {
-        "agri": 6,
-        "merchant": 0,
-        "collateral": 8
-      },
-      "hhi": 0.2653,
-      "raw_hhi": 0.5102,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "สุโขทัย",
-      "region": "North",
-      "n_branches": 14,
-      "segment_mix": {
-        "agri": 0.5714,
-        "merchant": 0.0,
-        "collateral": 0.4286
-      },
-      "counts": {
-        "agri": 8,
-        "merchant": 0,
-        "collateral": 6
-      },
-      "hhi": 0.2653,
-      "raw_hhi": 0.5102,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "เลย",
-      "region": "Isan",
-      "n_branches": 21,
-      "segment_mix": {
-        "agri": 0.4286,
-        "merchant": 0.0,
-        "collateral": 0.5714
-      },
-      "counts": {
-        "agri": 9,
-        "merchant": 0,
-        "collateral": 12
-      },
-      "hhi": 0.2653,
-      "raw_hhi": 0.5102,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "พระนครศรีอยุธยา",
-      "region": "Central&BKK",
-      "n_branches": 27,
-      "segment_mix": {
-        "agri": 0.3333,
-        "merchant": 0.037,
-        "collateral": 0.6296
-      },
-      "counts": {
-        "agri": 9,
-        "merchant": 1,
-        "collateral": 17
-      },
-      "hhi": 0.2634,
-      "raw_hhi": 0.5089,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ร้อยเอ็ด",
-      "region": "Isan",
-      "n_branches": 39,
-      "segment_mix": {
-        "agri": 0.6154,
-        "merchant": 0.0256,
-        "collateral": 0.359
-      },
-      "counts": {
-        "agri": 24,
-        "merchant": 1,
-        "collateral": 14
-      },
-      "hhi": 0.2623,
-      "raw_hhi": 0.5082,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "จันทบุรี",
-      "region": "East",
-      "n_branches": 25,
-      "segment_mix": {
-        "agri": 0.44,
-        "merchant": 0.0,
-        "collateral": 0.56
-      },
-      "counts": {
-        "agri": 11,
-        "merchant": 0,
-        "collateral": 14
-      },
-      "hhi": 0.2608,
-      "raw_hhi": 0.5072,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ลำปาง",
-      "region": "North",
-      "n_branches": 18,
-      "segment_mix": {
-        "agri": 0.5556,
-        "merchant": 0.0,
-        "collateral": 0.4444
-      },
-      "counts": {
-        "agri": 10,
-        "merchant": 0,
-        "collateral": 8
-      },
-      "hhi": 0.2593,
-      "raw_hhi": 0.5062,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "อุตรดิตถ์",
-      "region": "North",
-      "n_branches": 9,
-      "segment_mix": {
-        "agri": 0.5556,
-        "merchant": 0.0,
-        "collateral": 0.4444
-      },
-      "counts": {
-        "agri": 5,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.2593,
-      "raw_hhi": 0.5062,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "แพร่",
-      "region": "North",
-      "n_branches": 9,
-      "segment_mix": {
-        "agri": 0.5556,
-        "merchant": 0.0,
-        "collateral": 0.4444
-      },
-      "counts": {
-        "agri": 5,
-        "merchant": 0,
-        "collateral": 4
-      },
-      "hhi": 0.2593,
-      "raw_hhi": 0.5062,
-      "dominant_segment": "agri"
     },
     {
       "province": "ชลบุรี",
@@ -1376,154 +1520,44 @@
       "hhi": 0.2535,
       "raw_hhi": 0.5023,
       "dominant_segment": "collateral"
-    },
-    {
-      "province": "พิษณุโลก",
-      "region": "North",
-      "n_branches": 30,
-      "segment_mix": {
-        "agri": 0.4667,
-        "merchant": 0.0,
-        "collateral": 0.5333
-      },
-      "counts": {
-        "agri": 14,
-        "merchant": 0,
-        "collateral": 16
-      },
-      "hhi": 0.2533,
-      "raw_hhi": 0.5022,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ราชบุรี",
-      "region": "Central&BKK",
-      "n_branches": 27,
-      "segment_mix": {
-        "agri": 0.4815,
-        "merchant": 0.0,
-        "collateral": 0.5185
-      },
-      "counts": {
-        "agri": 13,
-        "merchant": 0,
-        "collateral": 14
-      },
-      "hhi": 0.251,
-      "raw_hhi": 0.5007,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ขอนแก่น",
-      "region": "Isan",
-      "n_branches": 35,
-      "segment_mix": {
-        "agri": 0.4857,
-        "merchant": 0.0,
-        "collateral": 0.5143
-      },
-      "counts": {
-        "agri": 17,
-        "merchant": 0,
-        "collateral": 18
-      },
-      "hhi": 0.2506,
-      "raw_hhi": 0.5004,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "ฉะเชิงเทรา",
-      "region": "East",
-      "n_branches": 35,
-      "segment_mix": {
-        "agri": 0.5143,
-        "merchant": 0.0,
-        "collateral": 0.4857
-      },
-      "counts": {
-        "agri": 18,
-        "merchant": 0,
-        "collateral": 17
-      },
-      "hhi": 0.2506,
-      "raw_hhi": 0.5004,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "อุดรธานี",
-      "region": "Isan",
-      "n_branches": 38,
-      "segment_mix": {
-        "agri": 0.5,
-        "merchant": 0.0,
-        "collateral": 0.5
-      },
-      "counts": {
-        "agri": 19,
-        "merchant": 0,
-        "collateral": 19
-      },
-      "hhi": 0.25,
-      "raw_hhi": 0.5,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "เพชรบุรี",
-      "region": "Central&BKK",
-      "n_branches": 20,
-      "segment_mix": {
-        "agri": 0.5,
-        "merchant": 0.0,
-        "collateral": 0.5
-      },
-      "counts": {
-        "agri": 10,
-        "merchant": 0,
-        "collateral": 10
-      },
-      "hhi": 0.25,
-      "raw_hhi": 0.5,
-      "dominant_segment": "agri"
-    },
-    {
-      "province": "ปทุมธานี",
-      "region": "Central&BKK",
-      "n_branches": 39,
-      "segment_mix": {
-        "agri": 0.0769,
-        "merchant": 0.2821,
-        "collateral": 0.641
-      },
-      "counts": {
-        "agri": 3,
-        "merchant": 11,
-        "collateral": 25
-      },
-      "hhi": 0.2446,
-      "raw_hhi": 0.4964,
-      "dominant_segment": "collateral"
-    },
-    {
-      "province": "นครราชสีมา",
-      "region": "Isan",
-      "n_branches": 81,
-      "segment_mix": {
-        "agri": 0.5556,
-        "merchant": 0.0247,
-        "collateral": 0.4198
-      },
-      "counts": {
-        "agri": 45,
-        "merchant": 2,
-        "collateral": 34
-      },
-      "hhi": 0.2282,
-      "raw_hhi": 0.4854,
-      "dominant_segment": "agri"
     }
   ],
   "most_concentrated": {
     "regions": [
+      {
+        "region": "North",
+        "n_branches": 311,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0032,
+          "collateral": 0.9968
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 1,
+          "collateral": 310
+        },
+        "hhi": 0.9904,
+        "raw_hhi": 0.9936,
+        "dominant_segment": "collateral"
+      },
+      {
+        "region": "Isan",
+        "n_branches": 601,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0067,
+          "collateral": 0.9933
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 4,
+          "collateral": 597
+        },
+        "hhi": 0.9802,
+        "raw_hhi": 0.9868,
+        "dominant_segment": "collateral"
+      },
       {
         "region": "South",
         "n_branches": 250,
@@ -1542,71 +1576,37 @@
         "dominant_segment": "collateral"
       },
       {
-        "region": "Isan",
-        "n_branches": 601,
-        "segment_mix": {
-          "agri": 0.6389,
-          "merchant": 0.005,
-          "collateral": 0.3561
-        },
-        "counts": {
-          "agri": 384,
-          "merchant": 3,
-          "collateral": 214
-        },
-        "hhi": 0.3026,
-        "raw_hhi": 0.5351,
-        "dominant_segment": "agri"
-      },
-      {
-        "region": "North",
-        "n_branches": 311,
-        "segment_mix": {
-          "agri": 0.5531,
-          "merchant": 0.0,
-          "collateral": 0.4469
-        },
-        "counts": {
-          "agri": 172,
-          "merchant": 0,
-          "collateral": 139
-        },
-        "hhi": 0.2584,
-        "raw_hhi": 0.5056,
-        "dominant_segment": "agri"
-      },
-      {
         "region": "Central&BKK",
         "n_branches": 580,
         "segment_mix": {
-          "agri": 0.2534,
-          "merchant": 0.1172,
-          "collateral": 0.6293
+          "agri": 0.0,
+          "merchant": 0.1276,
+          "collateral": 0.8724
         },
         "counts": {
-          "agri": 147,
-          "merchant": 68,
-          "collateral": 365
+          "agri": 0,
+          "merchant": 74,
+          "collateral": 506
         },
-        "hhi": 0.211,
-        "raw_hhi": 0.474,
+        "hhi": 0.6661,
+        "raw_hhi": 0.7774,
         "dominant_segment": "collateral"
       },
       {
         "region": "East",
         "n_branches": 273,
         "segment_mix": {
-          "agri": 0.2381,
-          "merchant": 0.1868,
-          "collateral": 0.5751
+          "agri": 0.0,
+          "merchant": 0.1905,
+          "collateral": 0.8095
         },
         "counts": {
-          "agri": 65,
-          "merchant": 51,
-          "collateral": 157
+          "agri": 0,
+          "merchant": 52,
+          "collateral": 221
         },
-        "hhi": 0.1335,
-        "raw_hhi": 0.4223,
+        "hhi": 0.5374,
+        "raw_hhi": 0.6916,
         "dominant_segment": "collateral"
       }
     ],
@@ -1624,6 +1624,132 @@
           "agri": 0,
           "merchant": 0,
           "collateral": 14
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "กาญจนบุรี",
+        "region": "Central&BKK",
+        "n_branches": 32,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 32
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "กาฬสินธุ์",
+        "region": "Isan",
+        "n_branches": 32,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 32
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "ขอนแก่น",
+        "region": "Isan",
+        "n_branches": 35,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 35
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "จันทบุรี",
+        "region": "East",
+        "n_branches": 25,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 25
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "ฉะเชิงเทรา",
+        "region": "East",
+        "n_branches": 35,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 35
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "ชัยนาท",
+        "region": "Central&BKK",
+        "n_branches": 15,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 15
+        },
+        "hhi": 1.0,
+        "raw_hhi": 1.0,
+        "dominant_segment": "collateral"
+      },
+      {
+        "province": "ชัยภูมิ",
+        "region": "Isan",
+        "n_branches": 30,
+        "segment_mix": {
+          "agri": 0.0,
+          "merchant": 0.0,
+          "collateral": 1.0
+        },
+        "counts": {
+          "agri": 0,
+          "merchant": 0,
+          "collateral": 30
         },
         "hhi": 1.0,
         "raw_hhi": 1.0,
@@ -1664,132 +1790,6 @@
         "hhi": 1.0,
         "raw_hhi": 1.0,
         "dominant_segment": "collateral"
-      },
-      {
-        "province": "ตราด",
-        "region": "East",
-        "n_branches": 13,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 13
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "นราธิวาส",
-        "region": "South",
-        "n_branches": 11,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 11
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "บึงกาฬ",
-        "region": "Isan",
-        "n_branches": 15,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 15
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "ประจวบคีรีขันธ์",
-        "region": "Central&BKK",
-        "n_branches": 33,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 33
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "ปัตตานี",
-        "region": "South",
-        "n_branches": 11,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 11
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "พัทลุง",
-        "region": "South",
-        "n_branches": 13,
-        "segment_mix": {
-          "agri": 0.0,
-          "merchant": 0.0,
-          "collateral": 1.0
-        },
-        "counts": {
-          "agri": 0,
-          "merchant": 0,
-          "collateral": 13
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "collateral"
-      },
-      {
-        "province": "พิจิตร",
-        "region": "North",
-        "n_branches": 17,
-        "segment_mix": {
-          "agri": 1.0,
-          "merchant": 0.0,
-          "collateral": 0.0
-        },
-        "counts": {
-          "agri": 17,
-          "merchant": 0,
-          "collateral": 0
-        },
-        "hhi": 1.0,
-        "raw_hhi": 1.0,
-        "dominant_segment": "agri"
       }
     ]
   }

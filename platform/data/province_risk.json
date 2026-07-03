@@ -22,28 +22,18 @@
       "province": "อุบลราชธานี",
       "region": "Isan",
       "n_branches": 46,
-      "mean_risk": 54.4,
-      "p90_risk": 58.3,
+      "mean_risk": 50.2,
+      "p90_risk": 56.4,
       "top_driver_mix": {
         "household": 46
-      }
-    },
-    {
-      "province": "มหาสารคาม",
-      "region": "Isan",
-      "n_branches": 32,
-      "mean_risk": 53.0,
-      "p90_risk": 54.8,
-      "top_driver_mix": {
-        "household": 32
       }
     },
     {
       "province": "ร้อยเอ็ด",
       "region": "Isan",
       "n_branches": 39,
-      "mean_risk": 52.6,
-      "p90_risk": 56.5,
+      "mean_risk": 46.9,
+      "p90_risk": 48.5,
       "top_driver_mix": {
         "household": 39
       }
@@ -52,168 +42,159 @@
       "province": "ศรีสะเกษ",
       "region": "Isan",
       "n_branches": 31,
-      "mean_risk": 50.3,
-      "p90_risk": 54.7,
+      "mean_risk": 44.4,
+      "p90_risk": 47.2,
       "top_driver_mix": {
         "household": 31
       }
     },
     {
-      "province": "อำนาจเจริญ",
-      "region": "Isan",
-      "n_branches": 14,
-      "mean_risk": 50.3,
-      "p90_risk": 51.5,
-      "top_driver_mix": {
-        "household": 14
-      }
-    },
-    {
-      "province": "กาฬสินธุ์",
+      "province": "มหาสารคาม",
       "region": "Isan",
       "n_branches": 32,
-      "mean_risk": 47.4,
-      "p90_risk": 51.1,
+      "mean_risk": 43.8,
+      "p90_risk": 45.6,
       "top_driver_mix": {
         "household": 32
-      }
-    },
-    {
-      "province": "ขอนแก่น",
-      "region": "Isan",
-      "n_branches": 35,
-      "mean_risk": 47.4,
-      "p90_risk": 49.0,
-      "top_driver_mix": {
-        "household": 35
-      }
-    },
-    {
-      "province": "ยโสธร",
-      "region": "Isan",
-      "n_branches": 19,
-      "mean_risk": 46.9,
-      "p90_risk": 48.9,
-      "top_driver_mix": {
-        "household": 19
-      }
-    },
-    {
-      "province": "อุดรธานี",
-      "region": "Isan",
-      "n_branches": 38,
-      "mean_risk": 46.2,
-      "p90_risk": 48.7,
-      "top_driver_mix": {
-        "household": 38
-      }
-    },
-    {
-      "province": "สุรินทร์",
-      "region": "Isan",
-      "n_branches": 30,
-      "mean_risk": 45.6,
-      "p90_risk": 50.6,
-      "top_driver_mix": {
-        "household": 30
       }
     },
     {
       "province": "เชียงราย",
       "region": "North",
       "n_branches": 22,
-      "mean_risk": 45.1,
-      "p90_risk": 47.7,
+      "mean_risk": 42.8,
+      "p90_risk": 47.8,
       "top_driver_mix": {
         "household": 22
+      }
+    },
+    {
+      "province": "ขอนแก่น",
+      "region": "Isan",
+      "n_branches": 35,
+      "mean_risk": 41.8,
+      "p90_risk": 50.2,
+      "top_driver_mix": {
+        "household": 35
+      }
+    },
+    {
+      "province": "อุดรธานี",
+      "region": "Isan",
+      "n_branches": 38,
+      "mean_risk": 41.7,
+      "p90_risk": 49.7,
+      "top_driver_mix": {
+        "household": 38
+      }
+    },
+    {
+      "province": "กาฬสินธุ์",
+      "region": "Isan",
+      "n_branches": 32,
+      "mean_risk": 41.5,
+      "p90_risk": 45.9,
+      "top_driver_mix": {
+        "household": 32
+      }
+    },
+    {
+      "province": "อำนาจเจริญ",
+      "region": "Isan",
+      "n_branches": 14,
+      "mean_risk": 40.9,
+      "p90_risk": 42.8,
+      "top_driver_mix": {
+        "household": 14
+      }
+    },
+    {
+      "province": "สุรินทร์",
+      "region": "Isan",
+      "n_branches": 30,
+      "mean_risk": 40.3,
+      "p90_risk": 42.1,
+      "top_driver_mix": {
+        "household": 30
+      }
+    },
+    {
+      "province": "ยโสธร",
+      "region": "Isan",
+      "n_branches": 19,
+      "mean_risk": 39.7,
+      "p90_risk": 42.3,
+      "top_driver_mix": {
+        "household": 19
       }
     },
     {
       "province": "นครราชสีมา",
       "region": "Isan",
       "n_branches": 81,
-      "mean_risk": 44.6,
-      "p90_risk": 46.8,
+      "mean_risk": 38.8,
+      "p90_risk": 47.7,
       "top_driver_mix": {
         "household": 81
-      }
-    },
-    {
-      "province": "หนองบัวลำภู",
-      "region": "Isan",
-      "n_branches": 10,
-      "mean_risk": 43.9,
-      "p90_risk": 47.0,
-      "top_driver_mix": {
-        "household": 10
-      }
-    },
-    {
-      "province": "อุทัยธานี",
-      "region": "North",
-      "n_branches": 18,
-      "mean_risk": 43.8,
-      "p90_risk": 46.7,
-      "top_driver_mix": {
-        "household": 18
-      }
-    },
-    {
-      "province": "สกลนคร",
-      "region": "Isan",
-      "n_branches": 30,
-      "mean_risk": 43.4,
-      "p90_risk": 46.8,
-      "top_driver_mix": {
-        "household": 30
-      }
-    },
-    {
-      "province": "สุโขทัย",
-      "region": "North",
-      "n_branches": 14,
-      "mean_risk": 43.0,
-      "p90_risk": 46.6,
-      "top_driver_mix": {
-        "household": 14
       }
     },
     {
       "province": "อุตรดิตถ์",
       "region": "North",
       "n_branches": 9,
-      "mean_risk": 43.0,
-      "p90_risk": 45.6,
+      "mean_risk": 38.2,
+      "p90_risk": 41.8,
       "top_driver_mix": {
         "household": 9
       }
     },
     {
-      "province": "นครพนม",
-      "region": "Isan",
-      "n_branches": 21,
-      "mean_risk": 42.5,
-      "p90_risk": 44.8,
-      "top_driver_mix": {
-        "household": 21
-      }
-    },
-    {
-      "province": "ชัยนาท",
-      "region": "Central&BKK",
-      "n_branches": 15,
-      "mean_risk": 42.1,
-      "p90_risk": 44.7,
-      "top_driver_mix": {
-        "household": 15
-      }
-    },
-    {
-      "province": "กำแพงเพชร",
+      "province": "สุโขทัย",
       "region": "North",
+      "n_branches": 14,
+      "mean_risk": 37.8,
+      "p90_risk": 40.4,
+      "top_driver_mix": {
+        "household": 14
+      }
+    },
+    {
+      "province": "หนองบัวลำภู",
+      "region": "Isan",
+      "n_branches": 10,
+      "mean_risk": 37.7,
+      "p90_risk": 41.3,
+      "top_driver_mix": {
+        "household": 10
+      }
+    },
+    {
+      "province": "ระยอง",
+      "region": "East",
+      "n_branches": 59,
+      "mean_risk": 36.1,
+      "p90_risk": 40.7,
+      "top_driver_mix": {
+        "household": 58,
+        "occupation": 1
+      }
+    },
+    {
+      "province": "สงขลา",
+      "region": "South",
+      "n_branches": 20,
+      "mean_risk": 35.8,
+      "p90_risk": 42.4,
+      "top_driver_mix": {
+        "household": 20
+      }
+    },
+    {
+      "province": "สกลนคร",
+      "region": "Isan",
       "n_branches": 30,
-      "mean_risk": 41.7,
-      "p90_risk": 45.4,
+      "mean_risk": 35.7,
+      "p90_risk": 37.9,
       "top_driver_mix": {
         "household": 30
       }
@@ -222,170 +203,231 @@
       "province": "บุรีรัมย์",
       "region": "Isan",
       "n_branches": 53,
-      "mean_risk": 41.4,
-      "p90_risk": 45.0,
+      "mean_risk": 35.2,
+      "p90_risk": 38.3,
       "top_driver_mix": {
         "household": 53
       }
     },
     {
-      "province": "ลำปาง",
+      "province": "อุทัยธานี",
       "region": "North",
       "n_branches": 18,
-      "mean_risk": 39.2,
-      "p90_risk": 41.4,
+      "mean_risk": 35.2,
+      "p90_risk": 36.3,
       "top_driver_mix": {
         "household": 18
-      }
-    },
-    {
-      "province": "พิจิตร",
-      "region": "North",
-      "n_branches": 17,
-      "mean_risk": 38.5,
-      "p90_risk": 39.4,
-      "top_driver_mix": {
-        "household": 17
-      }
-    },
-    {
-      "province": "สงขลา",
-      "region": "South",
-      "n_branches": 20,
-      "mean_risk": 38.2,
-      "p90_risk": 39.7,
-      "top_driver_mix": {
-        "household": 20
-      }
-    },
-    {
-      "province": "เลย",
-      "region": "Isan",
-      "n_branches": 21,
-      "mean_risk": 38.2,
-      "p90_risk": 41.7,
-      "top_driver_mix": {
-        "household": 21
-      }
-    },
-    {
-      "province": "สุพรรณบุรี",
-      "region": "Central&BKK",
-      "n_branches": 22,
-      "mean_risk": 37.6,
-      "p90_risk": 41.9,
-      "top_driver_mix": {
-        "household": 20,
-        "segment": 2
-      }
-    },
-    {
-      "province": "พะเยา",
-      "region": "North",
-      "n_branches": 11,
-      "mean_risk": 37.5,
-      "p90_risk": 40.5,
-      "top_driver_mix": {
-        "household": 11
-      }
-    },
-    {
-      "province": "มุกดาหาร",
-      "region": "Isan",
-      "n_branches": 9,
-      "mean_risk": 37.0,
-      "p90_risk": 39.9,
-      "top_driver_mix": {
-        "household": 9
-      }
-    },
-    {
-      "province": "ชัยภูมิ",
-      "region": "Isan",
-      "n_branches": 30,
-      "mean_risk": 36.9,
-      "p90_risk": 38.9,
-      "top_driver_mix": {
-        "household": 30
-      }
-    },
-    {
-      "province": "นครสวรรค์",
-      "region": "North",
-      "n_branches": 31,
-      "mean_risk": 36.5,
-      "p90_risk": 40.4,
-      "top_driver_mix": {
-        "household": 31
-      }
-    },
-    {
-      "province": "ระยอง",
-      "region": "East",
-      "n_branches": 59,
-      "mean_risk": 35.7,
-      "p90_risk": 41.7,
-      "top_driver_mix": {
-        "household": 58,
-        "occupation": 1
-      }
-    },
-    {
-      "province": "พิษณุโลก",
-      "region": "North",
-      "n_branches": 30,
-      "mean_risk": 33.1,
-      "p90_risk": 36.7,
-      "top_driver_mix": {
-        "household": 30
-      }
-    },
-    {
-      "province": "หนองคาย",
-      "region": "Isan",
-      "n_branches": 15,
-      "mean_risk": 32.9,
-      "p90_risk": 35.6,
-      "top_driver_mix": {
-        "household": 15
-      }
-    },
-    {
-      "province": "ตราด",
-      "region": "East",
-      "n_branches": 13,
-      "mean_risk": 32.3,
-      "p90_risk": 34.8,
-      "top_driver_mix": {
-        "household": 13
       }
     },
     {
       "province": "ชลบุรี",
       "region": "East",
       "n_branches": 103,
-      "mean_risk": 32.2,
-      "p90_risk": 36.7,
+      "mean_risk": 34.7,
+      "p90_risk": 38.9,
       "top_driver_mix": {
-        "household": 103
+        "household": 91,
+        "segment": 12
       }
     },
     {
-      "province": "เพชรบูรณ์",
+      "province": "นครพนม",
+      "region": "Isan",
+      "n_branches": 21,
+      "mean_risk": 34.2,
+      "p90_risk": 36.1,
+      "top_driver_mix": {
+        "household": 21
+      }
+    },
+    {
+      "province": "พะเยา",
       "region": "North",
-      "n_branches": 23,
-      "mean_risk": 31.6,
+      "n_branches": 11,
+      "mean_risk": 34.2,
+      "p90_risk": 38.3,
+      "top_driver_mix": {
+        "household": 11
+      }
+    },
+    {
+      "province": "กำแพงเพชร",
+      "region": "North",
+      "n_branches": 30,
+      "mean_risk": 34.1,
+      "p90_risk": 37.6,
+      "top_driver_mix": {
+        "household": 30
+      }
+    },
+    {
+      "province": "ชัยนาท",
+      "region": "Central&BKK",
+      "n_branches": 15,
+      "mean_risk": 34.0,
+      "p90_risk": 35.0,
+      "top_driver_mix": {
+        "household": 15
+      }
+    },
+    {
+      "province": "เลย",
+      "region": "Isan",
+      "n_branches": 21,
+      "mean_risk": 33.9,
+      "p90_risk": 37.0,
+      "top_driver_mix": {
+        "household": 21
+      }
+    },
+    {
+      "province": "ลำปาง",
+      "region": "North",
+      "n_branches": 18,
+      "mean_risk": 33.2,
+      "p90_risk": 38.8,
+      "top_driver_mix": {
+        "household": 18
+      }
+    },
+    {
+      "province": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "n_branches": 22,
+      "mean_risk": 31.9,
       "p90_risk": 33.2,
       "top_driver_mix": {
-        "household": 23
+        "household": 22
+      }
+    },
+    {
+      "province": "มุกดาหาร",
+      "region": "Isan",
+      "n_branches": 9,
+      "mean_risk": 30.8,
+      "p90_risk": 34.7,
+      "top_driver_mix": {
+        "household": 9
+      }
+    },
+    {
+      "province": "ตราด",
+      "region": "East",
+      "n_branches": 13,
+      "mean_risk": 30.6,
+      "p90_risk": 32.7,
+      "top_driver_mix": {
+        "household": 13
+      }
+    },
+    {
+      "province": "นครสวรรค์",
+      "region": "North",
+      "n_branches": 31,
+      "mean_risk": 30.1,
+      "p90_risk": 31.8,
+      "top_driver_mix": {
+        "household": 31
+      }
+    },
+    {
+      "province": "พิษณุโลก",
+      "region": "North",
+      "n_branches": 30,
+      "mean_risk": 30.0,
+      "p90_risk": 33.6,
+      "top_driver_mix": {
+        "household": 30
+      }
+    },
+    {
+      "province": "ชุมพร",
+      "region": "South",
+      "n_branches": 18,
+      "mean_risk": 29.4,
+      "p90_risk": 30.7,
+      "top_driver_mix": {
+        "household": 18
+      }
+    },
+    {
+      "province": "ชัยภูมิ",
+      "region": "Isan",
+      "n_branches": 30,
+      "mean_risk": 27.9,
+      "p90_risk": 31.9,
+      "top_driver_mix": {
+        "household": 30
+      }
+    },
+    {
+      "province": "พิจิตร",
+      "region": "North",
+      "n_branches": 17,
+      "mean_risk": 27.6,
+      "p90_risk": 28.5,
+      "top_driver_mix": {
+        "household": 17
+      }
+    },
+    {
+      "province": "น่าน",
+      "region": "North",
+      "n_branches": 7,
+      "mean_risk": 27.2,
+      "p90_risk": 32.0,
+      "top_driver_mix": {
+        "household": 7
+      }
+    },
+    {
+      "province": "สมุทรปราการ",
+      "region": "Central&BKK",
+      "n_branches": 40,
+      "mean_risk": 27.2,
+      "p90_risk": 30.3,
+      "top_driver_mix": {
+        "segment": 30,
+        "occupation": 10
+      }
+    },
+    {
+      "province": "กระบี่",
+      "region": "South",
+      "n_branches": 14,
+      "mean_risk": 26.8,
+      "p90_risk": 31.5,
+      "top_driver_mix": {
+        "household": 14
+      }
+    },
+    {
+      "province": "สมุทรสาคร",
+      "region": "Central&BKK",
+      "n_branches": 13,
+      "mean_risk": 26.6,
+      "p90_risk": 30.8,
+      "top_driver_mix": {
+        "occupation": 11,
+        "segment": 2
+      }
+    },
+    {
+      "province": "หนองคาย",
+      "region": "Isan",
+      "n_branches": 15,
+      "mean_risk": 26.4,
+      "p90_risk": 32.7,
+      "top_driver_mix": {
+        "household": 15
       }
     },
     {
       "province": "นราธิวาส",
       "region": "South",
       "n_branches": 11,
-      "mean_risk": 31.4,
-      "p90_risk": 33.0,
+      "mean_risk": 25.4,
+      "p90_risk": 27.6,
       "top_driver_mix": {
         "household": 11
       }
@@ -394,315 +436,290 @@
       "province": "แพร่",
       "region": "North",
       "n_branches": 9,
-      "mean_risk": 31.3,
-      "p90_risk": 33.1,
+      "mean_risk": 25.4,
+      "p90_risk": 28.3,
       "top_driver_mix": {
         "household": 9
-      }
-    },
-    {
-      "province": "ลพบุรี",
-      "region": "Central&BKK",
-      "n_branches": 29,
-      "mean_risk": 30.8,
-      "p90_risk": 34.8,
-      "top_driver_mix": {
-        "segment": 21,
-        "household": 8
-      }
-    },
-    {
-      "province": "น่าน",
-      "region": "North",
-      "n_branches": 7,
-      "mean_risk": 30.3,
-      "p90_risk": 32.7,
-      "top_driver_mix": {
-        "household": 7
-      }
-    },
-    {
-      "province": "ปัตตานี",
-      "region": "South",
-      "n_branches": 11,
-      "mean_risk": 29.7,
-      "p90_risk": 30.8,
-      "top_driver_mix": {
-        "household": 11
-      }
-    },
-    {
-      "province": "ลำพูน",
-      "region": "North",
-      "n_branches": 14,
-      "mean_risk": 28.5,
-      "p90_risk": 31.1,
-      "top_driver_mix": {
-        "household": 14
       }
     },
     {
       "province": "สตูล",
       "region": "South",
       "n_branches": 9,
-      "mean_risk": 28.3,
-      "p90_risk": 29.8,
+      "mean_risk": 24.8,
+      "p90_risk": 27.6,
       "top_driver_mix": {
         "household": 9
-      }
-    },
-    {
-      "province": "ชุมพร",
-      "region": "South",
-      "n_branches": 18,
-      "mean_risk": 26.9,
-      "p90_risk": 28.1,
-      "top_driver_mix": {
-        "household": 18
-      }
-    },
-    {
-      "province": "ตาก",
-      "region": "North",
-      "n_branches": 9,
-      "mean_risk": 26.8,
-      "p90_risk": 29.8,
-      "top_driver_mix": {
-        "segment": 5,
-        "household": 4
-      }
-    },
-    {
-      "province": "สมุทรสาคร",
-      "region": "Central&BKK",
-      "n_branches": 13,
-      "mean_risk": 26.7,
-      "p90_risk": 31.9,
-      "top_driver_mix": {
-        "occupation": 11,
-        "segment": 2
-      }
-    },
-    {
-      "province": "นครนายก",
-      "region": "Central&BKK",
-      "n_branches": 7,
-      "mean_risk": 26.6,
-      "p90_risk": 29.8,
-      "top_driver_mix": {
-        "segment": 6,
-        "household": 1
-      }
-    },
-    {
-      "province": "สระแก้ว",
-      "region": "East",
-      "n_branches": 20,
-      "mean_risk": 26.4,
-      "p90_risk": 28.6,
-      "top_driver_mix": {
-        "household": 20
-      }
-    },
-    {
-      "province": "ปราจีนบุรี",
-      "region": "East",
-      "n_branches": 18,
-      "mean_risk": 26.3,
-      "p90_risk": 31.0,
-      "top_driver_mix": {
-        "segment": 15,
-        "household": 3
-      }
-    },
-    {
-      "province": "ราชบุรี",
-      "region": "Central&BKK",
-      "n_branches": 27,
-      "mean_risk": 26.3,
-      "p90_risk": 30.9,
-      "top_driver_mix": {
-        "segment": 15,
-        "household": 12
-      }
-    },
-    {
-      "province": "เชียงใหม่",
-      "region": "North",
-      "n_branches": 45,
-      "mean_risk": 25.3,
-      "p90_risk": 26.6,
-      "top_driver_mix": {
-        "segment": 35,
-        "household": 10
-      }
-    },
-    {
-      "province": "สมุทรปราการ",
-      "region": "Central&BKK",
-      "n_branches": 40,
-      "mean_risk": 24.9,
-      "p90_risk": 28.2,
-      "top_driver_mix": {
-        "segment": 29,
-        "occupation": 11
-      }
-    },
-    {
-      "province": "กระบี่",
-      "region": "South",
-      "n_branches": 14,
-      "mean_risk": 24.8,
-      "p90_risk": 27.2,
-      "top_driver_mix": {
-        "household": 14
-      }
-    },
-    {
-      "province": "กาญจนบุรี",
-      "region": "Central&BKK",
-      "n_branches": 32,
-      "mean_risk": 24.3,
-      "p90_risk": 28.3,
-      "top_driver_mix": {
-        "segment": 28,
-        "household": 4
-      }
-    },
-    {
-      "province": "นครปฐม",
-      "region": "Central&BKK",
-      "n_branches": 22,
-      "mean_risk": 24.1,
-      "p90_risk": 28.9,
-      "top_driver_mix": {
-        "segment": 19,
-        "occupation": 2,
-        "household": 1
-      }
-    },
-    {
-      "province": "สระบุรี",
-      "region": "Central&BKK",
-      "n_branches": 24,
-      "mean_risk": 23.9,
-      "p90_risk": 29.0,
-      "top_driver_mix": {
-        "segment": 18,
-        "household": 4,
-        "occupation": 2
       }
     },
     {
       "province": "ประจวบคีรีขันธ์",
       "region": "Central&BKK",
       "n_branches": 33,
-      "mean_risk": 23.4,
-      "p90_risk": 26.0,
+      "mean_risk": 24.3,
+      "p90_risk": 27.9,
       "top_driver_mix": {
         "household": 33
       }
     },
     {
-      "province": "พระนครศรีอยุธยา",
+      "province": "ลพบุรี",
+      "region": "Central&BKK",
+      "n_branches": 29,
+      "mean_risk": 24.3,
+      "p90_risk": 28.4,
+      "top_driver_mix": {
+        "household": 29
+      }
+    },
+    {
+      "province": "เชียงใหม่",
+      "region": "North",
+      "n_branches": 45,
+      "mean_risk": 24.3,
+      "p90_risk": 29.6,
+      "top_driver_mix": {
+        "segment": 23,
+        "household": 22
+      }
+    },
+    {
+      "province": "ราชบุรี",
       "region": "Central&BKK",
       "n_branches": 27,
-      "mean_risk": 23.1,
-      "p90_risk": 27.8,
+      "mean_risk": 23.7,
+      "p90_risk": 25.2,
       "top_driver_mix": {
-        "segment": 22,
-        "occupation": 5
+        "household": 27
       }
     },
     {
-      "province": "พัทลุง",
-      "region": "South",
-      "n_branches": 13,
-      "mean_risk": 22.3,
-      "p90_risk": 23.6,
+      "province": "ลำพูน",
+      "region": "North",
+      "n_branches": 14,
+      "mean_risk": 23.7,
+      "p90_risk": 28.5,
       "top_driver_mix": {
-        "household": 13
-      }
-    },
-    {
-      "province": "สุราษฎร์ธานี",
-      "region": "South",
-      "n_branches": 43,
-      "mean_risk": 20.8,
-      "p90_risk": 22.4,
-      "top_driver_mix": {
-        "household": 43
-      }
-    },
-    {
-      "province": "ปทุมธานี",
-      "region": "Central&BKK",
-      "n_branches": 39,
-      "mean_risk": 20.6,
-      "p90_risk": 22.8,
-      "top_driver_mix": {
-        "segment": 39
-      }
-    },
-    {
-      "province": "สิงห์บุรี",
-      "region": "Central&BKK",
-      "n_branches": 8,
-      "mean_risk": 20.1,
-      "p90_risk": 23.4,
-      "top_driver_mix": {
-        "segment": 7,
-        "household": 1
+        "household": 14
       }
     },
     {
       "province": "กรุงเทพมหานคร",
       "region": "Central&BKK",
       "n_branches": 170,
-      "mean_risk": 19.8,
-      "p90_risk": 23.4,
+      "mean_risk": 23.2,
+      "p90_risk": 26.7,
       "top_driver_mix": {
-        "segment": 164,
-        "occupation": 6
+        "segment": 168,
+        "occupation": 2
+      }
+    },
+    {
+      "province": "นครปฐม",
+      "region": "Central&BKK",
+      "n_branches": 22,
+      "mean_risk": 22.7,
+      "p90_risk": 28.6,
+      "top_driver_mix": {
+        "segment": 19,
+        "occupation": 3
+      }
+    },
+    {
+      "province": "ปัตตานี",
+      "region": "South",
+      "n_branches": 11,
+      "mean_risk": 22.7,
+      "p90_risk": 24.2,
+      "top_driver_mix": {
+        "household": 11
+      }
+    },
+    {
+      "province": "เพชรบูรณ์",
+      "region": "North",
+      "n_branches": 23,
+      "mean_risk": 22.6,
+      "p90_risk": 25.8,
+      "top_driver_mix": {
+        "household": 23
+      }
+    },
+    {
+      "province": "ปทุมธานี",
+      "region": "Central&BKK",
+      "n_branches": 39,
+      "mean_risk": 21.7,
+      "p90_risk": 23.1,
+      "top_driver_mix": {
+        "segment": 38,
+        "occupation": 1
+      }
+    },
+    {
+      "province": "สุราษฎร์ธานี",
+      "region": "South",
+      "n_branches": 43,
+      "mean_risk": 20.1,
+      "p90_risk": 24.4,
+      "top_driver_mix": {
+        "household": 43
+      }
+    },
+    {
+      "province": "พระนครศรีอยุธยา",
+      "region": "Central&BKK",
+      "n_branches": 27,
+      "mean_risk": 20.0,
+      "p90_risk": 24.0,
+      "top_driver_mix": {
+        "segment": 12,
+        "occupation": 8,
+        "household": 7
+      }
+    },
+    {
+      "province": "ภูเก็ต",
+      "region": "South",
+      "n_branches": 21,
+      "mean_risk": 19.7,
+      "p90_risk": 21.9,
+      "top_driver_mix": {
+        "segment": 20,
+        "household": 1
+      }
+    },
+    {
+      "province": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "n_branches": 32,
+      "mean_risk": 19.5,
+      "p90_risk": 22.2,
+      "top_driver_mix": {
+        "household": 27,
+        "segment": 5
+      }
+    },
+    {
+      "province": "บึงกาฬ",
+      "region": "Isan",
+      "n_branches": 15,
+      "mean_risk": 18.8,
+      "p90_risk": 20.5,
+      "top_driver_mix": {
+        "household": 15
+      }
+    },
+    {
+      "province": "ตาก",
+      "region": "North",
+      "n_branches": 9,
+      "mean_risk": 18.7,
+      "p90_risk": 24.1,
+      "top_driver_mix": {
+        "household": 9
+      }
+    },
+    {
+      "province": "สระแก้ว",
+      "region": "East",
+      "n_branches": 20,
+      "mean_risk": 18.6,
+      "p90_risk": 20.9,
+      "top_driver_mix": {
+        "household": 20
+      }
+    },
+    {
+      "province": "นนทบุรี",
+      "region": "Central&BKK",
+      "n_branches": 39,
+      "mean_risk": 18.3,
+      "p90_risk": 21.0,
+      "top_driver_mix": {
+        "segment": 37,
+        "occupation": 2
+      }
+    },
+    {
+      "province": "นครนายก",
+      "region": "Central&BKK",
+      "n_branches": 7,
+      "mean_risk": 18.1,
+      "p90_risk": 19.2,
+      "top_driver_mix": {
+        "household": 7
+      }
+    },
+    {
+      "province": "ปราจีนบุรี",
+      "region": "East",
+      "n_branches": 18,
+      "mean_risk": 17.7,
+      "p90_risk": 22.1,
+      "top_driver_mix": {
+        "household": 18
+      }
+    },
+    {
+      "province": "พัทลุง",
+      "region": "South",
+      "n_branches": 13,
+      "mean_risk": 17.5,
+      "p90_risk": 24.4,
+      "top_driver_mix": {
+        "household": 13
+      }
+    },
+    {
+      "province": "สระบุรี",
+      "region": "Central&BKK",
+      "n_branches": 24,
+      "mean_risk": 16.6,
+      "p90_risk": 21.3,
+      "top_driver_mix": {
+        "household": 20,
+        "occupation": 4
       }
     },
     {
       "province": "ตรัง",
       "region": "South",
       "n_branches": 23,
-      "mean_risk": 19.1,
-      "p90_risk": 20.3,
+      "mean_risk": 16.1,
+      "p90_risk": 20.4,
       "top_driver_mix": {
         "household": 23
       }
     },
     {
-      "province": "แม่ฮ่องสอน",
-      "region": "North",
+      "province": "ระนอง",
+      "region": "South",
       "n_branches": 4,
-      "mean_risk": 18.4,
-      "p90_risk": 19.9,
+      "mean_risk": 16.1,
+      "p90_risk": 18.3,
       "top_driver_mix": {
-        "segment": 4
+        "household": 2,
+        "segment": 2
       }
     },
     {
-      "province": "ฉะเชิงเทรา",
-      "region": "East",
-      "n_branches": 35,
-      "mean_risk": 17.8,
-      "p90_risk": 25.7,
+      "province": "สิงห์บุรี",
+      "region": "Central&BKK",
+      "n_branches": 8,
+      "mean_risk": 15.4,
+      "p90_risk": 16.1,
       "top_driver_mix": {
-        "segment": 27,
-        "occupation": 8
+        "segment": 5,
+        "household": 3
       }
     },
     {
       "province": "อ่างทอง",
       "region": "Central&BKK",
       "n_branches": 8,
-      "mean_risk": 17.8,
-      "p90_risk": 21.4,
+      "mean_risk": 14.7,
+      "p90_risk": 16.6,
       "top_driver_mix": {
         "segment": 8
       }
@@ -711,103 +728,85 @@
       "province": "เพชรบุรี",
       "region": "Central&BKK",
       "n_branches": 20,
-      "mean_risk": 17.4,
-      "p90_risk": 21.7,
+      "mean_risk": 14.0,
+      "p90_risk": 14.8,
       "top_driver_mix": {
-        "segment": 20
+        "segment": 18,
+        "occupation": 2
       }
     },
     {
-      "province": "นนทบุรี",
-      "region": "Central&BKK",
-      "n_branches": 39,
-      "mean_risk": 17.1,
-      "p90_risk": 18.0,
-      "top_driver_mix": {
-        "segment": 39
-      }
-    },
-    {
-      "province": "บึงกาฬ",
-      "region": "Isan",
-      "n_branches": 15,
-      "mean_risk": 17.0,
-      "p90_risk": 18.5,
-      "top_driver_mix": {
-        "household": 15
-      }
-    },
-    {
-      "province": "ยะลา",
-      "region": "South",
-      "n_branches": 8,
-      "mean_risk": 16.9,
-      "p90_risk": 18.0,
-      "top_driver_mix": {
-        "household": 7,
-        "segment": 1
-      }
-    },
-    {
-      "province": "ภูเก็ต",
-      "region": "South",
-      "n_branches": 21,
-      "mean_risk": 16.3,
-      "p90_risk": 17.4,
-      "top_driver_mix": {
-        "segment": 21
-      }
-    },
-    {
-      "province": "ระนอง",
-      "region": "South",
+      "province": "แม่ฮ่องสอน",
+      "region": "North",
       "n_branches": 4,
-      "mean_risk": 15.5,
-      "p90_risk": 17.3,
+      "mean_risk": 13.9,
+      "p90_risk": 16.8,
       "top_driver_mix": {
-        "household": 4
+        "household": 2,
+        "segment": 2
       }
     },
     {
       "province": "พังงา",
       "region": "South",
       "n_branches": 13,
-      "mean_risk": 14.2,
-      "p90_risk": 15.2,
+      "mean_risk": 13.7,
+      "p90_risk": 16.0,
       "top_driver_mix": {
         "household": 13
       }
     },
     {
-      "province": "จันทบุรี",
+      "province": "ฉะเชิงเทรา",
       "region": "East",
-      "n_branches": 25,
-      "mean_risk": 13.9,
-      "p90_risk": 16.2,
+      "n_branches": 35,
+      "mean_risk": 13.5,
+      "p90_risk": 21.7,
       "top_driver_mix": {
-        "segment": 24,
-        "occupation": 1
+        "segment": 19,
+        "occupation": 16
       }
     },
     {
-      "province": "นครศรีธรรมราช",
+      "province": "ยะลา",
       "region": "South",
-      "n_branches": 42,
-      "mean_risk": 13.4,
-      "p90_risk": 15.1,
+      "n_branches": 8,
+      "mean_risk": 12.9,
+      "p90_risk": 14.7,
       "top_driver_mix": {
-        "household": 40,
-        "segment": 2
+        "household": 8
       }
     },
     {
       "province": "สมุทรสงคราม",
       "region": "Central&BKK",
       "n_branches": 5,
-      "mean_risk": 12.2,
-      "p90_risk": 12.8,
+      "mean_risk": 12.6,
+      "p90_risk": 13.5,
       "top_driver_mix": {
         "segment": 5
+      }
+    },
+    {
+      "province": "จันทบุรี",
+      "region": "East",
+      "n_branches": 25,
+      "mean_risk": 11.8,
+      "p90_risk": 15.7,
+      "top_driver_mix": {
+        "segment": 13,
+        "occupation": 9,
+        "household": 3
+      }
+    },
+    {
+      "province": "นครศรีธรรมราช",
+      "region": "South",
+      "n_branches": 42,
+      "mean_risk": 10.6,
+      "p90_risk": 13.1,
+      "top_driver_mix": {
+        "household": 42
       }
     }
   ]

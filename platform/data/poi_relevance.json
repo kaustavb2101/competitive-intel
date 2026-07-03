@@ -565,14 +565,14 @@
     },
     {
       "rel": 12.63,
-      "raw": 7135.6,
+      "raw": 7135.0,
       "cat": {
         "gold": 37,
         "vehicle": 961,
         "fresh_mkt": 49,
         "agri": 55,
         "factory": 93,
-        "commerce": 348,
+        "commerce": 347,
         "retail_general": 3358,
         "food_service": 6855,
         "school": 567
@@ -628,7 +628,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 49.89,
+      "rel": 49.88,
       "raw": 28188.8,
       "cat": {
         "gold": 42,
@@ -949,14 +949,14 @@
     },
     {
       "rel": 70.45,
-      "raw": 39809.3,
+      "raw": 39809.9,
       "cat": {
         "gold": 290,
         "vehicle": 6298,
         "fresh_mkt": 152,
         "agri": 533,
         "factory": 1466,
-        "commerce": 860,
+        "commerce": 861,
         "retail_general": 22264,
         "food_service": 29651,
         "school": 5160
@@ -1093,14 +1093,14 @@
     },
     {
       "rel": 75.48,
-      "raw": 42652.7,
+      "raw": 42653.3,
       "cat": {
         "gold": 72,
         "vehicle": 7425,
         "fresh_mkt": 125,
         "agri": 565,
         "factory": 1214,
-        "commerce": 789,
+        "commerce": 790,
         "retail_general": 22729,
         "food_service": 32731,
         "school": 5378
@@ -1573,11 +1573,11 @@
     },
     {
       "rel": 6.49,
-      "raw": 3664.8,
+      "raw": 3665.9,
       "cat": {
         "gold": 1,
         "vehicle": 810,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 110,
         "factory": 86,
         "commerce": 72,
@@ -1957,14 +1957,14 @@
     },
     {
       "rel": 65.01,
-      "raw": 36735.8,
+      "raw": 36737.0,
       "cat": {
         "gold": 20,
         "vehicle": 6563,
         "fresh_mkt": 88,
         "agri": 356,
         "factory": 1552,
-        "commerce": 729,
+        "commerce": 731,
         "retail_general": 18842,
         "food_service": 28436,
         "school": 3979
@@ -1972,7 +1972,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 10.12,
+      "rel": 10.11,
       "raw": 5715.7,
       "cat": {
         "gold": 23,
@@ -2053,14 +2053,14 @@
     },
     {
       "rel": 68.19,
-      "raw": 38531.2,
+      "raw": 38531.8,
       "cat": {
         "gold": 25,
         "vehicle": 7643,
         "fresh_mkt": 90,
         "agri": 411,
         "factory": 1361,
-        "commerce": 699,
+        "commerce": 700,
         "retail_general": 19001,
         "food_service": 29051,
         "school": 4033
@@ -2229,14 +2229,14 @@
     },
     {
       "rel": 93.86,
-      "raw": 53037.5,
+      "raw": 53038.7,
       "cat": {
         "gold": 256,
         "vehicle": 7979,
         "fresh_mkt": 178,
         "agri": 578,
         "factory": 1838,
-        "commerce": 1129,
+        "commerce": 1131,
         "retail_general": 29198,
         "food_service": 42141,
         "school": 6770
@@ -2357,14 +2357,14 @@
     },
     {
       "rel": 74.96,
-      "raw": 42357.3,
+      "raw": 42357.9,
       "cat": {
         "gold": 282,
         "vehicle": 6828,
         "fresh_mkt": 153,
         "agri": 483,
         "factory": 2088,
-        "commerce": 992,
+        "commerce": 993,
         "retail_general": 23015,
         "food_service": 31163,
         "school": 5401
@@ -2373,14 +2373,14 @@
     },
     {
       "rel": 81.67,
-      "raw": 46150.0,
+      "raw": 46151.2,
       "cat": {
         "gold": 277,
         "vehicle": 6294,
         "fresh_mkt": 159,
         "agri": 479,
         "factory": 2282,
-        "commerce": 1146,
+        "commerce": 1148,
         "retail_general": 25362,
         "food_service": 36830,
         "school": 6079
@@ -2709,14 +2709,14 @@
     },
     {
       "rel": 13.69,
-      "raw": 7738.4,
+      "raw": 7737.2,
       "cat": {
         "gold": 12,
         "vehicle": 1552,
         "fresh_mkt": 22,
         "agri": 212,
         "factory": 100,
-        "commerce": 153,
+        "commerce": 151,
         "retail_general": 3801,
         "food_service": 5535,
         "school": 1154
@@ -2805,14 +2805,14 @@
     },
     {
       "rel": 63.2,
-      "raw": 35712.9,
+      "raw": 35713.5,
       "cat": {
         "gold": 268,
         "vehicle": 5609,
         "fresh_mkt": 127,
         "agri": 393,
         "factory": 2137,
-        "commerce": 828,
+        "commerce": 829,
         "retail_general": 19775,
         "food_service": 25896,
         "school": 4175
@@ -3269,14 +3269,14 @@
     },
     {
       "rel": 13.74,
-      "raw": 7763.7,
+      "raw": 7762.5,
       "cat": {
         "gold": 12,
         "vehicle": 1559,
         "fresh_mkt": 22,
         "agri": 213,
         "factory": 102,
-        "commerce": 155,
+        "commerce": 153,
         "retail_general": 3813,
         "food_service": 5542,
         "school": 1159
@@ -3797,14 +3797,14 @@
     },
     {
       "rel": 97.46,
-      "raw": 55071.7,
+      "raw": 55072.9,
       "cat": {
         "gold": 291,
         "vehicle": 7947,
         "fresh_mkt": 178,
         "agri": 613,
         "factory": 1948,
-        "commerce": 1165,
+        "commerce": 1167,
         "retail_general": 30679,
         "food_service": 44041,
         "school": 7221
@@ -4645,11 +4645,11 @@
     },
     {
       "rel": 8.36,
-      "raw": 4724.3,
+      "raw": 4725.4,
       "cat": {
         "gold": 2,
         "vehicle": 1081,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 85,
         "factory": 219,
         "commerce": 77,
@@ -5061,14 +5061,14 @@
     },
     {
       "rel": 98.38,
-      "raw": 55592.2,
+      "raw": 55593.4,
       "cat": {
         "gold": 296,
         "vehicle": 7770,
         "fresh_mkt": 184,
         "agri": 614,
         "factory": 1943,
-        "commerce": 1254,
+        "commerce": 1256,
         "retail_general": 31230,
         "food_service": 44745,
         "school": 7413
@@ -6485,14 +6485,14 @@
     },
     {
       "rel": 12.9,
-      "raw": 7290.5,
+      "raw": 7289.9,
       "cat": {
         "gold": 38,
         "vehicle": 953,
         "fresh_mkt": 48,
         "agri": 66,
         "factory": 103,
-        "commerce": 355,
+        "commerce": 354,
         "retail_general": 3388,
         "food_service": 7100,
         "school": 577
@@ -6788,7 +6788,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 58.26,
+      "rel": 58.25,
       "raw": 32918.5,
       "cat": {
         "gold": 239,
@@ -7029,11 +7029,11 @@
     },
     {
       "rel": 0.25,
-      "raw": 142.1,
+      "raw": 143.2,
       "cat": {
         "gold": 0,
         "vehicle": 33,
-        "fresh_mkt": 0,
+        "fresh_mkt": 1,
         "agri": 13,
         "factory": 11,
         "commerce": 1,
@@ -7125,14 +7125,14 @@
     },
     {
       "rel": 69.74,
-      "raw": 39407.8,
+      "raw": 39408.4,
       "cat": {
         "gold": 28,
         "vehicle": 7507,
         "fresh_mkt": 106,
         "agri": 488,
         "factory": 1256,
-        "commerce": 664,
+        "commerce": 665,
         "retail_general": 19739,
         "food_service": 30199,
         "school": 4384
@@ -7237,14 +7237,14 @@
     },
     {
       "rel": 81.52,
-      "raw": 46065.8,
+      "raw": 46067.0,
       "cat": {
         "gold": 60,
         "vehicle": 7736,
         "fresh_mkt": 126,
         "agri": 527,
         "factory": 1466,
-        "commerce": 910,
+        "commerce": 912,
         "retail_general": 24659,
         "food_service": 36029,
         "school": 5676
@@ -7653,14 +7653,14 @@
     },
     {
       "rel": 86.48,
-      "raw": 48867.7,
+      "raw": 48868.9,
       "cat": {
         "gold": 293,
         "vehicle": 6542,
         "fresh_mkt": 170,
         "agri": 571,
         "factory": 2092,
-        "commerce": 1207,
+        "commerce": 1209,
         "retail_general": 27615,
         "food_service": 39013,
         "school": 6476
@@ -7813,11 +7813,11 @@
     },
     {
       "rel": 8.36,
-      "raw": 4724.3,
+      "raw": 4725.4,
       "cat": {
         "gold": 2,
         "vehicle": 1081,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 85,
         "factory": 219,
         "commerce": 77,
@@ -7893,14 +7893,14 @@
     },
     {
       "rel": 65.12,
-      "raw": 36797.0,
+      "raw": 36798.2,
       "cat": {
         "gold": 259,
         "vehicle": 5273,
         "fresh_mkt": 126,
         "agri": 387,
         "factory": 2161,
-        "commerce": 907,
+        "commerce": 909,
         "retail_general": 20680,
         "food_service": 27792,
         "school": 4439
@@ -9045,11 +9045,11 @@
     },
     {
       "rel": 8.78,
-      "raw": 4961.0,
+      "raw": 4962.1,
       "cat": {
         "gold": 2,
         "vehicle": 1139,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 107,
         "factory": 173,
         "commerce": 91,
@@ -9253,14 +9253,14 @@
     },
     {
       "rel": 0.97,
-      "raw": 546.9,
+      "raw": 548.1,
       "cat": {
         "gold": 0,
         "vehicle": 120,
         "fresh_mkt": 0,
         "agri": 43,
         "factory": 14,
-        "commerce": 4,
+        "commerce": 6,
         "retail_general": 231,
         "food_service": 322,
         "school": 111
@@ -9301,14 +9301,14 @@
     },
     {
       "rel": 69.74,
-      "raw": 39407.8,
+      "raw": 39408.4,
       "cat": {
         "gold": 28,
         "vehicle": 7507,
         "fresh_mkt": 106,
         "agri": 488,
         "factory": 1256,
-        "commerce": 664,
+        "commerce": 665,
         "retail_general": 19739,
         "food_service": 30199,
         "school": 4384
@@ -9461,14 +9461,14 @@
     },
     {
       "rel": 13.69,
-      "raw": 7738.4,
+      "raw": 7737.2,
       "cat": {
         "gold": 12,
         "vehicle": 1552,
         "fresh_mkt": 22,
         "agri": 212,
         "factory": 100,
-        "commerce": 153,
+        "commerce": 151,
         "retail_general": 3801,
         "food_service": 5535,
         "school": 1154
@@ -9493,14 +9493,14 @@
     },
     {
       "rel": 93.86,
-      "raw": 53037.5,
+      "raw": 53038.7,
       "cat": {
         "gold": 256,
         "vehicle": 7979,
         "fresh_mkt": 178,
         "agri": 578,
         "factory": 1838,
-        "commerce": 1129,
+        "commerce": 1131,
         "retail_general": 29198,
         "food_service": 42141,
         "school": 6770
@@ -9541,14 +9541,14 @@
     },
     {
       "rel": 81.76,
-      "raw": 46199.2,
+      "raw": 46200.4,
       "cat": {
         "gold": 288,
         "vehicle": 6186,
         "fresh_mkt": 171,
         "agri": 555,
         "factory": 2110,
-        "commerce": 1151,
+        "commerce": 1153,
         "retail_general": 25815,
         "food_service": 36758,
         "school": 6219
@@ -9605,14 +9605,14 @@
     },
     {
       "rel": 72.58,
-      "raw": 41013.2,
+      "raw": 41013.8,
       "cat": {
         "gold": 279,
         "vehicle": 6506,
         "fresh_mkt": 152,
         "agri": 451,
         "factory": 2143,
-        "commerce": 964,
+        "commerce": 965,
         "retail_general": 22461,
         "food_service": 30069,
         "school": 5240
@@ -9764,7 +9764,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 20.6,
+      "rel": 20.59,
       "raw": 11637.6,
       "cat": {
         "gold": 61,
@@ -10053,11 +10053,11 @@
     },
     {
       "rel": 6.49,
-      "raw": 3664.8,
+      "raw": 3665.9,
       "cat": {
         "gold": 1,
         "vehicle": 810,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 110,
         "factory": 86,
         "commerce": 72,
@@ -10501,14 +10501,14 @@
     },
     {
       "rel": 84.63,
-      "raw": 47819.0,
+      "raw": 47820.2,
       "cat": {
         "gold": 292,
         "vehicle": 6732,
         "fresh_mkt": 174,
         "agri": 596,
         "factory": 1574,
-        "commerce": 1067,
+        "commerce": 1069,
         "retail_general": 27153,
         "food_service": 37903,
         "school": 6460
@@ -10548,7 +10548,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 16.53,
+      "rel": 16.52,
       "raw": 9337.8,
       "cat": {
         "gold": 6,
@@ -10725,11 +10725,11 @@
     },
     {
       "rel": 8.78,
-      "raw": 4961.0,
+      "raw": 4962.1,
       "cat": {
         "gold": 2,
         "vehicle": 1139,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 107,
         "factory": 173,
         "commerce": 91,
@@ -11493,14 +11493,14 @@
     },
     {
       "rel": 75.48,
-      "raw": 42652.7,
+      "raw": 42653.3,
       "cat": {
         "gold": 72,
         "vehicle": 7425,
         "fresh_mkt": 125,
         "agri": 565,
         "factory": 1214,
-        "commerce": 789,
+        "commerce": 790,
         "retail_general": 22729,
         "food_service": 32731,
         "school": 5378
@@ -11941,14 +11941,14 @@
     },
     {
       "rel": 68.49,
-      "raw": 38701.1,
+      "raw": 38701.7,
       "cat": {
         "gold": 274,
         "vehicle": 6446,
         "fresh_mkt": 147,
         "agri": 507,
         "factory": 1586,
-        "commerce": 830,
+        "commerce": 831,
         "retail_general": 21012,
         "food_service": 28312,
         "school": 5024
@@ -12084,7 +12084,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 5.51,
+      "rel": 5.5,
       "raw": 3110.7,
       "cat": {
         "gold": 0,
@@ -12197,14 +12197,14 @@
     },
     {
       "rel": 65.12,
-      "raw": 36797.0,
+      "raw": 36798.2,
       "cat": {
         "gold": 259,
         "vehicle": 5273,
         "fresh_mkt": 126,
         "agri": 387,
         "factory": 2161,
-        "commerce": 907,
+        "commerce": 909,
         "retail_general": 20680,
         "food_service": 27792,
         "school": 4439
@@ -12565,14 +12565,14 @@
     },
     {
       "rel": 68.19,
-      "raw": 38531.2,
+      "raw": 38531.8,
       "cat": {
         "gold": 25,
         "vehicle": 7643,
         "fresh_mkt": 90,
         "agri": 411,
         "factory": 1361,
-        "commerce": 699,
+        "commerce": 700,
         "retail_general": 19001,
         "food_service": 29051,
         "school": 4033
@@ -12613,14 +12613,14 @@
     },
     {
       "rel": 93.86,
-      "raw": 53037.5,
+      "raw": 53038.7,
       "cat": {
         "gold": 256,
         "vehicle": 7979,
         "fresh_mkt": 178,
         "agri": 578,
         "factory": 1838,
-        "commerce": 1129,
+        "commerce": 1131,
         "retail_general": 29198,
         "food_service": 42141,
         "school": 6770
@@ -12693,14 +12693,14 @@
     },
     {
       "rel": 51.53,
-      "raw": 29118.9,
+      "raw": 29119.5,
       "cat": {
         "gold": 17,
         "vehicle": 5714,
         "fresh_mkt": 74,
         "agri": 282,
         "factory": 1582,
-        "commerce": 569,
+        "commerce": 570,
         "retail_general": 13923,
         "food_service": 21481,
         "school": 3158
@@ -12901,11 +12901,11 @@
     },
     {
       "rel": 8.36,
-      "raw": 4724.3,
+      "raw": 4725.4,
       "cat": {
         "gold": 2,
         "vehicle": 1081,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 85,
         "factory": 219,
         "commerce": 77,
@@ -12981,14 +12981,14 @@
     },
     {
       "rel": 100.0,
-      "raw": 56506.6,
+      "raw": 56507.8,
       "cat": {
         "gold": 293,
         "vehicle": 7874,
         "fresh_mkt": 169,
         "agri": 631,
         "factory": 2008,
-        "commerce": 1233,
+        "commerce": 1235,
         "retail_general": 31821,
         "food_service": 45527,
         "school": 7514
@@ -13093,14 +13093,14 @@
     },
     {
       "rel": 76.98,
-      "raw": 43498.3,
+      "raw": 43498.9,
       "cat": {
         "gold": 283,
         "vehicle": 6426,
         "fresh_mkt": 162,
         "agri": 559,
         "factory": 1409,
-        "commerce": 916,
+        "commerce": 917,
         "retail_general": 24827,
         "food_service": 33522,
         "school": 5870
@@ -13300,7 +13300,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 25.17,
+      "rel": 25.16,
       "raw": 14219.9,
       "cat": {
         "gold": 7,
@@ -13365,14 +13365,14 @@
     },
     {
       "rel": 79.13,
-      "raw": 44714.3,
+      "raw": 44714.9,
       "cat": {
         "gold": 209,
         "vehicle": 7003,
         "fresh_mkt": 143,
         "agri": 615,
         "factory": 1360,
-        "commerce": 888,
+        "commerce": 889,
         "retail_general": 25029,
         "food_service": 34286,
         "school": 6025
@@ -13797,14 +13797,14 @@
     },
     {
       "rel": 12.06,
-      "raw": 6816.3,
+      "raw": 6815.1,
       "cat": {
         "gold": 12,
         "vehicle": 1440,
         "fresh_mkt": 21,
         "agri": 182,
         "factory": 102,
-        "commerce": 136,
+        "commerce": 134,
         "retail_general": 3355,
         "food_service": 4711,
         "school": 927
@@ -13813,14 +13813,14 @@
     },
     {
       "rel": 79.13,
-      "raw": 44714.3,
+      "raw": 44714.9,
       "cat": {
         "gold": 209,
         "vehicle": 7003,
         "fresh_mkt": 143,
         "agri": 615,
         "factory": 1360,
-        "commerce": 888,
+        "commerce": 889,
         "retail_general": 25029,
         "food_service": 34286,
         "school": 6025
@@ -15268,7 +15268,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 3.04,
+      "rel": 3.03,
       "raw": 1715.0,
       "cat": {
         "gold": 0,
@@ -15349,11 +15349,11 @@
     },
     {
       "rel": 8.1,
-      "raw": 4575.5,
+      "raw": 4576.6,
       "cat": {
         "gold": 1,
         "vehicle": 1075,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 120,
         "factory": 141,
         "commerce": 86,
@@ -15541,14 +15541,14 @@
     },
     {
       "rel": 77.94,
-      "raw": 44039.4,
+      "raw": 44040.0,
       "cat": {
         "gold": 284,
         "vehicle": 6977,
         "fresh_mkt": 161,
         "agri": 541,
         "factory": 2008,
-        "commerce": 1021,
+        "commerce": 1022,
         "retail_general": 23786,
         "food_service": 33051,
         "school": 5723
@@ -15797,14 +15797,14 @@
     },
     {
       "rel": 14.09,
-      "raw": 7959.8,
+      "raw": 7959.2,
       "cat": {
         "gold": 39,
         "vehicle": 1214,
         "fresh_mkt": 53,
         "agri": 76,
         "factory": 120,
-        "commerce": 327,
+        "commerce": 326,
         "retail_general": 3692,
         "food_service": 7328,
         "school": 633
@@ -16309,14 +16309,14 @@
     },
     {
       "rel": 13.69,
-      "raw": 7738.4,
+      "raw": 7737.2,
       "cat": {
         "gold": 12,
         "vehicle": 1552,
         "fresh_mkt": 22,
         "agri": 212,
         "factory": 100,
-        "commerce": 153,
+        "commerce": 151,
         "retail_general": 3801,
         "food_service": 5535,
         "school": 1154
@@ -16756,7 +16756,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 8.31,
+      "rel": 8.3,
       "raw": 4692.9,
       "cat": {
         "gold": 0,
@@ -16917,14 +16917,14 @@
     },
     {
       "rel": 75.48,
-      "raw": 42652.7,
+      "raw": 42653.3,
       "cat": {
         "gold": 72,
         "vehicle": 7425,
         "fresh_mkt": 125,
         "agri": 565,
         "factory": 1214,
-        "commerce": 789,
+        "commerce": 790,
         "retail_general": 22729,
         "food_service": 32731,
         "school": 5378
@@ -17237,14 +17237,14 @@
     },
     {
       "rel": 75.34,
-      "raw": 42571.9,
+      "raw": 42573.1,
       "cat": {
         "gold": 201,
         "vehicle": 6404,
         "fresh_mkt": 130,
         "agri": 350,
         "factory": 2298,
-        "commerce": 960,
+        "commerce": 962,
         "retail_general": 23464,
         "food_service": 32792,
         "school": 5099
@@ -17573,14 +17573,14 @@
     },
     {
       "rel": 54.24,
-      "raw": 30648.2,
+      "raw": 30648.8,
       "cat": {
         "gold": 15,
         "vehicle": 5882,
         "fresh_mkt": 74,
         "agri": 272,
         "factory": 1581,
-        "commerce": 592,
+        "commerce": 593,
         "retail_general": 14927,
         "food_service": 22915,
         "school": 3346
@@ -17925,14 +17925,14 @@
     },
     {
       "rel": 60.12,
-      "raw": 33974.0,
+      "raw": 33975.2,
       "cat": {
         "gold": 124,
         "vehicle": 5216,
         "fresh_mkt": 96,
         "agri": 304,
         "factory": 1994,
-        "commerce": 765,
+        "commerce": 767,
         "retail_general": 17729,
         "food_service": 26643,
         "school": 4091
@@ -18613,14 +18613,14 @@
     },
     {
       "rel": 69.74,
-      "raw": 39407.8,
+      "raw": 39408.4,
       "cat": {
         "gold": 28,
         "vehicle": 7507,
         "fresh_mkt": 106,
         "agri": 488,
         "factory": 1256,
-        "commerce": 664,
+        "commerce": 665,
         "retail_general": 19739,
         "food_service": 30199,
         "school": 4384
@@ -18725,11 +18725,11 @@
     },
     {
       "rel": 8.36,
-      "raw": 4724.3,
+      "raw": 4725.4,
       "cat": {
         "gold": 2,
         "vehicle": 1081,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 85,
         "factory": 219,
         "commerce": 77,
@@ -18837,14 +18837,14 @@
     },
     {
       "rel": 60.12,
-      "raw": 33974.0,
+      "raw": 33975.2,
       "cat": {
         "gold": 124,
         "vehicle": 5216,
         "fresh_mkt": 96,
         "agri": 304,
         "factory": 1994,
-        "commerce": 765,
+        "commerce": 767,
         "retail_general": 17729,
         "food_service": 26643,
         "school": 4091
@@ -18901,14 +18901,14 @@
     },
     {
       "rel": 77.4,
-      "raw": 43734.5,
+      "raw": 43735.7,
       "cat": {
         "gold": 285,
         "vehicle": 5767,
         "fresh_mkt": 160,
         "agri": 474,
         "factory": 2192,
-        "commerce": 1126,
+        "commerce": 1128,
         "retail_general": 24605,
         "food_service": 34559,
         "school": 5882
@@ -19125,14 +19125,14 @@
     },
     {
       "rel": 60.12,
-      "raw": 33974.0,
+      "raw": 33975.2,
       "cat": {
         "gold": 124,
         "vehicle": 5216,
         "fresh_mkt": 96,
         "agri": 304,
         "factory": 1994,
-        "commerce": 765,
+        "commerce": 767,
         "retail_general": 17729,
         "food_service": 26643,
         "school": 4091
@@ -19781,14 +19781,14 @@
     },
     {
       "rel": 96.96,
-      "raw": 54791.0,
+      "raw": 54792.2,
       "cat": {
         "gold": 288,
         "vehicle": 7579,
         "fresh_mkt": 157,
         "agri": 590,
         "factory": 2225,
-        "commerce": 1194,
+        "commerce": 1196,
         "retail_general": 31091,
         "food_service": 43897,
         "school": 6932
@@ -20069,14 +20069,14 @@
     },
     {
       "rel": 77.4,
-      "raw": 43734.5,
+      "raw": 43735.7,
       "cat": {
         "gold": 285,
         "vehicle": 5767,
         "fresh_mkt": 160,
         "agri": 474,
         "factory": 2192,
-        "commerce": 1126,
+        "commerce": 1128,
         "retail_general": 24605,
         "food_service": 34559,
         "school": 5882
@@ -20420,7 +20420,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 29.31,
+      "rel": 29.3,
       "raw": 16559.4,
       "cat": {
         "gold": 67,
@@ -20933,14 +20933,14 @@
     },
     {
       "rel": 13.69,
-      "raw": 7738.4,
+      "raw": 7737.2,
       "cat": {
         "gold": 12,
         "vehicle": 1552,
         "fresh_mkt": 22,
         "agri": 212,
         "factory": 100,
-        "commerce": 153,
+        "commerce": 151,
         "retail_general": 3801,
         "food_service": 5535,
         "school": 1154
@@ -21765,11 +21765,11 @@
     },
     {
       "rel": 6.49,
-      "raw": 3664.8,
+      "raw": 3665.9,
       "cat": {
         "gold": 1,
         "vehicle": 810,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 110,
         "factory": 86,
         "commerce": 72,
@@ -21844,7 +21844,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 8.31,
+      "rel": 8.3,
       "raw": 4692.9,
       "cat": {
         "gold": 0,
@@ -21908,7 +21908,7 @@
       "src": "occ+k10"
     },
     {
-      "rel": 18.41,
+      "rel": 18.4,
       "raw": 10400.1,
       "cat": {
         "gold": 1,
@@ -23557,14 +23557,14 @@
     },
     {
       "rel": 79.93,
-      "raw": 45165.3,
+      "raw": 45165.9,
       "cat": {
         "gold": 298,
         "vehicle": 6781,
         "fresh_mkt": 176,
         "agri": 575,
         "factory": 1575,
-        "commerce": 1024,
+        "commerce": 1025,
         "retail_general": 25447,
         "food_service": 34693,
         "school": 5886
@@ -25493,14 +25493,14 @@
     },
     {
       "rel": 75.48,
-      "raw": 42652.7,
+      "raw": 42653.3,
       "cat": {
         "gold": 72,
         "vehicle": 7425,
         "fresh_mkt": 125,
         "agri": 565,
         "factory": 1214,
-        "commerce": 789,
+        "commerce": 790,
         "retail_general": 22729,
         "food_service": 32731,
         "school": 5378
@@ -25717,14 +25717,14 @@
     },
     {
       "rel": 45.14,
-      "raw": 25509.8,
+      "raw": 25510.4,
       "cat": {
         "gold": 18,
         "vehicle": 5185,
         "fresh_mkt": 76,
         "agri": 263,
         "factory": 1633,
-        "commerce": 475,
+        "commerce": 476,
         "retail_general": 12014,
         "food_service": 18267,
         "school": 2455
@@ -25733,14 +25733,14 @@
     },
     {
       "rel": 75.48,
-      "raw": 42652.7,
+      "raw": 42653.3,
       "cat": {
         "gold": 72,
         "vehicle": 7425,
         "fresh_mkt": 125,
         "agri": 565,
         "factory": 1214,
-        "commerce": 789,
+        "commerce": 790,
         "retail_general": 22729,
         "food_service": 32731,
         "school": 5378
@@ -26005,14 +26005,14 @@
     },
     {
       "rel": 86.48,
-      "raw": 48867.7,
+      "raw": 48868.9,
       "cat": {
         "gold": 293,
         "vehicle": 6542,
         "fresh_mkt": 170,
         "agri": 571,
         "factory": 2092,
-        "commerce": 1207,
+        "commerce": 1209,
         "retail_general": 27615,
         "food_service": 39013,
         "school": 6476
@@ -26853,11 +26853,11 @@
     },
     {
       "rel": 7.71,
-      "raw": 4358.4,
+      "raw": 4359.5,
       "cat": {
         "gold": 1,
         "vehicle": 1029,
-        "fresh_mkt": 10,
+        "fresh_mkt": 11,
         "agri": 97,
         "factory": 126,
         "commerce": 78,
@@ -27237,14 +27237,14 @@
     },
     {
       "rel": 69.74,
-      "raw": 39407.8,
+      "raw": 39408.4,
       "cat": {
         "gold": 28,
         "vehicle": 7507,
         "fresh_mkt": 106,
         "agri": 488,
         "factory": 1256,
-        "commerce": 664,
+        "commerce": 665,
         "retail_general": 19739,
         "food_service": 30199,
         "school": 4384
@@ -27541,14 +27541,14 @@
     },
     {
       "rel": 99.42,
-      "raw": 56181.5,
+      "raw": 56182.7,
       "cat": {
         "gold": 294,
         "vehicle": 7934,
         "fresh_mkt": 177,
         "agri": 636,
         "factory": 1936,
-        "commerce": 1204,
+        "commerce": 1206,
         "retail_general": 31583,
         "food_service": 45123,
         "school": 7461
@@ -27797,11 +27797,11 @@
     },
     {
       "rel": 0.63,
-      "raw": 354.8,
+      "raw": 355.9,
       "cat": {
         "gold": 0,
         "vehicle": 92,
-        "fresh_mkt": 0,
+        "fresh_mkt": 1,
         "agri": 29,
         "factory": 47,
         "commerce": 3,
@@ -28325,11 +28325,11 @@
     },
     {
       "rel": 0.25,
-      "raw": 140.6,
+      "raw": 141.7,
       "cat": {
         "gold": 0,
         "vehicle": 30,
-        "fresh_mkt": 0,
+        "fresh_mkt": 1,
         "agri": 14,
         "factory": 20,
         "commerce": 1,
@@ -28789,14 +28789,14 @@
     },
     {
       "rel": 74.69,
-      "raw": 42206.2,
+      "raw": 42207.4,
       "cat": {
         "gold": 274,
         "vehicle": 5631,
         "fresh_mkt": 143,
         "agri": 449,
         "factory": 2255,
-        "commerce": 1065,
+        "commerce": 1067,
         "retail_general": 23689,
         "food_service": 33157,
         "school": 5535
@@ -28837,14 +28837,14 @@
     },
     {
       "rel": 79.7,
-      "raw": 45034.9,
+      "raw": 45036.1,
       "cat": {
         "gold": 143,
         "vehicle": 6940,
         "fresh_mkt": 117,
         "agri": 401,
         "factory": 2066,
-        "commerce": 944,
+        "commerce": 946,
         "retail_general": 23912,
         "food_service": 35949,
         "school": 5546
@@ -29172,15 +29172,15 @@
       "src": "occ+k10"
     },
     {
-      "rel": 13.84,
-      "raw": 7819.0,
+      "rel": 13.83,
+      "raw": 7817.8,
       "cat": {
         "gold": 12,
         "vehicle": 1568,
         "fresh_mkt": 22,
         "agri": 220,
         "factory": 103,
-        "commerce": 153,
+        "commerce": 151,
         "retail_general": 3840,
         "food_service": 5575,
         "school": 1174
@@ -29237,14 +29237,14 @@
     },
     {
       "rel": 13.84,
-      "raw": 7821.3,
+      "raw": 7820.7,
       "cat": {
         "gold": 41,
         "vehicle": 1180,
         "fresh_mkt": 53,
         "agri": 70,
         "factory": 115,
-        "commerce": 339,
+        "commerce": 338,
         "retail_general": 3598,
         "food_service": 7252,
         "school": 619
@@ -29301,14 +29301,14 @@
     },
     {
       "rel": 68.26,
-      "raw": 38569.9,
+      "raw": 38570.5,
       "cat": {
         "gold": 268,
         "vehicle": 6290,
         "fresh_mkt": 146,
         "agri": 529,
         "factory": 1264,
-        "commerce": 747,
+        "commerce": 748,
         "retail_general": 21765,
         "food_service": 28388,
         "school": 5025
@@ -29333,11 +29333,11 @@
     },
     {
       "rel": 5.99,
-      "raw": 3384.5,
+      "raw": 3385.6,
       "cat": {
         "gold": 1,
         "vehicle": 759,
-        "fresh_mkt": 7,
+        "fresh_mkt": 8,
         "agri": 135,
         "factory": 97,
         "commerce": 69,
@@ -30581,14 +30581,14 @@
     },
     {
       "rel": 81.25,
-      "raw": 45912.5,
+      "raw": 45913.1,
       "cat": {
         "gold": 267,
         "vehicle": 6822,
         "fresh_mkt": 159,
         "agri": 605,
         "factory": 1441,
-        "commerce": 953,
+        "commerce": 954,
         "retail_general": 25852,
         "food_service": 35826,
         "school": 6184
@@ -30757,14 +30757,14 @@
     },
     {
       "rel": 44.0,
-      "raw": 24861.4,
+      "raw": 24862.0,
       "cat": {
         "gold": 18,
         "vehicle": 5089,
         "fresh_mkt": 75,
         "agri": 253,
         "factory": 1591,
-        "commerce": 446,
+        "commerce": 447,
         "retail_general": 11712,
         "food_service": 17704,
         "school": 2417
@@ -30869,14 +30869,14 @@
     },
     {
       "rel": 85.55,
-      "raw": 48341.8,
+      "raw": 48343.0,
       "cat": {
         "gold": 289,
         "vehicle": 6396,
         "fresh_mkt": 172,
         "agri": 570,
         "factory": 2265,
-        "commerce": 1231,
+        "commerce": 1233,
         "retail_general": 26834,
         "food_service": 38850,
         "school": 6439
@@ -30980,15 +30980,15 @@
       "src": "occ+k10"
     },
     {
-      "rel": 12.4,
-      "raw": 7004.4,
+      "rel": 12.39,
+      "raw": 7003.8,
       "cat": {
         "gold": 34,
         "vehicle": 1079,
         "fresh_mkt": 38,
         "agri": 70,
         "factory": 109,
-        "commerce": 279,
+        "commerce": 278,
         "retail_general": 3285,
         "food_service": 6382,
         "school": 580
@@ -31013,14 +31013,14 @@
     },
     {
       "rel": 74.26,
-      "raw": 41964.2,
+      "raw": 41965.4,
       "cat": {
         "gold": 280,
         "vehicle": 5894,
         "fresh_mkt": 152,
         "agri": 452,
         "factory": 2142,
-        "commerce": 1052,
+        "commerce": 1054,
         "retail_general": 23545,
         "food_service": 32215,
         "school": 5586
@@ -31029,11 +31029,11 @@
     },
     {
       "rel": 8.36,
-      "raw": 4724.3,
+      "raw": 4725.4,
       "cat": {
         "gold": 2,
         "vehicle": 1081,
-        "fresh_mkt": 9,
+        "fresh_mkt": 10,
         "agri": 85,
         "factory": 219,
         "commerce": 77,
@@ -31141,14 +31141,14 @@
     },
     {
       "rel": 54.24,
-      "raw": 30648.2,
+      "raw": 30648.8,
       "cat": {
         "gold": 15,
         "vehicle": 5882,
         "fresh_mkt": 74,
         "agri": 272,
         "factory": 1581,
-        "commerce": 592,
+        "commerce": 593,
         "retail_general": 14927,
         "food_service": 22915,
         "school": 3346
@@ -31269,14 +31269,14 @@
     },
     {
       "rel": 95.62,
-      "raw": 54030.4,
+      "raw": 54031.6,
       "cat": {
         "gold": 294,
         "vehicle": 7379,
         "fresh_mkt": 187,
         "agri": 587,
         "factory": 2056,
-        "commerce": 1282,
+        "commerce": 1284,
         "retail_general": 30397,
         "food_service": 43620,
         "school": 7095
@@ -31989,14 +31989,14 @@
     },
     {
       "rel": 80.25,
-      "raw": 45347.3,
+      "raw": 45347.9,
       "cat": {
         "gold": 294,
         "vehicle": 6939,
         "fresh_mkt": 169,
         "agri": 561,
         "factory": 1900,
-        "commerce": 1031,
+        "commerce": 1032,
         "retail_general": 25189,
         "food_service": 34297,
         "school": 5933
