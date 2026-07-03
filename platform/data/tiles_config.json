@@ -10,8 +10,10 @@
     "note": "operator CDN (Cloudflare R2) hosting the 77 per-province <slug>_catchment.json Overture pulls (real building footprints, ~35MB each — too large for git). rayong-catchment.html falls back to <baseUrl>/<slug>_catchment.json when the local file is absent; a CDN miss degrades to the calm not-pulled notice."
   },
   "buildings": {
-    "pmtilesUrl": null,
+    "pmtilesUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev/buildings_rayong.pmtiles",
     "mvtUrl": null,
+    "coverageBbox": [100.860172, 12.478, 101.823, 13.195827],
+    "coverageNote": "RAYONG PILOT archive (89MB, 820k real Overture buildings; generated 2026-07-03 on the operator's desktop; verified: PMTiles magic + HTTP 206 range reads + CORS '*'). Scenes whose center falls outside coverageBbox fall back to curated catchments. When the national buildings.pmtiles run completes, point pmtilesUrl at it and REMOVE coverageBbox.",
     "minZoom": 9,
     "maxZoom": 15,
     "sourceLayer": "buildings",

@@ -61,16 +61,26 @@
       var DARK = opts.dark !== false;
       var clamp = function(v){ return Math.max(0, Math.min(255, Math.round(v))); };
       var RAMP = DARK ? [[44,38,32],[156,108,50],[238,182,86]]
-                      : [[190,172,140],[216,168,92],[234,194,96]];
+                      : [[132,120,104],[108,96,78],[84,72,56]];   // light ramp = curated taupe->umber (match the static scene)
       var rampAt = function(t){ var s=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2; var a=RAMP[s], b=RAMP[s+1];
         return [a[0]+(b[0]-a[0])*lt, a[1]+(b[1]-a[1])*lt, a[2]+(b[2]-a[2])*lt]; };
       var H_LO = 3, H_HI = 35;   // fixed band for streamed tiles (no global sort available)
+      var _loadedFired = false;  // fire opts.onLoaded ONCE, on the first tile that carries real features
 
       return new deck.TileLayer({
         id: 'pmtiles-bldg',
         minZoom: opts.minZoom || 9,
         maxZoom: opts.maxZoom || 15,
         tileSize: 512,
+        // tell the host page the stream is ACTUALLY delivering buildings (not just constructed).
+        // The page keeps its curated catchment on screen until this fires, so a failed/blocked
+        // stream (CDN down, esm.sh unreachable, empty coverage) can never blank the city.
+        onTileLoad: function(tile){
+          try{
+            var d = tile && (tile.content || tile.data);
+            if (!_loadedFired && d && d.length){ _loadedFired = true; if (opts.onLoaded) opts.onLoaded(); }
+          }catch(_){}
+        },
         // read + decode one tile from the PMTiles archive -> array of GeoJSON building features.
         getTileData: function(tile){
           var idx = (tile && tile.index) || tile;
@@ -103,9 +113,9 @@
               var h = heightOf(f.properties); var t = (h - H_LO) / (H_HI - H_LO); t = t<0?0:t>1?1:t;
               var m = rampAt(t); return [clamp(m[0]), clamp(m[1]), clamp(m[2]), DARK?236:214];
             },
-            getLineColor: DARK ? [28,22,14,210] : [196,176,140,120],
+            getLineColor: DARK ? [28,22,14,210] : [96,84,68,145],   // warm dark stroke (tiny footprints read as their stroke at city zoom)
             lineWidthMinPixels: 0.4,
-            material: { ambient:0.5, diffuse:0.34, shininess:10, specularColor:[0,0,0] }, // specular 0 -> no blow-out
+            material: false, // FLAT: no lighting term exists -> the real-GPU whiteout is impossible by construction
             parameters: { depthTest: true }, pickable: false
           });
         }

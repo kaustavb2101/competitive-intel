@@ -1206,16 +1206,26 @@ function streamBuildingLayer(){
   try{
     var cfg=(window.TILECFG&&TILECFG.buildings)||null;
     if(!cfg||!deck.MVTLayer)return null;
+    // COVERAGE GATE: the hosted archive may cover only part of the country (e.g. the Rayong pilot
+    // .pmtiles). Outside its bbox the archive has no tiles, so streaming would blank the scene —
+    // fall back to the curated catchment instead. coverageBbox = [W,S,E,N] in tiles_config.json;
+    // absent (national archive) -> stream everywhere.
+    var cb=cfg.coverageBbox||null;
+    if(cb&&cb.length===4&&CORE&&(CORE.lng<cb[0]||CORE.lng>cb[2]||CORE.lat<cb[1]||CORE.lat>cb[3]))return null;
     var url=cfg.mvtUrl||null;                 // prefer the native {z}/{x}/{y}.pbf path (zero extra deps)
     if(!url){                                  // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
       if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
-        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:darkMode()});
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:darkMode(),
+          // fires on the FIRST tile that carries real features: only then may the curated
+          // catchment hand over to the stream (see render() — prevents a blank city when the
+          // CDN/esm.sh is slow, blocked, or the archive has no coverage here).
+          onLoaded:function(){ if(!window._STREAM_READY){ window._STREAM_READY=true; try{render();}catch(e){} } }});
       return null;
     }
     var DARK=darkMode(), LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
     var RAMP=DARK?[[44,38,32],[156,108,50],[238,182,86]]
-                 :[[190,172,140],[216,168,92],[234,194,96]];
+                 :[[132,120,104],[108,96,78],[84,72,56]];   // light ramp = the curated layer's taupe->umber (was a much lighter sand set that read washed-out next to it)
     var H_LO=5, H_HI=90;                        // widened band for streamed tiles: low-rise stays sand, gold reserved for real towers (activates when tiles are hosted)
     var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
       return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -1229,10 +1239,12 @@ function streamBuildingLayer(){
       getElevation:function(f){var h=hOf(f);return h*(h<10?1.4:h<22?2.4:h<45?3.4:4.2);},  // 4-band: low-rise grounded, real towers punch up
       getFillColor:function(f){var h=hOf(f);var t=(h-H_LO)/(H_HI-H_LO);t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
-      getLineColor:LIGHT?[196,176,140,120]:(DARK?[28,22,14,210]:[120,110,90,150]),
+      getLineColor:LIGHT?[96,84,68,145]:(DARK?[28,22,14,210]:[120,110,90,150]),   // warm dark stroke: tiny footprints ARE their stroke at city zoom
       lineWidthMinPixels:0.4,
-      material:{ambient:0.50,diffuse:0,shininess:10,specularColor:[0,0,0]},  // ambient 0.72->0.50: buildings' LIGHT taupe base × high ambient blew to white on real GPUs (pins use 0.42 and stayed fine); specular/diffuse ZEROED so no directional blow-out
+      material:false,   // FLAT like the curated layer: no lighting term exists -> whiteout impossible on any GPU
       shadowEnabled:SHADOWS_ON,
+      onTileLoad:function(t){try{var d=t&&(t.content||t.data);
+        if(d&&d.length&&!window._STREAM_READY){window._STREAM_READY=true;render();}}catch(e){}},  // same first-real-tile handover as the PMTiles path
       parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
     });
@@ -1246,7 +1258,10 @@ function render(){
   const L=[baseLayer(), ...groundLayers(), ...extraLayers()];
   // streamed national building tiles (null unless operator-hosted tiles are configured). When
   // present, they SUPERSEDE the curated catchment buildings (avoids double-draw / z-fighting).
-  const STREAMB=streamBuildingLayer();
+  // CURATED-FIRST: a curated catchment (the rich, un-decimated per-province pull) always beats the
+  // streamed tile pyramid, whose mid-zoom levels are tippecanoe-decimated. The stream is the GAP
+  // FILLER for provinces with no curated buildings (local + CDN miss) once national tiles are hosted.
+  const STREAMB=(BUILDINGS&&BUILDINGS.length)?null:streamBuildingLayer();
   // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
@@ -1328,7 +1343,10 @@ function render(){
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
   if(STREAMB)L.push(STREAMB);   // streamed national tiles render in the building slot...
-  if(!STREAMB)L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
+  // Curated catchment stays on screen until the stream has PROVEN itself (first real tile ->
+  // _STREAM_READY). A constructed-but-dead stream layer (blocked CDN, no coverage, lib failure)
+  // must never blank the city.
+  if(!(STREAMB&&window._STREAM_READY))L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
     getPolygon:b=>b.p,
     // exaggerate height non-linearly: low-rise stays grounded, mid/tall get stretched so the skyline
     // separates. Visual only — getElevation never writes back to b.h.
