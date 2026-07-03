@@ -57,10 +57,21 @@ It does three things:
 3. *(optional)* also builds a folder of tiles (`tiles/{z}/{x}/{y}.pbf`) for static hosts
    that can't serve `.pmtiles`.
 
-> 💾 **Honest about size:** national buildings can be **many gigabytes** to download and
-> can take a while. If you want to test first, open `RUN_TILES.sh` and replace the big
-> `--bbox=...` with **one region's** bbox (e.g. just around Bangkok or Rayong), run it,
-> check it looks right, then do the full national pull. Everything else stays the same.
+> 💾 **Honest about size:** the national geojsonseq download is **~15–18 GB** (~30–35M real
+> Overture footprints at ~500 bytes each); the finished `buildings.pmtiles` is **~1.5–3 GB**.
+> The pull streams (constant memory — it will not OOM); it is **disk + time** bound (~20 min
+> download + ~20–40 min tippecanoe on a normal laptop). Make sure you have ~40 GB free disk.
+>
+> **Want to test first? Generate a small ONE-province plan** instead of hand-editing the bbox:
+> ```
+> python3 pipeline/build_building_tiles.py --province rayong
+> bash pipeline/tiles_out/RUN_TILES_rayong.sh
+> ```
+> This writes `RUN_TILES_rayong.sh` (its outputs are named `buildings_rayong.*` so they never
+> clobber the national ones). A full province is tiny — Rayong is ~0.8M buildings / ~400 MB /
+> ~30 s to download. Upload `buildings_rayong.pmtiles`, point `buildings.pmtilesUrl` at it,
+> confirm one province renders, then run the full national plan. `--province` accepts a slug,
+> English, or Thai name (e.g. `rayong`, `Bangkok`, `เชียงใหม่`).
 
 ### Step 3 — host it and tell the frontend where it is
 
@@ -70,14 +81,24 @@ It does three things:
    - **AWS S3** (+ CloudFront)
    - **Vercel Blob**
 2. Copy the **public URL** of the uploaded file.
-3. Paste it into `platform/data/tiles_config.json` so the map can read it, e.g.:
+3. Paste it into `platform/data/tiles_config.json`. The frontend reads the **nested**
+   `buildings.pmtilesUrl` key (NOT a flat `buildings_pmtiles`), so set it exactly like this
+   (only the URL changes — leave the other keys):
    ```json
-   {
-     "buildings_pmtiles": "https://YOUR-CDN/buildings.pmtiles"
+   "buildings": {
+     "pmtilesUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev/buildings.pmtiles",
+     "mvtUrl": null,
+     "minZoom": 9,
+     "maxZoom": 15,
+     "sourceLayer": "buildings",
+     "heightProperty": "height",
+     "attribution": "© Overture Maps Foundation"
    }
    ```
-   *(If you used the `tiles/` folder instead, point at that folder's base URL — the map
-   team will tell you the exact key to use.)*
+   *(If you used the `tiles/` folder instead of the single `.pmtiles`, set
+   `buildings.mvtUrl` to that folder's `{z}/{x}/{y}.pbf` template and leave `pmtilesUrl`
+   null — the frontend prefers `mvtUrl` when both are set. Avoid the `tiles/` folder for the
+   FULL national pull: it is millions of files. For R2, host the single `buildings.pmtiles`.)*
 
 That's it. The map's 3D building layer will start streaming real buildings nationwide.
 
