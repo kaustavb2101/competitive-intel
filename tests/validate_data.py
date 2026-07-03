@@ -2270,6 +2270,50 @@ def check_catchment_poi():
         ok("catchment_poi points [lat,lng] in Thailand bbox (%d points, %d types)" % (n_pts, len(poi)))
 
 
+def check_competitor_census():
+    # MERGED measured competitor census (Google ∪ Overture, deduped) — what the 3D scene loads.
+    # Optional file: SKIP-PASS when absent (run build_competitor_census.py to populate).
+    hdr("competitors_census.json (optional)")
+    if not exists("competitors_census.json"):
+        ok("competitors_census.json absent — skipped (optional; run build_competitor_census.py)")
+        return
+    try:
+        d = load("competitors_census.json")
+    except Exception as e:
+        fail("competitors_census.json loads", repr(e))
+        return
+    ok("competitors_census.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("source") \
+            or not isinstance(meta.get("counts"), dict):
+        fail("competitors_census meta/provenance present (generated_by + source + counts)",
+             "meta missing generated_by/source/counts")
+        return
+    ok("competitors_census meta/provenance present (generated_by + measured-union source + counts)")
+
+    items = d.get("items")
+    if not isinstance(items, list) or not items:
+        fail("competitors_census has a non-empty 'items' list", "got %s" % type(items).__name__)
+        return
+    # every rival: known brand, lat/lng inside the Thailand bbox (measured, can't leave the country).
+    KNOWN = {"Muangthai", "Srisawad", "Tidlor", "Heng", "Krungsri"}
+    bad = []
+    for i, it in enumerate(items):
+        if not isinstance(it, dict):
+            bad.append("#%d not an object" % i); continue
+        la, ln = it.get("lat"), it.get("lng")
+        if it.get("brand") not in KNOWN:
+            bad.append("#%d unknown brand %r" % (i, it.get("brand")))
+        if not (is_finite_number(la) and is_finite_number(ln)
+                and 5.0 <= la <= 21.0 and 97.0 <= ln <= 106.0):
+            bad.append("#%d coords outside Thailand bbox: %r,%r" % (i, la, ln))
+    if bad:
+        fail("competitors_census rivals sane (known brand, coords in Thailand bbox)", first_n(bad, 8))
+    else:
+        ok("competitors_census rivals sane (%d rivals, known brands, coords in bbox)" % len(items))
+
+
 # ---------------------------------------------------------------------------
 # PROVENANCE GATE (data-mandate enforcement).
 #
@@ -2655,6 +2699,7 @@ def main():
     check_macro_exposure(n)
     check_lead_sites(n)
     check_catchment_poi()
+    check_competitor_census()
     check_provenance()
     check_index_alignment(n)
     check_branches_fingerprint(branches)

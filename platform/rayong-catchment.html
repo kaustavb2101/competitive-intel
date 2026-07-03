@@ -1941,10 +1941,12 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
    // Both load best-effort; absent => the "who works nearby" panel keeps its estimated proxy.
    opt('data/branch_occupations.json'), opt('data/branches.json'),
-   // MEASURED national competitor census (Google Places) + the ESTIMATED-composite district
-   // opportunity score. Both nationwide; this page filters them to the current city bbox so rivals
-   // appear IN the scene even for cities without a curated per-province competitor file (e.g. Bangkok).
-   opt('data/competitors_national.json'), opt('data/opportunity_score.json'),
+   // MEASURED national competitor census + the ESTIMATED-composite district opportunity score. Both
+   // nationwide; this page filters them to the current city bbox so rivals appear IN the scene even
+   // for cities without a curated per-province competitor file (e.g. Bangkok). Prefer the MERGED
+   // census (Google ∪ Overture, deduped — ~4,400 measured rivals); fall back to the Google-only file.
+   opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
+   opt('data/opportunity_score.json'),
    // operator-configured CDN config (already fetched above) — kept in the same array slot so the
    // a[13] consumer below is unchanged.
    Promise.resolve(TILECFG),
