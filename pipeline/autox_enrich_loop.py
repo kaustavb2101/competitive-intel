@@ -48,8 +48,12 @@ OSM_LAYERS = {
 # OAE crop production (national trend) CKAN package ids
 OAE_CROPS = {"rice":"dataoae1104","rubber":"dataoae1404","maize":"dataoae1204",
              "cassava":"ปริมาณการผลิตมันสำปะหลัง","oilpalm":"ปริมาณการผลิตปาล์มน้ำมัน"}
-# World Bank Pink Sheet (all commodities incl. livestock/fisheries/forestry/gold)
-PINKSHEET = "https://thedocs.worldbank.org/en/doc/18675f1d1639c7a34d463f59263ba0a2-0050012025/related/CMO-Historical-Data-Monthly.xlsx"
+# World Bank Pink Sheet (all commodities incl. livestock/fisheries/forestry/gold).
+# The download lives behind a per-release doc-hash URL that changes every month, so we
+# SCRAPE the current CMO-Historical-Data-Monthly.xlsx link off the landing page and only
+# fall back to this last-known hash when the scrape fails (2026M06 vintage as of pull).
+PINKSHEET_PAGE = "https://www.worldbank.org/en/research/commodity-markets"
+PINKSHEET = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
 WB_COMMODITIES = {  # column name -> (label, crop/segment region weights N/I/C/S, stress sign)
  "Rice, Thai 5%":"rice","Rubber, RSS3":"rubber","Palm oil":"palm","Sugar, world":"sugar","Maize":"maize",
  "Beef **":"beef","Chicken **":"chicken","Fishmeal":"fishmeal","Shrimps, Mexican":"shrimp",
@@ -110,10 +114,25 @@ def stage_osm(force, log):
             layers[name]=json.load(open(path)); log[name]="stale-kept"
     return layers
 
+def pinksheet_url(log):
+    """Scrape the current monthly-xlsx doc-hash link off the WB landing page;
+    fall back to the last-known hash (PINKSHEET) when the scrape fails."""
+    import re
+    try:
+        html=get(PINKSHEET_PAGE,60).decode("utf-8","ignore")
+        m=re.findall(r'https?://[^\s"\'<>]*CMO-Historical-Data-Monthly\.xlsx',html)
+        if m:
+            log["pinksheet_url"]=f"scraped {m[0]}"
+            return m[0]
+        log["pinksheet_url"]="scrape-empty; last-known hash"
+    except Exception as e:
+        log["pinksheet_url"]=f"scrape-err {e}; last-known hash"
+    return PINKSHEET
+
 def stage_commodities(force, log):
     path=os.path.join(CACHE,"pinksheet.xlsx")
     if force or not fresh(path,15):
-        try: open(path,"wb").write(get(PINKSHEET,120)); log["pinksheet"]="pulled"
+        try: open(path,"wb").write(get(pinksheet_url(log),120)); log["pinksheet"]="pulled"
         except Exception as e: log["pinksheet"]=f"err {e}"
     try:
         import openpyxl
