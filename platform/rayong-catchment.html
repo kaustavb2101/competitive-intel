@@ -2222,14 +2222,18 @@ function buildCascade(){
     const list=IDX?IDX.filter(p=>p.region===r):[{slug:'rayong',th:'ระยอง',en:'Rayong'}];
     list.sort((a,b)=>(b.branches||0)-(a.branches||0));
     // every province with at least one branch is selectable; 0-branch provinces (nothing to drill into) disabled.
-    prov.innerHTML=list.map(p=>{
+    const opts=list.map(p=>{
       const enabled=(p.branches||0)>0 || p.slug===CITY;
       const lbl=`${p.en||p.th} (${p.branches||0})`;
       return `<option value="${p.slug}" ${enabled?'':'disabled'}>${lbl}</option>`;
     }).join('');
-    // prefer the active city, else Rayong, else leave the first
-    if(list.some(p=>p.slug===CITY))prov.value=CITY;
-    else if(list.some(p=>p.slug==='rayong'))prov.value='rayong';
+    // When the ACTIVE city is in this region, pre-select it. When it ISN'T (the user switched region),
+    // lead with a placeholder so ANY province pick fires onchange -> navigates. Otherwise the top
+    // province auto-selects but never loads, and re-picking the same shown value fires no change event
+    // (the "I picked a province but the map didn't load" bug on mobile).
+    const cityHere=list.some(p=>p.slug===CITY);
+    prov.innerHTML=(cityHere?'':'<option value="" selected>— select a province to load —</option>')+opts;
+    if(cityHere)prov.value=CITY;
     fillBranch();
   }
   function fillBranch(){
@@ -2258,7 +2262,7 @@ function buildCascade(){
   br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
   fillProv();
   const note=document.getElementById('cscNote');
-  if(note)note.textContent='Region › province › branch — pick a branch to fly in. Switch province to load its 3D scene.';
+  if(note)note.textContent='Region › province › branch. Pick a province to load its 3D scene, then a branch to fly in.';
 }
 
 /* ---------- POI legend (swatch + label + count) — single source of truth = POI_COLORS; click toggles the layer ---------- */
