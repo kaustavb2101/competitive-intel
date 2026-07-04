@@ -209,10 +209,22 @@ def main():
     places, buckets = src["places"], src["buckets"]
     drift = False
     for city in cities:
-        payload = build_city(city, places, buckets)
+        # A committed <city>_places.json may have been built in MAX-DENSITY-AROUND-BRANCHES mode
+        # (meta.branch_catchment_km). Reproduce it the SAME way so the gate stays byte-exact —
+        # otherwise the default bbox-clip+cap builder would "drift" against a full-density file.
+        outp = os.path.join(DATA, city + "_places.json")
+        km = None
+        if os.path.exists(outp):
+            try:
+                km = json.load(open(outp, encoding="utf-8")).get("meta", {}).get("branch_catchment_km")
+            except (ValueError, OSError):
+                km = None
+        if km:
+            payload = build_province(city, places, buckets, km)
+        else:
+            payload = build_city(city, places, buckets)
         if payload is None:
             continue
-        outp = os.path.join(DATA, city + "_places.json")
         new = dumps(payload)
         if a.check:
             cur = open(outp, encoding="utf-8").read() if os.path.exists(outp) else ""
