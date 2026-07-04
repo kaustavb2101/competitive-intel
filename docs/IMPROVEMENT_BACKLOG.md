@@ -376,6 +376,19 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (8) — AUDIT: closed the two remaining unsourced-catchment provenance gaps
+  (`docs/DATA_PROVENANCE.md` R2/R3).** `rayong_catchment.json` and `chiang-mai_catchment.json`
+  (180,000 real Overture building footprints each, commits `9482b0e`/`373b4f0`) shipped with
+  **zero embedded `meta`** — source was known (git history) but a reader of the file couldn't tell.
+  Added a real `meta` block to both (city/n_bldg/source/note/committed_in, same style as the
+  already-provenanced `bangkok_catchment.json`) — zero building/geometry values changed, no
+  fabrication (`n_bldg`/commit facts verified against `git log` before writing). Also caught that
+  `bangkok_catchment.json`'s register row was itself stale (claimed "no source" when the file
+  already has `meta.source`) — corrected the doc instead of the data. `PROVENANCE_EXEMPT` in
+  `tests/validate_data.py` tightened (removed 2 entries that no longer need a blanket exemption);
+  provenance gate now reads 276 sourced / 90 exempt (was 274/92). Gate: 47/0, `validate_data.py`
+  421/421 (unchanged pass count — provenance-label fix, not a new check). `slim_catchment.py --check`
+  confirmed unaffected. Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-04 (8) entry).
 - **2026-07-04 (7) — AUDIT: `docs/DATA_SOURCES.md` + `docs/DATA_PROVENANCE.md` quoting the
   pre-refresh (stale) World Bank Pink Sheet vintage, corrected to the already-committed 2026M06
   data.** No data value changed — both docs were still asserting Dec-2025 figures (rice −19.5%, gold

@@ -4,6 +4,83 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-04 (8) — AUDIT: closed the two remaining unsourced-catchment provenance gaps flagged in `docs/DATA_PROVENANCE.md`'s risk register (R2/R3)
+
+**Task type:** AUDIT. `/workspace/watcher` [TMLI blueprint] was not present this cycle. A RE-DERIVE
+pass first confirmed the working tree was already fully in sync: `bash tests/run.sh check` on a
+clean pull of `claude/new-session-wto26j` — 47 passed, 0 failed, `validate_data.py` 421/421, no
+drift. With nothing to re-derive and no cross-repo TMLI pull possible (no watcher checkout), moved
+to an AUDIT pass over `docs/DATA_PROVENANCE.md`'s own RISK REGISTER (§3) — the standing list of
+"provenance gaps to review" the project already tracks honestly.
+
+**What was found.** Two of the three "MEDIUM" register items (R2/R3) were real, closeable gaps —
+numeric 3D-scene building-footprint layers shipping with **zero embedded provenance**, unlike every
+other `platform/data` layer:
+- `platform/data/rayong_catchment.json` — 180,000 building footprints (`{"buildings":[...],
+  "center":{...}}`, **no `meta` key at all**). Confirmed via `git log` this is a real Overture pull
+  (commit `9482b0e`, "Rayong catchment: province-wide 180k-building pull") — the source was always
+  known, just never recorded in the file itself.
+- `platform/data/chiang-mai_catchment.json` — same shape, 180,000 buildings, **no `meta` key**, and
+  wasn't even listed in `DATA_PROVENANCE.md`'s table (a second, smaller gap: the register itself was
+  incomplete). Confirmed via `git log`: commit `373b4f0`, "Chiang Mai 3D catchment: 180k-building
+  Overture pull (web-sized)... 2.66M raw features capped to the dense core."
+- Checked the third register item, `bangkok_catchment.json`, against the actual committed file
+  (not just the doc's claim) — the doc said "meta has city/n_bldg/floor_area_m2 but no source", but
+  the file **already carries `meta.source`** ("Overture Maps buildings (memory-safe streaming pull,
+  6 strips, reservoir cap 180000)"). The register entry itself was stale, describing a state from
+  before an earlier (undocumented) fix. No action needed on the data; corrected the doc instead.
+
+**Fix applied (provenance metadata only — zero building/geometry values touched, no fabrication):**
+- Added a `meta` block to `rayong_catchment.json` and `chiang-mai_catchment.json`, mirroring the
+  exact style already used by `bangkok_catchment.json`: `city`, `n_bldg` (the real, verified 180,000
+  count — matches `pull_overture_buildings.py`'s documented `--max-buildings 180000` default and the
+  commit messages exactly), `source` (names the puller script + cap, real and verifiable), `note`
+  (states plainly that footprints are MEASURED/Overture but heights are ESTIMATED from type +
+  footprint area via `bake_catchment_heights.py` where Overture has no height tag — the same honest
+  caveat the UI already carries), and `committed_in` (the exact commit hash, so a future reader can
+  verify against `git log` themselves rather than trust the string). **Did NOT invent a `seen`
+  (raw-features-before-cap) figure for either file** the way `bangkok_catchment.json`'s meta has one
+  — that number isn't recorded anywhere in the commit history for Rayong, and Chiang Mai's commit
+  message states "2.66M raw features" which I DID cite verbatim in the `note` field (traceable to
+  commit `373b4f0`), but did not promote to a structured `seen` field since the commit message's
+  number is prose, not a self-reported build-time tally the way Bangkok's `seen:3105076` was.
+- Regenerated `platform/data/provenance.json` (`python3 build_provenance.py`) so the census picks up
+  the two newly-provenanced files — `unlabelled_files` count dropped from including these two entries
+  (confirmed via diff: both no longer appear in `unlabelled_files`).
+- `tests/validate_data.py`'s `PROVENANCE_EXEMPT` list: removed `rayong_catchment.json` and
+  `chiang-mai_catchment.json` (they now pass `check_provenance()`'s substantive `_has_provenance()`
+  check on their own merits — no longer need the blanket geometry-layer exemption); corrected the
+  stale `bangkok_catchment.json` inline comment. Gate's own count moved from "274 sourced / 92
+  documented-exempt" to **"276 sourced / 90 documented-exempt"** (366 scanned, unchanged) — a real
+  tightening, not just a relabelling, since two fewer files now rely on a broad exemption instead of
+  carrying their own provenance string.
+- `docs/DATA_PROVENANCE.md`: updated the §1 rows for all three catchment files (rayong "FIXED", the
+  stale bangkok claim corrected in place, chiang-mai added to the table for the first time) and
+  closed out R2/R3 in the §3 risk register (struck through, marked "Done", each pointing back to this
+  entry).
+
+**Verification.**
+- `python3 pipeline/build_provenance.py --check` — reproduces byte-exact after the regen.
+- `python3 pipeline/slim_catchment.py --check` — still `[ok]` for both `rayong_catchment.json` (32.6
+  MB) and `bangkok_catchment.json` (28.8 MB); the new `meta` key sits after `buildings`/`center` in
+  file order and `slim_payload()`'s `dict(d)` preserves arbitrary top-level keys verbatim, so adding
+  `meta` doesn't disturb the slim-canonical-form invariant (confirmed, not assumed).
+- `bash tests/run.sh check` — 47 passed, 0 failed (`validate_data.py` 421/421, unchanged pass count —
+  this was a provenance-label change, not a new numeric check). `node --check platform/app.js` clean.
+- Code-path check (no headless WebGL render run this cycle — pure metadata addition, no page JS
+  touched): grepped every consumer of `<slug>_catchment.json` in `rayong-catchment.html` and
+  `branch-explorer.html` — all access is via named keys (`CA.buildings`, `CA.center`, `ca.buildings`),
+  never positional or `Object.keys().length`-based, so an added `meta` key cannot affect rendering.
+  `rayong_catchment.json`/`chiang-mai_catchment.json` building count/order/content is byte-identical
+  before/after (diffed: only the appended top-level `meta` key changed).
+
+**Source:** `git log` on both files (commits `9482b0e`, `373b4f0`) + `pipeline/pull_overture_buildings.py`'s
+own `--max-buildings 180000` default (cross-checked against the exact 180,000 buildings both files
+carry) + the existing `bangkok_catchment.json` meta as the style precedent. No external pull performed
+this cycle — this is a provenance-labelling fix over already-committed, already-real geometry data.
+
+---
+
 ## 2026-07-04 (7) — AUDIT: two docs quoting the pre-refresh (stale) World Bank Pink Sheet vintage, corrected to match the already-committed 2026M06 data
 
 **Task type:** AUDIT (provenance/documentation sweep — no `platform/data` or `source-data` value
