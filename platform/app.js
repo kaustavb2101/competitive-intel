@@ -2924,7 +2924,8 @@ function drawSiegeTable(){
     `<th class="h-risk" title="MEASURED — rival branches within 2 km (merged competitor census)">Rivals ≤2 km</th>`+
     `<th title="MEASURED — rival branches within 5 km">≤5 km</th>`+
     `<th title="MEASURED — the closest rival brand and its distance (haversine)">Nearest rival</th>`+
-    `<th title="MEASURED — which brands hold the 2 km ring (brand · count)">Who surrounds it</th></tr>`+
+    `<th title="MEASURED — which brands hold the 2 km ring (brand · count)">Who surrounds it</th>`+
+    `<th class="no-print">3D</th></tr>`+
     rows.map((o,i)=>{
       const by=(o.by2||[]).map(p=>`${p[0]} <span class="mono sub">${p[1]}</span>`).join(' · ');
       return `<tr>
@@ -2936,6 +2937,7 @@ function drawSiegeTable(){
         <td class="mono sub">${o.n5}</td>
         <td class="mono">${o.nb||'—'} <span style="color:var(--gold)">${o.nd} km</span></td>
         <td class="sub" style="font-size:11px">${by}</td>
+        <td class="no-print" style="white-space:nowrap">${branch3DLinks((typeof DATA!=='undefined'&&DATA)?DATA[o.i]:null,false)}</td>
       </tr>`;}).join('');
   if(ro){
     const t=rows[0], m=RIVP.meta||{};
@@ -3778,9 +3780,11 @@ function popupHTML(d){
   return `<div class="pop" style="max-height:62vh;overflow:auto">
     <div class="pn">${d.n}</div>
     <div class="pv">${d.v}${d.d?' · '+d.d:''} · ${d.r} · ${d.w} AutoX ≤10km</div>
-    <a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}"
-       style="display:block;text-align:center;margin:8px 0 2px;padding:7px;border-radius:7px;
-       background:var(--accent);color:#fff;text-decoration:none;font:700 12px 'IBM Plex Sans Thai'">🏙 Open 3D explorer · what's within 10 km</a>
+    ${(()=>{const slug=pl&&pl.slug; const bh=bldgCenterHref(slug,d.y,d.x);
+      const btn='display:block;text-align:center;padding:7px;border-radius:7px;text-decoration:none;font:700 12px \'IBM Plex Sans Thai\'';
+      const bldg=bh?`<a href="${bh}" style="${btn};background:var(--accent);color:#fff">🏙 3D buildings</a>`:'';
+      const expl=`<a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}" style="${btn};background:var(--accent);color:#fff">🔎 10 km explorer</a>`;
+      return `<div style="display:grid;grid-template-columns:${bh?'1fr 1fr':'1fr'};gap:6px;margin:8px 0 2px">${bldg}${expl}</div>`;})()}
     ${briefPopupHTML(d,sec,r)}
     ${occLeadsPopupHTML(d,sec,r)}
     ${leadsPopupHTML(d,sec,r)}
@@ -3887,13 +3891,36 @@ function renderBranchSort(){
 }
 function branchSortVal(d,k){ return k==='ind'?((d.k10&&d.k10.ind)||0) : k==='risk'?riskVal(d) : (d[k]||0); }
 function branchHref(d){return `branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}`;}
+/* LANE 3D-7 — road every branch reference INTO the 3D scenes. One icon set, one order
+   everywhere: 🏙 3D (Overture building scene, centred on the branch when lat/lng are known)
+   then 🔎 explorer (per-branch deck.gl scene). We only EMIT links here — the catchment side
+   reads the city/lat/lng/z params (lane 3D-4). Pure frontend, no new data. */
+function bldgCenterHref(slug,lat,lng){
+  if(!slug) return null;
+  let u='rayong-catchment.html?city='+slug;
+  if(lat!=null&&lng!=null) u+='&lat='+lat+'&lng='+lng+'&z=15';
+  return u+themeQS();
+}
+// slug for a branch's province via the shared PLOOK (measured province index); null-safe.
+function branchSlug(d){const pl=(typeof PLOOK!=='undefined'&&PLOOK)?PLOOK[d&&d.v]:null; return (pl&&pl.slug)||null;}
+// compact "🏙 3D · 🔎 explorer" row for a full branch record (needs d.y=lat, d.x=lng, d.v→slug).
+// stop=true adds stopPropagation so it doesn't also fire a parent row's onclick navigation.
+function branch3DLinks(d,stop){
+  if(!d) return '';
+  const s=stop?' onclick="event.stopPropagation()"':'';
+  const parts=[];
+  const b=bldgCenterHref(branchSlug(d),d.y,d.x);
+  if(b) parts.push(`<a href="${b}"${s} title="3D building scene — centred on this branch" style="text-decoration:none;color:var(--accent)">🏙 3D</a>`);
+  parts.push(`<a href="${branchHref(d)}"${s} title="Per-branch 3D explorer — what's within 10 km" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">🔎 explorer</a>`);
+  return parts.join('');
+}
 function renderBranches(){
   const q=($('#search').value||'').trim().toLowerCase();
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q)
     || ((PLOOK[d.v]&&PLOOK[d.v].en)?PLOOK[d.v].en.toLowerCase().includes(q):false));  // also match English province name (was Thai-only: 'rayong' returned 0)
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
-  $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th></tr>`+
+  $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th><th class="no-print">3D</th></tr>`+
     rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
@@ -3904,7 +3931,8 @@ function renderBranches(){
       <td class="mono" style="color:var(--gold)">${naNum(d.dwork)}</td>
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono" style="color:var(--collat)">${nsoNum(pl.informal)}</td>
-      <td class="mono sub">${d.w}</td></tr>`;}).join('');
+      <td class="mono sub">${d.w}</td>
+      <td class="no-print" style="white-space:nowrap">${branch3DLinks(d,true)}</td></tr>`;}).join('');
 }
 
 /* ---------- provinces selector ---------- */
@@ -3948,7 +3976,7 @@ function drawProv(){
      <td class="mono">${Math.round((p.vehicles||0)/1000)}k</td>
      <td class="mono" style="color:var(--collat)">${p.branches?Math.round((p.factories||0)/p.branches):0}</td>
      <td class="no-print sub" style="white-space:nowrap">
-       <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none">🏙 3D</a>
+       <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none;color:var(--accent)">🏙 3D</a>
        <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">▦ district</a>
      </td></tr>`;}).join('');
 }
@@ -4092,6 +4120,20 @@ function loadDecisionQueue(){
     .catch(()=>{DQUEUE=null;dqLoaded=true;return null;});
 }
 function dqEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+/* LANE 3D-7 — road each queue action INTO the 3D scene it references. defend/audit name a
+   specific branch → centre the building scene on it (found by exact name in DATA); expand/tighten
+   name a district/province → open that province's building scene. Null-safe: no slug/branch → ''. */
+function queue3DLink(it){
+  if(!it) return '';
+  if((it.type==='defend'||it.type==='audit') && typeof DATA!=='undefined' && Array.isArray(DATA)){
+    const b=DATA.find(d=>d&&d.n===it.name);
+    if(b){ const h=bldgCenterHref(branchSlug(b),b.y,b.x);
+      if(h) return ` <a href="${h}" title="3D building scene — centred on this branch" style="text-decoration:none">🏙 3D</a>`; }
+  }
+  const pl=(typeof PLOOK!=='undefined'&&PLOOK)?PLOOK[it.prov]:null;
+  if(pl&&pl.slug) return ` <a href="rayong-catchment.html?city=${pl.slug}${themeQS()}" title="3D building scene — ${dqEsc(pl.th||it.prov)}" style="text-decoration:none;color:var(--accent)">🏙 3D</a>`;
+  return '';
+}
 function renderHomeQueue(){
   const box=$('#cc-queue-body'); if(!box) return;
   if(!dqLoaded){ return; }                                   // skeleton stays until the fetch resolves
@@ -4106,7 +4148,7 @@ function renderHomeQueue(){
       `<span class="cc-qnum mono">${it.rank}</span>`+
       `<span class="cc-qchip q-${dqEsc(it.type)}">${dqEsc(it.type)}</span>`+
       `<div class="cc-qtxt">${dqEsc(it.act)}`+
-      ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a></span></div></div>`;
+      ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a>${queue3DLink(it)}</span></div></div>`;
   }).join('')+
   `<div class="cc-qfoot sub">Ranking is a stated editorial rule (defend &gt; audit &gt; tighten &gt; expand, then each layer's own magnitude) — see <span class="mono">decision_queue.json</span> meta. Defend rows are measured rival geometry; the rest are estimated screens, not measured outcomes.</div>`;
 }
