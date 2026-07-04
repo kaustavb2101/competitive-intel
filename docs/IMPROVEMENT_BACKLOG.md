@@ -89,7 +89,7 @@
       (Srisawad ~11%, MTC ~14%, Tidlor ~37%, Heng ~35%). *(med, S)*
 - [ ] **NSO census occupation distiller** scaffolding in `ingest_gov.py` (code only; drop-in when the
       data.go.th pull lands) — improves data availability. *(med, M)*
-- [ ] **Expand `validate_data.py`** coverage as new data layers land. *(med, S)*
+- [x] **Expand `validate_data.py`** coverage as new data layers land — DONE 2026-07-04 (3) (see below).
 - [x] **National map: dedicated "Unemployment ▲" district lens — DONE 2026-07-03** (new `unemp` lens
       in `platform/app.js`'s `LENS` registry, mirrors the household-DTI dot-lens pattern; reads
       `d._amp.unemployment_rate` off the existing amphoe join, own 1-decimal-percent legend tagged
@@ -268,8 +268,37 @@
       similar but wasn't independently screenshotted, so it inherits the fix by code-path but not by
       pixel-verification. *(LOW, trivial)*
 
+## Queue — follow-ups noticed 2026-07-04 (3)
+- [ ] **The Overture 14-bucket taxonomy (`factory`/`auto`/`retail`/…) is now hand-copied in at least
+      three places** — `build_national_places.py`/`build_scene_places.py` (via their shared
+      `source-data/occupation_places_named.json` `buckets` list), `build_occupations.py`/
+      `build_amphoe_occupations.py`'s branch/amphoe occupation shares, and now
+      `tests/validate_data.py`'s new `KNOWN_PLACE_BUCKETS` constant. Nothing currently asserts these
+      three copies stay in sync — a future taxonomy change (a 15th bucket, a rename) in the source
+      Overture pull could silently diverge from what the validator expects vs. what
+      `occupation_leads.json`/`branch_occupations.json` actually carry. Worth a single shared
+      bucket-list constant (or a cross-check in `validate_data.py` comparing `KNOWN_PLACE_BUCKETS`
+      against whatever bucket list `branch_occupations.json`'s meta declares) next time either
+      taxonomy is touched. *(LOW, S)*
+- [ ] **`_check_places_payload()` (new this cycle, `tests/validate_data.py`) and the existing
+      `check_catchment_poi()` validate near-identical shapes** (meta+label+points-in-bbox) but with a
+      swapped point order (`[lng,lat]` vs `[lat,lng]`) and slightly different meta-key names — same
+      duplicate-helper smell already queued for `drawAmphoeChoropleth`/`drawProvinceChoropleth` on the
+      frontend side (2026-07-03 (6)/(9)); a shared `_check_point_layer(payload, order=...)` could
+      collapse both. *(LOW, S, pure refactor)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (3) — VALIDATOR: `national_places.json` + `<city>_places.json` Overture "dense POI"
+  layers gained data-integrity coverage.** These files (`build_national_places.py`/
+  `build_scene_places.py`, shipped by concurrent 3D-lane workflows) had a determinism gate in
+  `tests/run.sh` but zero sanity check in `validate_data.py`. New `check_national_places()` /
+  `check_scene_places()` validate meta/bucket-taxonomy/bbox/point-order/point-count, SKIP-pass when
+  absent. Caught a false-positive in development (module's tighter `TH_LAT_MIN=5.5` bbox constant
+  wrongly flagged ~1,800 genuine near-border factory points at lat 5.40–5.47 as "wrong order"; fixed
+  by using the same wider 5.0–21.0 bbox already used by `check_catchment_poi`/`check_lead_sites`).
+  Pure test-file change, no `platform/data`/`pipeline` touched. Gate 45/0, `validate_data.py` 259/259
+  (+2 checks). Full writeup: `docs/PROGRESS_LOG.md` (2026-07-04 (3) entry).
 - **2026-07-04 (2) — AUDIT: `household-debt.js`'s `debtToIncome`/`stressIndex` mislabelled MEASURED,
   actually UNVERIFIED.** No CKAN/BOT resource id cited (unlike every other TMLI-vendored layer);
   values hand-grouped under narrative headers (same smell as the 2026-07-02 GPP catch); diverges

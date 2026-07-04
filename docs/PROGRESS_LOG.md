@@ -5,6 +5,34 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 (3) — VALIDATOR: coverage for the new Overture "dense POI" layers
+
+Loop cycle. Backlog item: "Expand `validate_data.py` coverage as new data layers land." The recent
+concurrent 3D-lane workflows shipped `national_places.json` (`build_national_places.py`, nationwide
+grid-thinned Overture places, the fallback density layer for every province's 3D scene) and per-city
+`<city>_places.json` (`build_scene_places.py`, bbox-clipped full-density Overture places for
+Rayong/Bangkok/Chiang Mai) with a determinism gate in `tests/run.sh` but **zero data-integrity check**
+in `validate_data.py` — a bucket-taxonomy typo, a `[lat,lng]` order slip, or a `meta.count` drift over
+those ~340k committed points could have shipped silently.
+
+Added `check_national_places()` + `check_scene_places()` (shared `_check_places_payload()` helper) to
+`tests/validate_data.py`: validates `meta.label`/`meta.buckets` against the known 14-bucket Overture
+taxonomy, per-city `bbox` presence, every point is `[lng,lat]` inside a Thailand+border-buffer bbox
+(97–106°E, 5–21°N — the same tolerance already used by `check_catchment_poi`/`check_lead_sites`, not
+the tighter branches-only `TH_LAT_MIN/MAX` consts, since the Overture bulk pull genuinely reaches
+points near the deep-south border e.g. Betong ≈5.4°N that the tighter bbox would have false-failed),
+and `meta.count` matches the actual point total. Both new checks SKIP-pass (not fail) when the
+optional file is absent, matching every other optional-layer check in the file.
+
+Caught and fixed one real false-positive during development: my first draft used the module-level
+`TH_LAT_MIN=5.5` constant and failed on ~1,800 genuine near-border factory points at lat 5.40–5.47;
+confirmed these are real Overture coordinates (not an order bug) and switched to the wider 5.0–21.0
+bound the codebase already uses for POI-shaped (as opposed to branch-shaped) checks.
+
+Pure test-file change — no `platform/data`/`pipeline` files touched, zero risk of shared-tree
+conflicts with the concurrent 3D-lane workflows. Gate: `tests/run.sh check` 45 passed/0 failed,
+`validate_data.py` 259/259 (2 new checks added this cycle).
+
 ## 2026-07-04 — UX: district (amp) lenses get the same choropleth dot-thinning as province lenses
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (9)): `styleMarkers()`'s dot-opacity thinning
