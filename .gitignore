@@ -57,3 +57,6 @@ pipeline/tiles_out/
 .env.txt
 **/.env
 **/.env.txt
+
+# crop-type geodata scout scratch — raw re-pullable rasters/zips (SPAM/HDX), never commit
+source-data/.crop_scout/
