@@ -104,6 +104,20 @@
         renderSubLayers: function(props){
           var data = props.data;
           if (!data || !data.length) return null;
+          // FRINGE MODE: drop features whose first vertex lies inside the curated core's bbox —
+          // the host page draws that area from its richer curated set; we fill everything else.
+          if (opts.excludeBbox && opts.excludeBbox.length === 4){
+            var eb = opts.excludeBbox;
+            data = data.filter(function(f){
+              try{
+                var c = f.geometry && f.geometry.coordinates;
+                var pt = c && (f.geometry.type === 'Polygon' ? c[0][0] : c[0][0][0]);
+                if (!pt) return true;
+                return !(pt[0] >= eb[0] && pt[0] <= eb[2] && pt[1] >= eb[1] && pt[1] <= eb[3]);
+              }catch(_){ return true; }
+            });
+            if (!data.length) return null;
+          }
           return new deck.GeoJsonLayer({
             id: props.id + '-geo',
             data: data,
