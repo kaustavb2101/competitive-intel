@@ -59,6 +59,8 @@ PLAUSIBLE_LO, PLAUSIBLE_HI, HEADLINE = 300, 600, 450
 DOWNSTREAM = [
     "build_competitor_coverage.py",
     "build_rival_density.py",
+    "build_rival_pressure.py",
+    "build_contested_pop.py",
     "build_opportunity_score.py",
     "build_exit_whitespace.py",
     "build_province.py",
