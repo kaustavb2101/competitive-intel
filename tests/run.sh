@@ -74,6 +74,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_amphoe_occupations.py --check >/dev/null 2>&1 ) && ok "build_amphoe_occupations.py --check" || bad "build_amphoe_occupations.py --check (amphoe_occupations.json drifted from overture_places.json)"
   ( cd "$PIPE" && python3 build_occupation_risk.py --check >/dev/null 2>&1 ) && ok "build_occupation_risk.py --check" || bad "build_occupation_risk.py --check (occupation_risk.json drifted from branch_occupations.json/crop_stress.json)"
   ( cd "$PIPE" && python3 build_poi_relevance.py --check >/dev/null 2>&1 ) && ok "build_poi_relevance.py --check" || bad "build_poi_relevance.py --check (poi_relevance.json drifted from branch_occupations.json/branches.json k10)"
+  ( cd "$PIPE" && python3 build_branch_workforce.py --check >/dev/null 2>&1 ) && ok "build_branch_workforce.py --check" || bad "build_branch_workforce.py --check (branch_workforce.json drifted from branch_occupations/branch_labor/crop_stress/spam2010)"
   ( cd "$PIPE" && python3 build_branch_density.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_density.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_branch_density.py --check (source-data/perimeter_counts.json absent — not data drift)"

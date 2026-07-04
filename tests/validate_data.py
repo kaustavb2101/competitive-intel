@@ -3782,6 +3782,7 @@ def check_index_alignment(n_branches):
 #   3. layers without the field (predating the stamp) SKIP-PASS with a note (graceful rollout).
 _FINGERPRINTED_LAYERS = (
     "branch_occupations.json",   # build_occupations.py
+    "branch_workforce.json",     # build_branch_workforce.py
     "branch_labor.json",         # build_branch_labor.py
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
