@@ -33,10 +33,12 @@ html[data-theme="light"] #sky{
  background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
             linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
  background-blend-mode:multiply,normal}
-html[data-theme="light"] #atmos{
- background:linear-gradient(180deg,rgba(0,0,0,0) 54%,rgba(190,206,232,.14) 78%,rgba(206,220,240,.26) 100%)}
+/* light "paper studio" — mirrors rayong-catchment's CURRENT light constants: NO cool atmos/vignette
+   fade (the reference is a warm printed poster with neither). The old cool gradients tinted the warm
+   paper bed cool at the bottom + rim (a measured hue inversion). Keep only a whisper warm-gray rim. */
+html[data-theme="light"] #atmos{ background:none }
 html[data-theme="light"] #vignette{
- background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 54%,rgba(40,52,80,.07) 80%,rgba(30,40,66,.16) 92%,rgba(24,34,58,.24) 100%)}
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 62%,rgba(150,146,138,.05) 84%,rgba(150,146,138,.11) 100%)}
 #bar{position:fixed;top:0;left:0;right:0;height:44px;z-index:50;display:flex;align-items:center;gap:12px;
  padding:0 14px;background:rgba(8,11,18,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
 #bar a{color:var(--mid);text-decoration:none;font:600 13px 'IBM Plex Sans Thai'}
@@ -209,6 +211,18 @@ html[data-theme="light"] .wbox .cap{color:#5A6477}
 html[data-theme="light"] .ot{color:#2C3444}
 html[data-theme="light"] .ot b{color:#11151F}
 html[data-theme="light"] .occ .bar{background:#e3e8f1}
+/* occupation-leads call list (named establishments + phone + distance, MEASURED Overture) */
+.lead{padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.lead:last-child{border-bottom:none}
+.lead .ln{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--txt)}
+.lead .ln .nm2{font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--hi)}
+.lead .ln .ds{font-family:'IBM Plex Mono';color:var(--mid);font-size:11px;flex:none}
+.lead .lb{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--dim);margin-top:1px}
+.lead .lb .bk{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lead .lb a{color:var(--accent);text-decoration:none;font-family:'IBM Plex Mono';font-size:11px;flex:none}
+html[data-theme="light"] .lead{border-bottom-color:rgba(16,22,40,.08)}
+html[data-theme="light"] .lead .ln{color:#2C3444}
+html[data-theme="light"] .lead .lb{color:#5A6477}
 /* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays DARK */
 html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
 html[data-theme="light"] #nav .nb{color:#11151F}
@@ -280,7 +294,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 </script>
 <div id="bar">
   <a href="index.html#map">← National</a>
-  <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span>
+  <span class="nm" id="bnm">Branch</span><span class="sub" id="bsub"></span><span class="sub" id="brival"></span>
 </div>
 <div id="sky"></div>
 <div id="map"></div>
@@ -484,7 +498,7 @@ function streamBuildingLayer(){
     }
     var LIGHT=lightMode();
     var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
-    var RAMP=LIGHT?[[190,172,140],[216,168,92],[234,194,96]]
+    var RAMP=LIGHT?[[193,184,167],[174,164,146],[120,107,90]]   // mirrors rayong-catchment RAMP_LIGHT: gray-beige mat a clear step below the cream bed
                   :[[44,38,32],[156,108,50],[238,182,86]];
     var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
       return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
@@ -498,8 +512,8 @@ function streamBuildingLayer(){
       getElevation:function(f){var h=hOf(f);return h*(h<10?1.5:h<22?2.1:2.8);},
       getFillColor:function(f){var h=hOf(f);var t=(h-3)/32;t=t<0?0:t>1?1:t;
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),LIGHT?214:236];},
-      getLineColor:LIGHT?[196,176,140,120]:[28,22,14,210], lineWidthMinPixels:0.4,
-      material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no view-dependent (orbit) white blow-out
+      getLineColor:LIGHT?[164,156,144,150]:[28,22,14,210], lineWidthMinPixels:0.4,
+      material:false,  // FLAT (whiteout rule): no lighting term -> a real GPU can never blow the fill to white
       shadowEnabled:SHADOWS_ON, parameters:{depthTest:true}, pickable:false,
       updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}
     });
@@ -558,7 +572,7 @@ function bldgHeight(tags,fa){            // measured tag if present, else estima
 // amber/ochre -> tall gold, so the skyline reads as a premium, dimensional cityscape. A sparing COOL
 // accent (blue, purple crown on the very tallest) punctuates the tallest decile only — never the body.
 const RAMP_DARK_BE=[[44,38,32],[156,108,50],[238,182,86]];      // taupe -> ochre -> gold
-const RAMP_LIGHT_BE=[[181,171,155],[150,138,120],[116,102,82]];  // warm mid-tone taupe->umber: clearly darker than the light ground so buildings can't wash to white on a bright GPU (matches rayong-catchment)
+const RAMP_LIGHT_BE=[[193,184,167],[174,164,146],[120,107,90]];  // mirrors rayong-catchment's CURRENT RAMP_LIGHT: gray-beige mat a CLEAR step below the cream bed [241,238,231] (~50 L gap = real figure-ground); umber/dark only at the landmark decile — the reference recipe (buildings render material:false, so fill IS the pixel)
 const PURP=[122,79,224], BLUE=[91,124,250];
 function rampBE(stops,t){const seg=t<.5?0:1,lt=t<.5?t*2:(t-.5)*2,a=stops[seg],b=stops[seg+1];
   return [a[0]+(b[0]-a[0])*lt,a[1]+(b[1]-a[1])*lt,a[2]+(b[2]-a[2])*lt];}
@@ -572,7 +586,9 @@ function heightColor(h){                  // warm ramp + sparing cool landmark a
 // DataProteins light path: warm sand->amber->gold context buildings; the tallest decile lifts toward
 // the cool collateral accent so the few landmarks read against the white Positron base.
 function heightColorLight(h){
-  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+  // HARD anti-white ceiling (226), mirroring rayong-catchment: with the building layer at
+  // material:false the fill IS the pixel, so capping the DATA guarantees no face approaches white.
+  const cl=v=>Math.max(0,Math.min(226,Math.round(v)));
   const t=Math.pow(Math.max(0,Math.min(1,h/40)),0.9);
   if(t>=0.78){const acc=t>=0.92?PURP:BLUE,g=rampBE(RAMP_LIGHT_BE,1),w=0.5;
     return [cl(g[0]*(1-w)+acc[0]*w),cl(g[1]*(1-w)+acc[1]*w),cl(g[2]*(1-w)+acc[2]*w),238];}
@@ -669,8 +685,11 @@ function layers(){
   if(!STREAMB)L.push(new deck.PolygonLayer({id:'bldg',data:buildings,extruded:true,wireframe:false,
     getPolygon:b=>b.p,getElevation:b=>b.h,
     getFillColor:b=>LIGHT?heightColorLight(b.h):heightColor(b.h),
-    stroked:true,getLineColor:LIGHT?[176,182,194,120]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
-    material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> no orbit blow-out
+    // light stroke = soft warm-gray (mirrors rayong-catchment [164,156,144]); at city zoom a Thai
+    // shophouse footprint is 1-4px so the stroke IS the visible building — a cool outline reads as a
+    // frosted white carpet, a warm one keeps the mat warm + defined.
+    stroked:true,getLineColor:LIGHT?[164,156,144,150]:[45,60,90,170],getLineWidth:1.6,lineWidthMinPixels:0.6,
+    material:false,  // FLAT (whiteout rule): no lighting term -> faces render at the (height-ramped, anti-white-capped) fill, GPU-independent
     parameters:{depthTest:true},transitions:{getElevation:600},
     shadowEnabled:SHADOWS_ON,pickable:true,
     updateTriggers:{getFillColor:[LIGHT],getLineColor:[LIGHT]}}));
@@ -973,9 +992,32 @@ async function loadPanel(){
     // ANSWER-FIRST: who to acquire + macro exposure (index-aligned layers, same join as the
     // occupation rollup above; both graceful — absent file / entry → block omitted, no fabrication).
     const esc=s=>String(s||'').replace(/"/g,'&quot;');
-    let leadsJ=null, macxJ=null;
+    let leadsJ=null, macxJ=null, occLeadsJ=null, rivalJ=null;
     try{ const rl=await fetch('data/branch_leads.json'); if(rl.ok) leadsJ=await rl.json(); }catch(e){}
     try{ const rm=await fetch('data/macro_exposure.json'); if(rm.ok) macxJ=await rm.json(); }catch(e){}
+    // occupation_leads.json (NAMED establishments + phone + distance, MEASURED Overture) and
+    // rival_pressure.json (MEASURED rival distances/counts) are both INDEX-ALIGNED to branches.json,
+    // so branches[idx] is this branch. Both graceful: absent file / entry → block omitted, no fabrication.
+    try{ const ro=await fetch('data/occupation_leads.json'); if(ro.ok) occLeadsJ=await ro.json(); }catch(e){}
+    try{ const rr=await fetch('data/rival_pressure.json'); if(rr.ok) rivalJ=await rr.json(); }catch(e){}
+
+    // --- Task 3: rival-pressure line in the header card (#brival) — MEASURED census geometry ---
+    const rvE=(rivalJ&&rivalJ.branches&&idx>=0)?rivalJ.branches[idx]:null;
+    const rvBrands=(rivalJ&&rivalJ.brands)||['Heng','Muangthai','Srisawad','Tidlor'];
+    const brivalEl=document.getElementById('brival');
+    if(brivalEl && rvE){
+      const dkm=v=>v<1?Math.round(v*1000)+'m':v.toFixed(1)+'km';
+      let bi=-1,bd=Infinity; (rvE.d||[]).forEach((dd,i)=>{ if(dd!=null&&dd<bd){bd=dd;bi=i;} });
+      const near=bi>=0?` · nearest ${rvBrands[bi]} ${dkm(bd)}`:'';
+      const siege=(rvE.n2!=null && rvE.n2>=3);
+      const tip=esc(`MEASURED rival pressure — big-4 competitor census (Heng/Muangthai/Srisawad/Tidlor). `
+        +`${rvE.n5} rivals within 5 km, ${rvE.n2} within 2 km${bi>=0?`; nearest ${rvBrands[bi]} at ${dkm(bd)}`:''}. `
+        +(siege?'SIEGE = ≥3 rivals within 2 km (price/LTV pressure on the doorstep). ':'')
+        +'Pure geometry over pulled coordinates — Heng is a sample (lower bound), so its distance is an upper bound.');
+      brivalEl.innerHTML=` · <span title="${tip}" style="cursor:help">Rivals ${rvE.n5} ≤5km · ${rvE.n2} ≤2km${near}</span>`
+        +(siege?` <b style="color:var(--agri);font-weight:800">SIEGE</b>`:'');
+      brivalEl.title='';
+    }
     let acqHtml='';
     const leadsE=(leadsJ&&leadsJ.branches&&idx>=0)?leadsJ.branches[idx]:null;
     if(leadsE&&leadsE.leads&&leadsE.leads.length){
@@ -1015,11 +1057,33 @@ async function loadPanel(){
         +(macxE.d?`<div class="note" style="margin-top:4px">Customers most exposed to: <b style="color:var(--hi)">${dom?dom.label:macxE.d}</b> (est). Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED — a relative ranking (chip order), not a measured default rate.</div>`:'');
     }
 
+    // --- Task 2: occupation-leads call list — the nearest NAMED establishments (by occupation) with
+    // published phone + distance, so staff know WHO to call near this branch. MEASURED Overture Places.
+    let occLeadsHtml='';
+    const olE=(occLeadsJ&&occLeadsJ.branches&&idx>=0)?occLeadsJ.branches[idx]:null;
+    if(olE&&Array.isArray(olE.L)&&olE.L.length){
+      const olBk=(occLeadsJ.buckets||[]);   // [{key,label}] — lead[0] indexes into this
+      // prefer the nearest establishments that PUBLISH a phone (an actual call list); if none carry a
+      // phone here, fall back to the nearest named places so the section is never empty when data exists.
+      const withPhone=olE.L.filter(L=>L&&L[2]).slice().sort((a,b)=>a[3]-b[3]).slice(0,6);
+      const pool=withPhone.length?withPhone:olE.L.slice().sort((a,b)=>a[3]-b[3]).slice(0,5);
+      const dkm2=v=>v<1?Math.round(v*1000)+'m':v.toFixed(1)+'km';
+      occLeadsHtml=`<h3>Nearest workplaces to call <span class="tag meas">measured · Overture</span></h3>`
+        +pool.map(L=>{
+          const bk=olBk[L[0]]||{}, nmL=esc(L[1]||'—'), ph=L[2]||'', d=+L[3]||0;
+          const phHtml=ph?`<a href="tel:${esc(ph)}">${esc(ph)}</a>`:`<span style="opacity:.7">no phone published</span>`;
+          return `<div class="lead"><div class="ln"><span class="nm2">${nmL}</span><span class="ds">${dkm2(d)}</span></div>`
+            +`<div class="lb"><span class="bk">${esc(bk.label||bk.key||'')}</span>${phHtml}</div></div>`;
+        }).join('')
+        +`<div class="note">Named establishments within 10 km whose employees are the title-loan customer base, nearest first. MEASURED Overture Places (a sample / lower bound — absence is not absence of a business; phones as published, may be stale).</div>`;
+    }
+
     $('#panel').innerHTML =
       `<h3>${best.n}</h3>
        <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
        <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
        ${acqHtml}
+       ${occLeadsHtml}
        ${macxHtml}
        <h3>District workforce (DIW · measured)</h3>
        <div class="pr"><span>Factories</span><b style="color:#E6B450">${fmt(best.dfac)}</b></div>
