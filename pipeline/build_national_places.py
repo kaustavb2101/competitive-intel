@@ -66,7 +66,12 @@ def main():
     if not os.path.exists(SRC):
         if os.path.exists(OUT):
             d = json.load(open(OUT, encoding="utf-8"))
-            assert "places" in d, "national_places.json malformed"
+            if "places" not in d:
+                # same CHECK FAIL / exit-1 convention as every other builder, instead of an
+                # uncaught AssertionError — a corrupted committed file should read like any
+                # other gate failure, not a crash (see build_branch_density.py's BucketDriftError).
+                print("CHECK FAIL: national_places.json malformed (missing 'places' key)", file=sys.stderr)
+                sys.exit(1)
         print("build_national_places.py: SKIP (occupation_places_named.json absent; committed output valid)")
         sys.exit(3)
     payload = build(json.load(open(SRC, encoding="utf-8")))

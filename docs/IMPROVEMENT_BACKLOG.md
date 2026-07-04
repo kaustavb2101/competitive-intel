@@ -305,13 +305,10 @@
       `perimeter_counts.json`. Gate 46/0.)
 
 ## Queue — follow-ups noticed 2026-07-04 (5)
-- [ ] **The bare-`assert`-on-malformed-data pattern fixed in `build_branch_density.py` this cycle
-      also exists in `build_national_places.py` (line ~69, `assert "places" in d`) and
-      `build_scene_places.py` (line ~104, `assert "places" in d and "bbox" in d`)** — same class of
-      issue: a malformed committed JSON would raise an uncaught `AssertionError` under `--check`
-      instead of a clean `CHECK FAIL`. Lower urgency than the one just fixed (these guard against a
-      corrupted file, not a plausible threshold-tuning typo), but worth the same treatment next time
-      either file is touched. *(LOW, trivial, pure refactor)*
+- [x] **The bare-`assert`-on-malformed-data pattern fixed in `build_branch_density.py` this cycle
+      also exists in `build_national_places.py`/`build_scene_places.py` — DONE 2026-07-04 (6)**
+      (both now print `CHECK FAIL: ... malformed` + exit 1 instead of an uncaught `AssertionError`;
+      zero behavior change on the happy/SKIP paths, verified by hand. Gate 46/0.)
 - [ ] **The "vendor numpy/shapely/rasterio into the sandbox's default setup" backlog item (below,
       still open) cannot be done FROM the improvement loop itself** — a session-start-hook /
       `.claude/hooks` change is agent self-configuration, out of scope for a platform-improvement
@@ -326,6 +323,23 @@
       which file it lives in. Worth a one-line convention note in `CLAUDE.md` (or a shared per-day
       counter) if this ever causes real confusion; no action needed today. *(LOW, trivial,
       speculative)*
+
+## Queue — follow-ups noticed 2026-07-04 (6)
+- [ ] **`_check_places_payload()`/`check_catchment_poi()` in `tests/validate_data.py` still validate
+      near-identical shapes with swapped point order and different meta-key names** (this is the
+      2026-07-04 (3) duplicate-helper note, still open) — now that BOTH `build_national_places.py`
+      and `build_scene_places.py` share the identical "malformed → CHECK FAIL" one-liner added this
+      cycle, a small shared `_fail_if_malformed(d, required_keys, label)` pipeline helper could also
+      collapse that duplication alongside the validator-side one. *(LOW, trivial, pure refactor)*
+- [ ] **`build_national_places.py`'s `GRID=0.02` national fallback density has never been visually
+      compared against a per-city `_places.json` at the same zoom** — worth a quick headless render
+      of a province WITHOUT a committed catchment file (relies on the national fallback) to confirm
+      the POI mat still reads as "dense" and not visibly sparser than Rayong/Bangkok/Chiang Mai's
+      per-city files, now that both builders share hardened malformed-data handling. *(LOW, S)*
+- [ ] **Vendor `numpy`/`shapely`/`rasterio` into the sandbox's default setup** remains the single
+      highest-value low-effort infra gap (see the existing entry above) — still needs a human/
+      out-of-loop session (session-start-hook or environment Dockerfile), not another loop cycle
+      retrying the same blocked path. *(LOW, S, needs a human/out-of-loop session)*
 
 ## Done (most recent first)
 - (loop will append here)

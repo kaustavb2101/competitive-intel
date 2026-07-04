@@ -5,6 +5,24 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 (6) — HYGIENE: `build_national_places.py`/`build_scene_places.py` no longer bare-`assert` on malformed committed data
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-04 (5)): both scripts' SKIP-pass path (bulk
+`occupation_places_named.json` input absent — the normal CI/sandbox state) re-validated the
+already-committed output file with a bare `assert "places" in d, ...`. A corrupted committed JSON
+would have raised an uncaught `AssertionError` traceback under `tests/run.sh check` instead of the
+clean `CHECK FAIL: ...` / exit-1 convention every other builder follows — the same class of gap
+`build_branch_density.py`'s `BucketDriftError` fixed last cycle (2026-07-04 (5) entry above).
+
+Fix: both scripts now check the condition explicitly and print `CHECK FAIL: ... malformed (missing
+'places'/'bbox')` to stderr + `sys.exit(1)` instead of asserting. Zero behavior change on the happy
+path (source still absent in this sandbox → both scripts still SKIP/exit-3 exactly as before,
+verified by hand). Pure `pipeline/` change, no `platform/data` file touched.
+
+Gate: `tests/run.sh check` 46/0, `validate_data.py` 265/265 (both unchanged — no data file
+modified). Verified `build_national_places.py --check` and `build_scene_places.py --check` both
+still print their original SKIP message and exit 3 in this sandbox (bulk source absent, as always).
+
 ## 2026-07-04 (5) — HYGIENE: `build_branch_density.py`'s bucket-tally self-check now fails clean
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-04 (4)): the drift check added when

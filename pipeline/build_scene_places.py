@@ -101,7 +101,11 @@ def main():
             outp = os.path.join(DATA, city + "_places.json")
             if os.path.exists(outp):
                 d = json.load(open(outp, encoding="utf-8"))
-                assert "places" in d and "bbox" in d, f"{city}_places.json malformed"
+                if "places" not in d or "bbox" not in d:
+                    # same CHECK FAIL / exit-1 convention as every other builder, instead of an
+                    # uncaught AssertionError (see build_branch_density.py's BucketDriftError).
+                    print(f"CHECK FAIL: {city}_places.json malformed (missing 'places'/'bbox')", file=sys.stderr)
+                    sys.exit(1)
         print("build_scene_places.py: SKIP (occupation_places_named.json absent; committed outputs valid)")
         sys.exit(3)
     src = json.load(open(SRC, encoding="utf-8"))
