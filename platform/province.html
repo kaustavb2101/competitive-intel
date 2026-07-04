@@ -757,7 +757,48 @@ function render(){
       updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[LIGHT]}}));
   }
   deckgl.setProps({layers:L,
-    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
+    onClick:(info)=>{const object=info&&info.object,layer=info&&info.layer;
+      if(layer&&layer.id==='branches'&&object){closeDistPop();selectBranch(object,false);return;}
+      if(layer&&layer.id==='districts'&&object){openDistPop(info);return;}
+      closeDistPop();}});
+}
+
+/* ---------- district -> city 3D-building camera handoff ----------
+   Clicking a district opens a small readout popup with a "🏙 3D buildings here" action that hands
+   off to the Overture building scene AIMED AT THIS DISTRICT'S CENTROID (not the province city core):
+   rayong-catchment.html?city=<slug>&lat=&lng=&z=13.5 — the lat/lng/z are read by that page's boot code. */
+function districtCentroid(f){
+  const g=f&&f.geometry; if(!g)return null;
+  let sx=0,sy=0,n=0;
+  const eat=ring=>{for(const pt of ring){if(pt&&pt.length>=2&&isFinite(pt[0])&&isFinite(pt[1])){sx+=pt[0];sy+=pt[1];n++;}}};
+  if(g.type==='Polygon'){ if(g.coordinates&&g.coordinates[0])eat(g.coordinates[0]); }
+  else if(g.type==='MultiPolygon'){ for(const poly of (g.coordinates||[])){ if(poly&&poly[0])eat(poly[0]); } }
+  return n?{lng:sx/n,lat:sy/n}:null;
+}
+function closeDistPop(){const el=document.getElementById('distpop');if(el)el.remove();}
+function openDistPop(info){
+  closeDistPop();
+  const f=info&&info.object, p=(f&&f.properties)||{}, c=districtCentroid(f);
+  if(!c)return;
+  const themeQS=(document.documentElement.dataset.theme==='light'?'&theme=light':'');
+  const href='rayong-catchment.html?city='+encodeURIComponent(SLUG)+
+    '&lat='+c.lat.toFixed(5)+'&lng='+c.lng.toFixed(5)+'&z=13.5'+themeQS;
+  const el=document.createElement('div');
+  el.id='distpop';
+  // self-contained DARK popup (both themes) so the readout + action stay legible over any basemap.
+  el.style.cssText='position:fixed;z-index:40;max-width:250px;color:#C5CDDC;background:rgba(16,19,28,.96);'+
+    'border:1px solid #2a3450;border-radius:9px;padding:11px 12px 12px;box-shadow:0 8px 28px rgba(0,0,0,.5);'+
+    'backdrop-filter:blur(6px);font-family:\'IBM Plex Sans Thai\'';
+  el.innerHTML='<div class="dtt" style="max-width:none;margin-bottom:9px">'+
+      '<b>'+(p.district||'District')+'</b><br>Working-age: <b>'+((p.workingage||0).toLocaleString())+'</b>'+
+      '<br>Branches: <b>'+(p.branches||0)+'</b> · DIW workers: <b>'+((p.real_workers||0).toLocaleString())+'</b></div>'+
+    '<a href="'+href+'" style="display:inline-block;text-decoration:none;background:rgba(30,38,58,.9);'+
+      'border:1px solid var(--blue,#5B7CFA);border-radius:7px;padding:5px 10px;'+
+      'font:600 11px \'IBM Plex Mono\';color:#D7DEEC;white-space:nowrap">🏙 3D buildings here →</a>';
+  document.body.appendChild(el);
+  const px=Math.min(Math.max((info.x||0)+12,8),window.innerWidth-260);
+  const py=Math.min(Math.max((info.y||0)+12,8),window.innerHeight-130);
+  el.style.left=px+'px'; el.style.top=py+'px';
 }
 
 /* ---------- panels ---------- */

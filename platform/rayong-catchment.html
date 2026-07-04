@@ -994,8 +994,12 @@ if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
 // initialViewState, so the auto-orbit rAF loop and the click-to-fly transitions share one source of
 // truth and never fight. FRAMED = the cinematic resting view (low+wide, skyline catches the light).
 // INTRO = a higher, further-out, more top-down start; on load we ease from INTRO -> FRAMED.
-const FRAMED={longitude:CORE.lng,latitude:CORE.lat,zoom:14.4,pitch:55,bearing:-26};
-const INTRO ={longitude:CORE.lng,latitude:CORE.lat,zoom:11.4,pitch:38,bearing:-58};
+// AIM (from ?lat/lng/z, set by the boot code on a district camera-handoff) overrides the framing
+// centre + zoom so the intro fly-to lands on the clicked district instead of the derived city core.
+// Default framing = the DataProteins Wave-A camera (zoom 14.4 / pitch 55 — reference obliqueness).
+const AIM=(window.AIM&&isFinite(window.AIM.lat)&&isFinite(window.AIM.lng))?window.AIM:null;
+const FRAMED={longitude:AIM?AIM.lng:CORE.lng,latitude:AIM?AIM.lat:CORE.lat,zoom:AIM?AIM.z:14.4,pitch:55,bearing:-26};
+const INTRO ={longitude:AIM?AIM.lng:CORE.lng,latitude:AIM?AIM.lat:CORE.lat,zoom:AIM?Math.max(AIM.z-2.5,4):11.4,pitch:38,bearing:-58};
 let VIEW=Object.assign({},INTRO);
 // orbit state: enabled by default, paused on any user interaction (drag/zoom/click) until re-armed.
 let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
@@ -2587,7 +2591,31 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  try{var q=new URLSearchParams(location.search).get('city');if(q)CITY=q.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');}catch(e){}
  if(!CITY)CITY='rayong';
  window.CITY=CITY;
+ // CAMERA HANDOFF (from province.html district click): ?lat=&lng=&z= aim the intro fly-to at a
+ // specific district centroid instead of the derived city core. Parsed once, exposed as window.AIM;
+ // the scene's FRAMED/INTRO views read it when present, else fall back to the city-core framing.
+ try{var _sp=new URLSearchParams(location.search);
+   var _la=parseFloat(_sp.get('lat')),_ln=parseFloat(_sp.get('lng')),_z=parseFloat(_sp.get('z'));
+   if(isFinite(_la)&&isFinite(_ln)&&Math.abs(_la)<=90&&Math.abs(_ln)<=180){
+     window.AIM={lat:_la,lng:_ln,z:(isFinite(_z)?Math.min(Math.max(_z,3),20):13.5)};}
+ }catch(e){}
  var pretty=CITY.split(/[-_]/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');  // title-case EVERY word (was 'Chiang mai')
+ // BREADCRUMB back-link — only when arriving via the district camera-handoff. Prepends a "← districts"
+ // chip to the scene strip that returns to this province's district view. Self-contained inline styles
+ // (the strip gradient is dark in both themes, so #A7B0C2 on a dark chip reads in light + dark).
+ if(window.AIM){try{
+   var _strip=document.getElementById('strip');
+   if(_strip){
+     var _bc=document.createElement('a');
+     _bc.href='province.html?p='+encodeURIComponent(CITY)+(location.search.indexOf('theme=light')>-1?'&theme=light':'');
+     _bc.textContent='← districts';
+     _bc.title='Back to '+pretty+' districts';
+     _bc.style.cssText='flex:none;font:700 12px \'IBM Plex Sans Thai\';color:#A7B0C2;text-decoration:none;'+
+       'background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;'+
+       'margin-right:2px;white-space:nowrap';
+     _strip.insertBefore(_bc,_strip.firstChild);
+   }
+ }catch(e){}}
  // set the tab title up-front so EVERY path (loaded, not-pulled, error) shows the right province, not 'Rayong 3D'
  if(CITY!=='rayong'){try{document.title=pretty+' 3D · เงินไชโย';}catch(e){}}
  var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading '+pretty+' 3D…';document.body.appendChild(box);
