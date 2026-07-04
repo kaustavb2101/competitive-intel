@@ -606,6 +606,87 @@ def check_crop_stress():
 
 
 # ---------------------------------------------------------------------------
+def check_search_demand():
+    # PER-PROVINCE SEARCH DEMAND + brand share-of-search (acquisition, objective #2), built by
+    # pipeline/build_search_demand.py from the committed google_trends.json snapshot. Optional file:
+    # SKIP-PASS when absent. Value checks: demand in [0,100]; sos a fraction map summing to ~1 (or an
+    # honest null — the all-zero-province guard); autox_share in [0,1] matches sos.AutoX; ranks unique.
+    hdr("search_demand.json (optional)")
+    if not exists("search_demand.json"):
+        ok("search_demand.json absent — skipped (optional; run build_search_demand.py)")
+        return
+    try:
+        d = load("search_demand.json")
+    except Exception as e:
+        fail("search_demand.json loads", repr(e))
+        return
+    ok("search_demand.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "generated_by" not in meta or "brands" not in meta:
+        fail("search_demand meta/provenance present", "meta missing generated_by/brands")
+    else:
+        ok("search_demand meta/provenance present")
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("search_demand has a 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("search_demand provinces list present (%d)" % len(provs))
+
+    brands = (meta or {}).get("brands") or []
+    bad = []
+    ranks = []
+    for p in provs:
+        name = p.get("th") or p.get("slug") or "?"
+        if p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        if not p.get("slug"):
+            bad.append("%s missing slug (map-lens join key)" % name)
+        dem = p.get("demand")
+        if dem is not None and (not is_finite_number(dem) or not (0.0 <= dem <= 100.0)):
+            bad.append("%s demand=%r out of [0,100]" % (name, dem))
+        sos = p.get("sos")
+        ash = p.get("autox_share")
+        if sos is None:
+            # honest all-zero guard: everything share-derived must be null too.
+            if ash is not None:
+                bad.append("%s sos null but autox_share=%r not null" % (name, ash))
+            if p.get("best_rival") is not None:
+                bad.append("%s sos null but best_rival not null" % name)
+            if p.get("autox_sos_rank") is not None:
+                bad.append("%s sos null but autox_sos_rank not null" % name)
+        else:
+            if not isinstance(sos, dict):
+                bad.append("%s sos not a dict" % name)
+            else:
+                shares = list(sos.values())
+                if any(not is_finite_number(s) or not (0.0 <= s <= 1.0) for s in shares):
+                    bad.append("%s sos has a share out of [0,1]" % name)
+                elif abs(sum(shares) - 1.0) > 0.01:
+                    bad.append("%s sos shares sum=%.4f (not ~1.0)" % (name, sum(shares)))
+                # brand keys must be exactly the declared brand set
+                if brands and set(sos.keys()) != set(brands):
+                    bad.append("%s sos brand keys != meta.brands" % name)
+                # autox_share must equal sos.AutoX
+                if is_finite_number(ash) and is_finite_number(sos.get("AutoX")) and abs(ash - sos.get("AutoX")) > 1e-9:
+                    bad.append("%s autox_share=%r != sos.AutoX=%r" % (name, ash, sos.get("AutoX")))
+            r = p.get("autox_sos_rank")
+            if not (isinstance(r, int) and r >= 1):
+                bad.append("%s autox_sos_rank=%r not a positive int" % (name, r))
+            else:
+                ranks.append(r)
+    # ranks must be unique and a dense 1..N
+    if ranks and (len(set(ranks)) != len(ranks) or sorted(ranks) != list(range(1, len(ranks) + 1))):
+        bad.append("autox_sos_rank not a unique 1..N sequence")
+    if bad:
+        fail("search_demand values sane (demand in [0,100], sos sums to 1 or honest null, ranks unique)",
+             first_n(bad, 8))
+    else:
+        ok("search_demand values sane (demand in [0,100], sos fractions sum to ~1 or honest null, autox_share=sos.AutoX, ranks unique 1..N)")
+
+
+# ---------------------------------------------------------------------------
 def check_collateral_outlook():
     # PER-PROVINCE COLLATERAL-VALUE OUTLOOK (objective #1): a DIRECTIONAL, ESTIMATED read on whether
     # title-loan collateral recovery value is firming/softening, built from MEASURED gold YoY (global
@@ -3570,6 +3651,7 @@ def main():
     check_province_geo(branches)
     check_provinces(n)
     check_crop_stress()
+    check_search_demand()
     check_collateral_outlook()
     check_household_risk()
     check_province_stress()

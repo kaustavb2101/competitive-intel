@@ -24,6 +24,7 @@ const LENS = {
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
+  dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"WHERE TO EXPAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal for expansion, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
@@ -119,6 +120,36 @@ async function loadProvinceStress(){
 function pstressHasData(){return !!(PSTRESS&&Object.keys(PSTRESS).length);}
 // ESTIMATED composite_stress (0-100) for a branch's province. 0 when unknown.
 function pstressVal(d){const p=PSTRESS&&PSTRESS[d.v]; return p&&p.composite_stress!=null?Math.round(p.composite_stress):0;}
+
+/* ---------- title-loan SEARCH DEMAND + brand share-of-search (ESTIMATED · Google Trends, objective #2) ----------
+   Lazy-loaded from data/search_demand.json (pipeline/build_search_demand.py). SDEMAND maps Thai province
+   name -> {demand, sos:{brand:share}, autox_share, best_rival, autox_sos_rank, ...}. demand is a 0–100
+   RELATIVE search-interest index (NOT query volume); sos is a share-of-search fraction (null in an all-zero
+   province — the builder's honest guard). Everything is ESTIMATED. Null-guarded: absent file → SDEMAND stays
+   empty, the map lens hides itself (lensAbsent), sdemandVal reads 0, and the #acq board shows a calm notice. */
+let SDEMAND=null, SDEMAND_META=null, SDEMAND_LIST=[], sdemandLoaded=false, sdemandPromise=null;
+async function loadSearchDemand(){
+  if(sdemandPromise) return sdemandPromise;
+  sdemandLoaded=true;
+  sdemandPromise=(async()=>{
+    try{
+      const r=await fetch('data/search_demand.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      SDEMAND_META=j.meta||null; SDEMAND={}; SDEMAND_LIST=[];
+      if(!(j.meta&&j.meta.absent)){
+        const list=(j.provinces||[]).filter(p=>p&&p.demand!=null);
+        list.forEach(p=>{SDEMAND[p.th]=p;});
+        // sort by demand desc so the board/headline lead with the hottest-searching province.
+        SDEMAND_LIST=list.slice().sort((a,b)=>(b.demand||0)-(a.demand||0));
+      }
+    }catch(e){ SDEMAND={}; SDEMAND_META=null; SDEMAND_LIST=[]; }
+    return SDEMAND;
+  })();
+  return sdemandPromise;
+}
+function sdemandHasData(){return !!(SDEMAND&&Object.keys(SDEMAND).length);}
+// ESTIMATED relative search-demand (0–100) for a branch's province. 0 when unknown.
+function sdemandVal(d){const p=SDEMAND&&SDEMAND[d.v]; return p&&p.demand!=null?Math.round(p.demand):0;}
 
 /* ---------- measured occupation mix (Overture Places) ----------
    Lazy-loads data/branch_occupations.json — a MEASURED per-branch rollup of establishment
@@ -1154,10 +1185,80 @@ function renderAcq(){
   renderAcqBoard();
   renderRoad3k();
   renderExpansionPlan();
+  renderSearchDemand();
   renderOppScore();
   renderCompCoverage();
   renderRivalDensity();
   renderExitWhitespace();
+}
+
+/* ---------- Where demand searches · title-loan search interest by province (obj #2) ----------
+   Surfaces data/search_demand.json (built by pipeline/build_search_demand.py from the committed
+   google_trends.json snapshot): per-province ESTIMATED search-demand index (0–100) + brand
+   share-of-search. Answer-first readout + top-12 board. Lazy, promise-cached, graceful if absent. */
+const SEARCH_TOPN=12;
+function renderSearchDemand(){
+  const tbl=$('#searchtbl'); if(!tbl) return;
+  if(sdemandLoaded){ drawSearchDemand(); return; }
+  loadSearchDemand().then(drawSearchDemand).catch(drawSearchDemand);
+}
+function drawSearchDemand(){
+  const tbl=$('#searchtbl'), ro=$('#searchreadout'); if(!tbl) return;
+  const rows=(SDEMAND_LIST&&SDEMAND_LIST.length)?SDEMAND_LIST:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Search-demand board not yet computed.</b> <span class="sub">Run pipeline/build_search_demand.py — it fills in on the next data refresh.</span>';
+    return;
+  }
+  const pct=v=>(v==null?'<span class="sub">n/a</span>':`${Math.round(100*v)}%`);
+  // AutoX = gold accent; rivals = merchant teal — both are theme-token colors (contrast-safe in light+dark).
+  const AX='var(--gold)', RV='var(--merch)';
+  const list=rows.slice(0,SEARCH_TOPN);
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="Google Trends relative search-interest (0–100) for title-loan intent terms — ESTIMATED, a demand signal, not query volume">Demand ▲ est</th>`+
+    `<th title="AutoX (เงินไชโย) share of the five brands' search interest in this province — ESTIMATED">AutoX share-of-search</th>`+
+    `<th title="strongest rival brand by share-of-search in this province">Best rival</th></tr>`+
+    list.map((r,i)=>{
+      const dem=r.demand==null?0:r.demand;
+      const ash=r.autox_share;
+      const best=r.best_rival;
+      const rank=r.autox_sos_rank!=null?`<span class="sub" title="province rank by AutoX share-of-search (1 = strongest)">#${r.autox_sos_rank} nat'l</span>`:'';
+      const ashtxt=(ash==null)?'<span class="sub">n/a</span>'
+        :`<span class="mono" style="color:${AX}"><b>${pct(ash)}</b></span> ${barHTML(100*ash,AX)}`;
+      const btxt=best?`<span style="color:${RV}">${best.brand}</span> <span class="mono" style="color:${RV}">${pct(best.share)}</span>`:'<span class="sub">n/a</span>';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.th}</b> <span class="sub">${r.en||''}</span></td>
+        <td><span class="mono" style="color:${AX}">${dem.toFixed(0)}</span> ${barHTML(dem,AX)}</td>
+        <td>${ashtxt} ${rank}</td>
+        <td>${btxt}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const top=rows[0];
+    const m=SDEMAND_META||{};
+    // answer-first line: the hottest-searching province + whether AutoX or a rival owns share there.
+    let verdict='';
+    if(top){
+      const ash=top.autox_share, best=top.best_rival;
+      if(ash!=null&&best){
+        const own=ash>=best.share;
+        verdict=own
+          ? `<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100) — and <b style="color:var(--gold)">AutoX leads share-of-search there</b> (${Math.round(100*ash)}% vs ${best.brand} ${Math.round(100*best.share)}%).`
+          : `<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100) — but <b style="color:var(--merch)">${best.brand} owns share-of-search there</b> (${Math.round(100*best.share)}% vs AutoX ${Math.round(100*ash)}%). High demand + weak brand = an acquisition target.`;
+      }else{
+        verdict=`<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100).`;
+      }
+    }
+    // where does AutoX brand search actually lead? count provinces where AutoX SoS rank is 1..N and it beats every rival.
+    const axLead=rows.filter(r=>r.best_rival&&r.autox_share!=null&&r.autox_share>=r.best_rival.share).length;
+    ro.innerHTML=`<b>Where demand searches:</b> ${verdict} `+
+      `AutoX out-searches every rival brand in <b>${axLead}</b> of ${rows.length} provinces. ${TAG_E}`+
+      methodBox(null,
+        ['<b>Demand</b> = mean of two Google Trends title-loan intent terms per province (relative 0–100 index, <b>ESTIMATED</b> — a demand/attention signal, NOT query volume or bookings).',
+         '<b>Share-of-search</b> = a brand’s search interest ÷ the five brands’ total in that province. The five brands share one Trends payload axis, so the split is meaningful; it is a demand proxy, <b>not</b> market share.',
+         'Low-search-volume provinces are noisy — read the leaderboard as direction, not precise magnitude.',
+         (m.pulled_at_utc?`Snapshot pulled ${m.pulled_at_utc} · ${m.source||'Google Trends'}.`:'Source: Google Trends (geo=TH).')]);
+  }
 }
 
 /* ---------- Competitor coverage (lower bound) · found vs expected (obj #2) ----------
@@ -3101,6 +3202,7 @@ function lensAbsent(k){
   const l=LENS[k]; if(!l) return false;
   if(l.hh)    return hhriskLoaded && !hhriskHasData();
   if(l.pstr)  return pstressLoaded && !pstressHasData();
+  if(l.dsrch) return sdemandLoaded && !sdemandHasData();
   if(l.occr)  return occriskLoaded && !occriskHasData();
   if(l.brisk) return briskLoaded && !briskHasData();
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
@@ -3217,6 +3319,17 @@ function renderLegend(){
       ` <span class="sub" title="NSO Labour Force Survey — province-inherited district rate, measured">● measured · NSO LFS</span>`;
     return;
   }
+  // Search-demand lens: ESTIMATED relative index (0-100, Google Trends) — skeleton while loading,
+  // then an honest 'estimated · Google Trends relative index' tag (a demand signal, not query volume).
+  if(l.dsrch){
+    if(!sdemandLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">search demand…</span>'; return; }
+    $('#maplegend').innerHTML =
+      `<span><i style="background:${lensColor(.12,l.color)}"></i>${Math.round(mx*.12)}</span>`+
+      `<span><i style="background:${lensColor(.5,l.color)}"></i>${Math.round(mx*.5)}</span>`+
+      `<span><i style="background:${lensColor(1,l.color)}"></i>${Math.round(mx)} ${l.unit}</span>`+
+      ` <span class="sub" title="Google Trends relative search-interest (0–100) for title-loan intent terms — a demand/attention signal, not query volume or bookings">▲ estimated · Google Trends relative index</span>`;
+    return;
+  }
   // Combined province structural-stress lens: ESTIMATED composite (0-100) of two MEASURED
   // percentile ranks — tag it 'estimated' honestly, unlike the plain-MEASURED hhdti/unemp legends.
   if(l.pstr){
@@ -3310,6 +3423,9 @@ function initMap(){
   // itself when absent. Absent file (build_province_stress.py not run / inputs missing) → PSTRESS
   // empty, lens filtered out.
   if(!pstressLoaded) loadProvinceStress().then(()=>{ renderLenses(); if(mapReady&&curLens==='pstress'){ renderLegend(); styleMarkers(); } });
+  // warm the ESTIMATED title-loan search-demand layer (Google Trends) so its lens hides itself when
+  // absent. Absent file (build_search_demand.py not run) → SDEMAND empty, lens filtered out.
+  if(!sdemandLoaded) loadSearchDemand().then(()=>{ renderLenses(); if(mapReady&&curLens==='dsrch'){ renderLegend(); styleMarkers(); } });
   // warm the occupation × stress cross-read so the lens hides itself when absent. Absent file
   // (build_occupation_risk.py not run / no Overture pull yet) → OCCRISK empty, lens filtered out.
   if(!occriskLoaded) loadOccRisk().then(()=>{ renderLenses(); if(mapReady&&curLens==='occrisk'){ renderLegend(); styleMarkers(); } });
@@ -3919,6 +4035,9 @@ function setLens(k){
   }
   if(k==='pstress' && !pstressLoaded){
     loadProvinceStress().then(()=>{ renderLenses(); if(curLens==='pstress'){ renderLegend(); if(mapReady) styleMarkers(); } });
+  }
+  if(k==='dsrch' && !sdemandLoaded){
+    loadSearchDemand().then(()=>{ renderLenses(); if(curLens==='dsrch'){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(k==='occrisk' && !occriskLoaded){
     loadOccRisk().then(()=>{ renderLenses(); if(curLens==='occrisk'){ renderLegend(); if(mapReady) styleMarkers(); } });

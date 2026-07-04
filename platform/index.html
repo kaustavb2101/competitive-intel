@@ -211,6 +211,7 @@
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
       <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
+      <a class="chip" href="#acq" data-acq="sec-search">Search demand</a>
       <a class="chip" href="#acq" data-acq="sec-comp">Competitor thesis</a>
       <a class="chip" href="#acq" data-acq="sec-segments">Segment white-space</a>
     </nav>
@@ -258,6 +259,17 @@
         not a committed plan — every site needs a local survey. Built by <code>pipeline/build_expansion_plan.py</code> (deterministic, offline).</p></div></details>
     <button id="r3kseqcsv" class="chip" style="margin-bottom:10px">⬇ Download full plan CSV</button>
     <table class="tbl" id="r3kseqtbl"></table>
+    </details>
+
+    <!-- 2b · SEARCH DEMAND — where people search title-loan intent + brand share-of-search. -->
+    <details class="acqsec" id="sec-search" open>
+    <summary><h2 class="opp">Where demand searches · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
+      (<span class="mono">จำนำทะเบียนรถ</span> · <span class="mono">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
+      how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
+      A demand/attention signal for where to open next, <b>not</b> query volume or market share.</p>
+    <div class="insight" id="searchreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="searchtbl"></table>
     </details>
 
     <!-- 3 · COMPETITOR THESIS — coverage + exit white-space, collapsed by default. -->
