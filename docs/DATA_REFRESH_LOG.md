@@ -4,6 +4,89 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-04 (4) — ENRICH: MEASURED building-density-within-10km layer, sitting unused since 2026-07-02, wired into the branch popup
+
+**Task type:** ENRICH. `/workspace/watcher` [TMLI blueprint] was not present this cycle, so no
+cross-repo pull was possible. Started with a RE-DERIVE pass: `bash tests/run.sh check` on a clean
+pull of `claude/new-session-wto26j` — 45 passed, 0 failed, `validate_data.py` 259/259, no drift.
+With the tree already fully in sync, moved to an ENRICH pass per the rule to prefer folding in a
+real, already-available, not-yet-integrated layer over auditing files already scrutinized in the
+last several cycles (all four TMLI-vendored sources in `source-data/tmli/` have each already been
+audited — `household-debt.js` 2026-07-04, `provincial-gpp.js` 2026-07-02 — and the gov fold-in files
+from `ingest_gov.py` all carry non-round, province-distinct values consistent with a genuine pull).
+
+**What was found.** `source-data/perimeter_counts.json` — written in a single commit (`dda7816`,
+2026-07-02, "Perimeter 3D audit: measured building counts for all 2,015 branch perimeters") — is a
+real, sourced, MEASURED layer (per-branch Overture building-footprint count within 10km, counted
+from the 77 real per-province catchment pulls: 3 in-repo + 74 on the operator R2 CDN, capped
+180k/province) that has never been consumed by any pipeline script or `platform/app.js` (confirmed
+via `grep -rn perimeter_counts` across `pipeline/*.py` and `platform/` — zero hits before this
+cycle). It carries full provenance in its own `meta` (`generated_by`, `label` with the honest
+"a zero means the CAPPED file has no buildings there" caveat, `method`, `buckets` tally) and is
+`counts[]` index-aligned to `platform/data/branches.json` (2,015 entries) — a genuinely useful,
+already-real signal (urban/commercial density context for both objectives) sitting orphaned.
+
+**Alignment safety check (before wiring in as index-aligned).** `perimeter_counts.json` predates the
+`branches_fingerprint` convention and carries no per-record identity field, so it cannot be
+re-verified byte-for-byte the way a stamped layer can — an index-aligned projection is only honest
+if `branches.json`'s ORDER has not changed since the counts were generated. Checked explicitly:
+`branches.json` at commit `dda7816` (2026-07-02, when the counts were written) has the identical
+`branches_fingerprint` (`e25867ab0c76d888…`) as the `branches.json` committed with this cycle's
+change, despite two intervening commits that touched `branches.json` (`d9cc82f` adding a population
+field, `00196c5` a full data refresh) — both changed field VALUES, neither reordered/added/removed
+branches (length stable at 2,015 throughout; fingerprint recomputed independently, matches exactly).
+Wiring the layer in as index-aligned was safe.
+
+**What changed (zero fabrication — pure projection of an already-committed, already-sourced
+MEASURED source into its first consumer):**
+- New `pipeline/build_branch_density.py` (network-free, deterministic, `--check` byte-exact):
+  loads `source-data/perimeter_counts.json`, carries `buildings_10km` verbatim per branch (no
+  transform), and assigns a `bucket` label using the EXACT same cutpoints as the source's own
+  `meta.buckets` tally — self-checked at build time (`AssertionError` if the recomputed tally ever
+  disagrees with the source's, so a threshold typo fails loudly instead of shipping quietly wrong).
+  Degrades to an honest ABSENT-state (empty `branches: []`, `meta.absent=true`) rather than guessing
+  a projection if a future `branches.json` length ever stops matching `perimeter_counts.json`'s
+  2,015 counts. `--check` SKIPs (exit 3, not a `--check` failure) when the source file is absent.
+  → `platform/data/branch_density.json` (2,015 branches; buckets rich_1000plus 1,803 /
+  good_200_999 73 / thin_50_199 1 / sparse_1_49 4 / empty_0 134 — matches the source exactly).
+- `platform/app.js`: new `loadBranchDensity()`/`bldgDensityRec()` (mirrors the existing
+  `poi_relevance.json` lazy-load pattern), warmed alongside the other popup-only layers in
+  `initMap()`+`selectBranch()`. New `bldgDensityPopupHTML()` appends ONE line — "Buildings ≤10km
+  (Overture) · measured — N (bucket-label)" — to the existing "Within 10 km" popup section. No new
+  map lens (kept small per the loop's scope-discipline rule — a single popup-only metric doesn't
+  warrant a whole lens/legend). Fully null-guarded: absent file → the line is simply omitted.
+- `tests/validate_data.py`: new `check_branch_density()` (meta/provenance present, ABSENT-state
+  handling, length == branches.json, `buildings_10km` a non-negative int, `bucket` one of the 5
+  known labels); registered in the index-alignment gate and the branches-fingerprint gate (own
+  `branches_fingerprint` stamp, so any FUTURE `branches.json` reorder that isn't matched by a rebuild
+  of this layer will be caught by the existing fingerprint-mismatch check going forward).
+- `tests/run.sh`: gates `build_branch_density.py --check` (SKIP, not FAIL, if the source is absent —
+  same convention as the `numpy`/`build_branch_peers.py` fix).
+- `pipeline/build_provenance.py` re-run (its census of all `platform/data/*.json` picked up the new
+  file) — `platform/data/provenance.json` regenerated to match (pure count/list update, no logic
+  changed).
+- `CLAUDE.md` pipeline listing gained a one-line entry for the new builder.
+
+**Verification.**
+- `bash tests/run.sh check` — 46 passed, 0 failed (`validate_data.py`: 265/265, up from 259/259 — 6
+  new checks). `node --check platform/app.js` clean.
+- `python3 build_branch_density.py --check` reproduces byte-exact (0 drift); bucket tally
+  self-check passes (recomputed tally == source's own `meta.buckets`, exactly).
+- Headless-rendered `index.html#map` (Playwright, `/opt/pw-browsers/chromium-1194`) and evaluated
+  the real in-page functions directly (`loadBranchDensity()`, `bldgDensityRec()`, `popupHTML()`) for
+  branch #0: returned `{buildings_10km: 8, bucket: "sparse_1_49"}`, matching
+  `platform/data/branch_density.json`'s own record exactly; the rendered popup HTML contains
+  `Buildings ≤10km (Overture) · measured … 8 (sparse)`. Zero uncaught page errors (`pageerror`
+  listener empty); the only console errors were the known-expected basemap-tile CDN blocks (see
+  `tests/lib/render.sh`'s own comments — cartocdn is proxy-blocked in this sandbox).
+
+**Source:** `source-data/perimeter_counts.json` `meta.generated_by` — "perimeter 3D audit workflow
+(wf_127c1b1e-038), counts computed from the 77 real Overture catchment files (3 in-repo + 74 on the
+operator R2 CDN)". No external pull performed this cycle — this is a first-use projection of an
+already-committed, already-sourced MEASURED layer that had sat unconsumed for two days.
+
+---
+
 ## 2026-07-04 (2) — AUDIT: `household-debt.js`'s `debtToIncome`/`stressIndex` mislabelled MEASURED, actually UNVERIFIED (BOT figure with no citable resource)
 
 **Task type:** AUDIT (provenance sweep, per the backlog's own 2026-07-03 (7) follow-up: "the two

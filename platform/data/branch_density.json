@@ -1,0 +1,8084 @@
+{
+  "meta": {
+    "generated_by": "build_branch_density.py",
+    "label": "MEASURED — building density within 10km of each branch (Overture footprints)",
+    "provenance": "source-data/perimeter_counts.json, perimeter 3D audit workflow (wf_127c1b1e-038), counts computed from the 77 real Overture catchment files (3 in-repo + 74 on the operator R2 CDN). Method: per province: bin catchment building centroids into 0.1-degree grid; count within 10km of each branch; branch->province by Thai name join",
+    "caveats": [
+      "MEASURED — building count within 10km (equirect) of each branch, from the capped (180k/province) catchment pulls. A zero means the CAPPED file has no buildings there, NOT that the area is empty on the ground.",
+      "perimeter_counts.json predates the branches_fingerprint convention and carries no per-record identity field; index alignment against the CURRENT branches.json was manually verified (fingerprint continuity since commit dda7816, 2026-07-02) before this builder was written — see docs/DATA_REFRESH_LOG.md."
+    ],
+    "radius_km": 10.0,
+    "n_branches": 2015,
+    "branches_fingerprint": "e25867ab0c76d8889774a91b4c6bb9a890acd7929ca737dbbb36ff46bf9be786",
+    "buckets": {
+      "rich_1000plus": 1803,
+      "good_200_999": 73,
+      "thin_50_199": 1,
+      "sparse_1_49": 4,
+      "empty_0": 134
+    },
+    "index_aligned_to": "branches.json (record i == branch i)"
+  },
+  "branches": [
+    {
+      "buildings_10km": 8,
+      "bucket": "sparse_1_49"
+    },
+    {
+      "buildings_10km": 2734,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1145,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19722,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8780,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21906,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9158,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3273,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4302,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3511,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 29945,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10346,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4138,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14585,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33185,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14401,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3616,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8706,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20499,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5469,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32191,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12387,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3371,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14918,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15482,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10266,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5745,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13307,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 93778,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3118,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12126,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4305,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 51839,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16577,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9521,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 694,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 16327,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7451,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4656,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4422,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1418,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9207,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9755,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6313,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2417,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13465,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17722,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9205,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19999,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 42156,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13271,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18073,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 92071,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11356,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7425,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 87733,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 27262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 608,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 988,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2547,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15209,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5299,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 15431,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1061,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3409,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15615,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6781,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10406,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12126,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3713,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 249,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4618,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14636,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9158,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9208,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4369,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6702,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 8904,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10937,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29494,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 66233,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8952,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2509,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 46486,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20912,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 62130,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4493,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3752,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8520,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18894,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15762,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 53604,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 696,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 35800,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20987,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32762,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2595,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16025,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 80023,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14816,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2170,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1470,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8419,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7235,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3771,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4719,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 673,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4799,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16020,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7963,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3363,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11363,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12056,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21451,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17562,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6782,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36961,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25192,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18076,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 7555,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89036,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11920,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10318,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52841,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11586,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18757,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16475,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1232,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32368,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10355,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1854,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5654,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3823,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5339,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10164,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3084,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1416,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3090,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2267,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19891,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 49990,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10943,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11900,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22857,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9919,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11973,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30813,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2987,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1676,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1548,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 17830,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 78431,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2793,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 604,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 6064,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1376,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21595,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34419,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4502,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20645,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2103,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25271,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4059,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8371,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1647,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22430,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10560,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3485,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13565,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73845,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9152,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4436,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2563,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5977,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1784,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1686,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6441,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6600,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24994,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2622,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4212,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2382,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13417,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26391,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2,
+      "bucket": "sparse_1_49"
+    },
+    {
+      "buildings_10km": 4074,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10833,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5023,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17883,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18577,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4305,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27782,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3724,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13398,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13509,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3345,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12414,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4610,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1797,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15329,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5337,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6195,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26244,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17614,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7798,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8859,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 616,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 792,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7392,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11910,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1050,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6705,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4166,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14062,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2119,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23664,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2684,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2786,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 612,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2960,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17205,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3685,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 10458,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3690,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32880,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3102,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 316,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 41277,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32872,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3371,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 691,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7056,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13461,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2995,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16739,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30815,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 990,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 103890,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 844,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 23893,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 114259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15730,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2972,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3487,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27507,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34916,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29110,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 44585,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 12096,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3303,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6862,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 10355,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10962,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14553,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1576,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2191,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 38878,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3154,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10107,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16643,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30178,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7914,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32715,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 11145,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2995,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6306,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14010,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2619,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 660,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 19186,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33022,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18375,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5308,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3811,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5377,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16865,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 688,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 10359,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3408,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25403,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9705,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19145,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4220,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13994,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 11588,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 60789,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2316,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4360,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1893,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10802,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16702,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 430,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 10683,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3330,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32841,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12051,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2080,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15107,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4467,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 47193,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 49990,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11560,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2734,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5315,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18779,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 37061,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2119,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23647,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33886,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2885,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 64766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19097,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6587,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9641,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9575,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1011,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2466,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 113579,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 426,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 10172,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17393,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 269,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 49990,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 570,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 10821,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 78692,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1771,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17181,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 41186,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2268,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9061,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6258,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16651,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 454,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 32152,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 83747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21228,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8696,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 101352,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27025,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6723,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26517,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3531,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12126,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 59993,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32865,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13398,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8605,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21278,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10387,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3108,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11464,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21396,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8425,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 59159,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6465,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4148,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4356,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2242,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 41072,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4926,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13181,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6879,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7048,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13687,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10455,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1966,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5445,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10281,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2344,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2548,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2279,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8843,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4811,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13203,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2874,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3294,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5992,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11646,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19683,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 756,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7392,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 60789,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30738,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2936,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10065,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5530,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 670,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 5830,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3090,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 9660,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11711,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3904,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7975,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9064,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24875,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2544,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25051,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3536,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1675,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3823,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3095,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30120,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 35147,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3668,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8552,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5657,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18604,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20608,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 114259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9881,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1283,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2189,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22125,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22383,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 873,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 28395,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4196,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8517,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3176,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5622,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15752,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 18076,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10245,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2880,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3408,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16268,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4290,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1464,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12874,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 53088,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5785,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10192,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2444,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3310,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1038,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1019,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19286,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104051,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4820,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9340,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2389,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9260,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19618,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13199,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5232,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28983,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8902,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13398,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6612,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2554,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3497,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27611,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5794,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8597,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14337,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 39781,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16644,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 10935,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4336,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8834,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1273,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 838,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 1694,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9229,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34916,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24062,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4081,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 709,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 21389,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24080,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9521,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13681,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2538,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22617,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 490,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 5683,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2580,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 111009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1019,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3541,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 76244,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5420,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15854,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5143,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9176,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36361,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4637,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9158,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33550,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3087,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11762,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4399,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8843,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 11778,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 557,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 5641,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11775,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4565,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5153,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4779,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89036,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26100,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3654,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3473,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1696,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23011,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2379,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36060,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 90172,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18076,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11425,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 20608,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45138,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9350,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20968,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1620,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4382,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13609,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3034,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4923,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1320,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 41316,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6988,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7611,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8307,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14578,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4018,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4825,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4854,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5739,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4449,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 66233,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5078,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 119083,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8447,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2589,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28005,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6198,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18894,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2655,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15624,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6605,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5063,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8250,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18018,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10973,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3908,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 51642,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 110333,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6347,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3914,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2162,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12547,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 27366,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 65089,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2805,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22695,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6531,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3948,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2557,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21716,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4610,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16020,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 43971,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6007,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2072,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 111009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11016,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 70121,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26146,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6569,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11640,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7688,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10273,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2597,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 44751,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12631,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 37385,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4132,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2914,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15289,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 20933,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2344,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2397,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4436,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2638,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4544,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 468,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4956,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3346,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5816,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31942,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31396,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 47179,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7299,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4456,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13629,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13542,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5052,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21024,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 68921,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4883,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6047,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 98451,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6682,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3292,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3864,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 38276,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24743,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4853,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4362,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7547,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5071,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23725,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3403,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5948,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3579,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4714,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11313,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4719,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1517,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 90172,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5341,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16925,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10109,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 430,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2749,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9660,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15615,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34896,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15885,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5140,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26011,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10429,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1890,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27202,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3580,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12298,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22125,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3490,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45213,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15054,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73555,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1044,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2310,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 9299,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 49891,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9998,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2887,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3414,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9026,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13417,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2930,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13445,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17037,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 8097,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7235,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16010,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11931,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24695,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 20887,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45429,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7549,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 44262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26866,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 57581,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9274,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1804,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4524,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33927,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 70733,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5679,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6337,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15804,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4176,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 114259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1038,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3284,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3279,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29135,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5712,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28429,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11073,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7168,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 42678,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 44591,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2706,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2543,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4781,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2203,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3723,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8268,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14848,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1608,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4637,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16865,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 43520,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 87536,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5641,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3366,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1543,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19166,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 81492,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5404,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13707,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16481,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3567,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2319,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10542,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3102,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4459,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1035,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8471,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2603,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8972,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5586,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3219,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4980,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12479,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1368,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16703,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19736,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 59261,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9548,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19650,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19166,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 14401,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17860,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6526,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8635,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89223,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4148,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17780,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2972,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8792,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 525,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 18450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26641,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1803,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2944,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5935,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16327,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9207,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2420,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2965,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 50433,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16657,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4407,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6791,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21749,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 78692,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7688,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2263,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16577,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3161,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5959,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5305,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1580,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1082,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3603,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20499,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9173,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3900,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9970,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16904,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 61800,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16268,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89036,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2016,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3515,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 842,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 6410,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 89223,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7443,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 898,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2072,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8188,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 65135,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9657,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1363,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4997,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6030,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 35581,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3978,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15604,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2705,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9522,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16108,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10469,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 286,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 3579,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 308,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 3391,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 103420,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8412,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4081,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11231,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 490,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4705,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36320,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 72225,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4237,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2227,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3050,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10677,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29456,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7855,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11641,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4734,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 96032,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5041,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12726,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3622,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10173,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8854,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52138,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16308,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10076,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 39983,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12621,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28959,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9307,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18390,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32348,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4166,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9622,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20645,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64232,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8768,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6080,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3553,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1314,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1981,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 85510,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12980,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5173,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 113196,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19197,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3543,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 557,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 14439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2764,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3887,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33192,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14729,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7604,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7129,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5098,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5849,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12431,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1528,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19186,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 56620,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 51438,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 88277,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 120336,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1212,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6830,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4042,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5968,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19502,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3474,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10444,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2575,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1611,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16862,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7299,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7999,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5327,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3607,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4317,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 103970,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52768,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7055,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40808,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14860,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15603,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10923,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10985,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15874,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12851,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1314,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1090,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9179,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7056,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15226,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4292,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 76434,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7456,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27613,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7109,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4880,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3872,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 56254,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 59265,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 953,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 14006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 36961,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 25335,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15465,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3551,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6128,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 56575,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27633,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2634,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 65135,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16777,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4449,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19694,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10482,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2328,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 35607,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6897,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32333,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2693,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 57581,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8071,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10826,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2692,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29755,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36196,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31942,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2403,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4856,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2440,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9216,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2629,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5461,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13925,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1572,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3264,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3640,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7774,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4808,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18500,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7303,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31315,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22748,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4167,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 477,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 1853,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 680,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13307,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1609,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14089,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19618,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5001,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 343,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 12269,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10023,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2800,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34858,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7129,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4209,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4717,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2373,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2809,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 119083,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6118,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1691,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6830,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1589,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 86435,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8447,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8929,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 865,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4543,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20499,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2300,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2492,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3195,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2655,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1842,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45060,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 59261,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 95140,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14579,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 472,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 15603,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3350,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 43520,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64481,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10205,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13644,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2765,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6039,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11912,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8843,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5440,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5071,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22383,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6592,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 707,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 40723,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 114259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5684,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24796,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3395,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31021,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34858,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4232,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4077,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14055,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1512,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28949,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3194,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3553,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 7999,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5093,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2140,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19017,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16108,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3254,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3302,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34858,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2096,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11919,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12051,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1919,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6696,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24322,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27344,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32191,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45287,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4088,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11894,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2444,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25576,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36769,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7268,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25408,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 51246,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13564,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21765,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2017,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12982,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1615,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14642,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12286,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18018,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 68978,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36084,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21749,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16327,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10570,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2289,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5165,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 42949,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5998,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4724,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7540,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 45060,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4792,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2146,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3036,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2753,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3154,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31942,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2880,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28115,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9824,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 14585,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1410,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4109,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22889,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 8873,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15741,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 38634,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24473,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9462,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 818,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 100837,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5329,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 8255,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13600,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1852,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7173,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3473,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10952,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27087,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14119,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15226,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2196,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6996,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28056,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 107591,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6653,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17013,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 15615,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1188,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40920,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89585,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3351,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13261,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8461,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 941,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7118,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 85952,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28905,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11822,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11532,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3505,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13710,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4400,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13486,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 892,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 22357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26143,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1664,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12387,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6039,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3283,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6397,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40744,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9643,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2537,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6292,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11790,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6542,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13026,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3811,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2679,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7005,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 756,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 734,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 1479,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 95136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14960,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1827,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 300,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 31942,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20435,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10458,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9551,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 35581,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3674,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 306,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 1901,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11616,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16865,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17217,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2225,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3716,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23780,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23624,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3575,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10243,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32872,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20499,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5574,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32303,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 66233,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15874,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14122,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8115,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 76434,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 81179,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15226,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1300,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2808,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 628,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 57581,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3190,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3808,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6570,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 358,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13937,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2875,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4640,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3914,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14155,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2922,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1857,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7348,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2250,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7483,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2250,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18328,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26121,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18750,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5564,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 557,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2186,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104030,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11630,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 35153,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32129,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12379,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11050,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18377,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3003,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32875,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7772,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4084,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6045,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13609,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10458,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17494,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23755,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2656,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26513,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 7687,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7662,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19464,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28,
+      "bucket": "sparse_1_49"
+    },
+    {
+      "buildings_10km": 13904,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2312,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9294,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1955,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10482,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4779,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2843,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2678,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15730,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1637,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6594,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 82699,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20862,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1431,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1929,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2013,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4721,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10359,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6094,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8539,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2249,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2561,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 74018,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5564,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4934,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7763,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16716,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2482,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4289,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 528,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 16651,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10205,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12455,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11534,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 90172,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5677,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2472,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 14697,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10809,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1589,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 67080,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 27019,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1862,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4035,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2213,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 108555,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7689,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8607,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 83747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4823,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11803,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4295,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 594,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7649,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14155,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12621,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10542,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6813,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5186,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 31942,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 71475,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8310,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5590,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73914,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22650,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1433,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 67992,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12255,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 435,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 191,
+      "bucket": "thin_50_199"
+    },
+    {
+      "buildings_10km": 64196,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11124,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 37584,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32368,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1839,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2384,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4771,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16020,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8674,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4241,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1861,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5322,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 76415,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 51648,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11329,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6118,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4065,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13900,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4855,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1441,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 55058,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2142,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5170,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9479,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8988,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8768,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4366,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4719,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6478,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3116,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3692,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3439,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13609,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19475,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2510,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21685,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3715,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15648,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5586,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5872,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11245,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 7209,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11519,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8919,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 20820,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17877,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1011,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26213,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5553,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26077,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9643,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4414,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4242,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25269,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2075,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4165,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3369,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2817,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8666,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18779,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13892,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 97580,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5348,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10533,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8240,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23516,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3920,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19913,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36961,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13542,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2465,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25208,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8086,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 109101,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9557,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26907,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4853,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6233,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3332,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17180,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1080,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4764,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6242,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4148,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10373,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 36819,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3826,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10448,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 538,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 6762,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 51578,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14006,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1739,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9970,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26244,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15103,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10716,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6507,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 61789,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 336,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 28913,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5734,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 9158,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12982,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18793,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1262,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5770,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4578,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4289,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10412,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 44828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5355,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4543,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1913,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6944,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7649,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4449,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4422,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6266,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 48373,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 64766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8896,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6857,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13564,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3231,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3438,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 1699,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4759,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13954,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 27611,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 55585,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3272,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2572,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2969,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 13243,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4019,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13609,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1544,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6237,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1273,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5418,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20591,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25758,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6078,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33738,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8146,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5637,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1604,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10226,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 96898,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1358,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2251,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1884,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4384,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 737,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 4357,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8852,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5683,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 14760,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4915,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4691,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13464,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6729,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17551,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20591,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 725,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 8843,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 578,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 1399,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4020,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1761,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10735,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4124,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 63529,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3866,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4139,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26899,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2421,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11307,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6170,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2029,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5992,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10937,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73555,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15212,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1912,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19108,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13200,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2998,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 701,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 22761,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20038,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2970,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9281,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 834,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 31065,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16437,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20825,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1712,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3498,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7206,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 83747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2881,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1479,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 47897,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10273,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9657,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2672,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7943,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6640,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5242,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4647,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13138,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2538,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4048,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29267,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12298,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40232,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11073,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 50975,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5042,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 40920,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 910,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 10952,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 3009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 87909,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3752,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3122,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32191,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 557,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 25207,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 89223,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5434,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 56022,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8732,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5959,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10309,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7,
+      "bucket": "sparse_1_49"
+    },
+    {
+      "buildings_10km": 6169,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52521,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3330,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18153,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8780,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 19929,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3910,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 37902,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 32359,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1707,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 9498,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5876,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3088,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10714,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10282,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10941,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10533,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4856,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29346,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 86435,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 21685,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1905,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3362,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9890,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7011,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4432,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13427,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 709,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 3566,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4884,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14108,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20828,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3082,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 28365,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6341,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2168,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11573,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22753,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9643,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26568,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6793,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 110687,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 5785,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10458,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 38031,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8786,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 59719,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6538,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6953,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 419,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 7447,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 73845,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26870,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4966,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4565,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4135,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6220,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8632,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 37274,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15744,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2444,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24875,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 25476,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 54141,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3398,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5610,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 41110,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 34960,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18890,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18450,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3456,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28136,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 46334,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 24975,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2296,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7540,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 20591,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2867,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 585,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 27633,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4671,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4287,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 14752,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29115,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4565,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 414,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 15678,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3518,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 90172,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1919,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10821,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16310,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 62142,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22668,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5683,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8243,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4702,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13681,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7195,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23270,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14805,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2042,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 509,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 5768,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1114,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1522,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 15577,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3256,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12960,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9240,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6693,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 100184,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9548,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1936,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4455,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1884,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3210,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8747,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13417,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3399,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 22987,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9643,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4678,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 8610,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6166,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18861,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3358,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 6798,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4203,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1771,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 56732,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10729,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 515,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 26561,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5153,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12027,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 52009,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 2989,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12051,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9189,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5849,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4890,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 100462,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1955,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 26766,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 114259,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 38794,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28845,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5968,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12328,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14055,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2230,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7774,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9583,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3264,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 23304,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 14133,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5010,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4456,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9844,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9199,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7687,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 17638,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29179,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2735,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 104331,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18222,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 97861,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6599,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 20958,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 11215,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1811,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3061,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 4212,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2124,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6674,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1908,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2814,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1521,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5211,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4767,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2869,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 87733,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4559,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 62142,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 13509,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10714,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 30687,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2831,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2529,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2625,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9452,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3477,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10821,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2936,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10738,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 119083,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 12126,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 4490,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9118,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 7498,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28596,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 29391,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 16644,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 6674,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 33588,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 5412,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 43090,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    },
+    {
+      "buildings_10km": 32368,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 28913,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 1939,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 9158,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 623,
+      "bucket": "good_200_999"
+    },
+    {
+      "buildings_10km": 2224,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 2781,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 10395,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 3193,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 18906,
+      "bucket": "rich_1000plus"
+    },
+    {
+      "buildings_10km": 0,
+      "bucket": "empty_0"
+    }
+  ]
+}

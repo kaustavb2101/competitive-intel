@@ -296,6 +296,32 @@ function poiRelevanceRec(d){
   return POIREL[i]||null;
 }
 
+/* ---------- per-branch BUILDING DENSITY within 10km (data/branch_density.json) ----------
+   Lazy-loads pipeline/build_branch_density.py's projection of the already-committed
+   source-data/perimeter_counts.json: {meta, branches:[{buildings_10km, bucket}]}, INDEX-ALIGNED
+   to branches.json. buildings_10km is a MEASURED Overture footprint count (a sample from the
+   capped per-province catchment pulls — a zero can mean "catchment file capped before reaching
+   here", not "no buildings on the ground"). Fully null-guarded: absent file → BLDGDEN stays
+   empty, bldgDensityRec() reads null, the popup block is omitted. Nothing is fabricated. */
+let BLDGDEN=null, bldgdenLoaded=false, bldgdenPromise=null;
+async function loadBranchDensity(){
+  if(bldgdenPromise) return bldgdenPromise;
+  bldgdenLoaded=true;
+  bldgdenPromise=(async()=>{
+    try{ const r=await fetch('data/branch_density.json'); if(!r.ok){BLDGDEN=null;return BLDGDEN;}
+      const j=await r.json(); BLDGDEN=j.branches||null; }
+    catch(e){ BLDGDEN=null; }
+    return BLDGDEN;
+  })();
+  return bldgdenPromise;
+}
+// per-branch building-density record (for popups) — null when absent.
+function bldgDensityRec(d){
+  if(!BLDGDEN||!BLDGDEN.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return BLDGDEN[i]||null;
+}
+
 /* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
    Lazy-loads the fused composite-risk layer built by pipeline/build_branch_risk.py:
    {meta, branches:[{code, composite_risk 0–100, components{household,agri,occupation,segment},
@@ -3458,6 +3484,9 @@ function initMap(){
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
   if(!lsitesLoaded) loadLeadSites();
+  // warm the MEASURED building-density-within-10km popup line (Overture, projected from
+  // source-data/perimeter_counts.json). Popup-only, no lens — selectBranch refreshes below.
+  if(!bldgdenLoaded) loadBranchDensity();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -3483,8 +3512,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3836,6 +3865,19 @@ function poiRelevancePopupHTML(d,sec,r){
     + (top?r('Top relevant POIs ≤10km', top, '#8b90a7'):'')
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">POI counts MEASURED (Overture/OSM, a sample / lower bound); the per-category relevance WEIGHTING that fuses them into one score is ESTIMATED (judgement model)</div>`;
 }
+// Building-density block for a branch popup — MEASURED Overture footprint count within 10km
+// (data/branch_density.json, projected from source-data/perimeter_counts.json). A single line;
+// a zero/low count can mean the underlying catchment pull was capped before reaching this branch
+// (see meta.caveats), not that the ground truth is empty — stated inline so it isn't over-read.
+const BLDGDEN_BUCKET_LABEL={rich_1000plus:'dense',good_200_999:'moderate',thin_50_199:'thin',
+  sparse_1_49:'sparse',empty_0:'none in capped pull'};
+function bldgDensityPopupHTML(d,r){
+  const e=bldgDensityRec(d); if(!e) return '';
+  const n=e.buildings_10km||0;
+  const col=n>=1000?'#8b90a7':n>=200?'var(--gold)':n>0?'#cda23e':'var(--mid)';
+  return r('Buildings ≤10km (Overture) · measured',
+    `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col);
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -3993,7 +4035,8 @@ function popupHTML(d){
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
-    ${radar.map(rrow).join('')}</div>`;
+    ${radar.map(rrow).join('')}
+    ${bldgDensityPopupHTML(d,r)}</div>`;
 }
 function styleMarkers(){
   const l=LENS[curLens], mx=lensMax(l);

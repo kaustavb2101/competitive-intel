@@ -1398,6 +1398,61 @@ def check_province_risk():
         ok("province_risk rows sane (%d provinces, mean+p90 in 0..100, known regions)" % len(provs))
 
 
+def check_branch_density(n_branches):
+    # PER-BRANCH BUILDING DENSITY within 10km (MEASURED, Overture footprints), projected by
+    # build_branch_density.py from the already-committed source-data/perimeter_counts.json.
+    # Optional file: SKIP-PASS when absent.
+    hdr("branch_density.json (optional)")
+    if not exists("branch_density.json"):
+        ok("branch_density.json absent — skipped (optional; run build_branch_density.py to populate)")
+        return
+    try:
+        d = load("branch_density.json")
+    except Exception as e:
+        fail("branch_density.json loads", repr(e))
+        return
+    ok("branch_density.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label"):
+        fail("branch_density meta/provenance present (generated_by + label)",
+             "meta missing generated_by/label")
+    else:
+        ok("branch_density meta/provenance present (generated_by + MEASURED label)")
+
+    if meta and meta.get("absent"):
+        ok("branch_density is an honest ABSENT-state (source/master mismatch) — skipped value checks")
+        return
+
+    recs = d.get("branches")
+    if not isinstance(recs, list):
+        fail("branch_density has a 'branches' list", "got %s" % type(recs).__name__)
+        return
+
+    if n_branches is not None and len(recs) != n_branches:
+        fail("branch_density length == branches.json length",
+             "branch_density=%d branches=%d" % (len(recs), n_branches))
+    else:
+        ok("branch_density length == branches.json length (%d)" % len(recs))
+
+    valid_buckets = {"rich_1000plus", "good_200_999", "thin_50_199", "sparse_1_49", "empty_0"}
+    bad = []
+    for i, r in enumerate(recs):
+        if not isinstance(r, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        b = r.get("buildings_10km")
+        if not isinstance(b, int) or b < 0:
+            bad.append("#%d buildings_10km=%r not a non-negative int" % (i, b))
+        bucket = r.get("bucket")
+        if bucket not in valid_buckets:
+            bad.append("#%d bucket=%r not in %r" % (i, bucket, valid_buckets))
+    if bad:
+        fail("branch_density records sane (buildings_10km>=0 int, bucket known)", first_n(bad))
+    else:
+        ok("branch_density records sane (buildings_10km>=0 int, bucket known)")
+
+
 def check_branch_risk(n_branches):
     # PER-BRANCH COMPOSITE RISK (objective #1): fuses household debt-stress (MEASURED) +
     # crop/agri stress (ESTIMATED) + occupation-sector stress (MEASURED x ESTIMATED) + the
@@ -3664,6 +3719,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("branch_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("occupation_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("branch_density.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
@@ -3729,6 +3785,7 @@ _FINGERPRINTED_LAYERS = (
     "branch_labor.json",         # build_branch_labor.py
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
+    "branch_density.json",       # build_branch_density.py
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
     "rival_pressure.json",       # build_rival_pressure.py
@@ -3859,6 +3916,7 @@ def main():
     check_branch_occupations(n)
     check_occupation_risk(n)
     check_poi_relevance(n)
+    check_branch_density(n)
     check_branch_labor(n)
     check_branch_risk(n)
     check_province_risk()

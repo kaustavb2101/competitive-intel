@@ -91,6 +91,11 @@ timeseries `--check` plus `node --check` on every page's JS.*
   Places all ~985 net-new branches ONE AT A TIME by greedy divisor allocation (D'Hondt) over risk-adjusted
   district demand, with 15km neighbor cannibalization (ESTIMATED planning order over measured demand inputs;
   ≤8/district). Surfaces on `#acq` under Road to 3,000 (top-25 table + full-plan CSV + map drill-down).
+- `build_branch_density.py` — projects the already-committed `source-data/perimeter_counts.json`
+  (MEASURED Overture building count within 10km of each branch, from the 77-province catchment
+  pulls, previously unused since 2026-07-02) → `platform/data/branch_density.json`; one popup line
+  ("Buildings ≤10km (Overture)"), no lens. Degrades to an honest ABSENT-state on a length mismatch
+  against the current `branches.json` rather than guessing a projection.
 - `build_branch_peers.py` — **peer-twin outlier benchmark** (objective #1) → `platform/data/branch_peers.json`.
   Benchmarks every branch against its 15 statistical twins (measured market fingerprint: 10km POI mix +
   DIW/workers + rain + own density + NSO province-DTI backdrop, ≥25km away) and flags branches whose

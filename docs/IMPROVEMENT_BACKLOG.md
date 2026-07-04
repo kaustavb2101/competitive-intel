@@ -287,8 +287,36 @@
       frontend side (2026-07-03 (6)/(9)); a shared `_check_point_layer(payload, order=...)` could
       collapse both. *(LOW, S, pure refactor)*
 
+## Queue — follow-ups noticed 2026-07-04 (4)
+- [ ] **`branch_density.json`'s 134 `empty_0` branches are ALL in Bangkok/Rayong** (per the source
+      `perimeter_counts.json` commit message) — a genuine capped-pull artifact, not a real "no
+      buildings" reading. Once Bangkok/Rayong get true province-wide Overture catchments (the
+      "more tiles" ask in `docs/TONIGHT_CHECKLIST.md` §A), re-run
+      `pipeline/build_branch_density.py` — those 134 zeros should mostly clear. *(LOW, S, blocked
+      until the Thai-laptop tile pull lands)*.
+- [ ] **`bldgDensityPopupHTML()`'s bucket color/label ramp was picked to visually match the existing
+      `poiRelevancePopupHTML()` palette, not independently contrast-checked** — same low-priority
+      "not measured against a contrast bar" smell already logged for the 0.6 dot-opacity choice
+      (2026-07-03 (9)). *(LOW, trivial)*
+- [ ] **`build_branch_density.py`'s bucket-tally self-check (`AssertionError` on drift) is the only
+      builder in the pipeline that hard-crashes instead of failing `--check` cleanly** — worth
+      normalizing to the same `CHECK FAIL`/exit-1 convention as every other builder next time this
+      file is touched, so a future cycle doesn't need to read a Python traceback to diagnose a
+      threshold typo. *(LOW, trivial, pure refactor)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (4) — ENRICH: MEASURED building-density-within-10km layer (Overture, sitting unused
+  since 2026-07-02) wired into the branch popup.** New `pipeline/build_branch_density.py` projects
+  `source-data/perimeter_counts.json` (orphaned since commit `dda7816`, never consumed by any
+  builder or `app.js`) → `platform/data/branch_density.json`; one new popup line, no new lens
+  (scope discipline). Alignment safety verified by hand: `branches.json`'s `branches_fingerprint`
+  at `dda7816` (2026-07-02) matches the fingerprint of today's `branches.json` exactly, despite two
+  intervening data refreshes — the index alignment was never at risk. `validate_data.py` gained
+  `check_branch_density()` (265/265, was 259/259); gate 46/0. Headless Playwright evaluation of the
+  real in-page popup functions confirms branch #0 renders `buildings_10km=8, bucket=sparse_1_49`
+  matching the data file exactly, zero JS errors. Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-04
+  (4) entry).
 - **2026-07-04 (3) — VALIDATOR: `national_places.json` + `<city>_places.json` Overture "dense POI"
   layers gained data-integrity coverage.** These files (`build_national_places.py`/
   `build_scene_places.py`, shipped by concurrent 3D-lane workflows) had a determinism gate in
