@@ -2783,6 +2783,108 @@ def check_lead_sites(n_branches):
            "cat_idx valid, nearest-first)" % n_sites)
 
 
+# Overture economic buckets emitted by build_national_places.py / build_scene_places.py — any other
+# bucket key is a data bug (a taxonomy drift between the two builders or a stray field).
+KNOWN_PLACE_BUCKETS = {
+    "factory", "auto", "retail", "food", "hospitality", "finance", "health", "education",
+    "public", "professional", "agriculture", "personal", "logistics", "construction",
+}
+
+
+def _check_places_payload(label, d, require_bbox):
+    # Shared body for the national + per-city Overture "dense POI" files: same meta/label/buckets/
+    # points shape, only the per-city files also carry a bbox. Returns True on failure (matches the
+    # bad-list-driven fail() calls callers already use elsewhere in this file).
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("label") or not isinstance(meta.get("buckets"), list):
+        fail("%s meta/provenance present (label + buckets)" % label, "meta missing label/buckets")
+        return True
+    buckets = meta["buckets"]
+    if set(buckets) != KNOWN_PLACE_BUCKETS:
+        fail("%s meta.buckets is the known 14-bucket Overture taxonomy" % label,
+             "got %r" % sorted(buckets))
+        return True
+    if require_bbox:
+        bbox = d.get("bbox")
+        if not (isinstance(bbox, list) and len(bbox) == 4 and all(is_finite_number(v) for v in bbox)):
+            fail("%s has a 4-number bbox" % label, "got %r" % bbox)
+            return True
+
+    places = d.get("places")
+    if not isinstance(places, dict) or set(places.keys()) != set(buckets):
+        fail("%s 'places' has exactly the declared buckets" % label,
+             "buckets=%r places keys=%r" % (buckets, sorted(places.keys()) if isinstance(places, dict) else places))
+        return True
+
+    bad = []
+    n_pts = 0
+    for bucket, arr in places.items():
+        if not isinstance(arr, list):
+            bad.append("%s not a list" % bucket)
+            continue
+        for p in arr:
+            if not (isinstance(p, list) and len(p) == 2):
+                bad.append("%s malformed point %r" % (bucket, p)); continue
+            lng, lat = p
+            # wider bbox than TH_LAT_MIN/MAX (matches catchment_poi/lead_sites/rival_density below):
+            # the Overture bulk pull spans a border buffer, so genuine points near Betong/the deep
+            # south sit just outside the tighter branches-only bbox.
+            if not (is_finite_number(lng) and is_finite_number(lat)
+                    and 97.0 <= lng <= 106.0 and 5.0 <= lat <= 21.0):
+                bad.append("%s point outside Thailand bbox (lng,lat order?): %r" % (bucket, p))
+            n_pts += 1
+    if bad:
+        fail("%s points are [lng,lat] inside the Thailand bbox" % label, first_n(bad, 8))
+        return True
+
+    meta_count = meta.get("count")
+    if meta_count is not None and meta_count != n_pts:
+        fail("%s meta.count matches the actual point total" % label,
+             "meta.count=%r actual=%d" % (meta_count, n_pts))
+        return True
+
+    ok("%s sane (%d points, %d buckets, meta.count matches)" % (label, n_pts, len(buckets)))
+    return False
+
+
+def check_national_places():
+    # Grid-thinned NATIONWIDE Overture place points (build_national_places.py) — the 3D-scene POI
+    # fallback for every province without a per-city file. Optional: SKIP-PASS when absent.
+    hdr("national_places.json (optional)")
+    if not exists("national_places.json"):
+        ok("national_places.json absent — skipped (optional; run build_national_places.py)")
+        return
+    try:
+        d = load("national_places.json")
+    except Exception as e:
+        fail("national_places.json loads", repr(e))
+        return
+    ok("national_places.json loads")
+    _check_places_payload("national_places", d, require_bbox=False)
+
+
+def check_scene_places():
+    # Per-city dense Overture POI for the 3D catchment scenes (build_scene_places.py) — bbox-clipped
+    # to each committed <city>_catchment.json. Optional: SKIP-PASS when none are committed yet.
+    hdr("<city>_places.json (optional)")
+    cities = sorted(
+        fn[:-len("_places.json")] for fn in os.listdir(DATA)
+        if fn.endswith("_places.json") and fn != "national_places.json"
+    )
+    if not cities:
+        ok("no <city>_places.json committed — skipped (optional; run build_scene_places.py)")
+        return
+    for city in cities:
+        rel = "%s_places.json" % city
+        try:
+            d = load(rel)
+        except Exception as e:
+            fail("%s loads" % rel, repr(e))
+            continue
+        ok("%s loads" % rel)
+        _check_places_payload(rel, d, require_bbox=True)
+
+
 def check_catchment_poi():
     # NATIONWIDE POI PINS for the 3D catchment scene: MEASURED OSM coordinates for all 11 scene
     # pin types, [lat,lng] per point (the order the scene ColumnLayer expects — this check guards
@@ -3776,6 +3878,8 @@ def main():
     check_macro_exposure(n)
     check_macro_sensitivity(n)
     check_lead_sites(n)
+    check_national_places()
+    check_scene_places()
     check_catchment_poi()
     check_competitor_census()
     check_heng_branches()
