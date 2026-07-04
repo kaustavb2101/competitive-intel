@@ -28,28 +28,43 @@
 > Ranked by the committee. NOTE: some are IN FLIGHT in dedicated workflows — do not duplicate:
 > `viz-richness-bangkok` owns rayong-catchment.html + index.html nav-3D; `design-system-polish` owns
 > styles.css type/spacing. Loop should take the **app.js / page-structure / pipeline** items below.
-- [ ] **QW2 — Fill the canvas (likely a centering BUG).** Content is pinned to a narrow left column
-      (~770–1000px) wasting widescreen. Verify `main` centers at runtime; raise max-width to ~1280–1360px;
-      let map/3D/board views go edge-to-edge. Investigate the dual `max-width` (1000 vs 1180). *(HIGH, S–M)*
-- [ ] **QW3 — Fix the nav.** 11-item nav clips mid-word ("Exposu…") and hides tabs behind a fade. Fit all
-      tabs (smaller padding/wrap), shorten labels (Command center→Home, Risk trend→Trend, Acquisition→Acquire),
-      tuck Simulator/Market/Branches/Provinces under a "More ▾". Remove the silent fade mask. *(HIGH, S–M)*
-- [ ] **QW1 — Map = hero (National #map).** Render the Leaflet map full-bleed at top (~78vh); collapse the
-      ~10 lens cards into a single horizontal segmented pill row (colour dot + 2-word label) docked over the
-      map; default to Opportunity lens; methodology → "ⓘ" tooltip; never show pipeline script names in UI. *(HIGH, M)*
-- [ ] **QW5 — Home leads with the verdict.** Command center opens with 2–3 big plain-language hero
-      statements (e.g. "Open next in Vadhana & Bang Na; watching Isan rice + Samut Sakhon moto-title");
-      demote the measured/estimated legend to one quiet bottom line; ranked items click through to detail. *(HIGH, M)*
+> ⚠ **2026-07-04 (9) audit note:** this whole quick-wins list had gone stale — 6 of 8 items below were
+> already shipped in commits dated 2026-06-30/07-01 but never checked off. Before picking a "new" UX
+> item from this section, spot-check it against the live app (`bash tests/lib/render.sh 'index.html#<tab>'
+> ...`) — a `git log -S"<label>"` on `platform/styles.css`/`app.js` is a fast way to confirm.
+- [x] **QW2 — Fill the canvas — DONE 2026-06-30/07-01** (`f142cd0` fullbleed 2D + `5d006d6` consolidated
+      the conflicting `main{max-width}` rules into one `--maxw`/`--maxw-wide` source of truth). Re-confirmed
+      2026-07-04 (9): headless render of `index.html#map`/`#home` shows content edge-to-edge, no narrow column.
+- [x] **QW3 — Fix the nav — DONE 2026-06-30** (`738c28b`: shortened labels — Home/Overview/National/Acquire/
+      Exposure/Trend/3D map — tucked under a "More ▾", no fade mask). Re-confirmed 2026-07-04 (9): headless
+      render shows all 8 top-level items fit on one row, nothing clipped.
+- [x] **QW1 — Map = hero — DONE 2026-06-30** (`ff2e9af`: full-bleed 78vh Leaflet map, lens cards collapsed
+      into one segmented pill row docked over the map with "ⓘ" info tooltips, "More lenses ▾" for the rest).
+      Re-confirmed 2026-07-04 (9): headless render of `index.html#map` matches the spec exactly.
+- [x] **QW5 — Home leads with the verdict — DONE 2026-06-30, since grown well past spec** (`af05be8`).
+      Re-confirmed 2026-07-04 (9): Home now opens with a plain-language board-thesis line + Road-to-3,000
+      bar + a ranked "THIS WEEK — do these first" defend/audit/tighten/expand queue (`decision_queue.json`),
+      each row source-tagged — well beyond the original 2–3-sentence hero ask.
 - [ ] **QW6 — 3D fails gracefully.** Replace the raw "Could not load buildings (Overpass blocked?) — all
       mirrors failed" with a calm styled status ("Building footprints unavailable — showing branch + POI layer")
-      and keep rings + branch pin + POI dots rendered so the scene is never blank. *(HIGH, S)*
-- [ ] **QW8 — Seed or hide Risk-trend.** Until a 2nd vintage exists, render today's snapshot as a designed
-      "baseline captured" state (top stressed segments/provinces now + flat sparkline skeletons + "deltas next
-      refresh" chip), or hide the tab. No blank apology page. *(MED/HIGH, S)*
+      and keep rings + branch pin + POI dots rendered so the scene is never blank. *(HIGH, S)* **Still open on
+      `rayong-catchment.html`** (owned by `viz-richness-bangkok`, not touched by the loop) — confirmed
+      2026-07-04 (9): that page's data-load `.catch()` still shows a raw "Could not load … 3D data: {msg}"
+      string. `branch-explorer.html` already ships the target pattern verbatim
+      (`status('Building footprints unavailable — showing branch + POI layer', 'info')`) — the owning
+      workflow can likely port that exact string/pattern instead of designing a new one.
+- [x] **QW8 — Seed or hide Risk-trend — DONE 2026-06-30** (`44ca12d`: designed "baseline captured" state —
+      flat sparkline skeletons + "Δ at next refresh" chip — renders whenever `deltas.json` is single-vintage
+      or absent, never a blank apology). Re-confirmed 2026-07-04 (9) by reading the live `renderTrend()`/
+      `renderTrendBaseline()` code path (a 2nd vintage hasn't landed yet, so this is still the active state).
 - [ ] **QW4 (shared w/ design team) — Unify on ONE theme.** Make the indigo-console tokens canonical, delete
       the legacy `:root`/nav/`.mcard` block (~styles.css lines 1–98), confirm the SPA inherits it, use
       identical nav markup on every page so deck.gl pages feel in-product. *(HIGH, M — coordinate w/ design-sys)*
+      Confirmed 2026-07-04 (9) still open: `platform/styles.css` still has two `:root{}` blocks (line 1 and
+      line 119) — owned by `design-system-polish`, not touched by the loop.
 - [ ] **Reduce prose** — explanatory sentences → captions; numbers + colour carry meaning. *(med, S)*
+      Not independently re-checked 2026-07-04 (9) — unlike the QW items above, no single commit title
+      claims this one done; leaving open rather than guessing.
 
 ### Bigger bets (from committee — schedule after quick wins)
 - [ ] Promote a deck.gl 3D scene to a **landing hero** (clickable thumbnail/loop on Home + province headers). *(HIGH, M)*
@@ -57,12 +72,17 @@
       Streets/Satellite/Dark, action pills grouped bottom-right, proper header band, kill the stuck loader crescent). *(HIGH, M)*
 - [ ] **Standardize provenance** as one quiet chip (filled dot = measured, hollow = estimated, ≥11px AA),
       one legend per page; move caveats into a consistent "Method & caveats" expander everywhere. *(MED, M)*
-- [ ] **★ Rebuild dense tabs as 2-col dashboards — NOW THE TOP LAYOUT ITEM.** The full-bleed fix widened the
-      container (1180→1320/1680) but the KPI card ROWS still don't stretch, so Exposure/Overview/Acquisition
-      still look left-weighted with an empty right half. Real fix: lay each tab out as KPI strip BESIDE the lead
-      table/chart (2-col grid that fills the widened canvas), cards that grow, lead table to the right. Acquisition
-      leads with the full-width "Road to 3,000" headroom bar + the opportunity-score leaderboard under it. *(HIGH, M)*
+- [x] **★ Rebuild dense tabs as 2-col dashboards — DONE 2026-06-30** (`af05be8` "UX wow layer: 2-col
+      dashboards + home leads with the verdict"). Re-confirmed 2026-07-04 (9) via headless render: Home,
+      Overview and Exposure all lay out as KPI-card column beside a lead table/board that fills the widened
+      canvas. Acquisition intentionally stayed single-column full-width (matches this item's own spec — "leads
+      with the full-width Road to 3,000 bar + leaderboard"), though today the opportunity-score leaderboard
+      renders ABOVE the Road-to-3,000 section rather than after it — cosmetic ordering only, logged below.
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
+- [ ] **Acquisition tab section order** doesn't quite match the "2-col dashboards" bigger bet's own text
+      ("Acquisition leads with the full-width Road to 3,000 bar + the leaderboard under it") — today "Where
+      to open next" (the opportunity leaderboard) renders before the "Road to 3,000" section, not after.
+      Purely cosmetic re-ordering, noticed during the 2026-07-04 (9) backlog audit. *(LOW, trivial)*
 
 ## Queue — UX follow-ups noticed 2026-07-03 (2)
 - [x] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots — DONE
@@ -75,8 +95,12 @@
       → household_risk_by_province.json + National lens "MEASURED · NSO"; top DTI all Isan: Khon Kaen 1.15×, Amnat Charoen 1.14×).
 - [x] **★ Surface the opportunity score on the Acquisition tab — objective #2. DONE 2026-06-30** (#acq "Where to open next"
       leaderboard: top-20 districts + whitespace/competitor-gap/agri-stress component bars; Vadhana 82, Bang Na 80).
-- [ ] **Composite expansion-opportunity score** per district — combine white-space + dominant occupation +
-      competitor density + crop-stress into one rank for "where to open next". Graceful absent. *(high, M)*
+- [x] **Composite expansion-opportunity score per district — DONE (pre-existing, found stale during the
+      2026-07-04 (9) audit)** (`pipeline/build_opportunity_score.py` → `platform/data/opportunity_score.json`
+      already fuses white-space + competitor-gap + province-inherited agri-stress + optional occupation-pull
+      into one 0–100 composite, renormalizing weights over whichever optional inputs are present; surfaced
+      on `#acq`'s "Where to open next" leaderboard, re-confirmed live via headless render 2026-07-04 (9)).
+      This queue entry was a duplicate of already-shipped work — corrected instead of re-built.
 - [x] **Occupation × risk cross-read — DONE 2026-06-30** (`build_occupation_risk.py` → `occupation_risk.json`,
       index-aligned to branches.json: per-branch ESTIMATED occ-stress = MEASURED Overture occupation shares ×
       ESTIMATED stressed-sector weighting [factory national slowdown lever + agriculture = province crop-stress],
@@ -376,6 +400,19 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (9) — AUDIT: backlog reconciliation, "Queue — UX / polish" had gone stale.** No code
+  changed. Spot-checked the committee's quick-wins/bigger-bets list against the live app (headless
+  renders of `#home`/`#map`/`#overview`/`#exposure`/`#acq` + `git log -S` on the claimed labels) and
+  found 6 items already shipped in commits dated 2026-06-30/07-01 but never checked off: QW1 (map
+  hero), QW2 (full-bleed canvas), QW3 (nav fix), QW5 (home verdict — since grown well past its
+  original spec into a ranked decision queue), QW8 (Risk-trend baseline), and the "★ 2-col dashboards"
+  bigger bet. Also found the separate "Composite expansion-opportunity score" enrichment item was a
+  stale duplicate of the already-shipped `build_opportunity_score.py`/`opportunity_score.json`. Left
+  genuinely-open items open (QW4/QW6 — both confirmed still outstanding and correctly owned by other
+  workflows; "Reduce prose" — not independently verifiable either way, left as-is rather than
+  guessing). A stale backlog risks a future cycle re-analyzing or re-building work that already
+  shipped — this keeps the standing loop's queue trustworthy. `bash tests/run.sh check` unaffected
+  (docs-only change): 47/0 before and after.
 - **2026-07-04 (8) — AUDIT: closed the two remaining unsourced-catchment provenance gaps
   (`docs/DATA_PROVENANCE.md` R2/R3).** `rayong_catchment.json` and `chiang-mai_catchment.json`
   (180,000 real Overture building footprints each, commits `9482b0e`/`373b4f0`) shipped with

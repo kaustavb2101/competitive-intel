@@ -5,6 +5,42 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 (9) — AUDIT: reconciled the stale "Queue — UX / polish" backlog section against the live app
+
+Loop cycle. Before picking a build item, spot-checked the committee-ranked quick-wins/bigger-bets
+list in `docs/IMPROVEMENT_BACKLOG.md` against what's actually shipped — a hunch prompted by
+`docs/PROGRESS_LOG.md`'s own 2026-06-30/07-01 entries already describing several of those exact
+items as done. Confirmed via `git log -S"<label>"` on `platform/styles.css`/`app.js` (finding the
+exact shipping commit + date for each) and fresh headless renders of `index.html#home`, `#map`,
+`#overview`, `#exposure`, `#acq` (`bash tests/lib/render.sh`, screenshots read back).
+
+**Found stale:** QW1 (map = hero, `ff2e9af`), QW2 (full-bleed canvas, `f142cd0`/`5d006d6`), QW3 (nav
+fix, `738c28b`), QW5 (home leads with the verdict, `af05be8` — now grown well past its original
+2–3-sentence spec into a full ranked "THIS WEEK" defend/audit/tighten/expand decision queue), QW8
+(Risk-trend baseline, `44ca12d`), and the "★ Rebuild dense tabs as 2-col dashboards" bigger bet
+(`af05be8` again) — all six were still listed `[ ]` open in the backlog despite shipping weeks ago.
+Separately, the "Composite expansion-opportunity score per district" enrichment-queue item turned
+out to be a stale duplicate of the already-shipped `pipeline/build_opportunity_score.py` →
+`platform/data/opportunity_score.json` (fuses white-space + competitor-gap + agri-stress +
+optional occupation-pull into one composite, already surfacing on `#acq`'s "Where to open next"
+leaderboard).
+
+**Left genuinely open** (verified, not just assumed): QW4 (unify theme — `platform/styles.css`
+still literally has two `:root{}` blocks, lines 1 and 119) and QW6 (3D fails gracefully —
+`rayong-catchment.html`'s data-load `.catch()` still shows a raw "Could not load … 3D data:
+{msg}" string) — both correctly stay open and correctly stay out of the loop's scope (owned by
+`viz-richness-bangkok`/`design-system-polish`). Noted for that workflow: `branch-explorer.html`
+already ships QW6's exact target string (`'Building footprints unavailable — showing branch + POI
+layer'`) — reusable verbatim instead of re-designing. "Reduce prose" wasn't independently
+re-checked (no commit title claims it done) — left open rather than guessing.
+
+**Why this matters:** a stale backlog is a real cost to this standing loop — a future cycle (or a
+human skimming it) could burn a cycle "fixing" something already fixed, or worse, build a second,
+divergent implementation alongside the shipped one. Docs-only change, zero `platform/`/`pipeline/`
+files touched. Gate: `bash tests/run.sh check` 47/0 before and after (unaffected, as expected for a
+backlog-doc correction). Full detail + evidence trail in `docs/IMPROVEMENT_BACKLOG.md`'s Done log
+(2026-07-04 (9) entry) and inline against each corrected item.
+
 ## 2026-07-04 (8) — VALIDATOR: doc/data vintage-drift tripwire in `validate_data.py`
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-04 (7)): the AUDIT that same day found
