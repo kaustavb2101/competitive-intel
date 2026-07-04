@@ -2144,9 +2144,27 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
      if(r.status===404){
        if(!cdnBase)return null;
        box.textContent='Loading '+pretty+' 3D from CDN…';
-       return fetch(cdnBase+'/'+CITY+'_catchment.json')
-         .then(function(r2){return r2.ok?r2.json():null;})
-         .catch(function(){return null;});   // CDN unreachable => calm not-pulled state, never a crash
+       // STREAMED download with a live MB meter: these CDN pulls are 30-45MB of uncompressed JSON
+       // (r2.dev applies no gzip), i.e. tens of seconds on a normal line — a static message reads
+       // as a hang and gets the page closed. Falls back to plain .json() where streams are absent.
+       return fetch(cdnBase+'/'+CITY+'_catchment.json').then(function(r2){
+         if(!r2.ok)return null;
+         var total=+r2.headers.get('content-length')||0;
+         if(!r2.body||!r2.body.getReader||!window.TextDecoder)return r2.json();
+         var reader=r2.body.getReader(), chunks=[], got=0;
+         var mb=function(b){return (b/1048576).toFixed(1);};
+         var pump=function(){return reader.read().then(function(st){
+           if(st.done){
+             var buf=new Uint8Array(got), off=0;
+             for(var i=0;i<chunks.length;i++){buf.set(chunks[i],off);off+=chunks[i].length;}
+             box.textContent='Building the '+pretty+' scene…';
+             return JSON.parse(new TextDecoder().decode(buf));
+           }
+           chunks.push(st.value); got+=st.value.length;
+           box.textContent='Loading '+pretty+' 3D — '+mb(got)+(total?' / '+mb(total):'')+' MB…';
+           return pump();});};
+         return pump();
+       }).catch(function(){return null;});   // CDN unreachable => calm not-pulled state, never a crash
      }
      if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
    opt(P+'_province.json'),
