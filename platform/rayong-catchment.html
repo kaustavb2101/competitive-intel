@@ -365,6 +365,16 @@ html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828C
 html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
 html[data-theme="light"] .lg b{color:#5A6477}
 html[data-theme="light"] .lg.on b{color:#11151F}
+
+/* ---- POSTER MODE (isolated feature) — one tap hides ALL overlays so the extruded skyline is the
+   whole frame, then a shareable PNG is composited with an honest provenance caption. Only the sky /
+   atmos / vignette cinematic bed and the GL canvas remain; every UI panel + legend is pulled. */
+body.poster #nav,body.poster #strip,body.poster #left,body.poster #right,
+body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!important}
+/* the poster action pill tints its border amber while a capture is in flight. Deliberately does NOT
+   set `color` — the theme-aware `#ctl .acts button.on` rules already give white-in-dark / ink-in-light
+   text, so overriding it here would reintroduce the light-on-light chrome bug. */
+#ctl .acts #postertog.on{border-color:var(--gold)}
 </style>
 </head>
 <body>
@@ -438,6 +448,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
       <button id="ringtog" class="on">10 km reach rings</button>
       <button id="isotog" class="on">Isochrone</button>
       <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="postertog" title="Poster mode — hide overlays, frame the skyline edge-to-edge, download a shareable PNG">📸 Poster</button>
     </div>
   </div>
 </div>
@@ -663,6 +674,8 @@ const poiOn={}; POI_ORDER.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
 // wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
 let basemap='studio', showRings=true, showIso=true;  // clean no-raster default (scene draws its own ground)
+let posterMode=false;  // POSTER MODE: when true, render() emits ONLY ground + buildings (all overlays pulled) for a clean shareable still
+let _afterRenderCb=null;  // one-shot: fired by deck's onAfterRender so the poster capture reads a FRESHLY-painted frame (not a stale preserveDrawingBuffer frame)
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -915,10 +928,18 @@ function downgradeForSoftwareGL(){
 }
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
+  // preserveDrawingBuffer keeps the GL back-buffer readable AFTER compositing so Poster mode can copy
+  // the canvas into a 2D context and export a PNG. Perf cost is a single retained framebuffer + the
+  // loss of some driver swap optimisations — negligible for this mostly-static showcase scene (no
+  // measurable FPS change on the auto-orbit at 900x620; the poster capture itself is one extra draw).
+  glOptions:{preserveDrawingBuffer:true},
   // cap the framebuffer on mobile (DPR 1) so iOS/Android WebGL doesn't run out of memory and blank out
   useDevicePixels: IS_MOBILE ? false : true,
   controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+  // one-shot post-paint hook — Poster mode arms _afterRenderCb, then forces a redraw; this fires
+  // AFTER the GL draw completes, so the capture reads the just-painted poster frame deterministically.
+  onAfterRender:()=>{ if(_afterRenderCb){const cb=_afterRenderCb;_afterRenderCb=null;try{cb();}catch(e){}} },
   onViewStateChange:({viewState,interactionState})=>{
     VIEW=viewState;
     const inTrans=!!(interactionState&&interactionState.inTransition);
@@ -1535,9 +1556,18 @@ function render(){
   // (8) satellite place-name overlay — TOP of the stack so labels read over the dark photo (Upgrade 4).
   //     Only present in satellite mode; null otherwise. depthTest off so it isn't culled by buildings.
   const labelLyr=labelOverlayLayer(); if(labelLyr)L.push(labelLyr);
-  deckgl.setProps({layers:L,
+  // POSTER MODE: strip every overlay (POI columns, comp pegs/dots, rings, branch dots, all labels,
+  // districts, isochrone) so ONLY the ground bed + extruded buildings remain — a clean skyline still.
+  // Keep only the scenery layer ids; the cinematic sky/atmos/vignette DOM stays behind the canvas.
+  const LF=posterMode?L.filter(l=>l&&posterKeep(l.id)):L;
+  deckgl.setProps({layers:LF,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
+// which deck layer ids survive Poster mode: buildings (curated + streamed) + the ground scaffolding
+// (base tiles, land-use, water, roads, rail, trees). Everything else is an overlay and is dropped.
+function posterKeep(id){ if(!id)return false;
+  return id==='bldg'||id==='stream-bldg'||id==='base'||id==='sat-labels'||
+    /^(ground|landuse|water|roads|rail|trees)/.test(id); }
 
 /* ---------- panels ---------- */
 function fmt(n){return n.toLocaleString();}
@@ -2049,6 +2079,144 @@ document.getElementById('isotog').onclick=function(){showIso=!showIso;this.class
   });
 })();
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+
+// ---- POSTER MODE (Lane 3D-6) — one tap: hide overlays, frame the skyline edge-to-edge, capture a
+// shareable PNG with an honest provenance caption, then restore. Isolated + null-guarded throughout.
+// building extent Poster mode frames edge-to-edge. The Overture pull is PROVINCE-WIDE (Rayong = 180k
+// footprints spread ~85km across; the dense city is a small fraction), so fitting the raw bbox gives a
+// sparse, empty province view. Instead we frame the DENSE HEART: a box centred on CORE (the density
+// peak the resting view already targets) whose radius is the ~50th-percentile building distance from
+// CORE — i.e. the inner half of the mass nearest the core. This adapts per city (compact -> tight,
+// sprawling -> wider) and always fills the poster with buildings. Floored at ~2km so a sparse core
+// never over-zooms into a handful of footprints.
+function posterBbox(){
+  const b=(window.CA&&CA.buildings)||[];
+  const cLat=CORE.lat, cLng=CORE.lng, cos=Math.cos(cLat*Math.PI/180)||1;
+  // tight bbox of the CORE CLUSTER = building centroids within ~3.3km of the density peak. Widen the
+  // cap and retry if the core is sparse, so every city yields a building-filled frame.
+  let RCAP=0.03, minX,maxX,minY,maxY,cnt;
+  for(let pass=0;pass<3;pass++){
+    minX=Infinity;maxX=-Infinity;minY=Infinity;maxY=-Infinity;cnt=0;
+    for(const x of b){
+      let cx=(x.cx!=null?x.cx:null), cy=(x.cy!=null?x.cy:null);
+      if((cx==null||cy==null)&&x.p&&x.p[0]){cx=x.p[0][0];cy=x.p[0][1];}
+      if(cx==null||cy==null)continue;
+      const dx=(cx-cLng)*cos, dy=(cy-cLat);
+      if(dx*dx+dy*dy>RCAP*RCAP)continue;
+      if(cx<minX)minX=cx; if(cx>maxX)maxX=cx; if(cy<minY)minY=cy; if(cy>maxY)maxY=cy; cnt++;
+    }
+    if(cnt>=200)break;                                     // enough core mass — good frame
+    RCAP*=1.8;                                             // sparse core: widen and retry
+  }
+  if(!isFinite(minX))return {minX:cLng-0.03,maxX:cLng+0.03,minY:cLat-0.025,maxY:cLat+0.025};
+  return {minX,maxX,minY,maxY};
+}
+// cinematic poster camera: pitch ~55, bearing -20, zoom computed to FIT the core-cluster bbox edge-to-
+// edge (WebMercatorViewport.fitBounds, then pulled back ~0.55 zoom so the 55° tilt doesn't clip the far edge).
+function posterView(){
+  let vs=Object.assign({},FRAMED,{pitch:55,bearing:-20});
+  try{
+    const bb=posterBbox();
+    const VP=deck.WebMercatorViewport;
+    const W=window.innerWidth||900, H=window.innerHeight||620;
+    if(VP&&isFinite(bb.minX)&&bb.maxX>bb.minX&&bb.maxY>bb.minY){
+      const vp=new VP({width:W,height:H});
+      const f=vp.fitBounds([[bb.minX,bb.minY],[bb.maxX,bb.maxY]],
+        {padding:Math.round(Math.min(W,H)*0.08)});
+      vs={longitude:f.longitude,latitude:f.latitude,zoom:f.zoom-0.55,pitch:55,bearing:-20};
+    }
+  }catch(e){}
+  return vs;
+}
+// rounded-rect path helper for the caption chip.
+function posterRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+// composite the honest provenance caption into the bottom-left corner (device pixels):
+// 'เงินไชโย · <province> · <n> buildings (Overture)' — every shared image self-labels its source.
+function posterCaption(ctx,W,H){
+  const s=(W/(window.innerWidth||W))||1;               // device-pixel scale (DPR)
+  const n=((window.CA&&CA.buildings&&CA.buildings.length)||0);
+  const brand='เงินไชโย';
+  const rest=' · '+CITY_LABEL+' · '+n.toLocaleString()+' buildings (Overture)';
+  const fs=Math.round(15*s);
+  ctx.font='600 '+fs+'px "IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif';
+  const wBrand=ctx.measureText(brand).width, wRest=ctx.measureText(rest).width;
+  const dot=9*s, gap=8*s, padX=14*s, padY=9*s, m=18*s, r=8*s;
+  const cw=dot+gap+wBrand+wRest+padX*2, ch=fs+padY*2;
+  const x=m, y=H-m-ch, cy=y+ch/2;
+  ctx.fillStyle='rgba(13,17,27,0.86)'; posterRR(ctx,x,y,cw,ch,r); ctx.fill();
+  ctx.strokeStyle='rgba(224,169,59,0.55)'; ctx.lineWidth=Math.max(1,s); posterRR(ctx,x,y,cw,ch,r); ctx.stroke();
+  ctx.beginPath(); ctx.fillStyle='#E0A93B'; ctx.arc(x+padX+dot/2,cy,dot/2,0,Math.PI*2); ctx.fill();
+  ctx.textBaseline='middle';
+  let tx=x+padX+dot+gap;
+  ctx.fillStyle='#E6B450'; ctx.fillText(brand,tx,cy+s); tx+=wBrand;
+  ctx.fillStyle='#EDEFF5'; ctx.fillText(rest,tx,cy+s);
+}
+// capture the GL canvas -> 2D canvas -> caption -> PNG download (+ stash dataURL for headless verify).
+function posterCapture(){
+  const gl=document.querySelector('#map canvas');
+  if(!gl)throw new Error('no GL canvas');
+  const W=gl.width, H=gl.height;
+  const out=document.createElement('canvas'); out.width=W; out.height=H;
+  const c=out.getContext('2d');
+  c.drawImage(gl,0,0);
+  posterCaption(c,W,H);
+  const fname=(window.CITY||'rayong')+'-3d-'+(window._POSTER_VINTAGE||'latest')+'.png';
+  try{ window._POSTER_LAST=out.toDataURL('image/png'); }catch(e){}
+  out.toBlob(function(blob){ if(!blob)return;
+    try{ const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=fname; document.body.appendChild(a); a.click();
+      setTimeout(function(){try{URL.revokeObjectURL(url);a.remove();}catch(e){}},1500);
+    }catch(e){ try{console.error('poster download failed',e);}catch(_){}}
+  },'image/png');
+  return fname;
+}
+let _posterBusy=false;
+function runPoster(){
+  if(_posterBusy||posterMode)return; _posterBusy=true;
+  const btn=document.getElementById('postertog'); if(btn)btn.classList.add('on');
+  const prevVIEW=Object.assign({},VIEW), prevOrbit=orbitOn, prevPaused=orbitPausedByUser;
+  posterMode=true; document.body.classList.add('poster');
+  orbitOn=false; orbitPausedByUser=true;                 // freeze the frame for a crisp still
+  _programmatic=true; VIEW=posterView();
+  try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+  Promise.resolve().then(function(){_programmatic=false;});
+  render();                                              // rebuild layers WITHOUT overlays
+  // restore prior state (called exactly once, after the capture).
+  function restore(){
+    posterMode=false; document.body.classList.remove('poster');
+    orbitOn=prevOrbit; orbitPausedByUser=prevPaused;
+    _programmatic=true; VIEW=Object.assign({},prevVIEW);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(function(){_programmatic=false; lastT=0;});
+    render();
+    if(btn)btn.classList.remove('on');
+    _posterBusy=false;
+  }
+  // Let the reframe + building-elevation transition (≤600ms) settle, THEN force one guaranteed fresh
+  // draw and capture inside its onAfterRender — so the exported PNG is the fully-painted poster frame,
+  // never a stale preserveDrawingBuffer frame (which under software WebGL was catching mid-transition).
+  setTimeout(function(){
+    var done=false;
+    var finish=function(){ if(done)return; done=true;
+      try{ posterCapture(); }catch(e){ try{console.error('poster capture failed',e);}catch(_){}}
+      restore();
+    };
+    _afterRenderCb=finish;
+    try{ if(typeof deckgl.redraw==='function'){deckgl.redraw('poster-capture');} else {render();} }
+    catch(e){ try{render();}catch(_){}}
+    // belt-and-suspenders: if onAfterRender never fires, capture anyway so the button never hangs.
+    setTimeout(function(){ if(!done){ _afterRenderCb=null; finish(); } }, 500);
+  }, 1200);
+}
+(function(){var pb=document.getElementById('postertog'); if(pb)pb.onclick=runPoster;})();
+// best-effort MEASURED vintage for the filename (meta.updated first token, e.g. '2026M06'); non-blocking,
+// null-guarded, falls back to 'latest'. window.runPoster is exposed for headless verification only.
+try{ window.runPoster=runPoster; }catch(e){}
+fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(function(m){
+  if(m&&m.updated){var v=String(m.updated).trim().split(/\s+/)[0].replace(/[^0-9A-Za-z._-]/g,'');
+    if(v)window._POSTER_VINTAGE=v;}
+}).catch(function(){});
 
 buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
 
