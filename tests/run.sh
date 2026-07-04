@@ -100,6 +100,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_branch_population.py --check ($(echo "$bp_out" | tail -1))"
   else bad "build_branch_population.py --check (branch_population.json drifted from th_amphoe.geojson/amphoe.json/master)"
   fi
+  cl_out=$( cd "$PIPE" && python3 build_crop_landuse.py --check 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_crop_landuse.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_crop_landuse.py --check ($(echo "$cl_out" | tail -1))"
+  else bad "build_crop_landuse.py --check (crop_landuse.json drifted from spam2010_th_cropgrid.json/th_amphoe.geojson/amphoe.json)"
+  fi
   ( cd "$PIPE" && python3 build_contested_pop.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_contested_pop.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_contested_pop.py --check (rasterio/WorldPop raster missing — dependency gap, not data drift; pip install --break-system-packages rasterio)"
