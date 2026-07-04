@@ -2977,6 +2977,78 @@ def check_branch_population(n_branches):
         ok("branch_population values sane (0 <= pop <= 12M, %d branches)" % len(vals))
 
 
+def check_contested_pop(n_branches):
+    # CONTESTED POPULATION per branch — WorldPop 2020 10km catchment population + the measured
+    # subset within 2km of any census rival, index-aligned to branches.json. Optional: SKIP if
+    # absent (rasterio dep). rows[i] = [pop10, contested_pop], contested <= pop always.
+    hdr("contested_pop.json (optional)")
+    if not exists("contested_pop.json"):
+        ok("contested_pop.json absent — skipped (optional; run build_contested_pop.py)")
+        return
+    try:
+        d = load("contested_pop.json")
+    except Exception as e:
+        fail("contested_pop.json loads", repr(e))
+        return
+    ok("contested_pop.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not is_finite_number(meta.get("radius_km")) or not is_finite_number(meta.get("contest_km")) \
+            or not isinstance(meta.get("provenance"), dict) or not meta.get("vintage"):
+        fail("contested_pop meta/provenance present (generated_by + label + radius/contest km + provenance + vintage)",
+             "meta missing generated_by/label/radius_km/contest_km/provenance/vintage")
+        return
+    ok("contested_pop meta/provenance present (generated_by + WorldPop-vintage + stated contest rule)")
+    gaps = meta.get("gaps")
+    if not (isinstance(gaps, list) and any("lower bound" in str(g).lower() for g in gaps)):
+        fail("contested_pop meta states the census lower-bound caveat",
+             "meta.gaps must state contested share is a LOWER BOUND (Heng sample + sub-scale operators missing)")
+    else:
+        ok("contested_pop meta states the census lower-bound caveat")
+
+    rows = d.get("rows")
+    if not isinstance(rows, list):
+        fail("contested_pop has a 'rows' list", "got %s" % type(rows).__name__)
+        return
+    if n_branches is not None and len(rows) != n_branches:
+        fail("contested_pop length == branches.json length",
+             "contested_pop=%d branches=%d" % (len(rows), n_branches))
+    else:
+        ok("contested_pop length == branches.json length (%d)" % len(rows))
+    bad = []
+    for i, rr in enumerate(rows):
+        if not (isinstance(rr, list) and len(rr) == 2
+                and isinstance(rr[0], int) and isinstance(rr[1], int)
+                and 0 <= rr[1] <= rr[0] <= 12_000_000):
+            bad.append("#%d bad row %r" % (i, rr))
+    if bad:
+        fail("contested_pop rows sane ([pop10, contested] ints, contested <= pop10 <= 12M)", first_n(bad, 8))
+    else:
+        ok("contested_pop rows sane (contested <= pop10 <= 12M ints, %d branches)" % len(rows))
+
+    top = d.get("top")
+    if not isinstance(top, list):
+        fail("contested_pop has a 'top' list", "got %s" % type(top).__name__)
+        return
+    bad = []
+    prev = None
+    for j, t in enumerate(top):
+        if not (isinstance(t, dict) and isinstance(t.get("name"), str) and t["name"].strip()
+                and isinstance(t.get("i"), int) and 0 <= t["i"] < len(rows)
+                and isinstance(t.get("pct"), int) and 0 <= t["pct"] <= 100
+                and isinstance(t.get("pop"), int) and isinstance(t.get("cpop"), int)
+                and t["cpop"] <= t["pop"] and [t["pop"], t["cpop"]] == rows[t["i"]]):
+            bad.append("#%d malformed top record" % j); continue
+        if prev is not None and t["pct"] > prev + 1:   # pct is rounded; allow 1pt rounding slack
+            bad.append("#%d not sorted by contested share desc" % j)
+        prev = t["pct"]
+    if bad:
+        fail("contested_pop top records sane (named, valid index, pct desc, matches rows[])", first_n(bad, 8))
+    else:
+        ok("contested_pop top records sane (%d records, named + share-ranked + row-consistent)" % len(top))
+
+
 def check_occupation_leads(n_branches):
     # NAMED occupation leads per branch (nearest establishments by occupation within 10km, name +
     # phone). Index-aligned to branches.json. Optional file: SKIP-PASS when absent (bulk pull).
@@ -3216,6 +3288,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_sensitivity.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("lead_sites.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("contested_pop.json", lambda d: d.get("rows") if isinstance(d, dict) else None),
     # amphoe.json is NOT itself index-aligned, but it carries branch_amphoe[] which IS (BAMP[i]<->DATA[i]).
     ("amphoe.json", lambda d: d.get("branch_amphoe") if isinstance(d, dict) else None),
 )
@@ -3278,6 +3351,7 @@ _FINGERPRINTED_LAYERS = (
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
     "rival_pressure.json",       # build_rival_pressure.py
+    "contested_pop.json",        # build_contested_pop.py
     "macro_sensitivity.json",    # build_macro_sensitivity.py
 )
 
@@ -3428,6 +3502,7 @@ def main():
     check_rival_pressure(n)
     check_cluster_brief(n, branches)
     check_branch_population(n)
+    check_contested_pop(n)
     check_occupation_leads(n)
     check_provenance()
     check_index_alignment(n)

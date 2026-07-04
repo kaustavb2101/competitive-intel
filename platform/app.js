@@ -678,6 +678,22 @@ async function loadBranchPopulation(){
   })();
   return bpopPromise;
 }
+// CONTESTED POPULATION (contested_pop.json, index-aligned; pipeline/build_contested_pop.py):
+// MEASURED WorldPop-2020 × rival-census overlay — rows[i]=[pop10, contested_pop]: the population
+// inside branch i's 10km circle and the subset of it living within 2km of ANY census rival.
+// Share = rows[i][1]/rows[i][0] (census lower bound). Same cached-promise pattern.
+let CPOP=null, cpopLoaded=false, cpopPromise=null;
+async function loadContestedPop(){
+  if(cpopPromise) return cpopPromise;
+  cpopLoaded=true;
+  cpopPromise=(async()=>{
+    try{ const r=await fetch('data/contested_pop.json'); if(r.ok){ const j=await r.json();
+      CPOP=(j&&Array.isArray(j.rows))?j:null; } }
+    catch(e){ CPOP=null; }
+    return CPOP;
+  })();
+  return cpopPromise;
+}
 let CCEN=null, ccenItems=[], ccenLoaded=false, ccenPromise=null;   // MEASURED merged rival-branch census (.items with lat/lng)
 async function loadCompetitorCensus(){
   if(ccenPromise) return ccenPromise;
@@ -2125,6 +2141,54 @@ function renderExposure(){
   renderOccConcentration();
   // OBJECTIVE #1: composite-risk readouts — most-stressed provinces + riskiest branches (lazy, graceful).
   renderRiskReadouts();
+  // OBJECTIVE #2: most contested ground — catchments where rivals sit on top of our population (measured).
+  renderContestedGround();
+}
+
+/* ---------- most contested ground · contested population (objective #2, MEASURED) ----------
+   Surfaces data/contested_pop.json (pipeline/build_contested_pop.py): for each branch, the WorldPop
+   2020 population inside its 10km catchment and the MEASURED share of it also living within 2km of
+   any rival in the merged competitor census. The .top list ships pre-ranked (share desc, pop10>=25k
+   stated rule); we show the top 10. Lazy + graceful: absent file → renders nothing. DOM host is
+   created in-JS after #expo-risk (falls back to #expoprov) so no index.html wiring is needed. */
+function contestedHost(){
+  let h=document.getElementById('expo-contested');
+  if(h) return h;
+  const anchor=document.getElementById('expo-risk')||document.getElementById('expoprov');
+  if(!anchor||!anchor.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-contested'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+  return h;
+}
+function renderContestedGround(){
+  const host=contestedHost(); if(!host) return;
+  if(!CPOP){
+    if(!cpopLoaded) loadContestedPop().then(()=>{ if(onExposureView()) renderContestedGround(); });
+    host.innerHTML=''; return;                       // graceful: nothing until the layer lands
+  }
+  const top=(Array.isArray(CPOP.top)?CPOP.top:[]).slice(0,10);
+  if(!top.length){ host.innerHTML=''; return; }
+  const natSh=(CPOP.meta&&CPOP.meta.national_contested_share_pct!=null)?CPOP.meta.national_contested_share_pct:null;
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:0">Most contested ground ${TAG_M}</h2>`+
+    `<p class="lead">Top ${top.length} branches by the share of their <b>10km catchment population</b> that also lives `+
+    `<b>within 2km of a rival branch</b> — <b>measured</b> (WorldPop 2020 × merged competitor census). This is where `+
+    `AutoX and the rivals fight for the same people${natSh!=null?`; nationally <b>${natSh}%</b> of our catchment population is contested`:''}.</p>`+
+    methodBox('A 1km WorldPop cell counts as CONTESTED when its centre lies within 2km of any rival in the merged census; share = contested people ÷ catchment people.',
+      ['Population is <b>measured</b> — WorldPop 2020 (1km grid, UN-adjusted).',
+       'The census misses Heng’s full network (sample) and all sub-scale local operators — contested share is a <b>lower bound</b>.',
+       'Only branches with ≥25k catchment population are ranked (stated rule — keeps tiny catchments from posting empty 100%s).'])+
+    `<table class="tbl" id="expo-contested-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
+    `<th title="WorldPop 2020 population inside the 10km catchment — measured">Catchment pop</th>`+
+    `<th class="h-agri" title="people of that catchment also within 2km of a rival — measured, census lower bound">Contested people</th>`+
+    `<th class="h-agri" title="contested ÷ catchment — measured share">Share</th></tr>`+
+    top.map((t,rank)=>{
+      const col=t.pct>=60?'var(--agri)':t.pct>=35?'var(--gold)':'var(--merch)';
+      return `<tr><td class="mono sub">${rank+1}</td><td><b>${t.name||'—'}</b></td><td class="sub">${t.prov||'—'}${t.region?' · '+t.region:''}</td>`+
+        `<td class="mono">${(t.pop||0).toLocaleString()}</td>`+
+        `<td class="mono" style="color:${col}">${(t.cpop||0).toLocaleString()}</td>`+
+        `<td class="mono" style="color:${col}">${t.pct}%</td></tr>`;
+    }).join('')+`</table>`;
 }
 
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
@@ -3203,6 +3267,7 @@ function initMap(){
   // branch tap already carries the "Catchment ≤10km" block; selectBranch refreshes an open popup if
   // they land late. Optional + null-safe: absent file → BPOP/CCEN stay null and the block is omitted.
   if(!bpopLoaded) loadBranchPopulation();
+  if(!cpopLoaded) loadContestedPop();
   if(!ccenLoaded) loadCompetitorCensus();
   if(!cbrfLoaded) loadClusterBrief();
   if(!occlLoaded) loadOccLeads();
@@ -3236,8 +3301,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CCEN||!CBRF||!OCCL||!RIVP){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3406,17 +3471,23 @@ function rivalPressureLineHTML(d){
 // omitted when none of the three are available. Nothing is fabricated.
 function catchmentPopupHTML(d,sec,r){
   const i=idxOf(d);
-  const pop=(BPOP&&i>=0&&i<BPOP.length&&BPOP[i]!=null)?BPOP[i]:null;
+  // contested-population overlay (contested_pop.json rows[i]=[pop10, contested_pop], measured);
+  // falls back to its pop10 when branch_population.json is absent (same raster, same method).
+  const cp=(CPOP&&i>=0&&i<CPOP.rows.length&&Array.isArray(CPOP.rows[i]))?CPOP.rows[i]:null;
+  const pop=(BPOP&&i>=0&&i<BPOP.length&&BPOP[i]!=null)?BPOP[i]:(cp?cp[0]:null);
+  const cpct=(cp&&cp[0]>0)?Math.round(100*cp[1]/cp[0]):null;
+  const cc=cpct==null?'':cpct>=60?'var(--agri)':cpct>=35?'var(--gold)':'var(--merch)';
   const hasK=d.k10&&typeof d.k10==='object';
   const estab=hasK?Object.values(d.k10).reduce((a,v)=>a+(v||0),0):null;
   const rivals=catchRivalCount(d);
   if(pop==null && estab==null && rivals==null) return '';     // nothing measured to show → omit block
   const rc=rivals!=null&&rivals>0?'var(--agri)':'var(--merch)';
   return sec('Catchment ≤10km — measured')
-    + (pop!=null?r('Reachable population', pop.toLocaleString(), 'var(--accent)'):'')
+    + (pop!=null?r('Catchment population', pop.toLocaleString()
+        +(cpct!=null?` · <span style="color:${cc}" title="share of this 10km population also living within 2km of a rival branch — measured WorldPop 2020 × competitor census; census lower bound">${cpct}% contested by rivals</span>`:''), 'var(--accent)'):'')
     + (estab!=null?r('Establishments ≤10km (OSM)', estab.toLocaleString(), 'var(--merch)'):'')
     + (rivals!=null?r('Rival branches ≤10km', `<span style="color:${rc}">${rivals}</span>`, rc):'')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle${cpct!=null?'; contested = share of that population within 2km of any census rival (lower bound — Heng sampled, sub-scale operators missing)':''}; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
 }
 // Macro cluster brief — a one-line plain-language read of the macro forces on this branch's customer
 // cluster (cluster_brief.json, index-aligned; templated from measured board/crop/occupation signals).
