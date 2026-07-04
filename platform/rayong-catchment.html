@@ -240,14 +240,29 @@ html[data-theme="light"] #isolegend .il{color:#2C3444}
 #complegend{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
  padding-bottom:7px;border-bottom:1px solid #1c2740}
 #complegend .cl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
-#complegend .cl{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+/* clickable brand-toggle chip (LANE 3D-2): tap to show/hide that brand's rivals */
+#complegend .cl{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt);
+ cursor:pointer;user-select:none;padding:2px 7px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
+ background:rgba(255,255,255,.05);transition:opacity .12s,border-color .12s}
+#complegend .cl:hover{border-color:rgba(255,255,255,.34)}
+#complegend .cl.off{opacity:.4;border-style:dashed}
+#complegend .cl.off .cl-nm{text-decoration:line-through}
 #complegend .cl .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
 #complegend .cl b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
 #complegend .cl-tag{font:600 9px 'IBM Plex Mono';color:#3fc4ab;letter-spacing:.3px}
+/* rival-ground toggle chip — same chip look, distinct accent when ON */
+#complegend .cl-gnd{display:inline-flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Mono';color:var(--dim);
+ cursor:pointer;user-select:none;padding:2px 8px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
+ background:rgba(255,255,255,.05);letter-spacing:.2px;transition:border-color .12s,color .12s}
+#complegend .cl-gnd:hover{border-color:rgba(255,255,255,.34)}
+#complegend .cl-gnd.on{color:var(--txt);border-color:var(--blue);background:rgba(91,124,250,.16)}
 html[data-theme="light"] #complegend{border-bottom-color:#D3DAE6}
 html[data-theme="light"] #complegend .cl-ttl{color:#828CA0}
-html[data-theme="light"] #complegend .cl{color:#2C3444}
+html[data-theme="light"] #complegend .cl{color:#2C3444;border-color:#D3DAE6;background:#F4F6FB}
+html[data-theme="light"] #complegend .cl:hover{border-color:#9BA6BC}
 html[data-theme="light"] #complegend .cl b{color:#5A6477}
+html[data-theme="light"] #complegend .cl-gnd{color:#828CA0;border-color:#D3DAE6;background:#F4F6FB}
+html[data-theme="light"] #complegend .cl-gnd.on{color:#2C3444;border-color:var(--blue);background:rgba(91,124,250,.12)}
 
 .dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
 .dtt b{color:#fff}
@@ -766,6 +781,19 @@ const poiOn={}; POI_ORDER.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
 // wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
 let basemap='studio', showRings=true, showIso=true;  // clean no-raster default (scene draws its own ground)
+// ---- LANE 3D-2 rival-territory overlay state (MEASURED census) ----------------------------------
+// Per-brand legend toggles bucket every rival into one of the big-4 title lenders + "other"; a
+// toggled-off bucket hides its pegs/discs/labels. showRivalGround draws translucent 1.5km discs
+// under the visible rivals so contested corridors read spatially — OFF by default for poster clean.
+const RIVAL_NAMED=['Srisawad','Muangthai','Tidlor','Heng'];
+function rivalBucket(b){return RIVAL_NAMED.indexOf(b)>=0?b:'other';}
+const RIVAL_HIDDEN=new Set();       // buckets the user has switched OFF in the legend
+let showRivalGround=false;          // 1.5km ground discs under rival pegs — OFF by default
+// visible rivals = scene census minus any bucket toggled off in the legend.
+function compVisible(){return compScene().filter(c=>!RIVAL_HIDDEN.has(rivalBucket(c.brand)));}
+// nearest AutoX branch (metres) to a lat/lng — MEASURED, computed from BR. null when no branches.
+function nearestAutoX(lat,lng){ if(!BR||!BR.length)return null;
+  let best=Infinity; for(const b of BR){const d=hav(lat,lng,b.y,b.x); if(d<best)best=d;} return isFinite(best)?best:null; }
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -1065,7 +1093,10 @@ const deckgl=new deck.DeckGL({container:'map',
     if(!object)return null;
     // buildings are non-interactive scenery — no per-building readout (owner request)
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||'Rayong'} · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
-    if(layer.id==='comp'||layer.id==='comp-peg')return {html:`<div class="dtt"><b>${object.brand}</b>${object.name?'<br>'+object.name:''}<br><span style="color:#8a94a8">competitor branch · measured</span></div>`};
+    if(layer.id==='comp'||layer.id==='comp-peg'){
+      const nb=nearestAutoX(object.lat,object.lng);   // MEASURED: haversine to closest AutoX branch
+      const nbTxt=(nb!=null)?`<br><span style="color:#c8b78a">nearest AutoX ${(nb/1000).toFixed(1)} km</span>`:'';
+      return {html:`<div class="dtt"><b>${object.brand}</b>${object.name?'<br>'+object.name:''}${nbTxt}<br><span style="color:#8a94a8">competitor branch · measured</span></div>`};}
     if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
     if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
       const nm=Array.isArray(object)?object[2]:null;
@@ -1607,7 +1638,18 @@ function render(){
   //     filtered to the city bbox). A brand-coloured 3D ColumnLayer "peg" makes each rival stand up
   //     in the city (and cast a shadow, grounding it), with the flat dot kept for crisp read at any
   //     zoom. Both null-safe: compScene() is [] when no competitor data exists for the city.
-  const COMPS=compScene();
+  const COMPS=compVisible();
+  // (5a) RIVAL GROUND (LANE 3D-2) — optional translucent 1.5km discs under each visible rival, brand-
+  //      coloured, so contested corridors read as overlapping territory. Flat ground polygons (like the
+  //      isochrone bands: depthTest off) drawn UNDER the pegs. OFF by default for poster cleanliness.
+  if(showRivalGround && deck.PolygonLayer && COMPS.length){
+    const gA=(document.documentElement.dataset.theme==='dark')?40:26;   // fill alpha: dark 40 / light 26
+    L.push(new deck.PolygonLayer({id:'rival-ground',data:COMPS,getPolygon:d=>circle(d.lat,d.lng,1500),
+      extruded:false,stroked:true,filled:true,
+      getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],gA];},
+      getLineColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],Math.min(255,gA+80)];},
+      lineWidthMinPixels:1,parameters:{depthTest:false},pickable:false}));
+  }
   if(deck.ColumnLayer && COMPS.length){
     L.push(new deck.ColumnLayer({id:'comp-peg',data:COMPS,getPosition:d=>[d.lng,d.lat],
       diskResolution:8, radius:55, radiusUnits:'meters',
@@ -2234,22 +2276,41 @@ function buildIsoLegend(){
   }).join('');
 }
 
-/* ---------- competitor-brand legend (measured rivals in this scene) ---------- */
+/* ---------- competitor-brand legend (measured rivals in this scene) — LANE 3D-2 -------------------
+ * Interactive: each chip toggles a brand bucket (big-4 title lenders + "other") on/off in the scene;
+ * a "rival ground" chip flips the 1.5km territory discs. Counts are the MEASURED census (fixed). */
 function buildCompLegend(){
   const host=document.getElementById('complegend'); if(!host)return;
   const SC=compScene();
   if(!SC||!SC.length){host.style.display='none';return;}
-  // count rivals by brand, present-brands only, ordered by count desc.
-  const byB={}; SC.forEach(c=>{const b=c.brand||'?';byB[b]=(byB[b]||0)+1;});
-  const brands=Object.keys(byB).sort((a,b)=>byB[b]-byB[a]);
-  if(!brands.length){host.style.display='none';return;}
+  // count rivals by BUCKET (named big-4 + "other"), present buckets only.
+  const byB={}; SC.forEach(c=>{const b=rivalBucket(c.brand);byB[b]=(byB[b]||0)+1;});
+  // ordered: named brands (present) by count desc, then "other" last.
+  const named=RIVAL_NAMED.filter(b=>byB[b]).sort((a,b)=>byB[b]-byB[a]);
+  const buckets=byB['other']?named.concat(['other']):named;
+  if(!buckets.length){host.style.display='none';return;}
+  // brand swatch colour: named brands from BRAND, "other" neutral gray.
+  const swColor=b=>(b==='other')?[150,150,150]:(BRAND[b]||[150,150,150]);
   // provenance: curated for Rayong, national Google-Places census elsewhere.
   const measured=(COMP&&COMP.length)?'measured · curated':'measured · Google Places';
   host.style.display='flex';
-  host.innerHTML='<span class="cl-ttl">Competitors</span>'+brands.map(b=>{
-    const c=BRAND[b]||[150,150,150];
-    return `<span class="cl"><span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${b}<b>${byB[b]}</b></span>`;
-  }).join('')+`<span class="cl-tag">${measured}</span>`;
+  host.innerHTML='<span class="cl-ttl">Rivals</span>'+buckets.map(b=>{
+    const c=swColor(b), off=RIVAL_HIDDEN.has(b)?' off':'';
+    return `<span class="cl${off}" data-bk="${b}" role="button" tabindex="0" aria-pressed="${off?'false':'true'}">`+
+      `<span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>`+
+      `<span class="cl-nm">${b}</span><b>${byB[b]}</b></span>`;
+  }).join('')+
+    `<span class="cl-gnd${showRivalGround?' on':''}" id="rivalGndTog" role="button" tabindex="0" aria-pressed="${showRivalGround?'true':'false'}">◍ rival ground</span>`+
+    `<span class="cl-tag">${measured}</span>`;
+  // wire brand-bucket toggles
+  host.querySelectorAll('.cl[data-bk]').forEach(el=>{
+    const bk=el.getAttribute('data-bk');
+    el.onclick=()=>{ if(RIVAL_HIDDEN.has(bk))RIVAL_HIDDEN.delete(bk); else RIVAL_HIDDEN.add(bk);
+      buildCompLegend(); render(); };
+  });
+  // wire rival-ground toggle
+  const g=host.querySelector('#rivalGndTog');
+  if(g)g.onclick=()=>{ showRivalGround=!showRivalGround; buildCompLegend(); render(); };
 }
 
 /* controls */
