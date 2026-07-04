@@ -58,6 +58,10 @@ OUT = os.path.join(DATA, "branch_density.json")
 BUCKET_ORDER = ["rich_1000plus", "good_200_999", "thin_50_199", "sparse_1_49", "empty_0"]
 
 
+class BucketDriftError(Exception):
+    """Recomputed bucket tally disagrees with the source's own tally (threshold typo, not data drift)."""
+
+
 def _load(p):
     with open(p, encoding="utf-8") as f:
         return json.load(f)
@@ -115,7 +119,7 @@ def build():
         tally[r["bucket"]] += 1
     src_buckets = smeta.get("buckets") or {}
     if src_buckets and tally != src_buckets:
-        raise AssertionError(
+        raise BucketDriftError(
             "recomputed bucket tally %r does not match source-data/perimeter_counts.json's own "
             "meta.buckets %r — bucket thresholds have drifted from the source's; fix _bucket() "
             "before shipping" % (tally, src_buckets)
@@ -153,7 +157,13 @@ def main():
                          "(exit 3 / SKIP when source-data/perimeter_counts.json is absent)")
     args = ap.parse_args()
 
-    data = build()
+    try:
+        data = build()
+    except BucketDriftError as e:
+        # same CHECK FAIL / exit-1 convention as every other builder, instead of an uncaught
+        # traceback — a threshold typo should read like any other gate failure, not a crash.
+        print("CHECK FAIL: %s" % e, file=sys.stderr)
+        sys.exit(1)
 
     if args.check:
         if data is None:
