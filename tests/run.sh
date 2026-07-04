@@ -95,6 +95,10 @@ phase_check(){
   ( cd "$PIPE" && python3 build_lead_sites.py --check >/dev/null 2>&1 ) && ok "build_lead_sites.py --check" || bad "build_lead_sites.py --check (lead_sites.json drifted from osm_layers.json/branches.json/branch_leads.json)"
   ( cd "$PIPE" && python3 build_catchment_poi.py --check >/dev/null 2>&1 ) && ok "build_catchment_poi.py --check" || bad "build_catchment_poi.py --check (catchment_poi.json drifted from osm_layers.json)"
   ( cd "$PIPE" && python3 slim_catchment.py --check >/dev/null 2>&1 ) && ok "slim_catchment.py --check" || bad "slim_catchment.py --check (a committed *_catchment.json is not the slim canonical form — run: python3 pipeline/slim_catchment.py)"
+  scp_out=$( cd "$PIPE" && python3 build_scene_places.py --check 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_scene_places.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_scene_places.py --check ($(echo "$scp_out" | tail -1))"
+  else bad "build_scene_places.py --check (a <city>_places.json drifted — run: python3 pipeline/build_scene_places.py)"; fi
   bp_out=$( cd "$PIPE" && python3 build_branch_population.py --check 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_population.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_branch_population.py --check ($(echo "$bp_out" | tail -1))"

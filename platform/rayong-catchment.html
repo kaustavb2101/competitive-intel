@@ -624,9 +624,30 @@ function poiScene(){ if(_POI_SCENE)return _POI_SCENE;
       out.push(p);}
     _POI_SCENE[t]=out;}
   return _POI_SCENE; }
-// resolve a pin type's points: curated province set when present, else the bbox-filtered national set.
-function poiGet(t){ if(POIS[t]&&POIS[t].length)return POIS[t];
-  const ps=poiScene(); return (ps&&ps[t])||[]; }
+// window.POI_OV: dense Overture points keyed by SCENE category ([lat,lng]), built once from the
+// per-city <city>_places.json when it loads. Densifies the OSM categories + adds the new clusters.
+window.POI_OV=null;
+function buildPoiOv(){
+  const SP=window.SCENEPLACES; if(!SP||!SP.places){window.POI_OV={};return;}
+  const ov={};
+  for(const bucket in SP.places){ const cat=OV_MAP[bucket]; if(!cat)continue;
+    const src=SP.places[bucket]; if(!Array.isArray(src))continue;
+    const dst=ov[cat]||(ov[cat]=[]);
+    for(let i=0;i<src.length;i++){ const p=src[i]; if(!p)continue;
+      dst.push([p[1],p[0]]); }   // file is [lng,lat] -> scene wants [lat,lng]
+  }
+  window.POI_OV=ov;
+}
+// resolve a pin type's points: curated/national OSM set UNIONED with the dense Overture set for the
+// same category. Cached per type on first resolve (invalidated when POI_OV builds).
+let _POI_MERGE={};
+function poiGet(t){
+  if(_POI_MERGE[t])return _POI_MERGE[t];
+  let base=(POIS[t]&&POIS[t].length)?POIS[t]:((poiScene()||{})[t]||[]);
+  const ov=(window.POI_OV&&window.POI_OV[t])||null;
+  const out=ov?base.concat(ov):base;
+  if(window.POI_OV)_POI_MERGE[t]=out;   // only memoise once the Overture layer is settled
+  return out; }
 const GOLD=[230,180,80]; // 10km collateral catchment ring
 // canonical type->color map: single source of truth for map dots AND legend AND toggles.
 // Ordered + coloured by relevance to a TITLE-LOAN lender (collateral supply + finance first, then
@@ -639,15 +660,31 @@ const POI_COLORS={
   fresh_market:[224,144,47], supermarket:[224,170,90], convenience:[208,118,60],
   // surrounding economy / services
   industrial:[123,138,166], restaurant:[133,144,166], hotel:[214,90,160],
-  school:[122,79,224], pharmacy:[200,67,59]};
+  school:[122,79,224], pharmacy:[200,67,59],
+  // NEW dense Overture "who works nearby" clusters (build_scene_places.py)
+  professional:[110,150,190], personal:[200,140,175], logistics:[150,120,90],
+  construction:[170,150,110], agriculture:[120,170,90], publicsvc:[150,160,175]};
 const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
   fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
-  restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
+  restaurant:'Restaurants',hotel:'Hotels',school:'Schools',
+  professional:'Offices',personal:'Personal svc',logistics:'Logistics',construction:'Construction',
+  agriculture:'Agri traders',publicsvc:'Public'};
 // default-on: ALL POI types (owner request — show the full catchment, keep the colour legend to
 // read/toggle). The legend still lets any type be switched off, but nothing is hidden by default.
-const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1,restaurant:1,hotel:1,school:1,pharmacy:1};
-// legend/render order by relevance (collateral & finance, then demand, then economy)
-const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy'];
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1,restaurant:1,hotel:1,school:1,pharmacy:1,
+  professional:1,personal:1,logistics:1,construction:1,agriculture:1,publicsvc:1};
+// legend/render order by relevance (collateral & finance, then demand, then economy, then Overture clusters)
+const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy','professional','personal','agriculture','logistics','construction','publicsvc'];
+// Overture bucket -> scene category. 8 buckets DENSIFY existing categories (no new chip); the rest
+// become the new "who works nearby" chips above. Points are [lng,lat] in <city>_places.json -> the
+// loader swaps them to the scene's [lat,lng] and files them here as window.POI_OV[category].
+const OV_MAP={auto:'vehicle_commerce',finance:'bank',food:'restaurant',hospitality:'hotel',
+  education:'school',health:'pharmacy',factory:'industrial',retail:'convenience',
+  professional:'professional',personal:'personal',logistics:'logistics',construction:'construction',
+  agriculture:'agriculture',public:'publicsvc'};
+// fold the dense per-city Overture POI (loaded into window.SCENEPLACES by the bottom loader before
+// initCatch runs) into the POI categories — here, where buildPoiOv/OV_MAP/_POI_MERGE are all live.
+try{buildPoiOv();_POI_MERGE={};}catch(e){}
 // preserve a stable, relevance-ordered legend, restricted to types actually present in the scene.
 // LET (not const) + refreshed once the scene extent is known: for curated provinces the curated
 // POIS decides; for every other province poiGet() falls back to the bbox-filtered national POI, so
@@ -2215,7 +2252,10 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    opt('data/branch_population.json'),
    // NAMED occupation leads per branch (Overture Places, name+phone by occupation ≤10km) — the
    // "who to call near this branch" list, index-aligned to branches.json.
-   opt('data/occupation_leads.json')
+   opt('data/occupation_leads.json'),
+   // DENSE per-city Overture POI (build_scene_places.py, ~24x the OSM density) — local first, then
+   // the catchments CDN for provinces served from R2. Absent => the scene keeps the OSM POI only.
+   gopt('_places.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -2228,6 +2268,7 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
+   window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch, which is in-scope for buildPoiOv)
    killLoader();window.initCatch();})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
