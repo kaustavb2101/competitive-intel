@@ -4,6 +4,64 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-04 (7) — AUDIT: two docs quoting the pre-refresh (stale) World Bank Pink Sheet vintage, corrected to match the already-committed 2026M06 data
+
+**Task type:** AUDIT (provenance/documentation sweep — no `platform/data` or `source-data` value
+changed). `/workspace/watcher` was not present this cycle. Started with a RE-DERIVE pass:
+`bash tests/run.sh check` on a clean checkout of `claude/new-session-wto26j` → 46 passed, 0 failed
+(`validate_data.py` 265/265) — the pipeline outputs are already in sync with their sources, so there
+was no drift to fix. Moved to an AUDIT pass over docs that quote live data values, cross-checking each
+against the actual committed `source-data`/`platform/data` files.
+
+**What was found.** The 2026-07-03 Pink Sheet refresh (commit `adf5494`, "Refresh Pink Sheet to
+2026M06") correctly regenerated `source-data/commodities.json`, `commodities_protein.json`,
+`commodity_board.json` and `platform/data/meta.json` (whose `updated` field now correctly reads
+`"2026M06 prices · drought 2026-06-21"`, and whose `macro` Gold tile correctly reads `+26.1%`) — but
+two docs describing that same data were never updated and still asserted the **pre-refresh** numbers
+as current:
+- `docs/DATA_SOURCES.md` §"World Bank Pink Sheet — current read" was still titled "(Dec 2025 prices)"
+  and quoted the old figures (rice −19.5%, rubber −13.5%, sugar −25.9%, palm −17.6%, gold +62.7%, …)
+  and the old (2025-vintage) Pink Sheet URL hash — all superseded by the committed 2026M06 values
+  (rice +17.9%, rubber +32.4%, sugar −13.5%, palm +18.2%, gold +26.1%, per `source-data/commodities.json`
+  / `commodities_protein.json` verbatim).
+- `docs/DATA_PROVENANCE.md`'s `meta.json` provenance-table row quoted the vintage label as
+  `2025M12 prices · drought 2026-06-21` — the actual live `platform/data/meta.json.updated` value is
+  `2026M06 prices · drought 2026-06-21`.
+
+Neither doc had caused a live data-integrity problem (the app itself reads the correct, already-fresh
+`platform/data`/`source-data` files directly — this was a documentation-only drift), but both would
+mislead the next person or cycle relying on these docs as the current-state reference.
+
+**Fix applied (docs only, zero data/pipeline changes, no fabrication — every replacement number was
+copied verbatim from the already-committed source files, nothing new was pulled or invented):**
+- `docs/DATA_SOURCES.md`: retitled the section "(2026M06 prices)"; replaced every quoted YoY figure
+  with the current value from `source-data/commodities.json` / `commodities_protein.json`; added a
+  one-line note to keep this block in sync with `meta.json.updated` on future refreshes; kept the
+  independent OAE Dec-2025 outlook sentence as-is (flagged that it's a separate, not-re-verified
+  citation, not a Pink Sheet figure) rather than guessing a replacement; noted shrimp is still
+  genuinely stale (2023M10, unrefreshed) and that's *why* it's correctly excluded from
+  `commodity_board.json`, not an oversight; updated the Pink Sheet URL note to describe the
+  script's actual behaviour (`autox_enrich_loop.py`'s `pinksheet_url()` scrapes the current link each
+  pull; quoted its real last-known-good 2026M06 fallback hash from the source code, not a guess).
+- `docs/DATA_PROVENANCE.md`: corrected the `meta.json` row's quoted vintage label to the live value
+  and noted when/why it had drifted, so a future audit can tell this was already checked.
+
+**Verification:** `bash tests/run.sh check` — 46 passed, 0 failed, `validate_data.py` 265/265
+(unchanged before/after — confirms this cycle touched no `platform/data`/`source-data` file, docs-only).
+Diffed both edited files to confirm every new number traces to an existing committed file
+(`source-data/commodities.json`, `commodities_protein.json`, `platform/data/meta.json`) — no value was
+looked up externally or guessed.
+
+**Follow-up (logged in `docs/IMPROVEMENT_BACKLOG.md`, not attempted):** the OAE "Dec-2025 outlook"
+sentence in `docs/DATA_SOURCES.md` is now the oldest un-re-verified citation in that file; a future
+cycle with OAE (`catalog.oae.go.th`, reachable from this sandbox) access could confirm or refresh it.
+
+**Source:** `source-data/commodities.json`, `source-data/commodities_protein.json`,
+`platform/data/meta.json` (all already-committed, already-audited MEASURED/proxy files — see their own
+`meta`/commit `adf5494`). No external pull performed this cycle.
+
+---
+
 ## 2026-07-04 (4) — ENRICH: MEASURED building-density-within-10km layer, sitting unused since 2026-07-02, wired into the branch popup
 
 **Task type:** ENRICH. `/workspace/watcher` [TMLI blueprint] was not present this cycle, so no

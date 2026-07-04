@@ -25,13 +25,20 @@ registrations and DIW factories.
 - **Security:** it was exposed in chat — mark Sensitive in Vercel and **rotate it**. Don't hardcode it;
   read from env (`os.environ["DATA_GO_TH_TOKEN"]`).
 
-## World Bank Pink Sheet — current read (Dec 2025 prices)
-- **Crops DOWN:** rice −19.5%, rubber −13.5%, sugar −25.9%, palm −17.6%, maize +1.5%.
-- **Protein/forestry UP:** chicken +25.6%, beef +18.4%, lamb +9.1%, fishmeal +14.1%, logs +11.9%,
-  sawnwood +5.9%. **Gold +62.7%** (matters to a title/gold-collateral lender). Shrimp data stale (2023).
+## World Bank Pink Sheet — current read (2026M06 prices)
+> Refreshed 2026-07-03 (commit `adf5494`); this section previously described the stale Dec-2025
+> vintage after the underlying `source-data/commodit*.json` had already moved to 2026M06 — keep this
+> block in sync with `platform/data/meta.json`'s `updated` field whenever the loop re-pulls.
+- **Crops mostly UP:** rice +17.9%, rubber +32.4%, palm +18.2%; sugar −13.5% (still down); maize +0.5% (flat).
+- **Protein/forestry mixed:** beef +11.8%, lamb +16.7%, fishmeal +27.1%; chicken −0.6% and sawnwood
+  −1.6% (flat/slightly down); logs 0.0% (flat). **Gold +26.1%** (matters to a title/gold-collateral
+  lender). Shrimp still stale (2023M10, −25.0% YoY — never refreshed; excluded from the board for that reason).
 - OAE Dec-2025 outlook: rice + rubber = 2026 RISK crops; cassava (Laos curbs → prices rise), palm,
-  chicken, durian = firmer.
-- Pink Sheet URL: `https://thedocs.worldbank.org/en/doc/18675f1d1639c7a34d463f59263ba0a2-0050012025/related/CMO-Historical-Data-Monthly.xlsx`
+  chicken, durian = firmer. *(This OAE outlook citation is independent of the Pink Sheet vintage above
+  and has not been re-verified this cycle.)*
+- Pink Sheet URL: the loop scrapes the current month's link off the WB landing page each pull
+  (`pipeline/autox_enrich_loop.py`'s `pinksheet_url()`); last-known-good fallback hash (2026M06 vintage):
+  `https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx`
 
 ## Macro (current, citable — for the Overview panel)
 GDP 2026 ~1.6%; household debt 86.8% (Sep 2025); inflation ~0.3% (near-zero); tourists 2025 32.9M

@@ -341,8 +341,32 @@
       out-of-loop session (session-start-hook or environment Dockerfile), not another loop cycle
       retrying the same blocked path. *(LOW, S, needs a human/out-of-loop session)*
 
+## Queue — follow-ups noticed 2026-07-04 (7)
+- [ ] **`docs/DATA_SOURCES.md`'s OAE "Dec-2025 outlook" sentence (rice+rubber=2026 RISK crops;
+      cassava/palm/chicken/durian firmer) is now the oldest un-re-verified citation in that file** —
+      unlike the Pink Sheet block above it (just corrected to 2026M06), this line has never been
+      checked against a fresher OAE pull. OAE (`catalog.oae.go.th`) is REACHABLE from this sandbox
+      per the same doc's own reachability matrix — a future ENRICH cycle could pull the current OAE
+      outlook note and either confirm or update this sentence with a real citation. *(LOW, S)*
+- [ ] **Add a lightweight doc/data consistency check to `tests/validate_data.py` (or a small new
+      script) that greps `docs/DATA_SOURCES.md` / `docs/DATA_PROVENANCE.md` for a hardcoded vintage
+      label pattern (e.g. `\d{4}M\d{2}`) and fails if it doesn't match the live
+      `platform/data/meta.json.updated` string** — this cycle found the Pink Sheet vintage had silently
+      drifted stale in two docs after a data refresh with no automated tripwire; a cheap grep-based
+      check would catch the same class of doc-drift automatically on every future refresh instead of
+      relying on a manual AUDIT cycle to notice. *(MED, S — genuinely useful, low risk)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (7) — AUDIT: `docs/DATA_SOURCES.md` + `docs/DATA_PROVENANCE.md` quoting the
+  pre-refresh (stale) World Bank Pink Sheet vintage, corrected to the already-committed 2026M06
+  data.** No data value changed — both docs were still asserting Dec-2025 figures (rice −19.5%, gold
+  +62.7%, vintage label `2025M12`) two days after commit `adf5494` had already regenerated
+  `source-data/commodities*.json` / `platform/data/meta.json` to the real 2026M06 values. Every
+  replacement number was copied verbatim from the already-committed source files (no external pull,
+  no fabrication). Gate: `bash tests/run.sh check` 46/0 before and after (docs-only change,
+  `validate_data.py` 265/265 unaffected). Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-04 (7)
+  entry).
 - **2026-07-04 (4) — ENRICH: MEASURED building-density-within-10km layer (Overture, sitting unused
   since 2026-07-02) wired into the branch popup.** New `pipeline/build_branch_density.py` projects
   `source-data/perimeter_counts.json` (orphaned since commit `dda7816`, never consumed by any
