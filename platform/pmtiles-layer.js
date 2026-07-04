@@ -61,7 +61,7 @@
       var DARK = opts.dark !== false;
       var clamp = function(v){ return Math.max(0, Math.min(255, Math.round(v))); };
       var RAMP = DARK ? [[44,38,32],[156,108,50],[238,182,86]]
-                      : [[132,120,104],[108,96,78],[84,72,56]];   // light ramp = curated taupe->umber (match the static scene)
+                      : [[210,203,191],[186,176,161],[142,128,108]];   // light ramp = curated light warm-gray mass (match the static scene)
       var rampAt = function(t){ var s=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2; var a=RAMP[s], b=RAMP[s+1];
         return [a[0]+(b[0]-a[0])*lt, a[1]+(b[1]-a[1])*lt, a[2]+(b[2]-a[2])*lt]; };
       var H_LO = 3, H_HI = 35;   // fixed band for streamed tiles (no global sort available)
@@ -113,7 +113,7 @@
               var h = heightOf(f.properties); var t = (h - H_LO) / (H_HI - H_LO); t = t<0?0:t>1?1:t;
               var m = rampAt(t); return [clamp(m[0]), clamp(m[1]), clamp(m[2]), DARK?236:214];
             },
-            getLineColor: DARK ? [28,22,14,210] : [96,84,68,145],   // warm dark stroke (tiny footprints read as their stroke at city zoom)
+            getLineColor: DARK ? [28,22,14,210] : [164,156,144,150],   // warm dark stroke (tiny footprints read as their stroke at city zoom)
             lineWidthMinPixels: 0.4,
             material: false, // FLAT: no lighting term exists -> the real-GPU whiteout is impossible by construction
             parameters: { depthTest: true }, pickable: false
