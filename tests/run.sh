@@ -99,6 +99,10 @@ phase_check(){
   if [ "$rc" -eq 0 ]; then ok "build_scene_places.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_scene_places.py --check ($(echo "$scp_out" | tail -1))"
   else bad "build_scene_places.py --check (a <city>_places.json drifted — run: python3 pipeline/build_scene_places.py)"; fi
+  np_out=$( cd "$PIPE" && python3 build_national_places.py --check 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_national_places.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_national_places.py --check ($(echo "$np_out" | tail -1))"
+  else bad "build_national_places.py --check (national_places.json drifted — run: python3 pipeline/build_national_places.py)"; fi
   bp_out=$( cd "$PIPE" && python3 build_branch_population.py --check 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_population.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_branch_population.py --check ($(echo "$bp_out" | tail -1))"

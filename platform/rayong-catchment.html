@@ -628,12 +628,22 @@ function poiScene(){ if(_POI_SCENE)return _POI_SCENE;
 // per-city <city>_places.json when it loads. Densifies the OSM categories + adds the new clusters.
 window.POI_OV=null;
 function buildPoiOv(){
-  const SP=window.SCENEPLACES; if(!SP||!SP.places){window.POI_OV={};return;}
+  // full per-city set when present (window.SCENEPLACES); else the thinned NATIONAL set
+  // (window.NATPLACES) bbox-filtered to this scene — so EVERY province gets Overture density.
+  const SP=window.SCENEPLACES;
+  const nat=(!SP||!SP.places)?window.NATPLACES:null;
+  const src=(SP&&SP.places)||(nat&&nat.places);
+  if(!src){window.POI_OV={};return;}
+  let x0=-1e9,x1=1e9,y0=-1e9,y1=1e9;
+  if(nat){ try{const E=sceneExtent(); if(E&&isFinite(E.minX)){
+    const pX=(E.maxX-E.minX)*0.12+0.01,pY=(E.maxY-E.minY)*0.12+0.01;
+    x0=E.minX-pX;x1=E.maxX+pX;y0=E.minY-pY;y1=E.maxY+pY;}}catch(e){} }
   const ov={};
-  for(const bucket in SP.places){ const cat=OV_MAP[bucket]; if(!cat)continue;
-    const src=SP.places[bucket]; if(!Array.isArray(src))continue;
+  for(const bucket in src){ const cat=OV_MAP[bucket]; if(!cat)continue;
+    const arr=src[bucket]; if(!Array.isArray(arr))continue;
     const dst=ov[cat]||(ov[cat]=[]);
-    for(let i=0;i<src.length;i++){ const p=src[i]; if(!p)continue;
+    for(let i=0;i<arr.length;i++){ const p=arr[i]; if(!p)continue;
+      if(nat&&(p[0]<x0||p[0]>x1||p[1]<y0||p[1]>y1))continue;   // clip national set to the scene
       dst.push([p[1],p[0]]); }   // file is [lng,lat] -> scene wants [lat,lng]
   }
   window.POI_OV=ov;
@@ -2269,7 +2279,13 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
    window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch, which is in-scope for buildPoiOv)
-   killLoader();window.initCatch();})
+   // no per-city file for this province -> lazily pull the thinned NATIONAL Overture set as the
+   // fallback (covers all 77 provinces / every branch; flagship cities skip this 5MB download).
+   if(!window.SCENEPLACES){
+     fetch('data/national_places.json').then(function(r){return r.ok?r.json():null;})
+       .then(function(nat){window.NATPLACES=nat;killLoader();window.initCatch();})
+       .catch(function(){killLoader();window.initCatch();});
+   } else { killLoader();window.initCatch(); }})
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
     // cleared (init threw downstream), show a fresh error notice instead of a stuck spinner.
