@@ -45,6 +45,23 @@ def committed_cities():
             out.append(fn[:-len("_catchment.json")])
     return out
 
+
+def branch_catchment_places_slugs():
+    """Slugs whose committed <slug>_places.json was built in MAX-DENSITY-AROUND-BRANCHES mode
+    (meta.branch_catchment_km) but that have NO local <slug>_catchment.json (their buildings live
+    on R2). These aren't in committed_cities(), so the gate would skip them — return them so the
+    check loop reproduces them via build_province and keeps them byte-exact too."""
+    out = []
+    for fn in sorted(os.listdir(DATA)):
+        if fn.endswith("_places.json") and not fn.startswith("."):
+            try:
+                km = json.load(open(os.path.join(DATA, fn), encoding="utf-8")).get("meta", {}).get("branch_catchment_km")
+            except (ValueError, OSError):
+                km = None
+            if km:
+                out.append(fn[:-len("_places.json")])
+    return out
+
 def bbox_of(city):
     d = json.load(open(os.path.join(DATA, city + "_catchment.json"), encoding="utf-8"))
     b = d.get("buildings") or []
@@ -191,7 +208,10 @@ def main():
               f"{a.branch_catchment}km of every branch ({len(new)/1048576:.1f} MB)")
         return
 
-    cities = committed_cities()
+    # committed_cities() = provinces with a local _catchment.json; branch_catchment_places_slugs() =
+    # provinces whose buildings live on R2 but whose full-density _places.json IS committed (e.g.
+    # chon-buri). Union, de-duped, so both are built AND gate-verified.
+    cities = list(dict.fromkeys(committed_cities() + branch_catchment_places_slugs()))
     if not os.path.exists(SRC):
         # skip-pass: bulk input absent (CI). Verify the committed outputs are at least well-formed.
         for city in cities:
