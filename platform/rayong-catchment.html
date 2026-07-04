@@ -1864,6 +1864,24 @@ function OCC_BUCKETS_FROM(e){
   return bk.map(function(b,j){return {lab:b.label,col:OCC_BUCKET_COL[b.key]||[138,148,168],v:(e.o&&e.o[j])||0};})
     .filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
 }
+// → the reflective WORKFORCE entry (branch_workforce.json) for the focal branch, matched to the
+// nearest national branch (same ≤1.5km rule as measuredOcc). Returns {w,mix,top,dom,t} or null.
+function workforceOcc(f){
+  var WD=window.WFDATA, NB=window.NATBRANCHES;
+  if(!f||!WD||!WD.branches||!WD.buckets||!NB||!NB.length||f.x==null||f.y==null) return null;
+  var bi=-1, bd=Infinity;
+  for(var i=0;i<NB.length;i++){ var b=NB[i]; if(b.x==null||b.y==null) continue;
+    var dd=hav(f.y,f.x,b.y,b.x); if(dd<bd){bd=dd;bi=i;} }
+  if(bi<0||bd>1500) return null;
+  var e=WD.branches[bi]; return (e&&e.t>0)?e:null;
+}
+// → sorted {lab,col,people,pct} rows for a workforce entry (top buckets first).
+function WF_BUCKETS_FROM(e){
+  var bk=window.WFDATA.buckets;
+  return bk.map(function(b,j){return {lab:b.label,col:OCC_BUCKET_COL[b.key]||[138,148,168],
+      people:(e.w&&e.w[j])||0,pct:(e.mix&&e.mix[j])||0};})
+    .filter(function(r){return r.people>0;}).sort(function(a,b){return b.people-a.people;});
+}
 
 // ---- Call-sheet export (leads panel) --------------------------------------------------------
 // ALL leads for the focal branch, flattened from occupation_leads.json (window.OCCLEADS —
@@ -1992,27 +2010,35 @@ function updatePanels(){
     if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
     html+='</div>';
   }
-  // occupation mix — prefer the MEASURED Overture-Places rollup for the focal branch (matched to
-  // the nearest national branch); fall back to the ESTIMATED k10 proxy when the layer/entry is absent.
+  // WHO WORKS HERE — the reflective WORKFORCE mix (branch_workforce.json) is the PRIMARY read:
+  // farmers surface where they truly are (SPAM cropland × OAE area × NSO anchor), not buried under
+  // storefronts. The Overture establishment mix is DEMOTED to a secondary "Businesses & services
+  // nearby" block. When neither layer covers this branch, fall back to the estimated OSM proxy.
+  const wfEntry=workforceOcc(focal);
   const occEntry=measuredOcc(focal);
+  if(wfEntry){
+    const rows=WF_BUCKETS_FROM(wfEntry).slice(0,8);
+    const mx=rows.length?rows[0].pct:1;
+    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix — who works here <span class="tag est">estimated</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const badge=`<b>${fmt(r.people)} <span style="color:var(--dim);font-weight:500">· ${r.pct}%</span></b>`;
+        return `<div class="or"><div class="ot">${r.lab}${badge}</div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.pct/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">≈ ${fmt(wfEntry.t||0)} workers ≤10&nbsp;km by occupation — ESTIMATED: farmers from SPAM cropland × OAE planted area anchored to the NSO ~12M agri workforce; factory workers DIW; storefront occupations Overture × headcount. A reflective mix, not a census.</div>`;
+  }
   if(occEntry){
-    const rows=OCC_BUCKETS_FROM(occEntry);
-    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
-    // people-per-sector = the branch's MEASURED 10km population × employed share, split by the
-    // measured occupation mix. EMP_SHARE = employed / total population (NSO LFS: working-age ~71% ×
-    // employment-to-population ~66% ≈ 0.47). ESTIMATED (mix is an establishment proxy for workers).
-    const _pop=branchPop(focal); const EMP_SHARE=0.47;
-    const workforce=(_pop&&_pop.v)?Math.round(_pop.v*EMP_SHARE):null;
-    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag meas">measured · Overture</span></h2>`
+    const allRows=OCC_BUCKETS_FROM(occEntry), rows=allRows.slice(0,8);
+    const tot=allRows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    html+=`<h2 style="padding:${wfEntry?'10px':'0'} 0 4px;margin-top:2px">Businesses & services nearby <span class="tag meas">measured · Overture</span></h2>`
       +`<div class="occ">`+rows.map(r=>{
         const pct=Math.round(r.v/tot*100);
-        const ppl=workforce!=null?Math.round(workforce*r.v/tot):null;
-        const badge=ppl!=null?`<b>${fmt(ppl)} <span style="color:var(--dim);font-weight:500">· ${pct}%</span></b>`:`<b>${pct}%</b>`;
-        return `<div class="or"><div class="ot">${r.lab}${badge}</div>`
+        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
       }).join('')+`</div>`
-      +`<div class="foot">${workforce!=null?'≈ '+fmt(workforce)+' workers in the 10&nbsp;km catchment (measured '+(_pop.scope==='10km'&&window.BRANCHPOP_MEAS?'WorldPop':'')+' population × ~47% employed), split by the measured Overture occupation mix — the per-sector head-counts are ESTIMATED. ':''}${fmt(occEntry.t||0)} establishments ≤10&nbsp;km measured (Overture Places, a sample/lower bound).</div>`;
-  }else if(k){
+      +`<div class="foot">${fmt(occEntry.t||0)} establishments ≤10&nbsp;km by category (Overture Places — storefronts, a sample/lower bound). ${wfEntry?'The workforce mix above is the who-works-here read.':''}</div>`;
+  }
+  if(!wfEntry&&!occEntry&&k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
       .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
@@ -2022,7 +2048,7 @@ function updatePanels(){
         return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
       }).join('')+`</div>`
-      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py for measured Overture counts.</div>`;
+      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
   }
   // NAMED occupation leads — the actual businesses to CALL near this branch, by occupation
   // (occupation_leads.json, MEASURED Overture Places name+phone). The reframed core objective made
@@ -2786,7 +2812,11 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    Promise.resolve(null),
    // a[17] DENSE per-city Overture POI (build_scene_places.py, ~24x OSM density) — small (0.6-1.5MB)
    // and per-city, so kept on the critical path; local first, then the catchments CDN.
-   gopt('_places.json')
+   gopt('_places.json'),
+   // a[18] per-branch WORKFORCE mix (build_branch_workforce.py, ~330KB) — the reflective
+   // "who works here" layer where farmers surface; kept on the critical path so the panel
+   // leads with occupations, not storefronts. Index-aligned to branches.json / NATBRANCHES.
+   opt('data/branch_workforce.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -2801,6 +2831,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
    window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch)
+   window.WFDATA=a[18]||null;                    // per-branch workforce mix (reflective who-works-here)
    // no per-city file for this province -> lazily pull the thinned NATIONAL Overture set as the
    // fallback (covers all 77 provinces / every branch; flagship cities skip this 5MB download), then
    // proceed. afterData() runs first paint + the deferred second wave for both branches.
