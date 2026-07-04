@@ -1649,19 +1649,23 @@ function render(){
   //     each toggleable; POIS items are [lat,lng] (optionally [lat,lng,name]). The little 3D pegs read
   //     as granular detail standing on the ground between the buildings. Capped short so they don't
   //     clutter or hide the skyline; collateral types (vehicle/gold) stand a touch taller to pop.
-  const POI_ELEV={vehicle_commerce:80,gold:80,bank:65,fresh_market:58,supermarket:58,
-    industrial:62,convenience:48,restaurant:42,hotel:55,school:52,pharmacy:45};
+  // Rendered as LOW, SOFT, TRANSLUCENT round nubs (not tall bright hex sticks) so dense POI read as a
+  // calm colored TEXTURE hugging the ground between buildings — the "dense yet soothing" DataProteins
+  // feel — instead of a garish forest of markers. Collateral types (vehicle/gold) sit a hair taller
+  // to stay findable. Flat (material:false) + no hard outline + translucent = they recede, buildings win.
+  const POI_ELEV={vehicle_commerce:11,gold:11,bank:8,fresh_market:7,supermarket:7,
+    industrial:8,convenience:6,restaurant:5,hotel:7,school:6,pharmacy:6,
+    professional:6,personal:5,logistics:6,construction:5,publicsvc:6};
   POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
-    const c=POI_COLORS[t], e=POI_ELEV[t]||70;
+    const c=POI_COLORS[t], e=POI_ELEV[t]||6;
     L.push(new deck.ColumnLayer({id:'poi-'+t,data:poiGet(t),
       getPosition:p=>[p[1],p[0]],
-      diskResolution:6, radius:42, radiusUnits:'meters',
+      diskResolution:12, radius:19, radiusUnits:'meters', radiusMinPixels:1.2, radiusMaxPixels:7,
       extruded:true, elevationScale:1, getElevation:e,
-      getFillColor:[c[0],c[1],c[2],232],
-      stroked:true, getLineColor:[Math.round(c[0]*.55),Math.round(c[1]*.55),Math.round(c[2]*.55),255],
-      lineWidthMinPixels:0.5,
-      material:{ambient:0.42,diffuse:0.40,shininess:32,specularColor:[0,0,0]},
-      shadowEnabled:SHADOWS_ON,
+      getFillColor:[c[0],c[1],c[2],LIGHT?150:180],   // translucent so overlapping nubs blend into a soft mat
+      stroked:false,                                   // no hard dark outline (that was the "very visible" pop)
+      material:false,                                  // flat/unlit — calm little dots, no specular highlight
+      shadowEnabled:false,
       parameters:{depthTest:true},
       pickable:true,_poiType:t}));
   });
