@@ -170,6 +170,14 @@ html[data-theme="light"] #bldglegend .bl-ttl{color:#828CA0}
 html[data-theme="light"] #bldglegend .bl-cap,html[data-theme="light"] #bldglegend .bl-acc{color:#2C3444}
 html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
 #legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:7px}
+#croplegend{display:none;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin-top:7px}
+#croplegend.on{display:flex}
+#croplegend .cl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#croplegend .cl-k{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#croplegend .cl-k .sw{width:10px;height:10px;border-radius:3px;flex:none;border:1px solid rgba(255,255,255,.25)}
+#croplegend .cl-src{font:600 10px 'IBM Plex Mono';color:#8a94a8}
+html[data-theme="light"] #croplegend .cl-k{color:#2C3444}
+html[data-theme="light"] #croplegend .cl-ttl{color:#828CA0}
 .lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
  font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
 .lg.on{opacity:1;color:var(--hi);border-color:#33405e}
@@ -361,6 +369,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="ringtog" class="on">10 km reach rings</button>
+      <button id="croptog" title="Colour districts by dominant crop (SPAM 2010 — estimated, model-allocated crop areas)">Crops ◇ est</button>
       <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
     </div>
   </div>
@@ -413,6 +422,7 @@ html[data-theme="light"] .lg.on b{color:#11151F}
   </div>
   <div id="bldglegend"></div>
   <div id="legend"></div>
+  <div id="croplegend"></div>
 </div>
 
 <script>window.initProvince=function(){
@@ -442,6 +452,21 @@ const POI_TYPES=Object.keys(POI_COLORS).filter(t=>POIS[t]&&POIS[t].length);
 const poiOn={}; POI_TYPES.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
 // DataProteins look: LIGHT (CARTO Positron) basemap is the DEFAULT (matches rayong-catchment).
 let basemap='dark', showRings=true;  // dark default: gold buildings pop on black; no white basemap to wash into
+
+// ---- CROP lens (data/crop_landuse.json — SPAM 2010, ESTIMATED model-allocated crop areas) ----------
+// Categorical district colouring by dominant_crop. Muted, in-theme, both light+dark. Rubber is defined
+// for completeness but SPAM carries no rubber (folded into "rest of crops"), so it never actually paints.
+const CROP_COLORS={rice:[78,154,107],cassava:[169,116,50],maize:[224,160,58],sugarcane:[235,203,84],oilpalm:[95,122,70],rubber:[46,110,102]};
+const CROP_LABEL={rice:'Rice',cassava:'Cassava',maize:'Maize',sugarcane:'Sugarcane',oilpalm:'Oil palm',rubber:'Rubber'};
+// name_en -> crop record, restricted to THIS province (join key = th_amphoe shapeName == crop_landuse name_en).
+const CROPBYNAME={};
+(function(){const cl=window.CROPLU; if(cl&&Array.isArray(cl.amphoe)){
+  cl.amphoe.forEach(e=>{ if(e&&e.province_th===provTh&&e.name_en) CROPBYNAME[e.name_en]=e; }); }})();
+const hasCrop=Object.keys(CROPBYNAME).length>0;
+let cropLens=false;
+function cropRecFor(p){ return p?(CROPBYNAME[p.shapeName]||null):null; }
+function cropColorFor(p){ const e=cropRecFor(p); if(!e||!e.dominant_crop)return null;
+  const c=CROP_COLORS[e.dominant_crop]||[150,150,150]; return [c[0],c[1],c[2],lightMode()?218:228]; }
 
 function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
   const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
@@ -569,7 +594,11 @@ const deckgl=new deck.DeckGL({container:'map',
   getTooltip:({object,layer})=>{
     if(!object)return null;
     if(layer.id==='districts'){const p=object.properties;
-      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Branches: <b>${p.branches}</b> · DIW workers: <b>${(p.real_workers||0).toLocaleString()}</b></div>`};}
+      const ce=cropRecFor(p);
+      const cropLine=ce&&ce.dominant_crop
+        ? `<br>Dominant crop: <b>${CROP_LABEL[ce.dominant_crop]||ce.dominant_crop}</b> ${Math.round((ce.shares&&ce.shares[ce.dominant_crop]||0)*100)}% <span style="color:#8a94a8">est · SPAM</span>`
+        : (cropLens?`<br><span style="color:#8a94a8">No tracked crop (SPAM)</span>`:'');
+      return {html:`<div class="dtt"><b>${p.district}</b><br>Working-age: <b>${(p.workingage||0).toLocaleString()}</b><br>Branches: <b>${p.branches}</b> · DIW workers: <b>${(p.real_workers||0).toLocaleString()}</b>${cropLine}</div>`};}
     if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||provEn} · vehicle shops ${object.veh!=null?object.veh:'—'} · gold ${object.gold!=null?object.gold:'—'}</div>`};
     if(layer.id==='comp')return {html:`<div class="dtt"><b>${object.brand}</b><br>${object.name||''}</div>`};
     if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
@@ -652,7 +681,11 @@ function render(){
       let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t; return Math.pow(t,0.85)*MAX_ELEV; };
     const EXTRUDE=anyVal && !STREAMB;  // extrude relief only when we have a driver AND no streamed buildings
     // colour ramp by the SAME rank so taller (more populous/working) districts read warmer.
-    const fillCol=f=>{ if(!EXTRUDE)return LIGHT?[150,164,196,30]:[91,124,250,16];
+    const fillCol=f=>{
+      // Crops lens: colour each district CATEGORICALLY by its dominant crop (SPAM 2010, ESTIMATED).
+      // Districts with no tracked crop fall back to a faint neutral so they read as "no crop signal".
+      if(cropLens){ const cc=cropColorFor(f.properties); if(cc)return cc; return LIGHT?[196,202,214,70]:[70,80,100,55]; }
+      if(!EXTRUDE)return LIGHT?[150,164,196,30]:[91,124,250,16];
       const v=dval(f.properties); let t=(v-lo)/(hi-lo); t=t<0?0:t>1?1:t;
       // dark: deep indigo -> accent blue -> warm gold-ish; light: soft grey -> muted blue -> warm
       const A=LIGHT?[176,188,210]:[44,58,92], B=LIGHT?[120,150,206]:[72,104,196], C=LIGHT?[210,190,150]:[180,168,128];
@@ -667,7 +700,7 @@ function render(){
       // for a strong lit side; tight specular gives the taller parcels a subtle sheen.
       material:{ambient:0.72,diffuse:0,shininess:10,specularColor:[0,0,0]},  // specular zeroed -> view-independent, no orbit blow-out
       parameters:{depthTest:true},transitions:{getElevation:600},
-      updateTriggers:{getFillColor:[LIGHT,lo,hi],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
+      updateTriggers:{getFillColor:[LIGHT,lo,hi,cropLens],getElevation:[lo,hi,EXTRUDE],getLineColor:[LIGHT]}}));
   }
   // (1) 10km collateral catchment rings — faint over ALL branches; bright on the selected one
   if(showRings && BR.length){
@@ -985,6 +1018,21 @@ function buildLegend(){
 document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
   basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+// Crops lens: colour districts categorically by dominant crop (SPAM 2010, ESTIMATED). Self-disables
+// when this province has no crop_landuse rows (file absent, or SPAM had no cells inside its amphoe).
+function renderCropLegend(){
+  const host=document.getElementById('croplegend'); if(!host)return;
+  host.classList.toggle('on',cropLens&&hasCrop);
+  if(!(cropLens&&hasCrop)){host.innerHTML='';return;}
+  const present={};Object.values(CROPBYNAME).forEach(e=>{if(e.dominant_crop)present[e.dominant_crop]=1;});
+  const order=['rice','cassava','maize','sugarcane','oilpalm','rubber'].filter(k=>present[k]);
+  host.innerHTML='<span class="cl-ttl">Dominant crop</span>'+order.map(k=>{const c=CROP_COLORS[k];
+    return `<span class="cl-k"><span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${CROP_LABEL[k]}</span>`;}).join('')
+    +'<span class="cl-src">◇ estimated · SPAM 2010 (model-allocated)</span>';
+}
+(function(){var ct=document.getElementById('croptog');if(!ct)return;
+  if(!hasCrop){ct.disabled=true;ct.style.opacity='.45';ct.style.cursor='not-allowed';ct.title='No crop data (SPAM) for this province';return;}
+  ct.onclick=function(){cropLens=!cropLens;this.classList.toggle('on',cropLens);renderCropLegend();render();};})();
 // Orbit toggle: master on/off. Turning it ON clears any "paused by user" state so the scene resumes
 // breathing; turning it OFF parks the camera where it sits.
 (function(){var ot=document.getElementById('orbittog');if(!ot)return;
@@ -1075,8 +1123,10 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json();}),
    fetch('data/provinces/index.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // operator-hosted Overture building tiles (null/absent => keep the extruded-relief view).
-   fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];
+   fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // crop land-use by district (SPAM 2010, ESTIMATED) — null/absent => the Crops lens self-disables.
+   fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})

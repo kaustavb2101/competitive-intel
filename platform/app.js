@@ -22,6 +22,7 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
+  crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
@@ -1800,6 +1801,35 @@ function loadAmphoeGeo(){
 // LENS registry's own amp:true flag instead of a hand-maintained list of lens keys, so a future
 // amp lens (LENS.foo={amp:true,...}) wires into the choropleth + join-warming automatically.
 function isAmpLens(k){ return !!(LENS[k]&&LENS[k].amp); }
+
+/* ---------- crop land-use (district dominant-crop) — CATEGORICAL amp lens ----------
+   Lazy-loads data/crop_landuse.json (pipeline/build_crop_landuse.py — SPAM 2010 crop areas
+   sampled into the 928 amphoe by point-in-polygon; ESTIMATED, model-allocated). Keyed by the
+   amphoe `id` (== amphoe.json id == amphoe_geo feature id), so both the district choropleth and
+   the branch dots colour categorically by dominant_crop. Fully optional + null-safe: absent file
+   → CROPLU stays null, the lens hides itself (lensAbsent) and the paths below no-op. */
+let CROPLU=null, cropLuLoaded=false, cropLuPromise=null, cropById=null;
+const CROP_COLORS={rice:'#4E9A6B',cassava:'#A97432',maize:'#E0A03A',sugarcane:'#EBCB54',oilpalm:'#5F7A46',rubber:'#2E6E66'};
+const CROP_LABEL={rice:'Rice',cassava:'Cassava',maize:'Maize',sugarcane:'Sugarcane',oilpalm:'Oil palm',rubber:'Rubber'};
+function loadCropLanduse(){
+  if(cropLuPromise) return cropLuPromise;
+  cropLuLoaded=true;
+  cropLuPromise=(async()=>{
+    try{ const j=await fetch('data/crop_landuse.json').then(r=>r.ok?r.json():null);
+      CROPLU=(j&&Array.isArray(j.amphoe))?j:null; }
+    catch(e){ CROPLU=null; }
+    return CROPLU;
+  })();
+  return cropLuPromise;
+}
+function cropHasData(){ return !!(CROPLU&&Array.isArray(CROPLU.amphoe)&&CROPLU.amphoe.length); }
+function cropLuIndex(){
+  if(cropById||!cropHasData()) return cropById;
+  cropById={}; for(const e of CROPLU.amphoe){ if(e&&e.id!=null) cropById[e.id]=e; }
+  return cropById;
+}
+// dominant-crop record for an amphoe.json record (by its id) — null when the file/entry is absent.
+function cropRecForAmp(a){ const idx=cropLuIndex(); return (idx&&a&&a.id!=null)?(idx[a.id]||null):null; }
 // id -> amphoe record lookup, built once from AMP (the scored districts).
 function ampIndex(){
   if(ampById||!AMP) return ampById;
@@ -1818,9 +1848,10 @@ function drawAmphoeChoropleth(){
   }
   const l=LENS[curLens], idx=ampIndex();
   if(!l||!idx) return;
+  const cat=!!l.cat;   // categorical (dominant-crop) lens vs continuous ramp
   // colour scale: max lens value across the SCORED districts (not the polygons) so the
-  // ramp matches the dot legend. sqrt easing to match styleMarkers().
-  const mx=Math.max(1,...AMP.map(a=>{ const v=l.val({_amp:a}); return (typeof v==='number'&&isFinite(v))?v:0; }));
+  // ramp matches the dot legend. sqrt easing to match styleMarkers(). (unused for cat lenses)
+  const mx=cat?1:Math.max(1,...AMP.map(a=>{ const v=l.val({_amp:a}); return (typeof v==='number'&&isFinite(v))?v:0; }));
   // rebuild fresh each time the lens changes (cheap; 928 light polygons, canvas-rendered)
   if(ampChoroLayer){ map.removeLayer(ampChoroLayer); ampChoroLayer=null; }
   const renderer=L.canvas({padding:0.5});
@@ -1828,6 +1859,11 @@ function drawAmphoeChoropleth(){
     renderer,
     style:f=>{
       const a=idx[f.properties&&f.properties.id];
+      if(cat){
+        const e=a?cropRecForAmp(a):null; const dc=e&&e.dominant_crop;
+        return {fillColor:dc?(CROP_COLORS[dc]||'#8a94a8'):'rgba(70,80,100,.35)',
+                fillOpacity:dc?0.62:0.18, color:'rgba(20,26,34,.28)', weight:0.4, interactive:true};
+      }
       const v=a?l.val({_amp:a}):0;
       const t=Math.max(0,Math.min(1,(typeof v==='number'&&isFinite(v)?v:0)/mx));
       return {fillColor:lensColor(Math.sqrt(t),l.color), fillOpacity:0.5,
@@ -1835,8 +1871,21 @@ function drawAmphoeChoropleth(){
     },
     onEachFeature:(f,layer)=>{
       const a=idx[f.properties&&f.properties.id]; if(!a) return;
-      const v=l.val({_amp:a});
       const nm=a.name_measured?`${a.name} <span class="sub">${a.name_en||''}</span>`:(a.name_en||a.name||'');
+      if(cat){
+        const e=cropRecForAmp(a); const dc=e&&e.dominant_crop;
+        const col=dc?(CROP_COLORS[dc]||'#8a94a8'):'#8a94a8';
+        const shr=(dc&&e.shares&&e.shares[dc]!=null)?Math.round(e.shares[dc]*100)+'%':'';
+        const cs=(e&&e.cropland_share!=null)?Math.round(e.cropland_share*100)+'%':'n/a';
+        layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${col}">◇ ${nm}</div>`+
+          `<div class="pv">${a.province_th||''}${a.region?' · '+a.region:''}</div>`+
+          `<div class="sub" style="margin-top:4px">Dominant crop: <b style="color:${col}">${dc?(CROP_LABEL[dc]||dc):'none (SPAM)'}</b>${shr?' '+shr:''}</div>`+
+          `<div class="sub">Tracked-crop land share: ${cs} · <span title="SPAM 2010 model-allocated crop areas">estimated · SPAM</span></div>`+
+          `<div class="sub">AutoX branches inside: ${a.branches!=null?a.branches:'n/a'}</div></div>`,
+          {closeButton:true,maxWidth:260});
+        return;
+      }
+      const v=l.val({_amp:a});
       const unit=l.unit||'';
       const vtxt=(typeof v==='number'&&isFinite(v))?Math.round(v):'n/a';
       layer.bindPopup(`<div class="pop" style="min-width:0"><div class="pn" style="color:${l.color}">◇ ${nm}</div>`+
@@ -3057,6 +3106,7 @@ function lensAbsent(k){
   if(l.poirel) return poirelLoaded && !poiRelevanceHasData();
   if(l.peers) return peersLoaded && !peerHasData();
   if(l.macx)  return macxDone && !macxHasData();
+  if(l.cat)   return cropLuLoaded && !cropHasData();
   return false;
 }
 function renderLenses(){
@@ -3114,6 +3164,17 @@ function fmtK(n){return n>=1000?Math.round(n/1000)+'k':String(Math.round(n));}
 function renderLegend(){
   const l=LENS[curLens], mx=lensMax(l);
   const est=l.est?' <span class="sub" title="Estimated proxy, not measured">▲ estimated</span>':'';
+  // Categorical dominant-crop lens: a swatch KEY (not a ramp), honestly tagged estimated · SPAM.
+  if(l.cat){
+    if(!cropLuLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">crop land-use…</span>'; return; }
+    if(!cropHasData()){ $('#maplegend').innerHTML='<span class="sub">Crop land-use layer not present — run pipeline/build_crop_landuse.py.</span>'; return; }
+    const present={}; for(const e of CROPLU.amphoe){ if(e&&e.dominant_crop) present[e.dominant_crop]=1; }
+    const order=['rice','cassava','maize','sugarcane','oilpalm','rubber'].filter(k=>present[k]);
+    const key=order.map(k=>`<span><i style="background:${CROP_COLORS[k]};border-radius:2px"></i>${CROP_LABEL[k]}</span>`).join('');
+    $('#maplegend').innerHTML = key +
+      ` <span class="sub" title="SPAM 2010 v2.0 — a modeled spatial disaggregation of measured subnational crop statistics onto a ~9km grid; rubber absent">◇ estimated · SPAM 2010 (model-allocated)</span>`;
+    return;
+  }
   // Competitor-density lens: if the census file isn't present yet, say so quietly (no crash) instead
   // of a meaningless 0-coloured scale, and point at the puller. Once data is in, show the scale + an
   // honest "measured, lower bound" tag and a tiny brand key for the faint rival points.
@@ -3231,6 +3292,9 @@ function initMap(){
   // warm the province polygons so hhdti/pstress can paint one shape per province instead of many
   // same-coloured dots. Optional + null-safe: absent/failed file leaves PGEO null (dots only).
   if(!pgeoLoaded) loadProvinceGeo().then(()=>{ if(mapReady) drawProvinceChoropleth(); });
+  // warm the crop land-use layer so the Dominant-crop lens hides itself when absent and paints
+  // categorically when present. Optional + null-safe: absent file → CROPLU null, lens filtered out.
+  if(!cropLuLoaded) loadCropLanduse().then(()=>{ renderLenses(); if(mapReady&&LENS[curLens]&&LENS[curLens].cat){ renderLegend(); styleMarkers(); } });
   // warm the measured occupation rollup so branch popups carry the Overture occupation-mix block
   // when present (small, optional file). Absent → loader leaves OCCDATA null and nothing renders.
   if(!occLoaded) loadOccupations().then(()=>{ if(mapReady){ if(curLens==='estab'){ renderLegend(); styleMarkers(); } } });
@@ -3818,6 +3882,17 @@ function styleMarkers(){
   // over it (district polygons are smaller than province ones, so the tiling is worse there), so
   // thin the dots whenever either fill is live.
   const polyDots=isProvLens(curLens)||isAmpLens(curLens);
+  if(l.cat){
+    // categorical (dominant-crop) lens: colour each branch dot by its district's dominant crop so
+    // the dots agree with the choropleth beneath them (grey for districts with no tracked crop).
+    markers.forEach(m=>{
+      const a=m._d&&m._d._amp; const e=a?cropRecForAmp(a):null; const dc=e&&e.dominant_crop;
+      m.setStyle({fillColor:dc?(CROP_COLORS[dc]||'#8a94a8'):'#6b7488', radius:4.5, fillOpacity:0.85});
+    });
+    drawAmphoeChoropleth();
+    drawProvinceChoropleth();
+    return;
+  }
   markers.forEach(m=>{
     const v=l.val(m._d), t=v/mx;
     m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7, fillOpacity:polyDots?0.6:0.9});
@@ -3865,6 +3940,9 @@ function setLens(k){
   }
   if(isAmpLens(k) && !ageoLoaded){
     loadAmphoeGeo().then(()=>{ if(isAmpLens(curLens)&&mapReady) drawAmphoeChoropleth(); });
+  }
+  if(LENS[k]&&LENS[k].cat && !cropLuLoaded){
+    loadCropLanduse().then(()=>{ renderLenses(); if(curLens===k){ renderLegend(); if(mapReady) styleMarkers(); } });
   }
   if(isProvLens(k) && !pgeoLoaded){
     loadProvinceGeo().then(()=>{ if(isProvLens(curLens)&&mapReady) drawProvinceChoropleth(); });

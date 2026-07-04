@@ -2977,6 +2977,105 @@ def check_branch_population(n_branches):
         ok("branch_population values sane (0 <= pop <= 12M, %d branches)" % len(vals))
 
 
+def check_crop_landuse(amphoe):
+    # AGRICULTURAL LAND-USE-BY-CROP per amphoe + province rollup (SPAM 2010, ESTIMATED model-allocated).
+    # Optional file: SKIP-PASS when absent (shapely dep / grid intermediate). When present: ids match
+    # amphoe.json, shares sum ~1, dominant_crop is a tracked crop, cropland_share in [0,1], and the
+    # OAE rice cross-check r is present and sane.
+    hdr("crop_landuse.json (optional)")
+    if not exists("crop_landuse.json"):
+        ok("crop_landuse.json absent — skipped (optional; run build_crop_landuse.py)")
+        return
+    try:
+        d = load("crop_landuse.json")
+    except Exception as e:
+        fail("crop_landuse.json loads", repr(e))
+        return
+    ok("crop_landuse.json loads")
+
+    CROPS = {"rice", "cassava", "maize", "oilpalm", "sugarcane"}
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not isinstance(meta.get("crops"), list):
+        fail("crop_landuse meta/provenance present (generated_by + label + crops)",
+             "meta missing generated_by/label/crops")
+        return
+    ok("crop_landuse meta/provenance present (generated_by + estimated label + crops)")
+    # the layer must NOT claim to be measured (SPAM is a model allocation)
+    if meta.get("measured") is True:
+        fail("crop_landuse honestly labelled ESTIMATED (meta.measured must not be true)", "measured=true")
+    else:
+        ok("crop_landuse honestly labelled ESTIMATED (SPAM model-allocated)")
+
+    amp_rows = d.get("amphoe")
+    prov_rows = d.get("provinces")
+    if not isinstance(amp_rows, list) or not amp_rows:
+        fail("crop_landuse has an 'amphoe' list", "got %s" % type(amp_rows).__name__)
+        return
+    ok("crop_landuse amphoe list present (%d)" % len(amp_rows))
+    if not isinstance(prov_rows, list) or not prov_rows:
+        fail("crop_landuse has a 'provinces' rollup list", "got %s" % type(prov_rows).__name__)
+        return
+    ok("crop_landuse provinces rollup present (%d)" % len(prov_rows))
+
+    # id set must equal amphoe.json id set (built off the same 928 polygons).
+    # check_amphoe() returns the whole amphoe.json dict; the records live under key "amphoe".
+    amp_recs = amphoe.get("amphoe") if isinstance(amphoe, dict) else None
+    if isinstance(amp_recs, list):
+        amp_ids = {a.get("id") for a in amp_recs}
+        clu_ids = {r.get("id") for r in amp_rows}
+        if amp_ids != clu_ids:
+            miss = list(amp_ids - clu_ids)[:5]; extra = list(clu_ids - amp_ids)[:5]
+            fail("crop_landuse amphoe ids match amphoe.json", "missing=%s extra=%s" % (miss, extra))
+        else:
+            ok("crop_landuse amphoe ids match amphoe.json (%d)" % len(clu_ids))
+
+    bad = []
+    for r in amp_rows:
+        dc = r.get("dominant_crop")
+        sh = r.get("shares")
+        cs = r.get("cropland_share")
+        if dc is None:
+            # a district with no tracked crop: shares null, cropland_share 0/None — that's fine
+            if sh not in (None, {}) and isinstance(sh, dict) and sum(sh.values()) > 0.001:
+                bad.append("%s dominant_crop null but shares non-empty" % r.get("id"))
+            continue
+        if dc not in CROPS:
+            bad.append("%s dominant_crop=%r not a tracked crop" % (r.get("id"), dc))
+        if isinstance(sh, dict) and sh:
+            total = sum(sh.values())
+            if any(not is_finite_number(v) for v in sh.values()):
+                bad.append("%s shares non-numeric" % r.get("id"))
+            elif abs(total - 1.0) > 0.02:
+                bad.append("%s shares sum=%.4f (not ~1.0)" % (r.get("id"), total))
+            # dominant_crop must be the arg-max share
+            elif max(sh, key=lambda k: sh[k]) != dc:
+                bad.append("%s dominant_crop=%s != argmax share" % (r.get("id"), dc))
+        else:
+            bad.append("%s has dominant_crop but no shares dict" % r.get("id"))
+        if cs is not None and (not is_finite_number(cs) or not (0.0 <= cs <= 1.0)):
+            bad.append("%s cropland_share=%r out of [0,1]" % (r.get("id"), cs))
+    if bad:
+        fail("crop_landuse per-amphoe ranges sane (shares~1, dominant=argmax, cropland_share in [0,1])",
+             first_n(bad, 8))
+    else:
+        ok("crop_landuse per-amphoe ranges sane (shares~1, dominant=argmax, cropland_share in [0,1])")
+
+    # OAE rice cross-check must be reported (honesty mandate); r in [-1,1] and n>0
+    xc = meta.get("oae_rice_crosscheck")
+    if not isinstance(xc, dict) or xc.get("pearson_r") is None or not xc.get("note"):
+        fail("crop_landuse reports the OAE rice cross-check (meta.oae_rice_crosscheck.pearson_r + note)",
+             "missing pearson_r/note")
+    else:
+        r = xc.get("pearson_r"); nmp = xc.get("n_matched_provinces")
+        if not is_finite_number(r) or not (-1.0 <= r <= 1.0):
+            fail("crop_landuse OAE rice r in [-1,1]", "r=%r" % r)
+        elif not isinstance(nmp, int) or nmp < 10:
+            fail("crop_landuse OAE rice cross-check covers >=10 provinces", "n=%r" % nmp)
+        else:
+            ok("crop_landuse OAE rice cross-check reported (Pearson r=%.3f over %d provinces)" % (r, nmp))
+
+
 def check_contested_pop(n_branches):
     # CONTESTED POPULATION per branch — WorldPop 2020 10km catchment population + the measured
     # subset within 2km of any census rival, index-aligned to branches.json. Optional: SKIP if
@@ -3502,6 +3601,7 @@ def main():
     check_rival_pressure(n)
     check_cluster_brief(n, branches)
     check_branch_population(n)
+    check_crop_landuse(amphoe)
     check_contested_pop(n)
     check_occupation_leads(n)
     check_provenance()
