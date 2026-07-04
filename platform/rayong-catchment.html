@@ -365,6 +365,53 @@ html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828C
 html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
 html[data-theme="light"] .lg b{color:#5A6477}
 html[data-theme="light"] .lg.on b{color:#11151F}
+
+/* ---- IN-SCENE SEARCH (branches / rivals / named POIs / landmarks) + fly-to ----
+   Compact pill docked top-centre (top-right on phones so it never collides with the strip title).
+   Typeahead dropdown drops down under the input; z above the side panels + strip, below the nav. */
+#scenesearch{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:12;
+ width:min(360px,60vw);font-family:'IBM Plex Sans Thai',sans-serif}
+.ss-box{display:flex;align-items:center;gap:7px;background:rgba(13,17,27,.94);border:1px solid var(--cardln);
+ border-radius:10px;padding:6px 9px;backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);
+ transition:border-color .15s}
+.ss-box:focus-within{border-color:var(--blue)}
+.ss-ico{color:var(--dim);font-size:15px;line-height:1;flex:none}
+#ssInput{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--hi);
+ font:600 12.5px 'IBM Plex Sans Thai';padding:1px 0}
+#ssInput::placeholder{color:var(--dim)}
+.ss-kbd{flex:none;font:600 10px 'IBM Plex Mono';color:var(--dim);border:1px solid var(--cardln);
+ border-radius:5px;padding:1px 5px;line-height:1.4}
+.ss-box:focus-within .ss-kbd{display:none}
+.ss-clr{background:none;border:none;color:var(--mid);cursor:pointer;font-size:13px;display:none;flex:none;padding:0 2px}
+.ss-clr.show{display:block}
+#ssResults{margin-top:6px;background:rgba(13,17,27,.97);border:1px solid var(--cardln);border-radius:10px;
+ box-shadow:0 12px 34px rgba(0,0,0,.5);display:none;max-height:min(52vh,360px);overflow-y:auto}
+#ssResults.show{display:block}
+.ss-row{display:flex;align-items:center;gap:9px;padding:8px 10px;cursor:pointer;border-bottom:1px solid #161d2c}
+.ss-row:last-child{border-bottom:none}
+.ss-row.active{background:#161d2c}
+.ss-sw{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.ss-tx{flex:1;min-width:0}
+.ss-lb{display:block;font:600 12.5px 'IBM Plex Sans Thai';color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-sb{display:block;font:500 10.5px 'IBM Plex Mono';color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.ss-kind{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;color:var(--dim);flex:none}
+.ss-empty{padding:11px;font:500 11.5px 'IBM Plex Sans Thai';color:var(--mid);text-align:center}
+@media(max-width:820px){
+ #scenesearch{top:48px;left:auto;right:8px;transform:none;width:min(220px,52vw)}
+ #ssResults{max-height:44vh}
+}
+html[data-theme="light"] .ss-box{background:rgba(255,255,255,.95);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] #ssInput{color:#11151F}
+html[data-theme="light"] #ssInput::placeholder{color:#828CA0}
+html[data-theme="light"] .ss-ico{color:#828CA0}
+html[data-theme="light"] .ss-kbd{color:#828CA0;border-color:#D3DAE6}
+html[data-theme="light"] .ss-clr{color:#5A6477}
+html[data-theme="light"] #ssResults{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 12px 34px rgba(16,22,40,.2)}
+html[data-theme="light"] .ss-row{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .ss-row.active{background:#EEF2FA}
+html[data-theme="light"] .ss-lb{color:#11151F}
+html[data-theme="light"] .ss-sb{color:#5A6477}
+html[data-theme="light"] .ss-kind,html[data-theme="light"] .ss-empty{color:#828CA0}
 </style>
 </head>
 <body>
@@ -412,6 +459,16 @@ html[data-theme="light"] .lg.on b{color:#11151F}
 <div id="vignette"></div>
 
 <div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
+
+<div id="scenesearch">
+  <div class="ss-box">
+    <span class="ss-ico" aria-hidden="true">⌕</span>
+    <input id="ssInput" type="text" placeholder="Search branches, rivals, places" aria-label="Search the scene — branches, competitors, places" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="ssResults">
+    <span class="ss-kbd" aria-hidden="true">/</span>
+    <button id="ssClear" class="ss-clr" type="button" aria-label="Clear search">✕</button>
+  </div>
+  <div id="ssResults" role="listbox" aria-label="Search results"></div>
+</div>
 
 <div id="ctl">
   <div class="dkhd"><span class="dot"></span><span class="t" id="ctlScene">Rayong 3D</span></div>
@@ -867,6 +924,28 @@ function flyTo(o){
   orbitPausedByUser=false; setOrbitUI(orbitOn);
   deckgl.setProps(tp);
   setTimeout(()=>{_programmatic=false; lastT=0;}, dur+40);
+}
+// ---- TRANSIENT SEARCH HIGHLIGHT — a pulsing accent ring dropped at a searched result, fading out
+// over ~4s so the eye finds the fly-to target. Pure visual cue; render() draws _hilite when set.
+// Drives its OWN throttled rAF (render() diffs on stable data refs, so re-rendering is cheap: only
+// this one small ring layer changes each frame). Cleared to null on completion, then a final render.
+const HILITE_MS=4000;
+let _hilite=null, _hiliteRAF=0;
+function _now(){return (window.performance&&performance.now)?performance.now():Date.now();}
+function dropHighlight(lng,lat,color){
+  lng=+lng; lat=+lat; if(!isFinite(lng)||!isFinite(lat))return;
+  _hilite={lng:lng,lat:lat,color:(color&&color.length>=3)?color:[91,124,250],t0:_now()};
+  if(_hiliteRAF){try{cancelAnimationFrame(_hiliteRAF);}catch(e){} _hiliteRAF=0;}
+  let last=0;
+  const step=()=>{
+    if(!_hilite){_hiliteRAF=0;return;}
+    const t=_now(), age=(t-_hilite.t0)/HILITE_MS;
+    if(age>=1){_hilite=null;_hiliteRAF=0;try{render();}catch(e){}return;}
+    if(t-last>=45){last=t;try{render();}catch(e){}}
+    _hiliteRAF=requestAnimationFrame(step);
+  };
+  try{render();}catch(e){}                 // immediate first paint of the ring
+  _hiliteRAF=requestAnimationFrame(step);
 }
 // onWebGLInitialized: inspect the live GL renderer string. Under a SOFTWARE rasteriser
 // (swiftshader / llvmpipe / "software"), drop shadow casting so the heavy shadow pass can't stall
@@ -1514,6 +1593,18 @@ function render(){
   // (8) satellite place-name overlay — TOP of the stack so labels read over the dark photo (Upgrade 4).
   //     Only present in satellite mode; null otherwise. depthTest off so it isn't culled by buildings.
   const labelLyr=labelOverlayLayer(); if(labelLyr)L.push(labelLyr);
+  // (9) transient search-highlight ring — locator dropped by the in-scene search, pulses outward and
+  //     fades over ~4s. depthTest:false so it always reads on top of buildings (a "look here" cue).
+  if(_hilite){
+    const age=Math.min(1,Math.max(0,(_now()-_hilite.t0)/HILITE_MS));
+    const ease=1-age, a=Math.round(255*ease*ease), c=_hilite.color, rad=300*(1+0.9*age);
+    L.push(new deck.PolygonLayer({id:'search-hilite',data:[_hilite],
+      getPolygon:h=>circle(h.lat,h.lng,rad),extruded:false,stroked:true,filled:true,
+      getFillColor:[c[0],c[1],c[2],Math.round(a*0.16)],getLineColor:[c[0],c[1],c[2],a],
+      lineWidthMinPixels:3,lineWidthMaxPixels:5,pickable:false,
+      parameters:{depthTest:false},
+      updateTriggers:{getPolygon:[age,c],getFillColor:[age,c],getLineColor:[age,c]}}));
+  }
   deckgl.setProps({layers:L,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
 }
@@ -1881,6 +1972,100 @@ function selectBranch(b,fly){
   if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
 }
 
+/* ---------- IN-SCENE SEARCH + FLY-TO ----------
+   Typeahead over three MEASURED sets already in the scene: (a) this province's AutoX branches (BR),
+   (b) competitor branches (compScene()), (c) named POIs loaded in the scene layers (+ landmarks).
+   Picking an entry flies the camera there (reuses flyTo/selectBranch) and drops a fading highlight
+   ring. Thai + Latin matching is a case/space-insensitive substring test. Keyboard: '/' focuses,
+   Esc clears, ↑/↓ move, Enter selects. Index built lazily (compScene/poiGet need the scene extent). */
+function buildSearch(){
+  const wrap=document.getElementById('scenesearch');
+  const inp=document.getElementById('ssInput');
+  const res=document.getElementById('ssResults');
+  const clr=document.getElementById('ssClear');
+  if(!wrap||!inp||!res||!clr)return;
+  const norm=s=>String(s==null?'':s).toLowerCase().replace(/\s+/g,'');
+  const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  let _IDX=null;
+  function index(){
+    if(_IDX)return _IDX;
+    const out=[];
+    // (a) AutoX branches — the interactive gold set (fly + focus + panels via selectBranch)
+    (BR||[]).forEach(b=>{ if(!b)return; const la=+b.y,ln=+b.x; if(!isFinite(la)||!isFinite(ln))return;
+      const lb=b.n||'AutoX branch';
+      out.push({kind:'branch',klab:'AutoX',label:lb,sub:(b.d?b.d+' · ':'')+'เงินไชโย',
+        lat:la,lng:ln,color:GOLD,ref:b,norm:norm(lb+' '+(b.d||''))}); });
+    // (b) competitor branches — measured rivals in the scene
+    let COMPS=[]; try{COMPS=compScene()||[];}catch(e){}
+    COMPS.forEach(c=>{ const la=+c.lat,ln=+c.lng; if(!isFinite(la)||!isFinite(ln))return;
+      const br=c.brand||'?', lb=c.name||br;
+      out.push({kind:'comp',klab:br,label:lb,sub:br+' · competitor',lat:la,lng:ln,
+        color:BRAND[br]||[150,150,150],norm:norm(lb+' '+br)}); });
+    // (c) named POIs already loaded in the scene layers (only entries carrying a name)
+    POI_ORDER.forEach(t=>{ let arr=[]; try{arr=poiGet(t)||[];}catch(e){}
+      const col=POI_COLORS[t]||[150,150,150], kl=POI_LABEL[t]||t;
+      for(let i=0;i<arr.length;i++){ const p=arr[i]; if(!p||p[2]==null||p[2]==='')continue;
+        const la=+p[0],ln=+p[1]; if(!isFinite(la)||!isFinite(ln))continue;
+        out.push({kind:'poi',klab:kl,label:String(p[2]),sub:kl,lat:la,lng:ln,color:col,norm:norm(p[2]+' '+kl)}); } });
+    // (d) named landmarks (curated CA.landmarks)
+    ((CA&&CA.landmarks)||[]).forEach(m=>{ if(!m||!m.nm)return; const la=+m.cy,ln=+m.cx;
+      if(!isFinite(la)||!isFinite(ln))return;
+      out.push({kind:'landmark',klab:'Landmark',label:m.nm,sub:'Landmark',lat:la,lng:ln,color:[230,180,80],norm:norm(m.nm)}); });
+    _IDX=out; return _IDX;
+  }
+  let matches=[], active=-1;
+  const RANK={branch:0,comp:1,landmark:2,poi:3};
+  function search(q){
+    const nq=norm(q); if(!nq){matches=[];return;}
+    const idx=index(), starts=[], contains=[];
+    for(let i=0;i<idx.length;i++){ const e=idx[i], pos=e.norm.indexOf(nq); if(pos<0)continue;
+      (pos===0?starts:contains).push(e); }
+    const cmp=(a,b)=>(RANK[a.kind]-RANK[b.kind])||(a.label.length-b.label.length);
+    starts.sort(cmp); contains.sort(cmp);
+    matches=starts.concat(contains).slice(0,10);
+  }
+  function rowHTML(e,i){ const c=e.color;
+    return '<div class="ss-row'+(i===active?' active':'')+'" data-i="'+i+'" role="option">'+
+      '<span class="ss-sw" style="background:rgb('+c[0]+','+c[1]+','+c[2]+')"></span>'+
+      '<span class="ss-tx"><span class="ss-lb">'+esc(e.label)+'</span><span class="ss-sb">'+esc(e.sub)+'</span></span>'+
+      '<span class="ss-kind">'+esc(e.klab)+'</span></div>'; }
+  function paint(){
+    if(!inp.value.trim()){res.classList.remove('show');res.innerHTML='';inp.setAttribute('aria-expanded','false');return;}
+    if(!matches.length){res.innerHTML='<div class="ss-empty">No matches in this scene</div>';res.classList.add('show');inp.setAttribute('aria-expanded','true');return;}
+    res.innerHTML=matches.map(rowHTML).join('');
+    res.classList.add('show'); inp.setAttribute('aria-expanded','true');
+    res.querySelectorAll('.ss-row').forEach(el=>{
+      el.onmousedown=ev=>{ev.preventDefault();pick(+el.dataset.i);};
+      el.onmouseenter=()=>{active=+el.dataset.i;paintActive();}; });
+  }
+  function paintActive(){res.querySelectorAll('.ss-row').forEach(el=>el.classList.toggle('active',+el.dataset.i===active));}
+  function scrollActive(){const el=res.querySelector('.ss-row.active');if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
+  function hide(){res.classList.remove('show');active=-1;inp.setAttribute('aria-expanded','false');}
+  function pick(i){ const e=matches[i]; if(!e)return;
+    inp.value=e.label; clr.classList.add('show'); hide(); inp.blur();
+    if(e.kind==='branch'&&e.ref){ selectBranch(e.ref,true); }
+    else{ flyTo({longitude:e.lng,latitude:e.lat,zoom:13.4,pitch:55,bearing:VIEW.bearing,transitionDuration:900}); }
+    dropHighlight(e.lng,e.lat,e.color);
+  }
+  inp.addEventListener('input',()=>{active=-1;clr.classList.toggle('show',!!inp.value);search(inp.value);paint();});
+  inp.addEventListener('focus',()=>{if(inp.value.trim()){search(inp.value);paint();}});
+  inp.addEventListener('keydown',ev=>{
+    if(ev.key==='ArrowDown'){ev.preventDefault();if(matches.length){active=(active+1)%matches.length;paintActive();scrollActive();}}
+    else if(ev.key==='ArrowUp'){ev.preventDefault();if(matches.length){active=(active<=0?matches.length-1:active-1);paintActive();scrollActive();}}
+    else if(ev.key==='Enter'){ev.preventDefault();if(matches.length)pick(active>=0?active:0);}
+    else if(ev.key==='Escape'){ev.preventDefault();if(inp.value){inp.value='';clr.classList.remove('show');matches=[];hide();}else{inp.blur();}}
+  });
+  clr.onclick=()=>{inp.value='';clr.classList.remove('show');matches=[];hide();inp.focus();};
+  document.addEventListener('click',ev=>{if(!wrap.contains(ev.target))hide();});
+  // '/' focuses search from anywhere (unless already typing in a field)
+  document.addEventListener('keydown',ev=>{
+    if(ev.key!=='/'||ev.metaKey||ev.ctrlKey||ev.altKey)return;
+    const el=ev.target, tn=(el&&el.tagName)||'';
+    if(/^(INPUT|TEXTAREA|SELECT)$/.test(tn)||(el&&el.isContentEditable))return;
+    ev.preventDefault(); inp.focus(); inp.select();
+  });
+}
+
 /* ---------- Region > Province > Branch cascade (populated from the nationwide index.json; every
    province with branches is selectable — the ACTIVE province drills into its loaded branches in
    place with a fly-to zoom, other provinces switch the 3D scene to that province) ---------- */
@@ -2029,7 +2214,7 @@ document.getElementById('isotog').onclick=function(){showIso=!showIso;this.class
 })();
 document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
 
-buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
+buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildSearch();buildLeads();updatePanels();render();
 
 // ---- MOTION BOOTSTRAP (Upgrade 2): intro fly-in, then continuous gentle auto-orbit -------------
 // INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to the
