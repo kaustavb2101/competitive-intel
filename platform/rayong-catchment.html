@@ -2052,6 +2052,32 @@ document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementB
 
 buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildLeads();updatePanels();render();
 
+// ---- SECOND-WAVE APPLY (scene-startup perf) ----------------------------------------------------
+// The loader defers the heavier "detail" files (competitor census, national POI fallback, occupation
+// leads, trees, rail) until ~1s AFTER first paint so the city + branches show fast; it then calls
+// this hook with whatever loaded. We set the globals those deferred layers/panels read, drop the
+// bbox-filter memo caches so the new national data is picked up, then run a SECOND render pass (POI
+// columns, competitor pegs, trees, rail now draw) and rebuild the panels/legends that depend on them.
+// Fully null-safe + idempotent: any absent file just leaves that layer/panel exactly as first-paint
+// drew it, so a slow or failed second wave degrades to the first-paint scene, never a crash. For a
+// curated province (Rayong) the competitor + POI sets come from the province file, so the only visible
+// second-pass additions are trees/rail + the "who to call" list; elsewhere the pegs/POI columns fill in.
+window.applyDeferred=function(d){
+  d=d||{}; var changed=false;
+  if(d.comp){window.COMPNAT=d.comp;_COMP_SCENE=null;changed=true;}
+  if(d.poi){window.POINAT=(d.poi&&d.poi.poi)||null;_POI_SCENE=null;changed=true;}
+  if(d.trees){window.TREES=d.trees;changed=true;}
+  if(d.rail){window.RAIL=d.rail;changed=true;}
+  if(d.occ){window.OCCLEADS=(d.occ.branches)||null;window.OCCLEADS_BUCKETS=(d.occ.meta&&d.occ.meta.buckets)||null;changed=true;}
+  if(!changed)return;
+  try{refreshPoiTypes();}catch(e){}
+  try{render();}catch(e){}                 // second render pass — deferred layers now present
+  try{buildLegend();}catch(e){}            // POI legend (types may now be present)
+  try{buildCompLegend();}catch(e){}        // rival-brand legend (national census filtered to frame)
+  try{buildLeads();}catch(e){}             // acquisition leads (uses in-frame rivals)
+  try{updatePanels();}catch(e){}           // who-works-nearby / call-sheet (occupation leads)
+};
+
 // ---- MOTION BOOTSTRAP (Upgrade 2): intro fly-in, then continuous gentle auto-orbit -------------
 // INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to the
 // framed FRAMED view. A FlyToInterpolator (when present) gives a cinematic arced descent; the orbit
@@ -2158,6 +2184,7 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    if(r.ok)return r.json();
    if(r.status===404&&cdnBase)return fetch(cdnBase+'/'+CITY+sfx).then(function(r2){return r2.ok?r2.json():null;}).catch(function(){return null;});
    return null;}).catch(function(){return null;});};
+ try{performance.mark('catch:fetchStart');}catch(e){}
  return Promise.all([
    // The catchment building file is the ONE required input. .ok=false (404) => null-or-CDN here,
    // and we branch to notPulled() below; a genuine network/parse error still rejects loudly.
@@ -2195,31 +2222,35 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
    gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
    opt(P+'_isochrone.json'),
-   opt(P+'_trees.json'), opt(P+'_rail.json'),
+   // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
+   // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
+   Promise.resolve(null), Promise.resolve(null),
    // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
    // Both load best-effort; absent => the "who works nearby" panel keeps its estimated proxy.
    opt('data/branch_occupations.json'), opt('data/branches.json'),
-   // MEASURED national competitor census + the ESTIMATED-composite district opportunity score. Both
-   // nationwide; this page filters them to the current city bbox so rivals appear IN the scene even
-   // for cities without a curated per-province competitor file (e.g. Bangkok). Prefer the MERGED
-   // census (Google ∪ Overture, deduped — ~4,400 measured rivals); fall back to the Google-only file.
-   opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
+   // a[11] competitor census — DEFERRED to the second wave. It is a fallback the curated-province
+   // scenes (Rayong) never touch, and elsewhere only feeds competitor pegs (a second-pass layer);
+   // parsing its ~1.7MB up front needlessly delayed first paint.
+   Promise.resolve(null),
    opt('data/opportunity_score.json'),
    // operator-configured CDN config (already fetched above) — kept in the same array slot so the
    // a[13] consumer below is unchanged.
    Promise.resolve(TILECFG),
-   // MEASURED nationwide POI pins (OSM, all 11 scene types). The scene bbox-filters this to the
-   // current city extent so EVERY province's 3D scene gets POI columns — not just curated Rayong.
-   opt('data/catchment_poi.json'),
+   // a[14] nationwide POI pins — DEFERRED to the second wave. Only the POI-column layer (a second-pass
+   // layer) reads it, and never for curated-province scenes; keeping its ~1.2MB off the critical path
+   // lets the buildings paint first.
+   Promise.resolve(null),
    // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
    // branches.json — the "people" headline the catchment card shows.
    opt('data/branch_population.json'),
-   // NAMED occupation leads per branch (Overture Places, name+phone by occupation ≤10km) — the
-   // "who to call near this branch" list, index-aligned to branches.json.
-   opt('data/occupation_leads.json')
+   // a[16] occupation leads — DEFERRED to the second wave. It only feeds the side-panel "who to call"
+   // list / call-sheet export; its ~6.8MB parse was the single biggest non-scene item on the critical
+   // path. Fetched + applied ~1s after first paint.
+   Promise.resolve(null)
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
+   try{performance.mark('catch:dataReady');}catch(e){}
    window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
@@ -2229,7 +2260,27 @@ buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();
    window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
-   killLoader();window.initCatch();})
+   killLoader();window.initCatch();
+   try{performance.mark('catch:firstRender');}catch(e){}
+   // ---- SECOND WAVE (deferred) — non-critical detail fetched AFTER first paint --------------------
+   // The city + branches + rings are on screen; now fetch the heavier "detail" files (competitor
+   // census, national POI fallback, occupation leads, trees, rail) and apply them via the hook
+   // initCatch() exposed. Delayed ~1s so the first frame is never contending with these parses; the
+   // POI columns / competitor pegs / trees / rail / call-sheet then pop in as a second render pass.
+   // All are optional (a missing file just leaves that layer/panel as it renders today), so a slow or
+   // failed second wave degrades to exactly the first-paint scene — never a crash.
+   setTimeout(function(){
+     Promise.all([
+       opt('data/occupation_leads.json'),
+       opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
+       opt('data/catchment_poi.json'),
+       opt(P+'_trees.json'), opt(P+'_rail.json')
+     ]).then(function(d){
+       try{if(window.applyDeferred)window.applyDeferred({occ:d[0],comp:d[1],poi:d[2],trees:d[3],rail:d[4]});}
+       catch(e){try{console.error('deferred apply failed:',e);}catch(_){}}
+     });
+   },1000);
+  })
   .catch(function(e){
     // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
     // cleared (init threw downstream), show a fresh error notice instead of a stuck spinner.
