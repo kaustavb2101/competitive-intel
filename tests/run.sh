@@ -99,6 +99,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_branch_population.py --check ($(echo "$bp_out" | tail -1))"
   else bad "build_branch_population.py --check (branch_population.json drifted from th_amphoe.geojson/amphoe.json/master)"
   fi
+  ( cd "$PIPE" && python3 build_contested_pop.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_contested_pop.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_contested_pop.py --check (rasterio/WorldPop raster missing — dependency gap, not data drift; pip install --break-system-packages rasterio)"
+  else bad "build_contested_pop.py --check (contested_pop.json drifted from branches.json/competitors_census.json/worldpop raster)"
+  fi
   ( cd "$PIPE" && python3 ingest_tmli.py --check >/dev/null 2>&1 ) && ok "ingest_tmli.py --check" || bad "ingest_tmli.py --check (TMLI measured province layers drifted from source-data/tmli/)"
   ( cd "$PIPE" && python3 build_household_risk.py --check >/dev/null 2>&1 ) && ok "build_household_risk.py --check" || bad "build_household_risk.py --check (household_risk_by_province.json drifted from source-data NSO SES layers)"
   ( cd "$PIPE" && python3 build_province_stress.py --check >/dev/null 2>&1 ) && ok "build_province_stress.py --check" || bad "build_province_stress.py --check (province_stress_index.json drifted from household_risk_by_province.json/unemployment_by_province.json)"
