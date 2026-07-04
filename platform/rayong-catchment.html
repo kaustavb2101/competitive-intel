@@ -643,10 +643,9 @@ const POI_COLORS={
 const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
   fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
   restaurant:'Restaurants',hotel:'Hotels',school:'Schools'};
-// default-on: lead with the COLLATERAL + DEMAND read so the 10km catchment looks densely populated
-// with the signals a lender cares about. Ambient types (restaurants/hotels/schools) start off so they
-// don't drown the signal; they remain one click away in the legend.
-const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1};
+// default-on: ALL POI types (owner request — show the full catchment, keep the colour legend to
+// read/toggle). The legend still lets any type be switched off, but nothing is hidden by default.
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1,restaurant:1,hotel:1,school:1,pharmacy:1};
 // legend/render order by relevance (collateral & finance, then demand, then economy)
 const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy'];
 // preserve a stable, relevance-ordered legend, restricted to types actually present in the scene.
