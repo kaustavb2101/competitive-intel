@@ -126,6 +126,16 @@
           <span class="cc-link sub no-print">★ star branches &amp; provinces to pin them here</span></div>
         <div class="cc-card-b" id="cc-watch-body"></div>
       </div>
+
+      <!-- DATA ROOM — the provenance census (data/provenance.json, built by build_provenance.py).
+           MEASURED / ESTIMATED / UNLABELLED counts up top, then a per-layer table (layer, label
+           chip, source, vintage/size). The 'unlabelled' rows are the shame board: numeric layers
+           shipping with no meta stamp. Null-safe: calm note if the file is absent. -->
+      <div class="cc-card cc-card-wide" id="cc-dataroom">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Data room — provenance of every layer
+          <span class="cc-link sub no-print">what is measured, what is estimated, what still has no source</span></div>
+        <div class="cc-card-b" id="cc-dataroom-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
+      </div>
     </div>
     <p class="lead cc-provenance"><b>Provenance:</b> white-space &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any expansion with a site survey.</p>
   </section>

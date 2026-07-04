@@ -4200,11 +4200,14 @@ function renderHome(){
   renderHomeMacro();        // META.macro + META.board
   renderHomeMovers();       // deltas.json
   renderWatchlist();
+  renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
   if(!homeBooted){
     homeBooted=true;
     const onHome=()=>document.getElementById('v-home').classList.contains('on');
     // exec decision queue — the FIRST card: ranked weekly actions (null-safe, calm when absent).
     loadDecisionQueue().then(()=>{ if(onHome()) renderHomeQueue(); });
+    // data room — the provenance census (measured/estimated/unlabelled), lazy + null-safe.
+    loadProvenance().then(()=>{ if(onHome()) renderHomeDataRoom(); });
     loadAmphoe().then(()=>{ if(onHome()){ renderHomeWhitespace(); renderHomeThesis(); } });
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
@@ -4500,6 +4503,74 @@ function renderHomeMacro(){
   html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction</span></div>`;
   crops.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY','var(--agri)'));
   if(gold) html+=ccRow(`Gold`,gold.note||'collateral value ↑',`+${gold.yoy}%`,'YoY','var(--up)');
+  box.innerHTML=html;
+}
+
+/* ---- DATA ROOM — provenance census (data/provenance.json, built by build_provenance.py) ----
+   MEASURED / ESTIMATED / UNLABELLED counts + a per-layer table. The 'unlabelled' rows are the
+   shame board: numeric layers shipping with no meta stamp. Null-safe: calm note if absent. */
+let PROVEN=null,provenLoaded=false;
+function loadProvenance(){
+  if(provenLoaded) return Promise.resolve(PROVEN);
+  return fetch('data/provenance.json').then(r=>r.ok?r.json():null)
+    .then(j=>{PROVEN=j;provenLoaded=true;return j;})
+    .catch(()=>{PROVEN=null;provenLoaded=true;return null;});
+}
+function prBytes(n){
+  n=+n||0;
+  if(n>=1048576) return (n/1048576).toFixed(n>=10485760?0:1)+' MB';
+  if(n>=1024) return Math.round(n/1024)+' KB';
+  return n+' B';
+}
+function prChip(cls){
+  const map={measured:['m','measured'],estimated:['e','estimated'],unlabelled:['u','unlabelled']};
+  const [k,lab]=map[cls]||['u','unlabelled'];
+  return `<span class="cc-tag ${k}">${lab}</span>`;
+}
+function renderHomeDataRoom(){
+  const box=$('#cc-dataroom-body'); if(!box) return;
+  if(!provenLoaded){ return; }                                  // skeleton stays until the fetch resolves
+  if(!PROVEN||!Array.isArray(PROVEN.layers)||!PROVEN.counts){
+    box.innerHTML=`<div class="cc-empty">Provenance census not yet computed — run <span class="mono">pipeline/build_provenance.py</span>. The layer-by-layer data-room table fills in on the next data refresh.</div>`;
+    return;
+  }
+  const c=PROVEN.counts, f=PROVEN.files||{};
+  // headline: N layers, split three ways
+  let html=`<div class="dr-head">`+
+    `<span class="dr-total mono">${c.layers} layers</span>`+
+    `<span class="dr-split">`+
+      `<b style="color:var(--dr-m)">${c.measured}</b> measured`+
+      ` · <b style="color:var(--dr-e)">${c.estimated}</b> estimated`+
+      ` · <b style="color:var(--dr-u)">${c.unlabelled}</b> unlabelled`+
+    `</span></div>`;
+  // per-file shame note. `hidden` = unstamped member files that sit INSIDE otherwise-labelled
+  // families (so they don't show as their own unlabelled row) — surfaced so collapsing hides nothing.
+  const hidden=PROVEN.layers.reduce((s,L)=>s+(L.cls!=='unlabelled'?(L.n_unlabelled||0):0),0);
+  if((f.unlabelled||0)>0){
+    html+=`<div class="cc-sub2" style="margin-top:2px">${f.unlabelled} of ${f.total} files carry no meta stamp`+
+      (hidden>0?` — incl. ${hidden} basemap file${hidden!==1?'s':''} inside otherwise-labelled families`:'')+
+      `. These are the ones to source next.</div>`;
+  }
+  // table: layer | chip | source | vintage/size
+  html+=`<div class="dr-tblwrap"><table class="tbl dr-tbl"><thead><tr>`+
+    `<th>Layer</th><th>Provenance</th><th>Source / builder</th><th class="num">Vintage · size</th>`+
+    `</tr></thead><tbody>`;
+  PROVEN.layers.forEach(L=>{
+    const fam=L.family;
+    const name=dqEsc(L.file)+(fam?` <span class="sub">×${L.n_files}</span>`:'');
+    const shame=(L.n_unlabelled>0&&L.cls!=='unlabelled')?` <span class="dr-shame" title="${L.n_unlabelled} member file(s) have no meta stamp">△ ${L.n_unlabelled} unstamped</span>`:'';
+    const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
+    const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
+    const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
+    html+=`<tr class="dr-${L.cls}">`+
+      `<td><span class="dr-name">${name}</span>${shame}`+(L.label?`<span class="dr-desc">${dqEsc(L.label)}</span>`:'')+`</td>`+
+      `<td>${prChip(L.cls)}</td>`+
+      `<td class="dr-src"><span title="${L.source?dqEsc(L.source):''}">${src}</span></td>`+
+      `<td class="num mono dr-size">${vint}${prBytes(L.bytes)}${cnt?`<span class="dr-cnt">${cnt}</span>`:''}</td>`+
+      `</tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  html+=`<div class="cc-qfoot sub">MEASURED / ESTIMATED are read from each layer's own <span class="mono">meta</span> stamp; UNLABELLED = no stamp at all (the shame board). Per-province road/water/building basemaps are collapsed into one row each — see <span class="mono">provenance.json</span>. Generated by <span class="mono">build_provenance.py</span>.</div>`;
   box.innerHTML=html;
 }
 

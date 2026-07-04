@@ -1948,6 +1948,105 @@ def check_decision_queue():
 
 
 # ---------------------------------------------------------------------------
+def check_provenance_room():
+    # DATA ROOM census (#home). provenance.json is a deterministic listing of every platform/data
+    # layer's own meta stamp (measured/estimated/unlabelled) + byte size + count. The internal
+    # contract: the three verdict counts sum to the layer total; the per-file labelled/unlabelled
+    # split sums to the file total; the unlabelled_files list length matches files.unlabelled and
+    # every named file actually exists (a shame board that names a phantom file is a bug); every
+    # layer row carries a known cls and its bytes match the file on disk (for standalone rows).
+    hdr("provenance.json (data-room provenance census)")
+    if not exists("provenance.json"):
+        ok("provenance.json absent — skipped (optional; run build_provenance.py)")
+        return
+    try:
+        d = load("provenance.json")
+    except Exception as e:
+        fail("provenance.json loads", repr(e))
+        return
+    ok("provenance.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not (isinstance(meta.get("source"), str) and meta["source"].strip()):
+        fail("provenance meta/source present", "meta.source missing/empty")
+    else:
+        ok("provenance meta/source present")
+
+    counts = d.get("counts") or {}
+    layers = d.get("layers")
+    files = d.get("files") or {}
+    unlab = d.get("unlabelled_files")
+    if not isinstance(layers, list) or not layers:
+        fail("provenance layers is a non-empty list", "got %s" % type(layers).__name__)
+        return
+    if not isinstance(unlab, list):
+        fail("provenance unlabelled_files is a list", "got %s" % type(unlab).__name__)
+        return
+
+    # (a) verdict counts sum to the layer total, and each == the actual tally over layers[]
+    tally = {"measured": 0, "estimated": 0, "unlabelled": 0}
+    bad_cls = []
+    for i, L in enumerate(layers):
+        c = L.get("cls")
+        if c not in tally:
+            bad_cls.append("#%d cls=%r" % (i, c))
+        else:
+            tally[c] += 1
+    if bad_cls:
+        fail("every provenance layer carries a known cls (measured/estimated/unlabelled)",
+             first_n(bad_cls, 8))
+    else:
+        ok("every provenance layer carries a known cls")
+    mism = [k for k in tally if counts.get(k) != tally[k]]
+    if mism or counts.get("layers") != len(layers):
+        fail("provenance counts match the layers[] tally",
+             "counts=%r vs tally=%r n_layers=%d" % (counts, tally, len(layers)))
+    else:
+        ok("provenance counts match the layers[] tally (%d layers: %d m / %d e / %d u)"
+           % (len(layers), tally["measured"], tally["estimated"], tally["unlabelled"]))
+
+    # (b) per-file split is coherent
+    n_files = sum((L.get("n_files") or 0) for L in layers)
+    if files.get("total") != n_files:
+        fail("provenance files.total == sum(layer.n_files)",
+             "files.total=%r vs %d" % (files.get("total"), n_files))
+    elif files.get("labelled", 0) + files.get("unlabelled", 0) != files.get("total"):
+        fail("provenance files labelled+unlabelled == total", repr(files))
+    elif files.get("unlabelled") != len(unlab):
+        fail("provenance files.unlabelled == len(unlabelled_files)",
+             "files.unlabelled=%r vs %d" % (files.get("unlabelled"), len(unlab)))
+    else:
+        ok("provenance per-file split coherent (%d files, %d unlabelled)"
+           % (n_files, files.get("unlabelled")))
+
+    # (c) the shame board must name only files that actually exist (no phantom shame)
+    phantom = [rel for rel in unlab if not exists(rel)]
+    if phantom:
+        fail("every unlabelled_files entry exists on disk", first_n(phantom, 10))
+    else:
+        ok("every unlabelled_files entry exists on disk (%d, none phantom)" % len(unlab))
+
+    # (d) standalone-row byte sizes match the file on disk (families sum members — trust the builder)
+    bad_bytes = []
+    for L in layers:
+        if L.get("family"):
+            continue
+        rel = L.get("file")
+        if not rel or not exists(rel):
+            continue
+        try:
+            actual = os.path.getsize(os.path.join(DATA, rel.replace("/", os.sep)))
+        except OSError:
+            continue
+        if L.get("bytes") != actual:
+            bad_bytes.append("%s recorded=%r actual=%d" % (rel, L.get("bytes"), actual))
+    if bad_bytes:
+        fail("standalone provenance rows record the real byte size", first_n(bad_bytes, 8))
+    else:
+        ok("standalone provenance rows record the real byte size on disk")
+
+
+# ---------------------------------------------------------------------------
 def check_expansion_plan(amphoe, n_branches):
     # SEQUENCED Road-to-3,000 plan (objective #2). ESTIMATED planning order (greedy divisor method)
     # over MEASURED demand inputs — meta must say so, the arithmetic must reconcile exactly (every
@@ -3586,6 +3685,7 @@ def main():
     check_opportunity_score()
     check_exit_whitespace()
     check_decision_queue()
+    check_provenance_room()
     check_expansion_plan(amphoe, n)
     check_branch_peers(n)
     check_branch_leads(n)
