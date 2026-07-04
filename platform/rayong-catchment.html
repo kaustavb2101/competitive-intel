@@ -1177,6 +1177,21 @@ function extraLayers(){
   return G;
 }
 
+// Exact bbox of the CURATED building set (no margin) — the boundary between "curated core"
+// (rich, un-decimated) and the STREAMED FRINGE that fills the rest of the frame edge-to-edge
+// from the hosted tiles. Cached once; null when no curated buildings.
+let _CBBOX;
+function curatedBbox(){
+  if(_CBBOX!==undefined)return _CBBOX;
+  const b=(window.CA&&CA.buildings)||[];
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p;if(!p)continue;for(const pt of p){
+    if(pt[0]<minX)minX=pt[0];if(pt[0]>maxX)maxX=pt[0];
+    if(pt[1]<minY)minY=pt[1];if(pt[1]>maxY)maxY=pt[1];}}
+  _CBBOX=isFinite(minX)?[minX,minY,maxX,maxY]:null;
+  return _CBBOX;
+}
+
 // Isochrone (travel-time) bands. Graded by minutes: near = warm red -> far = cool green, translucent.
 // Drawn FLAT, above the ground bed but under buildings/markers/labels. Null-guarded (file absent
 // until pull_isochrone.py runs). Bands are sorted far->near so the smaller near band paints on top.
@@ -1236,6 +1251,9 @@ function streamBuildingLayer(){
     if(!url){                                  // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
       if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
         return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:darkMode(),
+          // FRINGE MODE: when a curated core exists, stream only OUTSIDE its bbox so the frame
+          // fills edge-to-edge (DataProteins fabric) without double-drawing/z-fighting the core.
+          excludeBbox:(BUILDINGS&&BUILDINGS.length)?curatedBbox():null,
           // fires on the FIRST tile that carries real features: only then may the curated
           // catchment hand over to the stream (see render() — prevents a blank city when the
           // CDN/esm.sh is slow, blocked, or the archive has no coverage here).
@@ -1281,7 +1299,9 @@ function render(){
   // CURATED-FIRST: a curated catchment (the rich, un-decimated per-province pull) always beats the
   // streamed tile pyramid, whose mid-zoom levels are tippecanoe-decimated. The stream is the GAP
   // FILLER for provinces with no curated buildings (local + CDN miss) once national tiles are hosted.
-  const STREAMB=(BUILDINGS&&BUILDINGS.length)?null:streamBuildingLayer();
+  // Stream ALWAYS considered: FRINGE-fills around the curated core (excludeBbox) when one exists,
+  // or carries the whole city when none does. The curated core always draws on top.
+  const STREAMB=streamBuildingLayer();
   // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
@@ -1367,10 +1387,9 @@ function render(){
     const a=stops[seg],b2=stops[seg+1];
     return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
   if(STREAMB)L.push(STREAMB);   // streamed national tiles render in the building slot...
-  // Curated catchment stays on screen until the stream has PROVEN itself (first real tile ->
-  // _STREAM_READY). A constructed-but-dead stream layer (blocked CDN, no coverage, lib failure)
-  // must never blank the city.
-  if(!(STREAMB&&window._STREAM_READY))L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
+  // Curated core ALWAYS draws (the stream is a fringe-filler around it, never a replacement —
+  // and a dead stream therefore can never blank the city).
+  if(BUILDINGS&&BUILDINGS.length)L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
     getPolygon:b=>b.p,
     // exaggerate height non-linearly: low-rise stays grounded, mid/tall get stretched so the skyline
     // separates. Visual only — getElevation never writes back to b.h.
