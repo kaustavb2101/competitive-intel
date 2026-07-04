@@ -158,6 +158,59 @@ def _bbox_parts(bbox):
     return p  # s, w, n, e
 
 
+def _province_branch_points(bbox_str, pad_km=1.0):
+    """Every AutoX branch (lng,lat) inside the province bbox — the catchment centres to densify
+    around. Read from platform/data/branches.json (x=lng, y=lat)."""
+    s, w, n, e = _bbox_parts(bbox_str)
+    pad = pad_km / 111.0
+    path = os.path.join(ROOT, "platform", "data", "branches.json")
+    d = json.load(open(path, encoding="utf-8"))
+    items = d.get("items", d) if isinstance(d, dict) else d
+    out = []
+    for b in items:
+        x, y = b.get("x"), b.get("y")
+        if isinstance(x, (int, float)) and isinstance(y, (int, float)) \
+           and (w - pad) <= x <= (e + pad) and (s - pad) <= y <= (n + pad):
+            out.append((x, y))
+    return out
+
+
+def keep_within_km_of_branches(items, bbox_str, km, get_xy):
+    """Keep only items within `km` of ANY branch in the province — full density around every branch,
+    empty rural gaps dropped. Grid-accelerated (bin branches into ~km cells; each item checks its 3x3
+    neighbourhood), so it's fast on millions of items. get_xy(item)->(lng,lat). Returns None when the
+    province has no branches (caller falls back). Deterministic; network-free."""
+    pts = _province_branch_points(bbox_str)
+    if not pts:
+        return None
+    cell = km / 111.0                      # ~km in degrees (lat); lng handled in the exact check
+    grid = {}
+    for (bx, by) in pts:
+        grid.setdefault((int(bx / cell), int(by / cell)), []).append((bx, by))
+    km2 = km * km
+    kept = []
+    for it in items:
+        cx, cy = get_xy(it)
+        gx, gy = int(cx / cell), int(cy / cell)
+        cosl = math.cos(math.radians(cy)) or 1.0
+        near = False
+        for ix in (gx - 1, gx, gx + 1):
+            for iy in (gy - 1, gy, gy + 1):
+                for (bx, by) in grid.get((ix, iy), ()):  # branches in this neighbour cell
+                    dx = (cx - bx) * cosl * 111.0
+                    dy = (cy - by) * 111.0
+                    if dx * dx + dy * dy <= km2:
+                        near = True
+                        break
+                if near:
+                    break
+            if near:
+                break
+        if near:
+            kept.append(it)
+    return kept
+
+
 # ── per-province bbox from the amphoe polygons (TASK 1) ──────────────────────────
 # A province has NO field on the amphoe geojson (only an English shapeName), so which
 # amphoe polygons belong to a province is recovered the SAME way build_province.py
@@ -495,6 +548,11 @@ def main():
                          "(~6km of centre) + the largest-floor-area buildings beyond, up to this many. "
                          "A whole-province pull can yield millions of buildings (hundreds of MB) that "
                          "can't be committed/served; this keeps it ~Rayong scale. 0 = no cap.")
+    ap.add_argument("--branch-catchment", type=float, default=0.0, metavar="KM",
+                    help="MAX-DENSITY-AROUND-BRANCHES mode: keep EVERY building within KM of ANY AutoX "
+                         "branch in the province (full density at each branch, empty rural gaps dropped). "
+                         "Overrides --max-buildings. e.g. --branch-catchment 10 = full density within 10km "
+                         "of every branch. Bigger file than the default core-prune, but only where it matters.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -555,11 +613,24 @@ def main():
         print("ERROR: no buildings produced — check the bbox / GeoJSON.", file=sys.stderr)
         sys.exit(2)
 
+    # BRANCH-CATCHMENT (max-density-around-branches): keep every building within KM of any branch in the
+    # province, drop the empty rural gaps. Full density AT each branch; file bounded by dropping the void.
+    if args.branch_catchment and args.branch_catchment > 0:
+        kept = keep_within_km_of_branches(buildings, args.bbox, args.branch_catchment,
+                                          lambda b: (b["cx"], b["cy"]))
+        if kept is None:
+            print(f"WARN: no branches found in bbox — --branch-catchment skipped, keeping all {n}.",
+                  file=sys.stderr)
+        else:
+            print(f"branch-catchment {args.branch_catchment}km: {n} -> {len(kept)} buildings "
+                  f"(full density within {args.branch_catchment}km of every branch)", file=sys.stderr)
+            buildings = kept
+            n = len(buildings)
     # SIZE CAP: a whole-province bbox can yield millions of buildings (hundreds of MB) that can't be
     # committed/served and crash the browser. Keep the dense CORE (~6km of the bbox centre) + the
     # largest-floor-area buildings beyond, up to --max-buildings, so the file stays ~Rayong scale.
     # The renderer already LOD-caps for the GPU; this caps the FILE. Deterministic (re-sorted by centroid).
-    if args.max_buildings and n > args.max_buildings:
+    elif args.max_buildings and n > args.max_buildings:
         s0, w0, n0, e0 = _bbox_parts(args.bbox)
         clat, clng = (s0 + n0) / 2.0, (w0 + e0) / 2.0
         cosl = math.cos(math.radians(clat)) or 1.0

@@ -13,6 +13,16 @@ dropped for the scene — the columns are density, names live in occupation_lead
   python3 build_scene_places.py            # (re)build for every committed <city>_catchment.json
   python3 build_scene_places.py --check    # byte-exact reproduce gate
 
+MAX-DENSITY-AROUND-BRANCHES (the per-province full-POI rollout)
+--------------------------------------------------------------
+  python3 build_scene_places.py --province chon-buri --branch-catchment 10
+
+keeps EVERY Overture place within 10km of ANY AutoX branch in the province (NO per-bucket cap — full
+density at each branch, empty rural gaps dropped) and writes platform/data/<slug>_places.json. This is
+the POI twin of pull_overture_buildings.py --province <slug> --branch-catchment 10 (buildings): same
+radius rule, same output shape, so rayong-catchment.html?city=<slug> reads both the same way. Bbox
+comes from the committed province_bbox.json. Big provinces yield big files (host on R2, not git).
+
 SKIP-PASS (exit 3) when source-data/occupation_places_named.json is absent (gitignored 147MB bulk
 input; CI never has it) — the committed <city>_places.json outputs are the canonical artifact and the
 gate does not fail for a missing re-pullable input (same pattern as build_occupation_leads.py).
@@ -23,8 +33,10 @@ CDN get their _places.json pulled on the desktop the same way the catchments are
 import os, sys, json, argparse, hashlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "source-data", "occupation_places_named.json")
 DATA = os.path.join(ROOT, "platform", "data")
+PROVINCE_BBOX = os.path.join(DATA, "province_bbox.json")
 
 def committed_cities():
     out = []
@@ -87,13 +99,98 @@ def build_city(city, places, buckets):
         "places": {buckets[i]: by.get(i, []) for i in range(len(buckets))},
     }
 
+def _province_bbox(slug):
+    """[S,W,N,E] for a province slug from the committed province_bbox.json (MEASURED amphoe
+    extents, written by pull_overture_buildings.write_province_bbox). Returns None if absent."""
+    if not os.path.exists(PROVINCE_BBOX):
+        return None
+    d = json.load(open(PROVINCE_BBOX, encoding="utf-8"))
+    ext = (d.get("provinces") or {}).get(slug)
+    return ext["bbox"] if ext else None
+
+
+def build_province(slug, places, buckets, km):
+    """MAX-DENSITY-AROUND-BRANCHES POI for a whole province: keep EVERY Overture place within `km`
+    of ANY AutoX branch in the province (no per-bucket cap — full density at each branch, empty rural
+    gaps dropped). Mirrors pull_overture_buildings.py's --branch-catchment for buildings. Output shape
+    is identical to build_city() so rayong-catchment.html?city=<slug> reads it the same way.
+    Returns None when the province is unknown or has no branches."""
+    # reuse the SAME grid-accelerated branch filter the buildings puller uses, so the POI and building
+    # catchments are defined by exactly one radius rule (can't drift).
+    sys.path.insert(0, HERE)
+    from pull_overture_buildings import keep_within_km_of_branches
+    bb = _province_bbox(slug)
+    if not bb:
+        print(f"build_scene_places.py --province {slug}: unknown slug (not in province_bbox.json). "
+              f"Run: python3 pipeline/pull_overture_buildings.py --bbox-only", file=sys.stderr)
+        return None
+    s, w, n, e = bb
+    bbox_str = f"{s},{w},{n},{e}"
+    # prefilter to the province bbox first (1.69M national -> province subset) so the per-item radius
+    # check runs over far fewer points; then keep only those within km of a branch.
+    pad = 0.02
+    inbox = [p for p in places if (w - pad) <= p[0] <= (e + pad) and (s - pad) <= p[1] <= (n + pad)]
+    kept = keep_within_km_of_branches(inbox, bbox_str, km, lambda p: (p[0], p[1]))
+    if kept is None:
+        print(f"build_scene_places.py --province {slug}: no branches in bbox — skipped.", file=sys.stderr)
+        return None
+    by = {i: [] for i in range(len(buckets))}
+    for p in kept:
+        bi = p[2]
+        if bi in by:
+            by[bi].append([round(p[0], 5), round(p[1], 5)])
+    for bi in by:
+        by[bi].sort()   # deterministic spatial order
+    return {
+        "meta": {
+            "city": slug,
+            "source": "Overture Maps named places (occupation_places_named.json), kept within "
+                      f"{km}km of every AutoX branch in the province (MAX-DENSITY-AROUND-BRANCHES)",
+            "label": "MEASURED (Overture place points)",
+            "buckets": buckets,
+            "branch_catchment_km": km,
+            "count": sum(len(v) for v in by.values()),
+        },
+        "bbox": [round(v, 5) for v in bb],
+        "places": {buckets[i]: by.get(i, []) for i in range(len(buckets))},
+    }
+
+
 def dumps(d):
     return json.dumps(d, ensure_ascii=False, separators=(",", ":"))
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--province", help="province SLUG (e.g. chon-buri): MAX-DENSITY-AROUND-BRANCHES "
+                                       "mode — keep every Overture place within --branch-catchment km "
+                                       "of any branch, write <slug>_places.json (no cap). Bbox from "
+                                       "province_bbox.json.")
+    ap.add_argument("--branch-catchment", type=float, default=10.0, metavar="KM",
+                    help="radius (km) for --province mode (default 10). Full POI density within KM of "
+                         "every branch in the province.")
     a = ap.parse_args()
+
+    # --province SLUG: full-density Overture POI within KM of every branch. Requires the bulk source
+    # (this is a desktop pull, same as the buildings) — no committed output to fall back to.
+    if a.province:
+        if not os.path.exists(SRC):
+            print("build_scene_places.py --province: source-data/occupation_places_named.json absent "
+                  "(the 1.69M-place bulk pull). Pull it on the desktop first.", file=sys.stderr)
+            sys.exit(2)
+        src = json.load(open(SRC, encoding="utf-8"))
+        slug = a.province.strip().lower()
+        payload = build_province(slug, src["places"], src["buckets"], a.branch_catchment)
+        if payload is None:
+            sys.exit(2)
+        outp = os.path.join(DATA, f"{slug}_places.json")
+        new = dumps(payload)
+        with open(outp, "w", encoding="utf-8") as f:
+            f.write(new)
+        print(f"{slug}_places.json: {payload['meta']['count']} Overture pts within "
+              f"{a.branch_catchment}km of every branch ({len(new)/1048576:.1f} MB)")
+        return
+
     cities = committed_cities()
     if not os.path.exists(SRC):
         # skip-pass: bulk input absent (CI). Verify the committed outputs are at least well-formed.
