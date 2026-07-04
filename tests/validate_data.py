@@ -21,6 +21,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -3901,6 +3902,58 @@ def check_rollup(branches):
 
 
 # ---------------------------------------------------------------------------
+# Doc/data vintage-drift tripwire. 2026-07-04 (7) found docs/DATA_SOURCES.md and
+# docs/DATA_PROVENANCE.md both still asserting the pre-refresh Pink Sheet vintage
+# (2025M12) two days after platform/data/meta.json had already moved to 2026M06 —
+# caught only by a manual AUDIT pass. This check greps the two docs' own "live read"
+# anchors (each already carries a "keep this in sync with meta.json" comment) and
+# fails if either one has drifted from the live vintage stamp, so the next refresh
+# trips the gate instead of waiting for another manual audit.
+_DOC_VINTAGE_ANCHORS = [
+    ("DATA_SOURCES.md", re.compile(r"current read \((\d{4}M\d{2}) prices\)")),
+    ("DATA_PROVENANCE.md", re.compile(r"currently `(\d{4}M\d{2}) prices")),
+]
+
+
+def check_doc_vintage():
+    hdr("doc/data vintage-drift tripwire (docs quoting meta.json's Pink Sheet vintage)")
+    try:
+        meta = load("meta.json")
+    except Exception as e:
+        fail("meta.json loads (for doc-vintage check)", repr(e))
+        return
+    updated = meta.get("updated") if isinstance(meta, dict) else None
+    m = re.search(r"(\d{4}M\d{2})", updated or "")
+    if not m:
+        fail("meta.json 'updated' carries a YYYYMmm vintage label", repr(updated))
+        return
+    live = m.group(1)
+    ok("live vintage from meta.json.updated = %s" % live)
+
+    docs_dir = os.path.join(REPO, "docs")
+    for fname, pat in _DOC_VINTAGE_ANCHORS:
+        path = os.path.join(docs_dir, fname)
+        if not os.path.exists(path):
+            ok("%s absent — skipped (doc moved/renamed)" % fname)
+            continue
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+        dm = pat.search(text)
+        if not dm:
+            fail("%s has a live-vintage anchor matching %s" % (fname, pat.pattern),
+                 "anchor not found — doc was reworded; update _DOC_VINTAGE_ANCHORS or restore "
+                 "the 'current read (...)' / 'currently `...`' phrasing")
+            continue
+        doc_vintage = dm.group(1)
+        if doc_vintage == live:
+            ok("%s vintage (%s) matches meta.json (%s)" % (fname, doc_vintage, live))
+        else:
+            fail("%s vintage matches meta.json" % fname,
+                 "%s says %s but meta.json.updated says %s — doc drifted after a data refresh, "
+                 "update the doc's cited figures + vintage label" % (fname, doc_vintage, live))
+
+
+# ---------------------------------------------------------------------------
 def main():
     print("AutoX data-integrity validator — reading %s" % DATA)
     branches = check_branches()
@@ -3953,6 +4006,7 @@ def main():
     check_index_alignment(n)
     check_branches_fingerprint(branches)
     check_rollup(branches)
+    check_doc_vintage()
 
     print("\n" + ("=" * 40))
     total = _passed + _failed
