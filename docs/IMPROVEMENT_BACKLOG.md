@@ -298,11 +298,34 @@
       `poiRelevancePopupHTML()` palette, not independently contrast-checked** — same low-priority
       "not measured against a contrast bar" smell already logged for the 0.6 dot-opacity choice
       (2026-07-03 (9)). *(LOW, trivial)*
-- [ ] **`build_branch_density.py`'s bucket-tally self-check (`AssertionError` on drift) is the only
-      builder in the pipeline that hard-crashes instead of failing `--check` cleanly** — worth
-      normalizing to the same `CHECK FAIL`/exit-1 convention as every other builder next time this
-      file is touched, so a future cycle doesn't need to read a Python traceback to diagnose a
-      threshold typo. *(LOW, trivial, pure refactor)*
+- [x] **`build_branch_density.py`'s bucket-tally self-check (`AssertionError` on drift) is the only
+      builder in the pipeline that hard-crashes instead of failing `--check` cleanly — DONE
+      2026-07-04 (5)** (new `BucketDriftError`, caught in `main()` → clean `CHECK FAIL: ...` +
+      exit 1, same convention as every other builder; verified via a hand-corrupted-then-restored
+      `perimeter_counts.json`. Gate 46/0.)
+
+## Queue — follow-ups noticed 2026-07-04 (5)
+- [ ] **The bare-`assert`-on-malformed-data pattern fixed in `build_branch_density.py` this cycle
+      also exists in `build_national_places.py` (line ~69, `assert "places" in d`) and
+      `build_scene_places.py` (line ~104, `assert "places" in d and "bbox" in d`)** — same class of
+      issue: a malformed committed JSON would raise an uncaught `AssertionError` under `--check`
+      instead of a clean `CHECK FAIL`. Lower urgency than the one just fixed (these guard against a
+      corrupted file, not a plausible threshold-tuning typo), but worth the same treatment next time
+      either file is touched. *(LOW, trivial, pure refactor)*
+- [ ] **The "vendor numpy/shapely/rasterio into the sandbox's default setup" backlog item (below,
+      still open) cannot be done FROM the improvement loop itself** — a session-start-hook /
+      `.claude/hooks` change is agent self-configuration, out of scope for a platform-improvement
+      cycle and blocked by the auto-mode policy (confirmed this cycle: creating `.claude/hooks/`
+      was denied as "self-modification... not user-authorized"). This needs Kaustav (or a session
+      with explicit hook-authoring intent) to set it up once outside the standing loop, e.g. via the
+      `session-start-hook` skill or the environment's Dockerfile/setup config — not a future loop
+      cycle retrying the same path. *(LOW, S, needs a human/out-of-loop session, not blocked-data)*
+- [ ] **`docs/PROGRESS_LOG.md` and `docs/DATA_REFRESH_LOG.md` have diverging numbering for the same
+      day** (e.g. today's cycles are `(2)`–`(5)` in one file and `(2)`/`(4)` in the other, tracking
+      independent counters) — not a bug, but a reader cross-referencing "2026-07-04 (4)" has to know
+      which file it lives in. Worth a one-line convention note in `CLAUDE.md` (or a shared per-day
+      counter) if this ever causes real confusion; no action needed today. *(LOW, trivial,
+      speculative)*
 
 ## Done (most recent first)
 - (loop will append here)

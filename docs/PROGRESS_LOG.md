@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 (5) — HYGIENE: `build_branch_density.py`'s bucket-tally self-check now fails clean
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-04 (4)): the drift check added when
+`branch_density.json` was wired in raised a bare `AssertionError` (uncaught Python traceback) on a
+bucket-threshold mismatch, instead of the `CHECK FAIL: ...` / exit-1 convention every other builder
+in `pipeline/` follows when `tests/run.sh check` calls it with `--check`. Functionally the gate still
+failed either way (an uncaught exception also exits nonzero), but a future cycle diagnosing a real
+failure would have had to read a raw traceback instead of a one-line message.
+
+Fix: introduced a `BucketDriftError` exception; `main()` now catches it and prints `CHECK FAIL: ...`
+to stderr + `sys.exit(1)`, matching `build_branch_density.py`'s own existing convention for every
+other failure path (missing `OUT` file, byte-mismatch) and the pattern used across
+`build_branch_peers.py`/`build_branch_population.py`'s `ImportError`→exit-3 `[SKIP]` handling. Zero
+behavior change on the happy path.
+
+Verified by hand: (1) normal `--check` still reproduces byte-exact (2,015 branches, exit 0); (2)
+hand-corrupted `source-data/perimeter_counts.json`'s `meta.buckets.empty_0` by +999 and re-ran both
+`--check` and the plain build — both now print a clean one-line `CHECK FAIL: ...` message (no
+traceback) and exit 1; (3) restored the source file via `git checkout --` and confirmed `git status`
+shows no diff before committing. Pure `pipeline/` change, no `platform/data`/`source-data` files
+touched. Gate: `tests/run.sh check` 46/0 (unchanged `validate_data.py` 265/265).
+
 ## 2026-07-04 (3) — VALIDATOR: coverage for the new Overture "dense POI" layers
 
 Loop cycle. Backlog item: "Expand `validate_data.py` coverage as new data layers land." The recent
