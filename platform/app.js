@@ -3742,12 +3742,14 @@ function popupHTML(d){
 }
 function styleMarkers(){
   const l=LENS[curLens], mx=lensMax(l);
-  // province-resolution lenses (hhdti/pstress) paint a polygon fill under the dots; the default
-  // 0.9 dot opacity fully tiles over it in denser provinces, so thin the dots when that fill is live.
-  const provDots=isProvLens(curLens);
+  // polygon-resolution lenses (district amp:true — dws/drisk/unemp — and province prov:true —
+  // hhdti/pstress) paint a choropleth fill under the dots; the default 0.9 dot opacity fully tiles
+  // over it (district polygons are smaller than province ones, so the tiling is worse there), so
+  // thin the dots whenever either fill is live.
+  const polyDots=isProvLens(curLens)||isAmpLens(curLens);
   markers.forEach(m=>{
     const v=l.val(m._d), t=v/mx;
-    m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7, fillOpacity:provDots?0.6:0.9});
+    m.setStyle({fillColor:lensColor(Math.sqrt(t),l.color), radius:3+Math.min(1,t)*7, fillOpacity:polyDots?0.6:0.9});
   });
   // paint (or clear) the district choropleth to match the active lens — null-safe no-op
   // on a branch lens or when the polygon file is absent.
