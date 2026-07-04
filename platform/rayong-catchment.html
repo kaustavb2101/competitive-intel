@@ -44,6 +44,15 @@ html[data-theme="light"] #sky{
 html[data-theme="light"] #atmos{ background:none }
 html[data-theme="light"] #vignette{ background:none }
 
+/* focal-branch label (HTML pill, tracks the branch on screen; browser-shaped Thai) */
+#focalLabel{position:absolute;z-index:6;display:none;transform:translate(-50%,-100%);
+ pointer-events:none;white-space:nowrap;
+ background:rgba(255,255,255,.96);border:1.5px solid var(--gold);border-radius:8px;
+ padding:4px 9px;font:700 12.5px 'IBM Plex Sans Thai',sans-serif;color:#281C08;
+ box-shadow:0 4px 14px rgba(16,22,40,.22)}
+html[data-theme="dark"] #focalLabel,html:not([data-theme="light"]) #focalLabel{
+ background:rgba(17,21,31,.94);color:#EDEFF5;border-color:var(--gold)}
+body.poster #focalLabel{display:none!important}
 /* top brand strip */
 #strip{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
  background:linear-gradient(180deg,rgba(16,19,28,.86),rgba(16,19,28,0));scrollbar-width:none;align-items:center}
@@ -475,6 +484,9 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 </script>
 <div id="sky"></div>
 <div id="map"></div>
+<!-- focal-branch label as HTML (browser shapes Thai correctly, unlike deck.gl TextLayer) — positioned
+     over the branch each frame by updateFocalLabel(). pointer-events off so it never blocks the map. -->
+<div id="focalLabel"></div>
 <div id="atmos"></div>
 <div id="vignette"></div>
 
@@ -1088,6 +1100,28 @@ function downgradeForSoftwareGL(){
   try{ if(typeof render==='function')render(); }catch(e){}   // rebuild layers so shadowEnabled flags clear
   try{ console.info('[catchment] software WebGL detected — shadows + auto-orbit disabled for performance; depth via material + sky/vignette.'); }catch(e){}
 }
+// Position the HTML focal-branch pill over the selected branch's projected screen point. HTML (not a
+// deck.gl TextLayer) so the browser SHAPES Thai correctly — deck.gl scatters Thai vowels/tone marks.
+// Hidden when there's no focal, in poster mode, or when the branch projects off/behind the camera.
+function updateFocalLabel(){
+  const el=document.getElementById('focalLabel'); if(!el)return;
+  if(!focal||(typeof posterMode!=='undefined'&&posterMode)||!deck.WebMercatorViewport){el.style.display='none';return;}
+  // project the branch from the CURRENT viewState (not deckgl.getViewports(), which is empty on the
+  // static software-GL path) so this is reliable to call any time — boot, resize, orbit, fly-to.
+  let px;
+  try{
+    const W=window.innerWidth||900, H=window.innerHeight||620;
+    const vp=new deck.WebMercatorViewport(Object.assign({width:W,height:H},VIEW));
+    px=vp.project([focal.x,focal.y]);
+  }catch(e){}
+  if(!px||!isFinite(px[0])||!isFinite(px[1])||px[0]<-300||px[1]<-300||
+     px[0]>(window.innerWidth||900)+300||px[1]>(window.innerHeight||620)+300){el.style.display='none';return;}
+  const nm='◉ '+(focal.n||'AutoX branch');
+  if(el.textContent!==nm)el.textContent=nm;
+  el.style.left=Math.round(px[0])+'px'; el.style.top=(Math.round(px[1])-14)+'px';
+  el.style.display='block';
+}
+try{ window.addEventListener('resize',function(){try{updateFocalLabel();}catch(e){}}); }catch(e){}
 const deckgl=new deck.DeckGL({container:'map',
   viewState:VIEW,
   // preserveDrawingBuffer keeps the GL back-buffer readable AFTER compositing so Poster mode can copy
@@ -1101,9 +1135,10 @@ const deckgl=new deck.DeckGL({container:'map',
   onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
   // one-shot post-paint hook — Poster mode arms _afterRenderCb, then forces a redraw; this fires
   // AFTER the GL draw completes, so the capture reads the just-painted poster frame deterministically.
-  onAfterRender:()=>{ if(_afterRenderCb){const cb=_afterRenderCb;_afterRenderCb=null;try{cb();}catch(e){}} },
+  onAfterRender:()=>{ try{updateFocalLabel();}catch(e){} if(_afterRenderCb){const cb=_afterRenderCb;_afterRenderCb=null;try{cb();}catch(e){}} },
   onViewStateChange:({viewState,interactionState})=>{
     VIEW=viewState;
+    try{updateFocalLabel();}catch(e){}   // keep the HTML branch pill glued to the branch as the camera moves
     const inTrans=!!(interactionState&&interactionState.inTransition);
     const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
        interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
@@ -1703,20 +1738,12 @@ function render(){
     getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
     getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
     updateTriggers:{getFillColor:[focal]}}));
-  // (7) pill+icon labels (DataProteins look). deck.gl TextLayer backgrounds are rectangular, so the
-  //     "pill" is approximated with a soft padded white chip + a leading icon glyph; readable on light.
-  //     Only the SELECTED branch is labelled (59 labels would overwhelm the scene).
+  // (7) SELECTED-branch label. NOT a deck.gl TextLayer: deck.gl lays each Unicode codepoint side by
+  //     side with no complex-script shaping, so Thai vowels/tone marks (which must stack on the base
+  //     consonant) scatter and the name renders garbled. Instead an HTML pill (#focalLabel) tracks the
+  //     branch's projected screen position — the browser shapes Thai correctly. updateFocalLabel()
+  //     runs on every view change + after each paint (see onViewStateChange / onAfterRender).
   const onLight=lightMode();
-  if(focal){
-    L.push(new deck.TextLayer({id:'branch-labels',data:[focal],getPosition:d=>[d.x,d.y],
-      getText:d=>'◉ '+(d.n||'AutoX'),
-      getSize:12.5,getColor:[40,28,8,255],getBackgroundColor:[255,255,255,250],
-      getBorderColor:[224,169,59,255],getBorderWidth:onLight?1.5:0,
-      background:true,backgroundPadding:[8,4,8,4],getPixelOffset:[0,-18],
-      fontFamily:'IBM Plex Sans Thai',fontWeight:700,
-      getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
-      updateTriggers:{getText:[focal],getPosition:[focal],getBorderWidth:[onLight]}}));
-  }
   // competitor pills — brand-coloured chip + brand initial glyph; white text reads on the chip
   L.push(new deck.TextLayer({id:'comp-labels',data:COMPS,getPosition:d=>[d.lng,d.lat],
     getText:d=>(d.brand||'?').charAt(0),getSize:9.5,getColor:[255,255,255,255],
@@ -1754,6 +1781,7 @@ function render(){
   const LF=posterMode?L.filter(l=>l&&posterKeep(l.id)):L;
   deckgl.setProps({layers:LF,
     onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
+  try{updateFocalLabel();}catch(e){}   // reposition the HTML branch pill whenever layers/focal change
 }
 // which deck layer ids survive Poster mode: buildings (curated + streamed) + the ground scaffolding
 // (base tiles, land-use, water, roads, rail, trees). Everything else is an overlay and is dropped.
@@ -2599,6 +2627,9 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
     pushView();
   }
   rafId=requestAnimationFrame(tick);
+  // belt-and-suspenders: reposition the focal pill after the intro fly-to settles, in case the
+  // render loop goes idle (static software-GL) and onViewStateChange stops firing.
+  [700,1800,3400].forEach(function(ms){setTimeout(function(){try{updateFocalLabel();}catch(e){}},ms);});
 })();
 }catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
 };</script>
