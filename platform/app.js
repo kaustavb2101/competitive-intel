@@ -197,6 +197,26 @@ function occLabel(key){
   return m[key]||(key.charAt(0).toUpperCase()+key.slice(1));
 }
 
+/* ---------- per-branch WORKFORCE mix (data/branch_workforce.json) ----------
+   Lazy-loads the ESTIMATED per-branch WORKFORCE layer (build_branch_workforce.py): the mix of
+   people by occupation within 10km, each occupation from the source that actually measures it —
+   farmers from SPAM cropland × OAE area anchored to the NSO agri headline, factory from DIW,
+   the 12 storefront occupations from Overture POI × headcount. Unlike branch_occupations.json
+   (which counts BUSINESSES and so buries farmers), this answers "who WORKS here" and is the
+   lead-by-occupation signal. Shape: { meta, buckets:[{key,label}], branches:[{w:[people],
+   mix:[pct], top:[idx], dom, t}] } — INDEX-ALIGNED to branches.json. Fully null-guarded. */
+let WFDATA=null, wfLoaded=false, wfPromise=null;
+async function loadWorkforce(){
+  if(wfPromise) return wfPromise;
+  wfLoaded=true;
+  wfPromise=(async()=>{
+    try{ const r=await fetch('data/branch_workforce.json'); if(r.ok) WFDATA=await r.json(); }
+    catch(e){ WFDATA=null; }
+    return WFDATA;
+  })();
+  return wfPromise;
+}
+
 /* ---------- per-branch EMPLOYMENT & LABOUR (data/branch_labor.json) ----------
    Lazy-loads the MEASURED per-branch labour layer built by pipeline/build_branch_labor.py:
    top-3 catchment occupation buckets (Overture), district factory workers (DIW), province
@@ -3512,8 +3532,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3764,6 +3784,28 @@ function hhriskPopupHTML(d,sec,r){
 // by occupation bucket within 10km of this branch. Renders nothing until branch_occupations.json is
 // loaded AND this branch has a non-empty entry (entry.t>0), so it is fully graceful: absent file or
 // absent/empty entry → no block at all. Shows the top ~6 buckets as labelled percentage bars.
+// WORKFORCE mix block — the reflective "who works in this 10km" answer (data/branch_workforce.json).
+// Shows the estimated occupation mix (people), so farmers surface where they truly are — the
+// lead-by-occupation signal. ESTIMATED, provenance-labelled. Graceful: absent file/entry → no block.
+function workforcePopupHTML(d,sec){
+  if(!WFDATA||!WFDATA.branches||!WFDATA.buckets||!DATA) return '';
+  const i=idxOf(d); if(i<0) return '';
+  const e=WFDATA.branches[i]; if(!e||!(e.t>0)) return '';
+  let rows=WFDATA.buckets.map((bk,j)=>({lab:bk.label,col:OCC_BUCKET_COL[bk.key]||'#8b90a7',
+      v:(e.w&&e.w[j])||0,pct:(e.mix&&e.mix[j])||0}))
+    .filter(rw=>rw.v>0).sort((a,b)=>b.v-a.v).slice(0,6);
+  if(!rows.length) return '';
+  const mx=rows[0].pct||1;
+  return sec('Workforce mix (estimated · who works here)')
+    + `<div class="occ" style="margin-top:2px">`+rows.map(rw=>{
+        const w=Math.max(4,Math.round(rw.pct/mx*100));
+        return `<div class="pr" style="gap:8px"><span style="flex:1">${rw.lab}</span>`
+          +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${rw.col}"></i></span>`
+          +`<b class="mono" style="color:${rw.col};min-width:34px;text-align:right">${rw.pct}%</b></div>`;
+      }).join('')
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">~${(e.t||0).toLocaleString()} workers ≤10km by occupation (ESTIMATED — farmers from SPAM cropland × OAE area anchored to NSO; factory DIW; services Overture×headcount) ${TAG_E}</div>`
+    + `</div>`;
+}
 function occPopupHTML(d,sec){
   if(!OCCDATA||!OCCDATA.branches||!OCCDATA.buckets||!DATA) return '';
   const i=idxOf(d); if(i<0) return '';
@@ -3772,14 +3814,14 @@ function occPopupHTML(d,sec){
     .filter(rw=>rw.v>0).sort((a,b)=>b.v-a.v).slice(0,6);
   if(!rows.length) return '';
   const tot=rows.reduce((a,rw)=>a+rw.v,0)||1, mx=rows[0].v||1;
-  return sec('Occupation mix (measured · Overture)')
+  return sec('Businesses & services nearby (measured · Overture)')
     + `<div class="occ" style="margin-top:2px">`+rows.map(rw=>{
         const pct=Math.round(rw.v/tot*100), w=Math.max(4,Math.round(rw.v/mx*100));
         return `<div class="pr" style="gap:8px"><span style="flex:1">${rw.lab}</span>`
           +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${rw.col}"></i></span>`
           +`<b class="mono" style="color:${rw.col};min-width:30px;text-align:right">${pct}%</b></div>`;
       }).join('')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">${(e.t||0).toLocaleString()} establishments ≤10km by category (Overture Maps Places — a sample/lower bound, not a registry)</div>`
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">${(e.t||0).toLocaleString()} establishments ≤10km by category (Overture Maps Places — storefronts, a sample/lower bound; workforce mix above is the who-works-here read)</div>`
     + `</div>`;
 }
 // Employment & labour block for a branch popup — the MEASURED per-branch labour layer
@@ -4023,6 +4065,7 @@ function popupHTML(d){
     ${pl?r('Province informal workers (NSO)', nsoNum(pl.informal), 'var(--collat)'):''}
     ${collatMixPopupHTML(d,sec,r)}
     ${hhriskPopupHTML(d,sec,r)}
+    ${workforcePopupHTML(d,sec)}
     ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
