@@ -5,6 +5,29 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 (8) — VALIDATOR: doc/data vintage-drift tripwire in `validate_data.py`
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-04 (7)): the AUDIT that same day found
+`docs/DATA_SOURCES.md` + `docs/DATA_PROVENANCE.md` had silently drifted stale (still quoting the
+pre-refresh Dec-2025 Pink Sheet vintage two days after `platform/data/meta.json` had already moved to
+2026M06), caught only by a manual pass — no automated tripwire existed for that class of doc-drift.
+
+New `check_doc_vintage()` in `tests/validate_data.py`: reads the live vintage off
+`meta.json.updated` (regex `\d{4}M\d{2}`), then greps each doc's own "live read" anchor — the
+`## World Bank Pink Sheet — current read (VINTAGE prices)` header in `DATA_SOURCES.md` and the
+`` currently `VINTAGE prices ...` `` phrase in `DATA_PROVENANCE.md` (both docs already carried a
+"keep this in sync with meta.json" comment next to these exact spots) — and fails the gate if either
+doc's cited vintage disagrees with the live one. Deliberately scoped to these two specific anchors
+rather than every `\d{4}M\d{2}` substring in the docs tree: `docs/DATA_REFRESH_LOG.md`,
+`docs/QA_FINDINGS.md` and `IMPROVEMENT_BACKLOG.md`'s own Done log legitimately *mention* the old
+stale vintage as history (audit write-ups), and a naive whole-doc scan would false-positive on those
+every cycle.
+
+Verified it actually catches drift: hand-edited `DATA_SOURCES.md`'s header back to `2025M12`, reran
+`validate_data.py` — new check correctly `FAIL`s with the doc/live vintages named; restored the file
+and reran — clean `PASS`. Zero `platform/data`/`source-data` files touched. Gate: `bash tests/run.sh
+check` 47/0 (`validate_data.py` 421/421, was 418/418).
+
 ## 2026-07-04 (6) — HYGIENE: `build_national_places.py`/`build_scene_places.py` no longer bare-`assert` on malformed committed data
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-04 (5)): both scripts' SKIP-pass path (bulk

@@ -348,13 +348,31 @@
       checked against a fresher OAE pull. OAE (`catalog.oae.go.th`) is REACHABLE from this sandbox
       per the same doc's own reachability matrix — a future ENRICH cycle could pull the current OAE
       outlook note and either confirm or update this sentence with a real citation. *(LOW, S)*
-- [ ] **Add a lightweight doc/data consistency check to `tests/validate_data.py` (or a small new
-      script) that greps `docs/DATA_SOURCES.md` / `docs/DATA_PROVENANCE.md` for a hardcoded vintage
-      label pattern (e.g. `\d{4}M\d{2}`) and fails if it doesn't match the live
-      `platform/data/meta.json.updated` string** — this cycle found the Pink Sheet vintage had silently
-      drifted stale in two docs after a data refresh with no automated tripwire; a cheap grep-based
-      check would catch the same class of doc-drift automatically on every future refresh instead of
-      relying on a manual AUDIT cycle to notice. *(MED, S — genuinely useful, low risk)*
+- [x] **Add a lightweight doc/data consistency check to `tests/validate_data.py` — DONE 2026-07-04
+      (8)** (new `check_doc_vintage()`: reads the live vintage off `meta.json.updated`, greps
+      `DATA_SOURCES.md`'s "current read (VINTAGE prices)" header + `DATA_PROVENANCE.md`'s "currently
+      `VINTAGE prices`" phrase, fails on mismatch; scoped to those two live-claim anchors, not a
+      whole-doc scan, so it doesn't false-positive on the audit logs' legitimate historical mentions
+      of the old stale vintage. Verified against a hand-corrupted vintage. Gate 47/0, validate_data
+      421/421).
+
+## Queue — follow-ups noticed 2026-07-04 (8)
+- [ ] **`check_doc_vintage()`'s two anchors are hand-picked regexes tied to exact current phrasing**
+      ("current read (...)" / "currently `...`") — if either doc's live-claim sentence is ever
+      reworded (not just re-vintaged), the check fails loudly with a clear message telling the editor
+      to update `_DOC_VINTAGE_ANCHORS`, which is the intended fail-safe behaviour, but it's worth
+      knowing this is a deliberate trade-off (brittle-but-loud beats silent) if a future doc rewrite
+      trips it for a non-drift reason. *(LOW, trivial, informational)*
+- [ ] **The same vintage-drift class could recur for other cited-vintage docs** beyond the Pink
+      Sheet (e.g. NSO SES/LFS vintages quoted in `docs/DATA_SOURCES.md`'s household-debt/unemployment
+      sections, or the OAE "Dec-2025 outlook" line flagged as unverified in the 2026-07-04 (7)
+      follow-up) — once one of those layers gets a real refresh, the same anchor-and-compare pattern
+      (`check_doc_vintage()`) could extend to a 2nd vintage family. Not needed until a refresh
+      actually happens. *(LOW, S, speculative)*
+- [ ] **OAE outlook re-verification (from 2026-07-04 (7), still open)** — pull the current OAE
+      (`catalog.oae.go.th`, REACHABLE) outlook note and confirm/update `docs/DATA_SOURCES.md`'s
+      "OAE Dec-2025 outlook" sentence (rice+rubber=2026 RISK; cassava/palm/chicken/durian firmer),
+      the oldest un-re-verified citation in that file. *(LOW, S)*
 
 ## Done (most recent first)
 - (loop will append here)
