@@ -83,7 +83,7 @@ It does three things:
 2. Copy the **public URL** of the uploaded file.
 3. Paste it into `platform/data/tiles_config.json`. The frontend reads the **nested**
    `buildings.pmtilesUrl` key (NOT a flat `buildings_pmtiles`), so set it exactly like this
-   (only the URL changes — leave the other keys):
+   (replace the WHOLE `buildings` block):
    ```json
    "buildings": {
      "pmtilesUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev/buildings.pmtiles",
@@ -95,6 +95,11 @@ It does three things:
      "attribution": "© Overture Maps Foundation"
    }
    ```
+   > 🚨 **Delete the `coverageBbox` line.** The current config carries a Rayong-pilot
+   > `coverageBbox` that gates streaming to Rayong only — with a **national** archive you must
+   > remove it, or all 76 other provinces will get no streamed buildings. The block above
+   > already omits it: replace the entire `buildings` block with exactly what's shown (no
+   > `coverageBbox`, no `coverageNote`) and every province streams nationwide.
    *(If you used the `tiles/` folder instead of the single `.pmtiles`, set
    `buildings.mvtUrl` to that folder's `{z}/{x}/{y}.pbf` template and leave `pmtilesUrl`
    null — the frontend prefers `mvtUrl` when both are set. Avoid the `tiles/` folder for the
