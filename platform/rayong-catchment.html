@@ -279,10 +279,16 @@ html[data-theme="light"] #complegend .cl-gnd.on{color:#2C3444;border-color:var(-
 
 /* TABLET (821–1200px): narrow the fixed panels + control frame a touch so the map well breathes,
    but keep the full desktop layout (panels docked, controls + legends all visible). */
+/* DESKTOP: #ctl (basemap / rings / poster controls) was pinned right:14px — directly UNDER the
+   right "Acquisition leads" .side panel (which occupies the top-right), so the scene-control menu
+   was invisible on desktop (only reachable on mobile, where it relocates to the bottom sheet).
+   Shift it left of the right panel into free map space so it's usable on desktop too. Offsets clear
+   the panel width + its 14px inset per breakpoint. */
 @media(min-width:821px) and (max-width:1200px){
  .side{width:270px}
- #ctl{min-width:160px;padding:10px}
+ #ctl{min-width:160px;padding:10px;right:296px}   /* panel 270 + 14 inset -> clear at 296 */
 }
+@media(min-width:1201px){ #ctl{right:340px} }      /* panel 312 + 14 inset -> clear at 340 */
 
 /* PHONE (<820px): map goes full-screen. The two info cards slide off-screen (left/right) and the
    #ctl control frame slides down off the bottom; all three are reachable via the #mtog bottom-sheet
