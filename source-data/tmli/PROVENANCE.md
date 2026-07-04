@@ -15,10 +15,12 @@ ESTIMATED proxies with MEASURED data.
 - commit (of `/workspace/watcher` at vendor time): `27172d4776dac905893e1d88942dc24f8339f3e4`
 - These files are copies of `watcher/data/*` — unmodified.
 
-## Files (all MEASURED)
+## Files
+> Most fields here are MEASURED. Two exceptions are called out explicitly below (not blanket-MEASURED):
+> `household-debt.js`'s `debtToIncome`/`stressIndex` (2026-07-04 audit) and `provincial-gpp.js` (2026-07-02 audit).
 | file | source authority | reference period (as stamped in the TMLI source) | drives |
 |---|---|---|---|
-| `household-debt.js` | NSO SES 2566 (debt/household, THB) + BOT Household Debt Regional Q4/2024 (debtToIncome, stressIndex) | NSO SES 2566 (2023 CE); BOT Q4/2024; TMLI `updated_at` 2026-04-05 | `household_debt_by_province.json` |
+| `household-debt.js` | **MIXED (corrected 2026-07-04 audit).** `debtPerHousehold`: NSO SES 2566 (debt/household, THB) — MEASURED, matches the co-vendored `nso-ses-debt-2566.json`. `debtToIncome`/`stressIndex`: attributed to "BOT Household Debt Regional Q4/2024" but **no CKAN/BOT resource id is cited anywhere in the file** — the values are grouped under hand-written narrative headers ("CENTRAL (High leverage)", "NORTHEASTERN (Agri-Stress Hubs)"...), the same fabrication smell caught in `provincial-gpp.js` below, and diverge 10-20x from the independently-computed ratio the app actually uses. **UNVERIFIED — treat as not-real; not consumed by any builder.** | NSO SES 2566 (2023 CE); BOT Q4/2024 (unverified); TMLI `updated_at` 2026-04-05 | `household_debt_by_province.json` (only `debt_per_household` is used downstream — `build_household_risk.py` recomputes its own `debt_to_income`) |
 | `nso-ses-debt-2566.json` | NSO SES 2566 raw debt-per-household (THB) | 2566 B.E. (2023 CE) | (raw reference; superseded by household-debt.js corrected values) |
 | `nso-ses-income-2566.json` | NSO SES 2566 monthly income by occupation (THB/month) | 2566 B.E. (2023 CE) | `household_income_by_province.json` |
 | `nso-lfs-provincial-summary.json` | NSO Labour Force Survey provincial summary (thousands of persons) | ไตรมาสที่ 3/2568 (Q3/2025); TMLI downloaded 2026-03-29 | `unemployment_by_province.json` |

@@ -8,8 +8,14 @@ The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling a
 (measured, from the Thai-network TMLI platform) and projected into clean province-keyed layers — no
 desktop pull needed. `pipeline/ingest_tmli.py` (deterministic, network-free, `--check`-gated in
 `tests/run.sh check`) reads `source-data/tmli/` and writes, keyed by the canonical 77 Thai names:
-- `source-data/household_debt_by_province.json` — `debt_to_income`, `stress_index` (BOT Q4/2024) +
-  `debt_per_household` THB (NSO SES 2566). **MEASURED.**
+- `source-data/household_debt_by_province.json` — `debt_per_household` THB (NSO SES 2566) is
+  **MEASURED**. `debt_to_income`/`stress_index` (attributed to BOT Q4/2024) are **⚠ UNVERIFIED
+  (corrected 2026-07-04 audit)** — no CKAN/BOT resource id is cited for them anywhere in the vendored
+  source, the values are grouped under hand-written narrative headers (same fabrication smell as the
+  GPP file below), and they diverge 10-20x from the debt-to-income the app actually computes and
+  ships (`household_risk_by_province.json`, `build_household_risk.py`: `debt_per_household ÷` NSO SES
+  annual income). **Do not use this file's `debt_to_income`/`stress_index` for anything** — the app
+  already only ever consumes the recomputed ratio. See `source-data/tmli/PROVENANCE.md`.
 - `source-data/household_income_by_province.json` — monthly income by occupation + `avg_monthly_income`
   (NSO SES 2566). **MEASURED.**
 - `source-data/unemployment_by_province.json` — employed/unemployed/labor-force (thousands) +
@@ -25,15 +31,16 @@ desktop pull needed. `pipeline/ingest_tmli.py` (deterministic, network-free, `--
   not yet integrated into any `platform/data` layer, which is why this was caught before it reached
   the app. A real fix needs a per-province NESDC CKAN pull (see `docs/DATA_REFRESH_LOG.md`).
 
-- **Why this matters (objective #1):** household **debt-to-income is a direct portfolio-risk signal** —
-  it ranks borrower stress by province (e.g. Si Sa Ket DTI 18.2, Surin 17.5, Amnat Charoen 17.1 — Isan
-  rural over-indebtedness). Pairing debt with `household_income_by_province` (esp. the Agriculture
-  occupation row) and `unemployment_by_province` gives a measured province stress read that can replace
-  estimated proxies in the district/province risk score.
-- **Next concrete step (NOT done this cycle — left for the build_province / build_amphoe / app owners):**
-  join these layers into `build_province.py` (province deep-dive risk panel) and `build_amphoe.py`
-  `risk_proxy` (currently estimated), and surface debt-to-income on the National risk lens + Provinces
-  deep-dive. Refresh path: re-vendor `source-data/tmli/` from the TMLI repo, re-run `ingest_tmli.py`.
+- **Why this matters (objective #1):** household **debt-to-income is a direct portfolio-risk signal**.
+  This is already DONE, via the app's own recomputed ratio, not the unverified BOT-attributed figures
+  above — see `household_risk_by_province.json` (`hhdti`/`pstress` National-map lenses; e.g. Khon Kaen
+  1.15x, Amnat Charoen 1.14x, both NSO SES-derived and fully cited). Pairing debt with
+  `household_income_by_province` (esp. the Agriculture occupation row) and `unemployment_by_province`
+  is also already wired (province deep-dive, `province_stress_index.json`).
+- **Next concrete step:** none outstanding for this layer — the measured path (recomputed DTI) is
+  already shipped. If a real per-province BOT Household Debt Regional pull is ever obtained (with a
+  citable resource id), it could be compared against the recomputed ratio as a second independent
+  measure, but do not substitute it in without that verification.
 
 ## 0. Replicate the Rayong deep-dive by province, then by region  ⟶ DONE (engine), refine with data
 Rayong was the pilot template; the goal was the same deep-dive for every province, rolled up by region.

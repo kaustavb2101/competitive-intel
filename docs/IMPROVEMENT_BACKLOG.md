@@ -219,11 +219,13 @@
       specifically when `isProvLens(curLens)` is true; every other lens unchanged at 0.9).
 
 ## Queue — follow-ups noticed 2026-07-03 (7)
-- [ ] **`household_debt_by_province.json` carries its OWN `debt_to_income` + `stress_index` (BOT
-      Q4/2024 regional)** that is never surfaced — only `build_household_risk.py`'s own computed
-      DTI (debt ÷ NSO SES annualized income) is. The two could disagree (different vintages/methods:
-      BOT regional vs NSO SES-derived); worth an AUDIT pass comparing them and either reconciling or
-      explicitly captioning "two independent DTI estimates" if they diverge materially. *(MED, S)*
+- [x] **`household_debt_by_province.json` carries its OWN `debt_to_income` + `stress_index` (BOT
+      Q4/2024 regional)** that is never surfaced — DONE 2026-07-04 (2), audit found this isn't just
+      "disagreement" — the BOT-attributed fields have no citable resource id, look editorially
+      hand-grouped (same smell as the GPP file), and diverge 10-20x from the recomputed ratio the app
+      actually uses. Relabelled UNVERIFIED in `ingest_tmli.py`/`PROVENANCE.md`/`NEXT_STEPS.md`
+      /`DATA_PROVENANCE.md`; zero data values changed; confirmed no code path ever consumed the
+      unverified fields. See `docs/DATA_REFRESH_LOG.md` (2026-07-04 (2)).
 - [ ] **The new `gov.income` per-occupation breakdown (2026-07-03 (8)) could feed the Simulator's
       occupation-sensitivity lever** — a sector shock that also discounts by the province's
       lowest-earning-occupation share would sharpen the existing ESTIMATED factory-slowdown lever
@@ -268,6 +270,16 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 (2) — AUDIT: `household-debt.js`'s `debtToIncome`/`stressIndex` mislabelled MEASURED,
+  actually UNVERIFIED.** No CKAN/BOT resource id cited (unlike every other TMLI-vendored layer);
+  values hand-grouped under narrative headers (same smell as the 2026-07-02 GPP catch); diverges
+  10-20x from the fully-cited ratio the app already computes and ships
+  (`household_risk_by_province.json`). Confirmed the unverified fields were never consumed downstream
+  — caught before any fabricated-looking number reached the app. Corrected provenance in
+  `ingest_tmli.py`/`source-data/tmli/PROVENANCE.md`/`docs/NEXT_STEPS.md`/`docs/DATA_PROVENANCE.md`;
+  zero data values changed (diffed: meta-only). Gate 42/0, `validate_data.py` 224/224 (unchanged —
+  this source layer sits upstream of the gated `platform/data` tree). Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-04 (2) entry).
 - **2026-07-04 — UX: district (amp) lenses get the same choropleth dot-thinning as province lenses.**
   `platform/app.js`'s `styleMarkers()` now thins dot `fillOpacity` to 0.6 for `isProvLens(curLens)||
   isAmpLens(curLens)` (was province-only) so `dws`/`drisk`/`unemp`'s district choropleth reads through

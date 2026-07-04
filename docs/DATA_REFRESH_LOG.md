@@ -4,6 +4,77 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-04 (2) — AUDIT: `household-debt.js`'s `debtToIncome`/`stressIndex` mislabelled MEASURED, actually UNVERIFIED (BOT figure with no citable resource)
+
+**Task type:** AUDIT (provenance sweep, per the backlog's own 2026-07-03 (7) follow-up: "the two
+independent DTI estimates could disagree — worth an AUDIT pass"). `/workspace/watcher` was not
+present this cycle, so no fresh cross-repo TMLI pull was possible; a RE-DERIVE pass first confirmed
+the working tree was already fully in sync (`bash tests/run.sh check` — 42 passed, 0 failed, no
+drift) before picking this AUDIT task.
+
+**What was found.** `source-data/household_debt_by_province.json` (built by
+`pipeline/ingest_tmli.py`'s `build_household_debt()` from the vendored
+`source-data/tmli/household-debt.js`) carries three fields per province — `debt_to_income`,
+`stress_index`, `debt_per_household` — and its `meta.provenance` blanket-claimed all three
+"MEASURED... NSO SES 2566... BOT Q4/2024." Inspecting the vendored source:
+- `debt_per_household` traces cleanly to the co-vendored `nso-ses-debt-2566.json` (NSO SES 2566,
+  `catalog.nso.go.th/dataset/0705_08_0009`) — genuinely MEASURED, values non-round and
+  province-distinct.
+- `debt_to_income`/`stress_index` are attributed only to "BOT Household Debt Regional Q4/2024" —
+  **no CKAN/BOT dataset or resource id is cited anywhere in the vendored file or its own
+  `PROVENANCE.md` entry**, unlike every other TMLI-vendored layer (NSO SES debt/income, NSO LFS —
+  all cite a real table/resource id). The values in `household-debt.js` are grouped under
+  hand-written narrative section headers (`// --- CENTRAL (High leverage) ---`, `// --- NORTHEASTERN
+  (Agri-Stress Hubs) ---`, etc.) — the exact same fabrication smell already caught and corrected in
+  `provincial-gpp.js` on 2026-07-02 (round numbers, hand-assigned per editorial category, no
+  verifiable resource).
+- Magnitude check: the file's `debt_to_income` ranges 9.5x–18.2x across provinces — i.e. it claims
+  the average Thai household owes 9.5 to 18.2 times its ANNUAL income, which is implausible (Thai
+  household debt-to-GDP nationally runs under 1.0x per BOT's own published aggregate figures). By
+  contrast, `platform/data/household_risk_by_province.json` (`build_household_risk.py`, independently
+  computed as `debt_per_household ÷ (avg_monthly_income × 12)` from two fully-cited NSO SES layers)
+  gives the *same* provinces a debt_to_income of 0.2x–1.2x — a 10-20x divergence from the
+  BOT-attributed figures in `household-debt.js` for the identical province set (e.g. Krabi: file says
+  10.5x, recomputed says 0.70x; Bangkok: file says 14.2x, recomputed says 0.22x).
+
+**Blast radius: contained.** Traced every consumer of `household_debt_by_province.json` — only
+`build_household_risk.py` reads it, and only its `debt_per_household` field (the genuinely-MEASURED
+one); `debt_to_income`/`stress_index` from this file are never read by any builder or app code
+(`grep` across `pipeline/*.py` and `platform/app.js` confirms every downstream consumer —
+`build_branch_peers.py`, `build_branch_risk.py`, `build_macro_exposure.py`,
+`build_province_stress.py`, `app.js`'s `HHRISK`/`PSTRESS` — reads exclusively from
+`platform/data/household_risk_by_province.json`'s own recomputed ratio, never the raw source file).
+The unverified BOT figure never reached a user-facing screen.
+
+**Fix applied (no fabrication — corrected labels/docs only, zero data values changed):**
+- `pipeline/ingest_tmli.py`'s `build_household_debt()`: `meta.provenance`/`fields`/new `meta.caveats`
+  now split MEASURED (`debt_per_household`) from UNVERIFIED (`debt_to_income`, `stress_index`), name
+  the exact divergence and the missing-resource-id issue, and state plainly "do NOT surface
+  debt_to_income/stress_index from THIS file as MEASURED anywhere."
+- Regenerated `source-data/household_debt_by_province.json` (`python3 ingest_tmli.py`) — diffed
+  before committing: **only the `meta` block changed; every per-province numeric value is
+  byte-identical.** `ingest_tmli.py --check` reproduces byte-exact.
+- Corrected the blanket "MEASURED" claims in `source-data/tmli/PROVENANCE.md` (file-level table +
+  header), `docs/NEXT_STEPS.md` §0a (also removed a stale "next concrete step: join into
+  build_province.py/build_amphoe.py" instruction that would have wired the unverified BOT figures
+  into the app had a future cycle followed it literally — replaced with a note that the measured path
+  is already shipped via the recomputed ratio), and `docs/DATA_PROVENANCE.md`'s `tmli/` row.
+- `bash tests/run.sh check` — 42 passed, 0 failed (`validate_data.py`: 224/224, unchanged — this
+  layer isn't itself a `platform/data` file, so the data-integrity gate was never touching it).
+
+**Follow-up (logged, not attempted — low priority since the figure is unused and there's no live BOT
+access from this sandbox):** if a real per-province BOT Household Debt Regional dataset with a
+citable resource id is ever pulled, it would be a genuinely independent second measure of household
+leverage worth comparing against the recomputed NSO-ratio — but should not simply replace it without
+that verification, given the current file's numbers don't check out even as a plausible unit
+mismatch (e.g. debt ÷ monthly income doesn't reconcile either).
+
+**Source:** `source-data/tmli/household-debt.js` (self-disclosed structure — narrative section
+headers, no resource id) + cross-check against `source-data/tmli/nso-ses-debt-2566.json` and
+`platform/data/household_risk_by_province.json`. No external pull performed this cycle.
+
+---
+
 ## 2026-07-03 (8) — ENRICH: NSO SES 2566 per-occupation income folded into the province deep-dive
 
 **Task type:** ENRICH. `/workspace/watcher` was not present this cycle, so no cross-repo TMLI pull

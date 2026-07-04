@@ -1,12 +1,15 @@
 {
   "meta": {
-    "source": "NSO SES 2566 (debt/household) + BOT Household Debt Regional Q4/2024 (debt_to_income, stress_index), via data.go.th / TMLI",
-    "provenance": "MEASURED. Vendored from kaustavb2101/watcher source-data/tmli/household-debt.js. NSO SES 2566 (2023 CE); BOT Q4/2024.",
+    "source": "debt_per_household: NSO SES 2566, via data.go.th / TMLI (CKAN-citable: see nso-ses-debt-2566.json). debt_to_income/stress_index: attributed in the vendored source to 'BOT Household Debt Regional Q4/2024' but NO CKAN/BOT resource id is cited anywhere in the vendored file — UNVERIFIED, see caveats.",
+    "provenance": "MIXED. debt_per_household is MEASURED (NSO SES 2566, matches the independently-vendored nso-ses-debt-2566.json). debt_to_income/stress_index are UNVERIFIED: 2026-07-04 audit found source-data/tmli/household-debt.js groups them under hand-written narrative headers ('CENTRAL (High leverage)', 'NORTHEASTERN (Agri-Stress Hubs)', etc.) with no CKAN/BOT resource id cited — the exact same fabrication smell already caught in provincial-gpp.js (2026-07-02 audit) — and the values (9.5x-18.2x annual income) diverge 10-20x from the independently-computed, fully-cited debt_to_income in platform/data/household_risk_by_province.json (build_household_risk.py: NSO SES debt_per_household / NSO SES annual income, ~0.2x-1.2x range for the same provinces). Do NOT surface debt_to_income/stress_index from THIS file as MEASURED anywhere; the app already only ever consumes household_risk_by_province.json's own recomputed ratio (verified 2026-07-04: no code path reads this file's debt_to_income/stress_index).",
     "fields": {
-      "debt_to_income": "household debt as a multiple of annual income (BOT regional)",
-      "stress_index": "0..1 financial-stress index (BOT regional)",
-      "debt_per_household": "average household debt, THB (NSO SES 2566, measured)"
+      "debt_to_income": "UNVERIFIED — attributed to 'BOT Household Debt Regional Q4/2024' in the vendored source but no resource id is cited; see meta.provenance. NOT consumed by any builder — kept for reference only.",
+      "stress_index": "UNVERIFIED — same caveat as debt_to_income. NOT consumed by any builder.",
+      "debt_per_household": "MEASURED — average household debt, THB (NSO SES 2566)."
     },
+    "caveats": [
+      "debt_to_income/stress_index in this file are NOT the same as the app's household-DTI lens (hhdti/pstress) — those are computed fresh by build_household_risk.py from debt_per_household ÷ NSO SES annual income. Do not conflate the two."
+    ],
     "n_provinces": 77
   },
   "provinces": {
