@@ -856,9 +856,16 @@ function buildLighting(withShadow){
     // ambient 0.95->0.70. On the reporter's GPU the province building faces blew to pure white — the
     // headless SwiftShader renderer never reproduced it, so this is tuned against real screenshots.
     // Max-lit now ~0.42*0.70 + 0.40*(0.55+0.18) = 0.294 + 0.292 = 0.586 (was 0.878) — no clamp headroom.
-    const sun=new deck.DirectionalLight({color:[255,241,216],intensity:0.55,direction:[-0.7,-2.2,-1.0],_shadow:!!withShadow});
-    const fill=new deck.DirectionalLight({color:[170,194,248],intensity:0.18,direction:[0.9,0.6,-0.4]});
-    const amb=new deck.AmbientLight({color:[245,238,222],intensity:0.70});  // warm-neutral
+    // NON-SHADOW soft shading, re-enabled 2026-07-04 for DataProteins sharpness (walls darker than
+    // roofs). BOUNDED so it CANNOT whiteout on any GPU: buildings are DATA-capped at 216 (light) and
+    // the max lighting multiplier here is ~0.86, so the brightest possible face is 216*0.86≈186 —
+    // far below 255 even if a GPU renders materially brighter than the headless SwiftShader path.
+    // Sun pitched high (roofs lightest), warm; a cool low-intensity fill keeps shaded walls from
+    // going flat-dark. NO specular (the old view-dependent term that spiked white under orbit). NO
+    // shadow pass ever (SHADOWS_ON stays false — that pass, not this base lighting, was the culprit).
+    const sun=new deck.DirectionalLight({color:[255,244,224],intensity:0.50,direction:[-0.6,-1.1,-2.4],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[176,198,246],intensity:0.15,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[248,242,228],intensity:1.02});  // warm-neutral; lifted so shaded faces stay readable, not muddy
     const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
     // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
     if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
@@ -880,8 +887,11 @@ const IS_MOBILE = (function(){try{
 // WITHOUT the one thing that differed on real hardware — the shadow pass. With no lighting or
 // shadow pass at all, every GPU rasterises the same flat, capped, warm fill colors (deterministic
 // by construction). Depth reads from the height ramp, extrusion parallax, strokes and vignette.
-let SHADOWS_ON=false;
-let LIGHTING=null;   // buildLighting() kept above for reference; deliberately not attached.
+let SHADOWS_ON=false;   // NEVER the shadow pass (the real-GPU whiteout culprit) — stays off everywhere.
+// Non-shadow soft shading IS attached (buildLighting(false)) for DataProteins wall/roof depth. Only
+// the extruded BUILDING + POI-column layers carry a material; the flat ground/water/road bed is
+// material:false so the paper cream stays exact. Buildings are data-capped so lighting can't whiteout.
+let LIGHTING=buildLighting(false);
 // cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
 // low-and-wide so the extruded skyline catches the light and reads as 3D depth.
 // Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
@@ -1198,14 +1208,14 @@ function groundLayers(){
     const E=sceneExtent();
     const rect=[[E.minX,E.minY],[E.maxX,E.minY],[E.maxX,E.maxY],[E.minX,E.maxY]];
     // base floor tint — warm-neutral so green landuse + grey roads sit on a continuous bed, not voids
-    G.push(new deck.PolygonLayer({id:'ground-bed',data:[rect],getPolygon:p=>p,extruded:false,
+    G.push(new deck.PolygonLayer({id:'ground-bed',data:[rect],getPolygon:p=>p,extruded:false,material:false,
       filled:true,stroked:false,getFillColor:D?[14,17,26,255]:[241,238,231,255],   // light bed = near-white paper (DataProteins reference): the city must read DARKER than its ground
       parameters:{depthTest:false},pickable:false}));
     // vignette: concentric rings, transparent at centre -> opaque dark at the rim (radial falloff)
     const ring=(scale,a)=>{const pts=[];for(let i=0;i<=40;i++){const ang=i/40*2*Math.PI;
       pts.push([E.cx+Math.cos(ang)*E.w*0.5*scale, E.cy+Math.sin(ang)*E.h*0.5*scale]);}return pts;};
     const vig=[{s:1.55,a:D?200:0},{s:1.15,a:D?120:0},{s:0.92,a:D?60:0},{s:0.7,a:0}];  // light: alpha 0 so the paper bed [241,238,231] actually renders (the gray discs were veiling the whole frame)
-    G.push(new deck.PolygonLayer({id:'ground-vignette',data:vig,getPolygon:v=>ring(v.s),extruded:false,
+    G.push(new deck.PolygonLayer({id:'ground-vignette',data:vig,getPolygon:v=>ring(v.s),extruded:false,material:false,
       filled:true,stroked:false,getFillColor:v=>D?[8,11,18,v.a]:[150,146,138,Math.round(v.a*0.55)],   // light vignette softened ~half: gray smudge corners kill the paper-white look
       parameters:{depthTest:false},pickable:false}));
   }
@@ -1236,7 +1246,7 @@ function groundLayers(){
     // outline almost entirely (a very faint same-hue stroke just keeps same-kind parcels from merging).
     // Lower the fill alpha a touch vs the bed so parcels read as tinted overlays, not cut-outs.
     const luEdge=f=>{const m=(LU[f.kind]||LU.park)[D?0:1];return [m[0],m[1],m[2],D?60:45];};
-    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,
+    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,material:false,
       filled:true,stroked:true,getFillColor:luCol,
       getLineColor:luEdge,getLineWidth:1,lineWidthMinPixels:0.4,lineWidthMaxPixels:1.2,
       parameters:{depthTest:false},pickable:false}));
@@ -1245,7 +1255,7 @@ function groundLayers(){
   // ---- WATER: flat fill + a darker, slightly inset shoreline so rivers/lakes read with depth. ----
   const wa=WATER&&Array.isArray(WATER.water)?WATER.water:null;
   if(wa&&wa.length&&deck.PolygonLayer){
-    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,
+    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,material:false,
       filled:true,stroked:true,
       getFillColor:D?[30,66,118,225]:[122,176,232,235],   // water = THE color accent on the paper-white base
       getLineColor:D?[16,40,78,235]:[88,138,196,235],getLineWidth:3,lineWidthMinPixels:1,
@@ -1412,7 +1422,7 @@ function isoLayers(){
   // ground (they were tuned for dark). Keep them functional but translucent-watercolor there.
   const isoA=lightMode()?44:104, isoLineA=lightMode()?150:235;
   G.push(new deck.GeoJsonLayer({id:'isochrone',data:{type:'FeatureCollection',features:feats},
-    extruded:false,filled:true,stroked:true,
+    extruded:false,material:false,filled:true,stroked:true,
     getFillColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],isoA];},
     getLineColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],isoLineA];},
     getLineWidth:14,lineWidthUnits:'meters',lineWidthMinPixels:2,lineWidthMaxPixels:5,
@@ -1473,7 +1483,7 @@ function streamBuildingLayer(){
         var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
       getLineColor:LIGHT?[164,156,144,150]:(DARK?[28,22,14,210]:[120,110,90,150]),   // soft warm-gray stroke: tiny footprints ARE their stroke at city zoom
       lineWidthMinPixels:0.4,
-      material:false,   // FLAT like the curated layer: no lighting term exists -> whiteout impossible on any GPU
+      material:{ambient:0.60,diffuse:0.42,shininess:0,specularColor:[0,0,0]},   // soft shading like the curated layer; bounded (cap+multiplier) so it can't whiteout
       shadowEnabled:SHADOWS_ON,
       onTileLoad:function(t){try{var d=t&&(t.content||t.data);
         if(d&&d.length&&!window._STREAM_READY){window._STREAM_READY=true;render();}}catch(e){}},  // same first-real-tile handover as the PMTiles path
@@ -1500,7 +1510,7 @@ function render(){
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
   if(DISTRICTS && deck.GeoJsonLayer){
-    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,filled:true,stroked:true,
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,material:false,filled:true,stroked:true,
       getFillColor:[91,124,250,18],getLineColor:[120,140,180,90],lineWidthMinPixels:1,pickable:false}));
   }
   // (1) 10km collateral catchment rings — faint over ALL branches; bright only on the selected branch (drawn beneath buildings)
@@ -1510,12 +1520,12 @@ function render(){
     // reach cue there; fills carry the cue only on dark.
     const ringFillA=lightMode()?3:10, focusFillA=lightMode()?8:28;
     L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
-      extruded:false,stroked:true,filled:true,
+      extruded:false,material:false,stroked:true,filled:true,
       getFillColor:[GOLD[0],GOLD[1],GOLD[2],ringFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],70],
       lineWidthMinPixels:1,pickable:false}));
     if(focal){
       L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
-        extruded:false,stroked:true,filled:true,
+        extruded:false,material:false,stroked:true,filled:true,
         getFillColor:[GOLD[0],GOLD[1],GOLD[2],focusFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
         lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
     }
@@ -1617,20 +1627,21 @@ function render(){
       if(LIGHT&&inFocalRing(b)){r+=10; g+=7; bl+=2;}
       const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
       if(c){const cw=LIGHT?0.3:0.18; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}  // dark tint weight 0.32->0.18: let the height ramp dominate the hue (was muddying towers)
-      // HARD anti-white ceiling in light mode: even after the reduced lighting multiplies these,
-      // a face cannot approach white. Caps the DATA so a hot GPU can't blow low buildings out.
-      const cap=LIGHT?226:255;   // flat render: fill IS the pixel, so the cap only guards the data itself
+      // HARD anti-white ceiling: soft lighting now multiplies these (max ~0.86), so a face cannot
+      // approach white. Cap 216 in light -> brightest lit face 216*0.86≈186, huge margin below 255
+      // even if a GPU renders brighter than headless. This DATA cap is the whiteout backstop.
+      const cap=LIGHT?216:255;
       return [Math.min(cap,clamp(r)),Math.min(cap,clamp(g)),Math.min(cap,clamp(bl)),LIGHT?255:236];},
     // Light-mode stroke is WARM DARK, not cool gray-blue: at city zoom a Thai shophouse footprint
     // is 1–4 px, so the stroke IS the visible building — a light cool outline over 180k tiny
     // footprints reads as a frosted white carpet. Dark warm outlines keep the mat warm + defined.
     stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[122,106,86,205]:[164,156,144,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
-    // LIGHTING OFF for the building fill. Any lighting model (ambient + directional/point terms)
-    // SUMS per-face and can exceed 1.0 on a real GPU -> the "white blow-out" that never reproduces
-    // on the sandbox's dimmer SwiftShader renderer. With material:false there is NO lighting term
-    // left to blow out: faces render flat at the fill color, which is already height-ramped (warm
-    // taupe->gold) and HARD-capped anti-white above. GPU-independent by construction.
-    material:false,
+    // SOFT NON-SHADOW SHADING (DataProteins realism): walls read a touch darker than sun-facing
+    // roofs. specular ZEROED (the old view-dependent term that spiked white under orbit). Bounded
+    // by construction: material.ambient 0.6 + diffuse 0.42; with the effect's light intensities the
+    // max multiplier is ~0.86, applied to fills DATA-capped at 216 -> brightest face ~186, so no GPU
+    // can whiteout. NO shadow pass (shadowEnabled false) — that pass, not this, caused the old blowout.
+    material:{ambient:0.60,diffuse:0.42,shininess:0,specularColor:[0,0,0]},
     shadowEnabled:SHADOWS_ON,
     parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
     updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
