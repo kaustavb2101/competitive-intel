@@ -233,13 +233,11 @@
       could add "lowest-paid occupation nationally" as a portfolio-risk callout. *(LOW, S)*
 
 ## Queue — follow-ups noticed 2026-07-03 (9)
-- [ ] **The same "opaque dots tile over a polygon fill" issue likely applies to the amphoe
-      (district) choropleth too** (`dws`/`drisk`/`unemp`) — `drawAmphoeChoropleth()` shares the exact
-      same paint-under-dots pattern as `drawProvinceChoropleth()`, and district polygons are smaller
-      than province polygons, so the tiling problem should be *worse* there, not better. Extend the
-      same `fillOpacity` thinning to `isAmpLens(curLens)` in `styleMarkers()` (or fold both flags into
-      one `isPolyLens()` check) once someone confirms the district fill is actually being hidden the
-      same way. *(MED, S — mirrors this cycle's fix)*
+- [x] **The same "opaque dots tile over a polygon fill" issue likely applies to the amphoe
+      (district) choropleth too — DONE 2026-07-04** (`styleMarkers()`'s dot-opacity thinning now
+      checks `isProvLens(curLens)||isAmpLens(curLens)`, so `dws`/`drisk`/`unemp` get the same 0.6
+      thinning `hhdti`/`pstress` got in 2026-07-03 (9); confirmed via headless render of
+      `?lens=drisk#map` that the district fill now reads through the dots).
 - [ ] **0.6 opacity was picked from the backlog's suggested 0.55–0.65 range, not measured against a
       contrast/legibility bar** — worth a quick visual check that dot fill-color is still readable at
       0.6 against both the light basemap and the reddest end of the stress ramp before calling the
@@ -250,8 +248,32 @@
       `drawChoropleth({...})` helper would collapse three duplicated call-sites at once instead of one.
       *(LOW, S, pure refactor)*
 
+## Queue — follow-ups noticed 2026-07-04
+- [ ] **`isProvLens(curLens)||isAmpLens(curLens)` in `styleMarkers()` is the third call-site that now
+      distinguishes "polygon-backed lens" from a plain branch/estab/comp lens** (the choropleth-draw
+      call already does `drawAmphoeChoropleth(); drawProvinceChoropleth();` unconditionally and each
+      no-ops internally) — the existing backlog item proposing a shared `isPolyLens(k)` helper
+      (2026-07-03 (6)/(9)) would now collapse three OR-chains into one; worth doing together with the
+      `drawAmphoeChoropleth`/`drawProvinceChoropleth` duplicate-function merge already queued.
+      *(LOW, S, pure refactor)*
+- [ ] **No amp/prov lens currently combines BOTH a district fill and a province fill on the same
+      view** — if a future lens ever wants district-level detail nested inside a province-level
+      rollup (e.g. show province stress shading with district risk dots atop it), `styleMarkers()`'s
+      binary `polyDots?0.6:0.9` would need a 3rd tier; not needed today, just a note for whoever adds
+      the next choropleth resolution. *(LOW, trivial, speculative — no action needed yet)*
+- [ ] **Verify the 0.6 dot-opacity thinning reads legibly on the `unemp` lens specifically** — this
+      cycle's headless check only screenshotted `drisk`; `unemp`'s legend/color ramp is visually
+      similar but wasn't independently screenshotted, so it inherits the fix by code-path but not by
+      pixel-verification. *(LOW, trivial)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-04 — UX: district (amp) lenses get the same choropleth dot-thinning as province lenses.**
+  `platform/app.js`'s `styleMarkers()` now thins dot `fillOpacity` to 0.6 for `isProvLens(curLens)||
+  isAmpLens(curLens)` (was province-only) so `dws`/`drisk`/`unemp`'s district choropleth reads through
+  the dots the same way `hhdti`/`pstress`'s province choropleth was fixed to in 2026-07-03 (9). Gate
+  42/0 (`validate_data.py` 224/224, unchanged). Headless-rendered `?lens=drisk#map` confirms the fill
+  now shows; control render of `opportunity` confirms no regression. Full writeup: `PROGRESS_LOG.md`.
 - **2026-07-03 (9) — UX: thinned branch-dot opacity so the province choropleth reads through.**
   `platform/app.js`'s `styleMarkers()` drops marker `fillOpacity` to 0.6 specifically when
   `isProvLens(curLens)` is true (`hhdti`/`pstress`); every other lens keeps 0.9, unchanged. Two-line

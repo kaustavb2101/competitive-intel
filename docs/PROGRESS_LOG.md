@@ -5,6 +5,23 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-04 — UX: district (amp) lenses get the same choropleth dot-thinning as province lenses
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (9)): `styleMarkers()`'s dot-opacity thinning
+(landed 2026-07-03 (9) for `hhdti`/`pstress`) only checked `isProvLens(curLens)`, but the three
+district (amphoe) `amp:true` lenses — `dws`, `drisk`, `unemp` — paint the exact same
+`drawAmphoeChoropleth()` polygon fill under the dots and were left at the full 0.9 opacity, tiling
+over their own choropleth just as badly (worse, per the backlog note, since district polygons are
+smaller than province ones).
+
+`platform/app.js`'s `styleMarkers()` now computes `polyDots = isProvLens(curLens) || isAmpLens(curLens)`
+and thins to 0.6 opacity for either; every branch/estab/comp-style lens is untouched at 0.9. Two-line
+logic change (plus an updated comment), no new data, no new files. Gate: `tests/run.sh check` 42/0
+(`validate_data.py` 224/224, unchanged — no data touched). Headless-rendered
+`index.html?lens=drisk#map`: the district risk-proxy choropleth fill now reads clearly through the
+dot layer in the denser clusters; a control render of the default `opportunity` lens confirms it's
+still pixel-unchanged at full 0.9 opacity.
+
 ## 2026-07-03 (10) — Exec decision queue: "This week — do these first" leads the Command Center
 
 New synthesis layer + first card on `#home`. `pipeline/build_decision_queue.py` →
