@@ -612,6 +612,36 @@ html[data-theme="light"] .cc-tag.m{color:#0c6a5b;background:rgba(28,140,125,.13)
 html[data-theme="light"] .cc-tag.m::before{background:#0c6a5b}
 html[data-theme="light"] .cc-tag.e{color:#8a6300;background:rgba(176,130,20,.13);border-color:rgba(176,130,20,.45)}
 html[data-theme="light"] .cc-tag.e::before{border-color:#8a6300}
+/* UNLABELLED (shame) — muted red, hollow square marker to read distinctly from the round m/e dots. */
+.cc-tag.u{color:#ef8079;border-color:rgba(224,87,79,.55);background:rgba(224,87,79,.13)}
+.cc-tag.u::before{background:transparent;border:1.5px solid #ef8079;border-radius:2px}
+html[data-theme="light"] .cc-tag.u{color:#B53A33;background:rgba(200,67,59,.10);border-color:rgba(200,67,59,.45)}
+html[data-theme="light"] .cc-tag.u::before{border-color:#B53A33}
+
+/* ---- DATA ROOM card (#home) — provenance census table ---- */
+:root{--dr-m:#5fd6c2;--dr-e:#f2cf78;--dr-u:#ef8079}
+html[data-theme="light"]{--dr-m:#0c6a5b;--dr-e:#8a6300;--dr-u:#B53A33}
+.dr-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px;margin:2px 0 4px}
+.dr-total{font-size:15px;font-weight:700;color:var(--hi);letter-spacing:-.2px}
+.dr-split{font-size:12px;color:var(--dim)}
+.dr-split b{font-weight:700}
+.dr-tblwrap{max-height:340px;overflow:auto;margin-top:8px;border:1px solid var(--line2);border-radius:8px}
+.dr-tbl{margin:0;width:100%;table-layout:fixed;min-width:520px}
+.dr-tbl thead th{position:sticky;top:0;z-index:1;background:var(--panel);font-size:9.5px}
+html[data-theme="light"] .dr-tbl thead th{background:#eef1f6}
+.dr-tbl td{padding:6px 9px;font-size:12px;border-bottom:1px solid var(--line2)}
+/* fixed columns so the vintage/size column is always visible (no off-screen scroll on desktop). */
+.dr-tbl th:nth-child(2),.dr-tbl td:nth-child(2){width:104px}
+.dr-tbl th:nth-child(3),.dr-tbl td:nth-child(3){width:34%}
+.dr-tbl th:nth-child(4),.dr-tbl td:nth-child(4){width:98px}
+.dr-name{display:block;font-family:var(--mono);font-size:11.5px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-desc{display:block;font-size:10px;color:var(--dim);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-src span{display:block;color:var(--mid);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-size{white-space:nowrap;text-align:right}
+.dr-cnt{display:block;font-size:9.5px;font-weight:400;color:var(--dim)}
+.dr-shame{color:var(--dr-u);font-size:10px;font-weight:600}
+.dr-tbl tr.dr-unlabelled td{background:rgba(224,87,79,.055)}
+html[data-theme="light"] .dr-tbl tr.dr-unlabelled td{background:rgba(200,67,59,.05)}
 .cc-sub2{font-size:10.5px;color:var(--dim);margin:8px 0 0}
 .cc-star{background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;line-height:1;padding:0 2px;vertical-align:middle}
 .cc-star.on{color:var(--gold)}
