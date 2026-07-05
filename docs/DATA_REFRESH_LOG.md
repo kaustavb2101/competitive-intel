@@ -4,6 +4,66 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-05 (7) — AUDIT: RE-DERIVE baseline green; closed 2 stale backlog duplicates; re-confirmed the OAE dead-end and PR #1 unmerged status (no change)
+
+**Task type:** AUDIT (backlog hygiene + gate/source re-verification — zero `platform/data` or
+`source-data` values changed this cycle).
+
+**1. RE-DERIVE baseline.** Fresh checkout of `claude/new-session-wto26j`, `bash tests/run.sh check`
+→ **52 passed, 0 failed** (`validate_data.py` 429/429, provenance gate: 372 numeric `platform/data`
+layers scanned, 359 sourced + 13 documented-exempt, 0 unsourced). No fix needed — the tree was
+already in sync. `/workspace/watcher` (TMLI blueprint) was not present in this sandbox this cycle.
+
+**2. Re-confirmed PR #1 is still unmerged (no change since 2026-07-05 (4)).**
+`mcp__github__list_pull_requests(state=open)` → PR #1 still open, not draft.
+`mcp__github__actions_list(list_workflows)` → still only `QA` registered. Same state as the
+2026-07-05 (4) audit; not re-flagging via `PushNotification` since nothing has changed. Backlog
+entry left open (not checked off) pending an actual status change.
+
+**3. Re-confirmed the OAE farm-gate price pull is a genuine dead end (not a transient gap).**
+`pipeline/pull_oae_prices.py --selftest` (offline, 30/30 assertions) then `--dry-run` (real network
+— `catalog.oae.go.th` is reachable from this sandbox). Queried `package_search` directly for the
+puller's exact term (`ราคาที่เกษตรกรขายได้`) plus 5 broader Thai/English terms
+(`ราคา`, `ราคาสินค้าเกษตร`, `ข้าวเปลือก`, `ยางแผ่นดิบ`, `farmgate`, `price`) — every query returns
+at most 6 results catalog-wide, and none is a per-crop farm-gate price series with a
+CSV/XLSX/datastore resource for any of our 6 target crops (rice, rubber, sugarcane, oil palm,
+cassava, maize). The puller's top-ranked match (`มูลค่าผลผลิตสินค้าเกษตรที่สำคัญ`) is JSON-metadata-only
+with no priced series inside; the next-best match (`มูลค่าของผลไม้เมืองร้อน`, tropical fruit) is
+off-topic. This reinforces (with fresh live evidence, not a re-read of old notes) the 2026-07-05 (5)
+conclusion that this needs a Thai-IP `data.go.th` pull or manual news-URL discovery, not another
+sandbox CKAN search retry. `build_crop_stress.py` correctly stays on the honestly-labelled World Bank
+GLOBAL proxy — no data changed.
+
+**4. Closed 2 stale backlog duplicates (code already shipped, never checked off):**
+- **Competitor coverage QA panel** — `pipeline/build_competitor_coverage.py` (shipped 2026-06-30) already
+  does exactly what the still-open `[ ]` entry asked for; confirmed via `grep` + reading the script
+  before touching anything.
+- **NSO census occupation distiller scaffolding** — `pipeline/ingest_gov.py`'s `build_occupations_census()`
+  + `OPTIONAL_LAYERS` (commit `7fd4994`, 2026-06-30) already distill the blocked NSO 2022 Business &
+  Industrial Census export into `source-data/occupations_by_district.json`, returning `None` (silent,
+  crash-free skip) when `dgt_out/nso_census__bizind__*.csv` is absent — confirmed still absent in this
+  sandbox (`ingest_gov.py --check` fails at the *mandatory* `factories_diw` layer for the same reason,
+  since no `dgt_out/` pull has ever landed here — expected, this script isn't gated in `tests/run.sh`
+  precisely because it needs the blocked Thai-IP pull). Verified via `git log -S"build_occupations_census"`
+  before touching anything; no code changed, both items checked off in `docs/IMPROVEMENT_BACKLOG.md`
+  rather than re-built.
+
+**Also investigated and ruled out as a non-issue:** `source-data/commodities.json` /
+`commodities_protein.json` (World Bank Pink Sheet raw-parse snapshots, orphaned from any pipeline
+script — nothing reads them back, only `cache/commodities.json` inside the gitignored cache dir is
+consumed) looked unsourced at first glance (bare dict, no embedded `meta`), but `docs/DATA_PROVENANCE.md`
+line 84 already documents both files by name as MEASURED World Bank Pink Sheet — confirmed no gap,
+no doc change needed.
+
+**Verification:** `bash tests/run.sh check` — 52 passed, 0 failed, before and after (docs-only cycle).
+
+**Source:** no external data pulled/committed this cycle (network calls were read-only catalog
+queries against `catalog.oae.go.th`, used only to verify a dead end, not to land data). `github` MCP
+used for PR/workflow status checks. Full backlog updates: `docs/IMPROVEMENT_BACKLOG.md` (2026-07-05
+(7) entries).
+
+---
+
 ## 2026-07-05 (4) — AUDIT: found the real reason the OAE puller (and every other scheduled data workflow) has never fired — none of them are merged to `master`
 
 **Task type:** AUDIT (repo/CI integrity, not a data value change — zero files under `platform/data`

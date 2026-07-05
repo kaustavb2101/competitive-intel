@@ -111,10 +111,19 @@
       check + tests/run.sh gated. Dark-until-data — lights up when the Overture pull lands.)
 - [x] **Competitor coverage QA panel — DONE 2026-06-30** (#acq found-vs-expected per brand, cited expected; total coverage
       21.9% — MTC 11.3% (978/8673), Tidlor 39%, Srisawad 49%, Heng expected uncited/null. build_competitor_coverage.py gated).
-- [ ] **Competitor coverage QA panel** — found-vs-expected per brand so the lower-bound caveat is explicit
-      (Srisawad ~11%, MTC ~14%, Tidlor ~37%, Heng ~35%). *(med, S)*
-- [ ] **NSO census occupation distiller** scaffolding in `ingest_gov.py` (code only; drop-in when the
-      data.go.th pull lands) — improves data availability. *(med, M)*
+- [x] **Competitor coverage QA panel — ALREADY SHIPPED, stale duplicate found 2026-07-05 (7).**
+      This entry duplicated the `[x]` DONE 2026-06-30 item two lines above (same feature,
+      `build_competitor_coverage.py`/`#acq` found-vs-expected panel) — confirmed via `grep`/`git log`
+      before touching anything; no code changed, checked off rather than re-built.
+- [x] **NSO census occupation distiller scaffolding in `ingest_gov.py` — ALREADY SHIPPED, stale
+      duplicate found 2026-07-05 (7).** `build_occupations_census()` + `OPTIONAL_LAYERS` (commit
+      `7fd4994`, 2026-06-30) already do exactly this: distill the blocked NSO 2022 Business &
+      Industrial Census export into `source-data/occupations_by_district.json` (per-province/
+      -district establishment + worker counts by business-activity category), returning `None`
+      (silent skip, no crash, no fabrication) when `dgt_out/nso_census__bizind__*.csv` is absent —
+      confirmed still absent in this sandbox, so the layer stays correctly dark. Verified via
+      `git log -S"build_occupations_census"` + reading `ingest_gov.py`'s `run()` before touching
+      anything; no code changed, checked off rather than re-built.
 - [x] **Expand `validate_data.py`** coverage as new data layers land — DONE 2026-07-04 (3) (see below).
 - [x] **National map: dedicated "Unemployment ▲" district lens — DONE 2026-07-03** (new `unemp` lens
       in `platform/app.js`'s `LENS` registry, mirrors the household-DTI dot-lens pattern; reads
@@ -503,13 +512,12 @@
       solvable — do not pick this up again until PR #1's status changes)*
 
 ## Queue — follow-ups noticed 2026-07-05 (6)
-- [ ] **Is PR #1 still unmerged?** — the 2026-07-05 (4) audit flagged (via `PushNotification`) that
-      every `schedule:`-triggered data workflow has never fired because `master` still only has the
-      pre-import single-page site. A future cycle should re-check `list_workflows`/
-      `list_workflow_runs` via the `github` MCP tool early in ORIENT — if Kaustav has since merged it,
-      several "blocked" backlog items (fuel-price deltas, OAE/NABC recurring pulls, site-health) unblock
-      at once and are worth re-triaging together. *(LOW, trivial — just a status check, do first if
-      picking a data-freshness item)*
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-05 (7), still unmerged, no change.**
+      `mcp__github__list_pull_requests(state=open)` shows PR #1 still open (not draft), and
+      `mcp__github__actions_list(list_workflows)` still shows only `QA` registered — same state as
+      2026-07-05 (4). Leaving this item open (not checking off) since the underlying blocker hasn't
+      moved; a future cycle should keep re-checking early in ORIENT per the note below. *(LOW,
+      trivial — just a status check, do first if picking a data-freshness item)*
 - [ ] **`drawAmphoeChoropleth()`/`drawProvinceChoropleth()` near-duplicate functions — still open,
       re-scoped after inspection 2026-07-05 (6).** Read both functions this cycle before considering
       picking this up: they're less "near-duplicate" than the backlog title suggests — one is keyed by
@@ -531,8 +539,36 @@
       fine as-is), just flagging the new visual adjacency for a future UX pass. *(LOW, trivial,
       speculative)*
 
+## Queue — follow-ups noticed 2026-07-05 (7)
+- [ ] **OAE farm-gate price pull — RE-CONFIRMED dead end 2026-07-05 (7), do not retry the CKAN
+      search path again without a new plan.** Ran `pipeline/pull_oae_prices.py --selftest` (30/30
+      parse-logic assertions pass, offline) then `--dry-run` (real network — `catalog.oae.go.th` is
+      reachable) to re-check the 2026-07-05 (5) "harder than scoped" finding with fresh evidence.
+      Queried `package_search` directly for the exact search term (`ราคาที่เกษตรกรขายได้`) plus 5
+      broader terms (`ราคา`, `ราคาสินค้าเกษตร`, `ข้าวเปลือก`, `ยางแผ่นดิบ`, `farmgate`, `price`): the
+      whole catalog returns at most **6** results for any of these, and **none** is a per-crop
+      farm-gate price time series with a CSV/XLSX/datastore resource for our 6 target crops (rice,
+      rubber, sugarcane, oil palm, cassava, maize) — the puller's own top-ranked match
+      (`มูลค่าผลผลิตสินค้าเกษตรที่สำคัญ`, "value of important agri products") ships **JSON-only**
+      metadata with no priced series inside, and the next-best match
+      (`มูลค่าของผลไม้เมืองร้อน`, "value of tropical fruits") is off-topic (fruit, not our crops).
+      This is not a transient catalog gap — it's the same conclusion the 2026-07-05 (5) audit reached
+      (no discoverable outlook/forecast doc either), now confirmed for the *price* search path too.
+      **Leave `build_crop_stress.py` on the World Bank GLOBAL proxy** (already honestly labelled) —
+      a real fix needs either a Thai-IP `data.go.th` pull (`docs/TONIGHT_CHECKLIST.md` §4) or finding
+      the actual OAE news/report URL by hand, not another sandbox CKAN search retry. *(BLOCKED —
+      sandbox CKAN search path exhausted, needs a Thai-IP pull or manual URL discovery)*
+- [x] **Two stale-duplicate backlog entries found and closed this cycle** (Competitor coverage QA
+      panel; NSO census occupation distiller scaffolding) — see the `[x]` corrections above in the
+      "Queue — enrichment / capabilities" section, both already shipped (`build_competitor_coverage.py`
+      2026-06-30; `ingest_gov.py`'s `build_occupations_census()` commit `7fd4994` 2026-06-30) but never
+      checked off. Zero code/data changed — pure backlog hygiene.
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 (7) — AUDIT: RE-DERIVE baseline confirmed green, closed 2 stale backlog duplicates,
+  re-confirmed the OAE farm-gate dead end + PR #1 unmerged status, both with no change.** Full
+  writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-05 (7) entry).
 - **2026-07-05 (4) — AUDIT: root-caused why the OAE puller (and every scheduled data workflow) has
   never fired.** Not a bug in the puller — `PR #1` (importing this whole platform on top of the old
   single-page site) has been open since 2026-06-28 and never merged to `master`, so `master` still
