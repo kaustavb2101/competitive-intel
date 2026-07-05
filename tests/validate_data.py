@@ -3784,6 +3784,7 @@ def check_index_alignment(n_branches):
 _FINGERPRINTED_LAYERS = (
     "branch_occupations.json",   # build_occupations.py
     "branch_workforce.json",     # build_branch_workforce.py
+    "branch_agri.json",          # build_branch_agri.py
     "branch_labor.json",         # build_branch_labor.py
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
