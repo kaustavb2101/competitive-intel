@@ -417,12 +417,12 @@
       `<score>`/100 opportunity · `<rivals>` rivals ≤5km" sourced from `opportunity_score.json`'s
       rank-1 district. Confirmed live via `grep`+`git log -S` before touching anything; no code
       changed, left checked rather than rebuilding duplicate UI.
-- [ ] **`provinces/<slug>.json`'s new `meta.provenance` block (2026-07-05) doesn't yet get its own
-      `validate_data.py` check** — the provenance GATE already passes it (via the generic
-      `meta.provenance` signal check), but there's no dedicated assertion that every one of the 77
-      files' `meta.generated_by`/`meta.provenance.{measured,editorial,estimated}` sub-keys are present
-      and non-empty (the way `check_province_stress()` does for `province_stress_index.json`). Would
-      catch a future regression where `build_province.py` silently drops the block. *(LOW, S)*
+- [x] **`provinces/<slug>.json`'s new `meta.provenance` block (2026-07-05) doesn't yet get its own
+      `validate_data.py` check — DONE 2026-07-05 (5)** (new `check_province_provenance()`: reads all 77
+      slugs off `provinces/index.json`, asserts `meta.generated_by` + `meta.provenance.
+      {measured,editorial,estimated}` are present and non-empty on every file; verified it actually
+      catches drift by hand-deleting one province's `provenance.editorial`, confirming a real FAIL,
+      then restoring. Gate 52/0, `validate_data.py` 429/429).
 - [ ] **Headless render of `province.html`/`rayong-catchment.html` is unreliable in this sandbox under
       software WebGL** (3 consecutive attempts this cycle all failed with `ERR_CONNECTION_REFUSED` or
       an empty screenshot, even after killing stray chrome/http.server processes between tries) — this
@@ -461,12 +461,31 @@
       correctly distinguishes composite/DTI/crop-stress by construction). A small win once someone's
       touching this function again: only add the distinguishing word if a real ambiguity is reported
       — the two rarely disagree today. *(LOW, trivial, speculative)*
-- [ ] **OAE outlook re-verification (from 2026-07-04 (7)/(8), still open)** — pull the current OAE
-      (`catalog.oae.go.th`, REACHABLE per the reachability matrix) outlook note and confirm/update
-      `docs/DATA_SOURCES.md`'s "OAE Dec-2025 outlook" sentence (rice+rubber=2026 RISK; cassava/palm/
-      chicken/durian firmer) — now the oldest un-re-verified citation in that file across 3 cycles.
-      Good next-cycle candidate: real network pull (no Thai-IP needed), small, closes a real audit
-      gap rather than another cosmetic pass. *(LOW, S)*
+- [ ] **OAE outlook re-verification — NOT a CKAN item, re-scope before retrying (checked 2026-07-05
+      (5))** — confirmed `catalog.oae.go.th` IS reachable from this sandbox (`package_search`/
+      `group_list`/`package_list` all return 200), so the earlier "blocked" assumption was wrong. But a
+      full sweep of the catalog's 57 datasets and its 8 groups (incl. `price` = ราคาสินค้าเกษตร) found
+      **zero** discoverable outlook/forecast document — searches for แนวโน้ม/สถานการณ์สินค้าเกษตร/
+      outlook all returned 0 results, and the `price` group itself has 0 packages tagged. The cited
+      "OAE Dec-2025 outlook" sentence in `docs/DATA_SOURCES.md` almost certainly traces to a
+      www.oae.go.th **news/press-release page**, not a CKAN dataset — a fundamentally different pull
+      (HTML scrape of a Thai gov news site, no CKAN API to lean on) with real risk of citing the wrong
+      page. Do NOT retry this as "just re-run pull_oae_prices.py's search pattern" — that pattern only
+      finds farm-gate PRICE series, not qualitative outlook notes. If revisited, budget for finding the
+      actual news URL first (may need a targeted web search, not a catalog query) before attempting any
+      text extraction. *(LOW, M — harder than previously scoped, not a quick win)*
+- [ ] **`pipeline/pull_oae_prices.py` (real OAE farm-gate price puller, `data-oae-prices.yml` weekly
+      workflow) has never actually landed `source-data/oae_farmgate_prices.json`** — confirmed
+      2026-07-05 (5): the file doesn't exist yet, so `build_crop_stress.py` is still 100% on the World
+      Bank GLOBAL price proxy for every crop despite the MEASURED Thai farm-gate puller having shipped
+      (commit `56c2e93`). Also confirmed this cycle that `catalog.oae.go.th` IS reachable from the
+      improvement-loop sandbox too (not just GH Actions runners) — worth checking whether the weekly
+      cron has actually fired yet / why no PR has appeared, since this is the single highest-value
+      pending ENRICH for objective #1 (real Thai prices replacing a global proxy) and the infra is
+      already built. Do NOT manually run the puller from the loop and commit its output directly to
+      `claude/new-session-wto26j` — it's owned by `data-oae-prices.yml`'s dedicated data-branch+PR flow
+      specifically so it doesn't race concurrent loop sessions; if it looks stuck, flag it rather than
+      bypassing the workflow. *(MED, S — investigate why the owned workflow hasn't produced output yet)*
 
 ## Done (most recent first)
 - (loop will append here)

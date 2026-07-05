@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-05 (5) — VALIDATOR: provinces/*.json now gated for meta.provenance completeness
+
+Loop cycle. Backlog follow-up (2026-07-05 audit): `provinces/<slug>.json` gained a real
+`meta.generated_by` + `meta.provenance.{measured,editorial,estimated}` block for all 77 provinces
+earlier this same day, but the generic `check_provenance()` gate exempts the whole `provinces/`
+subtree by prefix (a pre-existing exemption from before that block existed), so nothing actually
+asserted the new block stays populated. Added a dedicated `check_province_provenance()` to
+`tests/validate_data.py`: reads every slug off `provinces/index.json`, loads each deep-dive file, and
+fails loudly if `meta.generated_by` is missing/blank or `meta.provenance.measured` / `.editorial` /
+`.estimated` is missing, empty, or not a list of non-blank strings. Verified the check actually
+catches drift (not just a happy-path pass-through): hand-deleted `rayong.json`'s
+`provenance.editorial`, re-ran, got a real `FAIL` naming the exact file/field, then restored the file
+(confirmed 0 diff via `git status`). Also investigated (before picking this item) whether the
+CKAN-discoverable OAE outlook re-verification backlog item (flagged 3 cycles running) was tractable —
+confirmed `catalog.oae.go.th` IS reachable from this sandbox (200 OK, unlike the `data-oae-prices.yml`
+workflow's comment suggesting it 403s from a cloud runner), but a `package_list`/`group_list` sweep of
+all 57 datasets in the catalog found no discoverable "outlook"/forecast document — the cited "OAE
+Dec-2025 outlook" sentence almost certainly traces to a www.oae.go.th news page, not a CKAN dataset, so
+confirming it needs a different (website-scraping) approach; logged this finding below instead of
+guessing at an update with no real source to cite. Zero `platform/data`/`pipeline` files touched —
+pure test-file addition. Gate 52/0, `validate_data.py` 429/429 (was 428/428, +1 check).
+
 ## 2026-07-05 (4) — UX: Home board-thesis sentence now cites the DTI+unemployment composite
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (4), re-flagged 2026-07-05): `renderHomeThesis()`'s
