@@ -1043,6 +1043,45 @@ async function loadOutlook(){
 // tone → theme-aware colour (CSS vars flip with light/dark; no hardcoded greys)
 const OUT_TONE={good:'var(--merch)',warn:'var(--agri)',up:'var(--merch)',down:'var(--agri)',info:'var(--accent)'};
 const REGION_ACCENT={Isan:'var(--agri)',North:'var(--opp)',South:'var(--gold)',East:'var(--accent)','Central&BKK':'var(--accent)'};
+// per-province detail panel (revealed on row click) — the metrics that JUSTIFY the recommendation,
+// with measured/estimated provenance. Vehicle stock is the collateral evidence AutoX lends against.
+function provDetailHTML(p){
+  const m=p.metrics||{};
+  const M='<span style="color:var(--merch);font-size:8px;text-transform:uppercase;letter-spacing:.3px"> measured</span>';
+  const E='<span style="color:var(--dim);font-size:8px;text-transform:uppercase;letter-spacing:.3px"> est</span>';
+  const num=v=>v==null?'—':Number(v).toLocaleString();
+  const stat=(lab,val,tag)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:2px 0"><span style="color:var(--mid)">${lab}</span><b style="color:var(--txt);white-space:nowrap">${val}${tag||''}</b></div>`;
+  // vehicle-title collateral (the evidence behind "prime collateral density")
+  const mix=[m.moto_pct!=null?`${m.moto_pct}% moto`:null, m.pickup_pct!=null?`${m.pickup_pct}% pickup`:null,
+             m.car_pct!=null?`${m.car_pct}% car`:null, m.ev_pct!=null?`${m.ev_pct}% EV`:null].filter(Boolean).join(' · ');
+  const coll=`<div style="flex:1;min-width:200px">`
+    +`<div style="font:700 9px 'IBM Plex Sans Thai';color:var(--collat);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Vehicle-title collateral</div>`
+    +stat('Registered vehicles (DLT)', num(m.dlt_vehicles), M)
+    +(mix?`<div class="sub" style="padding:2px 0;color:var(--mid)">${mix}${M}</div>`:'')
+    +stat('Collateral score', m.coll_score!=null?m.coll_score+'/100':'—', E)
+    +stat('Vehicle/moto shops ≤10km', m.veh_shops!=null?'~'+num(m.veh_shops):'—', M)
+    +`</div>`;
+  // demand / risk
+  const risk=`<div style="flex:1;min-width:200px">`
+    +`<div style="font:700 9px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Demand &amp; risk</div>`
+    +stat('Branches', num(p.n), M)
+    +stat('Opportunity (white-space)', p.opp!=null?p.opp:'—', E)
+    +stat('Agri pressure', p.stress!=null?p.stress+'/100':'—', E)
+    +stat(m.dom_crop?`${m.dom_crop} price YoY`:'Crop price YoY', m.price_yoy!=null?(m.price_yoy>0?'+':'')+m.price_yoy+'%':'—', M)
+    +stat('Rival branches ≤2 / ≤5 km', (m.rivals2!=null?m.rivals2:'—')+' / '+(m.rivals5!=null?m.rivals5:'—'), M)
+    +`</div>`;
+  // deep-dive links
+  const qs=(typeof themeQS==='function')?themeQS():'';
+  const links=p.slug?`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">`
+    +`<a href="rayong-catchment.html?city=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none">🏙 3D scene →</a>`
+    +`<a href="province.html?p=${encodeURIComponent(p.slug)}${qs}" style="font:600 11px 'IBM Plex Sans Thai';color:var(--accent);text-decoration:none">▦ district view →</a>`
+    +`</div>`:'';
+  return `<div style="border-left:2px solid var(--line);padding:6px 0 6px 10px;margin:2px 0 4px">`
+    +`<div style="display:flex;gap:18px;flex-wrap:wrap;font:500 11px 'IBM Plex Sans Thai'">${coll}${risk}</div>`
+    +links
+    +`<div class="sub" style="font-size:9px;color:var(--dim);margin-top:5px">DLT vehicle stock &amp; rival counts are measured; collateral score, opportunity &amp; agri pressure are estimated screens.</div>`
+    +`</div>`;
+}
 function renderNationalOutlook(){
   const host=$('#outlook'); if(!host||!OUTLOOK||!OUTLOOK.national) return;
   const N=OUTLOOK.national;
@@ -1071,19 +1110,22 @@ function renderNationalOutlook(){
     const ac=REGION_ACCENT[r.r]||'var(--accent)';
     const stressed=(r.top_stressed||[]).slice(0,3).map(s=>`${s.v} <span class="mono" style="color:var(--agri)">${s.score}</span>`).join(' · ');
     const oppy=(r.top_opportunity||[]).slice(0,3).map(o=>`${o.v} <span class="mono" style="color:var(--gold)">${o.opp}</span>`).join(' · ');
-    // expandable province drill — every province in the region, biggest book first
+    // expandable province drill — every province in the region, biggest book first.
+    // Each summary row is CLICKABLE → toggles a detail row (metrics that justify the recommendation).
     const provRows=(r.provinces||[]).map(p=>{
       const a=p.action, col=a?(OUT_TONE[a.tone]||'var(--mid)'):'var(--dim)';
       const chip=a?`<span style="color:${col};white-space:nowrap">${a.i} ${a.label}</span>`:'<span class="sub">—</span>';
       const str=p.stress!=null?`<span class="mono" style="color:${p.stress>=25?'var(--agri)':'var(--mid)'}">${p.stress}</span>`:'<span class="sub">—</span>';
       const opp=p.opp!=null?`<span class="mono" style="color:${p.opp>=1.5?'var(--gold)':'var(--mid)'}">${p.opp}</span>`:'<span class="sub">—</span>';
-      return `<tr><td style="padding:3px 6px"><b style="font-weight:500;color:var(--txt)">${p.v}</b></td>`
+      return `<tr onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden;this.querySelector('.pv-caret').textContent=this.nextElementSibling.hidden?'▸':'▾'" style="cursor:pointer" onmouseover="this.style.background='var(--raised)'" onmouseout="this.style.background=''">`
+        +`<td style="padding:3px 6px"><span class="pv-caret" style="color:var(--dim);font-size:9px">▸</span> <b style="font-weight:500;color:var(--txt)">${p.v}</b></td>`
         +`<td class="mono sub" style="padding:3px 6px;text-align:right">${p.n}</td>`
         +`<td style="padding:3px 6px;font:500 11px 'IBM Plex Sans Thai'">${chip}</td>`
         +`<td style="padding:3px 6px;text-align:right" title="avg agri-pressure">${str}</td>`
-        +`<td style="padding:3px 6px;text-align:right" title="avg opportunity">${opp}</td></tr>`;
+        +`<td style="padding:3px 6px;text-align:right" title="avg opportunity">${opp}</td></tr>`
+        +`<tr hidden><td colspan="5" style="padding:0 6px 8px">${provDetailHTML(p)}</td></tr>`;
     }).join('');
-    const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces — drill down</summary>`
+    const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces in this region — click any row for full metrics</summary>`
       +`<div style="overflow-x:auto;margin-top:6px"><table style="width:100%;border-collapse:collapse;font-size:11px">`
       +`<tr style="color:var(--dim);font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg opportunity">Opp</td></tr>`
       +provRows+`</table></div></details>`:'';

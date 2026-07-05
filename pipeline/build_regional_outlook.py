@@ -20,6 +20,7 @@ opinion. Sources:
 import argparse, json, os, sys
 from collections import Counter, defaultdict
 from fingerprint import branches_fingerprint
+from regionmap import canonical
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = os.path.join(ROOT, "platform", "data")
@@ -92,6 +93,17 @@ def build():
     macro = (_load("macro_indicators.json") or {}).get("indicators", {})
     meta = _load("meta.json") or {}
     board = meta.get("board", [])
+    veh = _rows(_load("branch_vehicles.json"))          # per-branch collateral score / vehicle-shop density (est/OSM)
+    rival = _rows(_load("rival_pressure.json"))          # per-branch rival branches ≤2/5 km (measured)
+    agri_crops = (_load("branch_agri.json") or {}).get("meta", {}).get("crops", [])
+    # MEASURED DLT registered-vehicle stock per province (justifies "prime collateral density")
+    pidx = _load("provinces/index.json") or []
+    dlt = {}
+    for p in pidx:
+        dlt[p.get("th")] = p
+        c = canonical(p.get("th") or "")
+        if c:
+            dlt.setdefault(c, p)
 
     # per-branch rec-kind flags → region & province tallies
     def kinds_of(i):
@@ -112,6 +124,20 @@ def build():
     prov_meta = {}     # v -> {r, n}
     prov_stress = defaultdict(list)
     prov_opp = defaultdict(list)
+    prov_coll = defaultdict(list)      # branch collateral_score (est composite)
+    prov_vshop = defaultdict(list)     # vehicle/moto shops ≤10km (OSM, measured)
+    prov_pyoy = defaultdict(list)      # crop price YoY (measured)
+    prov_riv2 = defaultdict(list)      # rival branches ≤2km (measured)
+    prov_riv5 = defaultdict(list)      # rival branches ≤5km (measured)
+    prov_crop = defaultdict(Counter)   # dominant crop label per province
+    reg_coll = defaultdict(list)       # region-level collateral score
+
+    def dom_crop_label(i):
+        a = agri[i] if agri and i < len(agri) else {}
+        if a.get("rubber_share", 0) >= 0.5:
+            return "rubber"
+        d = a.get("dom", -1)
+        return agri_crops[d]["label"] if (isinstance(d, int) and 0 <= d < len(agri_crops)) else None
 
     for i, b in enumerate(items):
         r = b.get("r"); v = b.get("v")
@@ -133,6 +159,27 @@ def build():
         o = b.get("o")
         if isinstance(o, (int, float)):
             prov_opp[v].append(o)
+        # collateral / vehicle-shop density (justifies "prime collateral density")
+        vv = veh[i] if veh and i < len(veh) else {}
+        cs = vv.get("collateral_score")
+        if isinstance(cs, (int, float)):
+            prov_coll[v].append(cs); reg_coll[r].append(cs)
+        ne = vv.get("n_est")
+        if isinstance(ne, (int, float)):
+            prov_vshop[v].append(ne)
+        # rival pressure (measured)
+        rv = rival[i] if rival and i < len(rival) else {}
+        if isinstance(rv.get("n2"), (int, float)):
+            prov_riv2[v].append(rv["n2"])
+        if isinstance(rv.get("n5"), (int, float)):
+            prov_riv5[v].append(rv["n5"])
+        # crop price + dominant crop
+        py = (agri[i].get("price_yoy") if agri and i < len(agri) else None)
+        if isinstance(py, (int, float)):
+            prov_pyoy[v].append(py)
+        dc = dom_crop_label(i)
+        if dc:
+            prov_crop[v][dc] += 1
 
     # ---- per-region blocks ----
     regions = []
@@ -154,15 +201,34 @@ def build():
              for v in provs if prov_opp.get(v)),
             key=lambda x: -x["opp"])[:5]
         # full per-province drill within the region (every province, biggest book first)
+        def _avg(lst, d=0):
+            return round(sum(lst) / len(lst), d) if lst else None
         prov_list = []
         for v in provs:
             pt = prov_tally[(r, v)]; ptot = pt["n"]
+            d = dlt.get(v) or dlt.get(canonical(v)) or {}
+            tot_veh = d.get("vehicles") or 0
+            share = lambda k: (round(100 * (d.get(k) or 0) / tot_veh) if tot_veh else None)
+            top_crop = prov_crop[v].most_common(1)
+            metrics = {
+                # collateral (what justifies "prime collateral density")
+                "coll_score": _avg(prov_coll[v]),                       # ESTIMATED composite 0-100
+                "veh_shops": _avg(prov_vshop[v]),                       # MEASURED — vehicle/moto shops ≤10km (OSM), avg per branch
+                "dlt_vehicles": tot_veh or None,                        # MEASURED — DLT registered vehicle stock
+                "pickup_pct": share("pickup"), "car_pct": share("car"), # MEASURED — DLT mix
+                "moto_pct": share("moto"), "ev_pct": share("ev"),
+                # demand / risk
+                "rivals2": _avg(prov_riv2[v], 1), "rivals5": _avg(prov_riv5[v], 1),   # MEASURED
+                "price_yoy": _avg(prov_pyoy[v]),                        # MEASURED (NABC/OAE)
+                "dom_crop": top_crop[0][0] if top_crop else None,
+            }
             prov_list.append({
-                "v": v, "n": ptot,
+                "v": v, "slug": d.get("slug"), "n": ptot,
                 "tallies": {k: pt.get(k, 0) for k in ("acquire", "defend", "agri_stress", "agri_tail", "collateral")},
                 "stress": round(sum(prov_stress[v]) / len(prov_stress[v])) if prov_stress.get(v) else None,
                 "opp": round(sum(prov_opp[v]) / len(prov_opp[v]), 1) if prov_opp.get(v) else None,
                 "action": _top_action(pt, ptot),
+                "metrics": metrics,
             })
         prov_list.sort(key=lambda p: -p["n"])
         situation = "%d branches%s. %d in stressed crop catchments, %d flagged prime white-space, %d besieged by rivals." % (
@@ -176,6 +242,10 @@ def build():
             "recommendation": _region_actions(t, tot),
             "top_stressed": stressed,
             "top_opportunity": oppy,
+            "collateral": {
+                "avg_score": round(sum(reg_coll[r]) / len(reg_coll[r])) if reg_coll[r] else None,
+                "dlt_vehicles": sum((dlt.get(v, {}).get("vehicles") or 0) for v in provs) or None,
+            },
             "n_provinces": len(prov_list),
             "provinces": prov_list,
         })
