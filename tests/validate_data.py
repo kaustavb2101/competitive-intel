@@ -3826,6 +3826,7 @@ _FINGERPRINTED_LAYERS = (
     "branch_workforce.json",     # build_branch_workforce.py
     "branch_agri.json",          # build_branch_agri.py
     "branch_vehicles.json",      # build_branch_vehicles.py
+    "branch_recommendations.json",  # build_branch_recommendations.py
     "branch_labor.json",         # build_branch_labor.py
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
