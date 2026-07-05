@@ -60,3 +60,7 @@ pipeline/tiles_out/
 
 # crop-type geodata scout scratch — raw re-pullable rasters/zips (SPAM/HDX), never commit
 source-data/.crop_scout/
+
+# nightly cron wrapper logs (local only)
+pipeline/cron_nightly.log
+pipeline/cron_gate.out
