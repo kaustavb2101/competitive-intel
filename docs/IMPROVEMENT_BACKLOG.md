@@ -399,21 +399,24 @@
       the oldest un-re-verified citation in that file. *(LOW, S)*
 
 ## Queue — follow-ups noticed 2026-07-05
-- [ ] **`renderHomeThesis()`'s board-thesis sentence still doesn't cite `PSTRESS_LIST[0]`** — the
-      2026-07-03 (4) follow-up flagged this for the Home hero sentence specifically (distinct from
-      the risk CARD, which already cites it); still open, small, same lazy-load chain. *(LOW, S)*
+- [x] **`renderHomeThesis()`'s board-thesis sentence still doesn't cite `PSTRESS_LIST[0]` — DONE
+      2026-07-05 (4)** (thesis clause now prefers the DTI+unemployment composite, falling back to raw
+      DTI then crop-stress as before; `loadProvinceStress().then()` now also re-renders the thesis so
+      it updates once the composite lands. See `docs/PROGRESS_LOG.md` 2026-07-05 (4) entry).
 - [ ] **`drawAmphoeChoropleth()`/`drawProvinceChoropleth()` near-duplicate functions** (flagged
       2026-07-03 (6)/(9), still open) — a shared `drawChoropleth({features,keyFn,valFn,...})` helper
       would remove the duplication before a 3rd choropleth resolution is added; this cycle's Exposure
       change reused `ccRow()` rather than duplicating markup, which is the same instinct applied
       preemptively — worth doing the equivalent consolidation on the choropleth pair. *(LOW, S, pure
       refactor)*
-- [ ] **A parallel "structurally riskiest" callout for objective #2 (expansion)** — the Exposure tab
-      now surfaces the #1 objective-#1 (portfolio risk) household-leverage province; the Acquisition
-      tab (`#acq`) has the opportunity-score leaderboard but no equivalent single-line "where is the
-      clearest expansion signal right now" rank-1 callout mirroring this pattern (top
-      `opportunity_score.json` district, e.g.). Would balance both standing objectives with the same
-      lightweight UI idiom. *(LOW, S)*
+- [x] **A parallel "structurally riskiest" callout for objective #2 (expansion) — ALREADY SHIPPED,
+      stale duplicate found during the 2026-07-05 (4) audit.** This entry asked for a rank-1
+      "where is the clearest expansion signal right now" callout on `#acq` — but `renderAcqVerdict()`
+      (`platform/app.js`, gold `#acq-verdict` card, shipped in commit `7fb5d5f`, well before this
+      backlog note was written) already renders exactly that: "🏆 Open next: `<top district>` —
+      `<score>`/100 opportunity · `<rivals>` rivals ≤5km" sourced from `opportunity_score.json`'s
+      rank-1 district. Confirmed live via `grep`+`git log -S` before touching anything; no code
+      changed, left checked rather than rebuilding duplicate UI.
 - [ ] **`provinces/<slug>.json`'s new `meta.provenance` block (2026-07-05) doesn't yet get its own
       `validate_data.py` check** — the provenance GATE already passes it (via the generic
       `meta.provenance` signal check), but there's no dedicated assertion that every one of the 77
@@ -442,6 +445,28 @@
       Pink Sheet) — today this is disambiguated only by the "Bangchak retail, daily" sub-label; if a
       3rd differently-cadenced macro source is ever added to this card, worth a shared "as of <date>"
       chip per sub-section instead of relying on prose alone. *(LOW, trivial, speculative)*
+
+## Queue — follow-ups noticed 2026-07-05 (4)
+- [ ] **Before picking a "stale UX gap" item from this backlog, `grep`/`git log -S` the claimed
+      function name FIRST** — this cycle's audit found a 2nd instance (after the 2026-07-04 (9)
+      audit found six) of a backlog entry describing a UI gap that was already shipped
+      (`renderAcqVerdict()` for the objective-#2 rank-1 callout, live since `7fb5d5f`). A ~30-second
+      grep before implementing would have caught it immediately; worth internalizing as a standing
+      first-step for "UX gap noticed" items specifically, not just full backlog-hygiene passes.
+      *(LOW, trivial, process note)*
+- [ ] **`renderHomeThesis()`'s "strongest single opening" clause still doesn't distinguish the
+      sequenced Road-to-3,000 plan (`EXPLAN.sequence[0]`) from the opportunity-score fallback
+      (`OPPSCORE`) in its wording** — both render as "the strongest single opening is `<name>`" with
+      no tag telling the reader which method produced it, unlike the "risk to watch" clause (now
+      correctly distinguishes composite/DTI/crop-stress by construction). A small win once someone's
+      touching this function again: only add the distinguishing word if a real ambiguity is reported
+      — the two rarely disagree today. *(LOW, trivial, speculative)*
+- [ ] **OAE outlook re-verification (from 2026-07-04 (7)/(8), still open)** — pull the current OAE
+      (`catalog.oae.go.th`, REACHABLE per the reachability matrix) outlook note and confirm/update
+      `docs/DATA_SOURCES.md`'s "OAE Dec-2025 outlook" sentence (rice+rubber=2026 RISK; cassava/palm/
+      chicken/durian firmer) — now the oldest un-re-verified citation in that file across 3 cycles.
+      Good next-cycle candidate: real network pull (no Thai-IP needed), small, closes a real audit
+      gap rather than another cosmetic pass. *(LOW, S)*
 
 ## Done (most recent first)
 - (loop will append here)

@@ -5,6 +5,27 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-05 (4) — UX: Home board-thesis sentence now cites the DTI+unemployment composite
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (4), re-flagged 2026-07-05): `renderHomeThesis()`'s
+one-sentence board thesis ("risk to watch is …") only ever checked `HHRISK_LIST[0]` (raw household
+DTI) or `CSTRESS_LIST[0]` (crop stress) — never the more defensible `PSTRESS_LIST[0]` composite
+(`province_stress_index.json`, 0.5×DTI-percentile + 0.5×unemployment-percentile) that the Home risk
+CARD and the Exposure tab's rank-1 callout already lead with. The one-sentence hero and the detailed
+card below it could name different "riskiest" provinces if the two legs ever diverged.
+
+`platform/app.js`: the thesis clause now prefers `PSTRESS_LIST[0]` (states DTI + unemployment +
+composite score together, e.g. "อำนาจเจริญ household stress (DTI 1.14× + unemployment 2.8%, composite
+▲98, measured)"), falling back to raw DTI then crop-stress exactly as before when the composite layer
+hasn't loaded. Also wired `loadProvinceStress().then()` (already warmed on Home for the risk card) to
+call `renderHomeThesis()` too, so the sentence re-renders once the composite lands instead of staying
+on the DTI-only fallback. Purely additive UI, no new data file/pipeline script.
+
+Verified: `node --check platform/app.js` clean; `bash tests/run.sh check` 50/0 (`validate_data.py`
+426/426, unchanged — no data file touched). Headless-rendered `index.html#home` (`tests/lib/render.sh`,
+1400×3000): `data-errors="[]"`, thesis sentence renders the composite clause verbatim as above, no
+layout regression to the card/Road-to-3,000 bar below it.
+
 ## 2026-07-05 — UX: structural household-leverage callout on the Exposure tab
 
 Loop cycle. Backlog follow-up (self-noted 2026-07-03 (4)): the rank-1-surfacing pattern already

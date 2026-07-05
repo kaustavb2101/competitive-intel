@@ -4564,8 +4564,8 @@ function renderHome(){
     loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
-    // obj#1 — structurally riskiest province (DTI+unemployment composite) into the risk card (null-safe).
-    loadProvinceStress().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // obj#1 — structurally riskiest province (DTI+unemployment composite) into the risk card + thesis (null-safe).
+    loadProvinceStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeThesis(); } });
     // obj#1 — macro-exposure dominant-factor headline in the thesis sentence (null-safe, est).
     loadMacroExposure().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#1 — lead the "getting riskier" card with the composite province-risk verdict (null-safe).
@@ -4627,7 +4627,9 @@ function renderHomeThesis(){
   const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
   if(!openNext&&od&&od.length){const t=od.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(t&&t.name) openNext=t.name;}
   if(!openNext&&AMP&&AMP.length){const t=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0))[0]; if(t) openNext=t.name_measured?t.name:t.name_en;}
-  // what is stressing — measured household leverage (top DTI) else worst crop-stress province.
+  // what is stressing — the DTI+unemployment composite (more defensible, blends two NSO legs) else
+  // raw household DTI else worst crop-stress province.
+  const ps=(pstressHasData()&&PSTRESS_LIST.length)?PSTRESS_LIST[0]:null;
   const hh=(Array.isArray(HHRISK_LIST)&&HHRISK_LIST.length)?HHRISK_LIST[0]:null;
   const cs=(CSTRESS_LIST&&CSTRESS_LIST.length)?CSTRESS_LIST[0]:null;
   // ---- assemble the sentence, clause by clause, skipping any absent source ----
@@ -4641,7 +4643,9 @@ function renderHomeThesis(){
   } else if(openNext){
     clauses.push(`the strongest single opening is <b>${openNext}</b>`);
   }
-  if(hh){
+  if(ps){
+    clauses.push(`the risk to watch is <b>${ps.province} household stress</b> (DTI ${ps.debt_to_income!=null?(+ps.debt_to_income).toFixed(2)+'×':'—'} + unemployment ${ps.unemployment_rate!=null?(+ps.unemployment_rate).toFixed(1)+'%':'—'}, composite ▲${(ps.composite_stress||0).toFixed(0)}, measured)`);
+  } else if(hh){
     clauses.push(`the risk to watch is <b>${hh.region||hh.province} household leverage</b> (DTI ${(+hh.debt_to_income).toFixed(2)}× in ${hh.province}, measured)`);
   } else if(cs){
     clauses.push(`the risk to watch is a <b>${cs.th}</b> crop-income squeeze`);
