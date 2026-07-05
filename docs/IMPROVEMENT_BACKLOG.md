@@ -79,10 +79,12 @@
       with the full-width Road to 3,000 bar + leaderboard"), though today the opportunity-score leaderboard
       renders ABOVE the Road-to-3,000 section rather than after it — cosmetic ordering only, logged below.
 - [ ] **Touch-target pass** behind `@media (pointer:coarse)` (not a 600px phone breakpoint) for the touch laptop. *(MED, S)*
-- [ ] **Acquisition tab section order** doesn't quite match the "2-col dashboards" bigger bet's own text
-      ("Acquisition leads with the full-width Road to 3,000 bar + the leaderboard under it") — today "Where
-      to open next" (the opportunity leaderboard) renders before the "Road to 3,000" section, not after.
-      Purely cosmetic re-ordering, noticed during the 2026-07-04 (9) backlog audit. *(LOW, trivial)*
+- [x] **Acquisition tab section order — DONE 2026-07-05 (6)** (`platform/index.html`: swapped `sec-r3k`
+      (Road to 3,000) and `sec-opp` (opportunity leaderboard) so the tab now matches the "2-col
+      dashboards" bigger bet's own spec — full-width Road-to-3,000 bar first, leaderboard underneath;
+      `#acqjump` chip order updated to match. Pure markup reorder, zero JS/data touched, ids/`open`
+      state unchanged so no app.js call site was affected. Gate 52/0, headless-rendered `#acq` confirms
+      the new order + `data-errors="[]"`).
 
 ## Queue — UX follow-ups noticed 2026-07-03 (2)
 - [x] **`hhdti` (household DTI) lens is province-resolution but only paints branch dots — DONE
@@ -135,7 +137,12 @@
       → `tests/run.sh` reports `[SKIP]` not `[FAIL]`) in `CLAUDE.md`'s pipeline conventions, so if a
       future script adds `scipy`/`pandas`/etc. it follows `build_branch_peers.py`'s 2026-07-03 fix
       instead of reintroducing a false-red gate. *(LOW, S)*
-- [ ] **Simulator: occupation-sensitivity lever** — model borrower-base exposure to a sector shock. *(med, M)*
+- [x] **Simulator: occupation-sensitivity lever — ALREADY SHIPPED, stale duplicate found 2026-07-05 (6).**
+      Confirmed via `grep`+read before touching anything: the 2026-07-01 "factory-slowdown lever"
+      (`platform/app.js` `simFactoryModel()`/`renderSimFactory()`/`SIM_FACTORY_KEYS`) already IS this —
+      an ESTIMATED severity lever (0–100%) that models manufacturing-base branch exposure to a sector
+      slowdown off the MEASURED `occupation_risk.json` composite, hidden gracefully when the Overture
+      occupation pull is absent. No code changed; left checked rather than rebuilding duplicate UI.
 - [x] **`unemp` lens: add a district (amphoe) polygon choropleth — DONE 2026-07-03 (2)** (added `unemp`
       to `drawAmphoeChoropleth()`'s `on` check + the `ageoLoaded` lazy-load trigger in `setLens()`;
       reuses `unemp`'s existing color/val from `LENS` and the amphoe-geo layer already warmed for
@@ -494,6 +501,35 @@
       confirm the crons actually start firing, then this item can close. Full writeup:
       `docs/DATA_REFRESH_LOG.md` (2026-07-05 (4)). *(BLOCKED on a human merge decision, not sandbox-
       solvable — do not pick this up again until PR #1's status changes)*
+
+## Queue — follow-ups noticed 2026-07-05 (6)
+- [ ] **Is PR #1 still unmerged?** — the 2026-07-05 (4) audit flagged (via `PushNotification`) that
+      every `schedule:`-triggered data workflow has never fired because `master` still only has the
+      pre-import single-page site. A future cycle should re-check `list_workflows`/
+      `list_workflow_runs` via the `github` MCP tool early in ORIENT — if Kaustav has since merged it,
+      several "blocked" backlog items (fuel-price deltas, OAE/NABC recurring pulls, site-health) unblock
+      at once and are worth re-triaging together. *(LOW, trivial — just a status check, do first if
+      picking a data-freshness item)*
+- [ ] **`drawAmphoeChoropleth()`/`drawProvinceChoropleth()` near-duplicate functions — still open,
+      re-scoped after inspection 2026-07-05 (6).** Read both functions this cycle before considering
+      picking this up: they're less "near-duplicate" than the backlog title suggests — one is keyed by
+      amphoe `id` (via `ampIndex()`) and supports a categorical dominant-crop branch (`cat:true`) with
+      richer popups (branch count, crop share), the other is keyed by province `name` off `PGEO`
+      features with a simpler popup and no categorical path. A shared `drawChoropleth({features,
+      keyFn, valFn, popupFn, cat})` helper is still doable but is a real M-effort generalization, not
+      the S/mechanical merge implied by the LOW/S tag carried since 2026-07-03 (6) — flag as MED effort
+      if picked up, and diff-test both lenses (`hhdti`, `pstress`, `dws`, `drisk`, `unemp`, the
+      dominant-crop lens) pixel-by-pixel before/after, since this paints on every National-map polygon
+      lens. *(LOW→MED, re-scoped, pure refactor)*
+- [ ] **`renderAcqVerdict()`'s hero card and the newly-reordered "Road to 3,000" section both open
+      with a bold headline claim** (this cycle moved Road to 3,000 to lead the tab, right under the
+      verdict card) — worth a quick look at whether the verdict card and the Road-to-3,000 summary
+      line ever say something that reads as contradictory (e.g. verdict names a Central&BKK district
+      while Road-to-3,000's biggest regional allocation is Isan) now that they sit back-to-back at the
+      top of the page. Not observed as an actual conflict this cycle (screenshot showed Central&BKK
+      district `วัฒนา` in the verdict vs. Isan +247 in Road to 3,000 — different questions, arguably
+      fine as-is), just flagging the new visual adjacency for a future UX pass. *(LOW, trivial,
+      speculative)*
 
 ## Done (most recent first)
 - (loop will append here)

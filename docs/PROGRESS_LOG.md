@@ -5,6 +5,28 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-05 (6) — UX: Acquisition tab now leads with Road to 3,000, not the leaderboard
+
+Loop cycle. Backlog follow-up (noted 2026-07-04 (9), still open): the "★ Rebuild dense tabs as 2-col
+dashboards" bigger bet's own spec says Acquisition should "lead with the full-width Road to 3,000 bar
++ the leaderboard under it", but `platform/index.html` rendered `sec-opp` (the composite
+opportunity-score leaderboard) BEFORE `sec-r3k` (Road to 3,000) — the opposite order, confirmed by
+reading the live markup before touching anything (`sec-opp` at the old line 235, `sec-r3k` at 243).
+
+Swapped the two `<details>` blocks (and their preceding comment numbering, "1 ·"/"2 ·") so Road to
+3,000 (the regional headroom bar + the sequenced 985-branch plan nested inside it) now renders first,
+with the opportunity-score leaderboard directly underneath; also swapped the `#acqjump` chip-nav order
+to match the new visual order. Zero JS/data touched — pure markup reorder, both sections keep their
+existing ids (`sec-r3k`/`sec-opp`) and `open` attribute, so every `app.js` call site
+(`renderAcq()`/`renderAcqBoard()`/CSV buttons/jump-nav click handler) is unaffected by DOM position.
+Moved the (already CSS-inert — grepped `platform/styles.css`, zero rules reference it) `.acq-lead`
+class onto the new hero section for correctness.
+
+Verified: `bash tests/run.sh check` 52/0 (`validate_data.py` 429/429, unchanged — no data file
+touched). Headless-rendered `index.html#acq` (`tests/lib/render.sh`, 1400×3200): `data-errors="[]"`,
+screenshot confirms Road to 3,000 now renders first (headroom table + sequenced-plan callout), the
+composite-opportunity leaderboard directly below it, no layout regression to either table/CSV button.
+
 ## 2026-07-05 (5) — VALIDATOR: provinces/*.json now gated for meta.provenance completeness
 
 Loop cycle. Backlog follow-up (2026-07-05 audit): `provinces/<slug>.json` gained a real

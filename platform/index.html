@@ -224,23 +224,15 @@
     <div class="verdict" id="acq-verdict" style="display:none"></div>
 
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
-      <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
       <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
+      <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
       <a class="chip" href="#acq" data-acq="sec-search">Search demand</a>
       <a class="chip" href="#acq" data-acq="sec-comp">Competitor thesis</a>
       <a class="chip" href="#acq" data-acq="sec-segments">Segment white-space</a>
     </nav>
 
-    <!-- 1 · HERO ANSWER — the composite opportunity leaderboard, open by default. -->
-    <details class="acqsec acq-lead" id="sec-opp" open>
-    <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
-    <p class="lead">Districts (amphoe) ranked for branch expansion — higher = more underserved and undercompeted. Full method &amp; caveats below the table.</p>
-    <div id="oppreadout" class="sub" style="margin:2px 0 10px"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="opptbl"></table>
-    </details>
-
-    <!-- 2 · ROAD TO 3,000 headroom bar, open by default. -->
-    <details class="acqsec" id="sec-r3k" open>
+    <!-- 1 · ROAD TO 3,000 headroom bar — the full-width hero, open by default. -->
+    <details class="acqsec acq-lead" id="sec-r3k" open>
     <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
     <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
       This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
@@ -274,6 +266,14 @@
         not a committed plan — every site needs a local survey. Built by <code>pipeline/build_expansion_plan.py</code> (deterministic, offline).</p></div></details>
     <button id="r3kseqcsv" class="chip" style="margin-bottom:10px">⬇ Download full plan CSV</button>
     <table class="tbl" id="r3kseqtbl"></table>
+    </details>
+
+    <!-- 2 · LEADERBOARD — the composite opportunity score, open by default. -->
+    <details class="acqsec" id="sec-opp" open>
+    <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
+    <p class="lead">Districts (amphoe) ranked for branch expansion — higher = more underserved and undercompeted. Full method &amp; caveats below the table.</p>
+    <div id="oppreadout" class="sub" style="margin:2px 0 10px"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="opptbl"></table>
     </details>
 
     <!-- 2b · SEARCH DEMAND — where people search title-loan intent + brand share-of-search. -->
