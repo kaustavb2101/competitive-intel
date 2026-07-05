@@ -1065,17 +1065,34 @@ function renderNationalOutlook(){
       +`<span style="font-size:15px;line-height:1.2">${a.i}</span>`
       +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.4">${a.t}</span></div>`;
   }).join('');
-  // 4) REGIONAL IMPACT — one card per region: situation + top-2 recs + top provinces
+  // 4) REGIONAL IMPACT — one card per region: situation + top recs + top provinces + full province drill
   const regs=(OUTLOOK.regions||[]).map(r=>{
     const ac=REGION_ACCENT[r.r]||'var(--accent)';
     const stressed=(r.top_stressed||[]).slice(0,3).map(s=>`${s.v} <span class="mono" style="color:var(--agri)">${s.score}</span>`).join(' · ');
     const oppy=(r.top_opportunity||[]).slice(0,3).map(o=>`${o.v} <span class="mono" style="color:var(--gold)">${o.opp}</span>`).join(' · ');
+    // expandable province drill — every province in the region, biggest book first
+    const provRows=(r.provinces||[]).map(p=>{
+      const a=p.action, col=a?(OUT_TONE[a.tone]||'#8b90a7'):'#5B6479';
+      const chip=a?`<span style="color:${col};white-space:nowrap">${a.i} ${a.label}</span>`:'<span class="sub">—</span>';
+      const str=p.stress!=null?`<span class="mono" style="color:${p.stress>=25?'var(--agri)':'#8b90a7'}">${p.stress}</span>`:'<span class="sub">—</span>';
+      const opp=p.opp!=null?`<span class="mono" style="color:${p.opp>=1.5?'var(--gold)':'#8b90a7'}">${p.opp}</span>`:'<span class="sub">—</span>';
+      return `<tr><td style="padding:3px 6px"><b style="font-weight:500;color:#c7cedd">${p.v}</b></td>`
+        +`<td class="mono sub" style="padding:3px 6px;text-align:right">${p.n}</td>`
+        +`<td style="padding:3px 6px;font:500 11px 'IBM Plex Sans Thai'">${chip}</td>`
+        +`<td style="padding:3px 6px;text-align:right" title="avg agri-pressure">${str}</td>`
+        +`<td style="padding:3px 6px;text-align:right" title="avg opportunity">${opp}</td></tr>`;
+    }).join('');
+    const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces — drill down</summary>`
+      +`<div style="overflow-x:auto;margin-top:6px"><table style="width:100%;border-collapse:collapse;font-size:11px">`
+      +`<tr style="color:#5B6479;font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg opportunity">Opp</td></tr>`
+      +provRows+`</table></div></details>`:'';
     return `<div style="border:1px solid #ffffff14;border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:rgba(255,255,255,.02)">`
       +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:#e7ebf5">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
       +`<div class="sub" style="margin:5px 0 8px;color:#98a0b5;line-height:1.4">${r.situation}</div>`
       +actions((r.recommendation||[]).slice(0,3))
       +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:#8b90a7">Most agri-stressed:</b> ${stressed}</div>`:'')
       +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:#8b90a7">Best white-space:</b> ${oppy}</div>`:'')
+      +drill
       +`</div>`;
   }).join('');
   host.innerHTML=`<h2>National outlook — the answer up top</h2>`
@@ -1094,7 +1111,8 @@ function renderNationalOutlook(){
 /* ---------- overview ---------- */
 function renderOverview(){
   loadOutlook().then(renderNationalOutlook);
-  $('#macro').innerHTML = META.macro.map(([k,v,n])=>
+  // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
+  $('#macro').innerHTML = META.macro.filter(([k])=>!/gold/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);
   renderCommodityBoard();
@@ -1135,20 +1153,21 @@ function renderCommodityBoard(){
   };
   const row=b=>`<tr><td>${b.lab}</td><td class="mono" style="color:${cls(b)}">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td><td class="sub">${b.reg}</td><td class="sub">${b.note}${mnote(b)}</td></tr>`;
   const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
+  // AutoX lends against vehicle titles, not gold — exclude the Collateral (gold) row from the board.
   $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
-  $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops').map(row).join('');
+  $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops'&&b.seg!=='Collateral').map(row).join('');
   // Key-read prose: inject LIVE numbers from the board so it can never contradict the table beside it
   // (was hardcoded chicken +25.6/beef +18.4/gold +62.7, stale after the vintage refresh).
   const kr=$('#ov-keyread');
   if(kr){
     const pick=re=>{const b=META.board.find(x=>re.test(x.lab||'')&&x.yoy!=null);return b?{v:b.yoy,s:(b.yoy>0?'+':'')+b.yoy+'%'}:null;};
-    const gold=pick(/gold/i), chick=pick(/chicken|poultry/i), beef=pick(/beef|cattle/i);
+    const chick=pick(/chicken|poultry/i), beef=pick(/beef|cattle/i);
     const live=[chick&&('chicken '+chick.s), beef&&('beef '+beef.s)].filter(Boolean).join(', ');
     const anyUp=(chick&&chick.v>0)||(beef&&beef.v>0);
     kr.innerHTML='<b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) '+
       'ride crop-price cycles, while livestock &amp; forestry households move on their own'+
       (live?(' ('+live+', '+(anyUp?'holding up better':'also under pressure')+')'):'')+'. '+
-      (gold?('Gold '+gold.s+(gold.v>0?' lifts':' softens')+' pawn/gold-collateral value.'):'');
+      'These crop/livestock income cycles drive borrower cash flow — and repayment — across the agri book.';
   }
 }
 
@@ -1210,13 +1229,11 @@ function renderCollatOutlook(){
   const el=$('#collat-outlook'); if(!el) return;
   // warm the per-province outlook layer; re-render once it lands so the national card appears.
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
-  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
-  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
   const cards=[
-    {k:'Gold collateral', v:gy, d:'value ↑', cls:'up',
-     n:'Measured · commodity board (World Bank, '+(gold&&gold.stale?gold.stale:'2025M12')+'). Lifts pawn / gold-backed loan value & recovery.'},
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
+    {k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
+     n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book — see the motorcycle-share table below (DLT, measured).'},
   ];
   // national recovery-value outlook (from collateral_outlook.json) — firming vs softening + most-at-risk.
   const nat=COLLO&&COLLO.national;
@@ -1224,15 +1241,15 @@ function renderCollatOutlook(){
     const o=nat.exposure_weighted_outlook, firm=o>=0;
     cards.push({k:'Recovery outlook (national)', v:firm?'firming':'softening', d:(firm?'+':'')+o.toFixed(2)+' index', cls:firm?'up':'down',
       n:'Estimated directional read · '+(nat.n_firming||0)+'/'+(nat.n_provinces||0)+' provinces firming; most at-risk '+(nat.most_at_risk_province||'—')+
-        ' (highest motorcycle-title share). Combines measured DLT moto share + gold (global proxy). NOT a measured recovery rate.'});
+        ' (highest motorcycle-title share). Based on measured DLT vehicle mix. NOT a measured recovery rate.'});
   }
   el.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
   const note=$('#collat-note');
-  if(note) note.innerHTML='<b>Read:</b> the gold side of the book is appreciating while the diesel-pickup side faces a slow value squeeze — '+
-    'if recovery values on repossessed pickups fall, loss-given-default on the title book rises even before any change in default rates. '+
-    'The pickup direction is an <b>estimated/editorial watch</b> (no live Thai used-pickup price index in this data); gold is measured.';
+  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the diesel-pickup and used-motorcycle sides both face a slow value squeeze. '+
+    'If recovery values on repossessed vehicles fall, loss-given-default on the title book rises even before any change in default rates. '+
+    'These directions are an <b>estimated / editorial watch</b> (no live Thai used-vehicle price index in this data); the vehicle-mix shares below are measured (DLT).';
 }
 /* ---------- Collateral mix · most motorcycle-heavy provinces (objective #1, MEASURED) ----------
    Pure DLT vehicle stock split per province (moto / car / pickup / EV share of total). A ฿10k
@@ -1275,19 +1292,17 @@ function renderCollatMix(){
    is a stated, illustrative scenario, NOT a forecast. */
 function renderRecoverySensitivity(){
   const cards=$('#recovery-cards'), note=$('#recovery-note'), tbl=$('#recoverytbl'); if(!cards) return;
-  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
-  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
   cards.innerHTML=[
-    {k:'Gold collateral',v:gy,d:'recovery value ↑',cls:'up',
-     n:'MEASURED · commodity board (World Bank, '+(gold&&gold.stale?gold.stale:'2025M12')+'). Higher gold price lifts recovery on gold-backed loans.'},
     {k:'Used-motorcycle value',v:'−10%',d:'illustrative shock',cls:'down',
      n:'ILLUSTRATIVE scenario (not a forecast). We have no Thai used-motorcycle price index; this is a stated stress to rank exposure.'},
+    {k:'Diesel-pickup value',v:'↓ pressure',d:'resale at risk',cls:'down',
+     n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans.'},
     {k:'Most exposed',v:'high-moto provinces',d:'by title-share',cls:'down',
      n:'Ranked by MEASURED motorcycle-title share (DLT). No LTV/loan-balance data, so we rank exposure — we do NOT show breach counts.'},
   ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
-  if(note) note.innerHTML='<b>Read:</b> gold collateral '+((gold&&gold.yoy!=null&&gold.yoy<0)?'is softening ':'is appreciating ')+'(measured, '+gy+') while motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
+  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b>; motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
     'A <b>10% fall in used-motorcycle values</b> most exposes the provinces below, which carry the highest motorcycle-title share. '+
     'This is an <b>ESTIMATED / illustrative sensitivity</b>: we have <b>no loan balances and no LTV</b>, so we rank by motorcycle-share exposure and deliberately show <b>no LTV-breach counts</b>. Shares are measured (DLT).';
   const rows=collatMixRows().slice(0,8); if(!tbl||!rows.length) return;
@@ -2720,7 +2735,7 @@ function renderOccConcentration(){
    provinces that worsen most. Deterministic. Exposure = branch footprint (no per-branch ฿ balance / LTV /
    elasticities — all stated). Reuses crop_stress.json (lazy) + branches.json; no new data, no server. */
 const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
-const simState={price:0,rain:0,gold:0,veh:0,factory:0,botcap:false};
+const simState={price:0,rain:0,veh:0,factory:0,botcap:false};
 let simWired=false;
 
 /* ---------- BoT 28% title-loan rate-cap scenario (objective #1) ----------
@@ -2850,20 +2865,18 @@ function wireSim(){
     inp.oninput=()=>{simState[key]=+inp.value; const lab=$(id+'-v'); if(lab&&fmt) lab.textContent=fmt(+inp.value); computeSim();};};
   bind('#sim-price','price',v=>(v>0?'+':'')+v+'%');
   bind('#sim-rain','rain',v=>v===0?'normal':(v>0?'wetter +':'drier ')+v+'%');
-  bind('#sim-gold','gold',v=>(v>0?'+':'')+v+'%');
   bind('#sim-veh','veh',v=>(v>0?'+':'')+v+'%');
   bind('#sim-factory','factory',v=>v+'%');
   const bot=$('#sim-botcap'); if(bot) bot.onchange=()=>{simState.botcap=bot.checked; computeSim();};
   const rs=$('#sim-reset'); if(rs) rs.onclick=simReset;
 }
 function simReset(){
-  simState.price=0; simState.rain=0; simState.gold=0; simState.veh=0; simState.factory=0; simState.botcap=false;
+  simState.price=0; simState.rain=0; simState.veh=0; simState.factory=0; simState.botcap=false;
   const set=(id,v)=>{const e=$(id); if(e) e.value=v;};
-  set('#sim-price',0); set('#sim-rain',0); set('#sim-gold',0); set('#sim-veh',0); set('#sim-factory',0);
+  set('#sim-price',0); set('#sim-rain',0); set('#sim-veh',0); set('#sim-factory',0);
   const bot=$('#sim-botcap'); if(bot) bot.checked=false;
   $('#sim-price-v')&&($('#sim-price-v').textContent='0%');
   $('#sim-rain-v')&&($('#sim-rain-v').textContent='normal');
-  $('#sim-gold-v')&&($('#sim-gold-v').textContent='0%');
   $('#sim-veh-v')&&($('#sim-veh-v').textContent='0%');
   $('#sim-factory-v')&&($('#sim-factory-v').textContent='0%');
   computeSim();
@@ -2986,25 +2999,22 @@ function computeSim(){
   renderSimCollat();
   renderSimFactory();
 }
-// collateral recovery-value DIRECTION from the gold + used-vehicle sliders (illustrative, no balances).
+// collateral recovery-value DIRECTION from the used-vehicle slider (illustrative, no balances).
+// AutoX lends against VEHICLE TITLES (not gold), so only the used-vehicle backing is modelled.
 function renderSimCollat(){
   const box=$('#sim-collat'); if(!box) return;
-  const {gold,veh}=simState;
-  const dir=(v,upTxt,dnTxt)=>v>0?{t:upTxt,cls:'up',col:'var(--up)',a:'▲'}:v<0?{t:dnTxt,cls:'down',col:'var(--agri)',a:'▼'}:{t:'unchanged',cls:'',col:'var(--mid)',a:'•'};
-  const g=dir(gold,'recovery value ↑','recovery value ↓');
-  const v=dir(veh,'recovery value ↑ · LGD ↓','recovery value ↓ · LGD ↑');  // +move=resale up=>recovery up/LGD down (was inverted)
-  // for vehicles a NEGATIVE move is the bad case, so flip the colour logic
+  const {veh}=simState;
+  const vt=veh>0?'recovery value ↑ · LGD ↓':veh<0?'recovery value ↓ · LGD ↑':'unchanged';
+  // for vehicles a NEGATIVE move is the bad case
   const vCol=veh<0?'var(--agri)':veh>0?'var(--up)':'var(--mid)';
   const cards=[
-    {k:'Gold collateral',v:(gold>0?'+':'')+gold+'%',d:g.a+' '+g.t,col:g.col,
-     n:'ILLUSTRATIVE move applied to gold-backed recovery value. Baseline gold direction (measured) is '+(function(){var gb=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));return gb&&gb.yoy!=null?((gb.yoy>0?'+':'')+gb.yoy+'%'):'—';})()+' YoY on the board.'},
-    {k:'Used-vehicle collateral',v:(veh>0?'+':'')+veh+'%',d:(veh<0?'▼':veh>0?'▲':'•')+' '+v.t,col:vCol,
+    {k:'Used-vehicle collateral',v:(veh>0?'+':'')+veh+'%',d:(veh<0?'▼':veh>0?'▲':'•')+' '+vt,col:vCol,
      n:'ILLUSTRATIVE move on used motorcycle/pickup resale — the title-book backing. Down lowers recovery (loss-given-default rises). No LTV/balances.'},
-    {k:'Net collateral read',
-     v:(gold>=0&&veh>=0)?'firming':(gold<0&&veh<0)?'softening':'mixed',
+    {k:'Recovery read',
+     v:veh>0?'firming':veh<0?'softening':'unchanged',
      d:'direction only',
-     col:(gold<0&&veh<0)?'var(--agri)':(gold>0&&veh>=0)||(gold>=0&&veh>0)?'var(--up)':'var(--mid)',
-     n:'Qualitative net of the two backings. Gold up + vehicles down = the divergence AutoX already faces. No portfolio ฿ figure — illustrative.'},
+     col:vCol,
+     n:'Qualitative read on vehicle-title recovery value. A fall raises loss-given-default on the title book even before defaults move. No portfolio ฿ figure — illustrative.'},
   ];
   box.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v" style="color:${c.col}">${c.v}</div>
@@ -4961,9 +4971,8 @@ function renderHomeRisk(){
       `${p.moto}%`,'moto share','var(--agri)')).join('');
   }
   // COLLATERAL RECOVERY OUTLOOK — lead with the national read from collateral_outlook.json when
-  // loaded (firming vs softening + most-at-risk province), then the two diverging backings.
-  const gold=(META.board||[]).find(b=>b.seg==='Collateral'&&/gold/i.test(b.lab||''));
-  const gy=gold&&gold.yoy!=null?(gold.yoy>0?'+':'')+gold.yoy+'%':'+62.7%';
+  // loaded (firming vs softening + most-at-risk province), then the vehicle-title backings.
+  // AutoX lends against VEHICLE TITLES (not gold), so gold-collateral is not shown.
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
     const o=nat.exposure_weighted_outlook, firm=o>=0;
@@ -4972,9 +4981,9 @@ function renderHomeRisk(){
       `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`,
       `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
   }
-  html+=`<div class="cc-sub2">Collateral value · the two backings diverge</div>`;
-  html+=ccRow(`Gold collateral ${TAG_M}`,'pawn / gold-backed recovery value ↑',gy,'value ↑','var(--up)');
+  html+=`<div class="cc-sub2">Vehicle-title collateral value · under pressure</div>`;
   html+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');
+  html+=ccRow(`Used-motorcycle collateral ${TAG_M}`,'smallest, most volatile, lowest-recovery title collateral','↓ volatile','lowest recovery','var(--agri)');
   box.innerHTML=html;
 }
 
@@ -5003,13 +5012,13 @@ function renderHomeMacro(){
   html+=ccRow(`BoT hire-purchase rate/fee cap ${TAG_E}`,
     'car &amp; motorcycle lending · effective ~Dec 2025 · sector-margin item, not a credit signal',
     '~Dec 2025','margin watch','#D9742B');
-  // key commodity moves: 2 worst crop YoY + gold
+  // key commodity moves: 2 worst + 2 best crop/livestock YoY (borrower income drivers; gold is
+  // NOT AutoX collateral, so it is excluded).
   const board=(META.board||[]);
-  const crops=board.filter(b=>b.seg==='Crops'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2);
-  const gold=board.find(b=>/gold/i.test(b.lab||''));
-  html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction</span></div>`;
-  crops.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY','var(--agri)'));
-  if(gold) html+=ccRow(`Gold`,gold.note||'collateral value ↑',`+${gold.yoy}%`,'YoY','var(--up)');
+  const agri=board.filter(b=>(b.seg==='Crops'||b.seg==='Livestock')&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy);
+  const moves=agri.slice(0,2).concat(agri.slice(-2).reverse()).filter((b,i,arr)=>arr.indexOf(b)===i);
+  html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction · borrower income</span></div>`;
+  moves.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY',b.yoy>=0?'var(--up)':'var(--agri)'));
   // live retail fuel prices (Bangchak, daily) — diesel tracks pickup/farm borrowers, gasohol
   // tracks motorcycle borrowers, AutoX's two dominant title-loan collateral types.
   if(FUEL&&FUEL.headline){

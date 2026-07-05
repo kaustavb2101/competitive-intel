@@ -165,21 +165,21 @@
         </div>
         <div class="cols2">
           <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
-          <div><h2>Protein · forestry · gold · firming</h2><table class="tbl" id="board-other"></table></div>
+          <div><h2>Protein · forestry · firming</h2><table class="tbl" id="board-other"></table></div>
         </div>
 
         <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
              omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
         <div id="mwatch-wrap" style="display:none">
           <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
-          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / gold trade / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first.</p>
+          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first.</p>
           <div class="grid macro" id="mwatch"></div>
         </div>
       </div>
     </div>
 
-    <h2 class="collat">Collateral outlook · the two backings diverge</h2>
-    <p class="lead">What is happening to the value of what AutoX lends against (portfolio objective #1). Gold is <b>measured</b> (commodity board); the pickup signal is an <b>editorial / estimated watch</b> — see note.</p>
+    <h2 class="collat">Collateral outlook · vehicle-title value watch</h2>
+    <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
 
@@ -194,7 +194,7 @@
 
     <h2>Segment signals by region</h2>
     <table class="tbl" id="region"></table>
-    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle + gold trade density.</p>
+    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle density.</p>
 
     <h2 class="risk">Crop-household stress · worst provinces</h2>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
@@ -434,12 +434,6 @@
         </div>
 
         <div class="sim-slider">
-          <label>Gold price move <span class="mono" id="sim-gold-v">0%</span></label>
-          <input type="range" id="sim-gold" min="-30" max="30" step="5" value="0">
-          <div class="sim-hint">Gold-backed collateral recovery value. Up = stronger recovery on pawn/gold loans.</div>
-        </div>
-
-        <div class="sim-slider">
           <label>Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
           <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0">
           <div class="sim-hint">Used motorcycle/pickup resale value. Down = lower recovery on the title book (LGD up).</div>
@@ -473,7 +467,7 @@
     <table class="tbl" id="sim-prov"></table>
 
     <h2 class="collat">Collateral recovery-value direction</h2>
-    <p class="lead">Direction only, from the gold &amp; used-vehicle sliders — <b>illustrative</b>, no loan balances or LTV.</p>
+    <p class="lead">Direction only, from the used-vehicle slider — <b>illustrative</b>, no loan balances or LTV. AutoX lends against <b>vehicle titles</b>.</p>
     <div class="grid macro" id="sim-collat"></div>
 
     <div id="sim-factory-out-wrap" style="display:none;margin-top:20px">

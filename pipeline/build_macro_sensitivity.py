@@ -87,27 +87,26 @@ from regionmap import canonical
 from fingerprint import branches_fingerprint
 
 # fixed driver order — tie-break for equal scores and the audit order in meta.
-DRIVER_ORDER = ("rice", "rubber", "palm", "gold", "drought")
+# NOTE: gold is deliberately excluded — AutoX lends against vehicle titles, not gold, so gold
+# price / gold-shop presence is NOT a driver of the book.
+DRIVER_ORDER = ("rice", "rubber", "palm", "drought")
 # Pink Sheet board row per price driver (source-data/commodity_board.json "lab").
-BOARD_LAB = {"rice": "Rice", "rubber": "Rubber", "palm": "Palm oil", "gold": "Gold"}
+BOARD_LAB = {"rice": "Rice", "rubber": "Rubber", "palm": "Palm oil"}
 # crop_stress.json crop_mix crop name per crop driver.
 CROP_NAME = {"rice": "Rice", "rubber": "Rubber", "palm": "Oil palm"}
 # |YoY| of 25% == full severity 1.0 — same denominator as build_crop_stress.py price_term.
 PRICE_SEV_DEN = 25.0
-# 5+ gold shops within 10km == full gold-trade presence for the gold driver.
-GOLD_SHOP_DEN = 5.0
 # Bueng Kan fallback drought formula denominator — same as build_crop_stress.py drought_term.
 RAIN_DEN = 40.0
 
 DRIVER_LABELS = {
     "rice": "Rice price", "rubber": "Rubber price", "palm": "Palm-oil price",
-    "gold": "Gold price", "drought": "Drought / rainfall",
+    "drought": "Drought / rainfall",
 }
 CTX_LABELS = {
     "rice": "% of province planted area (MEASURED, OAE)",
     "rubber": "% of province planted area (MEASURED, OAE)",
     "palm": "% of province planted area (MEASURED, OAE)",
-    "gold": "gold shops ≤10km (MEASURED, OSM count)",
     "drought": "% of normal 3-month rain (MEASURED proxy)",
 }
 
@@ -175,8 +174,6 @@ def build():
                                   "score": defaultdict(float), "region": None})
     for b in branches:
         a_rel = (b.get("a") or 0) / 100.0          # ESTIMATED agri catchment weight
-        c_rel = (b.get("c") or 0) / 100.0          # ESTIMATED collateral catchment weight
-        gold_shops = int(((b.get("k10") or {}).get("gold")) or 0)
         pv = prov.get(canonical(b.get("v") or ""))
 
         cand = []
@@ -186,10 +183,6 @@ def build():
             score = int(round(100 * sev * share * a_rel))
             if score > 0:
                 cand.append([k, score, signals[k]["dir"], int(round(share * 100))])
-        gsev = _clamp01(abs(signals["gold"]["yoy_pct"]) / PRICE_SEV_DEN)
-        gscore = int(round(100 * gsev * c_rel * min(1.0, gold_shops / GOLD_SHOP_DEN)))
-        if gscore > 0:
-            cand.append(["gold", gscore, signals["gold"]["dir"], gold_shops])
         if pv:
             dsev = pv["drought"]
             drel = a_rel * pv["dep"]
@@ -245,27 +238,25 @@ def build():
         "deterministic": True,
         "network_free": True,
         "label": "ESTIMATED PROXY OVER MEASURED INPUTS — real Pink Sheet price YoY (GLOBAL direction "
-                 "proxy, not Thai farm-gate) and measured OAE crop shares / rainfall / OSM gold-shop "
-                 "counts, combined through ESTIMATED branch relevance weights (segment scores a/c are "
-                 "estimated 0-100 screens). A ranking of which macro lever moves each branch's book — "
-                 "NOT a measured elasticity or default rate.",
+                 "proxy, not Thai farm-gate) and measured OAE crop shares / rainfall, combined through "
+                 "ESTIMATED branch relevance weights (segment score a is an estimated 0-100 screen). A "
+                 "ranking of which macro lever moves each branch's book — NOT a measured elasticity or "
+                 "default rate. Gold is excluded: AutoX lends against vehicle titles, not gold.",
         "provenance": {
             "price_signals": "MEASURED — World Bank Pink Sheet YoY via source-data/commodity_board.json "
                              "(vintage %s). GLOBAL prices, a direction proxy, NOT Thai farm-gate." % price_vintage,
             "crop_shares": "MEASURED — OAE planting-area shares per province (platform/data/crop_stress.json crop_mix)",
             "drought": "MEASURED PROXY — 3-month rainfall %% of normal (crop_stress.json components.rain_pct_of_normal)",
-            "gold_shops": "MEASURED — OSM gold shops ≤10km per branch (branches.json k10.gold)",
-            "relevance_weights": "ESTIMATED — branch agri/collateral segment scores (branches.json a/c, "
-                                 "estimated 0-100 OSM/price screens) scale the driver relevance",
+            "relevance_weights": "ESTIMATED — branch agri segment score (branches.json a, "
+                                 "estimated 0-100 OSM/price screen) scales the driver relevance",
         },
         "formula": "score = round(100 × severity × relevance). Crops: sev=clamp(|yoy|/%d,0,1), "
-                   "rel=crop_share×(a/100). Gold: rel=(c/100)×min(1,gold_shops/%d). Drought: sev=province "
-                   "drought(0..1), rel=(a/100)×crop_dependence. dir: 't' tailwind when price YoY>0, else 'h'; "
-                   "drought is headwind-only. t2 = top-2 by score desc (fixed driver order tie-break)."
-                   % (int(PRICE_SEV_DEN), int(GOLD_SHOP_DEN)),
+                   "rel=crop_share×(a/100). Drought: sev=province drought(0..1), rel=(a/100)×crop_dependence. "
+                   "dir: 't' tailwind when price YoY>0, else 'h'; drought is headwind-only. t2 = top-2 by "
+                   "score desc (fixed driver order tie-break)."
+                   % (int(PRICE_SEV_DEN),),
         "score_scale": "RELATIVE 0-100 but diluted by measured shares and estimated segment scores — a "
-                       "crop driver rarely exceeds ~50 while gold can near 100 in dense urban gold-trade "
-                       "catchments. Compare ORDER, not magnitude.",
+                       "crop driver rarely exceeds ~50. Compare ORDER, not magnitude.",
         "rec_format": "branches[i] = t2 = up to 2 of [driver_key, score, 'h'|'t', ctx] — ctx meaning per "
                       "driver is meta.drivers[key].ctx_label. INDEX-ALIGNED to branches.json (entry i ↔ branch i).",
         "province_format": "provinces[] = macro watchlist: modal TOP driver per province, headwind-dominant "

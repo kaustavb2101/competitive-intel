@@ -69,6 +69,17 @@ def _region_actions(t, tot):
     return [c[1] for c in cand]
 
 
+# single dominant action for a province (icon · kind · short label), from its rec tally
+def _top_action(t, tot):
+    acts = _region_actions(t, tot)
+    if not acts:
+        return None
+    a = acts[0]
+    short = {"acquire": "Expand", "defend": "Defend", "agri_stress": "De-risk agri",
+             "agri_tail": "Grow farm lending", "collateral": "Push vehicle-title"}
+    return {"i": a["i"], "k": a["k"], "tone": a["tone"], "label": short.get(a["k"], a["k"])}
+
+
 def build():
     branches = _load("branches.json")
     items = branches if isinstance(branches, list) else branches.get("items", branches)
@@ -142,6 +153,18 @@ def build():
             ({"v": v, "opp": round(sum(prov_opp[v]) / len(prov_opp[v]), 1), "n": prov_meta[v]["n"]}
              for v in provs if prov_opp.get(v)),
             key=lambda x: -x["opp"])[:5]
+        # full per-province drill within the region (every province, biggest book first)
+        prov_list = []
+        for v in provs:
+            pt = prov_tally[(r, v)]; ptot = pt["n"]
+            prov_list.append({
+                "v": v, "n": ptot,
+                "tallies": {k: pt.get(k, 0) for k in ("acquire", "defend", "agri_stress", "agri_tail", "collateral")},
+                "stress": round(sum(prov_stress[v]) / len(prov_stress[v])) if prov_stress.get(v) else None,
+                "opp": round(sum(prov_opp[v]) / len(prov_opp[v]), 1) if prov_opp.get(v) else None,
+                "action": _top_action(pt, ptot),
+            })
+        prov_list.sort(key=lambda p: -p["n"])
         situation = "%d branches%s. %d in stressed crop catchments, %d flagged prime white-space, %d besieged by rivals." % (
             tot, " · mostly %s borrowers (%d%%)" % (base_lab.lower(), base_share) if base_lab else "",
             t.get("agri_stress", 0), t.get("acquire", 0), t.get("defend", 0))
@@ -153,6 +176,8 @@ def build():
             "recommendation": _region_actions(t, tot),
             "top_stressed": stressed,
             "top_opportunity": oppy,
+            "n_provinces": len(prov_list),
+            "provinces": prov_list,
         })
 
     # ---- national situation (macro) ----
@@ -178,22 +203,19 @@ def build():
     ] if c]
 
     # ---- factors (commodity board movers + rate) ----
+    # AutoX lends against VEHICLE TITLES, not gold — gold/pawn collateral is NOT relevant, so the
+    # Collateral segment (gold) is excluded from the borrower-facing factors.
     factors = []
     for b in sorted(board, key=lambda x: -abs(x.get("yoy") or 0)):
         y = b.get("yoy")
-        if y is None or abs(y) < 8:
+        seg = b.get("seg", "")
+        if y is None or abs(y) < 8 or seg == "Collateral":
             continue
         up = y > 0
-        # crop/livestock/fisheries price up = income tailwind (supports borrowers); gold up = collateral value up
-        seg = b.get("seg", "")
-        if seg == "Collateral":
-            tone = "good" if up else "warn"
-            hits = "pawn / gold-collateral value %s" % ("↑" if up else "↓")
-        else:
-            tone = "good" if up else "warn"
-            hits = "%s household income %s" % (seg.lower() or "farm", "↑" if up else "↓")
+        # crop/livestock/fisheries price up = borrower income tailwind (eases PD)
         factors.append({"lab": b.get("lab"), "yoy": y, "seg": seg, "reg": b.get("reg"),
-                        "note": b.get("note"), "tone": tone, "hits": hits})
+                        "note": b.get("note"), "tone": "good" if up else "warn",
+                        "hits": "%s household income %s" % (seg.lower() or "farm", "↑" if up else "↓")})
     factors = factors[:8]
 
     # ---- nationwide recommendation (sum of regional tallies) ----
@@ -209,8 +231,8 @@ def build():
                     % hh.get("value")) if hh["yoy_change"] < 0 else \
                    ("Rising household leverage (%s%% of GDP) argues for caution on new exposure. " % hh.get("value"))
     top_reg = lambda kind: max(regions, key=lambda x: x["tallies"].get(kind, 0))["name"] if regions else "—"
-    headline = backdrop + "Priority: expand where white-space is thin-competition (most in %s), de-risk agri-stressed branches (most in %s), and push gold-collateral products while gold is bid." % (
-        top_reg("acquire"), top_reg("agri_stress"))
+    headline = backdrop + "Priority: expand where white-space is thin-competition (most in %s), lead with vehicle-title products where collateral density is high (most in %s), and de-risk agri-stressed branches (most in %s)." % (
+        top_reg("acquire"), top_reg("collateral"), top_reg("agri_stress"))
 
     return {
         "meta": {
