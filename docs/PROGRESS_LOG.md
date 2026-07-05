@@ -5,6 +5,36 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-05 (7) — ENRICH: national lowest-paid-occupation callout on Exposure (objective #1)
+
+Loop cycle. Closed the 2026-07-03 (7) backlog follow-up: `province.html`'s "Income by occupation"
+panel (NSO SES 2566, per-province) had no national-level read — a reader had to open all 77
+province pages to notice which occupation category is structurally the lowest-paid nationally.
+
+New `pipeline/build_occupation_income.py` projects the already-committed, already-MEASURED
+`source-data/household_income_by_province.json` into `platform/data/occupation_income.json`: for
+each of the 5 occupation categories, the unweighted national average monthly income plus the
+single lowest/highest-paying province (a concrete worst case, not just the mean), sorted
+worst-first. Pure aggregation of already-MEASURED data — no modeling, no new source. Absent-state
+degrades gracefully (empty `categories`, `meta.absent=true`) if the source file is ever missing.
+
+`renderRiskReadouts()` on `#exposure` (`platform/app.js`) gained a "Lowest-paid occupation
+nationally" callout right after the existing DTI+unemployment "Structurally riskiest" block, same
+rank-1-surfacing pattern, lazy-loaded via `loadOccupationIncome()`/`OCCINC_LIST`, null-safe. Live
+data: **Transport** is the lowest-paid occupation nationally, ฿18,547/mo average — worst case
+แม่ฮ่องสอน (Mae Hong Son) at just ฿6,713/mo. A concrete fact, not an abstract index, per CLAUDE.md's
+"concrete not abstract" preference.
+
+`--check`-gated in `tests/run.sh` (new `build_occupation_income.py --check` line, SKIP-pass if the
+source is absent); `tests/validate_data.py` gained `check_occupation_income()` (positive values,
+min≤avg≤max, sorted worst-first, meta/provenance present). `build_provenance.py` regenerated to
+pick up the new file (auto-discovered via its `platform/data/*.json` glob — no manual registration
+needed). Gate: 53/0 (was 52/0), `validate_data.py` 433/433 (was 428/428, +5 checks). Headless-
+rendered `index.html#exposure`: settled-DOM probe shows `data-errors="[]"`, the new callout renders
+with the real Transport/แม่ฮ่องสอน numbers right where expected, no regression to the existing
+"Structurally riskiest" block above it (verified via DOM text search, not just a viewport
+screenshot, since the callout sits below the first ~1600px of a taller tab).
+
 ## 2026-07-05 (6) — UX: Acquisition tab now leads with Road to 3,000, not the leaderboard
 
 Loop cycle. Backlog follow-up (noted 2026-07-04 (9), still open): the "★ Rebuild dense tabs as 2-col

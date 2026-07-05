@@ -270,9 +270,13 @@
       occupation-sensitivity lever** — a sector shock that also discounts by the province's
       lowest-earning-occupation share would sharpen the existing ESTIMATED factory-slowdown lever
       with a real NSO income floor. *(LOW, M)*
-- [ ] **`province.html`'s new "Income by occupation" panel has no equivalent on the Overview/Exposure
-      tabs** — same rank-1-surfacing pattern used for `PSTRESS_LIST[0]`/`HHRISK_LIST[0]` on Home
-      could add "lowest-paid occupation nationally" as a portfolio-risk callout. *(LOW, S)*
+- [x] **`province.html`'s new "Income by occupation" panel has no equivalent on the Overview/Exposure
+      tabs — DONE 2026-07-05 (7)** (new `pipeline/build_occupation_income.py` aggregates the
+      already-MEASURED `household_income_by_province.json` into a national worst-first ranking by
+      occupation category; `#exposure`'s `renderRiskReadouts()` gained a "Lowest-paid occupation
+      nationally" callout — Transport ฿18,547/mo avg, worst แม่ฮ่องสอน ฿6,713/mo — same rank-1
+      pattern as `PSTRESS_LIST[0]`. Gate 53/0, `validate_data.py` 433/433. See `docs/PROGRESS_LOG.md`
+      2026-07-05 (7).)
 
 ## Queue — follow-ups noticed 2026-07-03 (9)
 - [x] **The same "opaque dots tile over a polygon fill" issue likely applies to the amphoe
@@ -564,8 +568,37 @@
       2026-06-30; `ingest_gov.py`'s `build_occupations_census()` commit `7fd4994` 2026-06-30) but never
       checked off. Zero code/data changed — pure backlog hygiene.
 
+## Queue — follow-ups noticed 2026-07-05 (8)
+- [ ] **`occupation_income.json`'s national aggregate could feed the Simulator's occupation-
+      sensitivity lever the same way the raw `gov.income` breakdown was proposed to (2026-07-03 (7)
+      entry above, still open)** — now that the lowest-paid-occupation fact is already computed
+      nationally (not just per-province), the factory-slowdown lever could discount by
+      `min_value`/`national_avg` for the affected occupation category instead of a flat severity
+      knob, sharpening the ESTIMATED lever with a real NSO income floor. Still *(LOW, M)* — a
+      Simulator formula change, not a quick win.
+- [ ] **`occupation_income.json` is unweighted-mean across provinces (a small province counts the
+      same as Bangkok)** — labelled honestly in `meta.caveats`, but if this callout ever needs to
+      answer "which occupation pays least for the AVERAGE WORKER nationally" rather than "for the
+      average PROVINCE", it would need population-weighting (branch-count or NSO labor-force
+      weights are already in the pipeline elsewhere, e.g. `unemployment_by_province.json`'s
+      labor-force column) — not needed today, the province-level read is honest as scoped. *(LOW,
+      S, speculative)*
+- [ ] **The Home command-center (`#home`) doesn't yet surface the same "lowest-paid occupation
+      nationally" fact** — this cycle only wired it into `#exposure` (scope discipline: one tab per
+      cycle), but Home's risk card already follows the exact `PSTRESS_LIST[0]`/`HHRISK_LIST[0]`
+      rank-1-surfacing convention this reuses; a future cycle could add the same `OCCINC_LIST[0]`
+      row to `renderHomeRisk()` if Home's risk card ever feels thin. *(LOW, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 (7)/PROGRESS_LOG numbering — ENRICH: national lowest-paid-occupation callout on
+  Exposure.** `pipeline/build_occupation_income.py` aggregates the already-MEASURED
+  `household_income_by_province.json` (NSO SES 2566) into a national worst-first ranking by
+  occupation category (national avg + concrete min/max province, not just an average).
+  `#exposure` gained a "Lowest-paid occupation nationally" callout (Transport ฿18,547/mo avg,
+  worst แม่ฮ่องสอน ฿6,713/mo). `--check`-gated, `validate_data.py` +5 checks (433/433), gate 53/0.
+  Headless-rendered, `data-errors="[]"`, no regression. Full writeup: `docs/PROGRESS_LOG.md`
+  2026-07-05 (7).
 - **2026-07-05 (7) — AUDIT: RE-DERIVE baseline confirmed green, closed 2 stale backlog duplicates,
   re-confirmed the OAE farm-gate dead end + PR #1 unmerged status, both with no change.** Full
   writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-05 (7) entry).
