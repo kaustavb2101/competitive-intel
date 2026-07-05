@@ -13,11 +13,15 @@ Each source has a freshness TTL; the loop only re-pulls what's stale, so repeate
 runs are cheap and the dataset keeps "refining itself." Outputs:
   branches_final.json · autox-branch-features.csv · deck_payload.json · iteration_log.json
 
-NOTE on blocked sources: data.go.th (DIW factories, DLT vehicles) Cloudflare-blocks
-datacenter IPs. Run THIS script from a Thai/residential network and set
-DATA_GO_TH_TOKEN to also pull those (hooks included, off by default).
+NOTE on blocked sources: data.go.th (DIW factories, DLT vehicles + brands/types/trends, OAE
+farm-gate prices, DLD livestock, DOF fisheries, RFD forestry) Cloudflare-blocks datacenter IPs.
+This loop now includes a GUARDED gov-data stage (stage_govdata): when run from a Thai/residential
+network with DATA_GO_TH_TOKEN set, each nightly iteration pulls those sources, folds them into
+source-data, and rebuilds the per-branch layers that read them (crop prices → agri, vehicle stock
+→ collateral). On any other network (no token / foreign-IP block) the stage logs a skip and the
+loop keeps running — nothing crashes. Daily TTL, so it re-pulls at most once a day.
 """
-import os, json, time, math, csv, argparse, datetime, urllib.request, urllib.parse, collections
+import os, sys, json, time, math, csv, argparse, datetime, urllib.request, urllib.parse, collections, subprocess
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
@@ -203,6 +207,46 @@ def write_outputs(branches, com, log):
             w.writerow([b.get(k.replace("store_code","code").replace("province","prov"),"") for k in cols])
     log["written"]=["branches_final.json","autox-branch-features.csv"]
 
+# ── data.go.th (DLT vehicles · OAE prices · DLD livestock · DOF fisheries · RFD forestry) ──────
+# GEO-BLOCKED from datacenter IPs, so this stage is fully guarded: no token, a foreign-IP Cloudflare
+# block, or any subprocess failure is LOGGED and skipped — the nightly loop never dies on it. When
+# the loop runs from a Thai IP with DATA_GO_TH_TOKEN set, it pulls, folds into source-data, and
+# rebuilds the per-branch layers that read that data (crop prices → agri, vehicle stock → collateral).
+DGT_INGEST   = os.path.join(ROOT, "autox_dgt_ingest.py")
+INGEST_GOV   = os.path.join(ROOT, "ingest_gov.py")
+GOV_MARKER   = os.path.join(CACHE, "govdata_last_pull")
+GOV_TTL_DAYS = 1
+# per-branch layers that read the gov-refreshed source-data (all network-free, rebuilt after a fold-in)
+GOV_DERIVED  = ["build_crop_stress.py", "build_branch_agri.py", "build_branch_vehicles.py"]
+
+
+def _sub(path, timeout):
+    return subprocess.run([sys.executable, path], capture_output=True, text=True, timeout=timeout)
+
+
+def stage_govdata(force, log):
+    if not os.environ.get("DATA_GO_TH_TOKEN"):
+        log["govdata"] = "skip (no DATA_GO_TH_TOKEN — the pull needs a Thai IP + token)"
+        return
+    if not force and fresh(GOV_MARKER, GOV_TTL_DAYS):
+        log["govdata"] = "fresh (within TTL)"
+        return
+    try:
+        r = _sub(DGT_INGEST, 3600)                       # pull data.go.th CSVs -> dgt_out/
+        if r.returncode != 0:
+            tail = ((r.stderr or r.stdout or "").strip().splitlines() or ["(no output)"])[-1]
+            log["govdata"] = "pull skipped (likely foreign-IP block / auth): " + tail[:160]
+            return
+        ig = _sub(INGEST_GOV, 900)                        # fold CSVs -> clean source-data layers
+        rebuilt = [os.path.basename(b) for b in GOV_DERIVED
+                   if _sub(os.path.join(ROOT, b), 900).returncode == 0]   # refresh per-branch layers
+        with open(GOV_MARKER, "w") as f:
+            f.write(log["ts"])
+        log["govdata_pulled"] = {"ingest_gov_ok": ig.returncode == 0, "rebuilt": rebuilt}
+    except Exception as e:                                # timeout / unexpected — never fatal
+        log["govdata"] = f"skip (error: {e})"
+
+
 def iterate(force=False, derive_only=False):
     import derive  # projection master → platform/data (same dir)
     t0=time.time(); log={"ts":datetime.datetime.now().isoformat(timespec="seconds")}
@@ -218,6 +262,10 @@ def iterate(force=False, derive_only=False):
     # close the loop: push the refreshed master into the deployable app data
     derive.run()
     log["derived"]=["platform/data/branches.json","platform/data/meta.json"]
+    # gov data (Thai-IP only) — pulled + folded + per-branch layers rebuilt AFTER derive so they read
+    # the current branches.json. Fully guarded: a foreign IP / missing token just logs a skip.
+    if not derive_only:
+        stage_govdata(force, log)
     log["seconds"]=round(time.time()-t0,1)
     hist_path=os.path.join(ROOT,"iteration_log.json")
     hist=json.load(open(hist_path)) if os.path.exists(hist_path) else []
