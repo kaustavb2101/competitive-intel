@@ -2479,6 +2479,7 @@ function renderRiskReadouts(){
   const onExp=()=>{const v=document.getElementById('v-exposure'); return v&&v.classList.contains('on');};
   if(!priskLoaded) loadProvinceRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!briskLoaded) loadBranchRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  if(!pstressLoaded) loadProvinceStress().then(()=>{ if(onExp()) renderRiskReadouts(); });
   let html='';
   // 1) MOST-STRESSED PROVINCES (province_risk.json)
   if(priskHasData()){
@@ -2500,6 +2501,17 @@ function renderRiskReadouts(){
             `<span class="mono" style="color:var(--agri)">${(p.mean_risk||0).toFixed(1)}</span>`+
             `<span class="s">p90 ${(p.p90_risk||0).toFixed(0)}</span></div></div>`;
       }).join('')+`</div>`;
+  }
+  // 1b) STRUCTURAL household-leverage read (province_stress_index.json: DTI + unemployment
+  // percentiles, both MEASURED NSO legs). Distinct signal from the composite above (that one
+  // blends agri/collateral/merchant/unemployment) — this is the pure borrower-leverage read,
+  // same rank-1-surfacing pattern already used on the Home command-center risk card.
+  if(pstressHasData()&&PSTRESS_LIST.length){
+    const p=PSTRESS_LIST[0];
+    html+=`<div class="cc-sub2" style="margin-top:14px">Structurally riskiest · household DTI + unemployment ${TAG_E}</div>`+
+      `<div class="cc-card-b">`+ccRow(`${p.province} <span class="s">${p.region||''}</span>`,
+        `DTI ${p.debt_to_income!=null?(+p.debt_to_income).toFixed(2)+'×':'—'} · unemployment ${p.unemployment_rate!=null?(+p.unemployment_rate).toFixed(1)+'%':'—'} (NSO, measured)`,
+        `▲ ${(p.composite_stress||0).toFixed(0)}`,'composite','var(--agri)')+`</div>`;
   }
   // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){

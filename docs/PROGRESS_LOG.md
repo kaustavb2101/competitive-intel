@@ -5,6 +5,29 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-05 — UX: structural household-leverage callout on the Exposure tab
+
+Loop cycle. Backlog follow-up (self-noted 2026-07-03 (4)): the rank-1-surfacing pattern already
+used on the Home command-center risk card (`PSTRESS_LIST[0]`, the MEASURED NSO household-DTI +
+unemployment composite from `province_stress_index.json`) had no equivalent on `#exposure`, which
+otherwise only surfaces the blended `province_risk.json` composite ("Most-stressed provinces" —
+agri/collateral/merchant/unemployment mix). The two signals answer different questions (pure
+borrower-leverage vs a broader multi-factor composite) and the backlog explicitly flagged the gap.
+
+`renderRiskReadouts()` in `platform/app.js` gained a small "Structurally riskiest · household DTI +
+unemployment" block, inserted between the existing "Most-stressed provinces" and "Riskiest branches"
+sections. Reuses the already-defined `ccRow()`/`TAG_E` helpers (same markup Home uses) and the
+existing `pstressHasData()`/`PSTRESS_LIST`/`loadProvinceStress()` plumbing — no new data file, no
+new pipeline script, purely additive UI. Lazy-loads `province_stress_index.json` on first Exposure
+visit (mirrors the existing `priskLoaded`/`briskLoaded` pattern in the same function) and renders
+nothing when the layer is absent (graceful degrade, no fabrication).
+
+Verified: `node --check platform/app.js` clean; `bash tests/run.sh check` 47/0 (`validate_data.py`
+421/421, unchanged — no data file touched). Headless-rendered `index.html#exposure`
+(`tests/lib/render.sh`, 1400×3000): `data-errors="[]"`, new block renders real data (อำนาจเจริญ,
+DTI 1.14×, unemployment 2.8% NSO-measured, composite ▲98) directly under "Most-stressed provinces",
+no layout regression to the surrounding cards/tables.
+
 ## 2026-07-04 (9) — AUDIT: reconciled the stale "Queue — UX / polish" backlog section against the live app
 
 Loop cycle. Before picking a build item, spot-checked the committee-ranked quick-wins/bigger-bets

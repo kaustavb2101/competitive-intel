@@ -209,11 +209,11 @@
       legs diverge on a future NSO refresh. Worth a short explanatory caption distinguishing
       "composite structural stress" from "raw household leverage" if it ever looks confusing in
       review. *(LOW, S)*
-- [ ] **Same rank-1-surfacing pattern could extend to the Exposure tab** (`#exposure`) — the
-      backlog item this cycle closed named "Command Center hero / Exposure tab" but only Command
-      Center got built (smaller, more central surface). Exposure's portfolio-concentration view has
-      no province-level structural-stress context yet; a compact callout there would round out the
-      original ask. *(LOW, S)*
+- [x] **Same rank-1-surfacing pattern could extend to the Exposure tab — DONE 2026-07-05**
+      (`#exposure`'s `renderRiskReadouts()` gained a "Structurally riskiest · household DTI +
+      unemployment" callout sourced from `PSTRESS_LIST[0]`, reusing the existing `ccRow()`/`TAG_E`
+      helpers and `province_stress_index.json` plumbing — no new data/pipeline. Headless-rendered,
+      no JS errors, gate 47/0).
 
 ## Queue — follow-ups noticed 2026-07-03 (5)
 - [x] **`pstress` lens has the same "province-resolution but only branch dots" issue as `hhdti` —
@@ -398,8 +398,35 @@
       "OAE Dec-2025 outlook" sentence (rice+rubber=2026 RISK; cassava/palm/chicken/durian firmer),
       the oldest un-re-verified citation in that file. *(LOW, S)*
 
+## Queue — follow-ups noticed 2026-07-05
+- [ ] **`renderHomeThesis()`'s board-thesis sentence still doesn't cite `PSTRESS_LIST[0]`** — the
+      2026-07-03 (4) follow-up flagged this for the Home hero sentence specifically (distinct from
+      the risk CARD, which already cites it); still open, small, same lazy-load chain. *(LOW, S)*
+- [ ] **`drawAmphoeChoropleth()`/`drawProvinceChoropleth()` near-duplicate functions** (flagged
+      2026-07-03 (6)/(9), still open) — a shared `drawChoropleth({features,keyFn,valFn,...})` helper
+      would remove the duplication before a 3rd choropleth resolution is added; this cycle's Exposure
+      change reused `ccRow()` rather than duplicating markup, which is the same instinct applied
+      preemptively — worth doing the equivalent consolidation on the choropleth pair. *(LOW, S, pure
+      refactor)*
+- [ ] **A parallel "structurally riskiest" callout for objective #2 (expansion)** — the Exposure tab
+      now surfaces the #1 objective-#1 (portfolio risk) household-leverage province; the Acquisition
+      tab (`#acq`) has the opportunity-score leaderboard but no equivalent single-line "where is the
+      clearest expansion signal right now" rank-1 callout mirroring this pattern (top
+      `opportunity_score.json` district, e.g.). Would balance both standing objectives with the same
+      lightweight UI idiom. *(LOW, S)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 — UX: structural household-leverage callout on the Exposure tab.** `renderRiskReadouts()`
+  in `platform/app.js` gained a "Structurally riskiest · household DTI + unemployment" block (rank-1
+  `PSTRESS_LIST[0]` from the already-MEASURED `province_stress_index.json`), inserted between "Most-
+  stressed provinces" and "Riskiest branches". Reused existing `ccRow()`/`TAG_E` helpers and the
+  existing `pstressHasData()`/`loadProvinceStress()` plumbing — no new data file, no new pipeline
+  script, purely additive. Closes the 2026-07-03 (4)/(9) follow-up asking for this pattern on
+  Exposure. Gate 47/0 (`validate_data.py` 421/421, unaffected — UI-only change). Headless-rendered
+  `index.html#exposure`: `data-errors="[]"`, block renders real data (อำนาจเจริญ, DTI 1.14×,
+  unemployment 2.8% NSO-measured, composite ▲98), no layout regression. Full writeup:
+  `docs/PROGRESS_LOG.md` (2026-07-05 entry).
 - **2026-07-04 (9) — AUDIT: backlog reconciliation, "Queue — UX / polish" had gone stale.** No code
   changed. Spot-checked the committee's quick-wins/bigger-bets list against the live app (headless
   renders of `#home`/`#map`/`#overview`/`#exposure`/`#acq` + `git log -S` on the claimed labels) and
