@@ -217,6 +217,22 @@ async function loadWorkforce(){
   return wfPromise;
 }
 
+/* ---------- per-branch AGRICULTURE profile (data/branch_agri.json) ----------
+   Crop exposure (SPAM) + REAL OAE farm-gate price stress + per-branch drought + farm income.
+   Shape: { meta:{crops:[{key,label}],crop_price_yoy,...}, branches:[{ha,sh,dom,crop_ha,price_yoy,
+   price_stress,rain_anom,drought_stress,intensity,agri_pressure,income_est}] } INDEX-ALIGNED. */
+let AGRIDATA=null, agriLoaded=false, agriPromise=null;
+async function loadAgri(){
+  if(agriPromise) return agriPromise;
+  agriLoaded=true;
+  agriPromise=(async()=>{
+    try{ const r=await fetch('data/branch_agri.json'); if(r.ok) AGRIDATA=await r.json(); }
+    catch(e){ AGRIDATA=null; }
+    return AGRIDATA;
+  })();
+  return agriPromise;
+}
+
 /* ---------- per-branch EMPLOYMENT & LABOUR (data/branch_labor.json) ----------
    Lazy-loads the MEASURED per-branch labour layer built by pipeline/build_branch_labor.py:
    top-3 catchment occupation buckets (Overture), district factory workers (DIW), province
@@ -3544,8 +3560,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3818,6 +3834,39 @@ function workforcePopupHTML(d,sec){
     + `<div class="sub" style="margin:2px 0 0;font-size:10px">~${(e.t||0).toLocaleString()} workers ≤10km by occupation (ESTIMATED — farmers from SPAM cropland × OAE area anchored to NSO; factory DIW; services Overture×headcount) ${TAG_E}</div>`
     + `</div>`;
 }
+// AGRICULTURE profile block — crop exposure + REAL farm-gate price stress + drought + income
+// (data/branch_agri.json). Only renders for branches with cropland in the catchment. The
+// price signal is measured Thai OAE farm-gate YoY; the rest is estimated. Serves objective #1.
+const AGRI_CROP_COL={rice:'#E6B450',cassava:'#C8433B',maize:'#7A4FE0',oilpalm:'#1C8C7D',sugarcane:'#8b90a7'};
+function agriPopupHTML(d,sec,r){
+  if(!AGRIDATA||!AGRIDATA.branches||!AGRIDATA.meta||!DATA) return '';
+  const i=idxOf(d); if(i<0) return '';
+  const e=AGRIDATA.branches[i]; if(!e||!(e.crop_ha>0)) return '';
+  const crops=AGRIDATA.meta.crops||[];
+  let rows=crops.map((c,j)=>({lab:c.label,col:AGRI_CROP_COL[c.key]||'#8b90a7',
+      ha:(e.ha&&e.ha[j])||0,sh:(e.sh&&e.sh[j])||0}))
+    .filter(rw=>rw.ha>0).sort((a,b)=>b.ha-a.ha);
+  if(!rows.length) return '';
+  const mx=rows[0].sh||1;
+  // colour the pressure/price stress
+  const pcol=e.agri_pressure>=40?'var(--agri)':(e.agri_pressure>=20?'var(--gold)':'#8b90a7');
+  const yoyStr=e.price_yoy!=null?(e.price_yoy>0?'+':'')+e.price_yoy+'%':'n/a';
+  const ycol=e.price_yoy!=null&&e.price_yoy<0?'var(--agri)':(e.price_yoy>0?'var(--merch)':'#8b90a7');
+  let html=sec('Agriculture — crop exposure & stress')
+    + `<div class="occ" style="margin-top:2px">`+rows.slice(0,5).map(rw=>{
+        const w=Math.max(4,Math.round(rw.sh/mx*100)), pct=Math.round(rw.sh*100);
+        return `<div class="pr" style="gap:8px"><span style="flex:1">${rw.lab}</span>`
+          +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${rw.col}"></i></span>`
+          +`<b class="mono" style="color:${rw.col};min-width:30px;text-align:right">${pct}%</b></div>`;
+      }).join('')+`</div>`;
+  html+=r('Farm-gate price YoY (crop mix)', `<b style="color:${ycol}">${yoyStr}</b> `+TAG_M, ycol);
+  if(e.rain_anom!=null) html+=r('Rainfall (3-mo, % of normal)', e.rain_anom+'% '+TAG_M,
+      e.rain_anom<90?'var(--gold)':'#8b90a7');
+  html+=r('Agri pressure (price + drought)', `<b style="color:${pcol}">${e.agri_pressure}</b> / 100 ${TAG_E}`, pcol);
+  if(e.income_est>0) html+=r('Est. gross farm income ≤10km', '฿'+(e.income_est/1e6).toFixed(1)+'M/yr '+TAG_E, 'var(--merch)');
+  html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">crop mix SPAM (modelled); price YoY MEASURED · OAE farm-gate; rainfall MEASURED · HDX; income + pressure ESTIMATED. Serves portfolio/PD risk.</div>`;
+  return html;
+}
 function occPopupHTML(d,sec){
   if(!OCCDATA||!OCCDATA.branches||!OCCDATA.buckets||!DATA) return '';
   const i=idxOf(d); if(i<0) return '';
@@ -4078,6 +4127,7 @@ function popupHTML(d){
     ${collatMixPopupHTML(d,sec,r)}
     ${hhriskPopupHTML(d,sec,r)}
     ${workforcePopupHTML(d,sec)}
+    ${agriPopupHTML(d,sec,r)}
     ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
