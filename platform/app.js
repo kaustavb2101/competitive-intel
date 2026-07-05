@@ -1028,8 +1028,72 @@ function renderMacroIndicators(){
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
+/* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
+   Leads the Overview with the ANSWER: current situation → factors hitting the economy & segments →
+   regional impact → recommendation by region → nationwide. A deterministic rollup of the SAME
+   per-branch recs shown on the map (not a fresh opinion). Fully null-guarded: absent file → the
+   #outlook block renders nothing and the rest of the Overview is unchanged. */
+let OUTLOOK=null, outlookDone=false, outlookPromise=null;
+async function loadOutlook(){
+  if(outlookPromise) return outlookPromise;
+  outlookPromise=fetch('data/regional_outlook.json').then(r=>r.ok?r.json():null)
+    .then(d=>{OUTLOOK=d;outlookDone=true;return d;}).catch(()=>{outlookDone=true;return null;});
+  return outlookPromise;
+}
+const OUT_TONE={good:'#1C8C7D',warn:'#C8433B',up:'#1C8C7D',down:'#C8433B',info:'#5B7CFA'};
+const REGION_ACCENT={Isan:'var(--agri)',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'var(--accent)'};
+function renderNationalOutlook(){
+  const host=$('#outlook'); if(!host||!OUTLOOK||!OUTLOOK.national) return;
+  const N=OUTLOOK.national;
+  const sec=(t,s)=>`<div style="margin:18px 0 6px;font:700 12px 'IBM Plex Sans Thai';color:#8b90a7;text-transform:uppercase;letter-spacing:.6px">${t}${s?` <span style="color:#5B6479;font-weight:500;text-transform:none;letter-spacing:0">— ${s}</span>`:''}</div>`;
+  // 1) SITUATION — national macro cards
+  const sit=(N.situation||[]).map(c=>{
+    const col=OUT_TONE[c.tone]||'#c7cedd';
+    return `<div class="mcard"><div class="k">${c.k}</div><div class="v" style="color:${col}">${c.v}</div><div class="n">${c.d||''}${c.src?` · ${c.src}`:''}</div></div>`;
+  }).join('');
+  // 2) FACTORS — commodity/price movers with which segment they hit
+  const fac=(N.factors||[]).map(f=>{
+    const col=OUT_TONE[f.tone]||'#c7cedd', s=(f.yoy>0?'+':'')+f.yoy+'%';
+    return `<div style="display:flex;gap:8px;align-items:baseline;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+      +`<b class="mono" style="color:${col};min-width:54px">${s}</b>`
+      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd"><b>${f.lab}</b> <span class="sub">(${f.seg}${f.reg?' · '+f.reg:''})</span> — ${f.hits}. <span class="sub">${f.note||''}</span></span></div>`;
+  }).join('');
+  // ranked action list (shared by national + regional)
+  const actions=(list)=>list.map(a=>{
+    const col=OUT_TONE[a.tone]||'#8b90a7';
+    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+      +`<span style="font-size:15px;line-height:1.2">${a.i}</span>`
+      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.4">${a.t}</span></div>`;
+  }).join('');
+  // 4) REGIONAL IMPACT — one card per region: situation + top-2 recs + top provinces
+  const regs=(OUTLOOK.regions||[]).map(r=>{
+    const ac=REGION_ACCENT[r.r]||'var(--accent)';
+    const stressed=(r.top_stressed||[]).slice(0,3).map(s=>`${s.v} <span class="mono" style="color:var(--agri)">${s.score}</span>`).join(' · ');
+    const oppy=(r.top_opportunity||[]).slice(0,3).map(o=>`${o.v} <span class="mono" style="color:var(--gold)">${o.opp}</span>`).join(' · ');
+    return `<div style="border:1px solid #ffffff14;border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:rgba(255,255,255,.02)">`
+      +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:#e7ebf5">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
+      +`<div class="sub" style="margin:5px 0 8px;color:#98a0b5;line-height:1.4">${r.situation}</div>`
+      +actions((r.recommendation||[]).slice(0,3))
+      +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:#8b90a7">Most agri-stressed:</b> ${stressed}</div>`:'')
+      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:#8b90a7">Best white-space:</b> ${oppy}</div>`:'')
+      +`</div>`;
+  }).join('');
+  host.innerHTML=`<h2>National outlook — the answer up top</h2>`
+    +`<div class="insight" style="border-left:3px solid var(--accent)"><b>Bottom line:</b> ${N.headline}</div>`
+    +sec('Current situation','national macro backdrop')
+    +`<div class="grid macro">${sit}</div>`
+    +sec('Factors hitting the economy & segments','World Bank price direction + BIS rates — |YoY| ≥ 8%')
+    +`<div>${fac}</div>`
+    +sec('Nationwide recommendation','the per-branch recs, rolled up · ranked by branch count')
+    +`<div>${actions(N.recommendation||[])}</div>`
+    +sec('Regional impact & recommendation','situation → action, by region')
+    +`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">${regs}</div>`
+    +`<p class="lead" style="margin-top:12px">Every number here is a rollup of the per-branch recommendation layer (click any branch on the National map to see its own recs + evidence). Deterministic — no model in the loop. Inputs are measured/estimated as labelled in their source layers.</p>`;
+}
+
 /* ---------- overview ---------- */
 function renderOverview(){
+  loadOutlook().then(renderNationalOutlook);
   $('#macro').innerHTML = META.macro.map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);

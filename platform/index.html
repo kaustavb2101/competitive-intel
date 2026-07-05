@@ -142,6 +142,11 @@
 
   <!-- OVERVIEW -->
   <section class="view" id="v-overview">
+    <!-- National outlook narrative (data/regional_outlook.json) — situation → factors → regional
+         impact → recommendation by region → nationwide. Rendered by renderNationalOutlook();
+         null-safe: absent file → the block stays empty and the rest of the Overview reads as before. -->
+    <div id="outlook"></div>
+
     <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
     <div class="dash2">
       <div class="dash2-side">

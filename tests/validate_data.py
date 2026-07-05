@@ -3827,6 +3827,7 @@ _FINGERPRINTED_LAYERS = (
     "branch_agri.json",          # build_branch_agri.py
     "branch_vehicles.json",      # build_branch_vehicles.py
     "branch_recommendations.json",  # build_branch_recommendations.py
+    "regional_outlook.json",     # build_regional_outlook.py (rollup — fingerprint tracks the branch base)
     "branch_labor.json",         # build_branch_labor.py
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
