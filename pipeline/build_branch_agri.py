@@ -48,6 +48,7 @@ BRANCHES = os.path.join(ROOT, "platform", "data", "branches.json")
 MASTER = os.path.join(ROOT, "source-data", "branches_final.json")
 SPAM = os.path.join(ROOT, "source-data", "spam2010_th_cropgrid.json")
 CROP_PRICES = os.path.join(ROOT, "source-data", "crop_prices.json")
+NABC_PRICES = os.path.join(ROOT, "source-data", "nabc_prices.json")   # LIVE prices (preferred)
 OUT = os.path.join(ROOT, "platform", "data", "branch_agri.json")
 
 RADIUS_KM = 10.0
@@ -86,15 +87,30 @@ def _load(p):
 
 
 def crop_price_yoy():
-    """{crop_key: median OAE farm-gate YoY %} from crop_prices.json — REAL Thai farm-gate, refreshes
-    when the pull refreshes. None for a crop with no priced series."""
+    """{crop_key: YoY %} + {crop_key: source}. PREFERS LIVE NABC daily prices (nabc_prices.json,
+    agriapi.nabc.go.th — cloud-refreshable) per crop; falls back to the OAE farm-gate snapshot
+    (crop_prices.json) for crops NABC doesn't carry (e.g. sugarcane). None where neither has it."""
+    # OAE snapshot (median YoY per crop) — the fallback.
     cp = _load(CROP_PRICES).get("commodities", {})
-    out = {}
+    out, src = {}, {}
     for c in CROPS:
         ys = [v.get("yoy") for k, v in cp.items()
               if c["oae"] in k and isinstance(v.get("yoy"), (int, float))]
-        out[c["key"]] = round(statistics.median(ys), 1) if ys else None
-    return out
+        if ys:
+            out[c["key"]] = round(statistics.median(ys), 1)
+            src[c["key"]] = "OAE farm-gate snapshot"
+        else:
+            out[c["key"]] = None
+            src[c["key"]] = None
+    # NABC live overlay (wins where present).
+    if os.path.exists(NABC_PRICES):
+        nabc = _load(NABC_PRICES).get("crop_yoy", {})
+        for c in CROPS:
+            v = nabc.get(c["key"])
+            if isinstance(v, (int, float)):
+                out[c["key"]] = round(v, 1)
+                src[c["key"]] = "NABC live daily"
+    return out, src
 
 
 def spam_crop_cells():
@@ -121,7 +137,7 @@ def build():
     for (lng, lat, ha) in cells:
         grid.setdefault(cell_key(lng, lat), []).append((lng, lat, ha))
 
-    yoy = crop_price_yoy()
+    yoy, yoy_src = crop_price_yoy()
     nkey = len(CROPS)
 
     # first pass: per-branch cropland ha vector, to set the intensity normaliser (P90 total ha)
@@ -189,11 +205,13 @@ def build():
             "radius_km": RADIUS_KM,
             "crops": [{"key": c["key"], "label": c["label"]} for c in CROPS],
             "crop_price_yoy": yoy,
-            "crop_price_source": "OAE ราคาที่เกษตรกรขายได้ (crop_prices.json) — REAL Thai farm-gate "
-                                 "price YoY, median per crop. MEASURED (Thai), not the global proxy.",
+            "crop_price_yoy_source": yoy_src,
+            "crop_price_source": "PREFERS NABC live daily prices (agriapi.nabc.go.th, cloud-refreshable "
+                                 "MEASURED market prices); falls back to the OAE farm-gate snapshot "
+                                 "(crop_prices.json) per crop. Per-crop source in crop_price_yoy_source.",
             "provenance": {
                 "crop_mix": "ESTIMATED — SPAM 2010 modelled 5-arcmin cropland, summed in the 10km perimeter.",
-                "price_yoy": "MEASURED — OAE farm-gate price YoY, crop-mix-weighted per branch.",
+                "price_yoy": "MEASURED — NABC live daily / OAE farm-gate price YoY, crop-mix-weighted per branch.",
                 "rain_anom": "MEASURED — HDX 3-month rainfall anomaly (% of normal), per branch.",
                 "income_est": "ESTIMATED — Σ crop ha × Thai national-average yield×price per rai (stated constants).",
                 "agri_pressure": "ESTIMATED composite — 0.6·price_stress + 0.4·drought, diluted by cropland intensity.",
