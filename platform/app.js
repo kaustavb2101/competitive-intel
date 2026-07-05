@@ -1040,30 +1040,31 @@ async function loadOutlook(){
     .then(d=>{OUTLOOK=d;outlookDone=true;return d;}).catch(()=>{outlookDone=true;return null;});
   return outlookPromise;
 }
-const OUT_TONE={good:'#1C8C7D',warn:'#C8433B',up:'#1C8C7D',down:'#C8433B',info:'#5B7CFA'};
-const REGION_ACCENT={Isan:'var(--agri)',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'var(--accent)'};
+// tone → theme-aware colour (CSS vars flip with light/dark; no hardcoded greys)
+const OUT_TONE={good:'var(--merch)',warn:'var(--agri)',up:'var(--merch)',down:'var(--agri)',info:'var(--accent)'};
+const REGION_ACCENT={Isan:'var(--agri)',North:'var(--opp)',South:'var(--gold)',East:'var(--accent)','Central&BKK':'var(--accent)'};
 function renderNationalOutlook(){
   const host=$('#outlook'); if(!host||!OUTLOOK||!OUTLOOK.national) return;
   const N=OUTLOOK.national;
-  const sec=(t,s)=>`<div style="margin:18px 0 6px;font:700 12px 'IBM Plex Sans Thai';color:#8b90a7;text-transform:uppercase;letter-spacing:.6px">${t}${s?` <span style="color:#5B6479;font-weight:500;text-transform:none;letter-spacing:0">— ${s}</span>`:''}</div>`;
+  const sec=(t,s)=>`<div style="margin:18px 0 6px;font:700 12px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.6px">${t}${s?` <span style="color:var(--dim);font-weight:500;text-transform:none;letter-spacing:0">— ${s}</span>`:''}</div>`;
   // 1) SITUATION — national macro cards
   const sit=(N.situation||[]).map(c=>{
-    const col=OUT_TONE[c.tone]||'#c7cedd';
+    const col=OUT_TONE[c.tone]||'var(--txt)';
     return `<div class="mcard"><div class="k">${c.k}</div><div class="v" style="color:${col}">${c.v}</div><div class="n">${c.d||''}${c.src?` · ${c.src}`:''}</div></div>`;
   }).join('');
   // 2) FACTORS — commodity/price movers with which segment they hit
   const fac=(N.factors||[]).map(f=>{
-    const col=OUT_TONE[f.tone]||'#c7cedd', s=(f.yoy>0?'+':'')+f.yoy+'%';
-    return `<div style="display:flex;gap:8px;align-items:baseline;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+    const col=OUT_TONE[f.tone]||'var(--txt)', s=(f.yoy>0?'+':'')+f.yoy+'%';
+    return `<div style="display:flex;gap:8px;align-items:baseline;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:var(--raised);border-radius:0 6px 6px 0">`
       +`<b class="mono" style="color:${col};min-width:54px">${s}</b>`
-      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd"><b>${f.lab}</b> <span class="sub">(${f.seg}${f.reg?' · '+f.reg:''})</span> — ${f.hits}. <span class="sub">${f.note||''}</span></span></div>`;
+      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:var(--txt)"><b>${f.lab}</b> <span class="sub">(${f.seg}${f.reg?' · '+f.reg:''})</span> — ${f.hits}. <span class="sub">${f.note||''}</span></span></div>`;
   }).join('');
   // ranked action list (shared by national + regional)
   const actions=(list)=>list.map(a=>{
-    const col=OUT_TONE[a.tone]||'#8b90a7';
-    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+    const col=OUT_TONE[a.tone]||'var(--mid)';
+    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 9px;margin:0 0 4px;border-left:3px solid ${col};background:var(--raised);border-radius:0 6px 6px 0">`
       +`<span style="font-size:15px;line-height:1.2">${a.i}</span>`
-      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.4">${a.t}</span></div>`;
+      +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:var(--txt);line-height:1.4">${a.t}</span></div>`;
   }).join('');
   // 4) REGIONAL IMPACT — one card per region: situation + top recs + top provinces + full province drill
   const regs=(OUTLOOK.regions||[]).map(r=>{
@@ -1072,11 +1073,11 @@ function renderNationalOutlook(){
     const oppy=(r.top_opportunity||[]).slice(0,3).map(o=>`${o.v} <span class="mono" style="color:var(--gold)">${o.opp}</span>`).join(' · ');
     // expandable province drill — every province in the region, biggest book first
     const provRows=(r.provinces||[]).map(p=>{
-      const a=p.action, col=a?(OUT_TONE[a.tone]||'#8b90a7'):'#5B6479';
+      const a=p.action, col=a?(OUT_TONE[a.tone]||'var(--mid)'):'var(--dim)';
       const chip=a?`<span style="color:${col};white-space:nowrap">${a.i} ${a.label}</span>`:'<span class="sub">—</span>';
-      const str=p.stress!=null?`<span class="mono" style="color:${p.stress>=25?'var(--agri)':'#8b90a7'}">${p.stress}</span>`:'<span class="sub">—</span>';
-      const opp=p.opp!=null?`<span class="mono" style="color:${p.opp>=1.5?'var(--gold)':'#8b90a7'}">${p.opp}</span>`:'<span class="sub">—</span>';
-      return `<tr><td style="padding:3px 6px"><b style="font-weight:500;color:#c7cedd">${p.v}</b></td>`
+      const str=p.stress!=null?`<span class="mono" style="color:${p.stress>=25?'var(--agri)':'var(--mid)'}">${p.stress}</span>`:'<span class="sub">—</span>';
+      const opp=p.opp!=null?`<span class="mono" style="color:${p.opp>=1.5?'var(--gold)':'var(--mid)'}">${p.opp}</span>`:'<span class="sub">—</span>';
+      return `<tr><td style="padding:3px 6px"><b style="font-weight:500;color:var(--txt)">${p.v}</b></td>`
         +`<td class="mono sub" style="padding:3px 6px;text-align:right">${p.n}</td>`
         +`<td style="padding:3px 6px;font:500 11px 'IBM Plex Sans Thai'">${chip}</td>`
         +`<td style="padding:3px 6px;text-align:right" title="avg agri-pressure">${str}</td>`
@@ -1084,14 +1085,14 @@ function renderNationalOutlook(){
     }).join('');
     const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces — drill down</summary>`
       +`<div style="overflow-x:auto;margin-top:6px"><table style="width:100%;border-collapse:collapse;font-size:11px">`
-      +`<tr style="color:#5B6479;font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg opportunity">Opp</td></tr>`
+      +`<tr style="color:var(--dim);font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg opportunity">Opp</td></tr>`
       +provRows+`</table></div></details>`:'';
-    return `<div style="border:1px solid #ffffff14;border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:rgba(255,255,255,.02)">`
-      +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:#e7ebf5">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
-      +`<div class="sub" style="margin:5px 0 8px;color:#98a0b5;line-height:1.4">${r.situation}</div>`
+    return `<div style="border:1px solid var(--line);border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:var(--panel)">`
+      +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:var(--hi)">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
+      +`<div class="sub" style="margin:5px 0 8px;color:var(--mid);line-height:1.4">${r.situation}</div>`
       +actions((r.recommendation||[]).slice(0,3))
-      +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:#8b90a7">Most agri-stressed:</b> ${stressed}</div>`:'')
-      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:#8b90a7">Best white-space:</b> ${oppy}</div>`:'')
+      +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:var(--mid)">Most agri-stressed:</b> ${stressed}</div>`:'')
+      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:var(--mid)">Best white-space:</b> ${oppy}</div>`:'')
       +drill
       +`</div>`;
   }).join('');
