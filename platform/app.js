@@ -233,6 +233,22 @@ async function loadAgri(){
   return agriPromise;
 }
 
+/* ---------- per-branch VEHICLE COLLATERAL (data/branch_vehicles.json) ----------
+   DLT province vehicle stock allocated to each 10km catchment: est fleet by type + collateral
+   mix + pickup share + a title-loan-able collateral score. Shape: { meta:{types,labels,...},
+   branches:[{fleet:{car,pickup,moto,ev},mix,dom,pickup_share,collateral_score,n_est}] } aligned. */
+let VEHDATA=null, vehLoaded=false, vehPromise=null;
+async function loadVehicles(){
+  if(vehPromise) return vehPromise;
+  vehLoaded=true;
+  vehPromise=(async()=>{
+    try{ const r=await fetch('data/branch_vehicles.json'); if(r.ok) VEHDATA=await r.json(); }
+    catch(e){ VEHDATA=null; }
+    return VEHDATA;
+  })();
+  return vehPromise;
+}
+
 /* ---------- per-branch EMPLOYMENT & LABOUR (data/branch_labor.json) ----------
    Lazy-loads the MEASURED per-branch labour layer built by pipeline/build_branch_labor.py:
    top-3 catchment occupation buckets (Overture), district factory workers (DIW), province
@@ -3560,8 +3576,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -3867,6 +3883,30 @@ function agriPopupHTML(d,sec,r){
   html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">crop mix SPAM (modelled); price YoY MEASURED · OAE farm-gate; rainfall MEASURED · HDX; income + pressure ESTIMATED. Serves portfolio/PD risk.</div>`;
   return html;
 }
+// VEHICLE COLLATERAL block — AutoX's title-loan asset base (data/branch_vehicles.json). Estimated
+// fleet by type in the 10km catchment + pickup share + a collateral-density score. Mix MEASURED (DLT
+// province stock); catchment allocation ESTIMATED (population-weighted).
+const VEH_TYPE_COL={pickup:'#E6B450',car:'#5B7CFA',moto:'#1C8C7D',ev:'#7A4FE0'};
+function vehiclePopupHTML(d,sec,r){
+  if(!VEHDATA||!VEHDATA.branches||!VEHDATA.meta||!DATA) return '';
+  const i=idxOf(d); if(i<0) return '';
+  const e=VEHDATA.branches[i]; if(!e||!(e.n_est>0)) return '';
+  const L=VEHDATA.meta.labels||{};
+  const order=['pickup','car','moto','ev'].filter(t=>(e.fleet&&e.fleet[t])>0);
+  const mx=Math.max(...order.map(t=>e.fleet[t]))||1;
+  const cscore=e.collateral_score, ccol=cscore>=60?'var(--gold)':(cscore>=35?'#5B7CFA':'#8b90a7');
+  let html=sec('Vehicle collateral (≤10km · title-loan base)')
+    + `<div class="occ" style="margin-top:2px">`+order.map(t=>{
+        const w=Math.max(4,Math.round(e.fleet[t]/mx*100));
+        return `<div class="pr" style="gap:8px"><span style="flex:1">${L[t]||t}</span>`
+          +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${VEH_TYPE_COL[t]||'#8b90a7'}"></i></span>`
+          +`<b class="mono" style="color:${VEH_TYPE_COL[t]||'#8b90a7'};min-width:52px;text-align:right">${e.fleet[t].toLocaleString()}</b></div>`;
+      }).join('')+`</div>`;
+  html+=r('Pickup share (prime collateral)', `<b style="color:var(--gold)">${e.pickup_share}%</b> `+TAG_M, 'var(--gold)');
+  html+=r('Collateral density score', `<b style="color:${ccol}">${cscore}</b> / 100 ${TAG_E}`, ccol);
+  html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">~${e.n_est.toLocaleString()} vehicles est. in the catchment. Mix MEASURED · DLT province stock; allocation ESTIMATED (population). Brands · trends · trucks · agri-vehicles need the DLT deep pull.</div>`;
+  return html;
+}
 function occPopupHTML(d,sec){
   if(!OCCDATA||!OCCDATA.branches||!OCCDATA.buckets||!DATA) return '';
   const i=idxOf(d); if(i<0) return '';
@@ -4128,6 +4168,7 @@ function popupHTML(d){
     ${hhriskPopupHTML(d,sec,r)}
     ${workforcePopupHTML(d,sec)}
     ${agriPopupHTML(d,sec,r)}
+    ${vehiclePopupHTML(d,sec,r)}
     ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}
     ${occriskPopupHTML(d,sec,r)}
