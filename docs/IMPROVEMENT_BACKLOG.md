@@ -474,21 +474,41 @@
       finds farm-gate PRICE series, not qualitative outlook notes. If revisited, budget for finding the
       actual news URL first (may need a targeted web search, not a catalog query) before attempting any
       text extraction. *(LOW, M — harder than previously scoped, not a quick win)*
-- [ ] **`pipeline/pull_oae_prices.py` (real OAE farm-gate price puller, `data-oae-prices.yml` weekly
-      workflow) has never actually landed `source-data/oae_farmgate_prices.json`** — confirmed
-      2026-07-05 (5): the file doesn't exist yet, so `build_crop_stress.py` is still 100% on the World
-      Bank GLOBAL price proxy for every crop despite the MEASURED Thai farm-gate puller having shipped
-      (commit `56c2e93`). Also confirmed this cycle that `catalog.oae.go.th` IS reachable from the
-      improvement-loop sandbox too (not just GH Actions runners) — worth checking whether the weekly
-      cron has actually fired yet / why no PR has appeared, since this is the single highest-value
-      pending ENRICH for objective #1 (real Thai prices replacing a global proxy) and the infra is
-      already built. Do NOT manually run the puller from the loop and commit its output directly to
-      `claude/new-session-wto26j` — it's owned by `data-oae-prices.yml`'s dedicated data-branch+PR flow
-      specifically so it doesn't race concurrent loop sessions; if it looks stuck, flag it rather than
-      bypassing the workflow. *(MED, S — investigate why the owned workflow hasn't produced output yet)*
+- [ ] **`pipeline/pull_oae_prices.py` — ROOT CAUSE FOUND 2026-07-05 (4), re-scope before touching
+      again.** It's not stuck, throttled, or silently failing: `data-oae-prices.yml` (and every other
+      `schedule:`-triggered workflow in this repo — `data-fuel-prices.yml`, `data-nabc-prices.yml`,
+      `data-macro.yml`, `site-health.yml`) **has never run once**, because none of them are merged to
+      `master` yet. Confirmed via the `github` MCP server: `list_workflows` shows only `QA` registered
+      for this repo (it self-registers via its `push:`/`pull_request:` triggers, which don't require
+      the default branch); `list_workflow_runs(data-oae-prices.yml)` returns a plain 404. `git fetch
+      origin master && git ls-tree origin/master` confirms `master` still only has the pre-import
+      single-page site (`index.html`, `vercel.json`, `.env`) — PR #1 ("Import platform…", open since
+      2026-06-28) has never merged. GitHub Actions only discovers `schedule:` workflows from files
+      present on the default branch, so nothing here can fire until that PR merges. The two "daily"
+      pulls that DO exist today (`fuel_prices.json`, `nabc_prices.json`) were each landed by a single
+      Claude session committing directly, not by their workflow executing — real data, but a **frozen
+      one-time snapshot**, not an active recurring refresh; don't treat their `pulled:` date as
+      "current" without checking. **Do NOT keep re-diagnosing the puller from the loop** — the fix is
+      entirely outside this sandbox's scope (merging PR #1 is Kaustav's call, flagged via
+      `PushNotification` this cycle); once merged, re-check `list_workflows`/`list_workflow_runs` to
+      confirm the crons actually start firing, then this item can close. Full writeup:
+      `docs/DATA_REFRESH_LOG.md` (2026-07-05 (4)). *(BLOCKED on a human merge decision, not sandbox-
+      solvable — do not pick this up again until PR #1's status changes)*
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 (4) — AUDIT: root-caused why the OAE puller (and every scheduled data workflow) has
+  never fired.** Not a bug in the puller — `PR #1` (importing this whole platform on top of the old
+  single-page site) has been open since 2026-06-28 and never merged to `master`, so `master` still
+  has no `pipeline/`/`platform/`/`.github/workflows/` at all. GitHub Actions only discovers
+  `schedule:`-triggered workflows from the default branch; confirmed via the `github` MCP
+  (`list_workflows` shows only `QA` registered; `list_workflow_runs(data-oae-prices.yml)` → 404).
+  Every `schedule:` workflow in this repo (`data-fuel-prices.yml`, `data-nabc-prices.yml`,
+  `data-macro.yml`, `data-oae-prices.yml`, `site-health.yml`) has therefore never executed once; the
+  two "daily" pulls that exist (`fuel_prices.json`, `nabc_prices.json`) were one-off manual commits,
+  not live recurring refreshes. Docs-only fix (zero data/pipeline changed); flagged to Kaustav via
+  push notification since merging PR #1 is a call only he can make. Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-05 (4)).
 - **2026-07-05 (3) — ENRICH: live Bangchak fuel prices wired into the Home macro card.** New
   `pipeline/build_fuel_prices.py` projects the already-committed `source-data/fuel_prices.json`
   (real Bangchak retail pull, unwired since commit `ea93b96` this morning) verbatim into

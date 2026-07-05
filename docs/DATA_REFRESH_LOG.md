@@ -4,6 +4,73 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-05 (4) — AUDIT: found the real reason the OAE puller (and every other scheduled data workflow) has never fired — none of them are merged to `master`
+
+**Task type:** AUDIT (repo/CI integrity, not a data value change — zero files under `platform/data`
+or `source-data` touched). `/workspace/watcher` [TMLI blueprint] was not present this cycle. A
+RE-DERIVE pass first confirmed the working tree needed no fix: `bash tests/run.sh check` on a clean
+pull of `claude/new-session-wto26j` was already green (52 passed, 0 failed, `validate_data.py`
+429/429).
+
+**What was investigated.** The 2026-07-05 (4) backlog entry flagged the OAE farm-gate price puller
+(`pipeline/pull_oae_prices.py`, weekly `data-oae-prices.yml`) as the single highest-value pending
+ENRICH — the infra shipped in commit `56c2e93` but `source-data/oae_farmgate_prices.json` still
+doesn't exist, and it asked "why hasn't the weekly cron fired yet." Checked GitHub Actions directly
+(MCP `actions_list`/`list_pull_requests`) instead of guessing:
+
+- `mcp__github__actions_list(list_workflow_runs, data-oae-prices.yml)` → **404 Not Found** — GitHub
+  doesn't even recognize this workflow file as a registered workflow.
+- `mcp__github__actions_list(list_workflows)` → only **one** workflow is registered for this whole
+  repo: `QA` (`.github/workflows/qa.yml`). None of the other 7 workflow files in the repo
+  (`data-fuel-prices.yml`, `data-macro.yml`, `data-nabc-prices.yml`, `data-oae-prices.yml`,
+  `data-overture.yml`, `data-tiles.yml`, `site-health.yml`) are registered at all.
+- Root cause: **PR #1 ("Import platform + one-command data refresh…"), open since 2026-06-28, has
+  never been merged into `master`.** `git fetch origin master` + `git ls-tree origin/master` shows
+  `master` still only contains the pre-import single-page site (`index.html`, `vercel.json`, `.env`)
+  — no `platform/`, `pipeline/`, `.github/workflows/`, nothing. GitHub Actions only discovers
+  `schedule:`-triggered and (per this repo's evidence) `workflow_dispatch:`-only workflows from the
+  files present on the **default branch**; `QA` is the sole exception because it also triggers on
+  `push: branches: ["**"]`, which self-registers the workflow the first time it runs on *any* branch
+  (confirmed via `list_workflow_runs(qa.yml)`, which returned a long history of runs on this feature
+  branch).
+- Practical effect: **every one of the 5 `schedule:`-cron workflows has never executed, not once** —
+  `data-fuel-prices.yml` (claimed daily), `data-nabc-prices.yml` (claimed daily), `data-macro.yml`
+  (weekly), `data-oae-prices.yml` (weekly), `site-health.yml` (daily). Cross-checked the two "daily"
+  claims against `git log`: `source-data/fuel_prices.json` (commit `ea93b96`) and
+  `source-data/nabc_prices.json` (commit `d132ea8`) were each landed by a **single Claude Code
+  session committing directly to this branch**, not by the workflow executing on a schedule — the
+  data in both files is real (Bangchak/NABC public APIs, genuinely pulled that one time, correctly
+  labelled MEASURED — no fabrication concern), but the docs/commit messages describing them as "daily
+  workflow refreshes it" are **misleadingly implying an active recurring refresh that has never
+  actually happened even once**. Both files are frozen at their one-time pull date until either (a)
+  PR #1 merges to `master`, or (b) someone manually re-dispatches/re-runs the puller.
+
+**Why this matters for the no-fabrication mandate:** nothing here is fabricated data, but it is a
+**provenance-freshness illusion** — a reader (or a future cycle) could reasonably assume
+`fuel_prices.json`/`nabc_prices.json` are auto-refreshing daily and treat a week-old snapshot as
+current, or keep re-investigating "why hasn't the OAE cron fired" as if it were a transient CI bug
+(exactly what the 2026-07-05 (4) backlog entry was doing) when the real cause is a one-line repo fact:
+**the branch carrying all this pipeline/workflow code has simply never been merged.** No amount of
+loop cycles re-running or re-diagnosing the puller from `claude/new-session-wto26j` will fix this —
+merging is the only fix, and it's a repo-owner decision (merging PR #1), not something this loop
+should do unilaterally.
+
+**Fix applied (docs only, zero data/pipeline code changed):**
+- Re-scoped the 2026-07-05 (4) OAE backlog entry below: the puller isn't stuck or broken — it has
+  simply never had a chance to run, and neither has anything else with a `schedule:` trigger.
+- This entry documents the root cause plainly so no future cycle re-investigates the OAE puller (or
+  assumes fuel/NABC prices are auto-refreshing) without first checking whether PR #1 has merged.
+
+**Verification:** no data or pipeline file changed this cycle — `bash tests/run.sh check` unaffected
+(52 passed, 0 failed, `validate_data.py` 429/429, identical before/after since this is a docs-only
+commit).
+
+**Source:** GitHub Actions API via the `github` MCP server (`actions_list`, `list_pull_requests`) +
+`git fetch origin master` / `git ls-tree origin/master` (this repository's own ref state) — no
+external data pulled, no repo-state assumption taken on faith.
+
+---
+
 ## 2026-07-05 (3) — ENRICH: live Bangchak fuel prices (sitting unwired since this morning's pull) wired into the Home macro card
 
 **Task type:** ENRICH. `/workspace/watcher` [TMLI blueprint] was not present this cycle. `bash
