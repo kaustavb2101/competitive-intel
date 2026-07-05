@@ -4170,11 +4170,24 @@ function recsPopupHTML(d){
     + `<div style="font:700 11px 'IBM Plex Sans Thai';color:#8b90a7;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Recommendations</div>`
     + e.recs.map(rc=>{
         const c=REC_TONE[rc.tone]||'#8b90a7';
-        return `<div style="display:flex;gap:7px;align-items:flex-start;padding:6px 8px;margin-bottom:4px;border-left:3px solid ${c};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+        // evidence chips: the exact source · value that triggered this rec (auditable, no model in the loop)
+        const ev=(rc.w||[]).map(wv=>{
+          const meas=wv.m==='measured';
+          const mc=meas?'#1C8C7D':'#8b7a3a';
+          const tag=meas?'measured':'est';
+          return `<span style="display:inline-flex;gap:4px;align-items:baseline;padding:2px 6px;margin:2px 3px 0 0;border-radius:5px;background:rgba(255,255,255,.04);border:1px solid ${mc}55;font:500 10px 'IBM Plex Mono'">`
+            +`<span style="color:#8b90a7">${wv.s}</span>`
+            +`<b style="color:${c}">${wv.v}</b>`
+            +`<span style="color:${mc};font-size:8px;text-transform:uppercase;letter-spacing:.3px">${tag}</span></span>`;
+        }).join('');
+        return `<div style="padding:6px 8px;margin-bottom:5px;border-left:3px solid ${c};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+          +`<div style="display:flex;gap:7px;align-items:flex-start">`
           +`<span style="font-size:14px;line-height:1.2">${rc.i||'•'}</span>`
-          +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.35">${rc.t}</span></div>`;
+          +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.35">${rc.t}</span></div>`
+          +(ev?`<div style="margin-top:5px;padding-left:21px">${ev}</div>`:'')
+          +`</div>`;
       }).join('')
-    + `<div class="sub" style="font-size:10px;color:#5B6479">ESTIMATED synthesis of the branch's signals — a triage prompt, not a credit decision.</div>`
+    + `<div class="sub" style="font-size:10px;color:#5B6479">Deterministic synthesis of the branch's own signals — each chip is the source layer · value that triggered the rec (no model in the loop). A triage prompt, not a credit decision.</div>`
     + `</div>`;
 }
 function popupHTML(d){

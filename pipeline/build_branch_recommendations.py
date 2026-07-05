@@ -65,13 +65,16 @@ def build():
     hh = macro.get("household_debt_gdp") or {}
     macro_rec = None
     if hh.get("yoy_change") is not None:
+        macro_why = [{"s": "Household debt-to-GDP · BIS", "v": "%s%%" % hh.get("value"), "m": "measured"},
+                     {"s": "YoY change · BIS", "v": "%+g pp" % hh["yoy_change"], "m": "measured"}]
         if hh["yoy_change"] < 0:
             macro_rec = {"k": "macro", "i": "🏦", "tone": "good", "p": 20,
                          "t": "Supportive backdrop: national household debt %s%% and falling (deleveraging)."
-                              % hh.get("value")}
+                              % hh.get("value"), "w": macro_why}
         elif hh["yoy_change"] > 0:
             macro_rec = {"k": "macro", "i": "🏦", "tone": "warn", "p": 30,
-                         "t": "Caution: national household leverage rising (%s%% of GDP)." % hh.get("value")}
+                         "t": "Caution: national household leverage rising (%s%% of GDP)." % hh.get("value"),
+                         "w": macro_why}
 
     out = []
     for i, b in enumerate(items):
@@ -86,36 +89,55 @@ def build():
         # 1) ACQUISITION — high opportunity + thin competition
         if isinstance(opp, (int, float)) and opp >= opp_hi and n5 <= 8:
             recs.append({"k": "acquire", "i": "📈", "tone": "good", "p": 90,
-                         "t": "Expand here: strong white-space (opportunity %d) with only %d rival(s) ≤5 km — prioritise acquisition." % (round(opp), n5)})
+                         "t": "Expand here: strong white-space (opportunity %d) with only %d rival(s) ≤5 km — prioritise acquisition." % (round(opp), n5),
+                         "w": [{"s": "Opportunity score · branches.json", "v": "%d (≥ p70 = %d)" % (round(opp), round(opp_hi)), "m": "est"},
+                               {"s": "Rival branches ≤5 km · rival_pressure.json", "v": "%d (≤8)" % n5, "m": "measured"}]})
         # 2) DEFEND — besieged by rivals
         if n2 >= 3:
             recs.append({"k": "defend", "i": "⚔️", "tone": "warn", "p": 85,
-                         "t": "Defend the book: %d competitor branch(es) ≤2 km — differentiate on service/turnaround, watch churn." % n2})
+                         "t": "Defend the book: %d competitor branch(es) ≤2 km — differentiate on service/turnaround, watch churn." % n2,
+                         "w": [{"s": "Competitor branches ≤2 km · rival_pressure.json", "v": "%d (≥3)" % n2, "m": "measured"}]})
         # 3) AGRI — pressure vs tailwind
         ap = a.get("agri_pressure"); pyoy = a.get("price_yoy")
+        pyoy_src = a.get("price_src") or "NABC/OAE"
         dom_crop = agri_crops[a["dom"]]["label"] if (a.get("dom", -1) >= 0 and a["dom"] < len(agri_crops)) else None
         if a.get("rubber_share", 0) >= 0.5:
             dom_crop = "rubber"
         if isinstance(ap, (int, float)) and ap >= 25:
+            agri_why = [{"s": "Agri-pressure index · branch_agri.json", "v": "%s (≥25)" % ap, "m": "est"}]
+            if pyoy is not None:
+                agri_why.append({"s": "%s price YoY · %s" % (dom_crop or "crop", pyoy_src), "v": "%s%%" % pyoy, "m": "measured"})
+            if (a.get("drought_stress") or 0) > 40:
+                agri_why.append({"s": "Drought stress · branch_agri.json", "v": "%s (>40)" % a.get("drought_stress"), "m": "est"})
             recs.append({"k": "agri", "i": "🌾", "tone": "warn", "p": 80,
                          "t": "Agri stress: %s catchment under pressure (%s, price %s%%%s) — tighten agri exposure, monitor collections."
                               % (dom_crop or "farming", ap, pyoy if pyoy is not None else "n/a",
-                                 " + dry" if (a.get("drought_stress") or 0) > 40 else "")})
+                                 " + dry" if (a.get("drought_stress") or 0) > 40 else ""), "w": agri_why})
         elif isinstance(pyoy, (int, float)) and pyoy >= 20 and (a.get("intensity") or 0) >= 0.3:
             recs.append({"k": "agri", "i": "🌾", "tone": "good", "p": 60,
-                         "t": "Agri tailwind: %s prices %+d%% and rising — collections favourable, room to grow farm lending." % (dom_crop or "crop", round(pyoy))})
+                         "t": "Agri tailwind: %s prices %+d%% and rising — collections favourable, room to grow farm lending." % (dom_crop or "crop", round(pyoy)),
+                         "w": [{"s": "%s price YoY · %s" % (dom_crop or "crop", pyoy_src), "v": "%+d%% (≥20)" % round(pyoy), "m": "measured"},
+                               {"s": "Agri intensity · branch_agri.json", "v": "%.2f (≥0.30)" % (a.get("intensity") or 0), "m": "est"}]})
         # 4) COLLATERAL — pickup/vehicle base
         cs = v.get("collateral_score"); ps = v.get("pickup_share")
         if isinstance(cs, (int, float)) and cs >= col_hi:
+            col_why = [{"s": "Collateral score · branch_vehicles.json", "v": "%s (≥ p70 = %s)" % (cs, round(col_hi)), "m": "est"}]
+            if ps is not None:
+                col_why.append({"s": "Pickup share · branch_vehicles.json", "v": "%s%%" % ps, "m": "est"})
             recs.append({"k": "collateral", "i": "🚙", "tone": "good", "p": 70,
-                         "t": "Prime collateral: high vehicle density (score %s, pickups %s%%) — push vehicle-title products." % (cs, ps)})
+                         "t": "Prime collateral: high vehicle density (score %s, pickups %s%%) — push vehicle-title products." % (cs, ps),
+                         "w": col_why})
         # 5) BORROWER BASE — dominant occupation
         if wf_rows and wf_buckets and i < len(wf_rows):
             dom = wf_rows[i].get("dom", -1)
             if dom is not None and 0 <= dom < len(wf_buckets):
                 lab = wf_buckets[dom]["label"] if isinstance(wf_buckets[dom], dict) else wf_buckets[dom]
+                mix = wf_rows[i].get("mix") or []
+                share = mix[dom] if dom < len(mix) else None
+                base_val = ("%s (%.0f%% of local workforce)" % (lab, share)) if isinstance(share, (int, float)) else lab
                 recs.append({"k": "base", "i": "👥", "tone": "info", "p": 40,
-                             "t": "Borrower base: mostly %s — tailor product + outreach to them." % lab.lower()})
+                             "t": "Borrower base: mostly %s — tailor product + outreach to them." % lab.lower(),
+                             "w": [{"s": "Dominant occupation · branch_workforce.json", "v": base_val, "m": "est"}]})
         if macro_rec:
             recs.append(dict(macro_rec))
 
@@ -127,6 +149,7 @@ def build():
             "title": "Per-branch action recommendations (acquire · defend · agri · collateral · base)",
             "generated_by": "pipeline/build_branch_recommendations.py",
             "label": "ESTIMATED synthesis over the per-branch layers — a triage prompt, not a credit decision.",
+            "evidence": "Every rec carries a 'w' array — the exact source layer · field · value (and measured/est provenance) that triggered its rule. Deterministic (network-free); no model in the loop, so the numbers are auditable, not generated.",
             "kinds": ["acquire", "defend", "agri", "collateral", "base", "macro"],
             "rec_max": REC_MAX,
             "branches_fingerprint": branches_fingerprint(items),
