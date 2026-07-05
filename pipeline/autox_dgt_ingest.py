@@ -47,6 +47,20 @@ TOPICS = [
     ("employment",     ["ภาวะการทำงานของประชากร", "ผู้มีงานทำ จังหวัด",
                         "ผู้ประกันตน ประกันสังคม", "กำลังแรงงาน จังหวัด"],              "ผู้มีงานทำ"),
     ("estates_ieat",   ["นิคมอุตสาหกรรม การนิคมอุตสาหกรรม"],                          None),
+    # ── AutoX COLLATERAL depth (title-loan asset base) — DLT vehicles by TYPE / BRAND / NEW
+    # registrations (the trend signal). The stock table we already have is car/pickup/moto totals;
+    # these add trucks, tractors/harvesters, brands (ยี่ห้อ) and month-over-month new-plate flow.
+    ("vehicles_new_dlt", ["รถใหม่ป้ายแดง กรมการขนส่งทางบก", "รถจดทะเบียนใหม่ จังหวัด",
+                          "จำนวนรถจดทะเบียน จำแนกตามประเภท", "รถจดทะเบียน ยี่ห้อ",
+                          "รถแทรกเตอร์ รถเกี่ยวข้าว จดทะเบียน"],                        "รถจดทะเบียนใหม่"),
+    # ── broader AGRICULTURE — livestock (DLD), fisheries (DOF), forestry (RFD) — beyond crops, per
+    # province where published. These feed the agri profile's livestock/fisheries/forestry legs.
+    ("livestock_dld",  ["ปศุสัตว์ กรมปศุสัตว์", "จำนวนปศุสัตว์ จังหวัด โค กระบือ สุกร ไก่",
+                        "เกษตรกรผู้เลี้ยงสัตว์ จังหวัด"],                              "ปศุสัตว์"),
+    ("fisheries_dof",  ["การเพาะเลี้ยงสัตว์น้ำ กรมประมง", "ผลผลิตการประมง จังหวัด",
+                        "จำนวนฟาร์มเพาะเลี้ยงสัตว์น้ำ จังหวัด"],                       "ประมง"),
+    ("forestry_rfd",   ["พื้นที่ป่าไม้ กรมป่าไม้", "สถิติป่าไม้ จังหวัด",
+                        "สวนป่า เศรษฐกิจ จังหวัด"],                                    "ป่าไม้"),
 ]
 
 def api(action, **params):
