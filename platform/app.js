@@ -3606,8 +3606,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4151,6 +4151,32 @@ function peerPopupHTML(d,sec,r){
     + r('Twin-median risk (15 twins)', e.pm==null?'n/a':e.pm, '#8b90a7')
     + r('This branch vs twins', (above?'+':'')+(e.dev==null?'n/a':e.dev)+' pts'+sig, col);
 }
+/* ---------- per-branch ACTION recommendations (data/branch_recommendations.json) ----------
+   The "what to do here" read — ranked recs (acquire/defend/agri/collateral/base/macro) shown at the
+   TOP of the branch panel. Lazy-loaded + null-guarded. */
+let RECDATA=null, recDone=false, recPromise=null;
+async function loadRecommendations(){
+  if(recPromise) return recPromise;
+  recPromise=fetch('data/branch_recommendations.json').then(rp=>rp.ok?rp.json():null)
+    .then(d=>{RECDATA=d;recDone=true;return d;}).catch(()=>{recDone=true;return null;});
+  return recPromise;
+}
+const REC_TONE={good:'#1C8C7D',warn:'#C8433B',info:'#5B7CFA'};
+function recsPopupHTML(d){
+  if(!RECDATA||!RECDATA.branches||!DATA) return '';
+  const i=idxOf(d); if(i<0) return '';
+  const e=RECDATA.branches[i]; if(!e||!e.recs||!e.recs.length) return '';
+  return `<div style="margin:8px 0 2px">`
+    + `<div style="font:700 11px 'IBM Plex Sans Thai';color:#8b90a7;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Recommendations</div>`
+    + e.recs.map(rc=>{
+        const c=REC_TONE[rc.tone]||'#8b90a7';
+        return `<div style="display:flex;gap:7px;align-items:flex-start;padding:6px 8px;margin-bottom:4px;border-left:3px solid ${c};background:rgba(255,255,255,.03);border-radius:0 6px 6px 0">`
+          +`<span style="font-size:14px;line-height:1.2">${rc.i||'•'}</span>`
+          +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:#c7cedd;line-height:1.35">${rc.t}</span></div>`;
+      }).join('')
+    + `<div class="sub" style="font-size:10px;color:#5B6479">ESTIMATED synthesis of the branch's signals — a triage prompt, not a credit decision.</div>`
+    + `</div>`;
+}
 function popupHTML(d){
   const r=(lab,val,col)=>`<div class="pr"><span>${lab}</span><b style="color:${col}">${val}</b></div>`;
   const k=d.k10||{};
@@ -4180,6 +4206,7 @@ function popupHTML(d){
       const bldg=bh?`<a href="${bh}" style="${btn};background:var(--accent);color:#fff">🏙 3D buildings</a>`:'';
       const expl=`<a href="branch-explorer.html?lat=${d.y}&lng=${d.x}&n=${encodeURIComponent(d.n)}${themeQS()}" style="${btn};background:var(--accent);color:#fff">🔎 10 km explorer</a>`;
       return `<div style="display:grid;grid-template-columns:${bh?'1fr 1fr':'1fr'};gap:6px;margin:8px 0 2px">${bldg}${expl}</div>`;})()}
+    ${recsPopupHTML(d)}
     ${briefPopupHTML(d,sec,r)}
     ${occLeadsPopupHTML(d,sec,r)}
     ${leadsPopupHTML(d,sec,r)}
