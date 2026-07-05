@@ -905,6 +905,70 @@ def check_household_risk():
 
 
 # ---------------------------------------------------------------------------
+def check_occupation_income():
+    # National lowest-paid-occupation aggregate (pipeline/build_occupation_income.py), projected
+    # from the already-MEASURED household_income_by_province.json. Optional file: SKIP-PASS when
+    # absent (the builder degrades to an absent-state too).
+    hdr("occupation_income.json (optional)")
+    if not exists("occupation_income.json"):
+        ok("occupation_income.json absent — skipped (optional; run build_occupation_income.py)")
+        return
+    try:
+        d = load("occupation_income.json")
+    except Exception as e:
+        fail("occupation_income.json loads", repr(e))
+        return
+    ok("occupation_income.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "generated_by" not in meta or "source" not in meta:
+        fail("occupation_income meta/provenance present", "meta missing generated_by/source")
+    else:
+        ok("occupation_income meta/provenance present")
+
+    if meta and meta.get("absent"):
+        ok("occupation_income is an honest ABSENT-state (no source) — skipped value checks")
+        return
+
+    cats = d.get("categories")
+    if not isinstance(cats, list) or not cats:
+        fail("occupation_income has a 'categories' list", "got %s" % type(cats).__name__)
+        return
+    ok("occupation_income categories list present (%d)" % len(cats))
+
+    bad = []
+    seen_keys = set()
+    for c in cats:
+        key = c.get("key") or "?"
+        seen_keys.add(key)
+        avg = c.get("national_avg")
+        mn = c.get("min_value")
+        mx = c.get("max_value")
+        if not is_finite_number(avg) or avg <= 0:
+            bad.append("%s national_avg=%r not positive" % (key, avg))
+        if not is_finite_number(mn) or mn <= 0:
+            bad.append("%s min_value=%r not positive" % (key, mn))
+        if not is_finite_number(mx) or mx <= 0:
+            bad.append("%s max_value=%r not positive" % (key, mx))
+        if is_finite_number(mn) and is_finite_number(mx) and mn > mx:
+            bad.append("%s min_value=%s > max_value=%s" % (key, mn, mx))
+        if is_finite_number(avg) and is_finite_number(mn) and is_finite_number(mx):
+            if not (mn <= avg <= mx):
+                bad.append("%s national_avg=%s not within [min,max]=[%s,%s]" % (key, avg, mn, mx))
+        if not c.get("min_province") or not c.get("max_province"):
+            bad.append("%s min_province/max_province missing" % key)
+    # sorted ascending by national_avg (worst-paid first)
+    avgs = [c.get("national_avg") for c in cats if is_finite_number(c.get("national_avg"))]
+    if avgs != sorted(avgs):
+        bad.append("categories not sorted ascending by national_avg (worst-first)")
+    if bad:
+        fail("occupation_income values sane (positive, min<=avg<=max, sorted worst-first)",
+             first_n(bad, 8))
+    else:
+        ok("occupation_income values sane (measured, min<=avg<=max, sorted worst-first)")
+
+
+# ---------------------------------------------------------------------------
 def check_province_stress():
     # Combined household-DTI + unemployment province structural-stress index
     # (pipeline/build_province_stress.py). Optional file: SKIP-PASS when absent.
@@ -4068,6 +4132,7 @@ def main():
     check_search_demand()
     check_collateral_outlook()
     check_household_risk()
+    check_occupation_income()
     check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)

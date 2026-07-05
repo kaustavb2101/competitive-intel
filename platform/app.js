@@ -121,6 +121,27 @@ function pstressHasData(){return !!(PSTRESS&&Object.keys(PSTRESS).length);}
 // ESTIMATED composite_stress (0-100) for a branch's province. 0 when unknown.
 function pstressVal(d){const p=PSTRESS&&PSTRESS[d.v]; return p&&p.composite_stress!=null?Math.round(p.composite_stress):0;}
 
+/* ---------- lowest-paid occupation nationally (objective #1) ----------
+   Lazy-loaded from data/occupation_income.json (pipeline/build_occupation_income.py) — a national
+   aggregate of the already-MEASURED province.html "income by occupation" panel (NSO SES 2566).
+   OCCINC_LIST is sorted worst-first (lowest national_avg first), so OCCINC_LIST[0] is the concrete
+   "lowest-paid occupation nationally" fact. Null-guarded: ABSENT source -> empty list, no error. */
+let OCCINC_LIST=[], occincLoaded=false, occincPromise=null;
+async function loadOccupationIncome(){
+  if(occincPromise) return occincPromise;
+  occincLoaded=true;
+  occincPromise=(async()=>{
+    try{
+      const r=await fetch('data/occupation_income.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      OCCINC_LIST=(j.meta&&j.meta.absent)?[]:(j.categories||[]);
+    }catch(e){ OCCINC_LIST=[]; }
+    return OCCINC_LIST;
+  })();
+  return occincPromise;
+}
+function occincHasData(){return !!(OCCINC_LIST&&OCCINC_LIST.length);}
+
 /* ---------- title-loan SEARCH DEMAND + brand share-of-search (ESTIMATED · Google Trends, objective #2) ----------
    Lazy-loaded from data/search_demand.json (pipeline/build_search_demand.py). SDEMAND maps Thai province
    name -> {demand, sos:{brand:share}, autox_share, best_rival, autox_sos_rank, ...}. demand is a 0–100
@@ -2664,6 +2685,7 @@ function renderRiskReadouts(){
   if(!priskLoaded) loadProvinceRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!briskLoaded) loadBranchRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!pstressLoaded) loadProvinceStress().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  if(!occincLoaded) loadOccupationIncome().then(()=>{ if(onExp()) renderRiskReadouts(); });
   let html='';
   // 1) MOST-STRESSED PROVINCES (province_risk.json)
   if(priskHasData()){
@@ -2696,6 +2718,15 @@ function renderRiskReadouts(){
       `<div class="cc-card-b">`+ccRow(`${p.province} <span class="s">${p.region||''}</span>`,
         `DTI ${p.debt_to_income!=null?(+p.debt_to_income).toFixed(2)+'×':'—'} · unemployment ${p.unemployment_rate!=null?(+p.unemployment_rate).toFixed(1)+'%':'—'} (NSO, measured)`,
         `▲ ${(p.composite_stress||0).toFixed(0)}`,'composite','var(--agri)')+`</div>`;
+  }
+  // 1c) LOWEST-PAID OCCUPATION NATIONALLY (occupation_income.json) — a concrete income-floor
+  // fact (not an index), same rank-1-surfacing pattern as the DTI+unemployment callout above.
+  if(occincHasData()){
+    const c=OCCINC_LIST[0];
+    html+=`<div class="cc-sub2" style="margin-top:14px">Lowest-paid occupation nationally ${TAG_M}</div>`+
+      `<div class="cc-card-b">`+ccRow(`${c.label}`,
+        `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
+        `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)')+`</div>`;
   }
   // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
