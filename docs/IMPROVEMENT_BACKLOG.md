@@ -430,8 +430,30 @@
       harness just being flaky in this container. *(MED, S — blocks a fast confidence check on future
       province-page cycles)*
 
+## Queue — follow-ups noticed 2026-07-05 (2)
+- [ ] **`fuel_prices.json` only ever carries a single day's snapshot** (the Bangchak API has no
+      in-API history) — `delta_tomorrow` is wired into the source file but not yet surfaced anywhere
+      in the UI, and there's no YoY/trend read until the daily workflow (`data-fuel-prices.yml`,
+      running since 2026-07-05) has accumulated enough committed snapshots to diff. Once ≥2 dated
+      pulls exist, worth surfacing "diesel +X% since <date>" the same way `deltas.json` drives the
+      Risk-trend card's sparklines. *(LOW, S, blocked on time — needs 2+ vintages)*
+- [ ] **`renderHomeMacro()`'s new Fuel-prices row sits in the same card as "Key commodity moves"
+      (World Bank) but has a structurally different vintage model** (daily point pull vs. monthly
+      Pink Sheet) — today this is disambiguated only by the "Bangchak retail, daily" sub-label; if a
+      3rd differently-cadenced macro source is ever added to this card, worth a shared "as of <date>"
+      chip per sub-section instead of relying on prose alone. *(LOW, trivial, speculative)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 (3) — ENRICH: live Bangchak fuel prices wired into the Home macro card.** New
+  `pipeline/build_fuel_prices.py` projects the already-committed `source-data/fuel_prices.json`
+  (real Bangchak retail pull, unwired since commit `ea93b96` this morning) verbatim into
+  `platform/data/fuel_prices.json`; `renderHomeMacro()` gained a measured "Fuel prices" row (diesel
+  = pickup/farm collateral, gasohol95 = motorcycle collateral). `--check`-gated (SKIP when the pull
+  is absent), `validate_data.py`/`build_provenance.py` extended. Gate 50/0, `validate_data.py`
+  426/426. Headless-rendered `index.html#home`: `data-errors="[]"`, live diesel ฿37.5/L + gasohol
+  ฿37.45/L render under "Key commodity moves". Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-05
+  (3) entry).
 - **2026-07-05 (2) — AUDIT: closed `docs/DATA_PROVENANCE.md`'s R1 provenance gap.** Every
   `platform/data/provinces/<slug>.json` (77 files) now carries its own `meta.generated_by` +
   `meta.provenance.{measured,editorial,estimated}` block naming every field's real source (PIP

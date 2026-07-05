@@ -4,6 +4,56 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-05 (3) — ENRICH: live Bangchak fuel prices (sitting unwired since this morning's pull) wired into the Home macro card
+
+**Task type:** ENRICH. `/workspace/watcher` [TMLI blueprint] was not present this cycle. `bash
+tests/run.sh check` on a clean pull of `claude/new-session-wto26j` was already green (49 passed, 0
+failed, `validate_data.py` 423/423) — no RE-DERIVE drift to fix. A scan for already-vendored-but-
+unwired `source-data/*` layers found `fuel_prices.json` (added earlier today, commit `ea93b96`,
+"Add live fuel prices (Bangchak, cloud-reachable) + daily workflow"): the file is real — pulled from
+Bangchak's public retail oil-price API (free, no key, cloud-reachable; verified `pulled: 2026-07-05`
+in the file's own meta, diesel ฿37.50/L, gasohol95 ฿37.45/L) — but nothing in `platform/data` or
+`platform/app.js` read it. Diesel price tracks the cost of running a pickup/farm vehicle and gasohol
+tracks motorcycles — AutoX's two dominant title-loan collateral types — so this is a real, cheap,
+daily macro-pressure signal on borrower cash flow that was going to waste.
+
+**What changed (no new data invented — pure re-projection + UI wiring of an already-real pull):**
+- New `pipeline/build_fuel_prices.py`: validates `source-data/fuel_prices.json` (headline diesel/
+  gasohol95 present, both within a sane 10–100 THB/litre bound — catches a malformed pull rather
+  than shipping garbage) and projects it **verbatim** (every number carried through unchanged) into
+  `platform/data/fuel_prices.json`, with `meta.generated_by`/`meta.provenance` naming the Bangchak
+  source and the daily workflow. `--check`-gated; exits 3/SKIP (not FAIL) when the source pull is
+  absent, matching the existing `build_branch_density.py` convention for optional cloud-refreshed
+  inputs. `tests/run.sh` and `tests/validate_data.py` (`check_fuel_prices()`, SKIP-pass when absent)
+  gained coverage; `pipeline/build_provenance.py` regenerated to include the new layer in the
+  measured/estimated/unlabelled census.
+- `platform/app.js`: new `loadFuelPrices()` (same lazy, null-safe fetch pattern as every other
+  optional Home-tab layer) + a "Fuel prices · measured · Bangchak retail, daily" section appended to
+  `renderHomeMacro()`'s "Regulatory watch" card, showing today's diesel (pickup/farm borrowers) and
+  gasohol 95 (motorcycle-title borrowers) price. Renders nothing when the file is absent — graceful,
+  no fabricated placeholder.
+
+**Verification:**
+- `bash tests/run.sh check` — 50 passed, 0 failed (`validate_data.py`: 426/426, +3 new checks: meta/
+  provenance present, headline object present, headline values sane). `build_fuel_prices.py --check`
+  reproduces byte-exact.
+- Headless-rendered `index.html#home` (`tests/lib/render.sh`): `data-errors="[]"` (zero JS errors),
+  DOM dump confirms the live section renders — `Diesel … ฿37.5 THB/L`, `Gasohol 95 … ฿37.45 THB/L`,
+  tagged measured, positioned under "Key commodity moves" in the macro card. Screenshot confirms no
+  layout regression elsewhere on Home.
+- Reverted one unrelated side-effect before committing: installing the headless-render harness's npm
+  deps (`tests/.cache/node_modules`, gitignored) had incidentally rewritten `tests/package.json`'s
+  pinned `deck.gl`/`leaflet` versions from exact (`8.9.35`/`1.9.4`) to caret ranges — restored via
+  `git checkout -- tests/package.json` before staging, so this cycle's diff touches only the files
+  described above.
+
+**Source:** `source-data/fuel_prices.json` `meta.source` — "Bangchak retail oil-price API
+(www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable."
+No external pull performed this cycle — this re-projects an already-committed, already-real pull
+into its first consuming view.
+
+---
+
 ## 2026-07-05 — AUDIT: closed the R1 provenance gap — `provinces/<slug>.json` now embeds its own `meta.provenance`
 
 **Task type:** AUDIT. `/workspace/watcher` [TMLI blueprint] was not present this cycle, so no new

@@ -4574,6 +4574,8 @@ function renderHome(){
     loadCollatOutlookData().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — per-branch composite to name the single riskiest branch in the risk card (null-safe).
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
+    loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
@@ -4838,6 +4840,23 @@ function renderHomeRisk(){
   box.innerHTML=html;
 }
 
+// LIVE fuel prices (data/fuel_prices.json, build_fuel_prices.py <- Bangchak daily pull).
+// Diesel = pickup/farm title-loan collateral; gasohol = motorcycle title-loan collateral.
+let FUEL=null, fuelLoaded=false, fuelPromise=null;
+function loadFuelPrices(){
+  if(fuelPromise) return fuelPromise;
+  fuelLoaded=true;
+  fuelPromise=(async()=>{
+    try{
+      const r=await fetch('data/fuel_prices.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      FUEL=(j&&j.headline)?j:null;
+    }catch(e){ FUEL=null; }
+    return FUEL;
+  })();
+  return fuelPromise;
+}
+
 // MACRO / REGULATORY — BoT rate-cap watch + key commodity moves from META.board.
 function renderHomeMacro(){
   const box=$('#cc-macro-body'); if(!box||!META) return;
@@ -4853,6 +4872,14 @@ function renderHomeMacro(){
   html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction</span></div>`;
   crops.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY','var(--agri)'));
   if(gold) html+=ccRow(`Gold`,gold.note||'collateral value ↑',`+${gold.yoy}%`,'YoY','var(--up)');
+  // live retail fuel prices (Bangchak, daily) — diesel tracks pickup/farm borrowers, gasohol
+  // tracks motorcycle borrowers, AutoX's two dominant title-loan collateral types.
+  if(FUEL&&FUEL.headline){
+    const h=FUEL.headline;
+    html+=`<div class="cc-sub2">Fuel prices ${TAG_M} <span class="sub">Bangchak retail, daily</span></div>`;
+    html+=ccRow('Diesel','pickup / farm-vehicle borrowers',`฿${h.diesel}`,'THB/L','var(--agri)');
+    html+=ccRow('Gasohol 95','motorcycle-title borrowers',`฿${h.gasohol95}`,'THB/L','var(--agri)');
+  }
   box.innerHTML=html;
 }
 

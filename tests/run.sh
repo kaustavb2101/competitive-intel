@@ -82,6 +82,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_branch_density.py --check (source-data/perimeter_counts.json absent — not data drift)"
   else bad "build_branch_density.py --check (branch_density.json drifted from source-data/perimeter_counts.json/branches.json)"
   fi
+  ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
+  else bad "build_fuel_prices.py --check (fuel_prices.json drifted from source-data/fuel_prices.json)"
+  fi
   ( cd "$PIPE" && python3 build_branch_risk.py --check >/dev/null 2>&1 ) && ok "build_branch_risk.py --check" || bad "build_branch_risk.py --check (branch_risk.json drifted from household_risk/crop_stress/occupation_risk/branches.json)"
   ( cd "$PIPE" && python3 build_opportunity_score.py --check >/dev/null 2>&1 ) && ok "build_opportunity_score.py --check" || bad "build_opportunity_score.py --check (opportunity_score.json drifted from amphoe.json/crop_stress.json/competitors)"
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"

@@ -1454,6 +1454,46 @@ def check_branch_density(n_branches):
         ok("branch_density records sane (buildings_10km>=0 int, bucket known)")
 
 
+def check_fuel_prices():
+    # LIVE Thai retail fuel prices (Bangchak, MEASURED daily pull), projected by
+    # build_fuel_prices.py from source-data/fuel_prices.json. National-scope (not per-branch).
+    # Optional file: SKIP-PASS when absent.
+    hdr("fuel_prices.json (optional)")
+    if not exists("fuel_prices.json"):
+        ok("fuel_prices.json absent — skipped (optional; run build_fuel_prices.py to populate)")
+        return
+    try:
+        d = load("fuel_prices.json")
+    except Exception as e:
+        fail("fuel_prices.json loads", repr(e))
+        return
+    ok("fuel_prices.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not meta.get("generated_by") or not meta.get("label") \
+            or not meta.get("source"):
+        fail("fuel_prices meta/provenance present (generated_by + label + source)",
+             "meta missing generated_by/label/source")
+    else:
+        ok("fuel_prices meta/provenance present (generated_by + MEASURED label + source)")
+
+    headline = d.get("headline")
+    if not isinstance(headline, dict):
+        fail("fuel_prices has a 'headline' object", "got %s" % type(headline).__name__)
+        return
+
+    bad = []
+    for key in ("diesel", "gasohol95"):
+        v = headline.get(key)
+        if not isinstance(v, (int, float)) or not (10.0 <= v <= 100.0):
+            bad.append("headline.%s=%r not a sane THB/litre value" % (key, v))
+    if bad:
+        fail("fuel_prices headline sane (diesel/gasohol95 in 10-100 THB/litre)", first_n(bad))
+    else:
+        ok("fuel_prices headline sane (diesel=%s, gasohol95=%s THB/litre)" %
+           (headline.get("diesel"), headline.get("gasohol95")))
+
+
 def check_branch_risk(n_branches):
     # PER-BRANCH COMPOSITE RISK (objective #1): fuses household debt-stress (MEASURED) +
     # crop/agri stress (ESTIMATED) + occupation-sector stress (MEASURED x ESTIMATED) + the
@@ -3973,6 +4013,7 @@ def main():
     check_occupation_risk(n)
     check_poi_relevance(n)
     check_branch_density(n)
+    check_fuel_prices()
     check_branch_labor(n)
     check_branch_risk(n)
     check_province_risk()
