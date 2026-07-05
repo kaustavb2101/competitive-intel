@@ -1,0 +1,56 @@
+name: Data — live fuel prices (daily)
+
+# Pulls LIVE Thai retail fuel prices (diesel/gasohol, ฿/litre) from Bangchak's official API
+# (www.bangchak.co.th/api/oilprice) — free, no key, REACHABLE from GitHub runners (verified 200),
+# unlike EPPO / PTT / data.go.th which geoblock datacenter IPs. Fuel cost is a macro pressure on
+# AutoX's pickup-owning and motorcycle-owning borrowers.
+#
+# Output: source-data/fuel_prices.json (pipeline/pull_fuel_prices.py). Committed to a fresh
+# data/fuel-<run_id> branch as a DRAFT PR back to the branch this ran on. Never pushes to a working
+# branch; no-ops when prices are unchanged. Also snapshots history over time (the API has no history).
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily 22:40 UTC (= 05:40 Bangkok) — off-minute; retailers announce next-day prices the evening before.
+    - cron: "40 22 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Offline selftest
+        run: python pipeline/pull_fuel_prices.py --selftest
+      - name: Pull live fuel prices
+        run: python pipeline/pull_fuel_prices.py --stamp "$(date -u +%F)"
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/fuel-${{ github.run_id }}
+        run: |
+          git add source-data/fuel_prices.json
+          if git diff --cached --quiet; then
+            echo "No change vs committed prices. No PR opened."; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          H="$(python -c "import json;h=json.load(open('source-data/fuel_prices.json'))['headline'];print('diesel B%s/L, gasohol95 B%s/L'%(h['diesel'],h['gasohol95']))")"
+          git commit -m "data: live fuel prices ($(date -u +%F), run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-fuel-prices.yml — Bangchak retail ($H)."
+          git push origin "$DATA_BRANCH"
+          printf 'Automated daily fuel-price pull (run %s) from `%s`.\n\n**Headline:** %s\n\nMEASURED — Bangchak retail (Bangkok reference, THB/litre). Cloud-reachable; no key.\n' \
+            "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: live fuel prices ($(date -u +%F))" --body-file /tmp/pr_body.md
