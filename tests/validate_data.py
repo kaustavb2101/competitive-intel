@@ -543,6 +543,63 @@ def check_provinces(n_branches):
 
 
 # ---------------------------------------------------------------------------
+def check_province_provenance():
+    # The generic check_provenance() gate exempts the whole provinces/ subtree by prefix
+    # (build_province.py's output predates a per-file meta block), but every
+    # provinces/<slug>.json has carried a real meta.generated_by + meta.provenance.
+    # {measured,editorial,estimated} block since 2026-07-05 (docs/DATA_PROVENANCE.md R1).
+    # Nothing previously asserted that block stays populated on all 77 files — this closes
+    # that gap so a future build_province.py regression that silently drops meta is caught
+    # here instead of only by the generic (currently-exempting) gate.
+    hdr("provinces/*.json meta.provenance completeness")
+    try:
+        idx = load(os.path.join("provinces", "index.json"))
+    except Exception as e:
+        fail("provinces/index.json loads (for provenance check)", repr(e))
+        return
+    if not isinstance(idx, list) or not idx:
+        fail("provinces index is a non-empty list (for provenance check)",
+             "got %s" % type(idx).__name__)
+        return
+
+    bad = []
+    n_checked = 0
+    for e in idx:
+        slug = e.get("slug")
+        if not isinstance(slug, str) or not slug:
+            continue
+        rel = os.path.join("provinces", slug + ".json")
+        try:
+            p = load(rel)
+        except Exception as ex:
+            bad.append("%s.json load error: %r" % (slug, ex))
+            continue
+        n_checked += 1
+        meta = p.get("meta")
+        if not isinstance(meta, dict):
+            bad.append("%s meta missing/not a dict" % slug)
+            continue
+        gb = meta.get("generated_by")
+        if not (isinstance(gb, str) and gb.strip()):
+            bad.append("%s meta.generated_by missing/blank" % slug)
+        prov = meta.get("provenance")
+        if not isinstance(prov, dict):
+            bad.append("%s meta.provenance missing/not a dict" % slug)
+            continue
+        for k in ("measured", "editorial", "estimated"):
+            v = prov.get(k)
+            if not isinstance(v, list) or not v or not all(
+                    isinstance(s, str) and s.strip() for s in v):
+                bad.append("%s meta.provenance.%s missing/empty/non-string-list" % (slug, k))
+    if bad:
+        fail("every provinces/<slug>.json carries meta.generated_by + "
+             "meta.provenance.{measured,editorial,estimated}", first_n(bad, 12))
+    else:
+        ok("every provinces/<slug>.json carries meta.generated_by + "
+           "meta.provenance.{measured,editorial,estimated} (%d files)" % n_checked)
+
+
+# ---------------------------------------------------------------------------
 def check_crop_stress():
     hdr("crop_stress.json")
     try:
@@ -4006,6 +4063,7 @@ def main():
     check_amphoe_geo(amphoe)
     check_province_geo(branches)
     check_provinces(n)
+    check_province_provenance()
     check_crop_stress()
     check_search_demand()
     check_collateral_outlook()
