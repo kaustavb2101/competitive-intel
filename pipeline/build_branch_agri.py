@@ -49,6 +49,7 @@ MASTER = os.path.join(ROOT, "source-data", "branches_final.json")
 SPAM = os.path.join(ROOT, "source-data", "spam2010_th_cropgrid.json")
 CROP_PRICES = os.path.join(ROOT, "source-data", "crop_prices.json")
 NABC_PRICES = os.path.join(ROOT, "source-data", "nabc_prices.json")   # LIVE prices (preferred)
+NABC_AGRI = os.path.join(ROOT, "source-data", "nabc_agri.json")       # per-province households + land use
 OUT = os.path.join(ROOT, "platform", "data", "branch_agri.json")
 
 RADIUS_KM = 10.0
@@ -140,6 +141,23 @@ def build():
     yoy, yoy_src = crop_price_yoy()
     nkey = len(CROPS)
 
+    # RUBBER overlay — SPAM has NO rubber, but it's Thailand's #2 farm crop (10.2M households). Bring
+    # it in per-province from NABC farmer-family (household share) + NABC live rubber price YoY, so the
+    # South/East rubber belt stops reading as low-agri. Province rubber-household share → a rubber
+    # "cropland-equivalent" per branch that folds into price stress, intensity and income.
+    prov_of = [canonical(b.get("v", "") or b.get("prov", "")) for b in branches]
+    rubber_share = {}
+    if os.path.exists(NABC_AGRI):
+        ff = _load(NABC_AGRI).get("farmer_family", {})
+        for prov, crops in ff.items():
+            tot_hh = sum(crops.values()) or 1
+            rubber_share[prov] = crops.get("ยางพารา", 0) / tot_hh
+    rubber_yoy = None
+    if os.path.exists(NABC_PRICES):
+        v = _load(NABC_PRICES).get("crop_yoy", {}).get("rubber")
+        rubber_yoy = round(v, 1) if isinstance(v, (int, float)) else None
+    RUBBER_INCOME_RAI = 14000   # ฿/rai/yr gross (yield×farm-gate; documented, ESTIMATED)
+
     # first pass: per-branch cropland ha vector, to set the intensity normaliser (P90 total ha)
     ha_vecs, totals = [], []
     for b in branches:
@@ -164,23 +182,31 @@ def build():
         tot = totals[i]
         shares = [round(v / tot, 3) if tot else 0.0 for v in vec]
         dom = max(range(nkey), key=lambda k: vec[k]) if tot else -1
-        # crop-mix-weighted farm-gate YoY (skip crops with no price series; renormalise weights)
-        wsum = sum(vec[k] for k in range(nkey) if yoy[CROPS[k]["key"]] is not None) or 0.0
-        pyoy = (round(sum(vec[k] * yoy[CROPS[k]["key"]] for k in range(nkey)
-                          if yoy[CROPS[k]["key"]] is not None) / wsum, 1)
-                if wsum > 0 else None)
+        # rubber "cropland-equivalent" for this perimeter = province rubber-household share × the
+        # 90th-pctile SPAM cropland (so a fully-rubber province branch weighs rubber like dense cropland).
+        rshare = rubber_share.get(prov_of[i], 0.0)
+        rubber_ha = rshare * p90
+        # crop-mix-weighted farm-gate YoY over the 5 SPAM crops + rubber (skip crops with no price)
+        num = sum(vec[k] * yoy[CROPS[k]["key"]] for k in range(nkey) if yoy[CROPS[k]["key"]] is not None)
+        den = sum(vec[k] for k in range(nkey) if yoy[CROPS[k]["key"]] is not None)
+        if rubber_yoy is not None and rubber_ha > 0:
+            num += rubber_ha * rubber_yoy
+            den += rubber_ha
+        pyoy = round(num / den, 1) if den > 0 else None
         price_stress = max(0.0, min(100.0, round(-(pyoy or 0.0) * 3.0, 1)))
         # drought: branch 3-month rainfall anomaly (% of normal); below 100 = dry
         ra = rain[i]
         rain_anom = round(ra, 1) if isinstance(ra, (int, float)) else None
         drought_stress = (max(0.0, min(100.0, round((100.0 - rain_anom) * 2.0, 1)))
                           if rain_anom is not None else None)
-        # how agricultural is this perimeter (0-1) — dilutes the pressure for city branches
-        intensity = min(1.0, tot / p90) if p90 else 0.0
+        # how agricultural is this perimeter (0-1), now INCLUDING the rubber-equivalent so the rubber
+        # belt reads as farming even where SPAM cropland is thin — dilutes the pressure for city branches
+        intensity = min(1.0, (tot + rubber_ha) / p90) if p90 else 0.0
         d_term = drought_stress if drought_stress is not None else 0.0
         agri_pressure = round((0.6 * price_stress + 0.4 * d_term) * intensity, 1)
-        # gross farm income proxy (฿/yr) = Σ crop ha × rai/ha × income per rai
-        income = int(round(sum(vec[k] * RAI_PER_HA * CROPS[k]["income_rai"] for k in range(nkey))))
+        # gross farm income proxy (฿/yr) = Σ crop ha × rai/ha × income per rai (+ rubber-equivalent)
+        income = int(round(sum(vec[k] * RAI_PER_HA * CROPS[k]["income_rai"] for k in range(nkey))
+                           + rubber_ha * RAI_PER_HA * RUBBER_INCOME_RAI))
         out_branches.append({
             "ha": [round(v) for v in vec],
             "sh": shares,
@@ -193,6 +219,7 @@ def build():
             "intensity": round(intensity, 3),
             "agri_pressure": agri_pressure,
             "income_est": income,
+            "rubber_share": round(rshare, 3),
         })
 
     # national context for the meta
@@ -212,6 +239,8 @@ def build():
             "provenance": {
                 "crop_mix": "ESTIMATED — SPAM 2010 modelled 5-arcmin cropland, summed in the 10km perimeter.",
                 "price_yoy": "MEASURED — NABC live daily / OAE farm-gate price YoY, crop-mix-weighted per branch.",
+                "rubber": "MEASURED overlay — NABC farmer-family per-province rubber-household share × "
+                          "NABC live rubber price YoY, added to price/intensity/income (SPAM has no rubber).",
                 "rain_anom": "MEASURED — HDX 3-month rainfall anomaly (% of normal), per branch.",
                 "income_est": "ESTIMATED — Σ crop ha × Thai national-average yield×price per rai (stated constants).",
                 "agri_pressure": "ESTIMATED composite — 0.6·price_stress + 0.4·drought, diluted by cropland intensity.",
