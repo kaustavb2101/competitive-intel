@@ -46,10 +46,18 @@ say "Installing Python deps"
 pip3 install --break-system-packages -q shapely openlocationcode openpyxl pdfplumber requests 2>/dev/null \
   || pip3 install -q shapely openlocationcode openpyxl pdfplumber requests
 
-# ── 3. token check ───────────────────────────────────────────────────────────
-if [ -z "${DATA_GO_TH_TOKEN:-}" ] && [ ! -f .env ]; then
-  die "No token. Run:  cp .env.example .env  then edit .env and paste your rotated DATA_GO_TH_TOKEN (or: export DATA_GO_TH_TOKEN=...)"
+# ── 3. token check — auto-locate .env wherever you saved it ──────────────────
+# The loader only reads the repo-root .env, but people often drop it in pipeline/.
+# If root .env is missing but one exists in pipeline/ (or ~), copy it up — no manual move.
+if [ ! -f .env ]; then
+  for cand in pipeline/.env "$HOME/.env" ~/competitive-intel/pipeline/.env; do
+    if [ -f "$cand" ]; then say "Found .env at $cand → copying to repo root"; cp "$cand" .env; break; fi
+  done
 fi
+if [ -z "${DATA_GO_TH_TOKEN:-}" ] && ! grep -q '^DATA_GO_TH_TOKEN=' .env 2>/dev/null; then
+  die "No token found. Run:  cp .env.example .env  then edit .env and paste your rotated DATA_GO_TH_TOKEN (or: export DATA_GO_TH_TOKEN=...)"
+fi
+echo "   ✓ token present (value not shown)"
 
 # ── 4. reachability sanity check (must be a THAI IP) ─────────────────────────
 say "Checking data.go.th reachability (needs a Thai IP)…"
