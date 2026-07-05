@@ -999,10 +999,40 @@ async function boot(){
   }
 }
 
+/* ---------- national macro-risk indicators (data/macro_indicators.json, obj#1) ----------
+   BIS household debt-to-GDP + policy rate, World Bank CPI/lending/FX — MEASURED, cloud-refreshed.
+   Household leverage is the core borrower-PD backdrop. Appended to the Overview macro board.
+   Fully null-guarded: absent file → nothing extra renders. */
+let MACROIND=null, macroIndDone=false, macroIndPromise=null;
+async function loadMacroIndicators(){
+  if(macroIndPromise) return macroIndPromise;
+  macroIndPromise=fetch('data/macro_indicators.json').then(r=>r.ok?r.json():null)
+    .then(d=>{MACROIND=d;macroIndDone=true;return d;}).catch(()=>{macroIndDone=true;return null;});
+  return macroIndPromise;
+}
+function renderMacroIndicators(){
+  const host=$('#macro'); if(!host||!MACROIND||!MACROIND.indicators) return;
+  const I=MACROIND.indicators, cards=[];
+  const arrow=v=>v==null?'':(v<0?'▼':(v>0?'▲':'●'));
+  const hh=I.household_debt_gdp;
+  if(hh) cards.push([`Household debt`, `${hh.value}%`,
+    `of GDP · ${arrow(hh.yoy_change)}${hh.yoy_change!=null?Math.abs(hh.yoy_change)+'pp':''} YoY${hh.yoy_change<0?' (deleveraging)':''} · BIS ${hh.period}`]);
+  const pr=I.policy_rate;
+  if(pr) cards.push([`Policy rate`, `${pr.value}%`, `${arrow(pr.yoy_change)}${pr.yoy_change!=null?Math.abs(pr.yoy_change)+'pp':''} YoY · BIS ${pr.period}`]);
+  const cpi=I.cpi_inflation;
+  if(cpi) cards.push([`Inflation`, `${cpi.value}%`, `CPI YoY · World Bank ${cpi.period}`]);
+  const fx=I.usd_thb;
+  if(fx) cards.push([`USD/THB`, `${fx.value}`, `World Bank ${fx.period}`]);
+  if(!cards.length) return;
+  host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
+    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+}
+
 /* ---------- overview ---------- */
 function renderOverview(){
   $('#macro').innerHTML = META.macro.map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
+  loadMacroIndicators().then(renderMacroIndicators);
   renderCommodityBoard();
   // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
   // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.

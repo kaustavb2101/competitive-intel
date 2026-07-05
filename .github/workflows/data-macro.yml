@@ -1,0 +1,47 @@
+name: Data — macro indicators (weekly)
+
+# Pulls MEASURED Thai macro-risk indicators from BIS (household debt-to-GDP + policy rate) and the
+# World Bank (CPI/lending/FX) — keyless, cloud-reachable (BOT's own API is geoblocked). Household
+# leverage is the core borrower-PD backdrop. Output: platform/data/macro_indicators.json. Draft-PR
+# pattern; no-ops when unchanged.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "25 21 * * 1"   # Mondays 21:25 UTC (BIS/WB update quarterly/annually — weekly is plenty)
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Offline selftest
+        run: python pipeline/pull_macro.py --selftest
+      - name: Pull macro indicators
+        run: python pipeline/pull_macro.py --stamp "$(date -u +%F)"
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/macro-${{ github.run_id }}
+        run: |
+          git add platform/data/macro_indicators.json
+          if git diff --cached --quiet; then echo "unchanged; no PR."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          H="$(python -c "import json;i=json.load(open('platform/data/macro_indicators.json'))['indicators']['household_debt_gdp'];print('household debt %s%% of GDP (%s)'%(i['value'],i['period']))")"
+          git commit -m "data: macro indicators ($(date -u +%F), run ${{ github.run_id }})" -m "BIS + World Bank — $H."
+          git push origin "$DATA_BRANCH"
+          printf 'Automated weekly macro pull (run %s) from `%s`.\n\n**%s**\n\nMEASURED — BIS (household debt, policy rate) + World Bank (CPI/lending/FX). Cloud-reachable, no key.\n' \
+            "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: macro indicators ($(date -u +%F))" --body-file /tmp/pr_body.md
