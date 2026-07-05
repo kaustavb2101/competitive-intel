@@ -290,7 +290,44 @@ def build_all():
                        "unemployment": unemp.get(prov) or {},
                        "income": income.get(prov) or {},
                        "src": "DIW factories · DLT vehicles · NSO labour + NSO Labour Force Survey "
-                              "+ NSO SES 2566 income by occupation (data.go.th / TMLI) — measured"}}
+                              "+ NSO SES 2566 income by occupation (data.go.th / TMLI) — measured"},
+               "meta": {
+                   "generated_by": "pipeline/build_province.py",
+                   "provenance": {
+                       "measured": [
+                           "branches (point-in-polygon of branches_final.json into th_amphoe.geojson, "
+                           "district-count amphoe polygons — gov ADM2 boundaries)",
+                           "poi (13-layer OSM/Overpass points, bbox-filtered to this province — osm_layers.json)",
+                           "district factories_avg/vehicle_avg/gold_avg/market_avg (branch-mean of the "
+                           "master's within-10km OSM POI counts, MEASURED)",
+                           "district real_fac/real_workers (DIW factories_by_district.json, prov|district "
+                           "join, MEASURED where the amphoe has an AutoX branch to read a Thai district "
+                           "name from — see fbd join notes in build_amphoe.py)",
+                           "district competitors (MEASURED rival title-loan/vehicle-finance branches, "
+                           "Google Places + Overture + official store-locators, deduped ~150m — lower bound)",
+                           "gov.factories/workers (DIW factories_by_district.json, province total)",
+                           "gov.vehicles (DLT vehicles_by_province.json, province total; null when the "
+                           "province is genuinely absent from that release — never a fabricated 0)",
+                           "gov.employment (NSO labour formal/informal, employment_by_province.json; "
+                           "null when absent, same rule)",
+                           "gov.unemployment (NSO Labour Force Survey, unemployment_by_province.json via "
+                           "ingest_tmli.py; {} when the source file is absent)",
+                           "gov.income (NSO SES 2566 income-by-occupation, household_income_by_province.json "
+                           "via ingest_tmli.py; {} when the source file is absent)",
+                       ],
+                       "editorial": [
+                           "facts (province_narratives.json hand-written 'what impacts them' notes — "
+                           "curated for Rayong today; other provinces get the safe EMPTY_FACTS stub)",
+                       ],
+                       "estimated": [
+                           "en/slug (English name/slug derived from the province's 'Mueang' amphoe "
+                           "shapeName, or a curated PROVINCE_EN override — a naming derivation, not a "
+                           "measured value)",
+                       ],
+                   },
+                   "join_note": "deterministic, network-free spatial join (--check byte-exact); "
+                                 "absent-source fields are null/{} /[] rather than guessed.",
+               }}
         out[slug] = obj
         # null (not 0) when a province is genuinely ABSENT from the measured source —
         # a real measured 0 in the file is preserved. Mis-ranking BKK (no NSO labour

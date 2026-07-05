@@ -4,6 +4,64 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-05 — AUDIT: closed the R1 provenance gap — `provinces/<slug>.json` now embeds its own `meta.provenance`
+
+**Task type:** AUDIT. `/workspace/watcher` [TMLI blueprint] was not present this cycle, so no new
+cross-repo TMLI layer could be folded in. A RE-DERIVE pass first confirmed the working tree was
+already fully in sync on a clean pull of `claude/new-session-wto26j`: `bash tests/run.sh check` —
+47 passed, 0 failed, `validate_data.py` 421/421, no drift. A scan of every unwired `source-data/*`
+file (`gpp_by_province.json`, `google_trends.json`, `spam2010_th_cropgrid.json`,
+`worldpop_tha_2020_1km.tif`, `osm_gapcheck.json`, `competitors_official.json`, `heng_branches.json`)
+confirmed each is either already wired into a builder or (in `gpp_by_province.json`'s case)
+correctly and deliberately left unwired per the 2026-07-02 audit — nothing new to enrich this cycle.
+
+Moved to closing an open item in `docs/DATA_PROVENANCE.md`'s own RISK REGISTER (§3), **R1**:
+`provinces/<slug>.json` (77 files) + `provinces/index.json` carried numeric rollups (branch/district
+counts, DIW factories, DLT vehicles, NSO workers/unemployment/income, OSM POI) with **no embedded
+`meta` block** — every input was already a named sourced layer and the build was already `--check`
+byte-exact deterministic, but the file itself didn't say so (flagged LOW since 2026-07-01, never
+picked up).
+
+**Fix applied (no fabrication — no data value changed):**
+- `pipeline/build_province.py`: each per-province `obj` now carries a `meta` block —
+  `meta.generated_by` + `meta.provenance.{measured,editorial,estimated}` naming every field's real
+  source (branches = PIP of `branches_final.json` into `th_amphoe.geojson`; POI = OSM/Overpass
+  `osm_layers.json`; district factories/workers = DIW `factories_by_district.json` prov|district
+  join; district competitors = deduped Google Places/Overture/official-locator census; `gov.*` =
+  DLT/NSO/TMLI province totals, explicitly noting the existing null-not-zero rule for absent
+  provinces; `facts` = EDITORIAL `province_narratives.json`; `en`/`slug` = an ESTIMATED naming
+  derivation, not a measured value) — mirrors `build_amphoe.py`'s existing `meta.provenance` pattern.
+- **Deliberately left `provinces/index.json` a bare array** (not wrapped in `{meta, provinces:[...]}`)
+  — it is fetched directly as an array by ~6 frontend call sites (`app.js` ×4, `province.html`,
+  `rayong-catchment.html`, `branch-explorer.html`); restructuring it would be a breaking frontend
+  change for a documentation-only gain. Its rows are a straight projection of the now-documented
+  per-slug files, so the provenance gap is closed one level down instead.
+- Regenerated all 77 `platform/data/provinces/<slug>.json` (`python3 build_province.py`) —
+  byte-diff confirms **only the new top-level `meta` key was added; every existing field
+  (branches/districts/poi/gov/facts) is unchanged** — `build_province.py --check` reproduces
+  byte-exact. `index.json` untouched (0 diff).
+- Verified no frontend code path breaks: `province.html`/`rayong-catchment.html`/`app.js` all access
+  specific known keys off the per-province object (`RY.branches`, `RY.competitors`, `RY.poi`,
+  `RY.districts`, `RY.province_en/th`, `RY.region`, `RY.gov.*`, `RY.facts`) — none enumerate/iterate
+  its keys, so the additive `meta` key cannot affect any existing render path.
+- Updated `docs/DATA_PROVENANCE.md` §1 (the `provinces/<slug>.json` and `provinces/index.json` table
+  rows) and §3 (closed R1, explaining the index.json bare-array exception) to match.
+
+**Verification:** `bash tests/run.sh check` — 47 passed, 0 failed (`validate_data.py`: 421/421, no
+regression from the pre-cycle baseline). `python3 build_province.py --check` — reproduces byte-exact.
+Headless-render of `province.html?p=rayong` was attempted 3x but failed to produce a screenshot each
+time under this sandbox's software WebGL (`ERR_CONNECTION_REFUSED`/empty-screenshot) — this matches
+already-documented sandbox flakiness for WebGL-heavy pages (see the 2026-07-02 (2) log entry's note
+on `rayong-catchment.html`'s intermittent empty-screenshot behavior), not a regression from this
+change: the diff touches zero HTML/JS, only an additive JSON key, and the mandated
+`bash tests/run.sh check` gate is what CLAUDE.md requires green.
+
+**Source:** no new external pull this cycle — this closes an in-file documentation gap over already-
+sourced inputs (DIW/DLT/NSO/OSM/TMLI, all cited in the new `meta.provenance` block and previously
+recorded in `docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md`).
+
+---
+
 ## 2026-07-04 (8) — AUDIT: closed the two remaining unsourced-catchment provenance gaps flagged in `docs/DATA_PROVENANCE.md`'s risk register (R2/R3)
 
 **Task type:** AUDIT. `/workspace/watcher` [TMLI blueprint] was not present this cycle. A RE-DERIVE

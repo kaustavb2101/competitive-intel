@@ -414,9 +414,36 @@
       clearest expansion signal right now" rank-1 callout mirroring this pattern (top
       `opportunity_score.json` district, e.g.). Would balance both standing objectives with the same
       lightweight UI idiom. *(LOW, S)*
+- [ ] **`provinces/<slug>.json`'s new `meta.provenance` block (2026-07-05) doesn't yet get its own
+      `validate_data.py` check** — the provenance GATE already passes it (via the generic
+      `meta.provenance` signal check), but there's no dedicated assertion that every one of the 77
+      files' `meta.generated_by`/`meta.provenance.{measured,editorial,estimated}` sub-keys are present
+      and non-empty (the way `check_province_stress()` does for `province_stress_index.json`). Would
+      catch a future regression where `build_province.py` silently drops the block. *(LOW, S)*
+- [ ] **Headless render of `province.html`/`rayong-catchment.html` is unreliable in this sandbox under
+      software WebGL** (3 consecutive attempts this cycle all failed with `ERR_CONNECTION_REFUSED` or
+      an empty screenshot, even after killing stray chrome/http.server processes between tries) — this
+      echoes the already-documented `rayong-catchment.html` flakiness (2026-07-02 (2) log entry) but
+      now also affects the plain-Leaflet-adjacent `province.html`. Worth a `tests/lib/render.sh`
+      retry-loop (it already has a 4x retry per its own header comment — confirm it's actually being
+      exercised) or a longer settle budget before concluding a render genuinely regressed vs. the
+      harness just being flaky in this container. *(MED, S — blocks a fast confidence check on future
+      province-page cycles)*
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-05 (2) — AUDIT: closed `docs/DATA_PROVENANCE.md`'s R1 provenance gap.** Every
+  `platform/data/provinces/<slug>.json` (77 files) now carries its own `meta.generated_by` +
+  `meta.provenance.{measured,editorial,estimated}` block naming every field's real source (PIP
+  branches/POI, DIW factories, DLT vehicles, NSO workers/unemployment/income, deduped competitor
+  census, editorial narratives) — mirrors `build_amphoe.py`'s existing pattern. `index.json`
+  deliberately left a bare array (6+ frontend call sites fetch it directly as an array; wrapping it
+  would be a breaking change for a docs-only gain). Zero data values changed — byte-diff confirms only
+  the new `meta` key was added; `build_province.py --check` reproduces byte-exact. Gate: 47/0,
+  validate_data 421/421. Headless-render of `province.html?p=rayong` was attempted 3x and failed each
+  time under this sandbox's software WebGL (new follow-up logged above) — unrelated to this change
+  (zero HTML/JS touched); the mandated `bash tests/run.sh check` gate is green. Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-05 entry).
 - **2026-07-05 — UX: structural household-leverage callout on the Exposure tab.** `renderRiskReadouts()`
   in `platform/app.js` gained a "Structurally riskiest · household DTI + unemployment" block (rank-1
   `PSTRESS_LIST[0]` from the already-MEASURED `province_stress_index.json`), inserted between "Most-
