@@ -4,6 +4,67 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-06 — AUDIT: closed R6, the last open provenance-register gap (7 OSM ground-bed geometry files stamped with real `meta.source`)
+
+**Task type:** AUDIT (provenance-integrity pass — no geometry/numeric value changed; only a `meta`
+block was added to already-committed files, verified byte-diff-clean on the underlying arrays).
+
+**0. RE-DERIVE baseline first.** Fresh checkout of `claude/new-session-wto26j`,
+`bash tests/run.sh check` → 53 passed, 0 failed (`validate_data.py` 433/433) before touching
+anything. Re-ran every deterministic builder named in the routine's step 2(a)
+(`derive.py`, `build_amphoe.py`, `build_province.py`, `build_crop_stress.py`,
+`build_occupations.py`/`build_amphoe_occupations.py` — both correctly `SKIP` (no
+`source-data/overture_places.json` yet), `build_opportunity_score.py`, `ingest_tmli.py`) — all
+`--check` green, tree already fully in sync. Also re-checked PR #1: `mcp__github__list_pull_requests`
+still shows it open/not-draft, `master` still un-imported — no change since 2026-07-05, not
+re-flagging.
+
+**1. What R6 was.** `docs/DATA_PROVENANCE.md`'s risk register has carried an open item since the
+2026-07-04 audit: `rayong_landuse/roads/water/rail.json` and `bangkok_landuse/roads/water.json` are
+genuine, 100%-measured OpenStreetMap geometry (pulled by `pipeline/pull_rayong_ground.py`,
+`pull_rayong_extra.py`, `pull_city_3d.py`) but shipped as a bare `{"roads":[...]}`-style array with
+**zero embedded `meta`** — the exact same class of gap R2/R3 closed for the `*_catchment.json`
+building files back on 2026-07-04, just never done for the ground-bed layers. They were sitting on
+`tests/validate_data.py`'s `PROVENANCE_EXEMPT` list rather than passing the provenance gate on their
+own merits.
+
+**2. Fix applied — real facts only, no fabrication.** Confirmed the exact pull commit/bbox/endpoint
+per file from `git log --diff-filter=A` and each pull script's own defaults/PRESETS before writing
+anything:
+- `rayong_roads/water/landuse.json` — `pipeline/pull_rayong_ground.py`, bbox `12.655,101.155,12.725,101.310`, commit `a7a1491`.
+- `rayong_rail.json` — `pipeline/pull_rayong_extra.py`, bbox `12.62,101.13,12.74,101.33`, commit `9a30396`.
+- `bangkok_roads/water/landuse.json` — `pipeline/pull_city_3d.py --preset bangkok`, bbox `13.715,100.515,13.765,100.565`, commit `43b6fe3`. Honestly noted in the new `meta.note` that this bbox is **narrower** than `bangkok_catchment.json`'s full-metro building pull, so the ground bed doesn't extend under every building in the outer metro — a real, previously-undocumented asymmetry.
+
+Added `meta.{city,source,bbox,note,n_features,committed_in}` to all 7 committed files (feature counts
+computed directly from each file's own array, not invented). **Verified byte-diff-clean**: for every
+file, the underlying `roads`/`water`/`landuse`/`rail` array is identical before/after — only the new
+top-level `meta` key was added.
+
+**3. Kept the fix live for future re-pulls.** Updated `pull_rayong_ground.py`, `pull_rayong_extra.py`,
+and `pull_city_3d.py` so the next time any of them actually runs (from a Thai IP / Overpass mirror),
+the same `meta` block is emitted automatically — this doesn't regress the moment `docs/TONIGHT_CHECKLIST.md`'s
+"more tiles"/"more cities" pulls happen.
+
+**4. Housekeeping.** `tests/validate_data.py`'s `PROVENANCE_EXEMPT` set: removed the 7 files (they now
+pass `check_provenance()` on real `meta.source`, same as the `*_catchment.json` precedent) — narrowed
+the exemption list to just `rayong_province.json` (curated deep-dive, unrelated, R-none). Regenerated
+`platform/data/provenance.json` (`build_provenance.py`) since its aggregate counts shift with the new
+meta stamps: unlabelled dropped 8→6, measured 20→22. `docs/DATA_PROVENANCE.md`: R6 marked CLOSED, §1
+register rows updated for all 7 files.
+
+**Verification:** `bash tests/run.sh check` → 53 passed, 0 failed (`validate_data.py` 433/433,
+unchanged pass *count* — the provenance gate re-classifies these 7 files as sourced-by-their-own-meta
+rather than exempt, net check count is the same because it's a set-membership reclassification, not a
+new check). `git status` confirms only the 7 ground-geometry files + 3 pull scripts + `provenance.json`
++ `tests/validate_data.py` + `docs/DATA_PROVENANCE.md` changed — no page/app.js touched, so no render
+verification required per the routine's own rule ("if you changed a page, render it").
+
+**Source:** no external pull this cycle — every fact stamped (bbox, pull script, commit hash, feature
+count) was read directly from git history and the pull scripts' own code, then written into files that
+already existed. Nothing invented; `docs/IMPROVEMENT_BACKLOG.md`'s R6 backlog line closed below.
+
+---
+
 ## 2026-07-05 (7) — AUDIT: RE-DERIVE baseline green; closed 2 stale backlog duplicates; re-confirmed the OAE dead-end and PR #1 unmerged status (no change)
 
 **Task type:** AUDIT (backlog hygiene + gate/source re-verification — zero `platform/data` or

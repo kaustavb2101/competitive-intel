@@ -285,14 +285,20 @@ def main():
 
     out = os.path.abspath(args.out)
     os.makedirs(out, exist_ok=True)
+    ground_meta = {
+        "city": label,
+        "source": f"OpenStreetMap (Overpass, {args.endpoint}) — pipeline/pull_city_3d.py --city {city}",
+        "bbox": bbox,
+        "note": "MEASURED OSM ground-bed geometry, no estimation. Same bbox as this city's *_catchment.json buildings pull.",
+    }
     targets = {
         f"{city}_catchment.json": {
             "buildings": buildings,
             "meta": {"city": label, "n_bldg": len(buildings), "floor_area_m2": floor_area},
         },
-        f"{city}_roads.json": {"roads": roads},
-        f"{city}_water.json": {"water": water},
-        f"{city}_landuse.json": {"landuse": landuse},
+        f"{city}_roads.json": {"roads": roads, "meta": {**ground_meta, "n_features": len(roads)}},
+        f"{city}_water.json": {"water": water, "meta": {**ground_meta, "n_features": len(water)}},
+        f"{city}_landuse.json": {"landuse": landuse, "meta": {**ground_meta, "n_features": len(landuse)}},
     }
     for name, payload in targets.items():
         path = os.path.join(out, name)

@@ -156,11 +156,17 @@ def main():
 
     out = os.path.abspath(args.out)
     os.makedirs(out, exist_ok=True)
+    base_meta = {
+        "city": "Rayong",
+        "source": f"OpenStreetMap (Overpass, {args.endpoint}) — pipeline/pull_rayong_extra.py",
+        "bbox": args.bbox,
+        "note": "MEASURED OSM geometry, no estimation.",
+    }
     targets = {}
     if trees:
-        targets["rayong_trees.json"] = {"trees": trees}
+        targets["rayong_trees.json"] = {"trees": trees, "meta": {**base_meta, "n_features": len(trees)}}
     if rail:
-        targets["rayong_rail.json"] = {"rail": rail}
+        targets["rayong_rail.json"] = {"rail": rail, "meta": {**base_meta, "n_features": len(rail)}}
     for name, payload in targets.items():
         path = os.path.join(out, name)
         with open(path, "w") as f:

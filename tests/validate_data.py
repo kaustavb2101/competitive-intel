@@ -3740,19 +3740,12 @@ PROVENANCE_EXEMPT = {
     "provinces/index.json",
     # --- (c) geometry / basemap layers: OSM (Overpass) + Overture footprints (DATA_PROVENANCE.md R2/R3/R6) ---
     # Numeric building/road/water/landuse GEOMETRY for the 3D scenes — coordinates & footprints, NOT
-    # decision metrics. Source is OSM/Overture by construction (via the pull_* scripts) though not all
-    # carry an in-file meta.source stamp yet. Exempt as visual basemap, flagged in the register.
-    # rayong/bangkok/chiang-mai _catchment.json all gained a real meta.source stamp (data-integrity
-    # cycle 2026-07-04) and now pass check_provenance() on their own merits via _has_provenance() —
-    # no longer listed here on purpose. See docs/DATA_PROVENANCE.md §1 R2/R3.
+    # decision metrics. Source is OSM/Overture by construction (via the pull_* scripts).
+    # rayong/bangkok/chiang-mai _catchment.json (R2/R3, 2026-07-04) AND rayong/bangkok's
+    # roads/water/landuse/rail OSM ground-bed layers (R6, 2026-07-06) all gained a real
+    # meta.source/bbox/note stamp and now pass check_provenance() on their own merits via
+    # _has_provenance() — no longer listed here on purpose. See docs/DATA_PROVENANCE.md §1 R2/R3/R6.
     "rayong_province.json",    # curated Rayong pilot deep-dive; inputs are sourced layers + curated list
-    "rayong_landuse.json",     # OSM/Overpass landuse polygons (basemap)
-    "rayong_roads.json",       # OSM/Overpass road lines (basemap)
-    "rayong_water.json",       # OSM/Overpass water polygons (basemap)
-    "rayong_rail.json",        # OSM/Overpass rail lines (basemap)
-    "bangkok_landuse.json",    # OSM/Overpass landuse polygons (basemap)
-    "bangkok_roads.json",      # OSM/Overpass road lines (basemap)
-    "bangkok_water.json",      # OSM/Overpass water polygons (basemap)
 }
 
 

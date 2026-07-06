@@ -612,6 +612,18 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-06 — AUDIT: closed `docs/DATA_PROVENANCE.md`'s R6, the last open provenance-register
+  gap.** The 7 OSM ground-bed geometry files (`rayong_landuse/roads/water/rail.json`,
+  `bangkok_landuse/roads/water.json`) were genuine 100%-measured OSM data sitting on
+  `tests/validate_data.py`'s `PROVENANCE_EXEMPT` list with zero in-file `meta` — same gap class R2/R3
+  closed for the `*_catchment.json` building files on 2026-07-04, never done for the ground layers.
+  Added real `meta.{city,source,bbox,note,n_features,committed_in}` to all 7 (facts read from git
+  history + each pull script's own bbox/preset — zero fabrication, byte-diff confirms the underlying
+  geometry arrays are unchanged). Updated `pull_rayong_ground.py`/`pull_rayong_extra.py`/
+  `pull_city_3d.py` so future re-pulls keep emitting this meta. `PROVENANCE_EXEMPT` narrowed to just
+  `rayong_province.json`; `provenance.json` regenerated (unlabelled 8→6, measured 20→22). Gate 53/0,
+  `validate_data.py` 433/433. Re-confirmed PR #1 still unmerged (no change). Full writeup:
+  `docs/DATA_REFRESH_LOG.md` (2026-07-06 entry).
 - **2026-07-05 (7)/PROGRESS_LOG numbering — ENRICH: national lowest-paid-occupation callout on
   Exposure.** `pipeline/build_occupation_income.py` aggregates the already-MEASURED
   `household_income_by_province.json` (NSO SES 2566) into a national worst-first ranking by
