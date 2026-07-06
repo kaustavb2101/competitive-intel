@@ -597,18 +597,41 @@
       more niche reads (e.g. moto-collateral) behind a "more" toggle, the same way the National map's
       lens picker collapses into "More lenses ▾". Not a problem yet — flagging before it becomes one.
       *(LOW, S, speculative)*
-- [ ] **Audit whether any other Exposure-only rank-1 callout is still missing from Home** — this
-      cycle found and closed one instance (lowest-paid occupation) of a fact shipped to `#exposure`
-      but never ported to `#home` despite Home's risk card explicitly following the same
-      rank-1-surfacing convention. Worth a quick `grep` pass comparing `renderRiskReadouts()`'s blocks
-      against `renderHomeRisk()`'s blocks to confirm parity, since these two functions have grown in
-      parallel across several cycles and could have drifted again. *(LOW, S)*
+- [x] **Audit whether any other Exposure-only rank-1 callout is still missing from Home — DONE
+      2026-07-06 (2)** (compared `renderRiskReadouts()` against `renderHomeRisk()`/
+      `renderHomeWhitespace()` block-by-block: Home's risk card already had parity/superset on every
+      objective-#1 callout, but the objective-#2 side was missing "Most contested ground"
+      (`renderContestedGround()`'s rank-1 fact, `contested_pop.json`, measured) — the flip side of the
+      white-space callouts already on Home. Ported the rank-1 row + wired `loadContestedPop()` into
+      Home's lazy-load chain, null-safe. Gate 53/0, headless-rendered, `data-errors="[]"`. See
+      `docs/PROGRESS_LOG.md` 2026-07-06 (2).)
 - [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-06, still unmerged, no change.**
       `mcp__github__list_pull_requests(state=open)` still shows PR #1 (`claude/new-session-wto26j` →
       `master`) open, not draft, created 2026-06-28. Every `schedule:`-triggered GitHub Actions
       workflow in this repo remains dormant until it merges (see the 2026-07-05 (4)/(6)/(7) writeups)
       — this is Kaustav's call, not sandbox-solvable. Re-check again next cycle before picking up any
       "why hasn't the scheduled puller fired" item. *(LOW, trivial — just a status check)*
+
+## Queue — follow-ups noticed 2026-07-06 (2)
+- [ ] **`CPOP.top[0]`'s contested share can be a rounded 100%** (as seen this cycle: a 4.59M-person
+      catchment reads as fully contested) — worth double-checking whether a near-100% contested
+      reading on Home's new "Most contested ground" row ever needs a distinguishing caveat (e.g. dense
+      Bangkok catchments where every rival brand physically overlaps look identical to a hypothetical
+      data bug) before treating it as fully self-explanatory; today's number is real and traces
+      correctly to `contested_pop.json`, just flagging the visual for a future UX pass. *(LOW, trivial,
+      speculative)*
+- [ ] **Home's whitespace card (`renderHomeWhitespace()`) now has 4 stacked blocks** (top districts,
+      top provinces, competitor coverage, contested ground) — same "card getting long" pattern already
+      flagged for the risk card (2026-07-06 entry above); not a problem yet, but if a 5th block is ever
+      added, worth doing the "more" toggle for both cards at once rather than one at a time. *(LOW, S,
+      speculative)*
+- [ ] **`renderHomeWhitespace()`'s new contested-ground row and `renderHomeHero()`'s existing
+      "Open next in `<district>`" verdict could theoretically point at the same or an adjacent place**
+      (a top-opportunity district that also happens to be heavily contested) — not observed as an
+      actual conflict this cycle (contested-ground rank-1 was a dense Bangkok branch, unrelated to the
+      Ko Pha-Ngan/Ko Kut Road-to-3,000 openings shown in the hero), just flagging the new visual
+      adjacency the same way the 2026-07-05 (6) note did for the Acquisition tab's verdict card vs.
+      Road-to-3,000. *(LOW, trivial, speculative)*
 
 ## Done (most recent first)
 - (loop will append here)

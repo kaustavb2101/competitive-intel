@@ -5,6 +5,31 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-06 (2) — UX: "Most contested ground" rank-1 fact ported to the Home command center (objective #2)
+
+Loop cycle. Audited the standing "any other Exposure-only rank-1 callout still missing from Home?"
+follow-up (2026-07-05 (8)/2026-07-06 backlog note) by comparing `renderRiskReadouts()` (`#exposure`)
+against `renderHomeRisk()`/`renderHomeWhitespace()` (`#home`) block-by-block. Found Home's risk card
+already has parity or a superset on every objective-#1 (risk) callout — but on the objective-#2
+(expand) side, Exposure's "Most contested ground" table (`renderContestedGround()`, MEASURED WorldPop
+2020 × merged rival census, `data/contested_pop.json`) had no equivalent anywhere on Home: the
+whitespace card only ever named *where there's open space*, never *where we already fight a rival for
+the same catchment population* — the natural flip side of the same signal, and a real portfolio/
+expansion-risk fact (a branch that is "open" but heavily contested is a weaker opening than the
+white-space score alone suggests).
+
+`renderHomeWhitespace()` (`platform/app.js`) gained a "Most contested ground" row (rank-1 branch off
+`CPOP.top[0]`, same measured tag/pattern as the existing competitor-coverage row right above it);
+wired `loadContestedPop()` into Home's lazy-load chain (`renderHome()`'s `homeBooted` block, calling
+the existing `reHome` re-render helper already used for the other white-space-card loaders) — null-safe,
+renders nothing until/unless `contested_pop.json` loads. Zero new data file, zero new pipeline script,
+pure reuse of plumbing that's been live on Exposure since the file shipped. `node --check app.js` clean;
+gate `bash tests/run.sh check` 53/0 (`validate_data.py` 433/433, unaffected — UI-only change).
+Headless-rendered `index.html#home`: `data-errors="[]"`, DOM dump confirms the new row renders with
+real measured data (เงินไชโยสาขาอินทามระ ซอย 4, Bangkok, 100% of a 4.59M-person catchment contested) right
+after "Competitor coverage" in the white-space card, no layout regression. Full diff: `platform/app.js`
+(+13 lines, 2 call sites).
+
 ## 2026-07-06 — UX: lowest-paid-occupation-nationally fact ported to the Home command center (objective #1)
 
 Loop cycle. Closed the 2026-07-05 (8) backlog follow-up: `#exposure`'s "Lowest-paid occupation

@@ -4802,6 +4802,9 @@ function renderHome(){
     loadCompetitors().then(reHome);
     // obj#2 — national competitor-coverage % chip in the where-to-expand card (null-safe).
     loadCompCoverage().then(reHome);
+    // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
+    // expand card, mirroring the full table already shipped on Exposure (null-safe).
+    loadContestedPop().then(reHome);
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -4988,6 +4991,17 @@ function renderHomeWhitespace(){
     html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
       'lower-bound census · a confidence flag on the white-space above, not market share',
       `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
+  }
+  // MOST CONTESTED GROUND (contested_pop.json) — the flip side of white-space: where we already
+  // fight a rival for the same catchment population. Same rank-1-surfacing pattern already shipped
+  // on Exposure's full "Most contested ground" table (renderContestedGround); mirrored here so Home's
+  // expand card names both "where's the open space" and "where are we already contested".
+  if(CPOP&&Array.isArray(CPOP.top)&&CPOP.top.length){
+    const t=CPOP.top[0];
+    html+=`<div class="cc-sub2">Most contested ground ${TAG_M}</div>`;
+    html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
+      `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
+      `${t.pct}%`,'contested','var(--agri)');
   }
   box.innerHTML=html;
 }
