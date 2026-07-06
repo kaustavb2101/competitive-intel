@@ -334,6 +334,28 @@ function occriskRec(d){
   return OCCRISK[i]||null;
 }
 
+/* ---------- per-province factory-worker income floor (data/factory_income_by_province.json) ----------
+   MEASURED (NSO SES 2566), keyed by province Thai name (matches branch field d.v). Lets the
+   Simulator's factory-slowdown lever (simFactoryModel) name WHICH manufacturing-base branches sit
+   in a province whose factory-worker income already runs below the national average — a concrete
+   geographic read layered on top of the existing flat national severity knob. Purely additive:
+   simFactoryModel()'s core scenario numbers are unchanged whether this file is present or not.
+   Written by pipeline/build_factory_income.py. Null-guarded throughout. */
+let FACTINC=null, factincMeta=null, factincLoaded=false, factincPromise=null;
+async function loadFactoryIncome(){
+  if(factincPromise) return factincPromise;
+  factincLoaded=true;
+  factincPromise=(async()=>{
+    try{ const r=await fetch('data/factory_income_by_province.json'); if(!r.ok) throw 0;
+      const j=await r.json(); factincMeta=j.meta||null;
+      FACTINC=(factincMeta&&factincMeta.absent)?null:(j.provinces||null); }
+    catch(e){ FACTINC=null; factincMeta=null; }
+    return FACTINC;
+  })();
+  return factincPromise;
+}
+function factincHasData(){return !!(FACTINC&&Object.keys(FACTINC).length);}
+
 /* ---------- per-branch RELEVANT-POI density (data/poi_relevance.json, obj#2) ----------
    Lazy-loads the title-loan-relevant POI-density layer built by pipeline/build_poi_relevance.py:
    {meta, branches:[{rel:0..100, raw, cat:{...category counts...}, src}]}, INDEX-ALIGNED to
@@ -2872,6 +2894,25 @@ function simFactoryModel(){
     baseAvg:baseSum/mfgBr, scenAvg:scenSum/mfgBr, delta:(scenSum-baseSum)/mfgBr,
     share:100*mfgBr/N, worstDelta};
 }
+// MEASURED context on top of the ESTIMATED lever above: of the manufacturing-base branches, how
+// many sit in a province whose NSO factory-worker income already runs below the national average
+// (factory_income_by_province.json)? Read-only — never changes simFactoryModel()'s scenario numbers.
+// Null when either the occupation-risk or factory-income layer is absent.
+function simFactoryIncomeFloor(){
+  if(!occriskHasData()||!factincHasData()||!DATA) return null;
+  let mfgBr=0, below=0, worstRatio=null, worstProv=null;
+  DATA.forEach((d,i)=>{
+    const e=OCCRISK[i]; if(!e||!SIM_FACTORY_KEYS[e.d]) return;
+    mfgBr++;
+    const rec=FACTINC[d.v]; if(!rec) return;
+    if(rec.ratio_to_national<1){
+      below++;
+      if(worstRatio==null||rec.ratio_to_national<worstRatio){ worstRatio=rec.ratio_to_national; worstProv=d.v; }
+    }
+  });
+  if(!mfgBr) return null;
+  return {mfgBr,below,worstRatio,worstProv};
+}
 // render the factory-slowdown output cards. Hidden when the occupation-risk pull is absent.
 function renderSimFactory(){
   const wrap=$('#sim-factory-out-wrap'), box=$('#sim-factory-out'); if(!box) return;
@@ -2891,6 +2932,13 @@ function renderSimFactory(){
      d:shocked?'points on the most exposed branch':'set the slowdown lever',col:shocked?'var(--agri)':'var(--mid)',
      n:'Largest ESTIMATED occupation-stress rise on a single manufacturing-base branch under this severity. Illustrative — no loan balances.'},
   ];
+  const fi=simFactoryIncomeFloor();
+  if(fi){
+    cards.push({k:'Below income-floor · measured',v:fi.below.toLocaleString(),
+      d:fi.worstProv?`worst: ${fi.worstProv} (${(fi.worstRatio*100).toFixed(0)}% of national)`:'none below national avg',
+      col:fi.below?'var(--agri)':'var(--mid)',
+      n:'MEASURED count of manufacturing-base branches sitting in a province whose NSO SES factory-worker income already runs below the national average (factory_income_by_province.json). Context only — does not change the estimated stress figures above.'});
+  }
   box.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v" style="color:${c.col}">${c.v}</div>
     <div class="d" style="color:${c.col}">${c.d}</div>
@@ -2922,6 +2970,7 @@ function renderSim(){
   const active=()=>document.getElementById('v-sim').classList.contains('on');
   loadCropStress().then(()=>{ if(active()) computeSim(); });
   loadOccRisk().then(()=>{ if(active()){ syncSimFactoryVisibility(); computeSim(); } });
+  loadFactoryIncome().then(()=>{ if(active()) renderSimFactory(); });
   syncSimFactoryVisibility();
 }
 // show the factory-slowdown lever only when the Overture occupation-risk pull is present; otherwise
