@@ -569,13 +569,15 @@
       checked off. Zero code/data changed — pure backlog hygiene.
 
 ## Queue — follow-ups noticed 2026-07-05 (8)
-- [ ] **`occupation_income.json`'s national aggregate could feed the Simulator's occupation-
-      sensitivity lever the same way the raw `gov.income` breakdown was proposed to (2026-07-03 (7)
-      entry above, still open)** — now that the lowest-paid-occupation fact is already computed
-      nationally (not just per-province), the factory-slowdown lever could discount by
-      `min_value`/`national_avg` for the affected occupation category instead of a flat severity
-      knob, sharpening the ESTIMATED lever with a real NSO income floor. Still *(LOW, M)* — a
-      Simulator formula change, not a quick win.
+- [x] **`occupation_income.json`'s national aggregate could feed the Simulator's occupation-
+      sensitivity lever — DONE 2026-07-06 (3), scoped as an additive read rather than a formula
+      change.** Rather than discounting `simFactoryModel()`'s existing uplift math (real regression
+      risk to an already-shipped lever), added a new `pipeline/build_factory_income.py` →
+      `platform/data/factory_income_by_province.json` (per-province NSO SES FactoryWorkers income +
+      ratio_to_national) and a 4th, purely-additive "Below income-floor · measured" card
+      (`simFactoryIncomeFloor()`) naming how many manufacturing-base branches sit in an
+      already-below-average factory-income province. Zero change to the existing scenario numbers.
+      Gate 54/0. See `docs/PROGRESS_LOG.md` 2026-07-06 (3).
 - [ ] **`occupation_income.json` is unweighted-mean across provinces (a small province counts the
       same as Bangkok)** — labelled honestly in `meta.caveats`, but if this callout ever needs to
       answer "which occupation pays least for the AVERAGE WORKER nationally" rather than "for the
@@ -611,6 +613,42 @@
       workflow in this repo remains dormant until it merges (see the 2026-07-05 (4)/(6)/(7) writeups)
       — this is Kaustav's call, not sandbox-solvable. Re-check again next cycle before picking up any
       "why hasn't the scheduled puller fired" item. *(LOW, trivial — just a status check)*
+
+## Queue — follow-ups noticed 2026-07-06 (3)
+- [ ] **⚠ SECURITY — a real-looking `.env` file with non-empty API key values (`DATA_GO_TH_TOKEN`,
+      `NSO_TOKEN`, `BOT_API_KEY_*`, `GISTDA_API_KEY`, `ORS_KEY`, `GOOGLE_PLACES_KEY`) is committed on
+      `origin/master` and `origin/claude/brave-goodall-je1xfj`** (added via "Add files via upload" /
+      "Rename .env.txt to .env", NOT this branch's history) — the file's own header comment says
+      "the .env file is git-ignored — it stays on your machine and is NEVER committed", so this
+      looks like an accidental upload rather than an intentional commit. Sandbox policy blocks
+      reading/printing the values (confirmed this cycle — a `git show origin/master:.env` was denied
+      by the auto-mode classifier as credential materialization), so provenance/validity of each key
+      couldn't be further inspected from here. **Out of this loop's scope** (different branches,
+      needs a human call: rotate every listed key, then either purge the blob from git history or
+      accept it as already-exposed) — flagged to Kaustav via `PushNotification` this cycle, not
+      something a future loop cycle should attempt to fix directly (this loop only ever touches
+      `claude/new-session-wto26j`, and history-rewrite/key-rotation are both explicitly
+      human-authorization-required actions). *(HIGH, needs a human, cross-branch — do not action
+      from the loop)*
+
+## Queue — follow-ups noticed 2026-07-06 (4)
+- [ ] **`build_factory_income.py`'s pattern (per-province occupation income → ratio_to_national)
+      only covers `FactoryWorkers`** — the same already-committed `household_income_by_province.json`
+      has 4 more MEASURED occupation columns (Agriculture, OfficeStaff, SMEOwners, Transport). The
+      Agriculture column in particular could sharpen `build_crop_stress.py`'s agri_stress the same
+      way this cycle sharpened the factory-slowdown lever — an income-floor context card alongside
+      the existing price/drought-driven score. *(LOW, S — same builder shape, different column)*
+- [ ] **`simFactoryIncomeFloor()`'s sample is tiny today (only 2 manufacturing-dominant branches
+      nationally, per `occupation_risk.json`)** — same "dark-until-data" ceiling already logged for
+      the underlying occupation-risk lens; this card will only become a meaningful read once the
+      Overture occupation pull broadens past the current 2-branch sample. No action needed, just
+      noting the same caveat applies one layer up. *(LOW, trivial, speculative)*
+- [ ] **`factory_income_by_province.json`'s per-province `ratio_to_national` could also surface on
+      `province.html`'s "Who works nearby" income panel** (which already renders `gov.income`'s raw
+      FactoryWorkers THB figure per province) as a one-line "X% of the national factory-worker
+      average" annotation — reuses the exact same MEASURED ratio this cycle computed, no new
+      pipeline needed, just a `build_province.py` join + a small `province.html` render tweak.
+      *(LOW, S)*
 
 ## Queue — follow-ups noticed 2026-07-06 (2)
 - [ ] **`CPOP.top[0]`'s contested share can be a rounded 100%** (as seen this cycle: a 4.59M-person

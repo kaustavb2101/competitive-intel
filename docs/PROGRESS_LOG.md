@@ -5,6 +5,34 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-06 (3) — ENRICH: MEASURED factory-worker income floor context on the Simulator (objective #1)
+
+Loop cycle. Closed the 2026-07-05 (8) backlog follow-up: the Simulator's factory-slowdown lever
+(`simFactoryModel()`) applied the same flat ESTIMATED severity uplift to every manufacturing-base
+branch nationwide, with no read on whether that province's factory-worker income floor is already
+thin. `source-data/household_income_by_province.json` (NSO SES 2566, already vendored + MEASURED)
+carries a real per-province `FactoryWorkers` figure that was never projected outside the
+per-province deep-dive.
+
+New `pipeline/build_factory_income.py` (network-free, deterministic, `--check`-gated, degrades to
+an honest ABSENT-state when the source is missing) projects it into
+`platform/data/factory_income_by_province.json`: `national_avg` (21,971 THB/mo) + per-province
+`ratio_to_national`, keyed by the canonical 77 Thai province names (matches branch field `d.v`).
+`platform/app.js` gained a null-guarded loader (`loadFactoryIncome`/`factincHasData`) wired into
+`renderSim()`'s lazy-load chain, and a new `simFactoryIncomeFloor()` read-only helper — purely
+additive, never touches `simFactoryModel()`'s existing scenario math. `renderSimFactory()` gained a
+4th "Below income-floor · measured" card citing the count of manufacturing-base branches sitting in
+a below-national-average factory-income province (+ the worst one by name), hidden gracefully when
+either source layer is absent.
+
+`validate_data.py` gained `check_factory_income()` (437/437, was 433/433); `tests/run.sh` gates the
+new builder's `--check`. Gate 54/0. Headless-rendered `index.html#sim`: `data-errors="[]"`, the new
+card renders (today only 2 manufacturing-dominant branches exist nationally — same small sample
+`occupation_risk.json` is dark-until-data on elsewhere — so it reads 0 below floor; the mechanism is
+verified and will sharpen once the Overture occupation pull broadens). No regression on the other 3
+existing factory cards or any other Simulator lever. Full diff: `pipeline/build_factory_income.py`
+(new, 170 lines), `platform/app.js` (+49 lines), `tests/run.sh`/`tests/validate_data.py` (+58 lines).
+
 ## 2026-07-06 (2) — UX: "Most contested ground" rank-1 fact ported to the Home command center (objective #2)
 
 Loop cycle. Audited the standing "any other Exposure-only rank-1 callout still missing from Home?"
