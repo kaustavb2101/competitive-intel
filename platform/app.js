@@ -4792,6 +4792,8 @@ function renderHome(){
     loadCollatOutlookData().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — per-branch composite to name the single riskiest branch in the risk card (null-safe).
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // obj#1 — lowest-paid occupation nationally into the risk card (null-safe, mirrors Exposure).
+    loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
     // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
     loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
@@ -5016,6 +5018,16 @@ function renderHomeRisk(){
     html+=ccRow(`${p.province} <span class="sub">${p.region||''}</span>`,
       `DTI ${p.debt_to_income!=null?(+p.debt_to_income).toFixed(2)+'×':'—'} · unemployment ${p.unemployment_rate!=null?(+p.unemployment_rate).toFixed(1)+'%':'—'} (NSO, measured)`,
       `▲ ${(p.composite_stress||0).toFixed(0)}`,'composite','var(--agri)');
+  }
+  // lowest-paid occupation nationally (occupation_income.json) — a concrete income-floor fact,
+  // same rank-1-surfacing pattern already shipped on Exposure; mirrored here per the 2026-07-05 (8)
+  // backlog follow-up ("Home doesn't yet surface the same fact").
+  if(occincHasData()){
+    const c=OCCINC_LIST[0];
+    html+=`<div class="cc-sub2">Lowest-paid occupation nationally ${TAG_M}</div>`;
+    html+=ccRow(`${c.label}`,
+      `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
+      `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)');
   }
   // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
