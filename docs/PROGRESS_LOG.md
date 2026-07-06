@@ -5,6 +5,22 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-06 — UX: lowest-paid-occupation-nationally fact ported to the Home command center (objective #1)
+
+Loop cycle. Closed the 2026-07-05 (8) backlog follow-up: `#exposure`'s "Lowest-paid occupation
+nationally" callout (`occupation_income.json`, NSO SES 2566, measured) had no equivalent on `#home`,
+even though Home's risk card already follows the exact same rank-1-surfacing convention used for
+`PSTRESS_LIST[0]`/`HHRISK_LIST[0]`. `renderHomeRisk()` (`platform/app.js`) gained the identical row
+(Transport ฿18,547/mo avg, worst แม่ฮ่องสอน ฿6,713/mo) placed right after the "Structurally riskiest ·
+DTI + unemployment" row; wired `loadOccupationIncome()` into Home's lazy-load chain
+(`renderHome()`'s `homeBooted` block) so it re-renders once the file lands, null-safe when absent
+(`occincHasData()` guard, matches the pattern already used everywhere else on this page). Zero new
+data file, zero new pipeline script — pure reuse of already-shipped plumbing. `node --check app.js`
+clean; gate `bash tests/run.sh check` 53/0 (`validate_data.py` 433/433, unaffected — UI-only change).
+Headless-rendered `index.html#home`: `data-errors="[]"`, new row renders with the real measured
+values under "What is getting riskier", no layout regression (screenshot confirmed). Full diff:
+`platform/app.js` (+12 lines).
+
 ## 2026-07-05 (7) — ENRICH: national lowest-paid-occupation callout on Exposure (objective #1)
 
 Loop cycle. Closed the 2026-07-03 (7) backlog follow-up: `province.html`'s "Income by occupation"

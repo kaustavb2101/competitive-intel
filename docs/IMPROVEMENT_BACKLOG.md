@@ -583,11 +583,32 @@
       weights are already in the pipeline elsewhere, e.g. `unemployment_by_province.json`'s
       labor-force column) — not needed today, the province-level read is honest as scoped. *(LOW,
       S, speculative)*
-- [ ] **The Home command-center (`#home`) doesn't yet surface the same "lowest-paid occupation
-      nationally" fact** — this cycle only wired it into `#exposure` (scope discipline: one tab per
-      cycle), but Home's risk card already follows the exact `PSTRESS_LIST[0]`/`HHRISK_LIST[0]`
-      rank-1-surfacing convention this reuses; a future cycle could add the same `OCCINC_LIST[0]`
-      row to `renderHomeRisk()` if Home's risk card ever feels thin. *(LOW, S)*
+- [x] **The Home command-center (`#home`) now surfaces the same "lowest-paid occupation
+      nationally" fact — DONE 2026-07-06** (`renderHomeRisk()` gained the identical `OCCINC_LIST[0]`
+      row already shipped on `#exposure`, wired `loadOccupationIncome()` into Home's lazy-load chain;
+      zero new data/pipeline, pure UI reuse. Gate 53/0, headless-rendered `#home`, `data-errors="[]"`,
+      no layout regression. See `docs/PROGRESS_LOG.md` 2026-07-06.)
+
+## Queue — follow-ups noticed 2026-07-06
+- [ ] **Home's risk card (`renderHomeRisk()`) now has 6 stacked blocks** (composite-risk verdict,
+      DTI+unemployment structural read, lowest-paid occupation, riskiest single branch, worst
+      crop-household stress, moto-heavy collateral) — each addition so far has been a small additive
+      row, but the card is getting long enough that a future UX pass may want to demote 1-2 of the
+      more niche reads (e.g. moto-collateral) behind a "more" toggle, the same way the National map's
+      lens picker collapses into "More lenses ▾". Not a problem yet — flagging before it becomes one.
+      *(LOW, S, speculative)*
+- [ ] **Audit whether any other Exposure-only rank-1 callout is still missing from Home** — this
+      cycle found and closed one instance (lowest-paid occupation) of a fact shipped to `#exposure`
+      but never ported to `#home` despite Home's risk card explicitly following the same
+      rank-1-surfacing convention. Worth a quick `grep` pass comparing `renderRiskReadouts()`'s blocks
+      against `renderHomeRisk()`'s blocks to confirm parity, since these two functions have grown in
+      parallel across several cycles and could have drifted again. *(LOW, S)*
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-06, still unmerged, no change.**
+      `mcp__github__list_pull_requests(state=open)` still shows PR #1 (`claude/new-session-wto26j` →
+      `master`) open, not draft, created 2026-06-28. Every `schedule:`-triggered GitHub Actions
+      workflow in this repo remains dormant until it merges (see the 2026-07-05 (4)/(6)/(7) writeups)
+      — this is Kaustav's call, not sandbox-solvable. Re-check again next cycle before picking up any
+      "why hasn't the scheduled puller fired" item. *(LOW, trivial — just a status check)*
 
 ## Done (most recent first)
 - (loop will append here)
