@@ -96,8 +96,17 @@ DLT also carries `dataset_stat_1_005` (driver licenses, monthly to Feb 2026) and
   ปราจีนบุรี, นครราชสีมา, ระยอง). Pairs with the brand-trends EV wave for the per-province risk read.
   Not yet surfaced in the app — next wave.
 
-**Next-wave targets:** surface the automotive/EV-exposure layer (Overview + province drill),
-ThaiWater reservoir/flood wiring, DLT monthly stat_1_008 transaction series (monthly vehicle-market pulse).
+**Wave 4 (2026-07-09):** EV-exposure surfaced — `build_ev_exposure.py` → `platform/data/ev_exposure.json`
+→ top-10 province table inside the Overview's New-vehicle market block. Gate 65/0.
+
+**Wave 5 (2026-07-09) — ThaiWater wired:** `/public/rain_24h` = **4,460 live rain-gauge stations** with
+province/amphoe/coords → `pull_thaiwater_rain.py` → `source-data/thaiwater_rain.json` (per-province
+n_stations / max / p90 / %heavy / %very-heavy, Thai Met thresholds). The real-time flood/soak pulse
+(live check: Songkhla 102mm max). Dam endpoints (`dam_daily` etc.) are auth-walled 403/404 — gauge
+network only. Not yet surfaced in the app.
+
+**Next-wave targets:** surface the live rain pulse (Overview/crop-stress card + CI refresh workflow),
+DLT monthly stat_1_008 transaction series (monthly vehicle-market pulse).
 
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
