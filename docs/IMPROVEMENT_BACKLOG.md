@@ -727,13 +727,14 @@
       `mcp__github__list_pull_requests(state=open)` check, same result as the entry directly above
       (checked twice this cycle, once at ORIENT and once before this new item). Not re-flagging.
       *(LOW, trivial — just a status check)*
-- [ ] **The new `gov.income_floor.{factory,agri}_ratio_to_national` field on `provinces/<slug>.json`
-      (this cycle) has no dedicated `validate_data.py` check** — it's a pure pass-through of an
-      already-validated ratio (`check_factory_income()`/`check_agri_income()` already assert
-      `factory_income_by_province.json`/`agri_income_by_province.json`'s ratios are sane), so the
-      risk is low, but a small `check_province_provenance()`-adjacent assertion (ratio in a sane
-      range, e.g. 0–5, when the key is present) would close the same "new field, no gate" gap other
-      enrichment cycles have caught themselves on. *(LOW, S)*
+- [x] **The new `gov.income_floor.{factory,agri}_ratio_to_national` field on `provinces/<slug>.json`
+      has no dedicated `validate_data.py` check — DONE 2026-07-09 (6)** (new
+      `check_province_income_floor()`: for all 77 provinces, asserts every present
+      `gov.income_floor.{factory,agri,sme}_ratio_to_national` sits in a sane (0,5) range AND exactly
+      matches the corresponding source file's own `ratio_to_national` for that province — closes the
+      join-integrity gap, not just a value-range gap. Verified it actually catches drift by
+      hand-corrupting `bangkok.json`, confirming a real FAIL, then restoring from git. Gate 56/0,
+      `validate_data.py` 446/446. See `docs/PROGRESS_LOG.md` 2026-07-09 (6).)
 - [ ] **`province.html`'s new "(X% of national avg)" ratio annotation color threshold (`<1` → red,
       else muted grey) was picked for readability, not contrast-checked** — same low-priority
       "not measured against a contrast bar" smell already logged for the National map's 0.6
@@ -770,6 +771,26 @@
       `mcp__github__list_pull_requests(state=open)` shows PR #1 (`claude/new-session-wto26j` →
       `master`) still open, not draft — same state as every prior recheck since 2026-07-05 (4). Not
       re-notifying (no change). *(LOW, trivial — just a status check)*
+
+## Queue — follow-ups noticed 2026-07-09 (6)
+- [ ] **`check_province_income_floor()` (new this cycle) reads all 77 `provinces/<slug>.json` files
+      in full to do the join check** — same pattern `check_province_provenance()` already uses (no
+      sampling, unlike `check_provinces()`'s `PROVINCE_SAMPLE`), so this isn't a new perf class, just
+      noting the validator now has two full-77-file scanners; fine at today's file sizes (a few KB
+      each) but worth remembering if `provinces/<slug>.json` ever grows much heavier. *(LOW, trivial,
+      speculative)*
+- [ ] **The same source-vs-join verification pattern (`check_province_income_floor()`) could extend
+      to `gov.vehicles`/`gov.employment`/`gov.unemployment`/`gov.income`** on `provinces/<slug>.json` —
+      those are also pass-through joins from `vehicles_by_province.json`/`employment_by_province.json`/
+      `unemployment_by_province.json`/`household_income_by_province.json`, and today only get the
+      generic `check_province_provenance()` (meta-block presence) + `check_provinces()`'s NaN/shape
+      scan, not a value-level join-integrity check against their own source files. Same shape as this
+      cycle's fix, would need per-field join-key logic (some are keyed by district not province).
+      *(LOW, M, speculative — worth doing if any of those layers ever shows drift)*
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (6), still unmerged, no change.**
+      `mcp__github__list_pull_requests(state=open, head=claude/new-session-wto26j)` shows PR #1 still
+      open, not draft, created 2026-06-28 — same state as every prior recheck since 2026-07-05 (4).
+      Not re-notifying (no change). *(LOW, trivial — just a status check)*
 
 ## Done (most recent first)
 - (loop will append here)

@@ -5,6 +5,34 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (6) — VALIDATOR: closed the `provinces/*.json` `gov.income_floor` join gap
+
+Picked the concrete, still-open 2026-07-09 (3) backlog follow-up: "The new
+`gov.income_floor.{factory,agri}_ratio_to_national` field on `provinces/<slug>.json` has no dedicated
+`validate_data.py` check" — since then `sme_ratio_to_national` also landed on the same join
+(2026-07-09 (4)), widening the gap to all three occupation columns. `check_factory_income()` /
+`check_agri_income()` / `check_sme_income()` already validate the *source* files
+(`factory_income_by_province.json` etc.) thoroughly, but nothing asserted the pass-through join in
+`build_province.py` (`gov.income_floor`) stays correct once it lands on the per-province deep-dive —
+a silent regression there (wrong province matched, stale value carried, a typo'd key) would have
+shipped un-caught.
+
+Added `check_province_income_floor()` to `tests/validate_data.py`: for all 77 provinces, whenever a
+`gov.income_floor.{factory,agri,sme}_ratio_to_national` key is present, asserts it (1) sits in a sane
+`(0, 5)` range and (2) exactly matches the corresponding source file's `ratio_to_national` for that
+same province (joined on the Thai province name). SKIP-passes cleanly when none of the three source
+layers exist yet (nothing to join). Wired into `main()` right after `check_sme_income()`.
+
+Verification: hand-corrupted `platform/data/provinces/bangkok.json`'s
+`factory_ratio_to_national` to `9.99`, re-ran `validate_data.py` directly, confirmed a real
+`[FAIL] ... out of sane range (0,5)`, then restored the file from git (confirmed clean via
+`git diff --stat`). Zero `platform/data` values changed by this cycle. `bash tests/run.sh check` →
+**56 passed, 0 failed** (`validate_data.py` 446/446, was 445/445 — the +1 new check group). Only
+`tests/validate_data.py` staged/committed/pushed. PR #1 (`claude/new-session-wto26j` → `master`)
+re-confirmed still open/not-draft, no new PR needed.
+
+---
+
 ## 2026-07-09 (5) — ENRICH: merchant-segment (SME-owner) income-floor callout on the Exposure tab (objective #1)
 
 Picked the concrete 2026-07-09 backlog follow-up: "`sme_income_by_province.json`'s
