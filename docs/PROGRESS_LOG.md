@@ -5,6 +5,27 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 — ENRICH: MEASURED agriculture-worker income floor context on the Simulator (objective #1)
+
+Loop cycle. Closed the 2026-07-06 (4) backlog follow-up: `build_factory_income.py`'s
+occupation-income-floor pattern only covered the `FactoryWorkers` NSO SES column; the same
+already-committed `household_income_by_province.json` also carries a MEASURED `Agriculture` column
+that was never projected outside the per-province deep-dive. New `pipeline/build_agri_income.py`
+(byte-for-byte mirror of `build_factory_income.py`, different source column) →
+`platform/data/agri_income_by_province.json` (77 provinces, national_avg ฿23,486/mo, 49 below the
+national floor). Wired a 4th, purely-additive "Below income-floor · measured" card into the
+Simulator's existing crop-price/rainfall what-if (`simAgriIncomeFloor()`, mirrors
+`simFactoryIncomeFloor()`): counts branches across agri-relevant provinces (`CSTRESS_LIST`) sitting
+in a province whose NSO Agriculture-occupation income already runs below the national average —
+static MEASURED context, read-only, does not touch `computeSim()`'s existing ESTIMATED scenario
+numbers. `validate_data.py` gained `check_agri_income()` (mirrors `check_factory_income()`, 441/441
+now includes it); `tests/run.sh` gates `build_agri_income.py --check`; `build_provenance.py`
+re-run (measured layers 23→24, no other counts shifted). Gate 55/0. Headless-rendered
+`index.html#sim`: `data-errors="[]"`, the new card renders real data (988 branches, worst
+นราธิวาส 31% of national), no layout regression on the existing 3 cards or the factory-income card
+below it. Re-confirmed PR #1 (`claude/new-session-wto26j` → `master`) still open/unmerged, no
+change — flagged in prior cycles, not re-flagging again this cycle since nothing moved.
+
 ## 2026-07-06 (3) — ENRICH: MEASURED factory-worker income floor context on the Simulator (objective #1)
 
 Loop cycle. Closed the 2026-07-05 (8) backlog follow-up: the Simulator's factory-slowdown lever

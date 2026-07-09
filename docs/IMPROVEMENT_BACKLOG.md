@@ -632,12 +632,13 @@
       from the loop)*
 
 ## Queue — follow-ups noticed 2026-07-06 (4)
-- [ ] **`build_factory_income.py`'s pattern (per-province occupation income → ratio_to_national)
-      only covers `FactoryWorkers`** — the same already-committed `household_income_by_province.json`
-      has 4 more MEASURED occupation columns (Agriculture, OfficeStaff, SMEOwners, Transport). The
-      Agriculture column in particular could sharpen `build_crop_stress.py`'s agri_stress the same
-      way this cycle sharpened the factory-slowdown lever — an income-floor context card alongside
-      the existing price/drought-driven score. *(LOW, S — same builder shape, different column)*
+- [x] **`build_factory_income.py`'s pattern (per-province occupation income → ratio_to_national)
+      only covers `FactoryWorkers` — DONE 2026-07-09** (`pipeline/build_agri_income.py` mirrors it for
+      the `Agriculture` column → `platform/data/agri_income_by_province.json`; Simulator's
+      crop-price/rainfall what-if gained a 4th "Below income-floor · measured" card
+      (`simAgriIncomeFloor()`), read-only context alongside the existing ESTIMATED agri-stress
+      scenario. `OfficeStaff`/`SMEOwners`/`Transport` columns remain unused — see new follow-up below.
+      Gate 55/0. See `docs/PROGRESS_LOG.md` 2026-07-09.)
 - [ ] **`simFactoryIncomeFloor()`'s sample is tiny today (only 2 manufacturing-dominant branches
       nationally, per `occupation_risk.json`)** — same "dark-until-data" ceiling already logged for
       the underlying occupation-risk lens; this card will only become a meaningful read once the
@@ -671,8 +672,42 @@
       adjacency the same way the 2026-07-05 (6) note did for the Acquisition tab's verdict card vs.
       Road-to-3,000. *(LOW, trivial, speculative)*
 
+## Queue — follow-ups noticed 2026-07-09
+- [ ] **`build_agri_income.py`/`build_factory_income.py`'s pattern still leaves 3 of the 5 NSO SES
+      occupation columns unused** (`OfficeStaff`, `SMEOwners`, `Transport` — `Agriculture` and
+      `FactoryWorkers` are now both wired). `SMEOwners` in particular could pair with the
+      merchant-demand segment score the same way Agriculture/FactoryWorkers now pair with
+      crop-stress/occupation-risk — a MEASURED income-floor context card for merchant-lending
+      branches. Same builder shape, different column; genuinely new value only if a UI surface wants
+      it (merchant/collateral tabs don't currently have an income-floor read). *(LOW, S — same
+      builder shape, different column + new UI surface)*
+- [ ] **`simAgriIncomeFloor()`'s scope is all agri-relevant provinces (`CSTRESS_LIST`), not just the
+      currently high-agri-stress ones** — this is a deliberate design choice (mirrors
+      `simFactoryIncomeFloor()`'s all-manufacturing-branches scope, gives a stable MEASURED baseline
+      independent of the price/rain sliders), but worth a second look if a future reviewer expects
+      the income-floor count to move when the crop-price/rainfall sliders are dragged — today it
+      correctly does NOT move, by design (context, not scenario). *(LOW, trivial, informational)*
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09, still unmerged, no change.**
+      `mcp__github__list_pull_requests(state=open)` shows PR #1 (`claude/new-session-wto26j` →
+      `master`) still open, not draft, created 2026-06-28 — same state as every prior recheck since
+      2026-07-05 (4). Every `schedule:`-triggered GitHub Actions workflow remains dormant until it
+      merges. Not re-flagging via `PushNotification` again (already surfaced repeatedly); a future
+      cycle should keep re-checking early in ORIENT per the standing note, but stop re-notifying
+      unless the state actually changes. *(LOW, trivial — just a status check)*
+
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-09 — ENRICH: MEASURED agriculture-worker income floor context on the Simulator
+  (objective #1).** New `pipeline/build_agri_income.py` mirrors `build_factory_income.py`'s pattern
+  for the NSO SES `Agriculture` income column → `platform/data/agri_income_by_province.json` (77
+  provinces, national_avg ฿23,486/mo, 49 below the national floor). Simulator's crop-price/rainfall
+  what-if gained a 4th, purely-additive "Below income-floor · measured" card
+  (`simAgriIncomeFloor()`), read-only context alongside the existing ESTIMATED agri-stress scenario
+  — zero change to existing scenario numbers. `validate_data.py` gained `check_agri_income()`;
+  `tests/run.sh` gates the new builder's `--check`; `build_provenance.py` re-run (measured layers
+  23→24). Gate 55/0. Headless-rendered `index.html#sim`: `data-errors="[]"`, new card renders real
+  data, no layout regression. Re-confirmed PR #1 still unmerged (no change). Full writeup:
+  `docs/PROGRESS_LOG.md` (2026-07-09 entry).
 - **2026-07-06 — AUDIT: closed `docs/DATA_PROVENANCE.md`'s R6, the last open provenance-register
   gap.** The 7 OSM ground-bed geometry files (`rayong_landuse/roads/water/rail.json`,
   `bangkok_landuse/roads/water.json`) were genuine 100%-measured OSM data sitting on
