@@ -5,6 +5,36 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (3) — AUDIT: the `tests/run.sh` visual-regression baseline has been stale (and effectively non-functional) since 2026-06-29
+
+While running the full `tests/run.sh` (check+render+health+visual) as an extra check on this cycle's
+`province.html` change, the `visual` phase came back **11 failed**, including pages this cycle never
+touched: `index` (mean_diff=203.0), `national` (198.9), `risk-trend` (211.2), `branch-explorer`
+(44.8), plus this cycle's `province-rayong` (27.0) and `province-chonburi` (27.5) — all far past the
+tolerance of 12, and `acquisition`/`rayong-catchment` failed for missing baseline/render entirely.
+Root cause: `tests/baseline/*.png` was captured once, in the `5f7f63e` "add committed QA harness"
+commit (2026-06-29), and **never regenerated since** — `git log` shows 124 commits touching
+`platform/index.html`/`app.js`/`styles.css` alone since that date (the entire dark-instrument-console
+redesign, nav overhaul, 2-col dashboards, docked 3D control frame, etc.), none of which ran
+`tests/run.sh baseline` to refresh the committed reference images. Confirmed this is baseline
+staleness, not a real regression from anything in this cycle or before it: the mean_diff on
+completely-untouched pages (index/national/risk-trend) is an order of magnitude larger than on the
+two province pages this cycle actually changed, and eyeballing `tests/baseline/province-chonburi.png`
+vs a fresh render shows two structurally different UIs (the baseline predates the current dark-theme
+2-col layout entirely).
+
+**Practical impact:** `bash tests/run.sh check` (the mandated gate every loop cycle runs, and the only
+phase referenced by `CLAUDE.md`'s "how to run things") is unaffected — it doesn't include the `visual`
+phase. But `tests/run.sh` (no args, i.e. the full suite) and `tests/run.sh visual` specifically have
+been reporting false-red on every page for well over a week; any prior cycle that ran the full suite
+rather than just `check` would have seen the same wall of failures and could easily have
+misdiagnosed its own change as a regression (this cycle nearly did exactly that before tracing it back
+via `git log` on the baseline file). No code/data changed this cycle for this finding — pure audit.
+Flagged to Kaustav via `PushNotification`; logged as a new backlog follow-up (needs a human-reviewed
+`tests/run.sh baseline` refresh — regenerating blind defeats the point of a regression check, someone
+should eyeball the 8 fresh PNGs first) rather than the loop silently overwriting the reference images
+itself.
+
 ## 2026-07-09 (2) — ENRICH: factory/agri income-floor ratios surfaced on the province deep-dive (objective #1)
 
 Loop cycle. Closed the 2026-07-06 (4) backlog follow-up: `factory_income_by_province.json` and
@@ -23,11 +53,10 @@ reproduces byte-exact (77/77 provinces). Gate 55/0, `validate_data.py` 441/441 (
 count — no new data-integrity check needed, the field only carries an already-validated ratio
 through). Also kicked off the full `tests/run.sh` (check+render+health+visual) as a stronger check
 since a page's inline JS changed; the `check` phase (the mandated gate) is what's reported above and
-passed cleanly — the `render` phase's `province.html?p=rayong` capture hit the same pre-existing
-headless-WebGL flakiness already logged in `docs/IMPROVEMENT_BACKLOG.md`'s 2026-07-05 follow-up
-(ERR_CONNECTION_REFUSED / stuck past its 32s timeout on repeated retries), unrelated to this cycle's
-change — it's a pure JSON-value + inline-JS-string edit, no WebGL/deck.gl code touched, and
-`node --check` already confirmed the inline JS parses (part of the `check` gate). Re-confirmed PR #1
+passed cleanly. The `visual` phase flagged `province-rayong`/`province-chonburi` as regressed — traced
+this to a pre-existing, whole-suite baseline-staleness bug unrelated to this cycle's change (every
+page fails visual, including ones this cycle never touched); full writeup and the actual root cause in
+the very next log entry below (2026-07-09 (3)). Re-confirmed PR #1
 (`claude/new-session-wto26j` → `master`) still open/unmerged, no change — not re-flagging again
 since nothing moved since 2026-07-09's first entry.
 

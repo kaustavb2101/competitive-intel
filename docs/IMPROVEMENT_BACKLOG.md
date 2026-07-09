@@ -695,7 +695,25 @@
       cycle should keep re-checking early in ORIENT per the standing note, but stop re-notifying
       unless the state actually changes. *(LOW, trivial — just a status check)*
 
-## Queue — follow-ups noticed 2026-07-09 (2)
+## Queue — follow-ups noticed 2026-07-09 (3)
+- [ ] **★ `tests/baseline/*.png` (the `tests/run.sh visual` regression check) is stale since
+      2026-06-29 and needs a human-reviewed refresh.** AUDIT this cycle (full writeup:
+      `docs/PROGRESS_LOG.md` 2026-07-09 (3)): running the full `tests/run.sh` found the `visual`
+      phase fails on **all 8** manifest pages (mean_diff 27–211, tolerance 12), including pages this
+      cycle never touched (`index`/`national`/`risk-trend` at ~200+) — the baseline PNGs were captured
+      once in the QA-harness-add commit and never regenerated across the 124 subsequent commits that
+      redesigned the app (dark-theme overhaul, 2-col dashboards, nav rework, docked 3D control frame,
+      etc.). `bash tests/run.sh check` (the mandated loop gate) is unaffected — it doesn't run
+      `visual` — but the full suite and `tests/run.sh visual` specifically give 100% false-red today,
+      which could mislead a future cycle into thinking a real change caused a regression (this cycle
+      almost did). **Do not have the loop blindly run `tests/run.sh baseline` to fix this** — that
+      regenerates the reference images from whatever's currently rendered, which only proves anything
+      if a human (or a very deliberate side-by-side review) confirms the current renders are actually
+      correct first; committing wrong-but-fresh baselines would make the check permanently
+      rubber-stamp future regressions. Needs either Kaustav's sign-off on the 8 current renders, or a
+      dedicated future cycle that renders all 8, screenshots them for review here in a message/
+      artifact, and only then runs `baseline`. *(MED, S-to-run/M-to-verify, needs a
+      human-in-the-loop review step)*
 - [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (2), still unmerged, no change.** Same
       `mcp__github__list_pull_requests(state=open)` check, same result as the entry directly above
       (checked twice this cycle, once at ORIENT and once before this new item). Not re-flagging.
