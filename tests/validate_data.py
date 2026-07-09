@@ -961,6 +961,63 @@ def check_factory_income():
 
 
 # ---------------------------------------------------------------------------
+def check_agri_income():
+    # Per-province agriculture-worker income floor (pipeline/build_agri_income.py), projected from
+    # the already-MEASURED household_income_by_province.json. Optional file: SKIP-PASS when absent
+    # (the builder degrades to an absent-state too). Mirrors check_factory_income() for a different
+    # NSO SES occupation column.
+    hdr("agri_income_by_province.json (optional)")
+    if not exists("agri_income_by_province.json"):
+        ok("agri_income_by_province.json absent — skipped (optional; run build_agri_income.py)")
+        return
+    try:
+        d = load("agri_income_by_province.json")
+    except Exception as e:
+        fail("agri_income_by_province.json loads", repr(e))
+        return
+    ok("agri_income_by_province.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or "generated_by" not in meta or "source" not in meta:
+        fail("agri_income meta/provenance present", "meta missing generated_by/source")
+    else:
+        ok("agri_income meta/provenance present")
+
+    if meta and meta.get("absent"):
+        ok("agri_income is an honest ABSENT-state (no source) — skipped value checks")
+        return
+
+    national_avg = meta.get("national_avg") if meta else None
+    if not is_finite_number(national_avg) or national_avg <= 0:
+        fail("agri_income national_avg positive", repr(national_avg))
+        return
+
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        fail("agri_income has a 'provinces' dict", "got %s" % type(provs).__name__)
+        return
+    ok("agri_income provinces dict present (%d)" % len(provs))
+
+    bad = []
+    for name, rec in provs.items():
+        ai = rec.get("agri_income")
+        ratio = rec.get("ratio_to_national")
+        if not is_finite_number(ai) or ai <= 0:
+            bad.append("%s agri_income=%r not positive" % (name, ai))
+            continue
+        if not is_finite_number(ratio) or ratio <= 0:
+            bad.append("%s ratio_to_national=%r not positive" % (name, ratio))
+            continue
+        expect = round(ai / national_avg, 3)
+        if abs(ratio - expect) > 0.001:
+            bad.append("%s ratio_to_national=%s != agri_income/national_avg=%s" % (name, ratio, expect))
+    if bad:
+        fail("agri_income values sane (positive, ratio=agri_income/national_avg)", first_n(bad, 8))
+    else:
+        ok("agri_income values sane (measured, ratio recomputed and matches)")
+
+
+# ---------------------------------------------------------------------------
 def check_occupation_income():
     # National lowest-paid-occupation aggregate (pipeline/build_occupation_income.py), projected
     # from the already-MEASURED household_income_by_province.json. Optional file: SKIP-PASS when
@@ -4183,6 +4240,7 @@ def main():
     check_household_risk()
     check_occupation_income()
     check_factory_income()
+    check_agri_income()
     check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)

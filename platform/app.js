@@ -356,6 +356,28 @@ async function loadFactoryIncome(){
 }
 function factincHasData(){return !!(FACTINC&&Object.keys(FACTINC).length);}
 
+/* ---------- per-province agriculture-worker income floor (data/agri_income_by_province.json) ----------
+   MEASURED (NSO SES 2566), keyed by province Thai name (matches crop_stress.json's `th`). Mirrors
+   FACTINC/factory_income_by_province.json for a different NSO SES occupation column — lets the
+   Simulator's crop-price/rainfall what-if (computeSim) show a static, MEASURED income-floor context
+   alongside the ESTIMATED price/drought agri-stress scenario. Purely additive: computeSim()'s core
+   scenario numbers are unchanged whether this file is present or not.
+   Written by pipeline/build_agri_income.py. Null-guarded throughout. */
+let AGRIINC=null, agrincMeta=null, agrincLoaded=false, agrincPromise=null;
+async function loadAgriIncome(){
+  if(agrincPromise) return agrincPromise;
+  agrincLoaded=true;
+  agrincPromise=(async()=>{
+    try{ const r=await fetch('data/agri_income_by_province.json'); if(!r.ok) throw 0;
+      const j=await r.json(); agrincMeta=j.meta||null;
+      AGRIINC=(agrincMeta&&agrincMeta.absent)?null:(j.provinces||null); }
+    catch(e){ AGRIINC=null; agrincMeta=null; }
+    return AGRIINC;
+  })();
+  return agrincPromise;
+}
+function agrincHasData(){return !!(AGRIINC&&Object.keys(AGRIINC).length);}
+
 /* ---------- per-branch RELEVANT-POI density (data/poi_relevance.json, obj#2) ----------
    Lazy-loads the title-loan-relevant POI-density layer built by pipeline/build_poi_relevance.py:
    {meta, branches:[{rel:0..100, raw, cat:{...category counts...}, src}]}, INDEX-ALIGNED to
@@ -2964,6 +2986,26 @@ function simBranchByProv(){
   SIM_BRN={}; (DATA||[]).forEach(d=>{const v=d.v||'—'; SIM_BRN[v]=(SIM_BRN[v]||0)+1;});
   return SIM_BRN;
 }
+// MEASURED context on top of the ESTIMATED crop-price/rainfall scenario above: of the agri-relevant
+// provinces (CSTRESS_LIST), how many branches sit in a province whose NSO Agriculture-occupation
+// income already runs below the national average (agri_income_by_province.json)? Read-only — never
+// changes computeSim()'s scenario numbers. Null when either crop-stress or agri-income is absent.
+function simAgriIncomeFloor(){
+  if(!CSTRESS_LIST||!CSTRESS_LIST.length||!agrincHasData()) return null;
+  const brn=simBranchByProv();
+  let agriBr=0, belowBr=0, worstRatio=null, worstProv=null;
+  CSTRESS_LIST.forEach(p=>{
+    const br=brn[p.th]||0; if(!br) return;
+    agriBr+=br;
+    const rec=AGRIINC[p.th]; if(!rec) return;
+    if(rec.ratio_to_national<1){
+      belowBr+=br;
+      if(worstRatio==null||rec.ratio_to_national<worstRatio){ worstRatio=rec.ratio_to_national; worstProv=p.th; }
+    }
+  });
+  if(!agriBr) return null;
+  return {agriBr,belowBr,worstRatio,worstProv};
+}
 function renderSim(){
   if(!simWired) wireSim();
   // load the crop-stress + occupation-risk layers, then (re)compute once either lands.
@@ -2971,6 +3013,7 @@ function renderSim(){
   loadCropStress().then(()=>{ if(active()) computeSim(); });
   loadOccRisk().then(()=>{ if(active()){ syncSimFactoryVisibility(); computeSim(); } });
   loadFactoryIncome().then(()=>{ if(active()) renderSimFactory(); });
+  loadAgriIncome().then(()=>{ if(active()) computeSim(); });
   syncSimFactoryVisibility();
 }
 // show the factory-slowdown lever only when the Overture occupation-risk pull is present; otherwise
@@ -3062,6 +3105,13 @@ function computeSim(){
      d:`${newBr.toLocaleString()} branches tip in`,col:newBr>0?'var(--agri)':'var(--mid)',
      n:'Share of all '+N.toLocaleString()+' branches that move into a newly high-stress province because of this shock.'},
   ];
+  const ai=simAgriIncomeFloor();
+  if(ai){
+    cards.push({k:'Below income-floor · measured',v:ai.belowBr.toLocaleString(),
+      d:ai.worstProv?`worst: ${ai.worstProv} (${(ai.worstRatio*100).toFixed(0)}% of national)`:'none below national avg',
+      col:ai.belowBr?'var(--agri)':'var(--mid)',
+      n:'MEASURED count of branches (across agri-relevant provinces) sitting in a province whose NSO SES Agriculture-occupation income already runs below the national average (agri_income_by_province.json). Context only — does not change the estimated agri-stress figures above.'});
+  }
   $('#sim-cards').innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v" style="color:${c.col}">${c.v}</div>
     <div class="d" style="color:${c.col}">${c.d}</div>
