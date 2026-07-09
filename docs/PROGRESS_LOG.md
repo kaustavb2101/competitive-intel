@@ -5,6 +5,33 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (4) — AUDIT: logged a prior cycle's shipped-but-undocumented ENRICH (SME-owner income floor)
+
+Orient found `HEAD` (`daf6d38`, "ENRICH: MEASURED SME-owner income floor context on the province
+deep-dive") already committed and pushed to `claude/new-session-wto26j`, but never logged here or
+checked off in `docs/IMPROVEMENT_BACKLOG.md` — the prior cycle's step 7 (LOG + self-enrich) appears
+to have been cut short. This closes that gap so a future cycle doesn't re-analyze or re-build
+already-shipped work (the exact failure mode the 2026-07-05 (4) note warned about).
+
+What `daf6d38` actually shipped: new `pipeline/build_sme_income.py` mirrors
+`build_factory_income.py`/`build_agri_income.py`'s pattern for the NSO SES `SMEOwners` income column
+→ `platform/data/sme_income_by_province.json` (77 provinces, national_avg ฿33,299/mo, 47 below the
+national floor). `build_province.py`'s `gov.income_floor` join gained `sme_ratio_to_national`;
+`province.html`'s existing "Income by occupation" panel now annotates the SME-owners row with "(X%
+of national avg)" the same way Agriculture/Factory-workers already are (previously `ratio:null`).
+`tests/validate_data.py` gained `check_sme_income()` (SKIP-pass when the file is absent, mirrors
+`check_agri_income()`); `tests/run.sh` gates the new builder's `--check`. This closes the
+2026-07-09 backlog follow-up flagging that merchant/SME-owner branches had no income-floor read
+while factory/agri branches already did.
+
+**This cycle's own verification** (re-run fresh, not just re-reading the old commit message):
+`cd pipeline && python3 build_sme_income.py --check` → byte-exact (77 provinces); `python3
+build_province.py --check` → 77 province files reproduce from source; `bash tests/run.sh check` →
+**56 passed, 0 failed** (`validate_data.py` 445/445). Read the actual diff (`git show daf6d38`)
+to confirm the commit message matched the code — it does. No code or data changed this cycle;
+docs-only. Re-confirmed PR #1 (`claude/new-session-wto26j` → `master`) still open/unmerged, no
+change since 2026-07-09 (no re-notification, per the standing "don't re-flag with no change" rule).
+
 ## 2026-07-09 (3) — AUDIT: the `tests/run.sh` visual-regression baseline has been stale (and effectively non-functional) since 2026-06-29
 
 While running the full `tests/run.sh` (check+render+health+visual) as an extra check on this cycle's

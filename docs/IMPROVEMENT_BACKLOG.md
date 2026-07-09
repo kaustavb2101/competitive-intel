@@ -673,14 +673,23 @@
       Road-to-3,000. *(LOW, trivial, speculative)*
 
 ## Queue — follow-ups noticed 2026-07-09
-- [ ] **`build_agri_income.py`/`build_factory_income.py`'s pattern still leaves 3 of the 5 NSO SES
-      occupation columns unused** (`OfficeStaff`, `SMEOwners`, `Transport` — `Agriculture` and
-      `FactoryWorkers` are now both wired). `SMEOwners` in particular could pair with the
-      merchant-demand segment score the same way Agriculture/FactoryWorkers now pair with
-      crop-stress/occupation-risk — a MEASURED income-floor context card for merchant-lending
-      branches. Same builder shape, different column; genuinely new value only if a UI surface wants
-      it (merchant/collateral tabs don't currently have an income-floor read). *(LOW, S — same
-      builder shape, different column + new UI surface)*
+- [x] **`build_agri_income.py`/`build_factory_income.py`'s pattern still left `SMEOwners` unused —
+      DONE, shipped in `daf6d38` (logged this cycle, 2026-07-09 (4)).** New
+      `pipeline/build_sme_income.py` → `platform/data/sme_income_by_province.json` (77 provinces,
+      national_avg ฿33,299/mo, 47 below floor); `build_province.py`'s `gov.income_floor` join gained
+      `sme_ratio_to_national`; `province.html`'s "Income by occupation" panel now annotates the SME
+      owners row with "(X% of national avg)". `OfficeStaff`/`Transport` remain the only unused NSO
+      SES columns — see the new follow-up below.
+- [ ] **`sme_income_by_province.json`'s `sme_ratio_to_national` only surfaces on `province.html` today
+      — the Exposure/collateral tabs (merchant-lending segment) still have no income-floor read**,
+      unlike factory/agri which also only live on `province.html` (same scope, consistent) — if a
+      future cycle wants an Exposure-tab merchant income-floor callout (mirroring
+      `renderRiskReadouts()`'s existing rank-1-fact pattern), this file already has everything needed;
+      no new pipeline required. *(LOW, S, speculative — new UI surface only)*
+- [ ] **`OfficeStaff`/`Transport` are now the only 2 of 5 NSO SES occupation columns with no
+      `build_*_income.py` ratio layer** (`Agriculture`, `FactoryWorkers`, `SMEOwners` all wired as of
+      `daf6d38`). Same builder shape, different column; only worth building once a concrete UI surface
+      wants it (Simulator has no transport/office-staff lever today). *(LOW, S, speculative)*
 - [ ] **`simAgriIncomeFloor()`'s scope is all agri-relevant provinces (`CSTRESS_LIST`), not just the
       currently high-agri-stress ones** — this is a deliberate design choice (mirrors
       `simFactoryIncomeFloor()`'s all-manufacturing-branches scope, gives a stable MEASURED baseline
@@ -739,6 +748,15 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-09 (4) — AUDIT: logged a prior cycle's shipped-but-undocumented ENRICH (SME-owner income
+  floor), closed the backlog item.** `daf6d38` (already committed + pushed) shipped
+  `pipeline/build_sme_income.py` → `platform/data/sme_income_by_province.json` (77 provinces,
+  national_avg ฿33,299/mo, 47 below floor), `build_province.py`'s `gov.income_floor` join gaining
+  `sme_ratio_to_national`, and a `province.html` annotation on the SME-owners income row — but step 7
+  (log + backlog checkoff) never ran. No code/data changed this cycle; re-verified fresh:
+  `build_sme_income.py --check` + `build_province.py --check` byte-exact, `bash tests/run.sh check`
+  56/0 (`validate_data.py` 445/445). PR #1 re-confirmed still open/unmerged (no change, not
+  re-notified). Full writeup: `docs/PROGRESS_LOG.md` (2026-07-09 (4) entry).
 - **2026-07-09 — ENRICH: MEASURED agriculture-worker income floor context on the Simulator
   (objective #1).** New `pipeline/build_agri_income.py` mirrors `build_factory_income.py`'s pattern
   for the NSO SES `Agriculture` income column → `platform/data/agri_income_by_province.json` (77
