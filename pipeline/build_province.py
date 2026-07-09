@@ -172,6 +172,8 @@ def build_all():
     facinc = _load(facinc_f)["provinces"] if os.path.exists(facinc_f) else {}
     agrinc_f = os.path.join(REPO, "platform", "data", "agri_income_by_province.json")
     agrinc = _load(agrinc_f)["provinces"] if os.path.exists(agrinc_f) else {}
+    smeinc_f = os.path.join(REPO, "platform", "data", "sme_income_by_province.json")
+    smeinc = _load(smeinc_f)["provinces"] if os.path.exists(smeinc_f) else {}
     osm = _load(os.path.join(SRC, "osm_layers.json"))
     narr = _load(os.path.join(SRC, "province_narratives.json")).get("provinces", {})
     EMPTY_FACTS = {"minwage": "", "minwage_mo": "", "natl_avg": "", "premium": "",
@@ -297,6 +299,7 @@ def build_all():
                            k: v for k, v in {
                                "factory_ratio_to_national": (facinc.get(prov) or {}).get("ratio_to_national"),
                                "agri_ratio_to_national": (agrinc.get(prov) or {}).get("ratio_to_national"),
+                               "sme_ratio_to_national": (smeinc.get(prov) or {}).get("ratio_to_national"),
                            }.items() if v is not None
                        },
                        "src": "DIW factories · DLT vehicles · NSO labour + NSO Labour Force Survey "
@@ -325,9 +328,10 @@ def build_all():
                            "gov.income (NSO SES 2566 income-by-occupation, household_income_by_province.json "
                            "via ingest_tmli.py; {} when the source file is absent)",
                            "gov.income_floor (derived ratio, factory_income_by_province.json / "
-                           "agri_income_by_province.json's ratio_to_national, both pure "
-                           "province_income/national_avg divisions over the same NSO SES 2566 figures "
-                           "above; key omitted, not zero-filled, when the source layer is absent)",
+                           "agri_income_by_province.json / sme_income_by_province.json's "
+                           "ratio_to_national, all pure province_income/national_avg divisions over "
+                           "the same NSO SES 2566 figures above; key omitted, not zero-filled, when "
+                           "the source layer is absent)",
                        ],
                        "editorial": [
                            "facts (province_narratives.json hand-written 'what impacts them' notes — "

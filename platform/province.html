@@ -885,7 +885,8 @@ function updatePanels(){
   if(INCOME){
     const OCC_INC=[['Agriculture','Agriculture','agri_ratio_to_national'],
       ['Factory workers','FactoryWorkers','factory_ratio_to_national'],
-      ['Transport','Transport',null],['SME owners','SMEOwners',null],['Office staff','OfficeStaff',null]]
+      ['SME owners','SMEOwners','sme_ratio_to_national'],
+      ['Transport','Transport',null],['Office staff','OfficeStaff',null]]
       .map(([lab,kk,rk])=>({lab,v:INCOME[kk],ratio:rk?INCFLOOR[rk]:null})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
     if(OCC_INC.length){
       const mx=OCC_INC[0].v;
