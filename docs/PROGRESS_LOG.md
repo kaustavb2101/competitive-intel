@@ -5,6 +5,32 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (2) — ENRICH: factory/agri income-floor ratios surfaced on the province deep-dive (objective #1)
+
+Loop cycle. Closed the 2026-07-06 (4) backlog follow-up: `factory_income_by_province.json` and
+`agri_income_by_province.json`'s `ratio_to_national` (MEASURED, NSO SES 2566, pure derived ratio —
+no modelling) already powered the Simulator's income-floor cards but were never surfaced on
+`province.html`'s "Who works nearby" panel, which renders the raw `gov.income` THB figures with no
+national-average context. `pipeline/build_province.py` now also reads the two already-committed
+`platform/data/factory_income_by_province.json`/`agri_income_by_province.json` files (same pattern
+`build_province_stress.py` already uses to read `household_risk_by_province.json`) and joins a new
+`gov.income_floor.{factory,agri}_ratio_to_national` field per province (key omitted, not zero-filled,
+when the source layer is absent). `province.html`'s "Income by occupation" bars for Agriculture and
+Factory workers now show a small "(X% of national avg)" annotation (red when <100%, muted grey
+otherwise) sourced from the same ratio, with a one-line caveat in the panel footer. Zero new pipeline
+script, zero new data file — pure join + read-only UI annotation. `build_province.py --check`
+reproduces byte-exact (77/77 provinces). Gate 55/0, `validate_data.py` 441/441 (unchanged pass
+count — no new data-integrity check needed, the field only carries an already-validated ratio
+through). Also kicked off the full `tests/run.sh` (check+render+health+visual) as a stronger check
+since a page's inline JS changed; the `check` phase (the mandated gate) is what's reported above and
+passed cleanly — the `render` phase's `province.html?p=rayong` capture hit the same pre-existing
+headless-WebGL flakiness already logged in `docs/IMPROVEMENT_BACKLOG.md`'s 2026-07-05 follow-up
+(ERR_CONNECTION_REFUSED / stuck past its 32s timeout on repeated retries), unrelated to this cycle's
+change — it's a pure JSON-value + inline-JS-string edit, no WebGL/deck.gl code touched, and
+`node --check` already confirmed the inline JS parses (part of the `check` gate). Re-confirmed PR #1
+(`claude/new-session-wto26j` → `master`) still open/unmerged, no change — not re-flagging again
+since nothing moved since 2026-07-09's first entry.
+
 ## 2026-07-09 — ENRICH: MEASURED agriculture-worker income floor context on the Simulator (objective #1)
 
 Loop cycle. Closed the 2026-07-06 (4) backlog follow-up: `build_factory_income.py`'s

@@ -808,6 +808,7 @@ function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
 const EMP=(RY.gov&&RY.gov.employment)||null;
 const UNEMP=(RY.gov&&RY.gov.unemployment&&RY.gov.unemployment.unemployment_rate!=null)?RY.gov.unemployment:null;
 const INCOME=(RY.gov&&RY.gov.income&&RY.gov.income.avg_monthly_income!=null)?RY.gov.income:null;
+const INCFLOOR=(RY.gov&&RY.gov.income_floor)||{};
 function districtWorkers(d){
   if(!DISTRICTS||!DISTRICTS.features)return null;
   const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
@@ -882,17 +883,19 @@ function updatePanels(){
     html+='</div>';
   }
   if(INCOME){
-    const OCC_INC=[['Agriculture','Agriculture'],['Factory workers','FactoryWorkers'],
-      ['Transport','Transport'],['SME owners','SMEOwners'],['Office staff','OfficeStaff']]
-      .map(([lab,kk])=>({lab,v:INCOME[kk]})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
+    const OCC_INC=[['Agriculture','Agriculture','agri_ratio_to_national'],
+      ['Factory workers','FactoryWorkers','factory_ratio_to_national'],
+      ['Transport','Transport',null],['SME owners','SMEOwners',null],['Office staff','OfficeStaff',null]]
+      .map(([lab,kk,rk])=>({lab,v:INCOME[kk],ratio:rk?INCFLOOR[rk]:null})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
     if(OCC_INC.length){
       const mx=OCC_INC[0].v;
       html+=`<h2 style="padding:0 0 4px;margin-top:2px">Income by occupation <span class="tag meas">measured · NSO SES 2566</span></h2>`
-        +`<div class="occ">`+OCC_INC.map(r=>
-          `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo</b></div>`
-          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div></div>`
-        ).join('')+`</div>`
-        +`<div class="foot">NSO Socio-Economic Survey 2566 (2023) average monthly income by occupation — province-level, measured.</div>`;
+        +`<div class="occ">`+OCC_INC.map(r=>{
+          const ratioLab=r.ratio!=null?` <small style="color:${r.ratio<1?'#C8433B':'#8A94A8'}">(${Math.round(r.ratio*100)}% of national avg)</small>`:'';
+          return `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo${ratioLab}</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div></div>`;
+        }).join('')+`</div>`
+        +`<div class="foot">NSO Socio-Economic Survey 2566 (2023) average monthly income by occupation — province-level, measured. "% of national avg" is a pure ratio over the unweighted 77-province mean (measured, no modelling).</div>`;
     }
   }
   if(k){

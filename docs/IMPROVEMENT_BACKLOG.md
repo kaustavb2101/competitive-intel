@@ -644,12 +644,12 @@
       the underlying occupation-risk lens; this card will only become a meaningful read once the
       Overture occupation pull broadens past the current 2-branch sample. No action needed, just
       noting the same caveat applies one layer up. *(LOW, trivial, speculative)*
-- [ ] **`factory_income_by_province.json`'s per-province `ratio_to_national` could also surface on
-      `province.html`'s "Who works nearby" income panel** (which already renders `gov.income`'s raw
-      FactoryWorkers THB figure per province) as a one-line "X% of the national factory-worker
-      average" annotation — reuses the exact same MEASURED ratio this cycle computed, no new
-      pipeline needed, just a `build_province.py` join + a small `province.html` render tweak.
-      *(LOW, S)*
+- [x] **`factory_income_by_province.json`'s per-province `ratio_to_national` could also surface on
+      `province.html`'s "Who works nearby" income panel — DONE 2026-07-09 (2)** (`build_province.py`
+      now joins `gov.income_floor.{factory,agri}_ratio_to_national` from the already-committed
+      `factory_income_by_province.json`/`agri_income_by_province.json`; `province.html`'s Agriculture
+      and Factory-workers income bars show a "(X% of national avg)" annotation. Gate 55/0. See
+      `docs/PROGRESS_LOG.md` 2026-07-09 (2).)
 
 ## Queue — follow-ups noticed 2026-07-06 (2)
 - [ ] **`CPOP.top[0]`'s contested share can be a rounded 100%** (as seen this cycle: a 4.59M-person
@@ -694,6 +694,30 @@
       merges. Not re-flagging via `PushNotification` again (already surfaced repeatedly); a future
       cycle should keep re-checking early in ORIENT per the standing note, but stop re-notifying
       unless the state actually changes. *(LOW, trivial — just a status check)*
+
+## Queue — follow-ups noticed 2026-07-09 (2)
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (2), still unmerged, no change.** Same
+      `mcp__github__list_pull_requests(state=open)` check, same result as the entry directly above
+      (checked twice this cycle, once at ORIENT and once before this new item). Not re-flagging.
+      *(LOW, trivial — just a status check)*
+- [ ] **The new `gov.income_floor.{factory,agri}_ratio_to_national` field on `provinces/<slug>.json`
+      (this cycle) has no dedicated `validate_data.py` check** — it's a pure pass-through of an
+      already-validated ratio (`check_factory_income()`/`check_agri_income()` already assert
+      `factory_income_by_province.json`/`agri_income_by_province.json`'s ratios are sane), so the
+      risk is low, but a small `check_province_provenance()`-adjacent assertion (ratio in a sane
+      range, e.g. 0–5, when the key is present) would close the same "new field, no gate" gap other
+      enrichment cycles have caught themselves on. *(LOW, S)*
+- [ ] **`province.html`'s new "(X% of national avg)" ratio annotation color threshold (`<1` → red,
+      else muted grey) was picked for readability, not contrast-checked** — same low-priority
+      "not measured against a contrast bar" smell already logged for the National map's 0.6
+      dot-opacity choice (2026-07-03 (9)) and the branch-density bucket colors (2026-07-04 (4)).
+      *(LOW, trivial)*
+- [ ] **`build_province.py`'s new income_floor join only covers Factory/Agriculture** — `Transport`/
+      `SMEOwners`/`OfficeStaff` still have no corresponding `build_*_income.py` ratio layer (same gap
+      flagged 2026-07-09 for the Simulator side); if a future cycle builds `build_transport_income.py`
+      or `build_sme_income.py`, this cycle's join pattern (`build_province.py` reading
+      `platform/data/<x>_income_by_province.json`) extends directly, no new mechanism needed.
+      *(LOW, S, speculative — needs the builder first)*
 
 ## Done (most recent first)
 - (loop will append here)
