@@ -1,0 +1,2 @@
+# For Render / Railway / Fly.io background worker (runs the daemon forever).
+worker: python3 committee/daemon.py

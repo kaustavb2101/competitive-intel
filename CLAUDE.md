@@ -119,6 +119,23 @@ timeseries `--check` plus `node --check` on every page's JS.*
 - `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. `build_platform.py` —
   assembles the Rayong HTML pages from head + app + loader, wires the nav.
 
+### The data-quality committee — `committee/` (+ `deploy/`)
+Brought over from the sibling **TMLI** effort (`kaustavb2101/watcher`). A standing, gated multi-agent
+loop that generates the MEASURED data the derive/build pipeline consumes — one verifiable improvement
+per cycle, never regressing a metric (see `committee/COMMITTEE.md`). Members:
+- **Competitor Scout** (`scout.py`) — pulls rival title-lenders (Srisawad, Muangthai, Tidlor, Krungsri…)
+  province-by-province via **Google Places** (`GOOGLE_MAPS_API_KEY`) → `source-data/competitor_census.json`
+  + `competitors_national.json`, joins `competitors_prov` onto the master. **Runs from any IP incl.
+  cloud/CI** (no Thai network needed) — this is the path to close the Rayong-only competitor gap
+  nationally without the laptop.
+- **Geocoder** (`geocoder.py`) — tambon/zip centroid → precise branch coordinates (Google/OSM).
+- **Industry Census** (`census.py`) — DIW factory census per province/district.
+- **Validator** (`validator.py`) — the acceptance gate; **Orchestrator** (`run_cycle.py`) picks the next
+  smallest highest-value task; **daemon** (`daemon.py`) runs members continuously. `deploy/` (Dockerfile +
+  Procfile + systemd unit) runs the daemon persistently. Keys come from env/`.env` — never committed.
+- Not wired into the determinism gate yet (its outputs are network-pulled inputs, like `branches.json`).
+  Next step: point `build_rival_pressure.py` at `competitor_census.json` once a national scout run lands.
+
 ### Master data — `source-data/`
 - `branches_final.json` — **the master**, all 2,015 branches, 46 fields each (see DATA_SOURCES.md
   for the field dictionary). Everything in `platform/data/` is derived from this.
