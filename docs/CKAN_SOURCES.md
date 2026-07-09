@@ -87,9 +87,17 @@ DLT also carries `dataset_stat_1_005` (driver licenses, monthly to Feb 2026) and
 - Still-useful HDX assets (subnational population, CHIRPS rainfall, admin boundaries) are ALREADY
   wired into the pipeline. Net: HDX adds nothing new at province granularity.
 
-**Next-wave targets:** DIW `factype2` raw pull (small 10–50HP factories — the small-business borrower
-census; grab while the host answers), ThaiWater reservoir/flood wiring, DLT monthly stat_1_008
-transaction series (a monthly vehicle-market pulse).
+**Wave 3 (2026-07-09) — DIW deep pulls:**
+- `factype2` = only **570 records nationally** — NOT the hoped small-business census. Skip.
+- `fac-10scurve` = **18,091 target-industry factories** with province/workers/capital/industry-group →
+  pulled + aggregated by `pull_diw_scurve.py` → `source-data/scurve_by_province.json` (55 KB, MEASURED,
+  all 77 provinces). The **automotive group: 1,621 factories / 172,878 workers** = the ICE-parts
+  workforce exposed to the EV transition (top: สมุทรปราการ 46.7k, ปทุมธานี 14.5k, ฉะเชิงเทรา 13.8k,
+  ปราจีนบุรี, นครราชสีมา, ระยอง). Pairs with the brand-trends EV wave for the per-province risk read.
+  Not yet surfaced in the app — next wave.
+
+**Next-wave targets:** surface the automotive/EV-exposure layer (Overview + province drill),
+ThaiWater reservoir/flood wiring, DLT monthly stat_1_008 transaction series (monthly vehicle-market pulse).
 
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
