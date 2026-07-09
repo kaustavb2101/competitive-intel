@@ -5,6 +5,38 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (5) — ENRICH: merchant-segment (SME-owner) income-floor callout on the Exposure tab (objective #1)
+
+Picked the concrete 2026-07-09 backlog follow-up: "`sme_income_by_province.json`'s
+`sme_ratio_to_national` only surfaces on `province.html` today — the Exposure/collateral tabs
+(merchant-lending segment) still have no income-floor read... this file already has everything
+needed; no new pipeline required." Confirmed via `grep`/reading `app.js` before touching anything
+that this was genuinely unbuilt (unlike several recent cycles that found stale duplicates).
+
+Added a "Merchant segment income floor · SME owners" block to `renderRiskReadouts()` on `#exposure`,
+reusing the exact rank-1-surfacing pattern already shipped for `PSTRESS_LIST[0]` (DTI+unemployment)
+and `OCCINC_LIST[0]` (lowest-paid occupation): new `loadSmeIncome()`/`smeincHasData()`/`SMEINC_LIST`
+lazy-load pair (mirrors `loadOccupationIncome()`'s shape) reads the already-committed, already-
+MEASURED `platform/data/sme_income_by_province.json` (NSO SES 2566, shipped `daf6d38`, previously
+only consumed by `province.html`); `SMEINC_LIST` sorts worst-first by `ratio_to_national` so
+`SMEINC_LIST[0]` is the concrete "which province has the weakest SME-owner income floor" fact, plus
+a "N/77 provinces below the national floor" count computed client-side. Zero new pipeline script,
+zero new data file — pure additive UI (`ccRow()`/`TAG_M` reuse, `var(--collat)` accent since this is
+the merchant/collateral-adjacent segment, not `--agri`).
+
+Verification: `node --check platform/app.js` clean; `bash tests/run.sh check` → **56 passed, 0
+failed** (`validate_data.py` 445/445, unaffected — UI-only change, no `platform/data` touched).
+Headless-rendered `index.html#exposure` (`tests/lib/render.sh`, 1400×2200): DOM dump confirms
+`data-errors="[]"` and the new block renders real data — "SME-owner income ฿16,473/mo · 47/77
+provinces below the national floor" for the worst province, ratio badge alongside it. No layout
+regression in the screenshot (top of tab unaffected; new block sits inside the existing risk-readouts
+flow between the DTI+unemployment and lowest-paid-occupation callouts and the riskiest-branches
+table).
+
+Backlog: checked off the 2026-07-09 follow-up item; added 3 new follow-ups (see
+`docs/IMPROVEMENT_BACKLOG.md`). Re-confirmed PR #1 (`claude/new-session-wto26j` → `master`) still
+open/unmerged via `mcp__github__list_pull_requests`, no change since the last recheck.
+
 ## 2026-07-09 (4) — AUDIT: logged a prior cycle's shipped-but-undocumented ENRICH (SME-owner income floor)
 
 Orient found `HEAD` (`daf6d38`, "ENRICH: MEASURED SME-owner income floor context on the province

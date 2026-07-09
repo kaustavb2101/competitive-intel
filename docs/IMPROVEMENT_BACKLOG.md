@@ -680,12 +680,12 @@
       `sme_ratio_to_national`; `province.html`'s "Income by occupation" panel now annotates the SME
       owners row with "(X% of national avg)". `OfficeStaff`/`Transport` remain the only unused NSO
       SES columns — see the new follow-up below.
-- [ ] **`sme_income_by_province.json`'s `sme_ratio_to_national` only surfaces on `province.html` today
-      — the Exposure/collateral tabs (merchant-lending segment) still have no income-floor read**,
-      unlike factory/agri which also only live on `province.html` (same scope, consistent) — if a
-      future cycle wants an Exposure-tab merchant income-floor callout (mirroring
-      `renderRiskReadouts()`'s existing rank-1-fact pattern), this file already has everything needed;
-      no new pipeline required. *(LOW, S, speculative — new UI surface only)*
+- [x] **`sme_income_by_province.json`'s `sme_ratio_to_national` only surfaces on `province.html` —
+      the Exposure/collateral tabs had no income-floor read — DONE 2026-07-09 (5)** (`renderRiskReadouts()`
+      gained a "Merchant segment income floor · SME owners" block, new `loadSmeIncome()`/
+      `smeincHasData()`/`SMEINC_LIST` lazy-load pair mirroring `loadOccupationIncome()`'s shape; worst
+      province + "N/77 below floor" count. Zero new pipeline/data. Gate 56/0, headless-rendered
+      `#exposure`, `data-errors="[]"`. See `docs/PROGRESS_LOG.md` 2026-07-09 (5).)
 - [ ] **`OfficeStaff`/`Transport` are now the only 2 of 5 NSO SES occupation columns with no
       `build_*_income.py` ratio layer** (`Agriculture`, `FactoryWorkers`, `SMEOwners` all wired as of
       `daf6d38`). Same builder shape, different column; only worth building once a concrete UI surface
@@ -745,6 +745,31 @@
       or `build_sme_income.py`, this cycle's join pattern (`build_province.py` reading
       `platform/data/<x>_income_by_province.json`) extends directly, no new mechanism needed.
       *(LOW, S, speculative — needs the builder first)*
+
+## Queue — follow-ups noticed 2026-07-09 (5)
+- [ ] **The same rank-1-worst-province pattern could extend to Home (`renderHomeRisk()`)** — Home
+      already ported the `OCCINC_LIST[0]` (lowest-paid-occupation) and `PSTRESS_LIST[0]`
+      (DTI+unemployment) callouts from Exposure (2026-07-06), but the new SME-owner income-floor
+      block landed on Exposure only this cycle. Same lazy-load chain (`loadSmeIncome()`), same
+      null-safe pattern — a small win once someone's touching `renderHomeRisk()`/`renderHomeWhitespace()`
+      again, though both cards are already flagged as "getting long" (2026-07-06 follow-ups) so worth
+      pairing with the "more" toggle idea rather than adding a 7th stacked block blindly. *(LOW, S,
+      speculative)*
+- [ ] **`OfficeStaff`/`Transport` are still the only 2 of 5 NSO SES occupation columns with no
+      `build_*_income.py` ratio layer** (Agriculture/FactoryWorkers/SMEOwners now all wired end-to-end
+      — pipeline → province.html → Exposure for SME). Same builder shape, different column; only
+      worth building once a concrete UI surface wants it (no Transport/office-staff lever exists in
+      the Simulator or Exposure today). *(LOW, S, speculative)*
+- [ ] **`renderRiskReadouts()`'s risk-readout block is now 4 stacked rank-1 callouts deep** (most-stressed
+      provinces table, DTI+unemployment, lowest-paid occupation, SME income floor) before the riskiest-
+      branches table — same "card getting long" pattern already flagged for Home's risk/whitespace cards
+      (2026-07-06). Not a problem yet (each is a single compact `cc-row`, not a full card), but if a 5th
+      rank-1 fact is ever added here, worth considering the same "more" toggle treatment. *(LOW, trivial,
+      speculative)*
+- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (5), still unmerged, no change.**
+      `mcp__github__list_pull_requests(state=open)` shows PR #1 (`claude/new-session-wto26j` →
+      `master`) still open, not draft — same state as every prior recheck since 2026-07-05 (4). Not
+      re-notifying (no change). *(LOW, trivial — just a status check)*
 
 ## Done (most recent first)
 - (loop will append here)
