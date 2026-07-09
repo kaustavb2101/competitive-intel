@@ -4858,6 +4858,25 @@ function renderHomeQueue(){
 
 /* ---- home orchestration ---- */
 let homeBooted=false;
+/* Command-center "Recommendation by region" card — the per-branch recs rolled up to the 5 regions
+   (data/regional_outlook.json, same layer the Overview uses). Each region shows its #1 action +
+   branch count. Null-safe: absent file → the card stays hidden. */
+function renderHomeRegions(){
+  const wrap=$('#cc-regions'), body=$('#cc-regions-body');
+  if(!wrap||!body||!OUTLOOK||!OUTLOOK.regions||!OUTLOOK.regions.length) return;
+  const rows=OUTLOOK.regions.map(r=>{
+    const ac=(typeof REGION_ACCENT!=='undefined'&&REGION_ACCENT[r.r])||'var(--accent)';
+    const a=(r.recommendation||[])[0];
+    const col=a?((typeof OUT_TONE!=='undefined'&&OUT_TONE[a.tone])||'var(--mid)'):'var(--dim)';
+    const act=a?`${a.i} ${(a.t||'').split('—')[0].trim()}`:'—';
+    return `<div class="cc-row">
+      <span class="l"><b style="border-left:3px solid ${ac};padding-left:7px">${r.name}</b>
+        <span class="s">${r.n} branches</span></span>
+      <span class="r" style="color:${col}">${act}</span></div>`;
+  }).join('');
+  body.innerHTML=rows+`<div class="sub" style="margin-top:6px;color:var(--dim)">Per-branch recommendations rolled up by region · full situation → action detail on the Overview.</div>`;
+  wrap.style.display='';
+}
 function renderHome(){
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready sentence + Road-to-3,000 strip (synthesized, null-safe)
@@ -4865,6 +4884,7 @@ function renderHome(){
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
+  renderHomeRegions();      // regional_outlook.json — recommendation by region (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
   renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
@@ -4877,6 +4897,8 @@ function renderHome(){
     loadProvenance().then(()=>{ if(onHome()) renderHomeDataRoom(); });
     loadAmphoe().then(()=>{ if(onHome()){ renderHomeWhitespace(); renderHomeThesis(); } });
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
+    // recommendation-by-region card — same rollup layer the Overview uses (null-safe).
+    loadOutlook().then(()=>{ if(onHome()) renderHomeRegions(); });
     // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
     loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
