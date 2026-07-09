@@ -1,0 +1,63 @@
+name: Data — ThaiWater live rain pulse (6-hourly)
+
+# Refreshes the LIVE per-province 24h rainfall aggregate (platform/data/thaiwater_rain.json) from
+# ThaiWater gauge telemetry (api-v3.thaiwater.net /public/rain_24h — ~4.5k stations, keyless,
+# verified reachable from cloud runners). The Overview's "Live rain pulse" strip reads this file;
+# without refresh a live layer goes stale fast, so this runs every 6 hours.
+#
+# Committed to a fresh data/rain-<run_id> branch and opened as a DRAFT PR back to the branch this
+# ran on. NEVER pushes to a working branch. No-ops when the telemetry snapshot is unchanged.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # every 6 hours, off-minute (03:25/09:25/15:25/21:25 UTC)
+    - cron: "25 3,9,15,21 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Pull ThaiWater rain telemetry
+        run: python pipeline/pull_thaiwater_rain.py --stamp "$(date -u +%F)"
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/rain-${{ github.run_id }}
+        run: |
+          git add platform/data/thaiwater_rain.json
+          if git diff --cached --quiet; then
+            echo "No change vs committed snapshot. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          OBS="$(python -c "import json;print(json.load(open('platform/data/thaiwater_rain.json'))['meta'].get('observed_to') or 'n/a')")"
+          git commit -m "data: ThaiWater rain pulse (obs to $OBS, run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-thaiwater-rain.yml via pipeline/pull_thaiwater_rain.py — live gauge telemetry, per-province 24h aggregate. MEASURED, nothing fabricated."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated 6-hourly ThaiWater rain refresh (run ${{ github.run_id }}), from \`$BASE_BRANCH\`."
+            echo
+            echo "Observed to: **$OBS** · ~4.5k gauges → per-province max / p90 / %heavy / %very-heavy."
+            echo
+            echo "The Overview 'Live rain pulse' strip reads this file directly. Merge to refresh the live read."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: ThaiWater rain pulse (obs to $OBS)" \
+            --body-file /tmp/pr_body.md
