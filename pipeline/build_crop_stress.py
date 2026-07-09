@@ -70,6 +70,14 @@ CROP_TO_OAE = {
     "oilpalm": "oilpalm",
 }
 OAE_FILE = "oae_farmgate_prices.json"
+# crop key in crop_prov_area.json -> crop key in nabc_prices.json crop_yoy (LIVE Thai daily prices,
+# agriapi.nabc.go.th — cloud-refreshable, PREFERRED over the OAE snapshot and the GLOBAL proxy).
+CROP_TO_NABC = {
+    "rice": "rice",
+    "rubber": "rubber",
+    "oilpalm": "oilpalm",
+}
+NABC_FILE = "nabc_prices.json"
 # staleness guard: the OAE vintage may lag the commodity board's own vintage by
 # at most this many months, else the file is treated as absent (the crop_prices
 # BE-2562 lesson: a measured-but-7-years-stale series is WORSE than the proxy).
@@ -181,6 +189,20 @@ def build():
                 oae_used.append(ckey)
         if not oae_used:
             oae = None  # file matched no priceable crop — behave as absent
+
+    # --- PREFER LIVE NABC daily Thai prices (agriapi.nabc.go.th) over OAE snapshot + GLOBAL proxy ---
+    # Same live feed build_branch_agri.py prefers, so both agri surfaces read consistent measured Thai
+    # prices. Absent file => no change (output stays byte-identical; --check green either way).
+    nabc_used = []
+    nabc = load(NABC_FILE) if os.path.exists(os.path.join(SRC, NABC_FILE)) else None
+    if nabc is not None:
+        nabc_yoy = nabc.get("crop_yoy") or {}
+        for ckey in sorted(CROP_TO_NABC):
+            val = nabc_yoy.get(CROP_TO_NABC[ckey])
+            if isinstance(val, (int, float)):
+                crop_yoy[ckey] = float(val)
+                crop_src[ckey] = "nabc"
+                nabc_used.append(ckey)
 
     covered_crops = sorted(crop_yoy.keys())
     # crops with planting-area data but no usable board price (coverage gap)
@@ -423,38 +445,45 @@ def build():
         ],
     }
 
-    # --- MEASURED-OAE relabel: ONLY when the measured file was actually used ---
-    # Every mutation of meta lives inside this guard so the absent-file output
-    # is byte-identical to the historical proxy-only build.
-    if oae is not None:
-        om = oae.get("meta", {})
+    # --- MEASURED relabel: when a measured price source (NABC live or OAE farm-gate) was used ---
+    # Every mutation of meta lives inside this guard so the all-proxy output stays byte-identical to
+    # the historical proxy-only build. Preference: NABC live Thai daily > OAE farm-gate > GLOBAL proxy.
+    if oae is not None or nabc_used:
+        om = oae.get("meta", {}) if oae is not None else {}
         oae_vintage = om.get("vintage")
+
+        def _src_label(c):
+            s = crop_src.get(c)
+            if s == "nabc":
+                return "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)"
+            if s == "oae":
+                return "MEASURED-OAE — Thai farm-gate YoY %% (vintage %s)" % oae_vintage
+            return "PROXY — World Bank Pink Sheet GLOBAL YoY %% (direction only)"
+
         meta["fields"]["price_stress"] = (
-            "MIXED — planting-area-weighted price YoY %% across the province's "
-            "covered crops. Per-crop source in meta.price_sources: MEASURED-OAE "
-            "Thai farm-gate (ราคาที่เกษตรกรขายได้) where matched, World Bank "
-            "GLOBAL proxy otherwise.")
-        meta["price_sources"] = {
-            CROP_EN.get(c, c): (
-                "MEASURED-OAE — Thai farm-gate YoY %% (vintage %s)" % oae_vintage
-                if crop_src.get(c) == "oae"
-                else "PROXY — World Bank Pink Sheet GLOBAL YoY %% (direction only)")
-            for c in covered_crops}
-        meta["provenance"]["oae_farmgate_prices.json"] = (
-            "OAE farm-gate prices (ราคาที่เกษตรกรขายได้), pulled by "
-            "pipeline/pull_oae_prices.py — MEASURED. vintage %s, dataset %s." % (
-                oae_vintage, om.get("dataset_id")))
-        measured_en = [CROP_EN.get(c, c) for c in oae_used]
+            "MIXED — planting-area-weighted price YoY % across the province's covered crops. "
+            "Per-crop source in meta.price_sources: LIVE NABC Thai daily prices preferred, then "
+            "MEASURED-OAE Thai farm-gate (ราคาที่เกษตรกรขายได้), else the World Bank GLOBAL proxy.")
+        meta["price_sources"] = {CROP_EN.get(c, c): _src_label(c) for c in covered_crops}
+        if nabc_used:
+            meta["provenance"]["nabc_prices.json"] = (
+                "NABC live daily market prices (agriapi.nabc.go.th), pulled by "
+                "pipeline/pull_nabc_prices.py — MEASURED, cloud-refreshable. Crops: %s." %
+                ", ".join(CROP_EN.get(c, c) for c in nabc_used))
+        if oae is not None:
+            meta["provenance"]["oae_farmgate_prices.json"] = (
+                "OAE farm-gate prices (ราคาที่เกษตรกรขายได้), pulled by "
+                "pipeline/pull_oae_prices.py — MEASURED. vintage %s, dataset %s." % (
+                    oae_vintage, om.get("dataset_id")))
+        measured_en = [CROP_EN.get(c, c) for c in covered_crops if crop_src.get(c) in ("nabc", "oae")]
         meta["caveats"][0] = (
-            "Price sources are MIXED per crop (see meta.price_sources): %s use "
-            "MEASURED Thai farm-gate YoY (OAE); any other priced crop still uses "
-            "the GLOBAL World Bank proxy (direction signal only)." %
-            ", ".join(measured_en))
-        if "rice" in oae_used and "rubber" in oae_used:
+            "Price sources are MIXED per crop (see meta.price_sources): %s use MEASURED Thai YoY "
+            "(NABC live / OAE farm-gate); any other priced crop still uses the GLOBAL World Bank "
+            "proxy (direction signal only)." % ", ".join(measured_en))
+        if crop_src.get("rice") in ("nabc", "oae") and crop_src.get("rubber") in ("nabc", "oae"):
             meta["double_stress"]["caveat"] = (
-                "price_term for rice/rubber now uses MEASURED Thai farm-gate YoY "
-                "(OAE, vintage %s), not the GLOBAL proxy. Still treat the flag as "
-                "a triage flag, not a default forecast." % oae_vintage)
+                "price_term for rice/rubber now uses MEASURED Thai YoY (NABC live / OAE farm-gate), "
+                "not the GLOBAL proxy. Still treat the flag as a triage flag, not a forecast.")
 
     return {"meta": meta, "provinces": records}
 
