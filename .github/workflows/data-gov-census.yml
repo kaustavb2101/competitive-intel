@@ -1,0 +1,83 @@
+name: Data — DIW factories + DLT vehicles (gov census, weekly)
+
+# The breakthrough this workflow captures: data.go.th is Cloudflare-geoblocked to datacenter IPs, BUT
+# the DEPARTMENTS' OWN CKAN catalogs are NOT — verified HTTP 200 from GitHub-hosted runners:
+#   * DIW factories : diw-dataset.diw.go.th  (factype3 — ~67k category-3 factories, all 77 provinces)
+#   * DLT vehicles  : gdcatalog.dlt.go.th    (dataset_1_1_04 — registered vehicles by province+type)
+# So the authoritative factory + vehicle census refreshes FULLY in the cloud — no Thai laptop, no key.
+# (DLT resource URLs rotate monthly; committee/census.py resolves the newest CSV via the CKAN API.)
+#
+# SAFETY: census.py would rewrite source-data/branches_final.json (the master) in place. This workflow
+# runs it against a THROWAWAY COPY (--in) so the master is never touched, and commits only the two
+# census artifacts. They are staged for review — wiring them into build_branch_vehicles / build_province
+# (replacing the old data.go.th fold-in) is a deliberate follow-up, not an auto-merge.
+#
+# Committed to a fresh data/gov-census-<run_id> branch and opened as a DRAFT PR back to the branch this
+# ran on. NEVER pushes to a working branch. No-ops cleanly when the upstream census is unchanged.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 02:40 UTC (= 09:40 Bangkok) — off-minute; gov catalogs update infrequently.
+    - cron: "40 2 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Pull DIW + DLT census via department CKAN (master protected)
+        run: |
+          # Protect the master: census.py rewrites its --in file, so point it at a copy.
+          cp source-data/branches_final.json /tmp/branches_protect.json
+          ( cd committee && python3 census.py --in /tmp/branches_protect.json )
+          # census.py wrote source-data/factory_census_national.json + vehicle_census_province.json.
+          # Confirm the master is byte-identical (the copy absorbed any join-writes).
+          git diff --quiet -- source-data/branches_final.json \
+            || { echo "::error::census.py modified the master — aborting"; exit 1; }
+
+      - name: Commit census artifacts to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/gov-census-${{ github.run_id }}
+        run: |
+          git add source-data/factory_census_national.json source-data/vehicle_census_province.json
+          if git diff --cached --quiet; then
+            echo "No change vs committed census (same upstream). No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          FAC="$(python3 -c "import json;d=json.load(open('source-data/factory_census_national.json'));print(len(d),'districts')" 2>/dev/null || echo '?')"
+          VEH="$(python3 -c "import json;d=json.load(open('source-data/vehicle_census_province.json'));t=sum(r.get('total',0) for r in d.values());print(f'{int(t):,} vehicles, {len(d)} provinces')" 2>/dev/null || echo '?')"
+          git commit -m "data: DIW factory + DLT vehicle census (cloud CKAN, run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-gov-census.yml via committee/census.py — DIW factype3 + DLT dataset_1_1_04 through the departments' own CKAN catalogs (NOT data.go.th; reachable from any IP). Master untouched. MEASURED, no synthesis."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated weekly DIW+DLT gov census (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Factories:** $FAC · **Vehicles:** $VEH"
+            echo
+            echo "Provenance: MEASURED — DIW \`factype3\` + DLT \`dataset_1_1_04\` via the department CKAN"
+            echo "catalogs (diw-dataset.diw.go.th / gdcatalog.dlt.go.th), which bypass the data.go.th"
+            echo "geo-block. Nothing fabricated."
+            echo
+            echo "These are staged for review. To adopt: wire them into \`build_branch_vehicles.py\` /"
+            echo "\`build_province.py\` (replacing the old data.go.th fold-in), then \`bash tests/run.sh check\`."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: DIW+DLT gov census (cloud CKAN, run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

@@ -183,10 +183,19 @@ cd pipeline && python3 autox_dgt_ingest.py        # DIW factories, DLT vehicles,
 
 ## Hard environment constraints (read DATA_SOURCES.md for the full list)
 - **REACHABLE:** Overpass (mirror `https://maps.mail.ru/osm/tools/overpass/api/interpreter`),
-  Google Places, HDX, OAE (`catalog.oae.go.th`), World Bank (`thedocs.worldbank.org`).
-- **BLOCKED from the sandbox's foreign IP (geo/Cloudflare):** ALL data.go.th, DLT, IMF, FRED,
-  competitor corporate sites, dataforthai. **These should work from Kaustav's Thai laptop** —
-  that is the single biggest reason to continue in Claude Code.
+  Google Places, HDX, OAE (`catalog.oae.go.th`), World Bank (`thedocs.worldbank.org`), NABC
+  (`agriapi.nabc.go.th`), BIS (`stats.bis.org`).
+- **✅ BREAKTHROUGH (verified 2026-07-09, both HTTP 200 from this sandbox — see docs/INSIGHTS.md §3):**
+  the government DEPARTMENTS' OWN CKAN catalogs are NOT geoblocked, only the `data.go.th` aggregator is.
+  So the authoritative factory + vehicle census refreshes from ANY cloud IP — **no Thai laptop needed:**
+  - DIW factories — `diw-dataset.diw.go.th` (`factype3`, ~67k category-3 factories, all 77 provinces)
+  - DLT vehicles — `gdcatalog.dlt.go.th` (`dataset_1_1_04`, registered vehicles by province+type; resource
+    URLs rotate monthly — `committee/census.py` resolves the newest CSV via the API)
+  Run via `committee/census.py` or the `.github/workflows/data-gov-census.yml` CI job.
+- **STILL BLOCKED from the foreign IP (geo/Cloudflare):** the `data.go.th` aggregator itself, IMF, FRED,
+  **competitor corporate sites** (muangthaicap/sawad/tidlor/hengleasing — the competitor census was
+  already pulled; can't refresh from CI), dataforthai. A real loan-tape export is the only true
+  laptop/owner-side unlock left.
 - `DATA_GO_TH_TOKEN` lives in Vercel env (project `thailand-labor-intel`). It is valid but
   useless from a foreign IP. Treat as sensitive; rotate (it was exposed in chat).
 
