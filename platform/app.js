@@ -465,6 +465,22 @@ function bldgDensityRec(d){
   return BLDGDEN[i]||null;
 }
 
+/* ---------- per-branch fuel-station density (data/branch_fuel.json, MEASURED OSM) ----------
+   Fuel stations ≤10km — a vehicle-economy / rural-reach signal (where fuel sells, the vehicles
+   backing the title book live). One popup line, no lens. Null-guarded: absent file → omitted. */
+let FUELDEN=null, fueldenPromise=null;
+async function loadBranchFuel(){
+  if(fueldenPromise) return fueldenPromise;
+  fueldenPromise=fetch('data/branch_fuel.json').then(r=>r.ok?r.json():null)
+    .then(j=>{FUELDEN=(j&&j.branches)||null;return FUELDEN;}).catch(()=>{FUELDEN=null;return null;});
+  return fueldenPromise;
+}
+function fuelDensityRec(d){
+  if(!FUELDEN||!FUELDEN.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return FUELDEN[i]||null;
+}
+
 /* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
    Lazy-loads the fused composite-risk layer built by pipeline/build_branch_risk.py:
    {meta, branches:[{code, composite_risk 0–100, components{household,agri,occupation,segment},
@@ -3891,8 +3907,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA||!FUELDEN){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4334,7 +4350,16 @@ function bldgDensityPopupHTML(d,r){
   const n=e.buildings_10km||0;
   const col=n>=1000?'#8b90a7':n>=200?'var(--gold)':n>0?'#cda23e':'var(--mid)';
   return r('Buildings ≤10km (Overture) · measured',
-    `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col);
+    `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col)
+    + fuelDensityPopupHTML(d,r);
+}
+// fuel stations ≤10km (OSM, MEASURED) — vehicle-economy / rural-reach signal. Omitted when absent.
+function fuelDensityPopupHTML(d,r){
+  const e=fuelDensityRec(d); if(!e||e.n10==null) return '';
+  const n=e.n10;
+  const col=n>=30?'var(--collat)':n>=10?'var(--gold)':n>0?'#cda23e':'var(--mid)';
+  return r('Fuel stations ≤10km (OSM) · measured',
+    `${n.toLocaleString()} <span class="sub">(vehicle economy)</span>`, col);
 }
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.

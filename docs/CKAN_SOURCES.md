@@ -55,6 +55,19 @@ All others 502 / connection-reset through the proxy (MOC, RID, MOPH, MOTS, GISTD
 The reachable gov-data surface is now essentially mapped: **OAE · DIW · DLT · NABC · ThaiWater · HDX ·
 World Bank · BIS · Overpass · Google Places(keyed)**.
 
+## Round-3 deep enumeration (2026-07-09)
+- **`gdcatalog.<dept>.go.th` pattern probe** — tried 13 more departments (TMD, DOA, DOAE, DIT, NSO,
+  DOL, MOI, DOPA, OAE, Fisheries, DLD, MOC, OIE): **all blocked** (proxy 502). Only DLT hosts this
+  reachably.
+- **DLT is INTERMITTENT** — `gdcatalog.dlt.go.th` answered census.py at ~17:30 UTC, then dropped
+  connections at ~19:00 (HTTP 000, "remote end closed"). The CI census job's retry loop is the right
+  countermeasure; do not assume a single failed probe means blocked-forever.
+- **DIW full catalog** (13 datasets): beyond `factype3` (used), the valuable ones are
+  **`factype2`** (small 10–50HP factories — the small-business borrowers a title lender actually
+  serves; widens the census beyond big plants), **`fac-10scurve`** (S-curve/EV-industry factories —
+  feeds the EV-transition risk narrative), `fac-eec-class3`, `factype101-105-106`, `dataset_chem`.
+  All pull through the same census.py CKAN path.
+
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
 osm_layers.json` — **13 national layers** feeding the per-branch within-10km `k10` radar (wired through
@@ -73,7 +86,8 @@ Candidate NEW categories (national OSM counts, 2026-07-09):
 
 Finding: the dense, high-value POI signals are **already covered** by the 13 layers, and the measured
 gov census (DIW factories, DLT vehicles) **supersedes** the OSM proxies for the key collateral/industrial
-signals. The single genuinely-additive layer is **fuel stations**. Adding it means editing OSM_LAYERS +
-keymap + derive POI10 + the app radar, then re-running the enrich loop (network Overpass pull → master
-rewrite → full cascade rebuild) — a heavy op for a modest signal, so it belongs in a deliberate
-enrich-loop cycle, not an inline edit.
+signals. The single genuinely-additive layer was **fuel stations** — now SHIPPED (2026-07-09) via the
+safe standalone pattern instead of the heavy enrich-loop path: `pull_fuel_stations.py` (8,706 stations,
+nodes + way-centroids, top brands PT/PTT/Bangchak/Caltex/Shell) → `source-data/fuel_stations.json` →
+`build_branch_fuel.py` → `platform/data/branch_fuel.json` (per-branch ≤10km count, median 11, max 214;
+index-aligned + fingerprinted + gated) → one MEASURED popup line under Buildings ≤10km.

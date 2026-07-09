@@ -4135,6 +4135,7 @@ _INDEX_ALIGNED_LAYERS = (
     ("occupation_risk.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("poi_relevance.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_density.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
+    ("branch_fuel.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_labor.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("branch_occupations.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
     ("macro_exposure.json", lambda d: d.get("branches") if isinstance(d, dict) else None),
@@ -4206,6 +4207,7 @@ _FINGERPRINTED_LAYERS = (
     "occupation_risk.json",      # build_occupation_risk.py
     "poi_relevance.json",        # build_poi_relevance.py
     "branch_density.json",       # build_branch_density.py
+    "branch_fuel.json",          # build_branch_fuel.py
     "branch_peers.json",         # build_branch_peers.py
     "branch_leads.json",         # build_branch_leads.py
     "rival_pressure.json",       # build_rival_pressure.py

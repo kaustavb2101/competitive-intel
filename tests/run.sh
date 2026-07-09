@@ -84,6 +84,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_branch_density.py --check (source-data/perimeter_counts.json absent — not data drift)"
   else bad "build_branch_density.py --check (branch_density.json drifted from source-data/perimeter_counts.json/branches.json)"
   fi
+  ( cd "$PIPE" && python3 build_branch_fuel.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_fuel.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_fuel.py --check (source-data/fuel_stations.json absent — not data drift)"
+  else bad "build_branch_fuel.py --check (branch_fuel.json drifted from source-data/fuel_stations.json/branches.json)"
+  fi
   ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
