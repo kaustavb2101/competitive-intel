@@ -206,6 +206,11 @@ Always state whether a number is measured or estimated. Read the matching SKILL.
 docx/pptx/xlsx/pdf.
 
 ## Operating model (how work happens here)
+**Agent patterns (see `docs/AGENT_PATTERNS.md` — adopted 2026-07-09):** every recurring process names
+its orchestration pattern — (1) ad-hoc sub-agents for recon/answers, (2) the fixed agent team in
+`.claude/agents/` (data-hunter · gate-runner · ui-verifier · provenance-auditor), (3) saved dynamic
+workflows in `.claude/workflows/` (`data-hunt` probe sweep, `ship-check` pre-commit verify fan-out).
+
 Three nested loops — see `docs/OPERATING_MODEL.md`: (1) agentic coding ~minutes (agent vs written
 spec, evals = gate REAL exit + headless render, worktree branches, incremental commits on long
 batches); (2) developer feedback ~hours (owner directive → committee → ranked waves → plain-language
