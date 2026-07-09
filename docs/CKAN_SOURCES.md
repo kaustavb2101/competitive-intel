@@ -68,6 +68,29 @@ World Bank · BIS · Overpass · Google Places(keyed)**.
   feeds the EV-transition risk narrative), `fac-eec-class3`, `factype101-105-106`, `dataset_chem`.
   All pull through the same census.py CKAN path.
 
+## Data-hunt waves (standing directive: keep finding, workaround blocks, iterate)
+**Wave 1 (2026-07-09):** Wayback Machine = **403 through the proxy** (dead as a geo-block bypass);
+NSO statbank blocked. **DLT window re-opened** and was exploited: 8 raw CSVs secured into
+`source-data/dlt/` — first registrations BY BRAND/MODEL (BE 2565–2568) + new-registration totals →
+`build_brand_trends.py` → Overview "New-vehicle market" board. Measured headlines: new-pickup
+registrations collapsed (Isuzu −71%, Toyota −53% since 2022); pure-EV marques 0.2%→3.8%.
+DLT also carries `dataset_stat_1_005` (driver licenses, monthly to Feb 2026) and
+`dataset_stat_1_008/009` (monthly registration/tax transactions) for future pulls.
+
+**Wave 2 (2026-07-09) — HDX deep-mine (162 Thailand datasets), verdicts:**
+- Thailand **MPI** (Oxford OPHI): only national + 6 macro-regions — too coarse for the 77-province
+  read. Skip (the app's NSO SES debt/income layers are finer).
+- **WFP Food Prices**: 1 market (Bangkok), 4 commodities, series ENDS 2020-03 — stale; NABC live
+  daily Thai prices strictly dominate. Skip.
+- "Thailand – Poverty / Financial Sector / Key Indicators" = World Bank WDI national indicators —
+  already covered by `pull_macro.py`. Skip.
+- Still-useful HDX assets (subnational population, CHIRPS rainfall, admin boundaries) are ALREADY
+  wired into the pipeline. Net: HDX adds nothing new at province granularity.
+
+**Next-wave targets:** DIW `factype2` raw pull (small 10–50HP factories — the small-business borrower
+census; grab while the host answers), ThaiWater reservoir/flood wiring, DLT monthly stat_1_008
+transaction series (a monthly vehicle-market pulse).
+
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
 osm_layers.json` — **13 national layers** feeding the per-branch within-10km `k10` radar (wired through
