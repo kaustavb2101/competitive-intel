@@ -105,8 +105,19 @@ n_stations / max / p90 / %heavy / %very-heavy, Thai Met thresholds). The real-ti
 (live check: Songkhla 102mm max). Dam endpoints (`dam_daily` etc.) are auth-walled 403/404 — gauge
 network only. Not yet surfaced in the app.
 
-**Next-wave targets:** surface the live rain pulse (Overview/crop-stress card + CI refresh workflow),
-DLT monthly stat_1_008 transaction series (monthly vehicle-market pulse).
+**Wave 6–7 (2026-07-09):** live rain pulse surfaced on the Overview (own #rainpulse element) +
+6-hourly CI refresh workflow (data-thaiwater-rain.yml).
+
+**Wave 8 (2026-07-09) — DLT monthly deep-pull (window re-opened):**
+- `dataset_stat_1_005` driver licenses: only Bangkok-vs-regions split (67 rows) — too coarse. Skip.
+- Monthly brand files: **Jan-2026 complete** (1,422 rows) → committed as
+  `first_regis_brand_monthly_2569_01.csv`; Feb-2026 upstream file is a 6-row stub — skipped with a
+  >500-row completeness guard in `build_brand_trends.py`. Headline: **pure-EV share 10.4% in Jan-2026**
+  (vs 3.8% full-2025 — ~3× acceleration) and **BYD #4 overall, ahead of Isuzu**. Surfaced as a YTD card
+  on the New-vehicle market board.
+
+**Next-wave targets:** DLT stat_1_008 monthly transaction series; refresh the Jan-2026 monthly file
+set as new months publish (manual or a future workflow).
 
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/

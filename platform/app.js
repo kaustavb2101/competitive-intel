@@ -1286,6 +1286,16 @@ function renderBrandTrends(){
     {k:`All first registrations ${ce(+last)}`, v:(yL.total_first_regis_cars/1e6).toFixed(2)+'M', d:'cars + motorcycles', cls:'up',
      n:`MEASURED · DLT ${last} (CE ${ce(+last)}). Top brands: ${(yL.top_brands||[]).slice(0,5).map(x=>x.b).join(', ')}.`},
   ];
+  // current-year YTD (monthly DLT files) — the EV wave is accelerating, not stabilising
+  const ytd=BRANDT.ytd;
+  if(ytd&&ytd.ev_only_share_pct!=null){
+    const mo=(ytd.months||[]).length||1;
+    const byd=(ytd.top_brands||[]).findIndex(x=>x.b==='BYD');
+    cards.push({k:`Pure-EV share ${ce(+ytd.year_be)} YTD`, v:ytd.ev_only_share_pct+'%', d:`${mo} month${mo>1?'s':''} · accelerating`, cls:'down',
+      n:`MEASURED counts (DLT monthly ${ce(+ytd.year_be)}) · estimated EV-only classification. `+
+        (byd>=0&&byd<5?`BYD is now #${byd+1} overall — ahead of Isuzu. `:'')+
+        `The EV wave is compounding, not stabilising.`});
+  }
   $('#brandtrends-cards').innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');

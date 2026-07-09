@@ -69,6 +69,40 @@ def build():
             "ev_only_brand_regis": ev,
             "ev_only_share_pct": round(100.0 * ev / allc, 1) if allc else 0.0,
         }
+    # current-year MONTHLY files (schema adds a เดือน column: year, month, type, brand, model, count)
+    # → a YTD block extending the annual trend into the running year. Feb-2569's upstream file is a
+    # truncated 6-row stub, so only complete-looking months (>500 rows) are accepted.
+    ytd = None
+    monthly = sorted(glob.glob(os.path.join(SRC_DIR, "first_regis_brand_monthly_25*.csv")))
+    if monthly:
+        tot = defaultdict(int); ev = 0; allc = 0; months = []
+        yr = None
+        for fn in monthly:
+            rows = _read(fn)[1:]
+            if len(rows) < 500:
+                continue
+            m = re.search(r"monthly_(25\d\d)_(\d\d)", os.path.basename(fn))
+            if m:
+                yr = m.group(1); months.append(m.group(2))
+            for r in rows:
+                if len(r) < 6:
+                    continue
+                brand, n = r[3].strip().upper(), r[5]
+                try:
+                    n = int(n)
+                except ValueError:
+                    continue
+                tot[brand] += n; allc += n
+                if brand in EV_ONLY_BRANDS:
+                    ev += n
+        if allc:
+            ytd = {
+                "year_be": yr, "months": sorted(months),
+                "total_first_regis_cars": allc,
+                "top_brands": [{"b": b, "n": n} for b, n in sorted(tot.items(), key=lambda x: -x[1])[:8]],
+                "ev_only_share_pct": round(100.0 * ev / allc, 1),
+            }
+
     # new-registration totals by class (trend across years)
     trend = {}
     for fn in regis_files:
@@ -104,6 +138,7 @@ def build():
                    "share is the leading indicator for the diesel-pickup resale watch (collateral outlook).",
         },
         "years": years,
+        "ytd": ytd,
         "new_regis_trend": trend,
     }
 
