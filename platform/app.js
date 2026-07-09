@@ -142,6 +142,32 @@ async function loadOccupationIncome(){
 }
 function occincHasData(){return !!(OCCINC_LIST&&OCCINC_LIST.length);}
 
+/* ---------- SME-owner income floor by province (merchant-lending segment, objective #1) ----------
+   Lazy-loaded from data/sme_income_by_province.json (pipeline/build_sme_income.py) — NSO SES 2566
+   SMEOwners-occupation monthly income, MEASURED, same builder shape as the factory/agri income-floor
+   layers already surfaced on province.html/Simulator, applied here to the merchant segment instead.
+   SMEINC_LIST is sorted worst-first (lowest ratio_to_national first). Null-guarded: ABSENT source ->
+   empty list, no error. */
+let SMEINC_LIST=[], SMEINC_META=null, smeincLoaded=false, smeincPromise=null;
+async function loadSmeIncome(){
+  if(smeincPromise) return smeincPromise;
+  smeincLoaded=true;
+  smeincPromise=(async()=>{
+    try{
+      const r=await fetch('data/sme_income_by_province.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      SMEINC_META=j.meta||null;
+      const prov=(j.meta&&j.meta.absent)?{}:(j.provinces||{});
+      SMEINC_LIST=Object.keys(prov).map(name=>Object.assign({province:name},prov[name]))
+        .filter(p=>p.ratio_to_national!=null)
+        .sort((a,b)=>(a.ratio_to_national||0)-(b.ratio_to_national||0));
+    }catch(e){ SMEINC_LIST=[]; SMEINC_META=null; }
+    return SMEINC_LIST;
+  })();
+  return smeincPromise;
+}
+function smeincHasData(){return !!(SMEINC_LIST&&SMEINC_LIST.length);}
+
 /* ---------- title-loan SEARCH DEMAND + brand share-of-search (ESTIMATED · Google Trends, objective #2) ----------
    Lazy-loaded from data/search_demand.json (pipeline/build_search_demand.py). SDEMAND maps Thai province
    name -> {demand, sos:{brand:share}, autox_share, best_rival, autox_sos_rank, ...}. demand is a 0–100
@@ -2730,6 +2756,7 @@ function renderRiskReadouts(){
   if(!briskLoaded) loadBranchRisk().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!pstressLoaded) loadProvinceStress().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!occincLoaded) loadOccupationIncome().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  if(!smeincLoaded) loadSmeIncome().then(()=>{ if(onExp()) renderRiskReadouts(); });
   let html='';
   // 1) MOST-STRESSED PROVINCES (province_risk.json)
   if(priskHasData()){
@@ -2771,6 +2798,17 @@ function renderRiskReadouts(){
       `<div class="cc-card-b">`+ccRow(`${c.label}`,
         `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
         `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)')+`</div>`;
+  }
+  // 1d) MERCHANT-SEGMENT income floor (sme_income_by_province.json) — same rank-1-surfacing
+  // pattern applied to the SME-owner occupation, the merchant-lending segment's income-floor proxy
+  // (previously only surfaced on province.html; this is the Exposure/merchant-tab equivalent).
+  if(smeincHasData()){
+    const s=SMEINC_LIST[0];
+    const nBelow=SMEINC_LIST.filter(p=>(p.ratio_to_national||0)<1).length;
+    html+=`<div class="cc-sub2" style="margin-top:14px">Merchant segment income floor · SME owners ${TAG_M}</div>`+
+      `<div class="cc-card-b">`+ccRow(`${s.province}`,
+        `SME-owner income ฿${(s.sme_income||0).toLocaleString()}/mo · ${nBelow}/${SMEINC_LIST.length} provinces below the national floor (NSO SES 2566, measured)`,
+        `${(s.ratio_to_national||0).toFixed(2)}×`,'vs national avg','var(--collat)')+`</div>`;
   }
   // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
