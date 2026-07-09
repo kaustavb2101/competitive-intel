@@ -5071,6 +5071,8 @@ function renderHome(){
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — lowest-paid occupation nationally into the risk card (null-safe, mirrors Exposure).
     loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // obj#1 — merchant-segment (SME owner) income floor into the risk card (null-safe, mirrors Exposure).
+    loadSmeIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
     // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
     loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
@@ -5319,6 +5321,17 @@ function renderHomeRisk(){
     html+=ccRow(`${c.label}`,
       `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
       `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)');
+  }
+  // merchant-segment income floor (SME owners, sme_income_by_province.json) — same rank-1-surfacing
+  // pattern as the two blocks above, mirrored from Exposure per the 2026-07-09 (5) backlog follow-up
+  // ("Home doesn't yet surface the SME income-floor fact").
+  if(smeincHasData()){
+    const s=SMEINC_LIST[0];
+    const nBelow=SMEINC_LIST.filter(p=>(p.ratio_to_national||0)<1).length;
+    html+=`<div class="cc-sub2">Merchant segment income floor · SME owners ${TAG_M}</div>`;
+    html+=ccRow(`${s.province}`,
+      `SME-owner income ฿${(s.sme_income||0).toLocaleString()}/mo · ${nBelow}/${SMEINC_LIST.length} provinces below the national floor (NSO SES 2566, measured)`,
+      `${(s.ratio_to_national||0).toFixed(2)}×`,'vs national avg','var(--collat)');
   }
   // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
