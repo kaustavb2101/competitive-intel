@@ -1,0 +1,18 @@
+# systemd unit for an always-on Linux host (incl. a Thai VPS for DLT later).
+# Install: sudo cp deploy/committee.service /etc/systemd/system/ && sudo systemctl enable --now committee
+[Unit]
+Description=AutoX committee daemon (continuous data-quality loop)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/autox-credit-intel
+Environment=GOOGLE_MAPS_API_KEY=CHANGeME
+Environment=CYCLE_SLEEP_SEC=900
+ExecStart=/usr/bin/python3 committee/daemon.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

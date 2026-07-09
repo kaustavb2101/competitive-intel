@@ -1,0 +1,402 @@
+{
+  "meta": {
+    "source": "debt_per_household: NSO SES 2566, via data.go.th / TMLI (CKAN-citable: see nso-ses-debt-2566.json). debt_to_income/stress_index: attributed in the vendored source to 'BOT Household Debt Regional Q4/2024' but NO CKAN/BOT resource id is cited anywhere in the vendored file — UNVERIFIED, see caveats.",
+    "provenance": "MIXED. debt_per_household is MEASURED (NSO SES 2566, matches the independently-vendored nso-ses-debt-2566.json). debt_to_income/stress_index are UNVERIFIED: 2026-07-04 audit found source-data/tmli/household-debt.js groups them under hand-written narrative headers ('CENTRAL (High leverage)', 'NORTHEASTERN (Agri-Stress Hubs)', etc.) with no CKAN/BOT resource id cited — the exact same fabrication smell already caught in provincial-gpp.js (2026-07-02 audit) — and the values (9.5x-18.2x annual income) diverge 10-20x from the independently-computed, fully-cited debt_to_income in platform/data/household_risk_by_province.json (build_household_risk.py: NSO SES debt_per_household / NSO SES annual income, ~0.2x-1.2x range for the same provinces). Do NOT surface debt_to_income/stress_index from THIS file as MEASURED anywhere; the app already only ever consumes household_risk_by_province.json's own recomputed ratio (verified 2026-07-04: no code path reads this file's debt_to_income/stress_index).",
+    "fields": {
+      "debt_to_income": "UNVERIFIED — attributed to 'BOT Household Debt Regional Q4/2024' in the vendored source but no resource id is cited; see meta.provenance. NOT consumed by any builder — kept for reference only.",
+      "stress_index": "UNVERIFIED — same caveat as debt_to_income. NOT consumed by any builder.",
+      "debt_per_household": "MEASURED — average household debt, THB (NSO SES 2566)."
+    },
+    "caveats": [
+      "debt_to_income/stress_index in this file are NOT the same as the app's household-DTI lens (hhdti/pstress) — those are computed fresh by build_household_risk.py from debt_per_household ÷ NSO SES annual income. Do not conflate the two."
+    ],
+    "n_provinces": 77
+  },
+  "provinces": {
+    "กระบี่": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.46,
+      "debt_per_household": 226547
+    },
+    "กรุงเทพมหานคร": {
+      "debt_to_income": 14.2,
+      "stress_index": 0.65,
+      "debt_per_household": 88856
+    },
+    "กาญจนบุรี": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.46,
+      "debt_per_household": 166875
+    },
+    "กาฬสินธุ์": {
+      "debt_to_income": 14.9,
+      "stress_index": 0.69,
+      "debt_per_household": 276654
+    },
+    "กำแพงเพชร": {
+      "debt_to_income": 11.0,
+      "stress_index": 0.49,
+      "debt_per_household": 247710
+    },
+    "ขอนแก่น": {
+      "debt_to_income": 14.8,
+      "stress_index": 0.68,
+      "debt_per_household": 280791
+    },
+    "จันทบุรี": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.46,
+      "debt_per_household": 191578
+    },
+    "ฉะเชิงเทรา": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.45,
+      "debt_per_household": 73913
+    },
+    "ชลบุรี": {
+      "debt_to_income": 11.2,
+      "stress_index": 0.5,
+      "debt_per_household": 282402
+    },
+    "ชัยนาท": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.46,
+      "debt_per_household": 246575
+    },
+    "ชัยภูมิ": {
+      "debt_to_income": 14.3,
+      "stress_index": 0.65,
+      "debt_per_household": 234837
+    },
+    "ชุมพร": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.46,
+      "debt_per_household": 242083
+    },
+    "ตรัง": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.47,
+      "debt_per_household": 188551
+    },
+    "ตราด": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.45,
+      "debt_per_household": 248163
+    },
+    "ตาก": {
+      "debt_to_income": 9.5,
+      "stress_index": 0.42,
+      "debt_per_household": 162027
+    },
+    "นครนายก": {
+      "debt_to_income": 9.8,
+      "stress_index": 0.44,
+      "debt_per_household": 176869
+    },
+    "นครปฐม": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.46,
+      "debt_per_household": 185534
+    },
+    "นครพนม": {
+      "debt_to_income": 13.8,
+      "stress_index": 0.63,
+      "debt_per_household": 247476
+    },
+    "นครราชสีมา": {
+      "debt_to_income": 15.4,
+      "stress_index": 0.72,
+      "debt_per_household": 322819
+    },
+    "นครศรีธรรมราช": {
+      "debt_to_income": 11.8,
+      "stress_index": 0.5,
+      "debt_per_household": 197765
+    },
+    "นครสวรรค์": {
+      "debt_to_income": 11.0,
+      "stress_index": 0.49,
+      "debt_per_household": 198261
+    },
+    "นนทบุรี": {
+      "debt_to_income": 13.5,
+      "stress_index": 0.62,
+      "debt_per_household": 113566
+    },
+    "นราธิวาส": {
+      "debt_to_income": 11.0,
+      "stress_index": 0.49,
+      "debt_per_household": 161015
+    },
+    "น่าน": {
+      "debt_to_income": 12.8,
+      "stress_index": 0.57,
+      "debt_per_household": 181434
+    },
+    "บึงกาฬ": {
+      "debt_to_income": 13.2,
+      "stress_index": 0.6,
+      "debt_per_household": 189021
+    },
+    "บุรีรัมย์": {
+      "debt_to_income": 16.9,
+      "stress_index": 0.78,
+      "debt_per_household": 216500
+    },
+    "ปทุมธานี": {
+      "debt_to_income": 12.1,
+      "stress_index": 0.55,
+      "debt_per_household": 193100
+    },
+    "ประจวบคีรีขันธ์": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.45,
+      "debt_per_household": 188786
+    },
+    "ปราจีนบุรี": {
+      "debt_to_income": 9.5,
+      "stress_index": 0.43,
+      "debt_per_household": 161050
+    },
+    "ปัตตานี": {
+      "debt_to_income": 11.5,
+      "stress_index": 0.52,
+      "debt_per_household": 167014
+    },
+    "พระนครศรีอยุธยา": {
+      "debt_to_income": 11.8,
+      "stress_index": 0.52,
+      "debt_per_household": 199073
+    },
+    "พะเยา": {
+      "debt_to_income": 12.1,
+      "stress_index": 0.54,
+      "debt_per_household": 184252
+    },
+    "พังงา": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.45,
+      "debt_per_household": 156498
+    },
+    "พัทลุง": {
+      "debt_to_income": 11.0,
+      "stress_index": 0.48,
+      "debt_per_household": 195011
+    },
+    "พิจิตร": {
+      "debt_to_income": 11.3,
+      "stress_index": 0.5,
+      "debt_per_household": 201817
+    },
+    "พิษณุโลก": {
+      "debt_to_income": 11.2,
+      "stress_index": 0.5,
+      "debt_per_household": 199561
+    },
+    "ภูเก็ต": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.45,
+      "debt_per_household": 199498
+    },
+    "มหาสารคาม": {
+      "debt_to_income": 15.2,
+      "stress_index": 0.71,
+      "debt_per_household": 285706
+    },
+    "มุกดาหาร": {
+      "debt_to_income": 13.5,
+      "stress_index": 0.61,
+      "debt_per_household": 207694
+    },
+    "ยะลา": {
+      "debt_to_income": 11.2,
+      "stress_index": 0.5,
+      "debt_per_household": 175213
+    },
+    "ยโสธร": {
+      "debt_to_income": 16.2,
+      "stress_index": 0.76,
+      "debt_per_household": 314516
+    },
+    "ระนอง": {
+      "debt_to_income": 9.8,
+      "stress_index": 0.43,
+      "debt_per_household": 155028
+    },
+    "ระยอง": {
+      "debt_to_income": 9.8,
+      "stress_index": 0.42,
+      "debt_per_household": 269028
+    },
+    "ราชบุรี": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.47,
+      "debt_per_household": 217625
+    },
+    "ร้อยเอ็ด": {
+      "debt_to_income": 15.8,
+      "stress_index": 0.74,
+      "debt_per_household": 293244
+    },
+    "ลพบุรี": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.47,
+      "debt_per_household": 187476
+    },
+    "ลำปาง": {
+      "debt_to_income": 11.9,
+      "stress_index": 0.52,
+      "debt_per_household": 238044
+    },
+    "ลำพูน": {
+      "debt_to_income": 11.5,
+      "stress_index": 0.5,
+      "debt_per_household": 217019
+    },
+    "ศรีสะเกษ": {
+      "debt_to_income": 18.2,
+      "stress_index": 0.85,
+      "debt_per_household": 281430
+    },
+    "สกลนคร": {
+      "debt_to_income": 14.1,
+      "stress_index": 0.64,
+      "debt_per_household": 246684
+    },
+    "สงขลา": {
+      "debt_to_income": 12.2,
+      "stress_index": 0.52,
+      "debt_per_household": 253523
+    },
+    "สตูล": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.45,
+      "debt_per_household": 207773
+    },
+    "สมุทรปราการ": {
+      "debt_to_income": 12.8,
+      "stress_index": 0.58,
+      "debt_per_household": 137015
+    },
+    "สมุทรสงคราม": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.48,
+      "debt_per_household": 115680
+    },
+    "สมุทรสาคร": {
+      "debt_to_income": 11.5,
+      "stress_index": 0.51,
+      "debt_per_household": 118060
+    },
+    "สระบุรี": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.48,
+      "debt_per_household": 203462
+    },
+    "สระแก้ว": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.49,
+      "debt_per_household": 169673
+    },
+    "สิงห์บุรี": {
+      "debt_to_income": 10.5,
+      "stress_index": 0.47,
+      "debt_per_household": 170810
+    },
+    "สุพรรณบุรี": {
+      "debt_to_income": 11.0,
+      "stress_index": 0.5,
+      "debt_per_household": 191020
+    },
+    "สุราษฎร์ธานี": {
+      "debt_to_income": 11.5,
+      "stress_index": 0.48,
+      "debt_per_household": 210855
+    },
+    "สุรินทร์": {
+      "debt_to_income": 17.5,
+      "stress_index": 0.82,
+      "debt_per_household": 248843
+    },
+    "สุโขทัย": {
+      "debt_to_income": 11.5,
+      "stress_index": 0.51,
+      "debt_per_household": 248399
+    },
+    "หนองคาย": {
+      "debt_to_income": 13.5,
+      "stress_index": 0.61,
+      "debt_per_household": 233625
+    },
+    "หนองบัวลำภู": {
+      "debt_to_income": 15.9,
+      "stress_index": 0.75,
+      "debt_per_household": 310867
+    },
+    "อำนาจเจริญ": {
+      "debt_to_income": 17.1,
+      "stress_index": 0.8,
+      "debt_per_household": 369739
+    },
+    "อุดรธานี": {
+      "debt_to_income": 15.1,
+      "stress_index": 0.7,
+      "debt_per_household": 289031
+    },
+    "อุตรดิตถ์": {
+      "debt_to_income": 12.3,
+      "stress_index": 0.55,
+      "debt_per_household": 268683
+    },
+    "อุทัยธานี": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.48,
+      "debt_per_household": 226261
+    },
+    "อุบลราชธานี": {
+      "debt_to_income": 14.5,
+      "stress_index": 0.66,
+      "debt_per_household": 268498
+    },
+    "อ่างทอง": {
+      "debt_to_income": 10.8,
+      "stress_index": 0.48,
+      "debt_per_household": 128630
+    },
+    "เชียงราย": {
+      "debt_to_income": 13.2,
+      "stress_index": 0.58,
+      "debt_per_household": 193540
+    },
+    "เชียงใหม่": {
+      "debt_to_income": 12.5,
+      "stress_index": 0.55,
+      "debt_per_household": 215821
+    },
+    "เพชรบุรี": {
+      "debt_to_income": 10.0,
+      "stress_index": 0.44,
+      "debt_per_household": 138782
+    },
+    "เพชรบูรณ์": {
+      "debt_to_income": 11.8,
+      "stress_index": 0.52,
+      "debt_per_household": 218063
+    },
+    "เลย": {
+      "debt_to_income": 14.2,
+      "stress_index": 0.65,
+      "debt_per_household": 281620
+    },
+    "แพร่": {
+      "debt_to_income": 11.8,
+      "stress_index": 0.52,
+      "debt_per_household": 188038
+    },
+    "แม่ฮ่องสอน": {
+      "debt_to_income": 10.2,
+      "stress_index": 0.46,
+      "debt_per_household": 131705
+    }
+  }
+}

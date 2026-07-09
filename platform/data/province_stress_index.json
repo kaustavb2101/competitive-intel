@@ -1,0 +1,803 @@
+{
+  "meta": {
+    "title": "Combined province structural-stress index — household DTI + unemployment (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_province_stress.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "n_provinces": 77,
+    "sort": "worst-first by composite_stress (desc)",
+    "source": "platform/data/household_risk_by_province.json (NSO SES 2566 debt-to-income, via build_household_risk.py) + source-data/unemployment_by_province.json (NSO Labour Force Survey unemployment_rate, via ingest_tmli.py).",
+    "provenance": "MEASURED inputs (debt_to_income, unemployment_rate — both NSO). dti_percentile and unemployment_percentile are ESTIMATED 0-100 percentile ranks of those measured values across the joined province set. composite_stress is an ESTIMATED 0.5/0.5 weighted average of the two percentile ranks.",
+    "fields": {
+      "debt_to_income": "MEASURED · NSO SES — household debt as a multiple of annual income (carried from household_risk_by_province.json).",
+      "dti_percentile": "ESTIMATED — 0-100 percentile rank of debt_to_income across the joined province set (carried from household_risk's stress_index).",
+      "unemployment_rate": "MEASURED · NSO Labour Force Survey — percent.",
+      "unemployment_percentile": "ESTIMATED — 0-100 percentile rank of unemployment_rate across the joined province set (same method as dti_percentile, for comparability).",
+      "composite_stress": "ESTIMATED — 0.5*dti_percentile + 0.5*unemployment_percentile, 0-100. A relative triage ordering, NOT a measured default rate.",
+      "rank": "1 = most structurally stressed province by composite_stress."
+    },
+    "formula": {
+      "unemployment_percentile": "100 * (#provinces with lower unemployment_rate + 0.5*#ties) / #provinces, rounded 2dp",
+      "composite_stress": "round(0.5*dti_percentile + 0.5*unemployment_percentile, 2)"
+    },
+    "measured_vs_estimated": "debt_to_income + unemployment_rate are MEASURED (NSO). Both percentile ranks and composite_stress are ESTIMATED (relative ordering, equal-weighted by editorial choice — no calibration to realized portfolio default/loss).",
+    "caveats": [
+      "Equal 50/50 weighting between DTI-percentile and unemployment-percentile is an editorial choice, not derived from AutoX loss history — treat as a triage ordering, not a calibrated risk score.",
+      "Both inputs are province AVERAGES (NSO SES / NSO LFS), not the AutoX borrower book.",
+      "Only provinces with a value in BOTH inputs are included; a province missing from either source is silently absent from this file (not zero-filled)."
+    ]
+  },
+  "provinces": [
+    {
+      "province": "อำนาจเจริญ",
+      "region": "Isan",
+      "debt_to_income": 1.14,
+      "dti_percentile": 98.05,
+      "unemployment_rate": 2.84,
+      "unemployment_percentile": 98.05,
+      "composite_stress": 98.05,
+      "rank": 1
+    },
+    {
+      "province": "นครพนม",
+      "region": "Isan",
+      "debt_to_income": 0.91,
+      "dti_percentile": 85.71,
+      "unemployment_rate": 2.32,
+      "unemployment_percentile": 95.45,
+      "composite_stress": 90.58,
+      "rank": 2
+    },
+    {
+      "province": "กำแพงเพชร",
+      "region": "North",
+      "debt_to_income": 0.83,
+      "dti_percentile": 74.68,
+      "unemployment_rate": 2.11,
+      "unemployment_percentile": 91.56,
+      "composite_stress": 83.12,
+      "rank": 3
+    },
+    {
+      "province": "สุโขทัย",
+      "region": "North",
+      "debt_to_income": 0.77,
+      "dti_percentile": 70.78,
+      "unemployment_rate": 2.12,
+      "unemployment_percentile": 92.86,
+      "composite_stress": 81.82,
+      "rank": 4
+    },
+    {
+      "province": "นราธิวาส",
+      "region": "South",
+      "debt_to_income": 0.74,
+      "dti_percentile": 62.99,
+      "unemployment_rate": 2.43,
+      "unemployment_percentile": 96.75,
+      "composite_stress": 79.87,
+      "rank": 5
+    },
+    {
+      "province": "บุรีรัมย์",
+      "region": "Isan",
+      "debt_to_income": 0.76,
+      "dti_percentile": 69.48,
+      "unemployment_rate": 1.87,
+      "unemployment_percentile": 88.96,
+      "composite_stress": 79.22,
+      "rank": 6
+    },
+    {
+      "province": "อุตรดิตถ์",
+      "region": "North",
+      "debt_to_income": 0.87,
+      "dti_percentile": 79.22,
+      "unemployment_rate": 1.38,
+      "unemployment_percentile": 78.57,
+      "composite_stress": 78.89,
+      "rank": 7
+    },
+    {
+      "province": "ลำปาง",
+      "region": "North",
+      "debt_to_income": 0.8,
+      "dti_percentile": 72.73,
+      "unemployment_rate": 1.58,
+      "unemployment_percentile": 83.77,
+      "composite_stress": 78.25,
+      "rank": 8
+    },
+    {
+      "province": "สงขลา",
+      "region": "South",
+      "debt_to_income": 0.87,
+      "dti_percentile": 79.22,
+      "unemployment_rate": 1.23,
+      "unemployment_percentile": 75.97,
+      "composite_stress": 77.59,
+      "rank": 9
+    },
+    {
+      "province": "อุทัยธานี",
+      "region": "North",
+      "debt_to_income": 0.87,
+      "dti_percentile": 79.22,
+      "unemployment_rate": 0.82,
+      "unemployment_percentile": 70.78,
+      "composite_stress": 75.0,
+      "rank": 10
+    },
+    {
+      "province": "ปัตตานี",
+      "region": "South",
+      "debt_to_income": 0.7,
+      "dti_percentile": 57.14,
+      "unemployment_rate": 1.93,
+      "unemployment_percentile": 90.26,
+      "composite_stress": 73.7,
+      "rank": 11
+    },
+    {
+      "province": "นครราชสีมา",
+      "region": "Isan",
+      "debt_to_income": 0.91,
+      "dti_percentile": 85.71,
+      "unemployment_rate": 0.7,
+      "unemployment_percentile": 57.79,
+      "composite_stress": 71.75,
+      "rank": 12
+    },
+    {
+      "province": "พิจิตร",
+      "region": "North",
+      "debt_to_income": 0.71,
+      "dti_percentile": 59.09,
+      "unemployment_rate": 1.43,
+      "unemployment_percentile": 82.47,
+      "composite_stress": 70.78,
+      "rank": 13
+    },
+    {
+      "province": "สตูล",
+      "region": "South",
+      "debt_to_income": 0.74,
+      "dti_percentile": 62.99,
+      "unemployment_rate": 1.37,
+      "unemployment_percentile": 77.27,
+      "composite_stress": 70.13,
+      "rank": 14
+    },
+    {
+      "province": "พะเยา",
+      "region": "North",
+      "debt_to_income": 0.8,
+      "dti_percentile": 72.73,
+      "unemployment_rate": 0.8,
+      "unemployment_percentile": 66.88,
+      "composite_stress": 69.81,
+      "rank": 15
+    },
+    {
+      "province": "ชัยนาท",
+      "region": "Central&BKK",
+      "debt_to_income": 0.75,
+      "dti_percentile": 66.88,
+      "unemployment_rate": 0.93,
+      "unemployment_percentile": 72.08,
+      "composite_stress": 69.48,
+      "rank": 16
+    },
+    {
+      "province": "กระบี่",
+      "region": "South",
+      "debt_to_income": 0.7,
+      "dti_percentile": 57.14,
+      "unemployment_rate": 1.41,
+      "unemployment_percentile": 79.87,
+      "composite_stress": 68.5,
+      "rank": 17
+    },
+    {
+      "province": "กาฬสินธุ์",
+      "region": "Isan",
+      "debt_to_income": 0.97,
+      "dti_percentile": 91.56,
+      "unemployment_rate": 0.58,
+      "unemployment_percentile": 42.21,
+      "composite_stress": 66.89,
+      "rank": 18
+    },
+    {
+      "province": "เพชรบูรณ์",
+      "region": "North",
+      "debt_to_income": 0.65,
+      "dti_percentile": 44.81,
+      "unemployment_rate": 1.83,
+      "unemployment_percentile": 87.66,
+      "composite_stress": 66.23,
+      "rank": 19
+    },
+    {
+      "province": "ชัยภูมิ",
+      "region": "Isan",
+      "debt_to_income": 0.74,
+      "dti_percentile": 62.99,
+      "unemployment_rate": 0.81,
+      "unemployment_percentile": 68.83,
+      "composite_stress": 65.91,
+      "rank": 20
+    },
+    {
+      "province": "เชียงราย",
+      "region": "North",
+      "debt_to_income": 0.9,
+      "dti_percentile": 83.77,
+      "unemployment_rate": 0.58,
+      "unemployment_percentile": 42.21,
+      "composite_stress": 62.99,
+      "rank": 21
+    },
+    {
+      "province": "ศรีสะเกษ",
+      "region": "Isan",
+      "debt_to_income": 0.92,
+      "dti_percentile": 87.66,
+      "unemployment_rate": 0.54,
+      "unemployment_percentile": 38.31,
+      "composite_stress": 62.98,
+      "rank": 22
+    },
+    {
+      "province": "พังงา",
+      "region": "South",
+      "debt_to_income": 0.53,
+      "dti_percentile": 24.68,
+      "unemployment_rate": 3.59,
+      "unemployment_percentile": 99.35,
+      "composite_stress": 62.02,
+      "rank": 23
+    },
+    {
+      "province": "ยโสธร",
+      "region": "Isan",
+      "debt_to_income": 0.96,
+      "dti_percentile": 89.61,
+      "unemployment_rate": 0.37,
+      "unemployment_percentile": 30.52,
+      "composite_stress": 60.06,
+      "rank": 24
+    },
+    {
+      "province": "ร้อยเอ็ด",
+      "region": "Isan",
+      "debt_to_income": 0.96,
+      "dti_percentile": 89.61,
+      "unemployment_rate": 0.33,
+      "unemployment_percentile": 27.27,
+      "composite_stress": 58.44,
+      "rank": 25
+    },
+    {
+      "province": "ระยอง",
+      "region": "East",
+      "debt_to_income": 0.69,
+      "dti_percentile": 54.55,
+      "unemployment_rate": 0.72,
+      "unemployment_percentile": 61.04,
+      "composite_stress": 57.8,
+      "rank": 26
+    },
+    {
+      "province": "ราชบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.57,
+      "dti_percentile": 30.52,
+      "unemployment_rate": 1.61,
+      "unemployment_percentile": 85.06,
+      "composite_stress": 57.79,
+      "rank": 27
+    },
+    {
+      "province": "สิงห์บุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.47,
+      "dti_percentile": 16.23,
+      "unemployment_rate": 2.29,
+      "unemployment_percentile": 94.16,
+      "composite_stress": 55.2,
+      "rank": 28
+    },
+    {
+      "province": "แพร่",
+      "region": "North",
+      "debt_to_income": 0.67,
+      "dti_percentile": 51.3,
+      "unemployment_rate": 0.71,
+      "unemployment_percentile": 59.09,
+      "composite_stress": 55.2,
+      "rank": 29
+    },
+    {
+      "province": "อุบลราชธานี",
+      "region": "Isan",
+      "debt_to_income": 1.0,
+      "dti_percentile": 95.45,
+      "unemployment_rate": 0.16,
+      "unemployment_percentile": 14.29,
+      "composite_stress": 54.87,
+      "rank": 30
+    },
+    {
+      "province": "อุดรธานี",
+      "region": "Isan",
+      "debt_to_income": 1.05,
+      "dti_percentile": 96.75,
+      "unemployment_rate": 0.06,
+      "unemployment_percentile": 8.44,
+      "composite_stress": 52.59,
+      "rank": 31
+    },
+    {
+      "province": "พิษณุโลก",
+      "region": "North",
+      "debt_to_income": 0.66,
+      "dti_percentile": 48.05,
+      "unemployment_rate": 0.69,
+      "unemployment_percentile": 55.84,
+      "composite_stress": 51.95,
+      "rank": 32
+    },
+    {
+      "province": "น่าน",
+      "region": "North",
+      "debt_to_income": 0.69,
+      "dti_percentile": 54.55,
+      "unemployment_rate": 0.65,
+      "unemployment_percentile": 47.4,
+      "composite_stress": 50.97,
+      "rank": 33
+    },
+    {
+      "province": "ขอนแก่น",
+      "region": "Isan",
+      "debt_to_income": 1.15,
+      "dti_percentile": 99.35,
+      "unemployment_rate": 0.0,
+      "unemployment_percentile": 1.95,
+      "composite_stress": 50.65,
+      "rank": 34
+    },
+    {
+      "province": "ตาก",
+      "region": "North",
+      "debt_to_income": 0.59,
+      "dti_percentile": 35.71,
+      "unemployment_rate": 0.76,
+      "unemployment_percentile": 65.58,
+      "composite_stress": 50.64,
+      "rank": 35
+    },
+    {
+      "province": "ยะลา",
+      "region": "South",
+      "debt_to_income": 0.55,
+      "dti_percentile": 26.62,
+      "unemployment_rate": 1.09,
+      "unemployment_percentile": 73.38,
+      "composite_stress": 50.0,
+      "rank": 36
+    },
+    {
+      "province": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.66,
+      "dti_percentile": 48.05,
+      "unemployment_rate": 0.66,
+      "unemployment_percentile": 49.35,
+      "composite_stress": 48.7,
+      "rank": 37
+    },
+    {
+      "province": "มหาสารคาม",
+      "region": "Isan",
+      "debt_to_income": 0.99,
+      "dti_percentile": 93.51,
+      "unemployment_rate": 0.0,
+      "unemployment_percentile": 1.95,
+      "composite_stress": 47.73,
+      "rank": 38
+    },
+    {
+      "province": "หนองบัวลำภู",
+      "region": "Isan",
+      "debt_to_income": 0.99,
+      "dti_percentile": 93.51,
+      "unemployment_rate": 0.0,
+      "unemployment_percentile": 1.95,
+      "composite_stress": 47.73,
+      "rank": 39
+    },
+    {
+      "province": "ตรัง",
+      "region": "South",
+      "debt_to_income": 0.57,
+      "dti_percentile": 30.52,
+      "unemployment_rate": 0.74,
+      "unemployment_percentile": 64.29,
+      "composite_stress": 47.41,
+      "rank": 40
+    },
+    {
+      "province": "สมุทรปราการ",
+      "region": "Central&BKK",
+      "debt_to_income": 0.38,
+      "dti_percentile": 8.44,
+      "unemployment_rate": 1.72,
+      "unemployment_percentile": 86.36,
+      "composite_stress": 47.4,
+      "rank": 41
+    },
+    {
+      "province": "ปทุมธานี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.41,
+      "dti_percentile": 11.69,
+      "unemployment_rate": 1.42,
+      "unemployment_percentile": 81.17,
+      "composite_stress": 46.43,
+      "rank": 42
+    },
+    {
+      "province": "หนองคาย",
+      "region": "Isan",
+      "debt_to_income": 0.72,
+      "dti_percentile": 60.39,
+      "unemployment_rate": 0.38,
+      "unemployment_percentile": 31.82,
+      "composite_stress": 46.11,
+      "rank": 43
+    },
+    {
+      "province": "สกลนคร",
+      "region": "Isan",
+      "debt_to_income": 0.89,
+      "dti_percentile": 82.47,
+      "unemployment_rate": 0.05,
+      "unemployment_percentile": 7.14,
+      "composite_stress": 44.8,
+      "rank": 44
+    },
+    {
+      "province": "สระแก้ว",
+      "region": "East",
+      "debt_to_income": 0.62,
+      "dti_percentile": 39.61,
+      "unemployment_rate": 0.66,
+      "unemployment_percentile": 49.35,
+      "composite_stress": 44.48,
+      "rank": 45
+    },
+    {
+      "province": "ภูเก็ต",
+      "region": "South",
+      "debt_to_income": 0.45,
+      "dti_percentile": 13.64,
+      "unemployment_rate": 1.1,
+      "unemployment_percentile": 74.68,
+      "composite_stress": 44.16,
+      "rank": 46
+    },
+    {
+      "province": "มุกดาหาร",
+      "region": "Isan",
+      "debt_to_income": 0.75,
+      "dti_percentile": 66.88,
+      "unemployment_rate": 0.24,
+      "unemployment_percentile": 20.78,
+      "composite_stress": 43.83,
+      "rank": 47
+    },
+    {
+      "province": "เชียงใหม่",
+      "region": "North",
+      "debt_to_income": 0.58,
+      "dti_percentile": 33.12,
+      "unemployment_rate": 0.68,
+      "unemployment_percentile": 53.9,
+      "composite_stress": 43.51,
+      "rank": 48
+    },
+    {
+      "province": "ตราด",
+      "region": "East",
+      "debt_to_income": 0.75,
+      "dti_percentile": 66.88,
+      "unemployment_rate": 0.23,
+      "unemployment_percentile": 18.83,
+      "composite_stress": 42.85,
+      "rank": 49
+    },
+    {
+      "province": "เลย",
+      "region": "Isan",
+      "debt_to_income": 0.87,
+      "dti_percentile": 79.22,
+      "unemployment_rate": 0.04,
+      "unemployment_percentile": 5.84,
+      "composite_stress": 42.53,
+      "rank": 50
+    },
+    {
+      "province": "สระบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.49,
+      "dti_percentile": 21.43,
+      "unemployment_rate": 0.73,
+      "unemployment_percentile": 62.99,
+      "composite_stress": 42.21,
+      "rank": 51
+    },
+    {
+      "province": "แม่ฮ่องสอน",
+      "region": "North",
+      "debt_to_income": 0.49,
+      "dti_percentile": 21.43,
+      "unemployment_rate": 0.72,
+      "unemployment_percentile": 61.04,
+      "composite_stress": 41.23,
+      "rank": 52
+    },
+    {
+      "province": "สุรินทร์",
+      "region": "Isan",
+      "debt_to_income": 0.84,
+      "dti_percentile": 75.97,
+      "unemployment_rate": 0.02,
+      "unemployment_percentile": 4.55,
+      "composite_stress": 40.26,
+      "rank": 53
+    },
+    {
+      "province": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.53,
+      "dti_percentile": 24.68,
+      "unemployment_rate": 0.67,
+      "unemployment_percentile": 51.95,
+      "composite_stress": 38.31,
+      "rank": 54
+    },
+    {
+      "province": "พัทลุง",
+      "region": "South",
+      "debt_to_income": 0.63,
+      "dti_percentile": 40.91,
+      "unemployment_rate": 0.46,
+      "unemployment_percentile": 34.42,
+      "composite_stress": 37.66,
+      "rank": 55
+    },
+    {
+      "province": "ลพบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.6,
+      "dti_percentile": 38.31,
+      "unemployment_rate": 0.48,
+      "unemployment_percentile": 35.71,
+      "composite_stress": 37.01,
+      "rank": 56
+    },
+    {
+      "province": "สมุทรสาคร",
+      "region": "Central&BKK",
+      "debt_to_income": 0.33,
+      "dti_percentile": 3.9,
+      "unemployment_rate": 0.81,
+      "unemployment_percentile": 68.83,
+      "composite_stress": 36.37,
+      "rank": 57
+    },
+    {
+      "province": "ปราจีนบุรี",
+      "region": "East",
+      "debt_to_income": 0.56,
+      "dti_percentile": 27.92,
+      "unemployment_rate": 0.58,
+      "unemployment_percentile": 42.21,
+      "composite_stress": 35.06,
+      "rank": 58
+    },
+    {
+      "province": "ลำพูน",
+      "region": "North",
+      "debt_to_income": 0.64,
+      "dti_percentile": 42.86,
+      "unemployment_rate": 0.31,
+      "unemployment_percentile": 24.03,
+      "composite_stress": 33.45,
+      "rank": 59
+    },
+    {
+      "province": "ประจวบคีรีขันธ์",
+      "region": "Central&BKK",
+      "debt_to_income": 0.64,
+      "dti_percentile": 42.86,
+      "unemployment_rate": 0.3,
+      "unemployment_percentile": 22.73,
+      "composite_stress": 32.8,
+      "rank": 60
+    },
+    {
+      "province": "อ่างทอง",
+      "region": "Central&BKK",
+      "debt_to_income": 0.39,
+      "dti_percentile": 9.74,
+      "unemployment_rate": 0.69,
+      "unemployment_percentile": 55.84,
+      "composite_stress": 32.79,
+      "rank": 61
+    },
+    {
+      "province": "นครสวรรค์",
+      "region": "North",
+      "debt_to_income": 0.68,
+      "dti_percentile": 52.6,
+      "unemployment_rate": 0.14,
+      "unemployment_percentile": 12.34,
+      "composite_stress": 32.47,
+      "rank": 62
+    },
+    {
+      "province": "สุราษฎร์ธานี",
+      "region": "South",
+      "debt_to_income": 0.59,
+      "dti_percentile": 35.71,
+      "unemployment_rate": 0.36,
+      "unemployment_percentile": 29.22,
+      "composite_stress": 32.47,
+      "rank": 63
+    },
+    {
+      "province": "ชลบุรี",
+      "region": "East",
+      "debt_to_income": 0.66,
+      "dti_percentile": 48.05,
+      "unemployment_rate": 0.12,
+      "unemployment_percentile": 11.04,
+      "composite_stress": 29.54,
+      "rank": 64
+    },
+    {
+      "province": "ชุมพร",
+      "region": "South",
+      "debt_to_income": 0.66,
+      "dti_percentile": 48.05,
+      "unemployment_rate": 0.07,
+      "unemployment_percentile": 9.74,
+      "composite_stress": 28.89,
+      "rank": 65
+    },
+    {
+      "province": "กรุงเทพมหานคร",
+      "region": "Central&BKK",
+      "debt_to_income": 0.22,
+      "dti_percentile": 1.95,
+      "unemployment_rate": 0.67,
+      "unemployment_percentile": 51.95,
+      "composite_stress": 26.95,
+      "rank": 66
+    },
+    {
+      "province": "นครนายก",
+      "region": "Central&BKK",
+      "debt_to_income": 0.59,
+      "dti_percentile": 35.71,
+      "unemployment_rate": 0.2,
+      "unemployment_percentile": 17.53,
+      "composite_stress": 26.62,
+      "rank": 67
+    },
+    {
+      "province": "สมุทรสงคราม",
+      "region": "Central&BKK",
+      "debt_to_income": 0.35,
+      "dti_percentile": 5.84,
+      "unemployment_rate": 0.6,
+      "unemployment_percentile": 44.81,
+      "composite_stress": 25.33,
+      "rank": 68
+    },
+    {
+      "province": "นนทบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.33,
+      "dti_percentile": 3.9,
+      "unemployment_rate": 0.62,
+      "unemployment_percentile": 46.1,
+      "composite_stress": 25.0,
+      "rank": 69
+    },
+    {
+      "province": "นครปฐม",
+      "region": "Central&BKK",
+      "debt_to_income": 0.47,
+      "dti_percentile": 16.23,
+      "unemployment_rate": 0.44,
+      "unemployment_percentile": 33.12,
+      "composite_stress": 24.67,
+      "rank": 70
+    },
+    {
+      "province": "ระนอง",
+      "region": "South",
+      "debt_to_income": 0.49,
+      "dti_percentile": 21.43,
+      "unemployment_rate": 0.32,
+      "unemployment_percentile": 25.32,
+      "composite_stress": 23.38,
+      "rank": 71
+    },
+    {
+      "province": "นครศรีธรรมราช",
+      "region": "South",
+      "debt_to_income": 0.48,
+      "dti_percentile": 18.83,
+      "unemployment_rate": 0.33,
+      "unemployment_percentile": 27.27,
+      "composite_stress": 23.05,
+      "rank": 72
+    },
+    {
+      "province": "บึงกาฬ",
+      "region": "Isan",
+      "debt_to_income": 0.57,
+      "dti_percentile": 30.52,
+      "unemployment_rate": 0.16,
+      "unemployment_percentile": 14.29,
+      "composite_stress": 22.41,
+      "rank": 73
+    },
+    {
+      "province": "จันทบุรี",
+      "region": "East",
+      "debt_to_income": 0.37,
+      "dti_percentile": 7.14,
+      "unemployment_rate": 0.5,
+      "unemployment_percentile": 37.01,
+      "composite_stress": 22.07,
+      "rank": 74
+    },
+    {
+      "province": "ฉะเชิงเทรา",
+      "region": "East",
+      "debt_to_income": 0.19,
+      "dti_percentile": 0.65,
+      "unemployment_rate": 0.57,
+      "unemployment_percentile": 39.61,
+      "composite_stress": 20.13,
+      "rank": 75
+    },
+    {
+      "province": "พระนครศรีอยุธยา",
+      "region": "Central&BKK",
+      "debt_to_income": 0.47,
+      "dti_percentile": 16.23,
+      "unemployment_rate": 0.17,
+      "unemployment_percentile": 16.23,
+      "composite_stress": 16.23,
+      "rank": 76
+    },
+    {
+      "province": "เพชรบุรี",
+      "region": "Central&BKK",
+      "debt_to_income": 0.41,
+      "dti_percentile": 11.69,
+      "unemployment_rate": 0.24,
+      "unemployment_percentile": 20.78,
+      "composite_stress": 16.23,
+      "rank": 77
+    }
+  ]
+}

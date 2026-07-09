@@ -1,0 +1,9 @@
+{
+  "name": "autox-tests",
+  "private": true,
+  "description": "Self-hosted deck.gl/leaflet deps for the headless QA harness. npm install pulls these into .cache/node_modules (gitignored); render.sh vendors the bundles into platform/ at run time.",
+  "dependencies": {
+    "deck.gl": "8.9.35",
+    "leaflet": "1.9.4"
+  }
+}

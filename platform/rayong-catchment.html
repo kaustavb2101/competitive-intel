@@ -1,0 +1,2874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Rayong 3D · เงินไชโย</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="pmtiles-layer.js"></script>
+<style>
+:root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
+ --gold:#E0A93B;--red:#E0474B;--mag:#D65AA0;--blue:#4F7BF0;--orange:#E07B2F;--teal:#159b86;--purp:#9a7fd6;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;background:var(--ink)}
+#map{position:fixed;inset:0;background:transparent}
+.mono{font-family:'IBM Plex Mono',monospace}
+canvas{outline:none}
+
+/* ---- CINEMATIC DEPTH (Upgrade 1) — purely visual chrome around the GL canvas ----
+   #sky : a fixed sky/horizon gradient that sits BEHIND the deck.gl canvas (z below #map) so the
+          scene reads against an atmosphere instead of flat ink. Indigo-console tuned: deep indigo
+          zenith -> warmer haze at the horizon band. Light theme gets a soft daylight sky.
+   #vignette : a radial darkening over the map well (above the canvas, pointer-events:none) that
+          frames the city and fades the corners — the classic cinematic "look here" vignette. */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:radial-gradient(135% 100% at 50% 2%,#26314f 0%,#1a2237 30%,#10152a 58%,#080b14 100%),
+            linear-gradient(180deg,#0a0f1e 0%,#121a30 40%,#23304e 70%,#33405e 92%,#3a4868 100%);
+ background-blend-mode:screen,normal}
+#map{z-index:1}
+/* #atmos : a subtle horizon haze/fog band that warms the lower scene so the skyline melts into the
+   distance instead of meeting a hard edge — the premium "depth fog" read. Above the canvas, no pointer. */
+#atmos{position:fixed;inset:0;z-index:6;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,0,0,0) 52%,rgba(60,74,108,.10) 74%,rgba(96,112,150,.20) 90%,rgba(120,136,176,.30) 100%)}
+#vignette{position:fixed;inset:0;z-index:7;pointer-events:none;
+ background:radial-gradient(128% 104% at 50% 46%,rgba(0,0,0,0) 46%,rgba(6,9,16,.22) 72%,rgba(4,6,12,.46) 90%,rgba(2,3,8,.66) 100%)}
+html[data-theme="light"] #sky{
+ background:radial-gradient(135% 100% at 50% 2%,#eef4fe 0%,#dde9f9 36%,#c9dcf2 64%,#b4cbe9 100%),
+            linear-gradient(180deg,#eef4fe 0%,#dce8f7 56%,#c6d8ef 88%,#bcd0ea 100%);
+ background-blend-mode:multiply,normal}
+/* light theme: NO cool atmos/vignette fade — the reference is a warm printed poster with neither.
+   These were tinting the warm paper bed cool at the bottom + rim (a measured hue inversion). */
+html[data-theme="light"] #atmos{ background:none }
+html[data-theme="light"] #vignette{ background:none }
+
+/* focal-branch label (HTML pill, tracks the branch on screen; browser-shaped Thai) */
+#focalLabel{position:absolute;z-index:6;display:none;transform:translate(-50%,-100%);
+ pointer-events:none;white-space:nowrap;
+ background:rgba(255,255,255,.96);border:1.5px solid var(--gold);border-radius:8px;
+ padding:4px 9px;font:700 12.5px 'IBM Plex Sans Thai',sans-serif;color:#281C08;
+ box-shadow:0 4px 14px rgba(16,22,40,.22)}
+html[data-theme="dark"] #focalLabel,html:not([data-theme="light"]) #focalLabel{
+ background:rgba(17,21,31,.94);color:#EDEFF5;border-color:var(--gold)}
+body.poster #focalLabel{display:none!important}
+/* top brand strip */
+#strip{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
+ background:linear-gradient(180deg,rgba(16,19,28,.86),rgba(16,19,28,0));scrollbar-width:none;align-items:center}
+#strip::-webkit-scrollbar{display:none}
+#strip .ttl{font:700 13px 'IBM Plex Sans Thai';color:#fff;white-space:nowrap;margin-right:4px}
+#strip .ttl b{color:var(--gold)}
+.bchip{flex:none;background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;
+ font:600 11px 'IBM Plex Mono';color:var(--txt);backdrop-filter:blur(6px);white-space:nowrap}
+.bchip b{color:#fff;margin-left:3px}
+.bchip .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+
+/* side cards */
+.side{position:fixed;top:52px;bottom:14px;width:312px;z-index:8;background:rgba(13,17,27,.93);
+ border:1px solid var(--cardln);border-radius:13px;backdrop-filter:blur(13px);display:flex;flex-direction:column;
+ box-shadow:0 12px 40px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#left{left:14px}#right{right:14px}
+.side h2{font:600 11px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;
+ padding:13px 15px 0}
+.side .scroll{overflow-y:auto;padding:11px 15px 16px;flex:1}
+.cardttl{padding:13px 15px 4px;border-bottom:1px solid #1a2236}
+.cardttl .a{font:700 14px 'IBM Plex Sans Thai';color:var(--hi)}
+.cardttl .b{font-size:11px;color:var(--mid);margin-top:1px}
+
+/* reachable block */
+.reach{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:12px;margin-bottom:12px}
+.reach .big{font:600 27px 'IBM Plex Mono';color:var(--gold);line-height:1}
+.reach .cap{font-size:11px;color:var(--mid);margin:3px 0 9px}
+.reach .r{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.reach .r .sw{width:9px;height:9px;border-radius:50%}
+.reach .r .lab{color:var(--txt);flex:1}
+.reach .r b{font-family:'IBM Plex Mono';color:#fff}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+
+/* catchment headline: population + total establishments in the perimeter (two MEASURED stats) */
+.cat10{display:flex;gap:8px;margin:2px 0 12px}
+.cat10 .c{flex:1;background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:9px 10px}
+.cat10 .c .n{font:600 20px 'IBM Plex Mono';line-height:1.05;color:var(--gold)}
+.cat10 .c.poi .n{color:#5B7CFA}
+.cat10 .c .l{font-size:10px;color:var(--mid);margin-top:4px;line-height:1.35}
+html[data-theme="light"] .cat10 .c{background:#F4F6FB;border-color:#D7DEEA}
+
+.stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.stat .k{color:var(--mid)}.stat .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.stat .v small{color:var(--dim)}
+
+/* tags: measured vs estimated provenance (honesty is mandatory) */
+.tag{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;padding:2px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.tag.meas{background:rgba(21,155,134,.16);color:#3fc4ab;border:1px solid rgba(21,155,134,.4)}
+.tag.est{background:rgba(224,169,59,.14);color:#e0a93b;border:1px solid rgba(224,169,59,.4)}
+
+/* within-10km grouped count rows */
+.kgrp{margin-bottom:11px}
+.kgrp .gh{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:0 0 3px}
+.krow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #161d2c;font-size:12.5px}
+.krow .sw{width:8px;height:8px;border-radius:50%;flex:none}
+.krow .lab{color:var(--txt);flex:1}
+.krow b{font-family:'IBM Plex Mono';color:var(--hi);font-weight:600}
+
+/* workforce measured block + occupation proxy bars */
+.wbox{background:#0a1018;border:1px solid #1c2740;border-radius:10px;padding:11px 12px;margin-bottom:11px}
+.wbox .wr{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:12.5px}
+.wbox .wr .k{color:var(--mid)}
+.wbox .wr .v{font-family:'IBM Plex Mono';color:var(--hi)}
+.wbox .wr .v small{color:var(--dim)}
+.wbox .big{font:600 23px 'IBM Plex Mono';color:var(--gold);line-height:1.1}
+.wbox .cap{font-size:11px;color:var(--mid);margin:1px 0 7px}
+.occ .or{margin:6px 0}
+.occ .ot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt);margin-bottom:2px}
+.occ .ot b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+.occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
+.occ .bar i{display:block;height:100%;border-radius:4px}
+.foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
+/* call-sheet export buttons (leads panel) — styled like #ctl .acts buttons, both themes */
+.cshrow{display:flex;gap:6px;margin-top:8px}
+.cshrow button{flex:1;background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+  font:600 11px 'IBM Plex Sans Thai';padding:6px 8px;cursor:pointer;text-align:center;white-space:nowrap}
+.cshrow button:hover{border-color:var(--blue);color:var(--hi)}
+.cshrow button:active{background:#161d2c}
+html[data-theme="light"] .cshrow button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .cshrow button:hover{border-color:var(--blue);color:#11151F}
+html[data-theme="light"] .cshrow button:active{background:#E8EEF8}
+
+/* leads */
+.verdict{border-radius:10px;padding:11px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5}
+.verdict.hot{background:rgba(224,71,75,.12);border:1px solid rgba(224,71,75,.4);color:#f0b9bb}
+.verdict.hot b{color:#fff}
+/* light theme: the dark-theme pink-on-dark palette is ILLEGIBLE on the white panel (pale pink text,
+   WHITE bold numbers). Deep red-browns on a faint red wash keep the "hot" read with real contrast. */
+html[data-theme="light"] .verdict.hot{background:#FBECEC;border-color:rgba(176,30,38,.45);color:#6E2226}
+html[data-theme="light"] .verdict.hot b{color:#A31D24}
+.lead{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #161d2c;cursor:pointer}
+.lead:active{background:#121a28}
+.lead .rank{font:700 12px 'IBM Plex Mono';color:var(--gold);width:18px;flex:none}
+.lead .body{flex:1}
+.lead .t{font-size:12.5px;font-weight:600;color:var(--hi)}
+.lead .d{font-size:11px;color:var(--mid);margin-top:1px;line-height:1.45}
+.reco{display:flex;gap:8px;padding:8px 0;font-size:12px;color:var(--txt);line-height:1.5;border-bottom:1px solid #161d2c}
+.reco .n{color:var(--teal);font-weight:700;flex:none}
+
+/* ---- DOCKED CONTROL FRAME ---- one designed panel (top-right), a header band naming the scene,
+   then labelled clusters: city switcher, a basemap segmented control, and action pills.
+   Matches province.html / branch-explorer.html so the deck.gl pages feel in-product. */
+#ctl{position:fixed;top:96px;right:14px;z-index:8;display:flex;flex-direction:column;gap:9px;
+ background:rgba(13,17,27,.94);border:1px solid var(--cardln);border-radius:12px;padding:11px;
+ backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);min-width:172px;
+ transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#ctl .dkhd{display:flex;align-items:center;gap:7px;padding:0 1px 8px;border-bottom:1px solid #1a2236}
+#ctl .dkhd .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none;box-shadow:0 0 8px rgba(79,123,240,.7)}
+#ctl .dkhd .t{font:700 11px 'IBM Plex Mono';color:var(--hi);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ctl .grp{display:flex;flex-direction:column;gap:5px}
+#ctl .glab{font:700 9.5px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.6px}
+/* segmented basemap control: tabs in one pill (wraps to 2 rows for the 4th option) */
+#ctl .seg{display:flex;flex-wrap:wrap;background:#0a1018;border:1px solid #1c2740;border-radius:9px;padding:2px;gap:2px}
+#ctl .seg button{flex:1 0 40%;background:none;border:none;color:var(--mid);border-radius:7px;
+ padding:6px 4px;font:600 11px 'IBM Plex Sans Thai';cursor:pointer;transition:background .15s,color .15s}
+#ctl .seg button.on{background:var(--blue);color:#fff}
+/* action pills cluster */
+#ctl .acts{display:flex;flex-direction:column;gap:5px}
+#ctl .acts button{background:#0a1018;border:1px solid #1c2740;color:var(--txt);border-radius:8px;
+ padding:7px 10px;font:600 12px 'IBM Plex Sans Thai';cursor:pointer;text-align:left}
+#ctl .acts button.on{border-color:var(--blue);color:var(--hi)}
+#ctl .acts button:active{background:#161d2c}
+#ctl select{background:#0a1018;border:1px solid #1c2740;color:var(--hi);font:600 12px 'IBM Plex Sans Thai';
+ padding:7px 8px;border-radius:8px;cursor:pointer;width:100%}
+html[data-theme="light"] #ctl select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
+
+/* mobile toggles */
+#mtog{position:fixed;bottom:16px;left:0;right:0;z-index:9;display:none;justify-content:center;gap:10px}
+#mtog button{background:rgba(13,17,27,.95);border:1px solid var(--cardln);color:var(--hi);
+ font:600 12px 'IBM Plex Sans Thai';padding:10px 18px;border-radius:22px;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.xbtn{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;display:none}
+
+/* cascade (Region>Province>Branch) */
+.casc{padding:10px 15px 11px;border-bottom:1px solid #1a2236;display:flex;flex-direction:column;gap:6px}
+.cscrow{display:flex;align-items:center;gap:8px}
+.cscrow label{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;width:62px;flex:none}
+.casc select{flex:1;min-width:0;background:#0a1018;border:1px solid #1c2740;color:var(--hi);
+ font:500 12px 'IBM Plex Sans Thai';padding:6px 7px;border-radius:7px;cursor:pointer}
+.casc select:disabled{color:var(--dim);cursor:not-allowed;opacity:.7}
+.casc select option:disabled{color:#5a6479}
+.cscnote{font-size:10px;color:var(--dim);line-height:1.4;margin-top:1px}
+
+/* POI legend overlay (bottom-center) */
+#legendwrap{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:8;max-width:min(94vw,720px);
+ background:rgba(13,17,27,.92);border:1px solid var(--cardln);border-radius:11px;padding:8px 10px 9px;
+ backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+/* collapsible legend header — tap to minimize so the 3D stays viewable (esp. on phones) */
+.lg-head{display:flex;align-items:center;gap:7px;width:100%;background:none;border:0;cursor:pointer;
+  padding:2px 2px 8px;color:var(--txt);font:700 11px 'IBM Plex Sans Thai';letter-spacing:.2px}
+.lg-head .lg-dot{width:8px;height:8px;border-radius:50%;background:var(--gold,#E6B450);flex:none}
+.lg-head .lg-label{flex:1;text-align:left;text-transform:uppercase;letter-spacing:.6px;font-size:10px;color:var(--dim)}
+.lg-head .lg-caret{transition:transform .18s;color:var(--dim);font-size:11px}
+#legendwrap.collapsed .lg-caret{transform:rotate(-90deg)}
+#legendwrap.collapsed .lg-head{padding-bottom:2px}
+#legendwrap.collapsed #lgBody{display:none}
+#legendwrap.collapsed{padding:6px 12px}
+.lgttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.lgttl span{color:#4a5469;text-transform:none;letter-spacing:0}
+#legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lg{display:inline-flex;align-items:center;gap:6px;background:#0e1422;border:1px solid #1c2740;color:var(--dim);
+ font:600 11px 'IBM Plex Sans Thai';padding:4px 8px;border-radius:16px;cursor:pointer;opacity:.55}
+.lg.on{opacity:1;color:var(--hi);border-color:#33405e}
+.lg .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.lg b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600;margin-left:1px}
+.lg.on b{color:var(--hi)}
+
+/* building colour/height legend — explains the warm sand->amber->gold massing ramp + landmark accent.
+   A continuous gradient bar (low->tall) plus a sparing cool-accent chip, in-theme. */
+#bldglegend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#bldglegend .bl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#bldglegend .bl-ramp{display:inline-flex;align-items:center;gap:6px}
+#bldglegend .bl-bar{width:104px;height:9px;border-radius:5px;border:1px solid rgba(255,255,255,.22);
+ background:linear-gradient(90deg,rgb(44,38,32),rgb(156,108,50),rgb(238,182,86))}
+#bldglegend .bl-cap{font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#bldglegend .bl-acc .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+html[data-theme="light"] #bldglegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #bldglegend .bl-ttl{color:#828CA0}
+html[data-theme="light"] #bldglegend .bl-cap,html[data-theme="light"] #bldglegend .bl-acc{color:#2C3444}
+html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rgb(190,172,140),rgb(216,168,92),rgb(234,194,96))}
+
+/* isochrone (travel-time) legend — graded band swatches above the POI legend */
+#isolegend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#isolegend .il-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+#isolegend .il{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
+#isolegend .il .sw{width:14px;height:9px;border-radius:3px;flex:none;border:1px solid rgba(255,255,255,.25)}
+html[data-theme="light"] #isolegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #isolegend .il-ttl{color:#828CA0}
+html[data-theme="light"] #isolegend .il{color:#2C3444}
+
+/* competitor-brand legend (Upgrade 3) — measured rival brands present in this scene */
+#complegend{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
+ padding-bottom:7px;border-bottom:1px solid #1c2740}
+#complegend .cl-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+/* clickable brand-toggle chip (LANE 3D-2): tap to show/hide that brand's rivals */
+#complegend .cl{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt);
+ cursor:pointer;user-select:none;padding:2px 7px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
+ background:rgba(255,255,255,.05);transition:opacity .12s,border-color .12s}
+#complegend .cl:hover{border-color:rgba(255,255,255,.34)}
+#complegend .cl.off{opacity:.4;border-style:dashed}
+#complegend .cl.off .cl-nm{text-decoration:line-through}
+#complegend .cl .sw{width:9px;height:9px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}
+#complegend .cl b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+#complegend .cl-tag{font:600 9px 'IBM Plex Mono';color:#3fc4ab;letter-spacing:.3px}
+/* rival-ground toggle chip — same chip look, distinct accent when ON */
+#complegend .cl-gnd{display:inline-flex;align-items:center;gap:5px;font:600 10.5px 'IBM Plex Mono';color:var(--dim);
+ cursor:pointer;user-select:none;padding:2px 8px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
+ background:rgba(255,255,255,.05);letter-spacing:.2px;transition:border-color .12s,color .12s}
+#complegend .cl-gnd:hover{border-color:rgba(255,255,255,.34)}
+#complegend .cl-gnd.on{color:var(--txt);border-color:var(--blue);background:rgba(91,124,250,.16)}
+html[data-theme="light"] #complegend{border-bottom-color:#D3DAE6}
+html[data-theme="light"] #complegend .cl-ttl{color:#828CA0}
+html[data-theme="light"] #complegend .cl{color:#2C3444;border-color:#D3DAE6;background:#F4F6FB}
+html[data-theme="light"] #complegend .cl:hover{border-color:#9BA6BC}
+html[data-theme="light"] #complegend .cl b{color:#5A6477}
+html[data-theme="light"] #complegend .cl-gnd{color:#828CA0;border-color:#D3DAE6;background:#F4F6FB}
+html[data-theme="light"] #complegend .cl-gnd.on{color:#2C3444;border-color:var(--blue);background:rgba(91,124,250,.12)}
+
+.dtt{font-family:'IBM Plex Sans Thai';font-size:11.5px;max-width:220px;line-height:1.45}
+.dtt b{color:#fff}
+.err{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:var(--red);background:var(--ink);z-index:99}
+
+/* TABLET (821–1200px): narrow the fixed panels + control frame a touch so the map well breathes,
+   but keep the full desktop layout (panels docked, controls + legends all visible). */
+/* DESKTOP: #ctl (basemap / rings / poster controls) was pinned right:14px — directly UNDER the
+   right "Acquisition leads" .side panel (which occupies the top-right), so the scene-control menu
+   was invisible on desktop (only reachable on mobile, where it relocates to the bottom sheet).
+   Shift it left of the right panel into free map space so it's usable on desktop too. Offsets clear
+   the panel width + its 14px inset per breakpoint. */
+@media(min-width:821px) and (max-width:1200px){
+ .side{width:270px}
+ #ctl{min-width:160px;padding:10px;right:296px}   /* panel 270 + 14 inset -> clear at 296 */
+}
+@media(min-width:1201px){ #ctl{right:340px} }      /* panel 312 + 14 inset -> clear at 340 */
+
+/* PHONE (<820px): map goes full-screen. The two info cards slide off-screen (left/right) and the
+   #ctl control frame slides down off the bottom; all three are reachable via the #mtog bottom-sheet
+   buttons (Analysis / Leads / Layers). Controls are NOT hidden — the .ctl legend + toggles ride in
+   on the Layers button. The POI/building legend rail stays docked + readable at the bottom. */
+@media(max-width:820px){
+ .side{width:86vw;max-width:340px;top:46px;bottom:78px}
+ #left{transform:translateX(calc(-100% - 22px))}#right{transform:translateX(calc(100% + 22px))}
+ #left.show{transform:translateX(0)}#right.show{transform:translateX(0)}
+ .xbtn{display:block}#mtog{display:flex}
+ #ctl{top:auto;bottom:0;right:8px;left:8px;min-width:0;padding:10px;gap:8px;max-height:60vh;overflow-y:auto;
+  transform:translateY(calc(100% + 24px))}
+ #ctl.show{transform:translateY(0)}
+ #ctl .dkhd{display:flex}#ctl .glab{display:block}#ctl .acts button{padding:7px 9px}
+ #ctl .seg button{flex:1 0 22%}
+ #strip .ttl{font-size:12px}
+ #legendwrap{bottom:66px;max-width:94vw;padding:6px 8px}
+ #legend{max-height:88px;overflow-y:auto}
+}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:2000;display:flex;align-items:center;gap:2px;
+ padding:0 8px;height:44px;background:rgba(8,11,18,.97);border-bottom:1px solid #1d2738;backdrop-filter:blur(10px);
+ overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav .nb{font:700 13px 'IBM Plex Sans Thai',sans-serif;color:#eef1f7;white-space:nowrap;padding:0 10px 0 4px;flex:none}
+#nav .nb b{color:#E0A93B;margin:0 1px}
+#nav a{flex:none;color:#8a94a8;text-decoration:none;font:500 12.5px 'IBM Plex Sans Thai',sans-serif;
+ padding:6px 11px;border-radius:7px;white-space:nowrap}
+#nav a.on{color:#fff;background:#1a2336}
+#nav a:active{background:#161d2c}
+
+/* "More ▾" dropdown (matches styles.css .nav-more) */
+.nav-more{position:relative;flex:none}
+.nav-more-btn{color:#8a94a8;background:none;border:none;cursor:pointer;
+  font:500 12.5px system-ui,sans-serif;padding:6px 11px;border-radius:7px;white-space:nowrap;
+  transition:color .15s,background .15s}
+.nav-more-btn:hover{color:#e6ecf5;background:rgba(255,255,255,.045)}
+#nav .nav-more-btn.on{color:#fff;background:#1a2336}
+.nav-more-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:160px;display:none;
+  flex-direction:column;gap:2px;padding:6px;z-index:2100;
+  background:rgba(15,20,34,.98);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid #1d2738;border-radius:10px;box-shadow:0 14px 38px rgba(0,0,0,.55)}
+.nav-more.open .nav-more-menu{display:flex}
+.nav-more-menu a{display:block;flex:none;margin-left:0}
+html[data-theme="light"] .nav-more-btn{color:#5A6477}
+html[data-theme="light"] .nav-more-btn:hover{color:#11151F;background:rgba(16,22,40,.05)}
+html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 14px 38px rgba(16,22,40,.18)}
+
+#strip{top:44px}
+.side{top:96px}
+.err{top:44px}
+@media(max-width:820px){.side{top:90px}}
+
+/* theme toggle button in nav */
+#themeToggle{margin-left:auto;flex:none;background:none;border:1px solid #1d2738;color:#8a94a8;
+ border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px}
+
+/* LIGHT / "Paper Console" — page chrome turns light; the 3D map well stays as-is */
+html[data-theme="light"] #nav{background:rgba(255,255,255,.92);border-bottom:1px solid #D3DAE6}
+html[data-theme="light"] #nav .nb{color:#11151F}
+html[data-theme="light"] #nav a{color:#5A6477}
+html[data-theme="light"] #nav a.on{color:#11151F;background:#e7edf8}
+html[data-theme="light"] #nav a:active{background:#e2e8f4}
+html[data-theme="light"] #themeToggle{border-color:#D3DAE6;color:#5A6477}
+html[data-theme="light"] .side{background:rgba(255,255,255,.95);border-color:#D3DAE6;box-shadow:0 12px 40px rgba(16,22,40,.16)}
+html[data-theme="light"] .cardttl{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cardttl .a,html[data-theme="light"] .stat .v,html[data-theme="light"] .lead .t{color:#11151F}
+html[data-theme="light"] .cardttl .b,html[data-theme="light"] .side h2,html[data-theme="light"] .stat .k,
+html[data-theme="light"] .lead .d{color:#5A6477}
+html[data-theme="light"] .reach{background:#F5F8FD;border-color:#D3DAE6}
+html[data-theme="light"] .reach .big{color:#B8862B}
+html[data-theme="light"] .reach .lab{color:#2C3444}
+html[data-theme="light"] .reach .r b,html[data-theme="light"] .foot{color:#11151F}
+html[data-theme="light"] .foot{color:#828CA0}
+html[data-theme="light"] .stat,html[data-theme="light"] .lead,html[data-theme="light"] .reco{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .krow .lab{color:#2C3444}
+html[data-theme="light"] .krow b,html[data-theme="light"] .kgrp .gh{color:#11151F}
+html[data-theme="light"] .wbox{background:#F5F8FD;border-color:#D3DAE6}
+html[data-theme="light"] .wbox .big{color:#B8862B}
+html[data-theme="light"] .wbox .wr .k{color:#5A6477}
+html[data-theme="light"] .wbox .wr .v{color:#11151F}
+html[data-theme="light"] .occ .ot{color:#2C3444}
+html[data-theme="light"] .occ .bar{background:#E4E8F1}
+html[data-theme="light"] #ctl{background:rgba(255,255,255,.95);border-color:#D3DAE6}
+html[data-theme="light"] #ctl .dkhd{border-bottom-color:#E4E8F1}
+html[data-theme="light"] #ctl .dkhd .t{color:#11151F}
+html[data-theme="light"] #ctl .glab{color:#828CA0}
+html[data-theme="light"] #ctl .seg{background:#F1F5FB;border-color:#D3DAE6}
+html[data-theme="light"] #ctl .seg button{color:#5A6477}
+html[data-theme="light"] #ctl .seg button.on{background:var(--blue);color:#fff}
+html[data-theme="light"] #ctl .acts button{background:#F5F8FD;border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] #ctl .acts button.on{border-color:var(--blue);color:#11151F}
+html[data-theme="light"] .bchip{background:rgba(255,255,255,.9);border-color:#D3DAE6;color:#2C3444}
+html[data-theme="light"] .bchip b{color:#11151F}
+html[data-theme="light"] #mtog button{background:rgba(255,255,255,.97);border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] .casc{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .cscrow label,html[data-theme="light"] .cscnote{color:#828CA0}
+html[data-theme="light"] .casc select{background:#F5F8FD;border-color:#D3DAE6;color:#11151F}
+html[data-theme="light"] #legendwrap{background:rgba(255,255,255,.94);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] .lgttl{color:#828CA0}
+html[data-theme="light"] .lg{background:#F1F5FB;border-color:#D3DAE6;color:#828CA0}
+html[data-theme="light"] .lg.on{color:#11151F;border-color:#9fb4dd}
+html[data-theme="light"] .lg b{color:#5A6477}
+html[data-theme="light"] .lg.on b{color:#11151F}
+
+/* ---- IN-SCENE SEARCH (branches / rivals / named POIs / landmarks) + fly-to ----
+   Compact pill docked top-centre (top-right on phones so it never collides with the strip title).
+   Typeahead dropdown drops down under the input; z above the side panels + strip, below the nav. */
+#scenesearch{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:12;
+ width:min(360px,60vw);font-family:'IBM Plex Sans Thai',sans-serif}
+.ss-box{display:flex;align-items:center;gap:7px;background:rgba(13,17,27,.94);border:1px solid var(--cardln);
+ border-radius:10px;padding:6px 9px;backdrop-filter:blur(13px);box-shadow:0 8px 28px rgba(0,0,0,.42);
+ transition:border-color .15s}
+.ss-box:focus-within{border-color:var(--blue)}
+.ss-ico{color:var(--dim);font-size:15px;line-height:1;flex:none}
+#ssInput{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--hi);
+ font:600 12.5px 'IBM Plex Sans Thai';padding:1px 0}
+#ssInput::placeholder{color:var(--dim)}
+.ss-kbd{flex:none;font:600 10px 'IBM Plex Mono';color:var(--dim);border:1px solid var(--cardln);
+ border-radius:5px;padding:1px 5px;line-height:1.4}
+.ss-box:focus-within .ss-kbd{display:none}
+.ss-clr{background:none;border:none;color:var(--mid);cursor:pointer;font-size:13px;display:none;flex:none;padding:0 2px}
+.ss-clr.show{display:block}
+#ssResults{margin-top:6px;background:rgba(13,17,27,.97);border:1px solid var(--cardln);border-radius:10px;
+ box-shadow:0 12px 34px rgba(0,0,0,.5);display:none;max-height:min(52vh,360px);overflow-y:auto}
+#ssResults.show{display:block}
+.ss-row{display:flex;align-items:center;gap:9px;padding:8px 10px;cursor:pointer;border-bottom:1px solid #161d2c}
+.ss-row:last-child{border-bottom:none}
+.ss-row.active{background:#161d2c}
+.ss-sw{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.ss-tx{flex:1;min-width:0}
+.ss-lb{display:block;font:600 12.5px 'IBM Plex Sans Thai';color:var(--hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-sb{display:block;font:500 10.5px 'IBM Plex Mono';color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.ss-kind{font:600 9px 'IBM Plex Mono';text-transform:uppercase;letter-spacing:.4px;color:var(--dim);flex:none}
+.ss-empty{padding:11px;font:500 11.5px 'IBM Plex Sans Thai';color:var(--mid);text-align:center}
+@media(max-width:820px){
+ #scenesearch{top:48px;left:auto;right:8px;transform:none;width:min(220px,52vw)}
+ #ssResults{max-height:44vh}
+}
+html[data-theme="light"] .ss-box{background:rgba(255,255,255,.95);border-color:#D3DAE6;box-shadow:0 8px 28px rgba(16,22,40,.16)}
+html[data-theme="light"] #ssInput{color:#11151F}
+html[data-theme="light"] #ssInput::placeholder{color:#828CA0}
+html[data-theme="light"] .ss-ico{color:#828CA0}
+html[data-theme="light"] .ss-kbd{color:#828CA0;border-color:#D3DAE6}
+html[data-theme="light"] .ss-clr{color:#5A6477}
+html[data-theme="light"] #ssResults{background:rgba(255,255,255,.98);border-color:#D3DAE6;box-shadow:0 12px 34px rgba(16,22,40,.2)}
+html[data-theme="light"] .ss-row{border-bottom-color:#E4E8F1}
+html[data-theme="light"] .ss-row.active{background:#EEF2FA}
+html[data-theme="light"] .ss-lb{color:#11151F}
+html[data-theme="light"] .ss-sb{color:#5A6477}
+html[data-theme="light"] .ss-kind,html[data-theme="light"] .ss-empty{color:#828CA0}
+/* ---- POSTER MODE — one tap hides ALL overlays so the extruded skyline is the whole frame, then a
+   shareable PNG is composited with an honest provenance caption. */
+body.poster #nav,body.poster #strip,body.poster #left,body.poster #right,
+body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!important}
+#ctl .acts #postertog.on{border-color:var(--gold)}
+</style>
+</head>
+<body>
+<nav id="nav" aria-label="Main views">
+  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <a href="index.html#home">Home</a>
+  <a href="index.html#overview">Overview</a>
+  <a href="index.html#map">National</a>
+  <a href="index.html#acq">Acquire</a>
+  <a href="index.html#exposure">Exposure</a>
+  <a href="index.html#trend">Trend</a>
+  <a href="rayong-catchment.html" class="on" id="nav3d">3D map</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a href="index.html#sim" role="menuitem">Simulator</a>
+      <a href="index.html#provinces" role="menuitem">Provinces</a>
+      <a href="index.html#market" role="menuitem">Market</a>
+      <a href="index.html#branches" role="menuitem">Branches</a>
+    </div>
+  </div>
+  <button id="themeToggle" title="Toggle light / dark" aria-pressed="false">☾</button>
+</nav>
+<script>/* "More ▾" nav dropdown — pure UI (copied from index.html) */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
+ syncActive();
+ new MutationObserver(syncActive).observe(menu,{subtree:true,attributes:true,attributeFilter:['class']});})();
+</script>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
+<div id="sky"></div>
+<div id="map"></div>
+<!-- focal-branch label as HTML (browser shapes Thai correctly, unlike deck.gl TextLayer) — positioned
+     over the branch each frame by updateFocalLabel(). pointer-events off so it never blocks the map. -->
+<div id="focalLabel"></div>
+<div id="atmos"></div>
+<div id="vignette"></div>
+
+<div id="strip"><span class="ttl" id="cityTitle">Rayong 3D <b>·</b> branches · POIs · 10km reach</span></div>
+
+<div id="scenesearch">
+  <div class="ss-box">
+    <span class="ss-ico" aria-hidden="true">⌕</span>
+    <input id="ssInput" type="text" placeholder="Search branches, rivals, places" aria-label="Search the scene — branches, competitors, places" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="ssResults">
+    <span class="ss-kbd" aria-hidden="true">/</span>
+    <button id="ssClear" class="ss-clr" type="button" aria-label="Clear search">✕</button>
+  </div>
+  <div id="ssResults" role="listbox" aria-label="Search results"></div>
+</div>
+
+<div id="ctl">
+  <div class="dkhd"><span class="dot"></span><span class="t" id="ctlScene">Rayong 3D</span></div>
+  <div class="grp">
+    <div class="glab">City</div>
+    <select id="citySel" title="Switch city (3D showcase)" aria-label="City">
+      <option value="rayong">Rayong</option>
+      <option value="bangkok">Bangkok</option>
+    </select>
+  </div>
+  <div class="grp">
+    <div class="glab">Basemap</div>
+    <div class="seg">
+      <button data-b="studio" class="on">Studio</button>
+      <button data-b="light">Light</button>
+      <button data-b="voyager">Streets</button>
+      <button data-b="dark">Dark</button>
+      <button data-b="satellite">Satellite</button>
+    </div>
+  </div>
+  <div class="grp">
+    <div class="glab">Layers</div>
+    <div class="acts">
+      <button id="ringtog" class="on">10 km reach rings</button>
+      <button id="isotog" class="on">Isochrone</button>
+      <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
+      <button id="postertog" title="Poster mode — hide overlays, frame the skyline edge-to-edge, download a shareable PNG">📸 Poster</button>
+    </div>
+  </div>
+</div>
+
+<aside class="side" id="left">
+  <button class="xbtn" data-x="left">✕</button>
+  <div class="cardttl"><div class="a" id="focalName">—</div><div class="b" id="focalSub">Tap a gold branch to refocus</div></div>
+  <div class="casc">
+    <div class="cscrow"><label>Region</label><select id="cscRegion"></select></div>
+    <div class="cscrow"><label>Province</label><select id="cscProv"></select></div>
+    <div class="cscrow"><label>Branch</label><select id="cscBranch"></select></div>
+    <div class="cscnote" id="cscNote"></div>
+  </div>
+  <div class="scroll">
+    <h2 id="k10H" style="padding:0 0 6px">Within 10km <span class="tag meas">measured · OSM</span></h2>
+    <div id="k10panel"></div>
+    <h2 id="workH" style="padding:14px 0 6px">Who works nearby</h2>
+    <div id="workpanel"></div>
+  </div>
+</aside>
+
+<aside class="side" id="right">
+  <button class="xbtn" data-x="right">✕</button>
+  <div class="cardttl"><div class="a">Acquisition leads</div><div class="b">Where competitors own ground you don't</div></div>
+  <div class="scroll">
+    <div id="verdict"></div>
+    <h2 id="gapsH" style="padding:0 0 4px">Top gaps</h2>
+    <div id="leads"></div>
+    <h2 id="recosH" style="padding:10px 0 4px">Recommendations</h2>
+    <div id="recos"></div>
+  </div>
+</aside>
+
+<div id="mtog">
+  <button data-s="left">Analysis</button>
+  <button data-s="right">Leads</button>
+  <button data-s="ctl">Layers</button>
+</div>
+
+<div id="legendwrap">
+  <button id="lgToggle" class="lg-head" aria-expanded="true" aria-controls="lgBody">
+    <span class="lg-dot"></span><span class="lg-label">Legend</span><span class="lg-caret">▾</span>
+  </button>
+  <div id="lgBody">
+    <div id="bldglegend"></div>
+    <div id="isolegend" style="display:none"></div>
+    <div id="complegend" style="display:none"></div>
+    <div class="lgttl">Catchment POIs · collateral & demand first <span>· tap to toggle</span></div>
+    <div id="legend"></div>
+  </div>
+</div>
+<script>/* legend collapse — tap the header to minimize; default COLLAPSED on phones so the map is viewable. */
+(function(){var w=document.getElementById('legendwrap'),h=document.getElementById('lgToggle');if(!w||!h)return;
+  function set(c){w.classList.toggle('collapsed',c);h.setAttribute('aria-expanded',String(!c));
+    var l=w.querySelector('.lg-label');if(l)l.textContent=c?'Legend — tap to show':'Legend';}
+  var small=(matchMedia&&matchMedia('(pointer:coarse)').matches)||(window.innerWidth||999)<820;
+  set(small);   // minimized on phones, open on desktop
+  h.addEventListener('click',function(){set(!w.classList.contains('collapsed'));});})();</script>
+<script>window.initCatch=function(){
+'use strict';
+try{
+const CA=window.CA;
+const CITY=window.CITY||'rayong';
+// Human label for the city: prefer the catchment meta name, else title-case the slug.
+const CITY_LABEL=(CA.meta&&(CA.meta.city||CA.meta.name))||
+  CITY.split(/[-_]/).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');  // title-case EVERY word (was 'Chiang mai')
+// Header + tab title. For Rayong the strip text is unchanged (byte-equivalent default view).
+if(CITY!=='rayong'){
+  const ct=document.getElementById('cityTitle');
+  if(ct)ct.innerHTML=CITY_LABEL+' 3D <b>·</b> branches · POIs · 10km reach';
+  const cs=document.getElementById('ctlScene'); if(cs)cs.textContent=CITY_LABEL+' 3D';
+  try{document.title=CITY_LABEL+' 3D · เงินไชโย';}catch(e){}
+  // The nav carries ONE "3D map" self-link (#nav3d) that stays highlighted for EVERY city —
+  // the strip/ctl city label above already says which province is open, so nothing to juggle.
+}
+const PROV=window.PROV||{};
+const IDX=window.PROV_INDEX||null;
+// The ACTIVE province's Thai name — used to slice the nationwide branch tape (window.NATBRANCHES,
+// keyed by field `v`) when this city ships no curated per-province branch file. Prefer the nationwide
+// index (slug -> th); fall back to the catchment meta if it ever carries a province name.
+const CITY_TH=(function(){
+  if(IDX){const e=IDX.find(p=>p&&p.slug===CITY); if(e&&e.th)return e.th;}
+  return (CA.meta&&(CA.meta.province_th||CA.meta.prov))||null;
+})();
+// normalise a nationwide branch (branches.json: x,y,n,v,r,d,k10{...}) into the shape the branch
+// marker layer + panels expect — top-level veh/gold, same as the curated Rayong province branches.
+function _normNat(b){const k=b.k10||{};
+  return {x:b.x,y:b.y,n:b.n,d:b.d||'',v:b.v,r:b.r,
+    veh:(b.veh!=null?b.veh:(k.veh!=null?k.veh:null)),
+    gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
+    pop:(b.pop!=null?b.pop:null),
+    k10:b.k10||null};}
+// population for a focal branch's catchment. PREFER the true ~10km-perimeter figure
+// (branch_population.json, area-weighted district pop — index-aligned to branches.json/NATBRANCHES).
+// Fall back to the branch's DISTRICT population (branches.json `pop`, MEASURED NSO) if the perimeter
+// layer isn't built. Returns {v:number, scope:'10km'|'district'} or null.
+function branchPopIndex(f){
+  const NB=window.NATBRANCHES; if(!NB||!NB.length)return -1;
+  // _normNat branches ARE NATBRANCHES entries; curated ones aren't — match by nearest coordinate.
+  let bi=-1,bd=1e9;
+  for(let i=0;i<NB.length;i++){ const b=NB[i]; if(!b)continue;
+    const dx=(b.x-f.x),dy=(b.y-f.y),d2=dx*dx+dy*dy;
+    if(d2<bd){bd=d2;bi=i;} }
+  return bd<0.0001?bi:-1;   // ~<1.1km — same branch site
+}
+function branchPop(f){
+  if(!f)return null;
+  const idx=branchPopIndex(f);
+  const BP=window.BRANCHPOP;
+  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km'};
+  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district'};
+  const NB=window.NATBRANCHES;
+  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district'};
+  return null;
+}
+// BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
+//  - Rayong (and any city shipping a curated province file): the curated PROV.branches — UNCHANGED
+//    (byte-for-byte for ?city=rayong / no city param).
+//  - every OTHER province: slice the nationwide tape to this province's Thai name so its REAL
+//    branches drive the scene (fly-to zoom + 10km rings + markers), not an empty set.
+//  - last resort (no province name / no tape): the catchment's own branches, or [].
+const BR=(PROV.branches&&PROV.branches.length)?PROV.branches:(function(){
+  const NB=window.NATBRANCHES;
+  if(CITY_TH&&NB&&NB.length){
+    const out=[]; for(const b of NB){ if(b&&b.v===CITY_TH)out.push(_normNat(b)); }
+    if(out.length)return out;
+  }
+  return CA.branches||[];
+})();
+const COMP=(PROV.competitors&&PROV.competitors.length)?PROV.competitors:(CA.competitors||[]);
+// full POI palette comes from the province file ([lat,lng]); fall back to the catchment POIs if missing.
+const POIS=(PROV.poi&&Object.keys(PROV.poi).length)?PROV.poi:(CA.poi||{});
+const DISTRICTS=PROV.districts||null;
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[79,123,240],Krungsri:[224,123,47],Heng:[224,180,80]};
+// ---- MEASURED competitor brands IN the scene (Upgrade 3) ----------------------------------------
+// competitors_national.json is the nationwide Google-Places census (brand,name,lat,lng,prov). We
+// filter it to the current scene bbox (padded) so rival branches appear AS markers inside the 3D
+// city — including for cities with no curated per-province competitor file (e.g. Bangkok). This is
+// MEASURED data; we never synthesise a location. Empty + harmless when the file is absent.
+//
+// LAZY + MEMOISED: this depends on sceneExtent(), which reads the `let _EXTENT` declared further
+// down — so it must NOT be evaluated during this const-init phase (that line is still in its
+// temporal dead zone). compScene() is only ever called from render()/buildCompLegend(), by which
+// point every declaration is live. The result is cached after the first call.
+let _COMP_SCENE=null;
+function compNat(){
+  const CN=window.COMPNAT, items=CN&&Array.isArray(CN.items)?CN.items:null;
+  if(!items||!items.length)return [];
+  let E; try{E=sceneExtent();}catch(e){return [];}
+  if(!E||!isFinite(E.minX))return [];
+  // pad the bbox a touch beyond the building extent so rivals on the immediate fringe still show.
+  const padX=(E.maxX-E.minX)*0.12+0.01, padY=(E.maxY-E.minY)*0.12+0.01;
+  const x0=E.minX-padX,x1=E.maxX+padX,y0=E.minY-padY,y1=E.maxY+padY;
+  const out=[];
+  for(const it of items){ if(it==null)continue;
+    const la=+it.lat, ln=+it.lng; if(!isFinite(la)||!isFinite(ln))continue;
+    if(ln<x0||ln>x1||la<y0||la>y1)continue;
+    out.push({brand:it.brand||'?',name:it.name||'',lat:la,lng:ln});}
+  return out;}
+// Use the curated per-province competitor set when present (Rayong); otherwise fall back to the
+// measured national census filtered to the scene — so every city shows real rivals in-frame.
+function compScene(){ if(_COMP_SCENE)return _COMP_SCENE;
+  _COMP_SCENE=(COMP&&COMP.length)?COMP:compNat(); return _COMP_SCENE; }
+// ---- MEASURED nationwide POI pins, bbox-filtered to the scene (parity with compNat) ----------
+// window.POINAT (catchment_poi.json .poi) is the national OSM POI set, [lat,lng] per point, keyed
+// by the scene's 11 pin types. Curated per-province .poi (Rayong) always wins; every OTHER province
+// falls back to POINAT sliced to this city's building extent — so the scene gets POI columns
+// everywhere, not only Rayong. Lazy + memoised: sceneExtent() is in its temporal dead zone during
+// const-init, so this is only ever called from render()/legend, after every declaration is live.
+let _POI_SCENE=null;
+function poiScene(){ if(_POI_SCENE)return _POI_SCENE;
+  _POI_SCENE={};
+  const PN=window.POINAT;
+  if(!PN){return _POI_SCENE;}
+  let E; try{E=sceneExtent();}catch(e){return _POI_SCENE;}
+  if(!E||!isFinite(E.minX)){_POI_SCENE=null;return {};}   // extent not ready yet — don't memoise empty
+  const padX=(E.maxX-E.minX)*0.12+0.01, padY=(E.maxY-E.minY)*0.12+0.01;
+  const x0=E.minX-padX,x1=E.maxX+padX,y0=E.minY-padY,y1=E.maxY+padY;
+  for(const t in PN){ const src=PN[t]; if(!Array.isArray(src))continue;
+    const out=[];
+    for(let i=0;i<src.length;i++){ const p=src[i]; if(!p)continue;
+      const la=+p[0], ln=+p[1]; if(!isFinite(la)||!isFinite(ln))continue;
+      if(ln<x0||ln>x1||la<y0||la>y1)continue;
+      out.push(p);}
+    _POI_SCENE[t]=out;}
+  return _POI_SCENE; }
+// window.POI_OV: dense Overture points keyed by SCENE category ([lat,lng]), built once from the
+// per-city <city>_places.json when it loads. Densifies the OSM categories + adds the new clusters.
+window.POI_OV=null;
+function buildPoiOv(){
+  // full per-city set when present (window.SCENEPLACES); else the thinned NATIONAL set
+  // (window.NATPLACES) bbox-filtered to this scene — so EVERY province gets Overture density.
+  const SP=window.SCENEPLACES;
+  const nat=(!SP||!SP.places)?window.NATPLACES:null;
+  const src=(SP&&SP.places)||(nat&&nat.places);
+  if(!src){window.POI_OV={};return;}
+  let x0=-1e9,x1=1e9,y0=-1e9,y1=1e9;
+  if(nat){ try{const E=sceneExtent(); if(E&&isFinite(E.minX)){
+    const pX=(E.maxX-E.minX)*0.12+0.01,pY=(E.maxY-E.minY)*0.12+0.01;
+    x0=E.minX-pX;x1=E.maxX+pX;y0=E.minY-pY;y1=E.maxY+pY;}}catch(e){} }
+  const ov={};
+  for(const bucket in src){ const cat=OV_MAP[bucket]; if(!cat)continue;
+    const arr=src[bucket]; if(!Array.isArray(arr))continue;
+    const dst=ov[cat]||(ov[cat]=[]);
+    for(let i=0;i<arr.length;i++){ const p=arr[i]; if(!p)continue;
+      if(nat&&(p[0]<x0||p[0]>x1||p[1]<y0||p[1]>y1))continue;   // clip national set to the scene
+      dst.push([p[1],p[0]]); }   // file is [lng,lat] -> scene wants [lat,lng]
+  }
+  window.POI_OV=ov;
+}
+// resolve a pin type's points: curated/national OSM set UNIONED with the dense Overture set for the
+// same category. Cached per type on first resolve (invalidated when POI_OV builds).
+let _POI_MERGE={};
+function poiGet(t){
+  if(_POI_MERGE[t])return _POI_MERGE[t];
+  let base=(POIS[t]&&POIS[t].length)?POIS[t]:((poiScene()||{})[t]||[]);
+  const ov=(window.POI_OV&&window.POI_OV[t])||null;
+  const out=ov?base.concat(ov):base;
+  if(window.POI_OV)_POI_MERGE[t]=out;   // only memoise once the Overture layer is settled
+  return out; }
+const GOLD=[230,180,80]; // 10km collateral catchment ring
+// canonical type->color map: single source of truth for map dots AND legend AND toggles.
+// Ordered + coloured by relevance to a TITLE-LOAN lender (collateral supply + finance first, then
+// demand signals, then surrounding economy) — distinct hues so every type is decodable. Palette is
+// kept in sync with branch-explorer.html. (supermarket/fresh_market now get DISTINCT hues.)
+const POI_COLORS={
+  // collateral supply + finance (the title-loan core)
+  vehicle_commerce:[28,140,125], gold:[230,180,80], bank:[91,124,250],
+  // demand signals: where cash-cycle borrowers transact
+  fresh_market:[224,144,47], supermarket:[224,170,90], convenience:[208,118,60],
+  // surrounding economy / services
+  industrial:[123,138,166], restaurant:[133,144,166], hotel:[214,90,160],
+  school:[122,79,224], pharmacy:[200,67,59],
+  // NEW dense Overture "who works nearby" clusters (build_scene_places.py)
+  professional:[110,150,190], personal:[200,140,175], logistics:[150,120,90],
+  construction:[170,150,110], agriculture:[120,170,90], publicsvc:[150,160,175]};
+const POI_LABEL={vehicle_commerce:'Vehicle shops',gold:'Gold dealers',bank:'Banks',convenience:'Convenience',
+  fresh_market:'Fresh markets',supermarket:'Supermarkets',industrial:'Industrial',pharmacy:'Pharmacy',
+  restaurant:'Restaurants',hotel:'Hotels',school:'Schools',
+  professional:'Offices',personal:'Personal svc',logistics:'Logistics',construction:'Construction',
+  agriculture:'Agri traders',publicsvc:'Public'};
+// default-on: ALL POI types (owner request — show the full catchment, keep the colour legend to
+// read/toggle). The legend still lets any type be switched off, but nothing is hidden by default.
+const POI_DEFAULT_ON={vehicle_commerce:1,gold:1,bank:1,fresh_market:1,supermarket:1,convenience:1,industrial:1,restaurant:1,hotel:1,school:1,pharmacy:1,
+  professional:1,personal:1,logistics:1,construction:1,agriculture:1,publicsvc:1};
+// legend/render order by relevance (collateral & finance, then demand, then economy, then Overture clusters)
+const POI_ORDER=['vehicle_commerce','gold','bank','fresh_market','supermarket','convenience','industrial','restaurant','hotel','school','pharmacy','professional','personal','agriculture','logistics','construction','publicsvc'];
+// Overture bucket -> scene category. 8 buckets DENSIFY existing categories (no new chip); the rest
+// become the new "who works nearby" chips above. Points are [lng,lat] in <city>_places.json -> the
+// loader swaps them to the scene's [lat,lng] and files them here as window.POI_OV[category].
+const OV_MAP={auto:'vehicle_commerce',finance:'bank',food:'restaurant',hospitality:'hotel',
+  education:'school',health:'pharmacy',factory:'industrial',retail:'convenience',
+  professional:'professional',personal:'personal',logistics:'logistics',construction:'construction',
+  agriculture:'agriculture',public:'publicsvc'};
+// fold the dense per-city Overture POI (loaded into window.SCENEPLACES by the bottom loader before
+// initCatch runs) into the POI categories — here, where buildPoiOv/OV_MAP/_POI_MERGE are all live.
+try{buildPoiOv();_POI_MERGE={};}catch(e){}
+// preserve a stable, relevance-ordered legend, restricted to types actually present in the scene.
+// LET (not const) + refreshed once the scene extent is known: for curated provinces the curated
+// POIS decides; for every other province poiGet() falls back to the bbox-filtered national POI, so
+// a type only lists if it actually has a pin in THIS city's viewport. refreshPoiTypes() runs at the
+// top of the init tail (after sceneExtent is available) and is cheap/idempotent (poiScene memoised).
+let POI_TYPES=POI_ORDER.filter(t=>POIS[t]&&POIS[t].length);
+function refreshPoiTypes(){ POI_TYPES=POI_ORDER.filter(t=>poiGet(t).length); }
+// poiOn defaults are keyed on the FULL order (not POI_TYPES) so toggling works no matter when a
+// type first appears in the bbox-filtered set.
+const poiOn={}; POI_ORDER.forEach(t=>poiOn[t]=!!POI_DEFAULT_ON[t]);
+// DARK (CARTO dark_all) basemap is the DEFAULT: the gold-ramp buildings pop against black (the
+// DataProteins night-city look), and there is no near-white basemap for the pale low-rise fills to
+// wash into (the light default read as a blank/white scene). Toggle to light/satellite in the control.
+let basemap='studio', showRings=true, showIso=true;  // clean no-raster default (scene draws its own ground)
+// ---- LANE 3D-2 rival-territory overlay state (MEASURED census) ----------------------------------
+// Per-brand legend toggles bucket every rival into one of the big-4 title lenders + "other"; a
+// toggled-off bucket hides its pegs/discs/labels. showRivalGround draws translucent 1.5km discs
+// under the visible rivals so contested corridors read spatially — OFF by default for poster clean.
+const RIVAL_NAMED=['Srisawad','Muangthai','Tidlor','Heng'];
+function rivalBucket(b){return RIVAL_NAMED.indexOf(b)>=0?b:'other';}
+const RIVAL_HIDDEN=new Set();       // buckets the user has switched OFF in the legend
+let showRivalGround=false;          // 1.5km ground discs under rival pegs — OFF by default
+// visible rivals = scene census minus any bucket toggled off in the legend.
+function compVisible(){return compScene().filter(c=>!RIVAL_HIDDEN.has(rivalBucket(c.brand)));}
+// nearest AutoX branch (metres) to a lat/lng — MEASURED, computed from BR. null when no branches.
+function nearestAutoX(lat,lng){ if(!BR||!BR.length)return null;
+  let best=Infinity; for(const b of BR){const d=hav(lat,lng,b.y,b.x); if(d<best)best=d;} return isFinite(best)?best:null; }
+let posterMode=false;  // POSTER MODE: when true, render() emits ONLY ground + buildings (all overlays pulled) for a clean shareable still
+let _afterRenderCb=null;  // one-shot: fired by deck's onAfterRender so the poster capture reads a FRESHLY-painted frame
+
+function hav(la1,ln1,la2,ln2){const R=6371000,p=Math.PI/180;
+  const x=Math.sin((la2-la1)*p/2)**2+Math.cos(la1*p)*Math.cos(la2*p)*Math.sin((ln2-ln1)*p/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));}
+// default focal = the province branch nearest the city-core building cluster (so the reachable card + 3D both read well).
+// For a city with no branch data, focal is null — every consumer null-guards it (rings, label, panels, cascade).
+let focal=(function(){const c=CA.center||{lat:12.686,lng:101.245};
+  if(!BR||!BR.length)return CA.focal||(CA.branches&&CA.branches[0])||null;
+  let best=BR[0],bd=Infinity;for(const b of BR){const d=hav(c.lat,c.lng,b.y,b.x);if(d<bd){bd=d;best=b;}}return best;})();
+function circle(lat,lng,r){const pts=[],dLat=r/111320,dLng=r/(111320*Math.cos(lat*Math.PI/180));
+  for(let i=0;i<=48;i++){const a=i/48*2*Math.PI;pts.push([lng+dLng*Math.cos(a),lat+dLat*Math.sin(a)]);}return pts;}
+
+// Basemap raster sources. light (CARTO Positron, the DataProteins white base + DEFAULT) +
+// voyager + dark from CARTO; satellite = Esri World Imagery.
+// NOTE Esri's template is {z}/{y}/{x} (row before column) — different from CARTO's {z}/{x}/{y}.
+// deck.gl's TileLayer resolves {x}/{y}/{z} tokens wherever they appear, so the order is respected.
+const TILE={light:'https://a.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+            voyager:'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+            dark:'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            satellite:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'};
+// Satellite imagery (Esri) ships with NO place labels — over a dark photo the city is hard to read.
+// Overlay CARTO's dark labels-only raster on top so roads/place names stay LEGIBLE on satellite
+// (Upgrade 4). Null-guarded by basemap==='satellite'; absent/blocked tiles just don't draw.
+const TILE_LABELS_SAT='https://a.basemaps.cartocdn.com/rastertiles/dark_only_labels/{z}/{x}/{y}.png';
+// ---- CINEMATIC LIGHTING (Upgrade 1) ----------------------------------------------------------
+// A real sun that CASTS SHADOWS so the extruded skyline reads as a grounded, dimensional city
+// rather than flat boxes. deck.gl 8.9.35 enables shadow maps when a DirectionalLight carries
+// _shadow:true and the LightingEffect.shadowColor is set; layers opt in via shadowEnabled (default
+// true for SolidPolygonLayer/PolygonLayer). The sun is angled low (long, readable shadows) and
+// warm; a cool fill light keeps the shadowed faces from going black. Ambient is dropped a touch
+// vs the old flat 1.0 so the directional contrast (the thing that sells depth) actually shows.
+//
+// GRACEFUL DEGRADE: every constructor is feature-detected; if the vendored bundle lacks shadow
+// support the try/catch leaves LIGHTING usable without shadows, and SHADOWS_ON gates the per-layer
+// shadow flags so nothing throws.
+//
+// SOFTWARE-WEBGL SAFETY: shadow maps are an extra full render pass per frame. On a real GPU that's
+// cheap and gives the big depth win; under SOFTWARE WebGL (swiftshader/llvmpipe — headless CI, very
+// old machines) it can be so slow the scene never settles. So shadows are enabled by default but
+// AUTO-DISABLED at runtime if onWebGLInitialized detects a software renderer (see below). The warm
+// material + directional shading + sky/vignette still give strong depth in that fallback.
+function buildLighting(withShadow){
+  try{ if(!(deck.LightingEffect&&deck.AmbientLight&&deck.DirectionalLight))return null;
+    // Intensities kept clamp-bounded ON PURPOSE: ambient + diffuse*(sun+fill) must stay below ~0.9 or
+    // light building colours clamp to pure white on a real GPU (the "white blow-out"). DataProteins
+    // depth comes from a WIDER lit/shade gap (deeper ambient floor, stronger diffuse peak), NOT specular.
+    // With material ambient 0.42 / diffuse 0.40 below:
+    //   shade floor (faces away from sun) = 0.42*0.92 = 0.386
+    //   max lit (faces sun+fill)          = 0.386 + 0.40*(0.95+0.28) = 0.386 + 0.492 = 0.878 < 0.9 -> never clamps
+    //   contrast ratio lit/shade          = 0.878/0.386 = 2.27x  (was 0.824/0.45 = 1.83x) -> punchier, still safe
+    // INTENSITIES REDUCED (2026-07-03, user-verified on real GPU): sun 0.95->0.55, fill 0.28->0.18,
+    // ambient 0.95->0.70. On the reporter's GPU the province building faces blew to pure white — the
+    // headless SwiftShader renderer never reproduced it, so this is tuned against real screenshots.
+    // Max-lit now ~0.42*0.70 + 0.40*(0.55+0.18) = 0.294 + 0.292 = 0.586 (was 0.878) — no clamp headroom.
+    // NON-SHADOW soft shading, re-enabled 2026-07-04 for DataProteins sharpness (walls darker than
+    // roofs). BOUNDED so it CANNOT whiteout on any GPU: buildings are DATA-capped at 216 (light) and
+    // the max lighting multiplier here is ~0.86, so the brightest possible face is 216*0.86≈186 —
+    // far below 255 even if a GPU renders materially brighter than the headless SwiftShader path.
+    // Sun pitched high (roofs lightest), warm; a cool low-intensity fill keeps shaded walls from
+    // going flat-dark. NO specular (the old view-dependent term that spiked white under orbit). NO
+    // shadow pass ever (SHADOWS_ON stays false — that pass, not this base lighting, was the culprit).
+    const sun=new deck.DirectionalLight({color:[255,244,224],intensity:0.50,direction:[-0.6,-1.1,-2.4],_shadow:!!withShadow});
+    const fill=new deck.DirectionalLight({color:[176,198,246],intensity:0.15,direction:[0.9,0.6,-0.4]});
+    const amb=new deck.AmbientLight({color:[248,242,228],intensity:1.02});  // warm-neutral; lifted so shaded faces stay readable, not muddy
+    const eff=new deck.LightingEffect({ambient:amb,sun:sun,fill:fill});
+    // shadowColor: cool, semi-transparent so shadows tint toward the indigo console, not pure black.
+    if(withShadow){ try{ eff.shadowColor=[12,18,38,0.42]; }catch(e){} }
+    return eff;
+  }catch(e){ return null; }
+}
+// MOBILE detection — iOS Safari / Android render this heavy scene at device-pixel-ratio 2–3, which
+// makes the WebGL framebuffer ~4–9× larger and (with shadow-map passes) blows the mobile GL memory
+// budget → the canvas comes up BLANK WHITE. So on mobile we (a) cap device pixels to 1 and (b) drop
+// shadows. Renders slightly less crisp but actually renders. (Desktop keeps full crispness + shadows.)
+const IS_MOBILE = (function(){try{
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+    || (matchMedia&&matchMedia('(pointer:coarse)').matches && (window.innerWidth||999)<1024)
+    || (navigator.maxTouchPoints>1 && /Mac/.test(navigator.platform)); // iPadOS masquerades as Mac
+}catch(e){return false;}})();
+// FLAT RENDER — shadows AND the LightingEffect are disabled EVERYWHERE, permanently (2026-07-03).
+// Root cause of the persistent real-GPU whiteout: the software-GL path (headless verification)
+// auto-disabled this very effect, so every screenshot used to validate a "fix" was rendered
+// WITHOUT the one thing that differed on real hardware — the shadow pass. With no lighting or
+// shadow pass at all, every GPU rasterises the same flat, capped, warm fill colors (deterministic
+// by construction). Depth reads from the height ramp, extrusion parallax, strokes and vignette.
+let SHADOWS_ON=false;   // NEVER the shadow pass (the real-GPU whiteout culprit) — stays off everywhere.
+// Non-shadow soft shading IS attached (buildLighting(false)) for DataProteins wall/roof depth. Only
+// the extruded BUILDING + POI-column layers carry a material; the flat ground/water/road bed is
+// material:false so the paper cream stays exact. Buildings are data-capped so lighting can't whiteout.
+let LIGHTING=buildLighting(false);
+// cinematic default: frame the city-core building cluster (not the focal branch, which may sit on the rim),
+// low-and-wide so the extruded skyline catches the light and reads as 3D depth.
+// Center: use the curated CA.center if present (Rayong), else derive from the building-cluster bbox
+// so ANY city frames itself. Computed lazily here to avoid forward-referencing buildingBbox.
+const CORE=(function(){
+  // Frame the DENSITY PEAK of the building mass, not the bbox centroid (which sits ~5km out in the
+  // bare fringe on Rayong) and not CA.center (measured ~5.3km off the real core). One O(n) pass bins
+  // centroids into ~500m cells; the modal cell centre is where the city actually is -> the resting
+  // frame fills with buildings instead of empty ground. Falls back to CA.center then bbox centroid.
+  const b=CA.buildings||[];
+  if(b.length){
+    const G=0.0045;                                  // ~500m grid in degrees
+    const cells=new Map(); let best=null,bestN=0;
+    for(const x of b){
+      const cx=(x.cx!=null?x.cx:(x.p&&x.p[0]&&x.p[0][0])), cy=(x.cy!=null?x.cy:(x.p&&x.p[0]&&x.p[0][1]));
+      if(cx==null||cy==null)continue;
+      const k=Math.round(cx/G)+'_'+Math.round(cy/G);
+      const c=cells.get(k)||{sx:0,sy:0,n:0}; c.sx+=cx; c.sy+=cy; c.n++; cells.set(k,c);
+      if(c.n>bestN){bestN=c.n; best=c;}
+    }
+    if(best&&bestN>=8)return {lat:best.sy/best.n, lng:best.sx/best.n};
+  }
+  if(CA.center&&CA.center.lat!=null&&CA.center.lng!=null)return CA.center;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p;if(!p)continue;for(const pt of p){
+    if(pt[0]<minX)minX=pt[0];if(pt[0]>maxX)maxX=pt[0];if(pt[1]<minY)minY=pt[1];if(pt[1]>maxY)maxY=pt[1];}}
+  if(!isFinite(minX))return {lat:13.75,lng:100.5};   // last-resort fallback (Bangkok-ish)
+  return {lat:(minY+maxY)/2,lng:(minX+maxX)/2};})();
+
+// ---- LEVEL-OF-DETAIL CAP for the extruded building layer ----------------------------------------
+// The Overture pull can carry ~124k footprints (24MB). Extruding all of them under software/mobile
+// WebGL is janky. We cap the polygon count WITHOUT thinning the part of the scene the eye actually
+// reads: EVERY building inside the inner catchment (<= LOD_INNER_M of the centre) is always kept;
+// beyond that we keep only the visually heaviest (largest-footprint, then tallest) up to a total
+// budget. The dense low-rise mat near the centre stays intact; the far fringe is pruned to the most
+// salient structures so the skyline still reads dense but the GL load is bounded.
+//
+// GRACEFUL DEGRADE: if the whole file already fits in the budget (e.g. the ~3.6k OSM catchment),
+// the original array is returned UNCHANGED (same object, same order) -- byte-identical behaviour.
+// Polygon budget is DEVICE-AWARE: desktop renders EVERYTHING (maximum DataProteins-grade density,
+// no cap); only small / low-memory phones fall back to a still-very-dense safety cap so a heavy
+// scene degrades instead of crashing the GL context (a crash = zero richness, strictly worse).
+const BLDG_BUDGET=(function(){
+  const mem=(navigator.deviceMemory||8);                       // GB; undefined on desktop -> 8
+  const small=Math.min(window.innerWidth,window.innerHeight)<700;
+  if(small||mem<=4) return 60000;                              // phone / low-mem: dense but bounded
+  return Infinity;                                             // desktop/laptop: render ALL buildings
+})();
+const LOD_INNER_M=3000;      // when capped, everything within this radius of CORE is always rendered
+const BUILDINGS=(function(){
+  const all=(CA&&CA.buildings)||[];
+  if(all.length<=BLDG_BUDGET)return all;          // small file (or already under budget) -> untouched
+  // squared-metre distance of a building centroid from CORE (cheap local planar approx).
+  const cosLat=Math.cos(CORE.lat*Math.PI/180);
+  const d2=b=>{const cy=(b.cy!=null?b.cy:CORE.lat), cx=(b.cx!=null?b.cx:CORE.lng);
+    const dy=(cy-CORE.lat)*111320, dx=(cx-CORE.lng)*111320*cosLat; return dx*dx+dy*dy;};
+  const innerR2=LOD_INNER_M*LOD_INNER_M;
+  const inner=[], outer=[];
+  for(const b of all){ (d2(b)<=innerR2?inner:outer).push(b); }
+  if(inner.length>=BLDG_BUDGET)return inner;       // inner alone already saturates the budget
+  // salience score for the OUTER fringe: footprint area first (fa), height as the tiebreak. Both
+  // make a building "read" from distance, so we keep the ones that carry the skyline.
+  const sal=b=>{const fa=(b.fa!=null&&isFinite(b.fa))?b.fa:0; const h=(b.h!=null&&isFinite(b.h))?b.h:0;
+    return fa*1000+h;};                            // fa dominates; h breaks ties
+  outer.sort((a,b)=>sal(b)-sal(a));
+  const room=BLDG_BUDGET-inner.length;
+  return inner.concat(outer.slice(0,room));
+})();
+if(BUILDINGS.length<((CA&&CA.buildings)||[]).length){
+  try{console.info('[catchment LOD] '+(CA.buildings.length)+' buildings -> '+BUILDINGS.length
+    +' rendered (budget '+BLDG_BUDGET+', inner '+LOD_INNER_M+'m kept in full)');}catch(e){}
+}
+// ---- FLAT-MAT GUARD (fixes the "white/cream slab" render on some provinces) --------------------
+// The R2-hosted province catchments were pulled with Overture's default ~9m storey height, so a huge
+// share of their buildings sit at ONE value. The per-city p5..p95 height normalisation below then
+// anchors H_LO at that value, mapping the majority to rank t=0 — the bottom of the warm ramp — so the
+// whole mass renders as ONE flat tone (on a real GPU it washes to the reported white/cream slab).
+// FIX: if the distribution is degenerate, apply a DETERMINISTIC per-building jitter (seeded from the
+// centroid, byte-stable — the SAME model the Bangkok pull bakes in) so heights regain a natural spread
+// and the ramp travels warm + varied. Visual only (mutates the local render copy's h); deck
+// lighting/material are NOT touched.
+//
+// Degeneracy is detected by TWO independent signals — a city tripping EITHER gets jittered:
+//   (1) too FEW distinct heights (<=60 buckets) — the original narrow-distinct case (Rayong: 50), and
+//   (2) too much mass ON THE FLOOR — a large share sits at/below the p5 anchor H_LO (Khon Kaen 78%,
+//       Chiang Mai 69%), which is what actually collapses the ramp. These provinces carry a HIGH
+//       distinct-count (87 / 143), so signal (1) alone silently missed them and they went flat.
+// Signal (2) is the direct measure of the slab (share rendering as the single floor tone); Bangkok's
+// genuine spread leaves only ~5% on the floor, so it trips NEITHER test and is byte-for-byte untouched.
+// Rayong still trips (1) and its jitter output is unchanged.
+(function(){
+  const bs=BUILDINGS; if(!bs||bs.length<20)return;
+  const seen=new Set(); const hs=[];
+  for(const b of bs){ const h=b.h||0; seen.add(Math.round(h*10)); hs.push(h); }
+  hs.sort((a,b)=>a-b);
+  const H_LO=hs[Math.floor(hs.length*0.05)]||0;                 // the same p5 anchor render() normalises against
+  let floor=0; for(const h of hs){ if(h<=H_LO)floor++; else break; }  // hs sorted asc -> share on/under the floor
+  const floorFrac=floor/hs.length;
+  if(seen.size>60 && floorFrac<0.30)return;   // rich AND spread off the floor (Bangkok) -> nothing to fix, leave as-is
+  for(const b of bs){
+    const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453; const f=s-Math.floor(s);
+    const h=(b.h&&b.h>0)?b.h:4;
+    b.h0=h;                                     // keep the PRE-jitter height so COLOR ranks on the calm original (jitter drives roof ELEVATION only, not hue)
+    b.h=Math.round(h*(0.78+0.44*f)*100)/100;   // ±~22% deterministic spread → discrete values become a continuum
+  }
+  try{console.info('[catchment] flat-mat guard: jittered '+bs.length+' concentrated heights ('+seen.size+' distinct, '+(floorFrac*100).toFixed(0)+'% on floor)');}catch(e){}
+})();
+// ---- MOTION (Upgrade 2) — controlled view state for intro fly-in + gentle auto-orbit -----------
+// The scene is now driven by a CONTROLLED viewState (VIEW) instead of an uncontrolled
+// initialViewState, so the auto-orbit rAF loop and the click-to-fly transitions share one source of
+// truth and never fight. FRAMED = the cinematic resting view (low+wide, skyline catches the light).
+// INTRO = a higher, further-out, more top-down start; on load we ease from INTRO -> FRAMED.
+// AIM (from ?lat/lng/z, set by the boot code on a district camera-handoff) overrides the framing
+// centre + zoom so the intro fly-to lands on the clicked district instead of the derived city core.
+// Default framing = the DataProteins Wave-A camera (zoom 14.4 / pitch 55 — reference obliqueness).
+const AIM=(window.AIM&&isFinite(window.AIM.lat)&&isFinite(window.AIM.lng))?window.AIM:null;
+const FRAMED={longitude:AIM?AIM.lng:CORE.lng,latitude:AIM?AIM.lat:CORE.lat,zoom:AIM?AIM.z:14.4,pitch:55,bearing:-26};
+const INTRO ={longitude:AIM?AIM.lng:CORE.lng,latitude:AIM?AIM.lat:CORE.lat,zoom:AIM?Math.max(AIM.z-2.5,4):11.4,pitch:38,bearing:-58};
+let VIEW=Object.assign({},INTRO);
+// orbit state: enabled by default, paused on any user interaction (drag/zoom/click) until re-armed.
+let orbitOn=false, orbitPausedByUser=false, introDone=false, rafId=null, lastT=0;  // default OFF: calmer first paint + no view-dependent shimmer (toggle re-enables)
+const ORBIT_DPS=2.6;                 // degrees / second — gentle, not nauseating (~2-4 dps target)
+// userInteract(): called from onViewStateChange when the *user* moves the camera (not our own
+// programmatic setProps). Pauses the orbit and flips the toggle UI off until the user re-enables it.
+function userInteract(){ orbitPausedByUser=true; setOrbitUI(false); }
+function setOrbitUI(on){const t=document.getElementById('orbittog'); if(t)t.classList.toggle('on',on);}
+let _programmatic=false;             // guards our own setProps from being mistaken for user input
+function pushView(extra){ _programmatic=true;
+  deckgl.setProps({viewState:Object.assign({},VIEW,extra||{})});
+  // clear the programmatic flag on the next tick (after deck fires onViewStateChange synchronously)
+  Promise.resolve().then(()=>{_programmatic=false;});}
+// flyTo: a smooth click-to-fly that REPLACES the old initialViewState+transitionDuration calls.
+// Uses deck's FlyToInterpolator when present (nice arc), else a plain eased transition. Always
+// re-arms orbit at the destination so the scene keeps breathing after the user lands somewhere.
+function flyTo(o){
+  const dur=o.transitionDuration||900;
+  VIEW=Object.assign({},VIEW,{longitude:o.longitude,latitude:o.latitude,
+    zoom:o.zoom!=null?o.zoom:VIEW.zoom,pitch:o.pitch!=null?o.pitch:VIEW.pitch,
+    bearing:o.bearing!=null?o.bearing:VIEW.bearing});
+  _programmatic=true;
+  const tp={viewState:Object.assign({},VIEW,{transitionDuration:dur})};
+  try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.4});} }catch(e){}
+  // a click-to-fly is a deliberate reframe, not an orbit-cancel: keep orbiting once we arrive.
+  orbitPausedByUser=false; setOrbitUI(orbitOn);
+  deckgl.setProps(tp);
+  setTimeout(()=>{_programmatic=false; lastT=0;}, dur+40);
+}
+// ---- TRANSIENT SEARCH HIGHLIGHT — a pulsing accent ring dropped at a searched result, fading out
+// over ~4s so the eye finds the fly-to target. Pure visual cue; render() draws _hilite when set.
+// Drives its OWN throttled rAF (render() diffs on stable data refs, so re-rendering is cheap: only
+// this one small ring layer changes each frame). Cleared to null on completion, then a final render.
+const HILITE_MS=4000;
+let _hilite=null, _hiliteRAF=0;
+function _now(){return (window.performance&&performance.now)?performance.now():Date.now();}
+function dropHighlight(lng,lat,color){
+  lng=+lng; lat=+lat; if(!isFinite(lng)||!isFinite(lat))return;
+  _hilite={lng:lng,lat:lat,color:(color&&color.length>=3)?color:[91,124,250],t0:_now()};
+  if(_hiliteRAF){try{cancelAnimationFrame(_hiliteRAF);}catch(e){} _hiliteRAF=0;}
+  let last=0;
+  const step=()=>{
+    if(!_hilite){_hiliteRAF=0;return;}
+    const t=_now(), age=(t-_hilite.t0)/HILITE_MS;
+    if(age>=1){_hilite=null;_hiliteRAF=0;try{render();}catch(e){}return;}
+    if(t-last>=45){last=t;try{render();}catch(e){}}
+    _hiliteRAF=requestAnimationFrame(step);
+  };
+  try{render();}catch(e){}                 // immediate first paint of the ring
+  _hiliteRAF=requestAnimationFrame(step);
+}
+// onWebGLInitialized: inspect the live GL renderer string. Under a SOFTWARE rasteriser
+// (swiftshader / llvmpipe / "software"), drop shadow casting so the heavy shadow pass can't stall
+// the scene; rebuild the LightingEffect without shadow and re-render. On a real GPU this never fires
+// the downgrade, so the full cinematic shadows stay. Wrapped in try/catch — purely additive.
+function detectSoftwareGL(gl){
+  try{ if(!gl)return false;
+    let r='';
+    try{ const ext=gl.getExtension&&gl.getExtension('WEBGL_debug_renderer_info');
+      if(ext)r=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||''; }catch(e){}
+    if(!r){ try{ r=gl.getParameter(gl.RENDERER)||''; }catch(e){} }
+    return /swiftshader|llvmpipe|software|angle \(google, vulkan|microsoft basic|mesa offscreen/i.test(String(r));
+  }catch(e){ return false; }
+}
+let SOFT_GL=false;
+function downgradeForSoftwareGL(){
+  SOFT_GL=true;
+  // continuous motion keeps the render loop hot — under software WebGL that prevents the scene from
+  // ever settling (and a still screenshot doesn't need it). Park the camera at the framed view.
+  orbitOn=false; introDone=true; try{setOrbitUI(false);}catch(e){}
+  if(SHADOWS_ON){
+    SHADOWS_ON=false;
+    const noShadow=buildLighting(false);
+    try{ deckgl.setProps({effects:noShadow?[noShadow]:[]}); }catch(e){}
+  }
+  try{ if(typeof render==='function')render(); }catch(e){}   // rebuild layers so shadowEnabled flags clear
+  try{ console.info('[catchment] software WebGL detected — shadows + auto-orbit disabled for performance; depth via material + sky/vignette.'); }catch(e){}
+}
+// Position the HTML focal-branch pill over the selected branch's projected screen point. HTML (not a
+// deck.gl TextLayer) so the browser SHAPES Thai correctly — deck.gl scatters Thai vowels/tone marks.
+// Hidden when there's no focal, in poster mode, or when the branch projects off/behind the camera.
+function updateFocalLabel(){
+  const el=document.getElementById('focalLabel'); if(!el)return;
+  if(!focal||(typeof posterMode!=='undefined'&&posterMode)||!deck.WebMercatorViewport){el.style.display='none';return;}
+  // project the branch from the CURRENT viewState (not deckgl.getViewports(), which is empty on the
+  // static software-GL path) so this is reliable to call any time — boot, resize, orbit, fly-to.
+  let px;
+  try{
+    const W=window.innerWidth||900, H=window.innerHeight||620;
+    const vp=new deck.WebMercatorViewport(Object.assign({width:W,height:H},VIEW));
+    px=vp.project([focal.x,focal.y]);
+  }catch(e){}
+  if(!px||!isFinite(px[0])||!isFinite(px[1])||px[0]<-300||px[1]<-300||
+     px[0]>(window.innerWidth||900)+300||px[1]>(window.innerHeight||620)+300){el.style.display='none';return;}
+  const nm='◉ '+(focal.n||'AutoX branch');
+  if(el.textContent!==nm)el.textContent=nm;
+  el.style.left=Math.round(px[0])+'px'; el.style.top=(Math.round(px[1])-14)+'px';
+  el.style.display='block';
+}
+try{ window.addEventListener('resize',function(){try{updateFocalLabel();}catch(e){}}); }catch(e){}
+const deckgl=new deck.DeckGL({container:'map',
+  viewState:VIEW,
+  // preserveDrawingBuffer keeps the GL back-buffer readable AFTER compositing so Poster mode can copy
+  // the canvas into a 2D context and export a PNG. Perf cost is a single retained framebuffer + the
+  // loss of some driver swap optimisations — negligible for this mostly-static showcase scene (no
+  // measurable FPS change on the auto-orbit at 900x620; the poster capture itself is one extra draw).
+  glOptions:{preserveDrawingBuffer:true},
+  // cap the framebuffer on mobile (DPR 1) so iOS/Android WebGL doesn't run out of memory and blank out
+  useDevicePixels: IS_MOBILE ? false : true,
+  controller:{inertia:300,dragRotate:true}, effects:LIGHTING?[LIGHTING]:[],
+  onWebGLInitialized:(gl)=>{ try{ if(detectSoftwareGL(gl))downgradeForSoftwareGL(); }catch(e){} },
+  // one-shot post-paint hook — Poster mode arms _afterRenderCb, then forces a redraw; this fires
+  // AFTER the GL draw completes, so the capture reads the just-painted poster frame deterministically.
+  onAfterRender:()=>{ try{updateFocalLabel();}catch(e){} if(_afterRenderCb){const cb=_afterRenderCb;_afterRenderCb=null;try{cb();}catch(e){}} },
+  onViewStateChange:({viewState,interactionState})=>{
+    VIEW=viewState;
+    try{updateFocalLabel();}catch(e){}   // keep the HTML branch pill glued to the branch as the camera moves
+    const inTrans=!!(interactionState&&interactionState.inTransition);
+    const userMoving=!!(interactionState&&(interactionState.isDragging||interactionState.isZooming||
+       interactionState.isPanning||interactionState.isRotating||(interactionState.inTransition===false&&interactionState.isMoving)));
+    // any pan/zoom/rotate the USER drives (pointer down or inertial fling) pauses the orbit.
+    if(!_programmatic && userMoving){ userInteract(); }
+    // CONTROLLED viewState: a user-driven change must be reflected straight back to deck or the map
+    // would appear frozen. We re-push only for genuine user moves — NOT during a programmatic
+    // transition (deck owns that interpolation) and NOT for our own orbit/flyTo (already pushed).
+    // Guard with _programmatic so the re-push can't be mistaken for fresh user input (no loop).
+    if(userMoving && !inTrans && !_programmatic){
+      _programmatic=true; deckgl.setProps({viewState:VIEW});
+      Promise.resolve().then(()=>{_programmatic=false;});
+    }
+    return viewState;
+  },
+  getTooltip:({object,layer})=>{
+    if(!object)return null;
+    // buildings are non-interactive scenery — no per-building readout (owner request)
+    if(layer.id==='branches')return {html:`<div class="dtt"><b>${object.n||'AutoX branch'}</b><br>เงินไชโย · ${object.d||'Rayong'} · vehicle shops ${object.veh} · gold ${object.gold}</div>`};
+    if(layer.id==='comp'||layer.id==='comp-peg'){
+      const nb=nearestAutoX(object.lat,object.lng);   // MEASURED: haversine to closest AutoX branch
+      const nbTxt=(nb!=null)?`<br><span style="color:#c8b78a">nearest AutoX ${(nb/1000).toFixed(1)} km</span>`:'';
+      return {html:`<div class="dtt"><b>${object.brand}</b>${object.name?'<br>'+object.name:''}${nbTxt}<br><span style="color:#8a94a8">competitor branch · measured</span></div>`};}
+    if(layer.id==='land')return {html:`<div class="dtt"><b>${object.nm}</b></div>`};
+    if(layer.id&&layer.id.indexOf('poi-')===0){const t=layer.props._poiType;
+      const nm=Array.isArray(object)?object[2]:null;
+      return {html:`<div class="dtt"><b>${POI_LABEL[t]||t}</b>${nm?'<br>'+nm:''}<br><span style="color:#8a94a8">OSM point · within view</span></div>`};}
+    return null;}});
+
+// 'studio' = NO raster basemap: the scene draws its own ground (land-use/water/roads) on the #sky
+// gradient, so a redundant basemap doesn't wash it out. This is the clean, high-contrast look;
+// Light/Streets/Dark/Satellite still available in the control for a geographic backdrop.
+function baseLayer(){if(basemap==='studio'||!TILE[basemap])return null;
+  return new deck.TileLayer({id:'base',data:TILE[basemap],minZoom:0,maxZoom:19,tileSize:256,
+  renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+    bounds:[b[0][0],b[0][1],b[1][0],b[1][1]]});}});}
+// Labels-only overlay — drawn ON TOP of the building scene only in satellite mode, so place names
+// and roads stay legible over the dark Esri photo (Upgrade 4). Returns null for non-satellite bases.
+function labelOverlayLayer(){
+  if(basemap!=='satellite'||!deck.TileLayer)return null;
+  return new deck.TileLayer({id:'sat-labels',data:TILE_LABELS_SAT,minZoom:0,maxZoom:19,tileSize:256,
+    renderSubLayers:p=>{const b=p.tile.boundingBox;return new deck.BitmapLayer(p,{data:null,image:p.data,
+      bounds:[b[0][0],b[0][1],b[1][0],b[1][1]],parameters:{depthTest:false}});}});}
+
+// satellite imagery reads as a dark base, so style buildings/ground with the dark palette over it.
+function darkMode(){return basemap==='dark'||basemap==='satellite';}
+// the DataProteins "white paper" look — muted-grey context buildings, ORANGE roads, selective
+// accent highlight — is reserved for the light CARTO Positron base. voyager keeps its old styling.
+function lightMode(){return basemap==='light'||basemap==='studio';}
+
+// ---- OPTIONAL ground layers (future OSM pull) — render UNDER buildings; absent file => skipped silently. ----
+// These are populated by a later Overpass pull on Kaustav's Thai laptop (network-blocked in this sandbox).
+// Each loader reads window.ROADS / window.WATER / window.LANDUSE (set by the bottom fetch; null if missing).
+//
+// EXPECTED JSON SHAPES (the laptop pull must emit exactly these so they plug in with no code change):
+//
+//  data/rayong_roads.json   ->  { "roads": [ { "path": [[lng,lat],[lng,lat],...], "cls": "primary" }, ... ] }
+//      path : array of [lng,lat] vertices (a polyline). cls (optional): OSM highway class
+//             one of primary|secondary|tertiary|residential|service (drives line width; default residential).
+//
+//  data/rayong_water.json   ->  { "water": [ { "polygon": [[lng,lat],...], "nm": "Rayong River" }, ... ] }
+//      polygon : closed ring of [lng,lat] (rivers/lakes/coast). nm (optional) name. Rendered FLAT at ground.
+//
+//  data/rayong_landuse.json ->  { "landuse": [ { "polygon": [[lng,lat],...], "kind": "park" }, ... ] }
+//      polygon : closed ring of [lng,lat]. kind (optional): park|forest|grass|recreation (all tint green).
+//      Rendered FLAT at ground (extruded:false).
+// Build the "full city" ground bed beneath the extruded buildings: soft-tinted landuse,
+// flat water with a darker shoreline, then roads drawn as casing + fill (a thin dark outline
+// under a brighter ribbon) so arterials read like lit asphalt — the DataProteins look.
+// All FLAT (extruded:false) and null-guarded: any missing file just drops that layer silently.
+// Scene extent (lng/lat bbox + centre) derived once from the building cluster, with margin.
+// Used to lay a continuous ground-bed plane + a radial vignette so the scene has a unified,
+// cinematic floor even where the (blocked-in-headless) basemap tiles are blank. Cached on first call.
+let _EXTENT=null;
+function sceneExtent(){
+  if(_EXTENT)return _EXTENT;
+  const b=(window.CA&&CA.buildings)||[];
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p; if(!p)continue;
+    for(const pt of p){ if(pt[0]<minX)minX=pt[0]; if(pt[0]>maxX)maxX=pt[0];
+      if(pt[1]<minY)minY=pt[1]; if(pt[1]>maxY)maxY=pt[1]; }}
+  if(!isFinite(minX)){const c=(CA&&CA.center)||{lat:12.686,lng:101.245};
+    minX=c.lng-0.06;maxX=c.lng+0.06;minY=c.lat-0.05;maxY=c.lat+0.05;}
+  const mx=(maxX-minX)*0.55+0.01, my=(maxY-minY)*0.55+0.01;  // generous margin so the bed runs past the buildings
+  _EXTENT={minX:minX-mx,maxX:maxX+mx,minY:minY-my,maxY:maxY+my,
+           cx:(minX+maxX)/2,cy:(minY+maxY)/2,w:(maxX-minX),h:(maxY-minY)};
+  return _EXTENT;
+}
+
+function groundLayers(){
+  const G=[], D=darkMode();
+  const WATER=window.WATER, LANDUSE=window.LANDUSE, ROADS=window.ROADS;
+  const hasGround=(WATER&&WATER.water&&WATER.water.length)||
+                  (LANDUSE&&LANDUSE.landuse&&LANDUSE.landuse.length)||
+                  (ROADS&&ROADS.roads&&ROADS.roads.length);
+
+  // ---- (A) GROUND BED + VIGNETTE — only when we actually have ground data to dress the floor.
+  //      A continuous soft-tinted plane fills the gaps between landuse parcels so their hard
+  //      polygon edges stop popping against the blank basemap; a darker vignette ring fades the
+  //      far edges for cinematic depth (lighting is tuned for buildings, so the bed is shaded by hand). ----
+  if(hasGround&&deck.PolygonLayer){
+    const E=sceneExtent();
+    const rect=[[E.minX,E.minY],[E.maxX,E.minY],[E.maxX,E.maxY],[E.minX,E.maxY]];
+    // base floor tint — warm-neutral so green landuse + grey roads sit on a continuous bed, not voids
+    G.push(new deck.PolygonLayer({id:'ground-bed',data:[rect],getPolygon:p=>p,extruded:false,material:false,
+      filled:true,stroked:false,getFillColor:D?[14,17,26,255]:[241,238,231,255],   // light bed = near-white paper (DataProteins reference): the city must read DARKER than its ground
+      parameters:{depthTest:false},pickable:false}));
+    // vignette: concentric rings, transparent at centre -> opaque dark at the rim (radial falloff)
+    const ring=(scale,a)=>{const pts=[];for(let i=0;i<=40;i++){const ang=i/40*2*Math.PI;
+      pts.push([E.cx+Math.cos(ang)*E.w*0.5*scale, E.cy+Math.sin(ang)*E.h*0.5*scale]);}return pts;};
+    const vig=[{s:1.55,a:D?200:0},{s:1.15,a:D?120:0},{s:0.92,a:D?60:0},{s:0.7,a:0}];  // light: alpha 0 so the paper bed [241,238,231] actually renders (the gray discs were veiling the whole frame)
+    G.push(new deck.PolygonLayer({id:'ground-vignette',data:vig,getPolygon:v=>ring(v.s),extruded:false,material:false,
+      filled:true,stroked:false,getFillColor:v=>D?[8,11,18,v.a]:[150,146,138,Math.round(v.a*0.55)],   // light vignette softened ~half: gray smudge corners kill the paper-white look
+      parameters:{depthTest:false},pickable:false}));
+  }
+
+  // ---- LANDUSE: soft, low-saturation tints by kind. Greens for parks/forest, tan farmland,
+  //      muted grey industrial, warm-grey commercial/residential. Kept translucent so the
+  //      basemap/ground still breathes through and buildings clearly sit on top. ----
+  const lu=LANDUSE&&Array.isArray(LANDUSE.landuse)?LANDUSE.landuse:null;
+  if(lu&&lu.length&&deck.PolygonLayer){
+    // [dark-theme rgba, light-theme rgba] per kind
+    const LU={
+      // light-theme tints WARMED + DEEPENED (2026-07-03): residential/industrial were cool light
+      // blue-grays that read as washed-out white patches next to the taupe ground — the opposite
+      // of the muted DataProteins bed. All light values now sit in the warm gray/green family,
+      // a step darker than the ground bed so parcels recede instead of glowing.
+      park:        [[ 40, 96, 58,150],[178,208,164,150]],
+      forest:      [[ 30, 76, 46,160],[160,196,148,160]],
+      grass:       [[ 40, 90, 56,140],[186,214,172,140]],
+      recreation:  [[ 40, 96, 58,148],[178,208,164,145]],
+      meadow:      [[ 44, 92, 58,140],[190,214,178,135]],
+      farmland:    [[ 92, 90, 52,110],[226,216,190,120]],
+      industrial:  [[ 74, 72, 72,110],[212,208,200,130]],
+      commercial:  [[ 92, 80, 62,110],[224,214,198,120]],
+      residential: [[ 66, 72, 92,105],[222,216,206,110]],
+      retail:      [[ 94, 80, 60,110],[226,216,200,120]]};  // dark land-use alphas cut ~35-45% + greens deepened: the ground recedes so buildings win figure-ground
+    const luCol=f=>{const m=LU[f.kind]||LU.park;return D?m[0]:m[1];};
+    // Edges are now soft: the ground-bed plane fills the gaps between parcels, so we drop the hard
+    // outline almost entirely (a very faint same-hue stroke just keeps same-kind parcels from merging).
+    // Lower the fill alpha a touch vs the bed so parcels read as tinted overlays, not cut-outs.
+    const luEdge=f=>{const m=(LU[f.kind]||LU.park)[D?0:1];return [m[0],m[1],m[2],D?60:45];};
+    G.push(new deck.PolygonLayer({id:'landuse',data:lu,getPolygon:f=>f.polygon,extruded:false,material:false,
+      filled:true,stroked:true,getFillColor:luCol,
+      getLineColor:luEdge,getLineWidth:1,lineWidthMinPixels:0.4,lineWidthMaxPixels:1.2,
+      parameters:{depthTest:false},pickable:false}));
+  }
+
+  // ---- WATER: flat fill + a darker, slightly inset shoreline so rivers/lakes read with depth. ----
+  const wa=WATER&&Array.isArray(WATER.water)?WATER.water:null;
+  if(wa&&wa.length&&deck.PolygonLayer){
+    G.push(new deck.PolygonLayer({id:'water',data:wa,getPolygon:f=>f.polygon,extruded:false,material:false,
+      filled:true,stroked:true,
+      getFillColor:D?[30,66,118,225]:[122,176,232,235],   // water = THE color accent on the paper-white base
+      getLineColor:D?[16,40,78,235]:[88,138,196,235],getLineWidth:3,lineWidthMinPixels:1,
+      parameters:{depthTest:false},pickable:false}));
+  }
+
+  // ---- ROADS: casing + fill. Two PathLayers per major road give the "lit asphalt" look:
+  //      a wider dark casing underneath, a brighter ribbon on top. Minor roads = single ribbon. ----
+  const rd=ROADS&&Array.isArray(ROADS.roads)?ROADS.roads:null;
+  if(rd&&rd.length&&deck.PathLayer){
+    const W={primary:16,secondary:11,tertiary:7,residential:3.5,service:2};      // ribbon width (m)
+    const CASE={primary:26,secondary:18,tertiary:12,residential:6,service:3.5};  // casing width (m)
+    const w=f=>W[f.cls]||3, cw=f=>CASE[f.cls]||5;
+    const major=f=>f.cls==='primary'||f.cls==='secondary'||f.cls==='tertiary';
+    const majors=rd.filter(major), minors=rd.filter(f=>!major(f));
+    // ribbon (fill) colour:
+    //  - dark / satellite : warm light-grey asphalt
+    //  - light (Positron, DataProteins look) : near-white warm-grey ribbon on a soft grey casing
+    //  - voyager : the original mid-grey
+    const L=lightMode();
+    const fill=D?[196,204,220,245]:(L?[250,225,160,250]:[140,148,164,225]);   // light: PALE YELLOW ribbon (was 8-off-the-bed near-white = invisible) — the reference's road colour
+    const casing=D?[8,12,22,240]:(L?[224,210,178,230]:[80,88,104,220]);       // warm sand casing under the yellow
+    // 1) casing for majors (drawn first, sits under the fill)
+    if(majors.length){
+      G.push(new deck.PathLayer({id:'roads-case',data:majors,getPath:f=>f.path,
+        getWidth:cw,widthUnits:'meters',widthMinPixels:1.4,widthMaxPixels:16,
+        getColor:casing,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 2) minor roads — single thin ribbon. To stop the residential grid reading as a uniform mesh:
+    //    (a) vary each minor road's width by a deterministic hash of its first vertex (organic, stable),
+    //    (b) fade alpha with distance from the scene centre, so the network dissolves toward the rim
+    //        instead of a hard uniform lattice — the grid feels denser/clearer where the eye is.
+    if(minors.length){
+      const E=sceneExtent();
+      const rhash=f=>{const p=f.path&&f.path[0]||[0,0];const s=Math.sin(p[0]*91.71+p[1]*53.19)*43758.5453;return s-Math.floor(s);};
+      const minorW=f=>{const base=W[f.cls]||3; return base*(0.7+rhash(f)*0.8);}; // ±width jitter
+      const minorCol=f=>{const p=f.path&&f.path[0]||[E.cx,E.cy];
+        const dx=(p[0]-E.cx)/(E.w*0.5||1), dy=(p[1]-E.cy)/(E.h*0.5||1);
+        const dist=Math.min(1.2,Math.sqrt(dx*dx+dy*dy));
+        const fade=Math.max(D?0.18:0.75,1-dist*0.62);          // dark: fade to rim; light: floor 0.75 so the road mesh reads EVEN edge-to-edge (reference has no fade)
+        const a=Math.round((D?185:190)*fade);
+        // light base: pale yellow minor streets to match the majors (even grid); else grey
+        return D?[120,130,150,a]:(L?[250,222,158,a]:[150,158,172,a]);};
+      G.push(new deck.PathLayer({id:'roads-minor',data:minors,getPath:f=>f.path,
+        getWidth:minorW,widthUnits:'meters',widthMinPixels:0.4,widthMaxPixels:5,
+        getColor:minorCol,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 3) ribbon (fill) for majors on top of the casing
+    if(majors.length){
+      G.push(new deck.PathLayer({id:'roads-fill',data:majors,getPath:f=>f.path,
+        getWidth:w,widthUnits:'meters',widthMinPixels:0.8,widthMaxPixels:11,
+        getColor:fill,capRounded:true,jointRounded:true,
+        parameters:{depthTest:false},pickable:false}));
+    }
+    // 4) centre dashes on primary arterials — the small detail that sells "real road network".
+    //    Only drawn when PathStyleExtension is actually present (else a solid line would look wrong).
+    const prim=rd.filter(f=>f.cls==='primary');
+    if(prim.length&&deck.PathLayer&&deck.PathStyleExtension){
+      G.push(new deck.PathLayer({id:'roads-dash',data:prim,getPath:f=>f.path,
+        getWidth:1.2,widthUnits:'meters',widthMinPixels:0.5,widthMaxPixels:1.6,
+        getColor:D?[230,202,128,200]:[232,212,142,185],
+        getDashArray:[6,7],dashJustified:true,extensions:[new deck.PathStyleExtension({dash:true})],
+        capRounded:false,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    }
+  }
+  return G;
+}
+
+// ---- OPTIONAL extra layers (Overpass pull) — TREES + RAIL. Additive + null-guarded:
+//      absent file => layer skipped, default scene unchanged. Drawn between the ground bed
+//      and the buildings so they read as ground detail, not over the skyline.
+//
+//  data/rayong_trees.json -> { "trees": [ [lng,lat], [lng,lat], ... ] }
+//      Rendered as small green points (ScatterplotLayer) plus short green columns so they
+//      stand a touch off the ground between buildings without cluttering the skyline.
+//  data/rayong_rail.json  -> { "rail": [ { "path": [[lng,lat],...] }, ... ] }
+//      Rendered as a dark DASHED PathLayer UNDER the roads (rail bed reads as track).
+function extraLayers(){
+  const G=[], D=darkMode();
+  // ---- RAIL: dark dashed track. Drawn first so roads/buildings sit on top of it. ----
+  const RAIL=window.RAIL, rl=RAIL&&Array.isArray(RAIL.rail)?RAIL.rail:null;
+  if(rl&&rl.length&&deck.PathLayer){
+    const railCol=D?[58,64,78,230]:[70,62,52,225];   // dark slate (dark) / dark brown (light)
+    // solid bed first so the line still reads if PathStyleExtension is unavailable
+    G.push(new deck.PathLayer({id:'rail-bed',data:rl,getPath:f=>f.path,
+      getWidth:5,widthUnits:'meters',widthMinPixels:1,widthMaxPixels:5,
+      getColor:[railCol[0],railCol[1],railCol[2],Math.round(railCol[3]*0.55)],
+      capRounded:true,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    if(deck.PathStyleExtension){
+      G.push(new deck.PathLayer({id:'rail-dash',data:rl,getPath:f=>f.path,
+        getWidth:2.4,widthUnits:'meters',widthMinPixels:0.8,widthMaxPixels:2.6,
+        getColor:railCol,getDashArray:[5,5],dashJustified:true,
+        extensions:[new deck.PathStyleExtension({dash:true})],
+        capRounded:false,jointRounded:true,parameters:{depthTest:false},pickable:false}));
+    }
+  }
+  // ---- TREES: small green points + short columns. ScatterplotLayer flat dot for the canopy
+  //      read at any zoom; a low ColumnLayer trunk so they have a little 3D presence. ----
+  const TREES=window.TREES, tr=TREES&&Array.isArray(TREES.trees)?TREES.trees:null;
+  if(tr&&tr.length){
+    const green=D?[96,170,108]:[78,150,86];
+    if(deck.ColumnLayer){
+      G.push(new deck.ColumnLayer({id:'trees-col',data:tr,
+        getPosition:p=>[p[0],p[1]],
+        diskResolution:5,radius:3.5,radiusUnits:'meters',
+        extruded:true,elevationScale:1,getElevation:6,
+        getFillColor:[green[0],green[1],green[2],225],
+        stroked:false,
+        material:{ambient:0.42,diffuse:0.40,shininess:8,specularColor:[0,0,0]},
+        parameters:{depthTest:true},pickable:false}));
+    }
+    if(deck.ScatterplotLayer){
+      G.push(new deck.ScatterplotLayer({id:'trees-pt',data:tr,
+        getPosition:p=>[p[0],p[1]],
+        getRadius:3.2,radiusUnits:'meters',radiusMinPixels:0.6,radiusMaxPixels:4,
+        filled:true,stroked:false,
+        getFillColor:[green[0]+18,green[1]+30,green[2]+18,210],
+        parameters:{depthTest:false},pickable:false}));
+    }
+  }
+  return G;
+}
+
+// Exact bbox of the CURATED building set (no margin) — the boundary between "curated core"
+// (rich, un-decimated) and the STREAMED FRINGE that fills the rest of the frame edge-to-edge
+// from the hosted tiles. Cached once; null when no curated buildings.
+let _CBBOX;
+function curatedBbox(){
+  if(_CBBOX!==undefined)return _CBBOX;
+  const b=(window.CA&&CA.buildings)||[];
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const x of b){const p=x.p;if(!p)continue;for(const pt of p){
+    if(pt[0]<minX)minX=pt[0];if(pt[0]>maxX)maxX=pt[0];
+    if(pt[1]<minY)minY=pt[1];if(pt[1]>maxY)maxY=pt[1];}}
+  _CBBOX=isFinite(minX)?[minX,minY,maxX,maxY]:null;
+  return _CBBOX;
+}
+
+// Isochrone (travel-time) bands. Graded by minutes: near = warm red -> far = cool green, translucent.
+// Drawn FLAT, above the ground bed but under buildings/markers/labels. Null-guarded (file absent
+// until pull_isochrone.py runs). Bands are sorted far->near so the smaller near band paints on top.
+function isoMinutes(f){const p=(f&&f.properties)||{};
+  if(p.minutes!=null)return +p.minutes;
+  if(p.value!=null)return +p.value/60;     // ORS/GISTDA emit seconds in properties.value
+  if(p.time!=null)return +p.time/60;
+  return null;}
+function isoColor(m){
+  // 0..~20+ min ramp: warm red (near) -> amber -> teal/green (far). Translucent fills.
+  const stops=[[0,[224,71,75]],[5,[230,150,70]],[10,[224,180,60]],[15,[80,170,130]],[20,[60,150,180]]];
+  let lo=stops[0],hi=stops[stops.length-1];
+  for(let i=0;i<stops.length-1;i++){if(m>=stops[i][0]&&m<=stops[i+1][0]){lo=stops[i];hi=stops[i+1];break;}}
+  const span=(hi[0]-lo[0])||1,t=Math.max(0,Math.min(1,(m-lo[0])/span));
+  const c=lo[1].map((v,i)=>Math.round(v+(hi[1][i]-v)*t));
+  return [c[0],c[1],c[2]];}
+function isoLayers(){
+  const G=[]; const ISO=window.ISO;
+  const feats=ISO&&ISO.features&&ISO.features.length?ISO.features.slice():null;
+  if(!feats||!deck.GeoJsonLayer)return G;
+  // paint far bands first (under), near bands last (on top) so concentric rings read correctly
+  feats.sort((a,b)=>(isoMinutes(b)||0)-(isoMinutes(a)||0));
+  // Light base: the bands at full strength read as huge flat color wedges on the paper-white
+  // ground (they were tuned for dark). Keep them functional but translucent-watercolor there.
+  const isoA=lightMode()?44:104, isoLineA=lightMode()?150:235;
+  G.push(new deck.GeoJsonLayer({id:'isochrone',data:{type:'FeatureCollection',features:feats},
+    extruded:false,material:false,filled:true,stroked:true,
+    getFillColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],isoA];},
+    getLineColor:f=>{const m=isoMinutes(f);const c=isoColor(m==null?15:m);return [c[0],c[1],c[2],isoLineA];},
+    getLineWidth:14,lineWidthUnits:'meters',lineWidthMinPixels:2,lineWidthMaxPixels:5,
+    parameters:{depthTest:false},pickable:false,
+    updateTriggers:{getFillColor:[feats.length],getLineColor:[feats.length]}}));
+  return G;}
+
+// ---- STREAMING BUILDINGS (operator-hosted Overture vector tiles) -------------------------------
+// When building tiles are configured in platform/data/tiles_config.json (a real Overture pull,
+// clipped to the union of 10km buffers around every branch + competitor, hosted on a CDN), stream
+// them per-viewport so the FULL 10km catchment everywhere is densely populated — not just the
+// curated per-city catchment file. deck.gl 8.9.35's MVTLayer natively fetches a {z}/{x}/{y}.pbf
+// tile pyramid and forwards GeoJsonLayer props, so the streamed footprints inherit the SAME
+// cinematic warm ramp + non-linear height exaggeration + lighting-capped material (no white
+// blow-out) as the static scene. Returns null when no tiles are configured, the bundle lacks
+// MVTLayer, or only a PMTiles URL is set (PMTiles needs a vector-tile shim — a follow-up) -> the
+// scene falls back to the curated catchment buildings. NO fabricated data: this renders only the
+// footprints actually present in the hosted real-Overture tiles.
+function streamBuildingLayer(){
+  try{
+    var cfg=(window.TILECFG&&TILECFG.buildings)||null;
+    if(!cfg||!deck.MVTLayer)return null;
+    // COVERAGE GATE: the hosted archive may cover only part of the country (e.g. the Rayong pilot
+    // .pmtiles). Outside its bbox the archive has no tiles, so streaming would blank the scene —
+    // fall back to the curated catchment instead. coverageBbox = [W,S,E,N] in tiles_config.json;
+    // absent (national archive) -> stream everywhere.
+    var cb=cfg.coverageBbox||null;
+    if(cb&&cb.length===4&&CORE&&(CORE.lng<cb[0]||CORE.lng>cb[2]||CORE.lat<cb[1]||CORE.lat>cb[3]))return null;
+    var url=cfg.mvtUrl||null;                 // prefer the native {z}/{x}/{y}.pbf path (zero extra deps)
+    if(!url){                                  // no MVT pyramid -> try the single-file PMTiles archive (Vercel Blob / R2)
+      if(cfg.pmtilesUrl && window.makePMTilesBuildingLayer)
+        return window.makePMTilesBuildingLayer(deck,{url:cfg.pmtilesUrl,sourceLayer:cfg.sourceLayer||'buildings',minZoom:cfg.minZoom||9,maxZoom:cfg.maxZoom||15,dark:darkMode(),
+          // FRINGE MODE: when a curated core exists, stream only OUTSIDE its bbox so the frame
+          // fills edge-to-edge (DataProteins fabric) without double-drawing/z-fighting the core.
+          excludeBbox:(BUILDINGS&&BUILDINGS.length)?curatedBbox():null,
+          // fires on the FIRST tile that carries real features: only then may the curated
+          // catchment hand over to the stream (see render() — prevents a blank city when the
+          // CDN/esm.sh is slow, blocked, or the archive has no coverage here).
+          onLoaded:function(){ if(!window._STREAM_READY){ window._STREAM_READY=true; try{render();}catch(e){} } }});
+      return null;
+    }
+    var DARK=darkMode(), LIGHT=lightMode();
+    var clamp=function(v){return Math.max(0,Math.min(255,Math.round(v)));};
+    var RAMP=DARK?[[44,38,32],[156,108,50],[238,182,86]]
+                 :[[210,203,191],[186,176,161],[142,128,108]];   // light ramp = the curated layer's taupe->umber (was a much lighter sand set that read washed-out next to it)
+    var H_LO=5, H_HI=90;                        // widened band for streamed tiles: low-rise stays sand, gold reserved for real towers (activates when tiles are hosted)
+    var rampAt=function(t){var seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;var a=RAMP[seg],b2=RAMP[seg+1];
+      return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+    var hOf=function(f){var p=(f&&f.properties)||{};var h=+(p.height||p.h||p.render_height||0);
+      if(!isFinite(h)||h<=0)h=p.levels?(+p.levels*3):(p.num_floors?(+p.num_floors*3):4);
+      return h>0?h:4;};
+    return new deck.MVTLayer({
+      id:'stream-bldg', data:url,
+      minZoom:cfg.minZoom||9, maxZoom:cfg.maxZoom||15,
+      extruded:true, filled:true, stroked:true, wireframe:false,
+      getElevation:function(f){var h=hOf(f);return h*(h<10?1.4:h<22?2.4:h<45?3.4:4.2);},  // 4-band: low-rise grounded, real towers punch up
+      getFillColor:function(f){var h=hOf(f);var t=(h-H_LO)/(H_HI-H_LO);t=t<0?0:t>1?1:t;
+        var m=rampAt(t);return [clamp(m[0]),clamp(m[1]),clamp(m[2]),DARK?236:214];},
+      getLineColor:LIGHT?[164,156,144,150]:(DARK?[28,22,14,210]:[120,110,90,150]),   // soft warm-gray stroke: tiny footprints ARE their stroke at city zoom
+      lineWidthMinPixels:0.4,
+      material:{ambient:0.60,diffuse:0.42,shininess:0,specularColor:[0,0,0]},   // soft shading like the curated layer; bounded (cap+multiplier) so it can't whiteout
+      shadowEnabled:SHADOWS_ON,
+      onTileLoad:function(t){try{var d=t&&(t.content||t.data);
+        if(d&&d.length&&!window._STREAM_READY){window._STREAM_READY=true;render();}}catch(e){}},  // same first-real-tile handover as the PMTiles path
+      parameters:{depthTest:true}, pickable:false,
+      updateTriggers:{getFillColor:[DARK,LIGHT],getLineColor:[DARK,LIGHT]}
+    });
+  }catch(e){ try{console.warn('[stream-bldg] disabled:',e&&e.message);}catch(_){} return null; }
+}
+
+function render(){
+  refreshPoiTypes();   // keep the pin type set current (bbox-filtered national POI for non-Rayong)
+  // ground scaffolding first so buildings/rings/POIs draw on top of it.
+  // extraLayers() (optional trees + rail) sit just above the ground bed / under buildings.
+  const L=[baseLayer(), ...groundLayers(), ...extraLayers()];
+  // streamed national building tiles (null unless operator-hosted tiles are configured). When
+  // present, they SUPERSEDE the curated catchment buildings (avoids double-draw / z-fighting).
+  // CURATED-FIRST: a curated catchment (the rich, un-decimated per-province pull) always beats the
+  // streamed tile pyramid, whose mid-zoom levels are tippecanoe-decimated. The stream is the GAP
+  // FILLER for provinces with no curated buildings (local + CDN miss) once national tiles are hosted.
+  // Stream ALWAYS considered: FRINGE-fills around the curated core (excludeBbox) when one exists,
+  // or carries the whole city when none does. The curated core always draws on top.
+  const STREAMB=streamBuildingLayer();
+  // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
+  if(showIso)L.push(...isoLayers());
+  // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
+  if(DISTRICTS && deck.GeoJsonLayer){
+    L.push(new deck.GeoJsonLayer({id:'districts',data:DISTRICTS,extruded:false,material:false,filled:true,stroked:true,
+      getFillColor:[91,124,250,18],getLineColor:[120,140,180,90],lineWidthMinPixels:1,pickable:false}));
+  }
+  // (1) 10km collateral catchment rings — faint over ALL branches; bright only on the selected branch (drawn beneath buildings)
+  if(showRings){
+    // Light base: the gold FILLS that were subtle on dark read as a huge beige wash on the
+    // paper-white ground (overlapping 10km discs tint half the frame). Keep the OUTLINES as the
+    // reach cue there; fills carry the cue only on dark.
+    const ringFillA=lightMode()?3:10, focusFillA=lightMode()?8:28;
+    L.push(new deck.PolygonLayer({id:'rings10',data:BR,getPolygon:b=>circle(b.y,b.x,10000),
+      extruded:false,material:false,stroked:true,filled:true,
+      getFillColor:[GOLD[0],GOLD[1],GOLD[2],ringFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],70],
+      lineWidthMinPixels:1,pickable:false}));
+    if(focal){
+      L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
+        extruded:false,material:false,stroked:true,filled:true,
+        getFillColor:[GOLD[0],GOLD[1],GOLD[2],focusFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
+        lineWidthMinPixels:2.5,pickable:false,updateTriggers:{getPolygon:[focal]}}));
+    }
+  }
+  // (2) extruded buildings — city-core scenery, non-interactive, no shadow.
+  //     RICH, HEIGHT-DRIVEN look (replaces the old blue-dominant ramp). The body colour is a WARM
+  //     gradient — sand/taupe at street level, amber/ochre in the mid-rise, bright gold for the tall
+  //     mat — so the massing reads as a premium, varied cityscape rather than a flat blue carpet.
+  //     Blue/purple survive ONLY as a sparing cool accent on the tallest landmarks / in-catchment key
+  //     buildings, never as the body colour.
+  //
+  //     HEIGHT DRAMA (visual only — the data h is never mutated): two render-side transforms make the
+  //     low-rise variation legible even where the city is genuinely flat (Rayong p90 is just ~9m):
+  //       (a) a PER-CITY percentile normalisation (p5..p95) of height -> the colour ramp uses the
+  //           building's RANK within this city, so a narrow 3-13m spread still travels the full warm
+  //           ramp instead of bunching at the dark end;
+  //       (b) a non-linear elevation exaggeration so the few taller structures punch above the mat.
+  const DARK=darkMode(), LIGHT=lightMode();
+  // deterministic per-building hash in [0,1) from its centroid — gives stable variation, no Math.random churn.
+  const jit=b=>{const s=Math.sin((b.cx||0)*12.9898+(b.cy||0)*78.233)*43758.5453;return s-Math.floor(s);};
+  // per-type WARM tints (used to nudge the body hue by use) — kept warm/neutral, no dominant blue.
+  const TINT={residential:[206,176,128],commercial:[230,182,96],hotel:[228,150,86],
+    industrial:[178,138,112],office:[214,168,108],school:[196,176,150]};
+  // ---- PER-CITY height normalisation (visual transform; data untouched) ----
+  // Robust p5/p95 of the rendered building heights, computed ONCE, so the colour ramp + height-shade
+  // are relative to THIS city's range. A flat low-rise city (Rayong) and a tall one (Bangkok) each
+  // spread across the full warm ramp; similar heights still differentiate because they map to
+  // different ranks. One sort of the rendered set — cheap.
+  // COLOUR height = the PRE-jitter original (h0) where the flat-mat guard set it, else b.h. So the
+  // hue mat stays calm even though roof ELEVATION carries the ±22% jitter — the reference's recipe.
+  const hc=b=>(b.h0!=null?b.h0:(b.h||4));
+  let H_LO=0, H_HI=20;
+  if(BUILDINGS&&BUILDINGS.length){
+    const hs=BUILDINGS.map(hc).sort((a,b)=>a-b);
+    H_LO=hs[Math.floor(hs.length*0.05)]||0;
+    H_HI=hs[Math.floor(hs.length*0.95)]||20;
+    if(H_HI<=H_LO)H_HI=H_LO+1;   // guard a degenerate flat distribution
+  }
+  // height -> [0,1] rank within the city's p5..p95 band (clamped). The colour + shade driver.
+  const hNorm=b=>{let t=(hc(b)-H_LO)/(H_HI-H_LO);t=t<0?0:t>1?1:t;return Math.pow(t,0.72);};  // gamma<1 lifts mid/tall into amber/gold so a dense low-rise mat doesn't bunch at the dark end
+  // ---- selective accent (SPARING cool punctuation) ----
+  // The cool accent (collateral purple #7A4FE0 + accent blue #5B7CFA) is reserved for genuine
+  // LANDMARKS only — the tallest decile (95th+ pct gets purple, 90-95th gets blue). NOT the whole
+  // in-catchment core (the 10km ring covers nearly the entire Mueang-Rayong scene, so accenting it
+  // would re-create the old "blue carpet"). The body is always the warm ramp; the accent is a few
+  // towers that punctuate the skyline, on BOTH light and dark bases.
+  const PURP=[122,79,224], BLUE=[91,124,250];
+  let tallThresh=Infinity, vtallThresh=Infinity;
+  if(BUILDINGS&&BUILDINGS.length){
+    const hs2=BUILDINGS.map(hc).sort((a,b)=>a-b);
+    tallThresh=Math.max(hs2[Math.floor(hs2.length*0.92)]||Infinity,20);   // p92 BUT floored at 20m: in low-rise cities p92~13m gave ~14k houses the dark accent (confetti). Only real towers punctuate.
+    vtallThresh=Math.max(hs2[Math.floor(hs2.length*0.98)]||Infinity,30); // p98 floored at 30m: the very tallest -> purple crown; adapts upward in tall cities
+  }
+  // is a building inside the focal branch's 10km catchment? (cheap squared-degree test on centroid).
+  // Used ONLY for a subtle warm brightness lift in light mode (NOT a colour swap) so the in-reach
+  // core reads a touch warmer/brighter without flooding the scene cool.
+  const inFocalRing=b=>{ if(!focal)return false;
+    const dy=(b.cy-focal.y)*111320, dx=(b.cx-focal.x)*111320*Math.cos(focal.y*Math.PI/180);
+    return (dx*dx+dy*dy)<=(10000*10000); };
+  const isLandmark=b=>hc(b)>=tallThresh;   // tallest decile = skyline punctuation, on the CALM pre-jitter height (both bases)
+  // 3-colour-stop WARM ramp evaluated at rank t in [0,1] (returns rgb). Light + dark variants.
+  // low = warm sand/taupe, mid = warm amber/ochre, high = bright gold.
+  const RAMP_DARK=[[18,15,12],[168,110,44],[255,214,120]];      // widened travel: deep base -> hotter ochre -> blazing gold crown (mat->skyline value separation)
+  const RAMP_LIGHT=[[193,184,167],[174,164,146],[120,107,90]];   // gray-beige mat a CLEAR step below the cream bed [241,238,231] (~50 L gap = real figure-ground), compressed low travel so it stays one uniform mass; umber/dark only at the landmark decile — the reference recipe
+  const rampAt=(stops,t)=>{const seg=t<.5?0:1, lt=t<.5?t*2:(t-.5)*2;
+    const a=stops[seg],b2=stops[seg+1];
+    return [a[0]+(b2[0]-a[0])*lt,a[1]+(b2[1]-a[1])*lt,a[2]+(b2[2]-a[2])*lt];};
+  if(STREAMB)L.push(STREAMB);   // streamed national tiles render in the building slot...
+  // Curated core ALWAYS draws (the stream is a fringe-filler around it, never a replacement —
+  // and a dead stream therefore can never blank the city).
+  if(BUILDINGS&&BUILDINGS.length)L.push(new deck.PolygonLayer({id:'bldg',data:BUILDINGS,extruded:true,wireframe:false,  // ...else the curated catchment
+    getPolygon:b=>b.p,
+    // exaggerate height non-linearly: low-rise stays grounded, mid/tall get stretched so the skyline
+    // separates. Visual only — getElevation never writes back to b.h.
+    getElevation:b=>{const h=b.h||4;return h<=13?h*1.1:13*1.1+(h-13)*4.0;},  // CONTINUOUS curve (no discontinuity for the ±22% jitter to straddle): low-rise stays a uniform barely-extruded mat, only genuine towers punch up
+    getFillColor:b=>{
+      const t=hNorm(b);                         // rank within this city's height band [0,1]
+      const clamp=v=>Math.max(0,Math.min(255,Math.round(v)));
+      const h=hc(b);                            // calm pre-jitter height for the accent-tier split
+      // ---- SPARING cool accent: tallest decile only (the body stays warm everywhere else) ----
+      // The very tallest (97th+ pct) get the collateral purple crown; the rest of the top decile a
+      // blue accent. Both bases. A handful of towers, not the whole core -> no blue carpet.
+      if(isLandmark(b)){
+        // light mode: towers go DARK BROWN like the reference render — the cool purple/blue crown
+        // reads as clutter on the paper-white base. Dark mode keeps the cool accents.
+        const acc=LIGHT?((h>=vtallThresh)?[84,66,46]:[112,92,64]):((h>=vtallThresh)?PURP:BLUE);
+        const g0=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,1);    // gold top of the warm ramp
+        // blend the gold crown toward the cool accent; lighter blend on the light base so it stays tasteful.
+        const w=LIGHT?0.55:0.30;   // stronger pull in light mode: the ramp top is now light, towers must darken past it   // accent weight: landmarks read as a clean cool/gold TIP, not a smear
+        const j=(jit(b)-0.5)*(LIGHT?10:14);
+        const r=g0[0]*(1-w)+acc[0]*w, g=g0[1]*(1-w)+acc[1]*w, bl=g0[2]*(1-w)+acc[2]*w;
+        return [clamp(r+j),clamp(g+j),clamp(bl+j),LIGHT?255:240];
+      }
+      // ---- warm body: sand/taupe -> amber/ochre -> gold along the height rank ----
+      const j=(jit(b)-0.5)*(LIGHT?4:22);   // light: ±4 not ±12 — a calm mat, not per-house speckle
+      const m=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,t);
+      let r=m[0]+j, g=m[1]+j, bl=m[2]+j;
+      // light-mode only: a subtle WARM brightness lift for in-reach buildings (not a colour swap).
+      if(LIGHT&&inFocalRing(b)){r+=10; g+=7; bl+=2;}
+      const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
+      if(c){const cw=LIGHT?0.3:0.18; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}  // dark tint weight 0.32->0.18: let the height ramp dominate the hue (was muddying towers)
+      // HARD anti-white ceiling: soft lighting now multiplies these (max ~0.86), so a face cannot
+      // approach white. Cap 216 in light -> brightest lit face 216*0.86≈186, huge margin below 255
+      // even if a GPU renders brighter than headless. This DATA cap is the whiteout backstop.
+      const cap=LIGHT?216:255;
+      return [Math.min(cap,clamp(r)),Math.min(cap,clamp(g)),Math.min(cap,clamp(bl)),LIGHT?255:236];},
+    // Light-mode stroke is WARM DARK, not cool gray-blue: at city zoom a Thai shophouse footprint
+    // is 1–4 px, so the stroke IS the visible building — a light cool outline over 180k tiny
+    // footprints reads as a frosted white carpet. Dark warm outlines keep the mat warm + defined.
+    stroked:true,getLineColor:LIGHT?(b=>isLandmark(b)?[122,106,86,205]:[164,156,144,150]):(DARK?[28,22,14,210]:[120,110,90,150]),getLineWidth:1.4,lineWidthMinPixels:0.6,
+    // SOFT NON-SHADOW SHADING (DataProteins realism): walls read a touch darker than sun-facing
+    // roofs. specular ZEROED (the old view-dependent term that spiked white under orbit). Bounded
+    // by construction: material.ambient 0.6 + diffuse 0.42; with the effect's light intensities the
+    // max multiplier is ~0.86, applied to fills DATA-capped at 216 -> brightest face ~186, so no GPU
+    // can whiteout. NO shadow pass (shadowEnabled false) — that pass, not this, caused the old blowout.
+    material:{ambient:0.60,diffuse:0.42,shininess:0,specularColor:[0,0,0]},
+    shadowEnabled:SHADOWS_ON,
+    parameters:{depthTest:true},transitions:{getElevation:600},pickable:false,
+    updateTriggers:{getFillColor:[DARK,LIGHT,focal,tallThresh,vtallThresh,H_LO,H_HI],getLineColor:[DARK,LIGHT,tallThresh]}}));
+  // (4) color-coded POIs — one ColumnLayer per type (short EXTRUDED hexagonal stubs, not flat dots),
+  //     each toggleable; POIS items are [lat,lng] (optionally [lat,lng,name]). The little 3D pegs read
+  //     as granular detail standing on the ground between the buildings. Capped short so they don't
+  //     clutter or hide the skyline; collateral types (vehicle/gold) stand a touch taller to pop.
+  // Rendered as LOW, SOFT, TRANSLUCENT round nubs (not tall bright hex sticks) so dense POI read as a
+  // calm colored TEXTURE hugging the ground between buildings — the "dense yet soothing" DataProteins
+  // feel — instead of a garish forest of markers. Collateral types (vehicle/gold) sit a hair taller
+  // to stay findable. Flat (material:false) + no hard outline + translucent = they recede, buildings win.
+  const POI_ELEV={vehicle_commerce:11,gold:11,bank:8,fresh_market:7,supermarket:7,
+    industrial:8,convenience:6,restaurant:5,hotel:7,school:6,pharmacy:6,
+    professional:6,personal:5,logistics:6,construction:5,publicsvc:6};
+  POI_TYPES.forEach(t=>{ if(!poiOn[t])return;
+    const c=POI_COLORS[t], e=POI_ELEV[t]||6;
+    L.push(new deck.ColumnLayer({id:'poi-'+t,data:poiGet(t),
+      getPosition:p=>[p[1],p[0]],
+      diskResolution:12, radius:19, radiusUnits:'meters', radiusMinPixels:1.2, radiusMaxPixels:7,
+      extruded:true, elevationScale:1, getElevation:e,
+      getFillColor:[c[0],c[1],c[2],LIGHT?150:180],   // translucent so overlapping nubs blend into a soft mat
+      stroked:false,                                   // no hard dark outline (that was the "very visible" pop)
+      material:false,                                  // flat/unlit — calm little dots, no specular highlight
+      shadowEnabled:false,
+      parameters:{depthTest:true},
+      pickable:true,_poiType:t}));
+  });
+  // (5) competitors — MEASURED rival branches IN the scene (curated for Rayong, else national census
+  //     filtered to the city bbox). A brand-coloured 3D ColumnLayer "peg" makes each rival stand up
+  //     in the city (and cast a shadow, grounding it), with the flat dot kept for crisp read at any
+  //     zoom. Both null-safe: compScene() is [] when no competitor data exists for the city.
+  const COMPS=compVisible();
+  // (5a) RIVAL GROUND (LANE 3D-2) — optional translucent 1.5km discs under each visible rival, brand-
+  //      coloured, so contested corridors read as overlapping territory. Flat ground polygons (like the
+  //      isochrone bands: depthTest off) drawn UNDER the pegs. OFF by default for poster cleanliness.
+  if(showRivalGround && deck.PolygonLayer && COMPS.length){
+    const gA=(document.documentElement.dataset.theme==='dark')?40:26;   // fill alpha: dark 40 / light 26
+    L.push(new deck.PolygonLayer({id:'rival-ground',data:COMPS,getPolygon:d=>circle(d.lat,d.lng,1500),
+      extruded:false,stroked:true,filled:true,
+      getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],gA];},
+      getLineColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],Math.min(255,gA+80)];},
+      lineWidthMinPixels:1,parameters:{depthTest:false},pickable:false}));
+  }
+  if(deck.ColumnLayer && COMPS.length){
+    L.push(new deck.ColumnLayer({id:'comp-peg',data:COMPS,getPosition:d=>[d.lng,d.lat],
+      diskResolution:8, radius:55, radiusUnits:'meters',
+      extruded:true, elevationScale:1, getElevation:115,
+      getFillColor:d=>{const c=BRAND[d.brand]||[150,150,150];return [c[0],c[1],c[2],235];},
+      stroked:true, getLineColor:[245,247,252,235], lineWidthMinPixels:0.6,
+      material:{ambient:0.42,diffuse:0.40,shininess:40,specularColor:[0,0,0]},  // was the worst blow-out: near-white specular on orbit
+      shadowEnabled:SHADOWS_ON,
+      parameters:{depthTest:true}, pickable:true}));
+  }
+  L.push(new deck.ScatterplotLayer({id:'comp',data:COMPS,getPosition:d=>[d.lng,d.lat],
+    getRadius:95,radiusMinPixels:7,radiusMaxPixels:15,stroked:true,getLineColor:[210,210,220,255],lineWidthMinPixels:2.0,
+    getFillColor:d=>BRAND[d.brand]||[150,150,150],pickable:true}));
+  // (6) AutoX branches (all of this province's branches) — selected one is white
+  L.push(new deck.ScatterplotLayer({id:'branches',data:BR,getPosition:d=>[d.x,d.y],
+    getRadius:130,radiusMinPixels:6,radiusMaxPixels:13,stroked:true,getLineColor:[40,28,8,255],lineWidthMinPixels:1.6,
+    getFillColor:d=>d===focal?[255,255,255,255]:[224,169,59,255],pickable:true,
+    updateTriggers:{getFillColor:[focal]}}));
+  // (7) SELECTED-branch label. NOT a deck.gl TextLayer: deck.gl lays each Unicode codepoint side by
+  //     side with no complex-script shaping, so Thai vowels/tone marks (which must stack on the base
+  //     consonant) scatter and the name renders garbled. Instead an HTML pill (#focalLabel) tracks the
+  //     branch's projected screen position — the browser shapes Thai correctly. updateFocalLabel()
+  //     runs on every view change + after each paint (see onViewStateChange / onAfterRender).
+  const onLight=lightMode();
+  // competitor pills — brand-coloured chip + brand initial glyph; white text reads on the chip
+  L.push(new deck.TextLayer({id:'comp-labels',data:COMPS,getPosition:d=>[d.lng,d.lat],
+    getText:d=>(d.brand||'?').charAt(0),getSize:9.5,getColor:[255,255,255,255],
+    getBackgroundColor:d=>[...(BRAND[d.brand]||[120,120,120]),240],
+    getBorderColor:[255,255,255,210],getBorderWidth:onLight?1:0,
+    background:true,backgroundPadding:[5,3,5,3],getPixelOffset:[0,-16],
+    fontFamily:'IBM Plex Sans Thai',fontWeight:700,
+    getTextAnchor:'middle',getAlignmentBaseline:'bottom',characterSet:'auto',sizeUnits:'pixels',
+    updateTriggers:{getBorderWidth:[onLight]}}));
+  // landmark pills — soft chip; light-aware so they stay legible on the white base
+  L.push(new deck.TextLayer({id:'land',data:CA.landmarks||[],getPosition:d=>[d.cx,d.cy],getText:d=>'★ '+d.nm,
+    getSize:10,getColor:onLight?[60,52,30,255]:[255,255,255,255],
+    getBackgroundColor:onLight?[255,255,255,235]:[70,52,30,225],
+    getBorderColor:[170,140,80,220],getBorderWidth:onLight?1:0,
+    background:true,backgroundPadding:[6,3,6,3],fontFamily:'IBM Plex Sans Thai',fontWeight:600,
+    getTextAnchor:'middle',characterSet:'auto',sizeUnits:'pixels',pickable:true,
+    updateTriggers:{getColor:[onLight],getBackgroundColor:[onLight],getBorderWidth:[onLight]}}));
+  // (8) satellite place-name overlay — TOP of the stack so labels read over the dark photo (Upgrade 4).
+  //     Only present in satellite mode; null otherwise. depthTest off so it isn't culled by buildings.
+  const labelLyr=labelOverlayLayer(); if(labelLyr)L.push(labelLyr);
+  // (9) transient search-highlight ring — locator dropped by the in-scene search, pulses outward and
+  //     fades over ~4s. depthTest:false so it always reads on top of buildings (a "look here" cue).
+  if(_hilite){
+    const age=Math.min(1,Math.max(0,(_now()-_hilite.t0)/HILITE_MS));
+    const ease=1-age, a=Math.round(255*ease*ease), c=_hilite.color, rad=300*(1+0.9*age);
+    L.push(new deck.PolygonLayer({id:'search-hilite',data:[_hilite],
+      getPolygon:h=>circle(h.lat,h.lng,rad),extruded:false,stroked:true,filled:true,
+      getFillColor:[c[0],c[1],c[2],Math.round(a*0.16)],getLineColor:[c[0],c[1],c[2],a],
+      lineWidthMinPixels:3,lineWidthMaxPixels:5,pickable:false,
+      parameters:{depthTest:false},
+      updateTriggers:{getPolygon:[age,c],getFillColor:[age,c],getLineColor:[age,c]}}));
+  }
+  // POSTER MODE: strip every overlay (POI columns, comp pegs/dots, rings, branch dots, all labels,
+  // districts, isochrone, the search ring) so ONLY the ground bed + extruded buildings remain.
+  const LF=posterMode?L.filter(l=>l&&posterKeep(l.id)):L;
+  deckgl.setProps({layers:LF,
+    onClick:({object,layer})=>{if(layer&&layer.id==='branches'&&object){selectBranch(object,false);}}});
+  try{updateFocalLabel();}catch(e){}   // reposition the HTML branch pill whenever layers/focal change
+}
+// which deck layer ids survive Poster mode: buildings (curated + streamed) + the ground scaffolding
+// (base tiles, land-use, water, roads, rail, trees). Everything else is an overlay and is dropped.
+function posterKeep(id){ if(!id)return false;
+  return id==='bldg'||id==='stream-bldg'||id==='base'||id==='sat-labels'||
+    /^(ground|landuse|water|roads|rail|trees)/.test(id); }
+
+/* ---------- panels ---------- */
+function fmt(n){return n.toLocaleString();}
+function poiArr(t){return poiGet(t);}
+function rgb(c){return `rgb(${c[0]},${c[1]},${c[2]})`;}
+
+// province workforce (MEASURED, NSO via gov.employment) — informal share is the core title-loan base
+const EMP=(PROV.gov&&PROV.gov.employment)||null;
+// district DIW factory-worker count (MEASURED, DIW) from the district polygons (real_workers)
+function districtWorkers(d){
+  if(!DISTRICTS||!DISTRICTS.features)return null;
+  const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
+  return f&&f.properties.real_workers!=null?f.properties.real_workers:null;
+}
+
+// "Within 10km" — three lender-oriented groups; every count is k10 (measured OSM).
+const K10_GROUPS=[
+  ['Collateral & finance',[
+    ['veh','Auto / vehicle shops','vehicle_commerce'],
+    ['gold','Gold dealers','gold'],
+    [['bank','atm'],'Banks + ATMs','bank']]],
+  ['Commerce & retail',[
+    ['fmkt','Fresh markets','fresh_market'],
+    ['super','Supermarkets','supermarket'],
+    ['cvs','Convenience','convenience'],
+    ['rest','Restaurants','restaurant']]],
+  ['Industry & services',[
+    ['ind','Factories','industrial'],
+    ['hotel','Hotels','hotel'],
+    ['sch','Schools','school'],
+    ['pharm','Pharmacies','pharmacy']]],
+];
+// establishment-mix → occupation proxy (ESTIMATED). keys sum k10 fields; color borrows the POI palette.
+const OCC=[
+  ['Factory / production',['ind'],'industrial'],
+  ['Market vendors & retail',['fmkt','super','cvs'],'fresh_market'],
+  ['Auto trade & mechanics',['veh'],'vehicle_commerce'],
+  ['Food service',['rest'],'restaurant'],
+  ['Hospitality / tourism',['hotel'],'hotel'],
+  ['Gold / pawn & finance',['gold','bank'],'gold'],
+  ['Education',['sch'],'school'],
+  ['Healthcare',['pharm'],'pharmacy'],
+  ['Public sector',['civic'],'school'],
+];
+// MEASURED occupation mix (Overture Places) — branch_occupations.json is INDEX-ALIGNED to
+// data/branches.json (the national 2,015), not to this page's province branch list. So to read
+// the measured mix for the focal AutoX branch we match its coordinates to the nearest national
+// branch and use that index. rgb colour per bucket key (parity with branch-explorer's palette).
+const OCC_BUCKET_COL={factory:[122,79,224],auto:[122,79,224],retail:[28,140,125],food:[230,180,80],
+  hospitality:[230,180,80],finance:[200,67,59],health:[91,124,250],education:[91,124,250],
+  public:[138,148,168],professional:[91,124,250],agriculture:[200,67,59],personal:[28,140,125],
+  logistics:[138,148,168],construction:[230,180,80]};
+// → the measured occupation entry for a focal branch, or null when the layer/branch is absent.
+// Matches focal (x=lng,y=lat) to the nearest national branch within ~1.5km, then reads its rollup.
+function measuredOcc(f){
+  var OD=window.OCCDATA, NB=window.NATBRANCHES;
+  if(!f||!OD||!OD.branches||!OD.buckets||!NB||!NB.length) return null;
+  if(f.x==null||f.y==null) return null;
+  var bi=-1, bd=Infinity;
+  for(var i=0;i<NB.length;i++){ var b=NB[i]; if(b.x==null||b.y==null) continue;
+    var dd=hav(f.y,f.x,b.y,b.x); if(dd<bd){bd=dd;bi=i;} }
+  if(bi<0||bd>1500) return null;            // no national branch within 1.5km → don't fabricate a match
+  var e=OD.branches[bi]; return (e&&e.t>0)?e:null;
+}
+// → sorted, non-empty {lab,col,v} rows for a measured occupation entry (top buckets first).
+function OCC_BUCKETS_FROM(e){
+  var bk=window.OCCDATA.buckets;
+  return bk.map(function(b,j){return {lab:b.label,col:OCC_BUCKET_COL[b.key]||[138,148,168],v:(e.o&&e.o[j])||0};})
+    .filter(function(r){return r.v>0;}).sort(function(a,b){return b.v-a.v;});
+}
+// → the reflective WORKFORCE entry (branch_workforce.json) for the focal branch, matched to the
+// nearest national branch (same ≤1.5km rule as measuredOcc). Returns {w,mix,top,dom,t} or null.
+function workforceOcc(f){
+  var WD=window.WFDATA, NB=window.NATBRANCHES;
+  if(!f||!WD||!WD.branches||!WD.buckets||!NB||!NB.length||f.x==null||f.y==null) return null;
+  var bi=-1, bd=Infinity;
+  for(var i=0;i<NB.length;i++){ var b=NB[i]; if(b.x==null||b.y==null) continue;
+    var dd=hav(f.y,f.x,b.y,b.x); if(dd<bd){bd=dd;bi=i;} }
+  if(bi<0||bd>1500) return null;
+  var e=WD.branches[bi]; return (e&&e.t>0)?e:null;
+}
+// → sorted {lab,col,people,pct} rows for a workforce entry (top buckets first).
+function WF_BUCKETS_FROM(e){
+  var bk=window.WFDATA.buckets;
+  return bk.map(function(b,j){return {lab:b.label,col:OCC_BUCKET_COL[b.key]||[138,148,168],
+      people:(e.w&&e.w[j])||0,pct:(e.mix&&e.mix[j])||0};})
+    .filter(function(r){return r.people>0;}).sort(function(a,b){return b.people-a.people;});
+}
+
+// ---- Call-sheet export (leads panel) --------------------------------------------------------
+// ALL leads for the focal branch, flattened from occupation_leads.json (window.OCCLEADS —
+// MEASURED Overture Places; lead = [bucket_idx, name, phone, dist_km], already grouped by bucket
+// then nearest-first). Returns [{occ,name,phone,km}] or null when the layer/branch is absent.
+function callSheetRows(){
+  if(!focal)return null;
+  const idx=branchPopIndex(focal); const LD=window.OCCLEADS, BK=window.OCCLEADS_BUCKETS;
+  if(!LD||idx<0||!LD[idx]||!LD[idx].L||!LD[idx].L.length||!BK)return null;
+  return LD[idx].L.map(function(e){
+    return {occ:(BK[e[0]]&&BK[e[0]].label)||'—', name:e[1]||'', phone:e[2]||'', km:(e[3]!=null&&isFinite(+e[3]))?+e[3]:null};});
+}
+// Blob-CSV of every lead near the focal branch — occupation, name, phone, distance. Client-side
+// only (no new data files); UTF-8 BOM so Thai names open cleanly in Excel.
+function callSheetCSV(){
+  const rows=callSheetRows(); if(!rows||!rows.length)return;
+  const bn=(focal&&focal.n)||CITY_LABEL;
+  const hdr=['occupation','name','phone','distance_km'];
+  const lines=[hdr.join(',')].concat(rows.map(function(r){
+    return [r.occ,r.name,r.phone,(r.km!=null?r.km.toFixed(1):'')]
+      .map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}).join(',');}));
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='autox_call_sheet_'+String(bn).replace(/[^\w\u0E00-\u0E7F-]+/g,'_')+'.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+// Printable call sheet: a minimal print-styled popup (branch name + date header, leads grouped
+// by occupation). Same measured rows as the CSV; popup-blocked → silently no-op.
+function callSheetPrint(){
+  const rows=callSheetRows(); if(!rows||!rows.length)return;
+  const bn=(focal&&focal.n)||CITY_LABEL;
+  const esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  const d=new Date();
+  const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  let body='', cur=null;
+  rows.forEach(function(r){
+    if(r.occ!==cur){cur=r.occ; body+='<tr class="grp"><td colspan="3">'+esc(cur)+'</td></tr>';}
+    body+='<tr><td>'+esc(r.name)+'</td><td class="ph">'+(r.phone?esc(r.phone):'—')
+      +'</td><td class="km">'+(r.km!=null?r.km.toFixed(1)+' km':'')+'</td></tr>';});
+  const w=window.open('','_blank'); if(!w)return;
+  // NOTE: assembled from parts; never emit a literal closing-script sequence inside this block.
+  const doc=['<!doctype html><html><head><meta charset="utf-8">',
+    '<title>Call sheet · '+esc(bn)+'</title>',
+    '<style>',
+    "body{font:13px/1.5 'IBM Plex Sans Thai','IBM Plex Sans',system-ui,sans-serif;color:#111;background:#fff;margin:26px}",
+    'h1{font-size:17px;margin:0 0 2px}',
+    '.sub{color:#555;font-size:11px;margin:0 0 14px}',
+    'table{width:100%;border-collapse:collapse}',
+    'td{padding:4px 8px;border-bottom:1px solid #ddd;font-size:12px;vertical-align:baseline}',
+    'tr.grp td{background:#f0f2f6;font-weight:700;padding-top:8px;font-size:11px;text-transform:uppercase;letter-spacing:.4px}',
+    ".ph{font-family:'IBM Plex Mono',monospace;white-space:nowrap}",
+    '.km{text-align:right;color:#555;white-space:nowrap}',
+    '.prov{color:#777;font-size:10px;margin-top:12px}',
+    '@page{margin:14mm}',
+    '@media print{tr.grp td{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}}',
+    '</style></head><body>',
+    '<h1>Call sheet · '+esc(bn)+'</h1>',
+    '<div class="sub">เงินไชโย · leads to call by occupation ≤10 km · printed '+ds+' · '+rows.length+' leads</div>',
+    '<table>'+body+'</table>',
+    '<div class="prov">Measured Overture Maps Places — names &amp; phones as published (a lower bound, not a census). Distances from the branch coordinate.</div>',
+    '</body></html>'].join('');
+  w.document.write(doc); w.document.close(); w.focus();
+  setTimeout(function(){try{w.print();}catch(e){}},300);
+}
+
+function updatePanels(){
+  // No branch data (a city without a province file) — leave the analysis panels in their empty state.
+  if(!focal){
+    // City with buildings but no branch/analysis stack (e.g. Bangkok): give it a real title and a
+    // single confident note — don't leave an em-dash title and orphan empty section headers ("looks broken").
+    const fn=document.getElementById('focalName'); if(fn)fn.textContent=CITY_LABEL;
+    const fs=document.getElementById('focalSub'); if(fs)fs.textContent='3D massing view — branch & competitor overlays roll out next';
+    const k10host=document.getElementById('k10panel');
+    if(k10host)k10host.innerHTML='<div class="foot">3D buildings & ground for this city. This province has no AutoX branches in the tape yet — the branch, 10&nbsp;km reach and POI panels populate wherever branches exist.</div>';
+    const whost=document.getElementById('workpanel'); if(whost)whost.innerHTML='';
+    const workH=document.getElementById('workH'); if(workH)workH.style.display='none';  // hide the orphan empty header
+    return;
+  }
+  // a branch IS selected — make sure the (possibly hidden) left header is visible
+  const workHv=document.getElementById('workH'); if(workHv)workHv.style.display='';
+  const dist=focal.d||(CA.meta&&CA.meta.dist)||CITY_LABEL;
+  const k=focal.k10||null;
+  document.getElementById('focalName').textContent=focal.n||'AutoX branch';
+  document.getElementById('focalSub').textContent=`เงินไชโย · ${dist} · vehicle shops ${focal.veh!=null?focal.veh:'—'}`;
+
+  // (C) "Within 10km of <branch>" — measured counts, grouped for a lender
+  const k10host=document.getElementById('k10panel');
+  if(!k){
+    k10host.innerHTML='<div class="foot">Select an AutoX branch from the cascade or map to see its measured 10km surroundings.</div>';
+  }else{
+    const sum=ks=>ks.reduce((a,kk)=>a+(k[kk]||0),0);
+    // headline the catchment: PEOPLE (district population, MEASURED NSO) + total ESTABLISHMENTS
+    // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
+    const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
+    const pop=branchPop(focal);
+    const popMeas=(pop&&pop.scope==='10km'&&window.BRANCHPOP_MEAS);   // 10km figure from the WorldPop raster
+    const popScope=pop&&pop.scope==='10km'?'people ≤10km':'people in district';
+    const popTag=popMeas?'<span class="tag meas">WorldPop</span>'
+      :(pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>');
+    const headline=`<div class="cat10">`
+      +`<div class="c pop"><div class="n">${pop?fmt(pop.v):'—'}</div>`
+      +`<div class="l">${pop?popScope:'people · n/a'} ${pop?popTag:''}</div></div>`
+      +`<div class="c poi"><div class="n">${fmt(totalPOI)}</div>`
+      +`<div class="l">establishments ≤10km <span class="tag meas">OSM</span></div></div>`
+      +`</div>`;
+    k10host.innerHTML=headline+K10_GROUPS.map(([gh,rows])=>
+      `<div class="kgrp"><div class="gh">${gh}</div>`+rows.map(([key,lab,col])=>{
+        const v=Array.isArray(key)?sum(key):(k[key]||0);
+        const c=POI_COLORS[col]||[138,148,168];
+        return `<div class="krow"><span class="sw" style="background:${rgb(c)}"></span><span class="lab">${lab}</span><b>${fmt(v)}</b></div>`;
+      }).join('')+`</div>`).join('')
+      +`<div class="foot">Establishments = points mapped in OpenStreetMap within a 10&nbsp;km radius of this branch (measured, a lower bound). Population ≤10&nbsp;km = ${popMeas?'WorldPop 2020 gridded population (1&nbsp;km, UN-adjusted) summed over the 10&nbsp;km circle — measured':'measured UNFPA/NSO district populations area-weighted over the circle — estimated'}.</div>`;
+  }
+
+  // (D) "Who works nearby" — measured workforce + estimated occupation-mix proxy
+  const whost=document.getElementById('workpanel');
+  let html='';
+  if(EMP){
+    const inf=EMP.informal||0, frm=EMP.formal||0, tot=inf+frm;
+    const share=tot?Math.round(inf/tot*100):0;
+    html+='<div class="wbox">'
+      +`<div class="big">${share}%</div><div class="cap">of Rayong workers are informal — the core title-loan base <span class="tag meas">measured · NSO</span></div>`
+      +`<div class="wr"><span class="k">Informal workers</span><span class="v">${fmt(inf)}</span></div>`
+      +`<div class="wr"><span class="k">Formal workers</span><span class="v">${fmt(frm)}</span></div>`;
+    const dw=districtWorkers(dist);
+    if(dw!=null)html+=`<div class="wr"><span class="k">DIW factory workers <small>(${dist})</small></span><span class="v">${fmt(dw)}</span></div>`;
+    html+='</div>';
+  }
+  // WHO WORKS HERE — the reflective WORKFORCE mix (branch_workforce.json) is the PRIMARY read:
+  // farmers surface where they truly are (SPAM cropland × OAE area × NSO anchor), not buried under
+  // storefronts. The Overture establishment mix is DEMOTED to a secondary "Businesses & services
+  // nearby" block. When neither layer covers this branch, fall back to the estimated OSM proxy.
+  const wfEntry=workforceOcc(focal);
+  const occEntry=measuredOcc(focal);
+  if(wfEntry){
+    const rows=WF_BUCKETS_FROM(wfEntry).slice(0,8);
+    const mx=rows.length?rows[0].pct:1;
+    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix — who works here <span class="tag est">estimated</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const badge=`<b>${fmt(r.people)} <span style="color:var(--dim);font-weight:500">· ${r.pct}%</span></b>`;
+        return `<div class="or"><div class="ot">${r.lab}${badge}</div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.pct/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">≈ ${fmt(wfEntry.t||0)} workers ≤10&nbsp;km by occupation — ESTIMATED: farmers from SPAM cropland × OAE planted area anchored to the NSO ~12M agri workforce; factory workers DIW; storefront occupations Overture × headcount. A reflective mix, not a census.</div>`;
+  }
+  if(occEntry){
+    const allRows=OCC_BUCKETS_FROM(occEntry), rows=allRows.slice(0,8);
+    const tot=allRows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    html+=`<h2 style="padding:${wfEntry?'10px':'0'} 0 4px;margin-top:2px">Businesses & services nearby <span class="tag meas">measured · Overture</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const pct=Math.round(r.v/tot*100);
+        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(r.col)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">${fmt(occEntry.t||0)} establishments ≤10&nbsp;km by category (Overture Places — storefronts, a sample/lower bound). ${wfEntry?'The workforce mix above is the who-works-here read.':''}</div>`;
+  }
+  if(!wfEntry&&!occEntry&&k){
+    const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
+      .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const tot=rows.reduce((a,r)=>a+r.v,0)||1, mx=rows.length?rows[0].v:1;
+    html+=`<h2 style="padding:0 0 4px;margin-top:2px">Occupation mix <span class="tag est">estimated · proxy</span></h2>`
+      +`<div class="occ">`+rows.map(r=>{
+        const c=POI_COLORS[r.col]||[138,148,168], pct=Math.round(r.v/tot*100);
+        return `<div class="or"><div class="ot">${r.lab}<b>${pct}%</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:${rgb(c)}"></i></div></div>`;
+      }).join('')+`</div>`
+      +`<div class="foot">Estimated from the mix of establishments within 10 km (OSM) — a proxy for who works locally, not a headcount.</div>`;
+  }
+  // NAMED occupation leads — the actual businesses to CALL near this branch, by occupation
+  // (occupation_leads.json, MEASURED Overture Places name+phone). The reframed core objective made
+  // actionable. Null-guarded: renders nothing when the layer/branch is absent.
+  (function(){
+    const idx=branchPopIndex(focal); const LD=window.OCCLEADS, BK=window.OCCLEADS_BUCKETS;
+    if(!LD||idx<0||!LD[idx]||!LD[idx].L||!LD[idx].L.length||!BK)return;
+    const byB={}; LD[idx].L.forEach(function(e){(byB[e[0]]=byB[e[0]]||[]).push(e);});
+    const order=Object.keys(byB).map(Number).sort(function(a,b){return byB[b].length-byB[a].length;});
+    html+=`<h2 style="padding:12px 0 4px;margin-top:6px">Leads to call · by occupation <span class="tag meas">measured · Overture</span></h2>`
+      +order.slice(0,6).map(function(bi){
+        const lab=(BK[bi]&&BK[bi].label)||'—', items=byB[bi].slice(0,2);
+        return `<div style="margin:5px 0"><div style="font-size:11px;color:var(--mid);font-weight:600;margin-bottom:2px">${lab}</div>`
+          +items.map(function(e){
+            const nm=e[1], phr=(e[2]||'').replace(/\s/g,'');
+            return `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:1px 0;align-items:baseline">`
+              +`<span style="color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm}</span>`
+              +(phr?`<a href="tel:${phr}" style="font-family:'IBM Plex Mono';color:var(--accent);text-decoration:none;white-space:nowrap">${e[2]}</a>`:`<span class="sub" style="white-space:nowrap;font-size:10px">no phone</span>`)
+              +`</div>`;
+          }).join('')+`</div>`;
+      }).join('')
+      +`<div class="foot">Nearest named establishments by occupation ≤10&nbsp;km — Overture Places (measured, a lower bound). Phones as published; tap to call.</div>`
+      +`<div class="cshrow"><button id="cshCsv" type="button">⬇ Download call sheet (CSV)</button>`
+      +`<button id="cshPrint" type="button">🖨 Print</button></div>`;
+  })();
+  whost.innerHTML=html||'<div class="foot">Select a branch for the local workforce profile.</div>';
+  // wire the call-sheet buttons (rendered only when the leads layer has entries for this branch)
+  const _bc=document.getElementById('cshCsv'); if(_bc)_bc.onclick=callSheetCSV;
+  const _bp=document.getElementById('cshPrint'); if(_bp)_bp.onclick=callSheetPrint;
+}
+
+function buildLeads(){
+  // Acquisition panel for ANY province — uses the measured nationwide rival census filtered to the
+  // scene (compScene(): curated Rayong set when present, else competitors_national.json in-frame) vs
+  // the province's branches. Copy is province-neutral (was hardcoded Rayong). Degrades to a note only
+  // when there are genuinely no in-frame rivals or branches.
+  const CS=compScene(), PLBL=(typeof CITY_LABEL!=='undefined'&&CITY_LABEL)?CITY_LABEL:'this province';
+  const RAYONG=(typeof CITY!=='undefined'&&CITY==='rayong');
+  if(!CS.length||!BR.length){
+    const v=document.getElementById('verdict');
+    if(v)v.innerHTML='<div class="foot">Branches and 10&nbsp;km reach are live for '+PLBL+'; no big-4 rival branches sit in this frame (measured Google-Places census, a lower bound).</div>';
+    const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
+    const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
+    const gH=document.getElementById('gapsH'); if(gH)gH.style.display='none';
+    const rH=document.getElementById('recosH'); if(rH)rH.style.display='none';
+    return;
+  }
+  const gHv=document.getElementById('gapsH'); if(gHv)gHv.style.display='';
+  const rHv=document.getElementById('recosH'); if(rHv)rHv.style.display='';
+  // gaps: rivals whose nearest AutoX branch is far -> contested ground we don't hold
+  const gaps=CS.map(c=>{
+    const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
+    return {c,nb};}).filter(g=>g.nb>650).sort((a,b)=>b.nb-a.nb);
+  const picked=[];
+  for(const g of gaps){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
+  const ratio=(CS.length/Math.max(1,BR.length)).toFixed(1);
+  // dominant rival brand in-frame
+  const byBrand={}; CS.forEach(c=>{byBrand[c.brand]=(byBrand[c.brand]||0)+1;});
+  const topBrand=Object.entries(byBrand).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('verdict').innerHTML=
+    `<div class="verdict hot">Contested ground — <b>${CS.length} rival branches</b> vs <b>${BR.length} AutoX</b> (${ratio}:1) in ${PLBL}.`
+    +(topBrand?` <b>${topBrand[0]}</b> holds the most in-frame (${topBrand[1]}).`:'')
+    +` Rows below = rivals sitting furthest from any AutoX branch — ground we don’t yet cover.</div>`;
+  document.getElementById('leads').innerHTML=picked.map((g,i)=>{
+    // vehicle shops + gold dealers within 2km (measured OSM) — only Rayong carries the per-province POI set today
+    const vNear=poiArr('vehicle_commerce').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
+    const gNear=poiArr('gold').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
+    const collat=(vNear||gNear)?` ${vNear} vehicle shops · ${gNear} gold dealers ≤2km.`:'';
+    return `<div class="lead" data-lat="${g.c.lat}" data-lng="${g.c.lng}">
+      <div class="rank">${i+1}</div><div class="body">
+      <div class="t">${(g.c.name||g.c.brand).replace(/^[^ ]+ /,'')} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
+      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km.${collat}</div>
+      </div></div>`;}).join('');
+  document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
+    const lat=+el.dataset.lat,lng=+el.dataset.lng;
+    flyTo({longitude:lng,latitude:lat,zoom:14.6,pitch:55,bearing:18,transitionDuration:900});
+    focal={n:'Gap (competitor-held)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
+    if(window.innerWidth<=820){document.getElementById('left').classList.add('show');document.getElementById('right').classList.remove('show');}
+  });
+  const far=picked[0];
+  const recos=RAYONG?[
+    ['1','Infill the Thapma–Choeng Noen corridor: densest competitor stack and most commerce in-frame, few AutoX points. One well-placed branch contests 4–5 rivals at once.'],
+    ['2','Lead with vehicle-title + gold collateral here — strong collateral supply and pawn competition in-frame. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
+    ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core where commerce is dense and no AutoX sits within 1 km.'],
+  ]:[
+    ['1',`Cover the contested points above first: `+(topBrand?topBrand[0]:'rivals')+` sit ${far?(far.nb/1000).toFixed(1):'>1'} km from your nearest branch — a well-placed outlet contests several at once.`],
+    ['2',`Lead on speed (same-day title release) against the ${ratio}:1 rival density, not rate. Use the branch drilldown above to inspect each AutoX branch’s 10&nbsp;km reach.`],
+    ['3',`Defend where AutoX already clusters; press into the frame’s rival-dense pockets where no AutoX sits within ~1 km.`],
+  ];
+  document.getElementById('recos').innerHTML=recos.map(([n,t])=>`<div class="reco"><span class="n">${n}</span><span>${t}</span></div>`).join('');
+}
+
+/* strip */
+function buildStrip(){
+  const byB={};COMP.forEach(c=>byB[c.brand]=(byB[c.brand]||0)+1);
+  const items=[['AutoX',BR.length,'#E0A93B'],['Srisawad',byB.Srisawad||0,'#E0474B'],
+    ['Tidlor',byB.Tidlor||0,'#4F7BF0'],['Muangthai',byB.Muangthai||0,'#D65AA0'],
+    ['7-Eleven+',poiGet('convenience').length,'#E07B2F'],['Vehicle',poiGet('vehicle_commerce').length,'#159b86'],
+    ['Markets',poiGet('fresh_market').length,'#E0C850']];
+  document.getElementById('strip').insertAdjacentHTML('beforeend',
+    items.filter(([n,v])=>v>0).map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));  // hide 0-count chips (a city with no branch/competitor/POI data shows a clean strip, not "AutoX 0 · Srisawad 0 ...")
+  // OPPORTUNITY CUE (Upgrade 3, optional): the top-scoring acquisition district for THIS city's
+  // province from opportunity_score.json — an ESTIMATED composite over MEASURED white-space +
+  // competitor gap + estimated crop-stress. Subtle, labelled, and skipped when the file is absent
+  // or no district matches the city. Provenance is honoured: the score is a composite ranking aid.
+  try{
+    const OS=window.OPPSCORE, ds=OS&&Array.isArray(OS.districts)?OS.districts:null;
+    if(ds&&ds.length){
+      const provTH=(CA.meta&&(CA.meta.province_th||CA.meta.prov))||OPP_PROV[CITY]||null;
+      const provEN=(CA.meta&&CA.meta.province)||CITY_LABEL;
+      const pool=provTH?ds.filter(d=>d.province===provTH):
+                 ds.filter(d=>(d.province||'').indexOf(provEN)>=0);
+      pool.sort((a,b)=>(b.score||0)-(a.score||0));
+      const top=pool[0];
+      if(top){
+        document.getElementById('strip').insertAdjacentHTML('beforeend',
+          `<span class="bchip" title="Top acquisition district for ${provEN} — composite opportunity score (estimated, measured inputs)">`
+          +`<span class="d" style="background:#E6B450"></span>Top opp · ${top.name||'—'}<b>${(top.score||0).toFixed(0)}</b></span>`);
+      }
+    }
+  }catch(e){}
+}
+// city slug -> Thai province name, to match opportunity_score.json (which keys by Thai province).
+// Only used as a fallback when the catchment meta doesn't carry the province name.
+const OPP_PROV={rayong:'ระยอง',bangkok:'กรุงเทพมหานคร'};
+
+/* ---------- branch selection (drives the camera + focus ring + panels) ---------- */
+function selectBranch(b,fly){
+  if(!b)return; focal=b;
+  if(fly){flyTo({longitude:b.x,latitude:b.y,zoom:12.5,pitch:55,bearing:18,transitionDuration:900});}
+  updatePanels();render();
+  const sum=document.getElementById('cascSummary'); if(sum)sum.textContent=CITY_LABEL+' · '+(b.n||'branch');
+  if(window.innerWidth<=820){document.getElementById('left').classList.add('show');}
+}
+
+/* ---------- IN-SCENE SEARCH + FLY-TO ----------
+   Typeahead over three MEASURED sets already in the scene: (a) this province's AutoX branches (BR),
+   (b) competitor branches (compScene()), (c) named POIs loaded in the scene layers (+ landmarks).
+   Picking an entry flies the camera there (reuses flyTo/selectBranch) and drops a fading highlight
+   ring. Thai + Latin matching is a case/space-insensitive substring test. Keyboard: '/' focuses,
+   Esc clears, ↑/↓ move, Enter selects. Index built lazily (compScene/poiGet need the scene extent). */
+function buildSearch(){
+  const wrap=document.getElementById('scenesearch');
+  const inp=document.getElementById('ssInput');
+  const res=document.getElementById('ssResults');
+  const clr=document.getElementById('ssClear');
+  if(!wrap||!inp||!res||!clr)return;
+  const norm=s=>String(s==null?'':s).toLowerCase().replace(/\s+/g,'');
+  const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  let _IDX=null;
+  function index(){
+    if(_IDX)return _IDX;
+    const out=[];
+    // (a) AutoX branches — the interactive gold set (fly + focus + panels via selectBranch)
+    (BR||[]).forEach(b=>{ if(!b)return; const la=+b.y,ln=+b.x; if(!isFinite(la)||!isFinite(ln))return;
+      const lb=b.n||'AutoX branch';
+      out.push({kind:'branch',klab:'AutoX',label:lb,sub:(b.d?b.d+' · ':'')+'เงินไชโย',
+        lat:la,lng:ln,color:GOLD,ref:b,norm:norm(lb+' '+(b.d||''))}); });
+    // (b) competitor branches — measured rivals in the scene
+    let COMPS=[]; try{COMPS=compScene()||[];}catch(e){}
+    COMPS.forEach(c=>{ const la=+c.lat,ln=+c.lng; if(!isFinite(la)||!isFinite(ln))return;
+      const br=c.brand||'?', lb=c.name||br;
+      out.push({kind:'comp',klab:br,label:lb,sub:br+' · competitor',lat:la,lng:ln,
+        color:BRAND[br]||[150,150,150],norm:norm(lb+' '+br)}); });
+    // (c) named POIs already loaded in the scene layers (only entries carrying a name)
+    POI_ORDER.forEach(t=>{ let arr=[]; try{arr=poiGet(t)||[];}catch(e){}
+      const col=POI_COLORS[t]||[150,150,150], kl=POI_LABEL[t]||t;
+      for(let i=0;i<arr.length;i++){ const p=arr[i]; if(!p||p[2]==null||p[2]==='')continue;
+        const la=+p[0],ln=+p[1]; if(!isFinite(la)||!isFinite(ln))continue;
+        out.push({kind:'poi',klab:kl,label:String(p[2]),sub:kl,lat:la,lng:ln,color:col,norm:norm(p[2]+' '+kl)}); } });
+    // (d) named landmarks (curated CA.landmarks)
+    ((CA&&CA.landmarks)||[]).forEach(m=>{ if(!m||!m.nm)return; const la=+m.cy,ln=+m.cx;
+      if(!isFinite(la)||!isFinite(ln))return;
+      out.push({kind:'landmark',klab:'Landmark',label:m.nm,sub:'Landmark',lat:la,lng:ln,color:[230,180,80],norm:norm(m.nm)}); });
+    _IDX=out; return _IDX;
+  }
+  let matches=[], active=-1;
+  const RANK={branch:0,comp:1,landmark:2,poi:3};
+  function search(q){
+    const nq=norm(q); if(!nq){matches=[];return;}
+    const idx=index(), starts=[], contains=[];
+    for(let i=0;i<idx.length;i++){ const e=idx[i], pos=e.norm.indexOf(nq); if(pos<0)continue;
+      (pos===0?starts:contains).push(e); }
+    const cmp=(a,b)=>(RANK[a.kind]-RANK[b.kind])||(a.label.length-b.label.length);
+    starts.sort(cmp); contains.sort(cmp);
+    matches=starts.concat(contains).slice(0,10);
+  }
+  function rowHTML(e,i){ const c=e.color;
+    return '<div class="ss-row'+(i===active?' active':'')+'" data-i="'+i+'" role="option">'+
+      '<span class="ss-sw" style="background:rgb('+c[0]+','+c[1]+','+c[2]+')"></span>'+
+      '<span class="ss-tx"><span class="ss-lb">'+esc(e.label)+'</span><span class="ss-sb">'+esc(e.sub)+'</span></span>'+
+      '<span class="ss-kind">'+esc(e.klab)+'</span></div>'; }
+  function paint(){
+    if(!inp.value.trim()){res.classList.remove('show');res.innerHTML='';inp.setAttribute('aria-expanded','false');return;}
+    if(!matches.length){res.innerHTML='<div class="ss-empty">No matches in this scene</div>';res.classList.add('show');inp.setAttribute('aria-expanded','true');return;}
+    res.innerHTML=matches.map(rowHTML).join('');
+    res.classList.add('show'); inp.setAttribute('aria-expanded','true');
+    res.querySelectorAll('.ss-row').forEach(el=>{
+      el.onmousedown=ev=>{ev.preventDefault();pick(+el.dataset.i);};
+      el.onmouseenter=()=>{active=+el.dataset.i;paintActive();}; });
+  }
+  function paintActive(){res.querySelectorAll('.ss-row').forEach(el=>el.classList.toggle('active',+el.dataset.i===active));}
+  function scrollActive(){const el=res.querySelector('.ss-row.active');if(el&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
+  function hide(){res.classList.remove('show');active=-1;inp.setAttribute('aria-expanded','false');}
+  function pick(i){ const e=matches[i]; if(!e)return;
+    inp.value=e.label; clr.classList.add('show'); hide(); inp.blur();
+    if(e.kind==='branch'&&e.ref){ selectBranch(e.ref,true); }
+    else{ flyTo({longitude:e.lng,latitude:e.lat,zoom:13.4,pitch:55,bearing:VIEW.bearing,transitionDuration:900}); }
+    dropHighlight(e.lng,e.lat,e.color);
+  }
+  inp.addEventListener('input',()=>{active=-1;clr.classList.toggle('show',!!inp.value);search(inp.value);paint();});
+  inp.addEventListener('focus',()=>{if(inp.value.trim()){search(inp.value);paint();}});
+  inp.addEventListener('keydown',ev=>{
+    if(ev.key==='ArrowDown'){ev.preventDefault();if(matches.length){active=(active+1)%matches.length;paintActive();scrollActive();}}
+    else if(ev.key==='ArrowUp'){ev.preventDefault();if(matches.length){active=(active<=0?matches.length-1:active-1);paintActive();scrollActive();}}
+    else if(ev.key==='Enter'){ev.preventDefault();if(matches.length)pick(active>=0?active:0);}
+    else if(ev.key==='Escape'){ev.preventDefault();if(inp.value){inp.value='';clr.classList.remove('show');matches=[];hide();}else{inp.blur();}}
+  });
+  clr.onclick=()=>{inp.value='';clr.classList.remove('show');matches=[];hide();inp.focus();};
+  document.addEventListener('click',ev=>{if(!wrap.contains(ev.target))hide();});
+  // '/' focuses search from anywhere (unless already typing in a field)
+  document.addEventListener('keydown',ev=>{
+    if(ev.key!=='/'||ev.metaKey||ev.ctrlKey||ev.altKey)return;
+    const el=ev.target, tn=(el&&el.tagName)||'';
+    if(/^(INPUT|TEXTAREA|SELECT)$/.test(tn)||(el&&el.isContentEditable))return;
+    ev.preventDefault(); inp.focus(); inp.select();
+  });
+}
+
+/* ---------- Region > Province > Branch cascade (populated from the nationwide index.json; every
+   province with branches is selectable — the ACTIVE province drills into its loaded branches in
+   place with a fly-to zoom, other provinces switch the 3D scene to that province) ---------- */
+function buildCascade(){
+  const reg=document.getElementById('cscRegion'), prov=document.getElementById('cscProv'), br=document.getElementById('cscBranch');
+  if(!reg||!prov||!br)return;
+  const regions=IDX?[...new Set(IDX.map(p=>p.region))]:['East'];
+  // keep a sensible region order with East first (it holds Rayong)
+  regions.sort((a,b)=>(a==='East'?-1:b==='East'?1:a.localeCompare(b)));
+  reg.innerHTML=regions.map(r=>`<option value="${r}">${r}</option>`).join('');
+  // default the cascade to the ACTIVE city (so the Bangkok tab reads "Bangkok", not "Rayong (59)"),
+  // falling back to East/Rayong when the city isn't in the index.
+  const cityEntry=IDX?IDX.find(p=>p.slug===CITY):null;
+  reg.value=(cityEntry&&cityEntry.region)||'East';
+  function fillProv(){
+    const r=reg.value;
+    const list=IDX?IDX.filter(p=>p.region===r):[{slug:'rayong',th:'ระยอง',en:'Rayong'}];
+    list.sort((a,b)=>(b.branches||0)-(a.branches||0));
+    // every province with at least one branch is selectable; 0-branch provinces (nothing to drill into) disabled.
+    const opts=list.map(p=>{
+      const enabled=(p.branches||0)>0 || p.slug===CITY;
+      const lbl=`${p.en||p.th} (${p.branches||0})`;
+      return `<option value="${p.slug}" ${enabled?'':'disabled'}>${lbl}</option>`;
+    }).join('');
+    // When the ACTIVE city is in this region, pre-select it. When it ISN'T (the user switched region),
+    // lead with a placeholder so ANY province pick fires onchange -> navigates. Otherwise the top
+    // province auto-selects but never loads, and re-picking the same shown value fires no change event
+    // (the "I picked a province but the map didn't load" bug on mobile).
+    const cityHere=list.some(p=>p.slug===CITY);
+    prov.innerHTML=(cityHere?'':'<option value="" selected>— select a province to load —</option>')+opts;
+    if(cityHere)prov.value=CITY;
+    fillBranch();
+  }
+  function fillBranch(){
+    // the ACTIVE province's branches are loaded (BR) — list + wire them for in-place fly-to zoom.
+    // key by positional index to avoid short-name collisions. A different province in the dropdown
+    // isn't loaded on this page; changing to it (prov.onchange below) navigates to its 3D scene.
+    if(prov.value===CITY && BR.length){
+      br.disabled=false;
+      br.innerHTML=BR.map((b,i)=>`<option value="${i}">${b.n||('Branch '+(i+1))}${b.d?' · '+b.d:''}</option>`).join('');
+      const fi=BR.indexOf(focal); br.value=String(fi>=0?fi:0);
+    }else{
+      br.disabled=true;
+      br.innerHTML=`<option>— open this province to drill into its branches —</option>`;
+    }
+  }
+  reg.onchange=fillProv;
+  // picking a DIFFERENT province loads its 3D scene (each city gets a fresh GL context, per the map
+  // tech split); re-selecting the active province just refreshes its branch list.
+  prov.onchange=function(){
+    if(prov.value && prov.value!==CITY){
+      location.href='rayong-catchment.html'+(prov.value==='rayong'?'':'?city='+encodeURIComponent(prov.value));
+      return;
+    }
+    fillBranch();
+  };
+  br.onchange=()=>{const b=BR[+br.value]; if(b)selectBranch(b,true);};
+  fillProv();
+  const note=document.getElementById('cscNote');
+  if(note)note.textContent='Region › province › branch. Pick a province to load its 3D scene, then a branch to fly in.';
+}
+
+/* ---------- POI legend (swatch + label + count) — single source of truth = POI_COLORS; click toggles the layer ---------- */
+function buildLegend(){
+  const host=document.getElementById('legend'); if(!host)return;
+  refreshPoiTypes();
+  host.innerHTML=POI_TYPES.map(t=>{
+    const c=POI_COLORS[t], n=poiGet(t).length;
+    return `<button class="lg ${poiOn[t]?'on':''}" data-t="${t}">
+      <span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${POI_LABEL[t]||t}<b>${n}</b></button>`;
+  }).join('');
+  host.querySelectorAll('.lg').forEach(el=>el.onclick=()=>{
+    const t=el.dataset.t; poiOn[t]=!poiOn[t]; el.classList.toggle('on',poiOn[t]); render();});
+}
+
+/* ---------- building colour/height legend ---------- */
+// Explains the warm height ramp (street-level sand -> mid-rise amber -> tall gold) and the sparing
+// cool accent reserved for the tallest landmark decile. Theme-aware via CSS (no inline colours that
+// would fight the light base). Always shown — buildings are the headline of every scene.
+function buildBldgLegend(){
+  const host=document.getElementById('bldglegend'); if(!host)return;
+  host.innerHTML='<span class="bl-ttl">Buildings</span>'+
+    '<span class="bl-ramp"><span class="bl-cap">low</span>'+
+    '<span class="bl-bar" title="building height: low -> tall"></span>'+
+    '<span class="bl-cap">tall</span></span>'+
+    '<span class="bl-acc"><span class="sw" style="background:rgb(91,124,250)"></span>landmark</span>';
+}
+
+/* ---------- isochrone legend (graded travel-time bands) — only shown when iso data is present ---------- */
+function buildIsoLegend(){
+  const host=document.getElementById('isolegend'); if(!host)return;
+  const ISO=window.ISO, feats=ISO&&ISO.features&&ISO.features.length?ISO.features:null;
+  const isotog=document.getElementById('isotog');
+  if(!feats){host.style.display='none'; if(isotog)isotog.style.display='none'; return;}
+  if(isotog)isotog.style.display='';
+  // unique minute bands, ascending (near -> far)
+  const mins=[...new Set(feats.map(f=>isoMinutes(f)).filter(m=>m!=null))].sort((a,b)=>a-b);
+  if(!mins.length){host.style.display='none';return;}
+  host.style.display='flex';
+  host.innerHTML='<span class="il-ttl">Drive time</span>'+mins.map(m=>{
+    const c=isoColor(m);
+    return `<span class="il"><span class="sw" style="background:rgba(${c[0]},${c[1]},${c[2]},.55)"></span>${m} min</span>`;
+  }).join('');
+}
+
+/* ---------- competitor-brand legend (measured rivals in this scene) — LANE 3D-2 -------------------
+ * Interactive: each chip toggles a brand bucket (big-4 title lenders + "other") on/off in the scene;
+ * a "rival ground" chip flips the 1.5km territory discs. Counts are the MEASURED census (fixed). */
+function buildCompLegend(){
+  const host=document.getElementById('complegend'); if(!host)return;
+  const SC=compScene();
+  if(!SC||!SC.length){host.style.display='none';return;}
+  // count rivals by BUCKET (named big-4 + "other"), present buckets only.
+  const byB={}; SC.forEach(c=>{const b=rivalBucket(c.brand);byB[b]=(byB[b]||0)+1;});
+  // ordered: named brands (present) by count desc, then "other" last.
+  const named=RIVAL_NAMED.filter(b=>byB[b]).sort((a,b)=>byB[b]-byB[a]);
+  const buckets=byB['other']?named.concat(['other']):named;
+  if(!buckets.length){host.style.display='none';return;}
+  // brand swatch colour: named brands from BRAND, "other" neutral gray.
+  const swColor=b=>(b==='other')?[150,150,150]:(BRAND[b]||[150,150,150]);
+  // provenance: curated for Rayong, national Google-Places census elsewhere.
+  const measured=(COMP&&COMP.length)?'measured · curated':'measured · Google Places';
+  host.style.display='flex';
+  host.innerHTML='<span class="cl-ttl">Rivals</span>'+buckets.map(b=>{
+    const c=swColor(b), off=RIVAL_HIDDEN.has(b)?' off':'';
+    return `<span class="cl${off}" data-bk="${b}" role="button" tabindex="0" aria-pressed="${off?'false':'true'}">`+
+      `<span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>`+
+      `<span class="cl-nm">${b}</span><b>${byB[b]}</b></span>`;
+  }).join('')+
+    `<span class="cl-gnd${showRivalGround?' on':''}" id="rivalGndTog" role="button" tabindex="0" aria-pressed="${showRivalGround?'true':'false'}">◍ rival ground</span>`+
+    `<span class="cl-tag">${measured}</span>`;
+  // wire brand-bucket toggles
+  host.querySelectorAll('.cl[data-bk]').forEach(el=>{
+    const bk=el.getAttribute('data-bk');
+    el.onclick=()=>{ if(RIVAL_HIDDEN.has(bk))RIVAL_HIDDEN.delete(bk); else RIVAL_HIDDEN.add(bk);
+      buildCompLegend(); render(); };
+  });
+  // wire rival-ground toggle
+  const g=host.querySelector('#rivalGndTog');
+  if(g)g.onclick=()=>{ showRivalGround=!showRivalGround; buildCompLegend(); render(); };
+}
+
+/* controls */
+// city switcher — reflect the current city, then navigate on change (each city gets a fresh GL context).
+(function(){var sel=document.getElementById('citySel');if(!sel)return;
+  try{sel.value=CITY;}catch(e){}
+  // if the current city isn't one of the listed options, add it so the control still shows it.
+  if(sel.value!==CITY){var o=document.createElement('option');o.value=CITY;o.textContent=CITY_LABEL;sel.appendChild(o);sel.value=CITY;}
+  sel.onchange=function(){var c=sel.value;if(!c||c===CITY)return;
+    location.href='rayong-catchment.html'+(c==='rayong'?'':'?city='+encodeURIComponent(c));};
+})();
+document.querySelectorAll('#ctl [data-b]').forEach(b=>b.onclick=()=>{
+  basemap=b.dataset.b;document.querySelectorAll('#ctl [data-b]').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.getElementById('ringtog').onclick=function(){showRings=!showRings;this.classList.toggle('on',showRings);render();};
+document.getElementById('isotog').onclick=function(){showIso=!showIso;this.classList.toggle('on',showIso);render();};
+// Orbit toggle: master on/off. Turning it ON also clears any "paused by user interaction" state so
+// the scene immediately resumes breathing; turning it OFF parks the camera where it sits.
+(function(){var ot=document.getElementById('orbittog');if(!ot)return;
+  ot.onclick=function(){orbitOn=!orbitOn; if(orbitOn)orbitPausedByUser=false; this.classList.toggle('on',orbitOn); lastT=0;};})();
+// Mobile bottom-sheet toggles: Analysis (#left) / Leads (#right) / Layers (#ctl). Opening any one
+// closes the other two so a single overlay is on screen at a time and the map stays usable.
+(function(){
+  const ids=['left','right','ctl'];
+  document.querySelectorAll('#mtog button').forEach(b=>b.onclick=()=>{
+    const s=b.dataset.s, el=document.getElementById(s);
+    const willShow=el?!el.classList.contains('show'):false;
+    ids.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('show',id===s?willShow:false);});
+  });
+})();
+document.querySelectorAll('.xbtn').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.x).classList.remove('show'));
+
+buildStrip();buildBldgLegend();buildLegend();buildIsoLegend();buildCompLegend();buildCascade();buildSearch();buildLeads();updatePanels();render();
+
+// ---- SECOND-WAVE APPLY (scene-startup perf) ----------------------------------------------------
+// The loader defers the heavier "detail" files (competitor census, national POI fallback, occupation
+// leads, trees, rail) until ~1s AFTER first paint so the city + branches show fast; it then calls
+// this hook with whatever loaded. We set the globals those deferred layers/panels read, drop the
+// bbox-filter memo caches so the new national data is picked up, then run a SECOND render pass (POI
+// columns, competitor pegs, trees, rail now draw) and rebuild the panels/legends that depend on them.
+// Fully null-safe + idempotent: any absent file just leaves that layer/panel exactly as first-paint
+// drew it, so a slow or failed second wave degrades to the first-paint scene, never a crash. For a
+// curated province (Rayong) the competitor + POI sets come from the province file, so the only visible
+// second-pass additions are trees/rail + the "who to call" list; elsewhere the pegs/POI columns fill in.
+window.applyDeferred=function(d){
+  d=d||{}; var changed=false;
+  if(d.comp){window.COMPNAT=d.comp;_COMP_SCENE=null;changed=true;}
+  if(d.poi){window.POINAT=(d.poi&&d.poi.poi)||null;_POI_SCENE=null;changed=true;}
+  if(d.trees){window.TREES=d.trees;changed=true;}
+  if(d.rail){window.RAIL=d.rail;changed=true;}
+  if(d.occ){window.OCCLEADS=(d.occ.branches)||null;window.OCCLEADS_BUCKETS=(d.occ.meta&&d.occ.meta.buckets)||null;changed=true;}
+  if(!changed)return;
+  try{refreshPoiTypes();}catch(e){}
+  try{render();}catch(e){}                 // second render pass — deferred layers now present
+  try{buildLegend();}catch(e){}            // POI legend (types may now be present)
+  try{buildCompLegend();}catch(e){}        // rival-brand legend (national census filtered to frame)
+  try{buildLeads();}catch(e){}             // acquisition leads (uses in-frame rivals)
+  try{updatePanels();}catch(e){}           // who-works-nearby / call-sheet (occupation leads)
+};
+// ---- POSTER MODE (Lane 3D-6) — one tap: hide overlays, frame the skyline edge-to-edge, capture a
+// shareable PNG with an honest provenance caption, then restore. Isolated + null-guarded throughout.
+// building extent Poster mode frames edge-to-edge. The Overture pull is PROVINCE-WIDE (Rayong = 180k
+// footprints spread ~85km across; the dense city is a small fraction), so fitting the raw bbox gives a
+// sparse, empty province view. Instead we frame the DENSE HEART: a box centred on CORE (the density
+// peak the resting view already targets) whose radius is the ~50th-percentile building distance from
+// CORE — i.e. the inner half of the mass nearest the core. This adapts per city (compact -> tight,
+// sprawling -> wider) and always fills the poster with buildings. Floored at ~2km so a sparse core
+// never over-zooms into a handful of footprints.
+function posterBbox(){
+  const b=(window.CA&&CA.buildings)||[];
+  const cLat=CORE.lat, cLng=CORE.lng, cos=Math.cos(cLat*Math.PI/180)||1;
+  // tight bbox of the CORE CLUSTER = building centroids within ~3.3km of the density peak. Widen the
+  // cap and retry if the core is sparse, so every city yields a building-filled frame.
+  let RCAP=0.03, minX,maxX,minY,maxY,cnt;
+  for(let pass=0;pass<3;pass++){
+    minX=Infinity;maxX=-Infinity;minY=Infinity;maxY=-Infinity;cnt=0;
+    for(const x of b){
+      let cx=(x.cx!=null?x.cx:null), cy=(x.cy!=null?x.cy:null);
+      if((cx==null||cy==null)&&x.p&&x.p[0]){cx=x.p[0][0];cy=x.p[0][1];}
+      if(cx==null||cy==null)continue;
+      const dx=(cx-cLng)*cos, dy=(cy-cLat);
+      if(dx*dx+dy*dy>RCAP*RCAP)continue;
+      if(cx<minX)minX=cx; if(cx>maxX)maxX=cx; if(cy<minY)minY=cy; if(cy>maxY)maxY=cy; cnt++;
+    }
+    if(cnt>=200)break;                                     // enough core mass — good frame
+    RCAP*=1.8;                                             // sparse core: widen and retry
+  }
+  if(!isFinite(minX))return {minX:cLng-0.03,maxX:cLng+0.03,minY:cLat-0.025,maxY:cLat+0.025};
+  return {minX,maxX,minY,maxY};
+}
+// cinematic poster camera: pitch ~55, bearing -20, zoom computed to FIT the core-cluster bbox edge-to-
+// edge (WebMercatorViewport.fitBounds, then pulled back ~0.55 zoom so the 55° tilt doesn't clip the far edge).
+function posterView(){
+  let vs=Object.assign({},FRAMED,{pitch:55,bearing:-20});
+  try{
+    const bb=posterBbox();
+    const VP=deck.WebMercatorViewport;
+    const W=window.innerWidth||900, H=window.innerHeight||620;
+    if(VP&&isFinite(bb.minX)&&bb.maxX>bb.minX&&bb.maxY>bb.minY){
+      const vp=new VP({width:W,height:H});
+      const f=vp.fitBounds([[bb.minX,bb.minY],[bb.maxX,bb.maxY]],
+        {padding:Math.round(Math.min(W,H)*0.08)});
+      vs={longitude:f.longitude,latitude:f.latitude,zoom:f.zoom-0.55,pitch:55,bearing:-20};
+    }
+  }catch(e){}
+  return vs;
+}
+// rounded-rect path helper for the caption chip.
+function posterRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+// composite the honest provenance caption into the bottom-left corner (device pixels):
+// 'เงินไชโย · <province> · <n> buildings (Overture)' — every shared image self-labels its source.
+function posterCaption(ctx,W,H){
+  const s=(W/(window.innerWidth||W))||1;               // device-pixel scale (DPR)
+  const n=((window.CA&&CA.buildings&&CA.buildings.length)||0);
+  const brand='เงินไชโย';
+  const rest=' · '+CITY_LABEL+' · '+n.toLocaleString()+' buildings (Overture)';
+  const fs=Math.round(15*s);
+  ctx.font='600 '+fs+'px "IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif';
+  const wBrand=ctx.measureText(brand).width, wRest=ctx.measureText(rest).width;
+  const dot=9*s, gap=8*s, padX=14*s, padY=9*s, m=18*s, r=8*s;
+  const cw=dot+gap+wBrand+wRest+padX*2, ch=fs+padY*2;
+  const x=m, y=H-m-ch, cy=y+ch/2;
+  ctx.fillStyle='rgba(13,17,27,0.86)'; posterRR(ctx,x,y,cw,ch,r); ctx.fill();
+  ctx.strokeStyle='rgba(224,169,59,0.55)'; ctx.lineWidth=Math.max(1,s); posterRR(ctx,x,y,cw,ch,r); ctx.stroke();
+  ctx.beginPath(); ctx.fillStyle='#E0A93B'; ctx.arc(x+padX+dot/2,cy,dot/2,0,Math.PI*2); ctx.fill();
+  ctx.textBaseline='middle';
+  let tx=x+padX+dot+gap;
+  ctx.fillStyle='#E6B450'; ctx.fillText(brand,tx,cy+s); tx+=wBrand;
+  ctx.fillStyle='#EDEFF5'; ctx.fillText(rest,tx,cy+s);
+}
+// capture the GL canvas -> 2D canvas -> caption -> PNG download (+ stash dataURL for headless verify).
+function posterCapture(){
+  const gl=document.querySelector('#map canvas');
+  if(!gl)throw new Error('no GL canvas');
+  const W=gl.width, H=gl.height;
+  const out=document.createElement('canvas'); out.width=W; out.height=H;
+  const c=out.getContext('2d');
+  c.drawImage(gl,0,0);
+  posterCaption(c,W,H);
+  const fname=(window.CITY||'rayong')+'-3d-'+(window._POSTER_VINTAGE||'latest')+'.png';
+  try{ window._POSTER_LAST=out.toDataURL('image/png'); }catch(e){}
+  out.toBlob(function(blob){ if(!blob)return;
+    try{ const url=URL.createObjectURL(blob); const a=document.createElement('a');
+      a.href=url; a.download=fname; document.body.appendChild(a); a.click();
+      setTimeout(function(){try{URL.revokeObjectURL(url);a.remove();}catch(e){}},1500);
+    }catch(e){ try{console.error('poster download failed',e);}catch(_){}}
+  },'image/png');
+  return fname;
+}
+let _posterBusy=false;
+function runPoster(){
+  if(_posterBusy||posterMode)return; _posterBusy=true;
+  const btn=document.getElementById('postertog'); if(btn)btn.classList.add('on');
+  const prevVIEW=Object.assign({},VIEW), prevOrbit=orbitOn, prevPaused=orbitPausedByUser;
+  posterMode=true; document.body.classList.add('poster');
+  orbitOn=false; orbitPausedByUser=true;                 // freeze the frame for a crisp still
+  _programmatic=true; VIEW=posterView();
+  try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+  Promise.resolve().then(function(){_programmatic=false;});
+  render();                                              // rebuild layers WITHOUT overlays
+  // restore prior state (called exactly once, after the capture).
+  function restore(){
+    posterMode=false; document.body.classList.remove('poster');
+    orbitOn=prevOrbit; orbitPausedByUser=prevPaused;
+    _programmatic=true; VIEW=Object.assign({},prevVIEW);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(function(){_programmatic=false; lastT=0;});
+    render();
+    if(btn)btn.classList.remove('on');
+    _posterBusy=false;
+  }
+  // Let the reframe + building-elevation transition (≤600ms) settle, THEN force one guaranteed fresh
+  // draw and capture inside its onAfterRender — so the exported PNG is the fully-painted poster frame,
+  // never a stale preserveDrawingBuffer frame (which under software WebGL was catching mid-transition).
+  setTimeout(function(){
+    var done=false;
+    var finish=function(){ if(done)return; done=true;
+      try{ posterCapture(); }catch(e){ try{console.error('poster capture failed',e);}catch(_){}}
+      restore();
+    };
+    _afterRenderCb=finish;
+    try{ if(typeof deckgl.redraw==='function'){deckgl.redraw('poster-capture');} else {render();} }
+    catch(e){ try{render();}catch(_){}}
+    // belt-and-suspenders: if onAfterRender never fires, capture anyway so the button never hangs.
+    setTimeout(function(){ if(!done){ _afterRenderCb=null; finish(); } }, 500);
+  }, 1200);
+}
+(function(){var pb=document.getElementById('postertog'); if(pb)pb.onclick=runPoster;})();
+// best-effort MEASURED vintage for the filename (meta.updated first token, e.g. '2026M06'); non-blocking,
+// null-guarded, falls back to 'latest'. window.runPoster is exposed for headless verification only.
+try{ window.runPoster=runPoster; }catch(e){}
+fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(function(m){
+  if(m&&m.updated){var v=String(m.updated).trim().split(/\s+/)[0].replace(/[^0-9A-Za-z._-]/g,'');
+    if(v)window._POSTER_VINTAGE=v;}
+}).catch(function(){});
+
+
+// ---- MOTION BOOTSTRAP (Upgrade 2): intro fly-in, then continuous gentle auto-orbit -------------
+// INTRO FLY-IN: start parked at the high/wide INTRO view, then on the next frame ease down to the
+// framed FRAMED view. A FlyToInterpolator (when present) gives a cinematic arced descent; the orbit
+// loop holds until the intro transition completes so the two motions don't overlap.
+(function startMotion(){
+  const INTRO_MS=2600;
+  // belt-and-suspenders: a raw pointerdown / wheel on the map well also pauses the orbit, even if
+  // deck's interactionState flags are missed under software WebGL in the headless harness.
+  try{const mapEl=document.getElementById('map');
+    if(mapEl){['pointerdown','wheel','touchstart'].forEach(ev=>
+      mapEl.addEventListener(ev,()=>{ if(introDone)userInteract(); },{passive:true}));}
+  }catch(e){}
+  // SOFTWARE-WEBGL FALLBACK: onWebGLInitialized (fired during deck construction, above) may have set
+  // SOFT_GL — in that case skip BOTH the intro transition and the continuous orbit so the render loop
+  // stays cold and the scene settles to a clean still frame. Snap straight to the framed view.
+  if(SOFT_GL){
+    _programmatic=true; VIEW=Object.assign({},FRAMED);
+    try{ deckgl.setProps({viewState:VIEW}); }catch(e){}
+    Promise.resolve().then(()=>{_programmatic=false;});
+    introDone=true; orbitOn=false; try{setOrbitUI(false);}catch(e){}
+    return;
+  }
+  // kick the intro on the next animation frame so the INTRO view paints first.
+  requestAnimationFrame(()=>{
+    _programmatic=true;
+    const tp={viewState:Object.assign({},FRAMED,{transitionDuration:INTRO_MS})};
+    try{ if(deck.FlyToInterpolator){tp.viewState.transitionInterpolator=new deck.FlyToInterpolator({speed:1.2,curve:1.3});} }catch(e){}
+    VIEW=Object.assign({},FRAMED);
+    deckgl.setProps(tp);
+    setTimeout(()=>{ _programmatic=false; introDone=true; lastT=0; }, INTRO_MS+60);
+  });
+  // ORBIT LOOP: slow bearing increment, frame-rate independent. Skips while a transition is running,
+  // while the orbit is off, or while the user has paused it. Pure rotation around the current centre.
+  function tick(t){
+    rafId=requestAnimationFrame(tick);
+    if(!introDone){ lastT=t; return; }
+    if(!orbitOn||orbitPausedByUser){ lastT=t; return; }
+    if(!lastT){ lastT=t; return; }
+    const dt=(t-lastT)/1000; lastT=t;
+    if(dt<=0||dt>0.5) return;                 // skip absurd gaps (tab was backgrounded)
+    VIEW=Object.assign({},VIEW,{bearing:((VIEW.bearing||0)+ORBIT_DPS*dt)%360});
+    pushView();
+  }
+  rafId=requestAnimationFrame(tick);
+  // belt-and-suspenders: reposition the focal pill after the intro fly-to settles, in case the
+  // render loop goes idle (static software-GL) and onViewStateChange stops firing.
+  [700,1800,3400].forEach(function(ms){setTimeout(function(){try{updateFocalLabel();}catch(e){}},ms);});
+})();
+}catch(e){document.body.insertAdjacentHTML('beforeend','<div class="err">Map failed: '+(e&&e.message||e)+'</div>');console.error(e);}
+};</script>
+<script>
+(function(){
+ // ?city=<slug> picks the dataset. Default (omitted) => 'rayong' => the exact files this page
+ // always loaded, so the default view is byte-equivalent behaviour to before generalisation.
+ var CITY='rayong';
+ try{var q=new URLSearchParams(location.search).get('city');if(q)CITY=q.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');}catch(e){}
+ if(!CITY)CITY='rayong';
+ window.CITY=CITY;
+ // CAMERA HANDOFF (from province.html district click): ?lat=&lng=&z= aim the intro fly-to at a
+ // specific district centroid instead of the derived city core. Parsed once, exposed as window.AIM;
+ // the scene's FRAMED/INTRO views read it when present, else fall back to the city-core framing.
+ try{var _sp=new URLSearchParams(location.search);
+   var _la=parseFloat(_sp.get('lat')),_ln=parseFloat(_sp.get('lng')),_z=parseFloat(_sp.get('z'));
+   if(isFinite(_la)&&isFinite(_ln)&&Math.abs(_la)<=90&&Math.abs(_ln)<=180){
+     window.AIM={lat:_la,lng:_ln,z:(isFinite(_z)?Math.min(Math.max(_z,3),20):13.5)};}
+ }catch(e){}
+ var pretty=CITY.split(/[-_]/).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');  // title-case EVERY word (was 'Chiang mai')
+ // BREADCRUMB back-link — only when arriving via the district camera-handoff. Prepends a "← districts"
+ // chip to the scene strip that returns to this province's district view. Self-contained inline styles
+ // (the strip gradient is dark in both themes, so #A7B0C2 on a dark chip reads in light + dark).
+ if(window.AIM){try{
+   var _strip=document.getElementById('strip');
+   if(_strip){
+     var _bc=document.createElement('a');
+     _bc.href='province.html?p='+encodeURIComponent(CITY)+(location.search.indexOf('theme=light')>-1?'&theme=light':'');
+     _bc.textContent='← districts';
+     _bc.title='Back to '+pretty+' districts';
+     _bc.style.cssText='flex:none;font:700 12px \'IBM Plex Sans Thai\';color:#A7B0C2;text-decoration:none;'+
+       'background:rgba(20,26,40,.82);border:1px solid #2a3450;border-radius:7px;padding:4px 9px;'+
+       'margin-right:2px;white-space:nowrap';
+     _strip.insertBefore(_bc,_strip.firstChild);
+   }
+ }catch(e){}}
+ // set the tab title up-front so EVERY path (loaded, not-pulled, error) shows the right province, not 'Rayong 3D'
+ if(CITY!=='rayong'){try{document.title=pretty+' 3D · เงินไชโย';}catch(e){}}
+ var box=document.createElement('div');box.className='err';box.style.color='#8a94a8';box.textContent='Loading '+pretty+' 3D…';document.body.appendChild(box);
+ // killLoader: remove the "Loading…" overlay idempotently. Called the instant the scene is ready
+ // AND from the graceful not-pulled / error paths, so the loader can NEVER stick on screen — even
+ // if a later step throws. Once detached, re-removal is a harmless no-op.
+ var loaderDead=false;
+ function killLoader(){ if(loaderDead)return; loaderDead=true; try{box.remove();}catch(e){} }
+ // catchment = city-core buildings (+reachable-pop for rayong); province = branches, full POI palette,
+ // district polygons; index = nationwide cascade. For non-rayong cities the province/index files
+ // usually don't exist yet — they load best-effort and the page degrades gracefully (Rayong-specific
+ // extras such as competitors, province panel and the branch cascade are skipped when absent).
+ // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
+ function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+ var P='data/'+CITY;
+ // CALM GRACEFUL STATE — the per-province 3D building file (<slug>_catchment.json) is pulled
+ // from the desktop per province (pull_overture_buildings.py --province <slug>) and lands over
+ // time. Until a province's file exists, do NOT crash into a broken/empty GL scene: show a quiet
+ // notice and a link to the always-available district view (province.html?p=<slug>). Rayong +
+ // Bangkok ship with their files, so this only ever fires for not-yet-pulled provinces.
+ function notPulled(){
+   killLoader();
+   var prettyP=pretty; // already title-cased from the slug
+   var href='province.html?p='+encodeURIComponent(CITY)+
+     (location.search.indexOf('theme=light')>-1?'&theme=light':'');
+   var el=document.createElement('div');el.className='err';el.style.color='#A7B0C2';
+   el.innerHTML='<div style="max-width:560px;line-height:1.6">'+
+     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+
+       '3D buildings for '+prettyP+' haven’t been pulled yet</div>'+
+     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+
+       'The Overture building scene is pulled per province from the desktop. Until then, the '+
+       'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.</div>'+
+     '<a href="'+href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
+       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;'+
+       'font:700 13px \'IBM Plex Sans Thai\'">Open the '+prettyP+' district view →</a>'+
+     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+
+       'pull command: pull_overture_buildings.py --province '+CITY+'</div>'+
+     '</div>';
+   document.body.appendChild(el);
+ }
+ // tiles_config first: it may carry catchments.baseUrl (operator CDN, e.g. Cloudflare R2 with all
+ // 77 province pulls). The catchment loader below falls back to it on a local 404, so provinces
+ // too big to commit to git still render their real buildings. CDN miss => same calm notPulled().
+ opt('data/tiles_config.json').then(function(TILECFG){
+ var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
+ if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
+ var gopt=function(sfx){return fetch(P+sfx).then(function(r){
+   if(r.ok)return r.json();
+   if(r.status===404&&cdnBase)return fetch(cdnBase+'/'+CITY+sfx).then(function(r2){return r2.ok?r2.json():null;}).catch(function(){return null;});
+   return null;}).catch(function(){return null;});};
+ try{performance.mark('catch:fetchStart');}catch(e){}
+ return Promise.all([
+   // The catchment building file is the ONE required input. .ok=false (404) => null-or-CDN here,
+   // and we branch to notPulled() below; a genuine network/parse error still rejects loudly.
+   fetch(P+'_catchment.json').then(function(r){
+     if(r.status===404){
+       if(!cdnBase)return null;
+       box.textContent='Loading '+pretty+' 3D from CDN…';
+       // STREAMED download with a live MB meter: these CDN pulls are 30-45MB of uncompressed JSON
+       // (r2.dev applies no gzip), i.e. tens of seconds on a normal line — a static message reads
+       // as a hang and gets the page closed. Falls back to plain .json() where streams are absent.
+       return fetch(cdnBase+'/'+CITY+'_catchment.json').then(function(r2){
+         if(!r2.ok)return null;
+         var total=+r2.headers.get('content-length')||0;
+         if(!r2.body||!r2.body.getReader||!window.TextDecoder)return r2.json();
+         var reader=r2.body.getReader(), chunks=[], got=0;
+         var mb=function(b){return (b/1048576).toFixed(1);};
+         var pump=function(){return reader.read().then(function(st){
+           if(st.done){
+             var buf=new Uint8Array(got), off=0;
+             for(var i=0;i<chunks.length;i++){buf.set(chunks[i],off);off+=chunks[i].length;}
+             box.textContent='Building the '+pretty+' scene…';
+             return JSON.parse(new TextDecoder().decode(buf));
+           }
+           chunks.push(st.value); got+=st.value.length;
+           box.textContent='Loading '+pretty+' 3D — '+mb(got)+(total?' / '+mb(total):'')+' MB…';
+           return pump();});};
+         return pump();
+       }).catch(function(){return null;});   // CDN unreachable => calm not-pulled state, never a crash
+     }
+     if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
+   opt(P+'_province.json'),
+   opt('data/provinces/index.json'),
+   // ground layers: local file first; ONLY on a local 404 fall back to the catchments CDN
+   // (committed files serve most provinces; R2 serves any too big to commit — see
+   // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
+   gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
+   opt(P+'_isochrone.json'),
+   // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
+   // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
+   Promise.resolve(null), Promise.resolve(null),
+   // optional MEASURED occupation layer (Overture Places) — index-aligned to branches.json.
+   // Both load best-effort; absent => the "who works nearby" panel keeps its estimated proxy.
+   opt('data/branch_occupations.json'), opt('data/branches.json'),
+   // a[11] competitor census — DEFERRED to the second wave. It is a fallback the curated-province
+   // scenes (Rayong) never touch, and elsewhere only feeds competitor pegs (a second-pass layer);
+   // parsing its ~1.7MB up front needlessly delayed first paint.
+   Promise.resolve(null),
+   opt('data/opportunity_score.json'),
+   // operator-configured CDN config (already fetched above) — kept in the same array slot so the
+   // a[13] consumer below is unchanged.
+   Promise.resolve(TILECFG),
+   // a[14] nationwide POI pins — DEFERRED to the second wave. Only the POI-column layer (a second-pass
+   // layer) reads it, and never for curated-province scenes; keeping its ~1.2MB off the critical path
+   // lets the buildings paint first.
+   Promise.resolve(null),
+   // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
+   // branches.json — the "people" headline the catchment card shows.
+   opt('data/branch_population.json'),
+   // a[16] occupation leads — DEFERRED to the second wave (its ~6.8MB parse was the biggest non-scene
+   // item on the critical path); fetched + applied ~1s after first paint.
+   Promise.resolve(null),
+   // a[17] DENSE per-city Overture POI (build_scene_places.py, ~24x OSM density) — small (0.6-1.5MB)
+   // and per-city, so kept on the critical path; local first, then the catchments CDN.
+   gopt('_places.json'),
+   // a[18] per-branch WORKFORCE mix (build_branch_workforce.py, ~330KB) — the reflective
+   // "who works here" layer where farmers surface; kept on the critical path so the panel
+   // leads with occupations, not storefronts. Index-aligned to branches.json / NATBRANCHES.
+   opt('data/branch_workforce.json')
+ ]);
+ }).then(function(a){
+   if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
+   try{performance.mark('catch:dataReady');}catch(e){}
+   window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
+   window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
+   window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
+   window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
+   window.POINAT=(a[14]&&a[14].poi)||null;
+   window.BRANCHPOP=(a[15]&&a[15].values)||null;
+   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
+   window.OCCLEADS=(a[16]&&a[16].branches)||null;
+   window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
+   window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch)
+   window.WFDATA=a[18]||null;                    // per-branch workforce mix (reflective who-works-here)
+   // no per-city file for this province -> lazily pull the thinned NATIONAL Overture set as the
+   // fallback (covers all 77 provinces / every branch; flagship cities skip this 5MB download), then
+   // proceed. afterData() runs first paint + the deferred second wave for both branches.
+   if(!window.SCENEPLACES){
+     fetch('data/national_places.json').then(function(r){return r.ok?r.json():null;})
+       .then(function(nat){window.NATPLACES=nat;afterData();})
+       .catch(function(){afterData();});
+   } else { afterData(); }
+   function afterData(){
+     killLoader();window.initCatch();
+     try{performance.mark('catch:firstRender');}catch(e){}
+     // ---- SECOND WAVE (deferred, from the startup-perf lane) — non-critical detail after first paint.
+     // Heavy files (occupation leads ~6.8MB, competitor census, OSM POI fallback, trees, rail) fetched
+     // ~1s later and applied via window.applyDeferred (resets memo caches + re-renders). All optional:
+     // a slow/failed second wave degrades to exactly the first-paint scene, never a crash.
+     setTimeout(function(){
+       Promise.all([
+         opt('data/occupation_leads.json'),
+         opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
+         opt('data/catchment_poi.json'),
+         opt(P+'_trees.json'), opt(P+'_rail.json')
+       ]).then(function(d){
+         try{if(window.applyDeferred)window.applyDeferred({occ:d[0],comp:d[1],poi:d[2],trees:d[3],rail:d[4]});}
+         catch(e){try{console.error('deferred apply failed:',e);}catch(_){}}
+       });
+     },1000);
+   }
+  })
+  .catch(function(e){
+    // data never loaded — turn the (still-mounted) loader into a calm error; if it was already
+    // cleared (init threw downstream), show a fresh error notice instead of a stuck spinner.
+    if(!loaderDead){box.style.color='#E0474B';box.textContent='Could not load '+pretty+' 3D data: '+e.message;}
+    else{var el=document.createElement('div');el.className='err';el.style.color='#E0474B';
+      el.textContent='Could not load '+pretty+' 3D data: '+(e&&e.message||e);document.body.appendChild(el);}
+    try{console.error('catchment load failed ('+CITY+'):',e);}catch(_){}
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+name: Committee — geocode precision backlog (weekly, key-gated)
+
+# The quietest data-quality lever (docs/INSIGHTS.md §2): only ~18% of branches were building-precise;
+# tambon-centroid errors up to 10.8 km were proven. Every proximity number (rival pressure, leads,
+# contested population, density) sharpens as precision rises. committee/run_cycle.py runs the gated
+# loop: geocoder proposes candidates -> validator gates (Thailand bbox, brand/name token match,
+# max-shift, dedup, no-regression) -> accepted patches merge into the master -> SCORECARD updated.
+#
+# Needs GOOGLE_MAPS_API_KEY (Places Text Search). This job SKIPS cleanly when the secret is unset, so
+# it is inert until you add it: repo -> Settings -> Secrets and variables -> Actions -> new secret
+# GOOGLE_MAPS_API_KEY (Places API enabled, key restricted to it). ROTATE the previously-exposed key first.
+#
+# A geocode changes branch coordinates, so this rebuilds every coordinate-dependent layer and runs the
+# determinism gate; it opens a DRAFT PR only when the gate is green. Never pushes to a working branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_cycles:
+        description: "geocoder cycles (batch 100 each)"
+        default: "5"
+  schedule:
+    # Weekly, Monday 03:10 UTC — after the gov-census job.
+    - cron: "10 3 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  geocode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard — require GOOGLE_MAPS_API_KEY
+        env:
+          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "GOOGLE_MAPS_API_KEY not set — geocoder is inert. Add the secret to enable. Skipping."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set up Python
+        if: env.SKIP != '1'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Deps
+        if: env.SKIP != '1'
+        run: pip install --quiet shapely openlocationcode || true
+
+      - name: Run gated geocoder cycles (merges accepted patches into the master)
+        if: env.SKIP != '1'
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          cd committee
+          python3 run_cycle.py --member geocoder --batch 100 --loop --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
+
+      - name: Rebuild every derived layer + run the determinism gate
+        if: env.SKIP != '1'
+        run: |
+          cd pipeline && python3 derive.py
+          for pass in 1 2; do for f in build_*.py; do python3 "$f" >/dev/null 2>&1 || true; done; done
+          python3 build_provenance.py >/dev/null 2>&1 || true
+          cd .. && bash tests/run.sh check
+
+      - name: Commit + open a draft PR (only reached when the gate passed)
+        if: env.SKIP != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/geocode-${{ github.run_id }}
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Geocoder accepted no new patches this run. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          PREC="$(python3 -c "import json;s=json.load(open('committee/SCORECARD.json'));print(s.get('precise','?'),'/',s.get('total','?'))" 2>/dev/null || echo '?')"
+          git commit -m "committee: geocode precision batch (run ${{ github.run_id }})" \
+                     -m "run_cycle.py geocoder member; validator-gated; every coordinate-dependent layer rebuilt and the determinism gate passed before this PR opened."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated weekly geocode precision run (run ${{ github.run_id }}), from \`$BASE_BRANCH\`."
+            echo
+            echo "**Building-precise branches:** $PREC"
+            echo
+            echo "Gated by the committee Validator (Thailand bbox · brand/name token match · max-shift ·"
+            echo "dedup · no-regression). All coordinate-dependent layers rebuilt; \`bash tests/run.sh check\`"
+            echo "passed in CI before this PR was opened. Rejected/ambiguous matches stay in the manual-review queue."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "committee: geocode precision batch (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

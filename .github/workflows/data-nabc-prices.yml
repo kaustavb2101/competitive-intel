@@ -1,0 +1,88 @@
+name: Data — NABC live daily prices (daily)
+
+# Pulls LIVE Thai daily market prices (crops · livestock · fisheries) from the NABC Agricultural
+# Data Service (agriapi.nabc.go.th) — real-time, free, NO API KEY, and REACHABLE from GitHub-hosted
+# runners (verified HTTP 200), unlike the data.go.th / DLT family which Cloudflare-geoblocks
+# datacenter IPs. So this is the one Thai-gov PRICE feed that refreshes fully in the cloud.
+#
+# WHAT IT PRODUCES: source-data/nabc_prices.json (pipeline/pull_nabc_prices.py) — per category, the
+# representative product's latest national price + a self-computed YoY. build_branch_agri.py PREFERS
+# this live crop YoY over the OAE snapshot, so the per-branch agri price-stress re-prices to current.
+#
+# Committed to a fresh data/nabc-<run_id> branch and opened as a DRAFT PR back to the branch this ran
+# on (cron uses the default branch). NEVER pushes to a working branch — can't race a session. No-ops
+# cleanly when the upstream prices haven't changed.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily, 20:15 UTC (= 03:15 Bangkok) — off-minute; NABC posts the prior day's prices overnight.
+    - cron: "15 20 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Offline selftest (prove the parse/aggregate path before the network)
+        run: python pipeline/pull_nabc_prices.py --selftest
+
+      - name: Pull NABC live prices
+        run: |
+          # --stamp = pull date for provenance; the script embeds no wall clock, so unchanged
+          # upstream prices reproduce byte-stable.
+          python pipeline/pull_nabc_prices.py --stamp "$(date -u +%F)"
+
+      - name: Rebuild branch_agri when prices changed
+        run: |
+          if git status --porcelain -- source-data/nabc_prices.json | grep -q .; then
+            echo "prices changed — rebuilding platform/data/branch_agri.json"
+            python pipeline/build_branch_agri.py
+          else
+            echo "prices unchanged — nothing to rebuild."
+          fi
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/nabc-${{ github.run_id }}
+        run: |
+          git add source-data/nabc_prices.json platform/data/branch_agri.json
+          if git diff --cached --quiet; then
+            echo "No change vs committed data (same upstream prices). No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          STAMP="$(python -c "import json;print(json.load(open('source-data/nabc_prices.json'))['meta'].get('pulled') or 'n/a')")"
+          YOY="$(python -c "import json;d=json.load(open('source-data/nabc_prices.json'))['crop_yoy'];print(', '.join('%s %+g%%'%(k,v) for k,v in sorted(d.items())))")"
+          git commit -m "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-nabc-prices.yml via pipeline/pull_nabc_prices.py — LIVE Thai daily market prices (agriapi.nabc.go.th). branch_agri.json re-priced to current crop YoY."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated daily NABC live-price pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Live crop YoY:** $YOY"
+            echo
+            echo "Provenance: MEASURED — NABC daily market prices (crops · livestock · fisheries), YoY"
+            echo "computed from the daily series. build_branch_agri.py prefers this live YoY over the OAE"
+            echo "snapshot (per-crop, OAE fallback for crops NABC lacks). Nothing fabricated."
+            echo
+            echo "Downstream layers reading branch_agri are unaffected (same shape). Run \`bash tests/run.sh check\` after merge."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

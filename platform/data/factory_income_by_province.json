@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "title": "Factory-worker income floor by province (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_factory_income.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "n_provinces": 77,
+    "national_avg": 21971,
+    "source": "NSO SES 2566 income-by-occupation, via data.go.th / TMLI bridge (pipeline/ingest_tmli.py); source-data/household_income_by_province.json.",
+    "provenance": "MEASURED. factory_income is the NSO SES 2566 FactoryWorkers monthly income for that province; national_avg is the unweighted mean across all provinces with a value; ratio_to_national is a pure derived ratio — no modeling.",
+    "fields": {
+      "factory_income": "MEASURED — NSO SES 2566 average monthly factory-worker income, THB.",
+      "ratio_to_national": "MEASURED (derived ratio) — factory_income / national_avg, 3dp. <1.0 means this province's factory-worker income floor sits below the national average."
+    },
+    "formula": {
+      "national_avg": "round(sum(province FactoryWorkers values) / n_provinces)",
+      "ratio_to_national": "round(factory_income / national_avg, 3)"
+    },
+    "measured_vs_estimated": "Every field here is MEASURED (NSO SES 2566) — this builder only aggregates and divides, it does not model or estimate anything.",
+    "caveats": [
+      "NSO SES occupation-category income is a province AVERAGE, not the AutoX borrower book — it reads structural income-floor risk for factory workers in that province, not realized PD.",
+      "Unweighted across provinces (not population-weighted)."
+    ]
+  },
+  "provinces": {
+    "กระบี่": {
+      "factory_income": 20281,
+      "ratio_to_national": 0.923
+    },
+    "กรุงเทพมหานคร": {
+      "factory_income": 27353,
+      "ratio_to_national": 1.245
+    },
+    "กาญจนบุรี": {
+      "factory_income": 21192,
+      "ratio_to_national": 0.965
+    },
+    "กาฬสินธุ์": {
+      "factory_income": 15503,
+      "ratio_to_national": 0.706
+    },
+    "กำแพงเพชร": {
+      "factory_income": 26349,
+      "ratio_to_national": 1.199
+    },
+    "ขอนแก่น": {
+      "factory_income": 18030,
+      "ratio_to_national": 0.821
+    },
+    "จันทบุรี": {
+      "factory_income": 25126,
+      "ratio_to_national": 1.144
+    },
+    "ฉะเชิงเทรา": {
+      "factory_income": 25495,
+      "ratio_to_national": 1.16
+    },
+    "ชลบุรี": {
+      "factory_income": 35095,
+      "ratio_to_national": 1.597
+    },
+    "ชัยนาท": {
+      "factory_income": 21761,
+      "ratio_to_national": 0.99
+    },
+    "ชัยภูมิ": {
+      "factory_income": 22169,
+      "ratio_to_national": 1.009
+    },
+    "ชุมพร": {
+      "factory_income": 20155,
+      "ratio_to_national": 0.917
+    },
+    "ตรัง": {
+      "factory_income": 21299,
+      "ratio_to_national": 0.969
+    },
+    "ตราด": {
+      "factory_income": 20426,
+      "ratio_to_national": 0.93
+    },
+    "ตาก": {
+      "factory_income": 12557,
+      "ratio_to_national": 0.572
+    },
+    "นครนายก": {
+      "factory_income": 24004,
+      "ratio_to_national": 1.093
+    },
+    "นครปฐม": {
+      "factory_income": 23111,
+      "ratio_to_national": 1.052
+    },
+    "นครพนม": {
+      "factory_income": 15752,
+      "ratio_to_national": 0.717
+    },
+    "นครราชสีมา": {
+      "factory_income": 27790,
+      "ratio_to_national": 1.265
+    },
+    "นครศรีธรรมราช": {
+      "factory_income": 24236,
+      "ratio_to_national": 1.103
+    },
+    "นครสวรรค์": {
+      "factory_income": 16680,
+      "ratio_to_national": 0.759
+    },
+    "นนทบุรี": {
+      "factory_income": 24348,
+      "ratio_to_national": 1.108
+    },
+    "นราธิวาส": {
+      "factory_income": 15359,
+      "ratio_to_national": 0.699
+    },
+    "น่าน": {
+      "factory_income": 16443,
+      "ratio_to_national": 0.748
+    },
+    "บึงกาฬ": {
+      "factory_income": 24991,
+      "ratio_to_national": 1.137
+    },
+    "บุรีรัมย์": {
+      "factory_income": 17321,
+      "ratio_to_national": 0.788
+    },
+    "ปทุมธานี": {
+      "factory_income": 33433,
+      "ratio_to_national": 1.522
+    },
+    "ประจวบคีรีขันธ์": {
+      "factory_income": 18860,
+      "ratio_to_national": 0.858
+    },
+    "ปราจีนบุรี": {
+      "factory_income": 27006,
+      "ratio_to_national": 1.229
+    },
+    "ปัตตานี": {
+      "factory_income": 16663,
+      "ratio_to_national": 0.758
+    },
+    "พระนครศรีอยุธยา": {
+      "factory_income": 35135,
+      "ratio_to_national": 1.599
+    },
+    "พะเยา": {
+      "factory_income": 14105,
+      "ratio_to_national": 0.642
+    },
+    "พังงา": {
+      "factory_income": 26318,
+      "ratio_to_national": 1.198
+    },
+    "พัทลุง": {
+      "factory_income": 21501,
+      "ratio_to_national": 0.979
+    },
+    "พิจิตร": {
+      "factory_income": 21115,
+      "ratio_to_national": 0.961
+    },
+    "พิษณุโลก": {
+      "factory_income": 21988,
+      "ratio_to_national": 1.001
+    },
+    "ภูเก็ต": {
+      "factory_income": 29715,
+      "ratio_to_national": 1.352
+    },
+    "มหาสารคาม": {
+      "factory_income": 17676,
+      "ratio_to_national": 0.805
+    },
+    "มุกดาหาร": {
+      "factory_income": 18604,
+      "ratio_to_national": 0.847
+    },
+    "ยะลา": {
+      "factory_income": 19434,
+      "ratio_to_national": 0.885
+    },
+    "ยโสธร": {
+      "factory_income": 14920,
+      "ratio_to_national": 0.679
+    },
+    "ระนอง": {
+      "factory_income": 18948,
+      "ratio_to_national": 0.862
+    },
+    "ระยอง": {
+      "factory_income": 36970,
+      "ratio_to_national": 1.683
+    },
+    "ราชบุรี": {
+      "factory_income": 22982,
+      "ratio_to_national": 1.046
+    },
+    "ร้อยเอ็ด": {
+      "factory_income": 19585,
+      "ratio_to_national": 0.891
+    },
+    "ลพบุรี": {
+      "factory_income": 26255,
+      "ratio_to_national": 1.195
+    },
+    "ลำปาง": {
+      "factory_income": 20244,
+      "ratio_to_national": 0.921
+    },
+    "ลำพูน": {
+      "factory_income": 26995,
+      "ratio_to_national": 1.229
+    },
+    "ศรีสะเกษ": {
+      "factory_income": 17244,
+      "ratio_to_national": 0.785
+    },
+    "สกลนคร": {
+      "factory_income": 15920,
+      "ratio_to_national": 0.725
+    },
+    "สงขลา": {
+      "factory_income": 22415,
+      "ratio_to_national": 1.02
+    },
+    "สตูล": {
+      "factory_income": 18349,
+      "ratio_to_national": 0.835
+    },
+    "สมุทรปราการ": {
+      "factory_income": 30091,
+      "ratio_to_national": 1.37
+    },
+    "สมุทรสงคราม": {
+      "factory_income": 23259,
+      "ratio_to_national": 1.059
+    },
+    "สมุทรสาคร": {
+      "factory_income": 23018,
+      "ratio_to_national": 1.048
+    },
+    "สระบุรี": {
+      "factory_income": 36514,
+      "ratio_to_national": 1.662
+    },
+    "สระแก้ว": {
+      "factory_income": 18375,
+      "ratio_to_national": 0.836
+    },
+    "สิงห์บุรี": {
+      "factory_income": 29202,
+      "ratio_to_national": 1.329
+    },
+    "สุพรรณบุรี": {
+      "factory_income": 24760,
+      "ratio_to_national": 1.127
+    },
+    "สุราษฎร์ธานี": {
+      "factory_income": 23259,
+      "ratio_to_national": 1.059
+    },
+    "สุรินทร์": {
+      "factory_income": 17639,
+      "ratio_to_national": 0.803
+    },
+    "สุโขทัย": {
+      "factory_income": 20688,
+      "ratio_to_national": 0.942
+    },
+    "หนองคาย": {
+      "factory_income": 19345,
+      "ratio_to_national": 0.88
+    },
+    "หนองบัวลำภู": {
+      "factory_income": 20357,
+      "ratio_to_national": 0.927
+    },
+    "อำนาจเจริญ": {
+      "factory_income": 18575,
+      "ratio_to_national": 0.845
+    },
+    "อุดรธานี": {
+      "factory_income": 14486,
+      "ratio_to_national": 0.659
+    },
+    "อุตรดิตถ์": {
+      "factory_income": 22613,
+      "ratio_to_national": 1.029
+    },
+    "อุทัยธานี": {
+      "factory_income": 18297,
+      "ratio_to_national": 0.833
+    },
+    "อุบลราชธานี": {
+      "factory_income": 17157,
+      "ratio_to_national": 0.781
+    },
+    "อ่างทอง": {
+      "factory_income": 28223,
+      "ratio_to_national": 1.285
+    },
+    "เชียงราย": {
+      "factory_income": 17697,
+      "ratio_to_national": 0.805
+    },
+    "เชียงใหม่": {
+      "factory_income": 18977,
+      "ratio_to_national": 0.864
+    },
+    "เพชรบุรี": {
+      "factory_income": 21697,
+      "ratio_to_national": 0.988
+    },
+    "เพชรบูรณ์": {
+      "factory_income": 28487,
+      "ratio_to_national": 1.297
+    },
+    "เลย": {
+      "factory_income": 20544,
+      "ratio_to_national": 0.935
+    },
+    "แพร่": {
+      "factory_income": 16690,
+      "ratio_to_national": 0.76
+    },
+    "แม่ฮ่องสอน": {
+      "factory_income": 16622,
+      "ratio_to_national": 0.757
+    }
+  }
+}

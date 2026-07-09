@@ -1,0 +1,337 @@
+{
+  "meta": {
+    "title": "Agriculture-worker income floor by province (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_agri_income.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "n_provinces": 77,
+    "national_avg": 23486,
+    "source": "NSO SES 2566 income-by-occupation, via data.go.th / TMLI bridge (pipeline/ingest_tmli.py); source-data/household_income_by_province.json.",
+    "provenance": "MEASURED. agri_income is the NSO SES 2566 Agriculture-occupation monthly income for that province; national_avg is the unweighted mean across all provinces with a value; ratio_to_national is a pure derived ratio — no modeling.",
+    "fields": {
+      "agri_income": "MEASURED — NSO SES 2566 average monthly agriculture-occupation income, THB.",
+      "ratio_to_national": "MEASURED (derived ratio) — agri_income / national_avg, 3dp. <1.0 means this province's agriculture-worker income floor sits below the national average."
+    },
+    "formula": {
+      "national_avg": "round(sum(province Agriculture values) / n_provinces)",
+      "ratio_to_national": "round(agri_income / national_avg, 3)"
+    },
+    "measured_vs_estimated": "Every field here is MEASURED (NSO SES 2566) — this builder only aggregates and divides, it does not model or estimate anything.",
+    "caveats": [
+      "NSO SES occupation-category income is a province AVERAGE, not the AutoX borrower book — it reads structural income-floor risk for agriculture households in that province, not realized PD.",
+      "Unweighted across provinces (not population-weighted).",
+      "Distinct from crop_stress.json's price/drought-driven agri_stress proxy — this is a static income-floor context, not a price or weather scenario."
+    ]
+  },
+  "provinces": {
+    "กระบี่": {
+      "agri_income": 20734,
+      "ratio_to_national": 0.883
+    },
+    "กรุงเทพมหานคร": {
+      "agri_income": 23541,
+      "ratio_to_national": 1.002
+    },
+    "กาญจนบุรี": {
+      "agri_income": 24630,
+      "ratio_to_national": 1.049
+    },
+    "กาฬสินธุ์": {
+      "agri_income": 22225,
+      "ratio_to_national": 0.946
+    },
+    "กำแพงเพชร": {
+      "agri_income": 21216,
+      "ratio_to_national": 0.903
+    },
+    "ขอนแก่น": {
+      "agri_income": 12759,
+      "ratio_to_national": 0.543
+    },
+    "จันทบุรี": {
+      "agri_income": 78117,
+      "ratio_to_national": 3.326
+    },
+    "ฉะเชิงเทรา": {
+      "agri_income": 32275,
+      "ratio_to_national": 1.374
+    },
+    "ชลบุรี": {
+      "agri_income": 40204,
+      "ratio_to_national": 1.712
+    },
+    "ชัยนาท": {
+      "agri_income": 20273,
+      "ratio_to_national": 0.863
+    },
+    "ชัยภูมิ": {
+      "agri_income": 22681,
+      "ratio_to_national": 0.966
+    },
+    "ชุมพร": {
+      "agri_income": 28285,
+      "ratio_to_national": 1.204
+    },
+    "ตรัง": {
+      "agri_income": 21151,
+      "ratio_to_national": 0.901
+    },
+    "ตราด": {
+      "agri_income": 30008,
+      "ratio_to_national": 1.278
+    },
+    "ตาก": {
+      "agri_income": 18316,
+      "ratio_to_national": 0.78
+    },
+    "นครนายก": {
+      "agri_income": 15439,
+      "ratio_to_national": 0.657
+    },
+    "นครปฐม": {
+      "agri_income": 36969,
+      "ratio_to_national": 1.574
+    },
+    "นครพนม": {
+      "agri_income": 16238,
+      "ratio_to_national": 0.691
+    },
+    "นครราชสีมา": {
+      "agri_income": 24065,
+      "ratio_to_national": 1.025
+    },
+    "นครศรีธรรมราช": {
+      "agri_income": 28500,
+      "ratio_to_national": 1.213
+    },
+    "นครสวรรค์": {
+      "agri_income": 28874,
+      "ratio_to_national": 1.229
+    },
+    "นนทบุรี": {
+      "agri_income": 15844,
+      "ratio_to_national": 0.675
+    },
+    "นราธิวาส": {
+      "agri_income": 7347,
+      "ratio_to_national": 0.313
+    },
+    "น่าน": {
+      "agri_income": 14684,
+      "ratio_to_national": 0.625
+    },
+    "บึงกาฬ": {
+      "agri_income": 19548,
+      "ratio_to_national": 0.832
+    },
+    "บุรีรัมย์": {
+      "agri_income": 20246,
+      "ratio_to_national": 0.862
+    },
+    "ปทุมธานี": {
+      "agri_income": 30671,
+      "ratio_to_national": 1.306
+    },
+    "ประจวบคีรีขันธ์": {
+      "agri_income": 21556,
+      "ratio_to_national": 0.918
+    },
+    "ปราจีนบุรี": {
+      "agri_income": 18556,
+      "ratio_to_national": 0.79
+    },
+    "ปัตตานี": {
+      "agri_income": 17496,
+      "ratio_to_national": 0.745
+    },
+    "พระนครศรีอยุธยา": {
+      "agri_income": 35484,
+      "ratio_to_national": 1.511
+    },
+    "พะเยา": {
+      "agri_income": 15336,
+      "ratio_to_national": 0.653
+    },
+    "พังงา": {
+      "agri_income": 18399,
+      "ratio_to_national": 0.783
+    },
+    "พัทลุง": {
+      "agri_income": 18998,
+      "ratio_to_national": 0.809
+    },
+    "พิจิตร": {
+      "agri_income": 23698,
+      "ratio_to_national": 1.009
+    },
+    "พิษณุโลก": {
+      "agri_income": 22335,
+      "ratio_to_national": 0.951
+    },
+    "ภูเก็ต": {
+      "agri_income": 34694,
+      "ratio_to_national": 1.477
+    },
+    "มหาสารคาม": {
+      "agri_income": 15297,
+      "ratio_to_national": 0.651
+    },
+    "มุกดาหาร": {
+      "agri_income": 16885,
+      "ratio_to_national": 0.719
+    },
+    "ยะลา": {
+      "agri_income": 13507,
+      "ratio_to_national": 0.575
+    },
+    "ยโสธร": {
+      "agri_income": 17639,
+      "ratio_to_national": 0.751
+    },
+    "ระนอง": {
+      "agri_income": 20472,
+      "ratio_to_national": 0.872
+    },
+    "ระยอง": {
+      "agri_income": 44041,
+      "ratio_to_national": 1.875
+    },
+    "ราชบุรี": {
+      "agri_income": 47453,
+      "ratio_to_national": 2.02
+    },
+    "ร้อยเอ็ด": {
+      "agri_income": 21349,
+      "ratio_to_national": 0.909
+    },
+    "ลพบุรี": {
+      "agri_income": 20320,
+      "ratio_to_national": 0.865
+    },
+    "ลำปาง": {
+      "agri_income": 13893,
+      "ratio_to_national": 0.592
+    },
+    "ลำพูน": {
+      "agri_income": 23777,
+      "ratio_to_national": 1.012
+    },
+    "ศรีสะเกษ": {
+      "agri_income": 39759,
+      "ratio_to_national": 1.693
+    },
+    "สกลนคร": {
+      "agri_income": 20307,
+      "ratio_to_national": 0.865
+    },
+    "สงขลา": {
+      "agri_income": 19749,
+      "ratio_to_national": 0.841
+    },
+    "สตูล": {
+      "agri_income": 19101,
+      "ratio_to_national": 0.813
+    },
+    "สมุทรปราการ": {
+      "agri_income": 23523,
+      "ratio_to_national": 1.002
+    },
+    "สมุทรสงคราม": {
+      "agri_income": 21477,
+      "ratio_to_national": 0.914
+    },
+    "สมุทรสาคร": {
+      "agri_income": 22843,
+      "ratio_to_national": 0.973
+    },
+    "สระบุรี": {
+      "agri_income": 27632,
+      "ratio_to_national": 1.177
+    },
+    "สระแก้ว": {
+      "agri_income": 23349,
+      "ratio_to_national": 0.994
+    },
+    "สิงห์บุรี": {
+      "agri_income": 26263,
+      "ratio_to_national": 1.118
+    },
+    "สุพรรณบุรี": {
+      "agri_income": 16772,
+      "ratio_to_national": 0.714
+    },
+    "สุราษฎร์ธานี": {
+      "agri_income": 30614,
+      "ratio_to_national": 1.303
+    },
+    "สุรินทร์": {
+      "agri_income": 17443,
+      "ratio_to_national": 0.743
+    },
+    "สุโขทัย": {
+      "agri_income": 23618,
+      "ratio_to_national": 1.006
+    },
+    "หนองคาย": {
+      "agri_income": 20460,
+      "ratio_to_national": 0.871
+    },
+    "หนองบัวลำภู": {
+      "agri_income": 35203,
+      "ratio_to_national": 1.499
+    },
+    "อำนาจเจริญ": {
+      "agri_income": 18477,
+      "ratio_to_national": 0.787
+    },
+    "อุดรธานี": {
+      "agri_income": 27150,
+      "ratio_to_national": 1.156
+    },
+    "อุตรดิตถ์": {
+      "agri_income": 22623,
+      "ratio_to_national": 0.963
+    },
+    "อุทัยธานี": {
+      "agri_income": 18044,
+      "ratio_to_national": 0.768
+    },
+    "อุบลราชธานี": {
+      "agri_income": 20798,
+      "ratio_to_national": 0.886
+    },
+    "อ่างทอง": {
+      "agri_income": 26928,
+      "ratio_to_national": 1.147
+    },
+    "เชียงราย": {
+      "agri_income": 15156,
+      "ratio_to_national": 0.645
+    },
+    "เชียงใหม่": {
+      "agri_income": 16152,
+      "ratio_to_national": 0.688
+    },
+    "เพชรบุรี": {
+      "agri_income": 28985,
+      "ratio_to_national": 1.234
+    },
+    "เพชรบูรณ์": {
+      "agri_income": 22633,
+      "ratio_to_national": 0.964
+    },
+    "เลย": {
+      "agri_income": 21750,
+      "ratio_to_national": 0.926
+    },
+    "แพร่": {
+      "agri_income": 13189,
+      "ratio_to_national": 0.562
+    },
+    "แม่ฮ่องสอน": {
+      "agri_income": 12435,
+      "ratio_to_national": 0.529
+    }
+  }
+}

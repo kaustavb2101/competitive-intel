@@ -1,0 +1,337 @@
+{
+  "meta": {
+    "title": "SME-owner income floor by province (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_sme_income.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "n_provinces": 77,
+    "national_avg": 33299,
+    "source": "NSO SES 2566 income-by-occupation, via data.go.th / TMLI bridge (pipeline/ingest_tmli.py); source-data/household_income_by_province.json.",
+    "provenance": "MEASURED. sme_income is the NSO SES 2566 SMEOwners-occupation monthly income for that province; national_avg is the unweighted mean across all provinces with a value; ratio_to_national is a pure derived ratio — no modeling.",
+    "fields": {
+      "sme_income": "MEASURED — NSO SES 2566 average monthly SME-owner-occupation income, THB.",
+      "ratio_to_national": "MEASURED (derived ratio) — sme_income / national_avg, 3dp. <1.0 means this province's SME-owner income floor sits below the national average."
+    },
+    "formula": {
+      "national_avg": "round(sum(province SMEOwners values) / n_provinces)",
+      "ratio_to_national": "round(sme_income / national_avg, 3)"
+    },
+    "measured_vs_estimated": "Every field here is MEASURED (NSO SES 2566) — this builder only aggregates and divides, it does not model or estimate anything.",
+    "caveats": [
+      "NSO SES occupation-category income is a province AVERAGE, not the AutoX borrower book — it reads structural income-floor risk for SME-owner households in that province (a proxy for merchant-lending demand), not realized PD.",
+      "Unweighted across provinces (not population-weighted).",
+      "SMEOwners is a distinct NSO SES occupation category from the app's merchant_demand segment score (which is an Overture establishment-density proxy) — this is a static income-floor context on business-owner households, not the segment score itself."
+    ]
+  },
+  "provinces": {
+    "กระบี่": {
+      "sme_income": 31978,
+      "ratio_to_national": 0.96
+    },
+    "กรุงเทพมหานคร": {
+      "sme_income": 48801,
+      "ratio_to_national": 1.466
+    },
+    "กาญจนบุรี": {
+      "sme_income": 30176,
+      "ratio_to_national": 0.906
+    },
+    "กาฬสินธุ์": {
+      "sme_income": 34218,
+      "ratio_to_national": 1.028
+    },
+    "กำแพงเพชร": {
+      "sme_income": 25638,
+      "ratio_to_national": 0.77
+    },
+    "ขอนแก่น": {
+      "sme_income": 22200,
+      "ratio_to_national": 0.667
+    },
+    "จันทบุรี": {
+      "sme_income": 55751,
+      "ratio_to_national": 1.674
+    },
+    "ฉะเชิงเทรา": {
+      "sme_income": 34652,
+      "ratio_to_national": 1.041
+    },
+    "ชลบุรี": {
+      "sme_income": 44976,
+      "ratio_to_national": 1.351
+    },
+    "ชัยนาท": {
+      "sme_income": 31043,
+      "ratio_to_national": 0.932
+    },
+    "ชัยภูมิ": {
+      "sme_income": 35134,
+      "ratio_to_national": 1.055
+    },
+    "ชุมพร": {
+      "sme_income": 49226,
+      "ratio_to_national": 1.478
+    },
+    "ตรัง": {
+      "sme_income": 38894,
+      "ratio_to_national": 1.168
+    },
+    "ตราด": {
+      "sme_income": 35888,
+      "ratio_to_national": 1.078
+    },
+    "ตาก": {
+      "sme_income": 31620,
+      "ratio_to_national": 0.95
+    },
+    "นครนายก": {
+      "sme_income": 31432,
+      "ratio_to_national": 0.944
+    },
+    "นครปฐม": {
+      "sme_income": 46995,
+      "ratio_to_national": 1.411
+    },
+    "นครพนม": {
+      "sme_income": 32481,
+      "ratio_to_national": 0.975
+    },
+    "นครราชสีมา": {
+      "sme_income": 29597,
+      "ratio_to_national": 0.889
+    },
+    "นครศรีธรรมราช": {
+      "sme_income": 57308,
+      "ratio_to_national": 1.721
+    },
+    "นครสวรรค์": {
+      "sme_income": 28511,
+      "ratio_to_national": 0.856
+    },
+    "นนทบุรี": {
+      "sme_income": 40798,
+      "ratio_to_national": 1.225
+    },
+    "นราธิวาส": {
+      "sme_income": 21175,
+      "ratio_to_national": 0.636
+    },
+    "น่าน": {
+      "sme_income": 23866,
+      "ratio_to_national": 0.717
+    },
+    "บึงกาฬ": {
+      "sme_income": 35566,
+      "ratio_to_national": 1.068
+    },
+    "บุรีรัมย์": {
+      "sme_income": 23966,
+      "ratio_to_national": 0.72
+    },
+    "ปทุมธานี": {
+      "sme_income": 53713,
+      "ratio_to_national": 1.613
+    },
+    "ประจวบคีรีขันธ์": {
+      "sme_income": 27114,
+      "ratio_to_national": 0.814
+    },
+    "ปราจีนบุรี": {
+      "sme_income": 23534,
+      "ratio_to_national": 0.707
+    },
+    "ปัตตานี": {
+      "sme_income": 22112,
+      "ratio_to_national": 0.664
+    },
+    "พระนครศรีอยุธยา": {
+      "sme_income": 43181,
+      "ratio_to_national": 1.297
+    },
+    "พะเยา": {
+      "sme_income": 20442,
+      "ratio_to_national": 0.614
+    },
+    "พังงา": {
+      "sme_income": 29351,
+      "ratio_to_national": 0.881
+    },
+    "พัทลุง": {
+      "sme_income": 33144,
+      "ratio_to_national": 0.995
+    },
+    "พิจิตร": {
+      "sme_income": 22049,
+      "ratio_to_national": 0.662
+    },
+    "พิษณุโลก": {
+      "sme_income": 29130,
+      "ratio_to_national": 0.875
+    },
+    "ภูเก็ต": {
+      "sme_income": 45410,
+      "ratio_to_national": 1.364
+    },
+    "มหาสารคาม": {
+      "sme_income": 29341,
+      "ratio_to_national": 0.881
+    },
+    "มุกดาหาร": {
+      "sme_income": 27564,
+      "ratio_to_national": 0.828
+    },
+    "ยะลา": {
+      "sme_income": 51466,
+      "ratio_to_national": 1.546
+    },
+    "ยโสธร": {
+      "sme_income": 34506,
+      "ratio_to_national": 1.036
+    },
+    "ระนอง": {
+      "sme_income": 39451,
+      "ratio_to_national": 1.185
+    },
+    "ระยอง": {
+      "sme_income": 27677,
+      "ratio_to_national": 0.831
+    },
+    "ราชบุรี": {
+      "sme_income": 34175,
+      "ratio_to_national": 1.026
+    },
+    "ร้อยเอ็ด": {
+      "sme_income": 31686,
+      "ratio_to_national": 0.952
+    },
+    "ลพบุรี": {
+      "sme_income": 26831,
+      "ratio_to_national": 0.806
+    },
+    "ลำปาง": {
+      "sme_income": 33895,
+      "ratio_to_national": 1.018
+    },
+    "ลำพูน": {
+      "sme_income": 30396,
+      "ratio_to_national": 0.913
+    },
+    "ศรีสะเกษ": {
+      "sme_income": 26648,
+      "ratio_to_national": 0.8
+    },
+    "สกลนคร": {
+      "sme_income": 31493,
+      "ratio_to_national": 0.946
+    },
+    "สงขลา": {
+      "sme_income": 29431,
+      "ratio_to_national": 0.884
+    },
+    "สตูล": {
+      "sme_income": 34103,
+      "ratio_to_national": 1.024
+    },
+    "สมุทรปราการ": {
+      "sme_income": 29761,
+      "ratio_to_national": 0.894
+    },
+    "สมุทรสงคราม": {
+      "sme_income": 37042,
+      "ratio_to_national": 1.112
+    },
+    "สมุทรสาคร": {
+      "sme_income": 38787,
+      "ratio_to_national": 1.165
+    },
+    "สระบุรี": {
+      "sme_income": 46871,
+      "ratio_to_national": 1.408
+    },
+    "สระแก้ว": {
+      "sme_income": 24690,
+      "ratio_to_national": 0.741
+    },
+    "สิงห์บุรี": {
+      "sme_income": 28269,
+      "ratio_to_national": 0.849
+    },
+    "สุพรรณบุรี": {
+      "sme_income": 27352,
+      "ratio_to_national": 0.821
+    },
+    "สุราษฎร์ธานี": {
+      "sme_income": 37719,
+      "ratio_to_national": 1.133
+    },
+    "สุรินทร์": {
+      "sme_income": 27946,
+      "ratio_to_national": 0.839
+    },
+    "สุโขทัย": {
+      "sme_income": 31186,
+      "ratio_to_national": 0.937
+    },
+    "หนองคาย": {
+      "sme_income": 32497,
+      "ratio_to_national": 0.976
+    },
+    "หนองบัวลำภู": {
+      "sme_income": 28144,
+      "ratio_to_national": 0.845
+    },
+    "อำนาจเจริญ": {
+      "sme_income": 38718,
+      "ratio_to_national": 1.163
+    },
+    "อุดรธานี": {
+      "sme_income": 28534,
+      "ratio_to_national": 0.857
+    },
+    "อุตรดิตถ์": {
+      "sme_income": 27693,
+      "ratio_to_national": 0.832
+    },
+    "อุทัยธานี": {
+      "sme_income": 24928,
+      "ratio_to_national": 0.749
+    },
+    "อุบลราชธานี": {
+      "sme_income": 25208,
+      "ratio_to_national": 0.757
+    },
+    "อ่างทอง": {
+      "sme_income": 30714,
+      "ratio_to_national": 0.922
+    },
+    "เชียงราย": {
+      "sme_income": 16473,
+      "ratio_to_national": 0.495
+    },
+    "เชียงใหม่": {
+      "sme_income": 50813,
+      "ratio_to_national": 1.526
+    },
+    "เพชรบุรี": {
+      "sme_income": 34651,
+      "ratio_to_national": 1.041
+    },
+    "เพชรบูรณ์": {
+      "sme_income": 29069,
+      "ratio_to_national": 0.873
+    },
+    "เลย": {
+      "sme_income": 31430,
+      "ratio_to_national": 0.944
+    },
+    "แพร่": {
+      "sme_income": 29670,
+      "ratio_to_national": 0.891
+    },
+    "แม่ฮ่องสอน": {
+      "sme_income": 46095,
+      "ratio_to_national": 1.384
+    }
+  }
+}

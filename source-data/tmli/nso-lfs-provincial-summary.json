@@ -1,0 +1,708 @@
+{
+  "meta": {
+    "source": "catalogapi.nso.go.th — NSO Thailand",
+    "table": "ST_02_2005005_4",
+    "dataset": "จำนวนกำลังแรงงานรวม รายจังหวัด (condensed)",
+    "description": "NSO LFS provincial summary — latest quarter, all genders combined",
+    "unit": "พันคน (thousands of persons)",
+    "reference_period": "ไตรมาสที่ 3/2568",
+    "reference_year_ce": 2025,
+    "province_count": 77,
+    "downloaded_at": "2026-03-29T08:28:44.698457+00:00"
+  },
+  "provinces": {
+    "กรุงเทพมหานคร": {
+      "employed": 5657.9,
+      "unemployed": 38.2,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 5696.1,
+      "employmentRate": 99.33,
+      "unemploymentRate": 0.67
+    },
+    "สมุทรปราการ": {
+      "employed": 1505.8,
+      "unemployed": 26.3,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 1532.1,
+      "employmentRate": 98.28,
+      "unemploymentRate": 1.72
+    },
+    "นนทบุรี": {
+      "employed": 1202.0,
+      "unemployed": 7.5,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 1209.5,
+      "employmentRate": 99.38,
+      "unemploymentRate": 0.62
+    },
+    "ปทุมธานี": {
+      "employed": 1177.1,
+      "unemployed": 17.0,
+      "seekingWork": 0,
+      "notInLF": 1.1,
+      "laborForce": 1194.1,
+      "employmentRate": 98.58,
+      "unemploymentRate": 1.42
+    },
+    "พระนครศรีอยุธยา": {
+      "employed": 523.1,
+      "unemployed": 0.9,
+      "seekingWork": 0,
+      "notInLF": 0.6,
+      "laborForce": 524.0,
+      "employmentRate": 99.83,
+      "unemploymentRate": 0.17
+    },
+    "อ่างทอง": {
+      "employed": 129.4,
+      "unemployed": 0.9,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 130.3,
+      "employmentRate": 99.31,
+      "unemploymentRate": 0.69
+    },
+    "ลพบุรี": {
+      "employed": 431.3,
+      "unemployed": 2.1,
+      "seekingWork": 0,
+      "notInLF": 1.1,
+      "laborForce": 433.4,
+      "employmentRate": 99.52,
+      "unemploymentRate": 0.48
+    },
+    "สิงห์บุรี": {
+      "employed": 98.0,
+      "unemployed": 2.3,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 100.3,
+      "employmentRate": 97.71,
+      "unemploymentRate": 2.29
+    },
+    "ชัยนาท": {
+      "employed": 171.0,
+      "unemployed": 1.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 172.6,
+      "employmentRate": 99.07,
+      "unemploymentRate": 0.93
+    },
+    "สระบุรี": {
+      "employed": 419.0,
+      "unemployed": 3.1,
+      "seekingWork": 0,
+      "notInLF": 1.7,
+      "laborForce": 422.1,
+      "employmentRate": 99.27,
+      "unemploymentRate": 0.73
+    },
+    "ราชบุรี": {
+      "employed": 452.7,
+      "unemployed": 7.4,
+      "seekingWork": 0,
+      "notInLF": 0.3,
+      "laborForce": 460.1,
+      "employmentRate": 98.39,
+      "unemploymentRate": 1.61
+    },
+    "กาญจนบุรี": {
+      "employed": 477.6,
+      "unemployed": 3.2,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 480.8,
+      "employmentRate": 99.33,
+      "unemploymentRate": 0.67
+    },
+    "สุพรรณบุรี": {
+      "employed": 482.4,
+      "unemployed": 3.2,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 485.6,
+      "employmentRate": 99.34,
+      "unemploymentRate": 0.66
+    },
+    "นครปฐม": {
+      "employed": 881.5,
+      "unemployed": 3.9,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 885.4,
+      "employmentRate": 99.56,
+      "unemploymentRate": 0.44
+    },
+    "สมุทรสาคร": {
+      "employed": 791.2,
+      "unemployed": 6.5,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 797.7,
+      "employmentRate": 99.19,
+      "unemploymentRate": 0.81
+    },
+    "สมุทรสงคราม": {
+      "employed": 98.7,
+      "unemployed": 0.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 99.3,
+      "employmentRate": 99.4,
+      "unemploymentRate": 0.6
+    },
+    "เพชรบุรี": {
+      "employed": 289.2,
+      "unemployed": 0.7,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 289.9,
+      "employmentRate": 99.76,
+      "unemploymentRate": 0.24
+    },
+    "ประจวบคีรีขันธ์": {
+      "employed": 269.0,
+      "unemployed": 0.8,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 269.8,
+      "employmentRate": 99.7,
+      "unemploymentRate": 0.3
+    },
+    "นครศรีธรรมราช": {
+      "employed": 876.4,
+      "unemployed": 2.9,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 879.3,
+      "employmentRate": 99.67,
+      "unemploymentRate": 0.33
+    },
+    "กระบี่": {
+      "employed": 244.4,
+      "unemployed": 3.5,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 247.9,
+      "employmentRate": 98.59,
+      "unemploymentRate": 1.41
+    },
+    "พังงา": {
+      "employed": 126.4,
+      "unemployed": 4.7,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 131.1,
+      "employmentRate": 96.41,
+      "unemploymentRate": 3.59
+    },
+    "ภูเก็ต": {
+      "employed": 342.4,
+      "unemployed": 3.8,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 346.2,
+      "employmentRate": 98.9,
+      "unemploymentRate": 1.1
+    },
+    "สุราษฏร์ธานี": {
+      "employed": 655.6,
+      "unemployed": 2.4,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 658.0,
+      "employmentRate": 99.64,
+      "unemploymentRate": 0.36
+    },
+    "ระนอง": {
+      "employed": 155.8,
+      "unemployed": 0.5,
+      "seekingWork": 0,
+      "notInLF": 0.2,
+      "laborForce": 156.3,
+      "employmentRate": 99.68,
+      "unemploymentRate": 0.32
+    },
+    "ชุมพร": {
+      "employed": 269.8,
+      "unemployed": 0.2,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 270.0,
+      "employmentRate": 99.93,
+      "unemploymentRate": 0.07
+    },
+    "สงขลา": {
+      "employed": 914.2,
+      "unemployed": 11.4,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 925.6,
+      "employmentRate": 98.77,
+      "unemploymentRate": 1.23
+    },
+    "สตูล": {
+      "employed": 151.6,
+      "unemployed": 2.1,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 153.7,
+      "employmentRate": 98.63,
+      "unemploymentRate": 1.37
+    },
+    "ตรัง": {
+      "employed": 361.7,
+      "unemployed": 2.7,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 364.4,
+      "employmentRate": 99.26,
+      "unemploymentRate": 0.74
+    },
+    "พัทลุง": {
+      "employed": 280.9,
+      "unemployed": 1.3,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 282.2,
+      "employmentRate": 99.54,
+      "unemploymentRate": 0.46
+    },
+    "ปัตตานี": {
+      "employed": 335.9,
+      "unemployed": 6.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 342.5,
+      "employmentRate": 98.07,
+      "unemploymentRate": 1.93
+    },
+    "ยะลา": {
+      "employed": 254.2,
+      "unemployed": 2.8,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 257.0,
+      "employmentRate": 98.91,
+      "unemploymentRate": 1.09
+    },
+    "นราธิวาส": {
+      "employed": 368.8,
+      "unemployed": 9.2,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 378.0,
+      "employmentRate": 97.57,
+      "unemploymentRate": 2.43
+    },
+    "ชลบุรี": {
+      "employed": 1251.0,
+      "unemployed": 1.5,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 1252.5,
+      "employmentRate": 99.88,
+      "unemploymentRate": 0.12
+    },
+    "ระยอง": {
+      "employed": 732.8,
+      "unemployed": 5.3,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 738.1,
+      "employmentRate": 99.28,
+      "unemploymentRate": 0.72
+    },
+    "จันทบุรี": {
+      "employed": 379.1,
+      "unemployed": 1.9,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 381.0,
+      "employmentRate": 99.5,
+      "unemploymentRate": 0.5
+    },
+    "ตราด": {
+      "employed": 172.2,
+      "unemployed": 0.4,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 172.6,
+      "employmentRate": 99.77,
+      "unemploymentRate": 0.23
+    },
+    "ฉะเชิงเทรา": {
+      "employed": 592.6,
+      "unemployed": 3.4,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 596.0,
+      "employmentRate": 99.43,
+      "unemploymentRate": 0.57
+    },
+    "ปราจีนบุรี": {
+      "employed": 392.0,
+      "unemployed": 2.3,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 394.3,
+      "employmentRate": 99.42,
+      "unemploymentRate": 0.58
+    },
+    "นครนายก": {
+      "employed": 149.8,
+      "unemployed": 0.3,
+      "seekingWork": 0,
+      "notInLF": 0.2,
+      "laborForce": 150.1,
+      "employmentRate": 99.8,
+      "unemploymentRate": 0.2
+    },
+    "สระแก้ว": {
+      "employed": 377.8,
+      "unemployed": 2.5,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 380.3,
+      "employmentRate": 99.34,
+      "unemploymentRate": 0.66
+    },
+    "นครราชสีมา": {
+      "employed": 1228.2,
+      "unemployed": 8.7,
+      "seekingWork": 0,
+      "notInLF": 10.9,
+      "laborForce": 1236.9,
+      "employmentRate": 99.3,
+      "unemploymentRate": 0.7
+    },
+    "บุรีรัมย์": {
+      "employed": 636.0,
+      "unemployed": 12.1,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 648.1,
+      "employmentRate": 98.13,
+      "unemploymentRate": 1.87
+    },
+    "สุรินทร์": {
+      "employed": 548.9,
+      "unemployed": 0.1,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 549.0,
+      "employmentRate": 99.98,
+      "unemploymentRate": 0.02
+    },
+    "ศรีสะเกษ": {
+      "employed": 572.6,
+      "unemployed": 3.1,
+      "seekingWork": 0,
+      "notInLF": 1.8,
+      "laborForce": 575.7,
+      "employmentRate": 99.46,
+      "unemploymentRate": 0.54
+    },
+    "อุบลราชธานี": {
+      "employed": 828.4,
+      "unemployed": 1.3,
+      "seekingWork": 0,
+      "notInLF": 0.3,
+      "laborForce": 829.7,
+      "employmentRate": 99.84,
+      "unemploymentRate": 0.16
+    },
+    "ยโสธร": {
+      "employed": 266.1,
+      "unemployed": 1.0,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 267.1,
+      "employmentRate": 99.63,
+      "unemploymentRate": 0.37
+    },
+    "ชัยภูมิ": {
+      "employed": 438.6,
+      "unemployed": 3.6,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 442.2,
+      "employmentRate": 99.19,
+      "unemploymentRate": 0.81
+    },
+    "อำนาจเจริญ": {
+      "employed": 140.4,
+      "unemployed": 4.1,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 144.5,
+      "employmentRate": 97.16,
+      "unemploymentRate": 2.84
+    },
+    "บึงกาฬ": {
+      "employed": 188.1,
+      "unemployed": 0.3,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 188.4,
+      "employmentRate": 99.84,
+      "unemploymentRate": 0.16
+    },
+    "หนองบัวลำภู": {
+      "employed": 224.8,
+      "unemployed": 0,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 224.8,
+      "employmentRate": 100.0,
+      "unemploymentRate": 0.0
+    },
+    "ขอนแก่น": {
+      "employed": 897.3,
+      "unemployed": 0,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 897.3,
+      "employmentRate": 100.0,
+      "unemploymentRate": 0.0
+    },
+    "อุดรธานี": {
+      "employed": 621.6,
+      "unemployed": 0.4,
+      "seekingWork": 0,
+      "notInLF": 1.0,
+      "laborForce": 622.0,
+      "employmentRate": 99.94,
+      "unemploymentRate": 0.06
+    },
+    "เลย": {
+      "employed": 281.2,
+      "unemployed": 0.1,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 281.3,
+      "employmentRate": 99.96,
+      "unemploymentRate": 0.04
+    },
+    "หนองคาย": {
+      "employed": 208.8,
+      "unemployed": 0.8,
+      "seekingWork": 0,
+      "notInLF": 2.2,
+      "laborForce": 209.6,
+      "employmentRate": 99.62,
+      "unemploymentRate": 0.38
+    },
+    "มหาสารคาม": {
+      "employed": 414.5,
+      "unemployed": 0,
+      "seekingWork": 0,
+      "notInLF": 0.3,
+      "laborForce": 414.5,
+      "employmentRate": 100.0,
+      "unemploymentRate": 0.0
+    },
+    "ร้อยเอ็ด": {
+      "employed": 550.9,
+      "unemployed": 1.8,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 552.7,
+      "employmentRate": 99.67,
+      "unemploymentRate": 0.33
+    },
+    "กาฬสินธุ์": {
+      "employed": 375.2,
+      "unemployed": 2.2,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 377.4,
+      "employmentRate": 99.42,
+      "unemploymentRate": 0.58
+    },
+    "สกลนคร": {
+      "employed": 380.5,
+      "unemployed": 0.2,
+      "seekingWork": 0,
+      "notInLF": 5.2,
+      "laborForce": 380.7,
+      "employmentRate": 99.95,
+      "unemploymentRate": 0.05
+    },
+    "นครพนม": {
+      "employed": 278.4,
+      "unemployed": 6.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 285.0,
+      "employmentRate": 97.68,
+      "unemploymentRate": 2.32
+    },
+    "มุกดาหาร": {
+      "employed": 246.1,
+      "unemployed": 0.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 246.7,
+      "employmentRate": 99.76,
+      "unemploymentRate": 0.24
+    },
+    "เชียงใหม่": {
+      "employed": 1051.6,
+      "unemployed": 7.2,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 1058.8,
+      "employmentRate": 99.32,
+      "unemploymentRate": 0.68
+    },
+    "ลำพูน": {
+      "employed": 224.0,
+      "unemployed": 0.7,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 224.7,
+      "employmentRate": 99.69,
+      "unemploymentRate": 0.31
+    },
+    "ลำปาง": {
+      "employed": 341.6,
+      "unemployed": 5.5,
+      "seekingWork": 0,
+      "notInLF": 0.5,
+      "laborForce": 347.1,
+      "employmentRate": 98.42,
+      "unemploymentRate": 1.58
+    },
+    "อุตรดิตถ์": {
+      "employed": 200.4,
+      "unemployed": 2.8,
+      "seekingWork": 0,
+      "notInLF": 0.5,
+      "laborForce": 203.2,
+      "employmentRate": 98.62,
+      "unemploymentRate": 1.38
+    },
+    "แพร่": {
+      "employed": 195.0,
+      "unemployed": 1.4,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 196.4,
+      "employmentRate": 99.29,
+      "unemploymentRate": 0.71
+    },
+    "น่าน": {
+      "employed": 243.4,
+      "unemployed": 1.6,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 245.0,
+      "employmentRate": 99.35,
+      "unemploymentRate": 0.65
+    },
+    "พะเยา": {
+      "employed": 186.6,
+      "unemployed": 1.5,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 188.1,
+      "employmentRate": 99.2,
+      "unemploymentRate": 0.8
+    },
+    "เชียงราย": {
+      "employed": 583.9,
+      "unemployed": 3.4,
+      "seekingWork": 0,
+      "notInLF": 0.3,
+      "laborForce": 587.3,
+      "employmentRate": 99.42,
+      "unemploymentRate": 0.58
+    },
+    "แม่ฮ่องสอน": {
+      "employed": 138.3,
+      "unemployed": 1.0,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 139.3,
+      "employmentRate": 99.28,
+      "unemploymentRate": 0.72
+    },
+    "นครสวรรค์": {
+      "employed": 485.4,
+      "unemployed": 0.7,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 486.1,
+      "employmentRate": 99.86,
+      "unemploymentRate": 0.14
+    },
+    "อุทัยธานี": {
+      "employed": 146.0,
+      "unemployed": 1.2,
+      "seekingWork": 0,
+      "notInLF": 1.1,
+      "laborForce": 147.2,
+      "employmentRate": 99.18,
+      "unemploymentRate": 0.82
+    },
+    "กำแพงเพชร": {
+      "employed": 449.4,
+      "unemployed": 9.7,
+      "seekingWork": 0,
+      "notInLF": 0.6,
+      "laborForce": 459.1,
+      "employmentRate": 97.89,
+      "unemploymentRate": 2.11
+    },
+    "ตาก": {
+      "employed": 286.0,
+      "unemployed": 2.2,
+      "seekingWork": 0,
+      "notInLF": 0.4,
+      "laborForce": 288.2,
+      "employmentRate": 99.24,
+      "unemploymentRate": 0.76
+    },
+    "สุโขทัย": {
+      "employed": 332.4,
+      "unemployed": 7.2,
+      "seekingWork": 0,
+      "notInLF": 0.1,
+      "laborForce": 339.6,
+      "employmentRate": 97.88,
+      "unemploymentRate": 2.12
+    },
+    "พิษณุโลก": {
+      "employed": 488.0,
+      "unemployed": 3.4,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 491.4,
+      "employmentRate": 99.31,
+      "unemploymentRate": 0.69
+    },
+    "พิจิตร": {
+      "employed": 268.6,
+      "unemployed": 3.9,
+      "seekingWork": 0,
+      "notInLF": 0,
+      "laborForce": 272.5,
+      "employmentRate": 98.57,
+      "unemploymentRate": 1.43
+    },
+    "เพชรบูรณ์": {
+      "employed": 462.2,
+      "unemployed": 8.6,
+      "seekingWork": 0,
+      "notInLF": 3.4,
+      "laborForce": 470.8,
+      "employmentRate": 98.17,
+      "unemploymentRate": 1.83
+    }
+  }
+}

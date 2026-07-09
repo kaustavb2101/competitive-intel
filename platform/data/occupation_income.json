@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "title": "Lowest-paid occupation nationally (portfolio risk, objective #1)",
+    "generated_by": "pipeline/build_occupation_income.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "n_categories": 5,
+    "sort": "worst-first (lowest national_avg first)",
+    "source": "NSO SES 2566 income-by-occupation, via data.go.th / TMLI bridge (pipeline/ingest_tmli.py); source-data/household_income_by_province.json.",
+    "provenance": "MEASURED. national_avg/min_value/max_value are the unweighted mean/min/max of that occupation category's MEASURED per-province monthly income across all 77 provinces — no modeling or estimation.",
+    "fields": {
+      "national_avg": "MEASURED — unweighted mean across provinces, THB/month.",
+      "min_province": "MEASURED — the single province with the lowest value for this category (a concrete worst case, not just the national mean).",
+      "max_province": "MEASURED — the single province with the highest value."
+    },
+    "formula": {
+      "national_avg": "round(sum(province values) / n_provinces)"
+    },
+    "measured_vs_estimated": "Every field here is MEASURED (NSO SES 2566) — this builder only aggregates, it does not model or estimate anything.",
+    "caveats": [
+      "NSO SES occupation-category incomes are province AVERAGES, not the AutoX borrower book — they read structural income-floor risk for that occupation, not realized PD.",
+      "Unweighted mean across provinces (not population-weighted) — a small province counts the same as Bangkok."
+    ]
+  },
+  "categories": [
+    {
+      "key": "Transport",
+      "label": "Transport",
+      "n_provinces": 77,
+      "national_avg": 18547,
+      "min_province": "แม่ฮ่องสอน",
+      "min_value": 6713,
+      "max_province": "เชียงใหม่",
+      "max_value": 31365
+    },
+    {
+      "key": "FactoryWorkers",
+      "label": "Factory workers",
+      "n_provinces": 77,
+      "national_avg": 21971,
+      "min_province": "ตาก",
+      "min_value": 12557,
+      "max_province": "ระยอง",
+      "max_value": 36970
+    },
+    {
+      "key": "Agriculture",
+      "label": "Agriculture",
+      "n_provinces": 77,
+      "national_avg": 23486,
+      "min_province": "นราธิวาส",
+      "min_value": 7347,
+      "max_province": "จันทบุรี",
+      "max_value": 78117
+    },
+    {
+      "key": "SMEOwners",
+      "label": "SME owners",
+      "n_provinces": 77,
+      "national_avg": 33299,
+      "min_province": "เชียงราย",
+      "min_value": 16473,
+      "max_province": "นครศรีธรรมราช",
+      "max_value": 57308
+    },
+    {
+      "key": "OfficeStaff",
+      "label": "Office staff",
+      "n_provinces": 77,
+      "national_avg": 36989,
+      "min_province": "เชียงราย",
+      "min_value": 26884,
+      "max_province": "ปทุมธานี",
+      "max_value": 52371
+    }
+  ]
+}

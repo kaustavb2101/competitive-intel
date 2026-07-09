@@ -1,0 +1,15 @@
+{
+ "branches": 2015,
+ "precise": 378,
+ "precise_pct": 18.8,
+ "with_phone": 9,
+ "competition_provinces": 3,
+ "factory_source": "diw_authoritative_national",
+ "demand_weights": "equal_uncalibrated",
+ "updated": "2026-06-28",
+ "notes": "DIW factories + DLT vehicles both solved via each department's own CKAN (diw-dataset.diw.go.th, gdcatalog.dlt.go.th), reachable from any IP; data.go.th was the only blocked route. Competition measured in 3 provinces. Geocoding 369 precise (+15 from baseline).",
+ "factory_records": 67416,
+ "factory_join_pct": 95,
+ "vehicle_source": "dlt_authoritative_national",
+ "vehicle_provinces": 77
+}

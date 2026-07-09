@@ -1,0 +1,159 @@
+{
+  "generated_by": "pipeline/pull_osm_gapcheck.py",
+  "what": "Per-branch Overpass re-query of the audit's POI-gap branches (zero-k10 / empty lead-sites). Records which branches were re-queried at which network vintage so a MEASURED zero is distinguishable from a never-pulled gap. Points are merged into source-data/osm_layers.json; NONE are fabricated.",
+  "provenance": "MEASURED — OpenStreetMap via Overpass (maps.mail.ru mirror), same 13 layer tag-sets as autox_enrich_loop.OSM_LAYERS, bbox-bounded to 10 km per branch. Absence of a point after re-query is a real measured zero.",
+  "vintage": "2026M06 prices · drought 2026-06-21",
+  "radius_km": 10.0,
+  "requeried_idx": [
+    223,
+    383,
+    677,
+    928,
+    1076,
+    1503,
+    1674,
+    1739,
+    1904
+  ],
+  "requeried_codes": [
+    "@chaiyo40330",
+    "@chaiyo60813",
+    "@chaiyo30329",
+    "@chaiyo50220",
+    "@chaiyo60330",
+    "@chaiyo70135",
+    "@chaiyo60324",
+    "@chaiyo50227",
+    "@chaiyo30332"
+  ],
+  "enriched_idx": [],
+  "verified_sparse_idx": [
+    223,
+    383,
+    677,
+    928,
+    1076,
+    1503,
+    1674,
+    1739,
+    1904
+  ],
+  "new_points_total": 0,
+  "new_points_by_layer": {},
+  "branches": [
+    {
+      "idx": 223,
+      "code": "@chaiyo40330",
+      "name": "เงินไชโยคลองน้ำไหล",
+      "prov": "กำแพงเพชร",
+      "lat": 16.157,
+      "lng": 99.144,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    },
+    {
+      "idx": 383,
+      "code": "@chaiyo60813",
+      "name": "เงินไชโย สาขาเทพารักษ์",
+      "prov": "นครราชสีมา",
+      "lat": 15.2933,
+      "lng": 101.5653,
+      "added": {},
+      "within10km_by_layer": {
+        "civic": 2
+      },
+      "new_points": 0,
+      "total_within10km": 2
+    },
+    {
+      "idx": 677,
+      "code": "@chaiyo30329",
+      "name": "เงินไชโยสาขาหนองบัวสะตอ",
+      "prov": "ตราด",
+      "lat": 12.553,
+      "lng": 102.434,
+      "added": {},
+      "within10km_by_layer": {
+        "civic": 1
+      },
+      "new_points": 0,
+      "total_within10km": 1
+    },
+    {
+      "idx": 928,
+      "code": "@chaiyo50220",
+      "name": "เงินไชโย สาขานาด้วง",
+      "prov": "เลย",
+      "lat": 17.505,
+      "lng": 101.9725,
+      "added": {},
+      "within10km_by_layer": {
+        "civic": 1
+      },
+      "new_points": 0,
+      "total_within10km": 1
+    },
+    {
+      "idx": 1076,
+      "code": "@chaiyo60330",
+      "name": "เงินไชโยหนองบัวบาน",
+      "prov": "ชัยภูมิ",
+      "lat": 15.652,
+      "lng": 101.802,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    },
+    {
+      "idx": 1503,
+      "code": "@chaiyo70135",
+      "name": "เงินไชโย สาขาสามร้อยยอด",
+      "prov": "ประจวบคีรีขันธ์",
+      "lat": 12.2615,
+      "lng": 99.6513,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    },
+    {
+      "idx": 1674,
+      "code": "@chaiyo60324",
+      "name": "เงินไชโยบ้านท่าโป่ง",
+      "prov": "ชัยภูมิ",
+      "lat": 15.83,
+      "lng": 101.583,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    },
+    {
+      "idx": 1739,
+      "code": "@chaiyo50227",
+      "name": "เงินไชโยสาขาตลาดบ้านธาตุ",
+      "prov": "เลย",
+      "lat": 17.738,
+      "lng": 101.847,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    },
+    {
+      "idx": 1904,
+      "code": "@chaiyo30332",
+      "name": "เงินไชโยสาขาจันทเขลม",
+      "prov": "จันทบุรี",
+      "lat": 13.071,
+      "lng": 102.09,
+      "added": {},
+      "within10km_by_layer": {},
+      "new_points": 0,
+      "total_within10km": 0
+    }
+  ]
+}

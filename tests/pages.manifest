@@ -1,0 +1,30 @@
+# Page manifest — one row per renderable view. Single source of truth for the harness.
+# Fields are TAB-separated:
+#   id            short name used for baseline png + temp files
+#   path          page file under platform/ + optional ?query (params the page needs to render data)
+#   gl            webgl|leaflet  — which lib must initialise (drives the init-detection probe)
+#   min_canvas    minimum count of non-trivial <canvas>/map containers expected after load
+#   hooks         comma-separated element IDs that MUST exist & be non-empty after the page settles
+#
+# Notes on params:
+#   branch-explorer needs ?lat=&lng=&n= (a real branch from data/branches.json[0]: x=lng,y=lat)
+#   province needs ?p=<slug>; default slug is "rayong" (data/provinces/rayong.json must exist)
+#   the two rayong-* pages self-load fixed JSON; no params needed
+#
+# Basemap raster tiles (cartocdn) are PROXY-BLOCKED -> they render blank. That is expected and
+# the pixel-variance check tolerates it: geometry (buildings/polygons/scatter/text) still draws.
+
+# index default tab is "Overview": it renders macro + region tables but does NOT create the Leaflet
+# map (that's lazy-initialised only when the National tab is opened), so gl=none, min_canvas=0.
+index	index.html	none	0	macro,region
+national	index.html#map	leaflet	1	map
+risk-trend	index.html#trend	none	0	trendbaseline
+acquisition	index.html#acq	none	0	amptbl,amprtbl
+branch-explorer	branch-explorer.html?lat=12.7506&lng=101.038&n=%E0%B8%A3%E0%B8%B0%E0%B8%A2%E0%B8%AD%E0%B8%87	webgl	1	map
+province-rayong	province.html?p=rayong	webgl	1	map,kpis,v-districts
+province-chonburi	province.html?p=chon-buri	webgl	1	map,kpis
+# rayong-province.html is a RETIRED redirect stub (meta-refresh + location.replace -> /rayong-catchment,
+# mirrored by a vercel.json permanent redirect). It has no WebGL scene, so it is intentionally NOT a
+# manifest row — the harness only renders live views. The route was consolidated into rayong-catchment
+# in f28d6df; the stub just keeps old deep-links/bookmarks alive.
+rayong-catchment	rayong-catchment.html	webgl	1	map,focalName,leads,recos

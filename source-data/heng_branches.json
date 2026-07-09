@@ -1,0 +1,4060 @@
+{
+ "meta": {
+  "brand": "Heng",
+  "label": "MEASURED (official Heng locator)",
+  "official_count": 450,
+  "count": 450
+ },
+ "items": [
+  {
+   "brand": "Heng",
+   "name": "เมืองกระบี่",
+   "lat": 8.102943,
+   "lng": 98.883227,
+   "prov": "กระบี่",
+   "code": "0580",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อ่าวลึก",
+   "lat": 8.3908,
+   "lng": 98.7337,
+   "prov": "กระบี่",
+   "code": "0602",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เหนือคลอง",
+   "lat": 8.075727,
+   "lng": 98.994203,
+   "prov": "กระบี่",
+   "code": "0623",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำทับ",
+   "lat": 8.066219,
+   "lng": 99.301668,
+   "prov": "กระบี่",
+   "code": "0639",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เลาขวัญ",
+   "lat": 14.593085,
+   "lng": 99.776234,
+   "prov": "กาญจนบุรี",
+   "code": "0171",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทองผาภูมิ",
+   "lat": 14.749416,
+   "lng": 98.628175,
+   "prov": "กาญจนบุรี",
+   "code": "0553",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลาดหญ้า",
+   "lat": 14.094323,
+   "lng": 99.422617,
+   "prov": "กาญจนบุรี",
+   "code": "0613",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองฝ้าย",
+   "lat": 14.678782,
+   "lng": 99.693137,
+   "prov": "กาญจนบุรี",
+   "code": "0682",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พนมทวน",
+   "lat": 14.12389,
+   "lng": 99.688527,
+   "prov": "กาญจนบุรี",
+   "code": "0694",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองตากยา",
+   "lat": 13.786118,
+   "lng": 99.565862,
+   "prov": "กาญจนบุรี",
+   "code": "0702",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลูกแก",
+   "lat": 13.887607,
+   "lng": 99.800362,
+   "prov": "กาญจนบุรี",
+   "code": "0736",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กาฬสินธุ์",
+   "lat": 16.416562,
+   "lng": 103.516283,
+   "prov": "กาฬสินธุ์",
+   "code": "0250",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กุฉินารายณ์",
+   "lat": 16.534242,
+   "lng": 104.044032,
+   "prov": "กาฬสินธุ์",
+   "code": "0283",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สหัสขันธ์",
+   "lat": 16.70739,
+   "lng": 103.517471,
+   "prov": "กาฬสินธุ์",
+   "code": "0497",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร่องคำ",
+   "lat": 16.269303,
+   "lng": 103.74947,
+   "prov": "กาฬสินธุ์",
+   "code": "0518",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาจารย์",
+   "lat": 16.528684,
+   "lng": 103.608361,
+   "prov": "กาฬสินธุ์",
+   "code": "0968",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คลองขลุง",
+   "lat": 16.217226,
+   "lng": 99.726851,
+   "prov": "กำแพงเพชร",
+   "code": "0097",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พรานกระต่าย",
+   "lat": 16.677061,
+   "lng": 99.592511,
+   "prov": "กำแพงเพชร",
+   "code": "0098",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กำแพงเพชร",
+   "lat": 16.469446,
+   "lng": 99.539383,
+   "prov": "กำแพงเพชร",
+   "code": "0101",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ขาณุวรลักษบุรี",
+   "lat": 16.075027,
+   "lng": 99.857482,
+   "prov": "กำแพงเพชร",
+   "code": "0113",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไทรงาม",
+   "lat": 16.466403,
+   "lng": 99.888228,
+   "prov": "กำแพงเพชร",
+   "code": "0144",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คลองลาน",
+   "lat": 16.202043,
+   "lng": 99.332205,
+   "prov": "กำแพงเพชร",
+   "code": "0150",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปางศิลาทอง",
+   "lat": 16.112078,
+   "lng": 99.51478,
+   "prov": "กำแพงเพชร",
+   "code": "0191",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นครชุม",
+   "lat": 16.474268,
+   "lng": 99.50788,
+   "prov": "กำแพงเพชร",
+   "code": "0202",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คลองแม่ลาย",
+   "lat": 16.410453,
+   "lng": 99.520167,
+   "prov": "กำแพงเพชร",
+   "code": "0330",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทรายทองวัฒนา",
+   "lat": 16.301804,
+   "lng": 99.821131,
+   "prov": "กำแพงเพชร",
+   "code": "0426",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลานกระบือ",
+   "lat": 16.596685,
+   "lng": 99.861038,
+   "prov": "กำแพงเพชร",
+   "code": "0430",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คณฑี",
+   "lat": 16.358744,
+   "lng": 99.655353,
+   "prov": "กำแพงเพชร",
+   "code": "0645",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คลองพิไกร",
+   "lat": 16.663632,
+   "lng": 99.723408,
+   "prov": "กำแพงเพชร",
+   "code": "0703",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังแขม",
+   "lat": 16.1757,
+   "lng": 99.793,
+   "prov": "กำแพงเพชร",
+   "code": "0879",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่นารี",
+   "lat": 16.4045,
+   "lng": 99.361722,
+   "prov": "กำแพงเพชร",
+   "code": "1028",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทรงธรรม",
+   "lat": 16.531976,
+   "lng": 99.485091,
+   "prov": "กำแพงเพชร",
+   "code": "1029",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งมหาชัย",
+   "lat": 16.48727,
+   "lng": 99.812695,
+   "prov": "กำแพงเพชร",
+   "code": "1051",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดงกระทิง",
+   "lat": 16.499972,
+   "lng": 99.99543,
+   "prov": "กำแพงเพชร",
+   "code": "1052",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เทพนิมิต",
+   "lat": 16.2175,
+   "lng": 99.8866,
+   "prov": "กำแพงเพชร",
+   "code": "1086",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คลองลานพัฒนา",
+   "lat": 16.12909,
+   "lng": 99.327217,
+   "prov": "กำแพงเพชร",
+   "code": "1100",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บึงหล่ม",
+   "lat": 16.1809,
+   "lng": 99.3854,
+   "prov": "กำแพงเพชร",
+   "code": "1101",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาป่าแดง",
+   "lat": 16.688234,
+   "lng": 99.964815,
+   "prov": "กำแพงเพชร",
+   "code": "1102",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีโยธิน",
+   "lat": 16.522439,
+   "lng": 99.512741,
+   "prov": "กำแพงเพชร",
+   "code": "1103",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โค้งวิไล",
+   "lat": 16.154489,
+   "lng": 99.72102,
+   "prov": "กำแพงเพชร",
+   "code": "1105",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าพุทรา",
+   "lat": 16.265655,
+   "lng": 99.687228,
+   "prov": "กำแพงเพชร",
+   "code": "1106",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ขอนแก่น",
+   "lat": 16.442633,
+   "lng": 102.829866,
+   "prov": "ขอนแก่น",
+   "code": "0205",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านไผ่",
+   "lat": 16.067259,
+   "lng": 102.720291,
+   "prov": "ขอนแก่น",
+   "code": "0233",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พล",
+   "lat": 15.808458,
+   "lng": 102.592774,
+   "prov": "ขอนแก่น",
+   "code": "0234",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชุมแพ",
+   "lat": 16.534237,
+   "lng": 102.124403,
+   "prov": "ขอนแก่น",
+   "code": "0243",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กระนวน",
+   "lat": 16.703693,
+   "lng": 103.069631,
+   "prov": "ขอนแก่น",
+   "code": "0246",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แวงน้อย",
+   "lat": 15.806075,
+   "lng": 102.412598,
+   "prov": "ขอนแก่น",
+   "code": "0582",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เขาสวนกวาง",
+   "lat": 16.8537,
+   "lng": 102.8645,
+   "prov": "ขอนแก่น",
+   "code": "0610",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฉะเชิงเทรา",
+   "lat": 13.7104,
+   "lng": 101.0911,
+   "prov": "ฉะเชิงเทรา",
+   "code": "0547",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีราชา",
+   "lat": 13.159113,
+   "lng": 100.948878,
+   "prov": "ชลบุรี",
+   "code": "0596",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชลบุรี",
+   "lat": 13.297998,
+   "lng": 100.946543,
+   "prov": "ชลบุรี",
+   "code": "0607",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พัทยาใต้",
+   "lat": 12.907306,
+   "lng": 100.896468,
+   "prov": "ชลบุรี",
+   "code": "0800",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดเนื่องจำนงค์",
+   "lat": 13.28974,
+   "lng": 101.17308,
+   "prov": "ชลบุรี",
+   "code": "0819",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หันคา",
+   "lat": 14.59204,
+   "lng": 100.00577,
+   "prov": "ชัยนาท",
+   "code": "0158",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วัดสิงห์",
+   "lat": 15.2593,
+   "lng": 100.0381,
+   "prov": "ชัยนาท",
+   "code": "0177",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สรรคบุรี",
+   "lat": 15.045885,
+   "lng": 100.154655,
+   "prov": "ชัยนาท",
+   "code": "0183",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นางลือ",
+   "lat": 15.157681,
+   "lng": 100.096251,
+   "prov": "ชัยนาท",
+   "code": "0958",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชัยภูมิ",
+   "lat": 15.820619,
+   "lng": 102.046036,
+   "prov": "ชัยภูมิ",
+   "code": "0208",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองบัวแดง",
+   "lat": 16.07782,
+   "lng": 101.79927,
+   "prov": "ชัยภูมิ",
+   "code": "0239",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แก้งคร้อ",
+   "lat": 16.118639,
+   "lng": 102.254031,
+   "prov": "ชัยภูมิ",
+   "code": "0242",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ภูเขียว",
+   "lat": 16.365623,
+   "lng": 102.138068,
+   "prov": "ชัยภูมิ",
+   "code": "0284",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เกษตรสมบูรณ์",
+   "lat": 16.28103,
+   "lng": 101.943324,
+   "prov": "ชัยภูมิ",
+   "code": "0301",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเป้า",
+   "lat": 16.371718,
+   "lng": 101.975286,
+   "prov": "ชัยภูมิ",
+   "code": "0360",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองปลาเฒ่า",
+   "lat": 15.795601,
+   "lng": 102.013046,
+   "prov": "ชัยภูมิ",
+   "code": "0362",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คอนสวรรค์",
+   "lat": 15.929362,
+   "lng": 102.281613,
+   "prov": "ชัยภูมิ",
+   "code": "0396",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คอนสาร",
+   "lat": 16.595582,
+   "lng": 101.928035,
+   "prov": "ชัยภูมิ",
+   "code": "0466",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เทพสถิต",
+   "lat": 15.385505,
+   "lng": 101.439054,
+   "prov": "ชัยภูมิ",
+   "code": "0468",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จัตุรัส",
+   "lat": 15.56749,
+   "lng": 101.85144,
+   "prov": "ชัยภูมิ",
+   "code": "0475",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านแท่น",
+   "lat": 16.409028,
+   "lng": 102.35369,
+   "prov": "ชัยภูมิ",
+   "code": "0476",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเขว้า",
+   "lat": 15.785473,
+   "lng": 101.912757,
+   "prov": "ชัยภูมิ",
+   "code": "0743",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองบัวระเหว",
+   "lat": 15.753353,
+   "lng": 101.762005,
+   "prov": "ชัยภูมิ",
+   "code": "0747",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยยาง",
+   "lat": 16.544018,
+   "lng": 101.901765,
+   "prov": "ชัยภูมิ",
+   "code": "1007",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หลังสวน",
+   "lat": 9.95263,
+   "lng": 99.076306,
+   "prov": "ชุมพร",
+   "code": "0629",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองตรัง",
+   "lat": 7.541944,
+   "lng": 99.603917,
+   "prov": "ตรัง",
+   "code": "0825",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยยอด",
+   "lat": 7.793987,
+   "lng": 99.629057,
+   "prov": "ตรัง",
+   "code": "0832",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองตาก",
+   "lat": 16.88966,
+   "lng": 99.12889,
+   "prov": "ตาก",
+   "code": "0082",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่สอด",
+   "lat": 16.723673,
+   "lng": 98.596994,
+   "prov": "ตาก",
+   "code": "0087",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังเจ้า",
+   "lat": 16.681932,
+   "lng": 99.263159,
+   "prov": "ตาก",
+   "code": "0114",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ระมาด",
+   "lat": 16.979879,
+   "lng": 98.52253,
+   "prov": "ตาก",
+   "code": "0409",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ซอโอ",
+   "lat": 16.506389,
+   "lng": 98.701729,
+   "prov": "ตาก",
+   "code": "0494",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านตาก",
+   "lat": 17.055518,
+   "lng": 99.052194,
+   "prov": "ตาก",
+   "code": "0546",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าสองยาง",
+   "lat": 17.22491,
+   "lng": 98.227912,
+   "prov": "ตาก",
+   "code": "0570",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาโบสถ์",
+   "lat": 16.6823,
+   "lng": 99.147,
+   "prov": "ตาก",
+   "code": "0864",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พระธาตุผาแดง",
+   "lat": 16.66599,
+   "lng": 98.59755,
+   "prov": "ตาก",
+   "code": "1088",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองนครนายก",
+   "lat": 14.231923,
+   "lng": 101.239925,
+   "prov": "นครนายก",
+   "code": "0482",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดอนตูม",
+   "lat": 13.965836,
+   "lng": 100.088037,
+   "prov": "นครปฐม",
+   "code": "0397",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ถนนเทศา",
+   "lat": 13.818262,
+   "lng": 100.083108,
+   "prov": "นครปฐม",
+   "code": "0733",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พุทธมณฑลสาย 4",
+   "lat": 13.740714,
+   "lng": 100.329128,
+   "prov": "นครปฐม",
+   "code": "0785",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นครพนม",
+   "lat": 17.395407,
+   "lng": 104.77456,
+   "prov": "นครพนม",
+   "code": "0300",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาแก",
+   "lat": 16.951785,
+   "lng": 104.482352,
+   "prov": "นครพนม",
+   "code": "0474",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ธาตุพนม",
+   "lat": 16.953478,
+   "lng": 104.72553,
+   "prov": "นครพนม",
+   "code": "0491",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาหว้า",
+   "lat": 17.488236,
+   "lng": 104.101238,
+   "prov": "นครพนม",
+   "code": "0527",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ครบุรี",
+   "lat": 14.529277,
+   "lng": 102.240451,
+   "prov": "นครราชสีมา",
+   "code": "0212",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สีคิ้ว",
+   "lat": 14.87453,
+   "lng": 101.72153,
+   "prov": "นครราชสีมา",
+   "code": "0215",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พิมาย",
+   "lat": 15.229047,
+   "lng": 102.496138,
+   "prov": "นครราชสีมา",
+   "code": "0217",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หัวทะเล",
+   "lat": 14.971004,
+   "lng": 102.146512,
+   "prov": "นครราชสีมา",
+   "code": "0278",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เสิงสาง",
+   "lat": 14.427366,
+   "lng": 102.464602,
+   "prov": "นครราชสีมา",
+   "code": "0436",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พระทองคำ",
+   "lat": 15.311931,
+   "lng": 101.964912,
+   "prov": "นครราชสีมา",
+   "code": "0577",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังน้ำเขียว",
+   "lat": 14.365894,
+   "lng": 101.845729,
+   "prov": "นครราชสีมา",
+   "code": "0829",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองนครศรีธรรมราช",
+   "lat": 8.41645,
+   "lng": 99.975,
+   "prov": "นครศรีธรรมราช",
+   "code": "0534",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สิชล",
+   "lat": 9.007783,
+   "lng": 99.891895,
+   "prov": "นครศรีธรรมราช",
+   "code": "0550",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งใหญ่",
+   "lat": 8.300717,
+   "lng": 99.381226,
+   "prov": "นครศรีธรรมราช",
+   "code": "0586",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าศาลา",
+   "lat": 8.657126,
+   "lng": 99.928924,
+   "prov": "นครศรีธรรมราช",
+   "code": "0621",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร่อนพิบูลย์",
+   "lat": 8.174652,
+   "lng": 99.854075,
+   "prov": "นครศรีธรรมราช",
+   "code": "0622",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ่อล้อ",
+   "lat": 8.107544,
+   "lng": 100.09688,
+   "prov": "นครศรีธรรมราช",
+   "code": "0813",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บรรพตพิสัย",
+   "lat": 15.936876,
+   "lng": 99.990362,
+   "prov": "นครสวรรค์",
+   "code": "0099",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นครสวรรค์",
+   "lat": 15.694961,
+   "lng": 100.102515,
+   "prov": "นครสวรรค์",
+   "code": "0100",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พยุหะคีรี",
+   "lat": 15.451153,
+   "lng": 100.145991,
+   "prov": "นครสวรรค์",
+   "code": "0143",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลาดยาว",
+   "lat": 15.755929,
+   "lng": 99.818537,
+   "prov": "นครสวรรค์",
+   "code": "0163",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าตะโก",
+   "lat": 15.641121,
+   "lng": 100.484646,
+   "prov": "นครสวรรค์",
+   "code": "0218",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไพศาลี",
+   "lat": 15.5946,
+   "lng": 100.65639,
+   "prov": "นครสวรรค์",
+   "code": "0224",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตาคลี",
+   "lat": 15.260972,
+   "lng": 100.325957,
+   "prov": "นครสวรรค์",
+   "code": "0230",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตากฟ้า",
+   "lat": 15.343567,
+   "lng": 100.48999,
+   "prov": "นครสวรรค์",
+   "code": "0581",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เนินกว้าว",
+   "lat": 15.529114,
+   "lng": 99.988805,
+   "prov": "นครสวรรค์",
+   "code": "1033",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บางประมุง",
+   "lat": 15.649603,
+   "lng": 100.035323,
+   "prov": "นครสวรรค์",
+   "code": "1063",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตะคร้อ",
+   "lat": 15.461242,
+   "lng": 100.716371,
+   "prov": "นครสวรรค์",
+   "code": "1072",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นิคมเขาบ่อแก้ว",
+   "lat": 15.469977,
+   "lng": 100.231634,
+   "prov": "นครสวรรค์",
+   "code": "1094",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เขาทอง",
+   "lat": 15.572304,
+   "lng": 100.186437,
+   "prov": "นครสวรรค์",
+   "code": "1095",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เวียงสา",
+   "lat": 18.565963,
+   "lng": 100.733266,
+   "prov": "น่าน",
+   "code": "0041",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปัว",
+   "lat": 19.1755,
+   "lng": 100.9109,
+   "prov": "น่าน",
+   "code": "0042",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "น่าน",
+   "lat": 18.752892,
+   "lng": 100.758145,
+   "prov": "น่าน",
+   "code": "0056",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงกลาง",
+   "lat": 19.293163,
+   "lng": 100.873186,
+   "prov": "น่าน",
+   "code": "0065",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาน้อย",
+   "lat": 18.33997,
+   "lng": 100.713891,
+   "prov": "น่าน",
+   "code": "0081",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปางค่า",
+   "lat": 18.793252,
+   "lng": 100.731686,
+   "prov": "น่าน",
+   "code": "0232",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านแก้ม",
+   "lat": 19.17087,
+   "lng": 100.92044,
+   "prov": "น่าน",
+   "code": "0314",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันติสุข",
+   "lat": 18.925177,
+   "lng": 100.931269,
+   "prov": "น่าน",
+   "code": "0348",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งช้าง",
+   "lat": 19.395857,
+   "lng": 100.880801,
+   "prov": "น่าน",
+   "code": "0385",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่จริม",
+   "lat": 18.710757,
+   "lng": 101.006301,
+   "prov": "น่าน",
+   "code": "0472",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "น้ำปั้ว",
+   "lat": 18.638383,
+   "lng": 100.740359,
+   "prov": "น่าน",
+   "code": "0680",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านรัชดา",
+   "lat": 19.3096,
+   "lng": 100.8617,
+   "prov": "น่าน",
+   "code": "0895",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เฟือยลุง",
+   "lat": 19.4079,
+   "lng": 100.8812,
+   "prov": "น่าน",
+   "code": "1049",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาไลย",
+   "lat": 18.5531,
+   "lng": 100.715,
+   "prov": "น่าน",
+   "code": "1068",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วัดพระธาตุแช่แห้ง",
+   "lat": 18.759704,
+   "lng": 100.789332,
+   "prov": "น่าน",
+   "code": "1069",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านหลวง",
+   "lat": 18.8495,
+   "lng": 100.4421,
+   "prov": "น่าน",
+   "code": "1078",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศิลาเพชร",
+   "lat": 19.0895,
+   "lng": 100.9258,
+   "prov": "น่าน",
+   "code": "1093",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บึงกาฬ",
+   "lat": 18.362943,
+   "lng": 103.644739,
+   "prov": "บึงกาฬ",
+   "code": "0258",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เซกา",
+   "lat": 17.925187,
+   "lng": 103.947097,
+   "prov": "บึงกาฬ",
+   "code": "0522",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บุรีรัมย์",
+   "lat": 14.981451,
+   "lng": 103.076515,
+   "prov": "บุรีรัมย์",
+   "code": "0256",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นางรอง",
+   "lat": 14.643034,
+   "lng": 102.794722,
+   "prov": "บุรีรัมย์",
+   "code": "0259",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สตึก",
+   "lat": 15.295579,
+   "lng": 103.294898,
+   "prov": "บุรีรัมย์",
+   "code": "0281",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ละหานทราย",
+   "lat": 14.421417,
+   "lng": 102.854278,
+   "prov": "บุรีรัมย์",
+   "code": "0437",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชำนิ",
+   "lat": 14.790958,
+   "lng": 102.819728,
+   "prov": "บุรีรัมย์",
+   "code": "0787",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปราณบุรี",
+   "lat": 12.39054,
+   "lng": 99.922828,
+   "prov": "ประจวบคีรีขันธ์",
+   "code": "0608",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บางสะพาน",
+   "lat": 11.249747,
+   "lng": 99.4458,
+   "prov": "ประจวบคีรีขันธ์",
+   "code": "0612",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ประจวบคีรีขันธ์",
+   "lat": 11.913114,
+   "lng": 99.755442,
+   "prov": "ประจวบคีรีขันธ์",
+   "code": "0684",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ประจันตคาม",
+   "lat": 14.0687,
+   "lng": 101.522,
+   "prov": "ปราจีนบุรี",
+   "code": "0544",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เสนา",
+   "lat": 14.318075,
+   "lng": 100.415943,
+   "prov": "พระนครศรีอยุธยา",
+   "code": "0175",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านแพรก",
+   "lat": 14.64053,
+   "lng": 100.576736,
+   "prov": "พระนครศรีอยุธยา",
+   "code": "0691",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ใจ",
+   "lat": 19.361607,
+   "lng": 99.796288,
+   "prov": "พะเยา",
+   "code": "0015",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงคำ(สามแยกแช่แห้ง)",
+   "lat": 19.53975,
+   "lng": 100.298168,
+   "prov": "พะเยา",
+   "code": "0033",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จุน",
+   "lat": 19.339704,
+   "lng": 100.128348,
+   "prov": "พะเยา",
+   "code": "0035",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปง",
+   "lat": 19.169885,
+   "lng": 100.283464,
+   "prov": "พะเยา",
+   "code": "0036",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ภูกามยาว",
+   "lat": 19.218767,
+   "lng": 99.95637,
+   "prov": "พะเยา",
+   "code": "0047",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พะเยา(แม่ต๋ำ)",
+   "lat": 19.153556,
+   "lng": 99.912834,
+   "prov": "พะเยา",
+   "code": "0055",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงคำ(แช่แห้ง)",
+   "lat": 19.542576,
+   "lng": 100.297793,
+   "prov": "พะเยา",
+   "code": "0057",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ภูซาง",
+   "lat": 19.575331,
+   "lng": 100.299455,
+   "prov": "พะเยา",
+   "code": "0321",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงม่วน",
+   "lat": 18.888612,
+   "lng": 100.286606,
+   "prov": "พะเยา",
+   "code": "0659",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สี่แยกบ้านต๋อม",
+   "lat": 19.193562,
+   "lng": 99.83724,
+   "prov": "พะเยา",
+   "code": "0841",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จำป่าหวาย",
+   "lat": 19.1239,
+   "lng": 99.9407,
+   "prov": "พะเยา",
+   "code": "1043",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านต๊ำ",
+   "lat": 19.2211,
+   "lng": 99.8329,
+   "prov": "พะเยา",
+   "code": "1044",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดงสุวรรณ",
+   "lat": 19.2473,
+   "lng": 100.0477,
+   "prov": "พะเยา",
+   "code": "1045",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ม่วงชุม",
+   "lat": 19.6217,
+   "lng": 100.3665,
+   "prov": "พะเยา",
+   "code": "1075",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองพังงา",
+   "lat": 8.443058,
+   "lng": 98.528427,
+   "prov": "พังงา",
+   "code": "0807",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พิจิตร",
+   "lat": 16.451721,
+   "lng": 100.334646,
+   "prov": "พิจิตร",
+   "code": "0096",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทับคล้อ",
+   "lat": 16.16661,
+   "lng": 100.58313,
+   "prov": "พิจิตร",
+   "code": "0137",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังทรายพูน",
+   "lat": 16.407568,
+   "lng": 100.528653,
+   "prov": "พิจิตร",
+   "code": "0381",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บึงนาราง",
+   "lat": 16.133553,
+   "lng": 100.125322,
+   "prov": "พิจิตร",
+   "code": "0545",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฆะมัง",
+   "lat": 16.350216,
+   "lng": 100.372146,
+   "prov": "พิจิตร",
+   "code": "0652",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองโสน",
+   "lat": 16.39447,
+   "lng": 100.06931,
+   "prov": "พิจิตร",
+   "code": "0675",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังสำโรง",
+   "lat": 16.2441,
+   "lng": 100.3052,
+   "prov": "พิจิตร",
+   "code": "1073",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พรหมพิราม",
+   "lat": 17.097843,
+   "lng": 100.168273,
+   "prov": "พิษณุโลก",
+   "code": "0103",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นครไทย",
+   "lat": 17.09013,
+   "lng": 100.828603,
+   "prov": "พิษณุโลก",
+   "code": "0142",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชาติตระการ",
+   "lat": 17.269933,
+   "lng": 100.609192,
+   "prov": "พิษณุโลก",
+   "code": "0149",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านคลอง",
+   "lat": 16.835453,
+   "lng": 100.242879,
+   "prov": "พิษณุโลก",
+   "code": "0223",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "มะขามสูง",
+   "lat": 16.938821,
+   "lng": 100.227959,
+   "prov": "พิษณุโลก",
+   "code": "0431",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เนินมะปราง",
+   "lat": 16.571233,
+   "lng": 100.633489,
+   "prov": "พิษณุโลก",
+   "code": "0516",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทรัพย์ไพรวัลย์",
+   "lat": 16.892716,
+   "lng": 100.647493,
+   "prov": "พิษณุโลก",
+   "code": "0634",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ถนนเอกาทศรถ",
+   "lat": 16.851841,
+   "lng": 100.26063,
+   "prov": "พิษณุโลก",
+   "code": "0660",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดพรหมพิราม",
+   "lat": 17.028613,
+   "lng": 100.20159,
+   "prov": "พิษณุโลก",
+   "code": "0871",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาตาจุม",
+   "lat": 17.303771,
+   "lng": 100.455937,
+   "prov": "พิษณุโลก",
+   "code": "0928",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองกุลา",
+   "lat": 16.65,
+   "lng": 99.9469,
+   "prov": "พิษณุโลก",
+   "code": "1005",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สามแยกบ้านยางโกลน",
+   "lat": 17.1871,
+   "lng": 100.918023,
+   "prov": "พิษณุโลก",
+   "code": "1024",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปลักแรด",
+   "lat": 16.684828,
+   "lng": 100.09782,
+   "prov": "พิษณุโลก",
+   "code": "1040",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สี่แยกหางไหล",
+   "lat": 17.090634,
+   "lng": 100.146812,
+   "prov": "พิษณุโลก",
+   "code": "1041",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไผ่ขอดอน",
+   "lat": 16.9157,
+   "lng": 100.1909,
+   "prov": "พิษณุโลก",
+   "code": "1057",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เนินกุ่ม",
+   "lat": 16.5443,
+   "lng": 100.4192,
+   "prov": "พิษณุโลก",
+   "code": "1077",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เสือลากหาง",
+   "lat": 16.839018,
+   "lng": 100.372473,
+   "prov": "พิษณุโลก",
+   "code": "1083",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีภิรมย์",
+   "lat": 17.1644,
+   "lng": 100.0997,
+   "prov": "พิษณุโลก",
+   "code": "1096",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "มหาสารคาม",
+   "lat": 16.201873,
+   "lng": 103.266055,
+   "prov": "มหาสารคาม",
+   "code": "0236",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาเชือก",
+   "lat": 15.800133,
+   "lng": 103.036153,
+   "prov": "มหาสารคาม",
+   "code": "0499",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาดูน",
+   "lat": 15.713032,
+   "lng": 103.225811,
+   "prov": "มหาสารคาม",
+   "code": "0512",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชื่นชม",
+   "lat": 16.5587,
+   "lng": 103.1774,
+   "prov": "มหาสารคาม",
+   "code": "0705",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเขื่อน",
+   "lat": 16.33879,
+   "lng": 103.089856,
+   "prov": "มหาสารคาม",
+   "code": "1003",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "มุกดาหาร",
+   "lat": 16.543593,
+   "lng": 104.703611,
+   "prov": "มุกดาหาร",
+   "code": "0260",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คำชะอี",
+   "lat": 16.574266,
+   "lng": 104.419452,
+   "prov": "มุกดาหาร",
+   "code": "0429",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดอนตาล",
+   "lat": 16.313977,
+   "lng": 104.921591,
+   "prov": "มุกดาหาร",
+   "code": "0528",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นิคมคำสร้อย",
+   "lat": 16.373559,
+   "lng": 104.550695,
+   "prov": "มุกดาหาร",
+   "code": "0529",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กุดชุม",
+   "lat": 16.037783,
+   "lng": 104.343517,
+   "prov": "ยโสธร",
+   "code": "0536",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองยโสธร",
+   "lat": 15.830272,
+   "lng": 104.114588,
+   "prov": "ยโสธร",
+   "code": "0590",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จตุรพักตรพิมาน",
+   "lat": 15.835623,
+   "lng": 103.556552,
+   "prov": "ร้อยเอ็ด",
+   "code": "0460",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พนมไพร",
+   "lat": 15.685441,
+   "lng": 104.098247,
+   "prov": "ร้อยเอ็ด",
+   "code": "0521",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แยกตลาดเอราวัณ",
+   "lat": 16.055,
+   "lng": 103.6958,
+   "prov": "ร้อยเอ็ด",
+   "code": "0808",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองราชบุรี",
+   "lat": 13.559699,
+   "lng": 99.781364,
+   "prov": "ราชบุรี",
+   "code": "0594",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลพบุรี",
+   "lat": 14.831251,
+   "lng": 100.646039,
+   "prov": "ลพบุรี",
+   "code": "0156",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พัฒนานิคม",
+   "lat": 14.85334,
+   "lng": 100.97283,
+   "prov": "ลพบุรี",
+   "code": "0162",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชัยบาดาล",
+   "lat": 15.200653,
+   "lng": 101.142583,
+   "prov": "ลพบุรี",
+   "code": "0176",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โคกเจริญ",
+   "lat": 15.378881,
+   "lng": 100.817205,
+   "prov": "ลพบุรี",
+   "code": "0189",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "งาว",
+   "lat": 18.7481,
+   "lng": 99.9757,
+   "prov": "ลำปาง",
+   "code": "0016",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังเหนือ",
+   "lat": 19.145588,
+   "lng": 99.614708,
+   "prov": "ลำปาง",
+   "code": "0019",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แจ้ห่ม",
+   "lat": 18.707323,
+   "lng": 99.575574,
+   "prov": "ลำปาง",
+   "code": "0022",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้างฉัตร",
+   "lat": 18.325542,
+   "lng": 99.355111,
+   "prov": "ลำปาง",
+   "code": "0043",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่เมาะ",
+   "lat": 18.276227,
+   "lng": 99.660885,
+   "prov": "ลำปาง",
+   "code": "0044",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำปาง(ริมวัง)",
+   "lat": 18.291255,
+   "lng": 99.491873,
+   "prov": "ลำปาง",
+   "code": "0052",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เถิน",
+   "lat": 17.6151,
+   "lng": 99.2302,
+   "prov": "ลำปาง",
+   "code": "0067",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำปาง(เวียงทอง)",
+   "lat": 18.281813,
+   "lng": 99.488032,
+   "prov": "ลำปาง",
+   "code": "0120",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ทะ",
+   "lat": 18.1329,
+   "lng": 99.5126,
+   "prov": "ลำปาง",
+   "code": "0197",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำปางพิชัย",
+   "lat": 18.3561,
+   "lng": 99.5657,
+   "prov": "ลำปาง",
+   "code": "0201",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดน้ำโท้ง(ลำปาง)",
+   "lat": 18.3081,
+   "lng": 99.4687,
+   "prov": "ลำปาง",
+   "code": "0302",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองปาน",
+   "lat": 18.765278,
+   "lng": 99.508214,
+   "prov": "ลำปาง",
+   "code": "0354",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านแม่สุก",
+   "lat": 18.781133,
+   "lng": 99.574263,
+   "prov": "ลำปาง",
+   "code": "1048",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเป๊าะ",
+   "lat": 18.724,
+   "lng": 99.9671,
+   "prov": "ลำปาง",
+   "code": "1074",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเหล่า",
+   "lat": 17.5976,
+   "lng": 99.2082,
+   "prov": "ลำปาง",
+   "code": "1079",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังทรายคำ(ปงวัง)",
+   "lat": 19.0572,
+   "lng": 99.6256,
+   "prov": "ลำปาง",
+   "code": "1082",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านไร่ข่วงเปา",
+   "lat": 18.2866,
+   "lng": 99.4457,
+   "prov": "ลำปาง",
+   "code": "1092",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำพูน(เหมืองง่า)",
+   "lat": 18.608234,
+   "lng": 99.024544,
+   "prov": "ลำพูน",
+   "code": "0050",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ป่าซาง",
+   "lat": 18.523249,
+   "lng": 98.939787,
+   "prov": "ลำพูน",
+   "code": "0053",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลี้",
+   "lat": 17.810812,
+   "lng": 98.940179,
+   "prov": "ลำพูน",
+   "code": "0060",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลำพูน(วัดสวนดอก)",
+   "lat": 18.5858,
+   "lng": 99.009771,
+   "prov": "ลำพูน",
+   "code": "0126",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านธิ",
+   "lat": 18.652913,
+   "lng": 99.127012,
+   "prov": "ลำพูน",
+   "code": "0130",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กาดอินทร",
+   "lat": 18.579947,
+   "lng": 99.073642,
+   "prov": "ลำพูน",
+   "code": "0132",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านโฮ่ง",
+   "lat": 18.294465,
+   "lng": 98.816032,
+   "prov": "ลำพูน",
+   "code": "0134",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทากาศ",
+   "lat": 18.42415,
+   "lng": 98.992336,
+   "prov": "ลำพูน",
+   "code": "0154",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เวียงหนองล่อง(ลำพูน)",
+   "lat": 18.421334,
+   "lng": 98.746889,
+   "prov": "ลำพูน",
+   "code": "0294",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โรงพยาบาลป่าซาง",
+   "lat": 18.447322,
+   "lng": 98.887877,
+   "prov": "ลำพูน",
+   "code": "0318",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดริมปิง",
+   "lat": 18.59617,
+   "lng": 98.97086,
+   "prov": "ลำพูน",
+   "code": "0355",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังกู่",
+   "lat": 18.472564,
+   "lng": 98.821254,
+   "prov": "ลำพูน",
+   "code": "1071",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อุทุมพรพิสัย",
+   "lat": 15.113567,
+   "lng": 104.136255,
+   "prov": "ศรีสะเกษ",
+   "code": "0275",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กันทรลักษ์",
+   "lat": 14.646917,
+   "lng": 104.642167,
+   "prov": "ศรีสะเกษ",
+   "code": "0289",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีสะเกษ",
+   "lat": 15.111549,
+   "lng": 104.349843,
+   "prov": "ศรีสะเกษ",
+   "code": "0292",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ขุนหาญ",
+   "lat": 14.621264,
+   "lng": 104.433113,
+   "prov": "ศรีสะเกษ",
+   "code": "0336",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กันทรารมย์",
+   "lat": 15.10055,
+   "lng": 104.57149,
+   "prov": "ศรีสะเกษ",
+   "code": "0404",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ขุขันธ์",
+   "lat": 14.720202,
+   "lng": 104.19868,
+   "prov": "ศรีสะเกษ",
+   "code": "0413",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีรัตนะ",
+   "lat": 14.787983,
+   "lng": 104.472344,
+   "prov": "ศรีสะเกษ",
+   "code": "0558",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สกลนคร",
+   "lat": 17.197105,
+   "lng": 104.08257,
+   "prov": "สกลนคร",
+   "code": "0227",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พังโคน",
+   "lat": 17.386895,
+   "lng": 103.731363,
+   "prov": "สกลนคร",
+   "code": "0238",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อากาศอำนวย",
+   "lat": 17.589434,
+   "lng": 103.979223,
+   "prov": "สกลนคร",
+   "code": "0287",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พรรณานิคม",
+   "lat": 17.354308,
+   "lng": 103.845993,
+   "prov": "สกลนคร",
+   "code": "0492",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ภูพาน",
+   "lat": 16.988235,
+   "lng": 103.958536,
+   "prov": "สกลนคร",
+   "code": "0742",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองสมุทรสาคร",
+   "lat": 13.5493,
+   "lng": 100.2703,
+   "prov": "สมุทรสาคร",
+   "code": "0686",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พระพุทธบาท",
+   "lat": 14.729781,
+   "lng": 100.787864,
+   "prov": "สระบุรี",
+   "code": "0187",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองสระแก้ว",
+   "lat": 13.830311,
+   "lng": 102.059097,
+   "prov": "สระแก้ว",
+   "code": "0591",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองวังน้ำเย็น",
+   "lat": 13.52063,
+   "lng": 102.172038,
+   "prov": "สระแก้ว",
+   "code": "0781",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตาพระยา",
+   "lat": 14.007405,
+   "lng": 102.807554,
+   "prov": "สระแก้ว",
+   "code": "0826",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บางระจัน",
+   "lat": 14.885732,
+   "lng": 100.314506,
+   "prov": "สิงห์บุรี",
+   "code": "0166",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เดิมบางนางบวช",
+   "lat": 14.848305,
+   "lng": 100.092925,
+   "prov": "สุพรรณบุรี",
+   "code": "0159",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อู่ทอง",
+   "lat": 14.380489,
+   "lng": 99.894093,
+   "prov": "สุพรรณบุรี",
+   "code": "0170",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีประจันต์",
+   "lat": 14.622611,
+   "lng": 100.146444,
+   "prov": "สุพรรณบุรี",
+   "code": "0172",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สองพี่น้อง",
+   "lat": 14.225602,
+   "lng": 100.027447,
+   "prov": "สุพรรณบุรี",
+   "code": "0181",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ด่านช้าง",
+   "lat": 14.842974,
+   "lng": 99.689282,
+   "prov": "สุพรรณบุรี",
+   "code": "0214",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดอนเจดีย์",
+   "lat": 14.634416,
+   "lng": 100.009058,
+   "prov": "สุพรรณบุรี",
+   "code": "0231",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองหญ้าไซ",
+   "lat": 14.775101,
+   "lng": 99.905559,
+   "prov": "สุพรรณบุรี",
+   "code": "0393",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สระกระโจม",
+   "lat": 14.63308,
+   "lng": 99.8762,
+   "prov": "สุพรรณบุรี",
+   "code": "0719",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กาญจนดิษฐ์",
+   "lat": 9.164019,
+   "lng": 99.478885,
+   "prov": "สุราษฎร์ธานี",
+   "code": "0373",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไชยา",
+   "lat": 9.386049,
+   "lng": 99.204901,
+   "prov": "สุราษฎร์ธานี",
+   "code": "0478",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชัยบุรี",
+   "lat": 8.474702,
+   "lng": 99.082389,
+   "prov": "สุราษฎร์ธานี",
+   "code": "0626",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านใน-ดอนสัก",
+   "lat": 9.135561,
+   "lng": 99.677668,
+   "prov": "สุราษฎร์ธานี",
+   "code": "0794",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาเดิม",
+   "lat": 8.8914,
+   "lng": 99.3009,
+   "prov": "สุราษฎร์ธานี",
+   "code": "0815",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สุรินทร์",
+   "lat": 14.89013,
+   "lng": 103.473184,
+   "prov": "สุรินทร์",
+   "code": "0274",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปราสาท",
+   "lat": 14.628524,
+   "lng": 103.409112,
+   "prov": "สุรินทร์",
+   "code": "0288",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สังขะ",
+   "lat": 14.634959,
+   "lng": 103.853753,
+   "prov": "สุรินทร์",
+   "code": "0442",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าตูม",
+   "lat": 15.321399,
+   "lng": 103.675047,
+   "prov": "สุรินทร์",
+   "code": "0627",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บัวเชด",
+   "lat": 14.529901,
+   "lng": 103.936724,
+   "prov": "สุรินทร์",
+   "code": "0767",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สวรรคโลก",
+   "lat": 17.293752,
+   "lng": 99.83759,
+   "prov": "สุโขทัย",
+   "code": "0061",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีสำโรง",
+   "lat": 17.160875,
+   "lng": 99.860142,
+   "prov": "สุโขทัย",
+   "code": "0062",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งเสลี่ยม",
+   "lat": 17.3232,
+   "lng": 99.56737,
+   "prov": "สุโขทัย",
+   "code": "0073",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีสัชนาลัย",
+   "lat": 17.526589,
+   "lng": 99.766669,
+   "prov": "สุโขทัย",
+   "code": "0076",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "คีรีมาศ",
+   "lat": 16.827338,
+   "lng": 99.795367,
+   "prov": "สุโขทัย",
+   "code": "0079",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านด่านลานหอย",
+   "lat": 17.00792,
+   "lng": 99.57723,
+   "prov": "สุโขทัย",
+   "code": "0080",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองสุโขทัย",
+   "lat": 17.022345,
+   "lng": 99.8148,
+   "prov": "สุโขทัย",
+   "code": "0083",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กงไกรลาศ",
+   "lat": 16.951765,
+   "lng": 99.97279,
+   "prov": "สุโขทัย",
+   "code": "0095",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สุโขทัย(ธานี)",
+   "lat": 17.008803,
+   "lng": 99.816449,
+   "prov": "สุโขทัย",
+   "code": "0200",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าฉนวน",
+   "lat": 16.82674,
+   "lng": 99.88578,
+   "prov": "สุโขทัย",
+   "code": "0376",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีนคร",
+   "lat": 17.363224,
+   "lng": 99.989432,
+   "prov": "สุโขทัย",
+   "code": "0484",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านไร่(ศรีสำโรง)",
+   "lat": 17.183669,
+   "lng": 99.765117,
+   "prov": "สุโขทัย",
+   "code": "0862",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทับผึ้ง",
+   "lat": 17.092813,
+   "lng": 99.816036,
+   "prov": "สุโขทัย",
+   "code": "1050",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองกระดิ่ง",
+   "lat": 16.8245,
+   "lng": 99.8127,
+   "prov": "สุโขทัย",
+   "code": "1058",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาทุ่ง",
+   "lat": 17.309039,
+   "lng": 99.768854,
+   "prov": "สุโขทัย",
+   "code": "1059",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ยางเอน",
+   "lat": 17.089883,
+   "lng": 99.883624,
+   "prov": "สุโขทัย",
+   "code": "1060",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สารจิตร",
+   "lat": 17.435734,
+   "lng": 99.724543,
+   "prov": "สุโขทัย",
+   "code": "1064",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองกลับ",
+   "lat": 17.224292,
+   "lng": 99.775636,
+   "prov": "สุโขทัย",
+   "code": "1081",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กกแรต",
+   "lat": 16.973,
+   "lng": 100.0329,
+   "prov": "สุโขทัย",
+   "code": "1104",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โพนพิสัย",
+   "lat": 18.035001,
+   "lng": 103.083017,
+   "prov": "หนองคาย",
+   "code": "0441",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าบ่อ",
+   "lat": 17.840665,
+   "lng": 102.583284,
+   "prov": "หนองคาย",
+   "code": "0473",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองหนองคาย",
+   "lat": 17.872468,
+   "lng": 102.743936,
+   "prov": "หนองคาย",
+   "code": "0655",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเซิม",
+   "lat": 17.931955,
+   "lng": 103.300335,
+   "prov": "หนองคาย",
+   "code": "0701",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองบัวลำภู",
+   "lat": 17.212351,
+   "lng": 102.433811,
+   "prov": "หนองบัวลำภู",
+   "code": "0194",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โนนสัง",
+   "lat": 16.877465,
+   "lng": 102.572902,
+   "prov": "หนองบัวลำภู",
+   "code": "0537",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านโคกสุวรรณคูหา",
+   "lat": 17.5395,
+   "lng": 102.2014,
+   "prov": "หนองบัวลำภู",
+   "code": "0782",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อ่างทอง",
+   "lat": 14.58241,
+   "lng": 100.452717,
+   "prov": "อ่างทอง",
+   "code": "0174",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ป่าโมก",
+   "lat": 14.497135,
+   "lng": 100.45661,
+   "prov": "อ่างทอง",
+   "code": "0628",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อำนาจเจริญ",
+   "lat": 15.883908,
+   "lng": 104.625066,
+   "prov": "อำนาจเจริญ",
+   "code": "0296",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านผือ",
+   "lat": 17.686849,
+   "lng": 102.48346,
+   "prov": "อุดรธานี",
+   "code": "0182",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เพ็ญ",
+   "lat": 17.697515,
+   "lng": 102.893518,
+   "prov": "อุดรธานี",
+   "code": "0193",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองหาน",
+   "lat": 17.35847,
+   "lng": 103.10445,
+   "prov": "อุดรธานี",
+   "code": "0253",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังสามหมอ",
+   "lat": 16.949303,
+   "lng": 103.441018,
+   "prov": "อุดรธานี",
+   "code": "0254",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองวัวซอ",
+   "lat": 17.271545,
+   "lng": 102.599664,
+   "prov": "อุดรธานี",
+   "code": "0255",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านดุง",
+   "lat": 17.70092,
+   "lng": 103.257687,
+   "prov": "อุดรธานี",
+   "code": "0262",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กุมภวาปี",
+   "lat": 17.111133,
+   "lng": 103.008633,
+   "prov": "อุดรธานี",
+   "code": "0418",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สามพร้าว",
+   "lat": 17.433271,
+   "lng": 102.82903,
+   "prov": "อุดรธานี",
+   "code": "0642",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สี่แยกขาวัว",
+   "lat": 17.252176,
+   "lng": 103.117502,
+   "prov": "อุดรธานี",
+   "code": "0988",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลับแล",
+   "lat": 17.64884,
+   "lng": 100.055872,
+   "prov": "อุตรดิตถ์",
+   "code": "0046",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พิชัย",
+   "lat": 17.307611,
+   "lng": 100.073295,
+   "prov": "อุตรดิตถ์",
+   "code": "0064",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตรอน",
+   "lat": 17.449171,
+   "lng": 100.14334,
+   "prov": "อุตรดิตถ์",
+   "code": "0071",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "น้ำปาด",
+   "lat": 17.731188,
+   "lng": 100.691594,
+   "prov": "อุตรดิตถ์",
+   "code": "0078",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเกาะ",
+   "lat": 17.604725,
+   "lng": 100.068811,
+   "prov": "อุตรดิตถ์",
+   "code": "0213",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านหม้อ",
+   "lat": 17.271711,
+   "lng": 100.08743,
+   "prov": "อุตรดิตถ์",
+   "code": "0383",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังขอน",
+   "lat": 17.668626,
+   "lng": 100.196596,
+   "prov": "อุตรดิตถ์",
+   "code": "0646",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฟากท่า",
+   "lat": 17.99937,
+   "lng": 100.88142,
+   "prov": "อุตรดิตถ์",
+   "code": "0669",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดท่าปลา",
+   "lat": 17.794617,
+   "lng": 100.376255,
+   "prov": "อุตรดิตถ์",
+   "code": "0853",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "น้ำพี้",
+   "lat": 17.558792,
+   "lng": 100.28578,
+   "prov": "อุตรดิตถ์",
+   "code": "0861",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาอิน",
+   "lat": 17.227133,
+   "lng": 100.193522,
+   "prov": "อุตรดิตถ์",
+   "code": "0927",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังแดง",
+   "lat": 17.503165,
+   "lng": 100.123268,
+   "prov": "อุตรดิตถ์",
+   "code": "1047",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อุทัยธานี",
+   "lat": 15.388392,
+   "lng": 100.017715,
+   "prov": "อุทัยธานี",
+   "code": "0104",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สว่างอารมณ์",
+   "lat": 15.5852,
+   "lng": 99.86,
+   "prov": "อุทัยธานี",
+   "code": "0210",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งนา",
+   "lat": 15.31257,
+   "lng": 99.717429,
+   "prov": "อุทัยธานี",
+   "code": "0578",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยคต",
+   "lat": 15.29699,
+   "lng": 99.630128,
+   "prov": "อุทัยธานี",
+   "code": "0677",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทัพทัน",
+   "lat": 15.459586,
+   "lng": 99.889759,
+   "prov": "อุทัยธานี",
+   "code": "0678",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทัพหลวง",
+   "lat": 15.017283,
+   "lng": 99.621446,
+   "prov": "อุทัยธานี",
+   "code": "0706",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "อุบลราชธานี",
+   "lat": 15.286328,
+   "lng": 104.838115,
+   "prov": "อุบลราชธานี",
+   "code": "0264",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตระการพืชผล",
+   "lat": 15.622391,
+   "lng": 105.030938,
+   "prov": "อุบลราชธานี",
+   "code": "0285",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พิบูลมังสาหาร",
+   "lat": 15.234493,
+   "lng": 105.238752,
+   "prov": "อุบลราชธานี",
+   "code": "0428",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "น้ำยืน",
+   "lat": 14.48643,
+   "lng": 105.002529,
+   "prov": "อุบลราชธานี",
+   "code": "0500",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "กุดข้าวปุ้น",
+   "lat": 15.790181,
+   "lng": 104.996873,
+   "prov": "อุบลราชธานี",
+   "code": "0763",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านกลาง",
+   "lat": 14.8355,
+   "lng": 105.109389,
+   "prov": "อุบลราชธานี",
+   "code": "0877",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งศรีอุดม",
+   "lat": 14.73429,
+   "lng": 104.91468,
+   "prov": "อุบลราชธานี",
+   "code": "0878",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่จัน",
+   "lat": 20.149797,
+   "lng": 99.855468,
+   "prov": "เชียงราย",
+   "code": "0001",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงราย",
+   "lat": 19.906692,
+   "lng": 99.841134,
+   "prov": "เชียงราย",
+   "code": "0002",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านดู่",
+   "lat": 19.964684,
+   "lng": 99.855078,
+   "prov": "เชียงราย",
+   "code": "0004",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงแสน",
+   "lat": 20.273814,
+   "lng": 100.081258,
+   "prov": "เชียงราย",
+   "code": "0005",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยไคร้",
+   "lat": 20.26975,
+   "lng": 99.860527,
+   "prov": "เชียงราย",
+   "code": "0006",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พาน",
+   "lat": 19.551444,
+   "lng": 99.740832,
+   "prov": "เชียงราย",
+   "code": "0008",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เวียงชัย",
+   "lat": 19.881809,
+   "lng": 99.929017,
+   "prov": "เชียงราย",
+   "code": "0011",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่สรวย",
+   "lat": 19.659527,
+   "lng": 99.545124,
+   "prov": "เชียงราย",
+   "code": "0012",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ขะจาน",
+   "lat": 19.193137,
+   "lng": 99.513417,
+   "prov": "เชียงราย",
+   "code": "0017",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พญาเม็งราย",
+   "lat": 19.847541,
+   "lng": 100.150288,
+   "prov": "เชียงราย",
+   "code": "0020",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่สาย",
+   "lat": 20.424538,
+   "lng": 99.882848,
+   "prov": "เชียงราย",
+   "code": "0024",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ป่าแดด",
+   "lat": 19.50306,
+   "lng": 99.992133,
+   "prov": "เชียงราย",
+   "code": "0025",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เทิง",
+   "lat": 19.689715,
+   "lng": 100.182812,
+   "prov": "เชียงราย",
+   "code": "0029",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ลาว",
+   "lat": 19.778578,
+   "lng": 99.74098,
+   "prov": "เชียงราย",
+   "code": "0030",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เด่นห้า",
+   "lat": 19.898764,
+   "lng": 99.811636,
+   "prov": "เชียงราย",
+   "code": "0031",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงของ",
+   "lat": 20.220442,
+   "lng": 100.404867,
+   "prov": "เชียงราย",
+   "code": "0037",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เวียงเชียงรุ้ง",
+   "lat": 20.004031,
+   "lng": 100.041636,
+   "prov": "เชียงราย",
+   "code": "0045",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงราย(ริมกก)",
+   "lat": 19.924171,
+   "lng": 99.844771,
+   "prov": "เชียงราย",
+   "code": "0051",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จันจว้า",
+   "lat": 20.216971,
+   "lng": 99.939796,
+   "prov": "เชียงราย",
+   "code": "0094",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยสัก",
+   "lat": 19.770552,
+   "lng": 99.911611,
+   "prov": "เชียงราย",
+   "code": "0178",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ป่างิ้ว",
+   "lat": 19.300072,
+   "lng": 99.511641,
+   "prov": "เชียงราย",
+   "code": "0179",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดหกแยก",
+   "lat": 19.545647,
+   "lng": 99.744909,
+   "prov": "เชียงราย",
+   "code": "0305",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีเวียง",
+   "lat": 19.858307,
+   "lng": 99.902145,
+   "prov": "เชียงราย",
+   "code": "0309",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยส้ม",
+   "lat": 19.585692,
+   "lng": 99.494729,
+   "prov": "เชียงราย",
+   "code": "0310",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านต้า",
+   "lat": 19.811061,
+   "lng": 100.239694,
+   "prov": "เชียงราย",
+   "code": "0312",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านเด่น",
+   "lat": 20.180429,
+   "lng": 99.88128,
+   "prov": "เชียงราย",
+   "code": "0323",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าสาย",
+   "lat": 19.855116,
+   "lng": 99.845827,
+   "prov": "เชียงราย",
+   "code": "0335",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปากทางแม่สรวย",
+   "lat": 19.746976,
+   "lng": 99.724471,
+   "prov": "เชียงราย",
+   "code": "0337",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านด้าย",
+   "lat": 20.290982,
+   "lng": 99.945792,
+   "prov": "เชียงราย",
+   "code": "0351",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เวียงแก่น",
+   "lat": 20.102395,
+   "lng": 100.508454,
+   "prov": "เชียงราย",
+   "code": "0384",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หน้ามอแม่ฟ้าหลวง",
+   "lat": 20.04361,
+   "lng": 99.87659,
+   "prov": "เชียงราย",
+   "code": "0399",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เจริญเมือง",
+   "lat": 19.603548,
+   "lng": 99.748482,
+   "prov": "เชียงราย",
+   "code": "0838",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดอนศิลา",
+   "lat": 19.8259,
+   "lng": 100.0209,
+   "prov": "เชียงราย",
+   "code": "0848",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันโค้งใต้",
+   "lat": 19.643,
+   "lng": 99.4939,
+   "prov": "เชียงราย",
+   "code": "1027",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่อ้อ",
+   "lat": 19.67385,
+   "lng": 99.858583,
+   "prov": "เชียงราย",
+   "code": "1035",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าต้นเกี๋ยง",
+   "lat": 19.574794,
+   "lng": 99.800775,
+   "prov": "เชียงราย",
+   "code": "1036",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ดงป่าสัก",
+   "lat": 19.9639,
+   "lng": 100.0056,
+   "prov": "เชียงราย",
+   "code": "1038",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สบเปา",
+   "lat": 19.890773,
+   "lng": 100.110257,
+   "prov": "เชียงราย",
+   "code": "1039",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าก๊อ",
+   "lat": 19.4892,
+   "lng": 99.4776,
+   "prov": "เชียงราย",
+   "code": "1066",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฝาง",
+   "lat": 19.91992,
+   "lng": 99.216767,
+   "prov": "เชียงใหม่",
+   "code": "0007",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่อาย",
+   "lat": 20.032153,
+   "lng": 99.296961,
+   "prov": "เชียงใหม่",
+   "code": "0009",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไชยปราการ",
+   "lat": 19.732387,
+   "lng": 99.141154,
+   "prov": "เชียงใหม่",
+   "code": "0010",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พร้าว",
+   "lat": 19.36948,
+   "lng": 99.200894,
+   "prov": "เชียงใหม่",
+   "code": "0021",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "จอมทอง",
+   "lat": 18.43217,
+   "lng": 98.683884,
+   "prov": "เชียงใหม่",
+   "code": "0023",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่แตง",
+   "lat": 19.090028,
+   "lng": 98.936716,
+   "prov": "เชียงใหม่",
+   "code": "0027",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงดาว",
+   "lat": 19.380694,
+   "lng": 98.96769,
+   "prov": "เชียงใหม่",
+   "code": "0028",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สารภี",
+   "lat": 18.720891,
+   "lng": 99.027008,
+   "prov": "เชียงใหม่",
+   "code": "0038",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หางดง",
+   "lat": 18.652881,
+   "lng": 98.904961,
+   "prov": "เชียงใหม่",
+   "code": "0049",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่แจ่ม",
+   "lat": 18.49957,
+   "lng": 98.36813,
+   "prov": "เชียงใหม่",
+   "code": "0059",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่วาง",
+   "lat": 18.603422,
+   "lng": 98.829791,
+   "prov": "เชียงใหม่",
+   "code": "0066",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันทราย",
+   "lat": 18.821283,
+   "lng": 99.032955,
+   "prov": "เชียงใหม่",
+   "code": "0093",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฝาง(หนองยาว)",
+   "lat": 19.85759,
+   "lng": 99.17581,
+   "prov": "เชียงใหม่",
+   "code": "0102",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่โจ้",
+   "lat": 18.881138,
+   "lng": 99.014558,
+   "prov": "เชียงใหม่",
+   "code": "0109",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงใหม่ภาค 5",
+   "lat": 18.759156,
+   "lng": 98.998957,
+   "prov": "เชียงใหม่",
+   "code": "0116",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันป่าตอง",
+   "lat": 18.616451,
+   "lng": 98.897355,
+   "prov": "เชียงใหม่",
+   "code": "0122",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันทรายแม่ย่อย",
+   "lat": 18.84263,
+   "lng": 99.071907,
+   "prov": "เชียงใหม่",
+   "code": "0123",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เจ็ดยอด",
+   "lat": 18.810024,
+   "lng": 98.976746,
+   "prov": "เชียงใหม่",
+   "code": "0124",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หัวทุ่ง",
+   "lat": 18.73628,
+   "lng": 99.125352,
+   "prov": "เชียงใหม่",
+   "code": "0127",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เชียงใหม่(ช้างคลาน)",
+   "lat": 18.765134,
+   "lng": 98.993649,
+   "prov": "เชียงใหม่",
+   "code": "0152",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ไชยสถาน",
+   "lat": 18.73934,
+   "lng": 99.044772,
+   "prov": "เชียงใหม่",
+   "code": "0180",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ฮอด",
+   "lat": 18.18637,
+   "lng": 98.61304,
+   "prov": "เชียงใหม่",
+   "code": "0226",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ฮ่าง",
+   "lat": 19.990704,
+   "lng": 99.251029,
+   "prov": "เชียงใหม่",
+   "code": "0306",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปากทางเจริญ",
+   "lat": 18.484776,
+   "lng": 98.803809,
+   "prov": "เชียงใหม่",
+   "code": "0326",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โรงเรียนพร้าววิทยาคม",
+   "lat": 19.335717,
+   "lng": 99.193728,
+   "prov": "เชียงใหม่",
+   "code": "0361",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โรงเรียนริมใต้",
+   "lat": 18.911402,
+   "lng": 98.946564,
+   "prov": "เชียงใหม่",
+   "code": "0370",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองแกน",
+   "lat": 19.1453,
+   "lng": 99.0033,
+   "prov": "เชียงใหม่",
+   "code": "0643",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ่อสร้าง",
+   "lat": 18.7724,
+   "lng": 99.086,
+   "prov": "เชียงใหม่",
+   "code": "0842",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยน้ำริน",
+   "lat": 18.986889,
+   "lng": 98.945579,
+   "prov": "เชียงใหม่",
+   "code": "0909",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สันต้นหมื้อ",
+   "lat": 19.9594,
+   "lng": 99.2812,
+   "prov": "เชียงใหม่",
+   "code": "1031",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร้องวัวแดง",
+   "lat": 18.742054,
+   "lng": 99.166178,
+   "prov": "เชียงใหม่",
+   "code": "1053",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ทะลบ",
+   "lat": 19.735807,
+   "lng": 99.176165,
+   "prov": "เชียงใหม่",
+   "code": "1054",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร่มหลวง",
+   "lat": 19.04253,
+   "lng": 98.968018,
+   "prov": "เชียงใหม่",
+   "code": "1055",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ตลาดใหญ่",
+   "lat": 18.820258,
+   "lng": 99.124698,
+   "prov": "เชียงใหม่",
+   "code": "1070",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โรงเรียนห้วยทราย",
+   "lat": 18.2257,
+   "lng": 98.6131,
+   "prov": "เชียงใหม่",
+   "code": "1080",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านลาด",
+   "lat": 13.050566,
+   "lng": 99.914776,
+   "prov": "เพชรบุรี",
+   "code": "0732",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เมืองเพชรบูรณ์",
+   "lat": 16.39504,
+   "lng": 101.133751,
+   "prov": "เพชรบูรณ์",
+   "code": "0089",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วิเชียรบุรี",
+   "lat": 15.658215,
+   "lng": 101.11496,
+   "prov": "เพชรบูรณ์",
+   "code": "0106",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บึงสามพัน",
+   "lat": 15.780693,
+   "lng": 101.005926,
+   "prov": "เพชรบูรณ์",
+   "code": "0107",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หนองไผ่",
+   "lat": 15.994748,
+   "lng": 101.065559,
+   "prov": "เพชรบูรณ์",
+   "code": "0108",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "หล่มเก่า",
+   "lat": 16.890557,
+   "lng": 101.228803,
+   "prov": "เพชรบูรณ์",
+   "code": "0112",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ศรีเทพ",
+   "lat": 15.440225,
+   "lng": 101.068352,
+   "prov": "เพชรบูรณ์",
+   "code": "0139",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ชนแดน",
+   "lat": 16.18467,
+   "lng": 100.850407,
+   "prov": "เพชรบูรณ์",
+   "code": "0140",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "พุเตย",
+   "lat": 15.583755,
+   "lng": 101.068679,
+   "prov": "เพชรบูรณ์",
+   "code": "0324",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าพล",
+   "lat": 16.564025,
+   "lng": 101.151541,
+   "prov": "เพชรบูรณ์",
+   "code": "0352",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาเฉลียง",
+   "lat": 16.08051,
+   "lng": 101.057544,
+   "prov": "เพชรบูรณ์",
+   "code": "0401",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังโป่ง",
+   "lat": 16.33149,
+   "lng": 100.798366,
+   "prov": "เพชรบูรณ์",
+   "code": "0950",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านกลาง(หล่มสัก)",
+   "lat": 16.6267,
+   "lng": 101.2608,
+   "prov": "เพชรบูรณ์",
+   "code": "0963",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ห้วยโป่ง",
+   "lat": 16.129447,
+   "lng": 101.043289,
+   "prov": "เพชรบูรณ์",
+   "code": "1025",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นางั่ว",
+   "lat": 16.52526,
+   "lng": 101.157198,
+   "prov": "เพชรบูรณ์",
+   "code": "1026",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ซับบอน",
+   "lat": 15.828472,
+   "lng": 101.161695,
+   "prov": "เพชรบูรณ์",
+   "code": "1046",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท่าข้าม",
+   "lat": 16.159597,
+   "lng": 100.801217,
+   "prov": "เพชรบูรณ์",
+   "code": "1061",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ท้ายดง",
+   "lat": 16.313382,
+   "lng": 100.722511,
+   "prov": "เพชรบูรณ์",
+   "code": "1062",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บุ่งคล้า",
+   "lat": 16.6347,
+   "lng": 101.1612,
+   "prov": "เพชรบูรณ์",
+   "code": "1085",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "โคกปรง",
+   "lat": 15.748272,
+   "lng": 101.159047,
+   "prov": "เพชรบูรณ์",
+   "code": "1087",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เพชรละคร",
+   "lat": 15.900644,
+   "lng": 101.128279,
+   "prov": "เพชรบูรณ์",
+   "code": "1090",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังซอง",
+   "lat": 16.550708,
+   "lng": 101.216448,
+   "prov": "เพชรบูรณ์",
+   "code": "1097",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เลย",
+   "lat": 17.493819,
+   "lng": 101.709983,
+   "prov": "เลย",
+   "code": "0241",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังสะพุง",
+   "lat": 17.28637,
+   "lng": 101.759642,
+   "prov": "เลย",
+   "code": "0257",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ภูเรือ",
+   "lat": 17.449187,
+   "lng": 101.352824,
+   "prov": "เลย",
+   "code": "0637",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาด้วง",
+   "lat": 17.4789,
+   "lng": 101.9866,
+   "prov": "เลย",
+   "code": "0776",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แพร่",
+   "lat": 18.121584,
+   "lng": 100.140862,
+   "prov": "แพร่",
+   "code": "0054",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "สูงเม่น",
+   "lat": 18.071523,
+   "lng": 100.120482,
+   "prov": "แพร่",
+   "code": "0068",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร้องกวาง",
+   "lat": 18.345232,
+   "lng": 100.319818,
+   "prov": "แพร่",
+   "code": "0070",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "เด่นชัย",
+   "lat": 17.984292,
+   "lng": 100.056231,
+   "prov": "แพร่",
+   "code": "0084",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ลอง",
+   "lat": 18.0881,
+   "lng": 99.8424,
+   "prov": "แพร่",
+   "code": "0088",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "วังชิ้น",
+   "lat": 17.900405,
+   "lng": 99.606346,
+   "prov": "แพร่",
+   "code": "0090",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งโฮ้ง",
+   "lat": 18.177484,
+   "lng": 100.17881,
+   "prov": "แพร่",
+   "code": "0319",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ทุ่งน้าว",
+   "lat": 18.400634,
+   "lng": 100.186981,
+   "prov": "แพร่",
+   "code": "0338",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ร้องเข็ม",
+   "lat": 18.3046,
+   "lng": 100.2892,
+   "prov": "แพร่",
+   "code": "0359",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "บ้านอ้อย",
+   "lat": 18.2164,
+   "lng": 100.2769,
+   "prov": "แพร่",
+   "code": "1023",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ต้าผามอก",
+   "lat": 18.159484,
+   "lng": 99.94498,
+   "prov": "แพร่",
+   "code": "1037",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "นาจักร",
+   "lat": 18.12796,
+   "lng": 100.168433,
+   "prov": "แพร่",
+   "code": "1098",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ฮ่องสอน",
+   "lat": 19.391984,
+   "lng": 97.891075,
+   "prov": "แม่ฮ่องสอน",
+   "code": "0115",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "ปาย",
+   "lat": 19.347185,
+   "lng": 98.434108,
+   "prov": "แม่ฮ่องสอน",
+   "code": "0169",
+   "source": "official-locator"
+  },
+  {
+   "brand": "Heng",
+   "name": "แม่ลาน้อย",
+   "lat": 18.380422,
+   "lng": 97.942244,
+   "prov": "แม่ฮ่องสอน",
+   "code": "0407",
+   "source": "official-locator"
+  }
+ ]
+}
