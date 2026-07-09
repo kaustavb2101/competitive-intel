@@ -45,3 +45,35 @@ Competitor corporate store-locators (muangthaicap / sawad / tidlor / hengleasing
 the datacenter IP — the national competitor census (`competitors_census.json`, 16,503 points) was
 already pulled and can't refresh from CI. A real **loan-tape export** remains the only true owner-side
 data unlock.
+
+## Round-2 sweep (2026-07-09) — what else is reachable
+Probed RID, MOC(alt), MOAC, DOPA, MOPH, MOTS, GISTDA, BMA, ONEP. **Only one new reachable source:**
+- **ThaiWater** `api-v3.thaiwater.net` (REST, not CKAN) — reservoir / water-level / flood telemetry per
+  province. Candidate upgrade for the drought/flood side of `build_crop_stress.py` (currently HDX/CHIRPS
+  rainfall). Reachable; not yet wired.
+All others 502 / connection-reset through the proxy (MOC, RID, MOPH, MOTS, GISTDA, BMA, ONEP, DOPA).
+The reachable gov-data surface is now essentially mapped: **OAE · DIW · DLT · NABC · ThaiWater · HDX ·
+World Bank · BIS · Overpass · Google Places(keyed)**.
+
+## POI sources (Overpass / OSM)
+Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
+osm_layers.json` — **13 national layers** feeding the per-branch within-10km `k10` radar (wired through
+`autox_enrich_loop.py` OSM_LAYERS → keymap → `derive.py` POI10 → app radar):
+`industrial · bank · atm · convenience · hotel · civic · vehicle_commerce · fresh_market · supermarket ·
+pharmacy · gold · restaurant · school`.
+
+Candidate NEW categories (national OSM counts, 2026-07-09):
+| Category | National | Verdict |
+|---|---|---|
+| `amenity=fuel` (fuel stations) | **5,348** | **Dense + relevant** (vehicle economy + rural reach) — the one worthwhile add. |
+| `amenity=marketplace` | 706 | thin vs the existing `fresh_market` (1,965) — marginal. |
+| `shop=car_repair` | 605 | overlaps `vehicle_commerce` (3,382) — marginal. |
+| `shop=pawnbroker` | ~4 (Chonburi) | OSM barely tags these — the official competitor census covers pawn/title rivals far better. |
+| `shop=agrarian`, rice mills | ~0–1 | OSM coverage ≈ nil in Thailand. |
+
+Finding: the dense, high-value POI signals are **already covered** by the 13 layers, and the measured
+gov census (DIW factories, DLT vehicles) **supersedes** the OSM proxies for the key collateral/industrial
+signals. The single genuinely-additive layer is **fuel stations**. Adding it means editing OSM_LAYERS +
+keymap + derive POI10 + the app radar, then re-running the enrich loop (network Overpass pull → master
+rewrite → full cascade rebuild) — a heavy op for a modest signal, so it belongs in a deliberate
+enrich-loop cycle, not an inline edit.
