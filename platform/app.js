@@ -1258,9 +1258,55 @@ function renderNationalOutlook(){
     +`<p class="lead" style="margin-top:12px">Every number here is a rollup of the per-branch recommendation layer (click any branch on the National map to see its own recs + evidence). Deterministic — no model in the loop. Inputs are measured/estimated as labelled in their source layers.</p>`;
 }
 
+/* ---------- New-vehicle market (data/brand_trends.json — DLT first regis by brand, MEASURED) ----------
+   The demand-side collateral read: pickup registrations collapsing + the pure-EV wave, plus which
+   brands enter the fleet (tomorrow's used collateral). Null-safe: absent file → the wrap stays hidden. */
+let BRANDT=null, brandtPromise=null;
+async function loadBrandTrends(){
+  if(brandtPromise) return brandtPromise;
+  brandtPromise=fetch('data/brand_trends.json').then(r=>r.ok?r.json():null)
+    .then(d=>{BRANDT=d;return d;}).catch(()=>null);
+  return brandtPromise;
+}
+function renderBrandTrends(){
+  const wrap=$('#brandtrends-wrap'); if(!wrap||!BRANDT||!BRANDT.years) return;
+  const ys=Object.keys(BRANDT.years).sort(); if(!ys.length) return;
+  const first=ys[0], last=ys[ys.length-1];
+  const yF=BRANDT.years[first], yL=BRANDT.years[last];
+  const ce=be=>be-543;
+  const pick=y=>(y.top_pickup_brands||[]).reduce((s,x)=>s+x.n,0);
+  const pF=pick(yF), pL=pick(yL);
+  const dPick=pF?Math.round(100*(pL-pF)/pF):null;
+  const cards=[
+    {k:`Pickup registrations (top brands)`, v:(dPick!=null?(dPick>0?'+':'')+dPick+'%':'—'), d:`${ce(+first)}→${ce(+last)}`,
+     cls:dPick!=null&&dPick<0?'down':'up',
+     n:`MEASURED · Toyota+Isuzu+Mitsubishi first registrations ${pF.toLocaleString()} → ${pL.toLocaleString()}. Fewer new pickups = an aging title-collateral fleet — the measured demand signal behind the diesel-pickup watch.`},
+    {k:`Pure-EV brand share`, v:yL.ev_only_share_pct+'%', d:`was ${yF.ev_only_share_pct}% in ${ce(+first)}`, cls:'down',
+     n:`ESTIMATED classification over measured counts (EV-only marques: BYD, AION, NETA… — Toyota/MG excluded, so a conservative floor). The EV wave pressuring ICE resale values.`},
+    {k:`All first registrations ${ce(+last)}`, v:(yL.total_first_regis_cars/1e6).toFixed(2)+'M', d:'cars + motorcycles', cls:'up',
+     n:`MEASURED · DLT ${last} (CE ${ce(+last)}). Top brands: ${(yL.top_brands||[]).slice(0,5).map(x=>x.b).join(', ')}.`},
+  ];
+  $('#brandtrends-cards').innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  // brand table: latest-year top brands with the first-year count beside (trend at a glance)
+  const f={}; (yF.top_brands||[]).forEach(x=>f[x.b]=x.n);
+  $('#brandtrends-tbl').innerHTML=`<tr><th>#</th><th>Brand</th><th>First regis ${ce(+last)} ▲</th><th>${ce(+first)}</th><th>Change</th></tr>`+
+    (yL.top_brands||[]).slice(0,8).map((x,i)=>{
+      const was=f[x.b]; const ch=was?Math.round(100*(x.n-was)/was):null;
+      const cc=ch==null?'var(--mid)':ch<0?'var(--agri)':'var(--merch)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${x.b}</b></td>
+        <td class="mono">${x.n.toLocaleString()}</td>
+        <td class="mono sub">${was?was.toLocaleString():'—'}</td>
+        <td class="mono" style="color:${cc}">${ch==null?'—':(ch>0?'+':'')+ch+'%'}</td></tr>`;}).join('');
+  $('#brandtrends-note').innerHTML=`What enters the fleet today is tomorrow's <b>used title collateral</b>. All counts are <b>measured</b> (DLT first registrations by brand, ${ce(+first)}–${ce(+last)}); the pure-EV share is an <b>estimated classification</b> over those measured counts.`;
+  wrap.style.display='';
+}
+
 /* ---------- overview ---------- */
 function renderOverview(){
   loadOutlook().then(renderNationalOutlook);
+  loadBrandTrends().then(renderBrandTrends);
   // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
   $('#macro').innerHTML = META.macro.filter(([k])=>!/gold/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
@@ -1381,7 +1427,7 @@ function renderCollatOutlook(){
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   const cards=[
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
-     n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
+     n:'Estimated watch, now backed by a MEASURED demand signal: new pickup registrations collapsed (see the New-vehicle market board below — Isuzu −71% since 2022) while the EV wave builds. Still no live Thai used-pickup price index.'},
     {k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
      n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book — see the motorcycle-share table below (DLT, measured).'},
   ];

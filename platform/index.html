@@ -192,6 +192,16 @@
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
 
+    <!-- New-vehicle market (data/brand_trends.json — DLT first registrations by brand, MEASURED).
+         The demand-side collateral signal: which brands enter the fleet (tomorrow's used collateral),
+         the pickup-registration trend, and the pure-EV share. Hidden until the layer loads. -->
+    <div id="brandtrends-wrap" style="display:none">
+      <h2 class="collat">New-vehicle market · registrations &amp; brands <span class="sub" style="text-transform:none;letter-spacing:0">— DLT, measured</span></h2>
+      <p class="lead" id="brandtrends-note"></p>
+      <div class="grid macro" id="brandtrends-cards"></div>
+      <table class="tbl" id="brandtrends-tbl"></table>
+    </div>
+
     <h2 class="collat">Collateral mix · most motorcycle-heavy provinces</h2>
     <p class="lead" id="collatmix-note"></p>
     <table class="tbl" id="collatmixtbl"></table>
