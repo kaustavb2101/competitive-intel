@@ -5,6 +5,36 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-09 (7) — MAJOR: PR #1 merged (finally) — all scheduled data workflows are now live; ENRICH: Home risk card gains the SME income-floor fact
+
+**Orient found a real state change, not just another "still unmerged" recheck.** `mcp__github__list_pull_requests`
+(all states) shows PR #1 ("Import platform + one-command data refresh & wired enrichment loop",
+`claude/new-session-wto26j` → `master`) **merged at 2026-07-09T18:42:21Z** — the blocker every cycle
+since 2026-07-05 (4) has been re-checking and finding unchanged. `mcp__github__actions_list(list_workflows)`
+now shows **10 workflows registered `active`** (was 1 — just `QA`): `data-fuel-prices.yml`,
+`data-gov-census.yml`, `data-macro.yml`, `data-nabc-prices.yml`, `data-oae-prices.yml`,
+`data-overture.yml`, `data-tiles.yml`, `committee-geocode.yml`, `site-health.yml`, `qa.yml`. None of
+the new `schedule:`-triggered ones have produced a run yet (`list_workflow_runs` = 0 for
+`site-health.yml`/`data-fuel-prices.yml` checked this cycle) — expected, crons need their first
+scheduled tick to fire; not evidence of a problem. **Flagged to Kaustav via `PushNotification`** since
+this closes a blocker he's the only one who could act on, and it means the OAE/DLT/DIW/fuel/NABC/macro
+pullers should start refreshing on their own from here — worth a spot-check next cycle (or sooner) that
+a run actually completed successfully once its schedule ticks, rather than assuming green.
+
+**Also noticed:** PR #2 ("Follow-up: CKAN round-2 + POI source map (post-merge)", same branch → master,
+opened right after the merge) is already open/draft — this is the correct continuation PR for
+`claude/new-session-wto26j`'s post-merge commits; no new PR was needed this cycle.
+
+**This cycle's substantive improvement (small, additive):** `renderHomeRisk()` (`platform/app.js`)
+gained the "Merchant segment income floor · SME owners" rank-1 callout (`SMEINC_LIST[0]`, from
+`sme_income_by_province.json`) — the same fact already shipped on Exposure (2026-07-09 (5)), completing
+the Home-parity pattern started 2026-07-06 for the DTI+unemployment and lowest-paid-occupation rows
+(closes the 2026-07-09 (5) backlog follow-up asking for exactly this). Wired `loadSmeIncome()` into
+Home's lazy-load chain (`onHome()`-gated re-render), null-safe when the source is absent. Zero new
+data/pipeline. Gate 59/0 (`validate_data.py` 448/448). Headless-rendered `index.html#home`:
+`data-errors="[]"`, DOM confirms the real row ("SME-owner income ฿16,473/mo · 47/77 provinces below
+the national floor"). Pushed as commit `c148bee`.
+
 ## 2026-07-09 (6) — VALIDATOR: closed the `provinces/*.json` `gov.income_floor` join gap
 
 Picked the concrete, still-open 2026-07-09 (3) backlog follow-up: "The new

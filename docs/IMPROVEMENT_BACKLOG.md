@@ -568,6 +568,30 @@
       2026-06-30; `ingest_gov.py`'s `build_occupations_census()` commit `7fd4994` 2026-06-30) but never
       checked off. Zero code/data changed — pure backlog hygiene.
 
+## Queue — follow-ups noticed 2026-07-09 (7)
+- [ ] **★ PR #1 merged — verify the newly-live scheduled workflows actually produce a green run,
+      don't just assume it.** `data-fuel-prices.yml`/`data-gov-census.yml`/`data-macro.yml`/
+      `data-nabc-prices.yml`/`data-oae-prices.yml`/`data-overture.yml`/`data-tiles.yml`/
+      `committee-geocode.yml`/`site-health.yml` are now `active` but had 0 runs as of this cycle
+      (crons hadn't ticked yet). A future cycle (or the next PR-activity check-in) should
+      `list_workflow_runs` each and read the actual log/conclusion of the first run — these pull from
+      previously-untested-in-CI code paths (secrets availability, `GITHUB_TOKEN` permissions for
+      committing data back, `GOOGLE_MAPS_API_KEY`/`GOOGLE_PLACES_KEY` for the geocode committee) and a
+      silent first-run failure would look identical to "hasn't ticked yet" without actually checking.
+      *(HIGH, S — just a status check once enough wall-clock has passed, but don't skip it)*
+- [ ] **Now that `master` has the full pipeline + committee, the sandbox-vs-CI story changes** — some
+      backlog items previously scoped as "needs a Thai-IP pull, blocked" (DIW factories, DLT vehicles)
+      are exactly what `data-gov-census.yml` now runs on a schedule from GitHub's own runners (already
+      proven reachable per CLAUDE.md's CKAN breakthrough). Once that workflow has a green run, its
+      *output* (fresh `factories_by_district.json`/`vehicles_by_province.json`) should get pulled back
+      into this branch's `source-data/` and re-derived — a real, non-speculative data refresh, not
+      just a workflow existing. *(MED, M, blocked until the workflow's first run lands)*
+- [ ] **Home's risk card (`renderHomeRisk()`) is now 7 stacked blocks deep** (composite-risk verdict,
+      DTI+unemployment, lowest-paid occupation, SME income floor, riskiest branch, crop stress,
+      moto-collateral) — the "more" toggle idea flagged 2026-07-06/2026-07-09 (5) is no longer
+      speculative headroom, it's the actual current state. Worth doing before an 8th block lands;
+      the National map's "More lenses ▾" pattern is the existing precedent to reuse. *(MED, S)*
+
 ## Queue — follow-ups noticed 2026-07-05 (8)
 - [x] **`occupation_income.json`'s national aggregate could feed the Simulator's occupation-
       sensitivity lever — DONE 2026-07-06 (3), scoped as an additive read rather than a formula
@@ -748,14 +772,13 @@
       *(LOW, S, speculative — needs the builder first)*
 
 ## Queue — follow-ups noticed 2026-07-09 (5)
-- [ ] **The same rank-1-worst-province pattern could extend to Home (`renderHomeRisk()`)** — Home
-      already ported the `OCCINC_LIST[0]` (lowest-paid-occupation) and `PSTRESS_LIST[0]`
-      (DTI+unemployment) callouts from Exposure (2026-07-06), but the new SME-owner income-floor
-      block landed on Exposure only this cycle. Same lazy-load chain (`loadSmeIncome()`), same
-      null-safe pattern — a small win once someone's touching `renderHomeRisk()`/`renderHomeWhitespace()`
-      again, though both cards are already flagged as "getting long" (2026-07-06 follow-ups) so worth
-      pairing with the "more" toggle idea rather than adding a 7th stacked block blindly. *(LOW, S,
-      speculative)*
+- [x] **The same rank-1-worst-province pattern could extend to Home (`renderHomeRisk()`) — DONE
+      2026-07-09 (7)** (`renderHomeRisk()` gained the identical `SMEINC_LIST[0]` "Merchant segment
+      income floor · SME owners" row already shipped on Exposure; wired `loadSmeIncome()` into Home's
+      lazy-load chain, null-safe. Home's risk card is now a 7th stacked block deep — the "more" toggle
+      idea flagged below/2026-07-06 is worth doing before an 8th block is added. Gate 59/0,
+      headless-rendered `#home`, `data-errors="[]"`, real data confirmed in DOM. See
+      `docs/PROGRESS_LOG.md` 2026-07-09 (7).)
 - [ ] **`OfficeStaff`/`Transport` are still the only 2 of 5 NSO SES occupation columns with no
       `build_*_income.py` ratio layer** (Agriculture/FactoryWorkers/SMEOwners now all wired end-to-end
       — pipeline → province.html → Exposure for SME). Same builder shape, different column; only
@@ -767,10 +790,10 @@
       (2026-07-06). Not a problem yet (each is a single compact `cc-row`, not a full card), but if a 5th
       rank-1 fact is ever added here, worth considering the same "more" toggle treatment. *(LOW, trivial,
       speculative)*
-- [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (5), still unmerged, no change.**
-      `mcp__github__list_pull_requests(state=open)` shows PR #1 (`claude/new-session-wto26j` →
-      `master`) still open, not draft — same state as every prior recheck since 2026-07-05 (4). Not
-      re-notifying (no change). *(LOW, trivial — just a status check)*
+- [x] **Is PR #1 still unmerged? — CHANGED 2026-07-09 (7): MERGED at last.** See the top-of-file
+      2026-07-09 (7) entry — `master` now has the full platform + all 9 `schedule:` workflows
+      registered `active`. This item is closed; the new follow-up is tracking whether the crons
+      actually produce a green run (below).
 
 ## Queue — follow-ups noticed 2026-07-09 (6)
 - [ ] **`check_province_income_floor()` (new this cycle) reads all 77 `provinces/<slug>.json` files
