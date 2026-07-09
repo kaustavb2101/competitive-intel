@@ -1075,6 +1075,96 @@ def check_sme_income():
 
 
 # ---------------------------------------------------------------------------
+def check_province_income_floor():
+    # provinces/<slug>.json's gov.income_floor.{factory,agri,sme}_ratio_to_national (build_province.py)
+    # is a pure pass-through join of factory_income_by_province.json / agri_income_by_province.json /
+    # sme_income_by_province.json's own ratio_to_national — those source files already have their own
+    # value checks (check_factory_income/check_agri_income/check_sme_income above) but nothing
+    # previously asserted the JOIN itself stays correct (right province, right number, sane range)
+    # once it lands on the per-province deep-dive. Flagged as an open gap in
+    # docs/IMPROVEMENT_BACKLOG.md (2026-07-09 (3)). SKIP-passes whole when none of the three source
+    # layers exist yet (nothing to join).
+    hdr("provinces/*.json gov.income_floor join (optional)")
+    sources = {
+        "factory_ratio_to_national": ("factory_income_by_province.json", "ratio_to_national"),
+        "agri_ratio_to_national": ("agri_income_by_province.json", "ratio_to_national"),
+        "sme_ratio_to_national": ("sme_income_by_province.json", "ratio_to_national"),
+    }
+    have_any = any(exists(fn) for fn, _ in sources.values())
+    if not have_any:
+        ok("no income-floor source layer present yet — join check skipped (optional)")
+        return
+
+    prov_ratios = {}
+    for key, (fn, field) in sources.items():
+        if not exists(fn):
+            continue
+        try:
+            d = load(fn)
+        except Exception as e:
+            fail("%s loads (for income_floor join check)" % fn, repr(e))
+            continue
+        if isinstance(d.get("meta"), dict) and d["meta"].get("absent"):
+            continue
+        provs = d.get("provinces")
+        if isinstance(provs, dict):
+            prov_ratios[key] = {name: rec.get(field) for name, rec in provs.items()}
+
+    try:
+        idx = load(os.path.join("provinces", "index.json"))
+    except Exception as e:
+        fail("provinces/index.json loads (for income_floor join check)", repr(e))
+        return
+    if not isinstance(idx, list) or not idx:
+        fail("provinces index is a non-empty list (for income_floor join check)",
+             "got %s" % type(idx).__name__)
+        return
+
+    bad = []
+    n_checked = 0
+    for e in idx:
+        slug = e.get("slug")
+        th = e.get("th")
+        if not isinstance(slug, str) or not slug or not isinstance(th, str) or not th:
+            continue
+        try:
+            p = load(os.path.join("provinces", slug + ".json"))
+        except Exception as ex:
+            bad.append("%s.json load error: %r" % (slug, ex))
+            continue
+        n_checked += 1
+        gov = p.get("gov")
+        if not isinstance(gov, dict):
+            bad.append("%s gov missing/not a dict" % slug)
+            continue
+        floor = gov.get("income_floor")
+        if not isinstance(floor, dict):
+            bad.append("%s gov.income_floor missing/not a dict" % slug)
+            continue
+        for key, ratios in prov_ratios.items():
+            if key not in floor:
+                continue  # correctly omitted when the source layer had no row for this province
+            val = floor[key]
+            if not is_finite_number(val) or not (0 < val < 5):
+                bad.append("%s gov.income_floor.%s=%r out of sane range (0,5)" % (slug, key, val))
+                continue
+            expect = ratios.get(th)
+            if expect is None:
+                bad.append("%s gov.income_floor.%s=%s but source has no row for '%s'"
+                            % (slug, key, val, th))
+                continue
+            if abs(val - expect) > 0.001:
+                bad.append("%s gov.income_floor.%s=%s != source ratio=%s for '%s'"
+                            % (slug, key, val, expect, th))
+    if bad:
+        fail("provinces/*.json gov.income_floor join matches source ratios (0,5 range)",
+             first_n(bad, 12))
+    else:
+        ok("provinces/*.json gov.income_floor join matches source ratios (%d provinces checked)"
+           % n_checked)
+
+
+# ---------------------------------------------------------------------------
 def check_occupation_income():
     # National lowest-paid-occupation aggregate (pipeline/build_occupation_income.py), projected
     # from the already-MEASURED household_income_by_province.json. Optional file: SKIP-PASS when
@@ -4299,6 +4389,7 @@ def main():
     check_factory_income()
     check_agri_income()
     check_sme_income()
+    check_province_income_floor()
     check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)
