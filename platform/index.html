@@ -223,6 +223,8 @@
 
     <h2 class="risk">Crop-household stress · worst provinces</h2>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
+    <!-- live rain pulse (ThaiWater gauges, measured) — its own element so crop-stress re-renders can't wipe it -->
+    <p class="lead" id="rainpulse" style="display:none"></p>
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note"></p>
     <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>

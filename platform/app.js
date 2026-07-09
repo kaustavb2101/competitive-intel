@@ -1327,10 +1327,33 @@ function renderEvExposure(){
   h.style.display=''; note.style.display='';
 }
 
+/* ---------- LIVE rain pulse (data/thaiwater_rain.json — ThaiWater gauge telemetry, MEASURED) ----------
+   The real-time flood/soak read over the crop provinces — pairs with the slower satellite drought
+   anomaly. One verdict line above the crop-stress card. Null-safe: absent file → nothing renders. */
+let RAINP=null, rainpPromise=null;
+async function loadRainPulse(){
+  if(rainpPromise) return rainpPromise;
+  rainpPromise=fetch('data/thaiwater_rain.json').then(r=>r.ok?r.json():null)
+    .then(d=>{RAINP=d;return d;}).catch(()=>null);
+  return rainpPromise;
+}
+function renderRainPulse(){
+  const el=$('#rainpulse'); if(!el||!RAINP||!RAINP.provinces) return;
+  const rows=Object.entries(RAINP.provinces).map(([p,v])=>({p,...v}));
+  const hot=rows.filter(r=>r.pct_very_heavy>0||r.max_mm>=90).sort((a,b)=>b.max_mm-a.max_mm).slice(0,3);
+  const wet=rows.sort((a,b)=>b.max_mm-a.max_mm).slice(0,3);
+  const list=(hot.length?hot:wet).map(r=>`${r.p} <span class="mono" style="color:${r.max_mm>=90?'var(--agri)':'var(--accent)'}">${Math.round(r.max_mm)}mm</span>`).join(' · ');
+  el.innerHTML=`<b>Live rain pulse (ThaiWater · measured):</b> `+
+    (hot.length?`⚠️ very-heavy 24h rain at ${list} — watch flooded-field collections there. `:`no province at very-heavy rain; wettest now: ${list}. `)+
+    `<span class="sub">${RAINP.meta.n_stations.toLocaleString()} gauges · obs to ${RAINP.meta.observed_to||'n/a'}</span>`;
+  el.style.display='';
+}
+
 /* ---------- overview ---------- */
 function renderOverview(){
   loadOutlook().then(renderNationalOutlook);
   loadBrandTrends().then(renderBrandTrends);
+  loadRainPulse().then(renderRainPulse);
   // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
   $('#macro').innerHTML = META.macro.filter(([k])=>!/gold/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');

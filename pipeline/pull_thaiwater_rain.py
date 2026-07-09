@@ -21,7 +21,7 @@ Network puller (live telemetry snapshot) — NOT in the determinism gate.
 import argparse, json, os, sys, time, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "source-data", "thaiwater_rain.json")
+OUT = os.path.join(ROOT, "platform", "data", "thaiwater_rain.json")   # served directly to the frontend
 URL = "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/rain_24h"
 UA = {"User-Agent": "autox-credit-intel/1.0"}
 HEAVY_MM, VERY_HEAVY_MM = 35.1, 90.1
