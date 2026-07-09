@@ -34,12 +34,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Guard — require GOOGLE_MAPS_API_KEY
+      - name: Guard — require a Google Places key (GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_KEY)
         env:
-          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           if [ -z "$KEY" ]; then
-            echo "GOOGLE_MAPS_API_KEY not set — geocoder is inert. Add the secret to enable. Skipping."
+            echo "No Google Places key found (checked GOOGLE_MAPS_API_KEY and GOOGLE_PLACES_KEY repo secrets) — geocoder is inert. Skipping."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
 
@@ -56,7 +56,7 @@ jobs:
       - name: Run gated geocoder cycles (merges accepted patches into the master)
         if: env.SKIP != '1'
         env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           cd committee
           python3 run_cycle.py --member geocoder --batch 100 --loop --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
