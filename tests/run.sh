@@ -94,6 +94,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_brand_trends.py --check (source-data/dlt/ pull absent — not data drift)"
   else bad "build_brand_trends.py --check (brand_trends.json drifted from source-data/dlt/*.csv)"
   fi
+  ( cd "$PIPE" && python3 build_ev_exposure.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_ev_exposure.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_ev_exposure.py --check (source-data/scurve_by_province.json absent — not data drift)"
+  else bad "build_ev_exposure.py --check (ev_exposure.json drifted from source-data/scurve_by_province.json)"
+  fi
   ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
