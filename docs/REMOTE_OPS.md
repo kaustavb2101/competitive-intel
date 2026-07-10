@@ -79,8 +79,9 @@ same issue** (no duplicate spam), and the issue **closes itself automatically**
 the first night the site is healthy again. The Actions run also goes red.
 
 **Run it manually (phone):** Actions → **Site health — nightly live check** →
-**Run workflow**. One box, **base_url** — leave the default (the stable branch
-alias) or paste the production domain once one exists.
+**Run workflow**. One box, **base_url** — leave the default
+(`competitive-intel-blue.vercel.app`, a public un-gated alias) or paste a
+different deployment URL to check instead.
 
 **Run it locally (laptop):** the same checker validates the repo's own files
 offline — `python3 pipeline/check_site_health.py --local platform` — or probes any
