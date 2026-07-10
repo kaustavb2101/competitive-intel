@@ -1311,7 +1311,7 @@ function renderBrandTrends(){
         <td class="mono" style="color:${cc}">${ch==null?'—':(ch>0?'+':'')+ch+'%'}</td></tr>`;}).join('');
   $('#brandtrends-note').innerHTML=`What enters the fleet today is tomorrow's <b>used title collateral</b>. All counts are <b>measured</b> (DLT first registrations by brand, ${ce(+first)}–${ce(+last)}); the pure-EV share is an <b>estimated classification</b> over those measured counts.`;
   wrap.style.display='';
-  loadEvExposure().then(renderEvExposure);
+  Promise.all([loadEvExposure(),loadEvPenetration()]).then(renderEvExposure);
 }
 /* EV-transition exposure (data/ev_exposure.json — DIW automotive-industry factories per province,
    MEASURED). Renders inside the New-vehicle market block; null-safe: absent file → stays hidden. */
@@ -1328,13 +1328,30 @@ function renderEvExposure(){
   const nat=EVEXP.meta.national||{};
   const rows=EVEXP.provinces.slice(0,10);
   const wmax=rows[0].workers||1;
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th class="h-agri" title="automotive-industry factory workers — DIW, measured">Auto-industry workers ▲</th><th title="DIW, measured">Factories</th><th title="DIW, measured">Capital ฿M</th></tr>`+
-    rows.map((p,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td>
+  // measured per-province EV penetration (DLT fuel-type table) — joined when loaded, omitted when absent
+  const pen={};
+  if(EVPEN&&EVPEN.provinces) EVPEN.provinces.forEach(p=>pen[p.th]=p);
+  const vin=EVPEN&&EVPEN.meta?EVPEN.meta.vintage:'';
+  const penCol=EVPEN?`<th class="h-collat" title="BEV share of the registered fleet — DLT fuel-type table, measured, ${vin}">BEV % of fleet</th>`:'';
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th class="h-agri" title="automotive-industry factory workers — DIW, measured">Auto-industry workers ▲</th><th title="DIW, measured">Factories</th><th title="DIW, measured">Capital ฿M</th>${penCol}</tr>`+
+    rows.map((p,i)=>{
+      const pe=pen[p.th];
+      const penCell=EVPEN?`<td class="mono" style="color:var(--collat)">${pe?pe.bev_pct.toFixed(2)+'%':'—'}</td>`:'';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td>
       <td>${barHTML(Math.round(100*p.workers/wmax),'var(--agri)')} <span class="mono" style="color:var(--agri)">${p.workers.toLocaleString()}</span></td>
       <td class="mono">${p.n}</td>
-      <td class="mono sub">${Math.round(p.capital_mbaht).toLocaleString()}</td></tr>`).join('');
-  note.innerHTML=`<b>${(nat.workers||0).toLocaleString()} workers</b> in <b>${(nat.factories||0).toLocaleString()} automotive-industry factories</b> (DIW target-industry census, measured) are the ICE-parts workforce most exposed as the EV share above builds. Exposure is <b>context</b> for factory-worker borrower concentrations — not a default forecast.`;
+      <td class="mono sub">${Math.round(p.capital_mbaht).toLocaleString()}</td>${penCell}</tr>`;}).join('');
+  const natPen=EVPEN&&EVPEN.meta&&EVPEN.meta.national?` The measured fleet is still early-EV — national BEV stock <b>${EVPEN.meta.national.bev_pct}%</b> (${vin}) vs ~10% of NEW registrations: the wave is arriving, not arrived.`:'';
+  note.innerHTML=`<b>${(nat.workers||0).toLocaleString()} workers</b> in <b>${(nat.factories||0).toLocaleString()} automotive-industry factories</b> (DIW target-industry census, measured) are the ICE-parts workforce most exposed as the EV share above builds. Exposure is <b>context</b> for factory-worker borrower concentrations — not a default forecast.${natPen}`;
   h.style.display=''; note.style.display='';
+}
+// measured per-province EV penetration (data/ev_penetration.json — DLT fuel-type, Feb 2026)
+let EVPEN=null, evpenPromise=null;
+async function loadEvPenetration(){
+  if(evpenPromise) return evpenPromise;
+  evpenPromise=fetch('data/ev_penetration.json').then(r=>r.ok?r.json():null)
+    .then(d=>{EVPEN=d;return d;}).catch(()=>null);
+  return evpenPromise;
 }
 
 /* ---------- LIVE rain pulse (data/thaiwater_rain.json — ThaiWater gauge telemetry, MEASURED) ----------

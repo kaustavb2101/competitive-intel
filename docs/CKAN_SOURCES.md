@@ -125,6 +125,17 @@ line on the province deep-dive. New target: `dataset_stat_1_009` (the land-trans
 trucks/buses) is the same shape but not yet distilled; refresh the Jan-2026 monthly file set as new
 months publish (manual or a future workflow).
 
+**Wave 11 (2026-07-10) — EV penetration + NSO verdict:**
+- The DLT mirror's `dataset_1_1_04` turned out to be province × vehicle type × **FUEL TYPE** (Feb-2026
+  vintage) → `build_ev_penetration.py` → measured per-province BEV/electrified/diesel shares
+  (national BEV stock 0.95%, Bangkok 2.20%). Joined into the Overview EV-exposure table with the
+  stock-vs-flow framing (fleet 0.95% vs ~10% of new registrations).
+- **NSO final verdict:** every direct host is sealed from datacenter IPs (www reachable but no open
+  API; api/ittdashboard/gis/provincial 403; statbank/gdcatalog/sdg/opendata 502). Reachable mirrors:
+  **ILOSTAT** (official LFS submissions, wired — wave 9), WB microdata catalog (survey METADATA only),
+  UNSD SDG API (national indicators). Per-province NSO data = the vendored TMLI SES/LFS layers remain
+  the finest available; a Thai-IP pull is the only refresh path.
+
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
 osm_layers.json` — **13 national layers** feeding the per-branch within-10km `k10` radar (wired through
