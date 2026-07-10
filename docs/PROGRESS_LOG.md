@@ -5,6 +5,26 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-10 (3) — UX: fixed the National-map "Opportunity" (dws) lens provenance mislabel.
+
+Picked from the committee's freshly-landed `docs/COMMITTEE_ASSESSMENT_2026-07-10.md` (finding #3,
+the smallest "copy-only" item on its "smallest first" build list). The map's Opportunity/district
+white-space lens (`platform/app.js` `LENS.dws`) was tagged `tag:'m'` (shows a "[M] measured" badge
+on the pill + "measured" in the popup + legend), while every other surface computing the identical
+`amphoe.json` `whitespace` score — `index.html`'s own copy, the `#acq` leaderboard, the CSV export
+headers (`whitespace_score_est`) — already calls it an ESTIMATED 0–100 screen. Confirmed the honest
+label by reading `pipeline/build_amphoe.py`: `whitespace = max(0, demand100 - 28*log1p(branches))` —
+a measured demand input run through an editorial saturation-penalty formula, i.e. a derived
+composite, not a measured quantity (the same shape as every other `est:true` lens in the registry —
+`drisk`, `cstress`, `pstress`). Flipped `LENS.dws` to `tag:'e'` + `est:true` (the pill badge/
+aria-label/legend "▲ estimated" note all derive from this one flag — no other code path to touch),
+reworded the `desc` string and the branch-popup's `amphoePopupHTML()` rows/caption from "measured" to
+"est (measured inputs)". Zero data values changed — provenance-label fix only, `build_amphoe.py`
+untouched. Gate 61/0 (`validate_data.py` 453/453, unaffected — no data file touched). Headless-rendered
+`index.html#map`: `data-errors="[]"`, screenshot confirms the Opportunity pill now shows an "E" badge
+and the legend reads "white-space (0–100, est) ▲ estimated". PR #2 (still open/draft) already carries
+this commit, no new PR needed.
+
 ## 2026-07-10 (2) — UX: Home risk card collapses secondary reads behind "Show N more".
 
 Picked from the backlog's repeated "card getting long" flags (2026-07-06, 2026-07-09 (5)) — audited

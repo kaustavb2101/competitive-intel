@@ -643,6 +643,28 @@
       2026-06-30; `ingest_gov.py`'s `build_occupations_census()` commit `7fd4994` 2026-06-30) but never
       checked off. Zero code/data changed — pure backlog hygiene.
 
+## Queue — follow-ups noticed 2026-07-10 (3)
+- [x] **★ `docs/COMMITTEE_ASSESSMENT_2026-07-10.md` finding #3 — dws lens provenance mislabel —
+      DONE 2026-07-10 (3)** (`LENS.dws` `tag:'m'`→`'e'` + `est:true`; `amphoePopupHTML()` rows/caption
+      reworded "measured"→"est (measured inputs)". Zero data changed. Gate 61/0. See
+      `docs/PROGRESS_LOG.md` 2026-07-10 (3).)
+- [ ] **The committee report's other 9 "smallest first" build items are still open** — next up in
+      order: (1) de-dupe the double-appended BIS macro cards (`renderMacroIndicators()`, app.js
+      ~1121-1136 — real idempotency bug, not just a copy fix) + fix Srisawad's expected count in
+      `build_competitor_coverage.py` (findings #4/#5); (2) rename the composite "Open next" card + add
+      a one-clause bridge on Home's white-space card pointing at the sequenced Road-to-3,000 plan
+      (findings #2/#7 — copy-only, no data change); (3) zero-state copy for the two always-red "0.0%"
+      high-stress cards on `#exposure`/`#sim` (finding #8). None require new data or a human call — all
+      sandbox-safe, ranked smallest-effort-first in the report's §5. *(HIGH for #1-#2 UX trust, MED
+      effort, unblocked)*
+- [ ] **Vendoring Leaflet + deck.gl into `platform/vendor/` (committee finding #1, the single
+      highest-severity UX finding — a CDN hiccup currently kills the whole National map and blames the
+      wrong thing)** is real work (~1.7MB of static files + splitting `boot()`'s catch block) — too
+      large for a single "one substantive improvement" cycle on its own merit, but the highest-value
+      NEXT pick once a cycle has room for a M-effort item instead of another S-effort copy fix.
+      *(HIGH, M, unblocked, sandbox-safe — no network pull needed, just committing the npm-installed
+      bundles)*
+
 ## Queue — follow-ups noticed 2026-07-09 (7)
 - [x] **★ PR #1 merged — verify the newly-live scheduled workflows actually produce a green run —
       DONE 2026-07-10.** `list_workflow_runs` on all 9 non-QA workflows found 3 had already ticked, all
@@ -893,6 +915,8 @@
 
 ## Done (most recent first)
 - (loop will append here)
+- **2026-07-10 (3) — UX: fixed the dws (Opportunity/district white-space) map lens's MEASURED→
+  ESTIMATED provenance mislabel** (committee finding #3). See `docs/PROGRESS_LOG.md` 2026-07-10 (3).
 - **2026-07-09 (4) — AUDIT: logged a prior cycle's shipped-but-undocumented ENRICH (SME-owner income
   floor), closed the backlog item.** `daf6d38` (already committed + pushed) shipped
   `pipeline/build_sme_income.py` → `platform/data/sme_income_by_province.json` (77 provinces,
