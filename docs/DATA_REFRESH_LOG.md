@@ -4,6 +4,61 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-10 (3) — AUDIT: closed a real traceability gap on `commodity_board.json` (0 data values changed)
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh checkout of `claude/new-session-wto26j`
+(after pulling in a concurrent session's "Sprint 2" UX/E0 commits), `bash tests/run.sh check` →
+64 passed, 0 failed (`validate_data.py` 458/458) before touching anything — no drift to fix, so this
+cycle did not pick RE-DERIVE.
+
+**1. What was found.** `source-data/commodity_board.json` (11 rows: Rice/Rubber/Sugar/Palm
+oil/Maize/Chicken/Beef/Fishmeal/Logs/Sawnwood/Gold — the World Bank Pink Sheet board that
+`build_macro_exposure.py`, `build_macro_sensitivity.py`, `build_collateral_outlook.py`,
+`build_crop_stress.py` and `derive.py`'s `meta.board` passthrough all read and label "MEASURED —
+World Bank Pink Sheet") is committed directly, hand-assembled — **no pipeline script regenerates it**,
+unlike every sibling file in `source-data/`. Traced its numbers against the two raw World Bank pulls
+that landed in the same original commit (`4e72b44`): `commodities.json` (palm/maize/rice/sugar/rubber)
+and the previously-**zero-consumer** `commodities_protein.json` (fishmeal/shrimp/logs/sawnwood/
+plywood/beef/chicken/lamb/gold — confirmed via a repo-wide grep that no `pipeline/*.py` file
+referenced it by name). Every one of the 11 board rows' `yoy`/`stale` values matched their raw-pull
+counterpart **exactly** (Rice 17.9%, Rubber 32.4%, Sugar −13.5%, Palm oil 18.2%, Maize 0.5% from
+`commodities.json`; Fishmeal 27.1%, Logs 0.0%, Sawnwood −1.6%, Beef 11.8%, Chicken −0.6%, Gold 26.1%
+from `commodities_protein.json`) — so the "MEASURED" claim already made in code comments across 4
+builders is TRUE today, but nothing was gating it: a future hand-edit to `commodity_board.json`
+(or a stale re-pull of one raw file but not the board) could silently drift the number every macro/
+collateral/crop-stress score on the site reads, with no check catching it. This is exactly the class
+of provenance gap the no-fabrication mandate cares about — a currently-honest number with no tripwire
+protecting it going forward.
+
+**2. Fix applied (pure integrity check — zero data values changed).** Added
+`check_commodity_board()` to `tests/validate_data.py`: verifies every row carries
+`lab/yoy/seg/reg/note/cls/stale`; maps each of the 11 labels to its backing `(file, key)` in
+`commodities.json` / `commodities_protein.json` via an explicit `_COMMODITY_BOARD_SOURCE_MAP`
+(fails loudly — not silently skips — if a future row's label isn't in the map, so a new commodity
+added to the board without updating the map is caught, not ignored); asserts `yoy` and `stale`
+match the raw pull's `yoy`/`date` **exactly**. Registered in `main()` right after
+`check_collateral_outlook()`. No `platform/data`, `source-data`, or pipeline builder file was
+touched — this is a test-only addition.
+
+**3. Verification.** Hand-corrupted `commodity_board.json`'s Gold row (`yoy: 26.1 → 999.9`),
+reran the validator → correctly failed with `Gold: board yoy=999.9 != commodities_protein.json
+['gold'].yoy=26.1`; restored the file from the pre-edit copy and confirmed `git status` clean
+before committing anything. `bash tests/run.sh check` → **64 passed, 0 failed**,
+`validate_data.py` **462/462** (+4 new checks: loads, row-shape, label-mapping-completeness,
+exact-value-match).
+
+**4. Not fabricated, not attempted:** `commodities_protein.json`'s `shrimp`/`plywood`/`lamb`/
+`logs_my` fields are NOT used by `commodity_board.json` (only 6 of 9 fields feed board rows) — left
+alone, not force-mapped. `shrimp`'s own `date` field (`2023M10`) is stale relative to the rest of the
+file (`2026M06`) but is unused anywhere in `platform/data`, so no live number is affected; flagged
+here rather than silently "fixed" by inventing a fresher value. Per this cycle's scope (`source-data/`
+only, no network), the "who regenerates `commodity_board.json` on a real Pink Sheet refresh" question
+stays open — logged to the backlog below rather than building a hand-authored-note-guessing builder.
+
+**Source:** `source-data/commodities.json` + `source-data/commodities_protein.json` (both World
+Bank Pink Sheet, committed since `4e72b44`) — no external pull performed this cycle; this cycle
+added a deterministic cross-check between two already-committed files.
+
 ## 2026-07-10 (2) — ENRICH: commercial (truck/bus) DLT registration-FLOW distilled + wired in; fixed a dead-code path that was silently hiding both this and the prior cycle's scrappage callouts
 
 **Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh checkout of `claude/new-session-wto26j`,
