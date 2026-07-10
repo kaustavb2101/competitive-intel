@@ -109,6 +109,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_labour_context.py --check (source-data/ilostat_labour.json absent — not data drift)"
   else bad "build_labour_context.py --check (labour_context.json drifted from source-data/ilostat_labour.json)"
   fi
+  ( cd "$PIPE" && python3 build_truck_flow.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_truck_flow.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (DLT mirror dataset_stat_1_009 absent — not data drift)"
+  else bad "build_truck_flow.py --check (truck_flow.json drifted from the DLT stat_1_009 mirror)"
+  fi
   ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"

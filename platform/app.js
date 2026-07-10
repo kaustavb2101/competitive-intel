@@ -1145,6 +1145,30 @@ function renderMacroIndicators(){
     `<div class="mcard mcard-bis"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
+/* ---------- commercial truck-fleet pulse (data/truck_flow.json, obj#1) ----------
+   MEASURED — DLT transport-law registration actions (stat_1_009, previously an untouched
+   mirror dataset). Trucks = the logistics-SME borrower pulse: contracting flow means the
+   owner-operator hauler segment's cash flow is thinning. One compact line under the
+   New-vehicle market board; null-safe (absent file → stays hidden). E0 wave. */
+let TRUCKFLOW=null, truckPromise=null;
+async function loadTruckFlow(){
+  if(truckPromise) return truckPromise;
+  truckPromise=fetch('data/truck_flow.json').then(r=>r.ok?r.json():null)
+    .then(d=>{TRUCKFLOW=d;return d;}).catch(()=>null);
+  return truckPromise;
+}
+function renderTruckFlow(){
+  const el=$('#truckpulse'); if(!el||!TRUCKFLOW||!TRUCKFLOW.meta) return;
+  const n=TRUCKFLOW.meta.national||{};
+  const worst=(TRUCKFLOW.provinces||[]).filter(p=>p.new_regis_yoy_pct!=null).slice(0,3);
+  el.style.display='';
+  el.innerHTML=`<b>Commercial truck-fleet pulse (DLT · measured):</b> `+
+    `${(n.new_regis_12m||0).toLocaleString()} new truck registrations in 12m `+
+    `(<span class="mono" style="color:${(n.new_regis_yoy_pct||0)>=0?'var(--merch)':'var(--agri)'}">${n.new_regis_yoy_pct>=0?'+':''}${n.new_regis_yoy_pct}% YoY</span>) · `+
+    `sharpest contractions: ${worst.map(p=>`${p.th} <span class="mono" style="color:var(--agri)">${p.new_regis_yoy_pct}%</span>`).join(' · ')} — `+
+    `the logistics-SME (owner-operator hauler) borrower pulse; contracting flow = that segment's cash flow thinning ${TAG_M}`;
+}
+
 /* ---------- national labour context (data/labour_context.json, obj#1) ----------
    MEASURED — ILOSTAT mirror of the official NSO LFS (national level). The informality rate IS
    the title-loan borrower base (no payslip => pledge a title). Appended to the Overview macro
@@ -1426,6 +1450,7 @@ function renderOverview(){
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);
   loadLabourContext().then(renderLabourContext);
+  loadTruckFlow().then(renderTruckFlow);
   renderCommodityBoard();
   // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
   // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.
