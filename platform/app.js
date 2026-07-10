@@ -1036,10 +1036,32 @@ function wrapTables(){
   });
 }
 
-/* ---------- tabs ---------- */
+/* ---------- tabs: four-destination IA (revamp P1, 2026-07-10) ----------
+   Destinations answer the platform's four standing questions; every legacy hash route keeps
+   working and maps to its destination, whose contextual #subnav exposes the sibling views.
+   No DOM moved — the view sections and their lazy renderers are untouched (the separate-GL-
+   context rule for heavy scenes still holds). */
+const DEST={
+  risk:   {views:[['overview','Outlook'],['exposure','Exposure'],['trend','Risk trend'],['sim','Simulator']]},
+  expand: {views:[['acq','Acquisition'],['market','Market']]},
+  explore:{views:[['map','National map'],['provinces','Provinces · 3D'],['branches','Branches']]},
+};
+const VIEW_DEST={home:'home'};
+Object.keys(DEST).forEach(d=>DEST[d].views.forEach(([v])=>VIEW_DEST[v]=d));
+function renderSubnav(dest,v){
+  const el=document.getElementById('subnav'); if(!el) return;
+  const g=DEST[dest];
+  if(!g){ el.style.display='none'; el.innerHTML=''; document.body.classList.remove('subnav-on'); return; }
+  el.innerHTML=g.views.map(([k,label])=>
+    `<a data-v="${k}" href="#${k}" role="tab" aria-selected="${String(k===v)}" class="${k===v?'on':''}">${label}</a>`).join('');
+  el.style.display='';
+  document.body.classList.add('subnav-on');
+}
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
-  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);t.setAttribute('aria-selected',String(sel));});
+  const dest=VIEW_DEST[v]||'home';
+  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.dest===dest;t.classList.toggle('on',sel);t.setAttribute('aria-selected',String(sel));});
+  renderSubnav(dest==='home'?null:dest,v);
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='overview') renderOverview();
@@ -1055,6 +1077,14 @@ function showTab(v){
   window.scrollTo(0,0);
 }
 $('#nav').addEventListener('click', e=>{
+  const b=e.target.closest('a[data-v]'); if(!b) return;
+  e.preventDefault(); const v=b.dataset.v;
+  history.replaceState(null,'','#'+v);
+  showTab(v);
+});
+// contextual sub-nav (four-destination IA) — same routing contract as #nav.
+const _subnav=document.getElementById('subnav');
+if(_subnav) _subnav.addEventListener('click', e=>{
   const b=e.target.closest('a[data-v]'); if(!b) return;
   e.preventDefault(); const v=b.dataset.v;
   history.replaceState(null,'','#'+v);

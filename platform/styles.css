@@ -224,6 +224,27 @@ html[data-theme="light"] .nav-more-btn:hover{background:rgba(16,22,40,.05)}
 html[data-theme="light"] .nav-more-menu{background:rgba(255,255,255,.98)}
 html[data-theme="light"] #nav .nav-more-btn.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
 
+/* ---------- contextual sub-nav (four-destination IA, revamp P1 2026-07-10) ----------
+   Fixed strip under the 48px main bar, only rendered when the active view belongs to a
+   destination group (body.subnav-on bumps main's top padding). Same scroll-not-wrap rule
+   as #nav so rows never clip on phones. */
+#subnav{position:fixed;top:48px;left:0;right:0;z-index:1900;display:flex;align-items:center;
+  flex-wrap:nowrap;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  padding:4px var(--s2) 4px calc(var(--s2) + 4px);min-height:36px;
+  background:rgba(15,20,34,.78);backdrop-filter:blur(12px) saturate(140%);
+  border-bottom:1px solid var(--line)}
+#subnav::-webkit-scrollbar{display:none}
+#subnav a{flex:none;color:var(--mid);text-decoration:none;font:500 12px var(--sans);
+  padding:5px 10px;border-radius:7px;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+#subnav a:hover{color:var(--txt);background:rgba(255,255,255,.045)}
+#subnav a.on{color:#fff;background:linear-gradient(180deg,var(--raised),#19223a);
+  box-shadow:inset 0 0 0 1px var(--line)}
+body.subnav-on main{padding-top:100px}
+html[data-theme="light"] #subnav{background:rgba(255,255,255,.82)}
+html[data-theme="light"] #subnav a{color:#3D4557}
+html[data-theme="light"] #subnav a:hover{background:rgba(16,22,40,.06);color:#11151F}
+html[data-theme="light"] #subnav a.on{color:#11151F;background:#e7edf8;box-shadow:inset 0 0 0 1px var(--line)}
+
 /* legacy sticky header/tabs (index uses #nav, but keep these coherent if present) */
 header{position:sticky;top:0;z-index:1000;background:rgba(15,20,34,.85);
   backdrop-filter:blur(12px) saturate(140%);border-bottom:1px solid var(--line)}
