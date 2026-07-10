@@ -121,6 +121,18 @@ def build():
     # branch-level agri_pd province mean from the master (also 0-100).
     cs = _load(os.path.join(REPO, "platform", "data", "crop_stress.json"))["provinces"]
     prov_agri = {canonical(p["th"]): round((p.get("agri_stress") or 0) * 100, 1) for p in cs}
+    # ── province household DTI (MEASURED NSO SES 2566, province-inherited) ────────
+    # The one measured variable that best separates Isan (DTI 1.0-1.15) from the Central
+    # belt (0.47-0.68) was absent from the district risk score — a Khon Kaen district and
+    # a Suphanburi district with the same footprint scored the same despite a 2x leverage
+    # difference (committee gap finding, 2026-07-10). Inherited per province, NOT
+    # amphoe-measured; scaled DTI 0 -> 0, 1.2x -> 100 (Isan max observed 1.15).
+    hr_f = os.path.join(REPO, "platform", "data", "household_risk_by_province.json")
+    prov_dti = {}
+    if os.path.exists(hr_f):
+        for p in _load(hr_f)["provinces"]:
+            if p.get("debt_to_income") is not None:
+                prov_dti[canonical(p["province"])] = float(p["debt_to_income"])
     n_cropstress = len(prov_agri)
     prov_branch_mean = collections.defaultdict(list)
     for b in master:
@@ -223,6 +235,7 @@ def build():
                     "moto": pv.get("moto"), "ev": pv.get("ev")},
             "informal": ev.get("informal"), "formal": ev.get("formal"),
             "unemployment_rate": (unemp.get(prov) or {}).get("unemployment_rate"),
+            "debt_to_income": prov_dti.get(prov),
             "agri_stress": prov_agri.get(prov),
             # local merchant/collateral mix (mean of branch features in this amphoe,
             # if any) — used by risk_proxy. None when no branch sits here.
@@ -256,10 +269,12 @@ def build():
         # to agri_stress + unemployment alone (same 2:1 ratio as the branch case's 0.4:0.2).
         ag = r["agri_stress"] or 0
         un = round(min(100.0, (r["unemployment_rate"] or 0) / 3.0 * 100), 1)
+        dti = prov_dti.get(prov)
+        dt = round(min(100.0, (dti or 0) / 1.2 * 100), 1)
         if r["_coll"] is not None:
-            r["risk_proxy"] = round(0.4 * ag + 0.25 * r["_coll"] + 0.15 * r["_merch"] + 0.2 * un, 1)
+            r["risk_proxy"] = round(0.3 * ag + 0.25 * dt + 0.2 * r["_coll"] + 0.1 * r["_merch"] + 0.15 * un, 1)
         else:
-            r["risk_proxy"] = round(2 / 3 * ag + 1 / 3 * un, 1)
+            r["risk_proxy"] = round(0.45 * ag + 0.3 * dt + 0.25 * un, 1)
         del r["_coll"]; del r["_merch"]
 
     recs.sort(key=lambda r: -r["whitespace"])
@@ -306,10 +321,12 @@ def build():
             "demand": "0-100 norm of log1p(sum(w*poi)) + 0.5*log1p(workers); "
                       "w = " + json.dumps(DEMAND_W, ensure_ascii=False),
             "whitespace": "max(0, demand - 28*log1p(branches)); higher = more underserved opportunity",
-            "risk_proxy": "ESTIMATED weighting. 0.4*agri_stress + 0.25*collateral_density + 0.15*merchant_pd "
-                          "(branch-mean in amphoe) + 0.2*unemployment_stress (MEASURED NSO unemployment_rate, "
-                          "linearly scaled 0-3.0% -> 0-100, clipped); falls back to (2/3)*agri_stress + "
-                          "(1/3)*unemployment_stress for zero-branch amphoe (no collateral/merchant signal)",
+            "risk_proxy": "ESTIMATED weighting. 0.3*agri_stress + 0.25*dti_stress (MEASURED NSO SES 2566 "
+                          "debt_to_income, province-inherited, scaled 0-1.2x -> 0-100, clipped) + "
+                          "0.2*collateral_density + 0.1*merchant_pd "
+                          "(branch-mean in amphoe) + 0.15*unemployment_stress (MEASURED NSO unemployment_rate, "
+                          "linearly scaled 0-3.0% -> 0-100, clipped); falls back to 0.45*agri_stress + 0.3*dti_stress + "
+                          "0.25*unemployment_stress for zero-branch amphoe (no collateral/merchant signal)",
         },
         "join_rates": {
             "branch_to_amphoe": f"{branch_join}/{len(master)}",
