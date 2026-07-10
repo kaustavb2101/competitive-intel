@@ -11,7 +11,7 @@
 // hero:true  → one of the 4 ALWAYS-VISIBLE hero pills docked over the map (the rest live in "More ▾").
 // tag:'m'|'e' → the in-band [M] measured / [E] estimated badge shown on the pill (parity with the prov chips).
 const LENS = {
-  dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
+  dws:  {pill:'Opportunity', label:'District white-space ◇ est', desc:"WHERE TO EXPAND · ESTIMATED (0–100, measured inputs) — each branch's whole district demand (footfall + workers, both measured) minus how saturated AutoX already is there. A derived screen, not a site survey. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100, est)', amp:true, hero:true, est:true, tag:'e', val:d=>d._amp?d._amp.whitespace:0},
   brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
   comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
   hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, prov:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
@@ -4495,18 +4495,19 @@ function collatMixPopupHTML(d,sec,r){
     + (ep!=null?r('EV share', ep+'%', 'var(--merch)'):'');
 }
 // District (amphoe) block for a branch popup — shows the whole-district scores joined to this
-// branch. White-space is MEASURED (demand POIs vs AutoX saturation); risk is ESTIMATED. Renders
-// only once amphoe.json has been joined (d._amp set), so it appears after a district lens loads.
+// branch. White-space is ESTIMATED (measured demand POIs minus AutoX saturation, editorial blend);
+// risk is ESTIMATED. Renders only once amphoe.json has been joined (d._amp set), so it appears
+// after a district lens loads.
 function amphoePopupHTML(d,sec,r){
   const a=d._amp; if(!a) return '';
   const ws=a.whitespace, rk=a.risk_proxy;
   const wc=ws>=40?'var(--gold)':ws>=20?'#cda23e':'#8b90a7';
   const rc=rk>=55?'var(--agri)':rk>=45?'var(--gold)':'var(--merch)';
   return sec('District (amphoe) — white-space & risk')
-    + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
+    + r('White-space ◇ · est (measured inputs)', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (demand inputs measured, blend is estimated); risk = province-inherited agri-stress + local mix (estimated)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
