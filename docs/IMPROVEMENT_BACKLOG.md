@@ -648,15 +648,40 @@
       DONE 2026-07-10 (3)** (`LENS.dws` `tag:'m'`→`'e'` + `est:true`; `amphoePopupHTML()` rows/caption
       reworded "measured"→"est (measured inputs)". Zero data changed. Gate 61/0. See
       `docs/PROGRESS_LOG.md` 2026-07-10 (3).)
-- [ ] **The committee report's other 9 "smallest first" build items are still open** — next up in
-      order: (1) de-dupe the double-appended BIS macro cards (`renderMacroIndicators()`, app.js
-      ~1121-1136 — real idempotency bug, not just a copy fix) + fix Srisawad's expected count in
-      `build_competitor_coverage.py` (findings #4/#5); (2) rename the composite "Open next" card + add
-      a one-clause bridge on Home's white-space card pointing at the sequenced Road-to-3,000 plan
-      (findings #2/#7 — copy-only, no data change); (3) zero-state copy for the two always-red "0.0%"
-      high-stress cards on `#exposure`/`#sim` (finding #8). None require new data or a human call — all
-      sandbox-safe, ranked smallest-effort-first in the report's §5. *(HIGH for #1-#2 UX trust, MED
-      effort, unblocked)*
+- [x] **Committee findings #4/#5 — DONE 2026-07-10 (4)** (`renderMacroIndicators()` idempotency guard
+      via a `.mcard-bis` marker class so two quick tab switches no longer double-append the BIS/World
+      Bank macro cards; Home's "Competitor coverage" row no longer says "lower-bound census" at 141%
+      coverage — copy now switches to "network fully located for the official-locator brands — Heng
+      still a sample" whenever `coverage_pct>=100`, matching `#market`'s own explanation. Deliberately
+      did NOT touch `build_competitor_coverage.py`'s Srisawad `expected` figure itself — nulling a
+      real cited number felt like hiding data rather than explaining it, and the actual visible defect
+      (self-contradictory Home copy) is fully fixed without a data-schema change; left as a narrower
+      follow-up below if a future cycle wants the pipeline-side polish too. Gate 61/0,
+      `validate_data.py` 453/453 [unaffected, UI-only]. See `docs/PROGRESS_LOG.md` 2026-07-10 (4).)
+- [ ] **The committee report's other 8 "smallest first" build items are still open** — next up in
+      order: (1) rename the composite "Open next" card + add a one-clause bridge on Home's white-space
+      card pointing at the sequenced Road-to-3,000 plan (findings #2/#7 — copy-only, no data change);
+      (2) zero-state copy for the two always-red "0.0%" high-stress cards on `#exposure`/`#sim`
+      (finding #8). None require new data or a human call — all sandbox-safe, ranked smallest-effort-
+      first in the report's §5. *(HIGH for #2 UX trust, MED effort, unblocked)*
+- [ ] **`build_competitor_coverage.py`'s Srisawad `expected=1138` is not apples-to-apples with
+      `found=5203`** (found = the WHOLE sawad.co.th group locator incl. every service point; expected =
+      the cited listed-entity IR headline) — 2026-07-10 (4) fixed the visible Home-copy contradiction
+      without touching this, but the underlying per-brand `coverage_pct=457.2%` for Srisawad specifically
+      is still a genuinely invalid ratio (mixing units), unlike Muangthai/Tidlor's ~103% (same units,
+      just >100% because locators list more than the IR headline). Worth either a `comparable:false`
+      flag + `coverage_pct:null` for Srisawad specifically (parallel to Heng's null-expected pattern) or
+      a distinct `group_found` field, if a future reviewer finds the raw 457% number confusing on
+      `#market`'s per-brand table. Not done this cycle — real schema change with downstream consumers
+      (`#market` table, sort-by-coverage) to re-verify. *(LOW-MED, S, sandbox-safe)*
+- [ ] **`renderMacroIndicators()`'s new `.mcard-bis` idempotency guard (2026-07-10 (4)) is a pattern
+      worth reusing** — any other lazy-loaded card block that does `insertAdjacentHTML('beforeend',...)`
+      on a host also written by a synchronous `innerHTML=` reset earlier in the same render function
+      (same race: two quick renders before the async `.then()` fires) could have the identical
+      double-append bug. Worth a quick `grep insertAdjacentHTML.*beforeend` audit of app.js next time
+      someone's in this area — not done this cycle (scope discipline), just flagging the class of bug
+      now that one instance is confirmed real. *(LOW-MED, S, speculative — audit only, no known 2nd
+      instance yet)*
 - [ ] **Vendoring Leaflet + deck.gl into `platform/vendor/` (committee finding #1, the single
       highest-severity UX finding — a CDN hiccup currently kills the whole National map and blames the
       wrong thing)** is real work (~1.7MB of static files + splitting `boot()`'s catch block) — too

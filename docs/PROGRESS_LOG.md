@@ -5,6 +5,39 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-10 (4) — UX: fixed two committee-flagged bugs (BIS card double-append + coverage copy).
+
+Picked the next item off the committee's "smallest first" build list (`docs/COMMITTEE_ASSESSMENT_2026-07-10.md`
+findings #4/#5, both scoped together in the backlog as "(1)"). Two real, independently-verified bugs:
+
+1. **`renderMacroIndicators()` (app.js:1120) appended the BIS household-debt/policy-rate + World Bank
+   inflation/USD-THB cards a second time.** Root cause: `renderOverview()` clears `#macro` synchronously
+   then kicks off `loadMacroIndicators().then(renderMacroIndicators)` on the *cached* promise; two quick
+   tab switches (or any double call to `renderOverview()` before the first `.then()` fires) reset `#macro`
+   in between the two scheduled appends, so both eventually landed on the same clean base — 8 cards instead
+   of 4. Fixed with an idempotency guard: the 4 appended cards now carry a `.mcard-bis` marker class, and
+   `renderMacroIndicators()` removes any existing `.mcard-bis` elements before appending fresh ones, so
+   repeat calls always converge on exactly one set regardless of timing.
+2. **Home's "Competitor coverage" row read as self-contradictory at >100% coverage.** Copy said "Located
+   16,503 of ~11,684 rival branches — **lower-bound census**" while showing **141%** — Srisawad's
+   official group-wide store-locator (5,203 locations, every service point) vs its cited listed-entity
+   headline count (1,138) alone accounts for the overshoot; Muangthai/Tidlor also read slightly >100% for
+   the same reason (locators list more than the IR "branches" figure). The `#market` tab's own
+   `drawCompCoverage()` already explains this correctly ("near-complete rival network... >100% is
+   expected"); Home's card didn't. Home's copy now switches to "network fully located for the
+   official-locator brands — Heng still a sample" whenever `coverage_pct >= 100`, matching `#market`'s
+   framing; the row's headline also changed from "of ~Y" (implies Y is a ceiling) to "vs ~Y publicly
+   reported" (neutral either side of 100%).
+
+Both fixes are UI-only (app.js), zero data/pipeline touched. Gate 61/0, `validate_data.py` 453/453
+(unaffected). Headless-rendered `#home` and `#overview` (had to bootstrap the render harness this cycle —
+`tests/.cache/node_modules` was empty; `cd tests/.cache && npm install deck.gl@8.9.35 leaflet@1.9.4`
+populated it, an unrelated `tests/package.json` version-range rewrite from the same npm run was reverted
+before committing): both show `data-errors="[]"`, exactly 4 `.mcard-bis` cards (not 8), and Home's coverage
+row reads "Located 16,503 rival branches vs ~11,684 publicly reported — network fully located for the
+official-locator brands — Heng still a sample · 141% coverage". PR #2 (already open, draft) covers this
+branch — no new PR needed.
+
 ## 2026-07-10 (3) — UX: fixed the National-map "Opportunity" (dws) lens provenance mislabel.
 
 Picked from the committee's freshly-landed `docs/COMMITTEE_ASSESSMENT_2026-07-10.md` (finding #3,
