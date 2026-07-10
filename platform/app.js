@@ -1145,6 +1145,34 @@ function renderMacroIndicators(){
     `<div class="mcard mcard-bis"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
+/* ---------- national labour context (data/labour_context.json, obj#1) ----------
+   MEASURED — ILOSTAT mirror of the official NSO LFS (national level). The informality rate IS
+   the title-loan borrower base (no payslip => pledge a title). Appended to the Overview macro
+   grid; null-guarded + idempotent like renderMacroIndicators. E0 wave (revamp analysis). */
+let LABOUR=null, labourPromise=null;
+async function loadLabourContext(){
+  if(labourPromise) return labourPromise;
+  labourPromise=fetch('data/labour_context.json').then(r=>r.ok?r.json():null)
+    .then(d=>{LABOUR=d;return d;}).catch(()=>null);
+  return labourPromise;
+}
+function renderLabourContext(){
+  const host=$('#macro'); if(!host||!LABOUR) return;
+  host.querySelectorAll('.mcard-labour').forEach(el=>el.remove());
+  const inf=LABOUR.informality||{}, emp=LABOUR.employment||{}, une=LABOUR.unemployment||{};
+  const agri=(emp.sectors||[]).find(s=>s.sector==='Agriculture');
+  const cards=[];
+  if(inf.rate_pct!=null) cards.push(['Informal employment',`${inf.rate_pct}%`,
+    `the title-loan borrower base (no payslip) · LFS via ILOSTAT ${inf.as_of} · measured`]);
+  if(agri) cards.push(['Agri employment',`${(agri.employed_thousands/1000).toFixed(1)}M`,
+    `${agri.yoy_change_thousands>=0?'+':''}${Math.round(agri.yoy_change_thousands||0)}k YoY · ${agri.share_pct}% of all workers · LFS ${agri.as_of}`]);
+  if(une.total_rate_pct!=null) cards.push(['Unemployment',`${une.total_rate_pct}%`,
+    `youth 15–24: ${une.youth_15_24_rate_pct}% · low headline = informal work absorbs slack · LFS ${une.as_of}`]);
+  if(!cards.length) return;
+  host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
+    `<div class="mcard mcard-labour"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+}
+
 /* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
    Leads the Overview with the ANSWER: current situation → factors hitting the economy & segments →
    regional impact → recommendation by region → nationwide. A deterministic rollup of the SAME
@@ -1397,6 +1425,7 @@ function renderOverview(){
   $('#macro').innerHTML = META.macro.filter(([k])=>!/gold|household debt|inflation|policy rate|usd/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);
+  loadLabourContext().then(renderLabourContext);
   renderCommodityBoard();
   // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
   // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.

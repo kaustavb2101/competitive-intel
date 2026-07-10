@@ -104,6 +104,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_ev_exposure.py --check (source-data/scurve_by_province.json absent — not data drift)"
   else bad "build_ev_exposure.py --check (ev_exposure.json drifted from source-data/scurve_by_province.json)"
   fi
+  ( cd "$PIPE" && python3 build_labour_context.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_labour_context.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_labour_context.py --check (source-data/ilostat_labour.json absent — not data drift)"
+  else bad "build_labour_context.py --check (labour_context.json drifted from source-data/ilostat_labour.json)"
+  fi
   ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
