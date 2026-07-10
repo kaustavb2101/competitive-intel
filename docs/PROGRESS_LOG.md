@@ -5,6 +5,34 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-10 (6) — VALIDATOR: join-integrity check for provinces/*.json gov.{vehicles,employment,unemployment,income}.
+
+`provinces/<slug>.json`'s `gov.vehicles`/`gov.employment`/`gov.unemployment`/`gov.income`
+(`build_province.py`) are each a pure pass-through join of a `source-data/*.json` dict, keyed by
+Thai province name — the same join shape as `gov.income_floor`'s ratio sub-fields, which got a
+join-integrity check (`check_province_income_floor`) back on 2026-07-09 (3). These four upstream
+dicts never got the equivalent value-level check — only `check_provinces()`'s generic NaN/shape
+scan and `check_province_provenance()`'s meta-presence check ever touched them, neither of which
+would catch a wrong-province or wrong-value join bug. Flagged as an open gap in
+`docs/IMPROVEMENT_BACKLOG.md` (2026-07-09 (6)).
+
+New `check_province_gov_joins()` in `tests/validate_data.py`: for each of the 4 source files
+present, reads `provinces/index.json`, loads every province file, and asserts `gov.<key>` is
+byte-for-byte equal (`==` on the parsed dict) to the source's own row for that province's Thai
+name — `{}` is the correct "absent" value on both sides, so no false positive when a province is
+genuinely missing from a release. SKIP-passes whole when none of the 4 source layers exist.
+
+Verified it actually catches drift, not just schema shape: hand-corrupted
+`platform/data/provinces/bangkok.json`'s `gov.unemployment.unemployment_rate` to `999.9`, reran —
+got a real `[FAIL]` naming the exact province/field/expected-vs-got — then restored from git
+(`git diff --stat` confirmed byte-identical afterward, zero stray changes).
+
+Gate: `bash tests/run.sh check` 64/0, `validate_data.py` 463/463 (was 462/462, +1 check). Only
+`tests/validate_data.py` touched — no `platform/data`/`pipeline` file changed. PR #2 (draft,
+`claude/new-session-wto26j` → `master`) still open, no new PR needed.
+
+---
+
 ## 2026-07-10 (5) — AUDIT: backlog reconciliation, the committee's other 8 "smallest first" build items were already shipped.
 
 `docs/IMPROVEMENT_BACKLOG.md`'s "Queue — follow-ups noticed 2026-07-10 (3)" section still listed

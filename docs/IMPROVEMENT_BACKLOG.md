@@ -6,6 +6,31 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-10 (6)
+- [ ] **`check_province_gov_joins()` (new this cycle) does an exact whole-dict `==` compare, not a
+      per-field range/type check** — this is deliberately stricter than `check_province_income_floor()`
+      (which validates each field individually with a sane-range assertion) since these 4 fields are
+      pure unmodified pass-throughs with no derived math, so a single dict-equality check is both
+      simpler and catches strictly more (any key added/dropped/renamed too, not just an out-of-range
+      value). Worth keeping in mind as the reference pattern if a 5th pure-pass-through `gov.*` field
+      is ever added — prefer the dict-equality shape over re-deriving a range check unless the field
+      involves real computation. *(LOW, trivial, informational)*
+- [ ] **`docs/PROGRESS_LOG.md` still has no entries for the "Sprint 2 E0 (1)-(5)" / "Sprint 2 UX (P1)"
+      commits now on this branch** (`8cf4f78`…`e53705d` and the newer `2b1e835`/`d4759eb` four-
+      destination IA reorg + Overview reorder) — flagged once already (2026-07-10 (3) follow-up,
+      still open) but the gap has grown: `git log --oneline -15` this cycle showed 2 more
+      undocumented "Sprint 2 UX" commits landed since. These are real, gate-passing, and clearly a
+      concurrent session/workflow's work (not this loop's) — a future AUDIT cycle should read the
+      diffs end-to-end and either backfill the log or confirm with Kaustav whether that workflow
+      should own its own logging. *(MED, S, informational — docs-debt, not a code defect, growing)*
+- [ ] **`build_province.py`'s `gov.factories`/`gov.workers` (from `factories_by_district.json`,
+      province total) are the only 2 of the ~8 `gov.*` top-level joins still without ANY
+      join-integrity check** (vehicles/employment/unemployment/income now covered this cycle;
+      income_floor covered 2026-07-09 (3); vehicle_flow/vehicle_flow_transport already covered by
+      `check_vehicle_flow`/`check_vehicle_flow_transport`) — same shape as this cycle's fix
+      (`gp["fac"]`/`gp["workers"]` from `fbd["provinces"].get(prov)`), would close the set entirely.
+      *(LOW, S)*
+
 ## Queue — follow-ups noticed 2026-07-10 (3) — data-enrichment cycle: commodity_board traceability
 - [x] **`source-data/commodity_board.json` had NO check tying its numbers to the raw World Bank Pink
       Sheet pulls that back it — DONE 2026-07-10 (3)** (`tests/validate_data.py`'s new
@@ -972,14 +997,13 @@
       noting the validator now has two full-77-file scanners; fine at today's file sizes (a few KB
       each) but worth remembering if `provinces/<slug>.json` ever grows much heavier. *(LOW, trivial,
       speculative)*
-- [ ] **The same source-vs-join verification pattern (`check_province_income_floor()`) could extend
+- [x] **The same source-vs-join verification pattern (`check_province_income_floor()`) could extend
       to `gov.vehicles`/`gov.employment`/`gov.unemployment`/`gov.income`** on `provinces/<slug>.json` —
-      those are also pass-through joins from `vehicles_by_province.json`/`employment_by_province.json`/
-      `unemployment_by_province.json`/`household_income_by_province.json`, and today only get the
-      generic `check_province_provenance()` (meta-block presence) + `check_provinces()`'s NaN/shape
-      scan, not a value-level join-integrity check against their own source files. Same shape as this
-      cycle's fix, would need per-field join-key logic (some are keyed by district not province).
-      *(LOW, M, speculative — worth doing if any of those layers ever shows drift)*
+      DONE 2026-07-10 (6)** (new `check_province_gov_joins()` in `tests/validate_data.py`: exact-dict
+      compare of each of the 4 pass-through joins against their `source-data/*.json` row, keyed by
+      Thai province name; SKIP-passes when no source layer present. Verified it catches real drift by
+      hand-corrupting `bangkok.json`'s `unemployment_rate`, confirming a FAIL, then restoring. Gate
+      64/0, `validate_data.py` 463/463. See `docs/PROGRESS_LOG.md` 2026-07-10 (6).)
 - [ ] **Is PR #1 still unmerged? — RE-CHECKED 2026-07-09 (6), still unmerged, no change.**
       `mcp__github__list_pull_requests(state=open, head=claude/new-session-wto26j)` shows PR #1 still
       open, not draft, created 2026-06-28 — same state as every prior recheck since 2026-07-05 (4).
