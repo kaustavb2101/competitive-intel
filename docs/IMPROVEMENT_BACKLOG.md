@@ -6,6 +6,38 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-10 (data-enrichment cycle: DLT vehicle-flow)
+- [x] **DLT `dataset_stat_1_008` registration-action flow — DONE 2026-07-10** (`pull_dlt_all.py`'s
+      full-catalog mirror, wave 10, had landed this dataset unprocessed; `build_vehicle_flow.py`
+      distills the trailing-12mo dereg_rate/transfer_rate per province/vehicle-class →
+      `source-data/vehicle_flow_by_province.json`, joined into `provinces/<slug>.json`'s
+      `gov.vehicle_flow`, surfaced as an "Elevated motorcycle scrappage" callout on the province
+      deep-dive for the ~top-decile provinces (dereg_rate≥1%). Gate 60/0, `validate_data.py` 453/453
+      (+5 checks incl. a source↔join exact-match check). Full writeup: `docs/DATA_REFRESH_LOG.md`
+      (2026-07-10 entry).
+- [ ] **`dataset_stat_1_009` (land-transport-law registration-action flow — trucks/buses) is the
+      same shape as the just-distilled `dataset_stat_1_008` (car law) but not yet built** — a
+      `build_vehicle_flow.py`-style distiller for the land-transport-law sibling would extend the
+      churn/scrappage read to commercial vehicles (also mirrored in full by `pull_dlt_all.py`,
+      50 monthly files, `source-data/dlt/raw/dataset_stat_1_009/`). Less central to a title-loan
+      book than car/pickup/moto (already covered), so lower priority than the item above was.
+      *(LOW-MED, S — same pattern, different dataset)*
+- [ ] **`vehicle_flow_by_province.json`'s "top decile" narrative threshold (dereg_rate≥1%) was
+      picked from this cycle's own computed p75/p90 (0.47%/1.47%), not recalculated per refresh** —
+      if a future DLT re-pull shifts the national distribution meaningfully, the hardcoded 0.01
+      constant in `province.html`'s `autoImpacts()` won't auto-adjust. Fine for now (a fixed
+      absolute-rate bar is arguably MORE stable/comparable across refreshes than a shifting
+      percentile), but worth a comment/awareness if it starts flagging 0 or 77 provinces after a
+      future refresh. *(LOW, trivial, speculative)*
+- [ ] **Headless render of `province.html?p=tak` hit the same pre-existing sandbox flakiness this
+      page has shown in multiple prior cycles (2026-07-03 (7), 2026-07-05)** — verified the new
+      narrative line is correct by reading `provinces/tak.json` by hand (`gov.vehicle_flow.moto.
+      dereg_rate=0.041`) and `node --check`ing the extracted inline JS instead. The render-harness
+      unreliability for this specific page (already logged twice) is now a 3rd occurrence — worth
+      the `tests/lib/render.sh` retry-budget investigation flagged back on 2026-07-05 if a future
+      cycle has spare scope. *(MED, S — blocks fast visual confidence on province-page cycles,
+      not this cycle's own regression)*
+
 ## Queue — follow-ups noticed 2026-07-10
 - [ ] **★ NEEDS KAUSTAV (repo Settings, not sandbox-fixable) — `data-fuel-prices.yml`/
       `data-nabc-prices.yml` both do real work then fail at `gh pr create`.** Both scheduled pullers ran

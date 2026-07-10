@@ -161,6 +161,11 @@ phase_check(){
   ( cd "$PIPE" && python3 build_collateral_outlook.py --check >/dev/null 2>&1 ) && ok "build_collateral_outlook.py --check" || bad "build_collateral_outlook.py --check (collateral_outlook.json drifted from commodity_board/vehicles_by_province/branches.json)"
   ( cd "$PIPE" && python3 build_branch_labor.py --check >/dev/null 2>&1 ) && ok "build_branch_labor.py --check" || bad "build_branch_labor.py --check (branch_labor.json drifted from branch_occupations/amphoe/NSO province layers)"
   ( cd "$PIPE" && python3 build_decision_queue.py --check >/dev/null 2>&1 ) && ok "build_decision_queue.py --check" || bad "build_decision_queue.py --check (decision_queue.json drifted from rival_pressure/branch_peers/macro_sensitivity/crop_stress/opportunity_score/exit_whitespace)"
+  ( cd "$PIPE" && python3 build_vehicle_flow.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_flow.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow.py --check (source-data/dlt/raw/dataset_stat_1_008/ absent or <12mo — not data drift)"
+  else bad "build_vehicle_flow.py --check (vehicle_flow_by_province.json drifted from source-data/dlt/raw/dataset_stat_1_008/)"
+  fi
   # build_provenance runs LAST — it censuses every other layer's meta + byte size, so it must
   # reproduce against the just-verified committed data tree.
   ( cd "$PIPE" && python3 build_provenance.py --check >/dev/null 2>&1 ) && ok "build_provenance.py --check" || bad "build_provenance.py --check (provenance.json drifted from platform/data/*.json — run: python3 pipeline/build_provenance.py)"

@@ -85,7 +85,8 @@ because the DERIVED platform layers inherit it.
 | `crop_prices.json` | MEASURED | OAE / gov crop prices fold-in (`ingest_gov.py`). | Blocked from foreign IP; pulled from Thai network. |
 | `crop_prov_area.json`, `rice_prov_area.json` | MEASURED | OAE planting area (rai) per crop per province. | |
 | `factories_by_district.json` | MEASURED | DIW factory registry (via `ingest_gov.py`). | |
-| `vehicles_by_province.json` | MEASURED | DLT vehicle registrations per province. | |
+| `vehicles_by_province.json` | MEASURED | DLT vehicle registrations per province (STOCK snapshot, dataset_1_1_04). | |
+| `vehicle_flow_by_province.json` | MEASURED | DLT registration-transaction FLOW per province (dataset_stat_1_008, `pull_dlt_all.py` mirror) — dereg/transfer rates by vehicle class, trailing-12mo sum via `build_vehicle_flow.py`. | Distinct from `vehicles_by_province.json` above (a different DLT dataset: actions/month, not point-in-time stock). Has own embedded `meta` (source/formula/window). Joined into `provinces/<slug>.json`'s `gov.vehicle_flow`. |
 | `employment_by_province.json` | MEASURED | NSO labour-force (formal/informal). | |
 | `estates.json` | MEASURED | 35 industrial estates (IEAT). | |
 | `rayong_competitors.json` | MEASURED (hand-curated) | Google Places hand-curated competitor list (`save_competitors.py`). | Curated, not exhaustive. |

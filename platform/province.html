@@ -929,6 +929,10 @@ function buildProvincePanels(){
     if(tot){const ms=Math.round(100*(v.moto||0)/tot); if(ms>=60) out.push(['Motorcycle-heavy collateral',ms+'% of registered vehicles are motorcycles — high volume, weaker loss-given-default; price on speed, watch LTV.','watch']);}
     if((v.ev||0)>0) out.push(['EV transition',(v.ev).toLocaleString()+' EVs registered and rising — watch ICE auto-parts jobs where factories are auto-supply.','watch']);
     if((gov.factories||0)>1500) out.push(['Industrial payroll dependence',(gov.factories).toLocaleString()+' factories — incomes track factory demand and export cycles.','risk']);
+    const vf=(gov.vehicle_flow||{}).moto||{};
+    if(vf.dereg_rate!=null && vf.dereg_rate>=0.01){
+      out.push(['Elevated motorcycle scrappage',(Math.round(vf.dereg_rate*1000)/10)+'% of registered motorcycles were permanently deregistered in the trailing 12 months (DLT, top decile nationally) — faster collateral turnover, watch recovery values on ageing bikes.','watch']);
+    }
     if(!out.length) out.push(['Vehicle-dependent daily life','Households rely on a motorbike or pickup for work — title-loan relevant.','opp']);
     return out;
   }

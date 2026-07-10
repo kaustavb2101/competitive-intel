@@ -116,8 +116,14 @@ network only. Not yet surfaced in the app.
   (vs 3.8% full-2025 — ~3× acceleration) and **BYD #4 overall, ahead of Isuzu**. Surfaced as a YTD card
   on the New-vehicle market board.
 
-**Next-wave targets:** DLT stat_1_008 monthly transaction series; refresh the Jan-2026 monthly file
-set as new months publish (manual or a future workflow).
+**Next-wave targets:** ~~DLT stat_1_008 monthly transaction series~~ — DONE (2026-07-10, data-
+enrichment cycle): `pull_dlt_all.py`'s full-catalog mirror already secured all 50 monthly
+`dataset_stat_1_008` files; `build_vehicle_flow.py` sums the trailing 12 months into
+`source-data/vehicle_flow_by_province.json` (dereg_rate/transfer_rate by car/pickup/moto), joined
+into `provinces/<slug>.json`'s `gov.vehicle_flow` and surfaced as a "motorcycle scrappage" impact
+line on the province deep-dive. New target: `dataset_stat_1_009` (the land-transport-law sibling —
+trucks/buses) is the same shape but not yet distilled; refresh the Jan-2026 monthly file set as new
+months publish (manual or a future workflow).
 
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/

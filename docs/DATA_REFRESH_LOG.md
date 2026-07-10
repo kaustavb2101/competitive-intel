@@ -4,6 +4,75 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-10 — ENRICH: DLT vehicle registration-transaction FLOW (dereg/transfer rates) distilled + wired into the province deep-dive
+
+**Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh checkout of
+`claude/new-session-wto26j`, `bash tests/run.sh check` → 59 passed, 0 failed
+(`validate_data.py` 448/448) before touching anything — no drift to fix.
+
+**1. What was found.** A concurrent "DATA HUNT" standing loop landed `e2336293` (wave 10, earlier
+today) — `pipeline/pull_dlt_all.py` mirrored DLT's ENTIRE gdcatalog (380 files, 14 datasets) into
+`source-data/dlt/raw/`, bypassing the data.go.th geoblock. One dataset in that mirror,
+`dataset_stat_1_008` ("การดำเนินการทางทะเบียน" — car-law registration-ACTION log, 50 monthly CSVs,
+national, covering every calendar month Jan-2022 → Feb-2026), was sitting completely unprocessed —
+CKAN_SOURCES.md itself named it a "next-wave target," and no pipeline script or `platform/data`
+layer referenced it. Confirmed this is genuinely additive, not a duplicate: the existing
+`vehicles_by_province.json` (dataset **1_1_04**, already wired into the `motomix`/`pickups`
+National-map lenses) is a vehicle-STOCK snapshot (byte-identical total, 44,290,957, verified against
+the new mirror's copy of the same dataset — no re-fabrication risk there); `dataset_stat_1_008` is a
+different DLT release entirely — a monthly registration/deregistration/transfer-ACTION log, i.e. a
+FLOW signal the app had no equivalent of.
+
+**2. What was built (100% MEASURED, no modelling beyond a sum + a plain ratio).**
+`pipeline/build_vehicle_flow.py` sums the TRAILING 12 available months (Mar-2025 → Feb-2026, the
+most recent complete year — a single month would be noisy) per province, for three
+collateral-relevant vehicle classes (car รย.1, pickup รย.3, motorcycle รย.12) + an all-types total,
+then derives two plain ratios per class: `dereg_rate` = permanently-deregistered
+("รถแจ้งไม่ใช้ตลอดไป") / total-processed ("รถที่ดำเนินการ") — a collateral-ageing/scrappage proxy —
+and `transfer_rate` = ownership-transfers ("รถโอน") / total-processed — a used-vehicle-market
+liquidity proxy. Output: `source-data/vehicle_flow_by_province.json` (77 provinces, full
+`meta.{source,formula,window_months}`). National spread sanity-checked: moto `dereg_rate` ranges
+0.02%–4.1% (median 0.14%, p90 1.47%) and moto `transfer_rate` ranges 2.4%–16.6% across provinces —
+plausible, no outlier that looks fabricated.
+
+**3. Wired in gracefully.** `pipeline/build_province.py` joins the new file (graceful `{}` when
+absent, same pattern as the existing `unemployment`/`income` joins) into every
+`provinces/<slug>.json`'s `gov.vehicle_flow`; `meta.provenance.measured` gained one line documenting
+the field and its distinction from `gov.vehicles` (STOCK, different dataset). `platform/province.html`'s
+`autoImpacts()` (the auto-derived "what moves local incomes" narrative, already used for
+motorcycle-collateral-share/EV/factory-payroll callouts) gained ONE new conditional line: provinces
+with moto `dereg_rate ≥ 1%` (roughly the national top decile — 14/77 provinces cross it) get an
+"Elevated motorcycle scrappage" watch-tagged callout citing the actual percentage. Regenerated all
+77 province files + `index.json` (`build_province.py --check` reproduces byte-exact).
+
+**4. Gates.** `tests/run.sh` gained a gated `build_vehicle_flow.py --check` line (graceful `[SKIP]`
+when the source mirror is absent, mirroring `build_branch_fuel.py`'s convention — not a hard `[FAIL]`
+if a future checkout lacks the DLT mirror). `tests/validate_data.py` gained `check_vehicle_flow()`:
+verifies the source file's meta/values (buckets present, counts ≥0, rates in [0,1]) AND that every
+`provinces/<slug>.json`'s `gov.vehicle_flow` is an EXACT pass-through of the source row (no silent
+recomputation drift). `bash tests/run.sh check` → **60 passed, 0 failed**, `validate_data.py`
+**453/453** (+5 new checks). Headless-render of `province.html?p=tak` (Tak has the highest moto
+dereg_rate nationally, 4.1%, so should trigger the new callout) hit the same pre-existing,
+already-documented sandbox flakiness this exact page has shown in multiple prior cycles (2026-07-03
+(7)/2026-07-05: `province.html`/`rayong-catchment.html` intermittently fail headless render under
+this container's software WebGL) — confirmed unrelated to this change by (a) `node --check`ing the
+extracted inline JS directly (clean, 5/5 blocks) and (b) reading `provinces/tak.json` by hand to
+confirm `gov.vehicle_flow.moto.dereg_rate = 0.041` is exactly what the new conditional reads and
+would render. The mandated `bash tests/run.sh check` gate — what CLAUDE.md requires green — passed.
+
+**5. Docs.** `docs/DATA_PROVENANCE.md` §2 register gained a row for
+`vehicle_flow_by_province.json` (distinguishing it from the pre-existing `vehicles_by_province.json`
+row). `docs/CKAN_SOURCES.md`'s "next-wave target" line marked DONE, with the still-open sibling
+(`dataset_stat_1_009`, land-transport-law trucks/buses — same shape, not yet distilled) logged as the
+new target.
+
+**Source:** `gdcatalog.dlt.go.th` `dataset_stat_1_008` (mirrored via `pipeline/pull_dlt_all.py`,
+already committed to this branch by a concurrent session before this cycle started) — no new
+external pull performed this cycle; this cycle only distilled and wired in already-committed raw
+data.
+
+---
+
 ## 2026-07-06 — AUDIT: closed R6, the last open provenance-register gap (7 OSM ground-bed geometry files stamped with real `meta.source`)
 
 **Task type:** AUDIT (provenance-integrity pass — no geometry/numeric value changed; only a `meta`

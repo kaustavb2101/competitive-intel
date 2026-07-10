@@ -168,6 +168,8 @@ def build_all():
     unemp = _load(unemp_f)["provinces"] if os.path.exists(unemp_f) else {}
     income_f = os.path.join(SRC, "household_income_by_province.json")
     income = _load(income_f)["provinces"] if os.path.exists(income_f) else {}
+    vflow_f = os.path.join(SRC, "vehicle_flow_by_province.json")
+    vflow = _load(vflow_f)["provinces"] if os.path.exists(vflow_f) else {}
     facinc_f = os.path.join(REPO, "platform", "data", "factory_income_by_province.json")
     facinc = _load(facinc_f)["provinces"] if os.path.exists(facinc_f) else {}
     agrinc_f = os.path.join(REPO, "platform", "data", "agri_income_by_province.json")
@@ -295,6 +297,7 @@ def build_all():
                        "vehicles": veh.get(prov, {}), "employment": emp.get(prov, {}),
                        "unemployment": unemp.get(prov) or {},
                        "income": income.get(prov) or {},
+                       "vehicle_flow": vflow.get(prov) or {},
                        "income_floor": {
                            k: v for k, v in {
                                "factory_ratio_to_national": (facinc.get(prov) or {}).get("ratio_to_national"),
@@ -302,8 +305,9 @@ def build_all():
                                "sme_ratio_to_national": (smeinc.get(prov) or {}).get("ratio_to_national"),
                            }.items() if v is not None
                        },
-                       "src": "DIW factories · DLT vehicles · NSO labour + NSO Labour Force Survey "
-                              "+ NSO SES 2566 income by occupation (data.go.th / TMLI) — measured"},
+                       "src": "DIW factories · DLT vehicles (stock + registration-action flow) · NSO labour "
+                              "+ NSO Labour Force Survey + NSO SES 2566 income by occupation "
+                              "(data.go.th / TMLI) — measured"},
                "meta": {
                    "generated_by": "pipeline/build_province.py",
                    "provenance": {
@@ -327,6 +331,10 @@ def build_all():
                            "ingest_tmli.py; {} when the source file is absent)",
                            "gov.income (NSO SES 2566 income-by-occupation, household_income_by_province.json "
                            "via ingest_tmli.py; {} when the source file is absent)",
+                           "gov.vehicle_flow (DLT registration-ACTION flow — dereg_rate/transfer_rate per "
+                           "car/pickup/moto class, trailing-12mo sum, vehicle_flow_by_province.json via "
+                           "build_vehicle_flow.py; {} when the source file is absent — distinct from "
+                           "gov.vehicles, which is a STOCK snapshot from a different DLT dataset)",
                            "gov.income_floor (derived ratio, factory_income_by_province.json / "
                            "agri_income_by_province.json / sme_income_by_province.json's "
                            "ratio_to_national, all pure province_income/national_avg divisions over "
