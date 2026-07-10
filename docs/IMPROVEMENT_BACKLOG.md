@@ -6,6 +6,30 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-10
+- [ ] **★ NEEDS KAUSTAV (repo Settings, not sandbox-fixable) — `data-fuel-prices.yml`/
+      `data-nabc-prices.yml` both do real work then fail at `gh pr create`.** Both scheduled pullers ran
+      for real (fresh Bangchak/NABC data pulled, `source-data/*.json` rebuilt, committed + pushed to a
+      fresh `data/fuel-<run>`/`data/nabc-<run>` branch) then hit `GraphQL: GitHub Actions is not
+      permitted to create or approve pull requests (createPullRequest)`. Fix is a one-click repo
+      setting: **Settings → Actions → General → Workflow permissions → check "Allow GitHub Actions to
+      create and approve pull requests"** — needs repo-admin access this loop doesn't have. Two real
+      pushed data branches (`data/fuel-29058372866`, `data/nabc-29052534833`) are sitting PR-less on
+      origin right now with genuinely fresh MEASURED prices; once the setting is flipped, either re-run
+      the workflows or manually open PRs for those two existing branches. Flagged via `PushNotification`
+      2026-07-10. *(HIGH, needs a human — do not attempt to change repo Settings from the loop)*
+- [ ] **Re-check `data-macro.yml`/`data-oae-prices.yml`/`data-gov-census.yml`/`data-overture.yml`/
+      `data-tiles.yml`'s first scheduled runs once enough wall-clock has passed** — all 5 still showed 0
+      runs as of 2026-07-10 (crons hadn't ticked). Once they have, they likely hit the SAME `gh pr
+      create` permission wall as fuel/nabc (all use the identical create-PR-from-Action pattern) —
+      worth confirming, but almost certainly the same single repo-setting fix covers all of them at
+      once, not 5 separate diagnoses. *(MED, S — just a status check, likely same root cause as above)*
+- [ ] **`site-health.yml` had already filed GitHub issue #3 from the false-alarm run** (title "🚨 Site
+      health check failed 2026-07-09") — now that the checker points at the real public alias, the next
+      scheduled or manual run should close it automatically via the workflow's own "Close health issue
+      on success" step. Not force-closed manually this cycle (didn't want to fake a health-check pass by
+      hand); worth confirming issue #3 auto-closes on the next real run. *(LOW, trivial — self-resolving)*
+
 ## Rules for each cycle (read before picking)
 - **Sandbox-only.** No item that needs a desktop/Thai-IP data pull (those live in `TONIGHT_CHECKLIST.md`).
   Anything that consumes pulled data must **degrade gracefully** when the data is absent.
@@ -569,16 +593,13 @@
       checked off. Zero code/data changed — pure backlog hygiene.
 
 ## Queue — follow-ups noticed 2026-07-09 (7)
-- [ ] **★ PR #1 merged — verify the newly-live scheduled workflows actually produce a green run,
-      don't just assume it.** `data-fuel-prices.yml`/`data-gov-census.yml`/`data-macro.yml`/
-      `data-nabc-prices.yml`/`data-oae-prices.yml`/`data-overture.yml`/`data-tiles.yml`/
-      `committee-geocode.yml`/`site-health.yml` are now `active` but had 0 runs as of this cycle
-      (crons hadn't ticked yet). A future cycle (or the next PR-activity check-in) should
-      `list_workflow_runs` each and read the actual log/conclusion of the first run — these pull from
-      previously-untested-in-CI code paths (secrets availability, `GITHUB_TOKEN` permissions for
-      committing data back, `GOOGLE_MAPS_API_KEY`/`GOOGLE_PLACES_KEY` for the geocode committee) and a
-      silent first-run failure would look identical to "hasn't ticked yet" without actually checking.
-      *(HIGH, S — just a status check once enough wall-clock has passed, but don't skip it)*
+- [x] **★ PR #1 merged — verify the newly-live scheduled workflows actually produce a green run —
+      DONE 2026-07-10.** `list_workflow_runs` on all 9 non-QA workflows found 3 had already ticked, all
+      3 failed. Fixed one for real (`site-health.yml`'s `BASE_URL` was an SSO-gated Vercel preview
+      alias, not the public site — swapped to `competitive-intel-blue.vercel.app`, re-verified 29/29
+      real checks pass). Root-caused but did not fix the other two (`data-fuel-prices.yml`/
+      `data-nabc-prices.yml` — both do real work then fail at `gh pr create` on a repo Settings toggle,
+      see the new item below). Full writeup: `docs/PROGRESS_LOG.md` (2026-07-10 entry).
 - [ ] **Now that `master` has the full pipeline + committee, the sandbox-vs-CI story changes** — some
       backlog items previously scoped as "needs a Thai-IP pull, blocked" (DIW factories, DLT vehicles)
       are exactly what `data-gov-census.yml` now runs on a schedule from GitHub's own runners (already
