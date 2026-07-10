@@ -140,6 +140,30 @@ refresh the monthly file set as new months publish (manual or a future workflow)
   UNSD SDG API (national indicators). Per-province NSO data = the vendored TMLI SES/LFS layers remain
   the finest available; a Thai-IP pull is the only refresh path.
 
+**Wave 12 (2026-07-10) — opportunity scan (no pulls; cheap probes on reachable hosts only):**
+- **OAE `dataoae1104` rice production is PER-PROVINCE CSV** (verified header: `year_th, commod,
+  province_name, attribute, amount, unit` — planted/harvested area, production, yield, incl. the
+  irrigated second crop นาปรัง ปี 2568). The measured "second-rice-crop cut" detector for the
+  Central/West drought pocket. Siblings `dataoae1204/1304/1404/1504` (maize/cassava/rubber/oil palm)
+  presumed same shape — not yet pulled.
+- **OAE `farmer-family`** = PDF-only (registered farmer households 2565–2568; pdfplumber path).
+  **OAE `dataset66-15-03`** net cash farm income = JSON, national by crop year (context card only).
+  **OAE `ai-drought-warning`** (SPEI by amphoe) = a PowerBI embed URL, NO data resource — scraping
+  PowerBI is brittle/L; SKIP unless someone finds the underlying service. Recorded so no one re-mines it.
+- **ILOSTAT new ids verified live** (rplumber.ilo.org, THA): `EMP_TEMP_SEX_STE_NB` (status in
+  employment — own-account/self-employed, 2025), `EMP_NIFL_SEX_ECO_RT` (informality BY SECTOR, 2024,
+  total 63.2%), `EES_TEES_SEX_ECO_NB` (employees by sector, 2025). The EAR_* earnings ids remain 400.
+- **ThaiWater `/public/waterlevel_load` verified live** (station water level + storage_percent +
+  `situation_level` flood tiers) — the flood-side sibling of the wired rain pulse.
+  `/public/rain_yesterday_by_basin` = 404 unknown service.
+- **DLT mirror on-disk verdicts:** `dataset_stat_1_010` (transport-operator licenses, 41 files) is
+  NATIONAL-only (`พื้นที่` = ทั่วประเทศ) — SKIP. `dataset_stat_1_005` (123 files) confirmed
+  Bangkok-vs-regions only across the whole mirror — the wave-8 skip stands. `dataset_stat_1_009`
+  (50 files, trucks/buses reg/tax transactions) IS per-province × month × vehicle class — on disk,
+  no consumer yet (the known next-wave distill).
+- **ILOSTAT battery gap:** `source-data/ilostat_labour.json` (pulled wave 9) has NO build_* consumer
+  and is not in app.js — pulled but never surfaced.
+
 ## POI sources (Overpass / OSM)
 Overpass (mirror `maps.mail.ru`) is reachable and fast. The branch feature layer is `source-data/
 osm_layers.json` — **13 national layers** feeding the per-branch within-10km `k10` radar (wired through
