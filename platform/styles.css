@@ -743,6 +743,9 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   .tblwrap{width:100%!important;max-width:none!important;overflow:visible!important;border:none!important}
   .tbl{width:100%!important;max-width:none!important;border-collapse:collapse!important;break-inside:avoid}
   .tbl th,.tbl td{color:#111!important;border-color:#ccc!important}
+  /* the exec one-pager shows everything — force the "Show more" disclosure open, hide its toggle */
+  details.cc-more>summary{display:none!important}
+  details.cc-more .cc-more-b{display:block!important}
 }
 
 /* ---------- scenario simulator ---------- */
@@ -1029,6 +1032,18 @@ details.method .mb ul{margin:0;padding-left:16px}
 details.method .mb li{margin:4px 0}
 details.method .mb li b{color:var(--txt)}
 html[data-theme="light"] details.method{background:#f4f6fb;border-color:#d6dbe6}
+
+/* "Show N more" disclosure for a Home card whose stacked rank-1 callouts outgrew always-visible
+   (renderHomeRisk()). Same collapse mechanic as details.method, plain text summary (no chip/box
+   chrome) since the content below is regular .cc-row/.cc-sub2 rows, not caveat prose. */
+details.cc-more{margin-top:6px;border-top:1px dashed var(--line2)}
+details.cc-more>summary{list-style:none;cursor:pointer;padding:8px 0 2px;font-size:11px;
+  font-weight:600;color:var(--accent)}
+details.cc-more>summary::-webkit-details-marker{display:none}
+details.cc-more>summary::after{content:' ▾';color:var(--dim)}
+details.cc-more[open]>summary::after{content:' ▴'}
+details.cc-more>summary:hover{text-decoration:underline}
+details.cc-more>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
 
 /* ---------- Portfolio concentration by region (Exposure obj#1) ----------
    Each region: dominant segment + a stacked agri/merchant/collateral mix bar

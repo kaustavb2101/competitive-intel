@@ -5315,7 +5315,11 @@ function renderHomeWhitespace(){
 // WHAT IS GETTING RISKIER — worst crop-stress province, motorcycle-heavy collateral, gold-up vs pickup.
 function renderHomeRisk(){
   const box=$('#cc-risk-body'); if(!box||!META) return;
-  let html='';
+  // LEAD (always visible) = the 3 sharpest portfolio-risk verdicts. Everything past that is real
+  // secondary context but the card had grown to 9 stacked rank-1 facts (flagged repeatedly in the
+  // backlog since 2026-07-06) — collapsed into a native <details> "Show N more", same disclosure
+  // idiom methodBox() already uses for caveats, so no new JS state/wiring is needed.
+  let lead='', more=''; let moreN=0;
   // LEAD WITH THE VERDICT — most-stressed provinces by composite risk (province_risk.json).
   // Pull ONLY from loaded data; omit gracefully if absent (no placeholder, no fabrication).
   if(priskHasData()){
@@ -5323,8 +5327,8 @@ function renderHomeRisk(){
     if(top.length){
       const names=top.map(p=>p.province).join(', ');
       const dom=priskDom(top[0]);
-      html+=`<div class="cc-sub2" style="margin-top:0">Most stressed · composite risk ${TAG_E}</div>`;
-      html+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)}`,
+      lead+=`<div class="cc-sub2" style="margin-top:0">Most stressed · composite risk ${TAG_E}</div>`;
+      lead+=ccRow(names,`${top[0].region||''} · driven by ${riskDriverLabel(dom)}`,
         `▲ ${(top[0].mean_risk||0).toFixed(0)}`,`p90 ${(top[0].p90_risk||0).toFixed(0)}`,'var(--agri)');
     }
   }
@@ -5334,20 +5338,32 @@ function renderHomeRisk(){
   // pure household-leverage read. Omitted gracefully when the file hasn't loaded yet / is absent.
   if(pstressHasData()&&PSTRESS_LIST.length){
     const p=PSTRESS_LIST[0];
-    html+=`<div class="cc-sub2">Structurally riskiest · DTI + unemployment ${TAG_E}</div>`;
-    html+=ccRow(`${p.province} <span class="sub">${p.region||''}</span>`,
+    lead+=`<div class="cc-sub2">Structurally riskiest · DTI + unemployment ${TAG_E}</div>`;
+    lead+=ccRow(`${p.province} <span class="sub">${p.region||''}</span>`,
       `DTI ${p.debt_to_income!=null?(+p.debt_to_income).toFixed(2)+'×':'—'} · unemployment ${p.unemployment_rate!=null?(+p.unemployment_rate).toFixed(1)+'%':'—'} (NSO, measured)`,
       `▲ ${(p.composite_stress||0).toFixed(0)}`,'composite','var(--agri)');
   }
+  // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
+  if(briskHasData()&&DATA&&DATA.length===BRISK.length){
+    let bi=-1,bv=-1; for(let i=0;i<BRISK.length;i++){const v=(BRISK[i]&&BRISK[i].composite_risk)||0; if(v>bv){bv=v;bi=i;}}
+    if(bi>=0){const e=BRISK[bi], d=DATA[bi];
+      lead+=`<div class="cc-sub2">Riskiest single branch ${TAG_E}</div>`;
+      lead+=ccRow(`${d.n||e.code} <span class="sub">${d.v||''}${d.r?' · '+d.r:''}</span>`,
+        `driven by ${riskDriverLabel(e.top_driver)}`,
+        `▲ ${(e.composite_risk||0).toFixed(0)}`,'composite','var(--agri)');
+    }
+  }
+  // ---- secondary context below, collapsed behind "Show more" ----
   // lowest-paid occupation nationally (occupation_income.json) — a concrete income-floor fact,
   // same rank-1-surfacing pattern already shipped on Exposure; mirrored here per the 2026-07-05 (8)
   // backlog follow-up ("Home doesn't yet surface the same fact").
   if(occincHasData()){
     const c=OCCINC_LIST[0];
-    html+=`<div class="cc-sub2">Lowest-paid occupation nationally ${TAG_M}</div>`;
-    html+=ccRow(`${c.label}`,
+    more+=`<div class="cc-sub2" style="margin-top:0">Lowest-paid occupation nationally ${TAG_M}</div>`;
+    more+=ccRow(`${c.label}`,
       `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
       `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)');
+    moreN++;
   }
   // merchant-segment income floor (SME owners, sme_income_by_province.json) — same rank-1-surfacing
   // pattern as the two blocks above, mirrored from Exposure per the 2026-07-09 (5) backlog follow-up
@@ -5355,37 +5371,30 @@ function renderHomeRisk(){
   if(smeincHasData()){
     const s=SMEINC_LIST[0];
     const nBelow=SMEINC_LIST.filter(p=>(p.ratio_to_national||0)<1).length;
-    html+=`<div class="cc-sub2">Merchant segment income floor · SME owners ${TAG_M}</div>`;
-    html+=ccRow(`${s.province}`,
+    more+=`<div class="cc-sub2">Merchant segment income floor · SME owners ${TAG_M}</div>`;
+    more+=ccRow(`${s.province}`,
       `SME-owner income ฿${(s.sme_income||0).toLocaleString()}/mo · ${nBelow}/${SMEINC_LIST.length} provinces below the national floor (NSO SES 2566, measured)`,
       `${(s.ratio_to_national||0).toFixed(2)}×`,'vs national avg','var(--collat)');
-  }
-  // single riskiest BRANCH (branch_risk.json, index-aligned to DATA) — names the sharpest single point.
-  if(briskHasData()&&DATA&&DATA.length===BRISK.length){
-    let bi=-1,bv=-1; for(let i=0;i<BRISK.length;i++){const v=(BRISK[i]&&BRISK[i].composite_risk)||0; if(v>bv){bv=v;bi=i;}}
-    if(bi>=0){const e=BRISK[bi], d=DATA[bi];
-      html+=`<div class="cc-sub2">Riskiest single branch ${TAG_E}</div>`;
-      html+=ccRow(`${d.n||e.code} <span class="sub">${d.v||''}${d.r?' · '+d.r:''}</span>`,
-        `driven by ${riskDriverLabel(e.top_driver)}`,
-        `▲ ${(e.composite_risk||0).toFixed(0)}`,'composite','var(--agri)');
-    }
+    moreN++;
   }
   // worst crop-household stress region/province (crop_stress.json)
   if(CSTRESS_LIST&&CSTRESS_LIST.length){
     const w=CSTRESS_LIST[0]; const sv=Math.round((w.agri_stress||0)*100);
     const dom=(w.crop_mix&&w.crop_mix[0])||{};
-    html+=`<div class="cc-sub2" style="margin-top:0">Worst crop-household stress ${TAG_E}</div>`;
-    html+=ccRow(`${w.th} <span class="sub">${w.region||''}</span>`,
+    more+=`<div class="cc-sub2">Worst crop-household stress ${TAG_E}</div>`;
+    more+=ccRow(`${w.th} <span class="sub">${w.region||''}</span>`,
       `${dom.crop||'crops'} ${dom.share!=null?Math.round(dom.share*100)+'%':''} · price ${w.price_stress!=null?(w.price_stress>0?'+':'')+w.price_stress+'%':'—'}`,
       `▲ ${sv}`,'agri-stress','var(--agri)');
-  } else { html+=skelRows(3); }
+    moreN++;
+  } else { more+=skelRows(3); }
   // most motorcycle-heavy collateral provinces (DLT, measured) — lowest-recovery title collateral
   const moto=collatMixRows().slice(0,2);
   if(moto.length){
-    html+=`<div class="cc-sub2">Most motorcycle-heavy collateral ${TAG_M}</div>`;
-    html+=moto.map(p=>ccRow(`${p.th} <span class="sub">${p.region}</span>`,
+    more+=`<div class="cc-sub2">Most motorcycle-heavy collateral ${TAG_M}</div>`;
+    more+=moto.map(p=>ccRow(`${p.th} <span class="sub">${p.region}</span>`,
       `${p.branches} branches · lowest-recovery title collateral`,
       `${p.moto}%`,'moto share','var(--agri)')).join('');
+    moreN++;
   }
   // COLLATERAL RECOVERY OUTLOOK — lead with the national read from collateral_outlook.json when
   // loaded (firming vs softening + most-at-risk province), then the vehicle-title backings.
@@ -5393,14 +5402,18 @@ function renderHomeRisk(){
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
     const o=nat.exposure_weighted_outlook, firm=o>=0;
-    html+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
-    html+=ccRow(firm?'Recovery value firming':'Recovery value softening',
+    more+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
+    more+=ccRow(firm?'Recovery value firming':'Recovery value softening',
       `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`,
       `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
+    moreN++;
   }
-  html+=`<div class="cc-sub2">Vehicle-title collateral value · under pressure</div>`;
-  html+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');
-  html+=ccRow(`Used-motorcycle collateral ${TAG_M}`,'smallest, most volatile, lowest-recovery title collateral','↓ volatile','lowest recovery','var(--agri)');
+  more+=`<div class="cc-sub2">Vehicle-title collateral value · under pressure</div>`;
+  more+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');
+  more+=ccRow(`Used-motorcycle collateral ${TAG_M}`,'smallest, most volatile, lowest-recovery title collateral','↓ volatile','lowest recovery','var(--agri)');
+  moreN++;
+  let html=lead;
+  if(more) html+=`<details class="cc-more"><summary>Show ${moreN} more</summary><div class="cc-more-b">${more}</div></details>`;
   box.innerHTML=html;
 }
 
