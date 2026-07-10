@@ -1119,6 +1119,10 @@ async function loadMacroIndicators(){
 }
 function renderMacroIndicators(){
   const host=$('#macro'); if(!host||!MACROIND||!MACROIND.indicators) return;
+  // idempotency guard: renderOverview() can fire this loader twice before the cached promise
+  // resolves (e.g. two quick tab switches), which used to append a second set of BIS cards on
+  // top of the first. Always clear our own prior cards before appending fresh ones.
+  host.querySelectorAll('.mcard-bis').forEach(el=>el.remove());
   const I=MACROIND.indicators, cards=[];
   const arrow=v=>v==null?'':(v<0?'▼':(v>0?'▲':'●'));
   const hh=I.household_debt_gdp;
@@ -1132,7 +1136,7 @@ function renderMacroIndicators(){
   if(fx) cards.push([`USD/THB`, `${fx.value}`, `World Bank ${fx.period}`]);
   if(!cards.length) return;
   host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
-    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+    `<div class="mcard mcard-bis"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
 /* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
@@ -5292,11 +5296,16 @@ function renderHomeWhitespace(){
   }
   // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
   // flag on every density/white-space signal above, not market share. Omitted gracefully if absent.
+  // coverage_pct can legitimately read >100% (official store-locators list every service point, not
+  // just headline "branches") — "lower-bound census" is self-contradictory once that happens, so the
+  // copy switches to a phrasing that's true either side of 100% (committee finding #4, 2026-07-10).
   const cct=(COMPCOV&&COMPCOV.meta&&COMPCOV.meta.totals)||null;
   if(cct&&cct.coverage_pct!=null){
     html+=`<div class="cc-sub2">Competitor coverage · census completeness ${TAG_M}</div>`;
-    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
-      'lower-bound census · a confidence flag on the white-space above, not market share',
+    const covered=cct.coverage_pct>=100;
+    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} rival branches vs ~${(cct.expected||0).toLocaleString()} publicly reported`,
+      covered?'network fully located for the official-locator brands — Heng still a sample'
+             :'lower-bound census · a confidence flag on the white-space above, not market share',
       `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
   }
   // MOST CONTESTED GROUND (contested_pop.json) — the flip side of white-space: where we already
