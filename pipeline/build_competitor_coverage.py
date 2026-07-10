@@ -52,7 +52,10 @@ BRANDS = ["Muangthai", "Tidlor", "Srisawad", "Heng"]
 EXPECTED = {
     "Muangthai": 8673,   # FY2025 total branches (MTC company IR / kaohoon)
     "Tidlor":    1873,   # FY2025 branches (Ngern Tid Lor IR, tidlorinvestor.com)
-    "Srisawad":  1138,   # ~late-2025 branches (SAWAD IR oppday deck)
+    "Srisawad":  None,   # IR figure (1,138, oppday deck) counts the LISTED ENTITY only while our
+                         # census measures the whole SAWAD-group locator network (~4.6x larger) —
+                         # scope-mismatched denominators produced a nonsense 457% / 141% coverage
+                         # (committee finding #4, 2026-07-10). No cited GROUP figure => null.
     "Heng":      None,   # no nationwide branch count cited in our research — do NOT invent
 }
 EXPECTED_SOURCES = {
@@ -60,7 +63,9 @@ EXPECTED_SOURCES = {
                  "https://investor.muangthaicap.com/en/newsroom/press-releases/144063/",
     "Tidlor":    "Ngern Tid Lor FY2025 — 1,873 branches; company IR / thaipr. "
                  "https://www.tidlorinvestor.com/en/home",
-    "Srisawad":  "Srisawad (SAWAD) ~late-2025 — ~1,138 branches; IR oppday deck.",
+    "Srisawad":  "IR cites ~1,138 listed-entity branches (oppday deck) but the sawad.co.th locator "
+                 "measures the whole group network (5,203 points) — scope mismatch, so expected is "
+                 "null until a cited GROUP figure exists (never invented).",
     "Heng":      "No nationwide branch count cited in docs/RESEARCH_DIGEST.md — left null (not invented).",
 }
 
@@ -111,8 +116,12 @@ def build():
         brands.append({"brand": b, "found": found, "expected": expected, "coverage_pct": cov})
 
     total_found = sum(counts.values())
-    total_expected = sum(v for v in EXPECTED.values() if v)
-    overall_cov = round(100.0 * total_found / total_expected, 1) if total_expected else None
+    # coverage is only meaningful where found and expected measure the SAME network — sum both
+    # sides over the comparable brands only (a full-census found over a partial expected read 141%).
+    comparable = [b for b in BRANDS if EXPECTED.get(b)]
+    comparable_found = sum(counts[b] for b in comparable)
+    total_expected = sum(EXPECTED[b] for b in comparable)
+    overall_cov = round(100.0 * comparable_found / total_expected, 1) if total_expected else None
 
     meta = {
         "generated_by": "pipeline/build_competitor_coverage.py",
@@ -123,7 +132,8 @@ def build():
         "expected_label": "ESTIMATED-from-public-reports",
         "expected_sources": {b: EXPECTED_SOURCES[b] for b in BRANDS},
         "totals": {"found": total_found, "expected": total_expected or None,
-                   "coverage_pct": overall_cov},
+                   "coverage_pct": overall_cov,
+                   "comparable_found": comparable_found, "comparable_brands": comparable},
         "caveat": "found now comes from each operator's OFFICIAL store-locator for Muangthai, "
                   "Srisawad and Tidlor (the near-complete network), so coverage_pct is ~100% and "
                   "can exceed 100% because a locator lists every service point / sub-branch beyond "
@@ -132,11 +142,11 @@ def build():
                   "a genuine lower bound. Read coverage as a data-completeness flag, not market share.",
         "note": "expected counts are CITED real figures (not modelled); Heng expected is null because "
                 "no nationwide branch count was cited in our research — never invented. coverage_pct "
-                ">100% for the official-locator brands is expected, not an error: a locator lists every "
-                "service point, and for a GROUP brand it covers the whole retail network while the IR "
-                "'branches' figure counts only the LISTED ENTITY. Srisawad is the clearest case — the "
-                "sawad.co.th locator returns 5,203 measured points vs the 1,138 listed-entity IR "
-                "figure, i.e. the SAWAD group's retail footprint is ~4.6x its reported branch count.",
+                "can exceed 100% for an official-locator brand (a locator lists every service point beyond "
+                "the IR headline). Srisawad's expected is null: its IR figure (1,138) counts the listed "
+                "entity only while the sawad.co.th locator measures the whole group (5,203 points, "
+                "~4.6x) — scope-mismatched denominators are excluded rather than shown as 457%. "
+                "totals.coverage_pct is computed over comparable_brands only.",
     }
     return {"meta": meta, "brands": brands}
 

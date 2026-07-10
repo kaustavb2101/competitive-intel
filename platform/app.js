@@ -1101,8 +1101,14 @@ async function boot(){
     renderOverview(); renderAcq(); renderLenses(); renderBranchSort(); renderBranches();
     showTab((location.hash||'').replace('#',''));
   }catch(err){
+    // say WHICH leg failed: a missing map library (CDN/vendor script didn't load) is not a data
+    // problem — the old single message sent people debugging data files when Leaflet was absent.
+    const libMissing=(typeof L==='undefined')||/\bL is not defined\b/.test(String(err));
+    const msg=libMissing
+      ? `The map library didn't load (${err}). Check the connection and reload — the data files are fine.`
+      : `Couldn't load data files. Make sure <b>data/branches.json</b> and <b>data/meta.json</b> sit next to this page. (${err})`;
     document.querySelector('main').insertAdjacentHTML('afterbegin',
-      `<div class="insight" style="border-left-color:var(--agri)">Couldn't load data files. Make sure <b>data/branches.json</b> and <b>data/meta.json</b> sit next to this page. (${err})</div>`);
+      `<div class="insight" style="border-left-color:var(--agri)">${msg}</div>`);
   }
 }
 
@@ -1386,7 +1392,9 @@ function renderOverview(){
   loadBrandTrends().then(renderBrandTrends);
   loadRainPulse().then(renderRainPulse);
   // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
-  $('#macro').innerHTML = META.macro.filter(([k])=>!/gold/i.test(k||'')).map(([k,v,n])=>
+  // Also drop editorial KPIs that the measured BIS/World-Bank feed (renderMacroIndicators) supplies:
+  // the page used to show household debt 86.8% (editorial) beside 87.5% (BIS) with no reconciliation.
+  $('#macro').innerHTML = META.macro.filter(([k])=>!/gold|household debt|inflation|policy rate|usd/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);
   renderCommodityBoard();
@@ -1668,7 +1676,7 @@ function drawSearchDemand(){
   const rows=(SDEMAND_LIST&&SDEMAND_LIST.length)?SDEMAND_LIST:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Search-demand board not yet computed.</b> <span class="sub">Run pipeline/build_search_demand.py — it fills in on the next data refresh.</span>';
+    if(ro) ro.innerHTML='<b>Search-demand board not yet computed.</b> <span class="sub">This layer is being prepared — it fills in on the next data refresh.</span>';
     return;
   }
   const pct=v=>(v==null?'<span class="sub">n/a</span>':`${Math.round(100*v)}%`);
@@ -1755,7 +1763,7 @@ function drawCompCoverage(){
   // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
   const list=rows.slice().sort((a,b)=>((b.coverage_pct==null?-1:b.coverage_pct)-(a.coverage_pct==null?-1:a.coverage_pct)));
   tbl.innerHTML=`<tr><th>Brand</th>`+
-    `<th title="MEASURED — locations of this brand in our de-duplicated census (a lower bound)">Found ◆ measured</th>`+
+    `<th title="MEASURED — locations of this brand in our de-duplicated census. Full official-locator network for Muangthai/Srisawad/Tidlor; Heng alone is still a sample (lower bound).">Found ◆ measured</th>`+
     `<th title="ESTIMATED-from-public-reports — the brand's publicly-reported nationwide branch count (cited company IR / annual reports)">Expected ★ public</th>`+
     `<th title="found ÷ expected — the share of the brand's reported network we have located so far. A confidence flag, NOT market share.">Coverage</th>`+
     `<th>Census completeness</th></tr>`+
@@ -1774,7 +1782,7 @@ function drawCompCoverage(){
   if(ro){
     const m=COMPCOV.meta||{}, t=m.totals||{};
     const ttxt=(t.coverage_pct!=null)
-      ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches vs an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> from public reports.`
+      ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches; coverage <b style="color:var(--gold)">${t.coverage_pct.toFixed(1)}%</b> over the brands with a same-scope cited figure (${(t.comparable_found||0).toLocaleString()} vs ${(t.expected||0).toLocaleString()}).`
       : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations.`;
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}`+
       methodBox(null,
@@ -1802,7 +1810,7 @@ function drawRivalDensity(){
   const recs=(RIVDEN&&Array.isArray(RIVDEN.records))?RIVDEN.records:[];
   if(!recs.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Rival-density board not yet computed.</b> <span class="sub">Run pipeline/build_rival_density.py — it fills in on the next data refresh.</span>';
+    if(ro) ro.innerHTML='<b>Rival-density board not yet computed.</b> <span class="sub">This layer is being prepared — it fills in on the next data refresh.</span>';
     return;
   }
   // most-outnumbered first: rank by (rivals − autox), i.e. the raw branch deficit vs the big-4.
@@ -1868,10 +1876,13 @@ function renderAcqVerdict(){
     ? `${c._competitors} rivals ≤5km`
     : `competitor-gap ${Math.round(c.competitor_gap||0)}/100`;
   box.style.display='block';
-  box.innerHTML=`<div class="verdict-line">🏆 <b>Open next: ${t.name}</b> — ${Math.round(t.score||0)}/100 opportunity`+
+  // NOT "Open next" — that verdict belongs to the sequenced Road-to-3,000 plan (canonical placement
+  // order, models cannibalization + risk). This card is the composite LENS: a different ranking.
+  box.innerHTML=`<div class="verdict-line">🏆 <b>Highest-composite district: ${t.name}</b> — ${Math.round(t.score||0)}/100 opportunity`+
     ` · <span style="color:var(--gold)">${compTxt}</span></div>`+
     `<div class="sub" style="margin-top:4px">${t.province||''}${t.region?' · '+t.region:''} · `+
-    `white-space ${Math.round(c.whitespace||0)} · competitor-gap ${Math.round(c.competitor_gap||0)} · agri-stress ${Math.round(c.agri_stress||0)} ${TAG_E}</div>`;
+    `white-space ${Math.round(c.whitespace||0)} · competitor-gap ${Math.round(c.competitor_gap||0)} · agri-stress ${Math.round(c.agri_stress||0)} ${TAG_E} · `+
+    `a different lens from the sequenced plan below — <b>Road to 3,000</b> gives the placement order</div>`;
 }
 function drawOppScore(){
   const tbl=$('#opptbl'), ro=$('#oppreadout'); if(!tbl) return;
@@ -2110,7 +2121,7 @@ function drawExpansionPlan(){
   const rows=(EXPLAN&&Array.isArray(EXPLAN.by_amphoe))?EXPLAN.by_amphoe:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Sequenced plan not yet computed.</b> <span class="sub">Run pipeline/build_expansion_plan.py — the leaderboard fills in on the next data refresh. The regional split above still stands.</span>';
+    if(ro) ro.innerHTML='<b>Sequenced plan not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh. The regional split above still stands.</span>';
     return;
   }
   const top=rows.slice(0,EXPLAN_TOPN);
@@ -2708,10 +2719,16 @@ function renderExposure(){
   const hhi=Object.values(byProvN).reduce((s,n)=>s+Math.pow(100*n/N,2),0);
   const hhiLabel=hhi<1500?'unconcentrated':hhi<2500?'moderate':'concentrated';
   const hhiCol=hhi<1500?'var(--merch)':hhi<2500?'var(--gold)':'var(--agri)';
+  // zero-state: a red "0.0%" headline reads as a bug and carries no signal (committee finding #8,
+  // 2026-07-10) — when nothing clears the ≥60 line, show the headroom read in neutral green instead.
+  const maxA=DATA.reduce((m,d)=>Math.max(m,d.a||0),0);
+  const agriCard=weakAgri.length
+    ? ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', 'var(--agri)','▲']
+    : ['High agri-PD proxy', 0, 'none', `No branch above the 60/100 high-risk line this vintage — worst is ${Math.round(maxA)}/100 (estimated proxy, not measured)`, 'var(--merch)','●'];
   const cards=[
     ['Stressed-crop regions', stressed.length, pctS(stressed.length), 'Region weakest crop in price stress (World Bank YoY < −10%, direction proxy)', 'var(--agri)','▼'],
     ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', 'var(--gold)','☀'],
-    ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', 'var(--agri)','▲'],
+    agriCard,
   ];
   $('#expocards').innerHTML=
     `<div class="mcard"><div class="k">◆ Geographic concentration (HHI)</div>
@@ -3235,7 +3252,14 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
   }
   if(!shocked){
     const pct=N?((100*baseHiBr/N).toFixed(1)):'0.0';
-    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)</div>`+
+    // zero-state: "0 provinces" alone reads as broken (committee finding #8) — name the headroom
+    // (worst province vs the 45/100 line) so the zero carries information.
+    let zeroCtx='';
+    if(baseHiP===0&&CSTRESS_LIST&&CSTRESS_LIST.length){
+      const w=CSTRESS_LIST[0];
+      zeroCtx=` — no province above the 45/100 high-stress line; worst is ${w.th} at ${Math.round((w.agri_stress||0)*100)}/100`;
+    }
+    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline:</b> ${baseHiP} provinces in high agri-stress today — ${baseHiBr.toLocaleString()} branches (${pct}% of the network)${zeroCtx}</div>`+
       `<div class="sub" style="margin-top:4px">Drag a slider to stress the book. ILLUSTRATIVE what-if (estimated proxy, no loan balances) — a direction, not a number. ${TAG_E}</div>`;
   } else {
     const dP=scenHiP-baseHiP, dBr=scenHiBr-baseHiBr; const s=v=>(v>0?'+':'')+v;
@@ -3567,7 +3591,7 @@ function drawPeerOutliers(){
   const rows=(PEERS&&Array.isArray(PEERS.outliers))?PEERS.outliers:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Peer benchmark not yet computed.</b> <span class="sub">Run pipeline/build_branch_peers.py — the audit-first list fills in on the next data refresh.</span>';
+    if(ro) ro.innerHTML='<b>Peer benchmark not yet computed.</b> <span class="sub">This layer is being prepared — the audit-first list fills in on the next data refresh.</span>';
     return;
   }
   tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
@@ -3612,7 +3636,7 @@ function drawSiegeTable(){
   const rows=(RIVP&&Array.isArray(RIVP.besieged))?RIVP.besieged.slice(0,10):[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Rival pressure not yet computed.</b> <span class="sub">Run pipeline/build_rival_pressure.py — the besieged list fills in on the next data refresh.</span>';
+    if(ro) ro.innerHTML='<b>Rival pressure not yet computed.</b> <span class="sub">This layer is being prepared — the besieged list fills in on the next data refresh.</span>';
     return;
   }
   tbl.innerHTML=`<tr><th>#</th><th>Branch</th><th>Province</th><th>Region</th>`+
@@ -3816,7 +3840,7 @@ function renderLegend(){
   // Categorical dominant-crop lens: a swatch KEY (not a ramp), honestly tagged estimated · SPAM.
   if(l.cat){
     if(!cropLuLoaded){ $('#maplegend').innerHTML='<span class="skel skel-line" style="display:inline-block;width:160px;vertical-align:middle" aria-hidden="true"></span> <span class="sub">crop land-use…</span>'; return; }
-    if(!cropHasData()){ $('#maplegend').innerHTML='<span class="sub">Crop land-use layer not present — run pipeline/build_crop_landuse.py.</span>'; return; }
+    if(!cropHasData()){ $('#maplegend').innerHTML='<span class="sub">Crop land-use layer is being prepared — it fills in on the next data refresh.</span>'; return; }
     const present={}; for(const e of CROPLU.amphoe){ if(e&&e.dominant_crop) present[e.dominant_crop]=1; }
     const order=['rice','cassava','maize','sugarcane','oilpalm','rubber'].filter(k=>present[k]);
     const key=order.map(k=>`<span><i style="background:${CROP_COLORS[k]};border-radius:2px"></i>${CROP_LABEL[k]}</span>`).join('');
@@ -5270,6 +5294,13 @@ function renderHomeWhitespace(){
     const extras=[]; if(aoccHasData()) extras.push('borrower base'); if(compHasData()) extras.push('rivals');
     const extraTag=extras.length?` <span class="sub">+ ${extras.join(' &amp; ')} ${TAG_M}</span>`:'';
     html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}${extraTag}</div>`;
+    // bridge to the thesis/hero verdict: the sequenced plan (cannibalization + risk) picks a
+    // DIFFERENT #1 than raw district white-space — say so, or the two reads look contradictory
+    // on one screen (committee finding #7, 2026-07-10).
+    const seq1=EXPLAN&&EXPLAN.sequence&&EXPLAN.sequence[0];
+    if(seq1&&seq1.name){
+      html+=`<div class="sub" style="margin:0 0 4px">Sequenced plan opens <b>${seq1.name}</b> first — raw white-space ranks the districts below. Different lenses; see <a href="#acq" data-v="acq">Acquisition</a>.</div>`;
+    }
     html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
       const where=`${a.province_th} · ${a.region}`;
       // committee trim: max ~2-3 short bits so the gold score leads the row. Keep the zero-branch
@@ -5303,7 +5334,11 @@ function renderHomeWhitespace(){
   if(cct&&cct.coverage_pct!=null){
     html+=`<div class="cc-sub2">Competitor coverage · census completeness ${TAG_M}</div>`;
     const covered=cct.coverage_pct>=100;
-    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} rival branches vs ~${(cct.expected||0).toLocaleString()} publicly reported`,
+    // compare like-for-like: coverage_pct is computed over the brands with a same-scope cited
+    // figure (comparable_found); the full census (found) is bigger because it also holds the
+    // whole Srisawad group + the Heng sample, which have no comparable denominator.
+    const compFound=cct.comparable_found!=null?cct.comparable_found:cct.found;
+    html+=ccRow(`Located ${(compFound||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} publicly reported (comparable brands) · ${(cct.found||0).toLocaleString()} rival points censused in all`,
       covered?'network fully located for the official-locator brands — Heng still a sample'
              :'lower-bound census · a confidence flag on the white-space above, not market share',
       `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
@@ -5413,8 +5448,12 @@ function renderHomeRisk(){
   if(nat&&nat.exposure_weighted_outlook!=null){
     const o=nat.exposure_weighted_outlook, firm=o>=0;
     more+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
+    // the index is dominated by the global gold tailwind, which is NOT AutoX collateral — without
+    // the caption below, "firming" sat directly above the ↓ vehicle-title rows with no bridge
+    // (committee finding #6, 2026-07-10: ex-gold the same index reads softening).
     more+=ccRow(firm?'Recovery value firming':'Recovery value softening',
-      `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`,
+      `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`+
+      (firm?' · gold-pawn tailwind dominates this index — the vehicle-title legs below still point down':''),
       `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
     moreN++;
   }

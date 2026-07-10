@@ -5,9 +5,10 @@
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%23121826%27/%3E%3Ccircle cx=%278%27 cy=%278%27 r=%274.5%27 fill=%27%23E6B450%27/%3E%3Ccircle cx=%278%27 cy=%278%27 r=%272%27 fill=%27%23121826%27/%3E%3C/svg%3E">
 <title>Rayong 3D · เงินไชโย</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<script src="vendor/deck.gl.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
@@ -2712,6 +2713,12 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  // extras such as competitors, province panel and the branch cascade are skipped when absent).
  // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
  function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+ // Per-slug optional SCENERY actually committed under data/ (province overlay, isochrone bands,
+ // trees, rail). Fetching the absent ones logged a red 404 on every load, burying real failures
+ // (committee low-severity finding, 2026-07-10). Update alongside any new committed scenery file.
+ var SCENERY_ON_DISK={rayong:['province','rail']};
+ function sopt(kind){var have=SCENERY_ON_DISK[CITY]||[];
+   return have.indexOf(kind)>=0?opt(P+'_'+kind+'.json'):Promise.resolve(null);}
  var P='data/'+CITY;
  // CALM GRACEFUL STATE — the per-province 3D building file (<slug>_catchment.json) is pulled
  // from the desktop per province (pull_overture_buildings.py --province <slug>) and lands over
@@ -2779,13 +2786,13 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
        }).catch(function(){return null;});   // CDN unreachable => calm not-pulled state, never a crash
      }
      if(!r.ok)throw new Error('catchment '+r.status);return r.json();}),
-   opt(P+'_province.json'),
+   sopt('province'),
    opt('data/provinces/index.json'),
    // ground layers: local file first; ONLY on a local 404 fall back to the catchments CDN
    // (committed files serve most provinces; R2 serves any too big to commit — see
    // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
    gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
-   opt(P+'_isochrone.json'),
+   sopt('isochrone'),
    // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
    // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
    Promise.resolve(null), Promise.resolve(null),
@@ -2852,7 +2859,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
          opt('data/occupation_leads.json'),
          opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
          opt('data/catchment_poi.json'),
-         opt(P+'_trees.json'), opt(P+'_rail.json')
+         sopt('trees'), sopt('rail')
        ]).then(function(d){
          try{if(window.applyDeferred)window.applyDeferred({occ:d[0],comp:d[1],poi:d[2],trees:d[3],rail:d[4]});}
          catch(e){try{console.error('deferred apply failed:',e);}catch(_){}}
