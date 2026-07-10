@@ -161,7 +161,19 @@
       </div>
     </div>
 
-    <h2 class="collat">Collateral outlook · vehicle-title value watch</h2>
+    <h2 class="risk">Crop-household stress · worst provinces</h2>
+    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
+    <!-- live rain pulse (ThaiWater gauges, measured) — its own element so crop-stress re-renders can't wipe it -->
+    <p class="lead" id="rainpulse" style="display:none"></p>
+    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
+    <p class="lead" id="cstress-note"></p>
+    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+
+    <!-- COLLATERAL & THE EV WAVE — the vehicle boards grouped behind one expander
+         (committee finding #10: five consecutive collateral boards made the page a pile).
+         Renderers keep their IDs; only the grouping/order changed. -->
+    <details class="acqsec" id="sec-collat-wave" open>
+    <summary><h2 class="collat">Collateral &amp; the EV wave · vehicle-title value watch</h2></summary>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
@@ -193,18 +205,12 @@
     <p class="lead" id="recovery-note"></p>
     <div class="grid macro" id="recovery-cards"></div>
     <table class="tbl" id="recoverytbl"></table>
+    </details>
 
     <h2>Segment signals by region</h2>
     <table class="tbl" id="region"></table>
     <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle density.</p>
 
-    <h2 class="risk">Crop-household stress · worst provinces</h2>
-    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
-    <!-- live rain pulse (ThaiWater gauges, measured) — its own element so crop-stress re-renders can't wipe it -->
-    <p class="lead" id="rainpulse" style="display:none"></p>
-    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note"></p>
-    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
   </section>
 
   <!-- MAP — map is the hero: full-bleed map with the lens pill row docked on top -->
