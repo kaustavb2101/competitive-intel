@@ -1,0 +1,1983 @@
+{
+ "meta": {
+  "source": "gdcatalog.dlt.go.th (DLT's own catalog — bypasses the data.go.th geoblock; INTERMITTENT host)",
+  "label": "MEASURED — raw mirror of every CSV/XLSX/JSON resource on the DLT catalog. Resumable; re-run pull_dlt_all.py when a window opens.",
+  "generated_by": "pipeline/pull_dlt_all.py",
+  "last_pull": "2026-07-10",
+  "n_datasets": 14,
+  "n_files": 380,
+  "n_stubs": 0
+ },
+ "datasets": {
+  "dataset_1_1_04": {
+   "title": "สถิติจำนวนรถจดทะเบียนสะสม",
+   "resources": {
+    "รถจดทะเบียนสะสม_จำแนกตามชนิดเชื้อเพลิง_ณ_วันที่_28_กุมภาพันธ์_2569.csv": {
+     "bytes": 697734,
+     "rows": 4644,
+     "url": "https://gdcatalog.dlt.go.th/dataset/e8b7d87e-5a3c-4b8b-854c-974d3b600256/resource/e5a037c6-3cc2-415e-b559-e6e85cfba2ca/download/stt_car_fuel_at_25690228.csv"
+    }
+   }
+  },
+  "dataset_o16": {
+   "title": "ขั้นตอนการปฏิบัติการดำเนินการต่อเรื่องร้องเรียนการปฏิบัติหน้าที่ของเจ้าหน้าที่",
+   "resources": {
+    "ขั้นตอนการปฏิบัติการดำเนินการต่อเรื่องร้องเรียนการปฏิบัติหน้าที่ของเจ้าหน้าที่.csv": {
+     "bytes": 810,
+     "rows": 2,
+     "url": "https://gdcatalog.dlt.go.th/dataset/dc958938-87cd-43c3-b31f-7fe0867cb646/resource/560fb79a-7dc6-4138-8db5-03b59d52094b/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_o18": {
+   "title": "ข้อมูลสถิติเรื่องร้องเรียนการทุจริตและประพฤติมิชอบ",
+   "resources": {
+    "ข้อมูลสถิติเรื่องร้องเรียนการทุจริตและประพฤติมิชอบ.csv": {
+     "bytes": 1417,
+     "rows": 25,
+     "url": "https://gdcatalog.dlt.go.th/dataset/0c0c4682-d625-42bf-9294-cfa237504fe3/resource/91b06260-de98-491c-a866-e4efc4bcde69/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_o2": {
+   "title": "ข้อมูลผู้บริหาร",
+   "resources": {
+    "ข้อมูลผู้บริหาร.csv": {
+     "bytes": 1313,
+     "rows": 5,
+     "url": "https://gdcatalog.dlt.go.th/dataset/73b73498-7507-41cd-b704-3b87ec3d23a3/resource/1ca69ee5-3ca3-40bd-9e63-6ae102b55f70/download/dlt-board.csv"
+    }
+   }
+  },
+  "dataset_o22": {
+   "title": "รายงานผลการดำเนินการตามแผนบริหารจัดการความเสี่ยงการทุจริตของหน่วยงาน",
+   "resources": {
+    "รายงานผลการดำเนินการตามแผนบริหารจัดการความเสี่ยงการทุจริตของกรมการขนส่งทางบก.csv": {
+     "bytes": 774,
+     "rows": 2,
+     "url": "https://gdcatalog.dlt.go.th/dataset/3e14a853-835a-4805-b33a-dd8a4adf51ee/resource/a1f3f3dd-5b53-490b-94fa-0955137594be/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_o5": {
+   "title": "แผนปฏิบัติราชการ",
+   "resources": {
+    "แผนปฏิบัติราชการ.csv": {
+     "bytes": 846,
+     "rows": 2,
+     "url": "https://gdcatalog.dlt.go.th/dataset/6d25d490-314e-454c-97c4-62f7670a956d/resource/a8c3ee47-4570-48b9-b631-f7c849a80f1d/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_o7_01": {
+   "title": "รายงานผลการดำเนินงานตามแผนปฏิบัติราชการ",
+   "resources": {
+    "รายงานผลการดำเนินงานตามแผนปฏิบัติราชการ.csv": {
+     "bytes": 3466,
+     "rows": 6,
+     "url": "https://gdcatalog.dlt.go.th/dataset/ae7e8dc3-b792-4ce4-92c2-09b21b7596a0/resource/ca9fdce5-dbbe-4bcb-bc00-66c3c036e445/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_o9": {
+   "title": "คู่มือสำหรับประชาชน",
+   "resources": {
+    "คู่มือสำหรับประชาชน_กรมการขนส่งทางบก.csv": {
+     "bytes": 459,
+     "rows": 2,
+     "url": "https://gdcatalog.dlt.go.th/dataset/87ad3074-221f-4480-a454-5fffef54b6ad/resource/e037580c-bd3d-4064-aedf-ddbf6519db57/download/untitled.csv"
+    }
+   }
+  },
+  "dataset_stat_1_003": {
+   "title": "สถิติจำนวนรถจดทะเบียนใหม่",
+   "resources": {
+    "รถจดทะเบียนใหม่_ปี_2568.csv": {
+     "bytes": 2168,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/4e4e8851-5b30-45e2-9888-0e600176cc60/download/sttt_new_reg2_yy_2568_full.csv"
+    },
+    "รถจดทะเบียนใหม่_ปี_2567.csv": {
+     "bytes": 2167,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/2c9f62d4-9e85-4dc9-8d23-12307791d2e9/download/sttt_new_reg2_yy_2567_full.csv"
+    },
+    "รถจดทะเบียนใหม่_ปี_2566.csv": {
+     "bytes": 2169,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/91ea170e-5323-4a2b-bdeb-84ad596446a2/download/sttt_new_reg2_yy_2566_full.csv"
+    },
+    "รถจดทะเบียนใหม่_ปี_2565.csv": {
+     "bytes": 2167,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/b40283d6-2138-45d6-9540-af7575de709d/download/sttt_new_reg2_yy_2565_full.csv"
+    },
+    "รถจดทะเบียนใหม่_กุมภาพันธ์_2569.csv": {
+     "bytes": 2499,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/34800a4e-8c34-4c5e-a2f1-bedeed4a9594/download/sttt_new_reg2_mm_2569_02.csv"
+    },
+    "รถจดทะเบียนใหม่_มกราคม_2569.csv": {
+     "bytes": 2269,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/644f3560-2975-4042-a67d-45796f6b77e8/download/sttt_new_reg2_mm_2569_01.csv"
+    },
+    "รถจดทะเบียนใหม่_ธันวาคม_2568.csv": {
+     "bytes": 2327,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/e5e678b7-f361-4d93-a5a1-43d254abcb94/download/sttt_new_reg2_mm_2568_12.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤศจิกายน_2568.csv": {
+     "bytes": 2441,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/4d76d04e-dd12-4eae-b07a-dac6091c318e/download/sttt_new_reg2_mm_2568_11.csv"
+    },
+    "รถจดทะเบียนใหม่_ตุลาคม_2568.csv": {
+     "bytes": 2385,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/dbc31f1a-5e2d-4c22-8ec0-42c6c77f97cc/download/sttt_new_reg2_mm_2568_10.csv"
+    },
+    "รถจดทะเบียนใหม่_กันยายน_2568.csv": {
+     "bytes": 2623,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/0ca2950c-e1cf-422b-9b0f-8bd45b7ff96b/download/sttt_new_reg2_mm_2568_09.csv"
+    },
+    "รถจดทะเบียนใหม่_สิงหาคม_2568.csv": {
+     "bytes": 2326,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/236aa36f-0e43-4c4b-ac95-52aeb934b19a/download/sttt_new_reg2_mm_2568_08.csv"
+    },
+    "รถจดทะเบียนใหม่_กรกฎาคม_2568.csv": {
+     "bytes": 2327,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/f0b1983d-5cbf-444a-98d9-731a734bb89d/download/sttt_new_reg2_mm_2568_07.csv"
+    },
+    "รถจดทะเบียนใหม่_มิถุนายน_2568.csv": {
+     "bytes": 2382,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/6e91ac51-6206-4fc3-aae3-efd7b4ea6af6/download/sttt_new_reg2_mm_2568_06.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤษภาคม_2568.csv": {
+     "bytes": 2444,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/326efb9d-3d2e-4087-b955-07edb043e6c5/download/sttt_new_reg2_mm_2568_05.csv"
+    },
+    "รถจดทะเบียนใหม่_เมษายน_2568.csv": {
+     "bytes": 2384,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/9fe1a96a-69a6-4bb9-a2d2-7eb68a792149/download/sttt_new_reg2_mm_2568_04.csv"
+    },
+    "รถจดทะเบียนใหม่_มีนาคม_2568.csv": {
+     "bytes": 2385,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/e133e910-2364-44a3-9ade-2e534f0b0c53/download/sttt_new_reg2_mm_2568_03.csv"
+    },
+    "รถจดทะเบียนใหม่_กุมภาพันธ์_2568.csv": {
+     "bytes": 2498,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/b9f3b8de-eb3e-4b95-bb02-22c9181205eb/download/sttt_new_reg2_mm_2568_02.csv"
+    },
+    "รถจดทะเบียนใหม่_มกราคม_2568.csv": {
+     "bytes": 2385,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/ccbb93fb-e2ef-4386-900f-0788534d8af9/download/sttt_new_reg2_mm_2568_01.csv"
+    },
+    "รถจดทะเบียนใหม่_ธันวาคม_2567.csv": {
+     "bytes": 2326,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/c9d707da-27fc-4dd0-9fdf-05575b7bb801/download/sttt_new_reg2_mm_2567_12.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤศจิกายน_2567.csv": {
+     "bytes": 2439,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/14d11cfe-c435-4d06-b7a6-cb1dd8ae2420/download/sttt_new_reg2_mm_2567_11.csv"
+    },
+    "รถจดทะเบียนใหม่_ตุลาคม_2567.csv": {
+     "bytes": 2267,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/c49d9510-0cd8-4a00-9cfc-42cccef23e73/download/sttt_new_reg2_mm_2567_10.csv"
+    },
+    "รถจดทะเบียนใหม่_กันยายน_2567.csv": {
+     "bytes": 2325,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/ab04e642-1e45-49e8-a1d0-c759e1e82145/download/sttt_new_reg2_mm_2567_09.csv"
+    },
+    "รถจดทะเบียนใหม่_สิงหาคม_2567.csv": {
+     "bytes": 2326,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/b95f11d2-d0d7-4029-919a-e35b23aee2a6/download/sttt_new_reg2_mm_2567_08.csv"
+    },
+    "รถจดทะเบียนใหม่_กรกฎาคม_2567.csv": {
+     "bytes": 2445,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/117daaa6-4b74-4887-b55f-e1060ec3f3d3/download/sttt_new_reg2_mm_2567_07.csv"
+    },
+    "รถจดทะเบียนใหม่_มิถุนายน_2567.csv": {
+     "bytes": 2381,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/c3493ac1-d10d-419b-a029-b6ac988360c4/download/sttt_new_reg2_mm_2567_06.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤษภาคม_2567.csv": {
+     "bytes": 2507,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/6cb71ee3-22ed-40aa-ac17-5a64a93b2719/download/sttt_new_reg2_mm_2567_05.csv"
+    },
+    "รถจดทะเบียนใหม่_เมษายน_2567.csv": {
+     "bytes": 2269,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/9aa07d4f-6f1d-490f-8805-5342a7be8855/download/sttt_new_reg2_mm_2567_04.csv"
+    },
+    "รถจดทะเบียนใหม่_มีนาคม_2567.csv": {
+     "bytes": 2384,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/8ba7dd2c-c17d-4354-b180-369bbb478c39/download/sttt_new_reg2_mm_2567_03.csv"
+    },
+    "รถจดทะเบียนใหม่_กุมภาพันธ์_2567.csv": {
+     "bytes": 2497,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/0b465e6f-30ca-44a4-b986-2899374a635e/download/sttt_new_reg2_mm_2567_02.csv"
+    },
+    "รถจดทะเบียนใหม่_มกราคม_2567.csv": {
+     "bytes": 2270,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/d9a68450-9851-46b8-8216-5e7a5a61d9da/download/sttt_new_reg2_mm_2567_01.csv"
+    },
+    "รถจดทะเบียนใหม่_ธันวาคม_2566.csv": {
+     "bytes": 2505,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/38be16d4-0d28-4177-8df3-21ea8cd3c29c/download/sttt_new_reg2_mm_2566_12.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤศจิกายน_2566.csv": {
+     "bytes": 2441,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/3bbf4a50-2950-483d-b633-fa454e33d58c/download/sttt_new_reg2_mm_2566_11.csv"
+    },
+    "รถจดทะเบียนใหม่_ตุลาคม_2566.csv": {
+     "bytes": 2272,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/7c0f50eb-8416-44bd-8de2-c4f1654f5182/download/sttt_new_reg2_mm_2566_10.csv"
+    },
+    "รถจดทะเบียนใหม่_กันยายน_2566.csv": {
+     "bytes": 2446,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/5534ce64-b071-4cdd-b129-ec904c8fbc00/download/sttt_new_reg2_mm_2566_09.csv"
+    },
+    "รถจดทะเบียนใหม่_สิงหาคม_2566.csv": {
+     "bytes": 2327,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/1deb7445-064d-4674-a9a6-495677b0a758/download/sttt_new_reg2_mm_2566_08.csv"
+    },
+    "รถจดทะเบียนใหม่_กรกฎาคม_2566.csv": {
+     "bytes": 2328,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/2fa9b9e7-6770-485c-bb11-ca7a3e98879a/download/sttt_new_reg2_mm_2566_07.csv"
+    },
+    "รถจดทะเบียนใหม่_มิถุนายน_2566.csv": {
+     "bytes": 2386,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/348105c1-a2a2-49e3-8ae5-b11607bf2a0a/download/sttt_new_reg2_mm_2566_06.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤษภาคม_2566.csv": {
+     "bytes": 2328,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/ffa3c30c-634c-4166-a64d-c30d85099ca7/download/sttt_new_reg2_mm_2566_05.csv"
+    },
+    "รถจดทะเบียนใหม่_เมษายน_2566.csv": {
+     "bytes": 2150,
+     "rows": 19,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/0cc6d957-2e9c-4907-a50f-a8f1f46d065b/download/sttt_new_reg2_mm_2566_04.csv"
+    },
+    "รถจดทะเบียนใหม่_มีนาคม_2566.csv": {
+     "bytes": 2564,
+     "rows": 22,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/74612c04-6082-447e-852b-046ee554c6b8/download/sttt_new_reg2_mm_2566_03.csv"
+    },
+    "รถจดทะเบียนใหม่_กุมภาพันธ์_2566.csv": {
+     "bytes": 2688,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/3f93cd2c-4f96-4862-a725-c9d6878d066a/download/sttt_new_reg2_mm_2566_02.csv"
+    },
+    "รถจดทะเบียนใหม่_มกราคม_2566.csv": {
+     "bytes": 2385,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/887e0bd6-906c-43a5-bf2b-b9710e68d554/download/sttt_new_reg2_mm_2566_01.csv"
+    },
+    "รถจดทะเบียนใหม่_ธันวาคม_2565.csv": {
+     "bytes": 2328,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/369d1b6c-f97d-4017-b47d-ed8c2cb8dee3/download/sttt_new_reg2_mm_12_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤศจิกายน_2565.csv": {
+     "bytes": 2443,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/84c4c52b-f5c5-4f29-802b-64254d3df267/download/sttt_new_reg2_mm_11_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_ตุลาคม_2565.csv": {
+     "bytes": 2385,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/5b2d70fa-ef87-4a4b-b023-e168629d7720/download/sttt_new_reg2_mm_10_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_กันยายน_2565.csv": {
+     "bytes": 2445,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/6bb3b22e-7c54-4127-bc56-5f615628d696/download/sttt_new_reg2_mm_09_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_สิงหาคม_2565.csv": {
+     "bytes": 2328,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/b863cbef-1287-4dfb-ad8f-4475c65c1af3/download/sttt_new_reg2_mm_08_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_กรกฎาคม_2565.csv": {
+     "bytes": 2441,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/67c60b01-434b-4ea0-9538-d3b83e7a25d3/download/sttt_new_reg2_mm_07_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_มิถุนายน_2565.csv": {
+     "bytes": 2383,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/90a20c6a-95cb-4744-9067-9fbd3d74c169/download/sttt_new_reg2_mm_06_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_พฤษภาคม_2565.csv": {
+     "bytes": 2506,
+     "rows": 21,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/725f03c4-c02d-47c2-8831-6460a574c5fa/download/sttt_new_reg2_mm_05_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_เมษายน_2565.csv": {
+     "bytes": 2265,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/f8b60380-323a-425e-8b53-ce9575df9a8c/download/sttt_new_reg2_mm_04_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_มีนาคม_2565.csv": {
+     "bytes": 2269,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/e7583cc9-761b-49c6-948b-d7c0bd74533d/download/sttt_new_reg2_mm_03_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_กุมภาพันธ์_2565.csv": {
+     "bytes": 2495,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/ff3145c3-d9d3-43f1-984a-f55194dcded1/download/sttt_new_reg2_mm_02_2565.csv"
+    },
+    "รถจดทะเบียนใหม่_มกราคม_2565.csv": {
+     "bytes": 2268,
+     "rows": 20,
+     "url": "https://gdcatalog.dlt.go.th/dataset/58fa19b4-de1a-43d2-a930-19051ed449cf/resource/f07301fb-ac37-4bf0-8bb3-adff607b9598/download/sttt_new_reg2_mm_01_2565.csv"
+    }
+   }
+  },
+  "dataset_stat_1_005": {
+   "title": "สถิติจำนวนใบอนุญาตขับรถและใบอนุญาตผู้ประจำรถ",
+   "resources": {
+    "จำนวนใบขับขี่_ณ_วันที่_28_กุมภาพันธ์_2569.csv": {
+     "bytes": 8287,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/ca83edda-7349-41bb-a61a-60ce670648fb/download/stt_drl_pbl_at_25690228.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มกราคม_2569.csv": {
+     "bytes": 8287,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/145f77fa-fbfe-47c9-a5e6-e430f35410c9/download/stt_drl_pbl_at_25690131.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ธันวาคม_2568.csv": {
+     "bytes": 8286,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/af7d5871-28cd-4ba1-90d7-0ee6a24b274e/download/stt_drl_pbl_at_25681231.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_พฤศจิกายน_2568.csv": {
+     "bytes": 8287,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/37f3b988-28e6-4b03-b8f5-95151c3a74a3/download/stt_drl_pbl_at_25681130.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ตุลาคม_2568.csv": {
+     "bytes": 8286,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/7ccd5d57-d4e9-4e5a-993d-c1848721442c/download/stt_drl_pbl_at_25681031.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_กันยายน_2568.csv": {
+     "bytes": 8287,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/181c17ea-94e4-46d0-84d0-9978d5e7c0ca/download/stt_drl_pbl_at_25680930.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_สิงหาคม_2568.csv": {
+     "bytes": 8288,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f95b3304-3c0e-4c60-82c9-4339ab0f084d/download/stt_drl_pbl_at_25680831.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_กรกฎาคม_2568.csv": {
+     "bytes": 8289,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8cf4ebf6-2a4f-4d4a-a4f7-935fa113abb3/download/stt_drl_pbl_at_25680731.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_มิถุนายน_2568.csv": {
+     "bytes": 8289,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/cf3d0dba-f2ec-44cc-abad-2420e1965c2e/download/stt_drl_pbl_at_25680630.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_พฤษภาคม_2568.csv": {
+     "bytes": 8290,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/0224c6f8-63aa-40af-9783-50d3b2ece5a0/download/stt_drl_pbl_at_25680531.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_เมษายน_2568.csv": {
+     "bytes": 8290,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/ba0bc338-bed4-4f6a-a2bf-5acd111f76d2/download/stt_drl_pbl_at_25680430.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มีนาคม_2568.csv": {
+     "bytes": 8290,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/79ce15d9-202e-49bf-9ef7-ec18e1ff52b8/download/stt_drl_pbl_at_25680331.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_28_กุมภาพันธ์_2568.csv": {
+     "bytes": 8289,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/7599b673-93d9-4477-9f8b-d670713bee60/download/stt_drl_pbl_at_25680228.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มกราคม_2568.csv": {
+     "bytes": 8289,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b809151e-9208-4d38-bc67-d58e5a9dc990/download/stt_drl_pbl_at_25680131.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ธันวาคม_2567.csv": {
+     "bytes": 8289,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/ffa0b27d-1044-4d12-a446-913381c1282f/download/stt_drl_pbl_at_25671231.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_พฤศจิกายน_2567.csv": {
+     "bytes": 8288,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/73b1f763-cf34-460f-90ea-0ec6a8ee0845/download/stt_drl_pbl_at_25671130.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ตุลาคม_2567.csv": {
+     "bytes": 8288,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/92fc8d5c-452f-4058-a917-889d7e121a77/download/stt_drl_pbl_at_25671031.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_กันยายน_2567.csv": {
+     "bytes": 8286,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d0b167d0-5e74-44d4-8af7-3c7030d7fcd7/download/stt_drl_pbl_at_25670930.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_สิงหาคม_2567.csv": {
+     "bytes": 8286,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/80aeedbb-1693-4aaf-9e0e-146f7ec385f5/download/stt_drl_pbl_at_25670831.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_กรกฎาคม_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/2347e5cc-5809-4231-913c-da93bd44c6a7/download/stt_drl_pbl_at_25670731.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_มิถุนายน_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/7d7eb2fd-ae01-4e06-897c-e0a556d85bd3/download/stt_drl_pbl_at_25670630.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_พฤษภาคม_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d885bf9c-3329-4d21-9ece-e261c6a4eb04/download/stt_drl_pbl_at_25670531.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_เมษายน_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/5f5c6056-4d35-4e98-95b4-cb525e0a484f/download/stt_drl_pbl_at_25670430.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มีนาคม_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/5692bb62-025d-4fd6-b169-11584f4c170a/download/stt_drl_pbl_at_25670331.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_29_กุมภาพันธ์_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b6012dda-006d-4923-9576-483d5ca6658c/download/stt_drl_pbl_at_25670229.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มกราคม_2567.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/239c9d48-3ab9-42af-8526-35b2e7e2d833/download/stt_drl_pbl_at_25670131.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ธันวาคม_2566.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/30fa1fb3-1e3c-4612-b53d-4e793f2b84a0/download/stt_drl_pbl_at_25661231.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_พฤศจิกายน_2566.csv": {
+     "bytes": 8285,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/80dcd88b-34f6-4525-8a04-b1f3c37ee674/download/stt_drl_pbl_at_25661130.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ตุลาคม_2566.csv": {
+     "bytes": 8283,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/aa814e2b-1246-485a-bd18-59c846530d6e/download/stt_drl_pbl_at_25661031.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_กันยายน_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/721a0c36-f708-46f1-b160-6d4f70ee66c1/download/stt_drl_pbl_at_25660930.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_สิงหาคม_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/276b7e0c-51db-40d2-b67c-0c2de140f669/download/stt_drl_pbl_at_25660831.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_กรกฎาคม_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d32355ae-a275-4871-8db3-5eb26c7a4857/download/stt_drl_pbl_at_25660731.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_มิถุนายน_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f99987fd-89c8-48bb-ac22-61427cc1705e/download/stt_drl_pbl_at_25660630.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_พฤษภาคม_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/c39ede0f-96bf-4d76-9dab-ee590ace39b4/download/stt_drl_pbl_at_25660531.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_เมษายน_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/2bdb77e3-94c8-4ba4-bfa7-d75117839eff/download/stt_drl_pbl_at_25660430.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มีนาคม_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/91b887a3-c1f0-44bd-9daf-cf6b77f68d4e/download/stt_drl_pbl_at_25660331.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_28_กุมภาพันธ์_2566.csv": {
+     "bytes": 8282,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/5563a4f6-4801-4ac6-9bc4-59e75e16ff17/download/stt_drl_pbl_at_25660228.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_มกราคม_2566.csv": {
+     "bytes": 8281,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/eddde691-b341-49f8-b846-d22d65bddab0/download/stt_drl_pbl_at_25660131.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ธันวาคม_2565.csv": {
+     "bytes": 8281,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/16a2b8dc-b9ee-438f-ba92-24bf591816c0/download/stt_drl_pbl_at_25651231.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_30_พฤศจิกายน_2565.csv": {
+     "bytes": 8281,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/37ec69ee-2783-4b8d-a777-199374e2cfe8/download/stt_drl_pbl_at_25651130.csv"
+    },
+    "จำนวนใบขับขี่_ณ_วันที่_31_ตุลาคม_2565.csv": {
+     "bytes": 8281,
+     "rows": 67,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/ec82a38e-7cd8-4e97-baa6-36c8e6502274/download/stt_drl_pbl_at_25651031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_28_กุมภาพันธ์_2569.csv": {
+     "bytes": 3753,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6e102c35-2cb5-4c04-9d91-73d133c505af/download/stt_drl_pbl_sex_at_25690228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มกราคม_2569.csv": {
+     "bytes": 3753,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/59abdb1f-4a3e-41a2-873f-e11eecfa964f/download/stt_drl_pbl_sex_at_25690131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ธันวาคม_2568.csv": {
+     "bytes": 3752,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/1382d769-c090-4400-9104-d2283393f143/download/stt_drl_pbl_sex_at_25681231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_พฤศจิกายน_2568.csv": {
+     "bytes": 3752,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/48bed1e2-e339-415e-b573-11d881b9fd84/download/stt_drl_pbl_sex_at_25681130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ตุลาคม_2568.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d23931b4-83bb-4d9a-a529-8060dd54d788/download/stt_drl_pbl_sex_at_25681031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_กันยายน_2568.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/810e1495-c905-418b-b3e7-4b888f1a8920/download/stt_drl_pbl_sex_at_25680930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_สิงหาคม_2568.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/7f36a8e6-1abb-4316-9687-061c9e19607b/download/stt_drl_pbl_sex_at_25680831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_กรกฎาคม_2568.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3f5d2c58-6422-4442-9525-1542b3289d4c/download/stt_drl_pbl_sex_at_25680731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_มิถุนายน_2568.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/0e4661c5-e917-4bb3-9445-e086a853c18c/download/stt_drl_pbl_sex_at_25680630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_พฤษภาคม_2568.csv": {
+     "bytes": 3756,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/72869945-82b4-4147-80af-1ef4c664edc0/download/stt_drl_pbl_sex_at_25680531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_เมษายน_2568.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/98270788-44e4-432d-b998-3b4af0d6cddf/download/stt_drl_pbl_sex_at_25680430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มีนาคม_2568.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6911a931-5996-4871-978e-aba2c34df96c/download/stt_drl_pbl_sex_at_25680331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_28_กุมภาพันธ์_2568.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d91a7c89-92fb-4fff-8e38-035ab13d272a/download/stt_drl_pbl_sex_at_25680228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มกราคม_2568.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/9179c360-cda4-4bee-ab97-2e29ac05776d/download/stt_drl_pbl_sex_at_25680131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ธันวาคม_2567.csv": {
+     "bytes": 3755,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/9cc9a088-c21e-42f2-8ee8-6ae1b5c07d2f/download/stt_drl_pbl_sex_at_25671231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_พฤศจิกายน_2567.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/5f946d58-5e98-4fa1-97fb-382195691897/download/stt_drl_pbl_sex_at_25671130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ตุลาคม_2567.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/008103d5-efd3-49d7-bd94-bf27e81e7a47/download/stt_drl_pbl_sex_at_25671031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_กันยายน_2567.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f1343bc3-227e-4dac-b81d-00f8274a457a/download/stt_drl_pbl_sex_at_25670930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_สิงหาคม_2567.csv": {
+     "bytes": 3754,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/33fab386-b204-4cd7-a8d4-aa84663d0ba3/download/stt_drl_pbl_sex_at_25670831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_กรกฎาคม_2567.csv": {
+     "bytes": 3753,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3ca30864-ece4-4f83-893a-0ccf52a1ae7e/download/stt_drl_pbl_sex_at_25670731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_มิถุนายน_2567.csv": {
+     "bytes": 3753,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3c5552b3-d3a8-4a01-9e6f-270cb94660a8/download/stt_drl_pbl_sex_at_25670630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_พฤษภาคม_2567.csv": {
+     "bytes": 3752,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6a0998fd-1850-4771-84fc-b9924d252c82/download/stt_drl_pbl_sex_at_25670531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_เมษายน_2567.csv": {
+     "bytes": 3752,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/22ff289f-918c-41ad-9dfd-66e6fff68419/download/stt_drl_pbl_sex_at_25670430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มีนาคม_2567.csv": {
+     "bytes": 3751,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/25044e56-cf7e-40a8-94c8-42b47ccf993c/download/stt_drl_pbl_sex_at_25670331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_29_กุมภาพันธ์_2567.csv": {
+     "bytes": 3750,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8504b187-1993-4fa7-ba8f-1cfcfafaff60/download/stt_drl_pbl_sex_at_25670229.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มกราคม_2567.csv": {
+     "bytes": 3748,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3df9e672-e9f3-450b-b59d-bcfc3f9c33d2/download/stt_drl_pbl_sex_at_25670131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ธันวาคม_2566.csv": {
+     "bytes": 3748,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6dc3d888-6bf5-4d4c-be12-1aaabed27588/download/stt_drl_pbl_sex_at_25661231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_พฤศจิกายน_2566.csv": {
+     "bytes": 3748,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/a708220c-e8b2-4030-a8c8-0b7448047346/download/stt_drl_pbl_sex_at_25661130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ตุลาคม_2566.csv": {
+     "bytes": 3748,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/56532e27-bc06-410f-afbd-bae54dbfd671/download/stt_drl_pbl_sex_at_25661031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_กันยายน_2566.csv": {
+     "bytes": 3748,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f3283b63-cbd5-4608-93b6-c2fb162bfd0f/download/stt_drl_pbl_sex_at_25660930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_สิงหาคม_2566.csv": {
+     "bytes": 3746,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/bf22bb7c-8811-4ee6-b388-7e46522e7752/download/stt_drl_pbl_sex_at_25660831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_กรกฎาคม_2566.csv": {
+     "bytes": 3745,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6dd20cc8-7424-4c02-844a-edcc1817b750/download/stt_drl_pbl_sex_at_25660731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_มิถุนายน_2566.csv": {
+     "bytes": 3744,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/41fb5958-e183-4cdb-9f14-246b31069993/download/stt_drl_pbl_sex_at_25660630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_พฤษภาคม_2566.csv": {
+     "bytes": 3744,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b02e747d-3252-4a98-a931-8948e219bde9/download/stt_drl_pbl_sex_at_25660531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_เมษายน_2566.csv": {
+     "bytes": 3744,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/aaf9ec79-4654-4b29-86ff-347bd2706eb0/download/stt_drl_pbl_sex_at_25660430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มีนาคม_2566.csv": {
+     "bytes": 3742,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/833b0eed-cb8c-42eb-a040-14862c0f36f3/download/stt_drl_pbl_sex_at_25660331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_28_กุมภาพันธ์_2566.csv": {
+     "bytes": 3742,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/dc867ab0-4ca2-4c50-9d0c-e1ee1ef65767/download/stt_drl_pbl_sex_at_25660228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_มกราคม_2566.csv": {
+     "bytes": 3740,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/16c6ee04-ddd7-4816-a13c-4bb80cbb06ff/download/stt_drl_pbl_sex_at_25660131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ธันวาคม_2565.csv": {
+     "bytes": 3740,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/50346012-35cd-4ea1-abb2-04548d9d92be/download/stt_drl_pbl_sex_at_25651231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_30_พฤศจิกายน_2565.csv": {
+     "bytes": 3740,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/abef1e47-6ec5-4f8c-bb00-26ca0e286df7/download/stt_drl_pbl_sex_at_25651130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามเพศ_ณ_วันที่_31_ตุลาคม_2565.csv": {
+     "bytes": 3739,
+     "rows": 34,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/09f977ab-a7f0-453b-b92d-a74b9b265d0e/download/stt_drl_pbl_sex_at_25651031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_28_กุมภาพันธ์_2569.csv": {
+     "bytes": 6541,
+     "rows": 147,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/66727b4f-ed69-499a-bfee-48875fd7e27b/download/stt_drl_nation_at_25690228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มกราคม_2569.csv": {
+     "bytes": 6508,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/63271d1d-8a23-42a2-b879-32dd890274a3/download/stt_drl_nation_at_25690131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ธันวาคม_2568.csv": {
+     "bytes": 6507,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/9141d993-255a-4408-8984-7b4a1351324e/download/stt_drl_nation_at_25681231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_พฤศจิกายน_2568.csv": {
+     "bytes": 6486,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/9a32fce6-7802-47c1-a616-b3b75a07b4e1/download/stt_drl_nation_at_25681130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ตุลาคม_2568.csv": {
+     "bytes": 6519,
+     "rows": 147,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/ad2a6ea8-854b-41f2-aed2-825eadd1b13c/download/stt_drl_nation_at_25681031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_กันยายน_2568.csv": {
+     "bytes": 6504,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f9c0f19d-fa6d-4bcc-b812-533a4836d062/download/stt_drl_nation_at_25680930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_สิงหาคม_2568.csv": {
+     "bytes": 6497,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/9ffe4797-cc1b-4fb0-8cd7-3bef2d5c129e/download/stt_drl_nation_at_25680831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_กรกฎาคม_2568.csv": {
+     "bytes": 6495,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/71229c82-df02-48f2-9649-11a7e9fe7118/download/stt_drl_nation_at_25680731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_มิถุนายน_2568.csv": {
+     "bytes": 6470,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/0d29ff0a-36df-4e2d-aefe-be8628042df6/download/stt_drl_nation_at_25680630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_พฤษภาคม_2568.csv": {
+     "bytes": 6492,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/0c1ac818-aded-404e-b8fa-4004cd55a50c/download/stt_drl_nation_at_25680531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_เมษายน_2568.csv": {
+     "bytes": 6497,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/fe255cde-8101-496f-87a9-3c4ce4d0c2fd/download/stt_drl_nation_at_25680430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มีนาคม_2568.csv": {
+     "bytes": 6492,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/31a81269-5a44-46fd-b350-a0e63d4af0b0/download/stt_drl_nation_at_25680331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_28_กุมภาพันธ์_2568.csv": {
+     "bytes": 6494,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/852d5a8f-7310-4f75-8a4b-e28e768ff2c7/download/stt_drl_nation_at_25680228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มกราคม_2568.csv": {
+     "bytes": 6499,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/62eb2914-f83c-4d8f-a07d-fd14fb415996/download/stt_drl_nation_at_25680131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ธันวาคม_2567.csv": {
+     "bytes": 6499,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/19407e7d-1b02-4a35-afee-2629146a5192/download/stt_drl_nation_at_25671231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_พฤศจิกายน_2567.csv": {
+     "bytes": 6497,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8bc69ebf-6b9c-4ce4-91a5-84fdac3801a1/download/stt_drl_nation_at_25671130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ตุลาคม_2567.csv": {
+     "bytes": 6495,
+     "rows": 146,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/f5f7c681-a558-4129-8dc2-202cee10f06e/download/stt_drl_nation_at_25671031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_กันยายน_2567.csv": {
+     "bytes": 6461,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/6ead4e39-598d-41c8-b7e5-20bdb9d3d777/download/stt_drl_nation_at_25670930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_สิงหาคม_2567.csv": {
+     "bytes": 6454,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/95867e0f-1aea-4c8b-8684-73cb3a633077/download/stt_drl_nation_at_25670831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_กรกฎาคม_2567.csv": {
+     "bytes": 6449,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b9f6b735-813a-42c0-8650-a080098d26fd/download/stt_drl_nation_at_25670731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_มิถุนายน_2567.csv": {
+     "bytes": 6445,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8243a4b4-ea44-4308-95c7-65809e4779d2/download/stt_drl_nation_at_25670630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_พฤษภาคม_2567.csv": {
+     "bytes": 6446,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/a90e0bb2-c9cf-403a-a67d-c2c025a0b3b8/download/stt_drl_nation_at_25670531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_เมษายน_2567.csv": {
+     "bytes": 6439,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b824bd3f-cd39-499d-ba05-2a1082f131b8/download/stt_drl_nation_at_25670430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มีนาคม_2567.csv": {
+     "bytes": 6431,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/edc20c91-f665-482e-9653-a35a5759740e/download/stt_drl_nation_at_25670331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_29_กุมภาพันธ์_2567.csv": {
+     "bytes": 6426,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3cc46919-128b-4a63-bbaf-29c1721e37fa/download/stt_drl_nation_at_25670229.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มกราคม_2567.csv": {
+     "bytes": 6411,
+     "rows": 145,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/4aa217fc-f3a1-4751-b477-1e5f2f891cdc/download/stt_drl_nation_at_25670131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ธันวาคม_2566.csv": {
+     "bytes": 6368,
+     "rows": 144,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/a2b29223-4c3c-46f1-b477-8acbb8787544/download/stt_drl_nation_at_25661231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_พฤศจิกายน_2566.csv": {
+     "bytes": 6380,
+     "rows": 144,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/4dc56d4e-8dc0-48d7-b51d-69aee761352f/download/stt_drl_nation_at_25661130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ตุลาคม_2566.csv": {
+     "bytes": 6354,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/4e9e9e04-bd50-4b0c-8e3a-0da4c526d484/download/stt_drl_nation_at_25661031.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_กันยายน_2566.csv": {
+     "bytes": 6395,
+     "rows": 144,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/41652ca6-9519-4a9d-8d1d-b0c13bb7f129/download/stt_drl_nation_at_25660930.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_สิงหาคม_2566.csv": {
+     "bytes": 6343,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/13fca141-2645-42fe-b113-e63318a7dec6/download/stt_drl_nation_at_25660831.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_กรกฎาคม_2566.csv": {
+     "bytes": 6336,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/d4d2c1aa-d70a-47cf-bd7a-45f7c5efa186/download/stt_drl_nation_at_25660731.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_มิถุนายน_2566.csv": {
+     "bytes": 6332,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b7d22777-cb55-474c-94cf-0f91df463fee/download/stt_drl_nation_at_25660630.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_พฤษภาคม_2566.csv": {
+     "bytes": 6326,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/05dae4ec-6198-4b5f-b021-9ee635aecc48/download/stt_drl_nation_at_25660531.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_เมษายน_2566.csv": {
+     "bytes": 6322,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/3399e74a-3aa6-4eaf-ba95-290f13ef7332/download/stt_drl_nation_at_25660430.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มีนาคม_2566.csv": {
+     "bytes": 6336,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/b0eb3b89-c048-4596-bf6d-884cfbabbaf3/download/stt_drl_nation_at_25660331.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_28_กุมภาพันธ์_2566.csv": {
+     "bytes": 6331,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/c4964be8-7653-40a6-8732-331db96e1733/download/stt_drl_nation_at_25660228.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_มกราคม_2566.csv": {
+     "bytes": 6317,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/05c15aa3-8ddd-4e03-9545-07ea9a370404/download/stt_drl_nation_at_25660131.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ธันวาคม_2565.csv": {
+     "bytes": 6321,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8c166651-5447-4540-aeda-9c17e3068129/download/stt_drl_nation_at_25651231.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_30_พฤศจิกายน_2565.csv": {
+     "bytes": 6316,
+     "rows": 143,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/8308fc39-f2c8-47cc-8387-bf83df762853/download/stt_drl_nation_at_25651130.csv"
+    },
+    "จำนวนใบขับขี่-จำแนกตามสัญชาติ_ณ_วันที่_31_ตุลาคม_2565.csv": {
+     "bytes": 6343,
+     "rows": 144,
+     "url": "https://gdcatalog.dlt.go.th/dataset/bd5290d9-3c08-449b-93ce-f27eec1db63a/resource/20e54014-c801-4160-bcc1-0747a22e64ca/download/stt_drl_nation_at_25651031.csv"
+    }
+   }
+  },
+  "dataset_stat_1_008": {
+   "title": "สถิติการดำเนินการเกี่ยวกับทะเบียนและภาษีรถ ตามกฎหมายว่าด้วยรถยนต์",
+   "resources": {
+    "การดำเนินการทางทะเบียน__รถยนต์__กุมภาพันธ์_2569.csv": {
+     "bytes": 121865,
+     "rows": 760,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/0bdd38c8-affb-4e34-b303-510f825b2303/download/sttt_car_tax_mm_2569_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มกราคม_2569.csv": {
+     "bytes": 113377,
+     "rows": 766,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/e5cf5730-870e-4299-947c-14ac06d01a74/download/sttt_car_tax_mm_2569_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ธันวาคม_2568.csv": {
+     "bytes": 113541,
+     "rows": 748,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/b768e082-6fd3-4606-905d-5b0daf649ff6/download/sttt_car_tax_mm_2568_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤศจิกายน_2568.csv": {
+     "bytes": 119460,
+     "rows": 759,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/261de80a-fa25-4b79-a81f-585f9ea63694/download/sttt_car_tax_mm_2568_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ตุลาคม_2568.csv": {
+     "bytes": 111803,
+     "rows": 753,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/12eaad1d-c992-4a37-8afe-5e83b596d264/download/sttt_car_tax_mm_2568_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กันยายน_2568.csv": {
+     "bytes": 114889,
+     "rows": 758,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/bd8f7f65-a2ca-406b-9f03-59b91291008c/download/sttt_car_tax_mm_2568_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__สิงหาคม_2568.csv": {
+     "bytes": 112545,
+     "rows": 745,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/0546f5dd-6282-4735-bc67-58be3f78d4c0/download/sttt_car_tax_mm_2568_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กรกฎาคม_2568.csv": {
+     "bytes": 110845,
+     "rows": 734,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/dcda6c4f-4792-47f0-a76c-bda7885a130e/download/sttt_car_tax_mm_2568_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มิถุนายน_2568.csv": {
+     "bytes": 111652,
+     "rows": 723,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/8f5be3d4-0887-479b-b1d9-058c2d17f583/download/sttt_car_tax_mm_2568_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤษภาคม_2568.csv": {
+     "bytes": 112201,
+     "rows": 743,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/daf41bdf-37b4-44ee-89c1-40edd7c7372c/download/sttt_car_tax_mm_2568_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__เมษายน_2568.csv": {
+     "bytes": 107396,
+     "rows": 726,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/310919f3-4541-4f3a-8dbd-011abfe4d6c1/download/sttt_car_tax_mm_2568_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มีนาคม_2568.csv": {
+     "bytes": 111110,
+     "rows": 750,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/f0bb565a-aad2-498d-aa28-5c87e32dd305/download/sttt_car_tax_mm_2568_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กุมภาพันธ์_2568.csv": {
+     "bytes": 117549,
+     "rows": 734,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/71becf03-0b0f-4b01-9fb6-0522d48aba70/download/sttt_car_tax_mm_2568_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มกราคม_2568.csv": {
+     "bytes": 109860,
+     "rows": 742,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/15fbce8e-b0a7-470b-9516-4bf645eedfad/download/sttt_car_tax_mm_2568_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ธันวาคม_2567.csv": {
+     "bytes": 111248,
+     "rows": 738,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/da3ad7f3-fad3-4651-a83d-58dda60546da/download/sttt_car_tax_mm_2567_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤศจิกายน_2567.csv": {
+     "bytes": 114802,
+     "rows": 731,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/c4821a7d-2574-466d-84d1-3479490aabba/download/sttt_car_tax_mm_2567_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ตุลาคม_2567.csv": {
+     "bytes": 110441,
+     "rows": 745,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/6df0d528-5aba-452f-b4eb-25a8534c1856/download/sttt_car_tax_mm_2567_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กันยายน_2567.csv": {
+     "bytes": 111832,
+     "rows": 741,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/14431efd-ae47-4477-88c0-f1d923c65ea8/download/sttt_car_tax_mm_2567_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__สิงหาคม_2567.csv": {
+     "bytes": 111350,
+     "rows": 734,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/33013758-430b-4952-a0b9-68c3b1ac8802/download/sttt_car_tax_mm_2567_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กรกฎาคม_2567.csv": {
+     "bytes": 109735,
+     "rows": 727,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/51adae83-823e-420a-8912-5cc95ceaa383/download/sttt_car_tax_mm_2566_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มิถุนายน_2567.csv": {
+     "bytes": 111471,
+     "rows": 724,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/118276ee-81e4-4d53-95d4-922859549535/download/sttt_car_tax_mm_2567_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤษภาคม_2567.csv": {
+     "bytes": 111291,
+     "rows": 736,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/20ac5966-0a1f-4cc5-97fd-8f82b41aa756/download/sttt_car_tax_mm_2567_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__เมษายน_2567.csv": {
+     "bytes": 107366,
+     "rows": 723,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/35f6110f-8d10-4fdb-9004-b274ef87fb4a/download/sttt_car_tax_mm_2567_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มีนาคม_2567.csv": {
+     "bytes": 109567,
+     "rows": 741,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/c2685b7e-394b-4a29-89cb-6337c0528ba6/download/sttt_car_tax_mm_2567_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กุมภาพันธ์_2567.csv": {
+     "bytes": 118363,
+     "rows": 739,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/06ae25dd-9816-45be-824c-814da47d7ae6/download/sttt_car_tax_mm_2567_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มกราคม_2567.csv": {
+     "bytes": 110235,
+     "rows": 745,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/3a9047f7-3e1e-4256-bd1b-890b5165165c/download/sttt_car_tax_mm_2567_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ธันวาคม_2566.csv": {
+     "bytes": 110063,
+     "rows": 729,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/f74a3f30-f8a1-4a98-9b69-c954c35b11de/download/sttt_car_tax_mm_2566_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤศจิกายน_2566.csv": {
+     "bytes": 115462,
+     "rows": 736,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/8c632e40-abb3-4598-80f0-641bef7b080c/download/sttt_car_tax_mm_2566_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ตุลาคม_2566.csv": {
+     "bytes": 110273,
+     "rows": 746,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/dd61f8bd-3c4d-47be-8b2e-5d8698527e3f/download/sttt_car_tax_mm_2566_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กันยายน_2566.csv": {
+     "bytes": 113479,
+     "rows": 746,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/0acb682f-e498-4e78-8712-034de8c5955c/download/sttt_car_tax_mm_2566_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__สิงหาคม_2566.csv": {
+     "bytes": 112607,
+     "rows": 740,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/145e54c7-71ea-440c-9d22-2a9de2a44e49/download/sttt_car_tax_mm_2566_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กรกฎาคม_2566.csv": {
+     "bytes": 110462,
+     "rows": 727,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/ac188312-5d27-4e89-b017-b73ec9325447/download/sttt_car_tax_mm_2566_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มิถุนายน_2566.csv": {
+     "bytes": 113308,
+     "rows": 726,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/75038245-f47a-4bcd-9fc2-571d763d696b/download/sttt_car_tax_mm_2566_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤษภาคม_2566.csv": {
+     "bytes": 110064,
+     "rows": 728,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/8fd0075a-381a-4101-844f-9edaf2b1f453/download/sttt_car_tax_mm_2566_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__เมษายน_2566.csv": {
+     "bytes": 107749,
+     "rows": 724,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/a761b9bc-c29a-4b43-ad42-64385f7e7904/download/sttt_car_tax_mm_2566_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มีนาคม_2566.csv": {
+     "bytes": 111816,
+     "rows": 754,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/ed5d57f9-7c4f-46e1-91d9-c24c42d1a2ca/download/sttt_car_tax_mm_2566_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กุมภาพันธ์_2566.csv": {
+     "bytes": 117777,
+     "rows": 736,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/e92859e4-ea7a-48bf-b4d5-a2ca0bf50e08/download/sttt_car_tax_mm_2566_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มกราคม_2566.csv": {
+     "bytes": 108203,
+     "rows": 731,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/cb99b96f-6ae1-4696-9c1a-a46cf3898e0a/download/sttt_car_tax_mm_2566_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ธันวาคม_2565.csv": {
+     "bytes": 113119,
+     "rows": 749,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/38ce2e4d-d9be-4f94-9264-6b9927b5ba4d/download/sttt_car_tax_mm_2565_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤศจิกายน_2565.csv": {
+     "bytes": 116922,
+     "rows": 744,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/1ed38938-d68a-4002-a0be-a2601e50d87e/download/sttt_car_tax_mm_2565_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__ตุลาคม_2565.csv": {
+     "bytes": 108333,
+     "rows": 734,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/610d1929-1994-4472-9612-de41f85b2dea/download/sttt_car_tax_mm_2565_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กันยายน_2565.csv": {
+     "bytes": 109242,
+     "rows": 725,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/92ee4fa4-0b56-4033-91d5-fae90dba149e/download/sttt_car_tax_mm_2565_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__สิงหาคม_2565.csv": {
+     "bytes": 110177,
+     "rows": 730,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/8ff84063-1575-40af-96a6-3bc4971f62c3/download/sttt_car_tax_mm_2565_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กรกฎาคม_2565.csv": {
+     "bytes": 107965,
+     "rows": 717,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/8cb706f3-9591-42ce-85e3-dbc31bed7584/download/sttt_car_tax_mm_2565_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มิถุนายน_2565.csv": {
+     "bytes": 111429,
+     "rows": 725,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/738edb38-ab80-4047-93db-64533bfafd32/download/sttt_car_tax_mm_2565_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__พฤษภาคม_2565.csv": {
+     "bytes": 110005,
+     "rows": 726,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/bebb67cc-4510-4ae6-adac-243b2050f4bf/download/sttt_car_tax_mm_2565_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__เมษายน_2565.csv": {
+     "bytes": 103424,
+     "rows": 703,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/fd136b9e-6fe5-4e55-936e-d6281bf1849e/download/sttt_car_tax_mm_2565_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มีนาคม_2565.csv": {
+     "bytes": 107382,
+     "rows": 726,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/933e3424-2735-4912-a817-bd548a21e735/download/sttt_car_tax_mm_2565_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__กุมภาพันธ์_2565.csv": {
+     "bytes": 116235,
+     "rows": 728,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/e84e7e05-c138-4104-83e8-67c283b58b9e/download/sttt_car_tax_mm_2565_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถยนต์__มกราคม_2565.csv": {
+     "bytes": 107037,
+     "rows": 726,
+     "url": "https://gdcatalog.dlt.go.th/dataset/c097e3cd-3cea-44cf-9e4e-e0cb3b5439b5/resource/ccc463f7-890e-408a-819f-60e54778141a/download/sttt_car_tax_mm_2565_01.csv"
+    }
+   }
+  },
+  "dataset_stat_1_009": {
+   "title": "สถิติการดำเนินการเกี่ยวกับทะเบียนและภาษีรถ ตามกฎหมายว่าด้วยการขนส่งทางบก",
+   "resources": {
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กุมภาพันธ์_2569.csv": {
+     "bytes": 69443,
+     "rows": 459,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/668e7de9-81b4-408b-9f3f-34251ba491f9/download/sttt_trc_tax_mm_2569_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มกราคม_2569.csv": {
+     "bytes": 68952,
+     "rows": 494,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/b9509ea5-cb1e-4dd9-a064-e70f0947540e/download/sttt_trc_tax_mm_2569_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ธันวาคม_2568.csv": {
+     "bytes": 79824,
+     "rows": 556,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/f85b1c98-90a4-4834-b73b-57909453c560/download/sttt_trc_tax_mm_2568_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤศจิกายน_2568.csv": {
+     "bytes": 70088,
+     "rows": 473,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/b22d5a57-6f84-475e-ab2b-a3f615453263/download/sttt_trc_tax_mm_2568_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ตุลาคม_2568.csv": {
+     "bytes": 71146,
+     "rows": 509,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/7c05a408-c36f-472b-81c0-e89afdfbc7bd/download/sttt_trc_tax_mm_2568_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กันยายน_2568.csv": {
+     "bytes": 80566,
+     "rows": 561,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/229ab6de-8e8a-480f-ba90-b9e5d675d564/download/sttt_trc_tax_mm_2568_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__สิงหาคม_2568.csv": {
+     "bytes": 65876,
+     "rows": 463,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/1d987e1e-03b8-4429-bd6b-dd8dfff6ad45/download/sttt_trc_tax_mm_2568_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กรกฎาคม_2568.csv": {
+     "bytes": 73085,
+     "rows": 512,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/7d1dbfa2-080a-4902-9046-38e36bbac893/download/sttt_trc_tax_mm_2568_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มิถุนายน_2568.csv": {
+     "bytes": 81184,
+     "rows": 554,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/22a6c657-b72c-4fdd-8aae-2217a9691f8d/download/sttt_trc_tax_mm_2568_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤษภาคม_2568.csv": {
+     "bytes": 65012,
+     "rows": 457,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/5eea03ec-f1ad-48d4-b294-60a7b1e887d0/download/sttt_trc_tax_mm_2568_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__เมษายน_2568.csv": {
+     "bytes": 69556,
+     "rows": 499,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/aa8fcb4f-cb15-4891-b142-52faed52b158/download/sttt_trc_tax_mm_2568_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มีนาคม_2568.csv": {
+     "bytes": 76535,
+     "rows": 544,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/464c9a6a-a52b-4fdc-8c0a-345b60f7fad4/download/sttt_trc_tax_mm_2568_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กุมภาพันธ์_2568.csv": {
+     "bytes": 69511,
+     "rows": 460,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/fd215ea2-d5d6-4855-b47a-6aab07f8ddea/download/sttt_trc_tax_mm_2568_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มกราคม_2568.csv": {
+     "bytes": 70000,
+     "rows": 502,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/08061876-875c-4de5-a705-4e4e68556962/download/sttt_trc_tax_mm_2568_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ธันวาคม_2567.csv": {
+     "bytes": 79922,
+     "rows": 557,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/a0b28d16-fe2f-42a3-baeb-ff209d082329/download/sttt_trc_tax_mm_2567_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤศจิกายน_2567.csv": {
+     "bytes": 75148,
+     "rows": 506,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/265ea626-1852-4fd5-9813-f974fc91bc7b/download/sttt_trc_tax_mm_2567_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ตุลาคม_2567.csv": {
+     "bytes": 70410,
+     "rows": 504,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/77cb512c-81a5-41a0-93d7-956fb777ff0d/download/sttt_trc_tax_mm_2567_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กันยายน_2567.csv": {
+     "bytes": 80036,
+     "rows": 558,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/17ffdecf-d94d-44a5-a086-6354eaf9caeb/download/sttt_trc_tax_mm_2567_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__สิงหาคม_2567.csv": {
+     "bytes": 66536,
+     "rows": 468,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/f1e76c8c-82aa-4872-ae1b-a1f537ffea63/download/sttt_trc_tax_mm_2567_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กรกฎาคม_2567.csv": {
+     "bytes": 73466,
+     "rows": 515,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/27406c73-e57c-4e3e-ae42-d5f2fba93f5b/download/sttt_trc_tax_mm_2567_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มิถุนายน_2567.csv": {
+     "bytes": 80838,
+     "rows": 552,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/fb8e7d8f-487f-4c4f-ab7c-58b65b1cabcb/download/sttt_trc_tax_mm_2567_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤษภาคม_2567.csv": {
+     "bytes": 67480,
+     "rows": 474,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/c0cbd493-4a83-4084-a144-be73386445eb/download/sttt_trc_tax_mm_2567_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__เมษายน_2567.csv": {
+     "bytes": 70351,
+     "rows": 504,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/1beef65e-05d1-45a3-bbed-29d4d691616a/download/sttt_trc_tax_mm_2567_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มีนาคม_2567.csv": {
+     "bytes": 77473,
+     "rows": 551,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/59306d16-c64a-4aba-a03b-42b356a827cc/download/sttt_trc_tax_mm_2567_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กุมภาพันธ์_2567.csv": {
+     "bytes": 69916,
+     "rows": 463,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/a9c98815-7e56-4169-9a94-dddf033f78c2/download/sttt_trc_tax_mm_2567_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มกราคม_2567.csv": {
+     "bytes": 70720,
+     "rows": 506,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/927d7e0f-c196-4259-942d-45211072b009/download/sttt_trc_tax_mm_2567_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ธันวาคม_2566.csv": {
+     "bytes": 79682,
+     "rows": 555,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/f942d637-384e-4be2-8a66-0ebf0e68d628/download/sttt_trc_tax_mm_2566_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤศจิกายน_2566.csv": {
+     "bytes": 73116,
+     "rows": 493,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/5da73e65-7ac7-40d6-aa61-40838341f8f1/download/sttt_trc_tax_mm_2566_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ตุลาคม_2566.csv": {
+     "bytes": 71990,
+     "rows": 515,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/d8dfd125-c77b-4d22-bde8-8b445c474765/download/sttt_trc_tax_mm_2566_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กันยายน_2566.csv": {
+     "bytes": 79265,
+     "rows": 552,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/45f6444e-c17d-4bd7-aa26-48991e0bac86/download/sttt_trc_tax_mm_2566_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__สิงหาคม_2566.csv": {
+     "bytes": 69498,
+     "rows": 488,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/4369a3d1-63ad-40db-9b77-25264f84fabf/download/sttt_trc_tax_mm_2566_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กรกฎาคม_2566.csv": {
+     "bytes": 72182,
+     "rows": 506,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/7e4da1eb-8449-43e6-996e-f11af43bf642/download/sttt_trc_tax_mm_2566_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มิถุนายน_2566.csv": {
+     "bytes": 81412,
+     "rows": 555,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/19abf353-61e2-461b-a789-030b6f967757/download/sttt_trc_tax_mm_2566_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤษภาคม_2566.csv": {
+     "bytes": 68594,
+     "rows": 482,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/df78f289-8869-4075-94e2-30cadd9e1167/download/sttt_trc_tax_mm_2566_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__เมษายน_2566.csv": {
+     "bytes": 70406,
+     "rows": 505,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/25685a8e-2ef9-4429-8329-333a9a502217/download/sttt_trc_tax_mm_2566_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มีนาคม_2566.csv": {
+     "bytes": 77306,
+     "rows": 549,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/466442d5-bd3f-4dab-af17-277979562c01/download/sttt_trc_tax_mm_2566_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กุมภาพันธ์_2566.csv": {
+     "bytes": 71712,
+     "rows": 474,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/49f1bc4f-5980-44a1-8705-086a8509122b/download/sttt_trc_tax_mm_2566_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มกราคม_2566.csv": {
+     "bytes": 71650,
+     "rows": 513,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/0fa83c72-f013-4e64-8776-a3de5d8acc92/download/sttt_trc_tax_mm_2566_01.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ธันวาคม_2565.csv": {
+     "bytes": 80111,
+     "rows": 558,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/ea3a47ca-446f-4458-a4b5-fbe4f3ff7ce9/download/sttt_trc_tax_mm_2565_12.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤศจิกายน_2565.csv": {
+     "bytes": 73938,
+     "rows": 498,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/4e3a4da3-f1dd-4cc7-856f-0b1cd0179ec7/download/sttt_trc_tax_mm_2565_11.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__ตุลาคม_2565.csv": {
+     "bytes": 71635,
+     "rows": 513,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/0e9375a6-4f2c-411c-ad1e-ca28dea24fa8/download/sttt_trc_tax_mm_2565_10.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กันยายน_2565.csv": {
+     "bytes": 80478,
+     "rows": 560,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/605afbe0-d758-4988-9309-116870881005/download/sttt_trc_tax_mm_2565_09.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__สิงหาคม_2565.csv": {
+     "bytes": 70477,
+     "rows": 494,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/a5cfd2a4-5a86-422b-b215-08e1c7741af8/download/sttt_trc_tax_mm_2565_08.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กรกฎาคม_2565.csv": {
+     "bytes": 72171,
+     "rows": 506,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/9d740f2f-04da-46ae-8f64-c8320186f767/download/sttt_trc_tax_mm_2565_07.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มิถุนายน_2565.csv": {
+     "bytes": 81808,
+     "rows": 557,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/906acfc7-af5a-4b05-9f4f-d6109dd32060/download/sttt_trc_tax_mm_2565_06.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__พฤษภาคม_2565.csv": {
+     "bytes": 68842,
+     "rows": 484,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/3fe85893-3ca1-4ed0-a1d8-b3b6392c8bda/download/sttt_trc_tax_mm_2565_05.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__เมษายน_2565.csv": {
+     "bytes": 69609,
+     "rows": 500,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/18ec2c19-99ae-4508-8955-4c5e97508fdf/download/sttt_trc_tax_mm_2565_04.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มีนาคม_2565.csv": {
+     "bytes": 76697,
+     "rows": 546,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/a6fdcc53-d07e-4492-b0e7-5d6d26375cff/download/sttt_trc_tax_mm_2565_03.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__กุมภาพันธ์_2565.csv": {
+     "bytes": 73134,
+     "rows": 485,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/a02a648a-a687-4b7c-99d0-0ebde155f853/download/sttt_trc_tax_mm_2565_02.csv"
+    },
+    "การดำเนินการทางทะเบียน__รถขนส่ง__มกราคม_2565.csv": {
+     "bytes": 70574,
+     "rows": 507,
+     "url": "https://gdcatalog.dlt.go.th/dataset/69709f84-3170-40b8-becb-ec554d56a53d/resource/98fe1ae1-5344-4c52-beaf-62284b1bfa0d/download/sttt_trc_tax_mm_2565_01.csv"
+    }
+   }
+  },
+  "dataset_stat_1_010": {
+   "title": "สถิติจำนวนใบอนุญาตประกอบการขนส่ง",
+   "resources": {
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_28_กุมภาพันธ์_2569.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/3fa8ba58-87d6-4622-9640-eedd0de5e940/download/sttt_trl_at_25690228.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มกราคม_2569.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/438d9108-a876-4767-abf9-cbca329e2ee9/download/sttt_trl_at_25690131.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ธันวาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/e33d701c-d08f-47bd-ba79-51ef430b63f8/download/sttt_trl_at_25681231.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_พฤศจิกายน_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/276ba659-36fd-4e46-a5a3-c77435cdd9ed/download/sttt_trl_at_25681130.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ตุลาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/162a4be8-477d-4e17-8434-57ceeaa0ac95/download/sttt_trl_at_25681031.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_กันยายน_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/b4a163a0-7031-4994-a92c-c9d6979791d0/download/sttt_trl_at_25680930.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_สิงหาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/fa93d8d3-076a-4af3-a472-9b2d267527cd/download/sttt_trl_at_25680831.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_กรกฎาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/3af180ad-d4e8-4b0e-9f69-961925c7b865/download/sttt_trl_at_25680731.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_มิถุนายน_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/2a6c923d-b62a-498a-a882-cea29cf77d49/download/sttt_trl_at_25680630.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_พฤษภาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/180e13f2-6c94-49d1-8507-301fbc0acec8/download/sttt_trl_at_25680531.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_เมษายน_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/f8a22b6e-506e-494a-b062-06e30d8d9a95/download/sttt_trl_at_25680430.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มีนาคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/f4e31a2a-7ea0-4ffc-9596-aa4356339ffd/download/sttt_trl_at_25680331.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_28_กุมภาพันธ์_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/fd145d7a-e07c-4fe5-bf00-ba86ffc9e8b5/download/sttt_trl_at_25680228.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มกราคม_2568.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/5bfc3380-fb1a-4552-9adc-60da8e466813/download/sttt_trl_at_25680131.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ธันวาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/fe6d8a6d-a769-4c85-a60f-d4d3366638af/download/sttt_trl_at_25671231.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_พฤศจิกายน_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/6bb1fba3-1b10-48d1-acab-b5d5fac69bca/download/sttt_trl_at_25671130.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ตุลาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/5638fdf6-fa62-440b-9444-b9c4dd6950e4/download/sttt_trl_at_25671031.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_กันยายน_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/983497c8-2c24-4f5f-a297-3f1105d93658/download/sttt_trl_at_25670930.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_สิงหาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/17fe8026-b2f3-4bd6-9df7-5948077af188/download/sttt_trl_at_25670831.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_กรกฎาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/1a6c602b-01ad-458e-8a4d-fe57e9d5d751/download/sttt_trl_at_25670731.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_มิถุนายน_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/9b2251db-60e9-4937-b7f8-513d35c1c7d3/download/sttt_trl_at_25670630.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_พฤษภาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/09bc41df-0898-4f1b-8cbd-8878b690d8e5/download/sttt_trl_at_25670531.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_เมษายน_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/a6a9510d-7da0-4cb2-82e1-07a7e0a5f6b0/download/sttt_trl_at_25670430.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มีนาคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/5a887b31-5c49-4ab7-b48c-d1866c4a1b99/download/sttt_trl_at_25670331.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_29_กุมภาพันธ์_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/41c9e933-40ce-46a8-a924-ee996a870349/download/sttt_trl_at_25670229.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มกราคม_2567.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/32834cf2-c6e9-45db-8a7e-078a90d37c66/download/sttt_trl_at_25670131.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ธันวาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/67ddb26e-235c-40c7-8aea-8f374076cb22/download/sttt_trl_at_25661231.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_พฤศจิกายน_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/60bb8565-d841-44f9-ab50-536971d98f3c/download/sttt_trl_at_25661130.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ตุลาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/28c78f4e-13e4-47d9-aefd-109084844efd/download/sttt_trl_at_25661031.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_กันยายน_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/f319ddf9-15a9-4650-9392-e002dbdeafa7/download/sttt_trl_at_25660930.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_สิงหาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/bc9ddef4-764d-4a3a-a456-02e5c97477e9/download/sttt_trl_at_25660831.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_กรกฏาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/6dd6a636-9dfc-4c83-acf1-32a6a6adcc1e/download/sttt_trl_at_25660731.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_มิถุนายน_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/ed72b7c9-80ab-4cc5-9a18-6094406cc938/download/sttt_trl_at_25660630.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_พฤษภาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/2acb4506-e34d-4e5e-bc2d-313be51d62e8/download/sttt_trl_at_25660531.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_เมษายน_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/4ffb6e9f-a3fc-4d0b-ad60-6555e62d8bc7/download/sttt_trl_at_25660430.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มีนาคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/ec182265-040d-4bde-b40f-784ecfe0939c/download/sttt_trl_at_25660331.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_28_กุมภาพันธ์_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/26017ffd-8b6f-444a-9380-505d7bbada4c/download/sttt_trl_at_25660228.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_มกราคม_2566.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/20a167c2-1b15-4841-b55e-379c56a2c418/download/sttt_trl_at_25660131.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ธันวาคม_2565.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/eebd6d93-4c86-4d09-8214-d9f3ab4286cb/download/sttt_trl_at_25651231.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_30_พฤศจิกายน_2565.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/b8ce4e21-6fed-4fc7-84c6-a939383fa6c5/download/sttt_trl_at_25651130.csv"
+    },
+    "สถิติจำนวนใบอนุญาตประกอบการขนส่ง_ณ_วันที่_31_ตุลาคม_2565.csv": {
+     "bytes": 1568,
+     "rows": 14,
+     "url": "https://gdcatalog.dlt.go.th/dataset/236d8e55-7b65-4b39-bd91-63e0c9778476/resource/94d3544d-60d4-41a4-90e6-8ab2d66a96c0/download/sttt_trl_at_25651031.csv"
+    }
+   }
+  },
+  "stat_1_1_01_first_regis_vehicles_car": {
+   "title": "สถิติจำนวนรถจดทะเบียนครั้งแรก ตามกฎหมายว่าด้วยรถยนต์",
+   "resources": {
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ตุลาคม_2568.csv": {
+     "bytes": 153852,
+     "rows": 1475,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/0c9e02c5-3fed-48a0-818b-19a15d68c4d2/download/sttt_car_new_reg_mm_2568_10.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กันยายน_2568.csv": {
+     "bytes": 160602,
+     "rows": 1490,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/dd155895-849e-4d5f-9a25-baa0e589b937/download/sttt_car_new_reg_mm_2568_09.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_สิงหาคม_2568.csv": {
+     "bytes": 156361,
+     "rows": 1472,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/a9c29290-7b2b-4c70-8a06-2a99eea4daa0/download/sttt_car_new_reg_mm_2568_08.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กรกฎาคม_2568.csv": {
+     "bytes": 162949,
+     "rows": 1522,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/44cacd5a-9e90-44d6-95b7-b61af7b9231c/download/sttt_car_new_reg_mm_2568_07.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มิถุนายน_2568.csv": {
+     "bytes": 162620,
+     "rows": 1486,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/09bd50af-90ab-4d2e-b067-4589a621a241/download/sttt_car_new_reg_mm_2568_06.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤษภาคม_2568.csv": {
+     "bytes": 162386,
+     "rows": 1526,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/00a979c2-f3d2-4c9d-8a3a-839e9ba30f85/download/sttt_car_new_reg_mm_2568_05.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_เมษายน_2568.csv": {
+     "bytes": 146236,
+     "rows": 1404,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/89a83479-ce44-466b-a093-7565e4b60c69/download/sttt_car_new_reg_mm_2568_04.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มีนาคม_2568.csv": {
+     "bytes": 153577,
+     "rows": 1472,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/0d7984e2-896c-473f-92a8-98b73e3d7e77/download/sttt_car_new_reg_mm_2568_03.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กุมภาพันธ์_2568.csv": {
+     "bytes": 162746,
+     "rows": 1396,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/21e32b83-9c50-43c0-9cac-cf0955918c3b/download/sttt_car_new_reg_mm_2568_02.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มกราคม_2568.csv": {
+     "bytes": 152973,
+     "rows": 1464,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/41ea628c-8f70-4901-a406-9d0068ca4e89/download/sttt_car_new_reg_mm_2568_01.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ธันวาคม_2567.csv": {
+     "bytes": 145092,
+     "rows": 1372,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/ff7f99bd-da44-4b16-b031-d30ae7ff8abc/download/sttt_car_new_reg_mm_2567_12.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤศจิกายน_2567.csv": {
+     "bytes": 159429,
+     "rows": 1406,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/27cf51c7-d19f-4f57-974a-acf7fbc70ccf/download/sttt_car_new_reg_mm_2567_11.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ตุลาคม_2567.csv": {
+     "bytes": 149373,
+     "rows": 1437,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/7be7ded3-73ec-42f6-8297-dbca4db57caf/download/sttt_car_new_reg_mm_2567_10.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กันยายน_2567.csv": {
+     "bytes": 147537,
+     "rows": 1383,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/3a3f1e8d-552f-4289-898a-a569cbbf1c61/download/sttt_car_new_reg_mm_2567_09.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_สิงหาคม_2567.csv": {
+     "bytes": 155373,
+     "rows": 1459,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/3797ba01-cbc5-4de1-ac3b-de9fe37887b0/download/sttt_car_new_reg_mm_2567_08.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กรกฎาคม_2567.csv": {
+     "bytes": 155695,
+     "rows": 1467,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/fff684f4-cfd5-48e8-b417-e5acaa89f55d/download/sttt_car_new_reg_mm_2567_07.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มิถุนายน_2567.csv": {
+     "bytes": 150645,
+     "rows": 1375,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/15f253c2-48a1-4263-8262-9a3950735f93/download/sttt_car_new_reg_mm_2567_06.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤษภาคม_2567.csv": {
+     "bytes": 150667,
+     "rows": 1415,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/cc90780b-288a-45b3-ba27-e30bf3f3b39b/download/sttt_car_new_reg_mm_2567_05.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_เมษายน_2567.csv": {
+     "bytes": 136081,
+     "rows": 1307,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/1e6dfbea-33cf-4bc5-a219-70bf7bd96816/download/sttt_car_new_reg_mm_2567_04.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มีนาคม_2567.csv": {
+     "bytes": 150891,
+     "rows": 1470,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/cedba011-b42e-4b31-9e45-3c265b4793d8/download/sttt_car_new_reg_mm_2567_03.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กุมภาพันธ์_2567.csv": {
+     "bytes": 161700,
+     "rows": 1395,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/812b3480-428a-449c-ba88-fc1f86832d06/download/sttt_car_new_reg_mm_2567_02.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มกราคม_2567.csv": {
+     "bytes": 144555,
+     "rows": 1395,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/51414aa0-b764-4013-a540-87039a3b8070/download/sttt_car_new_reg_mm_2567_01.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ธันวาคม_2566.csv": {
+     "bytes": 136187,
+     "rows": 1300,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/475ade70-243b-4250-bfe2-1bef174436ad/download/sttt_car_new_reg_mm_2565_12.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤศจิกายน_2566.csv": {
+     "bytes": 155811,
+     "rows": 1397,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/ab1b804a-472b-44b3-9d8a-a17723521222/download/sttt_car_new_reg_mm_2566_11.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ตุลาคม_2566.csv": {
+     "bytes": 145350,
+     "rows": 1412,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/574ed5f3-328e-46c4-b5d0-898d14d67a75/download/sttt_car_new_reg_mm_2566_10.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กันยายน_2566.csv": {
+     "bytes": 151857,
+     "rows": 1437,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/33c4c233-40ad-4dbe-89e4-5058bda00a2f/download/sttt_car_new_reg_mm_2566_09.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_สิงหาคม_2566.csv": {
+     "bytes": 152139,
+     "rows": 1437,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/af9f7f89-15d3-4688-88b6-6b348eb49003/download/sttt_car_new_reg_mm_2566_08.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กรกฎาคม_2566.csv": {
+     "bytes": 141773,
+     "rows": 1342,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/9d83acf7-7b6d-48ab-b3a7-72d77f903677/download/sttt_car_new_reg_mm_2566_07.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มิถุนายน_2566.csv": {
+     "bytes": 160263,
+     "rows": 1487,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/9b9f1f34-336d-47d8-9256-c24ae56eb5f3/download/sttt_car_new_reg_mm_2566_06.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤษภาคม_2566.csv": {
+     "bytes": 144594,
+     "rows": 1381,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/60a7a01f-84ee-42c6-8a89-9d5232114707/download/sttt_car_new_reg_mm_2566_05.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_เมษายน_2566.csv": {
+     "bytes": 131775,
+     "rows": 1293,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/a8b346b5-e543-4a09-827a-d41ff5a1975c/download/sttt_car_new_reg_mm_2566_04.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มีนาคม_2566.csv": {
+     "bytes": 154153,
+     "rows": 1510,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/e28c903c-70c1-4db9-9b09-cb2215f27ff3/download/sttt_car_new_reg_mm_2566_03.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กุมภาพันธ์_2566.csv": {
+     "bytes": 166656,
+     "rows": 1454,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/94b8a69a-d95e-46d9-bf9e-871a1def5de2/download/sttt_car_new_reg_mm_2566_02.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มกราคม_2566.csv": {
+     "bytes": 139041,
+     "rows": 1364,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/1208d1a1-c12d-4814-b776-4abbbbf3519b/download/sttt_car_new_reg_mm_2566_01.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ธันวาคม_2565.csv": {
+     "bytes": 136187,
+     "rows": 1300,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/b6f88d4b-7d9d-4d48-ac67-00ddd292628a/download/sttt_car_new_reg_mm_2565_12.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤศจิกายน_2565.csv": {
+     "bytes": 157106,
+     "rows": 1420,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/32be41a8-4973-43bf-a336-2ee7cc1350e9/download/sttt_car_new_reg_mm_2565_11.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ตุลาคม_2565.csv": {
+     "bytes": 142931,
+     "rows": 1402,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/dd709f46-1214-4c32-9fa5-3e5ab1d5ca0b/download/sttt_car_new_reg_mm_2565_10.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กันยายน_2565.csv": {
+     "bytes": 152839,
+     "rows": 1462,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/64a64c2a-2356-48a0-bd38-19d2b156c7ec/download/sttt_car_new_reg_mm_2565_09.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_สิงหาคม_2565.csv": {
+     "bytes": 162077,
+     "rows": 1545,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/e2c923b1-0b09-45a9-9ee7-00361a7e1e41/download/sttt_car_new_reg_mm_2565_08.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กรกฎาคม_2565.csv": {
+     "bytes": 144981,
+     "rows": 1391,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/58975bb4-929f-42b2-ad19-dc16bae5fca1/download/sttt_car_new_reg_mm_2565_07.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มิถุนายน_2565.csv": {
+     "bytes": 161490,
+     "rows": 1494,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/b8881ead-ecbe-4cca-b20e-53ef8b1234b5/download/sttt_car_new_reg_mm_2565_06.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤษภาคม_2565.csv": {
+     "bytes": 150657,
+     "rows": 1437,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/73e03996-0da8-4395-a853-73fada1fb7f2/download/sttt_car_new_reg_mm_2565_05.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_เมษายน_2565.csv": {
+     "bytes": 137686,
+     "rows": 1337,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/6e21e754-a850-4aea-8da2-90b0db315399/download/sttt_car_new_reg_mm_2565_04.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มีนาคม_2565.csv": {
+     "bytes": 155886,
+     "rows": 1523,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/a51d47b4-409e-4bc8-9969-0d0f96e443bd/download/sttt_car_new_reg_mm_2565_03.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กุมภาพันธ์_2565.csv": {
+     "bytes": 161534,
+     "rows": 1424,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/97937303-5ef4-4e5c-8a89-4b2162ad3e25/download/sttt_car_new_reg_mm_2565_02.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มกราคม_2565.csv": {
+     "bytes": 138487,
+     "rows": 1361,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/eed0f591-f67e-4dad-b374-cf113233ea32/download/sttt_car_new_reg_mm_2565_01.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ปี_2568.csv": {
+     "bytes": 320982,
+     "rows": 3921,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/07ece66c-eeb7-45a8-b95c-8a5275e4ccab/download/sttt_car_new_reg_yy_2568_full.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ปี_2567.csv": {
+     "bytes": 314660,
+     "rows": 3835,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/b9ee9f28-c3a1-44f7-a86e-e53799e5d4f0/download/sttt_car_new_reg_yy_2567_full.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ปี_2566.csv": {
+     "bytes": 323751,
+     "rows": 3966,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/e9a6ec34-a180-4b95-adca-6547b756c119/download/sttt_car_new_reg_yy_2566_full.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ปี_2565.csv": {
+     "bytes": 326440,
+     "rows": 3959,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/adecdfbf-5763-48a5-850c-8ed48635de88/download/sttt_car_new_reg_yy_2565_full.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_กุมภาพันธ์_2569.csv": {
+     "bytes": 1031,
+     "rows": 7,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/c54fcd06-1d8a-4c8e-baae-e516dbf529b7/download/sttt_car_new_reg_mm_2569_02.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_มกราคม_2569.csv": {
+     "bytes": 151312,
+     "rows": 1422,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/4bc376ba-1d64-49be-8e8c-fbdc6f0e2013/download/sttt_car_new_reg_mm_2569_01.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_ธันวาคม_2568.csv": {
+     "bytes": 151605,
+     "rows": 1405,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/d6b69075-96db-435d-9b26-26aa33d22614/download/sttt_car_new_reg_mm_2568_12.csv"
+    },
+    "รถจดทะเบียนครั้งแรก__รถยนต์_-จำแนกตามยี่ห้อและรุ่น_พฤศจิกายน_2568.csv": {
+     "bytes": 161320,
+     "rows": 1415,
+     "url": "https://gdcatalog.dlt.go.th/dataset/59a045dc-3ec4-4908-b035-ba789101b7f5/resource/378647b8-9c0e-4f04-998d-0804f06875a6/download/sttt_car_new_reg_mm_2568_11.csv"
+    }
+   }
+  }
+ }
+}

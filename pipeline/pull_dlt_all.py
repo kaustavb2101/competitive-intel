@@ -72,7 +72,16 @@ def main():
             fn = _safe(r.get("name", r.get("id", "res"))) + "." + fmt
             path = os.path.join(ddir, fn)
             rec = entry["resources"].get(fn)
-            if os.path.exists(path) or (rec and rec.get("stub")):
+            if os.path.exists(path):
+                # already mirrored (possibly by a run killed before it wrote the inventory) —
+                # make sure the inventory records it from disk.
+                if not rec:
+                    raw_sz = os.path.getsize(path)
+                    rows = open(path, "rb").read().count(b"\n") if fmt == "csv" else None
+                    entry["resources"][fn] = {"bytes": raw_sz, "rows": rows, "url": r["url"]}
+                skipped += 1
+                continue
+            if rec and rec.get("stub"):
                 skipped += 1
                 continue
             try:
