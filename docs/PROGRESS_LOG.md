@@ -5,6 +5,51 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-10 (5) — AUDIT: backlog reconciliation, the committee's other 8 "smallest first" build items were already shipped.
+
+`docs/IMPROVEMENT_BACKLOG.md`'s "Queue — follow-ups noticed 2026-07-10 (3)" section still listed
+`docs/COMMITTEE_ASSESSMENT_2026-07-10.md`'s remaining findings — #1 (vendor Leaflet/deck.gl so a CDN
+hiccup can't kill the National map), #2/#7 (rename the "Open next" verdict + bridge to the sequenced
+Road-to-3,000 plan), and #8 (zero-state copy for the always-red "0.0%" high-stress cards) — as open,
+flagged "too large for a single cycle" for #1. Before picking a new item this cycle, `git log
+--oneline -15` showed a commit already on this branch, `917ff47` ("Sprint 1 trust fixes: vendor map
+libraries + committee P0 findings"), whose message claims exactly this work. Rather than re-analyzing
+or re-building it, verified each claim live against the current tree:
+
+1. **Finding #1 (vendoring).** `platform/vendor/leaflet/` + `platform/vendor/deck.gl.min.js` exist;
+   `grep` confirms `index.html`, `province.html`, `rayong-catchment.html`, and `branch-explorer.html`
+   all `<script src="vendor/...">` — zero `unpkg.com`/`cdn.jsdelivr` references remain on any of the
+   four pages. `boot()`'s catch block was split (per the commit message) so a library-load failure and
+   a data-load failure now report distinctly instead of one generic "could not load" message blaming
+   the wrong layer.
+2. **Findings #2/#7 (verdict rename + bridge).** `platform/app.js:1946` `renderAcqVerdict()` renders
+   "🏆 Highest-composite district: `<name>` — `<score>`/100 opportunity" (was the old, contradictory
+   "Open next") with a one-clause pointer to the Road-to-3,000 sequenced plan as the canonical
+   placement order.
+3. **Finding #8 (zero-state copy).** `platform/app.js:2787` — the comment and code confirm the
+   `#exposure`/`#sim` high-stress cards now show a neutral "headroom" read instead of a red "0.0%"
+   when nothing clears the ≥60/≥45 threshold this vintage.
+
+All three read as genuinely shipped, not just claimed. Checked off the "8 items" entry and the
+standalone "Vendoring Leaflet + deck.gl" entry in the backlog; added a note that `917ff47` also
+resolved the previously-flagged "Srisawad 457% invalid coverage ratio" item (nulled the mismatched
+`expected` figure, comparable-brands-only totals now read 102.9%) — left that as a pointer rather than
+a full re-verification, since it wasn't independently re-screenshotted this cycle.
+
+While reconciling, also found `docs/PROGRESS_LOG.md` has no entries for `917ff47` itself or the 5
+`Sprint 2 E0 (1)–(5)` commits after it (`8cf4f78`…`e53705d`, per `git log` — household DTI, truck-fleet
+flow, labour context, and farm-gate-price macro-sensitivity joins into `build_amphoe.py`'s district
+risk score, plus a new `decision_queue.json`/`renderDecisionQueue()` surface). Those commits are real
+and already pushed to this branch by what looks like a different concurrent session — did not touch
+those files or backfill their log entries this cycle (out of scope: the loop logs its own work, and
+narrating an uninspected diff risks getting it wrong); logged as a new backlog follow-up instead so a
+future cycle (or Kaustav, if "Sprint 2" is a separately-run workflow) can either write the entries or
+confirm they're intentionally out of this loop's remit.
+
+No code or data changed this cycle — pure backlog/log accuracy fix. `bash tests/run.sh check`
+reconfirmed green on the current HEAD both before and after the doc edits: 64/0 (`validate_data.py`
+458/458). PR #2 (already open, draft, tracks this branch) covers this push — no new PR needed.
+
 ## 2026-07-10 (4) — UX: fixed two committee-flagged bugs (BIS card double-append + coverage copy).
 
 Picked the next item off the committee's "smallest first" build list (`docs/COMMITTEE_ASSESSMENT_2026-07-10.md`
