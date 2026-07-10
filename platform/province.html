@@ -922,6 +922,21 @@ function buildProvincePanels(){
   document.getElementById('provSub').textContent=`${reg} region · ${BR.length} branches · ${DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0} districts`;
   const f=RY.facts||{}, gov=RY.gov||{};
   const tagcol={risk:'var(--red)',watch:'var(--orange)',opp:'var(--teal)'};
+  // Sparse, conditional DLT-flow watch-flags (only ~top-decile provinces trigger either one) —
+  // kept separate from autoImpacts() so they still surface even on provinces with a curated
+  // editorial narrative below, instead of being silently dropped by the editorial-wins branch.
+  function vehicleFlowImpacts(){
+    const out=[];
+    const vf=(gov.vehicle_flow||{}).moto||{};
+    if(vf.dereg_rate!=null && vf.dereg_rate>=0.01){
+      out.push(['Elevated motorcycle scrappage',(Math.round(vf.dereg_rate*1000)/10)+'% of registered motorcycles were permanently deregistered in the trailing 12 months (DLT, top decile nationally) — faster collateral turnover, watch recovery values on ageing bikes.','watch']);
+    }
+    const vft=(gov.vehicle_flow_transport||{}).truck||{};
+    if(vft.dereg_rate!=null && vft.dereg_rate>=0.045){
+      out.push(['Elevated commercial-truck scrappage',(Math.round(vft.dereg_rate*1000)/10)+'% of registered private/contract-hire trucks ceased registration in the trailing 12 months (DLT land-transport-law flow, top decile nationally) — commercial-vehicle collateral is turning over faster here.','watch']);
+    }
+    return out;
+  }
   function autoImpacts(){
     const out=[], v=gov.vehicles||{}, e=gov.employment||{};
     const tot=v.total||0, inf=e.informal||0, form=e.formal||0, infShare=(inf+form)?Math.round(100*inf/(inf+form)):0;
@@ -929,15 +944,12 @@ function buildProvincePanels(){
     if(tot){const ms=Math.round(100*(v.moto||0)/tot); if(ms>=60) out.push(['Motorcycle-heavy collateral',ms+'% of registered vehicles are motorcycles — high volume, weaker loss-given-default; price on speed, watch LTV.','watch']);}
     if((v.ev||0)>0) out.push(['EV transition',(v.ev).toLocaleString()+' EVs registered and rising — watch ICE auto-parts jobs where factories are auto-supply.','watch']);
     if((gov.factories||0)>1500) out.push(['Industrial payroll dependence',(gov.factories).toLocaleString()+' factories — incomes track factory demand and export cycles.','risk']);
-    const vf=(gov.vehicle_flow||{}).moto||{};
-    if(vf.dereg_rate!=null && vf.dereg_rate>=0.01){
-      out.push(['Elevated motorcycle scrappage',(Math.round(vf.dereg_rate*1000)/10)+'% of registered motorcycles were permanently deregistered in the trailing 12 months (DLT, top decile nationally) — faster collateral turnover, watch recovery values on ageing bikes.','watch']);
-    }
+    out.push(...vehicleFlowImpacts());
     if(!out.length) out.push(['Vehicle-dependent daily life','Households rely on a motorbike or pickup for work — title-loan relevant.','opp']);
     return out;
   }
   const editorial=f.impacts&&f.impacts.length;
-  const impacts=editorial?f.impacts:autoImpacts();
+  const impacts=editorial?f.impacts.concat(vehicleFlowImpacts()):autoImpacts();
   document.getElementById('v-impacts').innerHTML=
     `<p class="lead">What moves local incomes${editorial?'':' (auto-derived from measured DLT/NSO/DIW data; editorial narrative pending)'}:</p>`+
     impacts.map(([t,d,k])=>`<div class="imp"><span class="dot" style="background:${tagcol[k]}"></span><div><div class="t">${t}<span class="tg" style="color:${tagcol[k]};border:1px solid ${tagcol[k]}">${(k||'').toUpperCase()}</span></div><div class="d">${d}</div></div></div>`).join('');

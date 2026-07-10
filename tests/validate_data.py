@@ -1246,6 +1246,87 @@ def check_vehicle_flow():
 
 
 # ---------------------------------------------------------------------------
+def check_vehicle_flow_transport():
+    # source-data/vehicle_flow_transport_by_province.json (pipeline/build_vehicle_flow_transport.py)
+    # — the commercial (truck/bus) sibling of check_vehicle_flow() above: DLT land-transport-law
+    # registration-ACTION flow, trailing-12mo, joined into provinces/<slug>.json's
+    # gov.vehicle_flow_transport. SKIP-passes whole when the source layer is absent.
+    hdr("source-data/vehicle_flow_transport_by_province.json (optional)")
+    path = os.path.join(REPO, "source-data", "vehicle_flow_transport_by_province.json")
+    if not os.path.exists(path):
+        ok("vehicle_flow_transport_by_province.json absent — skipped (optional; run build_vehicle_flow_transport.py)")
+        return
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except Exception as e:
+        fail("vehicle_flow_transport_by_province.json loads", repr(e))
+        return
+    ok("vehicle_flow_transport_by_province.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not all(k in meta for k in ("generated_by", "source", "formula")):
+        fail("vehicle_flow_transport meta/provenance present (generated_by + source + formula)",
+             "meta=%r" % (meta,))
+    else:
+        ok("vehicle_flow_transport meta/provenance present (generated_by + source + formula)")
+
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        fail("vehicle_flow_transport has a non-empty 'provinces' dict", "got %s" % type(provs).__name__)
+        return
+    ok("vehicle_flow_transport provinces dict present (%d)" % len(provs))
+
+    bad = []
+    for name, buckets in provs.items():
+        if not isinstance(buckets, dict) or "all" not in buckets:
+            bad.append("%s missing the 'all' bucket" % name)
+            continue
+        for bname, rec in buckets.items():
+            for k in ("processed", "dereg_permanent", "transferred"):
+                v = rec.get(k)
+                if not isinstance(v, int) or v < 0:
+                    bad.append("%s.%s.%s=%r invalid (want int>=0)" % (name, bname, k, v))
+            for k in ("dereg_rate", "transfer_rate"):
+                v = rec.get(k)
+                if v is not None and not (is_finite_number(v) and 0.0 <= v <= 1.0):
+                    bad.append("%s.%s.%s=%r out of [0,1]" % (name, bname, k, v))
+    if bad:
+        fail("vehicle_flow_transport per-province values sane (all bucket present, counts>=0, rates in [0,1])",
+             first_n(bad, 8))
+    else:
+        ok("vehicle_flow_transport per-province values sane (all bucket present, counts>=0, rates in [0,1])")
+
+    # join check: provinces/<slug>.json's gov.vehicle_flow_transport must match this source file
+    # exactly (build_province.py does a pure pass-through join — no recomputation).
+    try:
+        idx = load(os.path.join("provinces", "index.json"))
+    except Exception as e:
+        fail("provinces/index.json loads (for vehicle_flow_transport join check)", repr(e))
+        return
+    jbad = []
+    n_checked = 0
+    for e in idx if isinstance(idx, list) else []:
+        slug, th = e.get("slug"), e.get("th")
+        if not slug or not th:
+            continue
+        try:
+            p = load(os.path.join("provinces", slug + ".json"))
+        except Exception as ex:
+            jbad.append("%s.json load error: %r" % (slug, ex))
+            continue
+        n_checked += 1
+        vf = (p.get("gov") or {}).get("vehicle_flow_transport")
+        expect = provs.get(th) or {}
+        if vf != expect:
+            jbad.append("%s gov.vehicle_flow_transport != source-data row for '%s'" % (slug, th))
+    if jbad:
+        fail("provinces/*.json gov.vehicle_flow_transport join matches source exactly", first_n(jbad, 8))
+    else:
+        ok("provinces/*.json gov.vehicle_flow_transport join matches source exactly (%d provinces checked)"
+           % n_checked)
+
+
+# ---------------------------------------------------------------------------
 def check_occupation_income():
     # National lowest-paid-occupation aggregate (pipeline/build_occupation_income.py), projected
     # from the already-MEASURED household_income_by_province.json. Optional file: SKIP-PASS when
@@ -4474,6 +4555,7 @@ def main():
     check_sme_income()
     check_province_income_floor()
     check_vehicle_flow()
+    check_vehicle_flow_transport()
     check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)

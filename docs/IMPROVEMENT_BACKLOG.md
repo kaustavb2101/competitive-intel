@@ -15,13 +15,27 @@
       deep-dive for the ~top-decile provinces (dereg_rate≥1%). Gate 60/0, `validate_data.py` 453/453
       (+5 checks incl. a source↔join exact-match check). Full writeup: `docs/DATA_REFRESH_LOG.md`
       (2026-07-10 entry).
-- [ ] **`dataset_stat_1_009` (land-transport-law registration-action flow — trucks/buses) is the
-      same shape as the just-distilled `dataset_stat_1_008` (car law) but not yet built** — a
-      `build_vehicle_flow.py`-style distiller for the land-transport-law sibling would extend the
-      churn/scrappage read to commercial vehicles (also mirrored in full by `pull_dlt_all.py`,
-      50 monthly files, `source-data/dlt/raw/dataset_stat_1_009/`). Less central to a title-loan
-      book than car/pickup/moto (already covered), so lower priority than the item above was.
-      *(LOW-MED, S — same pattern, different dataset)*
+- [x] **`dataset_stat_1_009` (land-transport-law registration-action flow — trucks/buses) — DONE
+      2026-07-10 (2)** (`build_vehicle_flow_transport.py` distills the already-mirrored 50 monthly
+      files into `source-data/vehicle_flow_transport_by_province.json` [truck/bus/small buckets],
+      joined into `provinces/<slug>.json`'s `gov.vehicle_flow_transport`, surfaced as an "Elevated
+      commercial-truck scrappage" callout for `dereg_rate≥4.5%` [~top-decile, p90=4.66%]. Gate
+      62/0, `validate_data.py` 458/458. While verifying the new callout, found and fixed that
+      `province.html`'s `autoImpacts()` branch was DEAD CODE on all 77 provinces — see the new
+      follow-up below. Full writeup: `docs/DATA_REFRESH_LOG.md` (2026-07-10 (2) entry).)
+- [x] **★ FIXED WHILE WIRING IN THE ITEM ABOVE — `province.html`'s `buildProvincePanels()` had a
+      real bug: `const impacts = editorial ? f.impacts : autoImpacts()` never called
+      `autoImpacts()` on any of the 77 provinces, because `source-data/province_narratives.json`
+      now has non-empty `impacts` for every province (CLAUDE.md's "curated for Rayong today" note
+      is stale — this went unnoticed for at least one prior cycle).** This silently hid BOTH the
+      moto-scrappage callout (2026-07-10 (1)) and would have hidden this cycle's truck-scrappage
+      callout too. Fixed by extracting the two DLT-flow watch-flags into their own
+      `vehicleFlowImpacts()` and always appending them regardless of which branch renders — verified
+      live in the rendered DOM (Sa Kaeo now shows "Elevated motorcycle scrappage" appended after its
+      6 editorial lines; Nakhon Pathom, hand-checked via Node since this page's render is separately
+      flaky, shows the truck line appended after 5 editorial lines). *(DONE — worth a CLAUDE.md
+      correction on "curated for Rayong today" next time someone's touching that doc, since the
+      narrative file has clearly grown past that scope; LOW, trivial, doc-only follow-up)*
 - [ ] **`vehicle_flow_by_province.json`'s "top decile" narrative threshold (dereg_rate≥1%) was
       picked from this cycle's own computed p75/p90 (0.47%/1.47%), not recalculated per refresh** —
       if a future DLT re-pull shifts the national distribution meaningfully, the hardcoded 0.01

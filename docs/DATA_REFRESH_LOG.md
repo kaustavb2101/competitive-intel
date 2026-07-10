@@ -4,6 +4,79 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-10 (2) — ENRICH: commercial (truck/bus) DLT registration-FLOW distilled + wired in; fixed a dead-code path that was silently hiding both this and the prior cycle's scrappage callouts
+
+**Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh checkout of `claude/new-session-wto26j`,
+`bash tests/run.sh check` → 61 passed, 0 failed (`validate_data.py` 453/453) before touching
+anything — no drift to fix.
+
+**1. What was found.** The backlog (`docs/IMPROVEMENT_BACKLOG.md`, "Queue — follow-ups noticed
+2026-07-10") explicitly flagged `dataset_stat_1_009` (DLT land-transport-law registration-action
+log — trucks/buses) as the same shape as the just-shipped car-law distiller
+(`build_vehicle_flow.py` / `dataset_stat_1_008`) but not yet built, even though
+`pipeline/pull_dlt_all.py`'s full-catalog mirror already secured all 50 monthly CSVs into
+`source-data/dlt/raw/dataset_stat_1_009/`. Confirmed the raw files are genuinely a different
+dataset (different CSV schema — 9 vehicle-type categories: trucks รถบรรทุก private/contract-hire,
+7 bus รถโดยสาร subclasses, and an unqualified "small vehicle" รถขนาดเล็ก category — and two
+cessation columns, "รถแจ้งเลิกใช้ ม.79"/"ม.89", instead of dataset_stat_1_008's single
+"รถแจ้งไม่ใช้ตลอดไป" column), not a duplicate of anything already wired in.
+
+**2. What was built (100% MEASURED, no modelling beyond a sum + a plain ratio).**
+`pipeline/build_vehicle_flow_transport.py` — same trailing-12mo-sum method as
+`build_vehicle_flow.py`, applied to this dataset: buckets `truck` (private + contract-hire),
+`bus` (all 7 scheduled/unscheduled/international classes summed — none is individually
+collateral-central), `small` (kept separate, not guessed into truck/bus), plus `all`.
+`dereg_rate` sums BOTH ม.79 and ม.89 cessation columns without claiming to know why the source
+splits them (documented plainly in `meta.formula` as a literal column-sum, not a legal opinion).
+Output: `source-data/vehicle_flow_transport_by_province.json` (77 provinces, same window as the
+sibling: 2025-03 → 2026-02). Sanity-checked the spread: truck `dereg_rate` 1.47%–8.12% (median
+2.91%, p90 4.66%); bus `dereg_rate` 3.67%–26.24% (much wider — bus fleets per province are far
+smaller, so the ratio is noisier over small denominators, e.g. สระแก้ว's 58/221 processed — a real
+measured ratio, not an outlier that looks fabricated).
+
+**3. Wired in gracefully.** `pipeline/build_province.py` joins the new file (graceful `{}` when
+absent, identical pattern to `vehicle_flow`) into every `provinces/<slug>.json`'s
+`gov.vehicle_flow_transport`; `meta.provenance.measured` gained a line. `platform/province.html`
+gained a truck-scrappage watch line for provinces at/above `dereg_rate≥4.5%` (~top decile,
+p90=4.66%) — mirrors the existing moto-scrappage line's threshold logic.
+
+**4. Found + fixed a real bug while wiring this in: `autoImpacts()` was dead code on every
+province.** Regenerating and reading `provinces/nakhon-pathom.json` (top truck-dereg province,
+8.12%) to sanity-check the new UI line surfaced that `buildProvincePanels()`'s
+`const impacts = editorial ? f.impacts : autoImpacts()` branch never actually calls
+`autoImpacts()` — `source-data/province_narratives.json` now has non-empty `impacts` for **all 77
+provinces** (not just the Rayong pilot `CLAUDE.md` still describes), so `editorial` is always
+truthy. That silently hid not only this cycle's new truck-scrappage line but ALSO the prior
+cycle's (2026-07-10 (1)) motorcycle-scrappage line — both were correctly computed and joined into
+`platform/data`, but never rendered anywhere. Fixed by extracting the two DLT-flow watch-flags
+into their own `vehicleFlowImpacts()` function and always appending its (sparse — only ~top-decile
+provinces trigger either flag) output to whichever impacts list renders, editorial or auto-derived,
+instead of letting the editorial branch fully suppress them. Verified with a hand-run Node script
+against the live `nakhon-pathom.json`/`sa-kaeo.json` data (simulating the exact JS logic) since this
+page's headless render is separately, already-documented flaky in this sandbox (2026-07-03 (7),
+2026-07-05, 2026-07-10 (1)) — confirmed Nakhon Pathom's 6 impacts now include "Elevated
+commercial-truck scrappage" appended after its 5 editorial lines, and confirmed provinces below
+both thresholds are unaffected (only the sparse flag lines change, nothing else).
+
+**5. Gates.** `tests/run.sh` gained a gated `build_vehicle_flow_transport.py --check` line
+(graceful `[SKIP]` when the source mirror is absent, same convention as its sibling).
+`tests/validate_data.py` gained `check_vehicle_flow_transport()`: verifies the source file's
+meta/values (buckets present, counts ≥0, rates in [0,1]) AND that every `provinces/<slug>.json`'s
+`gov.vehicle_flow_transport` is an exact pass-through of the source row. `node --check` on the
+extracted inline JS of `province.html` (5/5 blocks) passed. `bash tests/run.sh check` →
+**62 passed, 0 failed**, `validate_data.py` **458/458** (+5 new checks).
+
+**6. Docs.** `docs/DATA_PROVENANCE.md` §2 register gained a row for
+`vehicle_flow_transport_by_province.json`. `docs/CKAN_SOURCES.md`'s `dataset_stat_1_009`
+"next target" line marked DONE.
+
+**Source:** `gdcatalog.dlt.go.th` `dataset_stat_1_009` (mirrored via `pipeline/pull_dlt_all.py`,
+already committed to this branch by a concurrent session before this cycle started) — no new
+external pull performed this cycle; this cycle distilled already-committed raw data and fixed a
+display-layer bug discovered while verifying the new layer actually surfaces.
+
+---
+
 ## 2026-07-10 — ENRICH: DLT vehicle registration-transaction FLOW (dereg/transfer rates) distilled + wired into the province deep-dive
 
 **Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh checkout of

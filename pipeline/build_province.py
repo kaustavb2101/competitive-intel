@@ -170,6 +170,8 @@ def build_all():
     income = _load(income_f)["provinces"] if os.path.exists(income_f) else {}
     vflow_f = os.path.join(SRC, "vehicle_flow_by_province.json")
     vflow = _load(vflow_f)["provinces"] if os.path.exists(vflow_f) else {}
+    vflowt_f = os.path.join(SRC, "vehicle_flow_transport_by_province.json")
+    vflowt = _load(vflowt_f)["provinces"] if os.path.exists(vflowt_f) else {}
     facinc_f = os.path.join(REPO, "platform", "data", "factory_income_by_province.json")
     facinc = _load(facinc_f)["provinces"] if os.path.exists(facinc_f) else {}
     agrinc_f = os.path.join(REPO, "platform", "data", "agri_income_by_province.json")
@@ -298,6 +300,7 @@ def build_all():
                        "unemployment": unemp.get(prov) or {},
                        "income": income.get(prov) or {},
                        "vehicle_flow": vflow.get(prov) or {},
+                       "vehicle_flow_transport": vflowt.get(prov) or {},
                        "income_floor": {
                            k: v for k, v in {
                                "factory_ratio_to_national": (facinc.get(prov) or {}).get("ratio_to_national"),
@@ -305,9 +308,9 @@ def build_all():
                                "sme_ratio_to_national": (smeinc.get(prov) or {}).get("ratio_to_national"),
                            }.items() if v is not None
                        },
-                       "src": "DIW factories · DLT vehicles (stock + registration-action flow) · NSO labour "
-                              "+ NSO Labour Force Survey + NSO SES 2566 income by occupation "
-                              "(data.go.th / TMLI) — measured"},
+                       "src": "DIW factories · DLT vehicles (stock + car-law + land-transport-law "
+                              "registration-action flow) · NSO labour + NSO Labour Force Survey + "
+                              "NSO SES 2566 income by occupation (data.go.th / TMLI) — measured"},
                "meta": {
                    "generated_by": "pipeline/build_province.py",
                    "provenance": {
@@ -335,6 +338,11 @@ def build_all():
                            "car/pickup/moto class, trailing-12mo sum, vehicle_flow_by_province.json via "
                            "build_vehicle_flow.py; {} when the source file is absent — distinct from "
                            "gov.vehicles, which is a STOCK snapshot from a different DLT dataset)",
+                           "gov.vehicle_flow_transport (DLT land-transport-law registration-ACTION flow — "
+                           "dereg_rate/transfer_rate per truck/bus/small class, trailing-12mo sum, "
+                           "vehicle_flow_transport_by_province.json via build_vehicle_flow_transport.py; "
+                           "{} when the source file is absent — the commercial-vehicle sibling of "
+                           "gov.vehicle_flow, a separate DLT dataset under a different legal regime)",
                            "gov.income_floor (derived ratio, factory_income_by_province.json / "
                            "agri_income_by_province.json / sme_income_by_province.json's "
                            "ratio_to_national, all pure province_income/national_avg divisions over "

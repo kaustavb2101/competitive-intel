@@ -121,9 +121,13 @@ enrichment cycle): `pull_dlt_all.py`'s full-catalog mirror already secured all 5
 `dataset_stat_1_008` files; `build_vehicle_flow.py` sums the trailing 12 months into
 `source-data/vehicle_flow_by_province.json` (dereg_rate/transfer_rate by car/pickup/moto), joined
 into `provinces/<slug>.json`'s `gov.vehicle_flow` and surfaced as a "motorcycle scrappage" impact
-line on the province deep-dive. New target: `dataset_stat_1_009` (the land-transport-law sibling —
-trucks/buses) is the same shape but not yet distilled; refresh the Jan-2026 monthly file set as new
-months publish (manual or a future workflow).
+line on the province deep-dive. ~~`dataset_stat_1_009` (the land-transport-law sibling — trucks/
+buses)~~ — DONE (2026-07-10, data-enrichment cycle 2): `build_vehicle_flow_transport.py` distills the
+same already-mirrored 50 monthly files (different column schema — two cessation columns, ม.79/ม.89,
+instead of dataset_stat_1_008's single one) into `source-data/vehicle_flow_transport_by_province.json`
+(dereg_rate/transfer_rate by truck/bus/small), joined into `provinces/<slug>.json`'s
+`gov.vehicle_flow_transport` and surfaced as a "commercial-truck scrappage" impact line. New target:
+refresh the monthly file set as new months publish (manual or a future workflow) for both siblings.
 
 **Wave 11 (2026-07-10) — EV penetration + NSO verdict:**
 - The DLT mirror's `dataset_1_1_04` turned out to be province × vehicle type × **FUEL TYPE** (Feb-2026
