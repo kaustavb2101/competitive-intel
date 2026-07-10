@@ -81,6 +81,7 @@ DATA = os.path.join(ROOT, "platform", "data")
 BRANCHES = os.path.join(DATA, "branches.json")
 CROP = os.path.join(DATA, "crop_stress.json")
 BOARD = os.path.join(ROOT, "source-data", "commodity_board.json")
+NABC = os.path.join(ROOT, "source-data", "nabc_prices.json")
 OUT = os.path.join(DATA, "macro_sensitivity.json")
 sys.path.insert(0, HERE)
 from regionmap import canonical
@@ -92,6 +93,10 @@ from fingerprint import branches_fingerprint
 DRIVER_ORDER = ("rice", "rubber", "palm", "drought")
 # Pink Sheet board row per price driver (source-data/commodity_board.json "lab").
 BOARD_LAB = {"rice": "Rice", "rubber": "Rubber", "palm": "Palm oil"}
+# NABC crop_yoy key per price driver (source-data/nabc_prices.json — LIVE Thai farm-gate,
+# agriapi.nabc.go.th). PREFERRED over the GLOBAL Pink Sheet proxy when present, mirroring
+# build_crop_stress.py (E0 wave: the app's other macro surfaces still ran on the proxy).
+NABC_KEY = {"rice": "rice", "rubber": "rubber", "palm": "oilpalm"}
 # crop_stress.json crop_mix crop name per crop driver.
 CROP_NAME = {"rice": "Rice", "rubber": "Rubber", "palm": "Oil palm"}
 # |YoY| of 25% == full severity 1.0 — same denominator as build_crop_stress.py price_term.
@@ -130,17 +135,38 @@ def build():
     price_vintage = vintages[-1] if vintages else None
 
     # ── measured price signals per driver ───────────────────────────────────
+    # PREFER the LIVE Thai farm-gate YoY (NABC) over the GLOBAL Pink Sheet proxy per crop,
+    # same preference order as build_crop_stress.py; fall back to the board when NABC absent.
+    nabc_yoy = {}
+    nabc_meta = None
+    if os.path.exists(NABC):
+        try:
+            _n = _load(NABC)
+            nabc_yoy = _n.get("crop_yoy") or {}
+            nabc_meta = (_n.get("meta") or {}).get("pulled")
+        except Exception:
+            nabc_yoy = {}
     signals = {}
     for k, lab in BOARD_LAB.items():
         row = by_lab[lab]
-        yoy = float(row["yoy"])
+        nv = nabc_yoy.get(NABC_KEY[k])
+        if isinstance(nv, (int, float)):
+            yoy = float(nv)
+            src = "NABC Thai farm-gate daily prices via source-data/nabc_prices.json ('%s')" % NABC_KEY[k]
+            provn = "MEASURED — LIVE Thai farm-gate YoY % (agriapi.nabc.go.th)"
+            vint = nabc_meta or row.get("stale")
+        else:
+            yoy = float(row["yoy"])
+            src = "World Bank Pink Sheet via source-data/commodity_board.json ('%s')" % lab
+            provn = "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate"
+            vint = row.get("stale")
         signals[k] = {
             "label": DRIVER_LABELS[k],
             "yoy_pct": yoy,
             "dir": "t" if yoy > 0 else "h",   # price up = supports income/collateral
-            "vintage": row.get("stale"),
-            "source": "World Bank Pink Sheet via source-data/commodity_board.json ('%s')" % lab,
-            "provenance": "MEASURED — GLOBAL price YoY %, a direction proxy, NOT Thai farm-gate",
+            "vintage": vint,
+            "source": src,
+            "provenance": provn,
             "ctx_label": CTX_LABELS[k],
         }
     signals["drought"] = {

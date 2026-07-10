@@ -221,8 +221,10 @@ def build():
             rival_bit = " vs %d big-4 rival branches in-district (measured)" % c["_competitors"]
         items.append({
             "type": "expand",
-            "act": ("Open next in %s (%s) — opportunity %s/100: white-space %s, %d AutoX "
-                    "branch%s today%s."
+            # NOT "Open next" — that verdict belongs to the sequenced Road-to-3,000 plan
+            # (committee finding #2, 2026-07-10). This is the composite LENS's top district.
+            "act": ("Scout %s (%s) — highest composite opportunity %s/100: white-space %s, %d AutoX "
+                    "branch%s today%s. Placement ORDER comes from the sequenced plan."
                     % (opick.get("name"), opick.get("province"), _num(opick.get("score")),
                        _num(c.get("whitespace")), opick.get("branches", 0),
                        "" if opick.get("branches") == 1 else "es", rival_bit)),
