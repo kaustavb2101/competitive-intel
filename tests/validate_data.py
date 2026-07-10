@@ -1165,6 +1165,80 @@ def check_province_income_floor():
 
 
 # ---------------------------------------------------------------------------
+def check_province_gov_joins():
+    # provinces/<slug>.json's gov.{vehicles,employment,unemployment,income} (build_province.py) are
+    # each a pure pass-through join of a source-data/*.json dict, keyed by Thai province name — same
+    # shape as gov.income_floor's ratio fields, which got a join-integrity check in
+    # check_province_income_floor() (2026-07-09 (3)). These four upstream dicts never got the
+    # equivalent value-level check (flagged docs/IMPROVEMENT_BACKLOG.md 2026-07-09 (6)) — only
+    # check_provinces()'s generic NaN/shape scan and check_province_provenance()'s meta-presence
+    # check ever touched them. SKIP-passes whole when none of the four source layers exist.
+    hdr("provinces/*.json gov.{vehicles,employment,unemployment,income} join (optional)")
+    sources = {
+        "vehicles": "vehicles_by_province.json",
+        "employment": "employment_by_province.json",
+        "unemployment": "unemployment_by_province.json",
+        "income": "household_income_by_province.json",
+    }
+    src_provs = {}
+    for key, fn in sources.items():
+        path = os.path.join(REPO, "source-data", fn)
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                d = json.load(f)
+        except Exception as e:
+            fail("%s loads (for gov.%s join check)" % (fn, key), repr(e))
+            continue
+        provs = d.get("provinces")
+        if isinstance(provs, dict):
+            src_provs[key] = provs
+
+    if not src_provs:
+        ok("no gov.{vehicles,employment,unemployment,income} source layer present — join check skipped (optional)")
+        return
+
+    try:
+        idx = load(os.path.join("provinces", "index.json"))
+    except Exception as e:
+        fail("provinces/index.json loads (for gov join check)", repr(e))
+        return
+    if not isinstance(idx, list) or not idx:
+        fail("provinces index is a non-empty list (for gov join check)", "got %s" % type(idx).__name__)
+        return
+
+    bad = []
+    n_checked = 0
+    for e in idx:
+        slug = e.get("slug")
+        th = e.get("th")
+        if not isinstance(slug, str) or not slug or not isinstance(th, str) or not th:
+            continue
+        try:
+            p = load(os.path.join("provinces", slug + ".json"))
+        except Exception as ex:
+            bad.append("%s.json load error: %r" % (slug, ex))
+            continue
+        n_checked += 1
+        gov = p.get("gov")
+        if not isinstance(gov, dict):
+            bad.append("%s gov missing/not a dict" % slug)
+            continue
+        for key, provs in src_provs.items():
+            got = gov.get(key)
+            expect = provs.get(th) or {}
+            if got != expect:
+                bad.append("%s gov.%s=%r != source=%r for '%s'" % (slug, key, got, expect, th))
+    if bad:
+        fail("provinces/*.json gov.{vehicles,employment,unemployment,income} join matches source exactly",
+             first_n(bad, 12))
+    else:
+        ok("provinces/*.json gov.{vehicles,employment,unemployment,income} join matches source exactly "
+           "(%d provinces checked, %d source layers present)" % (n_checked, len(src_provs)))
+
+
+# ---------------------------------------------------------------------------
 def check_vehicle_flow():
     # source-data/vehicle_flow_by_province.json (pipeline/build_vehicle_flow.py) — DLT registration-
     # ACTION flow (dereg/transfer rates per vehicle class), trailing-12mo, joined into provinces/
@@ -4651,6 +4725,7 @@ def main():
     check_agri_income()
     check_sme_income()
     check_province_income_floor()
+    check_province_gov_joins()
     check_vehicle_flow()
     check_vehicle_flow_transport()
     check_province_stress()
