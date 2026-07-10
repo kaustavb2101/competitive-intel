@@ -62,6 +62,25 @@
       on success" step. Not force-closed manually this cycle (didn't want to fake a health-check pass by
       hand); worth confirming issue #3 auto-closes on the next real run. *(LOW, trivial — self-resolving)*
 
+## Queue — follow-ups noticed 2026-07-10 (2)
+- [ ] **`renderHomeWhitespace()` (the "Where to expand" card) now has 4 stacked blocks** (top
+      districts, top provinces, competitor coverage, contested ground) — same growth pattern the risk
+      card just got the "Show N more" treatment for. Not urgent (4 is still comfortable per the
+      pattern this cycle used — the risk card wasn't collapsed until 9), but if a 5th block lands,
+      the exact `details.cc-more` CSS class + `<details>` markup this cycle added is already
+      reusable verbatim — no new mechanism needed, just wrap the newer blocks. *(LOW, S, speculative)*
+- [ ] **`dataset_stat_1_009` (land-transport-law registration-action flow — trucks/buses) still has
+      no distiller**, same shape as `build_vehicle_flow.py`'s already-shipped `dataset_stat_1_008` (car
+      law) distiller — the raw data is already mirrored (`pull_dlt_all.py`, 50 monthly files under
+      `source-data/dlt/raw/dataset_stat_1_009/`). Lower priority than car/moto (already covered) since
+      commercial-vehicle churn is less central to a title-loan book, but a same-pattern, same-effort
+      pickup for a future enrichment cycle. *(LOW-MED, S)*
+- [ ] **Re-verify PR #1's successors (PR #2, this branch's current open draft) don't go stale the way
+      PR #1 did** — PR #1 sat open 11 days before merging, during which every `schedule:`-triggered
+      workflow stayed dormant. PR #2 has been open since 2026-07-09 with no merge activity yet; not
+      actionable from the loop (merging is Kaustav's call), but worth a status mention if a future
+      cycle notices it's aged similarly. *(LOW, trivial, informational)*
+
 ## Rules for each cycle (read before picking)
 - **Sandbox-only.** No item that needs a desktop/Thai-IP data pull (those live in `TONIGHT_CHECKLIST.md`).
   Anything that consumes pulled data must **degrade gracefully** when the data is absent.
@@ -639,11 +658,15 @@
       *output* (fresh `factories_by_district.json`/`vehicles_by_province.json`) should get pulled back
       into this branch's `source-data/` and re-derived — a real, non-speculative data refresh, not
       just a workflow existing. *(MED, M, blocked until the workflow's first run lands)*
-- [ ] **Home's risk card (`renderHomeRisk()`) is now 7 stacked blocks deep** (composite-risk verdict,
-      DTI+unemployment, lowest-paid occupation, SME income floor, riskiest branch, crop stress,
-      moto-collateral) — the "more" toggle idea flagged 2026-07-06/2026-07-09 (5) is no longer
-      speculative headroom, it's the actual current state. Worth doing before an 8th block lands;
-      the National map's "More lenses ▾" pattern is the existing precedent to reuse. *(MED, S)*
+- [x] **Home's risk card (`renderHomeRisk()`) "more" toggle — DONE 2026-07-10 (2)** (had grown to 9
+      stacked blocks, not 7 — audited fresh this cycle. Kept the 3 sharpest verdicts always visible
+      [composite risk, DTI+unemployment, riskiest branch]; collapsed the remaining 6 into a native
+      `<details class="cc-more">` "Show N more", reusing `methodBox()`'s existing disclosure idiom
+      instead of building a new toggle+JS-state mechanism like the National map's "More lenses ▾" —
+      simpler, zero new wiring. Print stylesheet forces it open so the exec one-pager keeps full
+      content. Gate 61/0, `validate_data.py` 453/453 [unaffected, UI-only]. Headless-rendered
+      `#home`: `data-errors="[]"`, screenshot confirms 3 lead rows + "Show 6 more ▾". See
+      `docs/PROGRESS_LOG.md` 2026-07-10 (2).)
 
 ## Queue — follow-ups noticed 2026-07-05 (8)
 - [x] **`occupation_income.json`'s national aggregate could feed the Simulator's occupation-

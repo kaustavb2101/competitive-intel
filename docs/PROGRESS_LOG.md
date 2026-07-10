@@ -5,6 +5,30 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-10 (2) — UX: Home risk card collapses secondary reads behind "Show N more".
+
+Picked from the backlog's repeated "card getting long" flags (2026-07-06, 2026-07-09 (5)) — audited
+`renderHomeRisk()` and found it had grown to **9** stacked rank-1 facts (composite risk, DTI+
+unemployment, lowest-paid occupation, SME income floor, riskiest branch, crop stress, moto collateral,
+collateral outlook, vehicle-title pressure), each landed as a small additive win but never revisited as
+a group. Kept the 3 sharpest portfolio-risk verdicts always visible (composite risk, DTI+unemployment
+structural stress, riskiest single branch) and collapsed the remaining 6 conceptual blocks into a
+native `<details class="cc-more">` "Show N more" — reused the exact disclosure idiom `methodBox()`
+already uses for caveats, so this needed **zero new JS state or click-wiring** (native `<details>`
+toggles itself). Added the matching CSS (`platform/styles.css`, mirrors `details.method`'s style) plus
+a print-media override so the exec one-pager (`Print/PDF` button) forces the section open — the
+printed brief must keep full content even though the on-screen default is collapsed.
+
+Zero data/pipeline touched, pure `app.js`+`styles.css` UI change. Gate 61/0 (`validate_data.py`
+453/453, unaffected). Headless-rendered `index.html#home`: `data-errors="[]"`, screenshot confirms the
+risk card now shows 3 lead rows + a "Show 6 more ▾" toggle, no layout regression on the rest of the
+page (whitespace/macro/risk-movers cards unchanged). Files touched: `platform/app.js`,
+`platform/styles.css` only — staged and committed selectively (`git status --porcelain` confirmed
+clean of anything else before commit). PR #2 (existing open draft for this branch) covers this push;
+no new PR needed.
+
+---
+
 ## 2026-07-10 — AUDIT+FIX: the newly-live scheduled workflows' first runs, checked for real — found and
 fixed a genuine site-health bug, root-caused (but did not touch) a separate repo-settings blocker.
 
