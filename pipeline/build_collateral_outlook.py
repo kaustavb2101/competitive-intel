@@ -166,6 +166,10 @@ def build():
 
         # outlook: gold tailwind minus moto-title depreciation drag. POSITIVE = firming.
         outlook = round(W_GOLD * gold_term - W_MOTO * moto_term, 4)
+        # vehicle_outlook: the EX-GOLD leg — the same index with the gold term stripped. AutoX lends
+        # against VEHICLE titles, not gold, so this is the leg that describes the book's own
+        # collateral; the full outlook above is gold-dominated (committee finding #6, 2026-07-10).
+        vehicle_outlook = round(-W_MOTO * moto_term, 4)
 
         # human note: lead with the direction, name which legs were present, flag missing signals.
         note = _note(gold_yoy, moto_share, collateral_score, outlook)
@@ -177,6 +181,7 @@ def build():
             "moto_title_share": moto_share,  # MEASURED DLT (or null if absent)
             "collateral_score": collateral_score,  # ESTIMATED (or null if absent)
             "outlook": outlook,              # ESTIMATED directional read in ~[-1,+1]
+            "vehicle_outlook": vehicle_outlook,  # ESTIMATED — ex-gold leg (vehicle-title only)
             "outlook_note": note,
             "components": {
                 "gold_term": round(gold_term, 4),
@@ -204,6 +209,10 @@ def build():
             wsum += sc
             wnum += sc * r["outlook"]
     nat_outlook = round(wnum / wsum, 4) if wsum > 0 else None
+    # exposure-weighted EX-GOLD national leg (vehicle-title only) — same weights, gold term stripped.
+    vnum = sum((r["collateral_score"] or 0) * r["vehicle_outlook"] for r in records
+               if r["collateral_score"] is not None)
+    nat_vehicle_outlook = round(vnum / wsum, 4) if wsum > 0 else None
     most_at_risk = records[0]["province"] if records else None
 
     national = {
@@ -214,6 +223,7 @@ def build():
         "n_softening": len(softening),
         "n_firming": len(firming),
         "exposure_weighted_outlook": nat_outlook,
+        "vehicle_weighted_outlook": nat_vehicle_outlook,
         "most_at_risk_province": most_at_risk,
         "headline": _headline(gold_yoy, nat_outlook, len(softening), len(records)),
     }
@@ -244,6 +254,10 @@ def build():
             "outlook": "ESTIMATED — directional index in ~[-1,+1]. POSITIVE = recovery value firming "
                        "(gold tailwind dominates), NEGATIVE = softening (moto-title depreciation drag "
                        "dominates). See meta.formula. NOT a recovery rate.",
+            "vehicle_outlook": "ESTIMATED — the EX-GOLD leg of the same index (-W_MOTO*moto_term): "
+                               "the vehicle-title-only direction. AutoX lends against vehicle titles, "
+                               "not gold, so this leg describes the book's own collateral; the full "
+                               "outlook is dominated by the national gold term.",
         },
         "formula": {
             "gold_term": "clamp(gold_yoy / %g, -1, 1)" % GOLD_SCALE,

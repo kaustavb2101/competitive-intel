@@ -6,6 +6,7 @@
     "network_free": true,
     "n_provinces": 76,
     "n_double_stress": 0,
+    "n_drought_watch": 4,
     "sort": "worst-first by agri_stress (desc)",
     "fields": {
       "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
@@ -14,7 +15,8 @@
       "crop_dependence": "MEASURED — province total crop rai / max province crop rai (0..1).",
       "agri_stress": "ESTIMATED — composite, see meta.formula. Combines price + drought hazard, scaled by crop_dependence. Index, not a measured outcome.",
       "double_stress": "ESTIMATED FLAG — true when a province is rice/rubber-heavy AND its rice/rubber prices are softening AND its drought signal is elevated. See meta.double_stress for the exact rule. A triage flag, not a forecast.",
-      "double_stress_score": "ESTIMATED — 0..1 severity of the overlap when the flag is true (0 when false). See meta.double_stress."
+      "double_stress_score": "ESTIMATED — 0..1 severity of the overlap when the flag is true (0 when false). See meta.double_stress.",
+      "drought_watch": "ESTIMATED FLAG — rice >= 90% of the shown crop mix AND rainfall below 65% of normal. Price-INDEPENDENT: the rice-price tailwind hides these provinces in agri_stress, but the water deficit is measured and the income cushion disappears if the irrigated second rice crop is cut. A watch flag, not a default forecast."
     },
     "formula": {
       "price_term": "clamp(-price_stress / 25, 0, 1)",
@@ -97,6 +99,7 @@
       "agri_stress": 0.208,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 4769593,
         "price_term": 0.0,
@@ -107,6 +110,7 @@
         "n_branches": 46,
         "n_rain_branches": 46,
         "rice_rubber_share": 0.995,
+        "rice_share": 0.865,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -139,6 +143,7 @@
       "agri_stress": 0.1979,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3199687,
         "price_term": 0.0,
@@ -149,6 +154,7 @@
         "n_branches": 39,
         "n_rain_branches": 39,
         "rice_rubber_share": 0.9994,
+        "rice_share": 0.967,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -181,6 +187,7 @@
       "agri_stress": 0.1667,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3383728,
         "price_term": 0.0,
@@ -191,6 +198,7 @@
         "n_branches": 30,
         "n_rain_branches": 30,
         "rice_rubber_share": 0.9984,
+        "rice_share": 0.926,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -223,6 +231,7 @@
       "agri_stress": 0.1563,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3403003,
         "price_term": 0.0,
@@ -233,6 +242,7 @@
         "n_branches": 31,
         "n_rain_branches": 31,
         "rice_rubber_share": 0.9976,
+        "rice_share": 0.8899,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -265,6 +275,7 @@
       "agri_stress": 0.1094,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3309988,
         "price_term": 0.0,
@@ -275,6 +286,7 @@
         "n_branches": 53,
         "n_rain_branches": 53,
         "rice_rubber_share": 0.9976,
+        "rice_share": 0.9059,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -307,6 +319,7 @@
       "agri_stress": 0.1087,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2141313,
         "price_term": 0.0,
@@ -317,6 +330,7 @@
         "n_branches": 32,
         "n_rain_branches": 32,
         "rice_rubber_share": 0.9999,
+        "rice_share": 0.9947,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -349,6 +363,7 @@
       "agri_stress": 0.1015,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": true,
       "components": {
         "total_crop_rai": 1270855,
         "price_term": 0.0,
@@ -359,6 +374,7 @@
         "n_branches": 22,
         "n_rain_branches": 22,
         "rice_rubber_share": 0.998,
+        "rice_share": 0.9928,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -391,6 +407,7 @@
       "agri_stress": 0.1002,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2568763,
         "price_term": 0.0,
@@ -401,6 +418,7 @@
         "n_branches": 31,
         "n_rain_branches": 31,
         "rice_rubber_share": 0.9988,
+        "rice_share": 0.9963,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -433,6 +451,7 @@
       "agri_stress": 0.098,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1693323,
         "price_term": 0.0,
@@ -443,6 +462,7 @@
         "n_branches": 18,
         "n_rain_branches": 17,
         "rice_rubber_share": 0.3874,
+        "rice_share": 0.0013,
         "ds_price_softening": false,
         "ds_share_qualifies": false,
         "ds_drought_elevated": true
@@ -475,6 +495,7 @@
       "agri_stress": 0.0729,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1242460,
         "price_term": 0.0,
@@ -485,6 +506,7 @@
         "n_branches": 14,
         "n_rain_branches": 14,
         "rice_rubber_share": 0.9944,
+        "rice_share": 0.9525,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -517,6 +539,7 @@
       "agri_stress": 0.0696,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1710674,
         "price_term": 0.0,
@@ -527,6 +550,7 @@
         "n_branches": 32,
         "n_rain_branches": 32,
         "rice_rubber_share": 0.9962,
+        "rice_share": 0.88,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -559,6 +583,7 @@
       "agri_stress": 0.0644,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1839923,
         "price_term": 0.0,
@@ -569,6 +594,7 @@
         "n_branches": 30,
         "n_rain_branches": 30,
         "rice_rubber_share": 0.9902,
+        "rice_share": 0.8073,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -601,6 +627,7 @@
       "agri_stress": 0.0618,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1488240,
         "price_term": 0.0,
@@ -611,6 +638,7 @@
         "n_branches": 19,
         "n_rain_branches": 19,
         "rice_rubber_share": 0.9973,
+        "rice_share": 0.9168,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -643,6 +671,7 @@
       "agri_stress": 0.0591,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 848469,
         "price_term": 0.0,
@@ -653,6 +682,7 @@
         "n_branches": 15,
         "n_rain_branches": 15,
         "rice_rubber_share": 0.9985,
+        "rice_share": 0.9975,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -685,6 +715,7 @@
       "agri_stress": 0.0571,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1692136,
         "price_term": 0.0,
@@ -695,6 +726,7 @@
         "n_branches": 22,
         "n_rain_branches": 22,
         "rice_rubber_share": 0.9933,
+        "rice_share": 0.7647,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -727,6 +759,7 @@
       "agri_stress": 0.056,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2595135,
         "price_term": 0.0,
@@ -737,6 +770,7 @@
         "n_branches": 30,
         "n_rain_branches": 30,
         "rice_rubber_share": 0.988,
+        "rice_share": 0.8334,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -769,6 +803,7 @@
       "agri_stress": 0.0437,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1812111,
         "price_term": 0.0,
@@ -779,6 +814,7 @@
         "n_branches": 17,
         "n_rain_branches": 17,
         "rice_rubber_share": 0.999,
+        "rice_share": 0.9975,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -811,6 +847,7 @@
       "agri_stress": 0.0413,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 907119,
         "price_term": 0.0,
@@ -821,6 +858,7 @@
         "n_branches": 35,
         "n_rain_branches": 35,
         "rice_rubber_share": 0.9565,
+        "rice_share": 0.6998,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -853,6 +891,7 @@
       "agri_stress": 0.0396,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 811154,
         "price_term": 0.0,
@@ -863,6 +902,7 @@
         "n_branches": 29,
         "n_rain_branches": 29,
         "rice_rubber_share": 0.9969,
+        "rice_share": 0.9949,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -890,6 +930,7 @@
       "agri_stress": 0.0388,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 814467,
         "price_term": 0.0,
@@ -900,6 +941,7 @@
         "n_branches": 27,
         "n_rain_branches": 27,
         "rice_rubber_share": 0.9992,
+        "rice_share": 0.9992,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -932,6 +974,7 @@
       "agri_stress": 0.0376,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 515243,
         "price_term": 0.0,
@@ -942,6 +985,7 @@
         "n_branches": 32,
         "n_rain_branches": 32,
         "rice_rubber_share": 0.9574,
+        "rice_share": 0.7096,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -974,6 +1018,7 @@
       "agri_stress": 0.0368,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 655473,
         "price_term": 0.0,
@@ -984,6 +1029,7 @@
         "n_branches": 9,
         "n_rain_branches": 9,
         "rice_rubber_share": 0.9947,
+        "rice_share": 0.9513,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1016,6 +1062,7 @@
       "agri_stress": 0.0363,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 613520,
         "price_term": 0.0,
@@ -1026,6 +1073,7 @@
         "n_branches": 59,
         "n_rain_branches": 54,
         "rice_rubber_share": 0.9425,
+        "rice_share": 0.0159,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1058,6 +1106,7 @@
       "agri_stress": 0.0339,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1178913,
         "price_term": 0.0,
@@ -1068,6 +1117,7 @@
         "n_branches": 14,
         "n_rain_branches": 14,
         "rice_rubber_share": 0.9933,
+        "rice_share": 0.9142,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1100,6 +1150,7 @@
       "agri_stress": 0.0331,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3619326,
         "price_term": 0.0,
@@ -1110,6 +1161,7 @@
         "n_branches": 81,
         "n_rain_branches": 81,
         "rice_rubber_share": 0.9969,
+        "rice_share": 0.9758,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1142,6 +1194,7 @@
       "agri_stress": 0.0329,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1911130,
         "price_term": 0.0,
@@ -1152,6 +1205,7 @@
         "n_branches": 30,
         "n_rain_branches": 30,
         "rice_rubber_share": 0.997,
+        "rice_share": 0.9336,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1184,6 +1238,7 @@
       "agri_stress": 0.0283,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 410847,
         "price_term": 0.0,
@@ -1194,6 +1249,7 @@
         "n_branches": 103,
         "n_rain_branches": 100,
         "rice_rubber_share": 0.7262,
+        "rice_share": 0.1674,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1226,6 +1282,7 @@
       "agri_stress": 0.0275,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1338859,
         "price_term": 0.0,
@@ -1236,6 +1293,7 @@
         "n_branches": 23,
         "n_rain_branches": 23,
         "rice_rubber_share": 0.9876,
+        "rice_share": 0.9187,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1268,6 +1326,7 @@
       "agri_stress": 0.027,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 667535,
         "price_term": 0.0,
@@ -1278,6 +1337,7 @@
         "n_branches": 18,
         "n_rain_branches": 18,
         "rice_rubber_share": 0.9861,
+        "rice_share": 0.9313,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1310,6 +1370,7 @@
       "agri_stress": 0.0238,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1860871,
         "price_term": 0.0,
@@ -1320,6 +1381,7 @@
         "n_branches": 21,
         "n_rain_branches": 21,
         "rice_rubber_share": 0.9944,
+        "rice_share": 0.7972,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1352,6 +1414,7 @@
       "agri_stress": 0.0235,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 304419,
         "price_term": 0.0,
@@ -1362,6 +1425,7 @@
         "n_branches": 20,
         "n_rain_branches": 20,
         "rice_rubber_share": 0.9524,
+        "rice_share": 0.8952,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1394,6 +1458,7 @@
       "agri_stress": 0.0235,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 279910,
         "price_term": 0.0,
@@ -1404,6 +1469,7 @@
         "n_branches": 27,
         "n_rain_branches": 27,
         "rice_rubber_share": 0.9577,
+        "rice_share": 0.7986,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1436,6 +1502,7 @@
       "agri_stress": 0.0227,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2640757,
         "price_term": 0.0,
@@ -1446,6 +1513,7 @@
         "n_branches": 38,
         "n_rain_branches": 38,
         "rice_rubber_share": 0.9877,
+        "rice_share": 0.7677,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1478,6 +1546,7 @@
       "agri_stress": 0.0212,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 505432,
         "price_term": 0.0,
@@ -1488,6 +1557,7 @@
         "n_branches": 4,
         "n_rain_branches": 4,
         "rice_rubber_share": 0.6764,
+        "rice_share": 0.0011,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1510,6 +1580,7 @@
       "agri_stress": 0.0207,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 344353,
         "price_term": 0.0,
@@ -1520,6 +1591,7 @@
         "n_branches": 8,
         "n_rain_branches": 8,
         "rice_rubber_share": 1.0,
+        "rice_share": 1.0,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1552,6 +1624,7 @@
       "agri_stress": 0.0205,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1399590,
         "price_term": 0.0,
@@ -1562,6 +1635,7 @@
         "n_branches": 21,
         "n_rain_branches": 21,
         "rice_rubber_share": 0.9824,
+        "rice_share": 0.3122,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1594,6 +1668,7 @@
       "agri_stress": 0.0202,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 734882,
         "price_term": 0.0,
@@ -1604,6 +1679,7 @@
         "n_branches": 9,
         "n_rain_branches": 9,
         "rice_rubber_share": 0.9938,
+        "rice_share": 0.6274,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1636,6 +1712,7 @@
       "agri_stress": 0.0187,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 304949,
         "price_term": 0.0,
@@ -1646,6 +1723,7 @@
         "n_branches": 39,
         "n_rain_branches": 39,
         "rice_rubber_share": 0.9688,
+        "rice_share": 0.9679,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1678,6 +1756,7 @@
       "agri_stress": 0.0183,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 446386,
         "price_term": 0.0,
@@ -1688,6 +1767,7 @@
         "n_branches": 33,
         "n_rain_branches": 33,
         "rice_rubber_share": 0.6582,
+        "rice_share": 0.0488,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1720,6 +1800,7 @@
       "agri_stress": 0.0178,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1305530,
         "price_term": 0.0,
@@ -1730,6 +1811,7 @@
         "n_branches": 30,
         "n_rain_branches": 30,
         "rice_rubber_share": 0.9939,
+        "rice_share": 0.9696,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1762,6 +1844,7 @@
       "agri_stress": 0.0175,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 257944,
         "price_term": 0.0,
@@ -1772,6 +1855,7 @@
         "n_branches": 22,
         "n_rain_branches": 22,
         "rice_rubber_share": 0.9983,
+        "rice_share": 0.9982,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1799,6 +1883,7 @@
       "agri_stress": 0.0168,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 307574,
         "price_term": 0.0,
@@ -1809,6 +1894,7 @@
         "n_branches": 8,
         "n_rain_branches": 8,
         "rice_rubber_share": 0.9999,
+        "rice_share": 0.9999,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1841,6 +1927,7 @@
       "agri_stress": 0.0144,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 870232,
         "price_term": 0.0,
@@ -1851,6 +1938,7 @@
         "n_branches": 20,
         "n_rain_branches": 20,
         "rice_rubber_share": 0.9515,
+        "rice_share": 0.875,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1883,6 +1971,7 @@
       "agri_stress": 0.0138,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 370791,
         "price_term": 0.0,
@@ -1893,6 +1982,7 @@
         "n_branches": 13,
         "n_rain_branches": 13,
         "rice_rubber_share": 0.8303,
+        "rice_share": 0.0345,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1925,6 +2015,7 @@
       "agri_stress": 0.0128,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 503016,
         "price_term": 0.0,
@@ -1935,6 +2026,7 @@
         "n_branches": 25,
         "n_rain_branches": 25,
         "rice_rubber_share": 0.9586,
+        "rice_share": 0.0231,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1967,6 +2059,7 @@
       "agri_stress": 0.0121,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 647416,
         "price_term": 0.0,
@@ -1977,6 +2070,7 @@
         "n_branches": 7,
         "n_rain_branches": 7,
         "rice_rubber_share": 0.9951,
+        "rice_share": 0.5143,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2009,6 +2103,7 @@
       "agri_stress": 0.0106,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 369177,
         "price_term": 0.0,
@@ -2019,6 +2114,7 @@
         "n_branches": 7,
         "n_rain_branches": 7,
         "rice_rubber_share": 0.987,
+        "rice_share": 0.9855,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2051,6 +2147,7 @@
       "agri_stress": 0.0105,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 794738,
         "price_term": 0.0,
@@ -2061,6 +2158,7 @@
         "n_branches": 11,
         "n_rain_branches": 11,
         "rice_rubber_share": 0.9967,
+        "rice_share": 0.8032,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2093,6 +2191,7 @@
       "agri_stress": 0.0097,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 324544,
         "price_term": 0.0,
@@ -2103,6 +2202,7 @@
         "n_branches": 9,
         "n_rain_branches": 9,
         "rice_rubber_share": 0.9933,
+        "rice_share": 0.8937,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2135,6 +2235,7 @@
       "agri_stress": 0.0095,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 3767378,
         "price_term": 0.0,
@@ -2145,6 +2246,7 @@
         "n_branches": 43,
         "n_rain_branches": 42,
         "rice_rubber_share": 0.6115,
+        "rice_share": 0.0044,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2177,6 +2279,7 @@
       "agri_stress": 0.0083,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 966885,
         "price_term": 0.0,
@@ -2187,6 +2290,7 @@
         "n_branches": 15,
         "n_rain_branches": 2,
         "rice_rubber_share": 0.9742,
+        "rice_share": 0.6218,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2219,6 +2323,7 @@
       "agri_stress": 0.0066,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 484960,
         "price_term": 0.0,
@@ -2229,6 +2334,7 @@
         "n_branches": 18,
         "n_rain_branches": 18,
         "rice_rubber_share": 0.9607,
+        "rice_share": 0.8827,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2261,6 +2367,7 @@
       "agri_stress": 0.0061,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 333057,
         "price_term": 0.0,
@@ -2271,6 +2378,7 @@
         "n_branches": 24,
         "n_rain_branches": 24,
         "rice_rubber_share": 0.986,
+        "rice_share": 0.9805,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2298,6 +2406,7 @@
       "agri_stress": 0.006,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 82129,
         "price_term": 0.0,
@@ -2308,6 +2417,7 @@
         "n_branches": 170,
         "n_rain_branches": 170,
         "rice_rubber_share": 0.9953,
+        "rice_share": 0.9953,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -2335,6 +2445,7 @@
       "agri_stress": 0.0056,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 82857,
         "price_term": 0.0,
@@ -2345,6 +2456,7 @@
         "n_branches": 39,
         "n_rain_branches": 39,
         "rice_rubber_share": 0.9998,
+        "rice_share": 0.9998,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -2377,6 +2489,7 @@
       "agri_stress": 0.0024,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 398993,
         "price_term": 0.0,
@@ -2387,6 +2500,7 @@
         "n_branches": 9,
         "n_rain_branches": 9,
         "rice_rubber_share": 0.9954,
+        "rice_share": 0.9642,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2414,6 +2528,7 @@
       "agri_stress": 0.0014,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": true,
       "components": {
         "total_crop_rai": 17026,
         "price_term": 0.0,
@@ -2424,6 +2539,7 @@
         "n_branches": 40,
         "n_rain_branches": 40,
         "rice_rubber_share": 0.9944,
+        "rice_share": 0.9944,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -2451,6 +2567,7 @@
       "agri_stress": 0.0003,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": true,
       "components": {
         "total_crop_rai": 3910,
         "price_term": 0.0,
@@ -2461,6 +2578,7 @@
         "n_branches": 13,
         "n_rain_branches": 13,
         "rice_rubber_share": 0.9864,
+        "rice_share": 0.9864,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -2488,6 +2606,7 @@
       "agri_stress": 0.0002,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": true,
       "components": {
         "total_crop_rai": 1890,
         "price_term": 0.0,
@@ -2498,6 +2617,7 @@
         "n_branches": 5,
         "n_rain_branches": 5,
         "rice_rubber_share": 0.9751,
+        "rice_share": 0.9751,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -2530,6 +2650,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 219372,
         "price_term": 0.0,
@@ -2540,6 +2661,7 @@
         "n_branches": 4,
         "n_rain_branches": 4,
         "rice_rubber_share": 0.9998,
+        "rice_share": 0.9945,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2572,6 +2694,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2488138,
         "price_term": 0.0,
@@ -2582,6 +2705,7 @@
         "n_branches": 35,
         "n_rain_branches": 35,
         "rice_rubber_share": 0.9992,
+        "rice_share": 0.9654,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2614,6 +2738,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 580038,
         "price_term": 0.0,
@@ -2624,6 +2749,7 @@
         "n_branches": 45,
         "n_rain_branches": 45,
         "rice_rubber_share": 0.9993,
+        "rice_share": 0.9559,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2656,6 +2782,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 107803,
         "price_term": 0.0,
@@ -2666,6 +2793,7 @@
         "n_branches": 14,
         "n_rain_branches": 14,
         "rice_rubber_share": 0.9944,
+        "rice_share": 0.9242,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2698,6 +2826,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 485957,
         "price_term": 0.0,
@@ -2708,6 +2837,7 @@
         "n_branches": 18,
         "n_rain_branches": 18,
         "rice_rubber_share": 0.9952,
+        "rice_share": 0.9152,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2740,6 +2870,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 868259,
         "price_term": 0.0,
@@ -2750,6 +2881,7 @@
         "n_branches": 10,
         "n_rain_branches": 10,
         "rice_rubber_share": 0.9912,
+        "rice_share": 0.8605,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2782,6 +2914,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 496197,
         "price_term": 0.0,
@@ -2792,6 +2925,7 @@
         "n_branches": 11,
         "n_rain_branches": 11,
         "rice_rubber_share": 0.9481,
+        "rice_share": 0.134,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2824,6 +2958,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1209966,
         "price_term": 0.0,
@@ -2834,6 +2969,7 @@
         "n_branches": 13,
         "n_rain_branches": 13,
         "rice_rubber_share": 0.9033,
+        "rice_share": 0.0929,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2866,6 +3002,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2442263,
         "price_term": 0.0,
@@ -2876,6 +3013,7 @@
         "n_branches": 20,
         "n_rain_branches": 20,
         "rice_rubber_share": 0.9606,
+        "rice_share": 0.0629,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2908,6 +3046,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1202476,
         "price_term": 0.0,
@@ -2918,6 +3057,7 @@
         "n_branches": 8,
         "n_rain_branches": 8,
         "rice_rubber_share": 0.9922,
+        "rice_share": 0.0156,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2950,6 +3090,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1026007,
         "price_term": 0.0,
@@ -2960,6 +3101,7 @@
         "n_branches": 11,
         "n_rain_branches": 11,
         "rice_rubber_share": 0.9277,
+        "rice_share": 0.0286,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2992,6 +3134,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 72467,
         "price_term": 0.0,
@@ -3002,6 +3145,7 @@
         "n_branches": 21,
         "n_rain_branches": 16,
         "rice_rubber_share": 0.9563,
+        "rice_share": 0.0006,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3034,6 +3178,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 2747913,
         "price_term": 0.0,
@@ -3044,6 +3189,7 @@
         "n_branches": 42,
         "n_rain_branches": 42,
         "rice_rubber_share": 0.7441,
+        "rice_share": 0.0629,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3076,6 +3222,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 676007,
         "price_term": 0.0,
@@ -3086,6 +3233,7 @@
         "n_branches": 9,
         "n_rain_branches": 9,
         "rice_rubber_share": 0.7984,
+        "rice_share": 0.0217,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3118,6 +3266,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1658900,
         "price_term": 0.0,
@@ -3128,6 +3277,7 @@
         "n_branches": 23,
         "n_rain_branches": 23,
         "rice_rubber_share": 0.8034,
+        "rice_share": 0.0057,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3160,6 +3310,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 817562,
         "price_term": 0.0,
@@ -3170,6 +3321,7 @@
         "n_branches": 13,
         "n_rain_branches": 13,
         "rice_rubber_share": 0.6579,
+        "rice_share": 0.0025,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3202,6 +3354,7 @@
       "agri_stress": 0.0,
       "double_stress": false,
       "double_stress_score": 0.0,
+      "drought_watch": false,
       "components": {
         "total_crop_rai": 1816774,
         "price_term": 0.0,
@@ -3212,6 +3365,7 @@
         "n_branches": 14,
         "n_rain_branches": 14,
         "rice_rubber_share": 0.3347,
+        "rice_share": 0.0034,
         "ds_price_softening": false,
         "ds_share_qualifies": false,
         "ds_drought_elevated": false

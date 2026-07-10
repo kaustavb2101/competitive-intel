@@ -101,6 +101,12 @@ TOP_CROPS = 3
 DS_SHARE_FLOOR = 0.5     # rice+rubber must be >= half of mapped crop area to count
 DS_DROUGHT_FLOOR = 0.6   # drought signal (0..1) considered "elevated" at/above this
 RICE_RUBBER = ("Rice", "Rubber")
+# drought-watch: a near-monoculture rice province sitting on a deep rainfall deficit. The price
+# tailwind currently hides these in agri_stress (committee Area-2 finding, 2026-07-10): Suphanburi
+# scores 10/100 despite 62%-of-normal rain because rice is +18% YoY. The flag names the exposure
+# that crystallizes if the irrigated second rice crop is cut.
+DW_RICE_SHARE = 0.90     # rice >= 90% of shown crop mix
+DW_RAIN_PCT = 65.0       # rain below 65% of normal
 
 
 def load(name):
@@ -325,6 +331,11 @@ def build():
         else:
             double_stress_score = 0.0
 
+        # --- drought-watch: rice-monoculture on a deep rain deficit (price-independent) ---
+        rice_share = round(sum(c["share"] for c in crop_mix if c["crop"] == "Rice"), 4)
+        drought_watch = bool(rice_share >= DW_RICE_SHARE
+                             and rain_mean is not None and rain_mean < DW_RAIN_PCT)
+
         records.append({
             "th": prov,
             "en": None,  # english province name not available in source-data (honest null)
@@ -336,6 +347,7 @@ def build():
             "agri_stress": agri_stress,
             "double_stress": double_stress,
             "double_stress_score": double_stress_score,
+            "drought_watch": drought_watch,
             "components": {
                 "total_crop_rai": int(round(total_rai)),
                 "price_term": round(price_term, 4),
@@ -346,6 +358,7 @@ def build():
                 "n_branches": prov_nbranch.get(prov, 0),
                 "n_rain_branches": len(rains),
                 "rice_rubber_share": rice_rubber_share,
+                "rice_share": rice_share,
                 "ds_price_softening": ds_price,
                 "ds_share_qualifies": ds_share,
                 "ds_drought_elevated": ds_drought,
@@ -361,6 +374,7 @@ def build():
     ))
 
     n_double = sum(1 for r in records if r["double_stress"])
+    n_drought_watch = sum(1 for r in records if r["drought_watch"])
 
     meta = {
         "title": "Per-province crop-household stress (portfolio risk, objective #1)",
@@ -369,6 +383,7 @@ def build():
         "network_free": True,
         "n_provinces": len(records),
         "n_double_stress": n_double,
+        "n_drought_watch": n_drought_watch,
         "sort": "worst-first by agri_stress (desc)",
         "fields": {
             "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
@@ -387,6 +402,11 @@ def build():
                              "forecast.",
             "double_stress_score": "ESTIMATED — 0..1 severity of the overlap when the flag is true "
                                    "(0 when false). See meta.double_stress.",
+            "drought_watch": "ESTIMATED FLAG — rice >= %g%% of the shown crop mix AND rainfall below "
+                             "%g%% of normal. Price-INDEPENDENT: the rice-price tailwind hides these "
+                             "provinces in agri_stress, but the water deficit is measured and the "
+                             "income cushion disappears if the irrigated second rice crop is cut. "
+                             "A watch flag, not a default forecast." % (100 * DW_RICE_SHARE, DW_RAIN_PCT),
         },
         "formula": {
             "price_term": "clamp(-price_stress / %g, 0, 1)" % PRICE_SCALE,

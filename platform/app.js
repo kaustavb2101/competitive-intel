@@ -1635,11 +1635,22 @@ function renderCropStress(){
       // double-stress badge: rice/rubber-heavy AND softening prices AND elevated drought
       // (ESTIMATED flag from crop_stress.json). Graceful: nothing rendered when absent/false.
       const ds=p.double_stress?` <span class="tag" style="color:var(--agri);border:1px solid var(--agri)" title="ESTIMATED — rice/rubber-heavy AND prices softening AND drought elevated (double-stress, crop_stress.json)">double-stress</span>`:'';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b>${ds}</td><td class="sub">${p.region||'—'}</td>
+      const dw=p.drought_watch?` <span class="tag" style="color:var(--gold);border:1px solid var(--gold)" title="ESTIMATED FLAG — rice ≥90% of crop mix AND rain <65% of normal. Price-independent: the rice tailwind hides the deficit.">drought-watch</span>`:'';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b>${ds}${dw}</td><td class="sub">${p.region||'—'}</td>
       <td>${barHTML(sv,bar)} <span class="mono" style="color:${sc}">${sv}</span></td>
       <td class="sub">${dom.crop||'—'} <span class="mono">${dom.share!=null?Math.round(dom.share*100)+'%':''}</span></td>
       <td class="mono" style="color:${p.price_stress<0?'var(--agri)':'var(--mid)'}">${p.price_stress!=null?(p.price_stress>0?'+':'')+p.price_stress+'%':'—'}</td>
       <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td></tr>`;}).join('');
+  // DROUGHT-WATCH strip — rice-monoculture provinces on a deep measured rain deficit that the
+  // rice-price tailwind HIDES from the agri-stress ranking above (they score ~10/100 so they never
+  // make the worst-8 table). Committee Area-2 finding, 2026-07-10. Appended to the note line.
+  const dwList=CSTRESS_LIST.filter(p=>p.drought_watch);
+  if(note&&dwList.length){
+    const nbr=dwList.reduce((s,p)=>s+((p.components||{}).n_branches||0),0);
+    note.innerHTML+=`<br><b style="color:var(--gold)">⚠ Drought-watch (${dwList.length} provinces · ${nbr} branches):</b> `+
+      dwList.map(p=>`${p.th} <span class="mono">${(p.components||{}).rain_pct_of_normal}%</span>`).join(' · ')+
+      ` — ≥90% rice on rain &lt;65% of normal. The +rice-price cushion hides them in the ranking above; the exposure crystallizes if the irrigated second crop is cut ${TAG_E}`;
+  }
 }
 
 /* ---------- acquisition ---------- */
@@ -2897,6 +2908,15 @@ function onExposureView(){const v=document.getElementById('v-exposure'); return 
    max is the worst observed mean, so bars are relative). Lazy-load on first paint, re-render when data
    lands; render NOTHING when the source file is absent. DOM hosts are created in-JS and inserted after
    #expoprov's container so no extra index.html wiring is needed beyond the existing dash2-main. */
+// PEER NPL BENCHMARK (data/peer_npl.json — MEASURED-as-reported peer figures, RESEARCH_DIGEST §B).
+let PEERNPL=null, peernplLoaded=false, peernplPromise=null;
+function loadPeerNpl(){
+  if(peernplPromise) return peernplPromise;
+  peernplPromise=fetch('data/peer_npl.json').then(r=>r.ok?r.json():null)
+    .then(j=>{PEERNPL=j; peernplLoaded=true; return j;})
+    .catch(()=>{peernplLoaded=true; return null;});
+  return peernplPromise;
+}
 function riskHost(){
   let h=document.getElementById('expo-risk');
   if(h) return h;
@@ -2914,6 +2934,7 @@ function renderRiskReadouts(){
   if(!pstressLoaded) loadProvinceStress().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!occincLoaded) loadOccupationIncome().then(()=>{ if(onExp()) renderRiskReadouts(); });
   if(!smeincLoaded) loadSmeIncome().then(()=>{ if(onExp()) renderRiskReadouts(); });
+  if(!peernplLoaded) loadPeerNpl().then(()=>{ if(onExp()) renderRiskReadouts(); });
   let html='';
   // 1) MOST-STRESSED PROVINCES (province_risk.json)
   if(priskHasData()){
@@ -2966,6 +2987,17 @@ function renderRiskReadouts(){
       `<div class="cc-card-b">`+ccRow(`${s.province}`,
         `SME-owner income ฿${(s.sme_income||0).toLocaleString()}/mo · ${nBelow}/${SMEINC_LIST.length} provinces below the national floor (NSO SES 2566, measured)`,
         `${(s.ratio_to_national||0).toFixed(2)}×`,'vs national avg','var(--collat)')+`</div>`;
+  }
+  // 1e) PEER NPL BENCHMARK (peer_npl.json — listed peers' REPORTED NPLs). The external yardstick
+  // for every estimated risk read above: we hold no measured AutoX NPL, so the peers' reported
+  // range is the honest calibration context. Committed 2026-06, previously unsurfaced (E0 wave).
+  if(PEERNPL&&Array.isArray(PEERNPL.peers)&&PEERNPL.peers.length){
+    html+=`<div class="cc-sub2" style="margin-top:14px">Peer NPL benchmark · reported ${TAG_M}</div>`+
+      `<div class="cc-card-b">`+PEERNPL.peers.map(p=>ccRow(
+        `${p.name} <span class="s">${p.ticker}</span>`,
+        `${p.collateral||''} · reported (company IR, ${(PEERNPL.meta&&PEERNPL.meta.updated)||''})`,
+        `${p.npl_label||p.npl}%`,'NPL','var(--collat)')).join('')+
+      `<div class="s" style="margin-top:4px">Peer figures only — NOT an AutoX number (no measured AutoX NPL yet; a real loan-tape export unlocks that). The spread tracks collateral mix.</div></div>`;
   }
   // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
@@ -5446,15 +5478,24 @@ function renderHomeRisk(){
   // AutoX lends against VEHICLE TITLES (not gold), so gold-collateral is not shown.
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
-    const o=nat.exposure_weighted_outlook, firm=o>=0;
+    // LEAD with the EX-GOLD vehicle-title leg (vehicle_weighted_outlook) — AutoX lends against
+    // vehicle titles, not gold, and the full index is gold-dominated: it read "firming +0.14"
+    // directly above the ↓ vehicle-title rows while the book's own leg reads softening −0.13
+    // (committee finding #6, 2026-07-10). The gold-dominated full index stays as context.
+    const vo=nat.vehicle_weighted_outlook, o=nat.exposure_weighted_outlook;
     more+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
-    // the index is dominated by the global gold tailwind, which is NOT AutoX collateral — without
-    // the caption below, "firming" sat directly above the ↓ vehicle-title rows with no bridge
-    // (committee finding #6, 2026-07-10: ex-gold the same index reads softening).
-    more+=ccRow(firm?'Recovery value firming':'Recovery value softening',
-      `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`+
-      (firm?' · gold-pawn tailwind dominates this index — the vehicle-title legs below still point down':''),
-      `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
+    if(vo!=null){
+      const vfirm=vo>=0;
+      more+=ccRow(vfirm?'Vehicle-title recovery firming':'Vehicle-title recovery softening',
+        `ex-gold leg — the book's own collateral · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy) · full index ${o>=0?'+':''}${o.toFixed(2)} is gold-pawn dominated (not AutoX collateral)`,
+        `${vfirm?'+':''}${vo.toFixed(2)}`,'index −1…+1',vfirm?'var(--up)':'var(--agri)');
+    } else {
+      const firm=o>=0;
+      more+=ccRow(firm?'Recovery value firming':'Recovery value softening',
+        `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`+
+        (firm?' · gold-pawn tailwind dominates this index — the vehicle-title legs below still point down':''),
+        `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
+    }
     moreN++;
   }
   more+=`<div class="cc-sub2">Vehicle-title collateral value · under pressure</div>`;
