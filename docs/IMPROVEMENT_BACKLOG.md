@@ -6,6 +6,27 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (4) — AUDIT: Sprint 2 commit-log backfill
+- [ ] **`build_truck_flow.py` (Sprint 2 E0 (3), `694bb7a`) has no dedicated `validate_data.py`
+      join-integrity check** — same shape as `check_province_gov_joins()`/
+      `check_province_factories_workers()` (a pure per-province pass-through from
+      `source-data/*.json` into a `platform/data/*.json` layer), but `truck_flow.json` isn't
+      province-nested under `provinces/<slug>.json`, it's its own top-level file, so the existing
+      helper doesn't cover it as-is. Worth a small standalone check (or a light generalization of
+      `_check_province_gov_join` to also accept a flat top-level target) next time someone's in
+      `validate_data.py`. *(LOW-MED, S)*
+- [ ] **`docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md` don't yet cite `labour_context.json`'s
+      ILOSTAT-via-ILO-mirror source path or `truck_flow.json`'s DLT `stat_1_009`** the way other
+      layers are documented — both are real, gate-passing, cited-in-commit-message sources, just not
+      yet folded into the two standing source-register docs. A future docs cycle should add them
+      alongside the existing DLT/NSO entries. *(LOW, S, docs-only)*
+- [ ] **Confirm whether "Sprint 2"-style commits are a recurring named workflow (not this loop)** —
+      if so, worth a one-line note in `CLAUDE.md`'s Operating Model section pointing at whatever logs
+      IT keeps (if any), so a future loop cycle doesn't have to re-discover "this diff isn't mine" via
+      `git log` archaeology each time a gap is noticed. Needs Kaustav to confirm which workflow this
+      is / whether it should own its own `PROGRESS_LOG.md` entries going forward. *(LOW, trivial,
+      needs a human confirmation)*
+
 ## Queue — follow-ups noticed 2026-07-11 (3) — REFACTOR: gov.* join-check dedup
 - [x] **`check_province_gov_joins()`/`check_province_factories_workers()` near-identical loops —
       DONE 2026-07-11 (3)** (new shared `_check_province_gov_join(field_sources)` in
@@ -62,11 +83,11 @@
       future cycle doesn't re-propose "add a gov.* join check" as if there were still a gap — the
       next real gap here would only appear if `build_province.py` grows a 9th `gov.*` field.
       *(LOW, trivial, informational)*
-- [ ] **`docs/PROGRESS_LOG.md` Sprint 2 E0/UX commit-log gap (flagged 2026-07-10 (3), still open in
-      2026-07-10 (6)) hasn't grown further this cycle** — worth a future AUDIT cycle actually reading
-      `8cf4f78`…`e53705d` + `2b1e835`/`d4759eb` end-to-end and backfilling the log (or confirming with
-      Kaustav that workflow should own its own logging) rather than re-flagging it a third time
-      without action. *(MED, S, informational — docs-debt, carried forward unchanged)*
+- [x] **`docs/PROGRESS_LOG.md` Sprint 2 E0/UX commit-log gap (flagged 2026-07-10 (3), still open
+      2026-07-10 (6)/2026-07-11) — DONE 2026-07-11 (4)** (read all 7 diffs — `8cf4f78`…`e53705d` +
+      `2b1e835`/`d4759eb` — end-to-end, verified each headline claim live against the current tree,
+      wrote a full backfill entry into `docs/PROGRESS_LOG.md`. No code/data changed, pure docs backfill.
+      Gate reconfirmed 66/0 before and after. See `docs/PROGRESS_LOG.md` 2026-07-11 (4) entry).
 
 ## Queue — follow-ups noticed 2026-07-10 (6)
 - [ ] **`check_province_gov_joins()` (new this cycle) does an exact whole-dict `==` compare, not a

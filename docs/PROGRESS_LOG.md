@@ -5,6 +5,65 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 (4) — AUDIT: backfilled the PROGRESS_LOG gap for the 7 "Sprint 2" commits (E0 1-5 + UX P1 1-2).
+
+`docs/IMPROVEMENT_BACKLOG.md` had flagged, three separate times (2026-07-10 (3)/(6), 2026-07-11), that
+7 real, gate-passing commits already on this branch — landed by a different concurrent session/workflow
+using its own "Sprint 2" naming convention — never got a `PROGRESS_LOG.md` entry of their own. Read all
+7 diffs end-to-end (`git show --stat` + full commit bodies) and verified each commit's headline claim
+live against the current tree (grep for the new functions/fields/DOM) before writing this up, per the
+process note logged 2026-07-05 (4). No code or data changed this cycle — pure docs backfill.
+
+**Sprint 2 E0 (1-5) — data/pipeline, `8cf4f78`→`e53705d`:**
+1. **`8cf4f78`** — `build_collateral_outlook.py` gained `vehicle_outlook` (the ex-gold leg: same
+   index with the gold term stripped, national `vehicle_weighted_outlook=-0.125`/softening) — Home now
+   leads with this instead of the gold-dominated blended index (+0.136 kept as context); completes
+   committee finding #6. `peer_npl.json` (TIDLOR 1.5% / MTC 2.53% / SAWAD 3.5-3.6%) surfaced on
+   `#exposure` as a peer-only calibration yardstick. `build_crop_stress.py` gained a `drought_watch`
+   flag (rice ≥90% of crop mix AND rain <65% of normal) — verified live: `platform/app.js:1756` renders
+   the gold "drought-watch" tag, `1765` filters `CSTRESS_LIST` by the flag; 4 Central provinces / 80
+   branches per the commit message. Gate 68/68.
+2. **`e76751b`** — new `pipeline/build_labour_context.py` distills the previously-orphaned ILOSTAT
+   battery (NSO LFS via the ILO mirror) → `platform/data/labour_context.json`; 3 measured cards on the
+   Overview macro grid (informal employment 63.2%, agri employment 11.2M/-300k YoY, unemployment
+   0.60% headline / 3.88% youth). Verified live: `pipeline/build_labour_context.py` +
+   `platform/data/labour_context.json` exist, `app.js:1213` wires the fetch. SKIP-3 in `tests/run.sh`
+   when the pull is absent. Gate 69/69.
+3. **`694bb7a`** — new `pipeline/build_truck_flow.py` distills DLT `stat_1_009` (50 previously-untouched
+   monthly releases) → `platform/data/truck_flow.json` (trailing-12m registrations/transfers/dereg/net
+   flow per province + YoY); one measured pulse line under the Overview new-vehicle board (national
+   trucks +5.1% YoY; sharpest contractions Bueng Kan -33.8%, Chanthaburi -23.7%, Nan -21.3%). Gate 70/70.
+4. **`65f4994`** — `build_macro_sensitivity.py` now prefers live NABC Thai farm-gate YoY (rice +10.3%,
+   rubber +35.3%, palm +45.5%) over the World Bank GLOBAL proxy per crop, falling back to the board when
+   NABC is absent — closes the last macro surface still on the global proxy. `build_decision_queue.py`'s
+   composite-opportunity item copy changed from "Open next in วัฒนา" (that verdict belongs to the
+   sequenced plan, committee finding #2) to "Scout … highest composite opportunity" with an explicit
+   pointer to the sequenced plan. Gate 70/70.
+5. **`e53705d`** — `build_amphoe.py`'s `risk_proxy` gained a `dti_stress` component (measured NSO SES
+   2566 `debt_to_income`, province-inherited, scaled 0-1.2x → 0-100): weights become 0.3 agri + 0.25 DTI
+   + 0.2 collateral + 0.1 merchant + 0.15 unemployment (zero-branch fallback 0.45/0.3/0.25) — closes the
+   gap where a Khon Kaen and a Suphanburi district with the same footprint scored identically despite a
+   2x leverage difference. `debt_to_income` now stored per-amphoe record, labelled province-inherited.
+   Downstream rebuilt (expansion_plan, opportunity_score, exit_whitespace, decision_queue, provenance).
+   Gate 70/70.
+
+**Sprint 2 UX (P1, 1-2) — nav/layout, `2b1e835` + `d4759eb`:**
+6. **`2b1e835`** — collapsed the 7-tab + "More ▾" nav into four destinations (Home / Risk / Expand /
+   Map & Explore) per `docs/REVAMP_ANALYSIS_2026-07-10.md` §2.2, with a contextual `#subnav` strip
+   exposing each group's sections; every legacy hash route still resolves (`showTab` maps any view to
+   its destination), no view content moved, separate-GL-context rule intact. Verified live:
+   `platform/index.html:16-29` carries the "FOUR-DESTINATION IA" comment + `#subnav` element.
+7. **`d4759eb`** — Overview reorder (committee finding #10, confirmed): crop-household stress (the
+   objective-#1 payoff) was at 91% of page depth behind an illustrative board and five collateral
+   boards on an ~18-screen mobile page. Moved up to directly after the commodity board; the five
+   vehicle/collateral boards now group under one "Collateral & the EV wave" `<details>` expander
+   (same pattern as Acquisition's existing groupers). Renderer/element IDs untouched — document order
+   and grouping only.
+
+`bash tests/run.sh check` reconfirmed green on the current HEAD both before and after this doc-only
+edit: 66/0 (`validate_data.py` 464/464, unchanged). PR #2 (draft, tracks this branch) covers this push
+— no new PR needed.
+
 ## 2026-07-11 (3) — REFACTOR: collapsed duplicate gov.* join-integrity check loops in validate_data.py.
 
 `check_province_gov_joins()` (vehicles/employment/unemployment/income) and
