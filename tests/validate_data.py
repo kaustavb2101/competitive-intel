@@ -1455,6 +1455,70 @@ def check_vehicle_flow_transport():
 
 
 # ---------------------------------------------------------------------------
+def check_truck_flow():
+    # platform/data/truck_flow.json (pipeline/build_truck_flow.py) — the commercial-fleet (truck)
+    # sibling of check_vehicle_flow_transport() above, same DLT dataset_stat_1_009. Unlike
+    # vehicle_flow_transport, this one is NOT joined into provinces/<slug>.json — it's its own
+    # flat top-level file (no per-province `gov.*` join to cross-check), so this is a shape/sanity
+    # pass over platform/data/ only; build_truck_flow.py --check (wired into tests/run.sh) is what
+    # verifies the file reproduces byte-exact from the raw DLT mirror. SKIP-passes when absent.
+    hdr("truck_flow.json (optional)")
+    if not exists("truck_flow.json"):
+        ok("truck_flow.json absent — skipped (optional; run build_truck_flow.py)")
+        return
+    try:
+        d = load("truck_flow.json")
+    except Exception as e:
+        fail("truck_flow.json loads", repr(e))
+        return
+    ok("truck_flow.json loads")
+
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not all(k in meta for k in ("generated_by", "source", "label", "national")):
+        fail("truck_flow meta/provenance present (generated_by + source + label + national)",
+             "meta=%r" % (meta,))
+    else:
+        ok("truck_flow meta/provenance present (generated_by + source + label + national)")
+
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        fail("truck_flow has a non-empty 'provinces' list", "got %s" % type(provs).__name__)
+        return
+    ok("truck_flow provinces list present (%d)" % len(provs))
+
+    bad = []
+    for i, p in enumerate(provs):
+        if not isinstance(p, dict):
+            bad.append("#%d not an object" % i)
+            continue
+        name = p.get("th") or "#%d" % i
+        if not (isinstance(p.get("th"), str) and p.get("th").strip()):
+            bad.append("%s: th missing/empty" % name)
+        if p.get("region") is not None and p.get("region") not in KNOWN_REGIONS:
+            bad.append("%s region=%r unknown" % (name, p.get("region")))
+        counts = ("new_regis_12m", "transfers_12m", "dereg_12m")
+        for k in counts:
+            v = p.get(k)
+            if not isinstance(v, int) or v < 0:
+                bad.append("%s.%s=%r invalid (want int>=0)" % (name, k, v))
+        yoy = p.get("new_regis_yoy_pct")
+        if yoy is not None and not is_finite_number(yoy):
+            bad.append("%s.new_regis_yoy_pct=%r not finite-or-null" % (name, yoy))
+        # net_flow_12m is pure arithmetic (new_regis - dereg) — recompute and compare exactly.
+        if isinstance(p.get("new_regis_12m"), int) and isinstance(p.get("dereg_12m"), int):
+            expect_net = p["new_regis_12m"] - p["dereg_12m"]
+            if p.get("net_flow_12m") != expect_net:
+                bad.append("%s.net_flow_12m=%r != new_regis_12m-dereg_12m=%d" %
+                           (name, p.get("net_flow_12m"), expect_net))
+    if bad:
+        fail("truck_flow rows sane (counts>=0, net_flow=new-dereg, yoy finite-or-null, known region)",
+             first_n(bad, 8))
+    else:
+        ok("truck_flow rows sane (counts>=0, net_flow=new-dereg, yoy finite-or-null, known region, "
+           "%d provinces checked)" % len(provs))
+
+
+# ---------------------------------------------------------------------------
 # Label -> (raw World Bank Pink Sheet source file, key within that file) each
 # source-data/commodity_board.json row's numeric yoy is supposed to trace to.
 # commodity_board.json itself is hand-assembled (not machine-built from these two
@@ -4783,6 +4847,7 @@ def main():
     check_province_factories_workers()
     check_vehicle_flow()
     check_vehicle_flow_transport()
+    check_truck_flow()
     check_province_stress()
     check_branch_occupations(n)
     check_occupation_risk(n)
