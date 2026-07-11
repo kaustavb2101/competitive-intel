@@ -1165,48 +1165,24 @@ def check_province_income_floor():
 
 
 # ---------------------------------------------------------------------------
-def check_province_gov_joins():
-    # provinces/<slug>.json's gov.{vehicles,employment,unemployment,income} (build_province.py) are
-    # each a pure pass-through join of a source-data/*.json dict, keyed by Thai province name — same
-    # shape as gov.income_floor's ratio fields, which got a join-integrity check in
-    # check_province_income_floor() (2026-07-09 (3)). These four upstream dicts never got the
-    # equivalent value-level check (flagged docs/IMPROVEMENT_BACKLOG.md 2026-07-09 (6)) — only
-    # check_provinces()'s generic NaN/shape scan and check_province_provenance()'s meta-presence
-    # check ever touched them. SKIP-passes whole when none of the four source layers exist.
-    hdr("provinces/*.json gov.{vehicles,employment,unemployment,income} join (optional)")
-    sources = {
-        "vehicles": "vehicles_by_province.json",
-        "employment": "employment_by_province.json",
-        "unemployment": "unemployment_by_province.json",
-        "income": "household_income_by_province.json",
-    }
-    src_provs = {}
-    for key, fn in sources.items():
-        path = os.path.join(REPO, "source-data", fn)
-        if not os.path.exists(path):
-            continue
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                d = json.load(f)
-        except Exception as e:
-            fail("%s loads (for gov.%s join check)" % (fn, key), repr(e))
-            continue
-        provs = d.get("provinces")
-        if isinstance(provs, dict):
-            src_provs[key] = provs
-
-    if not src_provs:
-        ok("no gov.{vehicles,employment,unemployment,income} source layer present — join check skipped (optional)")
-        return
-
+def _check_province_gov_join(field_sources):
+    # Shared compare loop for provinces/<slug>.json's gov.* pass-through fields — both
+    # check_province_gov_joins() and check_province_factories_workers() used to hand-roll this same
+    # "load index -> load each province -> compare gov.<key> against a source value" loop (flagged as
+    # duplicate-helper smell in docs/IMPROVEMENT_BACKLOG.md 2026-07-10/2026-07-11). Callers normalize
+    # their own source layer into field_sources: {gov_key: {"src": {th_name: expected_value}, "default":
+    # value_when_province_missing_from_src}} — a dict-pass-through (whole record) for the multi-file
+    # case, or a scalar (remapped sub-field) for the single-file case; the comparison itself doesn't
+    # care which. Returns (bad_list, n_checked) or (None, None) on a fatal index/load error (caller
+    # already called fail() in that case).
     try:
         idx = load(os.path.join("provinces", "index.json"))
     except Exception as e:
         fail("provinces/index.json loads (for gov join check)", repr(e))
-        return
+        return None, None
     if not isinstance(idx, list) or not idx:
         fail("provinces index is a non-empty list (for gov join check)", "got %s" % type(idx).__name__)
-        return
+        return None, None
 
     bad = []
     n_checked = 0
@@ -1225,17 +1201,57 @@ def check_province_gov_joins():
         if not isinstance(gov, dict):
             bad.append("%s gov missing/not a dict" % slug)
             continue
-        for key, provs in src_provs.items():
-            got = gov.get(key)
-            expect = provs.get(th) or {}
-            if got != expect:
-                bad.append("%s gov.%s=%r != source=%r for '%s'" % (slug, key, got, expect, th))
+        for gov_key, spec in field_sources.items():
+            got = gov.get(gov_key)
+            want = spec["src"].get(th, spec["default"])
+            if got != want:
+                bad.append("%s gov.%s=%r != source=%r for '%s'" % (slug, gov_key, got, want, th))
+    return bad, n_checked
+
+
+def check_province_gov_joins():
+    # provinces/<slug>.json's gov.{vehicles,employment,unemployment,income} (build_province.py) are
+    # each a pure pass-through join of a source-data/*.json dict, keyed by Thai province name — same
+    # shape as gov.income_floor's ratio fields, which got a join-integrity check in
+    # check_province_income_floor() (2026-07-09 (3)). These four upstream dicts never got the
+    # equivalent value-level check (flagged docs/IMPROVEMENT_BACKLOG.md 2026-07-09 (6)) — only
+    # check_provinces()'s generic NaN/shape scan and check_province_provenance()'s meta-presence
+    # check ever touched them. SKIP-passes whole when none of the four source layers exist.
+    hdr("provinces/*.json gov.{vehicles,employment,unemployment,income} join (optional)")
+    sources = {
+        "vehicles": "vehicles_by_province.json",
+        "employment": "employment_by_province.json",
+        "unemployment": "unemployment_by_province.json",
+        "income": "household_income_by_province.json",
+    }
+    field_sources = {}
+    for key, fn in sources.items():
+        path = os.path.join(REPO, "source-data", fn)
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                d = json.load(f)
+        except Exception as e:
+            fail("%s loads (for gov.%s join check)" % (fn, key), repr(e))
+            continue
+        provs = d.get("provinces")
+        if isinstance(provs, dict):
+            field_sources[key] = {"src": provs, "default": {}}
+
+    if not field_sources:
+        ok("no gov.{vehicles,employment,unemployment,income} source layer present — join check skipped (optional)")
+        return
+
+    bad, n_checked = _check_province_gov_join(field_sources)
+    if bad is None:
+        return
     if bad:
         fail("provinces/*.json gov.{vehicles,employment,unemployment,income} join matches source exactly",
              first_n(bad, 12))
     else:
         ok("provinces/*.json gov.{vehicles,employment,unemployment,income} join matches source exactly "
-           "(%d provinces checked, %d source layers present)" % (n_checked, len(src_provs)))
+           "(%d provinces checked, %d source layers present)" % (n_checked, len(field_sources)))
 
 
 # ---------------------------------------------------------------------------
@@ -1262,39 +1278,13 @@ def check_province_factories_workers():
         fail("factories_by_district.json has a non-empty 'provinces' dict", "got %s" % type(src_provs).__name__)
         return
 
-    try:
-        idx = load(os.path.join("provinces", "index.json"))
-    except Exception as e:
-        fail("provinces/index.json loads (for gov.{factories,workers} join check)", repr(e))
+    field_sources = {
+        "factories": {"src": {th: v.get("fac", 0) for th, v in src_provs.items()}, "default": 0},
+        "workers": {"src": {th: v.get("workers", 0) for th, v in src_provs.items()}, "default": 0},
+    }
+    bad, n_checked = _check_province_gov_join(field_sources)
+    if bad is None:
         return
-    if not isinstance(idx, list) or not idx:
-        fail("provinces index is a non-empty list (for gov.{factories,workers} join check)",
-             "got %s" % type(idx).__name__)
-        return
-
-    bad = []
-    n_checked = 0
-    for e in idx:
-        slug = e.get("slug")
-        th = e.get("th")
-        if not isinstance(slug, str) or not slug or not isinstance(th, str) or not th:
-            continue
-        try:
-            p = load(os.path.join("provinces", slug + ".json"))
-        except Exception as ex:
-            bad.append("%s.json load error: %r" % (slug, ex))
-            continue
-        n_checked += 1
-        gov = p.get("gov")
-        if not isinstance(gov, dict):
-            bad.append("%s gov missing/not a dict" % slug)
-            continue
-        expect = src_provs.get(th, {"fac": 0, "workers": 0})
-        for key, srckey in (("factories", "fac"), ("workers", "workers")):
-            got = gov.get(key)
-            want = expect.get(srckey, 0)
-            if got != want:
-                bad.append("%s gov.%s=%r != source=%r for '%s'" % (slug, key, got, want, th))
     if bad:
         fail("provinces/*.json gov.{factories,workers} join matches source exactly", first_n(bad, 12))
     else:
