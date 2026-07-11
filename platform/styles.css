@@ -1,9 +1,8 @@
-:root{
-  --bg:#0a0e17; --panel:#111622; --panel2:#0f1420; --line:#1e2636; --line2:#141a26;
-  --hi:#eef1f7; --txt:#cdd3e0; --mid:#8590a6; --dim:#6b7790; --accent:#5B7CFA;
-  --agri:#C8433B; --merch:#1C8C7D; --collat:#7A4FE0; --opp:#E6B450; --up:#1C8C7D;
-  --mono:'IBM Plex Mono',ui-monospace,monospace; --sans:'IBM Plex Sans Thai',system-ui,sans-serif;
-}
+/* NOTE: the single canonical :root token set lives below (search "INDIGO CONSOLE").
+   The legacy dark :root that used to sit here (--bg:#0a0e17 / --agri:#C8433B …) was
+   fully overridden by the canonical block later in the cascade — all 17 of its vars are
+   redefined there — so it was dead code and has been removed (revamp design-system pass,
+   2026-07-11: one :root). */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-text-size-adjust:100%}
