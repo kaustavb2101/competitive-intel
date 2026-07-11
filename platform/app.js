@@ -3126,15 +3126,15 @@ function renderRiskReadouts(){
         `${p.npl_label||p.npl}%`,'NPL','var(--collat)')).join('')+
       `<div class="s" style="margin-top:4px">Peer figures only — NOT an AutoX number (no measured AutoX NPL yet; a real loan-tape export unlocks that). The spread tracks collateral mix.</div></div>`;
     // ANCHOR the estimated composite to this measured yardstick (roadmap move #1, 2026-07-11): the
-    // two tables render adjacent but never linked. AutoX lends against VEHICLE TITLES, so its
-    // comparable band is Tidlor→MTC (1.5–2.53%), NOT Srisawad's 3.55% (land/house collateral AutoX
-    // doesn't do). We deliberately do NOT map the composite to an "implied NPL %" per branch — that
-    // reads as a prediction (false precision the loan tape doesn't yet back). Instead: state the
-    // comparable band + the book's own composite spread as an honest triage scale.
-    // pure vehicle-title peers only: matches vehicle/motorcycle AND has no land/house/condo leg
-    // (excludes Srisawad, whose 3.55% is inflated by land/house collateral AutoX doesn't hold).
-    const vt=PEERNPL.peers.filter(p=>/vehicle|motorcycle/i.test(p.collateral||'')&&!/land|house|condo/i.test(p.collateral||''));
+    // two tables render adjacent but never linked. AutoX lends against VEHICLE TITLES (core) AND
+    // LAND (owner correction 2026-07-11), so ALL three peers are comparable — the band spans the
+    // full peer range, and Srisawad (vehicle + land) is AutoX's CLOSEST structural peer, not the
+    // one to exclude. We deliberately do NOT map the composite to an "implied NPL %" per branch —
+    // that reads as a prediction (false precision the loan tape doesn't yet back). Instead: state
+    // the comparable band + the book's own composite spread as an honest triage scale.
+    const vt=PEERNPL.peers.filter(p=>p&&isFinite(+p.npl));   // all peers: AutoX spans vehicle + land
     const lo=vt.length?Math.min(...vt.map(p=>+p.npl)):null, hi=vt.length?Math.max(...vt.map(p=>+p.npl)):null;
+    const loName=vt.length?vt.reduce((a,b)=>(+a.npl<=+b.npl?a:b)).ticker:'', hiName=vt.length?vt.reduce((a,b)=>(+a.npl>=+b.npl?a:b)).ticker:'';
     let meanC=null, p90C=null;
     if(briskHasData()&&BRISK.length){
       const cs=BRISK.map(e=>(e&&e.composite_risk)||0).filter(v=>v>0).sort((a,b)=>a-b);
@@ -3142,8 +3142,8 @@ function renderRiskReadouts(){
     }
     if(lo!=null){
       html+=`<div class="s" style="margin-top:6px;line-height:1.5">`+
-        `<b>Reading our composite against this:</b> AutoX is a <b>vehicle-title</b> lender, so its comparable band is `+
-        `<b style="color:var(--collat)">${lo.toFixed(2)}–${hi.toFixed(2)}%</b> (Tidlor best-in-class → MTC), not Srisawad's 3.55% (land/house collateral we don't hold). `+
+        `<b>Reading our composite against this:</b> AutoX lends against <b>vehicle titles</b> (core) <b>and land</b>, so all three peers are comparable — the band spans `+
+        `<b style="color:var(--collat)">${lo.toFixed(2)}–${hi.toFixed(2)}%</b> (${loName} best-in-class vehicle → ${hiName} vehicle + land, AutoX's closest structural peer). `+
         (meanC!=null?`Our estimated branch composite averages <b>${meanC.toFixed(0)}/100</b> (worst decile ~${p90C.toFixed(0)}). `:'')+
         `That 0–100 is a <b>triage rank</b> of where to look first — NOT a predicted NPL. Placing the book on the peers' real scale needs the measured loan tape (${TAG_E}).</div>`;
     }
