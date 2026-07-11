@@ -5241,21 +5241,16 @@ function renderHome(){
     loadCollatOutlookData().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — per-branch composite to name the single riskiest branch in the risk card (null-safe).
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
-    // obj#1 — lowest-paid occupation nationally into the risk card (null-safe, mirrors Exposure).
-    loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
-    // obj#1 — merchant-segment (SME owner) income floor into the risk card (null-safe, mirrors Exposure).
-    loadSmeIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
+    // (Home slimming, revamp P1: occupation-income, SME-income, contested-pop and the amphoe-
+    //  occupation enrich are no longer fetched here — their rows moved to the Risk/Expand
+    //  destinations, cutting Home's fetch fan-out. Exposure still lazy-loads them itself.)
     // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
     loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
-    // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
+    // measured competitor census for the top-district rival chip; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
-    loadAmphoeOccupations().then(reHome);
     loadCompetitors().then(reHome);
     // obj#2 — national competitor-coverage % chip in the where-to-expand card (null-safe).
     loadCompCoverage().then(reHome);
-    // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
-    // expand card, mirroring the full table already shipped on Exposure (null-safe).
-    loadContestedPop().then(reHome);
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -5417,29 +5412,19 @@ function renderHomeWhitespace(){
     if(seq1&&seq1.name){
       html+=`<div class="sub" style="margin:0 0 4px">Sequenced plan opens <b>${seq1.name}</b> first — raw white-space ranks the districts below. Different lenses; see <a href="#acq" data-v="acq">Acquisition</a>.</div>`;
     }
-    html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
+    // HOME SLIMMING (revamp P1): ONE row per theme — the top district only; the full
+    // leaderboards (districts, provinces, contested ground) live on Expand/Risk, one tap away.
+    html+=top.slice(0,1).map(a=>{const nm=a.name_measured?a.name:a.name_en;
       const where=`${a.province_th} · ${a.region}`;
-      // committee trim: max ~2-3 short bits so the gold score leads the row. Keep the zero-branch
-      // flag (real signal); drop the occupation-base phrase (it lives in the branch popup).
       const bits=[where];
       if(a.branches===0) bits.push('no AutoX yet');
       const cn=ampCompCount(a);
       if(cn===0) bits.push('0 rivals ≤5km ✦');
       else if(cn!=null) bits.push(`${cn} rival${cn===1?'':'s'} ≤5km`);
-      return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,bits.join(' · '),
+      return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,bits.join(' · ')+' · <a href="#acq" data-v="acq">full leaderboard →</a>',
         `★ ${(a.whitespace||0).toFixed(0)}`,'whitespace','var(--gold)');}).join('');
   } else {
-    html+=skelRows(3);
-  }
-  // top provinces by mean district whitespace (rolled up from amphoe) — "which province has room"
-  if(AMP&&AMP.length){
-    const byP={};
-    AMP.forEach(a=>{const k=a.province_th; const o=byP[k]||(byP[k]={th:k,region:a.region,sum:0,n:0,zero:0});
-      o.sum+=(a.whitespace||0); o.n++; if(a.branches===0)o.zero++;});
-    const provs=Object.values(byP).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg).slice(0,3);
-    html+=`<div class="cc-sub2">Top provinces · mean district white-space ${TAG_E}</div>`;
-    html+=provs.map(o=>ccRow(`${o.th}`,`${o.region} · ${o.zero} district${o.zero===1?'':'s'} with no AutoX`,
-      `★ ${o.avg.toFixed(0)}`,'avg','var(--gold)')).join('');
+    html+=skelRows(1);
   }
   // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
   // flag on every density/white-space signal above, not market share. Omitted gracefully if absent.
@@ -5459,28 +5444,16 @@ function renderHomeWhitespace(){
              :'lower-bound census · a confidence flag on the white-space above, not market share',
       `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
   }
-  // MOST CONTESTED GROUND (contested_pop.json) — the flip side of white-space: where we already
-  // fight a rival for the same catchment population. Same rank-1-surfacing pattern already shipped
-  // on Exposure's full "Most contested ground" table (renderContestedGround); mirrored here so Home's
-  // expand card names both "where's the open space" and "where are we already contested".
-  if(CPOP&&Array.isArray(CPOP.top)&&CPOP.top.length){
-    const t=CPOP.top[0];
-    html+=`<div class="cc-sub2">Most contested ground ${TAG_M}</div>`;
-    html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
-      `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
-      `${t.pct}%`,'contested','var(--agri)');
-  }
+  // (Home slimming: the contested-ground and province roll-up rows moved off Home — they
+  // live in full on Exposure and Acquisition, per one-fact-one-renderer.)
   box.innerHTML=html;
 }
 
-// WHAT IS GETTING RISKIER — worst crop-stress province, motorcycle-heavy collateral, gold-up vs pickup.
+// WHAT IS GETTING RISKIER — one row per risk theme (composite · leverage · branch · collateral),
+// each deep-linking into the Risk destination (Home slimming, revamp P1 2026-07-10).
 function renderHomeRisk(){
   const box=$('#cc-risk-body'); if(!box||!META) return;
-  // LEAD (always visible) = the 3 sharpest portfolio-risk verdicts. Everything past that is real
-  // secondary context but the card had grown to 9 stacked rank-1 facts (flagged repeatedly in the
-  // backlog since 2026-07-06) — collapsed into a native <details> "Show N more", same disclosure
-  // idiom methodBox() already uses for caveats, so no new JS state/wiring is needed.
-  let lead='', more=''; let moreN=0;
+  let lead='';
   // LEAD WITH THE VERDICT — most-stressed provinces by composite risk (province_risk.json).
   // Pull ONLY from loaded data; omit gracefully if absent (no placeholder, no fabrication).
   if(priskHasData()){
@@ -5514,81 +5487,31 @@ function renderHomeRisk(){
         `▲ ${(e.composite_risk||0).toFixed(0)}`,'composite','var(--agri)');
     }
   }
-  // ---- secondary context below, collapsed behind "Show more" ----
-  // lowest-paid occupation nationally (occupation_income.json) — a concrete income-floor fact,
-  // same rank-1-surfacing pattern already shipped on Exposure; mirrored here per the 2026-07-05 (8)
-  // backlog follow-up ("Home doesn't yet surface the same fact").
-  if(occincHasData()){
-    const c=OCCINC_LIST[0];
-    more+=`<div class="cc-sub2" style="margin-top:0">Lowest-paid occupation nationally ${TAG_M}</div>`;
-    more+=ccRow(`${c.label}`,
-      `worst: ${c.min_province} ฿${(c.min_value||0).toLocaleString()}/mo (NSO SES 2566, measured)`,
-      `฿${(c.national_avg||0).toLocaleString()}`,'national avg/mo','var(--agri)');
-    moreN++;
-  }
-  // merchant-segment income floor (SME owners, sme_income_by_province.json) — same rank-1-surfacing
-  // pattern as the two blocks above, mirrored from Exposure per the 2026-07-09 (5) backlog follow-up
-  // ("Home doesn't yet surface the SME income-floor fact").
-  if(smeincHasData()){
-    const s=SMEINC_LIST[0];
-    const nBelow=SMEINC_LIST.filter(p=>(p.ratio_to_national||0)<1).length;
-    more+=`<div class="cc-sub2">Merchant segment income floor · SME owners ${TAG_M}</div>`;
-    more+=ccRow(`${s.province}`,
-      `SME-owner income ฿${(s.sme_income||0).toLocaleString()}/mo · ${nBelow}/${SMEINC_LIST.length} provinces below the national floor (NSO SES 2566, measured)`,
-      `${(s.ratio_to_national||0).toFixed(2)}×`,'vs national avg','var(--collat)');
-    moreN++;
-  }
-  // worst crop-household stress region/province (crop_stress.json)
-  if(CSTRESS_LIST&&CSTRESS_LIST.length){
-    const w=CSTRESS_LIST[0]; const sv=Math.round((w.agri_stress||0)*100);
-    const dom=(w.crop_mix&&w.crop_mix[0])||{};
-    more+=`<div class="cc-sub2">Worst crop-household stress ${TAG_E}</div>`;
-    more+=ccRow(`${w.th} <span class="sub">${w.region||''}</span>`,
-      `${dom.crop||'crops'} ${dom.share!=null?Math.round(dom.share*100)+'%':''} · price ${w.price_stress!=null?(w.price_stress>0?'+':'')+w.price_stress+'%':'—'}`,
-      `▲ ${sv}`,'agri-stress','var(--agri)');
-    moreN++;
-  } else { more+=skelRows(3); }
-  // most motorcycle-heavy collateral provinces (DLT, measured) — lowest-recovery title collateral
-  const moto=collatMixRows().slice(0,2);
-  if(moto.length){
-    more+=`<div class="cc-sub2">Most motorcycle-heavy collateral ${TAG_M}</div>`;
-    more+=moto.map(p=>ccRow(`${p.th} <span class="sub">${p.region}</span>`,
-      `${p.branches} branches · lowest-recovery title collateral`,
-      `${p.moto}%`,'moto share','var(--agri)')).join('');
-    moreN++;
-  }
-  // COLLATERAL RECOVERY OUTLOOK — lead with the national read from collateral_outlook.json when
-  // loaded (firming vs softening + most-at-risk province), then the vehicle-title backings.
-  // AutoX lends against VEHICLE TITLES (not gold), so gold-collateral is not shown.
+  // HOME SLIMMING (revamp P1): the card carries ONE row per risk theme — composite stress,
+  // household leverage, sharpest branch, collateral direction — each deep-linking to the Risk
+  // destination where the full readouts live (income floors, crop worst, moto-heavy list all
+  // moved there; one-fact-one-renderer). The old "Show N more" secondary block is gone.
+  // COLLATERAL DIRECTION — the EX-GOLD vehicle-title leg (the book's own collateral); the
+  // gold-dominated full index is context only (committee finding #6, 2026-07-10).
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
-    // LEAD with the EX-GOLD vehicle-title leg (vehicle_weighted_outlook) — AutoX lends against
-    // vehicle titles, not gold, and the full index is gold-dominated: it read "firming +0.14"
-    // directly above the ↓ vehicle-title rows while the book's own leg reads softening −0.13
-    // (committee finding #6, 2026-07-10). The gold-dominated full index stays as context.
     const vo=nat.vehicle_weighted_outlook, o=nat.exposure_weighted_outlook;
-    more+=`<div class="cc-sub2">Collateral recovery outlook · national ${TAG_E}</div>`;
+    lead+=`<div class="cc-sub2">Vehicle-title collateral direction ${TAG_E}</div>`;
     if(vo!=null){
       const vfirm=vo>=0;
-      more+=ccRow(vfirm?'Vehicle-title recovery firming':'Vehicle-title recovery softening',
+      lead+=ccRow(vfirm?'Vehicle-title recovery firming':'Vehicle-title recovery softening',
         `ex-gold leg — the book's own collateral · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy) · full index ${o>=0?'+':''}${o.toFixed(2)} is gold-pawn dominated (not AutoX collateral)`,
         `${vfirm?'+':''}${vo.toFixed(2)}`,'index −1…+1',vfirm?'var(--up)':'var(--agri)');
     } else {
       const firm=o>=0;
-      more+=ccRow(firm?'Recovery value firming':'Recovery value softening',
+      lead+=ccRow(firm?'Recovery value firming':'Recovery value softening',
         `${nat.n_firming||0}/${nat.n_provinces||0} provinces firming · most at-risk ${nat.most_at_risk_province||'—'} (motorcycle-title heavy)`+
-        (firm?' · gold-pawn tailwind dominates this index — the vehicle-title legs below still point down':''),
+        (firm?' · gold-pawn tailwind dominates this index':''),
         `${firm?'+':''}${o.toFixed(2)}`,'index 0–1','var(--up)');
     }
-    moreN++;
   }
-  more+=`<div class="cc-sub2">Vehicle-title collateral value · under pressure</div>`;
-  more+=ccRow(`Diesel-pickup collateral ${TAG_E}`,'used-pickup glut + EV transition · editorial watch','↓ pressure','value at risk','var(--agri)');
-  more+=ccRow(`Used-motorcycle collateral ${TAG_M}`,'smallest, most volatile, lowest-recovery title collateral','↓ volatile','lowest recovery','var(--agri)');
-  moreN++;
-  let html=lead;
-  if(more) html+=`<details class="cc-more"><summary>Show ${moreN} more</summary><div class="cc-more-b">${more}</div></details>`;
-  box.innerHTML=html;
+  lead+=`<div class="sub" style="margin-top:6px">Income floors, crop stress, moto-heavy collateral and the full readouts: <a href="#exposure" data-v="exposure">Risk → Exposure</a> · <a href="#overview" data-v="overview">Risk → Outlook</a></div>`;
+  box.innerHTML=lead;
 }
 
 // LIVE fuel prices (data/fuel_prices.json, build_fuel_prices.py <- Bangchak daily pull).
