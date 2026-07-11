@@ -5,6 +5,33 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 (5) — VALIDATOR: shape/sanity check for `truck_flow.json` (dataset_stat_1_009).
+
+Closed the standing backlog item (flagged 2026-07-11 (4)'s AUDIT cycle): `build_truck_flow.py`'s
+`platform/data/truck_flow.json` (commercial-fleet/truck churn per province, portfolio-risk
+objective #1, MEASURED from DLT `dataset_stat_1_009`) had no `tests/validate_data.py` check at
+all — the only guard was `build_truck_flow.py --check`'s byte-exact reproduction gate (already
+wired into `tests/run.sh`), which only fires when the raw DLT mirror is present. Unlike its
+car/moto sibling `vehicle_flow_transport.json` (checked by `check_vehicle_flow_transport()`),
+`truck_flow.json` isn't nested under `provinces/<slug>.json` — it's its own flat top-level file,
+so the existing `gov.*` join-check helpers don't apply as-is (this was the exact gap the
+2026-07-11 (4) audit's follow-up #1 named).
+
+New `check_truck_flow()` in `tests/validate_data.py` (SKIP-passes when the file is absent):
+meta/provenance present (`generated_by`/`source`/`label`/`national`), non-empty `provinces` list,
+each row's `th` non-empty, `region` in `KNOWN_REGIONS` (or null), the three count fields
+(`new_regis_12m`/`transfers_12m`/`dereg_12m`) are `int>=0`, `new_regis_yoy_pct` finite-or-null,
+and — the one real arithmetic check — `net_flow_12m` is recomputed (`new_regis_12m -
+dereg_12m`) and compared exactly, so a corrupted or hand-edited derived field is caught even
+without the raw DLT mirror on disk.
+
+Verified it catches real drift: hand-corrupted `บึงกาฬ`'s `net_flow_12m` to `999999`, re-ran
+`validate_data.py` standalone, got the expected `[FAIL]` naming the exact expected-vs-got
+(`net_flow_12m=999999 != new_regis_12m-dereg_12m=33`), then restored via `git checkout --`.
+Gate `66/0`, `validate_data.py` `468/468` (was `464/464`, +4 new `[PASS]` lines for this check).
+No data changed — pure validator addition. `docs/IMPROVEMENT_BACKLOG.md` item checked off; 2 new
+follow-ups added (see there).
+
 ## 2026-07-11 (4) — AUDIT: backfilled the PROGRESS_LOG gap for the 7 "Sprint 2" commits (E0 1-5 + UX P1 1-2).
 
 `docs/IMPROVEMENT_BACKLOG.md` had flagged, three separate times (2026-07-10 (3)/(6), 2026-07-11), that

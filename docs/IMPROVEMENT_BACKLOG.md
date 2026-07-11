@@ -6,15 +6,32 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (5) — VALIDATOR: truck_flow.json shape check
+- [ ] **`check_truck_flow()` (new this cycle) only recomputes `net_flow_12m`** (pure arithmetic,
+      `new_regis_12m - dereg_12m`) — it does NOT re-verify the count fields themselves against the
+      raw DLT `dataset_stat_1_009` mirror (that's `build_truck_flow.py --check`'s job, which only
+      runs when the mirror is on disk). If a future cycle wants a source-traceable check that also
+      SKIP-passes gracefully, it would need to shell out to `build_truck_flow.py --check` from
+      inside `validate_data.py` (no existing check does this — worth confirming that pattern is
+      even desirable before adding it, since `tests/run.sh` already gates the byte-exact rebuild
+      separately). *(LOW, trivial, informational)*
+- [ ] **`truck_flow.json`'s worst-yoy provinces aren't surfaced anywhere in the UI yet** — the
+      builder computes `new_regis_yoy_pct` (worst-first sort) but nothing on `#acq`/`#trend`/
+      province pages reads `truck_flow.json` the way `vehicle_flow_transport.json`'s
+      `dereg_rate≥4.5%` callout is surfaced in `province.html`'s `autoImpacts()`. A same-pattern
+      "contracting truck fleet" callout (objective #1, logistics-SME borrower pulse) would close
+      the loop between this measured layer and an actual reader-facing signal. *(MED, S — real
+      UX gap, not just a validator gap)*
+- [x] **`build_truck_flow.py` (Sprint 2 E0 (3), `694bb7a`) has no dedicated `validate_data.py`
+      shape/sanity check — DONE 2026-07-11 (5)** (new `check_truck_flow()`: meta/provenance,
+      non-empty provinces list, counts≥0, `net_flow_12m` recomputed and compared exactly,
+      `new_regis_yoy_pct` finite-or-null, known region; SKIP-passes when absent. Since
+      `truck_flow.json` isn't province-nested — it's its own flat top-level file — this is a
+      standalone shape check rather than a join check like `_check_province_gov_join`. Verified
+      it catches real drift via a hand-corrupt-then-restore of `net_flow_12m`. Gate 66/0,
+      `validate_data.py` 468/468. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (5) entry).
+
 ## Queue — follow-ups noticed 2026-07-11 (4) — AUDIT: Sprint 2 commit-log backfill
-- [ ] **`build_truck_flow.py` (Sprint 2 E0 (3), `694bb7a`) has no dedicated `validate_data.py`
-      join-integrity check** — same shape as `check_province_gov_joins()`/
-      `check_province_factories_workers()` (a pure per-province pass-through from
-      `source-data/*.json` into a `platform/data/*.json` layer), but `truck_flow.json` isn't
-      province-nested under `provinces/<slug>.json`, it's its own top-level file, so the existing
-      helper doesn't cover it as-is. Worth a small standalone check (or a light generalization of
-      `_check_province_gov_join` to also accept a flat top-level target) next time someone's in
-      `validate_data.py`. *(LOW-MED, S)*
 - [ ] **`docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md` don't yet cite `labour_context.json`'s
       ILOSTAT-via-ILO-mirror source path or `truck_flow.json`'s DLT `stat_1_009`** the way other
       layers are documented — both are real, gate-passing, cited-in-commit-message sources, just not
