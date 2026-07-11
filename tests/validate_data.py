@@ -1239,6 +1239,70 @@ def check_province_gov_joins():
 
 
 # ---------------------------------------------------------------------------
+def check_province_factories_workers():
+    # provinces/<slug>.json's gov.{factories,workers} (build_province.py: gp = fbd["provinces"].get(prov),
+    # gov.factories=gp["fac"], gov.workers=gp["workers"]) were the last 2 of the ~8 gov.* top-level joins
+    # with no join-integrity check — vehicles/employment/unemployment/income got one in
+    # check_province_gov_joins() (2026-07-10), income_floor in check_province_income_floor()
+    # (2026-07-09 (3)); flagged as the remaining gap in docs/IMPROVEMENT_BACKLOG.md 2026-07-10 (6).
+    # SKIP-passes whole when source-data/factories_by_district.json is absent.
+    hdr("provinces/*.json gov.{factories,workers} join (optional)")
+    path = os.path.join(REPO, "source-data", "factories_by_district.json")
+    if not os.path.exists(path):
+        ok("factories_by_district.json absent — gov.{factories,workers} join check skipped (optional)")
+        return
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            fbd = json.load(f)
+    except Exception as e:
+        fail("factories_by_district.json loads (for gov.{factories,workers} join check)", repr(e))
+        return
+    src_provs = fbd.get("provinces")
+    if not isinstance(src_provs, dict) or not src_provs:
+        fail("factories_by_district.json has a non-empty 'provinces' dict", "got %s" % type(src_provs).__name__)
+        return
+
+    try:
+        idx = load(os.path.join("provinces", "index.json"))
+    except Exception as e:
+        fail("provinces/index.json loads (for gov.{factories,workers} join check)", repr(e))
+        return
+    if not isinstance(idx, list) or not idx:
+        fail("provinces index is a non-empty list (for gov.{factories,workers} join check)",
+             "got %s" % type(idx).__name__)
+        return
+
+    bad = []
+    n_checked = 0
+    for e in idx:
+        slug = e.get("slug")
+        th = e.get("th")
+        if not isinstance(slug, str) or not slug or not isinstance(th, str) or not th:
+            continue
+        try:
+            p = load(os.path.join("provinces", slug + ".json"))
+        except Exception as ex:
+            bad.append("%s.json load error: %r" % (slug, ex))
+            continue
+        n_checked += 1
+        gov = p.get("gov")
+        if not isinstance(gov, dict):
+            bad.append("%s gov missing/not a dict" % slug)
+            continue
+        expect = src_provs.get(th, {"fac": 0, "workers": 0})
+        for key, srckey in (("factories", "fac"), ("workers", "workers")):
+            got = gov.get(key)
+            want = expect.get(srckey, 0)
+            if got != want:
+                bad.append("%s gov.%s=%r != source=%r for '%s'" % (slug, key, got, want, th))
+    if bad:
+        fail("provinces/*.json gov.{factories,workers} join matches source exactly", first_n(bad, 12))
+    else:
+        ok("provinces/*.json gov.{factories,workers} join matches source exactly (%d provinces checked)"
+           % n_checked)
+
+
+# ---------------------------------------------------------------------------
 def check_vehicle_flow():
     # source-data/vehicle_flow_by_province.json (pipeline/build_vehicle_flow.py) — DLT registration-
     # ACTION flow (dereg/transfer rates per vehicle class), trailing-12mo, joined into provinces/
@@ -4726,6 +4790,7 @@ def main():
     check_sme_income()
     check_province_income_floor()
     check_province_gov_joins()
+    check_province_factories_workers()
     check_vehicle_flow()
     check_vehicle_flow_transport()
     check_province_stress()
