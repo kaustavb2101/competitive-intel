@@ -4,6 +4,64 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-11 (6) — ENRICH: wired the already-measured `truck_flow.json` into `province.html`'s reader-facing callouts
+
+**Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
+(`40663f5` HEAD), `bash tests/run.sh check` → 66 passed, 0 failed (`validate_data.py` 468/468)
+before touching anything — no pre-existing drift, so this cycle did not pick RE-DERIVE. No
+`/workspace/watcher` TMLI checkout present in this session, so the ENRICH source was an
+already-committed, already-measured, already-gated layer sitting unwired rather than a new pull.
+
+**1. What was found.** `docs/IMPROVEMENT_BACKLOG.md`'s 2026-07-11 (5) follow-up flagged that
+`platform/data/truck_flow.json` — built by `pipeline/build_truck_flow.py` from the MEASURED DLT
+`dataset_stat_1_009` transport-law registration-action mirror (trucks: new registrations,
+transfers, permanent deregistrations, trailing-12-month, 77 provinces) — was gated by
+`validate_data.py`'s `check_truck_flow()` (added 2026-07-11 (5)) but never read by any
+`platform/` page. Its sibling signal, `gov.vehicle_flow_transport.truck.dereg_rate` (same raw
+dataset, different builder, already gov-joined into `provinces/<slug>.json`), already surfaces
+an "Elevated commercial-truck scrappage" watch callout in `province.html`'s `vehicleFlowImpacts()`
+— `truck_flow.json`'s `net_flow_12m` (new registrations − deregistrations; negative = the fleet
+is literally shrinking) carries a distinct, no-less-real signal that had no reader-facing home.
+
+**2. Fix applied.** `platform/province.html`: added `truck_flow.json` to the page's `Promise.all`
+data-load alongside its other optional layers (self-disables to `null` on fetch failure, exactly
+like `crop_landuse.json`), and `vehicleFlowImpacts()` gained a new "Contracting truck fleet" watch
+callout. Chose `net_flow_12m<0` over the raw `new_regis_yoy_pct` worst-first sort the backlog item
+originally named: `new_regis_yoy_pct<0` alone flags 32/77 provinces (too broad for a "watch" tag,
+just measures decelerating growth), while `net_flow_12m<0` — new registrations actually trailing
+permanent deregistrations — flags only 8/77 (10%), matching the same top-decile rarity bar the
+existing `dereg_rate≥1%`/`dereg_rate≥4.5%` callouts use. Since `truck_flow.json` is a flat
+national file (not province-nested like `gov.vehicle_flow_transport`), the join happens
+client-side by exact `province_th`/`th` Thai-name match rather than via a new `build_province.py`
+gov.* field — kept the change to one page, zero pipeline/`platform/data` files touched.
+
+**3. Verification.**
+- Confirmed all 77 `platform/data/provinces/*.json` files' `province_th` has an exact match in
+  `truck_flow.json`'s 77 `th` names (0 silent misses that would leave a province's callout
+  permanently dark without anyone noticing).
+- `province.html`'s headless render harness is known-flaky for this specific page (logged
+  2026-07-03 (7), 2026-07-05, 2026-07-10 (2)) and wasn't available this cycle (render-harness npm
+  cache absent, install blocked by the sandboxed npm registry) — verified the actual runtime logic
+  instead by hand-transcribing `vehicleFlowImpacts()`'s new branch into a Node script and running
+  it against the real committed data: Chanthaburi (`net_flow_12m=-56`) correctly fires with the
+  message "New truck registrations trailed permanent deregistrations by 56 in the trailing 12
+  months (DLT dataset_stat_1_009, only 10% of provinces show this) — the owner-operator hauler
+  segment's cash flow is thinning here."; Rayong (`net_flow_12m=+378`) correctly stays silent.
+- `bash tests/run.sh check` → 66 passed, 0 failed, `validate_data.py` 468/468 unchanged (UI-only
+  change, no data file touched). `git status --short` confirms only `platform/province.html`
+  changed.
+
+**Scope not covered (logged, not built this cycle):** `#acq`/`#trend` still don't read
+`truck_flow.json` at all — a national worst-first rollup (mirroring `PSTRESS_LIST[0]`-style
+rank-1 callouts elsewhere) would be a separate, larger follow-up.
+
+**Source:** `platform/data/truck_flow.json` (already committed, `generated_by:
+pipeline/build_truck_flow.py`, DLT `dataset_stat_1_009` via `pull_dlt_all.py`'s mirror — MEASURED,
+no modelling). No external pull performed this cycle; no `platform/data`/`source-data` value
+created, changed, or invented.
+
+---
+
 ## 2026-07-11 (3) — AUDIT: verified all 4 optional-heavy-dependency `[SKIP]` builders reproduce byte-exact for real
 
 **Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`

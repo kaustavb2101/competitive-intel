@@ -15,13 +15,21 @@
       inside `validate_data.py` (no existing check does this — worth confirming that pattern is
       even desirable before adding it, since `tests/run.sh` already gates the byte-exact rebuild
       separately). *(LOW, trivial, informational)*
-- [ ] **`truck_flow.json`'s worst-yoy provinces aren't surfaced anywhere in the UI yet** — the
-      builder computes `new_regis_yoy_pct` (worst-first sort) but nothing on `#acq`/`#trend`/
-      province pages reads `truck_flow.json` the way `vehicle_flow_transport.json`'s
-      `dereg_rate≥4.5%` callout is surfaced in `province.html`'s `autoImpacts()`. A same-pattern
-      "contracting truck fleet" callout (objective #1, logistics-SME borrower pulse) would close
-      the loop between this measured layer and an actual reader-facing signal. *(MED, S — real
-      UX gap, not just a validator gap)*
+- [x] **`truck_flow.json`'s worst-yoy provinces weren't surfaced anywhere in the UI — DONE
+      2026-07-11 (6)** (`province.html` now fetches the flat `truck_flow.json` alongside its
+      other optional layers and `vehicleFlowImpacts()` gained a "Contracting truck fleet" watch
+      callout keyed on `net_flow_12m<0` — new_regis trailing permanent deregistrations, a rarer
+      and more decisive signal than the raw `new_regis_yoy_pct` sort [8/77 = 10% of provinces,
+      vs. 32/77 negative-yoy which is too broad for a "watch" flag]; joined client-side by
+      `province_th` name match [confirmed all 77 `provinces/*.json` files match a `truck_flow.json`
+      `th` name, zero silent misses], same self-disabling-on-absent pattern as `crop_landuse.json`.
+      Verified live logic (province-name join + threshold + message text) via a hand-run Node
+      simulation against Chanthaburi [-56 net flow, fires correctly] and Rayong [+378, correctly
+      silent] since this page's headless render harness is known-flaky (2026-07-03 (7)/2026-07-05/
+      2026-07-10). Gate 66/0, `validate_data.py` 468/468 unchanged — zero `platform/data`/
+      `source-data` values touched, UI-only wiring of an already-measured layer. `#acq`/`#trend`
+      still don't read this file — a national-rollup surfacing is a separate, larger follow-up if
+      wanted. Full writeup: `docs/DATA_REFRESH_LOG.md` 2026-07-11 (6) entry).
 - [x] **`build_truck_flow.py` (Sprint 2 E0 (3), `694bb7a`) has no dedicated `validate_data.py`
       shape/sanity check — DONE 2026-07-11 (5)** (new `check_truck_flow()`: meta/provenance,
       non-empty provinces list, counts≥0, `net_flow_12m` recomputed and compared exactly,

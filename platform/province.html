@@ -936,6 +936,10 @@ function buildProvincePanels(){
     if(vft.dereg_rate!=null && vft.dereg_rate>=0.045){
       out.push(['Elevated commercial-truck scrappage',(Math.round(vft.dereg_rate*1000)/10)+'% of registered private/contract-hire trucks ceased registration in the trailing 12 months (DLT land-transport-law flow, top decile nationally) — commercial-vehicle collateral is turning over faster here.','watch']);
     }
+    const tf=window.TRUCKFLOW&&window.TRUCKFLOW.provinces&&window.TRUCKFLOW.provinces.find(function(p){return p.th===provTh;});
+    if(tf && tf.net_flow_12m!=null && tf.net_flow_12m<0){
+      out.push(['Contracting truck fleet','New truck registrations trailed permanent deregistrations by '+Math.abs(tf.net_flow_12m).toLocaleString()+' in the trailing 12 months (DLT dataset_stat_1_009, only '+Math.round(100*(window.TRUCKFLOW.provinces.filter(function(p){return p.net_flow_12m<0;}).length)/window.TRUCKFLOW.provinces.length)+'% of provinces show this) — the owner-operator hauler segment’s cash flow is thinning here.','watch']);
+    }
     return out;
   }
   function autoImpacts(){
@@ -1187,8 +1191,11 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    // operator-hosted Overture building tiles (null/absent => keep the extruded-relief view).
    fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // crop land-use by district (SPAM 2010, ESTIMATED) — null/absent => the Crops lens self-disables.
-   fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];
+   fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // commercial-truck registration flow (DLT dataset_stat_1_009, MEASURED) — flat national file,
+   // not gov-joined per province; null/absent => the truck-fleet callout self-disables.
+   fetch('data/truck_flow.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.TRUCKFLOW=a[4];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})
