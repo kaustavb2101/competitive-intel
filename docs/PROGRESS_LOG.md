@@ -5,6 +5,24 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 (3) — REFACTOR: collapsed duplicate gov.* join-integrity check loops in validate_data.py.
+
+`check_province_gov_joins()` (vehicles/employment/unemployment/income) and
+`check_province_factories_workers()` (factories/workers) had each hand-rolled the identical
+"load `provinces/index.json` → load every `provinces/<slug>.json` → compare `gov.<key>` against a
+source value" loop — flagged as a duplicate-helper smell across multiple prior cycles
+(2026-07-10 (6), 2026-07-11). New `_check_province_gov_join(field_sources)` in `tests/validate_data.py`
+takes a normalized `{gov_key: {"src": {th_name: expected}, "default": ...}}` map and runs the shared
+compare loop; both callers now only build their own source map (whole-dict pass-through for the
+4-file case, remapped scalar sub-fields for factories/workers) and delegate the actual per-province
+comparison. Zero behavior change: gate `bash tests/run.sh check` 66/0 before and after,
+`validate_data.py` 464/464 (unchanged). Verified the refactored check still catches real drift by
+hand-corrupting `platform/data/provinces/bangkok.json`'s `gov.factories` to `999999` — confirmed the
+exact same `[FAIL] ... bangkok gov.factories=999999 != source=4886` message fires, then restored via
+`git checkout`. This closes out the last standing "near-identical gov-join-check functions" backlog
+item (open since 2026-07-10 (6)); the next real gap here would only appear if `build_province.py`
+grows a 9th `gov.*` field.
+
 ## 2026-07-11 — VALIDATOR: join-integrity check for provinces/*.json gov.{factories,workers}.
 
 Closed the last 2 of the ~8 `gov.*` top-level joins in `build_province.py` still without a

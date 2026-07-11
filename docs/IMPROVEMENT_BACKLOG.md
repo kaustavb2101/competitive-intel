@@ -6,6 +6,32 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (3) — REFACTOR: gov.* join-check dedup
+- [x] **`check_province_gov_joins()`/`check_province_factories_workers()` near-identical loops —
+      DONE 2026-07-11 (3)** (new shared `_check_province_gov_join(field_sources)` in
+      `tests/validate_data.py`; both callers now build a normalized `{gov_key: {"src":{th:expect},
+      "default":...}}` map and delegate the compare loop. Zero behavior change — gate 66/0,
+      `validate_data.py` 464/464 unchanged before/after; verified drift-detection still fires
+      correctly via a hand-corrupt-then-restore of `bangkok.json`'s `gov.factories`. Closes the
+      "near-identical gov-join-check functions" item open since 2026-07-10 (6)/carried through
+      2026-07-11. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (3) entry).
+- [ ] **The SAME duplicate-loop shape still exists on the frontend** — `drawAmphoeChoropleth()`/
+      `drawProvinceChoropleth()` in `platform/app.js` (flagged repeatedly: 2026-07-03 (6)/(9),
+      2026-07-04, 2026-07-04 (6), 2026-07-06 (3)) share the same "lazy-load polygons → colour-ramp by
+      lens value → canvas GeoJSON layer → popup" shape but differ enough (categorical crop-lens
+      branch, amphoe-id vs province-name keying, ◇ vs ● popup glyph, 0.5 vs 0.45 fillOpacity) that a
+      clean merge needs real design care, not a 10-minute port. This cycle deliberately picked the
+      backend (`validate_data.py`) version of this same smell instead, since it was fully mechanical
+      and verifiable by re-running the gate — the frontend one is a better fit for a cycle with room
+      to headless-render both `?lens=drisk#map` and `?lens=pstress#map` before/after to catch a
+      subtle regression a text diff wouldn't. *(LOW-MED, S-M, pure refactor, needs visual
+      verification)*
+- [ ] **`_check_province_gov_join()`'s new normalized `field_sources` shape is a reusable pattern**
+      for any FUTURE `gov.*` join check (a 9th field) — a future cycle adding one should build its
+      own `{th_name: expected}` map and pass it in, rather than reaching for the old per-function
+      hand-rolled loop this cycle just retired. *(LOW, trivial, informational — keeps the new
+      pattern from being rediscovered from scratch)*
+
 ## Queue — follow-ups noticed 2026-07-11 (2) — AUDIT: provenance sweep + determinism-gate gap
 - [x] **`platform/data/rayong_province.json`'s builder (`build_rayong.py --check`) was never wired
       into `tests/run.sh`'s determinism gate, unlike every sibling builder — DONE 2026-07-11 (2)**
@@ -25,14 +51,10 @@
       `opportunity_score.json`) again. *(LOW, trivial, informational)*
 
 ## Queue — follow-ups noticed 2026-07-11
-- [ ] **`check_province_gov_joins()` and `check_province_factories_workers()` are now near-identical
-      functions** (load `provinces/index.json`, loop provinces, load each province file, compare
-      `gov.<key>` against a source dict keyed by Thai province name) — same duplicate-helper smell
-      already logged for `drawAmphoeChoropleth`/`drawProvinceChoropleth` on the frontend side
-      (2026-07-03 (6)/(9)). A shared `_check_province_gov_join(key, src_provs, ...)` helper taking a
-      `{th_name: value}` map (or a `{th_name: {srckey: expect}}` remap for the factories/workers
-      case) would collapse both call-sites before a 9th `gov.*` join is ever added. *(LOW, S, pure
-      refactor)*
+- [x] **`check_province_gov_joins()` and `check_province_factories_workers()` are now near-identical
+      functions — DONE 2026-07-11 (3), see the entry above.** Same duplicate-helper smell already
+      logged for `drawAmphoeChoropleth`/`drawProvinceChoropleth` on the frontend side (2026-07-03
+      (6)/(9)) — that frontend twin is still open, carried forward as a new entry above.
 - [ ] **All ~8 `gov.*` top-level joins in `provinces/<slug>.json` now have a value-level check** —
       the full set (vehicles/employment/unemployment/income/income_floor/vehicle_flow/
       vehicle_flow_transport/factories/workers) is closed as of this cycle. Worth a one-line note in
