@@ -541,6 +541,18 @@
     <div class="insight" id="siegereadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="siegetbl"></table>
 
+    <!-- CONTRACTING TRUCK FLEET · WATCH LIST — vintage-independent: DLT trailing-12mo registration
+         actions (dataset_stat_1_009) per province. An owner-operator hauler is a classic heavy-title
+         borrower; a province where new_regis - dereg < 0 has a shrinking fleet = that segment's cash
+         flow thinning. Same self-disabling-on-absent pattern as the peer/siege lists above. -->
+    <h2 class="risk" style="margin-top:18px">Contracting truck fleet · province watch list <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2>
+    <p class="lead">DLT trailing-12-month truck registration actions per province. Provinces where
+      <b>new registrations trail permanent deregistrations</b> (net flow &lt; 0) have a fleet that's
+      shrinking, not just growing slower — the owner-operator hauler's cash flow thinning is a
+      heavy-collateral portfolio-risk signal. No modelling: plain sums and ratios off the DLT mirror.</p>
+    <div class="insight" id="truckreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="trucktbl"></table>
+
     <div id="trendbody" style="display:none">
       <h2>Region movers · proxy change vs prior vintage</h2>
       <p class="lead">Arrow + delta show how each region's mean risk proxy shifted. ▲ red = getting riskier · ▼ green = easing. All estimated.</p>

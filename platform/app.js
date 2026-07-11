@@ -3636,6 +3636,7 @@ async function renderTrend(){
   renderVintageDigest();
   renderPeerOutliers();
   renderSiegeTable();
+  renderTruckTrend();
   if(!trendLoaded){
     trendLoaded=true;
     try{ DELTAS = await fetch('data/deltas.json').then(r=>r.json()); }
@@ -3826,6 +3827,53 @@ function drawSiegeTable(){
       <span class="sub">MEASURED — haversine over the merged competitor census (Muangthai/Srisawad/Tidlor official
       store locators, measured-complete; Heng is a sample, so pressure is a lower bound). The ≥3 cutoff is a stated
       rule, not a model.</span>`;
+  }
+}
+/* ---------- contracting truck fleet · province watch list (data/truck_flow.json, obj #1) ----------
+   Vintage-independent, same slot as the peer/siege audit-first lists: worst-first by net_flow_12m
+   (new registrations - deregistrations), the provinces whose commercial-truck fleet is shrinking
+   outright, not just growing slower. Reuses loadTruckFlow()/TRUCKFLOW already warmed for the
+   Overview national pulse card. Graceful when the file is absent. */
+function renderTruckTrend(){
+  const tbl=$('#trucktbl'); if(!tbl) return;
+  loadTruckFlow().then(drawTruckTrend);
+}
+function drawTruckTrend(){
+  const tbl=$('#trucktbl'), ro=$('#truckreadout'); if(!tbl) return;
+  const all=(TRUCKFLOW&&Array.isArray(TRUCKFLOW.provinces))?TRUCKFLOW.provinces:[];
+  if(!all.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Truck-flow watch list not yet computed.</b> <span class="sub">This layer is being prepared — the list fills in on the next data refresh.</span>';
+    return;
+  }
+  const rows=all.slice().sort((a,b)=>(a.net_flow_12m||0)-(b.net_flow_12m||0)).slice(0,10);
+  const worstMag=Math.max(1,Math.abs(rows[0].net_flow_12m||1));
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th>`+
+    `<th title="MEASURED — new truck registrations, trailing 12mo (DLT stat_1_009)">New regis 12m</th>`+
+    `<th title="MEASURED — permanent deregistrations, trailing 12mo">Dereg 12m</th>`+
+    `<th class="h-risk" title="MEASURED — new_regis - dereg; negative = fleet contracting">Net flow ▲</th>`+
+    `<th title="MEASURED — new_regis vs the same 12-month window a year earlier">YoY</th></tr>`+
+    rows.map((o,i)=>{
+      const neg=(o.net_flow_12m||0)<0;
+      const c=neg?'var(--agri)':'var(--merch)';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${o.th||'—'}</b></td>
+        <td class="sub">${o.region||'—'}</td>
+        <td class="mono sub">${(o.new_regis_12m||0).toLocaleString()}</td>
+        <td class="mono sub">${(o.dereg_12m||0).toLocaleString()}</td>
+        <td>${barHTML(Math.abs(o.net_flow_12m||0),c,worstMag)} <span class="mono" style="color:${c}"><b>${o.net_flow_12m>0?'+':''}${o.net_flow_12m}</b></span></td>
+        <td class="mono sub">${o.new_regis_yoy_pct!=null?(o.new_regis_yoy_pct>0?'+':'')+o.new_regis_yoy_pct+'%':'—'}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const t=rows[0], neg=all.filter(p=>(p.net_flow_12m||0)<0).length;
+    ro.innerHTML=`<b>Watch first:</b> <b style="color:var(--agri)">${t.th}</b> (${t.region}) has the sharpest
+      truck-fleet contraction — <b style="color:var(--agri)">${t.net_flow_12m} net flow</b> over the trailing 12
+      months (${(t.new_regis_12m||0).toLocaleString()} new vs ${(t.dereg_12m||0).toLocaleString()} deregistered).
+      ${neg} of ${all.length} provinces have an outright shrinking fleet (net flow &lt; 0) — the owner-operator
+      hauler's cash flow thinning fastest there.
+      <span class="sub">MEASURED — DLT transport-law registration actions (dataset_stat_1_009), trailing-12-month
+      sums, no modelling.</span>`;
   }
 }
 function renderTrendBaseline(deltas){
