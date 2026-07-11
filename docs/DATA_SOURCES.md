@@ -44,6 +44,24 @@ registrations and DIW factories.
 GDP 2026 ~1.6%; household debt 86.8% (Sep 2025); inflation ~0.3% (near-zero); tourists 2025 32.9M
 (−7.2% YoY, first drop; 2026 target 35.5M); retail +2%; ฿44bn Khon La Khrueng co-payment scheme; credit contracting.
 
+## Truck-fleet flow (`platform/data/truck_flow.json`) — logistics-SME borrower pulse
+DLT land-transport-law registration-action log, `dataset_stat_1_009` (mirrored whole by
+`pipeline/pull_dlt_all.py` to `source-data/dlt/raw/dataset_stat_1_009`). `pipeline/build_truck_flow.py`
+sums the trailing 12 months of truck (รถบรรทุก, private + for-hire) new-registrations, transfers, and
+permanent deregistrations per province, plus the same window one year earlier for a YoY read on
+new-registrations. 100% MEASURED sums + plain ratios, no modelling. Surfaces on `#trend` as the
+"Contracting truck fleet · province watch list". Distinct from `dataset_stat_1_008` (cars/pickups/
+motorcycles — the collateral classes), which feeds `vehicle_flow_by_province.json` instead.
+
+## National labour context (`platform/data/labour_context.json`) — the informal-borrower base
+ILOSTAT rplumber mirror of Thailand's official NSO Labour Force Survey submissions
+(`source-data/ilostat_labour.json`, `pipeline/pull_ilostat_labour.py`, pulled 2026-07-11 — NSO's own
+hosts are geoblocked from this sandbox). `pipeline/build_labour_context.py` distills informality rate,
+sector employment + trend, unemployment (total vs youth), and the agri-vs-factory hours gap.
+**NATIONAL level only** — there is no cloud path to per-province LFS, so the vendored NSO SES 2566
+layer (`source-data/tmli/`) remains the per-province debt/income source; this file does not claim
+district or province resolution it doesn't have.
+
 ## `branches_final.json` field dictionary (the master, 2,015 records)
 Identity: `code, name, prov, district, subdistrict, zip, lat, lng, prec` (geocode precision),
 `phone, region` (Isan/North/South/East/Central&BKK).

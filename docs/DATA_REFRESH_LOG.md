@@ -4,6 +4,52 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-11 (8) — AUDIT: backfilled `DATA_SOURCES.md`/`DATA_PROVENANCE.md` citations for `labour_context.json` + `truck_flow.json`
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
+(`e55e0f6` HEAD), `bash tests/run.sh check` → 66 passed, 0 failed (`validate_data.py` 468/468) before
+touching anything — no pre-existing drift, so RE-DERIVE wasn't picked. No `/workspace/watcher` TMLI
+checkout present in this session, so ENRICH (folding a new real layer) wasn't available either; picked
+the standing AUDIT gap instead.
+
+**1. What was found.** `docs/IMPROVEMENT_BACKLOG.md`'s 2026-07-11 (4) follow-up flagged that
+`docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md` didn't yet cite `labour_context.json`'s ILOSTAT-via-
+ILO-mirror source path or `truck_flow.json`'s DLT `dataset_stat_1_009` origin, the way every other
+gov/NSO/DLT layer is documented in those two files. Confirmed both files were genuinely absent from
+both docs (`grep -n "truck_flow\|labour_context\|ilostat" docs/DATA_SOURCES.md docs/DATA_PROVENANCE.md`
+returned nothing before this change) — both are real, gate-passing, `meta`-carrying, already-shipped
+`platform/data/*.json` layers (verified `meta` blocks in each: `truck_flow.json` cites
+`dataset_stat_1_009` + `pull_dlt_all.py`; `labour_context.json` cites `source-data/ilostat_labour.json`
++ "pulled 2026-07-11", NATIONAL-only) — they just hadn't made it into the two standing source-register
+docs after landing.
+
+**2. Fix applied — docs only, zero data/code touched:**
+- `docs/DATA_PROVENANCE.md` §1 (the "layers the app actually serves" table): added two rows —
+  `truck_flow.json` (MEASURED, DLT `dataset_stat_1_009` via `build_truck_flow.py`, explicit note
+  distinguishing it from the pre-existing `vehicle_flow_transport_by_province.json` §2 row that reads
+  the *same* raw dataset but feeds a different consumer — `provinces/<slug>.json`'s
+  `gov.vehicle_flow_transport` vs. this file's flat national `#trend` watch table) and
+  `labour_context.json` (MEASURED national-only, ILOSTAT mirror via `build_labour_context.py`, with
+  the NATIONAL-vs-per-province caveat carried through explicitly so it doesn't overclaim resolution it
+  doesn't have).
+- `docs/DATA_SOURCES.md`: added two new short sections ("Truck-fleet flow" / "National labour
+  context") in the same citation style as the existing Macro/Rayong sections, naming the exact
+  dataset ids, puller scripts, and pull dates.
+
+**Verification:**
+- `bash tests/run.sh check` — 66 passed, 0 failed (`validate_data.py`: 468/468, unchanged before/after
+  — this is a pure docs backfill, no `platform/data`/`source-data` value or builder touched).
+- The doc/data vintage-drift tripwire (`DATA_SOURCES.md`/`DATA_PROVENANCE.md` vintage vs
+  `meta.json.updated`) still passes — neither edit touched the Pink Sheet vintage citation.
+- Closes the 2026-07-11 (4) follow-up in `docs/IMPROVEMENT_BACKLOG.md` (checked off there).
+
+**Source:** no external pull this cycle — cited the `meta` blocks already embedded in
+`platform/data/truck_flow.json` and `platform/data/labour_context.json` (themselves written by
+`pipeline/build_truck_flow.py` / `pipeline/build_labour_context.py` from already-committed,
+already-gated source files).
+
+---
+
 ## 2026-07-11 (6) — ENRICH: wired the already-measured `truck_flow.json` into `province.html`'s reader-facing callouts
 
 **Task type:** ENRICH. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`

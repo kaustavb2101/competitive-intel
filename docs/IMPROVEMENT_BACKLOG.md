@@ -6,6 +6,25 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (8) — AUDIT: source-register doc backfill
+- [ ] **`docs/DATA_PROVENANCE.md` §1's own header still says "the ledger now covers all 34 top-level
+      `platform/data/*.json` layers" from the 2026-07-01 audit** — that count is now stale (this
+      cycle alone added a 35th/36th row for `truck_flow.json`/`labour_context.json`, and several other
+      layers referenced elsewhere in this backlog — `branch_peers.json`, `branch_density.json`,
+      `exit_whitespace.json`, `expansion_plan.json`, occupation/opportunity layers — don't appear in
+      §1's table either). A future AUDIT cycle should do a full re-count (`ls platform/data/*.json`
+      vs. §1's row count) and either update the header number or, better, do a complete sweep adding
+      every still-missing row in one pass rather than one-off additions like this cycle's. *(MED, M,
+      needs a full file-by-file pass — this cycle deliberately scoped to just the 2 specifically-
+      flagged gaps rather than attempting the full sweep)*
+- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix still lists `DLT (vehicles) | stat.dlt.go.th,
+      web.dlt.go.th | ❌ BLOCKED`** without noting the CLAUDE.md-documented 2026-07-09 breakthrough
+      that the DEPARTMENTS' OWN CKAN catalogs (`gdcatalog.dlt.go.th`, `diw-dataset.diw.go.th`) are
+      NOT geoblocked — a different host than the blocked `stat.dlt.go.th`/`web.dlt.go.th` pair, so not
+      technically wrong, but potentially misleading to a reader who doesn't also have CLAUDE.md's
+      "Hard environment constraints" section open. A future docs cycle could add a one-line
+      cross-reference. *(LOW, trivial, informational)*
+
 ## Queue — follow-ups noticed 2026-07-11 (7) — ENRICH: truck_flow.json national-rollup on #trend
 - [x] **`truck_flow.json`'s worst-yoy provinces weren't surfaced on `#acq`/`#trend` — DONE
       2026-07-11 (7), closes half of the 2026-07-11 (6) follow-up** (`#trend` gained a
@@ -65,11 +84,11 @@
       `validate_data.py` 468/468. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (5) entry).
 
 ## Queue — follow-ups noticed 2026-07-11 (4) — AUDIT: Sprint 2 commit-log backfill
-- [ ] **`docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md` don't yet cite `labour_context.json`'s
-      ILOSTAT-via-ILO-mirror source path or `truck_flow.json`'s DLT `stat_1_009`** the way other
-      layers are documented — both are real, gate-passing, cited-in-commit-message sources, just not
-      yet folded into the two standing source-register docs. A future docs cycle should add them
-      alongside the existing DLT/NSO entries. *(LOW, S, docs-only)*
+- [x] **`docs/DATA_SOURCES.md`/`docs/DATA_PROVENANCE.md` don't yet cite `labour_context.json`'s
+      ILOSTAT-via-ILO-mirror source path or `truck_flow.json`'s DLT `stat_1_009` — DONE 2026-07-11
+      (8)** (two new rows in `DATA_PROVENANCE.md` §1 + two new cited sections in `DATA_SOURCES.md`,
+      docs-only, gate reconfirmed 66/0 unchanged. Full writeup: `docs/DATA_REFRESH_LOG.md` 2026-07-11
+      (8) entry).
 - [ ] **Confirm whether "Sprint 2"-style commits are a recurring named workflow (not this loop)** —
       if so, worth a one-line note in `CLAUDE.md`'s Operating Model section pointing at whatever logs
       IT keeps (if any), so a future loop cycle doesn't have to re-discover "this diff isn't mine" via
