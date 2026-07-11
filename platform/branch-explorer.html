@@ -327,7 +327,7 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
     </div>
   </div>
   <div class="grp">
-    <div class="glab">POIs · ≤10km (live OSM)</div>
+    <div class="glab" id="poiSrc">POIs · ≤10km (live OSM)</div>
     <div class="poileg" id="poileg"><div class="pl-empty">POIs load when buildings load…</div></div>
   </div>
 </div>
@@ -440,10 +440,43 @@ async function loadTilesConfig(){
 let catchPerim=null;     // filtered perimeter buildings; false after a definitive miss
 let catchPromise=null;   // in-flight resolve+fetch+filter, shared by concurrent callers
 let catchProv=null;      // resolved province slug (for the status line)
-function setBldgSource(s){ // 'catchment' | 'osm' | '' -> the provenance line in the Buildings legend
+function setBldgSource(s){ // 'catchment' | 'osm' | 'none' | '' -> the provenance line in the Buildings legend
   const el=document.getElementById('bsrc'); if(!el)return;
   el.textContent=s==='catchment'?'buildings: Overture catchment (measured)'
-    :s==='osm'?'buildings: OSM live (Overpass)':'buildings: —';
+    :s==='osm'?'buildings: OSM live (Overpass)'
+    :s==='none'?'buildings: none mapped here — showing branch, rings + POIs'
+    :'buildings: —';
+}
+// provenance line for the POI legend header (live-Overpass in-view vs committed national fallback)
+function setPoiSource(s){ // 'osm' (live) | 'catchment' (committed national) | ''
+  const el=document.querySelector('.ctl .glab'); // fallback if the header id isn't present
+  const hdr=document.getElementById('poiSrc');
+  if(hdr){ hdr.textContent=s==='catchment'?'POIs · ≤10km (measured OSM · committed)'
+    :s==='osm'?'POIs · ≤10km (live OSM)':'POIs · ≤10km'; }
+}
+// ---- COMMITTED national POI fallback: catchment_poi.json (68,946 MEASURED OSM points, 11 lender
+// types, [lat,lng]) — the SAME nationwide file rayong-catchment.html uses. Sliced ONCE to the 10km
+// branch box so EVERY province's per-branch scene gets commercial-fabric columns from committed data,
+// with no dependence on a live Overpass pull. Memoised; any miss returns [] and the live path (if it
+// succeeds) simply upgrades to in-view points. Nothing fabricated — coordinates are measured OSM.
+let catchPoi=null, catchPoiTried=false;
+async function loadCatchmentPOIScene(){
+  if(catchPoiTried) return catchPoi;
+  catchPoiTried=true;
+  try{
+    const r=await fetch('data/catchment_poi.json'); if(!r.ok){ catchPoi=[]; return catchPoi; }
+    const j=await r.json(); const P=(j&&j.poi)||{};
+    const dLat=10/111, dLng=10/(111*Math.cos((LAT||13.5)*D2R));
+    const S=LAT-dLat,N=LAT+dLat,W=LNG-dLng,E=LNG+dLng;
+    const out=[];
+    for(const t in P){ const arr=P[t]; if(!Array.isArray(arr))continue;
+      for(let i=0;i<arr.length;i++){ const p=arr[i]; if(!p)continue;
+        const la=+p[0], ln=+p[1]; if(!isFinite(la)||!isFinite(ln))continue;
+        if(la<S||la>N||ln<W||ln>E)continue;
+        out.push({x:ln,y:la,t}); } }
+    catchPoi=out;
+  }catch(e){ catchPoi=[]; }
+  return catchPoi;
 }
 async function resolveProvinceSlug(){
   try{
@@ -799,10 +832,16 @@ async function loadBuildings(){
       return;
     }
   }catch(e){ /* never let the preferred path break the fallback */ }
-  const b=viewBounds();              // [W,S,E,N]
-  const W=b[0],S=b[1],E=b[2],N=b[3];
-  // guard: only fetch when the box is small enough to be sane (≈ <6km across)
-  if((N-S)>0.08 || (E-W)>0.08){ status('Zoom in to load buildings (area too large)'); return; }
+  let b=viewBounds();                // [W,S,E,N]
+  let W=b[0],S=b[1],E=b[2],N=b[3];
+  // At the framed pitch (58°) the initial viewport's ground bounds can span far more than the ~6km
+  // sane window, which previously self-aborted with "Zoom in" and left a BARE scene on first load.
+  // Instead of bailing, clamp the query to a ~5km box centred on the BRANCH so buildings still load
+  // around the pin. (Panning to a genuinely huge, off-branch view still shows the committed POIs.)
+  if((N-S)>0.08 || (E-W)>0.08){
+    const dLat=2.5/111, dLng=2.5/(111*Math.cos((LAT||13.5)*D2R));
+    W=LNG-dLng; E=LNG+dLng; S=LAT-dLat; N=LAT+dLat;
+  }
   const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');     // bbox cache so panning doesn't refetch
   if(tileCache[ckey]){ buildings=tileCache[ckey]; render(); setBldgSource('osm'); status(`${fmt(buildings.length)} buildings in view`); return; }
   status('Loading buildings…');
@@ -827,14 +866,19 @@ async function loadBuildings(){
       status(`${fmt(out.length)} buildings · OSM live · heights estimated from type + footprint`);
       clearTimeout(window._statusT); window._statusT=setTimeout(()=>status(''),3200);
     }else{
-      status('No OSM buildings mapped here (rural / factory zone)', 'info');
+      // No footprints here (rural / factory zone / unmapped). Honest grounded state: the branch pin,
+      // ground-glow discs, 3/5/10km rings and the MEASURED POI columns are all still drawn.
+      setBldgSource('none');
+      status('No building footprints mapped here — branch, rings + measured POIs shown', 'info');
     }
   }catch(e){
-    // GRACEFUL: building footprints couldn't be fetched (Overpass blocked / offline). The rest of the
-    // scene (10km rings, branch pin, POI columns) is still drawn — never a raw error, never a blank page.
+    // GRACEFUL: building footprints couldn't be fetched (Overpass blocked / offline) AND no committed
+    // catchment covers this province. The scene is NOT empty — 10km rings, the grounded branch pin +
+    // glow discs, and the committed measured POI columns all render. Never a raw error or blank page.
     console.warn('buildings unavailable:', e&&e.message||e);
+    setBldgSource('none');
     render();
-    status('Building footprints unavailable — showing branch + POI layer', 'info');
+    status('Building footprints unavailable — branch, rings + measured POIs shown', 'info');
   }
 }
 
@@ -866,8 +910,16 @@ function poiType(t){
 }
 async function loadPOIs(){
   if(isNaN(LAT)) return;
+  // COMMITTED-DATA FIRST: if no live POIs are on screen yet, paint the measured national set
+  // (catchment_poi.json, sliced to the 10km branch box) so the scene has commercial-fabric columns
+  // in EVERY province — before, and independent of, any live Overpass call. Live Overpass (below)
+  // upgrades to in-view points when reachable; if it is blocked, the committed columns simply stay.
+  if(!pois.length){
+    const cp=await loadCatchmentPOIScene();
+    if(cp&&cp.length){ pois=cp; render(); buildPoiLegend(); setPoiSource('catchment'); }
+  }
   const b=viewBounds(); const W=b[0],S=b[1],E=b[2],N=b[3];
-  if((N-S)>0.08 || (E-W)>0.08){ return; }     // same area guard as buildings
+  if((N-S)>0.08 || (E-W)>0.08){ return; }     // area too large for a live in-view query — committed columns already shown
   const ckey=[W,S,E,N].map(v=>v.toFixed(3)).join(',');
   if(poiTileCache[ckey]){ pois=poiTileCache[ckey]; render(); return; }
   // Lender-relevant Overpass union. ^…$-anchored alternation so e.g. "car" doesn't also pull
@@ -899,9 +951,10 @@ async function loadPOIs(){
       if(x==null||y==null)continue;
       out.push({x,y,t});
     }
-    pois=out; poiTileCache[ckey]=out; render();
+    if(out.length){ pois=out; poiTileCache[ckey]=out; setPoiSource('osm'); }  // live in-view set upgrades the committed columns
+    render();
     buildPoiLegend();                                    // refresh legend counts from what's in view
-  }catch(e){ /* Overpass blocked: leave pois=[]; scene still draws buildings/rings/branch */ }
+  }catch(e){ /* Overpass blocked: keep the committed national columns already drawn above */ }
 }
 
 /* ---- branch panel (from branches.json, offline) ---- */
@@ -1005,6 +1058,14 @@ async function loadPanel(){
     try{ const ro=await fetch('data/occupation_leads.json'); if(ro.ok) occLeadsJ=await ro.json(); }catch(e){}
     try{ const rr=await fetch('data/rival_pressure.json'); if(rr.ok) rivalJ=await rr.json(); }catch(e){}
 
+    // MEASURED reachable population inside this branch's 10km circle (WorldPop 2020, index-aligned to
+    // branches.json). Committed for all 2,015 branches — matches the '≤10km' framing of the POI counts.
+    let popJ=null; try{ const rp=await fetch('data/branch_population.json'); if(rp.ok) popJ=await rp.json(); }catch(e){}
+    const popVal=(popJ&&Array.isArray(popJ.values)&&idx>=0)?popJ.values[idx]:null;
+    const popHtml=(popVal!=null&&isFinite(popVal))
+      ? `<div class="pr"><span>People ≤10km <span class="tag meas">measured · WorldPop</span></span><b>${fmt(Math.round(popVal))}</b></div>`
+      : '';
+
     // --- Task 3: rival-pressure line in the header card (#brival) — MEASURED census geometry ---
     const rvE=(rivalJ&&rivalJ.branches&&idx>=0)?rivalJ.branches[idx]:null;
     const rvBrands=(rivalJ&&rivalJ.brands)||['Heng','Muangthai','Srisawad','Tidlor'];
@@ -1086,6 +1147,7 @@ async function loadPanel(){
       `<h3>${best.n}</h3>
        <div class="pr"><span>Province · district</span><b>${best.v}${best.d?' · '+best.d:''}</b></div>
        <div class="pr"><span>AutoX ≤10km</span><b>${best.w}</b></div>
+       ${popHtml}
        ${acqHtml}
        ${occLeadsHtml}
        ${macxHtml}
@@ -1097,7 +1159,7 @@ async function loadPanel(){
        <div class="note">Establishments mapped in OpenStreetMap within 10 km of this branch — measured, not estimated.</div>
        <h3>Who works nearby</h3>
        ${workhtml}
-       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings = the province's Overture catchment (measured) when available, else live OpenStreetMap with heights estimated from type + footprint — the Buildings legend says which source is live. Coloured POI columns = live OSM (measured) when reachable. Rings = 3 / 5 / 10 km.</div>`;
+       <div class="note">${measuredOcc?'Occupation mix is a MEASURED count of establishments within 10 km by category (Overture Maps Places — a sample/lower bound, not a registry) — what kind of work surrounds the branch, not a headcount.':'Occupation mix is a proxy from the 10 km establishment mix (OSM) — who works locally, not a headcount. Run pull_overture_places.py + build_occupations.py to replace it with measured Overture counts.'} Informal/formal split is province-level (NSO, measured). 3D buildings = the province's Overture catchment (measured) when available, else live OpenStreetMap with heights estimated from type + footprint — the Buildings legend says which source is live. Coloured POI columns = MEASURED OSM establishments — the committed national set (catchment_poi.json) sliced to this branch's 10 km circle, upgraded to live in-view points when Overpass is reachable — so the commercial fabric shows in every province, not only where a live pull succeeds. Rings = 3 / 5 / 10 km.</div>`;
   }catch(e){ $('#panel').innerHTML='<div class="note">Branch data unavailable ('+e.message+')</div>'; }
 }
 
