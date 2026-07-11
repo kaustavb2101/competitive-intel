@@ -4,6 +4,53 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-11 (2) — AUDIT: `platform/data` provenance sweep + closed a real determinism-gate gap on `rayong_province.json`
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
+(`def0c6f` HEAD), `bash tests/run.sh check` → 64 passed, 0 failed (`validate_data.py` 464/464)
+before touching anything — no pre-existing drift, so this cycle did not pick RE-DERIVE.
+
+**1. What was checked.** Scanned all 67 non-geometry top-level files in `platform/data/*.json`
+(excluding the per-province `_places.json`/`_roads.json`/`_water.json`/`_landuse.json`/
+`_catchment.json` OSM/Overture basemap-geometry layers, which are exempt by design per
+`tests/validate_data.py`'s `PROVENANCE_EXEMPT` / `DATA_PROVENANCE.md`) for a `meta` block naming a
+source. 59/67 had one directly. Of the 8 flagged for manual review:
+
+- `branches.json`, `meta.json`, `deltas.json`, `snapshots_index.json` — all correctly on the
+  existing `PROVENANCE_EXEMPT` list (their provenance lives in `meta.json`/the master/vintage
+  stamps, per `DATA_PROVENANCE.md` §1 R4) — **not a gap**, false-positive from my scan.
+- `decision_queue.json`, `occupation_risk.json`, `opportunity_score.json` — all three DO carry a
+  full `meta` block; my scan's keyword list (`source`/`generated_by`/`provenance`/`src`) missed
+  their `generated_with` key. Read each in full: all three cite `pipeline/build_*.py` +
+  MEASURED-vs-ESTIMATED labels correctly. **Not a gap**, scan false-positive.
+- `rayong_province.json` — has no top-level `meta` block, but IS correctly listed in
+  `PROVENANCE_EXEMPT` (justified: curated pilot, inputs are sourced layers + a curated
+  competitor list, per-block `gov.src` citation present). **Provenance itself is fine.** But
+  checking why it's exempt surfaced a real, separate issue (below).
+
+**2. Real gap found and fixed.** `platform/data/rayong_province.json` is built by
+`pipeline/build_rayong.py`, which supports `--check` (byte-exact reproduction from
+`source-data/branches_final.json` + `source-data/rayong_competitors.json`, confirmed deterministic
+— no network pull) — but unlike every sibling builder (`derive.py`, `build_province.py`,
+`build_amphoe.py`, `build_amphoe_geo.py`, `build_province_geo.py`, `timeseries.py`, …),
+**`build_rayong.py --check` was never wired into `tests/run.sh`'s determinism gate.** This file
+also feeds `build_catchment_poi.py`'s curated POI source for every OTHER province's 3D scene (per
+that script's own header comment), so it's more than a retired-page artifact. A hand-edit or drift
+in this file would go undetected by CI. Ran `python3 build_rayong.py --check` manually first to
+confirm it currently reproduces byte-exact (it does), then added one line to `tests/run.sh`'s
+`phase_check()` (same pattern as every other builder) so future drift is caught.
+
+**Verification:** `bash tests/run.sh check` → 65 passed, 0 failed (`validate_data.py` unchanged at
+464/464 — this is a determinism-gate addition, not a data-check addition). `git status --short`
+confirms only `tests/run.sh` changed — zero `platform/data`/`source-data` files touched, no data
+value changed or invented.
+
+**Source:** `pipeline/build_rayong.py` (existing script, already supported `--check`, just wasn't
+called from the gate); `tests/validate_data.py`'s `PROVENANCE_EXEMPT` + `docs/DATA_PROVENANCE.md`
+§1 for the provenance-exemption rationale confirmed correct. No external pull performed this cycle.
+
+---
+
 ## 2026-07-10 (3) — AUDIT: closed a real traceability gap on `commodity_board.json` (0 data values changed)
 
 **Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh checkout of `claude/new-session-wto26j`

@@ -6,6 +6,24 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (2) — AUDIT: provenance sweep + determinism-gate gap
+- [x] **`platform/data/rayong_province.json`'s builder (`build_rayong.py --check`) was never wired
+      into `tests/run.sh`'s determinism gate, unlike every sibling builder — DONE 2026-07-11 (2)**
+      (one-line addition to `phase_check()`, same pattern as `derive.py`/`build_province.py`/etc.;
+      confirmed the builder already reproduced byte-exact before wiring it in, so this was a pure
+      gate-hardening fix, zero data changed. Notable because `rayong_province.json` also feeds
+      `build_catchment_poi.py`'s curated POI source for every OTHER province's 3D scene, not just
+      the retired `rayong-province.html` redirect stub — a silent hand-edit here would have gone
+      undetected by CI. Gate 65/0, `validate_data.py` 464/464. Full writeup:
+      `docs/DATA_REFRESH_LOG.md` 2026-07-11 (2) entry).
+- [ ] **A broader `meta`/provenance sweep of all 67 non-geometry `platform/data/*.json` files found
+      no other real gaps** (8 flagged by a keyword scan were all either already correctly on
+      `PROVENANCE_EXEMPT` or carry a `generated_with`-keyed meta the scan's keyword list missed) —
+      worth widening the recognized-provenance-key list (or `check_province_provenance()`-style
+      checks) to also accept `generated_with`, purely so a future audit doesn't have to hand-verify
+      the same 3 false positives (`decision_queue.json`, `occupation_risk.json`,
+      `opportunity_score.json`) again. *(LOW, trivial, informational)*
+
 ## Queue — follow-ups noticed 2026-07-11
 - [ ] **`check_province_gov_joins()` and `check_province_factories_workers()` are now near-identical
       functions** (load `provinces/index.json`, loop provinces, load each province file, compare
