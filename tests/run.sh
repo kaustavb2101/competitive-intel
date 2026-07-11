@@ -115,6 +115,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (DLT mirror dataset_stat_1_009 absent — not data drift)"
   else bad "build_truck_flow.py --check (truck_flow.json drifted from the DLT stat_1_009 mirror)"
   fi
+  ( cd "$PIPE" && python3 build_napprang.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_napprang.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_napprang.py --check (source-data/oae_napprang.json absent — not data drift)"
+  else bad "build_napprang.py --check (napprang.json drifted from source-data/oae_napprang.json)"
+  fi
   ( cd "$PIPE" && python3 build_fuel_prices.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_fuel_prices.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"

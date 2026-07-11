@@ -60,6 +60,17 @@ async function loadCropStress(){
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
 
+// MEASURED dry-season (second) rice exposure per province (napprang.json, OAE) — the drought-watch
+// strip cites it so the reader sees which flagged province actually rides on the irrigated second
+// crop the rain deficit threatens (Sprint 3). Lazy, promise-cached, null-safe.
+let NAPP=null, nappPromise=null;
+async function loadNapprang(){
+  if(nappPromise) return nappPromise;
+  nappPromise=fetch('data/napprang.json').then(r=>r.ok?r.json():null)
+    .then(j=>{NAPP=j;return j;}).catch(()=>{NAPP=null;return null;});
+  return nappPromise;
+}
+
 /* ---------- household debt-to-income (MEASURED · NSO SES, objective #1) ----------
    Lazy-loaded from data/household_risk_by_province.json (pipeline/build_household_risk.py).
    HHRISK maps Thai province name -> {debt, income, debt_to_income, stress_index}. debt + income
@@ -1473,6 +1484,8 @@ function renderOverview(){
   loadOutlook().then(renderNationalOutlook);
   loadBrandTrends().then(renderBrandTrends);
   loadRainPulse().then(renderRainPulse);
+  // measured second-crop exposure for the drought-watch strip — null-safe, re-renders crop stress.
+  loadNapprang().then(()=>{ if(CSTRESS_LIST&&CSTRESS_LIST.length) renderCropStress(); });
   // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
   // Also drop editorial KPIs that the measured BIS/World-Bank feed (renderMacroIndicators) supplies:
   // the page used to show household debt 86.8% (editorial) beside 87.5% (BIS) with no reconciliation.
@@ -1731,9 +1744,19 @@ function renderCropStress(){
   const dwList=CSTRESS_LIST.filter(p=>p.drought_watch);
   if(note&&dwList.length){
     const nbr=dwList.reduce((s,p)=>s+((p.components||{}).n_branches||0),0);
+    // MEASURED second-crop exposure (napprang.json, OAE) per flagged province: the drought-watch
+    // concern is "the income cushion disappears if the irrigated SECOND crop is cut" — this is the
+    // measured size of that second crop, so the reader sees which flagged province actually has the
+    // exposure (Suphanburi 906k rai / #2 nationally) vs which is small (committee Area-2, upgraded).
+    const napp=(NAPP&&NAPP.by_province)||null;
     note.innerHTML+=`<br><b style="color:var(--gold)">⚠ Drought-watch (${dwList.length} provinces · ${nbr} branches):</b> `+
-      dwList.map(p=>`${p.th} <span class="mono">${(p.components||{}).rain_pct_of_normal}%</span>`).join(' · ')+
-      ` — ≥90% rice on rain &lt;65% of normal. The +rice-price cushion hides them in the ranking above; the exposure crystallizes if the irrigated second crop is cut ${TAG_E}`;
+      dwList.map(p=>{
+        const rain=`<span class="mono">${(p.components||{}).rain_pct_of_normal}%</span>`;
+        const e=napp&&napp[p.th];
+        const crop=e?` <span class="sub">· 2nd-crop ${(e.planted_rai/1e6).toFixed(2)}M rai #${e.rank_planted} ${TAG_M}</span>`:'';
+        return `${p.th} rain ${rain}${crop}`;
+      }).join(' · ')+
+      ` — ≥90% rice on rain &lt;65% of normal. The +rice-price cushion hides them in the agri-stress ranking; the exposure crystallizes if the irrigated second crop is cut. Second-crop area (OAE, measured) shows Suphanburi carries the real exposure — the Samut provinces are rice-heavy by share but small in absolute dry-season area ${TAG_E}`;
   }
 }
 
