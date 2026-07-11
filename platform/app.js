@@ -1224,11 +1224,13 @@ async function loadLabourContext(){
 function renderLabourContext(){
   const host=$('#macro'); if(!host||!LABOUR) return;
   host.querySelectorAll('.mcard-labour').forEach(el=>el.remove());
-  const inf=LABOUR.informality||{}, emp=LABOUR.employment||{}, une=LABOUR.unemployment||{};
+  const inf=LABOUR.informality||{}, emp=LABOUR.employment||{}, une=LABOUR.unemployment||{}, se=LABOUR.self_employment||null;
   const agri=(emp.sectors||[]).find(s=>s.sector==='Agriculture');
   const cards=[];
   if(inf.rate_pct!=null) cards.push(['Informal employment',`${inf.rate_pct}%`,
     `the title-loan borrower base (no payslip) · LFS via ILOSTAT ${inf.as_of} · measured`]);
+  if(se&&se.self_employed_pct!=null) cards.push(['Self-employed',`${se.self_employed_pct}%`,
+    `${(se.self_employed_thousands/1000).toFixed(1)}M workers · own-account ${(se.own_account_thousands/1000).toFixed(1)}M + family ${(se.contributing_family_thousands/1000).toFixed(1)}M — no payslip-issuing employer · LFS ${se.as_of}`]);
   if(agri) cards.push(['Agri employment',`${(agri.employed_thousands/1000).toFixed(1)}M`,
     `${agri.yoy_change_thousands>=0?'+':''}${Math.round(agri.yoy_change_thousands||0)}k YoY · ${agri.share_pct}% of all workers · LFS ${agri.as_of}`]);
   if(une.total_rate_pct!=null) cards.push(['Unemployment',`${une.total_rate_pct}%`,

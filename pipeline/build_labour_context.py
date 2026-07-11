@@ -53,10 +53,31 @@ def build():
     une = S.get("UNE_DEAP_SEX_AGE_RT", {})
     nifl = S.get("EMP_NIFL_SEX_RT", {})
     how = S.get("HOW_TEMP_SEX_ECO_NB", {})
+    ste = S.get("EMP_TEMP_SEX_STE_NB", {})   # status in employment (own-account / employees / …)
 
     inf_t, inf_v = _latest(nifl, None)
     tot_t, tot_v = _latest(emp, "ECO_AGGREGATE_TOTAL")
     prev_year = str(int(tot_t) - 1) if tot_t else None
+
+    # self-employment: own-account (ICSE93_3) + contributing-family (ICSE93_5) + employers (ICSE93_2)
+    # = workers without a payslip-issuing employer, the exact vehicle-title borrower profile.
+    ste_t, ste_tot = _latest(ste, "STE_AGGREGATE_TOTAL")
+    _, own = _latest(ste, "STE_ICSE93_3")
+    _, fam = _latest(ste, "STE_ICSE93_5")
+    _, emprs = _latest(ste, "STE_ICSE93_2")
+    _, ees = _latest(ste, "STE_ICSE93_1")
+    self_emp = None
+    if None not in (ste_tot, own, fam, emprs) and ste_tot:
+        selfn = own + fam + emprs
+        self_emp = {"as_of": ste_t,
+                    "self_employed_thousands": round(selfn, 1),
+                    "self_employed_pct": round(100.0 * selfn / ste_tot, 1),
+                    "own_account_thousands": round(own, 1),
+                    "contributing_family_thousands": round(fam, 1),
+                    "employers_thousands": round(emprs, 1),
+                    "employees_thousands": round(ees, 1) if ees is not None else None,
+                    "note": "self-employed = own-account + contributing-family + employers — no "
+                            "payslip-issuing employer, the exact vehicle-title borrower profile"}
 
     sectors = []
     for code, label in SECTORS.items():
@@ -92,6 +113,7 @@ def build():
                         "as_of": inf_t,
                         "note": "share of employment that is INFORMAL (no payslip/social cover) "
                                 "— the core title-loan demographic"},
+        "self_employment": self_emp,
         "employment": {"total_thousands": round(tot_v, 1) if tot_v is not None else None,
                        "as_of": tot_t, "sectors": sectors},
         "unemployment": {"total_rate_pct": round(une_tot, 2) if une_tot is not None else None,

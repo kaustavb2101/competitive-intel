@@ -30,6 +30,7 @@ SERIES = [
     ("EMP_TEMP_SEX_AGE_NB", "2022", "Employment by age", "thousands"),
     ("UNE_DEAP_SEX_AGE_RT", "2022", "Unemployment rate", "%"),
     ("EMP_NIFL_SEX_RT", "2019", "Informal employment rate", "% of employment"),
+    ("EMP_TEMP_SEX_STE_NB", "2022", "Employment by status (own-account / employees / employers / family)", "thousands"),
     ("EAR_4MTH_SEX_ECO_CUR_NB", "2020", "Mean monthly earnings by sector", "local currency"),
     ("EAR_XEES_SEX_ECO_NB", "2020", "Mean monthly earnings of employees by sector", "local currency"),
     ("HOW_TEMP_SEX_ECO_NB", "2022", "Mean weekly hours by sector", "hours"),
