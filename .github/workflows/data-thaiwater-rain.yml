@@ -33,13 +33,16 @@ jobs:
       - name: Pull ThaiWater rain telemetry
         run: python pipeline/pull_thaiwater_rain.py --stamp "$(date -u +%F)"
 
+      - name: Pull ThaiWater flood (water-level) telemetry
+        run: python pipeline/pull_thaiwater_flood.py --stamp "$(date -u +%F)"
+
       - name: Commit to a data branch + open a draft PR
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/rain-${{ github.run_id }}
         run: |
-          git add platform/data/thaiwater_rain.json
+          git add platform/data/thaiwater_rain.json platform/data/thaiwater_flood.json
           if git diff --cached --quiet; then
             echo "No change vs committed snapshot. No PR opened."
             exit 0

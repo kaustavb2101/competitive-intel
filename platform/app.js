@@ -1467,15 +1467,35 @@ async function loadRainPulse(){
     .then(d=>{RAINP=d;return d;}).catch(()=>null);
   return rainpPromise;
 }
+// LIVE water-level FLOOD pulse (thaiwater_flood.json) — the twin of the rain pulse: water ON THE
+// GROUND (river/reservoir levels) vs water arriving. Null-safe, promise-cached (Sprint 3).
+let FLOODP=null, floodPromise=null;
+async function loadFloodPulse(){
+  if(floodPromise) return floodPromise;
+  floodPromise=fetch('data/thaiwater_flood.json').then(r=>r.ok?r.json():null)
+    .then(d=>{FLOODP=d;return d;}).catch(()=>null);
+  return floodPromise;
+}
 function renderRainPulse(){
   const el=$('#rainpulse'); if(!el||!RAINP||!RAINP.provinces) return;
   const rows=Object.entries(RAINP.provinces).map(([p,v])=>({p,...v}));
   const hot=rows.filter(r=>r.pct_very_heavy>0||r.max_mm>=90).sort((a,b)=>b.max_mm-a.max_mm).slice(0,3);
   const wet=rows.sort((a,b)=>b.max_mm-a.max_mm).slice(0,3);
   const list=(hot.length?hot:wet).map(r=>`${r.p} <span class="mono" style="color:${r.max_mm>=90?'var(--agri)':'var(--accent)'}">${Math.round(r.max_mm)}mm</span>`).join(' · ');
-  el.innerHTML=`<b>Live rain pulse (ThaiWater · measured):</b> `+
+  let html=`<b>Live rain pulse (ThaiWater · measured):</b> `+
     (hot.length?`⚠️ very-heavy 24h rain at ${list} — watch flooded-field collections there. `:`no province at very-heavy rain; wettest now: ${list}. `)+
     `<span class="sub">${RAINP.meta.n_stations.toLocaleString()} gauges · obs to ${RAINP.meta.observed_to||'n/a'}</span>`;
+  // FLOOD twin: water ON THE GROUND now — provinces with the most stations at high water / overflow.
+  if(FLOODP&&FLOODP.provinces){
+    const fl=Object.entries(FLOODP.provinces).map(([p,v])=>({p,...v}))
+      .filter(r=>r.n_high>0).sort((a,b)=>(b.max_level-a.max_level)||(b.pct_high-a.pct_high)).slice(0,3);
+    if(fl.length){
+      const flist=fl.map(r=>`${r.p} <span class="mono" style="color:${r.max_level>=5?'var(--agri)':'var(--gold)'}">${r.n_high}/${r.n_stations} high${r.max_level>=5?' · overflow':''}</span>`).join(' · ');
+      html+=`<br><b>Live flood pulse (river levels · measured):</b> ${flist} — high water on the ground now, a collections-access watch. `+
+        `<span class="sub">${(FLOODP.meta.n_stations||0).toLocaleString()} gauges · situation ≥4 of 5</span>`;
+    }
+  }
+  el.innerHTML=html;
   el.style.display='';
 }
 
@@ -1484,6 +1504,7 @@ function renderOverview(){
   loadOutlook().then(renderNationalOutlook);
   loadBrandTrends().then(renderBrandTrends);
   loadRainPulse().then(renderRainPulse);
+  loadFloodPulse().then(renderRainPulse);   // flood twin folds into the same pulse line
   // measured second-crop exposure for the drought-watch strip — null-safe, re-renders crop stress.
   loadNapprang().then(()=>{ if(CSTRESS_LIST&&CSTRESS_LIST.length) renderCropStress(); });
   // AutoX lends against vehicle titles, not gold — drop the gold macro KPI card.
