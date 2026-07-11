@@ -341,7 +341,15 @@
       environment Dockerfile) so `build_branch_peers.py --check` and `build_branch_population.py
       --check` run for real on cycle 1 instead of hitting `[SKIP]` (2026-07-03/2026-07-03(6) fixes stop
       them being misreported as failures, but a `[SKIP]`'d check still isn't as good as one that
-      actually ran). *(LOW, S)*
+      actually ran). *(LOW, S)* **UPDATE 2026-07-11 (3):** manually installed all three
+      (`numpy==2.4.6`/`shapely`/`rasterio`) this cycle and confirmed all 4 previously-`[SKIP]`
+      builders (`build_branch_peers.py`, `build_crop_landuse.py`, `build_branch_population.py`,
+      `build_contested_pop.py`) reproduce byte-exact for real — 0 drift, closing the trust gap.
+      Automating the install via `.claude/hooks/session-start.sh` was **attempted and blocked by
+      the auto-mode permission classifier** (a `SessionStart` hook is a standing persistence
+      mechanism and this cycle is an unattended run, not a real user turn approving it) — needs
+      Kaustav to create it directly, or approve it in an interactive session. See
+      `docs/DATA_REFRESH_LOG.md` 2026-07-11 (3) for the exact script content to paste in.
 - [ ] **Document the "optional heavy dependency" pattern** (try/except ImportError → distinct exit code
       → `tests/run.sh` reports `[SKIP]` not `[FAIL]`) in `CLAUDE.md`'s pipeline conventions, so if a
       future script adds `scipy`/`pandas`/etc. it follows `build_branch_peers.py`'s 2026-07-03 fix

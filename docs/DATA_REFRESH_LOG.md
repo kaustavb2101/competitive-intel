@@ -4,6 +4,63 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-11 (3) — AUDIT: verified all 4 optional-heavy-dependency `[SKIP]` builders reproduce byte-exact for real
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
+(`b62c419` HEAD), `bash tests/run.sh check` → 66 passed, 0 failed (`validate_data.py` 464/464)
+before touching anything — no pre-existing drift, so this cycle did not pick RE-DERIVE. 4 of the
+66 checks were `[SKIP]` (not `[FAIL]`, correctly — see the 2026-07-03/2026-07-03(6) SKIP-vs-DRIFT
+fixes): `build_branch_peers.py` (needs `numpy`), `build_branch_population.py` and
+`build_contested_pop.py` (need `rasterio` + the committed `source-data/worldpop_tha_2020_1km.tif`
+raster), and `build_crop_landuse.py` (needs `shapely`).
+
+**What was checked.** `docs/IMPROVEMENT_BACKLOG.md` carries an open item: *"Vendor
+numpy/shapely/rasterio into the sandbox's default setup ... so these checks run for real on
+cycle 1 instead of hitting `[SKIP]`."* This sandbox had none of the three installed. Installed all
+three this session (`pip install --break-system-packages numpy==2.4.6 shapely rasterio` — numpy
+pinned to the exact version `.github/workflows/qa.yml` uses, for the same byte-exact-reproduction
+reason) and re-ran the gate. All 4 previously-`[SKIP]`'d builders now **ran for real and passed**
+with **zero drift** against the already-committed files:
+- `build_branch_peers.py --check` → OK (numpy path)
+- `build_crop_landuse.py --check` → OK (shapely path)
+- `build_branch_population.py --check` → `OK: branch_population.json reproduces (2015 branches,
+  method=raster)` — confirms the committed file really was built via the MEASURED raster-sum
+  method (not silently the ESTIMATED area-weight fallback)
+- `build_contested_pop.py --check` → `OK: contested_pop.json reproduces (2015 branches, national
+  contested share 93.8%)`
+
+Gate went from 66/0 (4 SKIP) to **70/0 (0 SKIP but for the 2 unrelated
+`occupation_places_named.json`-absent SKIPs, which need a real Overture places pull, not a
+dependency)**. `git status` after: clean — this was pure verification, no `platform/data` or
+`source-data` file changed.
+
+**Why this matters (no-fabrication angle).** A `[SKIP]` is not proof of correctness — it means the
+gate trusted the already-committed file without being able to re-derive it. Actually installing
+the deps and re-running turns "trusted" into "verified": all four commited outputs are confirmed
+byte-for-byte reproducible from their real MEASURED source data in this environment, closing the
+trust gap the backlog item flagged.
+
+**Automating this (attempted, blocked — needs Kaustav's explicit sign-off):** the natural fix is a
+`.claude/hooks/session-start.sh` that runs this `pip install` automatically on every future web
+session (per the `session-start-hook` skill). Writing that file was **denied by the auto-mode
+permission classifier**: a `SessionStart` hook is a standing persistence mechanism that runs
+automatically on every future session, and this run is an unattended scheduled cycle, not a
+real user turn — the classifier correctly judged that this must not be created without an explicit
+one-time human decision. **Left for Kaustav to set up directly** (or approve in an interactive
+session): create `.claude/hooks/session-start.sh` running
+`pip install --break-system-packages numpy==2.4.6 shapely rasterio openlocationcode openpyxl
+pdfplumber` (the last three are the other deps `CLAUDE.md` already documents as
+manually-installed), guarded by `if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]`, registered in
+`.claude/settings.json`'s `SessionStart` hooks. Backlog item left open, annotated with this
+finding.
+
+**Source:** no external pull this cycle — pure re-verification of already-committed, already-audited
+files (`branch_peers.json`, `crop_landuse.json`/intermediate grid, `branch_population.json`,
+`contested_pop.json`) against their existing MEASURED inputs (`source-data/worldpop_tha_2020_1km.tif`
+WorldPop raster + branch/amphoe geometry already in the repo).
+
+---
+
 ## 2026-07-11 (2) — AUDIT: `platform/data` provenance sweep + closed a real determinism-gate gap on `rayong_province.json`
 
 **Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
