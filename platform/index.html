@@ -386,6 +386,13 @@
       is a triage signal — read the province, not the exact district. Not a measured default rate.</p>
     <div class="chips" id="amprchips"></div>
     <table class="tbl" id="amprtbl"></table>
+
+    <h3 class="acqsub risk">Truck-fleet watch · caution before expanding <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
+    <p class="lead">DLT commercial-truck registration flow by province (trailing 12mo, <span class="mono">data/truck_flow.json</span>).
+      Province-resolution, so it doesn't join into the district tables above — read it as a caution flag alongside
+      the district risk read: a province where <b>new registrations trail deregistrations</b> has a shrinking
+      owner-operator hauler fleet, that segment's cash flow thinning before you commit a new site there.</p>
+    <div class="insight" id="truckacqreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span></div></div>
     </details>
   </section>
 

@@ -1800,6 +1800,7 @@ function renderAcq(){
   renderCompCoverage();
   renderRivalDensity();
   renderExitWhitespace();
+  renderTruckAcq();
 }
 
 /* ---------- Where demand searches · title-loan search interest by province (obj #2) ----------
@@ -3875,6 +3876,34 @@ function drawTruckTrend(){
       <span class="sub">MEASURED — DLT transport-law registration actions (dataset_stat_1_009), trailing-12-month
       sums, no modelling.</span>`;
   }
+}
+/* ---------- truck-fleet watch on #acq (compact caution strip, obj #2) ----------
+   Same source as #trend's full 10-province table (data/truck_flow.json) — province-resolution,
+   so it doesn't slot into #acq's amphoe tables. Renders as a short readout, not a table, and
+   cross-links to #trend for the full list. Reuses loadTruckFlow()/TRUCKFLOW already warmed
+   elsewhere. Graceful when the file is absent. */
+function renderTruckAcq(){
+  const el=$('#truckacqreadout'); if(!el) return;
+  loadTruckFlow().then(drawTruckAcq);
+}
+function drawTruckAcq(){
+  const el=$('#truckacqreadout'); if(!el) return;
+  const all=(TRUCKFLOW&&Array.isArray(TRUCKFLOW.provinces))?TRUCKFLOW.provinces:[];
+  if(!all.length){
+    el.innerHTML='<b>Truck-flow watch list not yet computed.</b> <span class="sub">This layer is being prepared — it fills in on the next data refresh.</span>';
+    return;
+  }
+  const shrinking=all.filter(p=>(p.net_flow_12m||0)<0).sort((a,b)=>(a.net_flow_12m||0)-(b.net_flow_12m||0));
+  if(!shrinking.length){
+    el.innerHTML='<b>No province has a net-negative truck flow this vintage.</b> <span class="sub">MEASURED — DLT transport-law registration actions (dataset_stat_1_009).</span>';
+    return;
+  }
+  const worst=shrinking.slice(0,5);
+  el.innerHTML=`<b>${shrinking.length} of ${all.length} provinces</b> have an outright shrinking commercial-truck fleet
+    (new registrations trail deregistrations) — treat as a caution when weighing new sites there, alongside the
+    district risk read above: ${worst.map(p=>`<b>${p.th}</b> <span class="mono" style="color:var(--agri)">${p.net_flow_12m}</span>`).join(' · ')}.
+    <span class="sub">MEASURED — DLT transport-law registration actions (dataset_stat_1_009), trailing-12-month sums.
+    Full 10-province table on the <a href="#trend">Risk trend</a> tab.</span>`;
 }
 function renderTrendBaseline(deltas){
   const box=$('#trendbaselinebody'); if(!box) return;
