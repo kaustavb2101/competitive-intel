@@ -696,8 +696,20 @@ function compNat(){
   return out;}
 // Use the curated per-province competitor set when present (Rayong); otherwise fall back to the
 // measured national census filtered to the scene — so every city shows real rivals in-frame.
+// BUGFIX 2026-07-11: the COMP path (CA.competitors — a national/large list for non-curated
+// provinces) was returned UNSCOPED, so the acquisition panel read "10,014 rivals in <province>"
+// (60% of the national census) with a nonsense 123:1 ratio. compNat() already bbox-filters; now
+// the COMP path is filtered to the same scene extent too, so the in-frame count is real.
+function _scopeToScene(list){
+  if(!Array.isArray(list)||!list.length)return list||[];
+  let E; try{E=sceneExtent();}catch(e){return list;}
+  if(!E||!isFinite(E.minX))return list;
+  const padX=(E.maxX-E.minX)*0.12+0.01, padY=(E.maxY-E.minY)*0.12+0.01;
+  const x0=E.minX-padX,x1=E.maxX+padX,y0=E.minY-padY,y1=E.maxY+padY;
+  return list.filter(c=>{const la=+c.lat,ln=+c.lng; return isFinite(la)&&isFinite(ln)&&ln>=x0&&ln<=x1&&la>=y0&&la<=y1;});
+}
 function compScene(){ if(_COMP_SCENE)return _COMP_SCENE;
-  _COMP_SCENE=(COMP&&COMP.length)?COMP:compNat(); return _COMP_SCENE; }
+  _COMP_SCENE=(COMP&&COMP.length)?_scopeToScene(COMP):compNat(); return _COMP_SCENE; }
 // ---- MEASURED nationwide POI pins, bbox-filtered to the scene (parity with compNat) ----------
 // window.POINAT (catchment_poi.json .poi) is the national OSM POI set, [lat,lng] per point, keyed
 // by the scene's 11 pin types. Curated per-province .poi (Rayong) always wins; every OTHER province
@@ -2102,20 +2114,25 @@ function buildLeads(){
   }
   const gHv=document.getElementById('gapsH'); if(gHv)gHv.style.display='';
   const rHv=document.getElementById('recosH'); if(rHv)rHv.style.display='';
-  // gaps: rivals whose nearest AutoX branch is far -> contested ground we don't hold
+  // gaps: rivals whose nearest AutoX branch is far -> contested ground we don't hold.
+  // BUGFIX 2026-07-11: measure "nearest AutoX" against ALL 2,015 branches (window.NATBRANCHES,
+  // .y/.x lat/lng), NOT just this province's local set — comparing in-frame rivals against only
+  // ~81 local branches inflated every gap to 280+ km (rivals near the province edge looked
+  // remote). Against the national tape, a real gap is a rival genuinely far from ANY AutoX branch.
+  const AX=(window.NATBRANCHES&&window.NATBRANCHES.length)?window.NATBRANCHES:BR;
   const gaps=CS.map(c=>{
-    const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
+    const nb=Math.min(...AX.map(b=>hav(c.lat,c.lng,b.y,b.x)));
     return {c,nb};}).filter(g=>g.nb>650).sort((a,b)=>b.nb-a.nb);
   const picked=[];
   for(const g of gaps){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
-  const ratio=(CS.length/Math.max(1,BR.length)).toFixed(1);
   // dominant rival brand in-frame
   const byBrand={}; CS.forEach(c=>{byBrand[c.brand]=(byBrand[c.brand]||0)+1;});
   const topBrand=Object.entries(byBrand).sort((a,b)=>b[1]-a[1])[0];
+  // drop the raw rival:branch ratio — even scoped it isn't decision-useful and read as alarmist.
   document.getElementById('verdict').innerHTML=
-    `<div class="verdict hot">Contested ground — <b>${CS.length} rival branches</b> vs <b>${BR.length} AutoX</b> (${ratio}:1) in ${PLBL}.`
-    +(topBrand?` <b>${topBrand[0]}</b> holds the most in-frame (${topBrand[1]}).`:'')
-    +` Rows below = rivals sitting furthest from any AutoX branch — ground we don’t yet cover.</div>`;
+    `<div class="verdict hot"><b>${CS.length} rival branch${CS.length===1?'':'es'}</b> in frame across ${PLBL}.`
+    +(topBrand?` <b>${topBrand[0]}</b> holds the most (${topBrand[1]}).`:'')
+    +` Rows below = rivals sitting furthest from any AutoX branch nationwide — white-space we don’t yet cover.</div>`;
   document.getElementById('leads').innerHTML=picked.map((g,i)=>{
     // vehicle shops + gold dealers within 2km (measured OSM) — only Rayong carries the per-province POI set today
     const vNear=poiArr('vehicle_commerce').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
