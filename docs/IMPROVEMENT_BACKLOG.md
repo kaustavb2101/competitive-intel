@@ -6,6 +6,31 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (7) — ENRICH: truck_flow.json national-rollup on #trend
+- [x] **`truck_flow.json`'s worst-yoy provinces weren't surfaced on `#acq`/`#trend` — DONE
+      2026-07-11 (7), closes half of the 2026-07-11 (6) follow-up** (`#trend` gained a
+      "Contracting truck fleet · province watch list" audit-first table, same slot/pattern as the
+      peer-twin-outlier and siege-table lists — worst-first by `net_flow_12m`, vintage-independent
+      since the file carries its own trailing-12mo YoY, self-disabling when absent. นครปฐม leads
+      at −703 net flow; 8/77 provinces negative, matching the (6) province.html count. Gate 66/0,
+      `validate_data.py` 468/468 unchanged — UI-only. Headless-rendered `index.html#trend`
+      1400×4200, `data-errors="[]"`, table + readout confirmed correct, no regression to the
+      neighbouring peer/siege sections. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (7) entry).
+- [ ] **`#acq` still doesn't read `truck_flow.json`** — deliberately left open this cycle since the
+      file is province-resolution, not district/amphoe like `#acq`'s other tables, so it doesn't
+      slot in as cleanly as it did into `#trend`'s audit-first list format. A future cycle could add
+      a compact "worst provinces" strip to `#acq` (own small card, not forced into an existing
+      district table) if the province-vs-district resolution mismatch is judged acceptable there.
+      *(LOW-MED, S)*
+- [ ] **The new truck-watch table and the existing peer-twin/siege tables on `#trend` share the same
+      "worst-first table + prose readout, self-disabling when absent" shape** (three near-identical
+      render functions: `drawTruckTrend`/`drawPeerOutliers`/`drawSiegeTable`) — not yet a problem at
+      3 call-sites, but if a 4th vintage-independent audit list is ever added to `#trend`, worth
+      factoring a shared `renderAuditList({data, sortFn, rowFn, readoutFn, tblSel, roSel})` helper
+      instead of hand-rolling a 4th copy. Same "near-duplicate render function" smell already logged
+      for `drawAmphoeChoropleth`/`drawProvinceChoropleth` elsewhere in `app.js`. *(LOW, S, pure
+      refactor, speculative until a 4th list lands)*
+
 ## Queue — follow-ups noticed 2026-07-11 (5) — VALIDATOR: truck_flow.json shape check
 - [ ] **`check_truck_flow()` (new this cycle) only recomputes `net_flow_12m`** (pure arithmetic,
       `new_regis_12m - dereg_12m`) — it does NOT re-verify the count fields themselves against the

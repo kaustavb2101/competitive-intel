@@ -5,6 +5,37 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 (7) — ENRICH: surfaced `truck_flow.json`'s contracting-fleet provinces on `#trend`.
+
+Closed the remaining half of the 2026-07-11 (6) backlog item ("`#acq`/`#trend` still don't read
+this file"). `platform/index.html`'s Risk-trend tab gained a new **"Contracting truck fleet ·
+province watch list"** section, in the same audit-first slot as the existing peer-twin-outlier and
+siege-table lists (right after them, before the vintage-delta body) — deliberately vintage-
+independent, since `truck_flow.json` is a single-vintage MEASURED layer with its own trailing-
+12-month YoY comparison baked in, not something that needs a second snapshot to be useful.
+
+- New `renderTruckTrend()`/`drawTruckTrend()` in `platform/app.js`, called from `renderTrend()`,
+  reusing the already-warmed `loadTruckFlow()`/`TRUCKFLOW` global from the existing Overview pulse
+  card (2026-07-11 (6)). Sorts all 77 provinces worst-first by `net_flow_12m` (new registrations −
+  deregistrations), shows the worst 10 in a table (new regis / dereg / net flow bar / YoY%) plus a
+  prose readout naming the worst province and the `n/77` count with an outright shrinking fleet.
+  Same self-disabling-on-absent pattern (`if(!tbl) return`, empty-state message) as the peer/siege
+  lists it sits beside.
+- Confirmed live: นครปฐม (Central&BKK) leads at **−703 net flow** (2,050 new vs 2,753
+  deregistered, +3.6% YoY — a large used/re-registration churn masking a real net contraction);
+  8 of 77 provinces have net flow < 0, matching the count already cited in the 2026-07-11 (6)
+  province.html writeup.
+- Zero `platform/data`/`source-data` values touched — UI-only wiring of an already-measured,
+  already-shipped layer (same shape as (6)). Gate 66/0, `validate_data.py` 468/468 unchanged.
+  Headless-rendered `index.html#trend` at 1400×4200: `data-errors="[]"`, both the readout callout
+  and the 10-row table populate with the expected data, laid out identically to the neighbouring
+  peer/siege sections (screenshot-verified, no regression to either).
+- `#acq` still doesn't read this file — left open below as a smaller follow-up (`truck_flow.json`
+  is province-resolution, not district/amphoe, so it doesn't slot as cleanly into `#acq`'s
+  district-level tables as it did into `#trend`'s audit-first list format).
+
+---
+
 ## 2026-07-11 (5) — VALIDATOR: shape/sanity check for `truck_flow.json` (dataset_stat_1_009).
 
 Closed the standing backlog item (flagged 2026-07-11 (4)'s AUDIT cycle): `build_truck_flow.py`'s
