@@ -71,16 +71,28 @@ DATA = os.path.join(ROOT, "platform", "data")
 OUT = os.path.join(DATA, "branch_risk.json")
 
 # --- component default weights (sum to 1.0 when ALL present) ------------------
+# 2026-07-11 (roadmap move #1, re-fuse): the composite ignored this wave's measured layers.
+# Added a MEASURED logistics-SME leg (truck_flow) and a drought-watch bump to the agri leg.
+# Household stays dominant; the new leg takes a modest 0.10 carved proportionally from the
+# other three so household's lead is preserved.
 W = {
     "household": 0.35,   # MEASURED province debt-stress (NSO) — most direct signal
-    "agri": 0.25,        # ESTIMATED province crop/agri stress (global-price proxy)
-    "occupation": 0.20,  # MEASURED shares x ESTIMATED stressed-sector weight
-    "segment": 0.20,     # DERIVED branch-own agri/collateral/merchant blend
+    "agri": 0.22,        # ESTIMATED province crop/agri stress (global-price proxy) + drought-watch bump
+    "occupation": 0.18,  # MEASURED shares x ESTIMATED stressed-sector weight
+    "segment": 0.15,     # DERIVED branch-own agri/collateral/merchant blend
+    "truck": 0.10,       # MEASURED province logistics-SME churn (DLT truck registrations YoY)
 }
 
 # crop_stress agri_stress is 0..1 -> 0-100; double_stress provinces get a fixed
 # additive bump (capped at 100) reflecting the 2026 rice/rubber double-hit.
 DOUBLE_STRESS_BUMP = 12.0
+# drought_watch provinces (rice-monoculture on a deep MEASURED rain deficit) score LOW on
+# agri_stress because the rice-price tailwind masks the water deficit — the exact blind spot the
+# committee flagged. A smaller additive bump surfaces them in the composite without double-counting.
+DROUGHT_WATCH_BUMP = 8.0
+# truck_flow SME-churn: map new_regis_yoy_pct -> 0-100 risk. Contracting registrations = the
+# owner-operator hauler segment thinning. -25% YoY (or worse) -> 100; 0 or positive -> 0.
+TRUCK_CHURN_FULL = 25.0
 
 # branch-own "segment" blend weights over branches.json features (each ~0-100):
 #   a = agri_pd, c = collateral_density, m = merchant_demand.
@@ -94,6 +106,7 @@ DRIVER_LABEL = {
     "agri": "Crop/agri stress (province, estimated)",
     "occupation": "Occupation-sector stress (branch, measured x estimated)",
     "segment": "Branch own segment/collateral risk (derived)",
+    "truck": "Logistics-SME churn (province, measured DLT)",
 }
 
 
@@ -141,12 +154,14 @@ def build():
     hr = load_opt("household_risk_by_province.json")
     cs = load_opt("crop_stress.json")
     occ = load_opt("occupation_risk.json")
+    tf = load_opt("truck_flow.json")   # MEASURED province logistics-SME churn (DLT)
 
     hr_absent = not (hr and not (hr.get("meta") or {}).get("absent") and hr.get("provinces"))
     cs_present = bool(cs and cs.get("provinces"))
     # occupation layer must be present AND index-aligned to be usable
     occ_present = bool(occ and isinstance(occ.get("branches"), list)
                        and len(occ["branches"]) == n)
+    tf_present = bool(tf and isinstance(tf.get("provinces"), list) and tf["provinces"])
 
     # province lookups (Thai-name keyed — keys already match branches.json "v").
     hr_si = {}
@@ -156,7 +171,7 @@ def build():
             if isinstance(si, (int, float)) and not isinstance(si, bool):
                 hr_si[p.get("province")] = float(si)
 
-    cs_agri = {}    # prov_th -> agri_stress component (0-100, incl. double-stress bump)
+    cs_agri = {}    # prov_th -> agri_stress component (0-100, incl. double-stress + drought-watch bumps)
     if cs_present:
         for p in cs["provinces"]:
             ag = p.get("agri_stress")
@@ -164,7 +179,18 @@ def build():
                 v = ag * 100.0
                 if p.get("double_stress"):
                     v = min(100.0, v + DOUBLE_STRESS_BUMP)
+                if p.get("drought_watch"):     # rice-monoculture on a measured rain deficit
+                    v = min(100.0, v + DROUGHT_WATCH_BUMP)
                 cs_agri[p.get("th")] = round(v, 4)
+
+    tf_churn = {}   # prov_th -> logistics-SME churn component (0-100 from measured truck-reg YoY)
+    if tf_present:
+        for p in tf["provinces"]:
+            yoy = p.get("new_regis_yoy_pct")
+            if isinstance(yoy, (int, float)) and not isinstance(yoy, bool):
+                # contracting (negative YoY) = risk; positive/flat = 0.
+                v = max(0.0, min(100.0, (-float(yoy)) / TRUCK_CHURN_FULL * 100.0))
+                tf_churn[p.get("th")] = round(v, 4)
 
     # --- per-branch RAW component values (pre-normalization) ----------------------
     # household & agri are already on a 0-100 interpretable scale (use directly).
@@ -191,7 +217,7 @@ def build():
 
     # --- assemble per-branch composite -------------------------------------------
     recs = []
-    used_counts = {"household": 0, "agri": 0, "occupation": 0, "segment": 0}
+    used_counts = {"household": 0, "agri": 0, "occupation": 0, "segment": 0, "truck": 0}
     for i, b in enumerate(branches):
         prov = b.get("v")
         comps = {}   # component_key -> 0-100 value (only those PRESENT for this branch)
@@ -204,6 +230,8 @@ def build():
             comps["occupation"] = round(occ_norm[i], 1)
         if i in seg_norm:
             comps["segment"] = round(seg_norm[i], 1)
+        if tf_present and prov in tf_churn:
+            comps["truck"] = round(tf_churn[prov], 1)
 
         for k in comps:
             used_counts[k] += 1
@@ -259,11 +287,14 @@ def build():
                 "weight": W["agri"],
                 "provenance": "ESTIMATED — province agri_stress (0..1) from crop_stress.json "
                               "(World Bank GLOBAL price proxy x measured rainfall anomaly, "
-                              "scaled by crop_dependence), rescaled to 0-100, +%g when the "
-                              "province is double_stress (rice/rubber). Branch inherits province."
-                              % DOUBLE_STRESS_BUMP,
-                "scale": "agri_stress*100 (+%g double-stress bump, capped 100)." % DOUBLE_STRESS_BUMP,
+                              "scaled by crop_dependence), rescaled to 0-100, +%g double_stress "
+                              "(rice/rubber) and +%g drought_watch (rice-monoculture on a measured "
+                              "rain deficit the price tailwind masks). Branch inherits province."
+                              % (DOUBLE_STRESS_BUMP, DROUGHT_WATCH_BUMP),
+                "scale": "agri_stress*100 (+%g double-stress, +%g drought-watch; capped 100)."
+                         % (DOUBLE_STRESS_BUMP, DROUGHT_WATCH_BUMP),
                 "double_stress_bump": DOUBLE_STRESS_BUMP,
+                "drought_watch_bump": DROUGHT_WATCH_BUMP,
             },
             "occupation": {
                 "weight": W["occupation"],
@@ -282,6 +313,16 @@ def build():
                 "scale": "blend %s then min-max normalized to 0-100 across the network."
                          % json.dumps(SEG_W),
                 "blend_weights": SEG_W,
+            },
+            "truck": {
+                "weight": W["truck"],
+                "provenance": "MEASURED — province logistics-SME churn from truck_flow.json "
+                              "(DLT transport-law truck registrations, trailing-12m YoY). "
+                              "Contracting new registrations = the owner-operator hauler borrower "
+                              "segment thinning. Branch inherits its province value.",
+                "scale": "clamp(-new_regis_yoy_pct / %g, 0, 1) * 100 (contracting -> risk; "
+                         "flat/positive -> 0)." % TRUCK_CHURN_FULL,
+                "churn_full_pct": TRUCK_CHURN_FULL,
             },
         },
         "formula": {
