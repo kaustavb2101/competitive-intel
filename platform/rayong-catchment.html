@@ -1662,13 +1662,16 @@ function render(){
         return [clamp(r+j),clamp(g+j),clamp(bl+j),LIGHT?255:240];
       }
       // ---- warm body: sand/taupe -> amber/ochre -> gold along the height rank ----
-      const j=(jit(b)-0.5)*(LIGHT?4:22);   // light: ±4 not ±12 — a calm mat, not per-house speckle
+      // CALM-THE-RAMP (owner direction 2026-07-11, "clean like data proteins"): HEIGHT is the only
+      // encoder. Per-type hue TINT removed and the jitter cut to a whisper, so buildings of similar
+      // height read as ONE smooth warm mass, not a per-house multicolour speckle. The ramp + the
+      // sparing landmark tier stay — warmth kept, noise gone.
+      const j=(jit(b)-0.5)*(LIGHT?2:6);
       const m=rampAt(LIGHT?RAMP_LIGHT:RAMP_DARK,t);
       let r=m[0]+j, g=m[1]+j, bl=m[2]+j;
       // light-mode only: a subtle WARM brightness lift for in-reach buildings (not a colour swap).
       if(LIGHT&&inFocalRing(b)){r+=10; g+=7; bl+=2;}
-      const c=(b.ty&&b.ty!=='mixed'&&b.ty!=='house')?TINT[b.ty]:null;
-      if(c){const cw=LIGHT?0.3:0.18; r=r*(1-cw)+c[0]*cw; g=g*(1-cw)+c[1]*cw; bl=bl*(1-cw)+c[2]*cw;}  // dark tint weight 0.32->0.18: let the height ramp dominate the hue (was muddying towers)
+      // (per-type TINT blend removed — it was the dominant source of the multicolour speckle.)
       // HARD anti-white ceiling: soft lighting now multiplies these (max ~0.86), so a face cannot
       // approach white. Cap 216 in light -> brightest lit face 216*0.86≈186, huge margin below 255
       // even if a GPU renders brighter than headless. This DATA cap is the whiteout backstop.
