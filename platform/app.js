@@ -1843,9 +1843,9 @@ function loadCompCoverage(){
 function renderCompCoverage(){
   const tbl=$('#compcovtbl'); if(!tbl) return;
   if(compcovLoaded){ drawCompCoverage(); return; }
-  fetch('data/competitor_coverage.json').then(r=>r.ok?r.json():null).then(j=>{
-    COMPCOV=j; compcovLoaded=true; drawCompCoverage();
-  }).catch(()=>{ COMPCOV=null; compcovLoaded=true; drawCompCoverage(); });
+  // share the promise-cached loader — a raw fetch here raced Home's loadCompCoverage() and
+  // double-fetched the file on boot (found by the P1 fetch audit, 2026-07-11).
+  loadCompCoverage().then(drawCompCoverage);
 }
 function drawCompCoverage(){
   const tbl=$('#compcovtbl'), ro=$('#compcovreadout'); if(!tbl) return;
@@ -1948,14 +1948,12 @@ function drawRivalDensity(){
    an ESTIMATED COMPOSITE blending MEASURED white-space + MEASURED competitor-gap with ESTIMATED
    province agri-stress. We DO NOT recompute it here — we just rank & show the top districts with each
    component exposed, so the number stays honest. Lazy-loaded once; graceful if absent/empty. */
-let OPPSCORE=null, oppLoaded=false;
+let OPPSCORE=null, oppLoaded=false, oppPromise=null;
 const OPP_TOPN=20;
 function renderOppScore(){
   const tbl=$('#opptbl'); if(!tbl) return;
   if(oppLoaded){ drawOppScore(); return; }
-  fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null).then(j=>{
-    OPPSCORE=j; oppLoaded=true; drawOppScore();
-  }).catch(()=>{ OPPSCORE=null; oppLoaded=true; drawOppScore(); });
+  loadOppScore().then(drawOppScore);   // shared promise — no double-fetch vs Home's loader
 }
 // LEAD WITH THE VERDICT — colored card at the top of the Acquisition tab, built ONLY from the loaded
 // opportunity_score data. Omits gracefully when the layer is absent (card hidden, no fabrication).
@@ -2196,14 +2194,12 @@ function road3kCSV(){
    placed one at a time by greedy divisor allocation (D'Hondt) over risk-adjusted district demand,
    with 15km neighbor cannibalization. ESTIMATED planning order over MEASURED demand inputs.
    We don't recompute here; just rank & expose. Graceful when the file is absent. */
-let EXPLAN=null, explanLoaded=false;
+let EXPLAN=null, explanLoaded=false, explanPromise=null;
 const EXPLAN_TOPN=25;
 function renderExpansionPlan(){
   const tbl=$('#r3kseqtbl'); if(!tbl) return;
   if(explanLoaded){ drawExpansionPlan(); return; }
-  fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null).then(j=>{
-    EXPLAN=j; explanLoaded=true; drawExpansionPlan();
-  }).catch(()=>{ EXPLAN=null; explanLoaded=true; drawExpansionPlan(); });
+  loadExpansionPlan().then(drawExpansionPlan);   // shared promise — no double-fetch vs Home
 }
 function focusExpansionOnMap(i){
   const d=((EXPLAN||{}).by_amphoe||[])[i]; if(!d||d.cy==null||d.cx==null) return;
@@ -5266,16 +5262,18 @@ function renderHome(){
    Each statement links to its detail tab. Any source that is absent is omitted gracefully —
    never fabricated. Re-rendered as each lazy source resolves. */
 function loadOppScore(){
-  if(oppLoaded) return Promise.resolve(OPPSCORE);
-  return fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null)
+  if(oppPromise) return oppPromise;   // caches the IN-FLIGHT promise, not just the done state
+  oppPromise=fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null)
     .then(j=>{OPPSCORE=j;oppLoaded=true;return j;})
     .catch(()=>{OPPSCORE=null;oppLoaded=true;return null;});
+  return oppPromise;
 }
 function loadExpansionPlan(){
-  if(explanLoaded) return Promise.resolve(EXPLAN);
-  return fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null)
+  if(explanPromise) return explanPromise;   // caches the IN-FLIGHT promise
+  explanPromise=fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null)
     .then(j=>{EXPLAN=j;explanLoaded=true;return j;})
     .catch(()=>{EXPLAN=null;explanLoaded=true;return null;});
+  return explanPromise;
 }
 /* BOARD THESIS — one spoken-English sentence a director could read aloud, plus a Road-to-3,000
    headroom strip. Synthesized ONLY from data already in memory (DATA/META/AMP/OPPSCORE/HHRISK/
