@@ -3125,20 +3125,48 @@ function renderRiskReadouts(){
         `${p.collateral||''} · reported (company IR, ${(PEERNPL.meta&&PEERNPL.meta.updated)||''})`,
         `${p.npl_label||p.npl}%`,'NPL','var(--collat)')).join('')+
       `<div class="s" style="margin-top:4px">Peer figures only — NOT an AutoX number (no measured AutoX NPL yet; a real loan-tape export unlocks that). The spread tracks collateral mix.</div></div>`;
+    // ANCHOR the estimated composite to this measured yardstick (roadmap move #1, 2026-07-11): the
+    // two tables render adjacent but never linked. AutoX lends against VEHICLE TITLES, so its
+    // comparable band is Tidlor→MTC (1.5–2.53%), NOT Srisawad's 3.55% (land/house collateral AutoX
+    // doesn't do). We deliberately do NOT map the composite to an "implied NPL %" per branch — that
+    // reads as a prediction (false precision the loan tape doesn't yet back). Instead: state the
+    // comparable band + the book's own composite spread as an honest triage scale.
+    // pure vehicle-title peers only: matches vehicle/motorcycle AND has no land/house/condo leg
+    // (excludes Srisawad, whose 3.55% is inflated by land/house collateral AutoX doesn't hold).
+    const vt=PEERNPL.peers.filter(p=>/vehicle|motorcycle/i.test(p.collateral||'')&&!/land|house|condo/i.test(p.collateral||''));
+    const lo=vt.length?Math.min(...vt.map(p=>+p.npl)):null, hi=vt.length?Math.max(...vt.map(p=>+p.npl)):null;
+    let meanC=null, p90C=null;
+    if(briskHasData()&&BRISK.length){
+      const cs=BRISK.map(e=>(e&&e.composite_risk)||0).filter(v=>v>0).sort((a,b)=>a-b);
+      if(cs.length){ meanC=cs.reduce((s,v)=>s+v,0)/cs.length; p90C=cs[Math.floor(cs.length*0.9)]; }
+    }
+    if(lo!=null){
+      html+=`<div class="s" style="margin-top:6px;line-height:1.5">`+
+        `<b>Reading our composite against this:</b> AutoX is a <b>vehicle-title</b> lender, so its comparable band is `+
+        `<b style="color:var(--collat)">${lo.toFixed(2)}–${hi.toFixed(2)}%</b> (Tidlor best-in-class → MTC), not Srisawad's 3.55% (land/house collateral we don't hold). `+
+        (meanC!=null?`Our estimated branch composite averages <b>${meanC.toFixed(0)}/100</b> (worst decile ~${p90C.toFixed(0)}). `:'')+
+        `That 0–100 is a <b>triage rank</b> of where to look first — NOT a predicted NPL. Placing the book on the peers' real scale needs the measured loan tape (${TAG_E}).</div>`;
+    }
   }
   // 2) RISKIEST BRANCHES (branch_risk.json, index-aligned to DATA)
   if(briskHasData()&&DATA&&DATA.length===BRISK.length){
     const idx=BRISK.map((e,i)=>i).sort((a,b)=>(BRISK[b].composite_risk||0)-(BRISK[a].composite_risk||0)).slice(0,15);
+    // honest legibility (roadmap move #1): each branch's percentile WITHIN the book — a real rank of
+    // the measured branch set, so "composite 57" reads as "riskiest ~1% of AutoX branches". Not an NPL.
+    const N=BRISK.length;
+    const pct=v=>{ let below=0; for(let k=0;k<N;k++){ if(((BRISK[k]&&BRISK[k].composite_risk)||0)<v) below++; } return Math.round(100*below/N); };
     html+=`<h2 class="risk" style="margin-top:18px">Riskiest branches ${TAG_E}</h2>`+
-      `<p class="lead">Top 15 branches by the same <b>estimated composite</b> (0–100). — a triage rank for where to look first.</p>`+
+      `<p class="lead">Top 15 branches by the same <b>estimated composite</b> (0–100) — a triage rank for where to look first, read against the peer NPL band above.</p>`+
       methodBox('The readable list of the National map composite-risk lens.',
         ['A triage rank, <b>not</b> a measured default rate.',
+         '"vs book" = this branch\'s percentile among all '+N.toLocaleString()+' branches (a real rank of the measured set).',
          'Composite is index-aligned to the branch list; driver = the dominant component of the score.'])+
       `<table class="tbl" id="expo-brisk-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
-      `<th class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th title="dominant driver of the composite">Top driver</th></tr>`+
-      idx.map((i,rank)=>{const e=BRISK[i], d=DATA[i];
+      `<th class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th title="percentile among all branches — a real rank, not an NPL">vs book</th><th title="dominant driver of the composite">Top driver</th></tr>`+
+      idx.map((i,rank)=>{const e=BRISK[i], d=DATA[i]; const pc=pct(e.composite_risk||0);
         return `<tr><td class="mono sub">${rank+1}</td><td><b>${d.n||'—'}</b></td><td class="sub">${d.v||'—'}</td>`+
         `<td class="mono" style="color:var(--agri)">${(e.composite_risk||0).toFixed(1)}</td>`+
+        `<td class="mono sub" title="riskier than ${pc}% of branches">top ${Math.max(1,100-pc)}%</td>`+
         `<td class="sub">${riskDriverLabel(e.top_driver)}</td></tr>`;}).join('')+`</table>`;
   }
   host.innerHTML=html;
