@@ -5,6 +5,33 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 (9) — ENRICH: surfaced `truck_flow.json`'s contracting-fleet caution on `#acq`.
+
+Closed the remaining backlog item from 2026-07-11 (7) ("`#acq` still doesn't read
+`truck_flow.json`"). `platform/index.html`'s Acquisition tab gained a new **"Truck-fleet watch ·
+caution before expanding"** strip, placed right after "Most-stressed districts · risk readout" in
+the segment-whitespace section — deliberately a compact readout, not a table, since
+`truck_flow.json` is province-resolution and doesn't join `#acq`'s district/amphoe tables the way
+the other sections do.
+
+- New `renderTruckAcq()`/`drawTruckAcq()` in `platform/app.js`, called from `renderAcq()`, reusing
+  the already-warmed `loadTruckFlow()`/`TRUCKFLOW` global (same source as the Overview pulse card
+  and `#trend`'s full 10-province table). Reports the count of provinces with a net-negative
+  trailing-12mo truck flow, names the worst 5, and cross-links to `#trend` for the complete list —
+  framed as a caution for site selection (a shrinking commercial-fleet province is a weaker bet for
+  a new branch), not a duplicate of `#trend`'s risk-trend framing.
+- Confirmed live via headless render of `index.html#acq` (1400×5200): `data-errors="[]"`, strip
+  reads "8 of 77 provinces … นครปฐม −703 · นนทบุรี −57 · จันทบุรี −56 · ตราด −55 · เพชรบุรี −46",
+  matching `#trend`'s already-verified figures exactly, no regression to the neighbouring
+  district-risk table or the rest of the segment-whitespace section.
+- Zero `platform/data`/`source-data` values touched — UI-only wiring of an already-measured,
+  already-shipped layer. Gate 66/0, `validate_data.py` 468/468 unchanged.
+- This closes the truck_flow.json surfacing arc opened 2026-07-10 (5): Overview pulse → `#trend`
+  full table (7) → `#acq` caution strip (9). 3 new speculative/informational follow-ups logged in
+  `docs/IMPROVEMENT_BACKLOG.md`.
+
+---
+
 ## 2026-07-11 (7) — ENRICH: surfaced `truck_flow.json`'s contracting-fleet provinces on `#trend`.
 
 Closed the remaining half of the 2026-07-11 (6) backlog item ("`#acq`/`#trend` still don't read

@@ -6,6 +6,24 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11 (9) — ENRICH: truck_flow.json caution strip on #acq
+- [ ] **The new `#acq` truck-watch strip and `#trend`'s full table both hardcode "worst 5"/"worst
+      10"** off the same `TRUCKFLOW.provinces` sort — no shared constant/helper, just two
+      independent `.slice(0,N)` calls in two render functions. Not a real duplication problem yet
+      (the two views intentionally render at different granularity — strip vs table), but if a 3rd
+      truck-flow surfacing point is ever added, worth extracting a `worstTruckFlow(n)` accessor
+      instead of a 3rd copy of the sort. *(LOW, trivial, speculative)*
+- [ ] **`#acq`'s new truck-watch strip only cross-links to `#trend`'s table one-way** — `#trend`'s
+      truck section has no reciprocal "see the expansion-caution read on #acq" link. Minor, since
+      `#trend` is the canonical/fuller view and `#acq` is the derived caution strip, but a 2-line
+      addition if a future polish pass wants symmetric cross-nav between the risk and acquisition
+      tabs. *(LOW, trivial, cosmetic)*
+- [ ] **`truck_flow.json` is now surfaced in 3 places** (Overview pulse card, `#trend` full table,
+      `#acq` caution strip) but still has no lens on the National map — unlike `hhdti`/`unemp`/
+      `pstress`, it can't paint a branch-dot lens (it's province-only, not per-branch or per-amphoe),
+      so this isn't a real gap, just worth noting the layer's now fully wired everywhere it
+      structurally can be. *(LOW, trivial, informational — closes the truck_flow.json surfacing arc)*
+
 ## Queue — follow-ups noticed 2026-07-11 (8) — AUDIT: source-register doc backfill
 - [ ] **`docs/DATA_PROVENANCE.md` §1's own header still says "the ledger now covers all 34 top-level
       `platform/data/*.json` layers" from the 2026-07-01 audit** — that count is now stale (this
@@ -35,12 +53,16 @@
       `validate_data.py` 468/468 unchanged — UI-only. Headless-rendered `index.html#trend`
       1400×4200, `data-errors="[]"`, table + readout confirmed correct, no regression to the
       neighbouring peer/siege sections. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (7) entry).
-- [ ] **`#acq` still doesn't read `truck_flow.json`** — deliberately left open this cycle since the
-      file is province-resolution, not district/amphoe like `#acq`'s other tables, so it doesn't
-      slot in as cleanly as it did into `#trend`'s audit-first list format. A future cycle could add
-      a compact "worst provinces" strip to `#acq` (own small card, not forced into an existing
-      district table) if the province-vs-district resolution mismatch is judged acceptable there.
-      *(LOW-MED, S)*
+- [x] **`#acq` still doesn't read `truck_flow.json` — DONE 2026-07-11 (9)** (compact "Truck-fleet
+      watch · caution before expanding" strip added to `#acq`'s segment-whitespace section, right
+      after "Most-stressed districts" — a short readout (not a table, since the file is province-
+      resolution and doesn't join `#acq`'s amphoe tables), naming N/77 provinces + worst 5,
+      cross-linking to `#trend`'s full 10-province table. Reuses the already-warmed
+      `loadTruckFlow()`/`TRUCKFLOW` global. Gate 66/0, `validate_data.py` 468/468 unchanged —
+      UI-only. Headless-rendered `index.html#acq` 1400×5200, `data-errors="[]"`, strip populated
+      correctly (8/77 provinces, นครปฐม −703 leading, matching `#trend`'s figures), no regression
+      to the neighbouring district-risk table. Full writeup: `docs/PROGRESS_LOG.md` 2026-07-11 (9)
+      entry).
 - [ ] **The new truck-watch table and the existing peer-twin/siege tables on `#trend` share the same
       "worst-first table + prose readout, self-disabling when absent" shape** (three near-identical
       render functions: `drawTruckTrend`/`drawPeerOutliers`/`drawSiegeTable`) — not yet a problem at
