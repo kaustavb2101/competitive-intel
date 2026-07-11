@@ -6,6 +6,28 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-11
+- [ ] **`check_province_gov_joins()` and `check_province_factories_workers()` are now near-identical
+      functions** (load `provinces/index.json`, loop provinces, load each province file, compare
+      `gov.<key>` against a source dict keyed by Thai province name) — same duplicate-helper smell
+      already logged for `drawAmphoeChoropleth`/`drawProvinceChoropleth` on the frontend side
+      (2026-07-03 (6)/(9)). A shared `_check_province_gov_join(key, src_provs, ...)` helper taking a
+      `{th_name: value}` map (or a `{th_name: {srckey: expect}}` remap for the factories/workers
+      case) would collapse both call-sites before a 9th `gov.*` join is ever added. *(LOW, S, pure
+      refactor)*
+- [ ] **All ~8 `gov.*` top-level joins in `provinces/<slug>.json` now have a value-level check** —
+      the full set (vehicles/employment/unemployment/income/income_floor/vehicle_flow/
+      vehicle_flow_transport/factories/workers) is closed as of this cycle. Worth a one-line note in
+      `CLAUDE.md`'s `build_province.py` bullet or a comment atop `check_province_gov_joins()` so a
+      future cycle doesn't re-propose "add a gov.* join check" as if there were still a gap — the
+      next real gap here would only appear if `build_province.py` grows a 9th `gov.*` field.
+      *(LOW, trivial, informational)*
+- [ ] **`docs/PROGRESS_LOG.md` Sprint 2 E0/UX commit-log gap (flagged 2026-07-10 (3), still open in
+      2026-07-10 (6)) hasn't grown further this cycle** — worth a future AUDIT cycle actually reading
+      `8cf4f78`…`e53705d` + `2b1e835`/`d4759eb` end-to-end and backfilling the log (or confirming with
+      Kaustav that workflow should own its own logging) rather than re-flagging it a third time
+      without action. *(MED, S, informational — docs-debt, carried forward unchanged)*
+
 ## Queue — follow-ups noticed 2026-07-10 (6)
 - [ ] **`check_province_gov_joins()` (new this cycle) does an exact whole-dict `==` compare, not a
       per-field range/type check** — this is deliberately stricter than `check_province_income_floor()`
@@ -23,13 +45,14 @@
       concurrent session/workflow's work (not this loop's) — a future AUDIT cycle should read the
       diffs end-to-end and either backfill the log or confirm with Kaustav whether that workflow
       should own its own logging. *(MED, S, informational — docs-debt, not a code defect, growing)*
-- [ ] **`build_province.py`'s `gov.factories`/`gov.workers` (from `factories_by_district.json`,
-      province total) are the only 2 of the ~8 `gov.*` top-level joins still without ANY
-      join-integrity check** (vehicles/employment/unemployment/income now covered this cycle;
-      income_floor covered 2026-07-09 (3); vehicle_flow/vehicle_flow_transport already covered by
-      `check_vehicle_flow`/`check_vehicle_flow_transport`) — same shape as this cycle's fix
-      (`gp["fac"]`/`gp["workers"]` from `fbd["provinces"].get(prov)`), would close the set entirely.
-      *(LOW, S)*
+- [x] **`build_province.py`'s `gov.factories`/`gov.workers` (from `factories_by_district.json`,
+      province total) were the only 2 of the ~8 `gov.*` top-level joins still without ANY
+      join-integrity check — DONE 2026-07-11** (new `check_province_factories_workers()` in
+      `tests/validate_data.py`, same dict-pass-through shape as `check_province_gov_joins()`;
+      SKIP-passes when `factories_by_district.json` is absent. Verified it catches real drift by
+      hand-corrupting `bangkok.json`'s `gov.factories` to `999999`, confirming a `[FAIL]` naming the
+      exact expected-vs-got, then restoring. Gate 64/0, `validate_data.py` 464/464. This closes the
+      full set of `gov.*` top-level joins — see `docs/PROGRESS_LOG.md` 2026-07-11 entry).
 
 ## Queue — follow-ups noticed 2026-07-10 (3) — data-enrichment cycle: commodity_board traceability
 - [x] **`source-data/commodity_board.json` had NO check tying its numbers to the raw World Bank Pink

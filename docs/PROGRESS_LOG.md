@@ -5,6 +5,32 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-11 — VALIDATOR: join-integrity check for provinces/*.json gov.{factories,workers}.
+
+Closed the last 2 of the ~8 `gov.*` top-level joins in `build_province.py` still without a
+value-level check. `gov.factories`/`gov.workers` are `gp["fac"]`/`gp["workers"]` — a pure
+pass-through of `source-data/factories_by_district.json`'s `provinces` dict, keyed by Thai
+province name — same join shape as `gov.vehicles`/`employment`/`unemployment`/`income`, which got
+`check_province_gov_joins()` on 2026-07-10. This pair was flagged as the remaining gap in
+`docs/IMPROVEMENT_BACKLOG.md` (2026-07-10 (6)).
+
+New `check_province_factories_workers()` in `tests/validate_data.py`: reads
+`provinces/index.json`, loads every province file, and asserts `gov.factories`/`gov.workers`
+match `factories_by_district.json`'s row for that province's Thai name exactly (`{"fac": 0,
+"workers": 0}` default when a province is genuinely absent from the source, matching
+`build_province.py`'s own fallback). SKIP-passes whole when the source layer is absent.
+
+Verified it actually catches drift: hand-corrupted `platform/data/provinces/bangkok.json`'s
+`gov.factories` to `999999`, reran — got a real `[FAIL]` naming the exact province/field/
+expected-vs-got (`bangkok gov.factories=999999 != source=4886 for 'กรุงเทพมหานคร'`) — then
+restored from the scratchpad backup (`git diff --stat` confirmed byte-identical afterward).
+
+Gate: `bash tests/run.sh check` 64/0, `validate_data.py` 464/464 (was 463/463 before this cycle's
+commit, +1 check). Only `tests/validate_data.py` touched — no `platform/data`/`pipeline` file
+changed. PR #2 (draft, `claude/new-session-wto26j` → `master`) still open, no new PR needed.
+
+---
+
 ## 2026-07-10 (6) — VALIDATOR: join-integrity check for provinces/*.json gov.{vehicles,employment,unemployment,income}.
 
 `provinces/<slug>.json`'s `gov.vehicles`/`gov.employment`/`gov.unemployment`/`gov.income`
