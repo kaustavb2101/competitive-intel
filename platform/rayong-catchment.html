@@ -1241,6 +1241,10 @@ function sceneExtent(){
 
 function groundLayers(){
   const G=[], D=darkMode();
+  // A RASTER basemap (satellite/streets) IS the ground — so the scene must NOT lay its own opaque
+  // ground bed / landuse / water / road plane over it, or the pulled-buildings bbox reads as a hard
+  // dark rectangle floating on the imagery. The self-drawn ground is only for 'studio' (no raster).
+  if(typeof basemap!=='undefined' && basemap!=='studio') return G;
   const WATER=window.WATER, LANDUSE=window.LANDUSE, ROADS=window.ROADS;
   const hasGround=(WATER&&WATER.water&&WATER.water.length)||
                   (LANDUSE&&LANDUSE.landuse&&LANDUSE.landuse.length)||
