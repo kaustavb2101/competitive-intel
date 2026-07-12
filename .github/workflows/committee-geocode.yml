@@ -6,9 +6,10 @@ name: Committee — geocode precision backlog (weekly, key-gated)
 # loop: geocoder proposes candidates -> validator gates (Thailand bbox, brand/name token match,
 # max-shift, dedup, no-regression) -> accepted patches merge into the master -> SCORECARD updated.
 #
-# Needs GOOGLE_MAPS_API_KEY (Places Text Search). This job SKIPS cleanly when the secret is unset, so
-# it is inert until you add it: repo -> Settings -> Secrets and variables -> Actions -> new secret
-# GOOGLE_MAPS_API_KEY (Places API enabled, key restricted to it). ROTATE the previously-exposed key first.
+# Needs a Google Places key. This job SKIPS cleanly when no key secret is set, so it is inert until
+# you add one: repo -> Settings -> Secrets and variables -> Actions. It accepts EITHER
+# GOOGLE_PLACES_KEY or GOOGLE_MAPS_API_KEY (Places API enabled, key restricted to it). ROTATE the
+# previously-exposed key first.
 #
 # A geocode changes branch coordinates, so this rebuilds every coordinate-dependent layer and runs the
 # determinism gate; it opens a DRAFT PR only when the gate is green. Never pushes to a working branch.
@@ -34,12 +35,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Guard — require GOOGLE_MAPS_API_KEY
+      - name: Guard — require a Google Places key (GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_KEY)
         env:
-          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           if [ -z "$KEY" ]; then
-            echo "GOOGLE_MAPS_API_KEY not set — geocoder is inert. Add the secret to enable. Skipping."
+            echo "No Google Places key found (checked GOOGLE_MAPS_API_KEY and GOOGLE_PLACES_KEY repo secrets) — geocoder is inert. Skipping."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
 
@@ -56,7 +57,7 @@ jobs:
       - name: Run gated geocoder cycles (merges accepted patches into the master)
         if: env.SKIP != '1'
         env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           cd committee
           python3 run_cycle.py --member geocoder --batch 100 --loop --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
