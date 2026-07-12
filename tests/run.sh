@@ -94,6 +94,56 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
   else bad "build_fuel_prices.py --check (fuel_prices.json drifted from source-data/fuel_prices.json)"
   fi
+  # --- PR#2 enrichment layers (vehicle/EV collateral erosion + hydrology + labour) ---------------
+  # All deterministic + network-free over committed source-data. Each SKIPs (exit 3) when its upstream
+  # pull is absent (dlt CSV mirror is NOT committed — 20MB) or its output is not yet generated — never a
+  # data-drift FAIL. branch_fuel.json is intentionally NOT committed (coordinate-dependent; CI Python
+  # 3.11 generates it, mirroring branch_cropland/branch_density), so it SKIPs here too.
+  ( cd "$PIPE" && python3 build_vehicle_flow.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_flow.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow.py --check (dlt mirror absent/<12mo — not data drift)"
+  else bad "build_vehicle_flow.py --check (vehicle_flow_by_province.json drifted from the dlt mirror)"
+  fi
+  ( cd "$PIPE" && python3 build_vehicle_flow_transport.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_flow_transport.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_flow_transport.py --check (dlt mirror absent/<12mo — not data drift)"
+  else bad "build_vehicle_flow_transport.py --check (vehicle_flow_transport_by_province.json drifted from the dlt mirror)"
+  fi
+  ( cd "$PIPE" && python3 build_truck_flow.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_truck_flow.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (dlt mirror absent/<24mo or output not generated — not data drift)"
+  else bad "build_truck_flow.py --check (truck_flow.json drifted from the dlt mirror)"
+  fi
+  ( cd "$PIPE" && python3 build_ev_penetration.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_ev_penetration.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_ev_penetration.py --check (dlt mirror absent or output not generated — not data drift)"
+  else bad "build_ev_penetration.py --check (ev_penetration.json drifted from the dlt mirror)"
+  fi
+  ( cd "$PIPE" && python3 build_ev_exposure.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_ev_exposure.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_ev_exposure.py --check (scurve_by_province.json absent or output not generated — not data drift)"
+  else bad "build_ev_exposure.py --check (ev_exposure.json drifted from source-data/scurve_by_province.json)"
+  fi
+  ( cd "$PIPE" && python3 build_brand_trends.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_brand_trends.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_brand_trends.py --check (dlt CSVs absent or output not generated — not data drift)"
+  else bad "build_brand_trends.py --check (brand_trends.json drifted from the dlt CSVs)"
+  fi
+  ( cd "$PIPE" && python3 build_napprang.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_napprang.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_napprang.py --check (oae_napprang.json absent or output not generated — not data drift)"
+  else bad "build_napprang.py --check (napprang.json drifted from source-data/oae_napprang.json)"
+  fi
+  ( cd "$PIPE" && python3 build_labour_context.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_labour_context.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_labour_context.py --check (ilostat_labour.json absent or output not generated — not data drift)"
+  else bad "build_labour_context.py --check (labour_context.json drifted from source-data/ilostat_labour.json)"
+  fi
+  ( cd "$PIPE" && python3 build_branch_fuel.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_fuel.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_fuel.py --check (fuel_stations.json absent or branch_fuel.json not generated — not data drift)"
+  else bad "build_branch_fuel.py --check (branch_fuel.json drifted from source-data/fuel_stations.json/branches.json)"
+  fi
   ( cd "$PIPE" && python3 build_branch_risk.py --check >/dev/null 2>&1 ) && ok "build_branch_risk.py --check" || bad "build_branch_risk.py --check (branch_risk.json drifted from household_risk/crop_stress/occupation_risk/branches.json)"
   ( cd "$PIPE" && python3 build_opportunity_score.py --check >/dev/null 2>&1 ) && ok "build_opportunity_score.py --check" || bad "build_opportunity_score.py --check (opportunity_score.json drifted from amphoe.json/crop_stress.json/competitors)"
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"
