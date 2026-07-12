@@ -117,7 +117,12 @@ def main():
         sys.exit("doae_planted_area.json missing — run: python3 ingest_doae.py --pull && python3 ingest_doae.py")
     payload = serialize(build())
     if args.check:
-        if not os.path.exists(OUT) or open(OUT, encoding="utf-8").read() != payload:
+        if not os.path.exists(OUT):
+            # Not generated yet — the CI committee loop (Python 3.11) builds + commits it. SKIP so a
+            # fresh PR doesn't fail before the layer is generated in the gate's own environment.
+            print("build_branch_cropland.py --check: SKIP (branch_cropland.json not generated yet)")
+            sys.exit(3)
+        if open(OUT, encoding="utf-8").read() != payload:
             sys.exit("build_branch_cropland.py --check: branch_cropland.json drifted — run "
                      "python3 pipeline/build_branch_cropland.py")
         print("build_branch_cropland.py --check: OK (byte-exact)")
