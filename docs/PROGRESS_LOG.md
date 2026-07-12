@@ -1005,3 +1005,33 @@ Kaustav deploys).
   zero remaining drift. Gate back to green: **62 passed, 0 failed** (`bash tests/run.sh check`).
 - No data values changed — only the provenance byte-size stamps. No fabrication; provenance integrity
   restored. Not a visual/app-behaviour change, so no PR/headless render needed.
+
+## 2026-07-12 — UX loop: search inputs a11y (accessible name + native clear button) — merged & deployed
+- **Fix (ux-search-a11y):** the three SPA search boxes (`#branches`, `#provinces`, `#market` in
+  `platform/index.html`) were placeholder-only `text` inputs — no accessible name (WCAG 4.1.2, screen
+  readers announced them as unlabeled edit fields) and no native clear (×) control on mobile. Added
+  `type="search"` + `aria-label` to each, mirroring the scene-search (`ssInput`) pattern already used in
+  `rayong-catchment.html`. No CSS change (the `.search` rule already fully styles the box; empty field
+  renders identically). 5 insertions, 3 deletions across `index.html` + one `docs/UXUI_AUDIT.md` fix-log line.
+- **Safeguards:** (a) `bash tests/run.sh check` → 62 passed, 0 failed. (b) Headless render
+  `index.html#branches` @ 390×844 → header/lead/search/chips/table intact, 0 console errors
+  (`data-errors="[]"`), all three inputs carry `type="search"` + `aria-label` in served DOM. (c) no
+  secrets in diff. (d) diff = 2 intended files only, no stray files.
+- **Merge:** PR #29 squash-merged to master (`71c6ef2`).
+- **CI note (pre-existing, NOT caused by this change):** the GitHub `qa` Action is failing on EVERY
+  recent run — including current master HEAD (`8e5e549`) and 5+ prior master commits — each dying in
+  ~2 seconds with empty output. That signature is an infra/runner-level failure (the determinism gate
+  runs hundreds of checks and cannot fail in 2s), pre-dates this HTML-only change, and is unfixable by
+  it. GitHub reports `mergeable_state: "unstable"` (not `blocked`) → `qa` is not a required check, so
+  the merge was permitted. Local determinism gate is the real content gate and passed 0-failed. **Owner
+  action recommended: investigate why the `qa` workflow runner fails at startup (billing/permissions/
+  runner-provisioning) — it has been red on master for the whole day.**
+- **Deploy verify:** master auto-deployed to Vercel and is live. Production alias returns HTTP **401**
+  with `www-authenticate: Basic realm="AutoX Credit Intelligence"` (root) and `/index.html` → 308 → `/`
+  → same 401 — i.e. the **intentional Basic-Auth password gate** (added earlier today by
+  `feat(access): password-gate the deployment via Edge Middleware`) is running, with `server: Vercel`
+  + `x-vercel-id` present. That is a healthy, gated deploy, **not** a regression (a broken deploy would
+  404/500/fail to connect); the 401 is identical with or without this HTML change, so no rollback. Live
+  HTML content couldn't be byte-verified through the gate without `SITE_PASSWORD` (a secret, not in the
+  loop's env), but the branch preview deploy was reported **Ready** by the Vercel bot and the served DOM
+  was verified locally (headless render carried the attrs).
