@@ -6,7 +6,8 @@
 ## Who this is for
 **Kaustav**, Corp Strategy Director at **AutoX / บริษัท ออโต้ เอกซ์ จำกัด** (brand **เงินไชโย / Ngern Chaiyo**),
 a Thai non-bank **title-loan lender** (SCBX subsidiary). Targets ~1M customers, ฿70bn loans,
-3,000 branches, 25% ROE, IPO ~2027.
+25% ROE, IPO ~2027. Runs **~2,015 branches today and is now consolidating / rationalising the
+network, not expanding it** — there is no branch-growth target.
 
 Kaustav works from a laptop in **Thailand** and deploys to **Vercel**. He gets overwhelmed by
 complexity — so: **lead with the answer, explain simply, keep outputs concrete (not abstract indices),
@@ -15,7 +16,10 @@ prefer something that visibly works over something clever.** He values honesty a
 
 ## The two standing objectives (everything serves these)
 1. **Portfolio impact / risk** — which borrower segments and collateral are getting riskier.
-2. **Acquisition / where to expand** — where to open branches; white-space vs competitor density.
+2. **Competitive risk** — where the *existing* network faces competitive pressure / margin erosion:
+   rival density, contested-market concentration, and per-branch / per-province competitor counts around
+   the current branches. A risk lens on the footprint we already run — **not** branch expansion, and it
+   makes **no** open / close / where-to-open recommendations.
 
 ## What this project is
 A branch-intelligence platform over all **2,015 AutoX branches**, plus deep-dives. It is a
@@ -25,16 +29,17 @@ A branch-intelligence platform over all **2,015 AutoX branches**, plus deep-dive
 One Vercel app, one nav bar, multiple routes (kept as separate pages on purpose — heavy
 deck.gl/WebGL scenes in one DOM crashed on mobile; separate routes each get a fresh GL context):
 - `index.html` + `app.js` — SPA with lazy-rendered tabs (hash routes):
-  - **Command center** (`#home`) — exec front door: aggregates expand + risk into one readout (top
-    white-space districts, most-stressed segments/provinces, headline KPIs). Lead with the answer.
+  - **Command center** (`#home`) — exec front door: aggregates competitive risk + portfolio risk into one
+    readout (rival pressure & contested ground, most-stressed segments/provinces, headline KPIs). Lead with the answer.
   - **Overview** (`#overview`) — macro + commodity board + collateral outlook + BoT rate-cap card + region signals.
-  - **National** (`#map`) — Leaflet 2D map, 2,015 branches; branch lenses (opportunity / agri-PD /
-    merchant / collateral) **and district (amphoe) lenses** (white-space / risk).
+  - **National** (`#map`) — Leaflet 2D map, 2,015 branches; branch lenses (coverage-gap / competitor-density /
+    agri-PD / merchant / collateral) **and district (amphoe) lenses** (coverage / risk).
   - **Risk trend** (`#trend`) — the TIME dimension: snapshots + deltas (which segments/branches are
     getting riskier). Reads `data/snapshots_index.json` + `data/deltas.json`.
-  - **Acquisition** (`#acq`) — district white-space leaderboard, district-risk readout, **Road to
-    3,000** regional headroom allocation, estate/merchant/collateral white-space tables.
-  - **Exposure** (`#exposure`) — portfolio concentration (segment × collateral) + white-space v2.
+  - **Competition** (`#acq`) — competitive-risk readout on the existing network: competitor coverage &
+    rival density, districts where AutoX is outnumbered, brand share-of-search vs rivals, and segment
+    competitor-exposure tables. Makes **no** open / expand recommendations.
+  - **Exposure** (`#exposure`) — portfolio concentration (segment × collateral) + coverage / competitor exposure.
   - **Simulator** (`#sim`) — client-side portfolio what-if (rate/price/drought levers → PD + exposure).
   - **Provinces** (`#provinces`) — selector into the 77-province deep-dive. **Market** (`#market`) —
     real-numbers market assessment. **Branches** (`#branches`) — search/sort.
@@ -73,24 +78,26 @@ timeseries `--check` plus `node --check` on every page's JS.*
   `--derive-only` skips all network pulls and just re-projects the master (runnable offline).
 - `derive.py` — **projects the master into the app**: regenerates `platform/data/branches.json` +
   `meta.json` from `source-data/`. `--check` verifies byte-for-byte. Livestock-buffered agri counts
-  (`region.hi`, `n_agri`), white-space tables (`mws`/`cws`) and editorial macro are carried forward.
+  (`region.hi`, `n_agri`), segment coverage tables (`mws`/`cws`) and editorial macro are carried forward.
 - `build_province.py` — generalizes the Rayong deep-dive to ALL 77 provinces via spatial join (amphoe
   polygons + branches PIP + gov layers) → `platform/data/provinces/<slug>.json` + index.
 - `build_amphoe.py` — **district (amphoe) intelligence engine**: scores all 928 amphoe polygons
-  (incl. 0-branch white-space) → `platform/data/amphoe.json` (whitespace + risk_proxy + raw components).
+  (incl. 0-branch coverage gaps) → `platform/data/amphoe.json` (whitespace + risk_proxy + raw components).
 - `build_crop_stress.py` — per-province crop-household stress (objective #1) → `platform/data/crop_stress.json`
   (crop mix, price_stress [GLOBAL proxy], drought, agri_stress + components).
-- `build_exit_whitespace.py` — **competitor-exit white-space cue** (objective #2, regulatory-tailwind lens) →
-  `platform/data/exit_whitespace.json`. ESTIMATED PROXY: per-amphoe "where AutoX could capture share if
-  marginal sub-scale operators exit under the Q1-2026 BoT registration deadline", inferred from big-4
-  competitor scarcity (PIP of `competitors_national.json`) × our demand/white-space (`amphoe.json`). We do
-  NOT census the sub-scale operators that would actually exit (only the 4 big compliant brands), so the
-  score is inferred, not measured — full caveat + regulatory citation in `meta`. Surfaces on `#acq` (labelled
-  ESTIMATED). A true rival-fragility index needs a sub-scale-operator census (blocked Thai-IP registry pull).
-- `build_expansion_plan.py` — **sequenced Road-to-3,000 plan** (objective #2) → `platform/data/expansion_plan.json`.
-  Places all ~985 net-new branches ONE AT A TIME by greedy divisor allocation (D'Hondt) over risk-adjusted
-  district demand, with 15km neighbor cannibalization (ESTIMATED planning order over measured demand inputs;
-  ≤8/district). Surfaces on `#acq` under Road to 3,000 (top-25 table + full-plan CSV + map drill-down).
+- `build_exit_whitespace.py` — **competitor-fragility cue** (objective #2, regulatory-shakeout lens) →
+  `platform/data/exit_whitespace.json`. ESTIMATED PROXY: per-amphoe read of where the surviving big-4
+  rival field is thinnest / most exposed if marginal sub-scale operators exit under the Q1-2026 BoT
+  registration deadline, inferred from big-4 competitor scarcity (PIP of `competitors_national.json`) ×
+  local demand (`amphoe.json`). We do NOT census the sub-scale operators that would actually exit (only the
+  4 big compliant brands), so the score is inferred, not measured — full caveat + regulatory citation in
+  `meta`. Surfaces on `#acq` (Competition, labelled ESTIMATED) as a competitive-landscape signal. A true
+  rival-fragility index needs a sub-scale-operator census (blocked Thai-IP registry pull).
+- `build_expansion_plan.py` — **sequenced district-demand planning script**, now **RETAINED BUT DORMANT**
+  → `platform/data/expansion_plan.json`. Since the network is consolidating (not growing), its output is
+  **no longer surfaced in the UI**; the script + file are kept on disk for reversibility only. Places
+  branches one at a time by greedy divisor allocation (D'Hondt) over risk-adjusted district demand with
+  15km neighbor cannibalization (≤8/district). The app does not render it.
 - `build_branch_density.py` — projects the already-committed `source-data/perimeter_counts.json`
   (MEASURED Overture building count within 10km of each branch, from the 77-province catchment
   pulls, previously unused since 2026-07-02) → `platform/data/branch_density.json`; one popup line
@@ -165,7 +172,7 @@ cd pipeline && python3 derive.py                  # just re-project master → p
 
 # rebuild the derived layers (all deterministic + network-free, all have --check)
 cd pipeline && python3 build_province.py          # provinces/<slug>.json (77-province deep-dive)
-cd pipeline && python3 build_amphoe.py            # amphoe.json (928-district whitespace + risk)
+cd pipeline && python3 build_amphoe.py            # amphoe.json (928-district coverage + risk)
 cd pipeline && python3 build_crop_stress.py       # crop_stress.json (per-province agri stress)
 cd pipeline && python3 timeseries.py              # snapshot the current vintage + rebuild deltas
 
@@ -201,7 +208,7 @@ cd pipeline && python3 autox_dgt_ingest.py        # DIW factories, DLT vehicles,
 
 ## Conventions / theme
 Dark instrument-console. Fonts IBM Plex Sans Thai + IBM Plex Mono. Accent `#5B7CFA`.
-Segment colors: agri/PD `#C8433B`, merchant `#1C8C7D`, collateral `#7A4FE0`, opportunity/gold `#E6B450`.
+Segment colors: agri/PD `#C8433B`, merchant `#1C8C7D`, collateral `#7A4FE0`, coverage/gold `#E6B450`.
 Always state whether a number is measured or estimated. Read the matching SKILL.md before generating
 docx/pptx/xlsx/pdf.
 
