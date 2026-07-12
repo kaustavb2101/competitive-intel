@@ -434,11 +434,18 @@ const RY=window.RY;
 const IDX=window.PROV_INDEX||null;
 const SLUG=(new URLSearchParams(location.search).get('p')||'rayong').toLowerCase();
 const BR=RY.branches||[];
-const COMP=RY.competitors||[];
 const POIS=RY.poi||{};
 const DISTRICTS=RY.districts||null;
 const provEn=RY.province_en||'', provTh=RY.province_th||'', reg=RY.region||'';
-const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[91,124,250],Krungsri:[224,123,47]};
+// Competitors: the MEASURED national census (data/competitors_census.json — 16,503 rival title-loan
+// branches, each carrying prov(Thai)+amphoe), filtered to THIS province by province_th. Same source the
+// 3D building scene uses, so counts agree across views. Falls back to any set embedded in the province
+// file, then to empty (the map/panels still render branches, POIs and 10km reach).
+const _CENSUS=(window.CENSUS&&Array.isArray(window.CENSUS.items))?window.CENSUS.items:null;
+const COMP=(_CENSUS?_CENSUS.filter(c=>c&&c.prov===provTh):null)||RY.competitors||[];
+// Heng gets a distinct violet here: its 3D-scene amber ([224,180,80]) is ~AutoX gold and would clash
+// with our own gold branch markers on this view.
+const BRAND={Srisawad:[224,71,75],Muangthai:[214,90,160],Tidlor:[91,124,250],Krungsri:[224,123,47],Heng:[140,102,204]};
 const GOLD=[230,180,80];
 
 // canonical type->color map: single source of truth for map dots AND legend AND toggles (Rayong palette)
@@ -954,18 +961,30 @@ function buildProvincePanels(){
     `<table><tr><th>Branch</th><th>Fac km</th><th>Mkt km</th></tr>`+
     BR.map(d=>`<tr><td class="n">${d.n||'—'}</td><td class="mono">${d.nfac!=null?d.nfac:'–'}</td><td class="mono">${d.nmkt!=null?d.nmkt:'–'}</td></tr>`).join('')+`</table>`;
 
-  // competitors
-  const byBrand={};COMP.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
-  document.getElementById('v-comp').innerHTML= COMP.length?
-    (`<p class="lead">Competitor branches (live pull).</p>`+
-    `<table><tr><th>Brand</th><th>Branch</th></tr>`+COMP.map(c=>`<tr><td style="color:rgb(${(BRAND[c.brand]||[200,200,200]).join(',')})">${c.brand}</td><td>${(c.name||'').replace(/^[^ ]+ /,'')}</td></tr>`).join('')+`</table>`)
-    : `<p class="lead">Competitor locations not yet pulled for this province — Rayong has a live set; others pending a Google Places pull. The map and panels still show your branches, POIs and 10km reach.</p>`;
+  // competitors — this province's rival title-loan network from the measured national census, framed as
+  // competitive PRESSURE (brand mix + which districts are most contested), not acquisition targets.
+  (function(){
+    const el=document.getElementById('v-comp'); if(!el)return;
+    if(!COMP.length){ el.innerHTML=`<p class="lead">No rival title-loan branches recorded in this province.</p>`; return; }
+    const byBrand={}; COMP.forEach(c=>byBrand[c.brand]=(byBrand[c.brand]||0)+1);
+    const brands=Object.keys(byBrand).sort((a,b)=>byBrand[b]-byBrand[a]);
+    const chips=brands.map(b=>`<span class="bchip">${b}<b>${byBrand[b].toLocaleString()}</b><span class="d" style="background:rgb(${(BRAND[b]||[150,150,150]).join(',')});margin:0 0 0 5px"></span></span>`).join('');
+    const byAmp={}; COMP.forEach(c=>{const a=(c.amphoe||'—'); byAmp[a]=(byAmp[a]||0)+1;});
+    const amps=Object.keys(byAmp).sort((a,b)=>byAmp[b]-byAmp[a]);
+    const ratio=BR.length?(COMP.length/BR.length):0;
+    el.innerHTML=
+      `<p class="lead"><b>${COMP.length.toLocaleString()}</b> rival branches operate in this province — <b>${ratio?ratio.toFixed(1)+'×':'—'}</b> AutoX's ${BR.length} here. Where they cluster is where pricing and retention pressure runs highest.</p>`+
+      `<div style="display:flex;flex-wrap:wrap;gap:.3rem;margin:.35rem 0 .6rem">${chips}</div>`+
+      `<table><tr><th>Most contested districts</th><th class="mono">Rivals</th></tr>`+
+      amps.map(a=>`<tr><td class="n">${a}</td><td class="mono">${byAmp[a]}</td></tr>`).join('')+`</table>`;
+  })();
 }
 
 /* strip KPI chips (id kpis MUST stay non-empty for the QA hooks) */
 function buildStrip(){
   const gov=RY.gov||{}, emp=gov.employment||{}, veh=gov.vehicles||{};
   const items=[['Branches',BR.length,'#E6B450'],
+    (COMP.length?['Rivals',COMP.length,'#E0475B']:null),
     ['Districts',(DISTRICTS&&DISTRICTS.features?DISTRICTS.features.length:0),'#5B7CFA'],
     ['Factories',(gov.factories!=null?gov.factories:(POIS.industrial?POIS.industrial.length:0)),'#7b8aa6'],
     (veh.total?['Vehicles',Math.round(veh.total/1000)+'k','#1FA38C']:null),
@@ -1172,8 +1191,10 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    // operator-hosted Overture building tiles (null/absent => keep the extruded-relief view).
    fetch('data/tiles_config.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // crop land-use by district (SPAM 2010, ESTIMATED) — null/absent => the Crops lens self-disables.
-   fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];
+   fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // national competitor census (measured) — filtered per-province inside initProvince; null/absent is graceful.
+   fetch('data/competitors_census.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})
