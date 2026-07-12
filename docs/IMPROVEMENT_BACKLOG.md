@@ -6,6 +6,34 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-12 — AUDIT: provenance.json census pointer
+- [ ] **`docs/DATA_PROVENANCE.md` §1's hand-written table is still literally 34-ish rows describing a
+      2026-07-01 snapshot of the platform** — this cycle pointed the header at the live
+      `provenance.json` census instead of re-counting by hand, but the row-by-row table body itself
+      still doesn't mention `branch_peers.json`/`branch_density.json`/`exit_whitespace.json`/
+      `expansion_plan.json`/`agri_income_by_province.json`/`fuel_prices.json`/`thaiwater_*.json` and
+      ~35 other now-shipped layers (all of which DO carry real in-file `meta` and DO pass the gate —
+      this is a "curated tour is incomplete" gap, not a "provenance is missing" gap, since
+      `provenance.json`/the gate already cover everything). A future cycle could either backfill rows
+      for the handful of highest-value ones (the 4 named above are the two-objectives-relevant set) or
+      restructure §1 to link out to each builder's own `meta` block instead of duplicating it in
+      markdown. *(MED, M — genuinely needs the file-by-file pass previously flagged, now lower-stakes
+      since the gate + provenance.json are the real safety net)*
+- [ ] **`pipeline/build_provenance.py`'s `provenance.json` output has no rendered surface in the
+      platform app itself** — it's a build-time/CI artifact read by docs and humans, not fetched by
+      `app.js` anywhere. A future cycle could surface its `counts` (measured/estimated/unlabelled) as
+      a small trust indicator on `#overview` or `#home` ("N of M data layers independently sourced") —
+      would directly serve CLAUDE.md's "always state measured vs estimated" mandate at the UX layer,
+      not just the docs layer. Needs a design decision on framing before building (a bare count could
+      read as "37 layers are guesses", which undersells that ESTIMATED here always means
+      honestly-labelled-with-method, not fabricated). *(MED, S-M, needs a UX framing decision first)*
+- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix (fixed this cycle for `gdcatalog`) has not been
+      re-verified end-to-end against `committee/census.py`'s actual current host list** — only the
+      one contradicted row was fixed; a future AUDIT cycle could diff every row in the matrix against
+      what `committee/census.py`/`autox_dgt_ingest.py`/`pull_*.py` scripts actually hit today, since
+      this cycle found one real drift (gdcatalog) by spot-check, not a systematic pass. *(LOW, S,
+      informational)*
+
 ## Queue — follow-ups noticed 2026-07-11 (9) — ENRICH: truck_flow.json caution strip on #acq
 - [ ] **The new `#acq` truck-watch strip and `#trend`'s full table both hardcode "worst 5"/"worst
       10"** off the same `TRUCKFLOW.provinces` sort — no shared constant/helper, just two
@@ -25,23 +53,26 @@
       structurally can be. *(LOW, trivial, informational — closes the truck_flow.json surfacing arc)*
 
 ## Queue — follow-ups noticed 2026-07-11 (8) — AUDIT: source-register doc backfill
-- [ ] **`docs/DATA_PROVENANCE.md` §1's own header still says "the ledger now covers all 34 top-level
-      `platform/data/*.json` layers" from the 2026-07-01 audit** — that count is now stale (this
-      cycle alone added a 35th/36th row for `truck_flow.json`/`labour_context.json`, and several other
-      layers referenced elsewhere in this backlog — `branch_peers.json`, `branch_density.json`,
-      `exit_whitespace.json`, `expansion_plan.json`, occupation/opportunity layers — don't appear in
-      §1's table either). A future AUDIT cycle should do a full re-count (`ls platform/data/*.json`
-      vs. §1's row count) and either update the header number or, better, do a complete sweep adding
-      every still-missing row in one pass rather than one-off additions like this cycle's. *(MED, M,
-      needs a full file-by-file pass — this cycle deliberately scoped to just the 2 specifically-
-      flagged gaps rather than attempting the full sweep)*
-- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix still lists `DLT (vehicles) | stat.dlt.go.th,
-      web.dlt.go.th | ❌ BLOCKED`** without noting the CLAUDE.md-documented 2026-07-09 breakthrough
-      that the DEPARTMENTS' OWN CKAN catalogs (`gdcatalog.dlt.go.th`, `diw-dataset.diw.go.th`) are
-      NOT geoblocked — a different host than the blocked `stat.dlt.go.th`/`web.dlt.go.th` pair, so not
-      technically wrong, but potentially misleading to a reader who doesn't also have CLAUDE.md's
-      "Hard environment constraints" section open. A future docs cycle could add a one-line
-      cross-reference. *(LOW, trivial, informational)*
+- [x] **`docs/DATA_PROVENANCE.md` §1's own header still said "the ledger now covers all 34 top-level
+      `platform/data/*.json` layers" from the 2026-07-01 audit — DONE 2026-07-12** (rather than
+      hand-writing ~44 new rows for a 307-file tree — real risk of shipping a stale/inaccurate
+      description in the one doc whose job is trustworthy provenance — found `pipeline/
+      build_provenance.py` already exists and is already gated in `tests/run.sh`, deterministically
+      censusing every layer's own `meta` stamp into `platform/data/provenance.json`. Rewrote the
+      header to point there as the live, always-current audit [76 layers: 33 MEASURED/37 ESTIMATED/6
+      UNLABELLED] and cross-checked the 6 "unlabelled" files against `validate_data.py`'s
+      `PROVENANCE_EXEMPT` set — confirmed an exact match, i.e. every unlabelled file is a reviewed
+      exemption, not an undetected gap. Gate 66/0, `validate_data.py` 468/468 unchanged. Full
+      writeup: `docs/PROGRESS_LOG.md` 2026-07-12 entry).
+- [x] **`docs/DATA_SOURCES.md`'s reachability matrix still lists `DLT (vehicles) | stat.dlt.go.th,
+      web.dlt.go.th | ❌ BLOCKED` without noting the CLAUDE.md-documented 2026-07-09 breakthrough —
+      DONE 2026-07-12, and turned out worse than "just missing a cross-reference": the same table's
+      catch-all row also listed `gdcatalog` itself under still-❌-BLOCKED, directly contradicting the
+      verified breakthrough** (split into two rows: the genuinely-still-blocked old `stat.dlt.go.th`
+      portal, and a new ✅ row for `gdcatalog.dlt.go.th`/`diw-dataset.diw.go.th` citing the verified
+      date + `committee/census.py`/the CI workflow that already uses them + CLAUDE.md/INSIGHTS.md
+      cross-references. Gate reconfirmed 66/0 unchanged — docs-only. Full writeup: `docs/
+      PROGRESS_LOG.md` 2026-07-12 entry).
 
 ## Queue — follow-ups noticed 2026-07-11 (7) — ENRICH: truck_flow.json national-rollup on #trend
 - [x] **`truck_flow.json`'s worst-yoy provinces weren't surfaced on `#acq`/`#trend` — DONE

@@ -5,6 +5,45 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 — AUDIT: DATA_PROVENANCE.md pointed at the live provenance.json census; fixed a contradicted DLT reachability row.
+
+Picked up the standing backlog item flagged 2026-07-11 (8)/(2): `docs/DATA_PROVENANCE.md`'s §1
+header still claimed "34 top-level `platform/data/*.json` layers" from the 2026-07-01 hand audit,
+which had gone badly stale — the tree now ships 307 top-level `.json` files (most of them
+per-province `<slug>_places/roads/water.json` geometry that didn't exist yet on 2026-07-01).
+
+Rather than hand-write ~44 new markdown rows for every layer that's shipped since (a real risk of
+introducing a stale/inaccurate description into a document whose whole purpose is trustworthy
+provenance), found that **`pipeline/build_provenance.py` already exists and is already gated** in
+`tests/run.sh` (`build_provenance.py --check`) — it deterministically censuses every committed
+layer's own `meta` stamp into `platform/data/provenance.json` (collapsing the per-province geometry
+family into one row each) and reports a MEASURED/ESTIMATED/UNLABELLED count. This machine-generated
+census is the real, always-current audit; the markdown file just never said so. Rewrote the header to:
+- Point to `provenance.json`/`build_provenance.py --check` as the live census instead of re-claiming
+  a stale hand count.
+- Cite its current numbers (76 layers censused: 33 MEASURED / 37 ESTIMATED / 6 UNLABELLED).
+- Cross-check the 6 "unlabelled" files (`branches.json`, `deltas.json`, `meta.json`,
+  `provinces/index.json`, `rayong_province.json`, `snapshots_index.json`) against
+  `tests/validate_data.py`'s `PROVENANCE_EXEMPT` set — confirmed they match exactly, i.e. every
+  unlabelled file is a known, previously-reviewed exemption (R1/R4/R5 in §3), not an undetected gap.
+- Left the full row-by-row re-audit of the hand-written §1 table as a still-open (now smaller-stakes)
+  backlog item, since the gate itself is the real safety net going forward, not this markdown file.
+
+Also fixed a real, actively-misleading line while in the same doc family: `docs/DATA_SOURCES.md`'s
+reachability matrix listed `gdcatalog` under still-❌-BLOCKED sources, directly contradicting the
+CLAUDE.md-documented 2026-07-09 breakthrough (both hosts verified HTTP 200 from this sandbox) that
+`gdcatalog.dlt.go.th`/`diw-dataset.diw.go.th` — the DLT/DIW departments' own CKAN catalogs, a
+different host from the blocked `stat.dlt.go.th`/`data.go.th` — are reachable from any cloud IP and
+are already in active use by `committee/census.py` + `.github/workflows/data-gov-census.yml`. Split
+the row so the genuinely-still-blocked old DLT stat portal and the reachable CKAN catalogs are no
+longer conflated into one blocked line.
+
+Docs-only, zero `platform/data`/`source-data` values touched. Gate reconfirmed 66/0,
+`validate_data.py` 468/468 unchanged before/after. `git status` before commit showed only the 2
+intended files staged.
+
+---
+
 ## 2026-07-11 (9) — ENRICH: surfaced `truck_flow.json`'s contracting-fleet caution on `#acq`.
 
 Closed the remaining backlog item from 2026-07-11 (7) ("`#acq` still doesn't read
