@@ -15,12 +15,13 @@
       starting implementation would have caught this in one command instead of a partial build +
       revert. Worth folding into the general "spot-check before building" backlog hygiene note rather
       than a one-off. *(LOW, trivial, process note)*
-- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix now covers every host actually hit by
-      `pipeline/*.py`/`committee/*.py`, EXCEPT the Google Places API** (`maps.googleapis.com`, used by
-      `pull_competitors.py`/`pull_google_places.py`) — the matrix's existing Google Places row cites
-      "(places_search tool)" rather than the actual REST host the pipeline scripts call directly. Not
-      wrong, just a slightly different framing (tool-call vs. raw HTTP) that a future pass could
-      reconcile into one row. *(LOW, trivial, informational)*
+- [x] **`docs/DATA_SOURCES.md`'s reachability matrix's Google Places row cited "(places_search tool)"
+      rather than the actual REST host the pipeline scripts call directly — DONE 2026-07-12 (4)**
+      (grepped `pipeline/pull_competitors.py`/`pull_google_places.py`/`committee/scout.py`/
+      `committee/geocoder.py` for their literal request URL — all four call
+      `maps.googleapis.com/maps/api/place/{textsearch,nearbysearch}/json` directly; row now names that
+      host alongside the sandbox tool-call path, plus the 4 callers + the 2 env-var key names. Docs-only,
+      gate reconfirmed 66/0 unchanged. Full writeup: `docs/DATA_REFRESH_LOG.md` 2026-07-12 (4) entry).
 - [ ] **The isochrone puller (`pull_isochrone.py`) has never been run — reachability of
       `api.openrouteservice.org`/`api.sphere.gistda.or.th` from this sandbox is genuinely unknown**,
       not just key-gated. If a future cycle gets a free-tier `ORS_KEY` (signup link is in the script's

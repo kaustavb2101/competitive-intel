@@ -4,6 +4,37 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-12 (4) — AUDIT: `DATA_SOURCES.md` Google Places row reconciled to its actual REST host
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh `git fetch`/`checkout`/`pull` of
+`claude/new-session-wto26j` (HEAD `3496f67`), `bash tests/run.sh check` → 66 passed, 0 failed
+(`validate_data.py` 468/468) before touching anything — no pre-existing drift, so RE-DERIVE wasn't
+picked. No `/workspace/watcher` TMLI checkout present in this session, so ENRICH wasn't available
+either; picked the standing AUDIT follow-up instead (`docs/IMPROVEMENT_BACKLOG.md`'s "2026-07-12 (3)"
+queue: the Google Places reachability-matrix reconciliation).
+
+**1. What was found.** `docs/DATA_SOURCES.md`'s reachability matrix listed the Google Places row as
+`(places_search tool)` — a framing that only describes the sandbox's tool-call path, not the actual
+HTTP endpoint the pipeline scripts hit when run for real. Grepped every pipeline/committee caller:
+`pipeline/pull_competitors.py`, `pipeline/pull_google_places.py`, `committee/scout.py`, and
+`committee/geocoder.py` all call `https://maps.googleapis.com/maps/api/place/{textsearch,nearbysearch}/json`
+directly, gated by `GOOGLE_MAPS_API_KEY`/`GOOGLE_PLACES_KEY` env vars. Not a wrong row (Google Places
+genuinely is reachable), just an incomplete one — a future reader looking for "what host does the
+competitor-census puller actually call" wouldn't have found the answer in this table.
+
+**2. Fix applied — docs only, zero data/code touched.** Updated the one row in
+`docs/DATA_SOURCES.md`'s reachability matrix to name the real REST host alongside the existing
+tool-call mention, plus the 4 calling scripts and the 2 env-var key names actually used.
+
+**3. Verification.** `bash tests/run.sh check` — 66 passed, 0 failed (`validate_data.py` 468/468,
+identical to the pre-change baseline) — expected, since this is a one-line markdown edit with no
+`platform/data`/`source-data` file touched.
+
+**Source:** direct `grep` of the request-URL literals in the 4 named pipeline/committee scripts —
+no external pull performed this cycle.
+
+---
+
 ## 2026-07-12 (2) — AUDIT: backfilled `DATA_PROVENANCE.md` §1 rows for the two-objectives-relevant layer set
 
 **Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`

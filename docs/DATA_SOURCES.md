@@ -5,7 +5,7 @@
 | Source | Host | Status | Notes |
 |---|---|---|---|
 | OpenStreetMap / Overpass | `maps.mail.ru/osm/tools/overpass/api/interpreter` | ✅ REACHABLE (fast mirror) | also `overpass.kumi.systems`. National query: `area["ISO3166-1"="TH"][admin_level=2]` |
-| Google Places | (places_search tool) | ✅ | coords + reviews; best for live competitors |
+| Google Places | `maps.googleapis.com/maps/api/place/{textsearch,nearbysearch}/json` (also callable via the sandbox's `places_search` tool) | ✅ | coords + reviews; best for live competitors. Direct REST host used by `pull_competitors.py`/`pull_google_places.py`/`committee/scout.py`/`committee/geocoder.py`; key-gated (`GOOGLE_MAPS_API_KEY`/`GOOGLE_PLACES_KEY`). Row reconciled 2026-07-12 to name the actual pipeline-called host instead of only the tool-call framing. |
 | HDX (HumData) | `data.humdata.org/api/3/action/...` | ✅ | CKAN. UNFPA pop, WFP rainfall, geoBoundaries |
 | OAE agriculture | `catalog.oae.go.th/api/3/action/...` | ✅ | CKAN/nginx, not Cloudflare-blocked. `www.oae.go.th`=200 |
 | World Bank Pink Sheet | `thedocs.worldbank.org` | ✅ | Apache. Monthly commodity prices (xlsx) |
