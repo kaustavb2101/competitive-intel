@@ -1,0 +1,574 @@
+{
+  "meta": {
+    "title": "Per-province licensed PICO-finance operator census (competitor risk, objective #2)",
+    "generated_by": "pipeline/build_pico_operators.py",
+    "deterministic": true,
+    "network_free": true,
+    "provenance": "MEASURED",
+    "source": "FPO (Fiscal Policy Office) licensed pico-finance operator registry, snapshot 2026-05-22, via pipeline/pull_datagoth.py --only fpo_pico",
+    "source_url": "https://catalog.fpo.go.th/dataset/2b8aadd9-e0a7-45fc-8301-ea2fbdb781a2 (FPO licensed pico-finance operators)",
+    "registry_vintage": "2026-05-22",
+    "granularity": "province of licence (จังหวัดที่ให้บริการ) — NOT geocoded to branch coordinates",
+    "competitor_class": "sub-scale, single-province-licensed pico-finance lenders (฿50k pico / ฿100k pico-plus, MoF licence) — a DISTINCT tier from the big-4 title-lenders in competitors_census.json; complements, does not merge into, that census",
+    "measures": {
+      "n": "total licensed operators registered to serve the province (HQ + sub-branch)",
+      "hq": "head-office (สำนักงานใหญ่) registrations",
+      "branch": "sub-branch (สำนักสาขา) registrations"
+    },
+    "honesty_caveat": "Counts are LICENSED entities, not verified-active storefronts (a licence may be dormant) — a licence-count upper bound on sub-scale competition. Province granularity only; the registry's street addresses are not geocoded here.",
+    "n_operators": 2042,
+    "n_provinces_covered": 75,
+    "n_provinces_zero": 2,
+    "n_hq": 1187,
+    "n_branch": 855,
+    "n_unresolved_rows": 0,
+    "region_totals": {
+      "Central&BKK": 241,
+      "East": 107,
+      "Isan": 951,
+      "North": 469,
+      "South": 274
+    }
+  },
+  "provinces": [
+    {
+      "th": "กระบี่",
+      "region": "South",
+      "n": 9,
+      "hq": 4,
+      "branch": 5
+    },
+    {
+      "th": "กรุงเทพมหานคร",
+      "region": "Central&BKK",
+      "n": 111,
+      "hq": 101,
+      "branch": 10
+    },
+    {
+      "th": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "n": 4,
+      "hq": 4,
+      "branch": 0
+    },
+    {
+      "th": "กาฬสินธุ์",
+      "region": "Isan",
+      "n": 36,
+      "hq": 35,
+      "branch": 1
+    },
+    {
+      "th": "กำแพงเพชร",
+      "region": "North",
+      "n": 28,
+      "hq": 13,
+      "branch": 15
+    },
+    {
+      "th": "ขอนแก่น",
+      "region": "Isan",
+      "n": 76,
+      "hq": 63,
+      "branch": 13
+    },
+    {
+      "th": "จันทบุรี",
+      "region": "East",
+      "n": 4,
+      "hq": 3,
+      "branch": 1
+    },
+    {
+      "th": "ฉะเชิงเทรา",
+      "region": "East",
+      "n": 13,
+      "hq": 10,
+      "branch": 3
+    },
+    {
+      "th": "ชลบุรี",
+      "region": "East",
+      "n": 30,
+      "hq": 27,
+      "branch": 3
+    },
+    {
+      "th": "ชัยนาท",
+      "region": "Central&BKK",
+      "n": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    {
+      "th": "ชัยภูมิ",
+      "region": "Isan",
+      "n": 71,
+      "hq": 45,
+      "branch": 26
+    },
+    {
+      "th": "ชุมพร",
+      "region": "South",
+      "n": 15,
+      "hq": 3,
+      "branch": 12
+    },
+    {
+      "th": "ตรัง",
+      "region": "South",
+      "n": 35,
+      "hq": 9,
+      "branch": 26
+    },
+    {
+      "th": "ตราด",
+      "region": "East",
+      "n": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    {
+      "th": "ตาก",
+      "region": "North",
+      "n": 8,
+      "hq": 6,
+      "branch": 2
+    },
+    {
+      "th": "นครนายก",
+      "region": "Central&BKK",
+      "n": 7,
+      "hq": 4,
+      "branch": 3
+    },
+    {
+      "th": "นครปฐม",
+      "region": "Central&BKK",
+      "n": 6,
+      "hq": 6,
+      "branch": 0
+    },
+    {
+      "th": "นครพนม",
+      "region": "Isan",
+      "n": 19,
+      "hq": 16,
+      "branch": 3
+    },
+    {
+      "th": "นครราชสีมา",
+      "region": "Isan",
+      "n": 145,
+      "hq": 114,
+      "branch": 31
+    },
+    {
+      "th": "นครศรีธรรมราช",
+      "region": "South",
+      "n": 62,
+      "hq": 11,
+      "branch": 51
+    },
+    {
+      "th": "นครสวรรค์",
+      "region": "North",
+      "n": 31,
+      "hq": 15,
+      "branch": 16
+    },
+    {
+      "th": "นนทบุรี",
+      "region": "Central&BKK",
+      "n": 14,
+      "hq": 14,
+      "branch": 0
+    },
+    {
+      "th": "นราธิวาส",
+      "region": "South",
+      "n": 5,
+      "hq": 1,
+      "branch": 4
+    },
+    {
+      "th": "น่าน",
+      "region": "North",
+      "n": 22,
+      "hq": 7,
+      "branch": 15
+    },
+    {
+      "th": "บึงกาฬ",
+      "region": "Isan",
+      "n": 10,
+      "hq": 6,
+      "branch": 4
+    },
+    {
+      "th": "บุรีรัมย์",
+      "region": "Isan",
+      "n": 44,
+      "hq": 37,
+      "branch": 7
+    },
+    {
+      "th": "ปทุมธานี",
+      "region": "Central&BKK",
+      "n": 18,
+      "hq": 18,
+      "branch": 0
+    },
+    {
+      "th": "ประจวบคีรีขันธ์",
+      "region": "Central&BKK",
+      "n": 15,
+      "hq": 11,
+      "branch": 4
+    },
+    {
+      "th": "ปราจีนบุรี",
+      "region": "East",
+      "n": 17,
+      "hq": 10,
+      "branch": 7
+    },
+    {
+      "th": "ปัตตานี",
+      "region": "South",
+      "n": 3,
+      "hq": 1,
+      "branch": 2
+    },
+    {
+      "th": "พระนครศรีอยุธยา",
+      "region": "Central&BKK",
+      "n": 3,
+      "hq": 3,
+      "branch": 0
+    },
+    {
+      "th": "พะเยา",
+      "region": "North",
+      "n": 27,
+      "hq": 4,
+      "branch": 23
+    },
+    {
+      "th": "พังงา",
+      "region": "South",
+      "n": 16,
+      "hq": 4,
+      "branch": 12
+    },
+    {
+      "th": "พัทลุง",
+      "region": "South",
+      "n": 23,
+      "hq": 3,
+      "branch": 20
+    },
+    {
+      "th": "พิจิตร",
+      "region": "North",
+      "n": 13,
+      "hq": 6,
+      "branch": 7
+    },
+    {
+      "th": "พิษณุโลก",
+      "region": "North",
+      "n": 71,
+      "hq": 9,
+      "branch": 62
+    },
+    {
+      "th": "ภูเก็ต",
+      "region": "South",
+      "n": 15,
+      "hq": 3,
+      "branch": 12
+    },
+    {
+      "th": "มหาสารคาม",
+      "region": "Isan",
+      "n": 57,
+      "hq": 40,
+      "branch": 17
+    },
+    {
+      "th": "มุกดาหาร",
+      "region": "Isan",
+      "n": 27,
+      "hq": 14,
+      "branch": 13
+    },
+    {
+      "th": "ยะลา",
+      "region": "South",
+      "n": 5,
+      "hq": 1,
+      "branch": 4
+    },
+    {
+      "th": "ยโสธร",
+      "region": "Isan",
+      "n": 54,
+      "hq": 34,
+      "branch": 20
+    },
+    {
+      "th": "ระนอง",
+      "region": "South",
+      "n": 6,
+      "hq": 1,
+      "branch": 5
+    },
+    {
+      "th": "ระยอง",
+      "region": "East",
+      "n": 20,
+      "hq": 17,
+      "branch": 3
+    },
+    {
+      "th": "ราชบุรี",
+      "region": "Central&BKK",
+      "n": 3,
+      "hq": 3,
+      "branch": 0
+    },
+    {
+      "th": "ร้อยเอ็ด",
+      "region": "Isan",
+      "n": 74,
+      "hq": 63,
+      "branch": 11
+    },
+    {
+      "th": "ลพบุรี",
+      "region": "Central&BKK",
+      "n": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    {
+      "th": "ลำปาง",
+      "region": "North",
+      "n": 39,
+      "hq": 14,
+      "branch": 25
+    },
+    {
+      "th": "ลำพูน",
+      "region": "North",
+      "n": 23,
+      "hq": 10,
+      "branch": 13
+    },
+    {
+      "th": "ศรีสะเกษ",
+      "region": "Isan",
+      "n": 67,
+      "hq": 39,
+      "branch": 28
+    },
+    {
+      "th": "สกลนคร",
+      "region": "Isan",
+      "n": 18,
+      "hq": 14,
+      "branch": 4
+    },
+    {
+      "th": "สงขลา",
+      "region": "South",
+      "n": 46,
+      "hq": 10,
+      "branch": 36
+    },
+    {
+      "th": "สตูล",
+      "region": "South",
+      "n": 7,
+      "hq": 2,
+      "branch": 5
+    },
+    {
+      "th": "สมุทรปราการ",
+      "region": "Central&BKK",
+      "n": 27,
+      "hq": 25,
+      "branch": 2
+    },
+    {
+      "th": "สมุทรสงคราม",
+      "region": "Central&BKK",
+      "n": 1,
+      "hq": 1,
+      "branch": 0
+    },
+    {
+      "th": "สมุทรสาคร",
+      "region": "Central&BKK",
+      "n": 13,
+      "hq": 13,
+      "branch": 0
+    },
+    {
+      "th": "สระบุรี",
+      "region": "Central&BKK",
+      "n": 6,
+      "hq": 5,
+      "branch": 1
+    },
+    {
+      "th": "สระแก้ว",
+      "region": "East",
+      "n": 18,
+      "hq": 8,
+      "branch": 10
+    },
+    {
+      "th": "สิงห์บุรี",
+      "region": "Central&BKK",
+      "n": 0,
+      "hq": 0,
+      "branch": 0
+    },
+    {
+      "th": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "n": 4,
+      "hq": 4,
+      "branch": 0
+    },
+    {
+      "th": "สุราษฎร์ธานี",
+      "region": "South",
+      "n": 27,
+      "hq": 7,
+      "branch": 20
+    },
+    {
+      "th": "สุรินทร์",
+      "region": "Isan",
+      "n": 62,
+      "hq": 36,
+      "branch": 26
+    },
+    {
+      "th": "สุโขทัย",
+      "region": "North",
+      "n": 23,
+      "hq": 9,
+      "branch": 14
+    },
+    {
+      "th": "หนองคาย",
+      "region": "Isan",
+      "n": 13,
+      "hq": 7,
+      "branch": 6
+    },
+    {
+      "th": "หนองบัวลำภู",
+      "region": "Isan",
+      "n": 18,
+      "hq": 13,
+      "branch": 5
+    },
+    {
+      "th": "อำนาจเจริญ",
+      "region": "Isan",
+      "n": 13,
+      "hq": 11,
+      "branch": 2
+    },
+    {
+      "th": "อุดรธานี",
+      "region": "Isan",
+      "n": 46,
+      "hq": 27,
+      "branch": 19
+    },
+    {
+      "th": "อุตรดิตถ์",
+      "region": "North",
+      "n": 18,
+      "hq": 12,
+      "branch": 6
+    },
+    {
+      "th": "อุทัยธานี",
+      "region": "North",
+      "n": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    {
+      "th": "อุบลราชธานี",
+      "region": "Isan",
+      "n": 96,
+      "hq": 49,
+      "branch": 47
+    },
+    {
+      "th": "อ่างทอง",
+      "region": "Central&BKK",
+      "n": 0,
+      "hq": 0,
+      "branch": 0
+    },
+    {
+      "th": "เชียงราย",
+      "region": "North",
+      "n": 42,
+      "hq": 9,
+      "branch": 33
+    },
+    {
+      "th": "เชียงใหม่",
+      "region": "North",
+      "n": 97,
+      "hq": 20,
+      "branch": 77
+    },
+    {
+      "th": "เพชรบุรี",
+      "region": "Central&BKK",
+      "n": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    {
+      "th": "เพชรบูรณ์",
+      "region": "North",
+      "n": 11,
+      "hq": 10,
+      "branch": 1
+    },
+    {
+      "th": "เลย",
+      "region": "Isan",
+      "n": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    {
+      "th": "แพร่",
+      "region": "North",
+      "n": 10,
+      "hq": 10,
+      "branch": 0
+    },
+    {
+      "th": "แม่ฮ่องสอน",
+      "region": "North",
+      "n": 4,
+      "hq": 2,
+      "branch": 2
+    }
+  ]
+}

@@ -5,6 +5,41 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (integration) — PICO: fold the FPO licensed pico-finance registry into a measured province competitor layer
+
+Integration loop, backlog item #1 (the "#1 acquisition gap"). Confirmed the FPO pico-finance registry
+was NOT yet folded (grep of pipeline/source-data: only `pull_datagoth.py` mentioned `fpo_pico`; no
+distiller, no `platform/data` layer). Pulled it from CI — `pull_datagoth.py --only fpo_pico` succeeded
+from the cloud IP (768 KB, HTTP 200; the FPO department CKAN `catalog.fpo.go.th` is reachable even
+though the `data.go.th` aggregator is geo-blocked), giving 2,042 licensed pico-finance operators with a
+province-of-licence (`จังหวัดที่ให้บริการ`) column and full addresses.
+
+Shipped `pipeline/build_pico_operators.py` → `platform/data/pico_operators.json` (77-province rollup,
+11.5 KB). Every count is a straight tally of the FPO official registry — **MEASURED** (provenance verdict
+confirmed by `build_provenance.py`). Per province: `n` total licensed operators, `hq` head-office
+(สำนักงานใหญ่ = 1,187) and `branch` sub-branch (สำนักสาขา = 855) registrations; complete 77-province
+rollup (75 covered, 2 genuine zeros — Ang Thong, Sing Buri; all 2,042 rows canonicalized cleanly via
+`regionmap.canonical`, 0 unresolved). Headline: Nakhon Ratchasima 145, Bangkok 111, Chiang Mai 97,
+Ubon 96, Khon Kaen 76 — the sub-scale field is thickest in the upcountry NE + big metros.
+
+**Why this is the right granularity (honesty):** pico-finance operators are the SUB-SCALE, single-
+province-licensed tier (MoF licence, ฿50k pico / ฿100k pico-plus, many vehicle-title) — a DISTINCT
+competitor class from the big-4 title-lenders already in `competitors_census.json`. This is exactly the
+sub-scale-operator census `build_exit_whitespace.py` flagged as blocked. The registry gives province-of-
+licence, not geocoded storefronts, so the layer joins at PROVINCE level and **complements, does not merge
+into**, the coordinate-based big-4 census. `meta` carries the full caveat set (licensed-entity upper
+bound not verified-active storefronts; distinct product class; not geocoded). Not yet surfaced in the UI
+— that's the follow-up (a per-province sub-scale-rival readout on `#acq`).
+
+**Verification:** builds + re-`--check` reproduces byte-exact; wired into `tests/run.sh` right before
+`build_branch_vehicles` with the standard SKIP-on-absent-raw guard (exit 3) — the raw CSV is gitignored
+(`source-data/datagoth/`), so in CI the check SKIPs and the committed output is trusted, mirroring
+`build_branch_cropland`/`build_branch_density`. `build_provenance.py` re-run (pico_operators now tracked,
+MEASURED). `bash tests/run.sh check` → **63 passed, 0 failed** (the +1 is the new builder's check). Pure
+data addition, no app/visual change → committed to master.
+
+---
+
 ## 2026-07-13 (intelligence) — DEPLOYMENT HEALTH: point the nightly probe at the master PRODUCTION alias (auth-aware)
 
 Intelligence loop (deploy-health pillar). Backlog was 0-open / 96% done, so ran the deploy-health
