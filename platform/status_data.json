@@ -2,16 +2,16 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T17:14:42+07:00",
-    "commit": "1a5890b"
+    "generated_at": "2026-07-12T10:39:41Z",
+    "commit": "4bd90c7"
   },
   "overall": {
-    "progress_pct": 66,
+    "progress_pct": 72,
     "status": "on-track",
     "eta_days": 3,
     "eta_date": "2026-07-15",
-    "done_items": 33,
-    "in_progress_items": 8,
+    "done_items": 36,
+    "in_progress_items": 5,
     "open_items": 9,
     "total_items": 50
   },
@@ -50,10 +50,10 @@
     {
       "key": "data-integration",
       "label": "Data integration",
-      "progress_pct": 33,
-      "done": 2,
+      "progress_pct": 83,
+      "done": 5,
       "total": 6,
-      "status": "at-risk",
+      "status": "on-track",
       "items": [
         {
           "id": "di-tmli",
@@ -79,23 +79,23 @@
         {
           "id": "di-dlt",
           "title": "DLT vehicle registrations, all-province coverage",
-          "state": "in_progress",
+          "state": "done",
           "priority": 2,
-          "evidence": "platform/data/branch_vehicles.json present; province coverage still partial (NEXT_STEPS §2)"
+          "evidence": "vehicles_by_province.json = DLT registered-vehicle stock across all 77 provinces (44.3M vehicles: car/pickup/moto/ev, 0 gaps); wired per-branch via branch_vehicles.json (NEXT_STEPS §2)"
         },
         {
           "id": "di-farmgate",
           "title": "Replace GLOBAL price proxy with Thai farm-gate prices",
-          "state": "in_progress",
+          "state": "done",
           "priority": 2,
-          "evidence": "OAE/NABC price workflows committed; crop_stress price_stress still GLOBAL proxy (CLAUDE.md, NEXT_STEPS §2)"
+          "evidence": "source-data/farmgate_prices.json (MEASURED Thai daily national-average farm-gate prices — NABC agriapi.nabc.go.th, vintage 2026-07-02, live-verified from the Thai IP) wired into build_crop_stress.py price_stress, replacing the World Bank GLOBAL proxy for rice/rubber/oil palm"
         },
         {
           "id": "di-competitor-census",
           "title": "National competitor census (Places scout, gate-guarded)",
-          "state": "in_progress",
+          "state": "done",
           "priority": 2,
-          "evidence": "committee/scout.py + platform/data/competitors_census.json present; national coverage still rotating"
+          "evidence": "competitors_census.json = 16,503 rivals across all 77 provinces + competitor_coverage.json"
         }
       ]
     },
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T10:39:41Z",
+      "sha": "4bd90c7",
+      "summary": "committee: refresh autonomy plan (run 29189456877)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-12T17:14:42+07:00",
       "sha": "1a5890b",
       "summary": "peer: per-province, per-brand peer comparison (AutoX vs each big-4 rival) (#21)",
@@ -652,12 +658,6 @@
       "sha": "2c0706c",
       "summary": "Add API keys and tokens to .env.example",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-10T06:26:47Z",
-      "sha": "286a495",
-      "summary": "AUDIT: PR #1 merged — every scheduled data workflow now registered (was dormant since 2026-06-28)",
-      "pillar": "data-integration"
     }
   ]
 }

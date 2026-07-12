@@ -9,7 +9,7 @@
     "sort": "worst-first by agri_stress (desc)",
     "fields": {
       "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
-      "price_stress": "MIXED — planting-area-weighted price YoY % across the province's covered crops. Per-crop source in meta.price_sources: LIVE NABC Thai daily prices preferred, then MEASURED-OAE Thai farm-gate (ราคาที่เกษตรกรขายได้), else the World Bank GLOBAL proxy.",
+      "price_stress": "MIXED — planting-area-weighted price YoY % across the province's covered crops. Per-crop source in meta.price_sources: the MEASURED Thai FARM-GATE layer (farmgate_prices.json) preferred, then LIVE NABC Thai daily prices, then MEASURED-OAE Thai farm-gate, else the World Bank GLOBAL proxy (direction only).",
       "drought": "MEASURED PROXY — derived from branch rain_3mo_anom (3-month rainfall as %% of normal). 0..1 where 1 = driest. See components.rain_pct_of_normal for the underlying measured value.",
       "crop_dependence": "MEASURED — province total crop rai / max province crop rai (0..1).",
       "agri_stress": "ESTIMATED — composite, see meta.formula. Combines price + drought hazard, scaled by crop_dependence. Index, not a measured outcome.",
@@ -34,7 +34,7 @@
       "inputs": "Uses ONLY signals already computed here: crop_mix shares (rice+rubber), the existing price_term (from the GLOBAL price proxy), and the existing drought signal (measured rain_3mo_anom proxy). No new external numbers introduced.",
       "n_flagged": 0,
       "source": "RESEARCH_DIGEST.md 2026-06-30 Entry 1 §C — OAE 2026 outlook (rice & rubber softer) + El Niño drought >80% from mid-2026. INTERPRETATION (obj #1).",
-      "caveat": "price_term for rice/rubber now uses MEASURED Thai YoY (NABC live / OAE farm-gate), not the GLOBAL proxy. Still treat the flag as a triage flag, not a forecast."
+      "caveat": "price_term for rice/rubber now uses MEASURED Thai YoY (farm-gate layer / NABC live / OAE farm-gate), not the GLOBAL proxy. Still treat the flag as a triage flag, not a forecast."
     },
     "coverage": {
       "crops_priced": [
@@ -55,18 +55,19 @@
       "crop_prov_area.json": "OAE planting area (rai) per crop per province — MEASURED.",
       "commodity_board.json": "World Bank Pink Sheet GLOBAL commodity prices, YoY %% — PROXY for direction of Thai farm-gate, not farm-gate itself.",
       "branches_final.json": "rain_3mo_anom per branch — MEASURED rainfall anomaly proxy.",
+      "farmgate_prices.json": "MEASURED Thai farm-gate price layer (di-farmgate), built by pipeline/build_farmgate_prices.py from the NABC daily national-average feed (agriapi.nabc.go.th, reachable from a Thai IP / cloud). Replaces the World Bank GLOBAL proxy for: Oil palm, Rice, Rubber. vintage 2026-07-02.",
       "nabc_prices.json": "NABC live daily market prices (agriapi.nabc.go.th), pulled by pipeline/pull_nabc_prices.py — MEASURED, cloud-refreshable. Crops: Oil palm, Rice, Rubber."
     },
     "caveats": [
-      "Price sources are MIXED per crop (see meta.price_sources): Oil palm, Rice, Rubber use MEASURED Thai YoY (NABC live / OAE farm-gate); any other priced crop still uses the GLOBAL World Bank proxy (direction signal only).",
+      "Price sources are MIXED per crop (see meta.price_sources): Oil palm, Rice, Rubber use MEASURED Thai YoY (farm-gate layer / NABC live / OAE farm-gate); any other priced crop still uses the GLOBAL World Bank proxy (direction signal only).",
       "Only rice / rubber / oil palm are both area-mapped and priced; sugar, maize and other crops in a province are shown in crop_mix but NOT in price_stress.",
       "drought uses each province's own branch network; provinces with few branches have a thinner rainfall sample (see components.n_rain_branches).",
       "agri_stress is an index for triage, not a forecast of defaults."
     ],
     "price_sources": {
-      "Oil palm": "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)",
-      "Rice": "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)",
-      "Rubber": "MEASURED-NABC — Thai live daily market YoY % (agriapi.nabc.go.th)"
+      "Oil palm": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-07-02)",
+      "Rice": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-07-02)",
+      "Rubber": "MEASURED-farmgate — Thai daily national-average price for the raw farm commodity (farm-gate layer, NABC agriapi.nabc.go.th; vintage 2026-07-02)"
     }
   },
   "provinces": [

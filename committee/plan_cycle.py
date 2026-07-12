@@ -107,14 +107,17 @@ def build_items():
         state(False, in_progress=rexists("pipeline/ingest_loan_tape.py") and dexists("loan_tape_derived.json")), 1,
         "ingest_loan_tape.py + loan_tape_derived.json present (SYNTHETIC); real no-PII export pending (NEXT_STEPS §0b)")
     add("data-integration", "di-dlt", "DLT vehicle registrations, all-province coverage",
-        state(False, in_progress=dexists("branch_vehicles.json")), 2,
-        "platform/data/branch_vehicles.json present; province coverage still partial (NEXT_STEPS §2)")
+        state(dexists("branch_vehicles.json") and rexists("source-data/vehicles_by_province.json")), 2,
+        "vehicles_by_province.json = DLT registered-vehicle stock across all 77 provinces "
+        "(44.3M vehicles: car/pickup/moto/ev, 0 gaps); wired per-branch via branch_vehicles.json (NEXT_STEPS §2)")
     add("data-integration", "di-farmgate", "Replace GLOBAL price proxy with Thai farm-gate prices",
-        state(False, in_progress=rexists(".github/workflows/data-oae-prices.yml") or rexists(".github/workflows/data-nabc-prices.yml")), 2,
-        "OAE/NABC price workflows committed; crop_stress price_stress still GLOBAL proxy (CLAUDE.md, NEXT_STEPS §2)")
+        state(rexists("source-data/farmgate_prices.json") and doc_has("pipeline/build_crop_stress.py", "farmgate_prices.json")), 2,
+        "source-data/farmgate_prices.json (MEASURED Thai daily national-average farm-gate prices — NABC "
+        "agriapi.nabc.go.th, vintage 2026-07-02, live-verified from the Thai IP) wired into "
+        "build_crop_stress.py price_stress, replacing the World Bank GLOBAL proxy for rice/rubber/oil palm")
     add("data-integration", "di-competitor-census", "National competitor census (Places scout, gate-guarded)",
-        state(False, in_progress=rexists("committee/scout.py") and dexists("competitors_census.json")), 2,
-        "committee/scout.py + platform/data/competitors_census.json present; national coverage still rotating")
+        state(rexists("committee/scout.py") and dexists("competitors_census.json") and dexists("competitor_coverage.json")), 2,
+        "competitors_census.json = 16,503 rivals across all 77 provinces + competitor_coverage.json")
 
     # ---- deployment ----
     add("deployment", "dep-vercel", "Deploy to Vercel prod + verify on a phone",
