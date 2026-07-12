@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T15:20:21+07:00",
-    "commit": "6d1d87a"
+    "generated_at": "2026-07-12T15:52:23+07:00",
+    "commit": "e86f079"
   },
   "overall": {
     "progress_pct": 66,
@@ -160,11 +160,11 @@
       "status": "on-track",
       "items": [
         {
-          "id": "feat-expansion",
-          "title": "Road to 3,000 — sequenced expansion plan",
+          "id": "feat-competitor-coverage",
+          "title": "Competitive coverage & rival pressure (national census)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/expansion_plan.json + pipeline/build_expansion_plan.py present"
+          "evidence": "platform/data/competitor_coverage.json + pipeline/build_competitor_coverage.py present"
         },
         {
           "id": "feat-decision-queue",
@@ -174,8 +174,8 @@
           "evidence": "platform/data/decision_queue.json + pipeline/build_decision_queue.py present"
         },
         {
-          "id": "feat-exit-ws",
-          "title": "Competitor-exit white-space cue (regulatory-tailwind lens)",
+          "id": "feat-competitor-fragility",
+          "title": "Competitor fragility under BoT registration deadline (market-risk lens)",
           "state": "done",
           "priority": 2,
           "evidence": "platform/data/exit_whitespace.json present"
@@ -480,22 +480,22 @@
   ],
   "activity": [
     {
-      "date": "2026-07-12T15:20:21+07:00",
-      "sha": "6d1d87a",
-      "summary": "feat(platform): CEO autonomy status dashboard (/status)",
+      "date": "2026-07-12T15:52:23+07:00",
+      "sha": "e86f079",
+      "summary": "feat: autonomy planner + self-updating CEO dashboard (#13)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-12T15:20:21+07:00",
-      "sha": "643f75c",
-      "summary": "ci(committee): every-6h autonomy-planner cron, gate-guarded",
-      "pillar": "deployment"
+      "date": "2026-07-12T15:51:46+07:00",
+      "sha": "e2c2d9f",
+      "summary": "data(enrichment): vehicle/EV collateral + hydrology + labour layers from PR #2 (#14)",
+      "pillar": "service"
     },
     {
-      "date": "2026-07-12T15:20:08+07:00",
-      "sha": "a723d42",
-      "summary": "feat(committee): deterministic autonomy planner (plan_cycle.py)",
-      "pillar": "deployment"
+      "date": "2026-07-12T15:38:10+07:00",
+      "sha": "588e307",
+      "summary": "ci(3d): publish Overture catchments to R2, not git (#16)",
+      "pillar": "3d-enrichment"
     },
     {
       "date": "2026-07-12T14:49:26+07:00",
