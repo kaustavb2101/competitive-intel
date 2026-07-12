@@ -1,0 +1,69 @@
+name: Committee — autonomy planner (every 6h, gate-guarded)
+
+# Self-updating CEO status plan. Runs the DETERMINISTIC, network-free planner
+# (committee/plan_cycle.py), which assesses the platform across the 8 pillars from REAL committed
+# repo state + git history and emits platform/status_data.json (rendered live by platform/status.html)
+# plus its docs/AUTONOMY_PLAN.md mirror. Like the competitor-scout loop it commits STRAIGHT TO master,
+# but ONLY when the full determinism gate (bash tests/run.sh check) passes 0-failed — the gate is the
+# guard. The planner pulls no network and fabricates nothing, so a refreshed plan can never regress data.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 03,09,15,21 UTC — offset from committee-cycle (03:40) and the improvement loops.
+    - cron: "0 3,9,15,21 * * *"
+
+# Never let two planner runs overlap (both regenerate + push the same two files to master).
+concurrency:
+  group: committee-planner
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # full history: the planner reads git log, and we rebase before push
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"    # match the determinism gate's Python
+
+      - name: Regenerate the autonomy plan (deterministic, network-free)
+        run: |
+          python committee/plan_cycle.py
+
+      - name: Run the determinism gate (THE GUARD)
+        id: gate
+        run: |
+          if bash tests/run.sh check; then
+            echo "gate=green" >> "$GITHUB_OUTPUT"
+          else
+            echo "gate=red" >> "$GITHUB_OUTPUT"
+            echo "::warning::Determinism gate FAILED — pushing nothing (master untouched)."
+          fi
+
+      - name: Commit the refreshed plan to master (ONLY when the gate is green)
+        if: steps.gate.outputs.gate == 'green'
+        env:
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          git add platform/status_data.json docs/AUTONOMY_PLAN.md
+          if git diff --cached --quiet; then
+            echo "Gate green but the plan is unchanged this cycle. Nothing to push."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "committee: refresh autonomy plan (run ${{ github.run_id }})" \
+                     -m "committee/plan_cycle.py regenerated platform/status_data.json + docs/AUTONOMY_PLAN.md from committed repo state; 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          # master may have advanced since checkout — rebase before pushing.
+          git pull --rebase origin "$BASE_BRANCH"
+          git push origin "HEAD:$BASE_BRANCH"
+          echo "Autonomy plan refreshed on $BASE_BRANCH."
