@@ -5,6 +5,43 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (3) — AUDIT: backfilled 5 missing rows in DATA_SOURCES.md's reachability matrix.
+
+Picked up the 2026-07-12 backlog item ("re-verify the reachability matrix against what
+`committee/census.py`/pullers actually hit today"). Before touching anything, tried to build the
+"Data trust" UX indicator flagged in the same cycle's backlog (a card summarizing measured/estimated
+layer counts) — discovered mid-implementation that this **already exists**: `renderHomeDataRoom()` /
+`#cc-dataroom-body` on the Home tab already renders the full `provenance.json` census (headline
+counts + per-layer table), landed in an earlier commit not reflected in the backlog's "no rendered
+surface" description. Reverted that work immediately (`git checkout --` on the 2 touched files,
+confirmed clean) rather than ship a duplicate, and picked the reachability-matrix item instead.
+
+Grepped every `pipeline/*.py`/`committee/*.py` puller for its actual request host, then diffed
+against `docs/DATA_SOURCES.md`'s small hand-written reachability table (7 rows). Found the table was
+**incomplete, not wrong** — no row contradicted live behavior this time, but 4 real, actively-pulled
+REACHABLE sources had no row at all:
+- **NABC** (`agriapi.nabc.go.th`) and **BIS** (`stats.bis.org`) — both explicitly named in CLAUDE.md's
+  own "REACHABLE" bullet list, but never made it into this doc's table. Confirmed live via committed
+  evidence: `source-data/nabc_prices.json`'s own `meta.source` line + `platform/data/macro_indicators.json`
+  (built by `pull_macro.py` hitting BIS + World Bank).
+- **ThaiWater** (`api-v3.thaiwater.net`) and **ILOSTAT rplumber** (`rplumber.ilo.org`) — feed the
+  already-shipped `thaiwater_rain.json`/`thaiwater_flood.json` (Overview rain/flood pulse) and
+  `labour_context.json` (national labour context); ILOSTAT was already cited in this doc's prose
+  further down but never in the table itself.
+Also added an **isochrone row** (ORS/GISTDA routing) marked ⚠ UNTESTED, not ❌ BLOCKED — `pull_isochrone.py`
+exists but needs `ORS_KEY`/`GISTDA_API_KEY` that aren't vendored here and no `*_isochrone.json` has
+ever landed, so this is a genuinely different state from the confirmed-blocked rows (worth keeping
+that distinction honest rather than lumping "never tried" in with "tried and failed"). Named the
+specific competitor-site hosts (muangthaicap/sawad/tidlor/hengleasing) in the existing catch-all
+❌ row instead of leaving it as bare "various".
+
+No source-data/platform-data values touched, no new network calls made (all backed by already-
+committed evidence). Gate reconfirmed 66/0, `validate_data.py` 468/468 unchanged. `git status` before
+commit showed only `docs/DATA_SOURCES.md` staged. Pushed to the existing open draft PR #2 (no new PR
+needed).
+
+---
+
 ## 2026-07-12 — AUDIT: DATA_PROVENANCE.md pointed at the live provenance.json census; fixed a contradicted DLT reachability row.
 
 Picked up the standing backlog item flagged 2026-07-11 (8)/(2): `docs/DATA_PROVENANCE.md`'s §1

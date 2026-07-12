@@ -6,6 +6,29 @@
 > → commit/push to `claude/new-session-wto26j` → log to `PROGRESS_LOG.md` → check the item off here and
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
+## Queue — follow-ups noticed 2026-07-12 (3) — AUDIT: DATA_SOURCES.md reachability matrix backfill
+- [ ] **Before picking a "stale UX gap" item from this backlog, spot-check it against the live app
+      first** (repeats the lesson already logged 2026-07-05 (7)/2026-07-04 (9) for stale `[ ]` UX
+      entries specifically — this cycle found the SAME staleness class in a docs-audit-flavored entry,
+      "provenance.json has no rendered surface," which was already false). A `grep -n "renderHomeDataRoom\|cc-dataroom"
+      platform/app.js platform/index.html`-style check (or `git log -S"<claimed-missing-thing>"`) before
+      starting implementation would have caught this in one command instead of a partial build +
+      revert. Worth folding into the general "spot-check before building" backlog hygiene note rather
+      than a one-off. *(LOW, trivial, process note)*
+- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix now covers every host actually hit by
+      `pipeline/*.py`/`committee/*.py`, EXCEPT the Google Places API** (`maps.googleapis.com`, used by
+      `pull_competitors.py`/`pull_google_places.py`) — the matrix's existing Google Places row cites
+      "(places_search tool)" rather than the actual REST host the pipeline scripts call directly. Not
+      wrong, just a slightly different framing (tool-call vs. raw HTTP) that a future pass could
+      reconcile into one row. *(LOW, trivial, informational)*
+- [ ] **The isochrone puller (`pull_isochrone.py`) has never been run — reachability of
+      `api.openrouteservice.org`/`api.sphere.gistda.or.th` from this sandbox is genuinely unknown**,
+      not just key-gated. If a future cycle gets a free-tier `ORS_KEY` (signup link is in the script's
+      own docstring, no payment needed) it could resolve this to a real ✅/❌ instead of ⚠ UNTESTED —
+      would unblock replacing the catchment's walk-radius estimate with a true isochrone (NEXT_STEPS.md
+      item 4). Needs a human to obtain the key first; not sandbox-actionable on its own. *(MED, S, needs
+      a human for the key)*
+
 ## Queue — follow-ups noticed 2026-07-12 — AUDIT: provenance.json census pointer
 - [x] **`docs/DATA_PROVENANCE.md` §1's hand-written table backfill for the two-objectives-relevant set —
       DONE 2026-07-12 (2)** (added 4 rows — `branch_peers.json`, `branch_density.json`,
@@ -22,20 +45,21 @@
       to link out to each builder's own `meta` block instead of duplicating it in markdown. *(LOW-MED, M
       — lower-stakes now that the two-objectives-relevant set is documented and the gate is the real
       safety net)*
-- [ ] **`pipeline/build_provenance.py`'s `provenance.json` output has no rendered surface in the
-      platform app itself** — it's a build-time/CI artifact read by docs and humans, not fetched by
-      `app.js` anywhere. A future cycle could surface its `counts` (measured/estimated/unlabelled) as
-      a small trust indicator on `#overview` or `#home` ("N of M data layers independently sourced") —
-      would directly serve CLAUDE.md's "always state measured vs estimated" mandate at the UX layer,
-      not just the docs layer. Needs a design decision on framing before building (a bare count could
-      read as "37 layers are guesses", which undersells that ESTIMATED here always means
-      honestly-labelled-with-method, not fabricated). *(MED, S-M, needs a UX framing decision first)*
-- [ ] **`docs/DATA_SOURCES.md`'s reachability matrix (fixed this cycle for `gdcatalog`) has not been
-      re-verified end-to-end against `committee/census.py`'s actual current host list** — only the
-      one contradicted row was fixed; a future AUDIT cycle could diff every row in the matrix against
-      what `committee/census.py`/`autox_dgt_ingest.py`/`pull_*.py` scripts actually hit today, since
-      this cycle found one real drift (gdcatalog) by spot-check, not a systematic pass. *(LOW, S,
-      informational)*
+- [x] **`pipeline/build_provenance.py`'s `provenance.json` output — STALE, ALREADY SHIPPED, found
+      2026-07-12 (3).** This entry was wrong: `renderHomeDataRoom()`/`#cc-dataroom-body` on the Home
+      tab already renders exactly this (headline measured/estimated/unlabelled counts + a full
+      per-layer table, framed positively), from a commit that landed before this entry was last
+      touched. Discovered mid-build-attempt this cycle — reverted the in-progress duplicate
+      (`git checkout --` on the 2 touched files) rather than ship a second copy. No code changed;
+      checked off rather than re-built. See `docs/PROGRESS_LOG.md` 2026-07-12 (3) entry.
+- [x] **`docs/DATA_SOURCES.md`'s reachability matrix re-verified end-to-end against every puller's
+      actual request host — DONE 2026-07-12 (3)** (grepped every `pipeline/*.py`/`committee/*.py` for
+      its literal request URL, diffed against the matrix table: no row was actively wrong this pass,
+      but NABC/BIS/ThaiWater/ILOSTAT — all real, already-pulled REACHABLE sources, 2 of them named in
+      CLAUDE.md's own REACHABLE bullet — had no row at all. Added 4 rows + a 5th distinguishing the
+      ORS/GISTDA isochrone puller as ⚠ UNTESTED [no vendored key, never run] rather than ❌ BLOCKED
+      [tried, failed]. Docs-only, gate reconfirmed 66/0 unchanged. Full writeup: `docs/PROGRESS_LOG.md`
+      2026-07-12 (3) entry).
 
 ## Queue — follow-ups noticed 2026-07-11 (9) — ENRICH: truck_flow.json caution strip on #acq
 - [ ] **The new `#acq` truck-watch strip and `#trend`'s full table both hardcode "worst 5"/"worst
