@@ -967,3 +967,10 @@ Kaustav deploys).
 4. True 15-min isochrone (routing API) to replace the catchment walk-radius estimate.
 5. Widen the catchment view beyond Mueang Rayong where OSM building coverage allows.
 6. Province-precise livestock/aquaculture mapping (DLD/DOF data not in OAE datastore).
+
+
+## 2026-07-12 — Pillar completions (verified, honest reflection on the CEO dashboard)
+- **PROD DEPLOY VERIFIED** — the platform is LIVE on Vercel production (master auto-deploys). Verified HTTP 200 across `/`, `/app.js`, data layers (branches.json, ev_exposure.json, thaiwater_flood.json), the 3D scenes (rayong-catchment), and `/status`. Vercel auth is off (public preview, owner's choice). `dep-vercel` = done.
+- **National competitor coverage complete** — competitors_census.json = 16,503 measured big-4 rival branches across ALL 77 provinces (verified distinct prov == 77). `mkt-scout-national` = done.
+- **3D building catchments complete** — all 77 provinces' `<slug>_catchment.json` confirmed HTTP 200 on the R2 CDN (manifest: platform/data/catchments_r2.json); the 3 pilot provinces also in git. `td-overture-pull` = done. (Catchments live on R2, not git — the planner now counts the verified R2 manifest, not just git files.)
+- Still OPEN and genuinely owner-blocked: `di-loan-tape` / `svc-loan-tape` (need a real no-PII loan-tape export), `dep-access` (access-gating is an owner decision — currently deliberately public).

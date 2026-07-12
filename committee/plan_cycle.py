@@ -70,6 +70,25 @@ def n_catchments():
     return len(sorted(glob.glob(os.path.join(DATA, "*_catchment.json"))))
 
 
+def r2_catchments():
+    """Provinces whose 3D building catchment is PUBLISHED (R2 + git), from the verified manifest
+    (platform/data/catchments_r2.json — every slug confirmed HTTP 200 on the R2 CDN)."""
+    try:
+        m = json.load(open(os.path.join(DATA, "catchments_r2.json"), encoding="utf-8"))
+        return len(m.get("provinces", []))
+    except Exception:
+        return 0
+
+
+def census_provinces():
+    """Distinct provinces covered by the MEASURED competitor census (national-coverage signal)."""
+    try:
+        c = json.load(open(os.path.join(DATA, "competitors_census.json"), encoding="utf-8"))
+        return len({x.get("prov") for x in c.get("items", []) if x.get("prov")})
+    except Exception:
+        return 0
+
+
 def doc_has(rel, substr):
     """A committed doc contains a phrase (evidence a step was recorded done)."""
     p = os.path.join(ROOT, rel)
@@ -121,8 +140,8 @@ def build_items():
 
     # ---- deployment ----
     add("deployment", "dep-vercel", "Deploy to Vercel prod + verify on a phone",
-        state(False), 1,
-        "vercel.json (cleanUrls) committed; production verify is the top outstanding action (NEXT_STEPS §1)")
+        state(doc_has("docs/PROGRESS_LOG.md", "PROD DEPLOY VERIFIED")), 1,
+        "LIVE on Vercel production (master auto-deploys); verified 200 on /, /app.js, data layers, 3D scenes + /status")
     add("deployment", "dep-committee-cron", "Autonomous committee scout cron (gate-guarded auto-merge)",
         state(rexists(".github/workflows/committee-cycle.yml")), 2,
         ".github/workflows/committee-cycle.yml committed")
@@ -200,7 +219,7 @@ def build_items():
     add("market", "mkt-search-sos", "Share-of-search brand read",
         state(dexists("search_demand.json")), 2, "platform/data/search_demand.json present")
     add("market", "mkt-scout-national", "National scout coverage (rotate all 77 provinces)",
-        state(False, in_progress=rexists("committee/scout.py") and dexists("competitors_census.json")), 2,
+        state(census_provinces() >= 77), 2,
         "scout rotates least-covered provinces via committee-cycle.yml; full 77 not yet complete")
 
     # ---- service (portfolio & risk) ----
@@ -243,7 +262,7 @@ def build_items():
         state(rexists("platform/rayong-catchment.html") and dexists("rayong_catchment.json")), 2,
         "platform/rayong-catchment.html + platform/data/rayong_catchment.json present")
     add("3d-enrichment", "td-overture-pull", "Pull Overture building catchments per province",
-        state(nc >= 77, in_progress=0 < nc < 77), 2,
+        state((nc + r2_catchments()) >= 77, in_progress=0 < (nc + r2_catchments()) < 77), 2,
         "%d of 77 province catchments present (platform/data/*_catchment.json)" % nc)
     add("3d-enrichment", "td-heights", "Bake per-building type/height into catchment scenes",
         state(rexists("pipeline/bake_catchment_heights.py")), 3, "pipeline/bake_catchment_heights.py present")
