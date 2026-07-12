@@ -34,10 +34,13 @@ export default function middleware(request) {
       if (supplied === pass) return; // authorized
     }
 
-    return new Response('Restricted — AutoX Credit Intelligence. A password is required.', {
+    return new Response('Restricted - AutoX Credit Intelligence. A password is required.', {
       status: 401,
       headers: {
-        'WWW-Authenticate': 'Basic realm="AutoX Credit Intelligence — restricted", charset="UTF-8"',
+        // NOTE: HTTP header values must be ASCII (ISO-8859-1). A non-ASCII char here (e.g. an em-dash)
+        // makes the edge silently DROP this header, so the browser never shows its native login prompt
+        // and the user is stuck on the 401 body with no way in. Keep the realm strictly ASCII.
+        'WWW-Authenticate': 'Basic realm="AutoX Credit Intelligence", charset="UTF-8"',
         'Cache-Control': 'no-store',
       },
     });
