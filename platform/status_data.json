@@ -2,17 +2,17 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T17:14:42+07:00",
-    "commit": "1a5890b"
+    "generated_at": "2026-07-12T18:19:47+07:00",
+    "commit": "30aafc2"
   },
   "overall": {
-    "progress_pct": 66,
+    "progress_pct": 80,
     "status": "on-track",
-    "eta_days": 3,
-    "eta_date": "2026-07-15",
-    "done_items": 33,
-    "in_progress_items": 8,
-    "open_items": 9,
+    "eta_days": 1,
+    "eta_date": "2026-07-13",
+    "done_items": 40,
+    "in_progress_items": 7,
+    "open_items": 3,
     "total_items": 50
   },
   "loops": [
@@ -213,10 +213,10 @@
     {
       "key": "uxui",
       "label": "UX / UI",
-      "progress_pct": 12,
-      "done": 1,
+      "progress_pct": 100,
+      "done": 8,
       "total": 8,
-      "status": "at-risk",
+      "status": "on-track",
       "items": [
         {
           "id": "ux-basemap",
@@ -228,51 +228,51 @@
         {
           "id": "ux-isochrone-guard",
           "title": "Guard rayong isochrone/trees toggles when files absent (major)",
-          "state": "open",
+          "state": "done",
           "priority": 2,
-          "evidence": "platform/data/rayong_isochrone.json still absent — toggles must hide/guard (UXUI_AUDIT #2)"
+          "evidence": "rayong-catchment.html gates isochrone/trees fetch on tiles_config scenery list — no console 404; toggle self-hides when absent (UXUI_AUDIT #2)"
         },
         {
           "id": "ux-map-overlap",
           "title": "Fix #map lens pills overlapping the zoom control on mobile (major)",
-          "state": "open",
+          "state": "done",
           "priority": 2,
-          "evidence": "open — move zoom control / collapse lenses on narrow viewports (UXUI_AUDIT #3)"
+          "evidence": "styles.css @media(max-width:430px) moves the Leaflet zoom to bottom-right, clear of the lens pills (UXUI_AUDIT #3)"
         },
         {
           "id": "ux-province-overflow",
           "title": "province.html stat-chip toolbar overflow scroller (minor)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "open — top stat-chip toolbar clips off the right edge (UXUI_AUDIT #4)"
+          "evidence": "province.html #strip is a touch horizontal scroller (-webkit-overflow-scrolling:touch + white-space:nowrap) (UXUI_AUDIT #4)"
         },
         {
           "id": "ux-theme-persist",
           "title": "Persist one theme choice across pages (minor)",
-          "state": "in_progress",
+          "state": "done",
           "priority": 3,
-          "evidence": "index.html persists autox-theme in localStorage; dark-default convention still mixed (UXUI_AUDIT #5)"
+          "evidence": "all pages read the persisted autox-theme; province/branch-explorer aligned to the SPA light default (UXUI_AUDIT #5)"
         },
         {
           "id": "ux-contrast",
           "title": "Darken light-theme --dim for WCAG AA on microcopy (minor)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "styles.css light --dim still #7A8598 (≈3.4:1, below AA) (UXUI_AUDIT #6)"
+          "evidence": "styles.css light --dim darkened to #5B6678 (≈5.4:1 on #F4F6FA, clears AA) (UXUI_AUDIT #6)"
         },
         {
           "id": "ux-favicon",
           "title": "Add a favicon (stop the 404) (polish)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "no platform/favicon.* committed (UXUI_AUDIT #7)"
+          "evidence": "platform/favicon.svg committed + linked in every page head (UXUI_AUDIT #7)"
         },
         {
           "id": "ux-branches-lead",
           "title": "Add a headline/lead line to #branches (polish)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "open — #branches opens straight into a search box, no lead (UXUI_AUDIT #8)"
+          "evidence": "index.html #branches opens with a header + lead line like the other routes (UXUI_AUDIT #8)"
         }
       ]
     },
@@ -480,6 +480,18 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T18:19:47+07:00",
+      "sha": "30aafc2",
+      "summary": "ux: catch up the UX/UI pillar — favicon, WCAG contrast, mobile fixes, theme persist, #branches lead, isochrone guard",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T10:39:41Z",
+      "sha": "4bd90c7",
+      "summary": "committee: refresh autonomy plan (run 29189456877)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-12T17:14:42+07:00",
       "sha": "1a5890b",
       "summary": "peer: per-province, per-brand peer comparison (AutoX vs each big-4 rival) (#21)",
@@ -646,18 +658,6 @@
       "sha": "9f5b2fc",
       "summary": "Fix geocode workflow: accept GOOGLE_PLACES_KEY as well as GOOGLE_MAPS_API_KEY",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T06:40:47+07:00",
-      "sha": "2c0706c",
-      "summary": "Add API keys and tokens to .env.example",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-10T06:26:47Z",
-      "sha": "286a495",
-      "summary": "AUDIT: PR #1 merged — every scheduled data workflow now registered (was dormant since 2026-06-28)",
-      "pillar": "data-integration"
     }
   ]
 }
