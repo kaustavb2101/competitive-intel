@@ -1,0 +1,128 @@
+name: Data — ORS drive-time isochrones
+
+# Pulls TRUE 15-minute driving isochrones (platform/data/<slug>_isochrone.json) from
+# OpenRouteService and publishes them to Cloudflare R2 — RUN FROM ANYWHERE via
+# Actions → "Run workflow". This is the measured replacement for the 3D catchment scene's
+# walk-radius / 10km-ring ESTIMATE (rayong-catchment.html), i.e. the `td-isochrone` roadmap item.
+#
+# WHY CI (not the laptop): the ORS key lives ONLY as the repo secret ORS_KEY (not in the local
+# .env), so the real pull has to run here. ORS's public API is reachable from GitHub runners
+# (it is NOT one of the Thai-IP-only sources), so the pull succeeds from any cloud IP.
+#
+# WHAT IT PRODUCES: real ORS GeoJSON polygons (nothing fabricated — a province that errors/rate-
+# limits is SKIPPED, not faked). pipeline/pull_isochrones.py anchors each isochrone on a real AutoX
+# branch (nearest the province centre) and writes the exact FeatureCollection shape the scene reads
+# (window.ISO / optScene('iso','_isochrone.json')).
+#
+# WHERE THEY LAND: the isochrone JSONs are SMALL (a few KB each) but there are many, so — mirroring
+# the catchment pattern — they are UPLOADED TO R2 (pipeline/upload_r2.py, R2_PREFIX="",
+# --glob '*_isochrone.json'). The scene fetches <slug>_isochrone.json locally first, then from R2
+# (tiles_config.json -> catchments.baseUrl), so nothing heavy is committed to git.
+#
+# ENABLING A PROVINCE IN THE SCENE: the iso toggle is gated by tiles_config.json's "scenery"
+# allowlist (window.HAS_SCENERY). "rayong" is seeded. To light up more provinces after a pull,
+# add their slugs to that list + regenerate provenance.json, e.g. on the desktop:
+#     python3 pipeline/pull_isochrones.py --only <slugs> --register-scenery   # (after downloading
+#     python3 pipeline/build_provenance.py                                    #  R2 files locally)
+# then commit tiles_config.json + provenance.json. (Kept out of this job so it stays a pure,
+# commit-free R2 publish exactly like data-overture.yml's collect job.)
+#
+# INPUTS
+#   provinces   comma-separated slugs (ignored when all=true)
+#   all         true = pull EVERY province in province_bbox.json
+#   range_min   isochrone range in minutes (default 15)
+
+on:
+  workflow_dispatch:
+    inputs:
+      provinces:
+        description: "Province slugs, comma-separated (ignored when all=true)"
+        required: false
+        default: "rayong"
+        type: string
+      all:
+        description: "Pull EVERY province in province_bbox.json"
+        required: false
+        default: false
+        type: boolean
+      range_min:
+        description: "Isochrone range in minutes (default 15)"
+        required: false
+        default: "15"
+        type: string
+  schedule:
+    # Monthly self-refresh — 5th of the month, 05:00 UTC (12:00 Bangkok). Behaves as all=true.
+    - cron: "0 5 5 * *"
+
+permissions:
+  contents: read
+
+# Queue overlapping runs rather than cancel — a scheduled run must not kill a manual one.
+concurrency:
+  group: data-isochrones
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Pull ORS isochrones
+        env:
+          ORS_KEY: ${{ secrets.ORS_KEY }}
+          PROVINCES: ${{ inputs.provinces }}
+          PULL_ALL: ${{ inputs.all }}
+          RANGE_MIN: ${{ inputs.range_min }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ -z "${ORS_KEY}" ]; then
+            echo "::error::ORS_KEY secret is not set on this repo — add it (Settings → Secrets → Actions)."
+            exit 1
+          fi
+          # A scheduled run behaves as all=true (refresh every province).
+          if [ "${PULL_ALL}" = "true" ] || [ "${EVENT}" = "schedule" ]; then
+            SEL="--all"
+          else
+            SEL="--only ${PROVINCES:-rayong}"
+          fi
+          # Per-province failures are NON-FATAL (script exits 2); keep going so the upload step still
+          # publishes whatever succeeded. A hard failure (exit 1, e.g. missing key) still stops the job.
+          set +e
+          python pipeline/pull_isochrones.py $SEL --range-min "${RANGE_MIN:-15}"
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 2 ]; then
+            echo "::error::pull_isochrones.py failed hard (exit $rc)"; exit "$rc"
+          fi
+          if [ "$rc" -eq 2 ]; then
+            echo "::warning::some provinces were skipped (rate-limit/error) — publishing the rest"
+          fi
+          NW="$(ls platform/data/*_isochrone.json 2>/dev/null | wc -l | tr -d ' ')"
+          echo "ISO_COUNT=${NW}" >> "$GITHUB_ENV"
+          echo "Produced ${NW} isochrone file(s)."
+
+      - name: Publish isochrones to R2 (root prefix, like catchments)
+        if: ${{ env.ISO_COUNT != '0' }}
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PREFIX: ""
+        run: |
+          if [ -z "${R2_ACCOUNT_ID}" ] || [ -z "${R2_BUCKET}" ]; then
+            echo "::error::R2 secrets not set — cannot publish isochrones. Need R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_BUCKET."
+            exit 1
+          fi
+          pip install boto3
+          echo "Uploading ${ISO_COUNT} isochrone(s) to R2 root ..."
+          # Same publish path as the 3D catchments: the app fetches <baseUrl>/<slug>_isochrone.json
+          # with a local-file fallback. Idempotent (size-skip on re-runs).
+          python pipeline/upload_r2.py --glob '*_isochrone.json'
+          echo "Done — every province in tiles_config.json 'scenery' now renders its MEASURED 15-min drive-time isochrone from R2."

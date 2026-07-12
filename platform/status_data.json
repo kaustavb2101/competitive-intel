@@ -2,17 +2,17 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T18:25:07+07:00",
-    "commit": "ed04799"
+    "generated_at": "2026-07-12T18:27:35+07:00",
+    "commit": "b55598e"
   },
   "overall": {
-    "progress_pct": 86,
+    "progress_pct": 88,
     "status": "on-track",
     "eta_days": 1,
     "eta_date": "2026-07-13",
-    "done_items": 43,
+    "done_items": 44,
     "in_progress_items": 4,
-    "open_items": 3,
+    "open_items": 2,
     "total_items": 50
   },
   "loops": [
@@ -428,8 +428,8 @@
     {
       "key": "3d-enrichment",
       "label": "3D enrichment",
-      "progress_pct": 67,
-      "done": 4,
+      "progress_pct": 83,
+      "done": 5,
       "total": 6,
       "status": "on-track",
       "items": [
@@ -471,14 +471,20 @@
         {
           "id": "td-isochrone",
           "title": "True 15-min street-network isochrone (replace walk-radius)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "open — needs a routing API isochrone (NEXT_STEPS §3)"
+          "evidence": "pipeline/pull_isochrones.py + .github/workflows/data-isochrones.yml present (ORS driving-car 15-min → R2; scene prefers it over the estimated walk-radius ring)"
         }
       ]
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-12T18:27:35+07:00",
+      "sha": "b55598e",
+      "summary": "Merge remote-tracking branch 'origin/claude/ux-catchup'",
+      "pillar": "uxui"
+    },
     {
       "date": "2026-07-12T18:25:07+07:00",
       "sha": "ed04799",
@@ -496,6 +502,18 @@
       "sha": "15571a6",
       "summary": "data: catch up the Data-integration pillar (measured farm-gate prices + national competitor census)",
       "pillar": "market"
+    },
+    {
+      "date": "2026-07-12T18:20:03+07:00",
+      "sha": "ea3026a",
+      "summary": "ux: regenerate autonomy dashboard — UX/UI pillar 1/8 -> 8/8",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-12T18:19:47+07:00",
+      "sha": "30aafc2",
+      "summary": "ux: catch up the UX/UI pillar — favicon, WCAG contrast, mobile fixes, theme persist, #branches lead, isochrone guard",
+      "pillar": "3d-enrichment"
     },
     {
       "date": "2026-07-12T18:19:00+07:00",
@@ -640,24 +658,6 @@
       "sha": "d32804c",
       "summary": "pipeline: automated data.go.th + NSO puller (Thai-IP), 10/12 sources live",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T08:19:14+07:00",
-      "sha": "faff6c0",
-      "summary": "committee-cycle: run the competitor SCOUT, not the geocoder",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T01:02:21Z",
-      "sha": "532d41f",
-      "summary": "data: DIW factory + DLT vehicle census (cloud CKAN, run 29174641547)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T08:01:04+07:00",
-      "sha": "dfefc1d",
-      "summary": "ci: autonomous cloud enrichment loop + monthly 3D self-refresh",
-      "pillar": "3d-enrichment"
     }
   ]
 }
