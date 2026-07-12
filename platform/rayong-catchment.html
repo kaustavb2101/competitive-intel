@@ -242,9 +242,11 @@ html[data-theme="light"] #bldglegend .bl-bar{background:linear-gradient(90deg,rg
 #isolegend .il-ttl{font:600 10px 'IBM Plex Mono';color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
 #isolegend .il{display:inline-flex;align-items:center;gap:5px;font:600 11px 'IBM Plex Sans Thai';color:var(--txt)}
 #isolegend .il .sw{width:14px;height:9px;border-radius:3px;flex:none;border:1px solid rgba(255,255,255,.25)}
+#isolegend .il-tag{font:600 9px 'IBM Plex Mono';color:#3fc4ab;letter-spacing:.3px}
 html[data-theme="light"] #isolegend{border-bottom-color:#D3DAE6}
 html[data-theme="light"] #isolegend .il-ttl{color:#828CA0}
 html[data-theme="light"] #isolegend .il{color:#2C3444}
+html[data-theme="light"] #isolegend .il-tag{color:#178a76}
 
 /* competitor-brand legend (Upgrade 3) — measured rival brands present in this scene */
 #complegend{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:7px;
@@ -1551,6 +1553,10 @@ function render(){
   // or carries the whole city when none does. The curated core always draws on top.
   const STREAMB=streamBuildingLayer();
   // (0a) isochrone travel-time bands — above ground bed, under buildings/markers. Toggleable + null-guarded.
+  // A MEASURED drive-time isochrone (window.ISO, from ORS via pull_isochrones.py) is the reachable-area
+  // layer and is PREFERRED over the estimated focal walk/10km-reach ring below (kept as the graceful
+  // fallback only where no isochrone exists).
+  const HASISO=!!(window.ISO&&window.ISO.features&&window.ISO.features.length);
   if(showIso)L.push(...isoLayers());
   // (0) district context — FLAT (not extruded). GeoJsonLayer natively renders the Mueang/Klaeng MultiPolygon parts.
   if(DISTRICTS && deck.GeoJsonLayer){
@@ -1567,7 +1573,7 @@ function render(){
       extruded:false,material:false,stroked:true,filled:true,
       getFillColor:[GOLD[0],GOLD[1],GOLD[2],ringFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],70],
       lineWidthMinPixels:1,pickable:false}));
-    if(focal){
+    if(focal && !HASISO){   // MEASURED isochrone (when present) supersedes the estimated focal reach ring
       L.push(new deck.PolygonLayer({id:'ring10-focus',data:[focal],getPolygon:b=>circle(b.y,b.x,10000),
         extruded:false,material:false,stroked:true,filled:true,
         getFillColor:[GOLD[0],GOLD[1],GOLD[2],focusFillA],getLineColor:[GOLD[0],GOLD[1],GOLD[2],235],
@@ -2406,10 +2412,16 @@ function buildIsoLegend(){
   const mins=[...new Set(feats.map(f=>isoMinutes(f)).filter(m=>m!=null))].sort((a,b)=>a-b);
   if(!mins.length){host.style.display='none';return;}
   host.style.display='flex';
-  host.innerHTML='<span class="il-ttl">Drive time</span>'+mins.map(m=>{
+  // provenance tag: the isochrone is a MEASURED drive-time reach (ORS), in contrast to the estimated
+  // 10km reach ring it supersedes. Read from ISO.meta (pull_isochrones.py stamps measured + profile).
+  const meta=(ISO&&ISO.meta)||{};
+  const measured=meta.measured===true||/measured/i.test(String(meta.provenance||''));
+  const prof=(meta.profile||'driving-car').replace('driving-car','drive-time');
+  const tag=measured?('measured · ORS '+prof):('ORS '+prof);
+  host.innerHTML='<span class="il-ttl">Drive-time reach</span>'+mins.map(m=>{
     const c=isoColor(m);
     return `<span class="il"><span class="sw" style="background:rgba(${c[0]},${c[1]},${c[2]},.55)"></span>${m} min</span>`;
-  }).join('');
+  }).join('')+`<span class="il-tag">${tag}</span>`;
 }
 
 /* ---------- competitor-brand legend (measured rivals in this scene) — LANE 3D-2 -------------------
@@ -2742,13 +2754,13 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
  function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
  var P='data/'+CITY;
- // Optional per-city SCENERY layers — isochrone drive-time bands, street trees, rail. Each is
- // produced per city by a dedicated pull (pull_isochrone.py etc.) that is not wired for ANY province
- // yet, so fetching <city>_<layer>.json always 404s. That is harmless at the JS level (every consumer
- // is null-guarded and the isochrone toggle self-hides when absent) but it is console noise on every
- // scene. Gate the fetch on an explicit allowlist so NO request fires until a layer actually ships —
- // add a city here the moment its file lands and the layer (and, for iso, its toggle) light back up.
- var SCENERY_CITIES={iso:{},trees:{},rail:{}};   // e.g. iso:{rayong:1} once <city>_isochrone.json ships
+ // Optional per-city SCENERY layers — street trees + rail — produced per city by a dedicated pull
+ // that is not wired for any province yet, so fetching <city>_<layer>.json would 404 (console noise)
+ // and the consumers null-guard on absence. Gate their fetch on this explicit allowlist so NO request
+ // fires until a layer actually ships. NOTE: the ISOCHRONE (drive-time reach) is gated separately, by
+ // the tiles_config.json "scenery" allowlist (window.HAS_SCENERY) + fetched via gopt (local→R2), since
+ // pull_isochrones.py publishes it to R2 like the catchments; see the iso slot in the Promise.all below.
+ var SCENERY_CITIES={iso:{},trees:{},rail:{}};   // trees/rail only — iso uses tiles_config.scenery (HAS_SCENERY)
  function optScene(kind,sfx){return SCENERY_CITIES[kind][CITY]?opt(P+sfx):Promise.resolve(null);}
  // CALM GRACEFUL STATE — the per-province 3D building file (<slug>_catchment.json) is pulled
  // from the desktop per province (pull_overture_buildings.py --province <slug>) and lands over
@@ -2832,7 +2844,10 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // (committed files serve most provinces; R2 serves any too big to commit — see
    // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
    gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
-   optScene('iso','_isochrone.json'),
+   // isochrone (MEASURED ORS 15-min drive-time reach): gated by the tiles_config "scenery" allowlist
+   // (window.HAS_SCENERY) and fetched local-first then from R2 (gopt), exactly like the catchments —
+   // so a province registered in scenery lights up its measured reach whether the file is committed or on R2.
+   (window.HAS_SCENERY?gopt('_isochrone.json'):Promise.resolve(null)),
    // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
    // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
    Promise.resolve(null), Promise.resolve(null),

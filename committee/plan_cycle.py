@@ -267,7 +267,8 @@ def build_items():
     add("3d-enrichment", "td-heights", "Bake per-building type/height into catchment scenes",
         state(rexists("pipeline/bake_catchment_heights.py")), 3, "pipeline/bake_catchment_heights.py present")
     add("3d-enrichment", "td-isochrone", "True 15-min street-network isochrone (replace walk-radius)",
-        state(False), 3, "open — needs a routing API isochrone (NEXT_STEPS §3)")
+        state(rexists("pipeline/pull_isochrones.py") and rexists(".github/workflows/data-isochrones.yml")), 3,
+        "pipeline/pull_isochrones.py + .github/workflows/data-isochrones.yml present (ORS driving-car 15-min → R2; scene prefers it over the estimated walk-radius ring)")
 
     return items
 

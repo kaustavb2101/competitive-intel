@@ -9,6 +9,8 @@
     "baseUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev",
     "note": "operator CDN (Cloudflare R2) hosting the 77 per-province <slug>_catchment.json Overture pulls (real building footprints, ~35MB each — too large for git). rayong-catchment.html falls back to <baseUrl>/<slug>_catchment.json when the local file is absent; a CDN miss degrades to the calm not-pulled notice."
   },
+  "scenery": ["rayong"],
+  "sceneryNote": "Allowlist of province slugs that have an optional MEASURED drive-time isochrone (pipeline/pull_isochrones.py → ORS driving-car 15-min, published to R2 by .github/workflows/data-isochrones.yml). rayong-catchment.html reads this as window.HAS_SCENERY: a listed province fetches <slug>_isochrone.json (local first, then catchments.baseUrl on R2) and renders it as the reachable-area layer — preferred over, and labelled MEASURED vs, the estimated 10km reach ring. Unlisted provinces skip the fetch (no 404) and keep the ring. To enable a province after a pull: add its slug here + rerun pipeline/build_provenance.py, then commit both.",
   "buildings": {
     "pmtilesUrl": "https://pub-10384b83bd7245a68fd67916aa7f76ea.r2.dev/buildings_rayong.pmtiles",
     "mvtUrl": null,

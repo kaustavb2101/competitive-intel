@@ -2,17 +2,17 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T18:27:35+07:00",
-    "commit": "b55598e"
+    "generated_at": "2026-07-12T19:19:15+07:00",
+    "commit": "30f6d01"
   },
   "overall": {
-    "progress_pct": 92,
+    "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
     "eta_date": "2026-07-13",
-    "done_items": 46,
+    "done_items": 47,
     "in_progress_items": 2,
-    "open_items": 2,
+    "open_items": 1,
     "total_items": 50
   },
   "loops": [
@@ -428,8 +428,8 @@
     {
       "key": "3d-enrichment",
       "label": "3D enrichment",
-      "progress_pct": 83,
-      "done": 5,
+      "progress_pct": 100,
+      "done": 6,
       "total": 6,
       "status": "on-track",
       "items": [
@@ -471,14 +471,20 @@
         {
           "id": "td-isochrone",
           "title": "True 15-min street-network isochrone (replace walk-radius)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "open — needs a routing API isochrone (NEXT_STEPS §3)"
+          "evidence": "pipeline/pull_isochrones.py + .github/workflows/data-isochrones.yml present (ORS driving-car 15-min → R2; scene prefers it over the estimated walk-radius ring)"
         }
       ]
     }
   ],
   "activity": [
+    {
+      "date": "2026-07-12T19:19:15+07:00",
+      "sha": "30f6d01",
+      "summary": "dashboard: reflect genuinely-done pillar items (prod deploy, national census, 3D-on-R2)",
+      "pillar": "3d-enrichment"
+    },
     {
       "date": "2026-07-12T18:27:35+07:00",
       "sha": "b55598e",
@@ -652,12 +658,6 @@
       "sha": "d80f006",
       "summary": "fix(ux): branch-explorer basemap dead ({s} token) + record QA/UXUI audit",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T08:34:29+07:00",
-      "sha": "d32804c",
-      "summary": "pipeline: automated data.go.th + NSO puller (Thai-IP), 10/12 sources live",
-      "pillar": "data-integration"
     }
   ]
 }
