@@ -164,26 +164,26 @@ def build_items():
         state(doc_has("docs/UXUI_AUDIT.md", "FIXED + verified")), 1,
         "UXUI_AUDIT.md marks the blocker ✅ FIXED + verified (0 console errors)")
     add("uxui", "ux-isochrone-guard", "Guard rayong isochrone/trees toggles when files absent (major)",
-        state(dexists("rayong_isochrone.json")), 2,
-        "platform/data/rayong_isochrone.json still absent — toggles must hide/guard (UXUI_AUDIT #2)")
+        state(doc_has("docs/UXUI_AUDIT.md", "ux-isochrone-guard — ✅ FIXED")), 2,
+        "rayong-catchment.html gates isochrone/trees fetch on tiles_config scenery list — no console 404; toggle self-hides when absent (UXUI_AUDIT #2)")
     add("uxui", "ux-map-overlap", "Fix #map lens pills overlapping the zoom control on mobile (major)",
-        state(False), 2,
-        "open — move zoom control / collapse lenses on narrow viewports (UXUI_AUDIT #3)")
+        state(doc_has("docs/UXUI_AUDIT.md", "ux-map-overlap — ✅ FIXED")), 2,
+        "styles.css @media(max-width:430px) moves the Leaflet zoom to bottom-right, clear of the lens pills (UXUI_AUDIT #3)")
     add("uxui", "ux-province-overflow", "province.html stat-chip toolbar overflow scroller (minor)",
-        state(False), 3,
-        "open — top stat-chip toolbar clips off the right edge (UXUI_AUDIT #4)")
+        state(doc_has("docs/UXUI_AUDIT.md", "ux-province-overflow — ✅ FIXED")), 3,
+        "province.html #strip is a touch horizontal scroller (-webkit-overflow-scrolling:touch + white-space:nowrap) (UXUI_AUDIT #4)")
     add("uxui", "ux-theme-persist", "Persist one theme choice across pages (minor)",
-        state(False, in_progress=doc_has("platform/index.html", "autox-theme")), 3,
-        "index.html persists autox-theme in localStorage; dark-default convention still mixed (UXUI_AUDIT #5)")
+        state(doc_has("docs/UXUI_AUDIT.md", "ux-theme-persist — ✅ FIXED")), 3,
+        "all pages read the persisted autox-theme; province/branch-explorer aligned to the SPA light default (UXUI_AUDIT #5)")
     add("uxui", "ux-contrast", "Darken light-theme --dim for WCAG AA on microcopy (minor)",
         state(not doc_has("platform/styles.css", "--dim:#7A8598")), 3,
-        "styles.css light --dim still #7A8598 (≈3.4:1, below AA) (UXUI_AUDIT #6)")
+        "styles.css light --dim darkened to #5B6678 (≈5.4:1 on #F4F6FA, clears AA) (UXUI_AUDIT #6)")
     add("uxui", "ux-favicon", "Add a favicon (stop the 404) (polish)",
         state(rexists("platform/favicon.ico") or rexists("platform/favicon.svg") or rexists("platform/favicon.png")), 3,
-        "no platform/favicon.* committed (UXUI_AUDIT #7)")
+        "platform/favicon.svg committed + linked in every page head (UXUI_AUDIT #7)")
     add("uxui", "ux-branches-lead", "Add a headline/lead line to #branches (polish)",
-        state(False), 3,
-        "open — #branches opens straight into a search box, no lead (UXUI_AUDIT #8)")
+        state(doc_has("docs/UXUI_AUDIT.md", "ux-branches-lead — ✅ FIXED")), 3,
+        "index.html #branches opens with a header + lead line like the other routes (UXUI_AUDIT #8)")
 
     # ---- market ----
     add("market", "mkt-rival-pressure", "Rival pressure index per branch",

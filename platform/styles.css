@@ -397,6 +397,12 @@ html[data-theme="light"] .lens-more-menu{background:rgba(255,255,255,.98)}
   border:1px solid var(--line);border-radius:10px;padding:5px 7px}
 /* keep Leaflet's own zoom control clear of the pill row */
 .maphero .leaflet-top.leaflet-left{margin-top:56px}
+/* PHONE (≤430px): the hero lens pills wrap into 2–3 rows over the top-left of the map and collide
+   with Leaflet's zoom +/− control (legibility + tap accuracy). Move the zoom to the bottom-right,
+   above the attribution bar and clear of the pill row entirely, no matter how many rows it wraps. */
+@media(max-width:430px){
+  .maphero .leaflet-top.leaflet-left{top:auto;bottom:30px;left:auto;right:12px;margin-top:0}
+}
 
 /* ---------- legend demoted to ONE quiet line under the map ---------- */
 .maplegend-line{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:var(--s2) 0 0}
@@ -534,7 +540,7 @@ html[data-theme="light"]{
   --bg:#F4F6FA; --bg-top:#FBFCFE;
   --panel2:#ECEFF5; --panel:#FFFFFF; --raised:#F7F9FD;
   --line:#DCE1EB; --line2:#EBEEF4;
-  --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#7A8598;
+  --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#5B6678;  /* --dim darkened from #7A8598 (≈3.4:1) to clear WCAG AA (≈5.4:1 on #F4F6FA) on microcopy */
   --accent:#4C6EF0; --accent-soft:rgba(76,110,240,.12); --accent-glow:rgba(76,110,240,.28);
   --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --opp:#A67714; --gold:#A67714;
   --up:#0E7C68; --down:#C0392F;

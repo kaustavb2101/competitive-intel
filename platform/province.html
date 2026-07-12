@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved, else dark */
-(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'dark';document.documentElement.dataset.theme=(t==='light'?'light':'dark');}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<script>/* set theme before paint to avoid flash; ?theme= overrides, else saved autox-theme, else light — matches the SPA front door so the default theme is consistent across pages (a saved choice still wins) */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Province · เงินไชโย — Deep-Dive</title>
+<link rel="icon" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
 <script src="pmtiles-layer.js"></script>
@@ -43,6 +44,7 @@ html[data-theme="light"] #vignette{
 
 /* top brand strip (KPI chips) */
 #strip{position:fixed;top:44px;left:0;right:0;z-index:9;display:flex;gap:6px;padding:9px 12px;overflow-x:auto;
+ -webkit-overflow-scrolling:touch;white-space:nowrap;
  background:linear-gradient(180deg,rgba(7,10,17,.88),rgba(7,10,17,0));scrollbar-width:none;align-items:center}
 #strip::-webkit-scrollbar{display:none}
 #strip .ttl{font:700 13px 'IBM Plex Sans Thai';color:#fff;white-space:nowrap;margin-right:4px}

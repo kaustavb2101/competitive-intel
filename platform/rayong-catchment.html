@@ -6,6 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Rayong 3D · เงินไชโย</title>
+<link rel="icon" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
 <script src="pmtiles-layer.js"></script>
@@ -531,7 +532,7 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
     <div class="glab">Layers</div>
     <div class="acts">
       <button id="ringtog" class="on">10 km reach rings</button>
-      <button id="isotog" class="on">Isochrone</button>
+      <button id="isotog" class="on" style="display:none">Isochrone</button>
       <button id="orbittog" title="Gentle auto-orbit (pauses when you move the map)">Auto-orbit</button>
       <button id="postertog" title="Poster mode — hide overlays, frame the skyline edge-to-edge, download a shareable PNG">📸 Poster</button>
     </div>
@@ -2772,6 +2773,16 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  opt('data/tiles_config.json').then(function(TILECFG){
  var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
  if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
+ // Optional scenery (travel-time isochrone bands + street trees) is pulled per-province by
+ // pull_isochrone.py, which has run for NO province yet — so requesting <slug>_isochrone.json /
+ // <slug>_trees.json 404s (console noise) and would leave the isochrone toggle dead. Only fetch them
+ // for a province the operator has registered as having scenery, via tiles_config.json's "scenery"
+ // list (e.g. {"scenery":["rayong"]}); an absent/unlisted province skips the fetch entirely, so no
+ // 404. buildIsoLegend() already self-hides the isochrone toggle+legend when window.ISO is empty, so
+ // an unlisted province shows neither a console 404 nor a dead toggle.
+ // window-scoped so BOTH the first-wave isochrone fetch (this closure) AND the deferred second-wave
+ // trees fetch (a later .then/setTimeout closure) can read it without a ReferenceError.
+ window.HAS_SCENERY=!!(TILECFG&&Array.isArray(TILECFG.scenery)&&TILECFG.scenery.indexOf(CITY)>-1);
  var gopt=function(sfx){return fetch(P+sfx).then(function(r){
    if(r.ok)return r.json();
    if(r.status===404&&cdnBase)return fetch(cdnBase+'/'+CITY+sfx).then(function(r2){return r2.ok?r2.json():null;}).catch(function(){return null;});
@@ -2813,7 +2824,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // (committed files serve most provinces; R2 serves any too big to commit — see
    // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
    gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
-   opt(P+'_isochrone.json'),
+   window.HAS_SCENERY?opt(P+'_isochrone.json'):Promise.resolve(null),
    // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
    // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
    Promise.resolve(null), Promise.resolve(null),
@@ -2880,7 +2891,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
          opt('data/occupation_leads.json'),
          opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
          opt('data/catchment_poi.json'),
-         opt(P+'_trees.json'), opt(P+'_rail.json')
+         window.HAS_SCENERY?opt(P+'_trees.json'):Promise.resolve(null), opt(P+'_rail.json')
        ]).then(function(d){
          try{if(window.applyDeferred)window.applyDeferred({occ:d[0],comp:d[1],poi:d[2],trees:d[3],rail:d[4]});}
          catch(e){try{console.error('deferred apply failed:',e);}catch(_){}}
