@@ -1,25 +1,33 @@
 name: Data — Overture province catchments
 
 # Pulls the per-province 3D building catchments (platform/data/<slug>_catchment.json)
-# from Overture Maps — RUN FROM YOUR PHONE via Actions → "Run workflow".
+# from Overture Maps — RUN FROM ANYWHERE via Actions → "Run workflow" (no Thai IP needed).
 #
 # WHY THIS WORKS HERE: GitHub-hosted runners have unrestricted internet, so Overture's
 # S3 (blocked from the cloud sandbox's IP) downloads fine. This workflow does NOT touch
-# the Thai-IP-only sources (data.go.th, DLT) — those are geo-blocked from Actions too
-# and still need the owner's Thai laptop.
+# the Thai-IP-only sources (data.go.th, DLT) — those are geo-blocked from Actions too.
+#
+# RESILIENT MATRIX DESIGN (why this is not one long job):
+#   GitHub-hosted runners get preempted on long jobs ("The runner has received a shutdown
+#   signal"). The old single-job design committed only at the very end, so a mid-run
+#   preemption discarded every province pulled so far. Instead we fan out:
+#     prep    -> decides which provinces to pull, splits them into SMALL chunks (default 3)
+#     pull    -> a matrix job per chunk; each uploads its catchment files as an ARTIFACT.
+#                fail-fast:false — a preempted/failed chunk only loses ITS provinces.
+#     collect -> downloads every surviving artifact, commits them in ONE draft PR.
+#   So losing a runner costs at most one 3-province chunk, and whatever succeeded still lands.
 #
 # WHAT IT PRODUCES: real Overture building footprints (nothing fabricated), converted by
 # pipeline/pull_overture_buildings.py into the exact catchment shape the 3D scene reads
-# (rayong-catchment.html?city=<slug>). Results are committed to a fresh data/overture-<run_id>
-# branch and opened as a DRAFT PR back to the branch you dispatched from — this workflow
-# NEVER pushes to your working branch, so it can't race a concurrent session. Review the
-# PR on your phone, then merge.
+# (rayong-catchment.html?city=<slug>). Committed to a fresh data/overture-<run_id> branch
+# and opened as a DRAFT PR back to the branch you dispatched from — never pushed to your
+# working branch, so it can't race a concurrent session. Review on your phone, then merge.
 #
 # INPUTS
-#   provinces      comma-separated slugs (same slugs as platform/data/provinces/index.json)
+#   provinces      comma-separated slugs (ignored when all=true); unknown slugs are dropped
 #   max_buildings  per-province size cap; 60000 keeps files web-sized (~12 MB)
-#   all            true = every province missing a catchment file (long run; failures per
-#                  province are non-fatal — whatever succeeded still lands in the PR)
+#   all            true = every province MISSING a catchment file
+#   chunk_size     provinces per matrix job (smaller = more resilient, more jobs)
 
 on:
   workflow_dispatch:
@@ -35,81 +43,146 @@ on:
         default: "60000"
         type: string
       all:
-        description: "Pull EVERY province missing a catchment file (long run)"
+        description: "Pull EVERY province missing a catchment file"
         required: false
         default: false
         type: boolean
+      chunk_size:
+        description: "Provinces per matrix job (smaller = more resilient to runner preemption)"
+        required: false
+        default: "3"
+        type: string
   schedule:
-    # Monthly self-refresh — 1st of the month, 04:00 UTC (11:00 Bangkok). Overture footprints change
-    # slowly and provinces already pulled are skipped, so a monthly run only fills the remaining gaps
-    # cheaply. On a scheduled run the job behaves as all=true (every province still missing a catchment).
+    # Monthly self-refresh — 1st of the month, 04:00 UTC (11:00 Bangkok). Provinces already
+    # pulled are skipped, so a monthly run only fills remaining gaps. Behaves as all=true.
     - cron: "0 4 1 * *"
 
 permissions:
   contents: write
   pull-requests: write
 
+# Queue overlapping runs rather than cancel — a scheduled run must not kill a manual one.
+concurrency:
+  group: overture-catchments
+  cancel-in-progress: false
+
 jobs:
-  pull:
+  # 1) Decide the work list and split into small chunks -> strategy.matrix
+  prep:
     runs-on: ubuntu-latest
-    # a full 77-province run can take hours (per-province Overture download + convert)
-    timeout-minutes: 300
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          # Same pin as qa.yml: match the Python the committed data is generated under.
           python-version: "3.11"
-
-      - name: Install Overture CLI
-        run: pip install overturemaps
-
-      - name: Pull Overture catchments
+      - name: Plan matrix
+        id: plan
         env:
           PROVINCES: ${{ inputs.provinces }}
-          MAX_BUILDINGS: ${{ inputs.max_buildings }}
           PULL_ALL: ${{ inputs.all }}
+          CHUNK_SIZE: ${{ inputs.chunk_size }}
           EVENT: ${{ github.event_name }}
-        run: |
-          # Scheduled runs carry no dispatch inputs, so default the cap and treat the monthly
-          # cron as all=true (fill every province still missing a catchment).
-          ARGS=(--max-buildings "${MAX_BUILDINGS:-60000}")
-          if [ "$EVENT" != "schedule" ] && [ "$PULL_ALL" != "true" ]; then
-            ARGS+=(--only "$PROVINCES")
-          fi
-          echo "running: python pipeline/pull_all_provinces.py ${ARGS[*]}"
-          # Per-province failures are NON-FATAL: the batch script already continues past a
-          # failed slug and exits 2 if any failed. We still commit whatever succeeded.
-          python pipeline/pull_all_provinces.py "${ARGS[@]}" || \
-            echo "::warning::some provinces failed to pull — committing the ones that succeeded (see log above)"
+        run: python .github/scripts/plan_overture_matrix.py
 
+  # 2) One SHORT job per chunk. fail-fast:false + non-fatal per province -> maximum survivorship.
+  pull:
+    needs: prep
+    if: ${{ needs.prep.outputs.count != '0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        chunk: ${{ fromJSON(needs.prep.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Overture CLI
+        run: pip install overturemaps
+      - name: Pull chunk (${{ matrix.chunk.slugs }})
+        env:
+          SLUGS: ${{ matrix.chunk.slugs }}
+          MAX_BUILDINGS: ${{ inputs.max_buildings }}
+        run: |
+          # Per-province failures are NON-FATAL (the batch script continues and exits 2); the
+          # message keeps the artifact-upload step running so provinces that DID pull are kept.
+          python pipeline/pull_all_provinces.py --only "$SLUGS" \
+            --max-buildings "${MAX_BUILDINGS:-60000}" || \
+            echo "::warning::chunk ${{ matrix.chunk.idx }} had per-province failures — keeping what succeeded"
+      - name: Upload catchment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: catchments-${{ matrix.chunk.idx }}
+          path: platform/data/*_catchment.json
+          if-no-files-found: ignore
+          retention-days: 3
+
+  # 3) Gather every surviving artifact and commit them in ONE draft PR. always() so a preempted
+  #    chunk doesn't stop the successful ones from landing.
+  collect:
+    needs: [prep, pull]
+    if: ${{ always() && needs.prep.outputs.count != '0' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download all catchment artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: catchments-*
+          merge-multiple: true
+          path: _pulled
+      - name: Stage pulled catchments
+        run: |
+          shopt -s nullglob
+          files=(_pulled/*_catchment.json)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No catchment artifacts produced (every chunk failed?). Nothing to commit."
+            echo "HAVE_DATA=0" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          cp _pulled/*_catchment.json platform/data/
+          rm -rf _pulled
+          # Refresh the province bbox index deterministically (network-free).
+          python pipeline/pull_overture_buildings.py --bbox-only || true
+          echo "HAVE_DATA=1" >> "$GITHUB_ENV"
       - name: Commit to a data branch + open a draft PR
+        if: ${{ env.HAVE_DATA == '1' }}
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/overture-${{ github.run_id }}
         run: |
-          # Only the pulled data files — never anything else.
           git add platform/data/province_bbox.json
           git add platform/data/*_catchment.json
           if git diff --cached --quiet; then
-            echo "No new or changed catchment files (all requested provinces were already pulled?)."
+            echo "No new or changed catchment files (all requested provinces already had one)."
             echo "Nothing to commit — no PR opened."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$DATA_BRANCH"
+          NNEW="$(git diff --cached --name-only | grep -c '_catchment.json$' || true)"
           SUMMARY="$(git diff --cached --stat | tail -1)"
-          git commit -m "data: Overture province catchments (run ${{ github.run_id }})" \
-                     -m "Pulled by .github/workflows/data-overture.yml — real Overture building footprints, converted by pipeline/pull_overture_buildings.py."
+          git commit -m "data: Overture province catchments (run ${{ github.run_id }}, ${NNEW} provinces)" \
+                     -m "Pulled by .github/workflows/data-overture.yml (resilient matrix) — real Overture building footprints, converted by pipeline/pull_overture_buildings.py."
           git push origin "$DATA_BRANCH"
           {
             echo "Automated Overture catchment pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
             echo
-            echo "**Files** ($SUMMARY):"
+            echo "**${NNEW} new/updated province catchment(s)** ($SUMMARY):"
             echo '```'
             git diff --name-only HEAD~1 | while read -r f; do
               printf '%s  (%s)\n' "$f" "$(du -h "$f" | cut -f1)"
@@ -117,13 +190,9 @@ jobs:
             echo '```'
             echo
             echo "Provenance: MEASURED Overture Maps building footprints (heights measured where"
-            echo "Overture has them, estimated from type+footprint otherwise — same model as the"
-            echo "committed Rayong catchment). Nothing fabricated."
-            echo
-            echo "Merge this and every listed province's 3D scene (rayong-catchment.html?city=slug) lights up."
-          } > /tmp/pr_body.md
-          gh pr create --draft \
-            --base "$BASE_BRANCH" \
-            --head "$DATA_BRANCH" \
-            --title "data: Overture catchments (run ${{ github.run_id }})" \
-            --body-file /tmp/pr_body.md
+            echo "Overture has them, estimated from type+footprint otherwise). Pulled across a"
+            echo "resilient matrix so a preempted runner only cost its own chunk."
+          } > pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: Overture 3D catchments — ${NNEW} provinces (run ${{ github.run_id }})" \
+            --body-file pr_body.md
