@@ -39,6 +39,11 @@ on:
         required: false
         default: false
         type: boolean
+  schedule:
+    # Monthly self-refresh — 1st of the month, 04:00 UTC (11:00 Bangkok). Overture footprints change
+    # slowly and provinces already pulled are skipped, so a monthly run only fills the remaining gaps
+    # cheaply. On a scheduled run the job behaves as all=true (every province still missing a catchment).
+    - cron: "0 4 1 * *"
 
 permissions:
   contents: write
@@ -66,9 +71,12 @@ jobs:
           PROVINCES: ${{ inputs.provinces }}
           MAX_BUILDINGS: ${{ inputs.max_buildings }}
           PULL_ALL: ${{ inputs.all }}
+          EVENT: ${{ github.event_name }}
         run: |
-          ARGS=(--max-buildings "$MAX_BUILDINGS")
-          if [ "$PULL_ALL" != "true" ]; then
+          # Scheduled runs carry no dispatch inputs, so default the cap and treat the monthly
+          # cron as all=true (fill every province still missing a catchment).
+          ARGS=(--max-buildings "${MAX_BUILDINGS:-60000}")
+          if [ "$EVENT" != "schedule" ] && [ "$PULL_ALL" != "true" ]; then
             ARGS+=(--only "$PROVINCES")
           fi
           echo "running: python pipeline/pull_all_provinces.py ${ARGS[*]}"

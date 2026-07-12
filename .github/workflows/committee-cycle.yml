@@ -1,0 +1,128 @@
+name: Committee — autonomous enrichment loop (daily, gate-guarded)
+
+# The recursive, self-continuing enrichment loop, on cloud cron so it runs when the laptop is off.
+# This is the AUTONOMOUS sibling of committee-geocode.yml: instead of opening a draft PR for review,
+# it commits accepted improvements STRAIGHT TO master — but ONLY when the full determinism gate
+# (bash tests/run.sh check) passes 0-failed. The gate is the guard: if any layer drifts, nothing is
+# pushed, so broken or provenance-inconsistent data can never reach master, even unattended.
+#
+# Flow each run:
+#   committee/run_cycle.py --member geocoder --loop   (member proposes -> validator gates ->
+#                                                       accepted patches merge into the master)
+#   -> rebuild EVERY derived layer (derive.py + build_*.py x2 + build_provenance.py)
+#   -> bash tests/run.sh check          (THE GATE)
+#   -> gate green + real changes  ? commit to master + push   (autonomous)
+#      gate red                   ? push nothing, annotate the run, exit 0 (no issue spam)
+#
+# PREREQUISITE (why this can currently no-op): a geocode moves branch coordinates, so every
+# coordinate-aligned layer must rebuild to keep its branches_fingerprint in sync. Two layers
+# (branch_occupations.json, contested_pop.json) depend on heavy OPTIONAL sources not present on the
+# runner (overture_places.json / the WorldPop raster), so they can't rebuild in CI and the gate
+# fails by design. Until those sources are reachable in CI (or the loop is scoped to non-coordinate
+# members), this job will gate-block and push nothing — which is the safe failure, not a broken merge.
+#
+# Runs geocoder by default (the run_cycle-native member). scout/census have their own CLIs and
+# dedicated workflows; wire them in here once run_cycle drives them uniformly.
+
+on:
+  workflow_dispatch:
+    inputs:
+      member:
+        description: "Committee member to run (run_cycle-native)"
+        default: "geocoder"
+        type: string
+      max_cycles:
+        description: "Cycles this run (batch 100 each)"
+        default: "5"
+        type: string
+  schedule:
+    # Daily 03:40 UTC (10:40 Bangkok) — after the weekly gov-census (02:40 Mon) and geocode (03:10 Mon)
+    # jobs, so a scheduled overlap can't race them on the same day.
+    - cron: "40 3 * * *"
+
+# Never let two autonomous loops run at once (they both write the master + push to the same branch).
+concurrency:
+  group: committee-autonomous-loop
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so we can rebase-then-push cleanly onto a master that moved mid-run.
+          fetch-depth: 0
+
+      - name: Guard — require a Google Places key (GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_KEY)
+        env:
+          KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "No Google Places key found — geocoder member is inert. Skipping this run."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set up Python
+        if: env.SKIP != '1'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Deps
+        if: env.SKIP != '1'
+        run: pip install --quiet shapely openlocationcode || true
+
+      - name: Run gated committee cycles (merges accepted patches into the master)
+        if: env.SKIP != '1'
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
+        run: |
+          cd committee
+          python3 run_cycle.py \
+            --member "${{ github.event.inputs.member || 'geocoder' }}" \
+            --batch 100 --loop \
+            --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
+
+      - name: Rebuild every derived layer, then run the determinism gate (THE GUARD)
+        if: env.SKIP != '1'
+        id: gate
+        run: |
+          cd pipeline && python3 derive.py
+          # Two passes resolve inter-builder dependency order; failures of optional-source builders
+          # are non-fatal here (their own --check inside tests/run.sh is the real arbiter).
+          for pass in 1 2; do for f in build_*.py; do python3 "$f" >/dev/null 2>&1 || true; done; done
+          python3 build_provenance.py >/dev/null 2>&1 || true
+          cd ..
+          if bash tests/run.sh check; then
+            echo "gate=green" >> "$GITHUB_OUTPUT"
+          else
+            echo "gate=red" >> "$GITHUB_OUTPUT"
+            echo "::warning::Determinism gate FAILED — pushing nothing. The committee proposed changes"
+            echo "::warning::but a derived layer could not be reproduced (see the gate log above). This is"
+            echo "::warning::the safe outcome: master is untouched. Likely the fingerprint-drift prerequisite."
+          fi
+
+      - name: Commit to master + push  (ONLY when the gate is green — autonomous)
+        if: env.SKIP != '1' && steps.gate.outputs.gate == 'green'
+        env:
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Gate green but the committee accepted no new patches this run. Nothing to push."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          PREC="$(python3 -c "import json;s=json.load(open('committee/SCORECARD.json'));print(s.get('precise','?'),'/',s.get('total', s.get('branches','?')))" 2>/dev/null || echo '?')"
+          git commit -m "committee: autonomous enrichment cycle (run ${{ github.run_id }})" \
+                     -m "run_cycle.py member=${{ github.event.inputs.member || 'geocoder' }}; validator-gated; every derived layer rebuilt and 'bash tests/run.sh check' passed 0-failed in CI before this auto-merge. Building-precise: $PREC."
+          # master may have advanced (e.g. a data-* PR merged) since checkout — rebase before pushing.
+          git pull --rebase origin "$BASE_BRANCH"
+          git push origin "HEAD:$BASE_BRANCH"
+          echo "Autonomous merge landed on $BASE_BRANCH."
