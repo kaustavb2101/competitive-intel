@@ -1507,6 +1507,7 @@ function renderAcq(){
   renderSearchDemand();
   renderCompCoverage();
   renderRivalDensity();
+  renderPeerProvince();
   renderExitWhitespace();
   // REMOVED (strategy pivot — network consolidating, not growing): renderRoad3k() [branch-growth
   // headroom allocation], renderExpansionPlan() [sequenced growth plan] and renderOppScore()
@@ -1698,6 +1699,68 @@ function drawRivalDensity(){
         ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
          'Rivals = the merged census (official store-locators for Muangthai/Srisawad/Tidlor; Heng is a sample).',
          'A high ratio is a competitive-density signal, not a verdict — some dense districts are worth contesting, others conceding.']);
+  }
+}
+
+/* ---------- per-province peer comparison · AutoX vs each rival brand (obj #2) ----------
+   Surfaces data/peer_province.json (77 provinces, pipeline/build_peer_province.py): a pure
+   rollup of rival_density.json that KEEPS the per-brand split, so each province shows AutoX
+   next to Muangthai / Srisawad / Tidlor / Heng separately. Lazy, graceful if absent. We DO
+   NOT recompute anything here — we rank & show measured counts. A competitive-pressure read
+   on the existing network; no open / expand call. */
+let PEERPROV=null, peerprovLoaded=false;
+const PEERPROV_TOPN=20;
+function renderPeerProvince(){
+  const tbl=$('#peerprovtbl'); if(!tbl) return;
+  if(peerprovLoaded){ drawPeerProvince(); return; }
+  fetch('data/peer_province.json').then(r=>r.ok?r.json():null).then(j=>{
+    PEERPROV=j; peerprovLoaded=true; drawPeerProvince();
+  }).catch(()=>{ PEERPROV=null; peerprovLoaded=true; drawPeerProvince(); });
+}
+function drawPeerProvince(){
+  const tbl=$('#peerprovtbl'), ro=$('#peerprovreadout'); if(!tbl) return;
+  const recs=(PEERPROV&&Array.isArray(PEERPROV.provinces))?PEERPROV.provinces:[];
+  if(!recs.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Per-province peer board not yet computed.</b> <span class="sub">Run pipeline/build_peer_province.py — it fills in on the next data refresh.</span>';
+    return;
+  }
+  const m=PEERPROV.meta||{};
+  // fixed brand column order carried from the layer (alphabetical over the census).
+  const brands=Array.isArray(m.brands)?m.brands:['Heng','Muangthai','Srisawad','Tidlor'];
+  const list=recs.slice(0,PEERPROV_TOPN);
+  const bh=brands.map(b=>`<th title="${b} branches in this province (MEASURED census)">${b}</th>`).join('');
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="AutoX branches in this province (MEASURED, point-in-district)">AutoX</th>`+
+    bh+
+    `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
+    `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
+    list.map((r,i)=>{
+      const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
+      const rc=(r.rivals-r.autox)>=200?'var(--agri)':'var(--gold)';
+      const bcols=brands.map(b=>{const v=(r.by_brand&&r.by_brand[b])||0;
+        return `<td class="mono"${v?'':' style="color:var(--dim)"'}>${v?v.toLocaleString():'·'}</td>`;}).join('');
+      const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.province_th||'—'}</b></td>
+        <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b></td>
+        ${bcols}
+        <td class="mono" style="color:${rc}">${ratio}</td>
+        <td>${lead}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const nOut=m.n_provinces_outnumbered!=null?m.n_provinces_outnumbered:recs.filter(r=>r.autox>0&&r.rivals>r.autox).length;
+    const pbt=m.per_brand_total||{};
+    const brandStr=brands.filter(b=>pbt[b]).map(b=>`${b} ${pbt[b].toLocaleString()}`).join(' · ');
+    ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b> `+
+      `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
+      `National rival footprint: ${brandStr}. ${TAG_M}`+
+      methodBox(null,
+        ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
+         'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
+         'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
   }
 }
 
