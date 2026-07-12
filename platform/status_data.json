@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T14:49:26+07:00",
-    "commit": "08a4528"
+    "generated_at": "2026-07-12T15:20:21+07:00",
+    "commit": "6d1d87a"
   },
   "overall": {
     "progress_pct": 66,
@@ -480,6 +480,24 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T15:20:21+07:00",
+      "sha": "6d1d87a",
+      "summary": "feat(platform): CEO autonomy status dashboard (/status)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-12T15:20:21+07:00",
+      "sha": "643f75c",
+      "summary": "ci(committee): every-6h autonomy-planner cron, gate-guarded",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T15:20:08+07:00",
+      "sha": "a723d42",
+      "summary": "feat(committee): deterministic autonomy planner (plan_cycle.py)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-12T14:49:26+07:00",
       "sha": "08a4528",
       "summary": "ci(overture): resilient matrix pull — survive runner preemption (#12)",
@@ -639,24 +657,6 @@
       "date": "2026-07-09T18:06:31Z",
       "sha": "a2805cf",
       "summary": "Bring in TMLI knowledge base: INSIGHTS.md + WORKFLOWS.md",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-09T18:04:20Z",
-      "sha": "cbc4b3e",
-      "summary": "Bring in the TMLI data-quality committee (scout / census / geocoder / daemon)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-09T16:13:06Z",
-      "sha": "0f077c7",
-      "summary": "docs: log the income_floor join-validator cycle, close backlog item, add follow-ups",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-09T16:12:02Z",
-      "sha": "3207121",
-      "summary": "VALIDATOR: close the provinces/*.json gov.income_floor join gap",
       "pillar": "data-integration"
     }
   ]
