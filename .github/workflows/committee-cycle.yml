@@ -1,46 +1,33 @@
-name: Committee — autonomous enrichment loop (daily, gate-guarded)
+name: Committee — autonomous competitor scout (daily, gate-guarded)
 
 # The recursive, self-continuing enrichment loop, on cloud cron so it runs when the laptop is off.
-# This is the AUTONOMOUS sibling of committee-geocode.yml: instead of opening a draft PR for review,
-# it commits accepted improvements STRAIGHT TO master — but ONLY when the full determinism gate
-# (bash tests/run.sh check) passes 0-failed. The gate is the guard: if any layer drifts, nothing is
-# pushed, so broken or provenance-inconsistent data can never reach master, even unattended.
+# Autonomous sibling of the review-PR data jobs: it commits accepted improvements STRAIGHT TO master,
+# but ONLY when the full determinism gate (bash tests/run.sh check) passes 0-failed. The gate is the
+# guard — if any derived layer drifts, nothing is pushed, so broken/inconsistent data can never land.
 #
-# Flow each run:
-#   committee/run_cycle.py --member geocoder --loop   (member proposes -> validator gates ->
-#                                                       accepted patches merge into the master)
-#   -> rebuild EVERY derived layer (derive.py + build_*.py x2 + build_provenance.py)
-#   -> bash tests/run.sh check          (THE GATE)
-#   -> gate green + real changes  ? commit to master + push   (autonomous)
-#      gate red                   ? push nothing, annotate the run, exit 0 (no issue spam)
+# It runs the COMPETITOR SCOUT (committee/scout.py), deliberately chosen: it only ADDS the per-province
+# `competitors_prov` field to branches — it NEVER moves branch coordinates, so it cannot trip the
+# branches_fingerprint gate the way the geocoder does. Each run scouts the N provinces with the LEAST
+# competitor coverage so far, rotating national coverage over successive days. This closes the
+# documented "Rayong-only competitor" gap nationwide, unattended (objective #2 / acquisition).
 #
-# PREREQUISITE (why this can currently no-op): a geocode moves branch coordinates, so every
-# coordinate-aligned layer must rebuild to keep its branches_fingerprint in sync. Two layers
-# (branch_occupations.json, contested_pop.json) depend on heavy OPTIONAL sources not present on the
-# runner (overture_places.json / the WorldPop raster), so they can't rebuild in CI and the gate
-# fails by design. Until those sources are reachable in CI (or the loop is scoped to non-coordinate
-# members), this job will gate-block and push nothing — which is the safe failure, not a broken merge.
+# Coordinate-moving work (geocoder) intentionally stays a REVIEWED weekly PR (committee-geocode.yml),
+# NOT this autonomous path, until the branch_occupations / contested_pop CI-rebuild gap is closed.
 #
-# Runs geocoder by default (the run_cycle-native member). scout/census have their own CLIs and
-# dedicated workflows; wire them in here once run_cycle drives them uniformly.
+# Cost: Google Places Text Search — 4 brand queries x N provinces per run (default 5 => ~20 calls/day).
 
 on:
   workflow_dispatch:
     inputs:
-      member:
-        description: "Committee member to run (run_cycle-native)"
-        default: "geocoder"
-        type: string
-      max_cycles:
-        description: "Cycles this run (batch 100 each)"
+      provinces_per_run:
+        description: "How many least-covered provinces to scout this run"
         default: "5"
         type: string
   schedule:
-    # Daily 03:40 UTC (10:40 Bangkok) — after the weekly gov-census (02:40 Mon) and geocode (03:10 Mon)
-    # jobs, so a scheduled overlap can't race them on the same day.
+    # Daily 03:40 UTC (10:40 Bangkok) — after the weekly gov-census (Mon 02:40) and geocode (Mon 03:10).
     - cron: "40 3 * * *"
 
-# Never let two autonomous loops run at once (they both write the master + push to the same branch).
+# Never let two autonomous loops run at once (both write the master + push the same branch).
 concurrency:
   group: committee-autonomous-loop
   cancel-in-progress: false
@@ -49,21 +36,20 @@ permissions:
   contents: write
 
 jobs:
-  loop:
+  scout:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
-          # Full history so we can rebase-then-push cleanly onto a master that moved mid-run.
-          fetch-depth: 0
+          fetch-depth: 0            # full history so we can rebase-then-push onto a moved master
 
       - name: Guard — require a Google Places key (GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_KEY)
         env:
           KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
         run: |
           if [ -z "$KEY" ]; then
-            echo "No Google Places key found — geocoder member is inert. Skipping this run."
+            echo "No Google Places key found — scout is inert. Skipping this run."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
 
@@ -77,24 +63,25 @@ jobs:
         if: env.SKIP != '1'
         run: pip install --quiet shapely openlocationcode || true
 
-      - name: Run gated committee cycles (merges accepted patches into the master)
+      - name: Scout the least-covered provinces (adds competitors_prov; no coordinate changes)
         if: env.SKIP != '1'
         env:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY || secrets.GOOGLE_PLACES_KEY }}
+          BATCH: ${{ github.event.inputs.provinces_per_run || '5' }}
         run: |
-          cd committee
-          python3 run_cycle.py \
-            --member "${{ github.event.inputs.member || 'geocoder' }}" \
-            --batch 100 --loop \
-            --max-cycles "${{ github.event.inputs.max_cycles || '5' }}"
+          # Pick the BATCH provinces with the fewest scouted competitors so far (0 => never scouted),
+          # so successive runs rotate coverage across all 77. Province names come from the master's
+          # `prov` field (Thai) — the same key scout.py joins the census back on.
+          PROVS=$(python3 -c 'import json,os,sys; b=json.load(open("source-data/branches_final.json")); provs=sorted({x["prov"].strip() for x in b if x.get("prov")}); cp="source-data/competitor_census.json"; c=json.load(open(cp)) if os.path.exists(cp) else {}; print(" ".join(sorted(provs,key=lambda p:c.get(p,0))[:int(sys.argv[1])]))' "$BATCH")
+          echo "Scouting least-covered provinces: $PROVS"
+          python3 committee/scout.py --in source-data/branches_final.json --provinces $PROVS
 
       - name: Rebuild every derived layer, then run the determinism gate (THE GUARD)
         if: env.SKIP != '1'
         id: gate
         run: |
           cd pipeline && python3 derive.py
-          # Two passes resolve inter-builder dependency order; failures of optional-source builders
-          # are non-fatal here (their own --check inside tests/run.sh is the real arbiter).
+          # Two passes resolve inter-builder dependency order; optional-source builders may no-op.
           for pass in 1 2; do for f in build_*.py; do python3 "$f" >/dev/null 2>&1 || true; done; done
           python3 build_provenance.py >/dev/null 2>&1 || true
           cd ..
@@ -102,9 +89,7 @@ jobs:
             echo "gate=green" >> "$GITHUB_OUTPUT"
           else
             echo "gate=red" >> "$GITHUB_OUTPUT"
-            echo "::warning::Determinism gate FAILED — pushing nothing. The committee proposed changes"
-            echo "::warning::but a derived layer could not be reproduced (see the gate log above). This is"
-            echo "::warning::the safe outcome: master is untouched. Likely the fingerprint-drift prerequisite."
+            echo "::warning::Determinism gate FAILED — pushing nothing (master untouched). Inspect the gate log above."
           fi
 
       - name: Commit to master + push  (ONLY when the gate is green — autonomous)
@@ -114,15 +99,15 @@ jobs:
         run: |
           git add -A
           if git diff --cached --quiet; then
-            echo "Gate green but the committee accepted no new patches this run. Nothing to push."
+            echo "Gate green but scout added no new competitor data this run. Nothing to push."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          PREC="$(python3 -c "import json;s=json.load(open('committee/SCORECARD.json'));print(s.get('precise','?'),'/',s.get('total', s.get('branches','?')))" 2>/dev/null || echo '?')"
-          git commit -m "committee: autonomous enrichment cycle (run ${{ github.run_id }})" \
-                     -m "run_cycle.py member=${{ github.event.inputs.member || 'geocoder' }}; validator-gated; every derived layer rebuilt and 'bash tests/run.sh check' passed 0-failed in CI before this auto-merge. Building-precise: $PREC."
-          # master may have advanced (e.g. a data-* PR merged) since checkout — rebase before pushing.
+          COV="$(python3 -c "import json;c=json.load(open('source-data/competitor_census.json'));print(len(c),'provinces,',sum(c.values()),'rival branches')" 2>/dev/null || echo '?')"
+          git commit -m "committee: autonomous competitor scout (run ${{ github.run_id }})" \
+                     -m "scout.py over the least-covered provinces; competitors_prov joined; every derived layer rebuilt and 'bash tests/run.sh check' passed 0-failed before this auto-merge. Coverage: $COV."
+          # master may have advanced since checkout — rebase before pushing.
           git pull --rebase origin "$BASE_BRANCH"
           git push origin "HEAD:$BASE_BRANCH"
           echo "Autonomous merge landed on $BASE_BRANCH."
