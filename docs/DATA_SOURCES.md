@@ -9,10 +9,15 @@
 | HDX (HumData) | `data.humdata.org/api/3/action/...` | ✅ | CKAN. UNFPA pop, WFP rainfall, geoBoundaries |
 | OAE agriculture | `catalog.oae.go.th/api/3/action/...` | ✅ | CKAN/nginx, not Cloudflare-blocked. `www.oae.go.th`=200 |
 | World Bank Pink Sheet | `thedocs.worldbank.org` | ✅ | Apache. Monthly commodity prices (xlsx) |
+| NABC agriculture (live daily prices) | `agriapi.nabc.go.th/api` | ✅ | No key needed. `pull_nabc_prices.py`/`pull_nabc_agri.py` → `source-data/nabc_prices.json`/`nabc_agri.json`, preferred over the OAE/Pink-Sheet proxies in `build_crop_stress.py`/`build_branch_agri.py`/`build_macro_sensitivity.py` when present. Listed in CLAUDE.md's REACHABLE bullet; was missing from this table until this audit pass. |
+| BIS Statistics (household debt-to-GDP) | `stats.bis.org/api/v2/data/dataflow/BIS` | ✅ | SDMX-JSON, `pull_macro.py` → `platform/data/macro_indicators.json` (quarterly, authoritative — paired with World Bank series in the same puller). Listed in CLAUDE.md's REACHABLE bullet; was missing from this table until this audit pass. |
+| ThaiWater (rain gauges / flood/waterlevel) | `api-v3.thaiwater.net/api/v1/thaiwater30/public/...` | ✅ | `pull_thaiwater_rain.py`/`pull_thaiwater_flood.py` → `platform/data/thaiwater_rain.json`/`thaiwater_flood.json` (Overview rain/flood pulse). Was missing from this table until this audit pass. |
+| ILOSTAT rplumber mirror (NSO Labour Force Survey) | `rplumber.ilo.org/data/indicator/` | ✅ | `pull_ilostat_labour.py` → `source-data/ilostat_labour.json` → `labour_context.json` (national-only; NSO's own hosts are geoblocked, see §"National labour context" below). Was missing from this table until this audit pass. |
 | **data.go.th (all hosts)** | data.go.th, opend., api. | ❌ BLOCKED | Cloudflare "Access Denied" — **IP geo-block, not auth.** Token is valid but useless from here |
 | **DLT (vehicles), old stat portal** | stat.dlt.go.th, web.dlt.go.th | ❌ BLOCKED | DNS-fail / 503 |
 | **DLT (vehicles) / DIW (factories), own CKAN catalogs** | gdcatalog.dlt.go.th, diw-dataset.diw.go.th | ✅ REACHABLE (verified 2026-07-09) | **Different host from the blocked pair above** — the departments' own CKAN catalogs are NOT geoblocked, only the `data.go.th` aggregator + the old `stat.dlt.go.th` portal are. Refreshes from ANY cloud IP, no Thai laptop needed — see `committee/census.py` / `.github/workflows/data-gov-census.yml`. Full detail: CLAUDE.md "Hard environment constraints" + `docs/INSIGHTS.md` §3. |
-| IMF / FRED / dataforthai / competitor sites | various | ❌ | 403 / 503 / WAF |
+| IMF / FRED / dataforthai / competitor sites (muangthaicap/sawad/tidlor/hengleasing) | various | ❌ | 403 / 503 / WAF |
+| Isochrone routing (ORS / GISTDA) | `api.openrouteservice.org`, `api.sphere.gistda.or.th` | ⚠ UNTESTED | `pull_isochrone.py` exists but needs `ORS_KEY`/`GISTDA_API_KEY` (no free-tier key vendored here) — no `source-data/*_isochrone.json` has ever landed, so reachability itself is unconfirmed, distinct from the confirmed-blocked rows above. |
 
 **The single most important fact for the handoff:** the blocked sources are blocked because this
 sandbox runs on a foreign (Chicago) datacenter IP. **They should work from Kaustav's Thai residential
