@@ -1,0 +1,912 @@
+[
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.0737022,
+  "lng": 98.9110316,
+  "place_id": "ChIJ40uCAt2VUTAR4c0hBKxEx9k"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.097223999999999,
+  "lng": 98.91130899999999,
+  "place_id": "ChIJZXKvU8mVUTARGMxLc5oHRJc"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 7.7547114,
+  "lng": 99.2647415,
+  "place_id": "ChIJVxqrvJABUjARr2TjPUcwgto"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.0601197,
+  "lng": 98.91108299999999,
+  "place_id": "ChIJTQactpeUUTARsDAMp9DsbV0"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.107318,
+  "lng": 98.928156,
+  "place_id": "ChIJscTkd6mTUTARZM3W86qtq-0"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.0777916,
+  "lng": 98.90379370000001,
+  "place_id": "ChIJcbDl0u-VUTARBQGK53Ck1ww"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.1091076,
+  "lng": 98.9230053,
+  "place_id": "ChIJ3Z2ebCiVUTARHf5QgS4e_Gs"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.1045904,
+  "lng": 98.9598326,
+  "place_id": "ChIJ-4cJGaSTUTARJPTq2fwjKWE"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.0836924,
+  "lng": 98.99053359999999,
+  "place_id": "ChIJla4oYJWTUTARxeloQMa5AvQ"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กระบี่",
+  "lat": 8.0757846,
+  "lng": 98.83149619999999,
+  "place_id": "ChIJOamMDRa_UTARQiodbsEcOp4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กระบี่",
+  "lat": 8.0657359,
+  "lng": 98.9149144,
+  "place_id": "ChIJRUB9QpqUUTARdOZlwk6G3FQ"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กระบี่",
+  "lat": 8.075036299999999,
+  "lng": 98.833345,
+  "place_id": "ChIJ9WTf9Na_UTARgccT3qndz3E"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กระบี่",
+  "lat": 8.0714888,
+  "lng": 99.32335049999999,
+  "place_id": "ChIJqQAjJ9ojUjARVEWxUz4XiH0"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กระบี่",
+  "lat": 8.1101716,
+  "lng": 98.9230324,
+  "place_id": "ChIJ15FPSAiUUTARpKckkgHOG9g"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.065847999999999,
+  "lng": 98.91488799999999,
+  "place_id": "ChIJSxsuILeVUTARp3ek7iuhvl8"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.039738999999999,
+  "lng": 98.835143,
+  "place_id": "ChIJoQLUbka_UTARZuXw4QRKMqo"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.224406,
+  "lng": 98.808247,
+  "place_id": "ChIJu-ugBJOjUTARdL2pRbP3XCs"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.100992,
+  "lng": 98.908259,
+  "place_id": "ChIJZ2p78AmVUTAR14bmKBVsbuc"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 7.808453999999999,
+  "lng": 99.201689,
+  "place_id": "ChIJXyGlrWwDUjAR-dMlkfXJPW0"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.103399999999999,
+  "lng": 98.883038,
+  "place_id": "ChIJVUHLVUSVUTARTkemEbBQqi4"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.107479,
+  "lng": 98.927374,
+  "place_id": "ChIJkT7kbXyTUTARCjIs2UBzOrk"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กระบี่",
+  "lat": 8.262621,
+  "lng": 99.05561399999999,
+  "place_id": "ChIJN2BtmuaFUTARXWta0eMrsFk"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กระบี่",
+  "lat": 8.107698700000002,
+  "lng": 98.93764379999999,
+  "place_id": "ChIJC0e8PO-TUTARl6pPYgQKxKU"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7202514,
+  "lng": 100.557511,
+  "place_id": "ChIJXy9sLJCf4jARgw7fyY_Zq6E"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.71423,
+  "lng": 100.566474,
+  "place_id": "ChIJwXX5Swyf4jARKjHBIYvwwu0"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7364219,
+  "lng": 100.5983478,
+  "place_id": "ChIJz31P6TWe4jAR45g455NSl_o"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7559064,
+  "lng": 100.5247767,
+  "place_id": "ChIJPdZiy7CZ4jARecTLfQObRXI"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.888026,
+  "lng": 100.575256,
+  "place_id": "ChIJ0YCxbt-C4jARul-nAE4uvkQ"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7472835,
+  "lng": 100.5095405,
+  "place_id": "ChIJL1cOLD2Z4jARmtVGM_7iX6A"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7246776,
+  "lng": 100.5488192,
+  "place_id": "ChIJ56OpGbWf4jAR82kGjGXSpxU"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7630283,
+  "lng": 100.5560064,
+  "place_id": "ChIJSdS0kGuT26sRi43ydz2x85g"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.6946392,
+  "lng": 100.537839,
+  "place_id": "ChIJ3RLkJYWf4jARdE6yq5156Jk"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7889001,
+  "lng": 100.5571449,
+  "place_id": "ChIJpZNKd1ed4jARboS7sG_TUoQ"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7904182,
+  "lng": 100.503788,
+  "place_id": "ChIJfQfQ4eqb4jARhGP77nxCy7w"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7175727,
+  "lng": 100.5148075,
+  "place_id": "ChIJsb7ImsaY4jARlVvd1kOutz8"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.727189,
+  "lng": 100.4962084,
+  "place_id": "ChIJe9oDLOWY4jARwZq0TXPG2y4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.8195899,
+  "lng": 100.6596748,
+  "place_id": "ChIJI9re9vRjHTERPOMi-ETQ7sI"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7574689,
+  "lng": 100.4777987,
+  "place_id": "ChIJrw7mhNOZ4jARHa4zGXW60IA"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.787639,
+  "lng": 100.4990782,
+  "place_id": "ChIJ32MSkBab4jARVfk2WkHb1IA"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7066932,
+  "lng": 100.3619424,
+  "place_id": "ChIJy9oWuxqW4jARMQc6PV2eYjo"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7510882,
+  "lng": 100.5113162,
+  "place_id": "ChIJLz8hQDyZ4jARMrI-VmkCzVM"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7389523,
+  "lng": 100.5887819,
+  "place_id": "ChIJcfgmZK-f4jAR5e_m3rOPbpA"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.6953184,
+  "lng": 100.6386458,
+  "place_id": "ChIJM0Xs2OthHTER-lKKLzvoKAs"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.71785,
+  "lng": 100.568726,
+  "place_id": "ChIJCyG_v9mf4jAR_gJkjQOk4AY"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.74574,
+  "lng": 100.502041,
+  "place_id": "ChIJ9chLK0uZ4jART7TTO7EWf6w"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.6798636,
+  "lng": 100.4965081,
+  "place_id": "ChIJ_x32XHWj4jARTcbKye6QbXg"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.718652,
+  "lng": 100.538985,
+  "place_id": "ChIJPcR1BY2f4jARjha_CjKhoUs"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7252351,
+  "lng": 100.5648522,
+  "place_id": "ChIJt0Q2TyCf4jARDsm14IUUoBA"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.81796,
+  "lng": 100.56393,
+  "place_id": "ChIJidHQI3ed4jARMQG0EyNYkT0"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7918452,
+  "lng": 100.4478597,
+  "place_id": "ChIJOQRseY2X4jAROP-outjGyLQ"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7917916,
+  "lng": 100.5493755,
+  "place_id": "ChIJGW7nfMSd4jARzFd27ywnF8A"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7635515,
+  "lng": 100.3633527,
+  "place_id": "ChIJnbCoAw-b4jAR00Ku0I1GnFU"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7165443,
+  "lng": 100.8181566,
+  "place_id": "ChIJN4oWbqlpHTERX_Z6yhDdrdQ"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7431687,
+  "lng": 100.5457322,
+  "place_id": "ChIJgy563RWf4jARl8hp_wNNd-M"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.7140453,
+  "lng": 100.4788797,
+  "place_id": "ChIJCy3wBieZ4jARP2Uc-hFuEHI"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.6594407,
+  "lng": 100.662048,
+  "place_id": "ChIJE1CDd7VfHTERxvVf93vgFes"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.8797186,
+  "lng": 100.5902544,
+  "place_id": "ChIJk_Zj7J2D4jARLnUIa7wSD0Y"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.9247778,
+  "lng": 100.4126023,
+  "place_id": "ChIJv4bzc9iP4jARHNP311bnBy8"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.6923671,
+  "lng": 100.4070636,
+  "place_id": "ChIJHxqx6BxjHTERj0IWdez9Um8"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.8129377,
+  "lng": 100.7165703,
+  "place_id": "ChIJPeEp3AljHTEROt2cLDiS7h8"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กรุงเทพมหานคร",
+  "lat": 13.9197972,
+  "lng": 100.5194965,
+  "place_id": "ChIJ4dkvf72E4jARCJ_FTYe4GA8"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0350868,
+  "lng": 99.5227999,
+  "place_id": "ChIJ6ZBDzop14zARtYSN_dsWpkk"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.1026043,
+  "lng": 99.4162082,
+  "place_id": "ChIJB1ll7Cl24zARP5KwC6wMdZM"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.060139,
+  "lng": 99.495195,
+  "place_id": "ChIJ540YqRh14zAR53FXgc1gNE0"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0188263,
+  "lng": 99.540317,
+  "place_id": "ChIJSVoxbBR14zARIqgPu3W1Qdw"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0290371,
+  "lng": 99.52891299999999,
+  "place_id": "ChIJN-02QyR14zARuAGsmvz_BhE"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 13.9591693,
+  "lng": 99.6421002,
+  "place_id": "ChIJha6AjIYO4zAR76xReGwT3FY"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 13.9833834,
+  "lng": 99.6421795,
+  "place_id": "ChIJdQMXH0gP4zARn8g-T89Nwoc"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0254446,
+  "lng": 99.5434401,
+  "place_id": "ChIJVWzHVwR14zARX81DtQtaJis"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 13.9470062,
+  "lng": 99.6412261,
+  "place_id": "ChIJK2EEuHsO4zARx_JK6OiO6Go"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาญจนบุรี",
+  "lat": 13.925292,
+  "lng": 99.476271,
+  "place_id": "ChIJ2ZeGGzJz4zAR_0PPPYM0WRI"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0566204,
+  "lng": 99.45916229999999,
+  "place_id": "ChIJA86RVdR14zARNFQldHjfpIE"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0972539,
+  "lng": 99.4113345,
+  "place_id": "ChIJXV37ydR34zARcYJTP3Tfwaw"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0350055,
+  "lng": 99.4964444,
+  "place_id": "ChIJGauqSll04zAR3ip6oc9IDjw"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0235194,
+  "lng": 99.5352826,
+  "place_id": "ChIJ-xTAard04zARmJoDbWeoUiY"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0146204,
+  "lng": 99.5345577,
+  "place_id": "ChIJZ1nUqW914zARmxfY-zO-jIg"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.1366832,
+  "lng": 99.3687748,
+  "place_id": "ChIJNZAUljKd4zARMrC7JhNMMR4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0360979,
+  "lng": 99.51737999999999,
+  "place_id": "ChIJ2yoWM-l04zARZFyfDa4Dlag"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.1822681,
+  "lng": 99.74671459999999,
+  "place_id": "ChIJq_VtcjWv4zARUX6crf_5Aio"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาญจนบุรี",
+  "lat": 14.016286,
+  "lng": 99.5423141,
+  "place_id": "ChIJOa4CfrJ04zARk_s5RokcZ8U"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาญจนบุรี",
+  "lat": 14.0348475,
+  "lng": 99.52302809999999,
+  "place_id": "ChIJO2UCd6p14zAR9bADhfjXrzw"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาญจนบุรี",
+  "lat": 14.09472,
+  "lng": 99.422283,
+  "place_id": "ChIJKd__PY134zARikwi47nsV8o"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาญจนบุรี",
+  "lat": 13.9999858,
+  "lng": 99.5522398,
+  "place_id": "ChIJYbv8daMN4zARAqwpb3-Qc-0"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาญจนบุรี",
+  "lat": 14.01388,
+  "lng": 99.534875,
+  "place_id": "ChIJW_Dudut14zAR2_DQJvay7Gw"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาญจนบุรี",
+  "lat": 14.030303,
+  "lng": 99.55779059999999,
+  "place_id": "ChIJMw8JzB0L4zARCRb93gM5QYs"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กาญจนบุรี",
+  "lat": 13.9744222,
+  "lng": 99.6333934,
+  "place_id": "ChIJS_ix9u534zARW0xU3G97kb8"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4297556,
+  "lng": 103.4954442,
+  "place_id": "ChIJP_JJ6Iu1IjERhXySSQ8Ca_s"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.5281965,
+  "lng": 103.6085028,
+  "place_id": "ChIJoVRN3Bg1PTER1g7adNcIa7E"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4173856,
+  "lng": 103.547703,
+  "place_id": "ChIJyz8-uQVLPTER2s6WmHWLAUM"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4361493,
+  "lng": 103.5102271,
+  "place_id": "ChIJAyht9qa1IjERrrYPRX9fA_0"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4524954,
+  "lng": 103.5208153,
+  "place_id": "ChIJbYBOlXe1IjERx6-0KgtNzsc"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4239326,
+  "lng": 103.5067834,
+  "place_id": "ChIJh4q0lxK1IjERbRjlYCh0HVo"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4398758,
+  "lng": 103.4970726,
+  "place_id": "ChIJvaIFbpK1IjERCIul8oZLxC8"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.3389432,
+  "lng": 103.4306438,
+  "place_id": "ChIJ4SthOU2xIjER3U0XFbgAxso"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.9370246,
+  "lng": 103.2403406,
+  "place_id": "ChIJvSzhk_8hIzERN0TE_P1Qub8"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.6696213,
+  "lng": 103.3047401,
+  "place_id": "ChIJSS6eoDrbIjERdq0KSS6VHZg"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4361358,
+  "lng": 103.5103747,
+  "place_id": "ChIJvV-TKY61IjERaI0nITKmwD4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4284415,
+  "lng": 103.5032232,
+  "place_id": "ChIJBVpSKQC1IjER2tqA2iE_5PQ"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4260009,
+  "lng": 103.519705,
+  "place_id": "ChIJV8kSnR-1IjERAu0WT-Rlt38"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.9376797,
+  "lng": 103.2393805,
+  "place_id": "ChIJ1yHzm2ghIzERw_GaaQvfiLg"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4360703,
+  "lng": 103.5126462,
+  "place_id": "ChIJUY1hK7K1IjERv-O8pXV49Ms"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4322101,
+  "lng": 103.5048078,
+  "place_id": "ChIJd2QFf8y1IjER4JYSEdqBgqs"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4529823,
+  "lng": 103.5303669,
+  "place_id": "ChIJbUFeSQG1IjERqrT6rJY8Y3I"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.9374322,
+  "lng": 103.2415607,
+  "place_id": "ChIJSdje8KEhIzERF13G1ncWsbE"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4289241,
+  "lng": 103.5171239,
+  "place_id": "ChIJIfsQk4O1IjERUB4CuRfIO5Y"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4008417,
+  "lng": 103.3738436,
+  "place_id": "ChIJ281kk3C3IjER9wA7w2vofis"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.691933,
+  "lng": 104.0887584,
+  "place_id": "ChIJS9i-tmgbPTER3V8D2kUjH8o"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.190825,
+  "lng": 103.295082,
+  "place_id": "ChIJ4QHfqwGnIjER5v1H5CX-3MQ"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.336045,
+  "lng": 103.5758103,
+  "place_id": "ChIJYaRqJ0RNPTERcVSpvek4akU"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กาฬสินธุ์",
+  "lat": 16.4344125,
+  "lng": 103.5105493,
+  "place_id": "ChIJ5UbSlxq1IjER_UWQvMtc_Qk"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4746393,
+  "lng": 99.5474023,
+  "place_id": "ChIJNaHOz50i3jARvMGPB6prXlA"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4833178,
+  "lng": 99.5222712,
+  "place_id": "ChIJe6CUnXMZ3jARBpCeDPVe_yg"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.2170521,
+  "lng": 99.8869149,
+  "place_id": "ChIJuzczsk-B4DARMV_dZG9gQ60"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.449201,
+  "lng": 99.537076,
+  "place_id": "ChIJL9gDVoQY3jAR47nGI9dSo10"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.470343,
+  "lng": 99.52915089999999,
+  "place_id": "ChIJ1QrFPC8Z3jARUkvOyxdH5lY"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.46022,
+  "lng": 99.529252,
+  "place_id": "ChIJK5QQPGIY3jARKfQV_44TxHU"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4744427,
+  "lng": 99.5040277,
+  "place_id": "ChIJXeRNrU0Y3jAROiRxWz2LHUM"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.481947,
+  "lng": 99.49536769999999,
+  "place_id": "ChIJlQbbz48Z3jARnyXSkgUD2XE"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.1749136,
+  "lng": 99.7938788,
+  "place_id": "ChIJrezt58WF4DAR5Xb2Xcp4esc"
+ },
+ {
+  "brand": "Srisawad",
+  "prov": "กำแพงเพชร",
+  "lat": 16.3572463,
+  "lng": 99.6559696,
+  "place_id": "ChIJ3W8Wqvkn3jARLXla2UHB3Ps"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4734567,
+  "lng": 99.54091179999999,
+  "place_id": "ChIJHTtU3XYY3jAREEVr_CPfDGY"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4741274,
+  "lng": 99.53047910000001,
+  "place_id": "ChIJtyjN_24Y3jARfu1grndJqvo"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.379608,
+  "lng": 99.570048,
+  "place_id": "ChIJ2w5x4Lgh3jARgI5JnOWYtwE"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4741479,
+  "lng": 99.53048009999999,
+  "place_id": "ChIJa5sr7m4Y3jARSua-AW7v3R4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4868047,
+  "lng": 99.8091414,
+  "place_id": "ChIJYxTILQEu3jARP-W_q7vDTn4"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.5973954,
+  "lng": 99.86007819999999,
+  "place_id": "ChIJZxov_4g03jARZPZzoCdU0oo"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4821891,
+  "lng": 99.5359735,
+  "place_id": "ChIJ16DAMQ0Y3jARYuoqm279mnE"
+ },
+ {
+  "brand": "Muangthai",
+  "prov": "กำแพงเพชร",
+  "lat": 16.2657797,
+  "lng": 99.6884006,
+  "place_id": "ChIJpyIDmAKd4DAR6edhNfipUqI"
+ },
+ {
+  "brand": "Tidlor",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4739024,
+  "lng": 99.53079269999999,
+  "place_id": "ChIJrUyURdkZ3jAR8c29I50aGl0"
+ },
+ {
+  "brand": "Krungsri",
+  "prov": "กำแพงเพชร",
+  "lat": 16.4735348,
+  "lng": 99.5424886,
+  "place_id": "ChIJOwWxMnEY3jARxcgZoOJXzJE"
+ }
+]
