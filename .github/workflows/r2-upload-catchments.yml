@@ -1,0 +1,55 @@
+name: R2 — upload 3D catchments
+
+# Publishes the heavy per-province 3D building catchments (platform/data/<slug>_catchment.json,
+# ~12 MB each) to Cloudflare R2 instead of committing 755 MB+ to git. The app already fetches
+# catchments from R2 (platform/data/tiles_config.json -> catchments.baseUrl, with a local-file
+# fallback), so once they are on R2 root every province's 3D scene renders live.
+#
+# WHY A SEPARATE WORKFLOW: it can upload the catchments from ANY branch/ref — e.g. a data/overture-*
+# branch produced by a matrix pull whose auto-PR failed — without merging that 755 MB into master.
+#
+# Uploads to the R2 ROOT (R2_PREFIX="") because the app fetches <baseUrl>/<slug>_catchment.json.
+# Idempotent: upload_r2.py skips objects whose size already matches (cheap HEAD), so re-runs are cheap.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch/ref containing platform/data/*_catchment.json to upload to R2"
+        required: true
+        default: "master"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: r2-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install boto3
+        run: pip install boto3
+      - name: Upload catchments to R2 (root prefix)
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PREFIX: ""
+        run: |
+          if [ -z "${R2_ACCOUNT_ID}" ] || [ -z "${R2_BUCKET}" ]; then
+            echo "::error::R2 secrets are not set on this repo (need R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_BUCKET)."
+            exit 1
+          fi
+          python pipeline/upload_r2.py --also-bbox
