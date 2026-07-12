@@ -10,8 +10,9 @@
 | OAE agriculture | `catalog.oae.go.th/api/3/action/...` | ✅ | CKAN/nginx, not Cloudflare-blocked. `www.oae.go.th`=200 |
 | World Bank Pink Sheet | `thedocs.worldbank.org` | ✅ | Apache. Monthly commodity prices (xlsx) |
 | **data.go.th (all hosts)** | data.go.th, opend., api. | ❌ BLOCKED | Cloudflare "Access Denied" — **IP geo-block, not auth.** Token is valid but useless from here |
-| **DLT (vehicles)** | stat.dlt.go.th, web.dlt.go.th | ❌ BLOCKED | DNS-fail / 503 |
-| IMF / FRED / dataforthai / gdcatalog / competitor sites | various | ❌ | 403 / 503 / WAF |
+| **DLT (vehicles), old stat portal** | stat.dlt.go.th, web.dlt.go.th | ❌ BLOCKED | DNS-fail / 503 |
+| **DLT (vehicles) / DIW (factories), own CKAN catalogs** | gdcatalog.dlt.go.th, diw-dataset.diw.go.th | ✅ REACHABLE (verified 2026-07-09) | **Different host from the blocked pair above** — the departments' own CKAN catalogs are NOT geoblocked, only the `data.go.th` aggregator + the old `stat.dlt.go.th` portal are. Refreshes from ANY cloud IP, no Thai laptop needed — see `committee/census.py` / `.github/workflows/data-gov-census.yml`. Full detail: CLAUDE.md "Hard environment constraints" + `docs/INSIGHTS.md` §3. |
+| IMF / FRED / dataforthai / competitor sites | various | ❌ | 403 / 503 / WAF |
 
 **The single most important fact for the handoff:** the blocked sources are blocked because this
 sandbox runs on a foreign (Chicago) datacenter IP. **They should work from Kaustav's Thai residential

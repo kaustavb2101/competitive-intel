@@ -18,8 +18,25 @@
 Audit date: 2026-07-01 (re-audit; supersedes 2026-06-30 `prov-guard`). Branch: `agent/provenance-ledger`.
 Auditor scope: every JSON under `platform/data/` (top-level + `provinces/`) + `source-data/`.
 This pass added the risk / occupation / exposure / collateral / competitor layers that shipped after the
-first audit, and corrected the stale `ingest_tmli.py` / "absent today" entries. The ledger now covers
-**all 34 top-level `platform/data/*.json` layers** plus the 78-file `provinces/` subtree.
+first audit, and corrected the stale `ingest_tmli.py` / "absent today" entries. The ledger below covers
+the layers current as of that date **by hand**; it has not been re-walked row-by-row since, and the
+platform has grown well past 34 top-level layers since (307 `platform/data/*.json` files as of
+2026-07-12, most of them per-province `<slug>_places/roads/water.json` geometry).
+
+**This hand-written table is no longer the primary provenance census — treat it as a curated tour of
+the higher-value layers.** `platform/data/provenance.json` (built by `pipeline/build_provenance.py
+--check`, wired into `tests/run.sh`'s determinism gate) is now the live, deterministic, always-current
+audit: it reads every committed layer's OWN `meta` stamp (collapsing the per-province geometry family
+into one row each so the census stays readable) and reports counts + a shame list of anything with no
+readable provenance at all. As of the last regen it reports **76 layers censused, 33 MEASURED, 37
+ESTIMATED, 6 UNLABELLED** — the 6 unlabelled are `branches.json`, `deltas.json`, `meta.json`,
+`provinces/index.json`, `rayong_province.json`, `snapshots_index.json`, which is exactly
+`tests/validate_data.py`'s `PROVENANCE_EXEMPT` set (§4 below) — i.e. every "unlabelled" file is a
+known, reviewed, deliberate exemption (R1/R4/R5 in §3), not an undetected gap. Re-run
+`python3 pipeline/build_provenance.py` any time to refresh the live counts; a future full re-audit of
+this markdown table against that JSON is still worth doing (tracked in `docs/IMPROVEMENT_BACKLOG.md`)
+but is no longer the only safety net — the gate now fails the build if a new numeric layer ships with
+no provenance and no exemption, regardless of whether this file has been updated.
 
 ---
 
