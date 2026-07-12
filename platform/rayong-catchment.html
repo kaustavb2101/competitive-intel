@@ -280,7 +280,7 @@ html[data-theme="light"] #complegend .cl-gnd.on{color:#2C3444;border-color:var(-
 /* TABLET (821–1200px): narrow the fixed panels + control frame a touch so the map well breathes,
    but keep the full desktop layout (panels docked, controls + legends all visible). */
 /* DESKTOP: #ctl (basemap / rings / poster controls) was pinned right:14px — directly UNDER the
-   right "Acquisition leads" .side panel (which occupies the top-right), so the scene-control menu
+   right "Competitive pressure" .side panel (which occupies the top-right), so the scene-control menu
    was invisible on desktop (only reachable on mobile, where it relocates to the bottom sheet).
    Shift it left of the right panel into free map space so it's usable on desktop too. Offsets clear
    the panel width + its 14px inset per breakpoint. */
@@ -557,19 +557,19 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 
 <aside class="side" id="right">
   <button class="xbtn" data-x="right">✕</button>
-  <div class="cardttl"><div class="a">Acquisition leads</div><div class="b">Where competitors own ground you don't</div></div>
+  <div class="cardttl"><div class="a">Competitive pressure</div><div class="b">Where rivals cluster around your branches</div></div>
   <div class="scroll">
     <div id="verdict"></div>
-    <h2 id="gapsH" style="padding:0 0 4px">Top gaps</h2>
+    <h2 id="gapsH" style="padding:0 0 4px">Most contested markets</h2>
     <div id="leads"></div>
-    <h2 id="recosH" style="padding:10px 0 4px">Recommendations</h2>
+    <h2 id="recosH" style="padding:10px 0 4px">What to watch</h2>
     <div id="recos"></div>
   </div>
 </aside>
 
 <div id="mtog">
   <button data-s="left">Analysis</button>
-  <button data-s="right">Leads</button>
+  <button data-s="right">Rivals</button>
   <button data-s="ctl">Layers</button>
 </div>
 
@@ -691,7 +691,9 @@ function compNat(){
   for(const it of items){ if(it==null)continue;
     const la=+it.lat, ln=+it.lng; if(!isFinite(la)||!isFinite(ln))continue;
     if(ln<x0||ln>x1||la<y0||la>y1)continue;
-    out.push({brand:it.brand||'?',name:it.name||'',lat:la,lng:ln});}
+    // carry prov (canonical Thai province) + amphoe (district) so the narrative can be province-scoped
+    // and each row labelled by district — both reverse-geocoded in the census (build_competitor_census.py).
+    out.push({brand:it.brand||'?',name:it.name||'',lat:la,lng:ln,prov:it.prov||'',amphoe:it.amphoe||''});}
   return out;}
 // Use the curated per-province competitor set when present (Rayong); otherwise fall back to the
 // measured national census filtered to the scene — so every city shows real rivals in-frame.
@@ -2081,15 +2083,37 @@ function updatePanels(){
 }
 
 function buildLeads(){
-  // Acquisition panel for ANY province — uses the measured nationwide rival census filtered to the
-  // scene (compScene(): curated Rayong set when present, else competitors_national.json in-frame) vs
-  // the province's branches. Copy is province-neutral (was hardcoded Rayong). Degrades to a note only
-  // when there are genuinely no in-frame rivals or branches.
+  // COMPETITIVE-PRESSURE panel for ANY province. AutoX is CONSOLIDATING, not expanding — so this is a
+  // risk/consolidation read on the EXISTING network, NOT white-space to grow into. Province-accurate:
+  //  - the headline rival count is the TRUE in-province total from the measured census (window.COMPNAT,
+  //    reverse-geocoded `prov` in build_competitor_census.py) — NOT the padded-bbox count that bled
+  //    Chon Buri into Bangkok/Rayong and inflated it to thousands.
+  //  - the list = rivals sitting CLOSEST to an AutoX branch in THIS province (contested / over-served
+  //    markets — a margin/consolidation signal), each labelled by district + distance-to-nearest-AutoX.
   const CS=compScene(), PLBL=(typeof CITY_LABEL!=='undefined'&&CITY_LABEL)?CITY_LABEL:'this province';
+  const PROV_TH=(typeof CITY_TH!=='undefined'&&CITY_TH)?CITY_TH:null;
   const RAYONG=(typeof CITY!=='undefined'&&CITY==='rayong');
-  if(!CS.length||!BR.length){
+  // TRUE province-wide rival total + brand mix from the measured census (exact, not bbox). {} if absent.
+  const provAgg=(function(){
+    const CN=window.COMPNAT, items=CN&&Array.isArray(CN.items)?CN.items:null;
+    const bb={}; let n=0;
+    if(items&&PROV_TH){for(const it of items){ if(it&&it.prov===PROV_TH){ n++; const b=it.brand||'?'; bb[b]=(bb[b]||0)+1; } }}
+    return {n,bb};
+  })();
+  // in-frame, in-province rivals (drive the district-labelled list + click-to-fly to a visible peg).
+  // census path carries `prov`; curated path (Rayong) has no prov -> its items are all in-province.
+  const hasProv=CS.some(c=>c&&c.prov);
+  const CS_PROV=(hasProv&&PROV_TH)?CS.filter(c=>c.prov===PROV_TH):CS;
+  const provN=provAgg.n||CS_PROV.length;       // headline: prefer the exact census province total
+  const inFrame=CS.length;
+  if(!BR.length||(!provN&&!CS_PROV.length)){
     const v=document.getElementById('verdict');
-    if(v)v.innerHTML='<div class="foot">Branches and 10&nbsp;km reach are live for '+PLBL+'; no big-4 rival branches sit in this frame (measured Google-Places census, a lower bound).</div>';
+    if(v){
+      if(BR.length&&inFrame&&!provN&&!CS_PROV.length)
+        v.innerHTML='<div class="foot">No big-4 rival branches sit inside '+PLBL+' itself; '+inFrame+' are visible in the wider frame (measured store-locator census).</div>';
+      else
+        v.innerHTML='<div class="foot">Branches and 10&nbsp;km reach are live for '+PLBL+'; no big-4 rival branches sit inside it (measured store-locator census, a lower bound).</div>';
+    }
     const ld=document.getElementById('leads'); if(ld)ld.innerHTML='';
     const rc=document.getElementById('recos'); if(rc)rc.innerHTML='';
     const gH=document.getElementById('gapsH'); if(gH)gH.style.display='none';
@@ -2098,45 +2122,49 @@ function buildLeads(){
   }
   const gHv=document.getElementById('gapsH'); if(gHv)gHv.style.display='';
   const rHv=document.getElementById('recosH'); if(rHv)rHv.style.display='';
-  // gaps: rivals whose nearest AutoX branch is far -> contested ground we don't hold
-  const gaps=CS.map(c=>{
-    const nb=Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x)));
-    return {c,nb};}).filter(g=>g.nb>650).sort((a,b)=>b.nb-a.nb);
+  // contested markets: in-province rivals sitting CLOSEST to an AutoX branch (over-served = margin/
+  // consolidation risk). Sort ASC by distance-to-nearest-AutoX; keep spatially distinct picks.
+  const scored=CS_PROV.map(c=>{
+    const nb=BR.length?Math.min(...BR.map(b=>hav(c.lat,c.lng,b.y,b.x))):Infinity;
+    return {c,nb};}).filter(g=>isFinite(g.nb)).sort((a,b)=>a.nb-b.nb);
   const picked=[];
-  for(const g of gaps){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
-  const ratio=(CS.length/Math.max(1,BR.length)).toFixed(1);
-  // dominant rival brand in-frame
-  const byBrand={}; CS.forEach(c=>{byBrand[c.brand]=(byBrand[c.brand]||0)+1;});
+  for(const g of scored){if(picked.some(p=>hav(p.c.lat,p.c.lng,g.c.lat,g.c.lng)<600))continue;picked.push(g);if(picked.length>=5)break;}
+  const ratio=(provN/Math.max(1,BR.length)).toFixed(1);
+  // dominant rival brand IN-PROVINCE (census total; falls back to the in-frame subset if census absent)
+  const byBrand=(provAgg.n?provAgg.bb:(function(){const bb={};CS_PROV.forEach(c=>{bb[c.brand]=(bb[c.brand]||0)+1;});return bb;})());
   const topBrand=Object.entries(byBrand).sort((a,b)=>b[1]-a[1])[0];
   document.getElementById('verdict').innerHTML=
-    `<div class="verdict hot">Contested ground — <b>${CS.length} rival branches</b> vs <b>${BR.length} AutoX</b> (${ratio}:1) in ${PLBL}.`
-    +(topBrand?` <b>${topBrand[0]}</b> holds the most in-frame (${topBrand[1]}).`:'')
-    +` Rows below = rivals sitting furthest from any AutoX branch — ground we don’t yet cover.</div>`;
+    `<div class="verdict hot"><b>${provN} big-4 rival branches</b> in ${PLBL} vs <b>${BR.length} AutoX</b> (${ratio}:1)`
+    +(topBrand?` — <b>${topBrand[0]}</b> runs the most (${topBrand[1]}).`:` (measured store-locator census).`)
+    +` Rivals here cluster around your existing branches — contested, over-served ground, not open space.`
+    +(inFrame>provN?` · ${inFrame} visible in this wider frame (bleeds into neighbouring provinces).`:'')
+    +`</div>`;
   document.getElementById('leads').innerHTML=picked.map((g,i)=>{
     // vehicle shops + gold dealers within 2km (measured OSM) — only Rayong carries the per-province POI set today
     const vNear=poiArr('vehicle_commerce').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
     const gNear=poiArr('gold').filter(p=>hav(g.c.lat,g.c.lng,p[0],p[1])<=2000).length;
     const collat=(vNear||gNear)?` ${vNear} vehicle shops · ${gNear} gold dealers ≤2km.`:'';
+    const distLbl=g.c.amphoe?` · ${g.c.amphoe}`:'';
     return `<div class="lead" data-lat="${g.c.lat}" data-lng="${g.c.lng}">
       <div class="rank">${i+1}</div><div class="body">
-      <div class="t">${(g.c.name||g.c.brand).replace(/^[^ ]+ /,'')} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
-      <div class="d">${g.c.brand} holds this; nearest AutoX ${(g.nb/1000).toFixed(1)} km.${collat}</div>
+      <div class="t">${g.c.brand}${distLbl} <span style="color:rgb(${(BRAND[g.c.brand]||[150,150,150]).join(',')})">●</span></div>
+      <div class="d">Rival ${(g.nb/1000).toFixed(1)} km from your nearest AutoX branch — contested/over-served.${collat}</div>
       </div></div>`;}).join('');
   document.querySelectorAll('.lead').forEach(el=>el.onclick=()=>{
     const lat=+el.dataset.lat,lng=+el.dataset.lng;
     flyTo({longitude:lng,latitude:lat,zoom:14.6,pitch:55,bearing:18,transitionDuration:900});
-    focal={n:'Gap (competitor-held)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
+    focal={n:'Rival branch (competitor)',x:lng,y:lat,veh:0,gold:0};updatePanels();render();
     if(window.innerWidth<=820){document.getElementById('left').classList.add('show');document.getElementById('right').classList.remove('show');}
   });
-  const far=picked[0];
+  const near=picked[0];
   const recos=RAYONG?[
-    ['1','Infill the Thapma–Choeng Noen corridor: densest competitor stack and most commerce in-frame, few AutoX points. One well-placed branch contests 4–5 rivals at once.'],
-    ['2','Lead with vehicle-title + gold collateral here — strong collateral supply and pawn competition in-frame. Price against Srisawad/Tidlor on speed (same-day) not rate.'],
-    ['3','Hold the factory edge (Pluak Daeng / Nikhom) as your defensible base; attack the urban core where commerce is dense and no AutoX sits within 1 km.'],
+    ['1','The Thapma–Choeng Noen corridor is the densest rival stack in-frame and sits right on top of AutoX — a contested, over-served core. Defend share on service (same-day title release), not rate.'],
+    ['2','Vehicle-title + gold collateral face the heaviest pawn competition here. Protect margin by differentiating on speed and collateral flexibility against Srisawad/Tidlor, not price.'],
+    ['3','The factory edge (Pluak Daeng / Nikhom) is your most defensible base; the urban core is the most contested — track rival density there as a margin-pressure signal.'],
   ]:[
-    ['1',`Cover the contested points above first: `+(topBrand?topBrand[0]:'rivals')+` sit ${far?(far.nb/1000).toFixed(1):'>1'} km from your nearest branch — a well-placed outlet contests several at once.`],
-    ['2',`Lead on speed (same-day title release) against the ${ratio}:1 rival density, not rate. Use the branch drilldown above to inspect each AutoX branch’s 10&nbsp;km reach.`],
-    ['3',`Defend where AutoX already clusters; press into the frame’s rival-dense pockets where no AutoX sits within ~1 km.`],
+    ['1',`Contested markets first: `+(topBrand?topBrand[0]:'rivals')+` operate within ${near?(near.nb/1000).toFixed(1):'~1'} km of your nearest branch in ${PLBL} — over-served ground where margins compress.`],
+    ['2',`Hold share on service (same-day title release) against the ${ratio}:1 rival density, not rate. Use the branch drilldown to inspect each AutoX branch’s 10&nbsp;km reach and rival overlap.`],
+    ['3',`Flag branches ringed by big-4 rivals for retention/pricing review, and watch for consolidation as the BoT registration deadline reshapes the rival field.`],
   ];
   document.getElementById('recos').innerHTML=recos.map(([n,t])=>`<div class="reco"><span class="n">${n}</span><span>${t}</span></div>`).join('');
 }
@@ -2165,7 +2193,7 @@ function buildStrip(){
       const top=pool[0];
       if(top){
         document.getElementById('strip').insertAdjacentHTML('beforeend',
-          `<span class="bchip" title="Top acquisition district for ${provEN} — composite opportunity score (estimated, measured inputs)">`
+          `<span class="bchip" title="Highest composite opportunity-score district for ${provEN} — estimated (measured inputs)">`
           +`<span class="d" style="background:#E6B450"></span>Top opp · ${top.name||'—'}<b>${(top.score||0).toFixed(0)}</b></span>`);
       }
     }
@@ -2473,7 +2501,7 @@ window.applyDeferred=function(d){
   try{render();}catch(e){}                 // second render pass — deferred layers now present
   try{buildLegend();}catch(e){}            // POI legend (types may now be present)
   try{buildCompLegend();}catch(e){}        // rival-brand legend (national census filtered to frame)
-  try{buildLeads();}catch(e){}             // acquisition leads (uses in-frame rivals)
+  try{buildLeads();}catch(e){}             // competitive-pressure panel (province-scoped rival counts)
   try{updatePanels();}catch(e){}           // who-works-nearby / call-sheet (occupation leads)
 };
 // ---- POSTER MODE (Lane 3D-6) — one tap: hide overlays, frame the skyline edge-to-edge, capture a
