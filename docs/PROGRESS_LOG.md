@@ -5,6 +5,30 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (ux-loop) — Stop rayong-catchment scenery layers 404ing (gate iso/trees/rail fetch)
+
+Autonomous UX loop. Closed UXUI audit finding #2 (major). The `rayong-catchment.html` 3D scene loader
+unconditionally fetched three optional per-city SCENERY layers — isochrone drive-time bands
+(`<city>_isochrone.json`), street trees (`<city>_trees.json`), rail (`<city>_rail.json`) — none of
+which any pipeline produces yet, so every fetch 404'd on every scene. The consumers were already
+null-guarded and the isochrone toggle already self-hid when absent (added 2026-07-05), so this was
+pure console noise, not a functional break — but a browser's network-layer 404 log can't be suppressed
+by `.catch()`, only by not making the request. Added a per-city allowlist (`SCENERY_CITIES =
+{iso:{},trees:{},rail:{}}`, empty today) + an `optScene(kind,sfx)` helper that returns
+`Promise.resolve(null)` unless the city is listed, and swapped the three `opt(P+'_…json')` call sites
+to it. Forward-compatible: add a city to a list the moment its file ships and the layer (and, for iso,
+its toggle) light back up.
+
+**Safeguards:** `tests/run.sh check` 62/0 (incl. `node --check` on every page's inline JS); headless
+render of a not-pulled province exercised the first-wave fetch array → clean render, `data-errors=[]`,
+deck.gl init (Rayong's own 34 MB scene times out under swiftshader — pre-existing harness limit,
+unrelated); no secrets; diff = 3 code lines + 1 audit line, no stray files. **Merge+deploy+verify:**
+squash-merged PR #22 → master (91b7447); Vercel preview built Ready; after production deploy, ROOT
+`/` → HTTP 200 and the changed route → HTTP 200 (via its `cleanUrls` canonical `/rayong-catchment`;
+the `.html` form 308-redirects to it as configured). No regression, no rollback.
+
+---
+
 ## 2026-07-12 (intelligence) — PEER: per-province, per-brand peer comparison (AutoX vs each big-4 rival)
 
 Intelligence loop (peer pillar, priority 1). The competition surface had two peer reads — a NATIONAL
