@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T21:25:42+07:00",
-    "commit": "0f3d2d2"
+    "generated_at": "2026-07-12T19:38:03+00:00",
+    "commit": "5235381"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,18 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T19:38:03+00:00",
+      "sha": "5235381",
+      "summary": "fix(provenance): regenerate byte-size manifest — 17 drifted layers turned the gate red",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T21:32:08+07:00",
+      "sha": "93bc1ed",
+      "summary": "chore(dashboard): dep-access verified done → 96% (48/50); only owner-blocked loan-tape remains",
+      "pillar": "service"
+    },
+    {
       "date": "2026-07-12T21:25:42+07:00",
       "sha": "0f3d2d2",
       "summary": "fix(dep-access): keep WWW-Authenticate realm ASCII so the browser shows a login prompt",
@@ -552,7 +564,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-12T11:21:32Z",
+      "date": "2026-07-12T11:21:32+00:00",
       "sha": "39530e0",
       "summary": "docs: log ux-loop scenery-fetch 404 fix (PR #22 merged + deploy-verified)",
       "pillar": "uxui"
@@ -582,7 +594,7 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-12T10:39:41Z",
+      "date": "2026-07-12T10:39:41+00:00",
       "sha": "4bd90c7",
       "summary": "committee: refresh autonomy plan (run 29189456877)",
       "pillar": "deployment"
@@ -636,28 +648,16 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-12T06:22:04Z",
+      "date": "2026-07-12T06:22:04+00:00",
       "sha": "edf8ed2",
       "summary": "committee: autonomous competitor scout (run 29182474163)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-12T04:25:51Z",
+      "date": "2026-07-12T04:25:51+00:00",
       "sha": "166de75",
       "summary": "committee: autonomous competitor scout (run 29179621674)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T09:54:35+07:00",
-      "sha": "0d16e98",
-      "summary": "Merge pull request #11 from kaustavb2101/claude/crop-precision",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-12T09:50:58+07:00",
-      "sha": "8bc2206",
-      "summary": "Merge pull request #10 from kaustavb2101/claude/r2-migration",
-      "pillar": "data-integration"
     }
   ]
 }
