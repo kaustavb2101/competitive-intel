@@ -137,13 +137,13 @@ def build_items():
         "decision needed from Kaustav — password/SSO gating on the Vercel deployment (NEXT_STEPS §1)")
 
     # ---- feature ----
-    add("feature", "feat-expansion", "Road to 3,000 — sequenced expansion plan",
-        state(dexists("expansion_plan.json") and rexists("pipeline/build_expansion_plan.py")), 1,
-        "platform/data/expansion_plan.json + pipeline/build_expansion_plan.py present")
+    add("feature", "feat-competitor-coverage", "Competitive coverage & rival pressure (national census)",
+        state(dexists("competitor_coverage.json") and rexists("pipeline/build_competitor_coverage.py")), 1,
+        "platform/data/competitor_coverage.json + pipeline/build_competitor_coverage.py present")
     add("feature", "feat-decision-queue", "Exec decision queue (“This week — do these first”)",
         state(dexists("decision_queue.json") and rexists("pipeline/build_decision_queue.py")), 1,
         "platform/data/decision_queue.json + pipeline/build_decision_queue.py present")
-    add("feature", "feat-exit-ws", "Competitor-exit white-space cue (regulatory-tailwind lens)",
+    add("feature", "feat-competitor-fragility", "Competitor fragility under BoT registration deadline (market-risk lens)",
         state(dexists("exit_whitespace.json")), 2,
         "platform/data/exit_whitespace.json present")
     add("feature", "feat-search-demand", "Search demand + share-of-search board",
