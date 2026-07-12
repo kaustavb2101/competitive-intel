@@ -72,6 +72,8 @@ build build_amphoe.py              "build_amphoe.py      (928-district whitespac
 build build_province.py            "build_province.py    (77-province deep-dives + index)"
 # 3) per-province agri stress (OAE area + Pink Sheet proxy + HDX drought).
 build build_crop_stress.py         "build_crop_stress.py (per-province agri stress)"
+# per-branch MEASURED-corrected crop area (SPAM spatial x DOAE 2025 magnitude) — optional DOAE source.
+build build_branch_cropland.py     "build_branch_cropland.py (per-branch measured crop area, optional DOAE src)"
 # 4) MEASURED Overture occupation rollups — optional source; pass-quietly when absent.
 build build_occupations.py         "build_occupations.py (branch occupation rollup, optional src)"
 build build_amphoe_occupations.py  "build_amphoe_occupations.py (district occupation mix, optional src)"
