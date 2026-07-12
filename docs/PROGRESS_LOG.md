@@ -5,6 +5,59 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (integration) — PICO: fold the FPO sub-scale competitor census into the competition read
+
+Autonomous integration loop, top OPEN backlog item (#1 acquisition gap: "competitor coverage stops
+being Rayong-only" — big-4 census is national, but the SUB-SCALE long tail was uncensused). The
+big-4 title-lender census (Muangthai/Srisawad/Tidlor/Heng, coordinate-based) explicitly excludes the
+small operators — and two builders' own `gaps` say so verbatim: `build_rival_pressure.py` ("Sub-scale
+local operators … are not in the census at all — total pressure is a lower bound") and the app's Rival-
+fragility section ("A true rival-fragility index needs a sub-scale-operator census — a blocked
+desktop/Thai-IP company-registry pull"). The **FPO PICO-finance licence registry** IS that census, and
+it is **reachable from CI** (catalog.fpo.go.th, an open department CKAN — not the geo-blocked data.go.th
+aggregator). Verified the puller works from this cloud IP: `pull_datagoth.py --only fpo_pico` → 768 KB,
+2,042 licensed offices, HTTP 200.
+
+PICO-finance (พิโกไฟแนนซ์) = provincially-licensed small personal-loan operators (ceiling ฿50k PICO /
+฿100k PICO-plus, secured incl. vehicle title) — precisely the sub-scale rivals AutoX faces for the same
+small-ticket secured borrower, and precisely the cohort exposed to the Q1-2026 BoT registration
+deadline. The registry carries a service **province + full address per office but NO coordinates**, so —
+honestly — this is a province-level license census, NOT a branch-coordinate census. It therefore
+**complements** (never sums with) the coordinate-based big-4 layers; folding it into
+`rival_density`/`rival_pressure` (which need coordinates) would have meant fabricating geometry, so it
+is kept as its own MEASURED province layer instead.
+
+Shipped, mirroring the established ingest→build split (ingest_doae → build_branch_cropland):
+- `pipeline/ingest_pico.py` — normalizes the raw registry CSV (gitignored, re-pullable via `--pull`) →
+  committed `source-data/pico_by_province.json`: per-canonical-province operator/HQ/branch-office counts.
+  All 75 service provinces map to canonical keys (0 unmapped). `--check` byte-exact (SKIP/exit 3 on
+  absent raw, like ingest_doae).
+- `pipeline/build_pico_competitors.py` — joins those measured counts against AutoX's own per-province
+  branch count (MEASURED, from branches.json) → `platform/data/pico_competitors.json`. Deterministic,
+  `--check` byte-exact (input is the committed source file, so it always verifies in the gate).
+- UI: additive MEASURED table on `#acq` (Competition), placed immediately before the ESTIMATED Rival-
+  fragility proxy it partially unblocks — "Sub-scale rivals · licensed PICO-finance operators by
+  province" (operators/HQ/branch/AutoX/ratio, top-20, answer-first readout). Honestly labelled: province-
+  granular, a complement to the big-4 census, no open/expand call.
+- Wired both `--check`s into `tests/run.sh` after `build_exit_whitespace.py`; re-ran `build_provenance.py`
+  (pico_competitors now tracked as **MEASURED**, byte-exact).
+
+Headline MEASURED finding: **2,042 licensed PICO operators nationally, out-numbering AutoX branches in
+29 of 75 provinces**; the sub-scale field is thickest in Nakhon Ratchasima (145 ops vs 81 AutoX, 1.8×)
+and across agri-Isan (Khon Kaen 2.2×, Chaiyaphum/Phitsanulok 2.4×) — the same provinces carrying the
+highest household-debt stress and the most exposure to the regulatory shake-out. A competitive-pressure
+read on the network we already run; it makes no open/close/expand call.
+
+Verification: `bash tests/run.sh check` → **64 passed, 0 failed** (+2 = the new ingest+build checks,
+both PASS not skipped). Chromium headless render of `index.html#acq`: PICO table populates 20 provinces,
+readout correct ("2,042 … out-number AutoX in 29 of 75 provinces"), first row Nakhon Ratchasima
+145/114/31/81/1.8× — no pageerror (the ERR_CONNECTION_RESET entries are pre-existing external CDN/font
+blocks in the sandbox, unrelated). Opened as a PR (alters app visuals). Next integration: distill the
+remaining CI-reachable datagoth sources (DIW factories, MOT/Excise vehicles, DBD company formation) into
+clean province layers — backlog item #3.
+
+---
+
 ## 2026-07-12 (ux-loop) — Stop rayong-catchment scenery layers 404ing (gate iso/trees/rail fetch)
 
 Autonomous UX loop. Closed UXUI audit finding #2 (major). The `rayong-catchment.html` 3D scene loader

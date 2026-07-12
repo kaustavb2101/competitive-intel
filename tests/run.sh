@@ -154,6 +154,19 @@ phase_check(){
   ( cd "$PIPE" && python3 ingest_heng.py --check >/dev/null 2>&1 ) && ok "ingest_heng.py --check" || bad "ingest_heng.py --check (Heng official-locator merge drifted from source-data/heng_branches.json — run: python3 pipeline/ingest_heng.py)"
   ( cd "$PIPE" && python3 build_cluster_brief.py --check >/dev/null 2>&1 ) && ok "build_cluster_brief.py --check" || bad "build_cluster_brief.py --check (cluster_brief.json drifted from branch_occupations/branches/meta board/crop_stress)"
   ( cd "$PIPE" && python3 build_exit_whitespace.py --check >/dev/null 2>&1 ) && ok "build_exit_whitespace.py --check" || bad "build_exit_whitespace.py --check (exit_whitespace.json drifted from amphoe.json/competitors)"
+  # FPO PICO-finance sub-scale competitor census (measured, from catalog.fpo.go.th, any IP). The ingest's
+  # raw CSV is gitignored (re-pullable) so its --check SKIPs (exit 3) when absent; the builder reads the
+  # committed source-data/pico_by_province.json so it always verifies byte-exact in the gate.
+  ( cd "$PIPE" && python3 ingest_pico.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "ingest_pico.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "ingest_pico.py --check (source-data/datagoth/fpo_pico.csv absent — gitignored raw pull)"
+  else bad "ingest_pico.py --check (pico_by_province.json drifted from the FPO registry CSV — run: python3 pipeline/ingest_pico.py)"
+  fi
+  ( cd "$PIPE" && python3 build_pico_competitors.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_pico_competitors.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_pico_competitors.py --check (source-data/pico_by_province.json absent — FPO pull not run)"
+  else bad "build_pico_competitors.py --check (pico_competitors.json drifted from pico_by_province.json/branches.json — run: python3 pipeline/build_pico_competitors.py)"
+  fi
   ( cd "$PIPE" && python3 build_expansion_plan.py --check >/dev/null 2>&1 ) && ok "build_expansion_plan.py --check" || bad "build_expansion_plan.py --check (expansion_plan.json drifted from amphoe.json/branches.json)"
   ( cd "$PIPE" && python3 build_search_demand.py --check >/dev/null 2>&1 ) && ok "build_search_demand.py --check" || bad "build_search_demand.py --check (search_demand.json drifted from source-data/google_trends.json/provinces index)"
   ( cd "$PIPE" && python3 build_branch_peers.py --check >/dev/null 2>&1 ); rc=$?

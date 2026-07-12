@@ -1,0 +1,401 @@
+{
+  "meta": {
+    "title": "MEASURED sub-scale competitor census — licensed PICO-finance operators by province",
+    "generated_by": "pipeline/ingest_pico.py",
+    "source": "FPO (Fiscal Policy Office, Ministry of Finance) PICO-finance licence registry, catalog.fpo.go.th (open CKAN, no key). MEASURED — an official licence registry.",
+    "what": "PICO-finance (พิโกไฟแนนซ์) = provincially-licensed small personal-loan operators (ceiling ฿50k PICO / ฿100k PICO-plus, secured incl. vehicle title). The sub-scale rivals AutoX faces that the big-4 title-lender census does NOT cover, and the operators most exposed to the Q1-2026 BoT responsible-lending registration deadline.",
+    "provenance": "MEASURED — one row per licensed office (service province + licence no. + address). Aggregated to per-province counts only; the source carries NO coordinates, so no geometry is synthesized (this is a province registry, not a branch-coordinate census).",
+    "unit": "count of licensed offices",
+    "fields": {
+      "operators": "MEASURED — total licensed PICO offices whose SERVICE province is this province.",
+      "hq": "MEASURED — head offices (สำนักงานใหญ่) = distinct legal operators.",
+      "branch": "MEASURED — branch offices (สำนักสาขา) = additional service points."
+    },
+    "n_provinces": 75,
+    "n_offices_total": 2042,
+    "n_hq_total": 1187,
+    "n_branch_total": 855,
+    "n_rows_unmapped": 0,
+    "gaps": [
+      "Province-granular only — the FPO registry lists a service province + street address per office but no coordinates, so this cannot be joined to a district or a branch catchment. It complements (does not replace) the coordinate-based big-4 census.",
+      "Snapshot of currently-LICENSED operators — informal / unlicensed lenders are outside any registry."
+    ]
+  },
+  "provinces": {
+    "กระบี่": {
+      "operators": 9,
+      "hq": 4,
+      "branch": 5
+    },
+    "กรุงเทพมหานคร": {
+      "operators": 111,
+      "hq": 101,
+      "branch": 10
+    },
+    "กาญจนบุรี": {
+      "operators": 4,
+      "hq": 4,
+      "branch": 0
+    },
+    "กาฬสินธุ์": {
+      "operators": 36,
+      "hq": 35,
+      "branch": 1
+    },
+    "กำแพงเพชร": {
+      "operators": 28,
+      "hq": 13,
+      "branch": 15
+    },
+    "ขอนแก่น": {
+      "operators": 76,
+      "hq": 63,
+      "branch": 13
+    },
+    "จันทบุรี": {
+      "operators": 4,
+      "hq": 3,
+      "branch": 1
+    },
+    "ฉะเชิงเทรา": {
+      "operators": 13,
+      "hq": 10,
+      "branch": 3
+    },
+    "ชลบุรี": {
+      "operators": 30,
+      "hq": 27,
+      "branch": 3
+    },
+    "ชัยนาท": {
+      "operators": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    "ชัยภูมิ": {
+      "operators": 71,
+      "hq": 45,
+      "branch": 26
+    },
+    "ชุมพร": {
+      "operators": 15,
+      "hq": 3,
+      "branch": 12
+    },
+    "ตรัง": {
+      "operators": 35,
+      "hq": 9,
+      "branch": 26
+    },
+    "ตราด": {
+      "operators": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    "ตาก": {
+      "operators": 8,
+      "hq": 6,
+      "branch": 2
+    },
+    "นครนายก": {
+      "operators": 7,
+      "hq": 4,
+      "branch": 3
+    },
+    "นครปฐม": {
+      "operators": 6,
+      "hq": 6,
+      "branch": 0
+    },
+    "นครพนม": {
+      "operators": 19,
+      "hq": 16,
+      "branch": 3
+    },
+    "นครราชสีมา": {
+      "operators": 145,
+      "hq": 114,
+      "branch": 31
+    },
+    "นครศรีธรรมราช": {
+      "operators": 62,
+      "hq": 11,
+      "branch": 51
+    },
+    "นครสวรรค์": {
+      "operators": 31,
+      "hq": 15,
+      "branch": 16
+    },
+    "นนทบุรี": {
+      "operators": 14,
+      "hq": 14,
+      "branch": 0
+    },
+    "นราธิวาส": {
+      "operators": 5,
+      "hq": 1,
+      "branch": 4
+    },
+    "น่าน": {
+      "operators": 22,
+      "hq": 7,
+      "branch": 15
+    },
+    "บึงกาฬ": {
+      "operators": 10,
+      "hq": 6,
+      "branch": 4
+    },
+    "บุรีรัมย์": {
+      "operators": 44,
+      "hq": 37,
+      "branch": 7
+    },
+    "ปทุมธานี": {
+      "operators": 18,
+      "hq": 18,
+      "branch": 0
+    },
+    "ประจวบคีรีขันธ์": {
+      "operators": 15,
+      "hq": 11,
+      "branch": 4
+    },
+    "ปราจีนบุรี": {
+      "operators": 17,
+      "hq": 10,
+      "branch": 7
+    },
+    "ปัตตานี": {
+      "operators": 3,
+      "hq": 1,
+      "branch": 2
+    },
+    "พระนครศรีอยุธยา": {
+      "operators": 3,
+      "hq": 3,
+      "branch": 0
+    },
+    "พะเยา": {
+      "operators": 27,
+      "hq": 4,
+      "branch": 23
+    },
+    "พังงา": {
+      "operators": 16,
+      "hq": 4,
+      "branch": 12
+    },
+    "พัทลุง": {
+      "operators": 23,
+      "hq": 3,
+      "branch": 20
+    },
+    "พิจิตร": {
+      "operators": 13,
+      "hq": 6,
+      "branch": 7
+    },
+    "พิษณุโลก": {
+      "operators": 71,
+      "hq": 9,
+      "branch": 62
+    },
+    "ภูเก็ต": {
+      "operators": 15,
+      "hq": 3,
+      "branch": 12
+    },
+    "มหาสารคาม": {
+      "operators": 57,
+      "hq": 40,
+      "branch": 17
+    },
+    "มุกดาหาร": {
+      "operators": 27,
+      "hq": 14,
+      "branch": 13
+    },
+    "ยะลา": {
+      "operators": 5,
+      "hq": 1,
+      "branch": 4
+    },
+    "ยโสธร": {
+      "operators": 54,
+      "hq": 34,
+      "branch": 20
+    },
+    "ระนอง": {
+      "operators": 6,
+      "hq": 1,
+      "branch": 5
+    },
+    "ระยอง": {
+      "operators": 20,
+      "hq": 17,
+      "branch": 3
+    },
+    "ราชบุรี": {
+      "operators": 3,
+      "hq": 3,
+      "branch": 0
+    },
+    "ร้อยเอ็ด": {
+      "operators": 74,
+      "hq": 63,
+      "branch": 11
+    },
+    "ลพบุรี": {
+      "operators": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    "ลำปาง": {
+      "operators": 39,
+      "hq": 14,
+      "branch": 25
+    },
+    "ลำพูน": {
+      "operators": 23,
+      "hq": 10,
+      "branch": 13
+    },
+    "ศรีสะเกษ": {
+      "operators": 67,
+      "hq": 39,
+      "branch": 28
+    },
+    "สกลนคร": {
+      "operators": 18,
+      "hq": 14,
+      "branch": 4
+    },
+    "สงขลา": {
+      "operators": 46,
+      "hq": 10,
+      "branch": 36
+    },
+    "สตูล": {
+      "operators": 7,
+      "hq": 2,
+      "branch": 5
+    },
+    "สมุทรปราการ": {
+      "operators": 27,
+      "hq": 25,
+      "branch": 2
+    },
+    "สมุทรสงคราม": {
+      "operators": 1,
+      "hq": 1,
+      "branch": 0
+    },
+    "สมุทรสาคร": {
+      "operators": 13,
+      "hq": 13,
+      "branch": 0
+    },
+    "สระบุรี": {
+      "operators": 6,
+      "hq": 5,
+      "branch": 1
+    },
+    "สระแก้ว": {
+      "operators": 18,
+      "hq": 8,
+      "branch": 10
+    },
+    "สุพรรณบุรี": {
+      "operators": 4,
+      "hq": 4,
+      "branch": 0
+    },
+    "สุราษฎร์ธานี": {
+      "operators": 27,
+      "hq": 7,
+      "branch": 20
+    },
+    "สุรินทร์": {
+      "operators": 62,
+      "hq": 36,
+      "branch": 26
+    },
+    "สุโขทัย": {
+      "operators": 23,
+      "hq": 9,
+      "branch": 14
+    },
+    "หนองคาย": {
+      "operators": 13,
+      "hq": 7,
+      "branch": 6
+    },
+    "หนองบัวลำภู": {
+      "operators": 18,
+      "hq": 13,
+      "branch": 5
+    },
+    "อำนาจเจริญ": {
+      "operators": 13,
+      "hq": 11,
+      "branch": 2
+    },
+    "อุดรธานี": {
+      "operators": 46,
+      "hq": 27,
+      "branch": 19
+    },
+    "อุตรดิตถ์": {
+      "operators": 18,
+      "hq": 12,
+      "branch": 6
+    },
+    "อุทัยธานี": {
+      "operators": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    "อุบลราชธานี": {
+      "operators": 96,
+      "hq": 49,
+      "branch": 47
+    },
+    "เชียงราย": {
+      "operators": 42,
+      "hq": 9,
+      "branch": 33
+    },
+    "เชียงใหม่": {
+      "operators": 97,
+      "hq": 20,
+      "branch": 77
+    },
+    "เพชรบุรี": {
+      "operators": 2,
+      "hq": 2,
+      "branch": 0
+    },
+    "เพชรบูรณ์": {
+      "operators": 11,
+      "hq": 10,
+      "branch": 1
+    },
+    "เลย": {
+      "operators": 5,
+      "hq": 5,
+      "branch": 0
+    },
+    "แพร่": {
+      "operators": 10,
+      "hq": 10,
+      "branch": 0
+    },
+    "แม่ฮ่องสอน": {
+      "operators": 4,
+      "hq": 2,
+      "branch": 2
+    }
+  }
+}

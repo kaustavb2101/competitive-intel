@@ -1508,6 +1508,7 @@ function renderAcq(){
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
+  renderPicoCompetitors();
   renderExitWhitespace();
   // REMOVED (strategy pivot — network consolidating, not growing): renderRoad3k() [branch-growth
   // headroom allocation], renderExpansionPlan() [sequenced growth plan] and renderOppScore()
@@ -1761,6 +1762,63 @@ function drawPeerProvince(){
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
+  }
+}
+
+/* ---------- sub-scale rivals · licensed PICO-finance operators by province (obj #2) ----------
+   Surfaces data/pico_competitors.json (75 provinces, pipeline/build_pico_competitors.py): the FPO
+   PICO-finance licence registry (MEASURED) counted per province next to AutoX's own branch count.
+   The first measured read on the small-lender long tail the big-4 title census misses; province-only
+   (no coordinates), so it COMPLEMENTS — never sums with — the coordinate-based census. Lazy,
+   promise-free, graceful if absent. We DO NOT recompute — we rank & show measured counts. A
+   competitive-pressure read on the existing network; no open / expand call. */
+let PICO=null, picoLoaded=false;
+const PICO_TOPN=20;
+function renderPicoCompetitors(){
+  const tbl=$('#picotbl'); if(!tbl) return;
+  if(picoLoaded){ drawPico(); return; }
+  fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null).then(j=>{
+    PICO=j; picoLoaded=true; drawPico();
+  }).catch(()=>{ PICO=null; picoLoaded=true; drawPico(); });
+}
+function drawPico(){
+  const tbl=$('#picotbl'), ro=$('#picoreadout'); if(!tbl) return;
+  const recs=(PICO&&Array.isArray(PICO.provinces))?PICO.provinces:[];
+  if(!recs.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Sub-scale PICO census not yet computed.</b> <span class="sub">Run pipeline/ingest_pico.py --pull then build_pico_competitors.py — it fills in on the next data refresh.</span>';
+    return;
+  }
+  const m=PICO.meta||{};
+  const list=recs.slice(0,PICO_TOPN);
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="licensed PICO-finance offices whose service province is this one (MEASURED, FPO registry)">PICO ops</th>`+
+    `<th title="head offices = distinct legal operators">HQ</th>`+
+    `<th title="branch offices = extra service points">Br</th>`+
+    `<th title="AutoX branches in this province (MEASURED)">AutoX</th>`+
+    `<th title="PICO operators ÷ AutoX branches">Ratio</th></tr>`+
+    list.map((r,i)=>{
+      const rc=(r.ratio!=null&&r.ratio>=2)?'var(--agri)':(r.ratio!=null&&r.ratio>=1)?'var(--gold)':'var(--dim)';
+      const ratio=(r.ratio!=null)?r.ratio.toFixed(1)+'×':'—';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.province_th||'—'}</b></td>
+        <td class="mono" style="color:var(--merch)"><b>${(r.operators||0).toLocaleString()}</b></td>
+        <td class="mono sub">${(r.hq||0).toLocaleString()}</td>
+        <td class="mono sub">${(r.branch||0).toLocaleString()}</td>
+        <td class="mono">${(r.autox||0).toLocaleString()}</td>
+        <td class="mono" style="color:${rc}">${ratio}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const nOut=m.n_provinces_outnumbered!=null?m.n_provinces_outnumbered:recs.filter(r=>r.autox>0&&r.operators>r.autox).length;
+    const tot=m.n_operators_total||recs.reduce((s,r)=>s+(r.operators||0),0);
+    const top=m.top_province||recs[0];
+    ro.innerHTML=`<b><b style="color:var(--merch)">${tot.toLocaleString()}</b> licensed PICO-finance operators nationally — and they out-number AutoX branches in <b style="color:var(--agri)">${nOut}</b> of ${recs.length} provinces.</b> `+
+      `The sub-scale field is thickest in ${top?top.province_th:'—'} (${top?(top.operators||0).toLocaleString():'—'} operators) and across agri-Isan — the same provinces most exposed to the Q1-2026 BoT registration deadline. ${TAG_M}`+
+      methodBox(null,
+        ['PICO operator + AutoX branch counts are <b>MEASURED</b> — the FPO licence registry (catalog.fpo.go.th) vs branches.json, per canonical province.',
+         'PICO-finance = provincially-licensed small personal-loan lenders (฿50k–฿100k, secured incl. vehicle title) — the sub-scale rivals the big-4 title census does not cover.',
+         'Province-granular only (no coordinates in the source) — a <b>complement</b> to the coordinate-based big-4 census, not summed with it; a competitive-pressure read, not an expansion cue.']);
   }
 }
 
