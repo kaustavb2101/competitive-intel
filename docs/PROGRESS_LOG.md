@@ -974,3 +974,20 @@ Kaustav deploys).
 - **National competitor coverage complete** — competitors_census.json = 16,503 measured big-4 rival branches across ALL 77 provinces (verified distinct prov == 77). `mkt-scout-national` = done.
 - **3D building catchments complete** — all 77 provinces' `<slug>_catchment.json` confirmed HTTP 200 on the R2 CDN (manifest: platform/data/catchments_r2.json); the 3 pilot provinces also in git. `td-overture-pull` = done. (Catchments live on R2, not git — the planner now counts the verified R2 manifest, not just git files.)
 - Still OPEN and genuinely owner-blocked: `di-loan-tape` / `svc-loan-tape` (need a real no-PII loan-tape export), `dep-access` (access-gating is an owner decision — currently deliberately public).
+
+
+## 2026-07-12 — Access protection live + every-province competitor intel
+- **ACCESS PROTECTION VERIFIED** — the deployment is now gated by HTTP Basic Auth via a Vercel Edge
+  Middleware at the repo root (`./middleware.js`), controlled by the `SITE_PASSWORD` env var (owner set
+  it in Vercel Production+Preview). Verified live on the master alias: no creds → 401 with a
+  `WWW-Authenticate: Basic` prompt, wrong password → 401, correct password → 200. Fail-open when
+  `SITE_PASSWORD` is unset so a deploy can never lock everyone out. Two fixes were needed to make it real:
+  (1) the middleware had been under the outputDirectory (`platform/`) where Vercel never registers it —
+  moved to the project root; (2) the `WWW-Authenticate` realm contained a non-ASCII em-dash so the edge
+  silently dropped the header and browsers showed no login dialog — realm is now ASCII. `dep-access` = done.
+- **Every province now shows its real rival network** — `province.html` was Rayong-only for competitors
+  ("competitor locations not yet pulled" everywhere else). It now derives competitors from the measured
+  national census (`competitors_census.json`, 16,503 branches with prov+amphoe) filtered by `province_th`
+  — the same source the 3D scene uses, so counts agree across views. The panel is reframed to competitive
+  PRESSURE (total rivals, ratio vs AutoX branches, brand mix, most-contested districts) with a Rivals KPI
+  chip. Verified in-browser (Surat Thani: 439 rivals, 10.2× AutoX's 43) and live on production.

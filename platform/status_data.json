@@ -2,17 +2,17 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T19:19:15+07:00",
-    "commit": "30f6d01"
+    "generated_at": "2026-07-12T21:25:42+07:00",
+    "commit": "0f3d2d2"
   },
   "overall": {
-    "progress_pct": 94,
+    "progress_pct": 96,
     "status": "on-track",
-    "eta_days": 1,
-    "eta_date": "2026-07-13",
-    "done_items": 47,
+    "eta_days": 0,
+    "eta_date": "2026-07-12",
+    "done_items": 48,
     "in_progress_items": 2,
-    "open_items": 1,
+    "open_items": 0,
     "total_items": 50
   },
   "loops": [
@@ -102,8 +102,8 @@
     {
       "key": "deployment",
       "label": "Deployment & autonomy",
-      "progress_pct": 83,
-      "done": 5,
+      "progress_pct": 100,
+      "done": 6,
       "total": 6,
       "status": "on-track",
       "items": [
@@ -145,9 +145,9 @@
         {
           "id": "dep-access",
           "title": "Access protection on the deployment (sensitive branch-level PD)",
-          "state": "open",
+          "state": "done",
           "priority": 3,
-          "evidence": "decision needed from Kaustav — password/SSO gating on the Vercel deployment (NEXT_STEPS §1)"
+          "evidence": "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; fail-open when unset. Verified live (401 without creds, 200 with the password)."
         }
       ]
     },
@@ -480,6 +480,60 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T21:25:42+07:00",
+      "sha": "0f3d2d2",
+      "summary": "fix(dep-access): keep WWW-Authenticate realm ASCII so the browser shows a login prompt",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T21:23:47+07:00",
+      "sha": "b68f627",
+      "summary": "feat(province): wire competitor panel/map/KPI to the national census",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-12T21:16:06+07:00",
+      "sha": "d50d016",
+      "summary": "fix(dep-access): move Edge Middleware to repo root so Vercel actually runs it",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T21:07:52+07:00",
+      "sha": "bd66095",
+      "summary": "fix(3d): gate self-drawn ground on raster presence, not just studio (keep 'light' basemap's paper bed)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T21:06:50+07:00",
+      "sha": "8376ac7",
+      "summary": "fix(3d): don't draw the opaque ground bed on raster basemaps (satellite)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T21:03:34+07:00",
+      "sha": "246d429",
+      "summary": "feat(access): password-gate the deployment via Edge Middleware (Basic Auth)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T19:48:23+07:00",
+      "sha": "6a4680d",
+      "summary": "fix(isochrone): strip ORS_KEY (trailing newline in the secret corrupted the Authorization header -> 'Invalid header value')",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T19:42:48+07:00",
+      "sha": "40c3a2d",
+      "summary": "Merge remote-tracking branch 'origin/claude/isochrone-enrich'",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T19:39:30+07:00",
+      "sha": "43deaa1",
+      "summary": "feat(3d): true 15-min ORS drive-time isochrones (replace walk-radius)",
+      "pillar": "3d-enrichment"
+    },
+    {
       "date": "2026-07-12T19:19:15+07:00",
       "sha": "30f6d01",
       "summary": "dashboard: reflect genuinely-done pillar items (prod deploy, national census, 3D-on-R2)",
@@ -604,60 +658,6 @@
       "sha": "8bc2206",
       "summary": "Merge pull request #10 from kaustavb2101/claude/r2-migration",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T09:47:08+07:00",
-      "sha": "24d447e",
-      "summary": "crop: don't ship laptop-generated branch_cropland.json/provenance",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-12T09:42:32+07:00",
-      "sha": "f1e6307",
-      "summary": "feat(crop): per-branch MEASURED-corrected crop land-use (SPAM x DOAE 2025)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-12T09:41:49+07:00",
-      "sha": "f389991",
-      "summary": "r2(upload): force UTF-8 stdout so the arrow char doesn't crash on Windows",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T09:17:26+07:00",
-      "sha": "69140b2",
-      "summary": "r2: catchment-to-R2 migration tooling (upload script + guide)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T09:16:00+07:00",
-      "sha": "8159f7f",
-      "summary": "Merge pull request #9 from kaustavb2101/claude/ux-audit-fixes",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T09:15:56+07:00",
-      "sha": "c2c3721",
-      "summary": "Merge pull request #8 from kaustavb2101/claude/datagoth-puller",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T09:15:52+07:00",
-      "sha": "5305cda",
-      "summary": "Merge pull request #6 from kaustavb2101/claude/autonomous-enrichment-cloud",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T09:15:48+07:00",
-      "sha": "2ea0623",
-      "summary": "Merge pull request #7 from kaustavb2101/data/gov-census-29174641547",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T08:58:36+07:00",
-      "sha": "d80f006",
-      "summary": "fix(ux): branch-explorer basemap dead ({s} token) + record QA/UXUI audit",
-      "pillar": "uxui"
     }
   ]
 }

@@ -155,8 +155,9 @@ def build_items():
         state(rexists(".github/workflows/qa.yml") and rexists("tests/run.sh")), 2,
         ".github/workflows/qa.yml + tests/run.sh committed")
     add("deployment", "dep-access", "Access protection on the deployment (sensitive branch-level PD)",
-        state(False), 3,
-        "decision needed from Kaustav — password/SSO gating on the Vercel deployment (NEXT_STEPS §1)")
+        state(rexists("middleware.js") and doc_has("docs/PROGRESS_LOG.md", "ACCESS PROTECTION VERIFIED")), 3,
+        "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; "
+        "fail-open when unset. Verified live (401 without creds, 200 with the password).")
 
     # ---- feature ----
     add("feature", "feat-competitor-coverage", "Competitive coverage & rival pressure (national census)",
