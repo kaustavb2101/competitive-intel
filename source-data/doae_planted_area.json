@@ -1,0 +1,559 @@
+{
+ "meta": {
+  "title": "MEASURED planted area by province (DOAE farmer registry)",
+  "generated_by": "pipeline/ingest_doae.py",
+  "source": "DOAE farmer_all webservice (farmer.doae.go.th), no key",
+  "year_be": "2568",
+  "unit": "hectares (converted from rai / 6.25)",
+  "provenance": "MEASURED — DOAE farmer registration. Sugarcane absent (OCSB, not DOAE).",
+  "crops": [
+   "rice",
+   "cassava",
+   "maize",
+   "oilpalm",
+   "rubber"
+  ],
+  "n_provinces": 77
+ },
+ "provinces": {
+  "กระบี่": {
+   "rice": 782.5,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 79696.2,
+   "rubber": 34084.9
+  },
+  "กรุงเทพมหานคร": {
+   "rice": 23452.7,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 25.5,
+   "rubber": 0.0
+  },
+  "กาญจนบุรี": {
+   "rice": 80654.9,
+   "cassava": 32363.6,
+   "maize": 11188.6,
+   "oilpalm": 1187.6,
+   "rubber": 10375.4
+  },
+  "กาฬสินธุ์": {
+   "rice": 279014.9,
+   "cassava": 22620.6,
+   "maize": 1.4,
+   "oilpalm": 352.1,
+   "rubber": 6120.8
+  },
+  "กำแพงเพชร": {
+   "rice": 292203.8,
+   "cassava": 75220.8,
+   "maize": 19224.3,
+   "oilpalm": 845.3,
+   "rubber": 1922.4
+  },
+  "ขอนแก่น": {
+   "rice": 383017.7,
+   "cassava": 29004.1,
+   "maize": 328.0,
+   "oilpalm": 147.9,
+   "rubber": 1337.2
+  },
+  "จันทบุรี": {
+   "rice": 1338.6,
+   "cassava": 214.2,
+   "maize": 560.9,
+   "oilpalm": 841.6,
+   "rubber": 22020.4
+  },
+  "ฉะเชิงเทรา": {
+   "rice": 139706.1,
+   "cassava": 2787.5,
+   "maize": 273.8,
+   "oilpalm": 4907.5,
+   "rubber": 21788.9
+  },
+  "ชลบุรี": {
+   "rice": 10938.7,
+   "cassava": 5461.4,
+   "maize": 1.1,
+   "oilpalm": 12452.1,
+   "rubber": 20359.9
+  },
+  "ชัยนาท": {
+   "rice": 145456.7,
+   "cassava": 5357.7,
+   "maize": 1819.7,
+   "oilpalm": 23.1,
+   "rubber": 0.0
+  },
+  "ชัยภูมิ": {
+   "rice": 268149.5,
+   "cassava": 97835.6,
+   "maize": 6819.7,
+   "oilpalm": 866.5,
+   "rubber": 9364.8
+  },
+  "ชุมพร": {
+   "rice": 259.2,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 96327.1,
+   "rubber": 52334.0
+  },
+  "ตรัง": {
+   "rice": 1430.2,
+   "cassava": 0.5,
+   "maize": 0.3,
+   "oilpalm": 42448.4,
+   "rubber": 85729.7
+  },
+  "ตราด": {
+   "rice": 1414.9,
+   "cassava": 0.8,
+   "maize": 0.0,
+   "oilpalm": 3021.3,
+   "rubber": 21641.7
+  },
+  "ตาก": {
+   "rice": 54878.3,
+   "cassava": 18873.5,
+   "maize": 78928.4,
+   "oilpalm": 77.2,
+   "rubber": 812.3
+  },
+  "นครนายก": {
+   "rice": 73653.5,
+   "cassava": 20.7,
+   "maize": 17.6,
+   "oilpalm": 96.8,
+   "rubber": 7.6
+  },
+  "นครปฐม": {
+   "rice": 69698.3,
+   "cassava": 0.8,
+   "maize": 0.0,
+   "oilpalm": 43.4,
+   "rubber": 3.0
+  },
+  "นครพนม": {
+   "rice": 226108.9,
+   "cassava": 2729.6,
+   "maize": 3.2,
+   "oilpalm": 1013.4,
+   "rubber": 23805.8
+  },
+  "นครราชสีมา": {
+   "rice": 534964.2,
+   "cassava": 100949.0,
+   "maize": 61986.6,
+   "oilpalm": 611.4,
+   "rubber": 2184.3
+  },
+  "นครศรีธรรมราช": {
+   "rice": 18626.1,
+   "cassava": 0.2,
+   "maize": 0.0,
+   "oilpalm": 81549.9,
+   "rubber": 122964.1
+  },
+  "นครสวรรค์": {
+   "rice": 513171.4,
+   "cassava": 40667.6,
+   "maize": 56747.5,
+   "oilpalm": 111.7,
+   "rubber": 218.4
+  },
+  "นนทบุรี": {
+   "rice": 22438.7,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 2.3,
+   "rubber": 0.0
+  },
+  "นราธิวาส": {
+   "rice": 3011.4,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 7886.3,
+   "rubber": 64340.1
+  },
+  "น่าน": {
+   "rice": 54420.1,
+   "cassava": 4672.9,
+   "maize": 55733.9,
+   "oilpalm": 295.3,
+   "rubber": 53927.5
+  },
+  "บึงกาฬ": {
+   "rice": 71469.2,
+   "cassava": 830.3,
+   "maize": 0.0,
+   "oilpalm": 4573.4,
+   "rubber": 101707.5
+  },
+  "บุรีรัมย์": {
+   "rice": 450841.4,
+   "cassava": 25032.3,
+   "maize": 376.5,
+   "oilpalm": 487.6,
+   "rubber": 13108.9
+  },
+  "ปทุมธานี": {
+   "rice": 67130.0,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 1500.2,
+   "rubber": 9.8
+  },
+  "ประจวบคีรีขันธ์": {
+   "rice": 2722.8,
+   "cassava": 51.4,
+   "maize": 90.4,
+   "oilpalm": 14589.5,
+   "rubber": 24968.7
+  },
+  "ปราจีนบุรี": {
+   "rice": 80438.5,
+   "cassava": 2734.0,
+   "maize": 2319.6,
+   "oilpalm": 1292.7,
+   "rubber": 1988.0
+  },
+  "ปัตตานี": {
+   "rice": 7733.5,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 2804.4,
+   "rubber": 20359.1
+  },
+  "พระนครศรีอยุธยา": {
+   "rice": 215586.2,
+   "cassava": 0.0,
+   "maize": 3.4,
+   "oilpalm": 21.3,
+   "rubber": 1.0
+  },
+  "พะเยา": {
+   "rice": 104443.1,
+   "cassava": 705.0,
+   "maize": 14246.2,
+   "oilpalm": 157.7,
+   "rubber": 15436.1
+  },
+  "พังงา": {
+   "rice": 185.7,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 26118.1,
+   "rubber": 35792.3
+  },
+  "พัทลุง": {
+   "rice": 16690.9,
+   "cassava": 0.0,
+   "maize": 0.1,
+   "oilpalm": 16332.7,
+   "rubber": 52261.9
+  },
+  "พิจิตร": {
+   "rice": 386682.1,
+   "cassava": 809.0,
+   "maize": 9410.5,
+   "oilpalm": 189.6,
+   "rubber": 83.7
+  },
+  "พิษณุโลก": {
+   "rice": 341626.0,
+   "cassava": 15747.3,
+   "maize": 21857.4,
+   "oilpalm": 1771.9,
+   "rubber": 26183.7
+  },
+  "ภูเก็ต": {
+   "rice": 4.2,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 167.7,
+   "rubber": 3551.6
+  },
+  "มหาสารคาม": {
+   "rice": 354743.6,
+   "cassava": 10254.0,
+   "maize": 0.0,
+   "oilpalm": 11.0,
+   "rubber": 80.2
+  },
+  "มุกดาหาร": {
+   "rice": 66697.5,
+   "cassava": 7118.5,
+   "maize": 0.5,
+   "oilpalm": 264.6,
+   "rubber": 14680.8
+  },
+  "ยะลา": {
+   "rice": 1901.4,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 771.6,
+   "rubber": 74943.4
+  },
+  "ยโสธร": {
+   "rice": 206802.8,
+   "cassava": 10538.7,
+   "maize": 15.0,
+   "oilpalm": 73.6,
+   "rubber": 2416.4
+  },
+  "ระนอง": {
+   "rice": 82.0,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 15838.4,
+   "rubber": 27982.0
+  },
+  "ระยอง": {
+   "rice": 1192.2,
+   "cassava": 1226.7,
+   "maize": 0.0,
+   "oilpalm": 2771.8,
+   "rubber": 42387.1
+  },
+  "ราชบุรี": {
+   "rice": 52775.7,
+   "cassava": 2460.2,
+   "maize": 72.6,
+   "oilpalm": 795.6,
+   "rubber": 1481.0
+  },
+  "ร้อยเอ็ด": {
+   "rice": 499685.1,
+   "cassava": 972.6,
+   "maize": 8.9,
+   "oilpalm": 71.5,
+   "rubber": 409.1
+  },
+  "ลพบุรี": {
+   "rice": 167239.6,
+   "cassava": 16618.1,
+   "maize": 48880.6,
+   "oilpalm": 73.5,
+   "rubber": 33.9
+  },
+  "ลำปาง": {
+   "rice": 77605.0,
+   "cassava": 6407.7,
+   "maize": 34446.1,
+   "oilpalm": 216.4,
+   "rubber": 2437.7
+  },
+  "ลำพูน": {
+   "rice": 19295.0,
+   "cassava": 469.2,
+   "maize": 6366.9,
+   "oilpalm": 4.6,
+   "rubber": 636.9
+  },
+  "ศรีสะเกษ": {
+   "rice": 486753.6,
+   "cassava": 16030.1,
+   "maize": 3863.2,
+   "oilpalm": 664.3,
+   "rubber": 22731.7
+  },
+  "สกลนคร": {
+   "rice": 347278.8,
+   "cassava": 12846.3,
+   "maize": 47.7,
+   "oilpalm": 2874.7,
+   "rubber": 30549.3
+  },
+  "สงขลา": {
+   "rice": 19399.9,
+   "cassava": 0.0,
+   "maize": 0.2,
+   "oilpalm": 13058.3,
+   "rubber": 129291.6
+  },
+  "สตูล": {
+   "rice": 2063.9,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 12096.7,
+   "rubber": 35312.6
+  },
+  "สมุทรปราการ": {
+   "rice": 5580.8,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 0.0,
+   "rubber": 0.0
+  },
+  "สมุทรสงคราม": {
+   "rice": 486.2,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 0.0,
+   "rubber": 0.0
+  },
+  "สมุทรสาคร": {
+   "rice": 805.7,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 0.0,
+   "rubber": 0.0
+  },
+  "สระบุรี": {
+   "rice": 67638.8,
+   "cassava": 2769.7,
+   "maize": 19290.0,
+   "oilpalm": 541.8,
+   "rubber": 146.4
+  },
+  "สระแก้ว": {
+   "rice": 113091.8,
+   "cassava": 22882.0,
+   "maize": 10918.2,
+   "oilpalm": 2214.4,
+   "rubber": 3061.5
+  },
+  "สิงห์บุรี": {
+   "rice": 78234.5,
+   "cassava": 1.9,
+   "maize": 18.1,
+   "oilpalm": 2.0,
+   "rubber": 0.0
+  },
+  "สุพรรณบุรี": {
+   "rice": 311077.9,
+   "cassava": 5592.4,
+   "maize": 6002.8,
+   "oilpalm": 108.9,
+   "rubber": 348.6
+  },
+  "สุราษฎร์ธานี": {
+   "rice": 2250.6,
+   "cassava": 0.0,
+   "maize": 17.6,
+   "oilpalm": 133038.9,
+   "rubber": 149848.7
+  },
+  "สุรินทร์": {
+   "rice": 492123.5,
+   "cassava": 9505.8,
+   "maize": 27.4,
+   "oilpalm": 335.4,
+   "rubber": 19899.2
+  },
+  "สุโขทัย": {
+   "rice": 267297.3,
+   "cassava": 5086.2,
+   "maize": 10446.6,
+   "oilpalm": 677.3,
+   "rubber": 5976.8
+  },
+  "หนองคาย": {
+   "rice": 97078.1,
+   "cassava": 791.5,
+   "maize": 32.1,
+   "oilpalm": 2382.3,
+   "rubber": 31459.3
+  },
+  "หนองบัวลำภู": {
+   "rice": 99814.4,
+   "cassava": 3673.5,
+   "maize": 785.0,
+   "oilpalm": 777.7,
+   "rubber": 9887.1
+  },
+  "อำนาจเจริญ": {
+   "rice": 165687.9,
+   "cassava": 21612.9,
+   "maize": 7.2,
+   "oilpalm": 667.4,
+   "rubber": 8625.3
+  },
+  "อุดรธานี": {
+   "rice": 297172.6,
+   "cassava": 25403.0,
+   "maize": 63.9,
+   "oilpalm": 1532.4,
+   "rubber": 32676.5
+  },
+  "อุตรดิตถ์": {
+   "rice": 145005.7,
+   "cassava": 4370.8,
+   "maize": 17997.1,
+   "oilpalm": 427.7,
+   "rubber": 3864.8
+  },
+  "อุทัยธานี": {
+   "rice": 116983.6,
+   "cassava": 17611.3,
+   "maize": 24258.5,
+   "oilpalm": 664.1,
+   "rubber": 2488.3
+  },
+  "อุบลราชธานี": {
+   "rice": 671470.6,
+   "cassava": 63963.2,
+   "maize": 5186.6,
+   "oilpalm": 2544.3,
+   "rubber": 39786.5
+  },
+  "อ่างทอง": {
+   "rice": 71774.8,
+   "cassava": 0.0,
+   "maize": 0.0,
+   "oilpalm": 1.0,
+   "rubber": 0.2
+  },
+  "เชียงราย": {
+   "rice": 260526.1,
+   "cassava": 1999.4,
+   "maize": 22496.7,
+   "oilpalm": 382.7,
+   "rubber": 26867.3
+  },
+  "เชียงใหม่": {
+   "rice": 104349.4,
+   "cassava": 533.1,
+   "maize": 20907.0,
+   "oilpalm": 28.4,
+   "rubber": 967.5
+  },
+  "เพชรบุรี": {
+   "rice": 65207.0,
+   "cassava": 169.2,
+   "maize": 668.3,
+   "oilpalm": 1162.5,
+   "rubber": 909.8
+  },
+  "เพชรบูรณ์": {
+   "rice": 189318.6,
+   "cassava": 15510.2,
+   "maize": 79015.1,
+   "oilpalm": 485.7,
+   "rubber": 8551.4
+  },
+  "เลย": {
+   "rice": 56902.0,
+   "cassava": 15934.9,
+   "maize": 26049.0,
+   "oilpalm": 2862.9,
+   "rubber": 131201.0
+  },
+  "แพร่": {
+   "rice": 54509.8,
+   "cassava": 2004.4,
+   "maize": 30746.5,
+   "oilpalm": 184.2,
+   "rubber": 3775.8
+  },
+  "แม่ฮ่องสอน": {
+   "rice": 33381.6,
+   "cassava": 2.3,
+   "maize": 12763.7,
+   "oilpalm": 0.8,
+   "rubber": 25.4
+  }
+ }
+}

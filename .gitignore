@@ -68,3 +68,6 @@ source-data/datagoth/
 # nightly cron wrapper logs (local only)
 pipeline/cron_nightly.log
 pipeline/cron_gate.out
+
+# DOAE raw pull (re-pullable via pipeline/ingest_doae.py --pull)
+source-data/doae_raw.json
