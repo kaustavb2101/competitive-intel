@@ -80,7 +80,21 @@ build build_amphoe_occupations.py  "build_amphoe_occupations.py (district occupa
 # 5) composite expansion-opportunity score — reads amphoe + crop_stress + competitor census.
 #    Must run AFTER build_amphoe + build_crop_stress so its inputs are current.
 build build_opportunity_score.py   "build_opportunity_score.py (district opportunity composite)"
-# 6) tmli bridge — only if a builder exists in this tree (none today).
+# 6) PR#2 enrichment layers — vehicle/EV collateral erosion + hydrology + labour. Deterministic +
+#    network-free over committed source-data; each SKIP-passes when its upstream pull is absent (the
+#    20MB dlt CSV mirror is not committed) or its output is not yet generated. branch_fuel.json is
+#    intentionally NOT committed (coordinate-dependent; CI Python 3.11 generates it, like cropland).
+build build_vehicle_flow.py            "build_vehicle_flow.py           (province vehicle-flow from dlt mirror, optional src)"
+build build_vehicle_flow_transport.py  "build_vehicle_flow_transport.py (province transport-vehicle flow, optional src)"
+build build_truck_flow.py              "build_truck_flow.py             (province truck-flow momentum, optional src)"
+build build_ev_penetration.py          "build_ev_penetration.py         (province EV penetration, optional src)"
+build build_ev_exposure.py             "build_ev_exposure.py            (province EV-exposure collateral risk)"
+build build_brand_trends.py            "build_brand_trends.py           (vehicle-brand registration trends, optional src)"
+build build_napprang.py                "build_napprang.py               (OAE off-season/dry-rice stress)"
+build build_labour_context.py          "build_labour_context.py         (ILOSTAT labour repayment-capacity context)"
+build build_branch_fuel.py             "build_branch_fuel.py            (per-branch measured fuel-station density, output not committed)"
+
+# 7) tmli bridge — only if a builder exists in this tree (none today).
 build ingest_tmli.py               "ingest_tmli.py       (tmli bridge, if present)"
 
 # --- summary ----------------------------------------------------------------
