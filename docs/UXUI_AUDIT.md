@@ -26,3 +26,17 @@ scroll at 390px. This is the intake for the recursive UX-improvement loop.
   genuinely interactive). Only gap: `#branches`.
 
 Fix the blocker (done) + the two majors and the platform is in very good shape.
+
+## Fix log — recursive UX loop (2026-07-12, branch claude/ux-catchup)
+
+Each item below is a REAL, surgical fix matching the dark instrument-console theme (accent `#5B7CFA`,
+IBM Plex fonts). IDs match `committee/plan_cycle.py`'s uxui block (which flips `state` to done off these
+lines) so the CEO `/status` dashboard reflects the progress.
+
+- ux-favicon — ✅ FIXED 2026-07-12 — added `platform/favicon.svg` (dark rounded square + accent "AX" monogram) and `<link rel="icon" href="/favicon.svg">` in index.html, rayong-catchment.html, province.html, branch-explorer.html, status.html. Stops the favicon 404 (#7).
+- ux-contrast — ✅ FIXED 2026-07-12 — light-theme `--dim` darkened `#7A8598` → `#5B6678` in styles.css (≈3.4:1 → ≈5.4:1 on `#F4F6FA`, clears WCAG AA for microcopy) (#6).
+- ux-map-overlap — ✅ FIXED 2026-07-12 — added a `@media(max-width:430px)` rule in styles.css moving the Leaflet zoom `+/−` to the bottom-right on the `.maphero` map, clear of the floated lens pills (#3).
+- ux-province-overflow — ✅ FIXED 2026-07-12 — province.html `#strip` stat-chip toolbar made a proper touch horizontal scroller: added `-webkit-overflow-scrolling:touch` + `white-space:nowrap` (already `overflow-x:auto`); chips no longer clip off the right edge on mobile (#4).
+- ux-theme-persist — ✅ FIXED 2026-07-12 — every page already reads the persisted `autox-theme` from localStorage on load; province.html + branch-explorer.html defaulted dark while the SPA front door (index.html) and rayong-catchment.html default light — aligned those two to the SPA's light default so the first-load theme is consistent across pages (a saved choice still wins everywhere) (#5).
+- ux-branches-lead — ✅ FIXED 2026-07-12 — `#branches` (index.html) now opens with a header + lead ("All 2,015 AutoX branches — search, sort, and open any branch's 3D scene.") like every other route (#8).
+- ux-isochrone-guard — ✅ FIXED 2026-07-12 — rayong-catchment.html no longer requests `<slug>_isochrone.json` / `<slug>_trees.json` unless the province is registered in `tiles_config.json`'s `scenery` list, so absent files no longer 404 in the console; the isochrone toggle already self-hides when `window.ISO` is empty (also hidden by default now), so no dead toggle (#2).
