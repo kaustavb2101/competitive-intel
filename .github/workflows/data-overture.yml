@@ -14,14 +14,14 @@ name: Data — Overture province catchments
 #     prep    -> decides which provinces to pull, splits them into SMALL chunks (default 3)
 #     pull    -> a matrix job per chunk; each uploads its catchment files as an ARTIFACT.
 #                fail-fast:false — a preempted/failed chunk only loses ITS provinces.
-#     collect -> downloads every surviving artifact, commits them in ONE draft PR.
+#     collect -> downloads every surviving artifact and PUBLISHES them to Cloudflare R2.
 #   So losing a runner costs at most one 3-province chunk, and whatever succeeded still lands.
 #
 # WHAT IT PRODUCES: real Overture building footprints (nothing fabricated), converted by
 # pipeline/pull_overture_buildings.py into the exact catchment shape the 3D scene reads
-# (rayong-catchment.html?city=<slug>). Committed to a fresh data/overture-<run_id> branch
-# and opened as a DRAFT PR back to the branch you dispatched from — never pushed to your
-# working branch, so it can't race a concurrent session. Review on your phone, then merge.
+# (rayong-catchment.html?city=<slug>). Catchments are ~12 MB each, so the collect job
+# UPLOADS them to R2 (platform/data/tiles_config.json -> catchments.baseUrl; the app fetches
+# from R2 with a local-file fallback) instead of committing 755 MB+ to git. No PR, no git bloat.
 #
 # INPUTS
 #   provinces      comma-separated slugs (ignored when all=true); unknown slugs are dropped
@@ -157,42 +157,24 @@ jobs:
           # Refresh the province bbox index deterministically (network-free).
           python pipeline/pull_overture_buildings.py --bbox-only || true
           echo "HAVE_DATA=1" >> "$GITHUB_ENV"
-      - name: Commit to a data branch + open a draft PR
+      - name: Publish catchments to R2 (NOT git — they are ~12 MB each)
         if: ${{ env.HAVE_DATA == '1' }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          BASE_BRANCH: ${{ github.ref_name }}
-          DATA_BRANCH: data/overture-${{ github.run_id }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PREFIX: ""
         run: |
-          git add platform/data/province_bbox.json
-          git add platform/data/*_catchment.json
-          if git diff --cached --quiet; then
-            echo "No new or changed catchment files (all requested provinces already had one)."
-            echo "Nothing to commit — no PR opened."
-            exit 0
+          # The catchments are far too large for git (tiles_config.json: "too large for git").
+          # The app fetches them from R2 (catchments.baseUrl) with a local-file fallback, so we
+          # upload to the R2 ROOT and never commit the heavy JSON. Idempotent (size-skip).
+          NNEW="$(ls platform/data/*_catchment.json 2>/dev/null | wc -l | tr -d ' ')"
+          if [ -z "${R2_ACCOUNT_ID}" ] || [ -z "${R2_BUCKET}" ]; then
+            echo "::error::R2 secrets not set — cannot publish ${NNEW} catchment(s). Add R2_ACCOUNT_ID/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY/R2_BUCKET."
+            exit 1
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$DATA_BRANCH"
-          NNEW="$(git diff --cached --name-only | grep -c '_catchment.json$' || true)"
-          SUMMARY="$(git diff --cached --stat | tail -1)"
-          git commit -m "data: Overture province catchments (run ${{ github.run_id }}, ${NNEW} provinces)" \
-                     -m "Pulled by .github/workflows/data-overture.yml (resilient matrix) — real Overture building footprints, converted by pipeline/pull_overture_buildings.py."
-          git push origin "$DATA_BRANCH"
-          {
-            echo "Automated Overture catchment pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
-            echo
-            echo "**${NNEW} new/updated province catchment(s)** ($SUMMARY):"
-            echo '```'
-            git diff --name-only HEAD~1 | while read -r f; do
-              printf '%s  (%s)\n' "$f" "$(du -h "$f" | cut -f1)"
-            done
-            echo '```'
-            echo
-            echo "Provenance: MEASURED Overture Maps building footprints (heights measured where"
-            echo "Overture has them, estimated from type+footprint otherwise). Pulled across a"
-            echo "resilient matrix so a preempted runner only cost its own chunk."
-          } > pr_body.md
-          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
-            --title "data: Overture 3D catchments — ${NNEW} provinces (run ${{ github.run_id }})" \
-            --body-file pr_body.md
+          pip install boto3
+          echo "Uploading ${NNEW} catchment(s) + province_bbox.json to R2 root ..."
+          python pipeline/upload_r2.py --also-bbox
+          echo "Done — every uploaded province now renders its 3D scene from R2 (no git bloat)."
