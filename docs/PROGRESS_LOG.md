@@ -5,6 +5,45 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (intelligence) — PEER: per-province, per-brand peer comparison (AutoX vs each big-4 rival)
+
+Intelligence loop (peer pillar, priority 1). The competition surface had two peer reads — a NATIONAL
+brand-total board (`competitor_coverage.json`) and a per-DISTRICT *merged*-rival board
+(`rival_density.json`, all rivals summed into one number) — but nothing answered the question a
+strategy director actually asks about the existing footprint province by province: "in THIS province,
+how does our branch count stack up against Muangthai, against Srisawad, against Tidlor, against Heng —
+**one brand at a time** — and who leads the ground here?" Confirmed the gap first: `rival_density`'s
+`by_brand` split is per-district and only the top-2 brands surface on the district board; no
+per-province per-brand rollup existed (grep of pipeline + `platform/data`).
+
+Shipped `pipeline/build_peer_province.py` → `platform/data/peer_province.json` (77 provinces, 20 KB).
+It is a **pure deterministic rollup** of the already-gated `rival_density.json` (district → province,
+keeping the per-brand split intact), so provenance is inherited verbatim and the two boards can never
+disagree: `autox` and every `by_brand` count are MEASURED (point-in-polygon of `branches_final.json`
++ the merged official-locator UNION Google/Overture rival census); `rivals`/`ratio`/`leader`/
+`n_outnumbered_districts` are COMPUTED. Inherited caveats carried forward, not restated as new: rival
+census is a LOWER BOUND (Heng is a Google/Overture *sample*, under-counts; only the 4 big compliant
+brands are censused); AutoX PIP total = 2000 vs 2015 committed (the ~15-branch off-polygon shortfall
+is disclosed, not silently reconciled). Carries `--check` (byte-exact) and is wired into the gate
+right after `build_rival_density.py`. UI: additive "Per-province peer comparison · AutoX vs each rival
+brand" MEASURED table on `#acq` (Competition), between the district-outnumbered board and rival
+fragility — one row per province, a column per brand, the province ratio and the leading operator.
+
+The headline MEASURED finding: against the full official-locator census (16,503 rival branches vs
+2,000 AutoX) the big-4 out-station AutoX in **all 77 provinces**, Muangthai leading the ground in most;
+the deficit peaks in Khon Kaen (11.7×), Ubon/Nakhon Ratchasima and the upcountry NE. This is a
+competitive-pressure read on the network we already run — it makes **no** open / close / expand call.
+
+Verification: `build_peer_province.py` builds + re-`--check` reproduces byte-exact;
+`build_provenance.py` re-run (peer_province now tracked, deterministic — twice-run md5 identical);
+`bash tests/run.sh check` → **62 passed, 0 failed** (the +1 is the new builder's check). Headless
+render of `index.html#acq` (1400×2800): `data-errors="[]"`, the new table populates 20 provinces with
+the Muangthai/Srisawad/Tidlor/Heng headers and a real MEASURED readout, no layout regression. Safeguard
+protocol clean (gate green · no secrets in diff · diff matches intent · provenance/no-fabrication
+intact). Re-ran `committee/plan_cycle.py` after shipping.
+
+---
+
 ## 2026-07-09 (6) — VALIDATOR: closed the `provinces/*.json` `gov.income_floor` join gap
 
 Picked the concrete, still-open 2026-07-09 (3) backlog follow-up: "The new
