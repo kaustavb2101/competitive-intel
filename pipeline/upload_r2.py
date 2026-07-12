@@ -52,6 +52,9 @@ def main():
     ap.add_argument("--force", action="store_true", help="re-upload even if size matches")
     ap.add_argument("--dry-run", action="store_true", help="list only, no upload")
     args = ap.parse_args()
+    for stream in (sys.stdout, sys.stderr):
+        try: stream.reconfigure(encoding="utf-8")
+        except Exception: pass
 
     bucket = os.environ.get("R2_BUCKET")
     prefix = os.environ.get("R2_PREFIX", "data/")
