@@ -6,9 +6,10 @@ name: Committee — geocode precision backlog (weekly, key-gated)
 # loop: geocoder proposes candidates -> validator gates (Thailand bbox, brand/name token match,
 # max-shift, dedup, no-regression) -> accepted patches merge into the master -> SCORECARD updated.
 #
-# Needs GOOGLE_MAPS_API_KEY (Places Text Search). This job SKIPS cleanly when the secret is unset, so
-# it is inert until you add it: repo -> Settings -> Secrets and variables -> Actions -> new secret
-# GOOGLE_MAPS_API_KEY (Places API enabled, key restricted to it). ROTATE the previously-exposed key first.
+# Needs a Google Places key. This job SKIPS cleanly when no key secret is set, so it is inert until
+# you add one: repo -> Settings -> Secrets and variables -> Actions. It accepts EITHER
+# GOOGLE_PLACES_KEY or GOOGLE_MAPS_API_KEY (Places API enabled, key restricted to it). ROTATE the
+# previously-exposed key first.
 #
 # A geocode changes branch coordinates, so this rebuilds every coordinate-dependent layer and runs the
 # determinism gate; it opens a DRAFT PR only when the gate is green. Never pushes to a working branch.

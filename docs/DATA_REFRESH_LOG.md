@@ -456,6 +456,66 @@ already committed to this branch by a concurrent session before this cycle start
 external pull performed this cycle; this cycle only distilled and wired in already-committed raw
 data.
 
+## 2026-07-10 — AUDIT: PR #1 merged — every scheduled data workflow is now live-registered (was dormant since 2026-06-28); RE-DERIVE baseline confirmed green
+
+**Task type:** AUDIT (CI/repo-integrity finding — zero `platform/data`/`source-data` values changed
+this cycle; the finding itself is the deliverable).
+
+**1. ORIENT.** Session's designated branch (`claude/exciting-einstein-nah52s`) was already in sync
+with `origin/master` (0 commits ahead/behind — this branch *is* the merged PR #1 history). Read
+`IMPROVEMENT_BACKLOG.md`/`TONIGHT_CHECKLIST.md` first, per the standing note to re-check PR #1's
+status early in ORIENT.
+
+**2. The finding.** `mcp__github__list_pull_requests` shows **PR #1 merged into `master` 2026-07-10
+01:42 +07** (commit `ad91123`, "Merge PR #1: AutoX credit-intelligence platform + committee + cloud
+data pipeline"). This closes the root cause identified 2026-07-05 (4) and re-confirmed unchanged in
+every cycle since: `master` had only the pre-import single-page site, so GitHub Actions (which only
+discovers `schedule:`-triggered workflows from the default branch) had never registered any of the 8
+data-pull/site-health workflows — only `QA` ran, via its `push:`/`pull_request:` triggers.
+
+`mcp__github__actions_list(list_workflows)` now shows **10 registered workflows** (up from 1):
+`QA` (pre-existing) plus 9 newly live — `data-fuel-prices` (daily), `data-gov-census` (weekly,
+DIW factories + DLT vehicles), `data-macro` (weekly), `data-nabc-prices` (daily),
+`data-oae-prices` (weekly), `data-overture` (province catchments), `data-tiles` (national building
+PMTiles), `committee-geocode` (weekly), `site-health` (nightly). All created/registered
+`2026-07-10T01:42:23+07:00`, i.e. the moment the merge landed.
+
+**3. None has fired yet.** `list_workflow_runs` on `data-gov-census.yml`/`data-overture.yml` both
+return `total_count: 0` — registration ≠ execution; the first schedule tick is still pending
+(`data-gov-census` is weekly Mon 02:40 UTC, ~1.5 days out from this cycle). Tried to get real data
+landing sooner by manually dispatching `data-gov-census.yml` (the single highest-value pull — DIW
+factories + DLT vehicles via the departments' own CKAN catalogs, which bypass the `data.go.th`
+geo-block; the workflow is safe-by-design, running `census.py` against a throwaway copy of the
+master and committing only to a fresh `data/gov-census-<run_id>` branch + draft PR, never touching
+`master` or any working branch) via `mcp__github__actions_run_trigger(run_workflow)` —
+got `403 Resource not accessible by integration`: this session's GitHub token isn't scoped for
+`workflow_dispatch`. Confirmed `source-data/factory_census_national.json` and
+`vehicle_census_province.json` genuinely don't exist in the tree yet, so there is nothing to fold
+in this cycle — the pull hasn't happened, not "happened but unwired."
+
+**4. RE-DERIVE baseline (per the routine's step 2(a)).** Fresh state, `bash tests/run.sh check` →
+**56 passed, 0 failed** (`validate_data.py` 446/446) before touching anything. Re-ran every builder
+named in the routine: `derive.py`, `build_amphoe.py`, `build_province.py`, `build_crop_stress.py`,
+`build_occupations.py`/`build_amphoe_occupations.py` (both correctly `SKIP` — no
+`source-data/overture_places.json` pulled yet), `build_opportunity_score.py`, `ingest_tmli.py` —
+every one reproduced `--check`-clean, tree already fully in sync, zero files touched by the
+re-derive itself.
+
+**5. Also noted, not acted on.** A second PR (`#2`, draft, `claude/new-session-wto26j` → `master`,
+"Follow-up: CKAN round-2 + POI source map (post-merge)") is open — a prior session's docs-only
+follow-up, unrelated to this finding, left alone.
+
+**Verification:** `bash tests/run.sh check` — 56 passed, 0 failed, before and after (docs-only
+cycle; no `platform/data`/`source-data` file changed).
+
+**Source:** `github` MCP (`list_pull_requests`, `actions_list`, `actions_run_trigger`) for the PR/
+workflow-registration facts; `git log`/`git ls-tree` to confirm `master`'s new tree; a plain
+`ls source-data/` to confirm the census artifacts are genuinely absent (not a fabrication check —
+a presence check). Nothing pulled or synthesized. Flagged to Kaustav via push notification this
+cycle (he can manually dispatch `data-gov-census.yml` from the GitHub UI, where his token has the
+permission this session's lacks, to get DLT/DIW data sooner than the Monday cron). Full backlog
+entry: `docs/IMPROVEMENT_BACKLOG.md` (2026-07-10, Done section).
+
 ---
 
 ## 2026-07-06 — AUDIT: closed R6, the last open provenance-register gap (7 OSM ground-bed geometry files stamped with real `meta.source`)

@@ -1,0 +1,28 @@
+# QA/UXUI audit — 2026-07-12
+
+Automated Playwright audit of every route (desktop 1440×900 + mobile 390×844), served locally.
+**Counts:** 1 blocker · 2 major · 3 minor · 3 polish. All 13 routes loaded; no page-level horizontal
+scroll at 390px. This is the intake for the recursive UX-improvement loop.
+
+## Findings (severity-ranked)
+
+| # | Sev | Route | Category | Issue | Fix |
+|---|-----|-------|----------|-------|-----|
+| 1 | **BLOCKER** | branch-explorer.html | functional | Basemap dead (flat void) + 150+ `ERR_NAME_NOT_RESOLVED` console errors — deck.gl `TileLayer` doesn't expand the `{s}` subdomain token | Hardcode `a.basemaps.cartocdn.com` (as province/rayong pages do) — **✅ FIXED + verified (0 console errors)** |
+| 2 | major | rayong-catchment.html | functional | `rayong_isochrone.json` + `rayong_trees.json` 404; reach-rings & trees toggles silently no-op | Ship the files, or guard/hide the toggle when absent |
+| 3 | major | index.html `#map` | mobile | Lens pills overlap the Leaflet zoom +/− at top-left (legibility + tap accuracy) | Move zoom control bottom-right; collapse lenses into a sheet on narrow viewports |
+| 4 | minor | province.html | mobile | Top stat-chip toolbar clips off the right edge; chips unreachable | `overflow-x:auto` scroller |
+| 5 | minor | (global) | consistency | SPA defaults light ("Paper Console"); 3D pages default dark; convention is dark-console | Persist one theme choice across pages |
+| 6 | minor | (global) | accessibility | Light-theme `--dim #7A8598` on `#F4F6FA` ≈ 3.4:1 (below WCAG AA) on 10–11px microcopy | Darken to ~`#5B6678` |
+| 7 | polish | index routes | functional | favicon 404 | Add a favicon |
+| 8 | polish | index.html `#branches` | clarity | Opens straight into a search box, no headline/lead line (unlike every other route) | Add a header + one-line lead |
+
+## Verdicts
+- **Mobile-readiness: strong.** SPA reflows to single column, nav is a scrollable ~41px-target strip,
+  healthy 3D pages init non-blank with bottom-sheet controls. Main blemishes: #map lens/zoom overlap
+  and (now-fixed) branch-explorer.
+- **"Leads with the answer": excellent** on content routes (`#home`/`#overview`/`#trend`/`#acq`/
+  `#exposure` each open with a bold one-line answer + KPIs + ranked source-tagged actions; `#sim` is
+  genuinely interactive). Only gap: `#branches`.
+
+Fix the blocker (done) + the two majors and the platform is in very good shape.

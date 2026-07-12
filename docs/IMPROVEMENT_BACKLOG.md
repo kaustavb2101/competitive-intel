@@ -1257,6 +1257,36 @@
   `docs/PROGRESS_LOG.md` 2026-07-10 (5).
 - **2026-07-10 (3) — UX: fixed the dws (Opportunity/district white-space) map lens's MEASURED→
   ESTIMATED provenance mislabel** (committee finding #3). See `docs/PROGRESS_LOG.md` 2026-07-10 (3).
+- **2026-07-10 — AUDIT: PR #1 merged — the standing "every scheduled workflow is dormant"
+  blocker (tracked across 10+ recheck entries since 2026-07-05 (4)) is now CLOSED.**
+  `mcp__github__list_pull_requests` shows PR #1 merged into `master` 2026-07-10 01:42 +07
+  (commit `ad91123`); `master` now carries the full `platform/`/`pipeline/`/`.github/workflows/`
+  tree. `list_workflows` confirms all **9** `schedule:` workflows (`data-fuel-prices`,
+  `data-gov-census`, `data-macro`, `data-nabc-prices`, `data-oae-prices`, `data-overture`,
+  `data-tiles`, `committee-geocode`, `site-health`) are now registered/active alongside `QA` —
+  up from just `QA` at every prior recheck. None has fired yet (`list_workflow_runs` = 0 for
+  `data-gov-census`/`data-overture`; first schedule tick is still pending — `data-gov-census` is
+  weekly Mon 02:40 UTC). Attempted a manual `workflow_dispatch` on `data-gov-census.yml` (the
+  highest-value pull — DIW factories + DLT vehicles via department CKAN catalogs, safe by
+  design: throwaway copy of the master, writes only to a fresh `data/gov-census-<run_id>` branch
+  + draft PR, never touches `master`/working branches) to get real data landing sooner than the
+  weekly cron — got `403 Resource not accessible by integration` (this session's GitHub token
+  isn't scoped for `workflow_dispatch`). Confirmed `source-data/factory_census_national.json` /
+  `vehicle_census_province.json` genuinely don't exist yet, so nothing to fold in this cycle.
+  **RE-DERIVE baseline**: fresh checkout, `bash tests/run.sh check` → 56 passed, 0 failed
+  (`validate_data.py` 446/446) before touching anything; re-ran every builder named in the
+  routine (`derive.py`, `build_amphoe.py`, `build_province.py`, `build_crop_stress.py`,
+  `build_occupations.py`/`build_amphoe_occupations.py` — both correctly `SKIP` (no
+  `overture_places.json` yet), `build_opportunity_score.py`, `ingest_tmli.py`) — all `--check`
+  green, tree already fully in sync, zero data changed. Also noted a second open PR
+  (`#2`, draft, `claude/new-session-wto26j` → `master`, CKAN round-2 + POI source-map docs) —
+  unrelated to this finding, not touched. **Next step for whoever picks this up next:** either
+  wait for the Monday 02:40 UTC cron, or have Kaustav manually dispatch `data-gov-census.yml`
+  from the GitHub UI (he has the permission this session's token lacks) to pull DLT
+  vehicles/DIW factories sooner — this is the single highest-value real-data unlock left,
+  replacing an ESTIMATED collateral-supply/TAM proxy with MEASURED gov data (both objectives).
+  Flagged to Kaustav via push notification this cycle. Full writeup: `docs/DATA_REFRESH_LOG.md`
+  (2026-07-10 entry).
 - **2026-07-09 (4) — AUDIT: logged a prior cycle's shipped-but-undocumented ENRICH (SME-owner income
   floor), closed the backlog item.** `daf6d38` (already committed + pushed) shipped
   `pipeline/build_sme_income.py` → `platform/data/sme_income_by_province.json` (77 provinces,
