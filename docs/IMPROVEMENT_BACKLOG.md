@@ -7,18 +7,21 @@
 > add 1–3 new ideas (self-enriching). One substantive improvement per cycle.
 
 ## Queue — follow-ups noticed 2026-07-12 — AUDIT: provenance.json census pointer
-- [ ] **`docs/DATA_PROVENANCE.md` §1's hand-written table is still literally 34-ish rows describing a
-      2026-07-01 snapshot of the platform** — this cycle pointed the header at the live
-      `provenance.json` census instead of re-counting by hand, but the row-by-row table body itself
-      still doesn't mention `branch_peers.json`/`branch_density.json`/`exit_whitespace.json`/
-      `expansion_plan.json`/`agri_income_by_province.json`/`fuel_prices.json`/`thaiwater_*.json` and
-      ~35 other now-shipped layers (all of which DO carry real in-file `meta` and DO pass the gate —
-      this is a "curated tour is incomplete" gap, not a "provenance is missing" gap, since
-      `provenance.json`/the gate already cover everything). A future cycle could either backfill rows
-      for the handful of highest-value ones (the 4 named above are the two-objectives-relevant set) or
-      restructure §1 to link out to each builder's own `meta` block instead of duplicating it in
-      markdown. *(MED, M — genuinely needs the file-by-file pass previously flagged, now lower-stakes
-      since the gate + provenance.json are the real safety net)*
+- [x] **`docs/DATA_PROVENANCE.md` §1's hand-written table backfill for the two-objectives-relevant set —
+      DONE 2026-07-12 (2)** (added 4 rows — `branch_peers.json`, `branch_density.json`,
+      `exit_whitespace.json`, `expansion_plan.json` — after reading each file's actual `meta` block
+      directly; all four already carried strong in-file provenance/label/method stamps, so this is a
+      docs-only "curated tour" backfill, not a provenance fix. `agri_income_by_province.json`/
+      `fuel_prices.json`/`thaiwater_*.json` and ~30 others remain un-backfilled in this markdown table
+      (still real + gated via `provenance.json`) — see the new follow-up below).
+- [ ] **`docs/DATA_PROVENANCE.md` §1 still doesn't mention `agri_income_by_province.json`/
+      `fuel_prices.json`/`thaiwater_*.json` and ~30 other now-shipped layers** (all of which DO carry
+      real in-file `meta` and DO pass the gate — this is a "curated tour is incomplete" gap, not a
+      "provenance is missing" gap, since `provenance.json`/the gate already cover everything). A future
+      cycle could continue the file-by-file backfill (2026-07-12 (2) closed the top-4) or restructure §1
+      to link out to each builder's own `meta` block instead of duplicating it in markdown. *(LOW-MED, M
+      — lower-stakes now that the two-objectives-relevant set is documented and the gate is the real
+      safety net)*
 - [ ] **`pipeline/build_provenance.py`'s `provenance.json` output has no rendered surface in the
       platform app itself** — it's a build-time/CI artifact read by docs and humans, not fetched by
       `app.js` anywhere. A future cycle could surface its `counts` (measured/estimated/unlabelled) as

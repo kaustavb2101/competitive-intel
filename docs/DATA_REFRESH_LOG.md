@@ -4,6 +4,55 @@
 > refreshed/enriched/audited, with provenance + source). See `docs/IMPROVEMENT_BACKLOG.md` for the
 > Rules this cycle follows (no-fabrication is absolute).
 
+## 2026-07-12 (2) — AUDIT: backfilled `DATA_PROVENANCE.md` §1 rows for the two-objectives-relevant layer set
+
+**Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
+(`17f51a0` HEAD), `bash tests/run.sh check` → 66 passed, 0 failed (`validate_data.py` 468/468) before
+touching anything — no pre-existing drift, so RE-DERIVE wasn't picked. No `/workspace/watcher` TMLI
+checkout present in this session, so ENRICH (folding a new real layer) wasn't available either; picked
+the standing AUDIT follow-up instead (`docs/IMPROVEMENT_BACKLOG.md`'s "2026-07-12 — AUDIT:
+provenance.json census pointer" queue).
+
+**1. What was found.** The prior cycle (2026-07-12) pointed `docs/DATA_PROVENANCE.md`'s header at the
+live `platform/data/provenance.json` census (built by `pipeline/build_provenance.py --check`, already
+gated) but left the hand-written §1 table itself un-backfilled for ~39 now-shipped layers, naming 4 as
+the "two-objectives-relevant set": `branch_peers.json` (objective #1, peer-twin outlier benchmark),
+`branch_density.json` (objective #1/#2, measured building density), `exit_whitespace.json` (objective
+#2, competitor-exit white-space cue), `expansion_plan.json` (objective #2, Road-to-3,000 sequenced
+plan). Read each file's actual committed `meta` block directly (not the builder scripts) to confirm
+what provenance signal each one really carries before writing anything.
+
+**2. Fix applied — docs only, zero data/code touched.** Added 4 new rows to `docs/DATA_PROVENANCE.md`
+§1, one per file, transcribing what each file's own `meta` actually states (all four already ship
+strong provenance — this was a "curated tour is incomplete" doc gap, not a provenance gap, since the
+gate + `provenance.json` already cover them):
+- `branch_peers.json` — ESTIMATED composite over MEASURED features, `meta.label` states "twins matched
+  on MEASURED features only … NOT a measured default rate."
+- `branch_density.json` — MEASURED, `meta.caveats` explicitly states a zero count means the capped
+  Overture file has none there, not that the area is empty on the ground.
+- `exit_whitespace.json` — ESTIMATED PROXY, `meta.honesty_caveat` explicitly states the exiting
+  sub-scale operators are NOT censused (only the surviving big-4 brands are).
+- `expansion_plan.json` — ESTIMATED planning sequence over MEASURED demand inputs, `meta.provenance`
+  explicitly states it is NOT a committed branch plan and every site needs a local survey.
+
+Also added a short "2026-07-12 partial backfill" note under the header naming what's still open
+(`agri_income_by_province.json`/`fuel_prices.json`/`thaiwater_*.json` + ~30 others) so the doc doesn't
+overclaim completeness, and checked off the backlog item with a new narrower follow-up for the
+remaining long tail.
+
+**3. Verification.**
+- `bash tests/run.sh check` → 66 passed, 0 failed, `validate_data.py` 468/468 unchanged (docs-only —
+  the vintage-drift tripwire that reads `DATA_PROVENANCE.md`'s cited Pink Sheet vintage still passes,
+  since only §1's table body changed, not the vintage citation).
+- `git status --short` confirms only `docs/DATA_PROVENANCE.md` + `docs/IMPROVEMENT_BACKLOG.md`
+  changed.
+
+**Source:** no external pull this cycle — every new row transcribes the `meta` block already embedded
+in the named `platform/data/*.json` files (themselves written by their respective already-gated
+builders from already-committed, already-sourced inputs).
+
+---
+
 ## 2026-07-11 (8) — AUDIT: backfilled `DATA_SOURCES.md`/`DATA_PROVENANCE.md` citations for `labour_context.json` + `truck_flow.json`
 
 **Task type:** AUDIT. **0. RE-DERIVE baseline first.** Fresh pull of `claude/new-session-wto26j`
