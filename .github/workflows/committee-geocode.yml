@@ -51,7 +51,11 @@ jobs:
 
       - name: Deps
         if: env.SKIP != '1'
-        run: pip install --quiet shapely openlocationcode || true
+        # Full builder dep set. rasterio: build_contested_pop.py (WorldPop raster, committed).
+        # overturemaps: regenerate the gitignored source-data/overture_places.json so
+        # build_occupations.py can rebuild branch_occupations after a coordinate change (otherwise
+        # its fingerprint goes stale and the gate blocks — the first-run failure 2026-07-12).
+        run: pip install --quiet shapely openlocationcode rasterio numpy openpyxl pdfplumber overturemaps || true
 
       - name: Run gated geocoder cycles (merges accepted patches into the master)
         if: env.SKIP != '1'
@@ -64,7 +68,12 @@ jobs:
       - name: Rebuild every derived layer + run the determinism gate
         if: env.SKIP != '1'
         run: |
-          cd pipeline && python3 derive.py
+          cd pipeline
+          # regenerate the gitignored Overture places source (open data, keyless) so
+          # build_occupations.py can re-project branch_occupations against the moved coordinates.
+          # Best-effort: if the pull fails, the gate below still catches any stale layer honestly.
+          python3 pull_overture_places.py --preset national || echo "Overture places pull failed — branch_occupations may stay stale; the gate will report it."
+          python3 derive.py
           for pass in 1 2; do for f in build_*.py; do python3 "$f" >/dev/null 2>&1 || true; done; done
           python3 build_provenance.py >/dev/null 2>&1 || true
           cd .. && bash tests/run.sh check
