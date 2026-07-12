@@ -61,6 +61,10 @@ pipeline/tiles_out/
 # crop-type geodata scout scratch — raw re-pullable rasters/zips (SPAM/HDX), never commit
 source-data/.crop_scout/
 
+# data.go.th / NSO raw pull cache — bulk + re-pullable via pipeline/pull_datagoth.py (Thai IP only).
+# The distilled province-keyed layers that downstream builders emit are what gets committed, not this.
+source-data/datagoth/
+
 # nightly cron wrapper logs (local only)
 pipeline/cron_nightly.log
 pipeline/cron_gate.out
