@@ -1,0 +1,663 @@
+{
+  "meta": {
+    "title": "AutoX Platform — Autonomy Plan",
+    "generated_by": "committee/plan_cycle.py",
+    "generated_at": "2026-07-12T14:49:26+07:00",
+    "commit": "08a4528"
+  },
+  "overall": {
+    "progress_pct": 66,
+    "status": "on-track",
+    "eta_days": 3,
+    "eta_date": "2026-07-15",
+    "done_items": 33,
+    "in_progress_items": 8,
+    "open_items": 9,
+    "total_items": 50
+  },
+  "loops": [
+    {
+      "name": "integration-improvement",
+      "owns": "data · feature · deploy",
+      "cadence": "every 6h",
+      "schedule_utc": "00,06,12,18"
+    },
+    {
+      "name": "ux-improvement",
+      "owns": "UX/UI",
+      "cadence": "every 6h",
+      "schedule_utc": "02,08,14,20"
+    },
+    {
+      "name": "intelligence",
+      "owns": "market · service · peer · deploy-health",
+      "cadence": "every 6h",
+      "schedule_utc": "04,10,16,22"
+    },
+    {
+      "name": "committee-scout",
+      "owns": "competitor census",
+      "cadence": "daily"
+    },
+    {
+      "name": "committee-planner",
+      "owns": "this plan",
+      "cadence": "every 6h",
+      "schedule_utc": "03,09,15,21"
+    }
+  ],
+  "pillars": [
+    {
+      "key": "data-integration",
+      "label": "Data integration",
+      "progress_pct": 33,
+      "done": 2,
+      "total": 6,
+      "status": "at-risk",
+      "items": [
+        {
+          "id": "di-tmli",
+          "title": "Fold MEASURED TMLI province layers (NSO SES/LFS) into the risk read",
+          "state": "done",
+          "priority": 1,
+          "evidence": "pipeline/ingest_tmli.py + platform/data/household_risk_by_province.json present (NEXT_STEPS §0a)"
+        },
+        {
+          "id": "di-diw",
+          "title": "DIW factory census (~66k, 77 provinces) via CKAN",
+          "state": "done",
+          "priority": 2,
+          "evidence": "committee/census.py + .github/workflows/data-gov-census.yml committed"
+        },
+        {
+          "id": "di-loan-tape",
+          "title": "Real loan-tape export → measured portfolio risk",
+          "state": "in_progress",
+          "priority": 1,
+          "evidence": "ingest_loan_tape.py + loan_tape_derived.json present (SYNTHETIC); real no-PII export pending (NEXT_STEPS §0b)"
+        },
+        {
+          "id": "di-dlt",
+          "title": "DLT vehicle registrations, all-province coverage",
+          "state": "in_progress",
+          "priority": 2,
+          "evidence": "platform/data/branch_vehicles.json present; province coverage still partial (NEXT_STEPS §2)"
+        },
+        {
+          "id": "di-farmgate",
+          "title": "Replace GLOBAL price proxy with Thai farm-gate prices",
+          "state": "in_progress",
+          "priority": 2,
+          "evidence": "OAE/NABC price workflows committed; crop_stress price_stress still GLOBAL proxy (CLAUDE.md, NEXT_STEPS §2)"
+        },
+        {
+          "id": "di-competitor-census",
+          "title": "National competitor census (Places scout, gate-guarded)",
+          "state": "in_progress",
+          "priority": 2,
+          "evidence": "committee/scout.py + platform/data/competitors_census.json present; national coverage still rotating"
+        }
+      ]
+    },
+    {
+      "key": "deployment",
+      "label": "Deployment & autonomy",
+      "progress_pct": 67,
+      "done": 4,
+      "total": 6,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "dep-vercel",
+          "title": "Deploy to Vercel prod + verify on a phone",
+          "state": "open",
+          "priority": 1,
+          "evidence": "vercel.json (cleanUrls) committed; production verify is the top outstanding action (NEXT_STEPS §1)"
+        },
+        {
+          "id": "dep-committee-cron",
+          "title": "Autonomous committee scout cron (gate-guarded auto-merge)",
+          "state": "done",
+          "priority": 2,
+          "evidence": ".github/workflows/committee-cycle.yml committed"
+        },
+        {
+          "id": "dep-gov-census-ci",
+          "title": "Gov census CI (DIW/DLT from any cloud IP)",
+          "state": "done",
+          "priority": 2,
+          "evidence": ".github/workflows/data-gov-census.yml committed"
+        },
+        {
+          "id": "dep-planner-cron",
+          "title": "Autonomy planner cron (this loop, every 6h)",
+          "state": "done",
+          "priority": 1,
+          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present"
+        },
+        {
+          "id": "dep-qa-gate",
+          "title": "Determinism QA gate in CI (tests/run.sh check)",
+          "state": "done",
+          "priority": 2,
+          "evidence": ".github/workflows/qa.yml + tests/run.sh committed"
+        },
+        {
+          "id": "dep-access",
+          "title": "Access protection on the deployment (sensitive branch-level PD)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "decision needed from Kaustav — password/SSO gating on the Vercel deployment (NEXT_STEPS §1)"
+        }
+      ]
+    },
+    {
+      "key": "feature",
+      "label": "Features",
+      "progress_pct": 100,
+      "done": 7,
+      "total": 7,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "feat-expansion",
+          "title": "Road to 3,000 — sequenced expansion plan",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/data/expansion_plan.json + pipeline/build_expansion_plan.py present"
+        },
+        {
+          "id": "feat-decision-queue",
+          "title": "Exec decision queue (“This week — do these first”)",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/data/decision_queue.json + pipeline/build_decision_queue.py present"
+        },
+        {
+          "id": "feat-exit-ws",
+          "title": "Competitor-exit white-space cue (regulatory-tailwind lens)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/exit_whitespace.json present"
+        },
+        {
+          "id": "feat-search-demand",
+          "title": "Search demand + share-of-search board",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/search_demand.json present"
+        },
+        {
+          "id": "feat-collateral",
+          "title": "Collateral-value outlook (directional, estimated)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/collateral_outlook.json present"
+        },
+        {
+          "id": "feat-simulator",
+          "title": "Client-side portfolio what-if simulator (#sim)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "index.html #sim simulator view present"
+        },
+        {
+          "id": "feat-status",
+          "title": "CEO autonomy status dashboard (this deliverable)",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/status.html + platform/status_data.json present"
+        }
+      ]
+    },
+    {
+      "key": "uxui",
+      "label": "UX / UI",
+      "progress_pct": 12,
+      "done": 1,
+      "total": 8,
+      "status": "at-risk",
+      "items": [
+        {
+          "id": "ux-basemap",
+          "title": "Fix branch-explorer dead basemap (BLOCKER)",
+          "state": "done",
+          "priority": 1,
+          "evidence": "UXUI_AUDIT.md marks the blocker ✅ FIXED + verified (0 console errors)"
+        },
+        {
+          "id": "ux-isochrone-guard",
+          "title": "Guard rayong isochrone/trees toggles when files absent (major)",
+          "state": "open",
+          "priority": 2,
+          "evidence": "platform/data/rayong_isochrone.json still absent — toggles must hide/guard (UXUI_AUDIT #2)"
+        },
+        {
+          "id": "ux-map-overlap",
+          "title": "Fix #map lens pills overlapping the zoom control on mobile (major)",
+          "state": "open",
+          "priority": 2,
+          "evidence": "open — move zoom control / collapse lenses on narrow viewports (UXUI_AUDIT #3)"
+        },
+        {
+          "id": "ux-province-overflow",
+          "title": "province.html stat-chip toolbar overflow scroller (minor)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "open — top stat-chip toolbar clips off the right edge (UXUI_AUDIT #4)"
+        },
+        {
+          "id": "ux-theme-persist",
+          "title": "Persist one theme choice across pages (minor)",
+          "state": "in_progress",
+          "priority": 3,
+          "evidence": "index.html persists autox-theme in localStorage; dark-default convention still mixed (UXUI_AUDIT #5)"
+        },
+        {
+          "id": "ux-contrast",
+          "title": "Darken light-theme --dim for WCAG AA on microcopy (minor)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "styles.css light --dim still #7A8598 (≈3.4:1, below AA) (UXUI_AUDIT #6)"
+        },
+        {
+          "id": "ux-favicon",
+          "title": "Add a favicon (stop the 404) (polish)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "no platform/favicon.* committed (UXUI_AUDIT #7)"
+        },
+        {
+          "id": "ux-branches-lead",
+          "title": "Add a headline/lead line to #branches (polish)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "open — #branches opens straight into a search box, no lead (UXUI_AUDIT #8)"
+        }
+      ]
+    },
+    {
+      "key": "market",
+      "label": "Market intelligence",
+      "progress_pct": 83,
+      "done": 5,
+      "total": 6,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "mkt-rival-pressure",
+          "title": "Rival pressure index per branch",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/rival_pressure.json present"
+        },
+        {
+          "id": "mkt-rival-density",
+          "title": "Rival density per district",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/rival_density.json present"
+        },
+        {
+          "id": "mkt-comp-coverage",
+          "title": "Competitor coverage vs our footprint",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/competitor_coverage.json present"
+        },
+        {
+          "id": "mkt-contested-pop",
+          "title": "Contested population (rival catchment overlap)",
+          "state": "done",
+          "priority": 3,
+          "evidence": "platform/data/contested_pop.json present"
+        },
+        {
+          "id": "mkt-search-sos",
+          "title": "Share-of-search brand read",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/search_demand.json present"
+        },
+        {
+          "id": "mkt-scout-national",
+          "title": "National scout coverage (rotate all 77 provinces)",
+          "state": "in_progress",
+          "priority": 2,
+          "evidence": "scout rotates least-covered provinces via committee-cycle.yml; full 77 not yet complete"
+        }
+      ]
+    },
+    {
+      "key": "service",
+      "label": "Portfolio & risk",
+      "progress_pct": 83,
+      "done": 5,
+      "total": 6,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "svc-loan-tape",
+          "title": "Loan-tape portfolio outputs (90+ aging, ROI, HHI, PD)",
+          "state": "in_progress",
+          "priority": 1,
+          "evidence": "loan_tape_derived.json present (SYNTHETIC); flips to measured on a real export (NEXT_STEPS §0b)"
+        },
+        {
+          "id": "svc-household-dti",
+          "title": "Household DTI risk lens (NSO SES, measured)",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/data/household_risk_by_province.json present"
+        },
+        {
+          "id": "svc-branch-risk",
+          "title": "Composite per-branch risk",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/data/branch_risk.json present"
+        },
+        {
+          "id": "svc-crop-stress",
+          "title": "Agri-PD crop stress (objective #1)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/crop_stress.json present"
+        },
+        {
+          "id": "svc-occ-income",
+          "title": "Occupation income floors (factory / agri / SME)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "factory_income_by_province.json + agri_income_by_province.json present"
+        },
+        {
+          "id": "svc-macro-exposure",
+          "title": "Per-branch macro exposure",
+          "state": "done",
+          "priority": 3,
+          "evidence": "platform/data/macro_exposure.json present"
+        }
+      ]
+    },
+    {
+      "key": "peer",
+      "label": "Peer benchmarking",
+      "progress_pct": 100,
+      "done": 5,
+      "total": 5,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "peer-branch-twins",
+          "title": "Branch peer-twin outlier benchmark",
+          "state": "done",
+          "priority": 1,
+          "evidence": "platform/data/branch_peers.json + pipeline/build_branch_peers.py present"
+        },
+        {
+          "id": "peer-province-stress",
+          "title": "Province stress-index ranking",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/province_stress_index.json present"
+        },
+        {
+          "id": "peer-province-risk",
+          "title": "Province risk rollup",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/province_risk.json present"
+        },
+        {
+          "id": "peer-segment-exposure",
+          "title": "Segment × collateral concentration",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/data/segment_exposure.json present"
+        },
+        {
+          "id": "peer-cluster-brief",
+          "title": "Like-branch cluster brief",
+          "state": "done",
+          "priority": 3,
+          "evidence": "platform/data/cluster_brief.json present"
+        }
+      ]
+    },
+    {
+      "key": "3d-enrichment",
+      "label": "3D enrichment",
+      "progress_pct": 67,
+      "done": 4,
+      "total": 6,
+      "status": "on-track",
+      "items": [
+        {
+          "id": "td-province",
+          "title": "deck.gl province district-polygon deep-dive (77)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/province.html + platform/data/provinces/index.json present"
+        },
+        {
+          "id": "td-branch-explorer",
+          "title": "Per-branch 3D scene (live OSM buildings)",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/branch-explorer.html present"
+        },
+        {
+          "id": "td-catchment-scene",
+          "title": "Overture 3D building catchment scene",
+          "state": "done",
+          "priority": 2,
+          "evidence": "platform/rayong-catchment.html + platform/data/rayong_catchment.json present"
+        },
+        {
+          "id": "td-overture-pull",
+          "title": "Pull Overture building catchments per province",
+          "state": "in_progress",
+          "priority": 2,
+          "evidence": "3 of 77 province catchments present (platform/data/*_catchment.json)"
+        },
+        {
+          "id": "td-heights",
+          "title": "Bake per-building type/height into catchment scenes",
+          "state": "done",
+          "priority": 3,
+          "evidence": "pipeline/bake_catchment_heights.py present"
+        },
+        {
+          "id": "td-isochrone",
+          "title": "True 15-min street-network isochrone (replace walk-radius)",
+          "state": "open",
+          "priority": 3,
+          "evidence": "open — needs a routing API isochrone (NEXT_STEPS §3)"
+        }
+      ]
+    }
+  ],
+  "activity": [
+    {
+      "date": "2026-07-12T14:49:26+07:00",
+      "sha": "08a4528",
+      "summary": "ci(overture): resilient matrix pull — survive runner preemption (#12)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T06:22:04Z",
+      "sha": "edf8ed2",
+      "summary": "committee: autonomous competitor scout (run 29182474163)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-12T04:25:51Z",
+      "sha": "166de75",
+      "summary": "committee: autonomous competitor scout (run 29179621674)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-12T09:54:35+07:00",
+      "sha": "0d16e98",
+      "summary": "Merge pull request #11 from kaustavb2101/claude/crop-precision",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-12T09:50:58+07:00",
+      "sha": "8bc2206",
+      "summary": "Merge pull request #10 from kaustavb2101/claude/r2-migration",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T09:47:08+07:00",
+      "sha": "24d447e",
+      "summary": "crop: don't ship laptop-generated branch_cropland.json/provenance",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-12T09:42:32+07:00",
+      "sha": "f1e6307",
+      "summary": "feat(crop): per-branch MEASURED-corrected crop land-use (SPAM x DOAE 2025)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-12T09:41:49+07:00",
+      "sha": "f389991",
+      "summary": "r2(upload): force UTF-8 stdout so the arrow char doesn't crash on Windows",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T09:17:26+07:00",
+      "sha": "69140b2",
+      "summary": "r2: catchment-to-R2 migration tooling (upload script + guide)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T09:16:00+07:00",
+      "sha": "8159f7f",
+      "summary": "Merge pull request #9 from kaustavb2101/claude/ux-audit-fixes",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-12T09:15:56+07:00",
+      "sha": "c2c3721",
+      "summary": "Merge pull request #8 from kaustavb2101/claude/datagoth-puller",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T09:15:52+07:00",
+      "sha": "5305cda",
+      "summary": "Merge pull request #6 from kaustavb2101/claude/autonomous-enrichment-cloud",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T09:15:48+07:00",
+      "sha": "2ea0623",
+      "summary": "Merge pull request #7 from kaustavb2101/data/gov-census-29174641547",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T08:58:36+07:00",
+      "sha": "d80f006",
+      "summary": "fix(ux): branch-explorer basemap dead ({s} token) + record QA/UXUI audit",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-12T08:34:29+07:00",
+      "sha": "d32804c",
+      "summary": "pipeline: automated data.go.th + NSO puller (Thai-IP), 10/12 sources live",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T08:19:14+07:00",
+      "sha": "faff6c0",
+      "summary": "committee-cycle: run the competitor SCOUT, not the geocoder",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-12T01:02:21Z",
+      "sha": "532d41f",
+      "summary": "data: DIW factory + DLT vehicle census (cloud CKAN, run 29174641547)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T08:01:04+07:00",
+      "sha": "dfefc1d",
+      "summary": "ci: autonomous cloud enrichment loop + monthly 3D self-refresh",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-12T07:12:32+07:00",
+      "sha": "76703b7",
+      "summary": "Merge pull request #4 from kaustavb2101/claude/exciting-einstein-nah52s",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T07:11:48+07:00",
+      "sha": "71faaae",
+      "summary": "Merge pull request #5 from kaustavb2101/hotfix/geocode-key-guard",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-12T07:09:11+07:00",
+      "sha": "9f5b2fc",
+      "summary": "Fix geocode workflow: accept GOOGLE_PLACES_KEY as well as GOOGLE_MAPS_API_KEY",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-12T06:40:47+07:00",
+      "sha": "2c0706c",
+      "summary": "Add API keys and tokens to .env.example",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-10T06:26:47Z",
+      "sha": "286a495",
+      "summary": "AUDIT: PR #1 merged — every scheduled data workflow now registered (was dormant since 2026-06-28)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-10T01:42:21+07:00",
+      "sha": "ad91123",
+      "summary": "Merge PR #1: AutoX credit-intelligence platform + committee + cloud data pipeline",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-09T18:41:48Z",
+      "sha": "3446f20",
+      "summary": "Farm-gate: crop_stress uses live NABC Thai prices (not the WB global proxy) + CKAN source map",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-09T18:17:10Z",
+      "sha": "17a2a14",
+      "summary": "CI: cloud gov-census + key-gated geocoder workflows; record the CKAN breakthrough",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-09T18:06:31Z",
+      "sha": "a2805cf",
+      "summary": "Bring in TMLI knowledge base: INSIGHTS.md + WORKFLOWS.md",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-09T18:04:20Z",
+      "sha": "cbc4b3e",
+      "summary": "Bring in the TMLI data-quality committee (scout / census / geocoder / daemon)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-09T16:13:06Z",
+      "sha": "0f077c7",
+      "summary": "docs: log the income_floor join-validator cycle, close backlog item, add follow-ups",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-09T16:12:02Z",
+      "sha": "3207121",
+      "summary": "VALIDATOR: close the provinces/*.json gov.income_floor join gap",
+      "pillar": "data-integration"
+    }
+  ]
+}
