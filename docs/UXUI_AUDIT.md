@@ -9,7 +9,7 @@ scroll at 390px. This is the intake for the recursive UX-improvement loop.
 | # | Sev | Route | Category | Issue | Fix |
 |---|-----|-------|----------|-------|-----|
 | 1 | **BLOCKER** | branch-explorer.html | functional | Basemap dead (flat void) + 150+ `ERR_NAME_NOT_RESOLVED` console errors — deck.gl `TileLayer` doesn't expand the `{s}` subdomain token | Hardcode `a.basemaps.cartocdn.com` (as province/rayong pages do) — **✅ FIXED + verified (0 console errors)** |
-| 2 | major | rayong-catchment.html | functional | `rayong_isochrone.json` + `rayong_trees.json` 404; reach-rings & trees toggles silently no-op | Ship the files, or guard/hide the toggle when absent |
+| 2 | major | rayong-catchment.html | functional | `rayong_isochrone.json` + `rayong_trees.json` 404; reach-rings & trees toggles silently no-op | Isochrone toggle already self-hides when absent; now gate the optional-scenery fetches (iso/trees/rail) behind a per-city allowlist so no request fires until a file ships — **✅ FIXED (0 console 404s from scenery layers)** |
 | 3 | major | index.html `#map` | mobile | Lens pills overlap the Leaflet zoom +/− at top-left (legibility + tap accuracy) | Move zoom control bottom-right; collapse lenses into a sheet on narrow viewports |
 | 4 | minor | province.html | mobile | Top stat-chip toolbar clips off the right edge; chips unreachable | `overflow-x:auto` scroller |
 | 5 | minor | (global) | consistency | SPA defaults light ("Paper Console"); 3D pages default dark; convention is dark-console | Persist one theme choice across pages |

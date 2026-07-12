@@ -2741,6 +2741,14 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  // ground layers (roads/water/landuse) are always optional; missing file => layer skipped silently.
  function opt(u){return fetch(u).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
  var P='data/'+CITY;
+ // Optional per-city SCENERY layers — isochrone drive-time bands, street trees, rail. Each is
+ // produced per city by a dedicated pull (pull_isochrone.py etc.) that is not wired for ANY province
+ // yet, so fetching <city>_<layer>.json always 404s. That is harmless at the JS level (every consumer
+ // is null-guarded and the isochrone toggle self-hides when absent) but it is console noise on every
+ // scene. Gate the fetch on an explicit allowlist so NO request fires until a layer actually ships —
+ // add a city here the moment its file lands and the layer (and, for iso, its toggle) light back up.
+ var SCENERY_CITIES={iso:{},trees:{},rail:{}};   // e.g. iso:{rayong:1} once <city>_isochrone.json ships
+ function optScene(kind,sfx){return SCENERY_CITIES[kind][CITY]?opt(P+sfx):Promise.resolve(null);}
  // CALM GRACEFUL STATE — the per-province 3D building file (<slug>_catchment.json) is pulled
  // from the desktop per province (pull_overture_buildings.py --province <slug>) and lands over
  // time. Until a province's file exists, do NOT crash into a broken/empty GL scene: show a quiet
@@ -2813,7 +2821,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // (committed files serve most provinces; R2 serves any too big to commit — see
    // docs/r2_ground_manifest.json). Any other failure => null (layer skipped silently, as before).
    gopt('_roads.json'), gopt('_water.json'), gopt('_landuse.json'),
-   opt(P+'_isochrone.json'),
+   optScene('iso','_isochrone.json'),
    // a[7] trees, a[8] rail — DEFERRED to the second wave (non-critical scenery). Null now so the
    // city paints without waiting on them; the deferred wave below fetches + applies them ~1s later.
    Promise.resolve(null), Promise.resolve(null),
@@ -2880,7 +2888,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
          opt('data/occupation_leads.json'),
          opt('data/competitors_census.json').then(function(c){return c||opt('data/competitors_national.json');}),
          opt('data/catchment_poi.json'),
-         opt(P+'_trees.json'), opt(P+'_rail.json')
+         optScene('trees','_trees.json'), optScene('rail','_rail.json')
        ]).then(function(d){
          try{if(window.applyDeferred)window.applyDeferred({occ:d[0],comp:d[1],poi:d[2],trees:d[3],rail:d[4]});}
          catch(e){try{console.error('deferred apply failed:',e);}catch(_){}}
