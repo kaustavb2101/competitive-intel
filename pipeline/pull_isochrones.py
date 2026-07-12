@@ -413,7 +413,7 @@ def main():
     range_s = int(round(args.range_min * 60))
     vintage = time.strftime("%Y-%m", time.gmtime())
 
-    key = os.environ.get("ORS_KEY") or os.environ.get("ORS_API_KEY")
+    key = (os.environ.get("ORS_KEY") or os.environ.get("ORS_API_KEY") or "").strip()  # strip trailing newline (secrets often carry one) -> valid Authorization header
     if not key and not args.dry_run:
         raise SystemExit(
             "ORS_KEY not set. The real pull runs in CI (.github/workflows/data-isochrones.yml, "
