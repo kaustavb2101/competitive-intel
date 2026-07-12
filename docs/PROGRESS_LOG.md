@@ -991,3 +991,17 @@ Kaustav deploys).
   — the same source the 3D scene uses, so counts agree across views. The panel is reframed to competitive
   PRESSURE (total rivals, ratio vs AutoX branches, brand mix, most-contested districts) with a Rivals KPI
   chip. Verified in-browser (Surat Thani: 439 rivals, 10.2× AutoX's 43) and live on production.
+
+## 2026-07-12 — Service/provenance integrity: regenerate drifted byte-size manifest (gate was RED)
+- **Determinism gate was failing** (`validate_data.py` check "standalone provenance rows record the
+  real byte size"): `platform/data/provenance.json` recorded stale, larger byte sizes for **17
+  layers** whose data files had been regenerated smaller in a prior commit without re-running the
+  provenance builder — `branch_labor`, `branch_risk`, `collateral_outlook`, `loan_tape_derived`,
+  `poi_relevance`, `province_risk`, `province_stress_index`, `search_demand`, `segment_exposure`,
+  `agri_income_by_province`, `branch_density`, `factory_income_by_province`, `fuel_prices`,
+  `household_risk_by_province`, `occupation_income`, `peer_npl`, `sme_income_by_province`.
+- **Fix:** re-ran `pipeline/build_provenance.py` (deterministic, network-free) so the manifest records
+  the REAL on-disk byte size of every standalone layer. Verified idempotent (second run no-diff) and
+  zero remaining drift. Gate back to green: **62 passed, 0 failed** (`bash tests/run.sh check`).
+- No data values changed — only the provenance byte-size stamps. No fabrication; provenance integrity
+  restored. Not a visual/app-behaviour change, so no PR/headless render needed.
