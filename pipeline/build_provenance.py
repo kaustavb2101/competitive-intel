@@ -130,7 +130,12 @@ def _source_of(m):
 
 
 def _vintage_of(m):
-    for k in ("updated", "vintage", "as_of", "updated_to"):
+    # Priority: an explicit "as-of/updated" stamp first, then a data-observation
+    # window end, then a price vintage, then a pull timestamp. These are all real
+    # freshness fields the repo's layers actually carry — nothing is invented; a
+    # layer with none of them stays vintage-blank (the honest ABSENT state).
+    for k in ("updated", "vintage", "as_of", "updated_to",
+              "observed_to", "price_vintage", "pulled_at_utc", "pulled"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)

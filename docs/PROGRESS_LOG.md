@@ -5,6 +5,38 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-12 (intelligence) — SERVICE: freshness audit + fix the provenance ledger's dropped vintages
+
+Intelligence loop (service pillar). Backlog was 0-open / 96% done, so ran a full **service audit** of
+the platform-as-a-service (freshness per layer, provenance coverage, broken data references, heavy-JSON
+load weight) → new `docs/SERVICE_AUDIT.md`, and fixed the ONE concrete gap it surfaced.
+
+The gap: the Data-room provenance ledger (`build_provenance.py` → `platform/data/provenance.json`,
+which powers the #home Data-room card that already renders each layer's `vintage`) was silently
+**dropping the freshness stamp of 6 measured live-input layers**. `_vintage_of()` scanned only
+`updated / vintage / as_of / updated_to`, but those 6 layers stamp their vintage under other real keys:
+`thaiwater_flood`/`thaiwater_rain` use `observed_to`, `search_demand` uses `pulled_at_utc`,
+`fuel_prices`/`macro_indicators` use `pulled`, `macro_sensitivity` uses `price_vintage`. Extended the
+key list (priority: `updated, vintage, as_of, updated_to, observed_to, price_vintage, pulled_at_utc,
+pulled`) so those freshness dates now surface in the ledger — layers carrying a captured vintage rose
+**5 → 11 of 78**. No fabrication: a note field that merely mentions a year
+(`brand_trends.json::note_be_to_ce`) is correctly NOT read as a vintage — the extractor keys off known
+freshness fields, not any date-shaped string; layers with none stay honestly vintage-blank.
+
+Audit also confirmed the service is otherwise healthy: **no broken data references** (the only two
+unresolved `data/*.json` mentions — `perimeter_counts.json`, `rayong_trees.json` — appear only in code
+comments, never a live fetch); 6 unlabelled provenance files are all structural (branches/meta/deltas
+etc.), none ships an un-sourced number (logged as the next task, not fixed — one change per run); the
+30–40 MB catchments are all lazy-loaded per 3D scene, never on the default routes.
+
+**Safeguards:** `build_provenance.py` rebuilds + `--check` reproduces byte-exact; `bash tests/run.sh
+check` → **62 passed, 0 failed**. Pipeline + data + docs only — no app.js/HTML/visual change (the card
+already rendered `L.vintage`; this is additive data), so no PR/headless-render needed. Gate green · no
+secrets in diff · diff matches intent · provenance/no-fabrication intact. Committed to master.
+Next recommended: clear the 6-file provenance shame board (one-line meta stamp per structural layer).
+
+---
+
 ## 2026-07-12 (ux-loop) — Stop rayong-catchment scenery layers 404ing (gate iso/trees/rail fetch)
 
 Autonomous UX loop. Closed UXUI audit finding #2 (major). The `rayong-catchment.html` 3D scene loader

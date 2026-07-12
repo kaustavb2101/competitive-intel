@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-12T19:38:03+00:00",
-    "commit": "5235381"
+    "generated_at": "2026-07-12T20:15:28+00:00",
+    "commit": "c163b56"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,24 @@
   ],
   "activity": [
     {
+      "date": "2026-07-12T20:15:28+00:00",
+      "sha": "c163b56",
+      "summary": "docs: log ux-search-a11y merge + deploy-verify (PR #29)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T03:12:18+07:00",
+      "sha": "71c6ef2",
+      "summary": "ux: search inputs — accessible name + native clear button (#29)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-12T19:41:28+00:00",
+      "sha": "8e5e549",
+      "summary": "chore(dashboard): refresh autonomy plan after provenance gate fix",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-12T19:38:03+00:00",
       "sha": "5235381",
       "summary": "fix(provenance): regenerate byte-size manifest — 17 drifted layers turned the gate red",
@@ -640,24 +658,6 @@
       "sha": "588e307",
       "summary": "ci(3d): publish Overture catchments to R2, not git (#16)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T14:49:26+07:00",
-      "sha": "08a4528",
-      "summary": "ci(overture): resilient matrix pull — survive runner preemption (#12)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T06:22:04+00:00",
-      "sha": "edf8ed2",
-      "summary": "committee: autonomous competitor scout (run 29182474163)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T04:25:51+00:00",
-      "sha": "166de75",
-      "summary": "committee: autonomous competitor scout (run 29179621674)",
-      "pillar": "market"
     }
   ]
 }
