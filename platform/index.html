@@ -17,7 +17,7 @@
   <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Home</a>
   <a data-v="overview" href="#overview" role="tab" aria-selected="false">Overview</a>
   <a data-v="map" href="#map" role="tab" aria-selected="false">National</a>
-  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Acquire</a>
+  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Competition</a>
   <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
   <a data-v="trend" href="#trend" role="tab" aria-selected="false">Trend</a>
   <a data-v="provinces" href="#provinces" role="tab" aria-selected="false">3D map</a>
@@ -68,7 +68,7 @@
     <div class="cc-head">
       <div>
         <h2 style="margin:0">Command center</h2>
-        <p class="lead" id="cc-sub">The two questions, on one screen: where to expand, and what is getting riskier. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>.</p>
+        <p class="lead" id="cc-sub">The two questions, on one screen: where rivals pressure the existing network, and what is getting riskier. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>.</p>
       </div>
       <div class="cc-actions no-print">
         <button class="chip" id="cc-csv">⬇ Download brief (CSV)</button>
@@ -76,7 +76,7 @@
       </div>
     </div>
 
-    <!-- Board thesis: ONE spoken-English sentence + Road-to-3,000 strip, synthesized from loaded data. -->
+    <!-- Board thesis: ONE spoken-English sentence, synthesized from loaded data. -->
     <div class="cc-thesis" id="cc-thesis" aria-live="polite"></div>
 
     <!-- QW5: the verdict, in plain language — big hero statements generated from the loaded data. -->
@@ -93,10 +93,10 @@
         <div class="cc-card-b" id="cc-queue-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
-      <!-- WHERE TO EXPAND -->
+      <!-- COMPETITIVE PRESSURE -->
       <div class="cc-card" id="cc-whitespace">
-        <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Where to expand
-          <a class="cc-link no-print" data-v="acq">Acquisition →</a></div>
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Competitive pressure
+          <a class="cc-link no-print" data-v="acq">Competition →</a></div>
         <div class="cc-card-b" id="cc-ws-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
@@ -147,7 +147,7 @@
         <div class="cc-card-b" id="cc-dataroom-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
     </div>
-    <p class="lead cc-provenance"><b>Provenance:</b> white-space &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any expansion with a site survey.</p>
+    <p class="lead cc-provenance"><b>Provenance:</b> coverage-gap &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any competitive read against a local check.</p>
   </section>
 
   <!-- OVERVIEW -->
@@ -228,78 +228,45 @@
     </p>
   </section>
 
-  <!-- ACQUISITION — leads with ONE answer: the "where to open next" leaderboard. -->
+  <!-- COMPETITION — competitive-risk read on the EXISTING network: rival density, contested markets,
+       brand share-of-search, segment competitor exposure. NO open/close/where-to-open recommendations. -->
   <section class="view" id="v-acq">
-    <!-- VERDICT card (generated from opportunity_score.json; omitted gracefully if absent) -->
-    <div class="verdict" id="acq-verdict" style="display:none"></div>
+    <h2 class="opp" style="margin-bottom:4px">Competitive risk · where rivals pressure the existing network</h2>
+    <p class="lead">A risk lens on the branches AutoX <b>already runs</b> — where the rival field is densest, where
+      we are outnumbered, where our brand loses share-of-search, and which segments carry the most competitor
+      exposure. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>. This tab makes <b>no</b> open /
+      close / expansion recommendations.</p>
 
-    <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Acquisition">
-      <a class="chip" href="#acq" data-acq="sec-r3k">Road to 3,000</a>
-      <a class="chip" href="#acq" data-acq="sec-opp">Where to open next</a>
-      <a class="chip" href="#acq" data-acq="sec-search">Search demand</a>
-      <a class="chip" href="#acq" data-acq="sec-comp">Competitor thesis</a>
-      <a class="chip" href="#acq" data-acq="sec-segments">Segment white-space</a>
+    <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Competition">
+      <a class="chip" href="#acq" data-acq="sec-search">Brand &amp; search</a>
+      <a class="chip" href="#acq" data-acq="sec-comp">Rival density</a>
+      <a class="chip" href="#acq" data-acq="sec-segments">Segment exposure</a>
     </nav>
 
-    <!-- 1 · ROAD TO 3,000 headroom bar — the full-width hero, open by default. -->
-    <details class="acqsec acq-lead" id="sec-r3k" open>
-    <summary><h2 class="opp">Road to 3,000 · where the next ~1,000 branches go</h2></summary>
-    <p class="lead">AutoX has <b id="r3kcur" class="mono">2,015</b> branches today and targets <b class="mono" style="color:var(--gold)">3,000</b> by the IPO window (~2027).
-      This splits the <b id="r3knet" class="mono">985</b> net-new branches across the 5 regions <b>proportional to remaining headroom</b>.
-      <b>Capacity proxy = regional workforce</b> (informal + formal employment, NSO, measured) — a market-size stand-in, <b>not</b> a demand or revenue model.
-      <b>Saturation</b> = branches per 100k workforce. <b>Headroom</b> = the gap to the branches-per-100k density that 3,000 branches implies nationally.
-      The allocation is an <b>illustrative planning split</b>, not a committed branch plan — confirm with local site surveys.</p>
-    <div class="insight" id="r3kreadout" style="border-left-color:var(--gold)">Computing the road to 3,000…</div>
-    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
-      <p>For each region:
-        <code>fair_share@3000 = 3,000 × (region workforce ÷ national workforce)</code> ·
-        <code>headroom = max(0, fair_share@3000 − current branches)</code> ·
-        <code>net-new allocated = (985 net-new) × (region headroom ÷ Σ headroom)</code>, rounded so targets sum to exactly 3,000 (largest-remainder).
-        In plain terms: bring every region up to the same branches-per-100k-workforce density that 3,000 branches implies nationally; regions furthest below that line get the most new branches.
-        Workforce is measured (NSO); the split is an illustrative proxy allocation, not a demand model.</p></div></details>
-    <button id="r3kcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
-    <table class="tbl" id="r3ktbl"></table>
+    <!-- REMOVED (strategy pivot): the former branch-growth regional-headroom allocation + the sequenced
+         growth plan. The network is consolidating, not growing, so no open-a-branch recommendations are
+         surfaced. build_expansion_plan.py + expansion_plan.json remain on disk but dormant (unrendered). -->
 
-    <h3 class="acqsub" style="margin-top:18px">Sequenced district plan · which branch to open <i>next</i> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
-    <p class="lead">The regional split above says <i>how many</i>; this says <b>where, in what order</b>. All 985 net-new branches are
-      placed one at a time, each going to the district with the highest remaining <b>demand per outlet</b> — the same divisor method
-      used to allocate parliamentary seats (D'Hondt), so diminishing returns are built in. Placements within 15&nbsp;km of each other
-      <b>cannibalize</b>: a new branch also shrinks the value of its neighbors' next branch. Demand is risk-adjusted
-      (a high district risk-proxy trims its pull by up to 25%). Click a row to see the district on the national map.</p>
-    <div class="insight" id="r3kseqreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <details class="method" style="margin:6px 0 10px"><summary>Method &amp; caveats</summary><div class="mb">
-      <p>Marginal value of the next branch in district i: <code>v = D / (1 + e)</code> where
-        <code>D = demand × (1 − 0.25 × risk_proxy/100)</code> (demand: OSM footfall + DIW workers + vehicles, measured-derived; risk-proxy: estimated) and
-        <code>e = own + placed + 0.35 × Σ distance-weighted neighbor outlets within 15 km</code>.
-        Greedy placement of all net-new branches; ≤8 per district. Without the neighbor term this greedy is the provably optimal
-        allocation of total demand-per-outlet (classic divisor-method result). The sequence is an <b>ESTIMATED planning order</b>,
-        not a committed plan — every site needs a local survey. Built by <code>pipeline/build_expansion_plan.py</code> (deterministic, offline).</p></div></details>
-    <button id="r3kseqcsv" class="chip" style="margin-bottom:10px">⬇ Download full plan CSV</button>
-    <table class="tbl" id="r3kseqtbl"></table>
-    </details>
+    <!-- REMOVED (strategy pivot): the composite "opportunity score" branch-open leaderboard.
+         opportunity_score.json remains on disk but is no longer surfaced here as a growth leaderboard. -->
+    <!-- NOTE FOR OWNER: sec-opp (opportunity score) was removed rather than reframed because a high
+         opportunity score = UNDER-competed (few rivals) = the OPPOSITE of competitive risk, so it could not
+         be honestly relabelled as a risk signal. Restore-and-reframe if you'd rather keep it. -->
 
-    <!-- 2 · LEADERBOARD — the composite opportunity score, open by default. -->
-    <details class="acqsec" id="sec-opp" open>
-    <summary><h2 class="opp">Where to open next · composite opportunity score</h2></summary>
-    <p class="lead">Districts (amphoe) ranked for branch expansion — higher = more underserved and undercompeted. Full method &amp; caveats below the table.</p>
-    <div id="oppreadout" class="sub" style="margin:2px 0 10px"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
-    <table class="tbl" id="opptbl"></table>
-    </details>
-
-    <!-- 2b · SEARCH DEMAND — where people search title-loan intent + brand share-of-search. -->
+    <!-- 2 · BRAND SHARE-OF-SEARCH — how AutoX's brand demand compares to rivals, province by province. -->
     <details class="acqsec" id="sec-search" open>
-    <summary><h2 class="opp">Where demand searches · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
     <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
       (<span class="mono">จำนำทะเบียนรถ</span> · <span class="mono">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
       how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
-      A demand/attention signal for where to open next, <b>not</b> query volume or market share.</p>
+      A competitive read of <b>where our brand wins or loses demand attention to rivals</b>, <b>not</b> query volume or market share.</p>
     <div class="insight" id="searchreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="searchtbl"></table>
     </details>
 
-    <!-- 3 · COMPETITOR THESIS — coverage + exit white-space, collapsed by default. -->
+    <!-- 1 · COMPETITOR THESIS — coverage + rival density + rival fragility, collapsed by default. -->
     <details class="acqsec" id="sec-comp">
-    <summary><h2 class="opp">Competitor thesis · coverage &amp; exit white-space <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
+    <summary><h2 class="opp">Competitor thesis · coverage, rival density &amp; rival fragility <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
 
     <h3 class="acqsub">Competitor coverage · how complete is our rival census?</h3>
     <p class="lead">Our competitor map is now a <b>MEASURED, near-complete</b> census: Muangthai, Srisawad and Tidlor are pulled
@@ -317,48 +284,50 @@
     <div class="insight" id="rivdenreadout" style="border-left-color:var(--agri)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="rivdentbl"></table>
 
-    <h3 class="acqsub">Competitor-exit white-space · regulatory tailwind</h3>
-    <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory tailwind (Q1 2026):</b> under the BoT responsible-lending
+    <h3 class="acqsub">Rival fragility · where the competitor field thins under the Q1-2026 BoT deadline</h3>
+    <div class="insight" style="border-left-color:var(--accent)"><b>Regulatory shake-out (Q1 2026):</b> under the BoT responsible-lending
       framework (notification 25680030) auto title-loan operators need a personal-loan licence (≥฿50m capital, 28% interest cap). The
       <b>registration window closes Q1 2026</b> — non-compliant, sub-scale / informal lenders risk <b>forced exit</b>. Tighter supervision
-      favours scaled compliant incumbents (MTC, SAWAD, Tidlor, Heng — and AutoX) and squeezes small operators out, so <b>white-space may
-      open as sub-scale rivals retreat</b>. <span class="sub">Source: docs/RESEARCH_DIGEST.md §A (Conf: High) · BoT 25680030.</span></div>
+      favours scaled compliant incumbents (MTC, SAWAD, Tidlor, Heng — and AutoX) and squeezes small operators out, so <b>the competitive
+      field may thin as sub-scale rivals retreat</b>. <span class="sub">Source: docs/RESEARCH_DIGEST.md §A (Conf: High) · BoT 25680030.</span></div>
     <p class="lead"><b>Honest caveat — this is an ESTIMATED PROXY, not a measurement.</b> The operators that will <b>exit</b> are exactly the
       sub-scale / informal lenders we do <b>not</b> census. Our competitor census covers only the <b>four big, compliant brands</b>
       (Heng · Muangthai · Tidlor · Srisawad) — the incumbents who will <b>survive</b>. So we cannot directly measure exit; we
-      <b>infer</b> the opportunity surface: districts where AutoX demand / white-space exists but the big-4 are <b>absent or thin</b>, so the
-      residual market is likely served by a smaller local operator (the exit-prone player). It answers
-      <b>"where could AutoX capture share if a marginal operator exits?"</b> A true rival-fragility index needs a sub-scale-operator
+      <b>infer</b> where the surviving rival field is thinnest: districts where local demand exists but the big-4 are <b>absent or thin</b>, so the
+      residual market is likely held by a smaller local operator (the exit-prone player). It answers
+      <b>"where is the rival field most fragile under the regulatory shake-out?"</b> A true rival-fragility index needs a sub-scale-operator
       census — a <b>blocked desktop / Thai-IP company-registry pull</b>. Treat the score as ESTIMATED.</p>
     <div class="insight" id="exitreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="exittbl"></table>
     </details>
 
-    <!-- 4 · SEGMENT-SPECIFIC white-space — every segment + district table, collapsed by default. -->
+    <!-- 3 · SEGMENT coverage & competitor exposure — every segment + district table, collapsed by default. -->
     <details class="acqsec" id="sec-segments">
-    <summary><h2 class="opp">Segment-specific white-space · estates · merchant · collateral · districts</h2></summary>
+    <summary><h2 class="opp">Segment coverage &amp; competitor exposure · estates · merchant · collateral · districts</h2></summary>
+    <p class="lead">Descriptive coverage-and-rival tables for the existing network — how thin AutoX's presence is against demand,
+      and where rivals sit — as a <b>competitive-exposure read</b>. These are <b>not</b> open-a-branch recommendations.</p>
 
-    <h3 class="acqsub">Industrial-estate white-space · worker lending</h3>
-    <p class="lead">AutoX branches within 10km of each major estate. Low = factory-worker white space.</p>
+    <h3 class="acqsub">Industrial-estate coverage · worker lending</h3>
+    <p class="lead">AutoX branches within 10km of each major estate. Low = thin coverage of that factory-worker base.</p>
     <table class="tbl" id="estates"></table>
 
-    <h3 class="acqsub">Merchant white-space · small sellers</h3>
-    <p class="lead">High vendor demand (markets + footfall + population), ≤4 AutoX branches within 10km.</p>
+    <h3 class="acqsub">Merchant coverage · small sellers</h3>
+    <p class="lead">High vendor demand (markets + footfall + population) with ≤4 AutoX branches within 10km — thin merchant coverage.</p>
     <table class="tbl" id="mws"></table>
 
-    <h3 class="acqsub">Collateral-rich white-space</h3>
-    <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km.</p>
+    <h3 class="acqsub">Collateral-rich coverage</h3>
+    <p class="lead">Dense vehicle-commerce + gold trade (title/gold demand), ≤5 AutoX within 10km — thin coverage of collateral-rich demand.</p>
     <table class="tbl" id="cws"></table>
 
-    <h3 class="acqsub">Catchment white-space score v2 · around existing branches</h3>
-    <p class="lead"><b>★ White-space score</b> is an <b>estimated screen</b> (0–100), not a site survey:
-      <b>demand</b> (footfall + DIW factory workers + province pickups + precomputed opportunity)
-      × <b>own-AutoX headroom</b> (fewer of our branches ≤10km = more room)
+    <h3 class="acqsub">Catchment coverage &amp; rival score v2 · around existing branches</h3>
+    <p class="lead"><b>★ Coverage-gap score</b> is an <b>estimated screen</b> (0–100), not a site survey:
+      <b>demand</b> (footfall + DIW factory workers + province pickups + precomputed demand)
+      × <b>own-AutoX headroom</b> (fewer of our branches ≤10km = thinner coverage)
       × <b>competitor-proxy headroom</b> (fewer banks+ATMs ≤10km — an OSM financial-density proxy, <i>not</i> a lender census). Computed client-side, CSV-exportable.
-      The <b>Rivals ≤5km</b> column adds a <b>measured</b> count of actual competitor branches (Srisawad, Muangthai, Tidlor, Heng) from Google Places — a <b>lower bound</b>, not a registry — so an underserved catchment can be read as <b>underserved AND undercompeted</b> (<b>✦</b> = high white-space with zero nearby rivals). Populated by <span class="mono">pipeline/pull_competitors.py</span>; blank until that runs.</p>
+      The <b>Rivals ≤5km</b> column adds a <b>measured</b> count of actual competitor branches (Srisawad, Muangthai, Tidlor, Heng) from Google Places — a <b>lower bound</b>, not a registry — so a catchment can be read as <b>thinly-covered AND undercompeted</b> (<b>✦</b> = high coverage-gap with zero nearby rivals). Populated by <span class="mono">pipeline/pull_competitors.py</span>; blank until that runs.</p>
     <div class="insight" id="acqreadout" style="border-left-color:var(--gold)">Computing the screen…</div>
 
-    <h4 class="acqsub2">Region ranking · average white space</h4>
+    <h4 class="acqsub2">Region ranking · average coverage gap</h4>
     <table class="tbl" id="acqregions"></table>
 
     <h4 class="acqsub2">Top catchments</h4>
@@ -367,11 +336,11 @@
     <table class="tbl" id="acqboard"><tbody id="acqtbl"></tbody></table>
     <p class="lead" id="acqcompnote" style="margin-top:6px"></p>
 
-    <h3 class="acqsub">District white-space leaderboard · all 928 amphoe</h3>
+    <h3 class="acqsub">District coverage-gap leaderboard · all 928 amphoe</h3>
     <p class="lead">The catchment screen above ranks <i>around our existing branches</i>. This ranks <b>every district in Thailand</b> —
-      including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so true
-      white space surfaces. <b>★ Whitespace</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
-      <b>measured at the amphoe</b>) minus a penalty for AutoX branches already inside it. Higher = more underserved.
+      including the <b id="ampzero" class="mono" style="color:var(--gold)"></b> amphoe with <b>no AutoX branch at all</b> — so the widest
+      coverage gaps surface. <b>★ Coverage-gap</b> (0–100, est) = a district demand proxy (POI footfall + DIW workers, both
+      <b>measured at the amphoe</b>) minus a penalty for AutoX branches already inside it. Higher = more thinly covered.
       <span class="sub">Branches &amp; POI counts are MEASURED (point-in-polygon). DIW workers are measured only where the
       district name resolves (✓); vehicles / workforce are <b>province-inherited</b>, not amphoe-measured.</span></p>
     <div class="insight" id="ampreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
@@ -565,7 +534,7 @@
 
   <section class="view" id="v-provinces">
     <h2 class="opp">Provinces · 77 deep-dives</h2>
-    <p class="lead">Tap a province for its 3D district deep-dive. <b>Fac/br</b> = DIW factories per AutoX branch — high with few branches = industrial white-space.</p>
+    <p class="lead">Tap a province for its 3D district deep-dive. <b>Fac/br</b> = DIW factories per AutoX branch — high with few branches = thin coverage of industrial demand.</p>
     <input class="search" id="provsearch" placeholder="Search province (Thai or English)…">
     <div class="chips" id="provchips"></div>
     <table class="tbl" id="provtbl"></table>

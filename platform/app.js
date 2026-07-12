@@ -11,20 +11,20 @@
 // hero:true  → one of the 4 ALWAYS-VISIBLE hero pills docked over the map (the rest live in "More ▾").
 // tag:'m'|'e' → the in-band [M] measured / [E] estimated badge shown on the pill (parity with the prov chips).
 const LENS = {
-  dws:  {pill:'Opportunity', label:'District white-space ◇', desc:"WHERE TO EXPAND · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = more underserved room to grow around an existing branch.", color:'#E6B450', unit:'white-space (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
+  dws:  {pill:'Coverage gap', label:'District coverage gap ◇', desc:"COVERAGE · MEASURED — each branch's whole district demand (footfall + workers) minus how saturated AutoX already is there. Brighter = thinner AutoX coverage of local demand.", color:'#E6B450', unit:'coverage gap (0–100)', amp:true, hero:true, tag:'m', val:d=>d._amp?d._amp.whitespace:0},
   brisk:    {pill:'Composite risk', label:'Composite branch risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — one fused 'which branches are getting riskier' read, blending measured household debt + crop/drought stress + occupation concentration + the branch's own segment mix. A triage rank, not a measured default rate.", color:'#E0574F', unit:'composite (est)', est:true, brisk:true, hero:true, tag:'e', val:d=>briskVal(d)},
-  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'WHERE TO EXPAND · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
+  comp:     {pill:'Competitors', label:'Competitor density ◆', desc:'COMPETITIVE PRESSURE · MEASURED (Google Places, a lower bound, not a registry) — rival title-loan branches (Srisawad, Muangthai, Tidlor, Heng) within ~5 km of each AutoX branch. Brighter = denser rival presence around us. Blank until the rival census loads.', color:'#E0574F', unit:'rivals ≤5km', cmp:true, hero:true, tag:'m', val:d=>compCount(d)},
   hhdti:    {pill:'Household DTI', label:'Household debt-to-income ●', desc:"BORROWER STRESS · MEASURED (NSO household survey 2566) — the branch's province household debt as a multiple of annual income. Brighter = more household balance-sheet stress. Hidden until the survey layer loads.", color:'#C8433B', unit:'×100 DTI', hh:true, prov:true, hero:true, tag:'m', val:d=>hhriskVal(d)},
   cstress:  {pill:'Agri PD', label:'Agri crop-stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED triage (0–100) — the branch's province crop-household stress (crop price pressure × drought, scaled by how farm-dependent the area is). A warning flag, not a measured default rate.", color:'#C8433B', unit:'crop-stress (est)', est:true, tag:'e', val:d=>cstressVal(d)},
   estab:    {pill:'Merchant', label:'Establishments ≤10km', desc:'MERCHANT BASE · MEASURED (Overture Places, a sample / lower bound) — total businesses within 10 km of each branch, a proxy for how much trade surrounds it. Brighter = a denser merchant ecosystem.', color:'#1C8C7D', unit:'estab', tag:'m', val:d=>estabCount(d)},
   motomix:  {pill:'Collateral', label:'Motorcycle-title share ▲', desc:'COLLATERAL EXPOSURE · MEASURED (DLT) — motorcycle share of the province vehicle stock. Motorcycles are the most volatile, lowest-recovery title collateral; brighter = more exposure to a used-bike value fall.', color:'#7A4FE0', unit:'% moto (DLT)', tag:'m', val:d=>motoShare(d)},
   occrisk:  {pill:'Occupation risk', label:'Occupation × stress ◆▲', desc:"PORTFOLIO RISK · MEASURED occupation mix × ESTIMATED stress weighting — flags branches whose borrower base is concentrated in a stressed sector (factories in a slowdown · farming under crop-stress). A triage flag, not a measured default rate.", color:'#C8433B', unit:'occ-stress (est)', est:true, occr:true, tag:'e', val:d=>occriskVal(d)},
-  poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"WHERE TO EXPAND · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
+  poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"BORROWER BASE · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
-  dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"WHERE TO EXPAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal for expansion, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
+  dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
   peerdev:  {pill:'Vs twins', label:'Risk vs statistical twins ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how many points the branch's composite risk sits ABOVE its 15 statistical twins (branches with the most similar measured market elsewhere in the country, same household-leverage backdrop). Bright = the market alone doesn't explain the risk; something local is different. Audit these first.", color:'#E0574F', unit:'pts above twins (est)', est:true, peers:true, tag:'e', val:d=>peerDevVal(d)},
   macx:     {pill:'Macro headwind', label:'Macro headwind ▲ est', desc:"PORTFOLIO RISK · ESTIMATED — how exposed each branch's customer mix is to its dominant DETERIORATING macro factor (rice/rubber/palm price falls, drought, household leverage, factory slowdown). Brightest = customer base most exposed to a macro factor currently moving against them. Occupation mix MEASURED × sensitivity weights ESTIMATED × macro signals MEASURED; share-diluted scores, so compare branches relatively. Branches whose dominant factor is a tailwind read 0 — this lens flags headwinds.", color:'#C8433B', unit:'macro headwind (est, relative)', est:true, macx:true, tag:'e', val:d=>macxHeadwindVal(d)},
   workers:  {pill:'Factory jobs', label:'Factory workers', desc:'BORROWER BASE · MEASURED (DIW) — registered factory employment in the branch district. Brighter = a larger wage-earning borrower base nearby.', color:'#E6B450', unit:'workers', tag:'m', val:d=>d.dwork||0},
@@ -1156,7 +1156,7 @@ function provDetailHTML(p){
   const risk=`<div style="flex:1;min-width:200px">`
     +`<div style="font:700 9px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px">Demand &amp; risk</div>`
     +stat('Branches', num(p.n), M)
-    +stat('Opportunity (white-space)', p.opp!=null?p.opp:'—', E)
+    +stat('Coverage gap', p.opp!=null?p.opp:'—', E)
     +stat('Agri pressure', p.stress!=null?p.stress+'/100':'—', E)
     +stat(m.dom_crop?`${m.dom_crop} price YoY`:'Crop price YoY', m.price_yoy!=null?(m.price_yoy>0?'+':'')+m.price_yoy+'%':'—', M)
     +stat('Rival branches ≤2 / ≤5 km', (m.rivals2!=null?m.rivals2:'—')+' / '+(m.rivals5!=null?m.rivals5:'—'), M)
@@ -1170,7 +1170,7 @@ function provDetailHTML(p){
   return `<div style="border-left:2px solid var(--line);padding:6px 0 6px 10px;margin:2px 0 4px">`
     +`<div style="display:flex;gap:18px;flex-wrap:wrap;font:500 11px 'IBM Plex Sans Thai'">${coll}${risk}</div>`
     +links
-    +`<div class="sub" style="font-size:9px;color:var(--dim);margin-top:5px">DLT vehicle stock &amp; rival counts are measured; collateral score, opportunity &amp; agri pressure are estimated screens.</div>`
+    +`<div class="sub" style="font-size:9px;color:var(--dim);margin-top:5px">DLT vehicle stock &amp; rival counts are measured; collateral score, coverage gap &amp; agri pressure are estimated screens.</div>`
     +`</div>`;
 }
 function renderNationalOutlook(){
@@ -1213,19 +1213,19 @@ function renderNationalOutlook(){
         +`<td class="mono sub" style="padding:3px 6px;text-align:right">${p.n}</td>`
         +`<td style="padding:3px 6px;font:500 11px 'IBM Plex Sans Thai'">${chip}</td>`
         +`<td style="padding:3px 6px;text-align:right" title="avg agri-pressure">${str}</td>`
-        +`<td style="padding:3px 6px;text-align:right" title="avg opportunity">${opp}</td></tr>`
+        +`<td style="padding:3px 6px;text-align:right" title="avg coverage gap">${opp}</td></tr>`
         +`<tr hidden><td colspan="5" style="padding:0 6px 8px">${provDetailHTML(p)}</td></tr>`;
     }).join('');
     const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces in this region — click any row for full metrics</summary>`
       +`<div style="overflow-x:auto;margin-top:6px"><table style="width:100%;border-collapse:collapse;font-size:11px">`
-      +`<tr style="color:var(--dim);font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg opportunity">Opp</td></tr>`
+      +`<tr style="color:var(--dim);font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg coverage gap">Gap</td></tr>`
       +provRows+`</table></div></details>`:'';
     return `<div style="border:1px solid var(--line);border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:var(--panel)">`
       +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:var(--hi)">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
       +`<div class="sub" style="margin:5px 0 8px;color:var(--mid);line-height:1.4">${r.situation}</div>`
       +actions((r.recommendation||[]).slice(0,3))
       +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:var(--mid)">Most agri-stressed:</b> ${stressed}</div>`:'')
-      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:var(--mid)">Best white-space:</b> ${oppy}</div>`:'')
+      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:var(--mid)">Widest coverage gap:</b> ${oppy}</div>`:'')
       +drill
       +`</div>`;
   }).join('');
@@ -1504,13 +1504,14 @@ function renderAcq(){
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
-  renderRoad3k();
-  renderExpansionPlan();
   renderSearchDemand();
-  renderOppScore();
   renderCompCoverage();
   renderRivalDensity();
   renderExitWhitespace();
+  // REMOVED (strategy pivot — network consolidating, not growing): renderRoad3k() [branch-growth
+  // headroom allocation], renderExpansionPlan() [sequenced growth plan] and renderOppScore()
+  // [composite "where to open next" leaderboard] are no longer surfaced. Their DOM was removed and
+  // their functions + data files are left dormant on disk for reversibility.
 }
 
 /* ---------- Where demand searches · title-loan search interest by province (obj #2) ----------
@@ -1565,14 +1566,14 @@ function drawSearchDemand(){
         const own=ash>=best.share;
         verdict=own
           ? `<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100) — and <b style="color:var(--gold)">AutoX leads share-of-search there</b> (${Math.round(100*ash)}% vs ${best.brand} ${Math.round(100*best.share)}%).`
-          : `<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100) — but <b style="color:var(--merch)">${best.brand} owns share-of-search there</b> (${Math.round(100*best.share)}% vs AutoX ${Math.round(100*ash)}%). High demand + weak brand = an acquisition target.`;
+          : `<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100) — but <b style="color:var(--merch)">${best.brand} owns share-of-search there</b> (${Math.round(100*best.share)}% vs AutoX ${Math.round(100*ash)}%). High demand + weak brand = a competitive soft spot where a rival leads brand demand.`;
       }else{
         verdict=`<b style="color:var(--gold)">${top.th}</b> searches title-loan intent hardest (demand <b>${Math.round(top.demand)}</b>/100).`;
       }
     }
     // where does AutoX brand search actually lead? count provinces where AutoX SoS rank is 1..N and it beats every rival.
     const axLead=rows.filter(r=>r.best_rival&&r.autox_share!=null&&r.autox_share>=r.best_rival.share).length;
-    ro.innerHTML=`<b>Where demand searches:</b> ${verdict} `+
+    ro.innerHTML=`<b>Brand vs rival search:</b> ${verdict} `+
       `AutoX out-searches every rival brand in <b>${axLead}</b> of ${rows.length} provinces. ${TAG_E}`+
       methodBox(null,
         ['<b>Demand</b> = mean of two Google Trends title-loan intent terms per province (relative 0–100 index, <b>ESTIMATED</b> — a demand/attention signal, NOT query volume or bookings).',
@@ -1800,17 +1801,17 @@ function drawExitWhitespace(){
   const rows=(EXITWS&&Array.isArray(EXITWS.districts))?EXITWS.districts:[];
   if(!rows.length){
     tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Competitor-exit white-space not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh. The regulatory thesis above still stands.</span>';
+    if(ro) ro.innerHTML='<b>Rival-fragility cue not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh. The regulatory thesis above still stands.</span>';
     return;
   }
   const top=rows.slice().sort((a,b)=>(b.exit_capture_score||0)-(a.exit_capture_score||0)).slice(0,EXIT_TOPN);
   const cell=(v,color)=>{const n=Math.round(v||0); return `<td>${barHTML(n,color)} <span class="mono" style="color:${color}">${n}</span></td>`;};
   tbl.innerHTML=`<tr><th>#</th>`+
-    `<th class="h-opp" title="ESTIMATED capture cue (0–100): residual sub-scale demand + AutoX white-space. Higher = best place to win share if a marginal local operator exits under Q1-2026. NOT a measurement.">Exit-capture ★ est</th>`+
+    `<th class="h-opp" title="ESTIMATED fragility cue (0–100): thin surviving big-4 field + residual sub-scale demand. Higher = the rival field here is most exposed if a marginal local operator exits under Q1-2026. NOT a measurement.">Rival-fragility ★ est</th>`+
     `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
     `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
     `<th class="h-opp" title="ESTIMATED — demand the big-4 do NOT cover (demand × thin-big-4). Higher = residual market likely served by sub-scale, exit-prone operators.">Sub-scale residual est</th>`+
-    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = more underserved.">White-space ★</th>`+
+    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = thinner AutoX coverage.">Coverage-gap ★</th>`+
     `<th title="MEASURED — big-4 rival branches inside the district (Google Places, lower bound). Lower = thinner surviving-incumbent footprint.">Big-4 ≤district</th></tr>`+
     top.map((d,i)=>{
       const c=d.components||{};
@@ -1830,10 +1831,10 @@ function drawExitWhitespace(){
     const t=top[0], m=EXITWS.meta||{}, cc=m.competitor_census||{};
     const t0=t.components||{};
     const dl=(m.regulatory_citation||{}).deadline||'Q1 2026';
-    ro.innerHTML=`<b>Capture target if rivals exit:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the cue at
+    ro.innerHTML=`<b>Most fragile rival field:</b> <b style="color:var(--accent)">${t.name}</b> (${t.province}, ${t.region}) tops the cue at
       <b style="color:var(--accent)">${Math.round(t.exit_capture_score)}</b>/100 — sub-scale residual ${Math.round(t0.sub_scale_proxy||0)},
-      white-space ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.
-      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × our white-space, NOT a measurement of sub-scale operators. Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
+      coverage-gap ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.
+      <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × local demand, NOT a measurement of sub-scale operators. Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
   }
 }
 
@@ -1961,7 +1962,7 @@ function renderExpansionPlan(){
 }
 function focusExpansionOnMap(i){
   const d=((EXPLAN||{}).by_amphoe||[])[i]; if(!d||d.cy==null||d.cx==null) return;
-  pendingMapFocus={lat:d.cy,lng:d.cx,name:d.name,val:d.ws||0,label:'white-space ★'};
+  pendingMapFocus={lat:d.cy,lng:d.cx,name:d.name,val:d.ws||0,label:'coverage gap ★'};
   if(curLens!=='dws'){ curLens='dws'; if(typeof renderLenses==='function') try{renderLenses();}catch(e){} }
   history.replaceState(null,'','#map'); showTab('map');
 }
@@ -2088,7 +2089,7 @@ function drawAcqRegions(){
     o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
-  $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean white-space score across the region (est)">Avg white-space ★ est</th><th>Best single opening (est)</th></tr>`+
+  $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
@@ -2105,10 +2106,10 @@ function drawAcqRegions(){
     else if(t.w<=5) drivers.push(`thin own coverage (${t.w} ≤10km)`);
     if((t.dwork||0)>=8000) drivers.push(`${Math.round((t.dwork||0)/1000)}k factory workers in the district`);
     const scope=acqRegion==='all'?'nationwide':`in ${acqRegion}`;
-    $('#acqreadout').innerHTML=`<b>Open here next:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
+    $('#acqreadout').innerHTML=`<b>Widest coverage gap:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
       at <b style="color:var(--gold)">★ ${top1.s}</b>${drivers.length?' — '+drivers.join(', ')+'.':'.'}
-      By region, <b>${best.r}</b> shows the most average white space (★ ${best.avg.toFixed(1)} across ${best.n.toLocaleString()} catchments).
-      <span class="sub">Estimated screen — confirm with a site survey before committing.</span>`;
+      By region, <b>${best.r}</b> shows the widest average coverage gap (★ ${best.avg.toFixed(1)} across ${best.n.toLocaleString()} catchments).
+      <span class="sub">Estimated coverage screen — a competitive-exposure read, not a site survey or an open-a-branch recommendation.</span>`;
   }
 }
 function drawAcqBoard(){
@@ -2116,11 +2117,11 @@ function drawAcqBoard(){
     .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
   drawAcqRegions();
   const haveComp=compHasData();
-  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED white-space screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">White-space ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = more headroom">AutoX ≤10km</th>`+
-    `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high white-space = underserved AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
+  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
+    `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
     `<th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
     acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
-      const hd=d.w<=2?' · white space':d.w<=5?' · thin':' · covered';
+      const hd=d.w<=2?' · gap':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
       // competitor cell: measured count + an "undercompeted" flag when high white-space meets few rivals.
       const cn=compCount(d);
@@ -2147,7 +2148,7 @@ function drawAcqBoard(){
     else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — the competitor census isn\'t loaded yet. Once it refreshes, this column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
     else {
       const flagged=acqRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
-      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>underserved AND undercompeted</b> — high white-space with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
+      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>thinly-covered AND undercompeted</b> — high coverage-gap with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
         `Competitor counts are <b>measured</b> (Google Places) but a <b>lower bound</b>, not a lender registry.</span>`;
     }
   }
@@ -2161,7 +2162,7 @@ function acqCSV(){
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_acquisition_leaderboard.csv'; a.click(); URL.revokeObjectURL(a.href);
+  a.download='autox_catchment_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- district (amphoe) white-space + risk (Step 2) ----------
@@ -2414,11 +2415,11 @@ function drawAmpBoard(){
   const haveOcc=aoccHasData();      // measured dominant-occupation per district (Overture)
   const haveComp=compHasData();     // measured rival census near the district centroid
   $('#amptbl').innerHTML=`<tr><th>#</th>`+
-    `<th class="h-opp" title="ESTIMATED white-space score (0–100): district demand proxy minus an AutoX-presence penalty. Higher = more underserved.">Whitespace ★ est</th>`+
+    `<th class="h-opp" title="ESTIMATED coverage-gap score (0–100): district demand proxy minus an AutoX-presence penalty. Higher = thinner AutoX coverage.">Coverage-gap ★ est</th>`+
     `<th>District</th><th>Province</th><th>Region</th>`+
     `<th title="AutoX branches inside this amphoe (MEASURED, point-in-polygon). 0 = no own presence at all.">AutoX</th>`+
     (haveOcc?`<th class="h-collat" title="MEASURED dominant occupation/establishment bucket inside the district (Overture Maps Places, a sample/lower bound) — the borrower base you'd be lending into. From amphoe_occupations.json.">Borrower base ◆ meas</th>`:'')+
-    (haveComp?`<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~${COMP_RADIUS_KM}km of the district centre (Google Places ∪ Overture, a lower bound — not a registry). Low rivals + high white-space = underserved AND undercompeted.">Rivals ≤${COMP_RADIUS_KM}km ◆ meas</th>`:'')+
+    (haveComp?`<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~${COMP_RADIUS_KM}km of the district centre (Google Places ∪ Overture, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤${COMP_RADIUS_KM}km ◆ meas</th>`:'')+
     `<th class="h-opp" title="DIW factory workers in the district (MEASURED where ✓; — where the district name didn't resolve to DIW)">Workers (DIW)</th>`+
     `<th title="convenience stores + restaurants inside the amphoe (OSM, MEASURED) — merchant footfall proxy">Merchant POI ◇</th>`+
     `<th title="gold shops + vehicle dealers inside the amphoe (OSM, MEASURED) — title/gold-collateral demand proxy">Collat POI ◇</th></tr>`+
@@ -2466,10 +2467,10 @@ function drawAmpBoard(){
       const cn=ampCompCount(top);
       if(cn===0) drivers.push('<b>zero</b> rival branches nearby (undercompeted)');
       else if(cn!=null) drivers.push(`${cn} rival branch${cn===1?'':'es'} nearby`);
-      $('#ampreadout').innerHTML=`<b>Most underserved district ${scope}:</b> ${top.name_measured?top.name:''} ${top.name_en} (${top.province_th}, ${top.region})
+      $('#ampreadout').innerHTML=`<b>Widest coverage gap ${scope}:</b> ${top.name_measured?top.name:''} ${top.name_en} (${top.province_th}, ${top.region})
         at <b style="color:var(--gold)">★ ${(top.whitespace||0).toFixed(0)}</b> — ${drivers.join(', ')}.
         ${zeros?`<b>${zeros}</b> of the top 25 ${scope} have <b>zero AutoX presence</b>. `:''}
-        <span class="sub">Estimated white-space; borrower base &amp; rival counts measured (Overture / Google Places, lower bounds). Confirm with a site survey.</span>`;
+        <span class="sub">Estimated coverage gap; borrower base &amp; rival counts measured (Overture / Google Places, lower bounds). A competitive-exposure read, not an open-a-branch recommendation.</span>`;
     }
   }
 }
@@ -2484,7 +2485,7 @@ function focusDistrictOnMap(i,kind){
   const risk=(kind==='risk');
   const a=((risk?ampRRows:ampRows)||[])[i]||null; if(!a||a.cy==null||a.cx==null) return;
   const val=risk?(a.risk_proxy||0):(a.whitespace||0);
-  pendingMapFocus={lat:a.cy,lng:a.cx,name:a.name_measured?a.name:a.name_en,val,label:risk?'risk ▲':'white-space ★'};
+  pendingMapFocus={lat:a.cy,lng:a.cx,name:a.name_measured?a.name:a.name_en,val,label:risk?'risk ▲':'coverage gap ★'};
   const lens=risk?'drisk':'dws';
   if(curLens!==lens){ curLens=lens; if(typeof renderLenses==='function') try{renderLenses();}catch(e){} }
   history.replaceState(null,'','#map'); showTab('map');
@@ -2497,7 +2498,7 @@ function applyMapFocus(){
     map.flyTo([f.lat,f.lng], 12, {duration:0.9});
     focusMarker=L.circleMarker([f.lat,f.lng],{radius:12,weight:2.5,color:'#E6B450',opacity:0.95,fill:false});
     focusMarker.addTo(map);
-    focusMarker.bindTooltip(`${f.name} · ${f.label||'white-space ★'} ${Math.round(f.val!=null?f.val:(f.ws||0))}`,
+    focusMarker.bindTooltip(`${f.name} · ${f.label||'coverage gap ★'} ${Math.round(f.val!=null?f.val:(f.ws||0))}`,
       {permanent:true,direction:'top',offset:[0,-8],className:'focus-tip'}).openTooltip();
   }catch(e){}
 }
@@ -2539,7 +2540,7 @@ function ampCSV(){
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_district_whitespace.csv'; a.click(); URL.revokeObjectURL(a.href);
+  a.download='autox_district_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- portfolio exposure / concentration (item 3) ----------
@@ -4357,11 +4358,11 @@ function amphoePopupHTML(d,sec,r){
   const ws=a.whitespace, rk=a.risk_proxy;
   const wc=ws>=40?'var(--gold)':ws>=20?'#cda23e':'#8b90a7';
   const rc=rk>=55?'var(--agri)':rk>=45?'var(--gold)':'var(--merch)';
-  return sec('District (amphoe) — white-space & risk')
+  return sec('District (amphoe) — coverage & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">white-space = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
@@ -4878,7 +4879,9 @@ function queue3DLink(it){
 function renderHomeQueue(){
   const box=$('#cc-queue-body'); if(!box) return;
   if(!dqLoaded){ return; }                                   // skeleton stays until the fetch resolves
-  const items=(DQUEUE&&Array.isArray(DQUEUE.items))?DQUEUE.items:[];
+  // strategy pivot: the network is consolidating, so branch-"expand" actions are no longer surfaced —
+  // filter them out client-side (decision_queue.json is left intact on disk for reversibility).
+  const items=((DQUEUE&&Array.isArray(DQUEUE.items))?DQUEUE.items:[]).filter(it=>it&&it.type!=='expand');
   if(!items.length){
     box.innerHTML=`<div class="cc-empty">Decision queue not yet computed — run <span class="mono">pipeline/build_decision_queue.py</span>. The ranked weekly actions fill in on the next data refresh.</div>`;
     return;
@@ -4891,7 +4894,7 @@ function renderHomeQueue(){
       `<div class="cc-qtxt">${dqEsc(it.act)}`+
       ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a>${queue3DLink(it)}</span></div></div>`;
   }).join('')+
-  `<div class="cc-qfoot sub">Ranking is a stated editorial rule (defend &gt; audit &gt; tighten &gt; expand, then each layer's own magnitude) — see <span class="mono">decision_queue.json</span> meta. Defend rows are measured rival geometry; the rest are estimated screens, not measured outcomes.</div>`;
+  `<div class="cc-qfoot sub">Ranking is a stated editorial rule (defend &gt; audit &gt; tighten, then each layer's own magnitude) — see <span class="mono">decision_queue.json</span> meta. Defend rows are measured rival geometry; the rest are estimated screens, not measured outcomes.</div>`;
 }
 
 /* ---- home orchestration ---- */
@@ -4917,7 +4920,7 @@ function renderHomeRegions(){
 }
 function renderHome(){
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
-  renderHomeThesis();       // ONE board-ready sentence + Road-to-3,000 strip (synthesized, null-safe)
+  renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
   renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
@@ -4937,9 +4940,9 @@ function renderHome(){
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // recommendation-by-region card — same rollup layer the Overview uses (null-safe).
     loadOutlook().then(()=>{ if(onHome()) renderHomeRegions(); });
-    // QW5 hero needs the opportunity composite + measured household leverage — lazy, null-safe re-render.
-    loadOppScore().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
-    loadExpansionPlan().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
+    // REMOVED (strategy pivot): loadOppScore()/loadExpansionPlan() home-boot re-renders — the "open next"
+    // hero + growth thesis they fed are gone; the thesis/hero now render from the risk layers only.
+    // QW5 hero needs measured household leverage — lazy, null-safe re-render.
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     // obj#1 — structurally riskiest province (DTI+unemployment composite) into the risk card + thesis (null-safe).
     loadProvinceStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeThesis(); } });
@@ -4990,25 +4993,15 @@ function loadExpansionPlan(){
     .then(j=>{EXPLAN=j;explanLoaded=true;return j;})
     .catch(()=>{EXPLAN=null;explanLoaded=true;return null;});
 }
-/* BOARD THESIS — one spoken-English sentence a director could read aloud, plus a Road-to-3,000
-   headroom strip. Synthesized ONLY from data already in memory (DATA/META/AMP/OPPSCORE/HHRISK/
-   CSTRESS); every clause is dropped if its source is absent, so it never fabricates. Re-rendered
-   as lazy sources resolve (same lazy chain as the hero). The sentence names: how many districts
-   have room, where to open next, and what is stressing — the two standing objectives in one line. */
-const TARGET_BRANCHES=3000;
+/* BOARD THESIS — one spoken-English sentence a director could read aloud. Synthesized ONLY from data
+   already in memory (DATA/META/AMP/HHRISK/CSTRESS); every clause is dropped if its source is absent, so
+   it never fabricates. Re-rendered as lazy sources resolve. Names: how many branches we run, how many
+   districts have no coverage, and what is stressing — a RISK read, not a growth plan. */
 function renderHomeThesis(){
   const box=$('#cc-thesis'); if(!box) return;
   const have=(Array.isArray(DATA)?DATA.length:0);
-  // zero-branch (white-space) district count — measured PIP from amphoe.json.
+  // zero-branch (no-coverage) district count — measured PIP from amphoe.json.
   const zeroDist=(AMP&&AMP.length)?AMP.filter(a=>a.branches===0).length:null;
-  // where to open next — sequenced plan #1 (purpose-built for exactly this question) else top
-  // opportunity district (estimated composite) else top white-space district.
-  let openNext=null;
-  const sq=(EXPLAN&&Array.isArray(EXPLAN.sequence)&&EXPLAN.sequence[0])?EXPLAN.sequence[0]:null;
-  if(sq&&sq.name) openNext=sq.name;
-  const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
-  if(!openNext&&od&&od.length){const t=od.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(t&&t.name) openNext=t.name;}
-  if(!openNext&&AMP&&AMP.length){const t=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0))[0]; if(t) openNext=t.name_measured?t.name:t.name_en;}
   // what is stressing — the DTI+unemployment composite (more defensible, blends two NSO legs) else
   // raw household DTI else worst crop-stress province.
   const ps=(pstressHasData()&&PSTRESS_LIST.length)?PSTRESS_LIST[0]:null;
@@ -5017,13 +5010,10 @@ function renderHomeThesis(){
   // ---- assemble the sentence, clause by clause, skipping any absent source ----
   const clauses=[];
   if(have){
-    const gap=Math.max(0,TARGET_BRANCHES-have);
-    clauses.push(`AutoX runs <b>${have.toLocaleString()}</b> branches today — <b>${gap.toLocaleString()}</b> short of the ${TARGET_BRANCHES.toLocaleString()} target`);
+    clauses.push(`AutoX runs <b>${have.toLocaleString()}</b> branches today`);
   }
   if(zeroDist!=null){
-    clauses.push(`<b>${zeroDist.toLocaleString()}</b> district${zeroDist===1?'':'s'} still have no branch at all${openNext?`, and the strongest single opening is <b>${openNext}</b>`:''}`);
-  } else if(openNext){
-    clauses.push(`the strongest single opening is <b>${openNext}</b>`);
+    clauses.push(`<b>${zeroDist.toLocaleString()}</b> district${zeroDist===1?'':'s'} have <b>no AutoX branch</b> (coverage gaps)`);
   }
   if(ps){
     clauses.push(`the risk to watch is <b>${ps.province} household stress</b> (DTI ${ps.debt_to_income!=null?(+ps.debt_to_income).toFixed(2)+'×':'—'} + unemployment ${ps.unemployment_rate!=null?(+ps.unemployment_rate).toFixed(1)+'%':'—'}, composite ▲${(ps.composite_stress||0).toFixed(0)}, measured)`);
@@ -5040,44 +5030,17 @@ function renderHomeThesis(){
   }
   if(!clauses.length){ box.innerHTML=''; return; }
   const sentence=clauses.join('; ')+'.';
-  // Road-to-3,000 mini progress bar (measured count vs target) — only when we know the count.
-  let bar='';
-  if(have){
-    const pct=Math.min(100,Math.round(have/TARGET_BRANCHES*100));
-    bar=`<div class="cc-thesis-bar" title="${have.toLocaleString()} of ${TARGET_BRANCHES.toLocaleString()} branches">`+
-      `<div class="cc-thesis-fill" style="width:${pct}%"></div>`+
-      `<span class="cc-thesis-barlab">Road to ${TARGET_BRANCHES.toLocaleString()} · ${pct}%</span></div>`;
-  }
-  box.innerHTML=`<div class="cc-thesis-line">▶ ${sentence}</div>${bar}`;
+  // REMOVED (strategy pivot): the "Road to N" branch-count progress bar — the network is consolidating,
+  // there is no growth target to track against.
+  box.innerHTML=`<div class="cc-thesis-line">▶ ${sentence}</div>`;
 }
 function renderHomeHero(){
   const box=$('#cc-hero'); if(!box) return;
   const heroes=[];
-  // 1) WHERE TO OPEN NEXT — sequenced-plan first placements (purpose-built ranking with
-  //    cannibalization + risk adjustment); composite opportunity score as the fallback.
-  const sq=(EXPLAN&&Array.isArray(EXPLAN.sequence))?EXPLAN.sequence:null;
-  const od=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:null;
-  if(sq&&sq.length){
-    const firsts=[]; const seen=new Set();
-    for(const p of sq){ if(!seen.has(p.id)){ seen.add(p.id); firsts.push(p); if(firsts.length===2) break; } }
-    const names=firsts.map(p=>p.name).join(' then ');
-    const lead=firsts[0];
-    heroes.push({tone:'opp',v:'acq',
-      big:`Open next in ${names}`,
-      sub:`Placements #${firsts.map(p=>p.rank).join(' & #')} of the sequenced Road-to-3,000 plan (demand-per-outlet, risk-adjusted, 15 km cannibalization) · ${lead.region||''}`,
-      tag:'estimated sequence', cta:'Acquisition →'});
-  } else if(od&&od.length){
-    const top=od.slice().sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,2).filter(d=>d&&d.name);
-    if(top.length){
-      const names=top.map(d=>d.name).join(' & ');
-      const lead=top[0];
-      heroes.push({tone:'opp',v:'acq',
-        big:`Open next in ${names}`,
-        sub:`Top of the composite opportunity score (${top.map(d=>Math.round(d.score)).join(' & ')}/100) · ${lead.province||''}${lead.region?' · '+lead.region:''}`,
-        tag:'estimated composite', cta:'Acquisition →'});
-    }
-  }
-  // 2) WATCHING — MEASURED household leverage (top DTI province) + worst crop-household stress.
+  // REMOVED (strategy pivot): the "Open next in …" hero (sequenced growth plan / composite opportunity
+  // score) — a branch-open recommendation. The network is consolidating, so the home hero leads with the
+  // RISK read only. The competitive-risk detail lives on the Competition tab (#acq).
+  // WATCHING — MEASURED household leverage (top DTI province) + worst crop-household stress.
   const hh=(Array.isArray(HHRISK_LIST)&&HHRISK_LIST.length)?HHRISK_LIST[0]:null;
   const cs=(CSTRESS_LIST&&CSTRESS_LIST.length)?CSTRESS_LIST[0]:null;
   if(hh||cs){
@@ -5107,17 +5070,38 @@ function renderHomeHero(){
   }).join('');
 }
 
-// WHERE TO EXPAND — top 3 districts (amphoe whitespace) + top 3 provinces (province whitespace avg).
+// COMPETITIVE PRESSURE — leads with most contested ground (rivals in our catchments) + competitor
+// coverage, then thinnest-coverage districts/provinces (with rival counts). A risk read on the
+// EXISTING network — NOT an open-a-branch recommendation.
 function renderHomeWhitespace(){
   const box=$('#cc-ws-body'); if(!box||!META) return;
   let html='';
-  // top districts from amphoe.json (whitespace, est) — surfaces zero-branch white space
+  // MOST CONTESTED GROUND (contested_pop.json) — where we already fight a rival for the same catchment
+  // population: the lead competitive-pressure signal. Lazy; appears once the layer loads.
+  if(CPOP&&Array.isArray(CPOP.top)&&CPOP.top.length){
+    const t=CPOP.top[0];
+    html+=`<div class="cc-sub2" style="margin-top:0">Most contested ground ${TAG_M}</div>`;
+    html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
+      `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
+      `${t.pct}%`,'contested','var(--agri)');
+  }
+  // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
+  // flag on the coverage signals below, not market share. Omitted gracefully if absent.
+  const cct=(COMPCOV&&COMPCOV.meta&&COMPCOV.meta.totals)||null;
+  if(cct&&cct.coverage_pct!=null){
+    html+=`<div class="cc-sub2"${html?'':' style="margin-top:0"'}>Competitor coverage · census completeness ${TAG_M}</div>`;
+    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
+      'lower-bound census · a confidence flag on the coverage signal below, not market share',
+      `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
+  }
+  // thinnest-coverage districts from amphoe.json — where AutoX presence is thin vs demand, shown with
+  // measured rival counts (a competitive-exposure read; NOT an open-a-branch recommendation).
   if(AMP&&AMP.length){
     const top=AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0)).slice(0,3);
     // honest subhead: only advertise the measured extras that actually loaded.
     const extras=[]; if(aoccHasData()) extras.push('borrower base'); if(compHasData()) extras.push('rivals');
     const extraTag=extras.length?` <span class="sub">+ ${extras.join(' &amp; ')} ${TAG_M}</span>`:'';
-    html+=`<div class="cc-sub2" style="margin-top:0">Top underserved districts ${TAG_E}${extraTag}</div>`;
+    html+=`<div class="cc-sub2"${html?'':' style="margin-top:0"'}>Thinnest coverage · districts ${TAG_E}${extraTag}</div>`;
     html+=top.map(a=>{const nm=a.name_measured?a.name:a.name_en;
       const where=`${a.province_th} · ${a.region}`;
       // committee trim: max ~2-3 short bits so the gold score leads the row. Keep the zero-branch
@@ -5128,39 +5112,19 @@ function renderHomeWhitespace(){
       if(cn===0) bits.push('0 rivals ≤5km ✦');
       else if(cn!=null) bits.push(`${cn} rival${cn===1?'':'s'} ≤5km`);
       return ccRow(`${nm} <span class="sub">${a.name_measured?a.name_en:''}</span>`,bits.join(' · '),
-        `★ ${(a.whitespace||0).toFixed(0)}`,'whitespace','var(--gold)');}).join('');
+        `★ ${(a.whitespace||0).toFixed(0)}`,'coverage gap','var(--gold)');}).join('');
   } else {
     html+=skelRows(3);
   }
-  // top provinces by mean district whitespace (rolled up from amphoe) — "which province has room"
+  // top provinces by mean district coverage gap (rolled up from amphoe)
   if(AMP&&AMP.length){
     const byP={};
     AMP.forEach(a=>{const k=a.province_th; const o=byP[k]||(byP[k]={th:k,region:a.region,sum:0,n:0,zero:0});
       o.sum+=(a.whitespace||0); o.n++; if(a.branches===0)o.zero++;});
     const provs=Object.values(byP).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg).slice(0,3);
-    html+=`<div class="cc-sub2">Top provinces · mean district white-space ${TAG_E}</div>`;
+    html+=`<div class="cc-sub2">Top provinces · mean coverage gap ${TAG_E}</div>`;
     html+=provs.map(o=>ccRow(`${o.th}`,`${o.region} · ${o.zero} district${o.zero===1?'':'s'} with no AutoX`,
       `★ ${o.avg.toFixed(0)}`,'avg','var(--gold)')).join('');
-  }
-  // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
-  // flag on every density/white-space signal above, not market share. Omitted gracefully if absent.
-  const cct=(COMPCOV&&COMPCOV.meta&&COMPCOV.meta.totals)||null;
-  if(cct&&cct.coverage_pct!=null){
-    html+=`<div class="cc-sub2">Competitor coverage · census completeness ${TAG_M}</div>`;
-    html+=ccRow(`Located ${(cct.found||0).toLocaleString()} of ~${(cct.expected||0).toLocaleString()} rival branches`,
-      'lower-bound census · a confidence flag on the white-space above, not market share',
-      `${cct.coverage_pct.toFixed(0)}%`,'coverage','var(--merch)');
-  }
-  // MOST CONTESTED GROUND (contested_pop.json) — the flip side of white-space: where we already
-  // fight a rival for the same catchment population. Same rank-1-surfacing pattern already shipped
-  // on Exposure's full "Most contested ground" table (renderContestedGround); mirrored here so Home's
-  // expand card names both "where's the open space" and "where are we already contested".
-  if(CPOP&&Array.isArray(CPOP.top)&&CPOP.top.length){
-    const t=CPOP.top[0];
-    html+=`<div class="cc-sub2">Most contested ground ${TAG_M}</div>`;
-    html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
-      `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
-      `${t.pct}%`,'contested','var(--agri)');
   }
   box.innerHTML=html;
 }
@@ -5401,13 +5365,13 @@ function renderWatchlist(){
 // EXPORT — CSV brief of the command-center numbers.
 function ccBriefCSV(){
   const rows=[['section','item','detail','value','provenance']];
-  // white-space
+  // coverage gap (thinnest AutoX coverage vs demand — a competitive-exposure read, not a growth plan)
   if(AMP&&AMP.length){
     AMP.slice().sort((a,b)=>(b.whitespace||0)-(a.whitespace||0)).slice(0,3).forEach(a=>{
-      rows.push(['where_to_expand_district',(a.name_measured?a.name:a.name_en),`${a.province_th} | ${a.region} | ${a.branches} AutoX inside`,(a.whitespace||0).toFixed(0),'estimated']);});
+      rows.push(['coverage_gap_district',(a.name_measured?a.name:a.name_en),`${a.province_th} | ${a.region} | ${a.branches} AutoX inside`,(a.whitespace||0).toFixed(0),'estimated']);});
     const byP={}; AMP.forEach(a=>{const o=byP[a.province_th]||(byP[a.province_th]={s:0,n:0,r:a.region});o.s+=(a.whitespace||0);o.n++;});
     Object.entries(byP).map(([th,o])=>[th,o.r,o.s/o.n]).sort((a,b)=>b[2]-a[2]).slice(0,3).forEach(([th,r,avg])=>
-      rows.push(['where_to_expand_province',th,r,avg.toFixed(0),'estimated']));
+      rows.push(['coverage_gap_province',th,r,avg.toFixed(0),'estimated']));
   }
   // risk
   if(CSTRESS_LIST&&CSTRESS_LIST.length){const w=CSTRESS_LIST[0];
