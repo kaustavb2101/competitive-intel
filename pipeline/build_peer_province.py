@@ -60,6 +60,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DATA = os.path.join(ROOT, "platform", "data")
 RIVDEN = os.path.join(DATA, "rival_density.json")
+PICO = os.path.join(DATA, "pico_census.json")
 OUT = os.path.join(DATA, "peer_province.json")
 
 
@@ -76,6 +77,19 @@ def build():
     rd_meta = rd.get("meta", {})
     # fixed brand order carried verbatim from rival_density (alphabetical over the census)
     brands = list(rd_meta.get("brands", []))
+
+    # ── optional: fold in the licensed-PICO-finance operator field per province ──────
+    # pico_census.json is a MEASURED per-province count of licensed พิโกไฟแนนซ์ operators
+    # (FPO registry) — a DISTINCT small-ticket non-bank competitor class from the big-4 title
+    # lenders, keyed on province with no coordinates. It is carried as its own column, NOT
+    # summed into the coordinate-geometry big-4 `rivals`/`ratio`/`leader` (that would mix a
+    # province-count layer into a haversine census). Absent input degrades to pico=None.
+    pico_by_prov, pico_zero, pico_meta = {}, set(), {}
+    if os.path.exists(PICO):
+        pc = _load(PICO)
+        pico_meta = pc.get("meta", {})
+        pico_by_prov = pc.get("by_province", {}) or {}
+        pico_zero = set(pc.get("zero_provinces", []) or [])
 
     # ── roll the 928 district records up to their province ───────────────────────
     # province_th is the join key; region is carried from the first district seen (all
@@ -112,6 +126,16 @@ def build():
         order = ["AutoX"] + brands
         counts = {"AutoX": autox, **by_brand}
         leader = max(order, key=lambda k: (counts.get(k, 0), -order.index(k)))
+        # licensed-PICO operator count for this province: an int when the FPO registry lists
+        # the province (or a MEASURED zero when the registry explicitly has none), else null
+        # (registry absent in this sandbox, or province unmatched — an honest gap, not a 0).
+        pico_row = pico_by_prov.get(e["province_th"])
+        if pico_row is not None:
+            pico = pico_row.get("total")
+        elif e["province_th"] in pico_zero:
+            pico = 0
+        else:
+            pico = None
         provinces.append({
             "province_th": e["province_th"],
             "region": e["region"],
@@ -120,6 +144,7 @@ def build():
             "by_brand": by_brand,
             "ratio": ratio,
             "leader": leader,
+            "pico": pico,
             "n_districts": e["n_districts"],
             "n_outnumbered_districts": e["n_outnumbered_districts"],
         })
@@ -133,13 +158,17 @@ def build():
     total_autox = sum(p["autox"] for p in provinces)
     total_rivals = sum(p["rivals"] for p in provinces)
     per_brand_total = {b: sum(p["by_brand"].get(b, 0) for p in provinces) for b in brands}
+    pico_present = [p for p in provinces if isinstance(p["pico"], int)]
+    total_pico = sum(p["pico"] for p in pico_present)
+    n_pico_present = sum(1 for p in pico_present if p["pico"] > 0)
 
     meta = {
         "generated_by": "pipeline/build_peer_province.py",
         "label": "PEER COMPARISON per province — MEASURED AutoX branch count next to each big-4 "
                  "rival brand (Muangthai / Srisawad / Tidlor / Heng) separately, for all 77 "
-                 "provinces, with the province rival:AutoX ratio, the leading operator, and how "
-                 "many districts AutoX is outnumbered in.",
+                 "provinces, with the province rival:AutoX ratio, the leading operator, how many "
+                 "districts AutoX is outnumbered in, plus a MEASURED count of LICENSED PICO-finance "
+                 "operators (a distinct small-ticket rival class) carried as its own column.",
         "objective": "Competitive risk (objective #2): a per-province, per-brand read on the "
                      "footprint we ALREADY run — where each rival brand is densest around our "
                      "branches. Makes NO open / close / expand recommendation.",
@@ -158,6 +187,16 @@ def build():
                       "in the province; deterministic tie-break (AutoX first, then census order).",
             "n_outnumbered_districts": "COMPUTED — count of the province's districts flagged "
                                        "'outnumbered' in rival_density.json.",
+            "pico": "MEASURED — count of LICENSED พิโกไฟแนนซ์ (PICO-finance) operator service "
+                    "points registered to the province in the FPO open-data registry "
+                    "(pico_census.json, catalog.fpo.go.th, vintage %s). A DISTINCT small-ticket "
+                    "non-bank competitor class from the big-4 title lenders. Kept as its own "
+                    "column and deliberately NOT summed into 'rivals'/'ratio'/'leader' — the "
+                    "big-4 census is coordinate geometry (haversine), while the PICO registry is "
+                    "province-count only (no coordinates), so mixing them would be dishonest. "
+                    "int (or a MEASURED 0 where the registry lists none); null when the registry "
+                    "is absent from the sandbox or the province is unmatched."
+                    % (pico_meta.get("vintage") or "n/a"),
         },
         "caveats": [
             "The rival census is a LOWER BOUND: Muangthai / Srisawad / Tidlor are near-complete "
@@ -171,22 +210,37 @@ def build():
             "silently reconciled)." % total_autox,
             "A high rival:AutoX ratio is a competitive-pressure signal on the EXISTING network, "
             "not an expansion cue and not a verdict.",
+            "The 'pico' column is a DISTINCT competitor class (licensed small-ticket PICO-finance "
+            "operators), counted per province from the FPO registry's own province field — NOT a "
+            "coordinate census, so it is not comparable district-by-district and is never summed "
+            "into the big-4 'rivals' total. A province's pico=0 (สิงห์บุรี, อ่างทอง) is a MEASURED "
+            "zero from the registry, while pico=null would mean the layer was unavailable.",
         ],
         "brands": brands,
         "record_format": "{province_th, region, autox, rivals, by_brand{brand:count}, ratio, "
-                         "leader, n_districts, n_outnumbered_districts}. by_brand omits "
-                         "zero-count brands; provinces[] sorted by (rivals-autox) desc.",
+                         "leader, pico, n_districts, n_outnumbered_districts}. by_brand omits "
+                         "zero-count brands; pico is a distinct-class int/null (not in rivals); "
+                         "provinces[] sorted by (rivals-autox) desc.",
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
         "n_provinces_outnumbered": n_outnumbered_prov,
         "total_autox": total_autox,
         "total_rivals": total_rivals,
         "per_brand_total": per_brand_total,
+        "total_pico": total_pico,
+        "n_provinces_pico_present": n_pico_present,
+        "pico_available": bool(pico_by_prov),
         "rival_density_source": {
             "n_districts": rd_meta.get("n_districts"),
             "total_autox": rd_meta.get("total_autox"),
             "total_rivals": rd_meta.get("total_rivals"),
         },
+        "pico_source": {
+            "layer": "platform/data/pico_census.json",
+            "vintage": pico_meta.get("vintage"),
+            "source_url": pico_meta.get("source_url"),
+            "n_operators": pico_meta.get("n_operators"),
+        } if pico_by_prov else None,
     }
     return {"meta": meta, "provinces": provinces}
 
@@ -220,6 +274,10 @@ def run(check=False):
              ", ".join("%s %d" % (b, n) for b, n in m["per_brand_total"].items())))
     print("  provinces AutoX leads: %d | provinces outnumbered: %d"
           % (m["n_provinces_autox_leads"], m["n_provinces_outnumbered"]))
+    if m["pico_available"]:
+        print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
+              % (m["total_pico"], m["n_provinces_pico_present"],
+                 (m.get("pico_source") or {}).get("vintage")))
     return 0
 
 
