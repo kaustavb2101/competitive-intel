@@ -5,6 +5,41 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (intelligence) — DEPLOYMENT HEALTH: point the nightly probe at the master PRODUCTION alias (auth-aware)
+
+Intelligence loop (deploy-health pillar). Backlog was 0-open / 96% done, so ran the deploy-health
+check and found the ONE concrete regression: the nightly site-health workflow
+(`.github/workflows/site-health.yml`) was monitoring a **stale, non-production, unauthenticated
+branch preview alias** (`competitive-intel-git-claude-ne-6e11a7-…`) instead of the master production
+alias the loop mandate specifies (`competitive-intel-git-master-kaustav-bagchis-projects.vercel.app`).
+Verified live: the stale alias returns **200** (no access protection) while master returns **401** —
+i.e. every night the health check was passing green against a deployment that ISN'T what colleagues
+see, and never actually probing production. The stale alias is referenced nowhere else in the repo.
+
+**Why the fix isn't a one-line URL swap:** master runs `middleware.js` HTTP Basic Auth (any username,
+password = `SITE_PASSWORD`), so a naive repoint would make the credential-less probe 401 and fire a
+false "site broken" alarm every night. So the checker (`pipeline/check_site_health.py`) is now
+**auth-aware**: `--site-password` / `SITE_PASSWORD` env attaches `Authorization: Basic base64("health:"
++pass)` and runs the full deep suite; WITHOUT a credential, a live 401 is caught (`AuthGated`) and
+reported as **healthy-but-gated** ("site up + correctly access-protected", deep checks SKIPPED), never
+a failure. This degrades safely **whether or not** the `SITE_PASSWORD` repo secret exists — no human
+step is required to avoid breakage; adding the secret only *unlocks* the deep page/data validation.
+Workflow now defaults both the `workflow_dispatch` input and the scheduled `BASE_URL` to the master
+alias and passes `SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}`.
+
+**Safeguards:** verified all three code paths — offline `--local platform` 29/29 exit 0 (auth untouched
+locally); live master alias with no credential → healthy-but-gated exit 0 (no false alarm); public
+200 alias → full 29/29 deep checks exit 0 (back-compat preserved). `bash tests/run.sh check` → **62
+passed, 0 failed**. CI-workflow + probe-script only — no `platform/data` file altered (so no
+`build_provenance.py` / determinism-data change), no app.js/HTML/visual change (no PR/headless-render
+needed). Gate green · no secrets in diff (only the `secrets.SITE_PASSWORD` reference, no value) · diff
+matches intent · provenance/no-fabrication intact. Committed to master.
+Next recommended: clear the 6-file provenance shame board (one-line `meta` stamp per structural layer:
+`branches.json`, `meta.json`, `deltas.json`, `provinces/index.json`, `rayong_province.json`,
+`snapshots_index.json`) so the Data-room census reaches 100% labelled.
+
+---
+
 ## 2026-07-12 (intelligence) — SERVICE: freshness audit + fix the provenance ledger's dropped vintages
 
 Intelligence loop (service pillar). Backlog was 0-open / 96% done, so ran a full **service audit** of

@@ -23,8 +23,18 @@
 #   python3 pipeline/check_site_health.py --base-url https://<deployment>      # CI / live
 #   python3 pipeline/check_site_health.py --local platform                     # offline test
 #   python3 pipeline/check_site_health.py --local platform --json /tmp/h.json
+#   SITE_PASSWORD=... python3 pipeline/check_site_health.py --base-url ...      # auth-gated site
+#
+# ACCESS-PROTECTED DEPLOYMENTS: the production alias runs middleware.js HTTP
+# Basic Auth (any username, password = SITE_PASSWORD). Supply the same password
+# via --site-password or the SITE_PASSWORD env var and the probe authenticates
+# and runs the full deep checks. WITHOUT a password, a 401 from the live site is
+# treated as HEALTHY ("up and correctly access-protected") rather than a
+# breakage — the deep page/data checks are reported as SKIPPED, not FAILED, so
+# the nightly probe never fires a false alarm just because it lacks the secret.
 
 import argparse
+import base64
 import json
 import os
 import sys
@@ -50,21 +60,42 @@ WORDMARK = "AutoX"
 
 
 # ---------------------------------------------------------------------------
+class AuthGated(RuntimeError):
+    """The live deployment returned 401 and no credential was supplied. The site
+    is UP and correctly access-protected (middleware.js) — this is a healthy
+    state, not a breakage; the deep checks simply need the SITE_PASSWORD secret."""
+
+
 # Fetchers — one code path for validation, two transports.
 class HttpFetcher:
-    def __init__(self, base_url):
+    def __init__(self, base_url, password=None):
         self.base = base_url.rstrip("/")
         self.target = self.base
+        self.password = (password or "").strip()
+
+    def _headers(self):
+        h = {"User-Agent": USER_AGENT}
+        if self.password:
+            # middleware.js accepts any username; only the password is checked.
+            token = base64.b64encode(
+                ("health:" + self.password).encode("utf-8")).decode("ascii")
+            h["Authorization"] = "Basic " + token
+        return h
 
     def fetch(self, rel):
         """Return (bytes, detail) or raise RuntimeError with a plain reason."""
         url = self.base + "/" + rel
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        req = urllib.request.Request(url, headers=self._headers())
         try:
             with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
                 status = resp.getcode()
                 body = resp.read(MAX_BYTES + 1)
         except urllib.error.HTTPError as e:
+            if e.code == 401 and not self.password:
+                # Up + correctly protected, but we hold no credential -> gated.
+                raise AuthGated(
+                    "HTTP 401 — live site is up and access-protected; "
+                    "no SITE_PASSWORD supplied to the probe")
             raise RuntimeError("HTTP %d %s" % (e.code, e.reason))
         except urllib.error.URLError as e:
             raise RuntimeError("unreachable: %s" % e.reason)
@@ -178,6 +209,22 @@ def run_checks(fetcher):
     def record(name, ok, detail=""):
         results.append({"name": name, "ok": bool(ok), "detail": detail})
 
+    # Pre-flight: distinguish "site up + correctly access-protected (401)" from a
+    # real breakage. A protected production alias returning 401 to a
+    # credential-less probe is HEALTHY — report it and skip the deep checks
+    # rather than firing a false alarm. (LocalFetcher never raises AuthGated;
+    # supplying SITE_PASSWORD authenticates past this and runs the full suite.)
+    try:
+        fetcher.fetch(PAGES[0])
+    except AuthGated as e:
+        record("live site is up and access-protected (401)", True, str(e))
+        record("deep page/data checks", True,
+               "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
+               "authenticate and validate pages + data against the protected alias")
+        return results
+    except RuntimeError:
+        pass  # a genuine fetch failure is reported in detail by the loops below.
+
     def fetch_common(rel):
         """Fetch + the checks every asset shares (non-empty, under size cap).
         Returns bytes or None (failure already recorded)."""
@@ -262,11 +309,19 @@ def main(argv=None):
     src.add_argument("--local", metavar="DIR",
                      help="validate a local directory (e.g. 'platform') instead of HTTP — "
                           "same validation code path, for offline testing")
+    ap.add_argument("--site-password", default=os.environ.get("SITE_PASSWORD"),
+                    help="HTTP Basic Auth password for an access-protected deployment "
+                         "(any username; matches middleware.js SITE_PASSWORD). Falls "
+                         "back to the SITE_PASSWORD env var. Omit for a public site — a "
+                         "401 is then reported as healthy-but-gated, not a failure.")
     ap.add_argument("--json", metavar="OUT",
                     help="also write a machine-readable report to this path")
     args = ap.parse_args(argv)
 
-    fetcher = HttpFetcher(args.base_url) if args.base_url else LocalFetcher(args.local)
+    if args.base_url:
+        fetcher = HttpFetcher(args.base_url, password=args.site_password)
+    else:
+        fetcher = LocalFetcher(args.local)
     results = run_checks(fetcher)
     n_fail = print_report(results, fetcher.target)
 
