@@ -1067,3 +1067,33 @@ Kaustav deploys).
   HTML content couldn't be byte-verified through the gate without `SITE_PASSWORD` (a secret, not in the
   loop's env), but the branch preview deploy was reported **Ready** by the Vercel bot and the served DOM
   was verified locally (headless render carried the attrs).
+
+## 2026-07-13 — UX loop: #map zoom relocation extended across phone+tablet band — merged & deployed
+- **Fix (ux-map-overlap-tablet):** finding #3's zoom/lens-overlap fix relocated the Leaflet zoom `+/−`
+  to bottom-right only below **430px**. Headless renders (`tests/lib/render.sh index.html#map`) at
+  500/600/760px show the floating lens pills still wrap to 2–3 rows over the top-left zoom across the
+  whole **431–760px** band (foldables, tablets, landscape phones, split-screen), where the fixed 56px
+  one-row offset is insufficient — the zoom crowds/overlaps "More lenses" / "Household DTI". Extended the
+  relocation `@media` breakpoint `430px → 760px` in `platform/styles.css` (the file's established tablet
+  breakpoint) so the zoom sits bottom-right (always clear, any wrap count) across the full phone+tablet
+  range. Desktop (>760px, pills fit one row) keeps the conventional top-left zoom. 1 CSS line + comment;
+  `docs/UXUI_AUDIT.md` fix-log + residual-note lines.
+- **Safeguards:** (a) `bash tests/run.sh check` → **62 passed, 0 failed**. (b) Headless renders read
+  back: 500px → zoom bottom-right clear of 3-row pill stack (was overlapping); 760px → bottom-right clear
+  of 2-row stack (was crowding); 1440px → zoom unchanged top-left, pills one row (no desktop regression).
+  (c) no secrets in diff. (d) diff = 2 intended files only, no stray files.
+- **Merge:** PR #31 squash-merged to master (`c36d5d5`), branch deleted.
+- **CI note (pre-existing, NOT caused by this change):** the GitHub `qa` Action is red on EVERY recent
+  run — current master HEAD (`6b16d21`), 3+ prior master commits, and all feature branches — each a ~2s
+  empty-output infra/runner failure (the determinism gate runs hundreds of checks and cannot fail in 2s).
+  It pre-dates this CSS-only change and cannot be affected by it (the change touches no pipeline data).
+  `qa` is not a required check (`mergeable_state: unstable`, not `blocked`), so the merge was permitted,
+  exactly as PR #29 was. The real content gate — the LOCAL determinism gate — passed 0-failed. **Owner
+  action still recommended: investigate why the `qa` runner fails at startup (billing/permissions/
+  provisioning) — red on master all week.**
+- **Deploy verify:** master auto-deployed to Vercel. Production alias root returns HTTP **401** with
+  `server: Vercel` + `www-authenticate: Basic realm="AutoX Credit Intelligence"` + `x-vercel-id` — the
+  intentional Basic-Auth password gate serving normally (`/styles.css` → 401 gated, `/index.html` → 308 →
+  gated root). Identical signature to the PR #29 verify; a broken deploy would 404/500/fail-to-connect.
+  Healthy gated deploy, **no rollback**. HTML couldn't be byte-verified through the gate without
+  `SITE_PASSWORD` (a secret not in the loop's env); served CSS behaviour was verified via headless render.
