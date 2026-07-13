@@ -5,6 +5,39 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (intelligence) — PEER COMPARISON: fold the licensed-PICO rival field into the per-province peer board
+
+Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so took the highest-value
+peer improvement from committed REAL data: `peer_province.json` already sets AutoX branch counts next
+to each big-4 title lender (Muangthai/Srisawad/Tidlor/Heng) per province, but carried **no read on the
+distinct licensed-PICO-finance (พิโกไฟแนนซ์) rival class** that yesterday's integration run measured into
+`pico_census.json` (FPO registry, 2,042 operators, vintage 2026-05-22). `build_peer_province.py` now
+folds a **MEASURED `pico`** count onto every province row, so the peer board reads AutoX vs big-4 vs
+the small-ticket PICO field in one place. Totals reconcile exactly: total_pico=2042 across 75 provinces,
+the 2 registry-zero provinces (สิงห์บุรี, อ่างทอง) carry a MEASURED `pico=0`, 0 nulls.
+
+**Decision — a separate column, NOT summed into `rivals`/`ratio`/`leader`:** the big-4 fields are a
+coordinate-geometry (haversine) census rolled up from `rival_density.json`, while the FPO registry is
+province-count only (no coordinates). Mixing a province-count layer into the geometry totals would be
+dishonest, so `pico` rides as its own field with its own provenance line + caveat; `rivals`/`ratio`/
+`leader` stay big-4-only and byte-identical in spirit. Absent input degrades to `pico=null` (honest gap
+≠ a 0). `pico=0` is reserved for the registry's explicit measured zeros. Fully deterministic: output is
+a pure join of two committed, `--check`-reproducible files; vintage + source URL pinned from the census
+meta, not the volatile pull manifest.
+
+**Safeguards:** build → `--check` byte-exact → rebuild diff clean; ran `build_provenance.py` (peer_province
+size line only, 1-line manifest delta); `bash tests/run.sh check` → **62 passed, 0 failed** (validate_data
+446/446). Every `pico` value spot-checked equal to the FPO registry total (0 mismatches). Gate green ·
+no secrets in diff · diff matches intent (3 files: builder, layer, provenance) · provenance/no-fabrication
+intact. Data + pipeline only — no app.js/HTML/visual change (`peer_province.json` isn't rendered yet),
+so committed to master; no PR/headless-render needed.
+
+Next recommended: **surface the PICO column on the Competition (#acq) tab** beside the big-4 peer table
+(now that both live in `peer_province.json`) — an app/visual change → PR + headless render, owned by the
+integration/UX loops.
+
+---
+
 ## 2026-07-13 (integration) — FPO PICO-finance operator registry → measured per-province competitor layer
 
 Integration loop, top OPEN backlog item (#1 acquisition/competitive-risk gap). Folded the **FPO
