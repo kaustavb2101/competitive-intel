@@ -1728,11 +1728,16 @@ function drawPeerProvince(){
   const m=PEERPROV.meta||{};
   // fixed brand column order carried from the layer (alphabetical over the census).
   const brands=Array.isArray(m.brands)?m.brands:['Heng','Muangthai','Srisawad','Tidlor'];
+  // licensed PICO-finance operators are a DISTINCT small-ticket rival class (FPO registry, MEASURED),
+  // folded into the layer as its own `pico` column. Gate the column on the layer flag so an older
+  // peer_province.json (pre-fold) degrades gracefully to the big-4-only board.
+  const hasPico=m.pico_available===true;
   const list=recs.slice(0,PEERPROV_TOPN);
   const bh=brands.map(b=>`<th title="${b} branches in this province (MEASURED census)">${b}</th>`).join('');
+  const ph=hasPico?`<th title="Licensed PICO-finance operators — a DISTINCT small-ticket rival class (MEASURED, FPO registry ${m.pico_source&&m.pico_source.vintage?m.pico_source.vintage:''})">PICO</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
     `<th title="AutoX branches in this province (MEASURED, point-in-district)">AutoX</th>`+
-    bh+
+    bh+ph+
     `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
     `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
@@ -1740,12 +1745,14 @@ function drawPeerProvince(){
       const rc=(r.rivals-r.autox)>=200?'var(--agri)':'var(--gold)';
       const bcols=brands.map(b=>{const v=(r.by_brand&&r.by_brand[b])||0;
         return `<td class="mono"${v?'':' style="color:var(--dim)"'}>${v?v.toLocaleString():'·'}</td>`;}).join('');
+      const pv=(r.pico!=null)?r.pico:0;
+      const pcol=hasPico?`<td class="mono" style="color:${pv?'var(--collat)':'var(--dim)'}">${pv?pv.toLocaleString():'·'}</td>`:'';
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td><b>${r.province_th||'—'}</b></td>
         <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b></td>
-        ${bcols}
+        ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
         <td>${lead}</td>
       </tr>`;}).join('');
@@ -1753,13 +1760,16 @@ function drawPeerProvince(){
     const nOut=m.n_provinces_outnumbered!=null?m.n_provinces_outnumbered:recs.filter(r=>r.autox>0&&r.rivals>r.autox).length;
     const pbt=m.per_brand_total||{};
     const brandStr=brands.filter(b=>pbt[b]).map(b=>`${b} ${pbt[b].toLocaleString()}`).join(' · ');
+    const hasPico=m.pico_available===true;
+    const picoStr=hasPico?` Behind them sits a distinct small-ticket rival class: <b style="color:var(--collat)">${(m.total_pico||0).toLocaleString()}</b> licensed PICO-finance operators across ${m.n_provinces_pico_present||0} provinces (MEASURED, FPO registry).`:'';
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b> `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
-      `National rival footprint: ${brandStr}. ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
+         'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
   }
 }
