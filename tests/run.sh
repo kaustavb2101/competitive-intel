@@ -86,6 +86,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_pico_census.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"
   else bad "build_pico_census.py --check (pico_census.json drifted from source-data/datagoth/fpo_pico.csv)"
   fi
+  ( cd "$PIPE" && python3 build_dbd_formation.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_dbd_formation.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_dbd_formation.py --check (source-data/datagoth/dbd_newco.csv absent — re-pullable pull_datagoth input, not committed)"
+  else bad "build_dbd_formation.py --check (dbd_formation.json drifted from source-data/datagoth/dbd_newco.csv)"
+  fi
   ( cd "$PIPE" && python3 build_branch_vehicles.py --check >/dev/null 2>&1 ) && ok "build_branch_vehicles.py --check" || bad "build_branch_vehicles.py --check (branch_vehicles.json drifted from vehicles_by_province/branch_population)"
   ( cd "$PIPE" && python3 build_branch_recommendations.py --check >/dev/null 2>&1 ) && ok "build_branch_recommendations.py --check" || bad "build_branch_recommendations.py --check (branch_recommendations.json drifted from the per-branch layers)"
   ( cd "$PIPE" && python3 build_regional_outlook.py --check >/dev/null 2>&1 ) && ok "build_regional_outlook.py --check" || bad "build_regional_outlook.py --check (regional_outlook.json drifted from the per-branch/rec layers)"

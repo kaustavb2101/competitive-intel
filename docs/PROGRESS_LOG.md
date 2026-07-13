@@ -43,6 +43,47 @@ surfaced data**.
 
 ---
 
+## 2026-07-13 (integration) — DBD new-company formation → measured per-province demand layer
+
+Integration loop, top remaining OPEN backlog item (#3, data.go.th distillation — the demand slice).
+Folded the **DBD (Department of Business Development) monthly new-registration registry** into a clean
+measured province layer. Verified `openapi.dbd.go.th` is **reachable from the cloud/CI IP** (unlike the
+`data.go.th` aggregator, and unlike BAAC/SME-bank which 403 there), so `pull_datagoth.py --only
+dbd_newco` pulls the 5.4 MB June-2026 file (8,596 rows) without the Thai laptop.
+
+New `pipeline/build_dbd_formation.py` → `platform/data/dbd_formation.json`: **MEASURED** per-province
+new-company (juristic-person) formation for the snapshot month — count + registered capital, canonical
+77 keys via `regionmap.canonical`. 7,972 registrations map cleanly across **all 77 provinces**, ฿15.22bn
+registered capital; the heaviest are กรุงเทพฯ 2,291, ชลบุรี 652, นนทบุรี 478, สมุทรปราการ 429, ปทุมธานี 375,
+เชียงใหม่ 356 — a Bangkok/EEC-weighted formation pulse. This is a **demand-side** vitality signal
+(the growing small-business-owner / vehicle base AutoX's book draws on), DISTINCT from the competitor
+layers (pico_census / competitors_census).
+
+**Decision — count only mapped, canonical provinces; never guess the rest:** the DBD จังหวัด field
+carries a จ./จังหวัด prefix (stripped before `canonical`), and 617 rows have a blank province + 7 are
+column-shifted postcodes ('56000 etc.) — all counted honestly as unmapped/blank and excluded, not
+attributed. Provenance is byte-stable: output is a pure function of the CSV content, with the DBD
+resource URL + snapshot month (CE 2026-06 / BE 2569-06) PINNED as constants, not read from the volatile
+pull manifest. Two honesty caveats carried in `meta.gaps`: it's ONE month's flow (not a stock, not
+annualised) and ทุนจดทะเบียน is REGISTERED (authorised) capital, not paid-up.
+
+**Safeguards:** reads the **gitignored, re-pullable** `source-data/datagoth/dbd_newco.csv`, so the
+builder SKIP-passes (exit 3) in CI when the pull is absent — same convention as build_pico_census /
+build_branch_cropland / build_branch_density; determinism verified HERE with the CSV present (build →
+`--check` byte-exact → rebuild diff clean). Wired `--check` into `tests/run.sh`; ran `build_provenance.py`
+(Data-room ledger 34 → 35 measured, stamped MEASURED correctly). `bash tests/run.sh check` →
+**63 passed, 0 failed** (validate_data 446/446). Data + pipeline only — no app.js/HTML/visual change
+(the layer isn't rendered yet), so committed to master; no PR/headless-render needed.
+
+Next recommended: **surface `dbd_formation.json` on the Overview/Competition tab** as a per-province
+new-formation demand read (app/visual change → PR + render). Then optionally parse the อำเภอ column into a
+district-level formation tally, and distill the remaining CI-reachable datagoth sources (DIW factories
+subdistrict census, MOT vehicles, Excise moto/car tax) each into their own clean province layer.
+
+---
+
+---
+
 ## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED
 
 Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so audited the pillar for a
