@@ -13,6 +13,12 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<!-- WCAG 2.4.1 (A): bypass the ~12-stop tablist on every route. Focuses <main> directly;
+     preventDefault keeps the SPA hash-router (unknown hash falls back to #home) from firing. -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<script>(function(){var s=document.querySelector('.skip-link');if(!s)return;
+ s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');
+  if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" role="tablist" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
   <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Home</a>
@@ -63,7 +69,7 @@
 </script>
 <div id="updated" style="display:none"></div>
 
-<main>
+<main id="main-content" tabindex="-1">
   <!-- COMMAND CENTER (daily-use front door) -->
   <section class="view on" id="v-home">
     <div class="cc-head">
