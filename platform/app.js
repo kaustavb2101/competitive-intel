@@ -465,6 +465,26 @@ function bldgDensityRec(d){
   return BLDGDEN[i]||null;
 }
 
+/* ---------- per-branch MEASURED-corrected CROP AREA within 10km (data/branch_cropland.json) ----------
+   Lazy-loads pipeline/build_branch_cropland.py: {meta, branches:[{ha[],crop_ha,dom,fac[]}]},
+   INDEX-ALIGNED to branches.json. crop_ha is total planted hectares in the ~10km catchment —
+   SPAM-2010's within-province spatial pattern rescaled per province to DOAE's MEASURED 2025 planted
+   area (rai/6.25). So the crop-area MAGNITUDE is measured-corrected & current; the fine placement is
+   modelled. Popup-only, no lens. Fully null-guarded: absent/short file → CROPLAND stays null and the
+   popup block is omitted (croplandPopupHTML reads null). Nothing is fabricated. */
+let CROPLAND=null, croplandLoaded=false, croplandPromise=null;
+async function loadBranchCropland(){
+  if(croplandPromise) return croplandPromise;
+  croplandLoaded=true;
+  croplandPromise=(async()=>{
+    try{ const r=await fetch('data/branch_cropland.json'); if(!r.ok){CROPLAND=null;return CROPLAND;}
+      const j=await r.json(); CROPLAND=(j&&j.branches&&j.meta)?j:null; }
+    catch(e){ CROPLAND=null; }
+    return CROPLAND;
+  })();
+  return croplandPromise;
+}
+
 /* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
    Lazy-loads the fused composite-risk layer built by pipeline/build_branch_risk.py:
    {meta, branches:[{code, composite_risk 0–100, components{household,agri,occupation,segment},
@@ -3940,6 +3960,9 @@ function initMap(){
   // warm the MEASURED building-density-within-10km popup line (Overture, projected from
   // source-data/perimeter_counts.json). Popup-only, no lens — selectBranch refreshes below.
   if(!bldgdenLoaded) loadBranchDensity();
+  // warm the MEASURED-corrected per-branch crop-area popup line (DOAE-2025 × SPAM). Popup-only, no
+  // lens — selectBranch re-renders below if the tap beat the fetch.
+  if(!croplandLoaded) loadBranchCropland();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -3965,8 +3988,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA||!CROPLAND){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations(),loadBranchCropland()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4271,6 +4294,25 @@ function agriPopupHTML(d,sec,r){
   if(e.income_est>0) html+=r('Est. gross farm income ≤10km', '฿'+(e.income_est/1e6).toFixed(1)+'M/yr '+TAG_E, 'var(--merch)');
   html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">crop mix SPAM (modelled); price YoY MEASURED · OAE farm-gate; rainfall MEASURED · HDX; income + pressure ESTIMATED. Serves portfolio/PD risk.</div>`;
   return html;
+}
+// Crop-AREA block for a branch popup — the DOAE-2025 measured-corrected total planted hectares within
+// ~10km (data/branch_cropland.json). SPAM-2010's within-province pattern rescaled to DOAE's MEASURED
+// 2025 provincial planted area, so the crop-area MAGNITUDE is measured/current while the fine placement
+// is modelled — labelled honestly. One line + dominant crop; complements the SPAM % mix above with an
+// absolute, DOAE-anchored hectare figure. Serves objective #1 (agri collateral / PD exposure).
+const CROPLAND_LABEL={rice:'rice',cassava:'cassava',maize:'maize',oilpalm:'oil palm',sugarcane:'sugarcane'};
+function croplandPopupHTML(d,r){
+  if(!CROPLAND||!CROPLAND.branches||!CROPLAND.meta||!DATA) return '';
+  const i=idxOf(d); if(i<0) return '';
+  const e=CROPLAND.branches[i]; if(!e||!(e.crop_ha>0)) return '';
+  const crops=CROPLAND.meta.crops||[];
+  const domKey=(e.dom>=0&&crops[e.dom])?crops[e.dom]:null;
+  const dom=domKey?(CROPLAND_LABEL[domKey]||domKey):null;
+  const ha=Math.round(e.crop_ha);
+  const col=e.crop_ha>=15000?'var(--agri)':(e.crop_ha>=5000?'var(--gold)':'#8b90a7');
+  return r('Crop area ≤10km · DOAE-2025 corrected',
+      `<b style="color:${col}">${ha.toLocaleString()}</b> ha${dom?` <span class="sub">(mostly ${dom})</span>`:''}`, col)
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">planted-area MAGNITUDE MEASURED · DOAE-2025 farmer registry (rai/6.25); within-province placement modelled · SPAM-2010</div>`;
 }
 // VEHICLE COLLATERAL block — AutoX's title-loan asset base (data/branch_vehicles.json). Estimated
 // fleet by type in the 10km catchment + pickup share + a collateral-density score. Mix MEASURED (DLT
@@ -4597,6 +4639,7 @@ function popupHTML(d){
     ${hhriskPopupHTML(d,sec,r)}
     ${workforcePopupHTML(d,sec)}
     ${agriPopupHTML(d,sec,r)}
+    ${croplandPopupHTML(d,r)}
     ${vehiclePopupHTML(d,sec,r)}
     ${laborPopupHTML(d,sec,r)}
     ${occPopupHTML(d,sec)}

@@ -5,6 +5,38 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (integration) — CROPLAND: surface the MEASURED-corrected per-branch crop-area line in branch popups — PR
+
+Integration loop. Backlog item #2 (per-branch crop layer) was **half-done**: `build_branch_cropland.py`
+generates `platform/data/branch_cropland.json` (2,015 branches, all DOAE-2025 province-corrected) and it
+is committed + gated (`tests/run.sh check` line 79) — but the file was **never fetched anywhere in the
+app**. The measured intelligence was on disk and in the gate yet **invisible to the owner** (the only
+"cropland" strings in the app were unrelated `cropland_share` labels; `branch_cropland.json` had no
+`fetch`). This closes item #2's remaining half: surface it, honestly labelled.
+
+**Fix (`platform/app.js` only, +~45 lines, no data touched):** mirrors the proven building-density /
+poi-relevance popup pattern exactly —
+- a null-guarded lazy loader `loadBranchCropland()` (absent/short file → `CROPLAND` stays null, block
+  omitted; nothing fabricated),
+- a `croplandPopupHTML(d,r)` block rendering **one line** in the branch popup's Agriculture context:
+  `Crop area ≤10km · DOAE-2025 corrected — <n> ha (mostly <dominant crop>)`, colour-graded by magnitude,
+- warmed in `boot()` alongside `loadBranchDensity`, and added to `selectBranch`'s tap-beat-fetch
+  re-render `Promise.all` so a fast tap still gets the line.
+
+**Provenance / honesty:** the line's sub-note states it plainly — *planted-area MAGNITUDE MEASURED ·
+DOAE-2025 farmer registry (rai/6.25); within-province placement modelled · SPAM-2010*. It complements
+the existing SPAM **% crop-mix** block (which carries no absolute magnitude) with a DOAE-anchored
+absolute hectare figure. Serves objective #1 (agri collateral / PD exposure).
+
+**Verify:** (a) `bash tests/run.sh check` → **62 passed, 0 failed**; provenance unchanged (no
+`platform/data` file altered — pure rendering of already-committed data). (b) Headless Playwright boot
+of `index.html#map` over http: app boots with **0 page errors**, `CROPLAND` loads all **2,015**
+branches, and `croplandPopupHTML` renders branch[0] as *"Crop area ≤10km · DOAE-2025 corrected: 2,155
+ha (mostly sugarcane)"* — matching the raw record (crop_ha 2154.7, dom=4=sugarcane). (c) diff = exactly
+`app.js` + this log entry. Opened as a **PR** (visual change), not a direct master commit.
+
+---
+
 ## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED
 
 Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so audited the pillar for a
