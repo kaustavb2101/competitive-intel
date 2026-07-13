@@ -104,6 +104,12 @@ html[data-theme="light"] #map{background:#e8ecf2}  /* light loading bg so the ma
  padding:6px 11px;border-radius:7px;white-space:nowrap;cursor:pointer}
 #nav a.on{color:#fff;background:#1a2336}
 main{padding-top:56px}
+/* skip-to-content (WCAG 2.4.1): off-screen until keyboard focus, then overlays the fixed nav */
+.skip-link{position:fixed;top:7px;left:8px;z-index:3000;background:var(--accent);color:#fff;
+ font:600 13px var(--sans);padding:7px 14px;border-radius:8px;text-decoration:none;
+ box-shadow:0 4px 16px rgba(0,0,0,.45);transform:translateY(-180%)}
+.skip-link:focus{transform:translateY(0);outline:2px solid #fff;outline-offset:2px}
+main:focus{outline:none}
 
 /* ============================================================
    INDIGO CONSOLE THEME (ux-uplift workflow) — appended; overrides
