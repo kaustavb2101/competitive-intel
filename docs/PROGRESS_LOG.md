@@ -5,6 +5,56 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (integration) — ACQUISITION: fold the FPO PICO-finance registry in (the sub-scale competitor census)
+
+Integration loop, top open backlog item (#1 acquisition gap). The competitor census
+(`competitors_census.json` / `rival_pressure.json`) is a coordinate census of only the FOUR big
+compliant brands (Muangthai · Srisawad · Tidlor · Heng) and says so — its own caveat, echoed in the
+#acq "Rival fragility" copy, was that a true rival read *"needs a sub-scale-operator census — a blocked
+desktop / Thai-IP company-registry pull."* That census is no longer blocked: the **FPO PICO-finance
+operator registry** (`catalog.fpo.go.th` CKAN, id `fpo_pico`) is reachable from CI (verified HTTP 200
+from the cloud sandbox — it is a department CKAN, not the geo-blocked `data.go.th` aggregator). Pulled
+it (2,042 licensed พิโกไฟแนนซ์ operators, province + address, resource `picofinanceoperate`).
+
+Shipped `pipeline/build_pico_operators.py` → `platform/data/pico_operators.json` (77 provinces): a
+**MEASURED** per-province count of the licensed sub-scale competitor tier — MOF/FPO micro-lenders
+(฿50k/฿100k per-loan cap) that the big-4 coordinate census cannot see, and exactly the operators most
+exposed to the Q1-2026 BoT registration deadline. Per province: `n_total` operators, `n_hq` head
+offices (≈ distinct licensed companies) vs `n_office` branch offices, AutoX branches in the province
+(from the master, point-in-province), `pico_per_autox` density, and the newest licence date (a
+content-derived recency marker). Every figure is a straight count of real registry rows + the already-
+MEASURED AutoX count — no scores, no synthesis. The field is Isan-heavy (951 operators) then North
+(469): Nakhon Ratchasima leads (145 PICO vs 81 AutoX), and Mukdahan/Nan/Yasothon carry the highest
+sub-scale density relative to our footprint (~3×). 75/77 provinces covered (Ang Thong, Sing Buri = 0);
+all 75 raw province strings canonicalise cleanly, 0 unmapped rows.
+
+**Provenance honesty:** stamped MEASURED but with the real limits stated — licensed operators only
+(informal lenders uncounted → a LOWER bound), province-granular not geocoded (does not feed the
+per-branch rival-pressure geometry), and office-count ≠ loan volume (density, not comparable book
+size). Updated the adjacent "Rival fragility" caveat: the *licensed* slice of the sub-scale census it
+said it lacked is now measured directly above; only the *informal* tier remains inferred, so that
+score is still honestly ESTIMATED.
+
+**Surface (#acq / Competition):** a new "Sub-scale competitor field · licensed PICO-finance operators
+by province" table + answer-first readout, placed directly above the Rival-fragility section it
+completes. `renderPicoOperators()` mirrors the existing `renderPeerProvince` pattern (lazy fetch,
+promise-safe, calm notice when the layer is absent).
+
+**Safeguards:** the raw pull is gitignored (`source-data/datagoth/`, re-pullable), so the builder
+follows the established gate contract (like `build_branch_cropland`/`build_vehicle_flow`) — `--check`
+exits 3 (SKIP) when `fpo_pico.csv` is absent, 0 on byte-exact reproduce, 1 on drift; the derived
+`pico_operators.json` IS committed. Ran `build_provenance.py` (layer auto-registers as MEASURED, 79
+layers). `bash tests/run.sh check` → **63 passed, 0 failed** (incl. the new `build_pico_operators.py
+--check` + `node --check` on app.js); headless render + health on the #acq route clean. App/visual
+change → shipped via PR, not committed straight to master.
+
+Next recommended integration: distil the remaining CI-reachable data.go.th sources
+(`docs/DATAGOTH_CATALOG.md`) — `mot_vehicles`/excise into collateral, `dbd_newco` into demand — each
+into a clean province layer with `--check`; or geocode the PICO addresses (they carry อำเภอ/ตำบล) to
+lift this from a province count to a district-granular field.
+
+---
+
 ## 2026-07-12 (intelligence) — SERVICE: freshness audit + fix the provenance ledger's dropped vintages
 
 Intelligence loop (service pillar). Backlog was 0-open / 96% done, so ran a full **service audit** of

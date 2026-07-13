@@ -151,6 +151,11 @@ phase_check(){
   ( cd "$PIPE" && python3 build_rival_density.py --check >/dev/null 2>&1 ) && ok "build_rival_density.py --check" || bad "build_rival_density.py --check (rival_density.json drifted from amphoe.json/competitors_census.json/th_amphoe.geojson)"
   ( cd "$PIPE" && python3 build_peer_province.py --check >/dev/null 2>&1 ) && ok "build_peer_province.py --check" || bad "build_peer_province.py --check (peer_province.json drifted from rival_density.json — run: python3 pipeline/build_peer_province.py)"
   ( cd "$PIPE" && python3 build_rival_pressure.py --check >/dev/null 2>&1 ) && ok "build_rival_pressure.py --check" || bad "build_rival_pressure.py --check (rival_pressure.json drifted from branches.json/competitors_census.json)"
+  ( cd "$PIPE" && python3 build_pico_operators.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_pico_operators.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_pico_operators.py --check (source-data/datagoth/fpo_pico.csv absent — not data drift)"
+  else bad "build_pico_operators.py --check (pico_operators.json drifted from fpo_pico.csv/branches_final.json — run: python3 pipeline/build_pico_operators.py)"
+  fi
   ( cd "$PIPE" && python3 ingest_heng.py --check >/dev/null 2>&1 ) && ok "ingest_heng.py --check" || bad "ingest_heng.py --check (Heng official-locator merge drifted from source-data/heng_branches.json — run: python3 pipeline/ingest_heng.py)"
   ( cd "$PIPE" && python3 build_cluster_brief.py --check >/dev/null 2>&1 ) && ok "build_cluster_brief.py --check" || bad "build_cluster_brief.py --check (cluster_brief.json drifted from branch_occupations/branches/meta board/crop_stress)"
   ( cd "$PIPE" && python3 build_exit_whitespace.py --check >/dev/null 2>&1 ) && ok "build_exit_whitespace.py --check" || bad "build_exit_whitespace.py --check (exit_whitespace.json drifted from amphoe.json/competitors)"

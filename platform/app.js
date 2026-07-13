@@ -1508,6 +1508,7 @@ function renderAcq(){
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
+  renderPicoOperators();
   renderExitWhitespace();
   // REMOVED (strategy pivot — network consolidating, not growing): renderRoad3k() [branch-growth
   // headroom allocation], renderExpansionPlan() [sequenced growth plan] and renderOppScore()
@@ -1761,6 +1762,66 @@ function drawPeerProvince(){
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
+  }
+}
+
+/* ---------- Sub-scale competitor field · licensed PICO-finance operators per province (obj #2) ----------
+   Surfaces data/pico_operators.json (77 provinces, pipeline/build_pico_operators.py): a MEASURED
+   count of MOF/FPO-licensed PICO-finance micro-lenders — the sub-scale rival tier the big-4
+   coordinate census cannot see, and exactly the operators most exposed to the Q1-2026 BoT
+   registration deadline. Lazy, graceful if absent. We DO NOT recompute — we rank & show measured
+   counts. A competitive-density read on the existing network; no open / expand call. */
+let PICOOPS=null, picoLoaded=false;
+const PICO_TOPN=20;
+function renderPicoOperators(){
+  const tbl=$('#picotbl'); if(!tbl) return;
+  if(picoLoaded){ drawPicoOperators(); return; }
+  fetch('data/pico_operators.json').then(r=>r.ok?r.json():null).then(j=>{
+    PICOOPS=j; picoLoaded=true; drawPicoOperators();
+  }).catch(()=>{ PICOOPS=null; picoLoaded=true; drawPicoOperators(); });
+}
+function drawPicoOperators(){
+  const tbl=$('#picotbl'), ro=$('#picoreadout'); if(!tbl) return;
+  const recs=(PICOOPS&&Array.isArray(PICOOPS.provinces))?PICOOPS.provinces:[];
+  if(!recs.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Sub-scale operator census not yet computed.</b> <span class="sub">Pull the FPO registry (pipeline/pull_datagoth.py --only fpo_pico) then run pipeline/build_pico_operators.py — it fills in on the next data refresh.</span>';
+    return;
+  }
+  const m=PICOOPS.meta||{};
+  // rank by sub-scale field size; show against AutoX presence in the province.
+  const list=recs.slice(0,PICO_TOPN);
+  const AX='var(--gold)', RV='var(--agri)';
+  const maxOps=list.reduce((a,r)=>Math.max(a,r.n_total||0),0)||1;
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="Licensed PICO-finance operators serving this province (MEASURED, FPO registry). Sub-scale ฿50k/฿100k-cap micro-lenders — the tier the big-4 census misses.">PICO operators ◆ measured</th>`+
+    `<th title="Of which head offices (สำนักงานใหญ่ ≈ distinct licensed companies)">HQ</th>`+
+    `<th title="AutoX (เงินไชโย) branches in this province (MEASURED)">AutoX</th>`+
+    `<th title="PICO operators per AutoX branch — sub-scale competitor density relative to our own footprint">per AutoX</th></tr>`+
+    list.map((r,i)=>{
+      const dens=(r.pico_per_autox==null)?'<span class="sub" title="no AutoX branch in province">n/a</span>'
+        :`<span class="mono" style="color:${(r.pico_per_autox>=2)?RV:AX}">${r.pico_per_autox.toFixed(1)}×</span>`;
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${r.province_th||'—'}</b> <span class="sub">${r.region||''}</span></td>
+        <td><span class="mono" style="color:${RV}"><b>${(r.n_total||0).toLocaleString()}</b></span> ${barHTML(100*(r.n_total||0)/maxOps,RV)}</td>
+        <td class="mono sub">${(r.n_hq||0).toLocaleString()}</td>
+        <td class="mono" style="color:${AX}">${(r.autox||0).toLocaleString()}</td>
+        <td>${dens}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const c=m.counts||{};
+    const top=recs[0];
+    const region=(c.by_region&&Object.keys(c.by_region).length)?Object.entries(c.by_region).sort((a,b)=>b[1]-a[1])[0]:null;
+    ro.innerHTML=`<b>The sub-scale field the big-4 census misses:</b> <b style="color:var(--agri)">${(c.n_operators||0).toLocaleString()}</b> licensed PICO-finance operators `+
+      `across <b>${c.n_provinces_covered||0}</b> provinces`+
+      (top?`, densest in <b>${top.province_th}</b> (${(top.n_total||0).toLocaleString()} operators vs ${(top.autox||0).toLocaleString()} AutoX branches)`:'')+
+      (region?`; the <b>${region[0]}</b> region carries the most (${region[1].toLocaleString()})`:'')+`. ${TAG_M}`+
+      methodBox(null,
+        ['These are <b>MOF/FPO-licensed PICO-finance</b> operators (พิโกไฟแนนซ์) — province-restricted micro-lenders capped at ฿50k/฿100k per loan. They compete from <b>below</b> the big-4 for the same small-ticket borrower.',
+         'This is the <b>sub-scale-operator census the rival-fragility read below says it lacks</b> — the licensed slice of exactly the operators most exposed to the Q1-2026 BoT registration deadline. Counts are <b>MEASURED</b> registry rows.',
+         'Province-granular (service province), <b>not geocoded</b> — a per-province field-size count, not a coordinate census, so it does not feed the per-branch rival-pressure geometry.',
+         'Licensed operators only — informal / unlicensed lenders are uncounted, so the true sub-scale field is a <b>lower bound</b>.'+(m.vintage?` Newest licence in the registry: ${m.vintage}.`:'')]);
   }
 }
 

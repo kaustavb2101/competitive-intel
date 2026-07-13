@@ -17,7 +17,7 @@ each source URL, fetch time, byte size and status for honest provenance. First r
 
 | id | Signal | Org | Granularity | Status |
 |---|---|---|---|---|
-| `fpo_pico` | **Licensed PICO-finance operators — direct competitor registry (name, province, full address, phone, license date)** | FPO | province + address | ✅ 768 KB |
+| `fpo_pico` | **Licensed PICO-finance operators — direct competitor registry (name, province, full address, phone, license date)** | FPO | province + address | ✅ 768 KB · **CI-reachable** (dept CKAN, not the geo-blocked aggregator) · **distilled → `platform/data/pico_operators.json`** (2026-07-13, `build_pico_operators.py`) |
 | `dbd_newco` | New company registrations (business-formation demand) | DBD | subdistrict, monthly | ✅ 5.4 MB |
 | `smebank_credit` | SME-bank credit outstanding by province | SME Bank | province, monthly | ✅ |
 | `diw_factories` | Class-3 factory registry (name/addr/capital/workers/HP) | DIW | subdistrict | ✅ 44 MB |
@@ -44,5 +44,9 @@ each source URL, fetch time, byte size and status for honest provenance. First r
 
 ## Next: distill into province/branch layers
 The raw pulls are inputs. Downstream builders normalize them into the committed province/district layers
-(e.g. fold `fpo_pico` into the competitor census, `mot_vehicles`/excise into collateral, `dbd_newco`
-into demand/whitespace) — always keyed on the canonical 77 Thai province names / 928 amphoe.
+— always keyed on the canonical 77 Thai province names / 928 amphoe.
+- ✅ **`fpo_pico` → `platform/data/pico_operators.json`** (`pipeline/build_pico_operators.py`, 2026-07-13):
+  per-province MEASURED count of the licensed sub-scale competitor tier (the operators the big-4
+  coordinate census misses). Surfaced on #acq. Note: the FPO CKAN is **reachable from CI**, so this one
+  does NOT need the Thai laptop — only the aggregator (`data.go.th`) is geo-blocked.
+- ⏳ Still to distil: `mot_vehicles`/excise into collateral, `dbd_newco` into demand/whitespace.
