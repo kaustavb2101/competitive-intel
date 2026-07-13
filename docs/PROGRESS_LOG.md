@@ -1173,3 +1173,31 @@ Kaustav deploys).
   gated root). Identical signature to the PR #29 verify; a broken deploy would 404/500/fail-to-connect.
   Healthy gated deploy, **no rollback**. HTML couldn't be byte-verified through the gate without
   `SITE_PASSWORD` (a secret not in the loop's env); served CSS behaviour was verified via headless render.
+
+## 2026-07-13 — UX loop: #map zoom relocation extended to small-laptop band (761–1080px) — merged & deployed
+- **Finding (last open `#map` overlap residual):** the prior tablet fix (PR #31) relocated Leaflet's zoom
+  `+/−` to bottom-right only at `≤760px`, but headless renders of `index.html#map` confirmed the hero lens
+  row (4 pills + "More lenses ▾") still wraps to **2 rows** through ~1050px, so the top-left zoom (56px
+  offset clears only one row) sat directly on top of the 2nd-row "More lenses ▾" pill at widths like 900px.
+- **Fix (`platform/styles.css`, 1 breakpoint + comment):** extended the bottom-right zoom-relocation
+  `@media` breakpoint `760px → 1080px` (small cushion above the ~1050px one-row transition for wider
+  real-browser Thai-font pill metrics). Widths `>1080px` keep the conventional top-left zoom. Plus the
+  `docs/UXUI_AUDIT.md` residual-note line flipped to ✅ FIXED.
+- **Safeguards:** (a) `bash tests/run.sh check` → **62 passed, 0 failed**. (b) Headless renders read back:
+  900px before → zoom `+` overlapping "More lenses ▾" (2-row wrap); 900px after → zoom bottom-right, fully
+  clear; 1050/1100/1200px → one row, top-left zoom unchanged (no wider-desktop regression). (c) no secrets
+  in diff. (d) diff = 2 intended files only, no stray files.
+- **Merge:** PR #32 squash-merged to master (`f5455ef`), branch auto-deleted, session auto-unsubscribed.
+- **CI note (pre-existing, NOT caused by this change):** the GitHub `qa` Action is red on this branch AND
+  on master HEAD (`cd11055`, already in production) and every recent branch — the same known ~2s
+  empty-output infra/runner startup failure logged for PR #29/#31. It cannot be affected by a CSS/markdown
+  diff (touches no pipeline data; the local determinism gate — the real content gate — passed 0-failed).
+  `qa` is not a required check, so the merge was permitted. **Owner action still recommended: investigate
+  why the `qa` runner fails at startup (billing/permissions/provisioning) — red on master all week.**
+- **Deploy verify:** master auto-deployed. Vercel API confirms the production deployment
+  `dpl_Hyf2E9pLhQHPd5SRNxgrCar1Lrvt` = commit `f5455ef`, `target: production`, `state: READY` (build
+  succeeded), on the master production alias. Alias root returns HTTP **401** (the intentional
+  `middleware.js` Basic-Auth gate, `/styles.css` → 401, `/index.html` → 308 → gated root) — identical
+  signature to PR #29/#31; a broken deploy would 404/500/fail-to-connect. Healthy gated deploy, **no
+  rollback**. HTML couldn't be byte-verified through the auth gate (no `SITE_PASSWORD` in the loop env);
+  the served CSS change was verified via headless render pre-merge.
