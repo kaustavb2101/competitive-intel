@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-13T10:08:55+00:00",
-    "commit": "58dd412"
+    "generated_at": "2026-07-13T23:11:03+07:00",
+    "commit": "1ef9007"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,9 +480,27 @@
   ],
   "activity": [
     {
-      "date": "2026-07-13T10:08:55+00:00",
-      "sha": "58dd412",
-      "summary": "feat(peer): fold licensed-PICO rival field into the per-province peer board",
+      "date": "2026-07-13T23:11:03+07:00",
+      "sha": "1ef9007",
+      "summary": "feat(peer): surface the MEASURED PICO-finance rival column in the per-province peer board (#36)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-13T14:24:06+00:00",
+      "sha": "14d0dee",
+      "summary": "docs: log skip-to-content a11y ship + deploy-verify (PR #35)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T21:20:04+07:00",
+      "sha": "1f9354a",
+      "summary": "ux: add skip-to-content link (WCAG 2.4.1 bypass-blocks) (#35)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T17:16:25+07:00",
+      "sha": "226123f",
+      "summary": "feat(peer): fold licensed-PICO rival field into the per-province peer board (#33)",
       "pillar": "market"
     },
     {
@@ -640,24 +658,6 @@
       "sha": "39530e0",
       "summary": "docs: log ux-loop scenery-fetch 404 fix (PR #22 merged + deploy-verified)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T18:20:06+07:00",
-      "sha": "15571a6",
-      "summary": "data: catch up the Data-integration pillar (measured farm-gate prices + national competitor census)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T18:20:03+07:00",
-      "sha": "ea3026a",
-      "summary": "ux: regenerate autonomy dashboard — UX/UI pillar 1/8 -> 8/8",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T18:19:47+07:00",
-      "sha": "30aafc2",
-      "summary": "ux: catch up the UX/UI pillar — favicon, WCAG contrast, mobile fixes, theme persist, #branches lead, isochrone guard",
-      "pillar": "3d-enrichment"
     }
   ]
 }

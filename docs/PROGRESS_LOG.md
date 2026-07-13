@@ -5,6 +5,36 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED
+
+Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so audited the pillar for a
+**dangling fold**: yesterday's run added a MEASURED per-province `pico` count (FPO licensed
+พิโกไฟแนนซ์ registry — 2,042 operators across 75 provinces, vintage 2026-05-22) to `peer_province.json`,
+but the Competition-tab peer board (`drawPeerProvince` in `app.js`) only rendered the big-4 brand
+columns. The intelligence was **present in data yet invisible in the UI** — so the small-ticket rival
+class that the fold was meant to surface never reached the owner.
+
+**Fix (`platform/app.js` only, +13/−3):** adds a **PICO** column to the per-province peer table (header
+between Tidlor and Ratio; cell styled with the collateral accent `--collat` to read as a distinct rival
+class, dim `·` for the 2 registry-zero provinces), plus a readout line citing the 2,042-operator national
+total (labelled MEASURED, FPO registry) and a method-box line. The column is **gated on
+`meta.pico_available`** so an older `peer_province.json` (pre-fold) degrades gracefully to the
+big-4-only board — matches the codebase's graceful-absence idiom. Pure rendering of already-committed
+data: **no data file altered, no recompute, provenance untouched**.
+
+**Safeguards (all four passed):** (a) `bash tests/run.sh check` → **62 passed, 0 failed**; (b) no secrets
+in diff; (c) diff = exactly `app.js` + this log entry, intent-matched; (d) no fabrication — every value
+comes from the committed `peer_province.json`, column labelled MEASURED. Headless render at 1280×900
+confirmed the PICO header, Bangkok `pico=111` row (matches data), and the readout total.
+
+**Merge + deploy:** own PR **#36** squash-merged → master `1ef9007`; branch auto-unsubscribed. Vercel
+auto-deploys master to production.
+
+**CI note (unchanged, pre-existing):** the repo-wide QA GitHub Action failed again in **4s with 404 logs
+and empty output** (PR run `29265271105`, push run `29265249179`) — the documented runner setup/quota
+abort before `pip install`, red on every branch and master head equally (PR #34's run also 4s). The
+authoritative gate here remains the LOCAL `tests/run.sh check` (green), same basis as PRs #31–#35.
+
 ## 2026-07-13 (UX loop) — A11Y: skip-to-content link (WCAG 2.4.1 Bypass Blocks) — SHIPPED
 
 Autonomous UX loop. The `docs/UXUI_AUDIT.md` backlog (findings #1–8 + all discovered items) is fully
