@@ -5,6 +5,49 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-13 (UX loop) — A11Y: skip-to-content link (WCAG 2.4.1 Bypass Blocks) — SHIPPED
+
+Autonomous UX loop. The `docs/UXUI_AUDIT.md` backlog (findings #1–8 + all discovered items) is fully
+fixed, so reviewed the SPA front door myself and found a genuine **WCAG 2.4.1 (Level A) Bypass-Blocks**
+gap: the `role="tablist"` nav has ~12 focusable stops (7 tabs + More dropdown + its 5 menu items +
+theme toggle) that a keyboard/SR user Tabbed through on **every** route before reaching content, with no
+bypass. (In the course of reviewing I re-measured the home page's earlier "clipping" appearance — it is
+NOT overflow: `documentElement.scrollWidth == innerWidth == 390`; the nav is a scroll strip and the
+decision-queue table sits in an `overflow-x:auto` wrapper. No regression there.)
+
+**Fix (index.html + styles.css):** a "Skip to main content" link as the first `<body>` child —
+off-screen (`translateY(-180%)`) until keyboard focus, then overlays the fixed nav as an accent
+`#5B7CFA` pill with a white focus ring; `<main>` got `id="main-content" tabindex="-1"`.
+
+**Decision — focus handler, not a bare hash anchor:** the SPA hash-router (`showTab`) falls back to
+`#home` on any unknown hash, so a plain `href="#main-content"` would have force-navigated to Home. The
+click handler `preventDefault`s and calls `main.focus()` directly, so focus moves without touching the
+URL/route. Zero visual change for pointer users.
+
+**Safeguards (all four LOCAL gates passed):** (a) `bash tests/run.sh check` → **62 passed, 0 failed**
+(node --check on every page's inline JS + data integrity 446/446); (b) headless render at 390×844 +
+Playwright behavior check — hidden by default (`top=-45`), `Tab` reveals it (focus on `.skip-link`,
+`top=7`), `Enter` moves focus to `#main-content` with **hash staying `#home`** and Home view intact
+(router undisturbed); screenshot self-reviewed (on-theme pill, nothing broken); (c) no secrets in diff;
+(d) diff = exactly index.html + styles.css + the two docs, no stray files.
+
+**Merge + deploy + verify:** squash-merged own PR **#35** → master `1f9354ab`; branch deleted. Vercel
+auto-deploy **`dpl_5U7QVKvu…` state=READY, target=production, sha=1f9354ab** on the master alias. The
+prod alias returns **401** (intentional `middleware.js` Basic-Auth gate — the site-health workflow
+codifies 401 as "healthy-but-gated"; uniform across `/`, `/status`, untouched routes, and even
+nonexistent paths) and **308** on `index.html` (`cleanUrls` redirect). Neither is a regression → no
+rollback. Deploy verified healthy.
+
+**Known issue (pre-existing, NOT caused by this change):** the repo-wide **QA GitHub Actions** run fails
+every push in **4–6s with no downloadable logs** — a runner setup/quota abort before `pip install` even
+starts. It is red on **master heads** (`226123f`, `f046b91`, `f5455ef`) and every recent branch equally;
+prior loop PRs (#31–#33) merged on the same locally-verified determinism gate under identical CI-red
+conditions. The authoritative gate here is the LOCAL `tests/run.sh check` (green). **Recommend** the
+owner check GitHub Actions billing/minutes/runner health so the CI determinism gate actually executes
+again — until then CI provides no signal.
+
+---
+
 ## 2026-07-13 (intelligence) — PEER COMPARISON: fold the licensed-PICO rival field into the per-province peer board
 
 Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so took the highest-value
