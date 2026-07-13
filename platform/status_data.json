@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-13T04:09:24+00:00",
-    "commit": "aae9c13"
+    "generated_at": "2026-07-13T10:08:55+00:00",
+    "commit": "58dd412"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,36 @@
   ],
   "activity": [
     {
+      "date": "2026-07-13T10:08:55+00:00",
+      "sha": "58dd412",
+      "summary": "feat(peer): fold licensed-PICO rival field into the per-province peer board",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-13T08:23:10+00:00",
+      "sha": "f046b91",
+      "summary": "docs: log ux-map-overlap-residual merge + deploy-verify (PR #32)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T15:20:54+07:00",
+      "sha": "f5455ef",
+      "summary": "ux: #map zoom overlaps lens pills on small-laptop widths (761–1080px) (#32)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T06:20:31+00:00",
+      "sha": "cd11055",
+      "summary": "feat(competition): FPO PICO-finance registry → measured per-province competitor layer",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-13T04:11:48+00:00",
+      "sha": "3504221",
+      "summary": "chore(dashboard): refresh autonomy plan after deploy-health probe fix",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-13T04:09:24+00:00",
       "sha": "aae9c13",
       "summary": "fix(deploy-health): nightly site-health probe watches master PROD alias (auth-aware)",
@@ -628,36 +658,6 @@
       "sha": "30aafc2",
       "summary": "ux: catch up the UX/UI pillar — favicon, WCAG contrast, mobile fixes, theme persist, #branches lead, isochrone guard",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T18:19:00+07:00",
-      "sha": "91b7447",
-      "summary": "ux: stop rayong-catchment scenery layers 404ing (gate iso/trees/rail fetch) (#22)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T10:39:41+00:00",
-      "sha": "4bd90c7",
-      "summary": "committee: refresh autonomy plan (run 29189456877)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T17:14:42+07:00",
-      "sha": "1a5890b",
-      "summary": "peer: per-province, per-brand peer comparison (AutoX vs each big-4 rival) (#21)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T16:36:03+07:00",
-      "sha": "68f638d",
-      "summary": "strategy: reframe expansion → competitive risk (network is consolidating) (#20)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-12T16:25:24+07:00",
-      "sha": "4e79bec",
-      "summary": "fix(scene): province-scope competitor counts + district-labelled acquisition leads (#17)",
-      "pillar": "uxui"
     }
   ]
 }
