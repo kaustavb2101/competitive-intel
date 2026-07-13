@@ -397,12 +397,15 @@ html[data-theme="light"] .lens-more-menu{background:rgba(255,255,255,.98)}
   border:1px solid var(--line);border-radius:10px;padding:5px 7px}
 /* keep Leaflet's own zoom control clear of the pill row */
 .maphero .leaflet-top.leaflet-left{margin-top:56px}
-/* PHONE + TABLET (≤760px): the hero lens pills wrap into 2–3 rows over the top-left of the map and
-   collide with Leaflet's zoom +/− control (legibility + tap accuracy). The 56px offset above only
-   clears ONE pill row, so at ≤760px (where the pills wrap to 2–3 rows) the zoom still overlaps them.
-   Move the zoom to the bottom-right, above the attribution bar and clear of the pill row entirely,
-   no matter how many rows it wraps. Desktop (>760px) keeps the pills on one row, so the offset holds. */
-@media(max-width:760px){
+/* PHONE + TABLET + SMALL LAPTOP (≤1080px): the hero lens pills (4 pills + "More lenses ▾") wrap into
+   2–3 rows over the top-left of the map and collide with Leaflet's zoom +/− control (legibility + tap
+   accuracy). The 56px offset above only clears ONE pill row, so anywhere the row wraps the zoom still
+   overlaps the second row's "More lenses ▾" pill. Headless renders confirm the pills wrap to 2 rows
+   through ~1050px (verified overlap at 900px) and settle onto ONE row by ~1050–1100px; 1080px carries
+   a small cushion above that for wider real-browser (Thai-font) pill metrics. Move the zoom to the
+   bottom-right, above the attribution bar and clear of the pill row entirely, no matter how many rows
+   it wraps. Wider desktops (>1080px) keep the pills on one row, so the top-left 56px offset holds. */
+@media(max-width:1080px){
   .maphero .leaflet-top.leaflet-left{top:auto;bottom:30px;left:auto;right:12px;margin-top:0}
 }
 
