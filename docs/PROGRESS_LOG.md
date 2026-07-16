@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-16 — Intelligence loop: DEPLOY/SERVICE HEALTH — regenerate the drifted provenance ledger (CI gate was RED on master) — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Deploy-health probe first: the master
+prod alias returns **401** = the intentional `middleware.js` Basic-Auth gate (site up + protected),
+not a regression; `site-health.yml` correctly targets that alias. Backlog 0-open / 96% done. Then the
+**service audit surfaced a live regression in the authoritative CI gate itself.**
+
+- **Finding (severity: the gate was RED on master):** `bash tests/run.sh check` — the determinism gate
+  every "ship-on-green" loop relies on — was **failing on clean HEAD** with **2 failures**:
+  (1) `build_provenance.py --check` ("provenance.json drifted from platform/data/*.json") and
+  (2) `validate_data.py` ("standalone provenance rows record the real byte size", 1 of 446). Both trace
+  to the **same root cause**: `platform/data/provenance.json` recorded **stale byte sizes** for **17
+  data files** (`branch_labor`, `branch_risk`, `collateral_outlook`, `loan_tape_derived`,
+  `poi_relevance`, `province_risk`, `province_stress_index`, `search_demand`, `segment_exposure`,
+  `agri_income_by_province`, `branch_density`, `factory_income_by_province`, `fuel_prices`,
+  `household_risk_by_province`, `occupation_income`, `peer_npl`, `sme_income_by_province`). A prior
+  commit (`9f520c8`, the "Road to 3,000" dashboard hotfix) **re-serialized those files ~4-5% smaller**
+  but did **not** re-run `build_provenance.py`, so the ledger's `bytes` fields (= `os.path.getsize()`)
+  pointed at the pre-hotfix larger serialization. Until fixed, every autonomous loop that ships only on
+  a green gate was blocked (or bypassing a red gate).
+- **Fix:** re-ran `python3 pipeline/build_provenance.py` — a deterministic, network-free re-census that
+  reads the true on-disk sizes of the committed files. `provenance.json` now matches the committed data
+  exactly (verified: **0 byte mismatches** against `os.path.getsize()` across all single-file layers).
+  Only `provenance.json` changed. No data content, no app code, no visuals touched — the corrected
+  values are byte-size stamps, not intelligence numbers. Because `bytes` is `getsize()` of committed
+  files (not serialization-environment-dependent), the regenerated ledger is **CI-stable** — it
+  reproduces byte-exact under `--check` on the Python-3.11 CI runner too.
+- **Safeguards (all passed):** (a) `bash tests/run.sh check` → **64 passed, 0 failed** (was 62/2).
+  (b) No secrets in diff. (c) Diff = `provenance.json` + this log entry only; byte fields verified to
+  equal real on-disk sizes (0 mismatches). (d) No fabrication — a deterministic listing of committed
+  files, every per-layer verdict still read from each file's own `meta`; counts unchanged (81 layers ·
+  36 measured / 39 estimated / 6 unlabelled · 312 files).
+- **Deploy-verify:** data-only fix (no app behaviour) — see the dated line appended below after the push.
+
 ## 2026-07-16 — Integration loop: surface the MEASURED-corrected per-branch crop-area layer in the branch popup — PR
 
 Integration loop (backlog #2). `pipeline/build_branch_cropland.py` → `platform/data/branch_cropland.json`
