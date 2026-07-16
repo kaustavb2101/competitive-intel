@@ -3,6 +3,44 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-16 — Intelligence loop: PLANNING/MARKET — purge the forbidden "expand/open" rows from the exec decision queue — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Backlog 0-open / 96% done; deploy healthy
+(prod alias returns 401 = the intentional `middleware.js` Basic-Auth gate, not a regression). Audited the
+**exec front door** (`#home`) against CLAUDE.md and found a live **mandate-scope violation in committed,
+surfaced data**.
+
+- **Finding:** objective #2 is explicit and repeated — AutoX is **consolidating** the ~2,015-branch
+  network it already runs, there is **no branch-growth target**, and the platform makes **NO open / close
+  / where-to-open recommendation**. Yet `pipeline/build_decision_queue.py` still generated two `expand`
+  rows into the source-of-truth `platform/data/decision_queue.json`: *"Open next in วัฒนา … opportunity
+  82.5/100"* (from `opportunity_score.json`) and *"Scout บางนา … verify on the ground"* (from
+  `exit_whitespace.json`). The `#home` renderer band-aided this with a **client-side** `type!=='expand'`
+  filter (`app.js` `renderHomeQueue`), so the owner never *saw* them — but the committed data file (fetched
+  by every browser, readable by anyone inspecting `/data/`, and the canonical artefact) still shipped
+  "open a new branch" recommendations that contradict the strategy. A client filter over non-compliant
+  generated data is not compliance; the fix belongs at the generator. (This mirrors the earlier pivot that
+  **removed** the opportunity "where to open next" leaderboard from `index.html` — its `renderOppScore()`/
+  `renderAcqVerdict()` code in `app.js` is now dead: never called, no live container.)
+- **Fix (`pipeline/build_decision_queue.py`):** removed the EXPAND tier entirely — the generator no longer
+  reads `opportunity_score.json` / `exit_whitespace.json`, drops the "Open next" and "Scout" blocks, and
+  drops `expand` from `TYPE_BASE`, `GO_LABEL`, and every `meta` field (`objective`, `types`, `ranking.
+  type_base`, `ranking.intensity`, `ranking.dedupe`). `meta.objective` now states the consolidation scope
+  plainly ("defend/audit/tighten … makes NO open / close / where-to-open recommendation"). The queue is now
+  **6 rows — defend×2 / audit×2 / tighten×2**, all on the existing book. The upstream layers stay on disk
+  (`exit_whitespace` still surfaces on `#acq` as a competitive-landscape *signal*, not an action).
+  `app.js`: the client `expand` filter is kept as a belt-and-suspenders guard, its comment corrected (the
+  data no longer *contains* expand rows).
+- **No visual change:** the two expand rows were already filtered out of `#home`, and the `app.js` edit is
+  comment-only — so nothing renders differently. This is a data/pipeline compliance fix, not a UI change.
+- **Safeguards (all passed):** (a) `bash tests/run.sh check` → **62 passed, 0 failed** (incl.
+  `build_decision_queue.py --check` reproducing byte-exact + `validate_data.py` 446/446 + `node --check
+  app.js`). (b) `build_provenance.py` regenerated + gate-clean (decision_queue.json size drift folded in).
+  (c) no secrets in diff. (d) diff = 4 intended files; the committed data file now contains **0** `expand`
+  / "Open next" / "Scout" rows — verified programmatically — with every remaining number MEASURED/ESTIMATED
+  as before. No fabrication.
+- **Deploy-verify:** see the dated line appended below after the push.
+
 ---
 
 ## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED

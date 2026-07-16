@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-16T11:20:44+07:00",
-    "commit": "f13cfc4"
+    "generated_at": "2026-07-16T10:13:22+00:00",
+    "commit": "e96b75c"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,18 @@
   ],
   "activity": [
     {
+      "date": "2026-07-16T10:13:22+00:00",
+      "sha": "e96b75c",
+      "summary": "fix(decision-queue): stop emitting forbidden expand/\"open next\" rows (consolidation scope)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-16T04:23:00+00:00",
+      "sha": "97d7c33",
+      "summary": "chore(dashboard): refresh autonomy plan after peer-rank ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-16T11:20:44+07:00",
       "sha": "f13cfc4",
       "summary": "feat(peer): surface AutoX's competitive RANK per province in the peer board (#40)",
@@ -645,18 +657,6 @@
       "date": "2026-07-12T19:48:23+07:00",
       "sha": "6a4680d",
       "summary": "fix(isochrone): strip ORS_KEY (trailing newline in the secret corrupted the Authorization header -> 'Invalid header value')",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T19:42:48+07:00",
-      "sha": "40c3a2d",
-      "summary": "Merge remote-tracking branch 'origin/claude/isochrone-enrich'",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T19:39:30+07:00",
-      "sha": "43deaa1",
-      "summary": "feat(3d): true 15-min ORS drive-time isochrones (replace walk-radius)",
       "pillar": "3d-enrichment"
     }
   ]

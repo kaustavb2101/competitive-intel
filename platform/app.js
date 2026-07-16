@@ -4969,8 +4969,9 @@ function queue3DLink(it){
 function renderHomeQueue(){
   const box=$('#cc-queue-body'); if(!box) return;
   if(!dqLoaded){ return; }                                   // skeleton stays until the fetch resolves
-  // strategy pivot: the network is consolidating, so branch-"expand" actions are no longer surfaced —
-  // filter them out client-side (decision_queue.json is left intact on disk for reversibility).
+  // strategy pivot: the network is consolidating, so branch-"expand" actions are not surfaced.
+  // build_decision_queue.py no longer EMITS any expand row (consolidation scope), so this filter is
+  // now a belt-and-suspenders guard against a stale/hand-edited data file — never trips in practice.
   const items=((DQUEUE&&Array.isArray(DQUEUE.items))?DQUEUE.items:[]).filter(it=>it&&it.type!=='expand');
   if(!items.length){
     box.innerHTML=`<div class="cc-empty">Decision queue not yet computed — run <span class="mono">pipeline/build_decision_queue.py</span>. The ranked weekly actions fill in on the next data refresh.</div>`;

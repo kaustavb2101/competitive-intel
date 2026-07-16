@@ -2,11 +2,19 @@
 """
 build_decision_queue.py — EXEC DECISION QUEUE for the Command Center (#home)
 =============================================================================
-Synthesizes ~8 concrete recommended actions — "This week — do these first" —
+Synthesizes ~6 concrete recommended actions — "This week — do these first" —
 from EXISTING committed layers ONLY. Nothing is measured or estimated here that
 was not already measured or estimated upstream; this script only SELECTS and
 PHRASES, and every number in every sentence is copied verbatim (or rounded,
 stated below) from the named source file.
+
+STRATEGY SCOPE (CLAUDE.md objective #2): AutoX is CONSOLIDATING / rationalising
+the ~2,015-branch network it already runs — there is no branch-growth target, and
+this platform makes NO open / close / where-to-open recommendation. The queue is a
+RISK-and-DEFENCE list on the existing book only: it never emits an "open" or "scout"
+action. (The upstream opportunity_score.json / exit_whitespace.json layers stay on
+disk — exit_whitespace still surfaces on #acq as a competitive-landscape signal —
+but they are NOT read here, so no expansion row can reach the exec front door.)
 
 Inputs (all under platform/data/, all committed, all optional — a missing layer
 just contributes no items):
@@ -14,8 +22,6 @@ just contributes no items):
   branch_peers.json      -> AUDIT   : branches out of line vs statistical twins (ESTIMATED)
   macro_sensitivity.json -> TIGHTEN : the worst macro-headwind province (ESTIMATED proxy)
   crop_stress.json       -> TIGHTEN : the worst crop-household-stress province (ESTIMATED)
-  opportunity_score.json -> EXPAND  : the top expansion district (ESTIMATED composite)
-  exit_whitespace.json   -> EXPAND  : the top competitor-exit capture district (ESTIMATED PROXY)
 
 Output: platform/data/decision_queue.json
   { meta: {... full provenance + the ranking rule below ...},
@@ -24,21 +30,19 @@ Output: platform/data/decision_queue.json
 DETERMINISTIC RANKING (no wall clock, no randomness — documented here and in meta):
   priority = TYPE_BASE[type] + 10 * intensity          (rounded to 2 dp)
   TYPE_BASE — an EDITORIAL precedence, stated openly: defending and auditing the
-  existing book outranks growth actions in a weekly queue:
-      defend = 40   audit = 30   tighten = 20   expand = 10
+  existing book outranks tightening actions in a weekly queue:
+      defend = 40   audit = 30   tighten = 20
   intensity in [0, 1] — the layer's own native magnitude, normalized WITHIN its layer
   (cross-layer scores are not commensurable, so we never pretend they are):
       defend  : n2 / max(n2 over the shipped besieged list)     (measured rival count <=2 km)
       audit   : dev / max(dev over the shipped outlier list)    (risk-proxy points above twins)
       tighten : macro   -> hits / n  (share of the province's branches led by the headwind)
                 crop    -> agri_stress (already 0..1)
-      expand  : opportunity -> score / 100 ; exit -> exit_capture_score / 100
   Sort: priority desc, then type asc, then name asc (total order — byte-stable).
   Candidate picks are deterministic too: each source list is used in its committed
   sort order; DEFEND picks the top 2 besieged branches in DISTINCT districts and
   AUDIT the top 2 outliers in DISTINCT provinces (so the queue is not two rows of
-  the same market); the EXIT pick skips a district already taken by the
-  opportunity pick (no duplicate recommendation).
+  the same market).
 
 Deterministic + network-free. Pure stdlib.
     python3 build_decision_queue.py            # write the JSON
@@ -51,8 +55,11 @@ REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
 OUT  = os.path.join(DATA, "decision_queue.json")
 
-TYPE_BASE = {"defend": 40.0, "audit": 30.0, "tighten": 20.0, "expand": 10.0}
-GO_LABEL  = {"trend": "Risk trend →", "overview": "Overview →", "acq": "Acquisition →"}
+# CONSOLIDATION SCOPE (CLAUDE.md objective #2): no "expand" tier — the queue never
+# recommends opening / scouting new ground; it is a defence/audit/tighten list on the
+# existing network only.
+TYPE_BASE = {"defend": 40.0, "audit": 30.0, "tighten": 20.0}
+GO_LABEL  = {"trend": "Risk trend →", "overview": "Overview →"}
 # plain-language driver names (same map as app.js RISK_DRIVER_LABEL)
 DRIVER_LABEL = {"household": "household leverage", "agri": "crop / drought stress",
                 "occupation": "occupation concentration", "segment": "segment / collateral mix"}
@@ -84,8 +91,6 @@ def build():
     peers = _load("branch_peers.json")
     msens = _load("macro_sensitivity.json")
     crop  = _load("crop_stress.json")
-    opp   = _load("opportunity_score.json")
-    exitw = _load("exit_whitespace.json")
 
     items, used = [], []
 
@@ -211,54 +216,9 @@ def build():
         used.append("crop_stress.json — ESTIMATED stress (measured OAE crop areas + rainfall; "
                     "GLOBAL price direction proxy, not Thai farm-gate)")
 
-    # ---- EXPAND (ESTIMATED) — top opportunity district ---------------------------------
-    odist = (opp or {}).get("districts") or []
-    opick = odist[0] if odist else None          # committed order: score desc
-    if opick:
-        c = opick.get("components", {}) or {}
-        rival_bit = ""
-        if c.get("_competitors") is not None:
-            rival_bit = " vs %d big-4 rival branches in-district (measured)" % c["_competitors"]
-        items.append({
-            "type": "expand",
-            "act": ("Open next in %s (%s) — opportunity %s/100: white-space %s, %d AutoX "
-                    "branch%s today%s."
-                    % (opick.get("name"), opick.get("province"), _num(opick.get("score")),
-                       _num(c.get("whitespace")), opick.get("branches", 0),
-                       "" if opick.get("branches") == 1 else "es", rival_bit)),
-            "basis": "estimated",
-            "source": "opportunity_score.json",
-            "go": "acq",
-            "name": opick.get("name"), "prov": opick.get("province"),
-            "priority": round(TYPE_BASE["expand"] + 10.0 * (opick.get("score") or 0) / 100.0, 2),
-        })
-        used.append("opportunity_score.json — ESTIMATED composite (measured white-space + rival "
-                    "density blended with estimated crop stress)")
-
-    # ---- EXPAND/SCOUT (ESTIMATED PROXY) — top exit-capture district (no duplicate) -----
-    edist = (exitw or {}).get("districts") or []
-    epick = next((e for e in edist if not (opick and e.get("id") == opick.get("id"))), None)
-    if epick:
-        c = epick.get("components", {}) or {}
-        big4 = c.get("big4_competitors")
-        items.append({
-            "type": "expand",
-            "act": ("Scout %s (%s) — exit-capture %s/100 if sub-scale lenders exit at the "
-                    "Q1-2026 BoT registration deadline%s. Inferred cue, not a census — "
-                    "verify on the ground."
-                    % (epick.get("name"), epick.get("province"),
-                       _num(epick.get("exit_capture_score")),
-                       (" (%d big-4 rivals present today, measured)" % big4)
-                       if big4 is not None else "")),
-            "basis": "estimated",
-            "source": "exit_whitespace.json",
-            "go": "acq",
-            "name": epick.get("name"), "prov": epick.get("province"),
-            "priority": round(TYPE_BASE["expand"]
-                              + 10.0 * (epick.get("exit_capture_score") or 0) / 100.0, 2),
-        })
-        used.append("exit_whitespace.json — ESTIMATED PROXY (big-4 scarcity × demand; sub-scale "
-                    "operators are NOT censused)")
+    # NOTE — no EXPAND tier. AutoX is consolidating the network it already runs
+    # (CLAUDE.md objective #2); the exec queue never recommends opening or scouting new
+    # ground. opportunity_score.json / exit_whitespace.json are intentionally NOT read here.
 
     # ---- rank: priority desc, type asc, name asc (total, byte-stable order) ------------
     items.sort(key=lambda it: (-it["priority"], it["type"], it.get("name") or ""))
@@ -268,35 +228,34 @@ def build():
 
     meta = {
         "generated_with": "pipeline/build_decision_queue.py",
-        "label": ("EXEC DECISION QUEUE — ~8 ranked weekly actions SYNTHESIZED from existing "
+        "label": ("EXEC DECISION QUEUE — ~6 ranked weekly actions SYNTHESIZED from existing "
                   "committed layers; every inline number is copied from the named source file. "
                   "Items are individually tagged measured/estimated (defend rows are MEASURED "
-                  "geometry; audit/tighten/expand rows are ESTIMATED screens). The ordering "
+                  "geometry; audit/tighten rows are ESTIMATED screens). The ordering "
                   "itself is an editorial rule, stated in meta.ranking — not a measured urgency."),
-        "objective": "Both objectives on one list: #1 defend/audit/tighten the existing book, "
-                     "#2 expand/scout where the ground is open.",
+        "objective": "Objective #2 scope — AutoX is CONSOLIDATING the ~2,015-branch network it "
+                     "already runs; this queue is a defend/audit/tighten list on the existing book "
+                     "and makes NO open / close / where-to-open recommendation.",
         "ranking": {
             "rule": "priority = TYPE_BASE[type] + 10 x intensity (2 dp); sort priority desc, "
                     "type asc, name asc.",
-            "type_base": {"defend": 40, "audit": 30, "tighten": 20, "expand": 10},
+            "type_base": {"defend": 40, "audit": 30, "tighten": 20},
             "type_base_note": "EDITORIAL precedence, stated openly: defending and auditing the "
-                              "existing book outranks growth actions in a weekly queue.",
+                              "existing book outranks tightening actions in a weekly queue.",
             "intensity": {
                 "defend": "n2 / max(n2) over the shipped besieged list (measured rivals <=2 km)",
                 "audit": "dev / max(dev) over the shipped outlier list (risk-proxy points above twins)",
                 "tighten": "macro: hits/n (share of province branches led by the headwind); "
                            "crop: agri_stress (already 0..1)",
-                "expand": "opportunity: score/100; exit: exit_capture_score/100",
             },
             "dedupe": "defend: distinct districts; audit: distinct provinces; crop-watch skips a "
-                      "province already queued; exit pick skips the opportunity district.",
+                      "province already queued.",
             "deterministic": "no wall clock, no randomness — same inputs give the same bytes.",
         },
         "inputs_used": used,
         "types": {"defend": "hold share where rivals crowd our door",
                   "audit": "branch out of line vs its statistical twins",
-                  "tighten": "risk headwind — tighten LTV / watch the segment",
-                  "expand": "open or scout new ground"},
+                  "tighten": "risk headwind — tighten LTV / watch the segment"},
         "n_items": len(items),
     }
     if not items:
