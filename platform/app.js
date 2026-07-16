@@ -1146,6 +1146,40 @@ function renderMacroIndicators(){
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
+/* ---------- national labour-market backdrop (data/labour_context.json, obj#1) ----------
+   MEASURED — ILOSTAT mirror of Thailand's official NSO LFS. NATIONAL level only (no cloud path to
+   per-province LFS). Informal + self-employed workers have no payslip — that IS the title-loan
+   borrower base; the agri workforce trend is the agri-PD demand backdrop. Appended to the Overview
+   macro board as extra MEASURED national KPIs, same idiom as renderMacroIndicators. Fully
+   null-guarded: absent file → nothing extra renders. */
+let LABCTX=null, labctxDone=false, labctxPromise=null;
+async function loadLabourContext(){
+  if(labctxPromise) return labctxPromise;
+  labctxPromise=fetch('data/labour_context.json').then(r=>r.ok?r.json():null)
+    .then(d=>{LABCTX=d;labctxDone=true;return d;}).catch(()=>{labctxDone=true;return null;});
+  return labctxPromise;
+}
+function renderLabourContext(){
+  const host=$('#macro'); if(!host||!LABCTX) return;
+  const cards=[];
+  const inf=LABCTX.informality;
+  if(inf&&inf.rate_pct!=null) cards.push([`Informal work`, `${inf.rate_pct}%`,
+    `of employment · no payslip — the title-loan borrower base · NSO LFS ${inf.as_of}`]);
+  const se=LABCTX.self_employment;
+  if(se&&se.self_employed_pct!=null) cards.push([`Self-employed`, `${se.self_employed_pct}%`,
+    `own-account + family + employers · no payslip-issuing employer · NSO LFS ${se.as_of}`]);
+  const emp=LABCTX.employment, agri=emp&&Array.isArray(emp.sectors)?emp.sectors.find(s=>/agri/i.test(s.sector||'')):null;
+  if(agri&&agri.share_pct!=null){
+    const yc=agri.yoy_change_thousands;
+    const arrow=yc==null?'':(yc<0?'▼':(yc>0?'▲':'●'));
+    const ynote=yc!=null?` · ${arrow}${Math.abs(Math.round(yc)).toLocaleString()}k jobs YoY — the agri-PD demand backdrop`:'';
+    cards.push([`Agri jobs`, `${agri.share_pct}%`, `of employment${ynote} · NSO LFS ${agri.as_of||(emp&&emp.as_of)||''}`]);
+  }
+  if(!cards.length) return;
+  host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
+    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+}
+
 /* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
    Leads the Overview with the ANSWER: current situation → factors hitting the economy & segments →
    regional impact → recommendation by region → nationwide. A deterministic rollup of the SAME
@@ -1276,6 +1310,9 @@ function renderOverview(){
   $('#macro').innerHTML = META.macro.filter(([k])=>!/gold/i.test(k||'')).map(([k,v,n])=>
     `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join('');
   loadMacroIndicators().then(renderMacroIndicators);
+  // fold the MEASURED national labour backdrop (informality/self-employed/agri jobs) into the macro
+  // board — the informal-borrower base behind every segment score (obj#1). Null-safe: absent file → nothing.
+  loadLabourContext().then(renderLabourContext);
   renderCommodityBoard();
   // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
   // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.
