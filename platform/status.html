@@ -5,6 +5,7 @@
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F6FA"><!-- mobile browser chrome; JS keeps it tracking data-theme (light #F4F6FA / dark #0a0e17 = --bg) -->
 <title>AutoX · เงินไชโย — Autonomy plan</title>
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -115,7 +116,7 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 </nav>
 <script>/* theme toggle — shares the autox-theme key with the rest of the site */
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
- function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));var mtc=document.querySelector('meta[name="theme-color"]');if(mtc)mtc.setAttribute('content',l?'#F4F6FA':'#0a0e17');}
  sync();
  b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
 </script>
