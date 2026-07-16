@@ -1342,3 +1342,33 @@ Kaustav deploys).
 - **Backlog continuation:** logged `ux-theme-color` (NEW, polish) — `<meta name="theme-color">` for the
   mobile browser UI bar is still absent; correct fix must track `data-theme` (JS, not CSS), deferred to
   keep this run surgical.
+
+## 2026-07-16 — Intelligence loop: AutoX competitive RANK per province (peer board, MEASURED) — PR
+- **Finding (self-review — plan at 96%, 0 open backlog; data room verified healthy: 0 broken data refs,
+  deploy alias 401 = intentional Basic-Auth gate, not a regression):** the per-province peer board
+  (`#acq`, `peer_province.json`) already showed AutoX vs each big-4 brand + ratio + the **leader** — but
+  the leader column names only the *top rival*, hiding where **AutoX itself ranks**. Two provinces both
+  "led by Muangthai" can have AutoX sitting **2nd** (a defensible runner-up) or **dead-last of 4** (a
+  fragmented also-ran) at a similar ratio — a sharper margin-pressure read (objective #2) the board did
+  not surface.
+- **Fix (MEASURED counts, COMPUTED position — no new file, no fabrication):**
+  - `pipeline/build_peer_province.py`: added `autox_rank` (AutoX's 1-based rank among the operators
+    PRESENT in the province — {AutoX} + big-4 brands with >0 branches — same deterministic tie-break as
+    `leader`, AutoX ahead on an equal count) + `n_ranked` per province, plus meta rollups
+    (`n_provinces_autox_last`, `n_provinces_autox_top2`, `best_autox_rank`, `autox_rank_distribution`).
+    Provenance + record_format + a caveat updated (ranks AutoX only against the 4 big censused brands,
+    not sub-scale operators). Byte-exact `--check` reproduces.
+  - `platform/app.js` (`drawPeerProvince`): co-located a compact **`#k/n` rank chip** inside the existing
+    AutoX cell — **no new column** (stays 10-wide, no mobile overflow on the non-scrolling `.tbl`) —
+    green when 1st/2nd, red when AutoX is the smallest operator present, gold in between; header gains a
+    "·rank" hint, a method-box bullet explains it, and the readout gains one MEASURED sentence.
+- **What it reveals (all MEASURED):** AutoX is the single largest lender by branch count in **0 of 77**
+  provinces; its best standing anywhere is **2nd** (only 2 provinces — deep-south นราธิวาส/ยะลา where
+  Srisawad dominates and Muangthai is thin), modal **3rd** (54 provinces), and it is the **smallest** of
+  the big-4-plus-AutoX operators present in **10** provinces. Distribution: {2nd:2, 3rd:54, 4th:20, 5th:1}.
+- **Safeguards (all passed):** (a) `bash tests/run.sh check` → **62 passed, 0 failed** (incl.
+  `build_peer_province.py --check` + `node --check app.js`). (b) `build_provenance.py` regenerated +
+  `--check` OK (peer_province.json size drift folded in). (c) no secrets in diff. (d) diff = 4 intended
+  files only; all numbers MEASURED/COMPUTED with honest caveats — no fabrication. Headless render of
+  `#acq` at 1180px: 10-column header ("AutoX ·rank"), chips render (Bangkok 170→#4/4 red, ชลบุรี 100→#4/5
+  gold), readout sentence correct, **0 non-tile console errors**.
