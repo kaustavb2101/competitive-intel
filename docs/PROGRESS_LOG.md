@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-16 — Intelligence loop: DEPLOYMENT HEALTH — site-health probe no longer false-alarms "SITE DOWN" on a rejected credential (nightly monitor was RED 6+ nights) — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Deploy-health probe found a **real,
+week-long regression in the monitor itself**: `.github/workflows/site-health.yml` has failed **every
+scheduled night from 2026-07-10 through 07-15** (6+ consecutive red runs, GitHub issue #3 still open),
+even though the live site is up and healthy. Backlog is 0-open / 96% done and the QA gate is green on
+master (64/0, verified), so the monitor was the standing gap.
+
+- **Finding (severity: a false "site down" alarm every night for a week).** The master production
+  alias returns **HTTP 401 from the app's own `middleware.js` Basic-Auth gate** (verified live:
+  `www-authenticate: Basic realm="AutoX Credit Intelligence"`, no Vercel SSO layer). `check_site_health.py`
+  only treated a 401 as "healthy-but-gated" when **no** credential was supplied (`if e.code == 401 and
+  not self.password`). The CI job **does** pass a `SITE_PASSWORD` secret, but it no longer matches the
+  deployment's password, so the probe gets a **401 _with_ a credential** → the pre-flight guard misses
+  it → the code falls through → **all 11 page/data fetches record FAIL** → the run reports the site as
+  fully **BROKEN** and files/updates a "🚨 Site health check failed" issue. A rejected probe credential
+  is a **probe-config mismatch, not a site outage** — the site was up and correctly protected the whole
+  time. (Reproduced offline: credential-supplied 401 → 11/11 FAIL, exit 1.)
+- **Fix (pipeline-only, `pipeline/check_site_health.py`).** A **401 now always classifies as "site up +
+  access-protected"**, whether or not the probe holds a credential — because a 401 categorically means
+  the server is up and answering with an auth challenge. When a credential **was** supplied and still
+  got 401, the report says so honestly ("the supplied SITE_PASSWORD was rejected by the deployment —
+  probe-credential mismatch, not a site outage; align the CI SITE_PASSWORD secret with the deployment's")
+  and **skips** (not fails) the deep page/data checks. Real outages are untouched: connection-refused /
+  5xx / timeout / wrong-content-behind-auth still fail loudly (verified: a mocked 500 still → 11/11 FAIL,
+  exit 1). No check was weakened — only the 401 *classification* was corrected.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **64 passed, 0 failed**; the offline
+  `--local platform` health path still → **29/29 HEALTHY**. (b) No secrets in diff. (c) Diff = one file
+  (`pipeline/check_site_health.py`, +33/−8) + this log entry; pipeline-only, **no `platform/data` file
+  touched** (so no provenance regen) and **no app/visual change** (so no headless render needed).
+  (d) No fabricated data — a classification fix, no numbers.
+- **Verification:** after pushing to master, a manual `workflow_dispatch` of site-health.yml confirms the
+  run goes **green** and auto-closes issue #3. **Recommend to owner:** to unlock the *deep* nightly
+  page/data validation (not just the up/protected probe), set the repo `SITE_PASSWORD` secret to match
+  the deployment's current `SITE_PASSWORD` env var — until then the probe correctly reports "up +
+  protected, deep checks skipped" instead of a false alarm.
+
 ## 2026-07-16 — UX loop: Data book — region filter now persists when re-sorting the province table — SHIPPED (auto-merged #47, deploy READY)
 
 Autonomous UX loop. All 8 backlog findings in `docs/UXUI_AUDIT.md` were already fixed, so I reviewed

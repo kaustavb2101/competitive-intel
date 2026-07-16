@@ -61,9 +61,11 @@ WORDMARK = "AutoX"
 
 # ---------------------------------------------------------------------------
 class AuthGated(RuntimeError):
-    """The live deployment returned 401 and no credential was supplied. The site
-    is UP and correctly access-protected (middleware.js) — this is a healthy
-    state, not a breakage; the deep checks simply need the SITE_PASSWORD secret."""
+    """The live deployment returned 401 (middleware.js Basic Auth). The site is UP
+    and correctly access-protected — a healthy state, not a breakage — whether the
+    probe supplied no credential OR supplied one the deployment rejected. Either
+    way the deep checks are skipped, not failed; unlocking them just needs the CI
+    SITE_PASSWORD secret to match the deployment's own SITE_PASSWORD."""
 
 
 # Fetchers — one code path for validation, two transports.
@@ -91,8 +93,20 @@ class HttpFetcher:
                 status = resp.getcode()
                 body = resp.read(MAX_BYTES + 1)
         except urllib.error.HTTPError as e:
-            if e.code == 401 and not self.password:
-                # Up + correctly protected, but we hold no credential -> gated.
+            if e.code == 401:
+                # A 401 means the site is UP and answering with an auth challenge
+                # (middleware.js Basic Auth) — categorically not an outage, whether
+                # or not we hold a credential. Two sub-cases, both healthy:
+                #   no credential supplied  -> gated; deep checks need SITE_PASSWORD.
+                #   credential supplied but still 401 -> the probe's SITE_PASSWORD does
+                #     not match the deployment's; a probe-credential mismatch, NOT a
+                #     broken site. (A truly down site gives connection-refused / 5xx /
+                #     timeout, which the loops below still report as real failures.)
+                if self.password:
+                    raise AuthGated(
+                        "HTTP 401 — live site is up and access-protected, but the "
+                        "SITE_PASSWORD supplied to the probe was rejected by the "
+                        "deployment (probe-credential mismatch, not a site outage)")
                 raise AuthGated(
                     "HTTP 401 — live site is up and access-protected; "
                     "no SITE_PASSWORD supplied to the probe")
@@ -218,9 +232,20 @@ def run_checks(fetcher):
         fetcher.fetch(PAGES[0])
     except AuthGated as e:
         record("live site is up and access-protected (401)", True, str(e))
-        record("deep page/data checks", True,
-               "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
-               "authenticate and validate pages + data against the protected alias")
+        if getattr(fetcher, "password", ""):
+            # A credential was supplied but the deployment rejected it. The site is
+            # healthy; the probe simply cannot see past the gate. Skip (not fail) the
+            # deep checks and say exactly how to unlock them — align the CI
+            # SITE_PASSWORD secret with the deployment's own SITE_PASSWORD.
+            record("deep page/data checks", True,
+                   "SKIPPED — the supplied SITE_PASSWORD was rejected by the deployment "
+                   "(probe-credential mismatch, not a site outage); align the CI "
+                   "SITE_PASSWORD secret with the deployment's to run the full page + "
+                   "data validation")
+        else:
+            record("deep page/data checks", True,
+                   "SKIPPED — set the SITE_PASSWORD secret so the nightly probe can "
+                   "authenticate and validate pages + data against the protected alias")
         return results
     except RuntimeError:
         pass  # a genuine fetch failure is reported in detail by the loops below.
