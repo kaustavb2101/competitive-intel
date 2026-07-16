@@ -59,6 +59,7 @@ phase_check(){
   hdr "determinism + syntax gate"
   ( cd "$PIPE" && python3 derive.py --check >/dev/null 2>&1 ) && ok "derive.py --check" || bad "derive.py --check (platform/data drifted from source-data)"
   ( cd "$PIPE" && python3 build_province.py --check >/dev/null 2>&1 ) && ok "build_province.py --check" || bad "build_province.py --check (province files drifted)"
+  ( cd "$PIPE" && python3 build_regions.py --check >/dev/null 2>&1 ) && ok "build_regions.py --check" || bad "build_regions.py --check (regions.json drifted from provinces/*.json + competitors_census.json)"
   ( cd "$PIPE" && python3 build_amphoe.py --check >/dev/null 2>&1 ) && ok "build_amphoe.py --check" || bad "build_amphoe.py --check (amphoe.json drifted from source-data)"
   ( cd "$PIPE" && python3 build_amphoe_geo.py --check >/dev/null 2>&1 ) && ok "build_amphoe_geo.py --check" || bad "build_amphoe_geo.py --check (amphoe_geo.json drifted from th_amphoe.geojson)"
   ( cd "$PIPE" && python3 build_province_geo.py --check >/dev/null 2>&1 ) && ok "build_province_geo.py --check" || bad "build_province_geo.py --check (province_geo.json drifted from amphoe_geo.json/amphoe.json)"

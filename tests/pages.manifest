@@ -28,3 +28,10 @@ province-chonburi	province.html?p=chon-buri	webgl	1	map,kpis
 # manifest row — the harness only renders live views. The route was consolidated into rayong-catchment
 # in f28d6df; the stub just keeps old deep-links/bookmarks alive.
 rayong-catchment	rayong-catchment.html	webgl	1	map,focalName,leads,recos
+
+# Data book — pure numbers page (no WebGL/Leaflet); reads data/regions.json + provinces/<slug>.json.
+# gl=none, min_canvas=0. Two views: national overview and a province profile. NOTE: baseline PNGs are
+# minted by the Linux CI/cloud render (NOT locally — Windows chromium AA would poison the committed
+# baselines); until the first CI baseline run, the visual phase will flag these two rows.
+data-book	data.html	none	0	db-root
+data-book-province	data.html?p=rayong	none	0	db-root

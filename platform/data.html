@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>/* set theme before paint (matches every page): ?theme= overrides, else saved, else light */
+(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data book — AutoX · เงินไชโย</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ---- Data book — numbers-first surface. Self-contained "db-" components layered on the shared theme
+       variables in styles.css (var(--panel)/(--line)/(--mid)/(--dim)/(--accent)…), so light+dark just work.
+       NO map / NO WebGL — this is the analysis table the 3D pages were never meant to be. ---- */
+.db-wrap{max-width:var(--maxw,1320px);margin:0 auto;padding:18px 20px 80px}
+.db-crumb{font:500 12.5px/1.4 var(--mono);color:var(--dim);margin:2px 0 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.db-crumb a{color:var(--mid);text-decoration:none;border-bottom:1px dotted transparent}
+.db-crumb a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.db-crumb b{color:var(--dim);font-weight:500}
+.db-h1{font:700 22px/1.15 'IBM Plex Sans Thai';margin:0 0 3px;letter-spacing:-.01em}
+.db-h1 .th{color:var(--dim);font-weight:500;font-size:16px;margin-left:6px}
+.db-sub{color:var(--mid);font-size:13.5px;margin:0 0 18px;max-width:70ch;line-height:1.5}
+.db-sub b{color:var(--ink,inherit);font-weight:600}
+/* KPI strip */
+.db-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 22px}
+.db-kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 13px;min-width:0}
+.db-kpi .db-v{font:700 24px/1 var(--mono);letter-spacing:-.02em;color:var(--ink,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-kpi .db-v small{font-size:13px;color:var(--dim);font-weight:500;margin-left:2px}
+.db-kpi .db-k{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.3;text-transform:uppercase;letter-spacing:.03em}
+.db-kpi .db-ctx{font-size:11.5px;color:var(--mid);margin-top:5px;line-height:1.35}
+.db-kpi.lead{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.db-kpi.lead .db-v{color:var(--accent)}
+/* section */
+.db-sec{margin:26px 0 12px;font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);display:flex;align-items:center;gap:8px}
+.db-sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.db-sec .n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
+/* region cards */
+.db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.db-card{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;color:inherit;transition:border-color .12s,transform .12s}
+.db-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.db-card .rt{font:700 16px/1.1 'IBM Plex Sans Thai';margin-bottom:2px}
+.db-card .rp{font-size:11.5px;color:var(--dim);margin-bottom:11px}
+.db-card .cm{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-top:1px dashed var(--line)}
+.db-card .cm b{font:600 12.5px/1 var(--mono);color:var(--ink,inherit)}
+.db-card .cm span{color:var(--mid)}
+/* tables */
+.db-tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table.db-tbl{border-collapse:collapse;width:100%;font-size:12.5px;min-width:640px}
+.db-tbl th{position:sticky;top:0;background:var(--panel2,var(--panel));text-align:right;padding:9px 11px;font:600 11px/1.2 var(--mono);color:var(--dim);text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+.db-tbl th:first-child,.db-tbl td:first-child{text-align:left;position:sticky;left:0;background:var(--panel)}
+.db-tbl th.sort-asc::after{content:" ▲";color:var(--accent)}
+.db-tbl th.sort-desc::after{content:" ▼";color:var(--accent)}
+.db-tbl td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line2,var(--line));font-variant-numeric:tabular-nums;white-space:nowrap}
+.db-tbl tr:last-child td{border-bottom:none}
+.db-tbl tbody tr{cursor:pointer}
+.db-tbl tbody tr:hover td{background:var(--raised,rgba(127,127,127,.06))}
+.db-tbl td.name{font-weight:600}
+.db-tbl td .en{color:var(--dim);font-weight:400;font-size:11px}
+.db-tbl td.hot{color:var(--agri,#d1544b);font-weight:700}
+/* bars */
+.db-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;min-width:52px}
+.db-bar>i{display:block;height:100%;border-radius:4px}
+.db-stack{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--line)}
+.db-stack>i{height:100%}
+.db-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:11.5px;color:var(--mid)}
+.db-legend span{display:inline-flex;align-items:center;gap:5px}
+.db-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* vs-national centered baseline bar */
+.db-vs{position:relative;height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.db-vs::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--dim);opacity:.6}
+.db-vs>i{position:absolute;top:0;bottom:0}
+.db-badge{font:600 11px/1 var(--mono);padding:2px 6px;border-radius:5px;display:inline-block}
+.db-badge.up{color:#0c8f5f;background:rgba(18,160,110,.12)}
+.db-badge.dn{color:var(--agri,#d1544b);background:rgba(209,84,75,.12)}
+/* two-col rows (province profile metrics) */
+.db-rows{display:grid;grid-template-columns:1fr;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.db-row{display:grid;grid-template-columns:minmax(140px,1.2fr) minmax(90px,.7fr) minmax(120px,1.6fr);gap:14px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line2,var(--line))}
+.db-row:last-child{border-bottom:none}
+.db-row .rl{font-size:12.5px;color:var(--mid)}
+.db-row .rl small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.db-row .rv{font:600 15px/1 var(--mono);text-align:right;color:var(--ink,inherit)}
+.db-row .rg{min-width:0}
+.db-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:start}
+/* filter chips */
+.db-chiprow{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
+.db-chip{font:500 12px/1 'IBM Plex Sans Thai';padding:7px 12px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--mid);cursor:pointer}
+.db-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.db-note{color:var(--dim);font-size:13px;padding:40px 0;text-align:center}
+.db-tag{font:600 10px/1 var(--mono);padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--dim);text-transform:uppercase;letter-spacing:.04em;margin-left:8px;vertical-align:middle}
+.db-3dlinks{margin:30px 0 0;display:flex;flex-wrap:wrap;gap:10px}
+.db-3dlinks a{font-size:12.5px;color:var(--mid);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 12px}
+.db-3dlinks a:hover{border-color:var(--accent);color:var(--accent)}
+.db-foot{margin-top:34px;font-size:11px;color:var(--dim);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<script>(function(){var s=document.querySelector('.skip-link');if(!s)return;s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
+<nav id="nav" aria-label="Main views">
+  <a class="nb" href="index.html#home" style="text-decoration:none">AutoX<b>·</b>เงินไชโย</a>
+  <a href="index.html#home">Command center</a>
+  <a href="index.html#acq">Competition</a>
+  <a class="on" href="data.html" aria-current="page">Data book</a>
+  <a href="index.html#provinces">3D map</a>
+  <a href="/status">Status ↗</a>
+  <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
+    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
+</nav>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;
+ function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));}
+ sync();
+ b.addEventListener('click',function(){var l=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=l?'light':'dark';try{localStorage.setItem('autox-theme',l?'light':'dark');}catch(e){}sync();});})();
+</script>
+
+<main id="main-content" tabindex="-1">
+  <div class="db-wrap">
+    <div id="db-root"></div>
+    <div id="db-loading" class="db-note">Loading data book…</div>
+  </div>
+</main>
+
+<script>
+/* ============================ DATA BOOK ============================
+   Numbers-first province -> region rollup. Three levels via query param:
+     data.html            National overview (5 region cards + 77-province table)
+     data.html?r=<region> Region profile (rollup + its provinces ranked)
+     data.html?p=<slug>   Province profile (full measured readout, district table)
+   Reads data/regions.json (rollup) + data/provinces/<slug>.json (deep detail).
+   Rollup math lives in pipeline/build_regions.py; this page only presents it.        */
+(function(){
+'use strict';
+var THEME_QS = (function(){try{var t=new URLSearchParams(location.search).get('theme');return t?('&theme='+t):'';}catch(e){return '';}})();
+
+// ---- formatters ----
+function num(n){return n==null?'—':Number(n).toLocaleString('en-US');}
+function baht(n){return n==null?'—':'฿'+Number(n).toLocaleString('en-US');}
+function pct(n){return n==null?'—':Number(n).toFixed(1)+'%';}
+function mult(n){return n==null?'—':Number(n).toFixed(1)+'×';}
+function kk(n){return n==null?'—':Math.round(n).toLocaleString('en-US')+'k';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+// vs-national: ratio (1.0 = national). returns {txt, cls}
+function vsNat(r){if(r==null)return{txt:'—',cls:''};var d=Math.round((r-1)*100);return{txt:(d>=0?'+':'')+d+'%',cls:d>=0?'up':'dn'};}
+
+// ---- micro-components ----
+function bar(p,color){var w=Math.max(0,Math.min(100,p||0));return '<div class="db-bar"><i style="width:'+w+'%;background:'+color+'"></i></div>';}
+function stack(parts){ // parts:[{p,color}]
+  return '<div class="db-stack">'+parts.map(function(x){return '<i style="width:'+Math.max(0,x.p||0)+'%;background:'+x.color+'" title="'+esc(x.label||'')+'"></i>';}).join('')+'</div>';}
+function legend(parts){return '<div class="db-legend">'+parts.map(function(x){return '<span><i style="background:'+x.color+'"></i>'+esc(x.label)+'</span>';}).join('')+'</div>';}
+function vsbar(r){ // centered baseline at 1.0; clamp display to 0.5..1.5 -> 0..100
+  if(r==null)return '<div class="db-vs"></div>';
+  var d=Math.max(-.5,Math.min(.5,r-1)); // -0.5..0.5
+  var v=vsNat(r), col=d>=0?'#12a06e':'var(--agri,#d1544b)';
+  var left=d>=0?50:(50+d*100), w=Math.abs(d)*100;
+  return '<div style="display:flex;align-items:center;gap:8px"><div class="db-vs" style="flex:1"><i style="left:'+left+'%;width:'+w+'%;background:'+col+'"></i></div><span class="db-badge '+v.cls+'">'+v.txt+'</span></div>';}
+function kpi(v,k,ctx,lead){return '<div class="db-kpi'+(lead?' lead':'')+'"><div class="db-v">'+v+'</div><div class="db-k">'+esc(k)+'</div>'+(ctx?'<div class="db-ctx">'+ctx+'</div>':'')+'</div>';}
+
+// colors (theme-stable accents)
+var C={rival:'var(--agri,#d1544b)',moto:'var(--merch,#1c8c7d)',pickup:'#4f7bf0',car:'var(--dim,#8590a6)',ev:'var(--gold,#e6b450)',
+       informal:'#e0902f',formal:'#4f7bf0',income:'var(--gold,#e6b450)',pos:'#12a06e'};
+
+var DATA=null; // regions.json
+
+function crumb(parts){ // parts:[{t,href}] last is plain
+  return '<nav class="db-crumb" aria-label="Breadcrumb">'+parts.map(function(p,i){
+    var arrow=i<parts.length-1?' <b>›</b>':'';
+    return (p.href?'<a href="'+p.href+'">'+esc(p.t)+'</a>':'<b style="color:var(--mid)">'+esc(p.t)+'</b>')+arrow;
+  }).join(' ')+'</nav>';}
+
+// ================= LEVEL 0 — NATIONAL =================
+function renderNational(){
+  var n=DATA.national, regions=DATA.regions;
+  var allProv=[]; regions.forEach(function(r){r.provinces.forEach(function(p){allProv.push(p);});});
+  var h='';
+  h+=crumb([{t:'Thailand (all 77)'}]);
+  h+='<h1 class="db-h1">Thailand — the network in numbers</h1>';
+  h+='<p class="db-sub">Every measured number behind the '+num(n.branches)+'-branch footprint, and how the provinces roll up into the '+regions.length+' regions. Counts sum; shares and rates are recomputed as ratio-of-sums (never averaged); incomes are labour-weighted. Click a region or province to drill in.</p>';
+  // KPI strip
+  h+='<div class="db-kpis">';
+  h+=kpi(mult(n.rivals_per_branch),'Rivals per AutoX branch','<b>'+num(n.rival_branches)+'</b> measured rival branches vs our '+num(n.branches),true);
+  h+=kpi(num(n.branches),'AutoX branches',num(n.districts)+' districts across '+n.n_provinces+' provinces');
+  h+=kpi(pct(n.informal_share_pct),'Informal-income share','the core title-loan borrower pool');
+  h+=kpi(pct(n.moto_share_pct),'Motorcycle share','of '+num(n.vehicles.total)+' registered vehicles');
+  h+=kpi(baht(n.avg_income),'Avg monthly income','labour-weighted national mean');
+  h+=kpi(pct(n.unemployment_rate_pct),'Unemployment','labour force '+kk(n.labor_force_k));
+  h+='</div>';
+  // region cards
+  h+='<div class="db-sec"><span class="n">R</span> Regions — ranked by competitive pressure</div>';
+  h+='<div class="db-cards">';
+  regions.slice().sort(function(a,b){return b.rivals_per_branch-a.rivals_per_branch;}).forEach(function(r){
+    h+='<a class="db-card" href="?r='+encodeURIComponent(r.region)+THEME_QS+'">';
+    h+='<div class="rt">'+esc(r.label)+'</div><div class="rp">'+r.n_provinces+' provinces · '+num(r.branches)+' branches</div>';
+    h+='<div class="cm"><span>Rivals / branch</span><b>'+mult(r.rivals_per_branch)+'</b></div>';
+    h+='<div class="cm"><span>Informal share</span><b>'+pct(r.informal_share_pct)+'</b></div>';
+    h+='<div class="cm"><span>Motorcycle share</span><b>'+pct(r.moto_share_pct)+'</b></div>';
+    h+='<div class="cm"><span>Income vs national</span><b>'+vsNat(r.avg_income_vs_national).txt+'</b></div>';
+    h+='</a>';
+  });
+  h+='</div>';
+  // province table
+  h+='<div class="db-sec"><span class="n">P</span> All 77 provinces</div>';
+  h+='<div class="db-chiprow" id="regfilter"><button class="db-chip on" data-r="">All 77</button>'+
+     regions.map(function(r){return '<button class="db-chip" data-r="'+esc(r.region)+'">'+esc(r.label)+' ('+r.n_provinces+')</button>';}).join('')+'</div>';
+  h+=provinceTable(allProv);
+  h+=footer();
+  document.getElementById('db-root').innerHTML=h;
+  wireTable(allProv);
+  wireFilter(allProv);
+}
+
+var COLS=[
+  {k:'name',t:'Province',t2:0,get:function(p){return p.en;},cell:function(p){return '<td class="name">'+esc(p.th)+'<span class="en"> '+esc(p.en)+'</span></td>';}},
+  {k:'branches',t:'Branches',get:function(p){return p.branches;},cell:function(p){return '<td>'+num(p.branches)+'</td>';}},
+  {k:'rival_branches',t:'Rivals',get:function(p){return p.rival_branches;},cell:function(p){return '<td>'+num(p.rival_branches)+'</td>';}},
+  {k:'rivals_per_branch',t:'Rivals/br',get:function(p){return p.rivals_per_branch||0;},cell:function(p){return '<td class="'+(p.rivals_per_branch>=8?'hot':'')+'">'+mult(p.rivals_per_branch)+'</td>';}},
+  {k:'informal_share_pct',t:'Informal',get:function(p){return p.informal_share_pct==null?-1:p.informal_share_pct;},cell:function(p){return '<td>'+pct(p.informal_share_pct)+'</td>';}},
+  {k:'moto_share_pct',t:'Moto',get:function(p){return p.moto_share_pct||0;},cell:function(p){return '<td>'+pct(p.moto_share_pct)+'</td>';}},
+  {k:'avg_income',t:'Avg income',get:function(p){return p.avg_income||0;},cell:function(p){return '<td>'+baht(p.avg_income)+'</td>';}},
+  {k:'avg_income_vs_national',t:'vs nat',get:function(p){return p.avg_income_vs_national||0;},cell:function(p){var v=vsNat(p.avg_income_vs_national);return '<td class="'+(v.cls==='dn'?'':'')+'" style="color:'+(v.cls==='up'?'#12a06e':'var(--agri,#d1544b)')+'">'+v.txt+'</td>';}},
+  {k:'unemployment_rate_pct',t:'Unemp',get:function(p){return p.unemployment_rate_pct||0;},cell:function(p){return '<td>'+pct(p.unemployment_rate_pct)+'</td>';}}
+];
+function provinceTable(rows){
+  var h='<div class="db-tblwrap"><table class="db-tbl" id="ptbl"><thead><tr>';
+  COLS.forEach(function(c,i){h+='<th data-c="'+i+'"'+(i>=2?'':'')+'>'+esc(c.t)+'</th>';});
+  h+='</tr></thead><tbody>'+rows.map(rowHtml).join('')+'</tbody></table></div>';
+  return h;
+}
+function rowHtml(p){return '<tr data-slug="'+esc(p.slug)+'">'+COLS.map(function(c){return c.cell(p);}).join('')+'</tr>';}
+
+var sortState={c:3,dir:-1}; // default: rivals/branch desc
+function wireTable(rows){
+  var tbl=document.getElementById('ptbl'); if(!tbl)return;
+  applySort(rows);
+  tbl.querySelectorAll('th').forEach(function(th){
+    th.addEventListener('click',function(){var c=+th.getAttribute('data-c');
+      if(sortState.c===c)sortState.dir*=-1;else{sortState.c=c;sortState.dir=(c===0?1:-1);}
+      applySort(rows);});
+  });
+  tbl.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-slug'))location.href='?p='+encodeURIComponent(tr.getAttribute('data-slug'))+THEME_QS;});
+}
+function applySort(rows){
+  var c=COLS[sortState.c];
+  rows.sort(function(a,b){var x=c.get(a),y=c.get(b);if(typeof x==='string')return sortState.dir*x.localeCompare(y);return sortState.dir*(x-y);});
+  var tb=document.querySelector('#ptbl tbody'); if(tb)tb.innerHTML=rows.map(rowHtml).join('');
+  document.querySelectorAll('#ptbl th').forEach(function(th,i){th.classList.remove('sort-asc','sort-desc');if(i===sortState.c)th.classList.add(sortState.dir>0?'sort-asc':'sort-desc');});
+}
+function wireFilter(allRows){
+  var box=document.getElementById('regfilter'); if(!box)return;
+  box.addEventListener('click',function(e){var b=e.target.closest('.db-chip');if(!b)return;
+    box.querySelectorAll('.db-chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');
+    var r=b.getAttribute('data-r');var rows=r?allRows.filter(function(p){return p.region===r;}):allRows.slice();
+    applySort(rows);
+    var tb=document.querySelector('#ptbl tbody');
+    document.querySelector('#ptbl').__rows=rows;
+    // rebind row click set by re-rendering handled in applySort; ensure click still works via delegation (already bound to tbody)
+  });
+}
+
+// ================= LEVEL 1 — REGION =================
+function renderRegion(key){
+  var r=DATA.regions.filter(function(x){return x.region===key;})[0];
+  if(!r){renderNational();return;}
+  var n=DATA.national;
+  var h=crumb([{t:'Thailand',href:'data.html'+(THEME_QS?('?'+THEME_QS.slice(1)):'')},{t:r.label}]);
+  h+='<h1 class="db-h1">'+esc(r.label)+' <span class="th">region</span></h1>';
+  h+='<p class="db-sub">'+r.n_provinces+' provinces · '+num(r.branches)+' AutoX branches. Region figures are the correct rollup of the member provinces — counts summed, shares recomputed as ratio-of-sums, incomes labour-weighted.</p>';
+  h+='<div class="db-kpis">';
+  h+=kpi(mult(r.rivals_per_branch),'Rivals per AutoX branch','<b>'+num(r.rival_branches)+'</b> rival branches',true);
+  h+=kpi(num(r.branches),'AutoX branches',num(r.districts)+' districts');
+  h+=kpi(pct(r.informal_share_pct),'Informal share','vs '+pct(n.informal_share_pct)+' national');
+  h+=kpi(pct(r.moto_share_pct),'Motorcycle share','of '+num(r.vehicles.total)+' vehicles');
+  h+=kpi(baht(r.avg_income),'Avg income',vsNat(r.avg_income_vs_national).txt+' vs national');
+  h+=kpi(pct(r.unemployment_rate_pct),'Unemployment','labour force '+kk(r.labor_force_k));
+  h+='</div>';
+  // composition
+  h+='<div class="db-grid2">';
+  h+='<div><div class="db-sec">Workforce mix</div>'+compEmployment(r)+'</div>';
+  h+='<div><div class="db-sec">Vehicle collateral mix</div>'+compVehicles(r)+'</div>';
+  h+='</div>';
+  // provinces ranked
+  h+='<div class="db-sec"><span class="n">P</span> '+r.n_provinces+' provinces — by competitive pressure</div>';
+  h+=provinceTable(r.provinces.slice());
+  h+=footer();
+  document.getElementById('db-root').innerHTML=h;
+  wireTable(r.provinces.slice());
+}
+function compEmployment(o){
+  var inf=o.informal_share_pct;if(inf==null)return '<div class="db-note" style="padding:14px 0">Informal/formal split not available.</div>';
+  var h=stack([{p:inf,color:C.informal,label:'Informal'},{p:100-inf,color:C.formal,label:'Formal'}]);
+  h+=legend([{color:C.informal,label:'Informal '+pct(inf)},{color:C.formal,label:'Formal '+pct(100-inf)}]);
+  return '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px">'+h+'</div>';
+}
+function compVehicles(o){
+  var v=o.vehicles,t=v.total||1;
+  var parts=[{p:v.moto/t*100,color:C.moto,label:'Moto'},{p:v.pickup/t*100,color:C.pickup,label:'Pickup'},{p:v.car/t*100,color:C.car,label:'Car'},{p:v.ev/t*100,color:C.ev,label:'EV'}];
+  var h=stack(parts)+legend([{color:C.moto,label:'Moto '+pct(o.moto_share_pct)},{color:C.pickup,label:'Pickup '+pct(o.pickup_share_pct)},{color:C.car,label:'Car '+pct(o.car_share_pct)},{color:C.ev,label:'EV '+pct(o.ev_share_pct)}]);
+  return '<div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px">'+h+'</div>';
+}
+
+// ================= LEVEL 2 — PROVINCE =================
+function renderProvince(slug){
+  // find summary + region from regions.json; fetch full detail from provinces/<slug>.json
+  var sum=null,reg=null,rank=null;
+  var all=[];DATA.regions.forEach(function(r){r.provinces.forEach(function(p){all.push(p);if(p.slug===slug){sum=p;reg=r;}});});
+  all.sort(function(a,b){return (b.rivals_per_branch||0)-(a.rivals_per_branch||0);});
+  all.forEach(function(p,i){if(p.slug===slug)rank=i+1;});
+  fetch('data/provinces/'+slug+'.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){
+    provinceView(d,sum,reg,rank,all.length);
+  }).catch(function(){
+    document.getElementById('db-loading').style.display='none';
+    document.getElementById('db-root').innerHTML=crumb([{t:'Thailand',href:'data.html'},{t:'Province'}])+'<div class="db-note">Couldn’t load this province. <a href="data.html">Back to the data book</a>.</div>';
+  });
+}
+function provinceView(d,sum,reg,rank,total){
+  var gov=d.gov||{},veh=gov.vehicles||{},emp=gov.employment||{},un=gov.unemployment||{},inc=gov.income||{},facts=d.facts||{};
+  var nat=DATA.national, natOcc=nat.occ_income||{};
+  var t=veh.total||1;
+  var infShare=(emp.informal!=null&&emp.formal!=null)?(emp.informal/(emp.informal+emp.formal)*100):null;
+  var rivals=sum?sum.rival_branches:null, rpb=sum?sum.rivals_per_branch:null, branches=sum?sum.branches:(d.branches||[]).length;
+  var h=crumb([{t:'Thailand',href:'data.html'+(THEME_QS?('?'+THEME_QS.slice(1)):'')},{t:reg?reg.label:'Region',href:reg?('?r='+encodeURIComponent(reg.region)+THEME_QS):'data.html'},{t:d.province_en||sum&&sum.en||''}]);
+  h+='<h1 class="db-h1">'+esc(d.province_en||'')+'<span class="th">'+esc(d.province_th||'')+'</span></h1>';
+  h+='<p class="db-sub">'+esc(reg?reg.label:'')+' region · '+num(branches)+' AutoX branches · '+((d.districts&&d.districts.features)?d.districts.features.length:0)+' districts. Full measured readout, ordered the way a lender reads a market: competitive pressure, then the borrower pool, then the collateral behind the book.</p>';
+
+  // SECTION 1 — competitive pressure
+  h+='<div class="db-sec"><span class="n">1</span> Competitive pressure</div>';
+  h+='<div class="db-kpis">';
+  h+=kpi(mult(rpb),'Rivals per AutoX branch','<b>'+num(rivals)+'</b> rival branches vs our '+num(branches),true);
+  h+=kpi('#'+ (rank||'—') +' <small>of '+total+'</small>','Contested rank','1 = most rival pressure nationally');
+  h+=kpi(num(sum?sum.contested_districts:null),'Contested districts','districts where rivals outnumber our branches');
+  h+='</div>';
+
+  // SECTION 2 — borrower pool
+  h+='<div class="db-sec"><span class="n">2</span> Borrower pool</div>';
+  h+='<div class="db-rows">';
+  h+=metricRow('Informal-income share','the core title-loan borrower',infShare==null?'—':pct(infShare),infShare==null?'':bar(infShare,C.informal));
+  h+=metricRow('Informal workers','NSO measured',num(emp.informal),'');
+  h+=metricRow('Unemployment rate','labour force '+kk(un.labor_force_k),pct(un.unemployment_rate!=null?un.unemployment_rate:(un.unemployed_k&&un.labor_force_k?un.unemployed_k/un.labor_force_k*100:null)),bar(un.unemployment_rate!=null?un.unemployment_rate:(un.unemployed_k/un.labor_force_k*100),C.rival));
+  h+=metricRow('Avg income vs national','labour-weighted, computed baseline',baht(inc.avg_monthly_income),sum?vsbar(sum.avg_income_vs_national):'');
+  h+='</div>';
+
+  // SECTION 3 — vehicle collateral
+  h+='<div class="db-sec"><span class="n">3</span> Vehicle collateral base</div>';
+  h+='<div class="db-grid2"><div>'+compVehicles({vehicles:veh,moto_share_pct:veh.moto/t*100,pickup_share_pct:veh.pickup/t*100,car_share_pct:veh.car/t*100,ev_share_pct:veh.ev/t*100})+'</div>';
+  h+='<div class="db-rows" style="margin:0">';
+  h+=metricRow('Motorcycle titles','cheapest, highest-velocity collateral',num(veh.moto),bar(veh.moto/t*100,C.moto));
+  h+=metricRow('Pickup titles','higher-ticket collateral',num(veh.pickup),bar(veh.pickup/t*100,C.pickup));
+  h+=metricRow('Collateral per branch','(moto+pickup) ÷ branches',num(Math.round(((veh.moto||0)+(veh.pickup||0))/(branches||1))),'');
+  h+=metricRow('EV share','structural collateral-mix watch',pct(veh.ev/t*100),bar(veh.ev/t*100,C.ev));
+  h+='</div></div>';
+
+  // SECTION 4 — economic engine
+  h+='<div class="db-sec"><span class="n">4</span> Economic engine <span class="db-tag">context</span></div>';
+  h+='<div class="db-grid2"><div class="db-rows" style="margin:0">';
+  h+=metricRow('DIW factories','registered category-3',num(gov.factories),'');
+  h+=metricRow('Factory workers','DIW measured',num(gov.workers),'');
+  h+=metricRow('Formal employment','NSO',num(emp.formal),'');
+  h+='</div>';
+  h+='<div>'+occTable(inc,natOcc)+'</div></div>';
+  if(facts.anchors&&facts.anchors.length){
+    h+='<div style="margin-top:12px;font-size:12.5px;color:var(--mid);line-height:1.6"><b style="color:var(--dim)">Local anchors:</b> '+facts.anchors.map(esc).join(' · ')+(facts.skill_gap?('<br><b style="color:var(--dim)">Note:</b> '+esc(facts.skill_gap)):'')+'</div>';
+  }
+
+  // SECTION 5 — districts
+  h+='<div class="db-sec"><span class="n">5</span> Inside the province — districts</div>';
+  h+=districtTable(d);
+
+  // demoted 3D links
+  h+='<div class="db-3dlinks"><a href="rayong-catchment.html?city='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">🏙 Open 3D building scene</a><a href="province.html?p='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">▦ Open 3D district view</a></div>';
+  h+=footer();
+  document.getElementById('db-loading').style.display='none';
+  document.getElementById('db-root').innerHTML=h;
+}
+function metricRow(label,sub,val,graphic){
+  return '<div class="db-row"><div class="rl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><div class="rv">'+val+'</div><div class="rg">'+(graphic||'')+'</div></div>';
+}
+function occTable(inc,natOcc){
+  var keys=['Agriculture','FactoryWorkers','OfficeStaff','SMEOwners','Transport'];
+  var lab={Agriculture:'Agriculture',FactoryWorkers:'Factory',OfficeStaff:'Office',SMEOwners:'SME owner',Transport:'Transport'};
+  var rows=keys.filter(function(k){return inc[k]!=null;}).map(function(k){
+    var r=(natOcc[k]?inc[k]/natOcc[k]:null),v=vsNat(r);
+    return '<div class="db-row" style="grid-template-columns:1fr auto auto;gap:10px"><div class="rl">'+lab[k]+'</div><div class="rv" style="font-size:13.5px">'+baht(inc[k])+'</div><div><span class="db-badge '+v.cls+'">'+v.txt+'</span></div></div>';
+  }).join('');
+  return '<div class="db-rows" style="margin:0"><div class="db-row" style="grid-template-columns:1fr;padding-bottom:4px"><div class="rl" style="color:var(--dim);font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em">Income by occupation · ฿/mo · vs national</div></div>'+rows+'</div>';
+}
+function districtTable(d){
+  var feats=(d.districts&&d.districts.features)?d.districts.features.slice():[];
+  if(!feats.length)return '<div class="db-note" style="padding:20px 0">No district breakdown for this province.</div>';
+  feats.sort(function(a,b){return (b.properties.competitors||0)-(a.properties.competitors||0);});
+  var h='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>District</th><th>AutoX</th><th>Rivals</th><th>Working-age</th><th>DIW workers</th></tr></thead><tbody>';
+  feats.forEach(function(f){var p=f.properties||{};var contested=(p.competitors||0)>(p.branches||0);
+    h+='<tr style="cursor:default"><td class="name">'+esc(p.district||p.shapeName||'—')+'</td><td>'+num(p.branches||0)+'</td><td class="'+(contested?'hot':'')+'">'+num(p.competitors||0)+'</td><td>'+num(p.workingage||0)+'</td><td>'+num(p.real_workers||0)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  return h;
+}
+
+function footer(){
+  var m=DATA.meta||{};
+  return '<div class="db-foot">Measured sources: DIW factories · DLT registered vehicles · NSO labour force &amp; income · big-4 rival branch census. Region figures are true rollups (counts summed; shares as ratio-of-sums; incomes labour-weighted). "vs national" uses the computed labour-weighted national mean. Bangkok’s informal/formal split is unavailable and is skipped in that ratio only.</div>';
+}
+
+// ---- boot ----
+fetch('data/regions.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
+  DATA=data;
+  document.getElementById('db-loading').style.display='none';
+  var qs=new URLSearchParams(location.search),p=qs.get('p'),rg=qs.get('r');
+  if(p)renderProvince(p);
+  else if(rg)renderRegion(rg);
+  else renderNational();
+}).catch(function(){
+  var el=document.getElementById('db-loading');if(el){el.textContent='Data book unavailable — could not load data/regions.json.';}
+});
+})();
+</script>
+</body>
+</html>
