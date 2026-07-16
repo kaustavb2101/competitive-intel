@@ -5,6 +5,47 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-16 (integration) — CROPLAND: surface the per-branch SPAM×DOAE crop-area layer in the map popup — PR
+
+Integration loop, objective #1 (portfolio risk). Backlog item #2 was **half-done**: the per-branch
+crop layer `platform/data/branch_cropland.json` (built by `pipeline/build_branch_cropland.py`, gated
+in `tests/run.sh check`, and already in `provenance.json`) existed and reproduced byte-exact — but it
+was **never fetched or rendered anywhere in the app**. The intelligence was on disk yet invisible to
+the owner. This closes the "surface it in the app" half.
+
+**What it is (honest provenance):** per-branch crop land-use area (hectares) within a 10km catchment,
+by crop (rice/cassava/maize/oil-palm/sugarcane). The **within-province spatial pattern** is SPAM-2010
+modelled (**ESTIMATED**); each crop's **provincial magnitude** is rescaled to DOAE's farmer-registry
+**MEASURED 2025** planted area (rai/6.25). Sugarcane is uncorrected (pure SPAM est — DOAE doesn't cover
+it, it's OCSB). So the layer is a hybrid: est pattern × measured current magnitude — labelled exactly
+that in the UI, never as flat "measured".
+
+**Fix (`platform/app.js` only, +~55 lines):** mirrors the existing `branch_density` idiom exactly —
+a lazy loader `loadBranchCropland()` (index-aligned to `branches.json`, null-guarded), a `croplandRec()`
+accessor, and a `croplandPopupHTML()` block wired into the National-map branch popup after the crop-stress
+block. The block shows total crop-area ≤10km, the dominant crop, the top-3 crops by area, and an inline
+provenance line ("SPAM-2010 spatial pattern (est) rescaled per province to DOAE 2025 planted area
+(measured, rai/6.25); sugarcane uncorrected (est)"). Loader added to the map-init `Promise.all`. The
+block returns empty when the layer is absent or the branch has no cropland in catchment — graceful
+absence, no fabrication. **No data file altered, no recompute, provenance untouched** — pure rendering
+of already-committed data.
+
+**Verify:** (a) `node --check platform/app.js` OK; (b) `bash tests/run.sh check` → **62 passed, 0
+failed**; (c) headless map render blocked in this sandbox (Leaflet loads from the unpkg CDN, which is
+network-blocked here — not a code issue), so verified the real `croplandPopupHTML` source extracted
+from `app.js` against real `branch_cropland.json` records in Node: renders the header, total (2,155 ha),
+dominant crop (Sugarcane), correct top-3-by-area, and provenance note; returns empty for a zero-crop
+branch and an absent record (null-guards hold). Number spot-check correct against the raw `ha[]` vector.
+
+**Decision — PR, not straight-to-master:** this changes visible app behaviour (a new popup block), so
+per the loop's ship rule it goes through a PR rather than a direct master commit.
+
+**Next recommended integration:** distill the remaining data.go.th pulls (backlog #3) — fold
+`mot_vehicles`/excise into a clean province collateral layer and `dbd_newco` into a demand/whitespace
+layer, each keyed on the canonical 77 provinces with a `--check` and measured provenance.
+
+---
+
 ## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED
 
 Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so audited the pillar for a

@@ -465,6 +465,34 @@ function bldgDensityRec(d){
   return BLDGDEN[i]||null;
 }
 
+/* ---------- per-branch MEASURED-corrected CROPLAND area within 10km (data/branch_cropland.json) ----------
+   Lazy-loads pipeline/build_branch_cropland.py: {meta:{crops[],radius_km,...},
+   branches:[{ha:[..],crop_ha,dom,fac}]}, INDEX-ALIGNED to branches.json. ha[] is the SPAM-2010 modelled
+   spatial pattern (ESTIMATED) rescaled per province to DOAE farmer-registry MEASURED 2025 planted area —
+   so the WITHIN-province pattern is estimated but each crop's provincial MAGNITUDE is measured & current.
+   Sugarcane is uncorrected (pure SPAM est — DOAE doesn't cover it; it's OCSB). Fully null-guarded:
+   absent file → CROPLAND stays null, croplandRec() reads null, the popup block is omitted. Nothing is
+   fabricated. */
+let CROPLAND=null, croplandCrops=null, croplandRk=10, croplandLoaded=false, croplandPromise=null;
+async function loadBranchCropland(){
+  if(croplandPromise) return croplandPromise;
+  croplandLoaded=true;
+  croplandPromise=(async()=>{
+    try{ const r=await fetch('data/branch_cropland.json'); if(!r.ok){CROPLAND=null;return CROPLAND;}
+      const j=await r.json(); CROPLAND=j.branches||null;
+      croplandCrops=(j.meta&&j.meta.crops)||null; croplandRk=(j.meta&&j.meta.radius_km)||10; }
+    catch(e){ CROPLAND=null; croplandCrops=null; }
+    return CROPLAND;
+  })();
+  return croplandPromise;
+}
+// per-branch cropland record (for popups) — null when absent.
+function croplandRec(d){
+  if(!CROPLAND||!CROPLAND.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return CROPLAND[i]||null;
+}
+
 /* ---------- per-branch COMPOSITE risk (data/branch_risk.json, obj#1) ----------
    Lazy-loads the fused composite-risk layer built by pipeline/build_branch_risk.py:
    {meta, branches:[{code, composite_risk 0–100, components{household,agri,occupation,segment},
@@ -3966,7 +3994,7 @@ function selectBranch(d,m){
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
   if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadBranchCropland(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4410,6 +4438,27 @@ function bldgDensityPopupHTML(d,r){
   return r('Buildings ≤10km (Overture) · measured',
     `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col);
 }
+// Cropland block for a branch popup — MEASURED-corrected crop land-use area within 10km
+// (data/branch_cropland.json). Total crop-area + dominant crop + top crops by area (hectares). The
+// WITHIN-province spatial pattern is SPAM-2010 modelled (est); each crop's provincial magnitude is
+// rescaled to DOAE's MEASURED 2025 planted area (sugarcane uncorrected — pure SPAM est). Honest
+// provenance inline. Omitted when the layer is absent or the branch has no cropland in catchment.
+function croplandPopupHTML(d,sec,r){
+  const e=croplandRec(d); if(!e||!croplandCrops||!(e.crop_ha>0)) return '';
+  const fmt=n=>Math.round(n).toLocaleString();
+  const domK=(e.dom>=0&&e.dom<croplandCrops.length)?croplandCrops[e.dom]:null;
+  const domLab=domK?(CROP_LABEL[domK]||domK):'—';
+  const domCol=domK?(CROP_COLORS[domK]||'var(--gold)'):'var(--mid)';
+  let h=sec(`Cropland ≤${croplandRk}km — SPAM×DOAE · est pattern, measured 2025 magnitude`);
+  h+=r(`Crop area ≤${croplandRk}km ◇`, `${fmt(e.crop_ha)} <span class="sub">ha</span>`, 'var(--gold)');
+  h+=r('Dominant crop', domLab, domCol);
+  const rows=croplandCrops.map((k,i)=>({k,ha:e.ha[i]})).filter(x=>x.ha>0)
+    .sort((a,b)=>b.ha-a.ha).slice(0,3);
+  rows.forEach(x=>{ h+=r(CROP_LABEL[x.k]||x.k, `${fmt(x.ha)} <span class="sub">ha</span>`,
+    CROP_COLORS[x.k]||'#8b90a7'); });
+  h+=`<div class="sub" style="margin:2px 0 0;font-size:10px">SPAM-2010 spatial pattern (est) rescaled per province to DOAE 2025 planted area (measured, rai/6.25); sugarcane uncorrected (est)</div>`;
+  return h;
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -4609,6 +4658,7 @@ function popupHTML(d){
     ${rivalPressureLineHTML(d)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
+    ${croplandPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}
     ${bldgDensityPopupHTML(d,r)}</div>`;
