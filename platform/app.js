@@ -280,6 +280,22 @@ async function loadAgri(){
   return agriPromise;
 }
 
+/* ---------- per-branch MEASURED-corrected crop AREA (data/branch_cropland.json) ----------
+   SPAM-2010 modelled spatial pattern rescaled per province to the DOAE-2025 farmer-registry
+   MEASURED planted area — so the crop-area MAGNITUDE is measured (spatial pattern still SPAM).
+   Shape: { meta:{crops:[...],radius_km,...}, branches:[{ha:[..],crop_ha,dom,fac:[..]}] }
+   INDEX-ALIGNED to branches.json. Optional/null-guarded: absent file → the readout is omitted. */
+let CROPDATA=null, cropPromise=null;
+async function loadCropland(){
+  if(cropPromise) return cropPromise;
+  cropPromise=(async()=>{
+    try{ const r=await fetch('data/branch_cropland.json'); if(r.ok) CROPDATA=await r.json(); }
+    catch(e){ CROPDATA=null; }
+    return CROPDATA;
+  })();
+  return cropPromise;
+}
+
 /* ---------- per-branch VEHICLE COLLATERAL (data/branch_vehicles.json) ----------
    DLT province vehicle stock allocated to each 10km catchment: est fleet by type + collateral
    mix + pickup share + a title-loan-able collateral score. Shape: { meta:{types,labels,...},
@@ -3982,8 +3998,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadVehicles(),loadRecommendations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPDATA||!VEHDATA||!RECDATA){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadCropland(),loadVehicles(),loadRecommendations()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4281,12 +4297,27 @@ function agriPopupHTML(d,sec,r){
           +`<span class="bar" style="flex:0 0 62px"><i style="width:${w}%;background:${rw.col}"></i></span>`
           +`<b class="mono" style="color:${rw.col};min-width:30px;text-align:right">${pct}%</b></div>`;
       }).join('')+`</div>`;
+  // MEASURED-corrected crop AREA in the catchment (branch_cropland.json): SPAM spatial pattern
+  // rescaled per province to the DOAE-2025 farmer-registry planted area, so the magnitude is
+  // measured (pattern still SPAM). Shown in rai (ha×6.25). Rendered only when the layer is present.
+  const ce=(CROPDATA&&CROPDATA.branches)?CROPDATA.branches[i]:null;
+  let cropCorrected=false;
+  if(ce&&ce.crop_ha>0){
+    const rai=Math.round(ce.crop_ha*6.25);
+    const domLab=(ce.dom!=null&&crops[ce.dom])?crops[ce.dom].label:null;
+    html+=r('Crop area ≤10km (DOAE-corrected)',
+      `<b style="color:var(--gold)">~${rai.toLocaleString()} rai</b>`
+      +(domLab?` · ${domLab}-led`:'')+` ${TAG_M}`, 'var(--gold)');
+    cropCorrected=true;
+  }
   html+=r('Farm-gate price YoY (crop mix)', `<b style="color:${ycol}">${yoyStr}</b> `+TAG_M, ycol);
   if(e.rain_anom!=null) html+=r('Rainfall (3-mo, % of normal)', e.rain_anom+'% '+TAG_M,
       e.rain_anom<90?'var(--gold)':'#8b90a7');
   html+=r('Agri pressure (price + drought)', `<b style="color:${pcol}">${e.agri_pressure}</b> / 100 ${TAG_E}`, pcol);
   if(e.income_est>0) html+=r('Est. gross farm income ≤10km', '฿'+(e.income_est/1e6).toFixed(1)+'M/yr '+TAG_E, 'var(--merch)');
-  html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">crop mix SPAM (modelled); price YoY MEASURED · OAE farm-gate; rainfall MEASURED · HDX; income + pressure ESTIMATED. Serves portfolio/PD risk.</div>`;
+  html+=`<div class="sub" style="margin:2px 0 0;font-size:10px">crop mix SPAM (modelled)`
+    +(cropCorrected?'; crop area MEASURED magnitude · DOAE-2025 registry, SPAM pattern':'')
+    +`; price YoY MEASURED · OAE farm-gate; rainfall MEASURED · HDX; income + pressure ESTIMATED. Serves portfolio/PD risk.</div>`;
   return html;
 }
 // VEHICLE COLLATERAL block — AutoX's title-loan asset base (data/branch_vehicles.json). Estimated

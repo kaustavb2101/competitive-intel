@@ -5,6 +5,37 @@ don't re-litigate settled choices.
 
 ---
 
+## 2026-07-16 (integration) — CROP: surface the MEASURED-corrected per-branch crop AREA on the National-map branch popup — PR
+
+Integration loop, objective #1 (portfolio/PD risk). Backlog item #2 ("wire the new per-branch crop
+layer") was **half-done**: `build_branch_cropland.py` builds `platform/data/branch_cropland.json` in
+the gate and it is in `provenance.json`, but **nothing consumed it** — the layer was invisible in the
+app. `branch_cropland.json` is the *measured-corrected* crop layer: the SPAM-2010 modelled spatial
+pattern rescaled per province to the **DOAE-2025 farmer-registry MEASURED planted area**, so the
+crop-**area magnitude** is measured (the spatial pattern is still SPAM/estimated). The app's existing
+Agriculture popup (`agriPopupHTML`) only ever showed the pure-SPAM crop-mix **shares** (dimensionless)
+— no measured area anywhere.
+
+**Fix (`platform/app.js` only, +34/−3):** lazy-loads `branch_cropland.json` (new `CROPDATA` +
+`loadCropland()`, modelled on `loadAgri`, wired into the popup lazy-load re-render trigger) and adds one
+readout line to the Agriculture block: **"Crop area ≤10km (DOAE-corrected) · ~N rai · <crop>-led"**,
+tagged MEASURED, with the sub-note expanded to "crop area MEASURED magnitude · DOAE-2025 registry, SPAM
+pattern". Rai = catchment `crop_ha × 6.25`. The layer is INDEX-ALIGNED to `branches.json` (verified
+crop-order match rice/cassava/maize/oilpalm/sugarcane) and fully null-guarded — an absent
+`branch_cropland.json` simply omits the line (graceful-absence idiom). **No data file altered, no
+recompute, provenance untouched** — pure rendering of already-committed measured data.
+
+**Verify:** `bash tests/run.sh check` → **62 passed, 0 failed**; `node --check platform/app.js` clean;
+headless render at 1280×900 exercised `agriPopupHTML` for a cropland branch (สาขายายร้า) → renders
+"~13,467 rai · Sugarcane-led" (= 2154.7 ha × 6.25 ✓), sub-note present, **no page/JS errors** (only
+external-tile `ERR_CONNECTION_RESET`, sandbox-blocked CDN, unrelated). Diff = exactly `app.js` + this
+log entry; no secrets. Opened as a **draft PR** (visual/behaviour change per the ship rule).
+
+**Next integration:** the branch/province deep-dive pages (`province.html`) still show only SPAM crop
+mix — carry the same DOAE-corrected area readout there; and pull the remaining data.go.th province
+layers (DBD new-co demand, MOT/Excise collateral) once a Thai-IP `pull_datagoth.py` cache lands (still
+CI-blocked).
+
 ## 2026-07-13 (intelligence) — PEER: surface the MEASURED PICO-finance rival column in the peer board — SHIPPED
 
 Intelligence loop, PEER-COMPARISON pillar. Backlog was 0-open / 96% done, so audited the pillar for a
