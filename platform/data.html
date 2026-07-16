@@ -236,25 +236,27 @@ function wireTable(rows){
   tbl.querySelectorAll('th').forEach(function(th){
     th.addEventListener('click',function(){var c=+th.getAttribute('data-c');
       if(sortState.c===c)sortState.dir*=-1;else{sortState.c=c;sortState.dir=(c===0?1:-1);}
-      applySort(rows);});
+      applySort();}); // no arg -> re-sort the table's CURRENT (possibly region-filtered) row set
   });
   tbl.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-slug'))location.href='?p='+encodeURIComponent(tr.getAttribute('data-slug'))+THEME_QS;});
 }
+// #ptbl.__rows is the single source of truth for what the table is currently showing. Pass `rows`
+// to swap the set (initial render / region filter); call with no arg to re-sort what's already there
+// so a column-sort after a filter keeps the filter instead of reverting to all 77 provinces.
 function applySort(rows){
+  var tbl=document.getElementById('ptbl'); if(!tbl)return;
+  if(rows)tbl.__rows=rows; else rows=tbl.__rows||[];
   var c=COLS[sortState.c];
   rows.sort(function(a,b){var x=c.get(a),y=c.get(b);if(typeof x==='string')return sortState.dir*x.localeCompare(y);return sortState.dir*(x-y);});
-  var tb=document.querySelector('#ptbl tbody'); if(tb)tb.innerHTML=rows.map(rowHtml).join('');
-  document.querySelectorAll('#ptbl th').forEach(function(th,i){th.classList.remove('sort-asc','sort-desc');if(i===sortState.c)th.classList.add(sortState.dir>0?'sort-asc':'sort-desc');});
+  var tb=tbl.querySelector('tbody'); if(tb)tb.innerHTML=rows.map(rowHtml).join('');
+  tbl.querySelectorAll('th').forEach(function(th,i){th.classList.remove('sort-asc','sort-desc');if(i===sortState.c)th.classList.add(sortState.dir>0?'sort-asc':'sort-desc');});
 }
 function wireFilter(allRows){
   var box=document.getElementById('regfilter'); if(!box)return;
   box.addEventListener('click',function(e){var b=e.target.closest('.db-chip');if(!b)return;
     box.querySelectorAll('.db-chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');
     var r=b.getAttribute('data-r');var rows=r?allRows.filter(function(p){return p.region===r;}):allRows.slice();
-    applySort(rows);
-    var tb=document.querySelector('#ptbl tbody');
-    document.querySelector('#ptbl').__rows=rows;
-    // rebind row click set by re-rendering handled in applySort; ensure click still works via delegation (already bound to tbody)
+    applySort(rows); // swaps the table's row set to the filtered view; subsequent column-sorts stick to it
   });
 }
 
