@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-16T10:13:22+00:00",
-    "commit": "e96b75c"
+    "generated_at": "2026-07-16T16:10:52+00:00",
+    "commit": "bc071e9"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,9 +480,75 @@
   ],
   "activity": [
     {
-      "date": "2026-07-16T10:13:22+00:00",
-      "sha": "e96b75c",
-      "summary": "fix(decision-queue): stop emitting forbidden expand/\"open next\" rows (consolidation scope)",
+      "date": "2026-07-16T16:10:52+00:00",
+      "sha": "bc071e9",
+      "summary": "fix(gate): regenerate drifted provenance ledger — CI gate was red on master",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-16T22:08:23+07:00",
+      "sha": "911cdc6",
+      "summary": "refactor(consolidation): remove dead branch-expansion code from app.js",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-16T21:33:45+07:00",
+      "sha": "ec1907f",
+      "summary": "feat(data-book): numbers-first province→region rollup page (data.html)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-16T14:21:42+00:00",
+      "sha": "aae06d4",
+      "summary": "docs: record theme-color deploy-verify result (PR #45)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T14:20:50+00:00",
+      "sha": "ead01a9",
+      "summary": "docs: log theme-color meta ship + CI-runner outage note (PR #45)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T21:20:10+07:00",
+      "sha": "0074229",
+      "summary": "ux: track mobile browser chrome via theme-color meta (#45)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T21:17:33+07:00",
+      "sha": "56f1fb0",
+      "summary": "security: scrub real API keys from .env.example → placeholders",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-16T21:02:29+07:00",
+      "sha": "4c1476b",
+      "summary": "integration: DBD new-company formation → measured per-province demand layer (#34)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-16T20:18:15+07:00",
+      "sha": "b3a1b5b",
+      "summary": "feat(branch): surface MEASURED-corrected per-branch crop-area in the branch popup (#43)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-16T19:32:37+07:00",
+      "sha": "7df7a82",
+      "summary": "docs: record status.html light-default deploy-verify result (#44)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-16T19:28:55+07:00",
+      "sha": "b8e930b",
+      "summary": "ux: default status.html to the light theme, consistent with every page (#27)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T17:17:29+07:00",
+      "sha": "80fb621",
+      "summary": "fix(decision-queue): stop emitting forbidden expand/\"open next\" rows (consolidation scope) (#42)",
       "pillar": "deployment"
     },
     {
@@ -592,72 +658,6 @@
       "sha": "c163b56",
       "summary": "docs: log ux-search-a11y merge + deploy-verify (PR #29)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T03:12:18+07:00",
-      "sha": "71c6ef2",
-      "summary": "ux: search inputs — accessible name + native clear button (#29)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T19:41:28+00:00",
-      "sha": "8e5e549",
-      "summary": "chore(dashboard): refresh autonomy plan after provenance gate fix",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T19:38:03+00:00",
-      "sha": "5235381",
-      "summary": "fix(provenance): regenerate byte-size manifest — 17 drifted layers turned the gate red",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T21:32:08+07:00",
-      "sha": "93bc1ed",
-      "summary": "chore(dashboard): dep-access verified done → 96% (48/50); only owner-blocked loan-tape remains",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-12T21:25:42+07:00",
-      "sha": "0f3d2d2",
-      "summary": "fix(dep-access): keep WWW-Authenticate realm ASCII so the browser shows a login prompt",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T21:23:47+07:00",
-      "sha": "b68f627",
-      "summary": "feat(province): wire competitor panel/map/KPI to the national census",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-12T21:16:06+07:00",
-      "sha": "d50d016",
-      "summary": "fix(dep-access): move Edge Middleware to repo root so Vercel actually runs it",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T21:07:52+07:00",
-      "sha": "bd66095",
-      "summary": "fix(3d): gate self-drawn ground on raster presence, not just studio (keep 'light' basemap's paper bed)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T21:06:50+07:00",
-      "sha": "8376ac7",
-      "summary": "fix(3d): don't draw the opaque ground bed on raster basemaps (satellite)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T21:03:34+07:00",
-      "sha": "246d429",
-      "summary": "feat(access): password-gate the deployment via Edge Middleware (Basic Auth)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-12T19:48:23+07:00",
-      "sha": "6a4680d",
-      "summary": "fix(isochrone): strip ORS_KEY (trailing newline in the secret corrupted the Authorization header -> 'Invalid header value')",
-      "pillar": "3d-enrichment"
     }
   ]
 }
