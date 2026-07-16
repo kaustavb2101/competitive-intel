@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-16 — Integration loop: surface the MEASURED-corrected per-branch crop-area layer in the branch popup — PR
+
+Integration loop (backlog #2). `pipeline/build_branch_cropland.py` → `platform/data/branch_cropland.json`
+was already built, `--check`-gated (`tests/run.sh`), and provenance-stamped — but the data was a **dangling
+fold**: fetched by nothing in the app, so the owner never saw it (same "present in data yet invisible in the
+UI" pattern the PICO fold hit). Backlog #2 asks specifically to "surface it in the app (a per-branch measured
+crop-area readout … honestly labelled)".
+
+- **What the layer adds (vs the existing agri block):** `branch_agri.json` already renders crop **shares**
+  (%, SPAM-modelled) in the branch popup. `branch_cropland.json` adds the complementary **absolute
+  MAGNITUDE** — per-crop hectares in the 10km catchment, SPAM-2010's within-province spatial pattern
+  **rescaled to DOAE's MEASURED 2025 provincial planted-area** (rai/6.25). A branch with 24,000 crop-ha vs
+  500 crop-ha in its catchment is a very different agri-PD exposure profile, invisible in shares alone. This
+  is the honest **measured-corrected** area the backlog wanted surfaced.
+- **Fix (`platform/app.js` only):** mirrors the established `branch_density` one-block idiom — a lazy loader
+  (`loadBranchCropland`), a null-guarded index-aligned accessor (`croplandRec`), and a compact popup block
+  (`croplandPopupHTML`) inserted right after the agri block in `popupHTML`. Renders: total crop area ≤10km,
+  dominant crop + its ha, and the top-3 crops by ha. Honest sub-line: "absolute hectares MEASURED-CORRECTED
+  to DOAE 2025 farmer-registry provincial planted area; SPAM-2010 supplies the within-province spatial
+  pattern (modelled); sugarcane uncorrected (OCSB)." Warmed on map init and re-rendered on late fetch,
+  alongside the other per-branch layers. Fully null-guarded — absent file → block omitted, nothing
+  fabricated. Only renders for the 2,003/2,015 branches with `crop_ha>0`.
+- **No data file changed** — pure rendering of already-committed, already-gated data. `build_provenance.py`
+  regenerated (no drift). This is a **visual** change, so shipped as a PR (not a direct master commit) per
+  the loop's own rule.
+- **Safeguards (all passed):** (a) `node --check app.js` OK. (b) `bash tests/run.sh check` → **62 passed,
+  0 failed** (incl. `build_branch_cropland.py --check` byte-exact + `validate_data.py` 446/446).
+  (c) `build_provenance.py` regenerated, gate-clean, no data drift. (d) Popup logic verified against the real
+  `branch_cropland.json` in an isolated Node harness: totals (23,946 ha / dominant Rice 21,855 ha),
+  dominant-crop consistency (0 mismatches vs the data's own `dom` index across all branches), and zero-branch
+  omission all correct. (e) Headless render of `index.html#map` (self-hosted Leaflet, chromium): probe
+  `data-errors="[]"` (zero uncaught JS) + `data-leaflet="1"` (National map initialised) — app.js loads and
+  runs clean. (f) No secrets in diff; diff = `app.js` + this log entry only.
+
 ## 2026-07-16 — Intelligence loop: PLANNING/MARKET — purge the forbidden "expand/open" rows from the exec decision queue — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Backlog 0-open / 96% done; deploy healthy
