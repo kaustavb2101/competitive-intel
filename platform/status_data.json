@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-13T23:11:03+07:00",
-    "commit": "1ef9007"
+    "generated_at": "2026-07-16T11:20:44+07:00",
+    "commit": "f13cfc4"
   },
   "overall": {
     "progress_pct": 96,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-13",
+    "eta_date": "2026-07-16",
     "done_items": 48,
     "in_progress_items": 2,
     "open_items": 0,
@@ -480,6 +480,30 @@
   ],
   "activity": [
     {
+      "date": "2026-07-16T11:20:44+07:00",
+      "sha": "f13cfc4",
+      "summary": "feat(peer): surface AutoX's competitive RANK per province in the peer board (#40)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-16T03:25:53+00:00",
+      "sha": "2aadd61",
+      "summary": "docs: log color-scheme theme-tracking ship + deploy-verify (PR #38)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T10:23:58+07:00",
+      "sha": "44312db",
+      "summary": "ux: theme-track native scrollbars/controls via color-scheme (#38)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-13T16:11:56+00:00",
+      "sha": "092d49c",
+      "summary": "docs: log peer PICO-column ship + refresh CEO dashboard (PR #36)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-13T23:11:03+07:00",
       "sha": "1ef9007",
       "summary": "feat(peer): surface the MEASURED PICO-finance rival column in the per-province peer board (#36)",
@@ -634,30 +658,6 @@
       "sha": "43deaa1",
       "summary": "feat(3d): true 15-min ORS drive-time isochrones (replace walk-radius)",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T19:19:15+07:00",
-      "sha": "30f6d01",
-      "summary": "dashboard: reflect genuinely-done pillar items (prod deploy, national census, 3D-on-R2)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-12T18:27:35+07:00",
-      "sha": "b55598e",
-      "summary": "Merge remote-tracking branch 'origin/claude/ux-catchup'",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T18:25:07+07:00",
-      "sha": "ed04799",
-      "summary": "Merge remote-tracking branch 'origin/claude/data-catchup'",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-12T11:21:32+00:00",
-      "sha": "39530e0",
-      "summary": "docs: log ux-loop scenery-fetch 404 fix (PR #22 merged + deploy-verified)",
-      "pillar": "uxui"
     }
   ]
 }
