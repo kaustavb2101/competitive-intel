@@ -1307,3 +1307,38 @@ Kaustav deploys).
   signature to PR #29/#31; a broken deploy would 404/500/fail-to-connect. Healthy gated deploy, **no
   rollback**. HTML couldn't be byte-verified through the auth gate (no `SITE_PASSWORD` in the loop env);
   the served CSS change was verified via headless render pre-merge.
+
+## 2026-07-16 — UX loop: theme-track native UA surfaces via `color-scheme` — merged & deployed
+- **Finding (new, self-review — backlog #1–8 all shipped):** no page in `platform/` declared a
+  `color-scheme`, so native UA surfaces (scrollbars, form controls, the pre-paint canvas background,
+  iOS rubber-band overscroll) rendered in the **OS** scheme regardless of the app's chosen theme —
+  dark-console users got OS-default *light* scrollbars against the dark chrome (and vice-versa).
+- **Fix (`platform/styles.css`, 2 declarations + comments):** `color-scheme:dark` on the canonical
+  `:root` (Indigo Console base) + `color-scheme:light` on `html[data-theme="light"]` (Paper Console).
+  Keys off the `data-theme` attr the pre-paint `<script>` sets synchronously, so it applies from the
+  first frame and auto-follows the toggle across all 5 styles.css pages (index/province/
+  rayong-catchment/branch-explorer/status). CSS-only, no per-page JS.
+- **Safeguards (all passed):** (a) `bash tests/run.sh check` → **62 passed, 0 failed**. (b) computed
+  `getComputedStyle(html).colorScheme` = `light` on default load, `dark` on `?theme=dark` (confirms it
+  tracks the active theme); headless renders of `index.html` (light) + `index.html?theme=dark` (dark)
+  at 1100×800 read back clean — full layout intact, **0 console errors**, no visible regression.
+  (c) no secrets in diff. (d) diff = `styles.css` + a one-line `docs/UXUI_AUDIT.md` fixed entry, no
+  stray files.
+- **Merge:** PR #38 squash-merged to master (`44312db`), session auto-unsubscribed on merge.
+- **CI note (pre-existing, NOT caused by this change):** the GitHub `qa` Action failed with **empty
+  output** (no summary/text/logs → HTTP 404) — the same ~2s startup infra/quota failure logged for PRs
+  #29/#31/#32/#35/#36, red on master heads too. It cannot be affected by a 2-line CSS diff (touches no
+  pipeline data; the real content gate — the local determinism gate — passed 0-failed). `qa` is not a
+  required check (`mergeable_state: unstable`, not `blocked`), so the merge was permitted. **Owner
+  action still recommended: investigate why the `qa` runner aborts at startup.**
+- **Deploy verify:** master auto-deployed. Vercel API confirms production deployment
+  `dpl_2jvFXLgU5Eg5CrHyNvb7tvAukFeu` = commit `44312db`, `target: production`, `state: READY`, on the
+  master production alias. Alias returns HTTP **401** on `/` + `/styles.css` and **308** on
+  `/index.html` (the intentional `middleware.js` Basic-Auth gate) — identical signature to PR #29/#31/
+  #32/#35; a broken deploy would 404/500/fail-to-connect. The Vercel PR-preview also built **Ready**.
+  Healthy gated deploy, **no rollback**. HTML couldn't be byte-verified through the auth gate (no
+  `SITE_PASSWORD` in the loop env); the CSS change was verified via headless render + computed-style
+  probe pre-merge.
+- **Backlog continuation:** logged `ux-theme-color` (NEW, polish) — `<meta name="theme-color">` for the
+  mobile browser UI bar is still absent; correct fix must track `data-theme` (JS, not CSS), deferred to
+  keep this run surgical.
