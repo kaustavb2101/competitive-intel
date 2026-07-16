@@ -3,6 +3,32 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-16 — UX loop: Data book — region filter now persists when re-sorting the province table — SHIPPED (auto-merged #47, deploy READY)
+
+Autonomous UX loop. All 8 backlog findings in `docs/UXUI_AUDIT.md` were already fixed, so I reviewed
+the newest route (`data.html`, the numbers-first Data book) and found a real functional bug.
+
+- **Finding (functional):** On the national view's 77-province table, filtering to one region (region
+  chips) and then clicking a column header to re-sort **silently reverted the table to all 77
+  provinces**, discarding the filter. The `th` sort handler closed over the stale full `allProv`
+  array, while the `#ptbl.__rows` field that was clearly meant to be the shared source of truth was
+  set in `wireFilter` but never read anywhere.
+- **Fix:** Made `#ptbl.__rows` the single source of truth. `applySort(rows)` with an arg swaps the set
+  (initial render / region filter); `applySort()` with no arg re-sorts whatever is currently there —
+  so a column-sort after a filter now **keeps the filter**. Removed the dead `__rows` write + stale
+  comment. Surgical (`platform/data.html`, ~10 lines), no visual change to the default render.
+- **Safeguards (all pass):** `bash tests/run.sh check` = **64 passed, 0 failed** (incl. `node --check`
+  on data.html inline JS + 446 data-integrity checks); headless render of `data.html` (national) = OK,
+  no runtime errors, default render **byte-identical** to pre-fix (as expected — interaction-only fix);
+  no secrets in diff; only `platform/data.html` + one-line `docs/UXUI_AUDIT.md` log entry.
+- **Merge + deploy:** PR **#47** marked ready → **squash-merged** to master (`41c706c`), branch deleted.
+  Vercel production deployment `dpl_CBaUp4tFvT1bH83bTRdPjtXDevrv` = **READY** (target production, master,
+  verified SHA). Prod alias curls return **401** = the intentional `middleware.js` Basic-Auth gate
+  (uniform across all routes incl. untouched root; a static JS edit cannot cause it) — pre-existing
+  protected state, **not a regression**, so no rollback.
+- **Recommend next:** the region-filter chips only appear on the national table; consider carrying a
+  `?r=<region>` deep-link into the filter state so a filtered view is shareable/bookmarkable.
+
 ## 2026-07-16 — Intelligence loop: DEPLOY/SERVICE HEALTH — regenerate the drifted provenance ledger (CI gate was RED on master) — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Deploy-health probe first: the master
