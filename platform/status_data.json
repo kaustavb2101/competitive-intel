@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-16T16:15:37Z",
-    "commit": "35a6653"
+    "generated_at": "2026-07-16T20:14:24Z",
+    "commit": "52e96e7"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,24 @@
   ],
   "activity": [
     {
+      "date": "2026-07-16T20:14:24Z",
+      "sha": "52e96e7",
+      "summary": "docs(progress-log): record ux-loop data-book filter/sort fix — merged #47, deploy READY",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-17T03:11:07+07:00",
+      "sha": "41c706c",
+      "summary": "ux: data book — region filter now persists when re-sorting the province table (#47)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-16T16:22:52Z",
+      "sha": "0ea7eb6",
+      "summary": "committee: refresh autonomy plan (run 29515234336)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-16T16:15:37Z",
       "sha": "35a6653",
       "summary": "chore(dashboard): refresh autonomy plan after provenance-gate fix",
@@ -640,24 +658,6 @@
       "sha": "aae9c13",
       "summary": "fix(deploy-health): nightly site-health probe watches master PROD alias (auth-aware)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-13T02:29:49Z",
-      "sha": "77926cd",
-      "summary": "docs: log ux-map-overlap-tablet merge + deploy-verify (PR #31)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T09:27:07+07:00",
-      "sha": "c36d5d5",
-      "summary": "ux: #map zoom overlaps lens pills on tablet/foldable widths (431–760px) (#31)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-12T22:10:14Z",
-      "sha": "6b16d21",
-      "summary": "service: capture 6 layers' dropped freshness vintages + emit SERVICE_AUDIT",
-      "pillar": "feature"
     }
   ]
 }
