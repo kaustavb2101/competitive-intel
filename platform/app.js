@@ -1536,10 +1536,10 @@ function renderAcq(){
   renderRivalDensity();
   renderPeerProvince();
   renderExitWhitespace();
-  // REMOVED (strategy pivot — network consolidating, not growing): renderRoad3k() [branch-growth
-  // headroom allocation], renderExpansionPlan() [sequenced growth plan] and renderOppScore()
-  // [composite "where to open next" leaderboard] are no longer surfaced. Their DOM was removed and
-  // their functions + data files are left dormant on disk for reversibility.
+  // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
+  // (Road-to-3,000 headroom split, sequenced expansion plan, "where to open next" opportunity board)
+  // and their CSV exports have been REMOVED from this file entirely. The scope is competitive risk on
+  // the existing footprint; nothing here recommends where to open branches.
 }
 
 /* ---------- Where demand searches · title-loan search interest by province (obj #2) ----------
@@ -1818,86 +1818,6 @@ function drawPeerProvince(){
   }
 }
 
-/* ---------- composite opportunity score · where to open next (item 2) ----------
-   Surfaces data/opportunity_score.json (928 districts, built by pipeline/build_opportunity_score.py):
-   an ESTIMATED COMPOSITE blending MEASURED white-space + MEASURED competitor-gap with ESTIMATED
-   province agri-stress. We DO NOT recompute it here — we just rank & show the top districts with each
-   component exposed, so the number stays honest. Lazy-loaded once; graceful if absent/empty. */
-let OPPSCORE=null, oppLoaded=false;
-const OPP_TOPN=20;
-function renderOppScore(){
-  const tbl=$('#opptbl'); if(!tbl) return;
-  if(oppLoaded){ drawOppScore(); return; }
-  fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null).then(j=>{
-    OPPSCORE=j; oppLoaded=true; drawOppScore();
-  }).catch(()=>{ OPPSCORE=null; oppLoaded=true; drawOppScore(); });
-}
-// LEAD WITH THE VERDICT — colored card at the top of the Acquisition tab, built ONLY from the loaded
-// opportunity_score data. Omits gracefully when the layer is absent (card hidden, no fabrication).
-function renderAcqVerdict(){
-  const box=$('#acq-verdict'); if(!box) return;
-  const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
-  if(!rows.length){ box.style.display='none'; box.innerHTML=''; return; }
-  const t=rows.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; if(!t||!t.name){ box.style.display='none'; return; }
-  const c=t.components||{};
-  // measured rival branches ≤5km of the top district (components._competitors); fall back to the
-  // competitor-gap score when the raw count isn't present.
-  const compTxt=(c._competitors!=null)
-    ? `${c._competitors} rivals ≤5km`
-    : `competitor-gap ${Math.round(c.competitor_gap||0)}/100`;
-  box.style.display='block';
-  box.innerHTML=`<div class="verdict-line">🏆 <b>Open next: ${t.name}</b> — ${Math.round(t.score||0)}/100 opportunity`+
-    ` · <span style="color:var(--gold)">${compTxt}</span></div>`+
-    `<div class="sub" style="margin-top:4px">${t.province||''}${t.region?' · '+t.region:''} · `+
-    `white-space ${Math.round(c.whitespace||0)} · competitor-gap ${Math.round(c.competitor_gap||0)} · agri-stress ${Math.round(c.agri_stress||0)} ${TAG_E}</div>`;
-}
-function drawOppScore(){
-  const tbl=$('#opptbl'), ro=$('#oppreadout'); if(!tbl) return;
-  const rows=(OPPSCORE&&Array.isArray(OPPSCORE.districts))?OPPSCORE.districts:[];
-  renderAcqVerdict();
-  if(!rows.length){
-    tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Opportunity score not yet computed.</b> <span class="sub">This layer is being prepared — the leaderboard fills in on the next data refresh.</span>';
-    return;
-  }
-  // already sorted (score desc) in the file, but sort defensively so the view is stable
-  const top=rows.slice().sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,OPP_TOPN);
-  // component colours per CLAUDE.md: white-space = gold, competitor-gap = merchant, agri-stress = agri
-  const cell=(v,color)=>{const n=Math.round(v||0); return `<td>${barHTML(n,color)} <span class="mono" style="color:${color}">${n}</span></td>`;};
-  tbl.innerHTML=`<tr><th>#</th>`+
-    `<th class="h-opp" title="ESTIMATED COMPOSITE (0–100): weighted blend of the three components. Higher = open here sooner. A ranking aid, not a measured quantity.">Opportunity ★ est</th>`+
-    `<th>District (amphoe)</th><th>Province</th><th>Region</th>`+
-    `<th title="AutoX branches inside the district (measured)">AutoX</th>`+
-    `<th class="h-opp" title="MEASURED — district demand proxy minus AutoX saturation (0–100). Higher = more underserved.">White-space ★</th>`+
-    `<th class="h-opp" title="MEASURED — 100 minus normalised rival-branch count (0–100). Higher = fewer competitors = more room.">Competitor-gap</th>`+
-    `<th class="h-opp" title="ESTIMATED — province-inherited crop-household stress (0–100). A demand-pull signal, not a measured default rate.">Agri-stress est</th></tr>`+
-    top.map((d,i)=>{
-      const c=d.components||{};
-      const sc=Math.round(d.score||0);
-      return `<tr>
-        <td class="mono sub">${i+1}</td>
-        <td>${barHTML(sc,'var(--accent)')} <span class="mono" style="color:var(--accent)"><b>${sc}</b></span></td>
-        <td><b>${d.name||'—'}</b></td>
-        <td>${d.province||'—'}</td>
-        <td class="sub">${d.region||'—'}</td>
-        <td class="mono sub">${d.branches==null?'—':d.branches}</td>
-        ${cell(c.whitespace,'var(--gold)')}
-        ${cell(c.competitor_gap,'var(--merch)')}
-        ${cell(c.agri_stress,'var(--agri)')}
-      </tr>`;}).join('');
-  if(ro){
-    const t=top[0], m=OPPSCORE.meta||{};
-    const w=m.weights_effective||m.weights_full||{};
-    const wtxt=(w.whitespace!=null)?` Weights: white-space ${Math.round(w.whitespace*100)}% · competitor-gap ${Math.round((w.competitor_gap||0)*100)}% · agri-stress ${Math.round((w.agri_stress||0)*100)}%.`:'';
-    // The gold hero banner (#acq-verdict) already states the answer — here just frame the table columns
-    // (avoids stating "open next: X" three times before the ranked evidence).
-    ro.innerHTML=`Ranked by an <b>estimated composite</b> (0–100): white-space + competitor-gap <b>measured</b>, agri-stress province-inherited <b>estimated</b> — each component shown per row. ${TAG_E}`+
-      methodBox(`Top ${top.length} of ${rows.length} districts.${wtxt}`,
-        ['<b>ESTIMATED COMPOSITE</b> — a ranking aid for expansion, not a measured quantity.',
-         'White-space &amp; competitor-gap components are <b>measured</b>; agri-stress is <b>province-inherited estimated</b>.']);
-  }
-}
-
 /* ---------- competitor-exit white-space · regulatory tailwind (obj #2) ----------
    Surfaces data/exit_whitespace.json (928 districts, built by pipeline/build_exit_whitespace.py).
    ESTIMATED PROXY: where AutoX could CAPTURE SHARE if marginal sub-scale operators exit under the
@@ -1953,191 +1873,6 @@ function drawExitWhitespace(){
       coverage-gap ${Math.round(t0.whitespace||0)}, big-4 branches ${t0.big4_competitors==null?'—':t0.big4_competitors}.
       <span class="sub">Top ${top.length} of ${rows.length} districts. ESTIMATED PROXY — inferred from big-4 scarcity (${cc.points_joined||0} censused points, brands: ${(cc.brands_censused||[]).join(' · ')||'—'}) × local demand, NOT a measurement of sub-scale operators. Thesis: registration window closes ${dl}; marginal lenders may exit.</span>`;
   }
-}
-
-/* ---------- Road to 3,000 · regional headroom allocation ----------
-   Splits the net-new branches (3,000 target − current) across the 5 regions, proportional to
-   remaining headroom. Capacity proxy = regional WORKFORCE (informal+formal employment, NSO,
-   measured) aggregated from data/provinces/index.json — a market-SIZE stand-in, NOT a demand or
-   revenue model. Saturation = branches per 100k workforce. Headroom = the gap to the
-   branches-per-100k density that the 3,000-branch target implies nationally:
-     fair_share@3000 = TARGET × (region workforce / national workforce)
-     headroom        = max(0, fair_share@3000 − current branches)
-     alloc           = NET_NEW × (region headroom / Σ headroom)   [largest-remainder rounding → Σ = TARGET]
-   Everything here is an ILLUSTRATIVE planning split, labelled as such. */
-const R3K_TARGET=3000;
-let r3kRows=[], r3kNet=0;
-function computeRoad3k(){
-  if(!PROV||!PROV.length) return null;
-  const byReg={};
-  PROV.forEach(p=>{const r=p.region||'—';
-    const o=byReg[r]||(byReg[r]={r,branches:0,wf:0});
-    o.branches+=p.branches||0;
-    o.wf+=(p.informal||0)+(p.formal||0);   // workforce capacity proxy (NSO, measured); nulls treated as 0
-  });
-  const regs=Object.values(byReg).filter(o=>o.wf>0);
-  const totBr=regs.reduce((s,o)=>s+o.branches,0);
-  const totWf=regs.reduce((s,o)=>s+o.wf,0);
-  if(!totWf||!totBr) return null;
-  const net=Math.max(0,R3K_TARGET-totBr);
-  // headroom relative to the per-workforce density implied by the 3,000 target
-  regs.forEach(o=>{
-    o.fair=R3K_TARGET*o.wf/totWf;
-    o.headroom=Math.max(0,o.fair-o.branches);
-    o.sat=o.branches/o.wf*1e5;            // branches per 100k workforce (current saturation)
-  });
-  const totHr=regs.reduce((s,o)=>s+o.headroom,0);
-  // largest-remainder allocation so the alloc sums to exactly `net`
-  if(totHr>0){
-    regs.forEach(o=>{o._raw=net*o.headroom/totHr; o.alloc=Math.floor(o._raw); o._rem=o._raw-o.alloc;});
-    let assigned=regs.reduce((s,o)=>s+o.alloc,0);
-    regs.sort((a,b)=>b._rem-a._rem).forEach(o=>{ if(assigned<net){o.alloc++;assigned++;} });
-  } else { regs.forEach(o=>o.alloc=0); }
-  regs.forEach(o=>{o.targetBranches=o.branches+o.alloc;});
-  regs.sort((a,b)=>b.alloc-a.alloc);
-  r3kRows=regs; r3kNet=net;
-  return {regs,net,totBr,totWf,totHr};
-}
-function renderRoad3k(){
-  if(!$('#r3ktbl')) return;
-  const c=computeRoad3k();
-  if(!c){ $('#r3ktbl').innerHTML='<tr><td class="sub">Workforce data not available (data/provinces/index.json).</td></tr>'; return; }
-  const {regs,net,totBr}=c;
-  if($('#r3kcur')) $('#r3kcur').textContent=totBr.toLocaleString();
-  if($('#r3knet')) $('#r3knet').textContent=net.toLocaleString();
-  const mxT=Math.max(1,...regs.map(o=>o.targetBranches));   // shared scale: current & target bars comparable
-  const mxA=Math.max(1,...regs.map(o=>o.alloc));
-  $('#r3ktbl').innerHTML=`<tr><th>Region</th>`+
-    `<th title="AutoX branches today (measured)">Now</th>`+
-    `<th title="regional workforce = informal + formal employment (NSO, measured) — a market-SIZE proxy, not demand">Workforce</th>`+
-    `<th title="branches per 100k workforce — lower = more headroom">Per 100k</th>`+
-    `<th class="h-opp" title="gap to the branches-per-100k density that the 3,000 target implies nationally">Headroom est</th>`+
-    `<th class="h-opp" title="net-new branches allocated to this region, proportional to headroom (illustrative split)">+ New</th>`+
-    `<th title="now vs target (illustrative). Filled = current, outline tick = target">Now → 3,000 (target)</th>`+
-    `<th title="branches at the 3,000-branch target">Target</th></tr>`+
-    regs.map(o=>{
-      const curW=Math.round(62*Math.min(o.branches,mxT)/mxT);
-      const tgtW=Math.round(62*Math.min(o.targetBranches,mxT)/mxT);
-      const ac=o.alloc>0?'var(--gold)':'var(--mid)';
-      // dual bar: gold target outline behind, blue (accent) current filled in front, gold tick at target
-      const dual=`<span class="bar" style="position:relative;width:62px">`+
-        `<i style="position:absolute;left:0;top:0;width:${tgtW}px;background:rgba(230,180,80,.22)"></i>`+
-        `<i style="position:absolute;left:0;top:0;width:${curW}px;background:var(--accent)"></i>`+
-        `</span>`;
-      return `<tr>
-        <td><b>${o.r}</b></td>
-        <td class="mono">${o.branches.toLocaleString()}</td>
-        <td class="mono sub">${(o.wf/1e6).toFixed(1)}M</td>
-        <td class="mono sub">${o.sat.toFixed(2)}</td>
-        <td class="mono" style="color:var(--gold)">${Math.round(o.headroom).toLocaleString()}</td>
-        <td>${barHTML(o.alloc,ac,mxA)} <span class="mono" style="color:${ac}">+${o.alloc}</span></td>
-        <td>${dual}</td>
-        <td class="mono" style="color:var(--gold)">${o.targetBranches.toLocaleString()}</td></tr>`;}).join('')+
-    `<tr style="border-top:2px solid var(--line)"><td><b>Total</b></td>`+
-      `<td class="mono"><b>${totBr.toLocaleString()}</b></td>`+
-      `<td class="mono sub">${(c.totWf/1e6).toFixed(1)}M</td><td></td>`+
-      `<td class="mono" style="color:var(--gold)"><b>${regs.reduce((s,o)=>s+Math.round(o.headroom),0).toLocaleString()}</b></td>`+
-      `<td class="mono" style="color:var(--gold)"><b>+${net.toLocaleString()}</b></td><td></td>`+
-      `<td class="mono" style="color:var(--gold)"><b>${(totBr+net).toLocaleString()}</b></td></tr>`;
-  if($('#r3kreadout')){
-    const top=regs[0];
-    const ranked=regs.filter(o=>o.alloc>0).map(o=>`${o.r} +${o.alloc}`).join(' · ');
-    $('#r3kreadout').innerHTML=`<b>Road to 3,000:</b> add <b style="color:var(--gold)">${net.toLocaleString()}</b> branches (${totBr.toLocaleString()} → 3,000).
-      Biggest share goes to <b>${top.r}</b> (<b style="color:var(--gold)">+${top.alloc}</b>) — it is furthest below the workforce-density line.
-      Split: ${ranked}.
-      <span class="sub">Capacity = workforce (NSO, measured); allocation is an illustrative planning proxy, not a demand model — confirm with site surveys.</span>`;
-  }
-  if($('#r3kcsv')&&!$('#r3kcsv').dataset.init){ $('#r3kcsv').onclick=road3kCSV; $('#r3kcsv').dataset.init='1'; }
-}
-function road3kCSV(){
-  if(!r3kRows.length) computeRoad3k();
-  const hdr=['region','branches_now_measured','workforce_informal_plus_formal_nso_measured','branches_per_100k_workforce',
-    'fair_share_at_3000_proxy','headroom_est','net_new_allocated_illustrative','target_branches'];
-  const lines=[hdr.join(',')].concat(r3kRows.map(o=>
-    [o.r,o.branches,o.wf,o.sat.toFixed(3),Math.round(o.fair),Math.round(o.headroom),o.alloc,o.targetBranches]
-      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')));
-  const totBr=r3kRows.reduce((s,o)=>s+o.branches,0), totWf=r3kRows.reduce((s,o)=>s+o.wf,0), totHr=r3kRows.reduce((s,o)=>s+o.headroom,0);
-  lines.push(['Total',totBr,totWf,'',R3K_TARGET,Math.round(totHr),r3kNet,totBr+r3kNet].map(v=>`"${v}"`).join(','));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_road_to_3000.csv'; a.click(); URL.revokeObjectURL(a.href);
-}
-
-/* ---------- Road to 3,000 · SEQUENCED district plan (obj #2) ----------
-   Surfaces data/expansion_plan.json (pipeline/build_expansion_plan.py): all 985 net-new branches
-   placed one at a time by greedy divisor allocation (D'Hondt) over risk-adjusted district demand,
-   with 15km neighbor cannibalization. ESTIMATED planning order over MEASURED demand inputs.
-   We don't recompute here; just rank & expose. Graceful when the file is absent. */
-let EXPLAN=null, explanLoaded=false;
-const EXPLAN_TOPN=25;
-function renderExpansionPlan(){
-  const tbl=$('#r3kseqtbl'); if(!tbl) return;
-  if(explanLoaded){ drawExpansionPlan(); return; }
-  fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null).then(j=>{
-    EXPLAN=j; explanLoaded=true; drawExpansionPlan();
-  }).catch(()=>{ EXPLAN=null; explanLoaded=true; drawExpansionPlan(); });
-}
-function focusExpansionOnMap(i){
-  const d=((EXPLAN||{}).by_amphoe||[])[i]; if(!d||d.cy==null||d.cx==null) return;
-  pendingMapFocus={lat:d.cy,lng:d.cx,name:d.name,val:d.ws||0,label:'coverage gap ★'};
-  if(curLens!=='dws'){ curLens='dws'; if(typeof renderLenses==='function') try{renderLenses();}catch(e){} }
-  history.replaceState(null,'','#map'); showTab('map');
-}
-function drawExpansionPlan(){
-  const tbl=$('#r3kseqtbl'), ro=$('#r3kseqreadout'); if(!tbl) return;
-  const rows=(EXPLAN&&Array.isArray(EXPLAN.by_amphoe))?EXPLAN.by_amphoe:[];
-  if(!rows.length){
-    tbl.innerHTML='';
-    if(ro) ro.innerHTML='<b>Sequenced plan not yet computed.</b> <span class="sub">Run pipeline/build_expansion_plan.py — the leaderboard fills in on the next data refresh. The regional split above still stands.</span>';
-    return;
-  }
-  const top=rows.slice(0,EXPLAN_TOPN);
-  const mxAdd=Math.max(1,...top.map(d=>d.add||0));
-  tbl.innerHTML=`<tr><th>#</th><th>District (amphoe)</th><th>Province</th><th>Region</th>`+
-    `<th title="AutoX branches in the district today (measured, PIP-joined)">Now</th>`+
-    `<th class="h-opp" title="ESTIMATED — net-new branches the sequence places here (of 985)">+ New</th>`+
-    `<th class="h-opp" title="Position of this district's FIRST branch in the 985-placement sequence — lower = open sooner">First at #</th>`+
-    `<th title="MEASURED-derived district demand leg (0–100): OSM footfall + DIW workers + vehicles">Demand</th>`+
-    `<th title="ESTIMATED district risk proxy (0–100) — already discounts demand in the sequence">Risk ▲</th></tr>`+
-    top.map((d,i)=>{
-      const clk=(d.cy!=null&&d.cx!=null)?` onclick="focusExpansionOnMap(${i})" tabindex="0" role="link" style="cursor:pointer" title="Show this district on the national map →"`:'';
-      return `<tr${clk}>
-        <td class="mono sub">${i+1}</td>
-        <td><b>${d.name||'—'}</b></td>
-        <td>${d.prov||'—'}</td>
-        <td class="sub">${d.region||'—'}</td>
-        <td class="mono sub">${d.now}</td>
-        <td>${barHTML(d.add,'var(--gold)',mxAdd)} <span class="mono" style="color:var(--gold)"><b>+${d.add}</b></span></td>
-        <td class="mono" style="color:var(--accent)">#${d.first_rank}</td>
-        <td class="mono sub">${Math.round(d.demand)}</td>
-        <td class="mono" style="color:${d.risk>=60?'var(--agri)':'var(--ink,inherit)'}">${Math.round(d.risk)}</td>
-      </tr>`;}).join('');
-  if(ro){
-    const seq=(EXPLAN.sequence||[]);
-    const first=seq[0], m=EXPLAN.meta||{}, p=m.params||{};
-    const regs=(EXPLAN.by_region||[]).map(r=>`${r.name} +${r.add}`).join(' · ');
-    const n100=new Set(seq.slice(0,100).map(s=>s.id)).size;
-    ro.innerHTML=`<b>Open next:</b> <b style="color:var(--gold)">${first?first.name:'—'}</b>${first?` (${first.region})`:''} is placement
-      <b>#1</b> of ${(p.net_new||985).toLocaleString()} — the highest remaining demand-per-outlet in the country.
-      The first 100 placements spread across <b>${n100}</b> districts; ${rows.length} districts get at least one branch in the full plan.
-      Regional totals from this model: ${regs} — <b>cross-check them against the workforce-headroom split above</b>; where the two models
-      agree, confidence is higher.
-      <span class="sub">ESTIMATED planning order (divisor method over measured demand, risk-adjusted, 15 km cannibalization) — not a committed plan; confirm sites with local surveys.</span>`;
-  }
-  const btn=$('#r3kseqcsv');
-  if(btn&&!btn.dataset.init){ btn.onclick=expansionPlanCSV; btn.dataset.init='1'; }
-}
-function expansionPlanCSV(){
-  const rows=(EXPLAN&&EXPLAN.by_amphoe)||[]; if(!rows.length) return;
-  const hdr=['district_en','province_th','region','branches_now_measured','net_new_est','first_placement_rank',
-    'marginal_value_at_first','demand_measured_derived','risk_proxy_est','whitespace','lat','lng'];
-  const lines=[hdr.join(',')].concat(rows.map(d=>
-    [d.name,d.prov,d.region,d.now,d.add,d.first_rank,d.first_v,d.demand,d.risk,d.ws,d.cy,d.cx]
-      .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')));
-  lines.push(['Total','','',rows.reduce((s,d)=>s+d.now,0),rows.reduce((s,d)=>s+d.add,0),'','','','','','',''].map(v=>`"${v}"`).join(','));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='autox_expansion_plan_sequenced.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ---------- nationwide acquisition leaderboard (item 2) ----------
@@ -5082,8 +4817,8 @@ function renderHome(){
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
     // recommendation-by-region card — same rollup layer the Overview uses (null-safe).
     loadOutlook().then(()=>{ if(onHome()) renderHomeRegions(); });
-    // REMOVED (strategy pivot): loadOppScore()/loadExpansionPlan() home-boot re-renders — the "open next"
-    // hero + growth thesis they fed are gone; the thesis/hero now render from the risk layers only.
+    // Strategy pivot: the opportunity-score / expansion-plan loaders and their "open next" hero + growth
+    // thesis have been REMOVED. The home thesis/hero now render from the risk layers only.
     // QW5 hero needs measured household leverage — lazy, null-safe re-render.
     loadHouseholdRisk().then(()=>{ if(onHome()){ renderHomeHero(); renderHomeThesis(); } });
     // obj#1 — structurally riskiest province (DTI+unemployment composite) into the risk card + thesis (null-safe).
@@ -5116,25 +4851,13 @@ function renderHome(){
 }
 
 /* QW5 — HOME LEADS WITH THE VERDICT.
-   2–3 BIG plain-language hero statements built ONLY from data already loaded:
-   • "Open next in …" — from the opportunity_score composite (top districts).
+   2–3 BIG plain-language hero statements built ONLY from data already loaded (a RISK read, never a
+   growth/where-to-open one):
    • "Watching: … household leverage (DTI …×) …" — from MEASURED household_risk (top DTI province)
      paired with the worst crop-household double-/single-stress (crop_stress).
    • a third drought/double-stress line when crop_stress carries a flagged province.
    Each statement links to its detail tab. Any source that is absent is omitted gracefully —
    never fabricated. Re-rendered as each lazy source resolves. */
-function loadOppScore(){
-  if(oppLoaded) return Promise.resolve(OPPSCORE);
-  return fetch('data/opportunity_score.json').then(r=>r.ok?r.json():null)
-    .then(j=>{OPPSCORE=j;oppLoaded=true;return j;})
-    .catch(()=>{OPPSCORE=null;oppLoaded=true;return null;});
-}
-function loadExpansionPlan(){
-  if(explanLoaded) return Promise.resolve(EXPLAN);
-  return fetch('data/expansion_plan.json').then(r=>r.ok?r.json():null)
-    .then(j=>{EXPLAN=j;explanLoaded=true;return j;})
-    .catch(()=>{EXPLAN=null;explanLoaded=true;return null;});
-}
 /* BOARD THESIS — one spoken-English sentence a director could read aloud. Synthesized ONLY from data
    already in memory (DATA/META/AMP/HHRISK/CSTRESS); every clause is dropped if its source is absent, so
    it never fabricates. Re-rendered as lazy sources resolve. Names: how many branches we run, how many
