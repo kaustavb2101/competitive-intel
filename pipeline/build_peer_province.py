@@ -126,6 +126,19 @@ def build():
         order = ["AutoX"] + brands
         counts = {"AutoX": autox, **by_brand}
         leader = max(order, key=lambda k: (counts.get(k, 0), -order.index(k)))
+        # AutoX's OWN competitive standing among the operators PRESENT in the province
+        # ({AutoX} + every big-4 brand with >0 branches): a 1-based rank by branch count with
+        # the SAME deterministic tie-break as `leader` (AutoX ahead on an equal count). This is
+        # the read the `leader` column hides: two provinces both "led by Muangthai" can have
+        # AutoX sitting 2nd (a defensible runner-up) or dead-last of 4 (a fragmented also-ran)
+        # — a sharper margin-pressure signal than the merged ratio alone. MEASURED counts,
+        # COMPUTED position; null where autox == 0 (no AutoX branches assigned in the census).
+        if autox > 0:
+            n_ranked = 1 + len(by_brand)
+            autox_rank = 1 + sum(1 for c in by_brand.values() if c > autox)
+        else:
+            n_ranked = len(by_brand)
+            autox_rank = None
         # licensed-PICO operator count for this province: an int when the FPO registry lists
         # the province (or a MEASURED zero when the registry explicitly has none), else null
         # (registry absent in this sandbox, or province unmatched — an honest gap, not a 0).
@@ -144,6 +157,8 @@ def build():
             "by_brand": by_brand,
             "ratio": ratio,
             "leader": leader,
+            "autox_rank": autox_rank,
+            "n_ranked": n_ranked,
             "pico": pico,
             "n_districts": e["n_districts"],
             "n_outnumbered_districts": e["n_outnumbered_districts"],
@@ -155,6 +170,14 @@ def build():
 
     n_autox_leads = sum(1 for p in provinces if p["leader"] == "AutoX")
     n_outnumbered_prov = sum(1 for p in provinces if p["autox"] > 0 and p["rivals"] > p["autox"])
+    # AutoX competitive-standing rollup (only provinces where AutoX is present / rankable).
+    ranked = [p for p in provinces if p["autox_rank"] is not None]
+    n_autox_last = sum(1 for p in ranked if p["n_ranked"] > 1 and p["autox_rank"] == p["n_ranked"])
+    n_autox_top2 = sum(1 for p in ranked if p["autox_rank"] <= 2)
+    best_autox_rank = min((p["autox_rank"] for p in ranked), default=None)
+    # distribution keyed by rank (string keys, sorted asc) — deterministic, JSON-stable.
+    rank_counter = collections.Counter(p["autox_rank"] for p in ranked)
+    autox_rank_distribution = {str(k): rank_counter[k] for k in sorted(rank_counter)}
     total_autox = sum(p["autox"] for p in provinces)
     total_rivals = sum(p["rivals"] for p in provinces)
     per_brand_total = {b: sum(p["by_brand"].get(b, 0) for p in provinces) for b in brands}
@@ -185,6 +208,15 @@ def build():
             "ratio": "COMPUTED — rivals / autox, rounded 2 dp; null where autox == 0.",
             "leader": "COMPUTED — the operator (AutoX or a rival brand) with the most branches "
                       "in the province; deterministic tie-break (AutoX first, then census order).",
+            "autox_rank": "COMPUTED — AutoX's 1-based rank by branch count among the operators "
+                          "PRESENT in the province ({AutoX} + every big-4 brand with >0 branches), "
+                          "same deterministic tie-break as `leader` (AutoX ahead on an equal "
+                          "count). null where autox == 0. Underlying counts are MEASURED; the "
+                          "position is arithmetic. Ranks AutoX only against the 4 big censused "
+                          "brands — NOT against sub-scale local operators (not censused).",
+            "n_ranked": "COMPUTED — how many operators are present in the province and thus in the "
+                        "ranking pool (AutoX + present big-4 brands), so autox_rank reads as "
+                        "'k of n_ranked'.",
             "n_outnumbered_districts": "COMPUTED — count of the province's districts flagged "
                                        "'outnumbered' in rival_density.json.",
             "pico": "MEASURED — count of LICENSED พิโกไฟแนนซ์ (PICO-finance) operator service "
@@ -210,6 +242,11 @@ def build():
             "silently reconciled)." % total_autox,
             "A high rival:AutoX ratio is a competitive-pressure signal on the EXISTING network, "
             "not an expansion cue and not a verdict.",
+            "autox_rank ranks AutoX ONLY against the 4 big censused brands present in the "
+            "province — sub-scale local operators and the distinct PICO class are not in the "
+            "pool, so a strong rank (e.g. 2nd) means 'ahead of some big-4 brands here', not "
+            "'the 2nd-largest lender overall'. It sharpens the leader column (which names only "
+            "the top operator) by showing where AutoX itself sits.",
             "The 'pico' column is a DISTINCT competitor class (licensed small-ticket PICO-finance "
             "operators), counted per province from the FPO registry's own province field — NOT a "
             "coordinate census, so it is not comparable district-by-district and is never summed "
@@ -218,12 +255,18 @@ def build():
         ],
         "brands": brands,
         "record_format": "{province_th, region, autox, rivals, by_brand{brand:count}, ratio, "
-                         "leader, pico, n_districts, n_outnumbered_districts}. by_brand omits "
-                         "zero-count brands; pico is a distinct-class int/null (not in rivals); "
-                         "provinces[] sorted by (rivals-autox) desc.",
+                         "leader, autox_rank, n_ranked, pico, n_districts, "
+                         "n_outnumbered_districts}. by_brand omits zero-count brands; autox_rank "
+                         "is AutoX's 1-based position of n_ranked present operators (int/null); "
+                         "pico is a distinct-class int/null (not in rivals); provinces[] sorted "
+                         "by (rivals-autox) desc.",
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
         "n_provinces_outnumbered": n_outnumbered_prov,
+        "n_provinces_autox_last": n_autox_last,
+        "n_provinces_autox_top2": n_autox_top2,
+        "best_autox_rank": best_autox_rank,
+        "autox_rank_distribution": autox_rank_distribution,
         "total_autox": total_autox,
         "total_rivals": total_rivals,
         "per_brand_total": per_brand_total,
