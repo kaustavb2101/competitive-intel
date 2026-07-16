@@ -123,6 +123,10 @@ main:focus{outline:none}
    and delete the per-page inline :root color blocks.
    ============================================================ */
 :root{
+  /* Native UA surfaces (scrollbars, form controls, pre-paint canvas, iOS overscroll) follow the
+     ACTIVE theme, not the OS scheme. data-theme is set synchronously pre-paint, so this applies from
+     the first frame — dark-console users get dark scrollbars instead of OS-default light ones. */
+  color-scheme:dark;
   /* ---- elevation ladder: canvas < sunken < panel < raised ---- */
   --bg:#121826;          /* deep blue-slate canvas, NOT pure black */
   --bg-top:#19223a;      /* top vignette terminus */
@@ -548,6 +552,7 @@ tr[role="link"]:focus-visible{outline-offset:-2px}
    (per the light-slate panel verdict). Default remains dark.
    ============================================================ */
 html[data-theme="light"]{
+  color-scheme:light;  /* native scrollbars/controls/overscroll match the light "Paper Console" chrome */
   --bg:#F4F6FA; --bg-top:#FBFCFE;
   --panel2:#ECEFF5; --panel:#FFFFFF; --raised:#F7F9FD;
   --line:#DCE1EB; --line2:#EBEEF4;
