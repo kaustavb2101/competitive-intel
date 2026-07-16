@@ -1410,3 +1410,9 @@ Kaustav deploys).
   files only; all numbers MEASURED/COMPUTED with honest caveats — no fabrication. Headless render of
   `#acq` at 1180px: 10-column header ("AutoX ·rank"), chips render (Bangkok 170→#4/4 red, ชลบุรี 100→#4/5
   gold), readout sentence correct, **0 non-tile console errors**.
+
+
+## 2026-07-12 — UX loop: status.html light-theme default (PR #27)
+- **Fix:** `ux: default status.html to the light theme` — `status.html` (nav "Status ↗") still defaulted **dark** while index / province / branch-explorer / rayong-catchment default **light**; a leftover the theme-persist fix (#5) missed, so a first-time visitor got a dark Status page amid a light site. Aligned its pre-paint init + catch fallback to `'light'`; also corrected the stale "else dark" comments in index.html + rayong-catchment.html (partly closes ux-theme-comment). Surgical: `platform/` + UXUI_AUDIT line. Branch `claude/ux-loop-20260712-1405`.
+- **Blocker cleared independently.** When first shipped, the `qa` gate was RED on master from a pre-existing provenance byte-size drift (17 stale `.bytes` rows), so per the safeguard protocol I held the merge rather than weaken a check or fold an unrelated data regen into a UX PR. That drift was then fixed on master by a separate `build_provenance.py` regen (see the "Service/provenance integrity" entry above) — gate back to 62 passed / 0 failed.
+- **Resolution:** rebased PR #27 onto the now-green master (`80fb621`); re-ran `bash tests/run.sh check` → **0-failed**; re-ran safeguards (headless render of status.html = loads light, layout intact, nothing broken; no secrets; diff = intended files only) and merged. Master auto-deploys; deploy verified below.
