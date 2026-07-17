@@ -1331,6 +1331,8 @@ function renderOverview(){
   renderCollatOutlook();
   renderCollatMix();
   renderRecoverySensitivity();
+  // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
+  renderEvWatch();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
 }
@@ -1511,6 +1513,62 @@ function renderRecoverySensitivity(){
       <td class="mono">${p.branches}</td>
       <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
       <td class="mono" style="color:${mc}">▲ ${rank}</td></tr>`;}).join('');
+}
+
+/* ---------- EV transition · used-collateral value watch (objective #1, MEASURED) ----------
+   Surfaces data/ev_penetration.json (build_ev_penetration.py, DLT registered-fleet fuel-type
+   split — a previously dangling MEASURED layer, visible nowhere in the app). Backs the editorial
+   "EV/PHEV transition erodes resale" line in the recovery-sensitivity card with real DLT numbers.
+   IMPORTANT honesty: this is registered-STOCK share, an exposure proxy — NOT a used-vehicle price
+   index. BEV is still <1% of the national fleet, so the collateral-value threat is early, not
+   present; the value is as a monitorable leading indicator concentrated in a few provinces. */
+let EVLOADED=false, EVDATA=null;
+function renderEvWatch(){
+  const cards=$('#ev-cards'), note=$('#ev-note'), tbl=$('#evtbl'); if(!cards) return;
+  if(!EVLOADED){
+    fetch('data/ev_penetration.json').then(r=>r.ok?r.json():null).then(j=>{EVDATA=j;EVLOADED=true;try{renderEvWatch();}catch(e){}}).catch(()=>{EVLOADED=true;});
+    return;
+  }
+  if(!EVDATA||!EVDATA.meta||!EVDATA.meta.national){
+    cards.innerHTML=''; if(tbl) tbl.innerHTML='';
+    if(note) note.innerHTML='<b>EV-penetration data not available.</b> <span class="sub">data/ev_penetration.json is absent — it fills in from the DLT registered-fleet mirror on the next data refresh.</span>';
+    return;
+  }
+  const nat=EVDATA.meta.national, vin=EVDATA.meta.vintage||'';
+  const elecPct=nat.total?+( 100*((nat.bev||0)+(nat.phev||0)+(nat.hybrid||0))/nat.total ).toFixed(2):0;
+  const dieselPct=nat.total?+( 100*(nat.diesel||0)/nat.total ).toFixed(1):0;
+  const bevPct=nat.bev_pct!=null?nat.bev_pct:(nat.total?+(100*(nat.bev||0)/nat.total).toFixed(2):0);
+  cards.innerHTML=[
+    {k:'National BEV share',v:bevPct+'%',d:'of registered fleet',cls:'down',
+     n:'MEASURED (DLT) — pure battery-EV as % of the '+(nat.total||0).toLocaleString()+'-vehicle registered fleet. Still under 1% — the ICE title book is not yet materially threatened.'},
+    {k:'Electrified share',v:elecPct+'%',d:'BEV + PHEV + hybrid',cls:'down',
+     n:'MEASURED (DLT) — all electrified powertrains. The leading indicator to watch; most title collateral is still ICE.'},
+    {k:'Diesel share',v:dieselPct+'%',d:'pickups & trucks',cls:'up',
+     n:'MEASURED (DLT) — diesel (pickup/truck) share; the higher-recovery title collateral, least exposed to the EV shift so far.'},
+  ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>used vehicle titles</b>, so a shift to EVs would soften resale of the ICE cars/pickups/motorcycles backing the book. '+
+    'The transition is <b>real but early</b>: BEVs are only <b>'+bevPct+'%</b> of the registered fleet and electrified powertrains <b>'+elecPct+'%</b> (both <b>measured, DLT '+vin+'</b>). '+
+    'This is registered-<b>stock</b> share — an <b>exposure proxy, not a used-vehicle price index</b> (we have no Thai used-vehicle price series). '+
+    'It matters as a <b>leading indicator</b>: adoption is concentrated in the provinces below, where used-ICE resale softening would show first.';
+  if(!tbl) return;
+  // join the MEASURED EV layer to AutoX's own footprint (PROV branches/region) and keep only
+  // provinces AutoX operates in — ties the collateral watch to the network we actually run.
+  const byTh={}; (PROV||[]).forEach(p=>{byTh[p.th]=p;});
+  const rows=(EVDATA.provinces||[]).map(r=>{const pv=byTh[r.th]||{};
+    return {th:r.th,en:pv.en||r.th,region:pv.region||'—',branches:pv.branches||0,
+            elec:r.electrified_pct,bev:r.bev_pct,diesel:r.diesel_pct};})
+    .filter(r=>r.branches>0)
+    .sort((a,b)=>b.elec-a.elec).slice(0,8);
+  if(!rows.length){ tbl.innerHTML=''; return; }
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="BEV+PHEV+hybrid as % of registered fleet — DLT, measured">Electrified % ▲ (DLT)</th><th title="pure battery-EV share — DLT, measured">BEV %</th><th title="diesel share — DLT, measured">Diesel %</th></tr>`+
+    rows.map((r,i)=>{const ec=r.elec>=4?'var(--agri)':r.elec>=2.5?'var(--gold)':'var(--collat)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.en}</b></td><td class="sub">${r.region}</td>
+      <td class="mono">${r.branches}</td>
+      <td>${barHTML(r.elec,ec,8)} <span class="mono" style="color:${ec}">${r.elec}%</span></td>
+      <td class="mono sub">${r.bev!=null?r.bev+'%':'—'}</td>
+      <td class="mono sub">${r.diesel!=null?r.diesel+'%':'—'}</td></tr>`;}).join('');
 }
 
 /* ---------- crop-household stress (Overview card) ----------
