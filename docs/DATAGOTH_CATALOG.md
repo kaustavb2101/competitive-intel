@@ -30,6 +30,15 @@ each source URL, fetch time, byte size and status for honest provenance. First r
 | `osmep_sme_growth` | MSME counts / growth | OSMEP | province | ⚠ 404 (package id needs refresh) |
 | `nso_agri_income_debt` | Agri income & debt by province | NSO | province | ⚠ HTTP 500 (retry/resource) |
 
+> **✅ = the 2026-07-12 pull succeeded; it does NOT mean the source is distilled into a committed
+> layer.** Distilled + shipped: `fpo_pico` → `pico_census.json`, `dbd_newco` → `dbd_formation.json`,
+> `diw_factories` → factory layers, `mot_vehicles` → vehicle layers. **Pulled but never distilled:**
+> `baac_credit`, `smebank_credit` (the formal-credit **penetration** signal). Their raw CSVs are in the
+> gitignored `source-data/datagoth/` cache, so nothing is committed — and the data.go.th aggregator is
+> now **403 from CI** (re-verified 2026-07-17), so they **cannot be rebuilt from the cloud**. To finish
+> them, re-pull from the Thai IP and **commit** the raw CSV (or a distilled per-province layer). Full
+> blocked-source status + owner-side unblocks: **`docs/BLOCKED_SOURCES.md`**.
+
 ## Access notes
 - **data.go.th CKAN** (`https://data.go.th/api/3/action/`) — open, CKAN 2.10.1, no token. ~30 distinct
   high-relevance national/multi-province dataset families; every province also self-publishes NSO/DLT/OAE

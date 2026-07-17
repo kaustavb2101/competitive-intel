@@ -3,6 +3,47 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-17 — Integration loop: evidence-backed BLOCKED-SOURCE LEDGER — stop every run re-probing the same walls — SHIPPED
+
+Integration loop. Worked the high-value integration backlog top-down and verified each against the
+committed state rather than trusting the prompt's "OPEN" framing. **Finding: every reachable integration
+is already done, and every remaining unlock is owner-side-blocked, not code-blocked.**
+
+- **Backlog audit (what I verified, not assumed):** #1 FPO PICO — **done** (`pico_census.json`, MEASURED,
+  folded into `competitor_coverage.json` as a distinct per-province rival column + national narrative;
+  national coverage is via `competitors_census.json`, 16,503 rivals, so "Rayong-only" is long fixed).
+  #2 branch cropland — **done** (`branch_cropland.json`, gate-`--check`ed, surfaced in the branch popup +
+  the 3D catchment scene). #3 datagoth distillation — DIW factories / MOT-DLT vehicles / DBD formation all
+  **done**; **BAAC + SME-bank credit (penetration) is the only un-distilled sub-item and is BLOCKED** (see
+  below). #4 GISTDA 40m crop — **blocked** (`GISTDA_SPHERE_KEY` not in the CI env; host reachable). #5
+  NEXT_STEPS — the open rows (real loan tape, Thai-IP gov pulls, isochrone key) are all owner-side.
+  Dangling-layer sweep was already reasoned-resolved (2026-07-16 labour_context fold); I respected those
+  skips (`dbd_formation`/`ev_penetration`/`thaiwater_*` etc.) rather than re-litigate them.
+- **Live evidence gathered this run (cloud runner, 2026-07-17):** data.go.th aggregator (BAAC + SME-bank)
+  = **403**; `catalog.excise.go.th` = **000**; `sphere.gistda.or.th` = **200 but key absent**;
+  `opendata.nesdc.go.th` = 200 but a project catalog with **0** GPP datastores (Thai + English keyword);
+  BAAC/SME own hosts = 403/000; DOAE = 301 portal (no clean API, and `doae_planted_area.json` is already
+  vendored); MOT = **200** (already distilled). Confirmed **no BAAC/SME-bank distillation builder exists**
+  and their raw CSVs are gitignored → nothing committed, nothing rebuildable from CI.
+- **Honesty check (a real correctness guard, passed):** verified the ESTIMATED `gpp_by_province.json`
+  (NEXT_STEPS §0a: only 1/77 CKAN-verified) has **not** leaked into the app as a MEASURED number — the
+  only GPP mention in the shipped province files is an editorial narrative fact. No mislabel to fix.
+- **Ship (docs-only → gate-safe direct commit):** new **`docs/BLOCKED_SOURCES.md`** — an
+  evidence-backed ledger of every blocked frontier source (HTTP status measured today, why blocked, the
+  exact owner-side unblock, objective served, most-valuable first) + a one-paste re-probe block so a
+  future run reads the state in seconds instead of re-deriving it (as this run had to). Corrected the
+  stale `✅` marks in `DATAGOTH_CATALOG.md`: `✅` = the pull succeeded, **not** distilled — `baac_credit`
+  / `smebank_credit` were pulled once but never distilled and are now un-repullable from CI.
+- **Safeguards:** `bash tests/run.sh check` → **65 passed, 0 failed** (docs-only; no data/app/gate file
+  touched, no build_provenance run needed — no `platform/data` file added). No secrets in diff. Diff =
+  `BLOCKED_SOURCES.md` (new) + `DATAGOTH_CATALOG.md` note + this entry.
+- **Next recommended integration:** all remaining unlocks are owner-side — in value order: (1) **real
+  loan tape** (`ingest_loan_tape.py --real`) flips the four portfolio-risk outputs from SYNTHETIC to
+  measured; (2) map **`GISTDA_SPHERE_KEY`** into the workflow env, then build the check-crop puller to
+  supersede the SPAM cropland baseline; (3) a **Thai-IP re-pull + commit** of `baac_credit`/`smebank_credit`
+  so a CI builder can distill the formal-credit penetration layer. Until one of those lands, the CI-side
+  integration backlog is genuinely empty.
+
 ## 2026-07-17 — Intelligence loop: SERVICE — finish the provenance "shame board" (2 → 0) with a sidecar manifest for the array-shaped layers — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Backlog 0-open / 96% done, gate green on
