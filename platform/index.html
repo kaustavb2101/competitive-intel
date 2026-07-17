@@ -61,8 +61,24 @@
  function open(o){if(o)place();menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
  btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
  menu.addEventListener('click',function(){open(false);}); /* picking a view closes it; app.js handles the route */
- document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
- document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target)&&!menu.contains(e.target))open(false);});
+ /* keyboard: menu-button pattern (WCAG). The menu is re-parented to end of <body>, so a keyboard
+    user tabbing off "More ▾" would otherwise skip its items to the page body. Arrow-open into the
+    menu, arrow between items, Escape/Tab close and restore focus to the trigger. */
+ function items(){return Array.prototype.slice.call(menu.querySelectorAll('a[role="menuitem"]'));}
+ function focusItem(i){var a=items();if(!a.length)return;a[(i+a.length)%a.length].focus();}
+ btn.addEventListener('keydown',function(e){
+   if(e.key==='ArrowDown'){e.preventDefault();open(true);focusItem(0);}
+   else if(e.key==='ArrowUp'){e.preventDefault();open(true);focusItem(-1);}});
+ menu.addEventListener('keydown',function(e){
+   var a=items(),i=a.indexOf(document.activeElement);
+   if(e.key==='ArrowDown'){e.preventDefault();focusItem(i+1);}
+   else if(e.key==='ArrowUp'){e.preventDefault();focusItem(i-1);}
+   else if(e.key==='Home'){e.preventDefault();focusItem(0);}
+   else if(e.key==='End'){e.preventDefault();focusItem(-1);}
+   else if(e.key==='Escape'){e.preventDefault();open(false);btn.focus();}
+   else if(e.key==='Tab'){open(false);}});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&wrap.classList.contains('open')){open(false);btn.focus();}});
  /* mirror active state onto the More button when one of its views is selected */
  function syncActive(){btn.classList.toggle('on',!!menu.querySelector('a.on'));}
  syncActive();
