@@ -66,6 +66,47 @@ the newest route (`data.html`, the numbers-first Data book) and found a real fun
 - **Recommend next:** the region-filter chips only appear on the national table; consider carrying a
   `?r=<region>` deep-link into the filter state so a filtered view is shareable/bookmarkable.
 
+## 2026-07-16 — Integration loop: surface the MEASURED national labour-market backdrop on the Overview macro board — PR
+
+Integration loop (dangling-fold sweep). Enumerated every `platform/data/*.json` not fetched by any page
+(the "present in data yet invisible in the UI" pattern the PICO and cropland folds both fixed). Filtering
+out the dynamically-slug-loaded province geo layers (`*_places/_roads/_water/_catchment`, false positives —
+`province.html` builds those URLs at runtime), the genuinely dangling MEASURED layers were `labour_context`,
+`ev_penetration`, `truck_flow`, `brand_trends`, `dbd_formation`, `thaiwater_rain/flood` — each built,
+`--check`-gated, and provenance-stamped but fetched by nothing and consumed by no downstream builder, so the
+owner never saw them.
+
+- **Chosen fold — `labour_context.json`:** picked for the best value / non-redundancy / scope-safety balance.
+  `ev_penetration`'s core signal (per-province EV share) is **already** shown by the province vehicle-stock
+  table, so surfacing it would duplicate; `dbd_formation` is a business-formation **demand** signal and the
+  loop just purged expand/"open next" rows, so surfacing a demand layer risks re-introducing the exact
+  consolidation-scope drift that was removed; `thaiwater_*` are **live** 24h pulses (a frozen snapshot shown
+  as "live" is an honesty risk); `truck_flow`/`brand_trends` are minor collateral classes. `labour_context`
+  is genuinely invisible, **MEASURED** (ILOSTAT mirror of NSO LFS), non-redundant, and squarely objective #1:
+  informal (63.2%) + self-employed (50.4%) workers have no payslip — *that is the title-loan borrower base* —
+  and the agri workforce (28.3% of employment, ▼300k jobs YoY) is the agri-PD demand backdrop. Zero expansion
+  flavour; pure portfolio-risk context.
+- **What it adds:** three MEASURED national KPI cards on the Overview **macro board** (`#macro`) — *Informal
+  work 63.2%*, *Self-employed 50.4%*, *Agri jobs 28.3% ▼300k YoY* — each honestly labelled "NSO LFS
+  <year>". National-only is disclosed (the layer's own `meta` states there is no cloud path to per-province
+  LFS; vendored SES 2566 remains the per-province source), so no false per-province precision is implied.
+- **Fix (`platform/app.js` only):** mirrors the established `renderMacroIndicators` idiom exactly — a
+  cached-promise lazy loader (`loadLabourContext`) + a null-guarded renderer (`renderLabourContext`) that
+  appends `.mcard`s to `#macro`, hooked into `renderOverview()` right after `loadMacroIndicators`. Fully
+  null-guarded (absent file / partial object → cards omitted, nothing fabricated). No data file changed —
+  pure rendering of already-committed, already-gated data. Visual change → shipped as a PR (not a direct
+  master commit) per the loop rule.
+- **Safeguards (all passed):** (a) `node --check app.js` OK. (b) `bash tests/run.sh check` → **64 passed,
+  0 failed** (unchanged from baseline; app.js-only). (c) `build_provenance.py --check` clean — no new data
+  file, no ledger drift. (d) Card logic verified in an isolated Node harness against the real
+  `labour_context.json`: 3 cards, correct values (63.2 / 50.4 / 28.3% ▼300k), no throw on empty/partial
+  objects. (e) Headless chromium `--dump-dom` of `index.html#overview`: all three cards present in the
+  settled DOM; the async-append double-render seen under the dump-dom timing race is **pre-existing** (the
+  shipped `Household debt`/`Policy rate` macro-indicator cards double the same way — `renderOverview` resets
+  `#macro` innerHTML each pass in normal interactive use), so this faithfully follows the blessed idiom and
+  introduces no new behaviour. (f) No secrets in diff; diff = `app.js` + this log entry only.
+- **Deploy-verify:** appended below after the PR renders on preview.
+
 ## 2026-07-16 — Intelligence loop: DEPLOY/SERVICE HEALTH — regenerate the drifted provenance ledger (CI gate was RED on master) — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Deploy-health probe first: the master
