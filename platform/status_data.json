@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-16T22:19:03+00:00",
-    "commit": "8ba7638"
+    "generated_at": "2026-07-17T11:32:20+07:00",
+    "commit": "a47cc33"
   },
   "overall": {
     "progress_pct": 96,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-16",
+    "eta_date": "2026-07-17",
     "done_items": 48,
     "in_progress_items": 2,
     "open_items": 0,
@@ -480,6 +480,54 @@
   ],
   "activity": [
     {
+      "date": "2026-07-17T11:32:20+07:00",
+      "sha": "a47cc33",
+      "summary": "feat(peer): surface the MEASURED peer-NPL benchmark on the Competition tab (#52)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-17T02:12:19+00:00",
+      "sha": "30b9fe8",
+      "summary": "docs(progress-log): record ux-loop search empty-state fix — merged #51, deploy 401 (up+gated)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-17T09:09:58+07:00",
+      "sha": "efe1aa1",
+      "summary": "ux: search tables show a \"no results\" row instead of a blank body (#51)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-17T00:35:48+00:00",
+      "sha": "46d6448",
+      "summary": "fix(gate): regenerate fuel-price-dependent layers — master CI was red after the #49 fuel auto-commit",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-17T07:24:32+07:00",
+      "sha": "0a99e95",
+      "summary": "data: live fuel prices (2026-07-16, run 29542575688) (#49)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-17T07:23:55+07:00",
+      "sha": "0ddd80b",
+      "summary": "data: NABC live prices (2026-07-16, run 29535503219) (#48)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-17T07:15:39+07:00",
+      "sha": "747c3fc",
+      "summary": "feat(overview): surface MEASURED national labour-market backdrop on the macro board (#46)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-16T22:22:23+00:00",
+      "sha": "75001e6",
+      "summary": "chore(dashboard): refresh autonomy plan after site-health deploy-health fix",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-16T22:19:03+00:00",
       "sha": "8ba7638",
       "summary": "fix(deploy-health): a rejected-credential 401 is \"site up + protected\", not a site outage",
@@ -610,54 +658,6 @@
       "sha": "44312db",
       "summary": "ux: theme-track native scrollbars/controls via color-scheme (#38)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T16:11:56+00:00",
-      "sha": "092d49c",
-      "summary": "docs: log peer PICO-column ship + refresh CEO dashboard (PR #36)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-13T23:11:03+07:00",
-      "sha": "1ef9007",
-      "summary": "feat(peer): surface the MEASURED PICO-finance rival column in the per-province peer board (#36)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-13T14:24:06+00:00",
-      "sha": "14d0dee",
-      "summary": "docs: log skip-to-content a11y ship + deploy-verify (PR #35)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T21:20:04+07:00",
-      "sha": "1f9354a",
-      "summary": "ux: add skip-to-content link (WCAG 2.4.1 bypass-blocks) (#35)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T17:16:25+07:00",
-      "sha": "226123f",
-      "summary": "feat(peer): fold licensed-PICO rival field into the per-province peer board (#33)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-13T08:23:10+00:00",
-      "sha": "f046b91",
-      "summary": "docs: log ux-map-overlap-residual merge + deploy-verify (PR #32)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T15:20:54+07:00",
-      "sha": "f5455ef",
-      "summary": "ux: #map zoom overlaps lens pills on small-laptop widths (761–1080px) (#32)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-13T06:20:31+00:00",
-      "sha": "cd11055",
-      "summary": "feat(competition): FPO PICO-finance registry → measured per-province competitor layer",
-      "pillar": "market"
     }
   ]
 }
