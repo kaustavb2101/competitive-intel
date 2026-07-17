@@ -1454,16 +1454,42 @@ function loadCollatOutlookData(){
     .then(j=>{COLLO=j||null;return COLLO;}).catch(()=>{COLLO=null;return null;});
   return colloPromise;
 }
+// MEASURED national title-collateral fleet trend (data/vehicle_fleet.json, obj#1). Adds the TIME
+// dimension the single-vintage province vehicle stock lacks — is the collateral base growing/shrinking.
+let FLEET=null, fleetLoaded=false, fleetPromise=null;
+function loadFleetData(){
+  if(fleetPromise) return fleetPromise;
+  fleetLoaded=true;
+  fleetPromise=fetch('data/vehicle_fleet.json').then(r=>r.ok?r.json():null)
+    .then(j=>{FLEET=j||null;return FLEET;}).catch(()=>{FLEET=null;return null;});
+  return fleetPromise;
+}
 function renderCollatOutlook(){
   const el=$('#collat-outlook'); if(!el) return;
   // warm the per-province outlook layer; re-render once it lands so the national card appears.
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
+  if(!fleetLoaded) loadFleetData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   const cards=[
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
     {k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
      n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book — see the motorcycle-share table below (DLT, measured).'},
   ];
+  // MEASURED national fleet trend (vehicle_fleet.json) — the collateral BASE size + whether it is
+  // growing or shrinking (DLT/MOT registry). This is the measured companion to the editorial cards
+  // above: it puts a real YoY number on the diesel-pickup / motorcycle collateral-pool direction.
+  if(FLEET&&Array.isArray(FLEET.classes)){
+    const yc=FLEET.latest_year_ce||(FLEET.meta&&FLEET.meta.latest_year_ce);
+    const byk={}; FLEET.classes.forEach(c=>byk[c.key]=c);
+    [['pickup','Pickup-title fleet'],['moto','Motorcycle-title fleet']].forEach(([k,lbl])=>{
+      const c=byk[k]; if(!c||c.yoy_pct==null) return;
+      const up=c.yoy_pct>0, v=(up?'▲ +':'▼ ')+c.yoy_pct.toFixed(2)+'%';
+      cards.push({k:lbl+' (national)', v, d:c.latest.toLocaleString()+' regd', cls:up?'up':'down',
+        n:'MEASURED · DLT/MOT registered-vehicle stock, YoY to '+(yc||'latest')+'. '+
+          (up?'Collateral pool still growing (pace vs prior years).':'Collateral pool CONTRACTING — a shrinking resale/recovery base behind this slice of the book.')+
+          ' Fleet SIZE, not resale value.'});
+    });
+  }
   // national recovery-value outlook (from collateral_outlook.json) — firming vs softening + most-at-risk.
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
