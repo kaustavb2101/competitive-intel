@@ -3887,7 +3887,10 @@ function closeBranchSheet(){
 function wireBranchSheet(s,b,body){
   b.addEventListener('click',closeBranchSheet);
   const h=document.getElementById('msheet-handle');
-  if(h) h.addEventListener('click',closeBranchSheet);
+  if(h){ h.addEventListener('click',closeBranchSheet);
+    // WCAG 2.1.1: the handle is role=button tabindex=0, but a <div> doesn't fire click on
+    // Enter/Space like a native button — wire keyboard activation so it's operable by keyboard.
+    h.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); closeBranchSheet(); } }); }
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBranchSheet(); });
   // simple swipe-down-to-close: arm on touchstart unless the body is mid-scroll (so internal
   // scrolling never fights the gesture); a downward drag past the threshold closes the sheet.
