@@ -3,6 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-17 — Intelligence loop: PEER COMPARISON — surface the MEASURED peer-NPL benchmark (a dangling layer, visible nowhere) on the Competition tab — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Backlog is 0-open / 96% done, the QA gate
+is green on master (64/0), the live site is up + Basic-Auth-gated (401 = healthy), and a fresh
+broken-reference re-audit of all 58 `fetch()` data paths found **no missing files** — so the standing
+gap was a **dangling peer-pillar layer**: `platform/data/peer_npl.json` (the listed title-lenders' own
+reported NPL ratios — TIDLOR 1.5% / MTC 2.53% / SAWAD 3.5–3.6%, MEASURED peer-reported, provenance-
+stamped) was committed but referenced **nowhere in the app** — only in `provenance.json`. The owner
+could not see it.
+
+- **Task (peer pillar #1 — extend peer-vs-AutoX comparison, measured-vs-estimated labelled).** The
+  Competition tab (`#acq`) already compares AutoX to each rival by **branch count** (peer_province board);
+  it carried **no read on rival loan *quality***. NPL is the other half of the competitive picture and
+  directly serves both objectives: portfolio-risk context (obj #1 — the collateral-mix driver of default)
+  and competitive risk (obj #2 — the quality band around us).
+- **Fix (app-only, no new data).** Added a compact **"Peer loan quality · listed rivals' reported NPL
+  ratios"** card in `sec-comp`, right under the per-province peer board. `renderPeerNpl()` fetches
+  `peer_npl.json` (lazy, graceful if absent), ranks the 3 listed peers by reported NPL, colours the band
+  (vehicle/gold = green, land/heavy-vehicle/agri = red), and the readout frames the 2.0pp spread as a
+  **collateral story**. Tagged **MEASURED · peer-reported** with the honest, repeated caveat that **these
+  are the peers' own numbers, NOT an AutoX/Ngern Chaiyo figure** (we hold no measured AutoX NPL) — carried
+  straight from the layer's own `meta.note` into the Method & caveats box. No fabricated number; every
+  value read from the committed layer.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **64 passed, 0 failed**. (b) No secrets in
+  diff (scanned). (c) Diff = `platform/app.js` (+56, one new render fn + one call) + `platform/index.html`
+  (+9, the card markup); intent-matched. (d) No fabrication — a pure display of an existing MEASURED layer,
+  provenance ledger unchanged (peer_npl already labelled). **Headless render self-review (Chromium):** the
+  card draws 3 peer rows sorted ascending, readout correct, **zero page errors** — the only failed requests
+  are the sandbox-blocked external CDN (Google Fonts, Leaflet), pre-existing and unrelated.
+- **Next recommended intelligence task:** the peer-NPL card is a static 3-peer table; the natural follow-up
+  is to co-locate it with the collateral-mix exposure (segment_exposure.json) so the owner reads "our book
+  leans land/agri → the peer with that book runs 3.5% NPL" as one joined signal — a market-analysis fold.
+
 ## 2026-07-16 — Intelligence loop: DEPLOYMENT HEALTH — site-health probe no longer false-alarms "SITE DOWN" on a rejected credential (nightly monitor was RED 6+ nights) — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Deploy-health probe found a **real,

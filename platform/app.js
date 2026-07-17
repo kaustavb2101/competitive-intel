@@ -1572,6 +1572,7 @@ function renderAcq(){
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
+  renderPeerNpl();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
   // (Road-to-3,000 headroom split, sequenced expansion plan, "where to open next" opportunity board)
@@ -1852,6 +1853,61 @@ function drawPeerProvince(){
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
+  }
+}
+
+/* ---------- peer loan quality · reported NPL benchmark (obj #1 + #2) ----------
+   Surfaces data/peer_npl.json (docs/RESEARCH_DIGEST.md §B — the listed title-lenders' own
+   reported NPL ratios). PEER-reported MEASURED figures — NOT an AutoX number (we hold no
+   measured AutoX NPL). A pure display: rank by reported NPL, show the collateral driver, and
+   read the spread as the competitive loan-quality band. Lazy, graceful if absent. */
+let PEERNPL=null, peernplLoaded=false;
+function renderPeerNpl(){
+  const tbl=$('#peernpltbl'); if(!tbl) return;
+  if(peernplLoaded){ drawPeerNpl(); return; }
+  fetch('data/peer_npl.json').then(r=>r.ok?r.json():null).then(j=>{
+    PEERNPL=j; peernplLoaded=true; drawPeerNpl();
+  }).catch(()=>{ PEERNPL=null; peernplLoaded=true; drawPeerNpl(); });
+}
+function drawPeerNpl(){
+  const tbl=$('#peernpltbl'), ro=$('#peernplreadout'); if(!tbl) return;
+  const peers=(PEERNPL&&Array.isArray(PEERNPL.peers))?PEERNPL.peers:[];
+  if(!peers.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Peer NPL benchmark not available.</b> <span class="sub">data/peer_npl.json is absent — it fills in from docs/RESEARCH_DIGEST.md §B on the next data refresh.</span>';
+    return;
+  }
+  const m=PEERNPL.meta||{};
+  const list=peers.slice().sort((a,b)=>(a.npl||0)-(b.npl||0));
+  const vals=list.map(p=>p.npl).filter(v=>typeof v==='number');
+  const lo=Math.min(...vals), hi=Math.max(...vals);
+  // colour the NPL band: lower is better (green), higher worse (red), scaled across the observed spread.
+  const col=v=>{ if(hi<=lo) return 'var(--merch)'; const t=(v-lo)/(hi-lo); return t<=0.34?'var(--merch)':t>=0.67?'var(--agri)':'var(--gold)'; };
+  tbl.innerHTML=`<tr><th>#</th><th>Peer</th>`+
+    `<th title="the operator's own reported non-performing-loan ratio (FY2025 / 2025 IR)">Reported NPL</th>`+
+    `<th title="the collateral mix that drives the NPL level">Collateral book</th>`+
+    `<th>Source</th></tr>`+
+    list.map((p,i)=>{
+      const v=(typeof p.npl==='number')?p.npl:null;
+      const label=p.npl_label?p.npl_label+'%':(v!=null?v.toFixed(2)+'%':'—');
+      const c=v!=null?col(v):'var(--dim)';
+      const bar=v!=null?barHTML(v,c,Math.max(hi,4)):'';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${p.name||p.ticker||'—'}</b>${p.ticker?` <span class="sub mono">${p.ticker}</span>`:''}</td>
+        <td>${bar} <span class="mono" style="color:${c}"><b>${label}</b></span></td>
+        <td class="sub">${p.collateral||'—'}</td>
+        <td class="sub" style="font-size:11px">${p.source||'—'}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const best=list[0], worst=list[list.length-1];
+    const spread=(vals.length>1)?`from <b style="color:var(--merch)">${best.name} ${best.npl}%</b> (${best.collateral}) to <b style="color:var(--agri)">${worst.name} ${(worst.npl_label||worst.npl)}%</b> (${worst.collateral})`:'';
+    ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
+      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL. ${TAG_M}`+
+      methodBox(m.note||null,
+        [`Figures are <b>reported by the peer companies themselves</b> (FY2025 / 2025 IR) — ${m.source||'docs/RESEARCH_DIGEST.md §B'}. Vintage ${m.updated||'2026-06'}.`,
+         '<b>Not an AutoX/Ngern Chaiyo number.</b> We hold no measured AutoX NPL — this is the competitive quality band around us, not our own book.',
+         'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.']);
   }
 }
 
