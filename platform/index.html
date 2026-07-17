@@ -20,15 +20,15 @@
 <script>(function(){var s=document.querySelector('.skip-link');if(!s)return;
  s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
-<nav id="nav" role="tablist" aria-label="Main views">
+<nav id="nav" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
-  <a data-v="home" class="on" href="#home" role="tab" aria-selected="true">Home</a>
+  <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <a href="data.html">Data book</a>
-  <a data-v="overview" href="#overview" role="tab" aria-selected="false">Overview</a>
-  <a data-v="map" href="#map" role="tab" aria-selected="false">National</a>
-  <a data-v="acq" href="#acq" role="tab" aria-selected="false">Competition</a>
-  <a data-v="exposure" href="#exposure" role="tab" aria-selected="false">Exposure</a>
-  <a data-v="trend" href="#trend" role="tab" aria-selected="false">Trend</a>
+  <a data-v="overview" href="#overview">Overview</a>
+  <a data-v="map" href="#map">National</a>
+  <a data-v="acq" href="#acq">Competition</a>
+  <a data-v="exposure" href="#exposure">Exposure</a>
+  <a data-v="trend" href="#trend">Trend</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">

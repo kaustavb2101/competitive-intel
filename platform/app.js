@@ -1050,7 +1050,7 @@ function wrapTables(){
 /* ---------- tabs ---------- */
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
-  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);t.setAttribute('aria-selected',String(sel));});
+  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='overview') renderOverview();
