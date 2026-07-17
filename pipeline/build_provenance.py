@@ -14,6 +14,14 @@ Three verdicts per layer:
   - UNLABELLED  — no readable meta stamp at all. This is the SHAME BOARD: files that
                   ship a numeric layer with no provenance. Named explicitly so they get fixed.
 
+Top-level JSON arrays (branches.json, provinces/index.json) structurally cannot carry an inline
+`meta` block. Their provenance comes from a hand-authored SIDECAR manifest (provenance_sidecar.json,
+keyed by relpath); it supplies the same label/source/provenance a real meta block would, so those
+layers leave the shame board with no breaking {meta,data} restructure. The sidecar carries only
+provenance TEXT (no data), and a `vintage_from` key lets an array layer inherit the live vintage of
+the file it ships with (branches.json ← meta.json). Nothing is fabricated — a file is upgraded only
+when an honest, committed sidecar entry names it.
+
 The per-province geometry basemaps (`<slug>_roads/_water/_landuse/_rail/_places/_catchment.json`)
 are COLLAPSED into one "family" layer each (77 road files -> one "roads" row) so the exec card
 stays readable — but any family member lacking a stamp is still counted in the per-FILE shame
@@ -40,6 +48,11 @@ DATA = os.path.join(REPO, "platform", "data")
 OUT_PATH = os.path.join(DATA, "provenance.json")
 INDEX_REL = "provinces/index.json"
 SELF = "provenance.json"
+# Sidecar provenance manifest. Top-level JSON arrays (branches.json, provinces/index.json)
+# structurally cannot carry an inline `meta` block; this companion supplies their stamp so they
+# leave the shame board without a breaking {meta,data} restructure. Consumed here only — never
+# fabricates a stamp for a file that has no honest, hand-authored entry.
+SIDECAR = "provenance_sidecar.json"
 
 # meta keys that count as a provenance stamp (exactly the four named in the mandate).
 PROV_KEYS = ("label", "source", "provenance", "generated_by")
@@ -158,8 +171,45 @@ def _top_count(d):
     return 0, ""
 
 
-def _scan_file(rel):
-    """Read one file -> (verdict, meta_or_None, bytes, count, count_of)."""
+def _load_sidecar():
+    """Sidecar provenance stamps for array-shaped layers: {rel -> stamp dict}. Empty if absent."""
+    path = os.path.join(DATA, SIDECAR)
+    if not os.path.exists(path):
+        return {}
+    try:
+        d = _load(path)
+    except Exception:
+        return {}
+    stamps = d.get("stamps")
+    return stamps if isinstance(stamps, dict) else {}
+
+
+def _resolve_sidecar_stamp(stamp):
+    """Prepare a sidecar stamp for scanning. If it carries `vintage_from`, resolve the referenced
+    file's live vintage so an array layer inherits the exact freshness of the file it ships with
+    (e.g. branches.json shares meta.json's vintage — both projected in one derive.py run). Reads
+    committed bytes only; never invents a date."""
+    if not isinstance(stamp, dict):
+        return None
+    ref = stamp.get("vintage_from")
+    if isinstance(ref, str) and ref.strip():
+        try:
+            rm = _load(os.path.join(DATA, ref.replace("/", os.sep))).get("meta")
+        except Exception:
+            rm = None
+        v = _vintage_of(rm) if isinstance(rm, dict) else ""
+        if v:
+            stamp = {**stamp, "vintage": v}
+    return stamp
+
+
+def _scan_file(rel, sidecar=None):
+    """Read one file -> (verdict, meta_or_None, bytes, count, count_of).
+
+    Array-shaped layers (top-level JSON arrays) cannot carry an inline meta block; when one has no
+    inline stamp we fall back to a hand-authored sidecar entry keyed by its relpath, so it leaves the
+    shame board without a breaking {meta,data} restructure. Only an honest, committed sidecar entry
+    upgrades a file — nothing is fabricated."""
     path = os.path.join(DATA, rel.replace("/", os.sep))
     size = os.path.getsize(path)
     try:
@@ -168,6 +218,9 @@ def _scan_file(rel):
         return "unlabelled", None, size, 0, ""
     m = _stamp_meta(d)
     count, count_of = _top_count(d)
+    if m is None and sidecar and rel in sidecar and any(
+            _nonempty(sidecar[rel].get(k)) for k in PROV_KEYS):
+        m = _resolve_sidecar_stamp(sidecar[rel])
     if m is None:
         return "unlabelled", None, size, count, count_of
     return _verdict_from_meta(m), m, size, count, count_of
@@ -175,6 +228,7 @@ def _scan_file(rel):
 
 def build():
     slugs = set(p.get("slug") for p in _load(os.path.join(DATA, INDEX_REL)))
+    sidecar = _load_sidecar()   # hand-authored stamps for array-shaped layers (branches / index)
 
     # ---- partition top-level *.json into standalone files vs geometry families ----
     fam_re = re.compile(r"^(?P<slug>.+)_(?P<kind>%s)$" % "|".join(FAMILY_KINDS))
@@ -197,7 +251,7 @@ def build():
 
     # ---- standalone layers (one file = one layer) ----
     for rel in standalone:
-        cls, m, size, count, count_of = _scan_file(rel)
+        cls, m, size, count, count_of = _scan_file(rel, sidecar)
         if cls == "unlabelled":
             unlabelled_files.append(rel)
         layers.append({
@@ -219,7 +273,7 @@ def build():
         srcs = Counter()
         vints = Counter()
         for rel in members:
-            cls, m, size, count, count_of = _scan_file(rel)
+            cls, m, size, count, count_of = _scan_file(rel, sidecar)
             tot_bytes += size
             tot_count += count
             member_cls.append(cls)
@@ -274,7 +328,10 @@ def build():
                             "ship a numeric layer with no provenance and should get a meta block. "
                             "Per-province geometry basemaps are collapsed into one 'family' row each, "
                             "but any unstamped member is still counted in files.unlabelled and named in "
-                            "unlabelled_files, so collapsing hides no gap."),
+                            "unlabelled_files, so collapsing hides no gap. Top-level JSON arrays "
+                            "(branches.json, provinces/index.json) cannot carry an inline meta block; "
+                            "their stamp comes from the hand-authored provenance_sidecar.json manifest "
+                            "(provenance text only, no data) — honest by mechanism, not un-sourced."),
     }
     return {
         "meta": meta,

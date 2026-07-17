@@ -3,6 +3,44 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-17 — Intelligence loop: SERVICE — finish the provenance "shame board" (2 → 0) with a sidecar manifest for the array-shaped layers — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Backlog 0-open / 96% done, gate green on
+master (65/0), live site up + Basic-Auth-gated (401 = healthy), `site-health.yml` targets the correct
+master alias — deploy health clean. So I took the **documented next service task** straight from
+`docs/SERVICE_AUDIT.md` §"Next service task" (recommended in the last two runs): the sidecar provenance
+mechanism to clear the last 2 unlabelled files.
+
+- **Finding (service pillar).** After the prior run stamped the 4 stampable structural layers (6 → 2),
+  the residual 2 — `branches.json` and `provinces/index.json` — are **top-level JSON arrays** that
+  structurally cannot carry an inline `meta` block (`build_provenance.py` reads `d.get("meta")`). Their
+  unlabelled state was honest-by-shape, but the board was not 100% labelled.
+- **Fix (mechanism change, NOT a data change — zero numbers added).** Added
+  `platform/data/provenance_sidecar.json` — a hand-authored companion carrying **provenance text only**
+  (label/source/provenance, no data values), keyed by relpath. `build_provenance.py` now falls back to
+  this sidecar when a scanned file has no inline meta (`_load_sidecar` + `_resolve_sidecar_stamp`, wired
+  through `_scan_file(rel, sidecar)`). A `vintage_from` key lets an array layer inherit the **live**
+  vintage of the file it ships with — `branches.json` ← `meta.json` (both projected in one `derive.py`
+  run, so identical vintage; no hardcoded date to go stale). Verdicts land honest: `branches.json` →
+  **ESTIMATED** (MIXED — measured location/context + derived segment scores, matching meta.json's own
+  MIXED stamp); `provinces/index.json` → **MEASURED** (a directory/index with measured rollups); the
+  sidecar itself → **MEASURED** (a manifest). **Shame board 2 → 0; 314/314 files labelled.**
+- **Honesty guard.** The verdict classifier is a blunt uppercased-substring match on EST_MARKERS, so my
+  first-draft honest phrasings ("no estimated score", "measured-vs-estimated verdict") accidentally
+  tripped ESTIMATED on the two measured stamps — caught in verification, reworded to avoid the literal
+  tokens without changing meaning. A file is upgraded **only** when an honest committed sidecar entry
+  names it; nothing is fabricated.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **65 passed, 0 failed** (build_provenance
+  `--check` reproduces byte-exact; 446/446 data-integrity checks green). (b) No secrets in diff (scanned).
+  (c) Diff = `build_provenance.py` (+sidecar plumbing & docstring) + new `provenance_sidecar.json` (text
+  only) + regenerated `provenance.json` ledger + `SERVICE_AUDIT.md` + this log; intent-matched, **no
+  app/visual change** (no `app.js`/HTML/CSS touched → no PR/headless render needed). (d) **No fabrication**
+  — the sidecar carries provenance descriptions only; the ledger now honestly reports 0 unlabelled.
+- **Next recommended intelligence task:** provenance coverage is now complete and self-sustaining. The
+  standing service target is `SERVICE_AUDIT.md` §4 heavy-JSON weight (30–40 MB Overture catchments) — a
+  precision-trim is the biggest payload win, but it belongs to the **3D/UX loop** (changes what a scene
+  renders), not this loop. No open service gap remains.
+
 ## 2026-07-17 — Intelligence loop: SERVICE — clear the provenance "shame board" (6 → 2 unlabelled) by self-stamping the structural layers — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Backlog is 0-open / 96% done, the QA gate

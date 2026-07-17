@@ -5,7 +5,7 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-12 · commit at time of run: `c163b56` · against `platform/data/provenance.json`._
+_Audit run: 2026-07-17 · latest ship: provenance shame board **2 → 0** via the sidecar mechanism (§2) · against `platform/data/provenance.json`._
 
 ## Headline
 
@@ -45,18 +45,22 @@ live-input layer detected.
 
 ## 2. Provenance coverage
 
-- **82 layers · 313 files.** 39 measured · 41 estimated · **2 unlabelled** (the "shame board").
-- **Update 2026-07-17 (intelligence loop):** the shame board was **cut 6 → 2**. Four of the six
-  structural layers now carry an honest self-declared `meta` provenance stamp, added at the generator
-  so they stay `--check`-reproducible: `meta.json` (via `derive.py::build_meta` — MIXED, classifies
-  ESTIMATED), `deltas.json` + `snapshots_index.json` (via `timeseries.py::targets`), and the orphaned
-  curated pilot aggregate `rayong_province.json` (hand-stamped — verified **no live `fetch()`**).
-- The **2 remaining** unlabelled files — `branches.json` and `provinces/index.json` — are **top-level
-  JSON arrays**. They structurally **cannot** carry a `meta` block without a breaking `{meta, data}`
-  restructure that every consumer would have to change, so `build_provenance.py` (which reads
-  `d.get("meta")`) can never stamp them as-is. Their unlabelled state is honest-by-shape, not an
-  un-sourced number. Fully clearing the board needs a **sidecar** provenance mechanism (a
-  `branches.prov.json` / manifest the ledger consults for array layers) — a code change, deferred.
+- **83 layers · 314 files.** 41 measured · 42 estimated · **0 unlabelled** — the shame board is **clear**.
+- **Update 2026-07-17 (a), intelligence loop:** the board was **cut 6 → 2**. Four structural layers
+  gained an honest self-declared `meta` stamp at the generator so they stay `--check`-reproducible:
+  `meta.json` (`derive.py::build_meta` — MIXED, classifies ESTIMATED), `deltas.json` +
+  `snapshots_index.json` (`timeseries.py::targets`), and the orphaned curated pilot aggregate
+  `rayong_province.json` (hand-stamped — verified **no live `fetch()`**).
+- **Update 2026-07-17 (b), intelligence loop — the sidecar mechanism (this run):** the last **2**
+  unlabelled files — `branches.json` and `provinces/index.json` — are **top-level JSON arrays** that
+  structurally cannot carry an inline `meta` block. `build_provenance.py` now consults a hand-authored
+  **sidecar manifest** (`platform/data/provenance_sidecar.json`, keyed by relpath) for exactly those
+  array-shaped layers, supplying the same `label/source/provenance` an inline block would. `branches.json`
+  → **ESTIMATED** (MIXED: measured location/context + derived segment scores), inheriting meta.json's
+  live vintage via a `vintage_from` key; `provinces/index.json` → **MEASURED** (a directory/index with
+  measured rollups). The sidecar carries **provenance text only — zero data, zero numbers**; a file is
+  upgraded only when an honest committed entry names it. **Shame board 2 → 0.** Honest by mechanism, not
+  by fabrication — the board reports 314/314 labelled.
 
 ## 3. Broken data references — NONE
 
@@ -87,9 +91,14 @@ drop sub-visible buildings) is the biggest available payload win but belongs to 
 
 ## Next service task (recommended)
 
-**Done 2026-07-17** — the stampable structural layers were stamped (see §2), taking the board 6 → 2.
-To reach 100 % labelled, the remaining work is a **mechanism** change: teach `build_provenance.py`
-to read a **sidecar** provenance stamp for the two array-shaped layers (`branches.json`,
-`provinces/index.json`) — e.g. a `branches.prov.json` companion or a small manifest — since a
-top-level JSON array cannot carry an inline `meta` block. A code change, not a data change, so it
-stays deterministic, gate-safe, and fabrication-free.
+**Done 2026-07-17 (b)** — the sidecar mechanism shipped (see §2): `build_provenance.py` now reads
+`provenance_sidecar.json` for the two array-shaped layers, taking the board **2 → 0 / 314 files
+100 % labelled**. Provenance coverage is now complete and self-sustaining (any future array-shaped
+layer just adds a sidecar entry).
+
+The next standing service target is **§4 heavy-JSON load weight**: the 30–40 MB Overture building
+catchments (`chiang-mai` 40.5 MB, `rayong` 34.2 MB, `bangkok` 30.2 MB) are the biggest available
+payload win. All three are lazy (fetched only when their own WebGL scene opens), so this is **not a
+regression** — but a precision-trim (round coordinates to ~6 dp, drop sub-visible buildings) would
+cut the 3D-scene cold-load. That belongs to the **3D/UX loop** (it changes what a scene renders), not
+this intelligence loop. For the service pillar, the data room is healthy with no open gap.
