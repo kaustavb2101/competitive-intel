@@ -62,6 +62,39 @@ don't re-litigate settled choices.
 - **Verified:** full chain run locally end-to-end — `pull_datagoth.py --only fpo_pico` (768,134 B, 200) → `build_pico_census.py`/`build_peer_province.py`/`build_provenance.py` all `--check` **OK byte-exact**; YAML parses (`yaml.safe_load`); `--check` exit-code contract confirmed (SKIP=3, unchanged=0, drift=1); `git status` shows only the workflow staged (raw files gitignored). Full gate `bash tests/run.sh check` → **66 passed, 0 failed** with the CSV present locally (the extra pass is `build_pico_census.py --check` running instead of SKIPping; reverts to 65 on the fresh CI runner — both healthy). No secrets in the workflow (uses `${{ github.token }}` only; no API key needed for FPO). No `platform/data` file changed on master → no committed provenance drift.
 - **Why not more this run:** the data backlog is genuinely empty and every remaining unlock is owner-side. Shipping the GISTDA check-crop puller (#4) still needs the key in the CI env + an unverifiable API contract; a real loan tape is owner-side. This workflow is the honest incremental win: it keeps a MEASURED competitor layer current without a laptop, closing the last CI-reachable-but-unautomated source.
 - **Next recommended integration (owner-side, value order):** (1) **real loan tape** → flips the four portfolio-risk outputs SYNTHETIC → measured (`ingest_loan_tape.py --real`); (2) map **`GISTDA_SPHERE_KEY`** into a workflow `env:` (code already reads it), then build + verify the check-crop puller to supersede the SPAM cropland baseline; (3) Thai-IP re-pull + commit of `baac_credit`/`smebank_credit` for a CI-distillable formal-credit-penetration layer.
+## 2026-07-17 — Integration loop: fold the MOT registered-vehicle registry → MEASURED national collateral-base layer + Overview readout — PR
+
+Integration loop (backlog #3: distil the reachable data.go.th department sources into clean measured
+layers). DIW factories, FPO PICO, and DBD new-company formation were already distilled; the open
+collateral gap was **vehicles**. The per-province DLT registry (gdcatalog.dlt.go.th) stays geo-blocked
+from cloud IPs, but the **MOT** department CKAN (`datagov.mot.go.th`) is reachable from CI (verified
+HTTP 200 this run) — so the national registered-vehicle stock is now pullable without the Thai laptop.
+
+- **Why this matters (objective #1).** AutoX lends against **vehicle titles**; the collateral mix
+  ("motorcycle title ≈ half the book, car/pickup ≈ a quarter") was an *assumption* nowhere grounded in a
+  measured count. The MOT registry grounds it: motorcycles are **52.9% of the title-lendable base**
+  (23.3M of 44.0M motorcycles+cars+pickups+farm vehicles; 45.5M vehicles of every type), vintage **2025
+  (BE 2568)**, +0.9% YoY. That is the external anchor for the book's collateral risk.
+- **What shipped.** (a) `pipeline/build_vehicle_registry.py` — distils the gitignored, re-pullable
+  `source-data/datagoth/mot_vehicles.csv` into `platform/data/vehicle_registry.json` (latest vintage,
+  prior year, YoY, 10-year per-class series), grouped by รย. code into the four AutoX collateral classes.
+  DETERMINISTIC + `--check` (byte-exact; SKIP-exit-3 when the raw CSV is absent, same convention as
+  build_pico_census / build_dbd_formation). (b) Gate wired (`tests/run.sh`, 65 → 66 checks).
+  (c) `build_provenance.py` re-run — new layer registered **measured**. (d) Overview surfacing: a new
+  **"Collateral base · registered-vehicle stock (MOT, measured)"** card (4 class tiles + YoY + a note
+  that leads with the measured moto-share), null-safe (hidden if the file is absent).
+- **Honesty.** Labelled MEASURED but with the two caveats stated in the layer `meta` and carried into the
+  UI note: it is **national, NOT province** (the province dimension stays with `vehicles_by_province.json`
+  / the DLT-derived collatmix table below it), and it is a **cumulative registered stock, not new sales**
+  — so the YoY is net stock growth. No fabricated number; every value read from the registry.
+- **Safeguards (all pass):** `bash tests/run.sh check` → **66 passed, 0 failed** (build_vehicle_registry
+  `--check` byte-exact; 446/446 data-integrity green). Overview headless render (Chromium): card visible,
+  4 tiles, correct note, **zero page errors** (only the pre-existing sandbox-blocked CDN resets); the full
+  harness render captured the card in `index.dom.html`. No secrets in diff. Opened as a **PR** (app-visual
+  change).
+- **Next recommended integration:** distil **Excise vehicle-tax** collections (catalog.excise.go.th — SSL
+  handshake failed from CI this run, retry) as a *new-vehicle-flow* companion to this stock layer, and
+  fold this collateral base into the Command-center readout (obj #1 headline).
 
 ## 2026-07-18 — Integration loop: GISTDA readiness — fix the latent key-name mismatch (repo secret `GISTDA_SPHERE_KEY` ≠ code's `GISTDA_API_KEY`) — SHIPPED
 - **State verified first (not assumed):** gate green on master (`bash tests/run.sh check` → 65/0); the frontier sources are still blocked, measured live from this cloud runner today — data.go.th aggregator (BAAC) **403**, `sphere.gistda.or.th` **200** but **`GISTDA_SPHERE_KEY` absent from the CI env**, NESDC opendata **200** with no clean GPP datastore (all matching `docs/BLOCKED_SOURCES.md`). The CI-side integration backlog is confirmed empty per the last two runs; every remaining unlock (real loan tape, GISTDA key mapping, Thai-IP BAAC/SME re-pull) is owner-side. So rather than manufacture churn, I took the one **fully-verifiable, zero-blast-radius correctness fix** on the path to the top open CI task (backlog #4, GISTDA 40m cropland).
@@ -71,6 +104,7 @@ don't re-litigate settled choices.
 - **Why not more this run:** backlog #4's substantive remainder — the check-crop puller itself — needs the GISTDA sphere API request/response contract, which I cannot verify from CI (no key in env; the existing gistda isochrone path already hedges "endpoint shape varies by plan, verify against docs"). Shipping an untested network puller to master would be speculative, unverifiable code — deferred to the owner-side GISTDA unlock, now one footgun lighter.
 - **Next recommended integration (all owner-side, value order):** (1) **real loan tape** → flips the four portfolio-risk outputs SYNTHETIC → measured (`ingest_loan_tape.py --real`); (2) **map `GISTDA_SPHERE_KEY` into a workflow `env:`** (now that the code reads it correctly), then build+verify the check-crop puller to supersede the SPAM cropland baseline; (3) Thai-IP re-pull + commit of `baac_credit`/`smebank_credit` for a CI-distillable formal-credit-penetration layer.
 
+
 ## 2026-07-17 — Intelligence loop: PEER — place AutoX in its own national peer set (2nd-largest title-loan network, MEASURED) — SHIPPED
 - **Gap:** the national competitor-coverage board (`#acq`, `competitor_coverage.json`) shows the four big-4 rivals' networks (found vs reported-expected) but **never places AutoX in that peer set** — so a strategy director reading it, and the per-province density board next to it (`peer_province.json`, where clustering makes AutoX read as a modal-3rd local also-ran), had no line stating where AutoX actually stands nationally by footprint. The genuinely useful MEASURED fact was uncomputed and unstated: by branch-NETWORK size AutoX is the **2nd-largest title-loan network in Thailand**.
 - **Ship (one improvement, 2 code files + 2 regenerated data files):**
@@ -79,6 +113,7 @@ don't re-litigate settled choices.
 - **Why it matters:** reconciles an apparent contradiction the platform never addressed — the per-province board makes AutoX look weak (modal 3rd) because rivals cluster in dense provinces, while at national footprint scale AutoX is second only to Muangthai. Both readings are correct and now sit side by side, labelled.
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **65 passed, 0 failed** (incl. `build_competitor_coverage.py --check` + `build_provenance.py --check` + `node --check app.js`). (b) `build_provenance.py` regenerated + `--check` OK (competitor_coverage.json size drift folded in). (c) no secrets in diff. (d) diff = 4 intended files + committee plan churn; AutoX count MEASURED, peer counts the pre-existing CITED figures, honest caveats — no fabrication. Headless render of `#acq` at 1180px: readout `innerHTML` verified (correct numbers, measured/est tags, AutoX in accent), screenshot of the expanded section clean.
 - **Deploy-verify:** recorded below after the push.
+
 
 ## 2026-07-17 — Integration loop: evidence-backed BLOCKED-SOURCE LEDGER — stop every run re-probing the same walls — SHIPPED
 
@@ -121,6 +156,7 @@ is already done, and every remaining unlock is owner-side-blocked, not code-bloc
   so a CI builder can distill the formal-credit penetration layer. Until one of those lands, the CI-side
   integration backlog is genuinely empty.
 
+
 ## 2026-07-17 — Intelligence loop: SERVICE — finish the provenance "shame board" (2 → 0) with a sidecar manifest for the array-shaped layers — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Backlog 0-open / 96% done, gate green on
@@ -158,6 +194,7 @@ mechanism to clear the last 2 unlabelled files.
   standing service target is `SERVICE_AUDIT.md` §4 heavy-JSON weight (30–40 MB Overture catchments) — a
   precision-trim is the biggest payload win, but it belongs to the **3D/UX loop** (changes what a scene
   renders), not this loop. No open service gap remains.
+
 
 ## 2026-07-17 — Intelligence loop: SERVICE — clear the provenance "shame board" (6 → 2 unlabelled) by self-stamping the structural layers — SHIPPED
 
