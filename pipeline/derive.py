@@ -127,11 +127,26 @@ def build_meta(master, prev):
     meta = {"board": board, "region": region, "estates": estates}
     for k in CARRY:
         meta[k] = prev[k]
-    # key order in the committed file: board, region, estates, mws, cws, macro, n_agri, updated
+    # Self-declared provenance stamp so this file leaves the provenance "shame board"
+    # (build_provenance.py reads meta.label/source/provenance/generated_by). meta.json is a
+    # supporting app-wide meta block, NOT a numeric intelligence layer — its provenance is
+    # MIXED (measured structure + editorial macro), so it correctly classifies ESTIMATED.
+    stamp = {
+        "label": ("App-wide meta block (supporting, NOT a numeric intelligence layer): commodity "
+                  "board, region rollups, industrial-estate own-counts, segment coverage (mws/cws), "
+                  "macro EDITORIAL narrative, and the tamper-evident branches_fingerprint."),
+        "generated_by": "pipeline/derive.py (build_meta) — deterministic, network-free, --check-reproducible",
+        "source": ("Derived from source-data/branches_final.json + commodity_board.json + estates.json; "
+                   "mws / cws / macro / updated carried from source-data via the enrichment loop."),
+        "provenance": ("MIXED — region means, estate own-counts and the fingerprint are MEASURED-structural; "
+                       "the macro block is EDITORIAL. A supporting meta block, not a risk/market metric."),
+        "updated": meta["updated"],
+    }
+    # key order in the committed file: board, region, estates, mws, cws, macro, n_agri, updated, meta
     # (run() appends branches_fingerprint last — derived, not carried)
     return {"board": meta["board"], "region": meta["region"], "estates": meta["estates"],
             "mws": meta["mws"], "cws": meta["cws"], "macro": meta["macro"],
-            "n_agri": meta["n_agri"], "updated": meta["updated"]}
+            "n_agri": meta["n_agri"], "updated": meta["updated"], "meta": stamp}
 
 
 def run(check=False):

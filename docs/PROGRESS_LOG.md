@@ -3,6 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-17 — Intelligence loop: SERVICE — clear the provenance "shame board" (6 → 2 unlabelled) by self-stamping the structural layers — SHIPPED
+
+Intelligence loop (market · service · peer · deploy-health). Backlog is 0-open / 96% done, the QA gate
+was green on master (64/0), and the live site is up + Basic-Auth-gated (401 = healthy, `site-health.yml`
+targets the correct master alias). Deploy health is clean. So I took the **recommended next service task**
+straight from `docs/SERVICE_AUDIT.md`: clear the provenance shame board — the files that ship in
+`platform/data/` with **no self-declared `meta` provenance stamp** (`build_provenance.py` counts them in
+`files.unlabelled`).
+
+- **Finding (service pillar).** `provenance.json` listed **6 unlabelled files**: `branches.json`,
+  `deltas.json`, `meta.json`, `provinces/index.json`, `rayong_province.json`, `snapshots_index.json`.
+  Four are dict-shaped and can carry a `meta` block; **two are top-level JSON arrays** (`branches.json`,
+  `provinces/index.json`) that **structurally cannot self-stamp** without a breaking `{meta, data}`
+  restructure that would ripple through every consumer — so the fully-clearable target is 4.
+- **Fix (provenance stamps only — NO data, NO numbers).** Added an honest self-declared `meta` block to
+  each of the 4 stampable files, at the **generator** so it stays `--check`-reproducible:
+  `derive.py::build_meta` → `meta.json` (MIXED: measured structure + EDITORIAL macro → classifies
+  ESTIMATED); `timeseries.py::targets` → `deltas.json` (ESTIMATED proxy-score deltas) + `snapshots_index.json`
+  (MEASURED file listing); and a hand stamp on the **orphaned** `rayong_province.json` (curated pilot
+  aggregate — verified **no live `fetch()`** references it anywhere, so the edit touches nothing). Shame
+  board **6 → 2**; the residual 2 are the array-shaped files, documented as honestly structural, not a gap.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **65 passed, 0 failed** (derive / timeseries /
+  vintage_digest / provenance all `--check`-reproduce; 446/446 data-integrity checks green). (b) No secrets
+  in diff (scanned). (c) Diff = 2 pipeline scripts (`derive.py` +17, `timeseries.py` +22) + 5 regenerated
+  data files (the 4 stamped + `provenance.json` ledger); intent-matched, **no app/visual change** (no
+  `app.js`/HTML/CSS touched → no PR/headless render needed). (d) **No fabrication** — every stamp is a
+  provenance *description*, zero data added; `vintage_digest.json` is byte-identical (confirms the new
+  `meta` key is inert downstream), and the ledger now honestly reports 2 unlabelled, not 0.
+- **Next recommended intelligence task:** the last 2 unlabelled files are top-level arrays. If a future run
+  wants a fully-clean board, teach `build_provenance.py` to read a **sidecar** provenance stamp
+  (`branches.prov.json` / a small manifest) for array-shaped layers — a mechanism change, not a data change,
+  so it stays gate-safe and fabrication-free.
+
 ## 2026-07-17 — Intelligence loop: PEER COMPARISON — surface the MEASURED peer-NPL benchmark (a dangling layer, visible nowhere) on the Competition tab — SHIPPED
 
 Intelligence loop (market · service · peer · deploy-health). Backlog is 0-open / 96% done, the QA gate

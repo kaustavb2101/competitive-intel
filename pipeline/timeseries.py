@@ -195,11 +195,33 @@ def build_deltas(snaps):
             "region": region, "board": board, "branches": branches}
 
 
+# Self-declared provenance stamps so these two derived files leave the provenance "shame board"
+# (build_provenance.py reads meta.label/source/provenance/generated_by). Deterministic literals —
+# they add no data, only a provenance header, so --check stays byte-exact once regenerated.
+INDEX_META = {
+    "label": "Index of captured data-vintage snapshots (label + updated) that back the Risk-trend deltas.",
+    "generated_by": "pipeline/timeseries.py (build_index) — deterministic, network-free, --check-reproducible",
+    "source": "source-data/snapshots/*.json (one per captured vintage).",
+    "provenance": "MEASURED — a listing of committed snapshot files; carries no computed risk/market number.",
+}
+DELTAS_META = {
+    "label": ("Time-dimension snapshot diff (Risk-trend tab): region proxy movers, commodity-board YoY "
+              "re-ratings, and the top per-branch composite movers between two committed data vintages."),
+    "generated_by": "pipeline/timeseries.py (build_deltas) — deterministic, network-free, --check-reproducible",
+    "source": "Diff of two committed source-data/snapshots/*.json vintages (by index order).",
+    "provenance": ("ESTIMATED — region/branch movers are proxy-score deltas; the commodity board is "
+                   "measured/editorial price direction. Not a measured default/loss delta."),
+}
+
+
 def targets():
     """(path, canonical-text) for the two derived platform files, given committed snapshots."""
     snaps = list_snapshots()
     idx = build_index(snaps)
+    idx["meta"] = INDEX_META
     deltas = build_deltas(snaps)
+    # vintage of the diff = the "to" snapshot's updated stamp (blank on the baseline path)
+    deltas["meta"] = {**DELTAS_META, "updated": deltas.get("updated_to", "")}
     return [
         (os.path.join(OUT, "snapshots_index.json"),
          json.dumps(idx, ensure_ascii=False, sort_keys=True, separators=(",", ":"))),

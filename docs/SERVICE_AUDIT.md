@@ -45,12 +45,18 @@ live-input layer detected.
 
 ## 2. Provenance coverage
 
-- **78 layers · 309 files.** 33 measured · 39 estimated · **6 unlabelled** (the "shame board").
-- The 6 unlabelled files are all **structural, not numeric-intelligence** layers:
-  `branches.json`, `deltas.json`, `meta.json`, `provinces/index.json`, `rayong_province.json`,
-  `snapshots_index.json`. They carry no self-declared `meta.label/source/provenance/generated_by`
-  stamp. Low priority — none ships an un-sourced risk/market number — but adding a one-line meta
-  stamp to each would clear the board. **Logged, not fixed this run** (scope: one change per run).
+- **82 layers · 313 files.** 39 measured · 41 estimated · **2 unlabelled** (the "shame board").
+- **Update 2026-07-17 (intelligence loop):** the shame board was **cut 6 → 2**. Four of the six
+  structural layers now carry an honest self-declared `meta` provenance stamp, added at the generator
+  so they stay `--check`-reproducible: `meta.json` (via `derive.py::build_meta` — MIXED, classifies
+  ESTIMATED), `deltas.json` + `snapshots_index.json` (via `timeseries.py::targets`), and the orphaned
+  curated pilot aggregate `rayong_province.json` (hand-stamped — verified **no live `fetch()`**).
+- The **2 remaining** unlabelled files — `branches.json` and `provinces/index.json` — are **top-level
+  JSON arrays**. They structurally **cannot** carry a `meta` block without a breaking `{meta, data}`
+  restructure that every consumer would have to change, so `build_provenance.py` (which reads
+  `d.get("meta")`) can never stamp them as-is. Their unlabelled state is honest-by-shape, not an
+  un-sourced number. Fully clearing the board needs a **sidecar** provenance mechanism (a
+  `branches.prov.json` / manifest the ledger consults for array layers) — a code change, deferred.
 
 ## 3. Broken data references — NONE
 
@@ -81,6 +87,9 @@ drop sub-visible buildings) is the biggest available payload win but belongs to 
 
 ## Next service task (recommended)
 
-Clear the 6-file provenance shame board by stamping a one-line `meta` block on each structural
-layer (`branches.json`, `meta.json`, …) so the Data-room census reaches 100 % labelled — a small,
-deterministic, gate-safe change for a future run.
+**Done 2026-07-17** — the stampable structural layers were stamped (see §2), taking the board 6 → 2.
+To reach 100 % labelled, the remaining work is a **mechanism** change: teach `build_provenance.py`
+to read a **sidecar** provenance stamp for the two array-shaped layers (`branches.json`,
+`provinces/index.json`) — e.g. a `branches.prov.json` companion or a small manifest — since a
+top-level JSON array cannot carry an inline `meta` block. A code change, not a data change, so it
+stays deterministic, gate-safe, and fabrication-free.
