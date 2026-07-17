@@ -1703,11 +1703,24 @@ function drawCompCoverage(){
     const ttxt=(t.coverage_pct!=null)
       ? `We now hold <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> measured rival branches vs an estimated <b style="color:var(--gold)">${(t.expected||0).toLocaleString()}</b> from public reports.`
       : `Found <b style="color:var(--merch)">${(t.found||0).toLocaleString()}</b> competitor locations.`;
-    ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}`+
+    // national peer standing — where AutoX sits among the big-4 by branch-NETWORK size (obj #2).
+    // AutoX size = MEASURED own network; peer size = REPORTED (cited IR). A footprint-scale read
+    // that reframes the per-province density board; null-safe (older data has no block).
+    const ns=m.national_standing;
+    let nstxt='';
+    if(ns&&ns.autox_rank&&Array.isArray(ns.ranking)){
+      const ordLabel=n=>({1:'largest',2:'2nd-largest',3:'3rd-largest',4:'4th-largest',5:'5th-largest'}[n]||`#${n}`);
+      const chain=ns.ranking.map(o=>`${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ${(o.branches||0).toLocaleString()}`).join(' &rsaquo; ');
+      nstxt=`<div style="margin-top:6px"><b>Nationally, AutoX runs the ${ordLabel(ns.autox_rank)} title-loan branch network</b> `+
+        `of the ${ns.n_ranked} big operators with a cited count: ${chain}. ${TAG_M} ${TAG_E} `+
+        `<span class="sub">By network size — a different question from the per-province density board above, where rivals cluster and AutoX reads as a local 3rd.</span></div>`;
+    }
+    ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
         ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
          'Heng is the one exception — still a Google/Overture <b>SAMPLE</b> (its locator is Cloudflare-blocked), so Heng alone is a lower bound.',
-         'Coverage % is a data-completeness flag, <b>not</b> market share.']);
+         'Coverage % is a data-completeness flag, <b>not</b> market share.',
+         '<b>National standing</b> ranks operators by branch-network SIZE (AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts). Heng is excluded — no cited count. Network size ≠ market share, and differs from the local per-province density read.']);
   }
 }
 

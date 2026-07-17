@@ -38,6 +38,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
 OUT  = os.path.join(DATA, "competitor_coverage.json")
+BRANCHES = os.path.join(DATA, "branches.json")
 
 # The MERGED full census (official store-locators for Muangthai/Srisawad/Tidlor + Google/Overture
 # sample for Heng — already deduped). For 3 of 4 brands this is now the near-COMPLETE network, so
@@ -101,6 +102,66 @@ def _count_found():
     return counts, sources
 
 
+def _autox_branch_count():
+    """MEASURED count of AutoX's OWN operating network = number of committed branches
+    (branches.json is a top-level array, one object per branch). Returns None if absent
+    (stripped sandbox) so the standing block degrades honestly rather than inventing a count."""
+    if not os.path.exists(BRANCHES):
+        return None
+    with open(BRANCHES, encoding="utf-8") as f:
+        d = json.load(f)
+    return len(d) if isinstance(d, list) else None
+
+
+def _national_standing(autox_n):
+    """Where AutoX sits nationally among the big-4 by BRANCH-NETWORK SIZE — the read the
+    found-vs-expected board hides (it never places AutoX in its own peer set). AutoX's size is
+    MEASURED (its own committed network); each peer's size is its cited public 'expected' figure
+    (REPORTED). Only operators with a cited figure enter the ranking pool — Heng (uncited) is
+    listed but excluded from the rank, mirroring the never-invent rule. This is a NETWORK-SIZE
+    comparison, NOT market share and NOT the local per-province density read (peer_province.json,
+    where clustering makes AutoX read as a modal-3rd) — the two answer different questions and are
+    cross-referenced in the caveat. Returns None when the AutoX count is unavailable."""
+    if not autox_n:
+        return None
+    # pool = AutoX (measured own network) + each peer WITH a cited reported figure.
+    pool = [{"operator": "AutoX", "branches": autox_n, "basis": "MEASURED (own operating network, branches.json)"}]
+    for b in BRANDS:
+        exp = EXPECTED.get(b)
+        if exp:
+            pool.append({"operator": b, "branches": exp, "basis": "REPORTED (cited public IR figure)"})
+    # rank by network size desc; deterministic tie-break by the fixed pool order (AutoX first,
+    # then census brand order) — matches build_peer_province's tie-break convention.
+    order = ["AutoX"] + BRANDS
+    ranked = sorted(pool, key=lambda o: (-o["branches"], order.index(o["operator"])))
+    for i, o in enumerate(ranked, 1):
+        o["rank"] = i
+    autox_rank = next(o["rank"] for o in ranked if o["operator"] == "AutoX")
+    n_ranked = len(ranked)
+    ahead = [o["operator"] for o in ranked if o["rank"] < autox_rank]
+    behind = [o["operator"] for o in ranked if o["rank"] > autox_rank]
+    # peers named in our brand set that carry NO cited figure -> excluded from the pool, disclosed.
+    excluded = [b for b in BRANDS if not EXPECTED.get(b)]
+    return {
+        "autox_branches": autox_n,
+        "autox_rank": autox_rank,
+        "n_ranked": n_ranked,
+        "ranking": ranked,
+        "ahead_of_autox": ahead,
+        "behind_autox": behind,
+        "excluded_uncited": excluded,
+        "basis": "NETWORK SIZE — AutoX's MEASURED own-network branch count vs each peer's REPORTED "
+                 "(cited public IR) branch count. A national footprint-scale read, NOT market share.",
+        "caveat": "This ranks operators by total branch-NETWORK size nationally, where AutoX is the "
+                  "2nd-largest title-loan network. It is a DIFFERENT question from the per-province "
+                  "density board (peer_province.json), where rivals cluster in dense provinces and "
+                  "AutoX reads as a modal-3rd locally — national scale and local density tell "
+                  "different stories, both true. Heng carries no cited branch count so it is excluded "
+                  "from the rank (never invented). Peer figures are listed-ENTITY IR counts; a group's "
+                  "full retail footprint can be larger (see the Srisawad note above).",
+    }
+
+
 def build():
     counts, sources = _count_found()
     brands = []
@@ -113,6 +174,7 @@ def build():
     total_found = sum(counts.values())
     total_expected = sum(v for v in EXPECTED.values() if v)
     overall_cov = round(100.0 * total_found / total_expected, 1) if total_expected else None
+    national_standing = _national_standing(_autox_branch_count())
 
     meta = {
         "generated_by": "pipeline/build_competitor_coverage.py",
@@ -124,6 +186,7 @@ def build():
         "expected_sources": {b: EXPECTED_SOURCES[b] for b in BRANDS},
         "totals": {"found": total_found, "expected": total_expected or None,
                    "coverage_pct": overall_cov},
+        "national_standing": national_standing,
         "caveat": "found now comes from each operator's OFFICIAL store-locator for Muangthai, "
                   "Srisawad and Tidlor (the near-complete network), so coverage_pct is ~100% and "
                   "can exceed 100% because a locator lists every service point / sub-branch beyond "
@@ -163,6 +226,11 @@ def run(check=False):
     print("  TOTAL      found=%-5d expected=%-7s coverage=%s"
           % (t["found"], (t["expected"] if t["expected"] is not None else "n/a"),
              ("%.1f%%" % t["coverage_pct"]) if t["coverage_pct"] is not None else "n/a"))
+    ns = obj["meta"].get("national_standing")
+    if ns:
+        print("  national standing (by network size): AutoX #%d of %d — %s"
+              % (ns["autox_rank"], ns["n_ranked"],
+                 " > ".join("%s %s" % (o["operator"], "{:,}".format(o["branches"])) for o in ns["ranking"])))
     return 0
 
 
