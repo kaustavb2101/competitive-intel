@@ -4576,7 +4576,7 @@ function renderBranches(){
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
   rows=rows.slice(0,150);
   $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th><th class="no-print">3D</th></tr>`+
-    rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
+    (rows.length ? rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
       const wItem={id,label:d.n,sub:`${d.v} · ${d.r}`,val:`▲ ${rk}`,valSub:'risk · est',col:rc,prov:d.v};
       return `<tr onclick="location.href='${branchHref(d)}'" tabindex="0" role="link" style="cursor:pointer">
@@ -4587,7 +4587,8 @@ function renderBranches(){
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono" style="color:var(--collat)">${nsoNum(pl.informal)}</td>
       <td class="mono sub">${d.w}</td>
-      <td class="no-print" style="white-space:nowrap">${branch3DLinks(d,true)}</td></tr>`;}).join('');
+      <td class="no-print" style="white-space:nowrap">${branch3DLinks(d,true)}</td></tr>`;}).join('')
+     : `<tr><td colspan="9" class="cc-empty" style="padding:14px 7px">No branches match “${dqEsc(q)}”. Clear the search to see all 2,015.</td></tr>`);
 }
 
 /* ---------- provinces selector ---------- */
@@ -4619,7 +4620,7 @@ function drawProv(){
     (!q || p.th.includes(q) || (p.en||'').toLowerCase().includes(q) || p.slug.includes(q)))
     .sort((a,b)=>b.branches-a.branches);
   $('#provtbl').innerHTML=`<tr><th class="no-print"></th><th>Province</th><th>Region</th><th>Br</th><th>Distr</th><th>Factories</th><th>Vehicles</th><th>Fac/br</th><th class="no-print">View</th></tr>`+
-   rows.map(p=>{const id=`prov:${p.th}`;
+   (rows.length ? rows.map(p=>{const id=`prov:${p.th}`;
      const wItem={id,label:p.th,sub:`${p.region} · ${p.branches} branches`,val:`${(p.factories||0).toLocaleString()}`,valSub:'factories · measured',col:'var(--gold)',prov:p.th};
      return `<tr onclick="location.href='${bldgURL(p.slug)}'" tabindex="0" role="link" style="cursor:pointer">
      <td class="no-print">${starBtn(id,wItem)}</td>
@@ -4633,7 +4634,8 @@ function drawProv(){
      <td class="no-print sub" style="white-space:nowrap">
        <a href="${bldgURL(p.slug)}" onclick="event.stopPropagation()" title="3D building scene" style="text-decoration:none;color:var(--accent)">🏙 3D</a>
        <a href="${distURL(p.slug)}" onclick="event.stopPropagation()" title="Extruded district view" style="text-decoration:none;margin-left:8px;color:var(--mid,#8A94A8)">▦ district</a>
-     </td></tr>`;}).join('');
+     </td></tr>`;}).join('')
+    : `<tr><td colspan="9" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${provRegion==='all'?'':` in ${dqEsc(provRegion)}`}. Clear the search to see all 77.</td></tr>`);
 }
 
 /* ---------- market assessment (real measured numbers, no indices) ---------- */
@@ -4695,7 +4697,8 @@ function drawMarket(){
      <td class="mono" style="color:var(--collat)">${naNum(p.informal)}</td>
      <td class="mono">${naNum(p.pickup)}</td>
      <td class="mono sub">${pct(p)}%</td>
-     <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('');
+     <td class="mono" style="color:${wc&&wc.yoy<0?'var(--agri)':'var(--mid)'}">${wc?wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%':'—'}</td></tr>`;}).join('')
+    || `<tr><td colspan="7" class="cc-empty" style="padding:14px 7px">No provinces match “${dqEsc(q)}”${mktRegion==='all'?'':` in ${dqEsc(mktRegion)}`}. Clear the search to see all 77.</td></tr>`;
   $('#mktcsv').onclick=()=>{
     const hdr=['province','province_en','region','branches','registered_factory_workers_diw','informal_workforce_nso','pickups_dlt','pickup_share_pct','vehicles_total','weakest_crop_est','weakest_crop_yoy_est'];
     const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
