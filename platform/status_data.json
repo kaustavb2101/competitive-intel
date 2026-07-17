@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-17T11:32:20+07:00",
-    "commit": "a47cc33"
+    "generated_at": "2026-07-17T04:32:45Z",
+    "commit": "5196c76"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-17T04:32:45Z",
+      "sha": "5196c76",
+      "summary": "chore(dashboard): refresh autonomy plan after peer-NPL card ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-17T11:32:20+07:00",
       "sha": "a47cc33",
       "summary": "feat(peer): surface the MEASURED peer-NPL benchmark on the Competition tab (#52)",
       "pillar": "peer"
     },
     {
-      "date": "2026-07-17T02:12:19+00:00",
+      "date": "2026-07-17T02:12:19Z",
       "sha": "30b9fe8",
       "summary": "docs(progress-log): record ux-loop search empty-state fix — merged #51, deploy 401 (up+gated)",
       "pillar": "uxui"
@@ -498,7 +504,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T00:35:48+00:00",
+      "date": "2026-07-17T00:35:48Z",
       "sha": "46d6448",
       "summary": "fix(gate): regenerate fuel-price-dependent layers — master CI was red after the #49 fuel auto-commit",
       "pillar": "deployment"
@@ -522,25 +528,25 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-16T22:22:23+00:00",
+      "date": "2026-07-16T22:22:23Z",
       "sha": "75001e6",
       "summary": "chore(dashboard): refresh autonomy plan after site-health deploy-health fix",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T22:19:03+00:00",
+      "date": "2026-07-16T22:19:03Z",
       "sha": "8ba7638",
       "summary": "fix(deploy-health): a rejected-credential 401 is \"site up + protected\", not a site outage",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T22:08:40+00:00",
+      "date": "2026-07-16T22:08:40Z",
       "sha": "fb859fb",
       "summary": "committee: refresh autonomy plan (run 29538475364)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T20:14:24+00:00",
+      "date": "2026-07-16T20:14:24Z",
       "sha": "52e96e7",
       "summary": "docs(progress-log): record ux-loop data-book filter/sort fix — merged #47, deploy READY",
       "pillar": "uxui"
@@ -552,19 +558,19 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-16T16:22:52+00:00",
+      "date": "2026-07-16T16:22:52Z",
       "sha": "0ea7eb6",
       "summary": "committee: refresh autonomy plan (run 29515234336)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T16:15:37+00:00",
+      "date": "2026-07-16T16:15:37Z",
       "sha": "35a6653",
       "summary": "chore(dashboard): refresh autonomy plan after provenance-gate fix",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T16:10:52+00:00",
+      "date": "2026-07-16T16:10:52Z",
       "sha": "bc071e9",
       "summary": "fix(gate): regenerate drifted provenance ledger — CI gate was red on master",
       "pillar": "deployment"
@@ -582,13 +588,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-16T14:21:42+00:00",
+      "date": "2026-07-16T14:21:42Z",
       "sha": "aae06d4",
       "summary": "docs: record theme-color deploy-verify result (PR #45)",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-16T14:20:50+00:00",
+      "date": "2026-07-16T14:20:50Z",
       "sha": "ead01a9",
       "summary": "docs: log theme-color meta ship + CI-runner outage note (PR #45)",
       "pillar": "uxui"
@@ -636,7 +642,7 @@
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-16T04:23:00+00:00",
+      "date": "2026-07-16T04:23:00Z",
       "sha": "97d7c33",
       "summary": "chore(dashboard): refresh autonomy plan after peer-rank ship",
       "pillar": "peer"
@@ -648,15 +654,9 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-16T03:25:53+00:00",
+      "date": "2026-07-16T03:25:53Z",
       "sha": "2aadd61",
       "summary": "docs: log color-scheme theme-tracking ship + deploy-verify (PR #38)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-16T10:23:58+07:00",
-      "sha": "44312db",
-      "summary": "ux: theme-track native scrollbars/controls via color-scheme (#38)",
       "pillar": "uxui"
     }
   ]
