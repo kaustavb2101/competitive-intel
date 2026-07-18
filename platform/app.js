@@ -1856,14 +1856,21 @@ function drawRivalDensity(){
    next to Muangthai / Srisawad / Tidlor / Heng separately. Lazy, graceful if absent. We DO
    NOT recompute anything here — we rank & show measured counts. A competitive-pressure read
    on the existing network; no open / expand call. */
-let PEERPROV=null, peerprovLoaded=false;
+let PEERPROV=null, peerprovLoaded=false, peerprovPromise=null;
 const PEERPROV_TOPN=20;
+// Reusable promise loader — shared by the Competition tab board AND the command-center thesis clause
+// (obj#2). Fetches once, caches, degrades to null on any error so callers stay null-safe.
+function loadPeerProvince(){
+  if(peerprovPromise) return peerprovPromise;
+  peerprovPromise=fetch('data/peer_province.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PEERPROV=j; peerprovLoaded=true; return PEERPROV; })
+    .catch(()=>{ PEERPROV=null; peerprovLoaded=true; return null; });
+  return peerprovPromise;
+}
 function renderPeerProvince(){
   const tbl=$('#peerprovtbl'); if(!tbl) return;
   if(peerprovLoaded){ drawPeerProvince(); return; }
-  fetch('data/peer_province.json').then(r=>r.ok?r.json():null).then(j=>{
-    PEERPROV=j; peerprovLoaded=true; drawPeerProvince();
-  }).catch(()=>{ PEERPROV=null; peerprovLoaded=true; drawPeerProvince(); });
+  loadPeerProvince().then(drawPeerProvince);
 }
 function drawPeerProvince(){
   const tbl=$('#peerprovtbl'), ro=$('#peerprovreadout'); if(!tbl) return;
@@ -5153,6 +5160,9 @@ function renderHome(){
     // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
     // expand card, mirroring the full table already shipped on Exposure (null-safe).
     loadContestedPop().then(reHome);
+    // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
+    // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
+    loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -5188,6 +5198,16 @@ function renderHomeThesis(){
   }
   if(zeroDist!=null){
     clauses.push(`<b>${zeroDist.toLocaleString()}</b> district${zeroDist===1?'':'s'} have <b>no AutoX branch</b> (coverage gaps)`);
+  }
+  // obj#2 — the CO-EQUAL competitive-risk clause (CLAUDE.md: the command center aggregates competitive
+  // risk + portfolio risk into ONE readout). How universally the big-4 title-lenders outnumber the
+  // EXISTING network on local per-province density (MEASURED census, peer_province.json) — a risk read
+  // on the footprint we run, never an open/expand call. Null-safe; dropped until the layer loads.
+  const pp=(PEERPROV&&PEERPROV.meta)?PEERPROV.meta:null;
+  if(pp&&pp.n_provinces_outnumbered!=null&&pp.n_provinces){
+    const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
+    const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
+    clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
   }
   if(ps){
     clauses.push(`the risk to watch is <b>${ps.province} household stress</b> (DTI ${ps.debt_to_income!=null?(+ps.debt_to_income).toFixed(2)+'×':'—'} + unemployment ${ps.unemployment_rate!=null?(+ps.unemployment_rate).toFixed(1)+'%':'—'}, composite ▲${(ps.composite_stress||0).toFixed(0)}, measured)`);
