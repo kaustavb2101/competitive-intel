@@ -1329,6 +1329,7 @@ function renderOverview(){
   // absent file → the wrap stays display:none and the Overview reads exactly as before.
   loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
+  renderDieselCollateral();
   renderCollatMix();
   renderRecoverySensitivity();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
@@ -1448,6 +1449,74 @@ function renderCollatOutlook(){
   if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the diesel-pickup and used-motorcycle sides both face a slow value squeeze. '+
     'If recovery values on repossessed vehicles fall, loss-given-default on the title book rises even before any change in default rates. '+
     'These directions are an <b>estimated / editorial watch</b> (no live Thai used-vehicle price index in this data); the vehicle-mix shares below are measured (DLT).';
+}
+/* ---------- Diesel-pickup collateral · per-province diesel share + national brand mix ----------
+   objective #1, MEASURED. AutoX's core title collateral is the diesel pickup; the EV/diesel
+   transition is the resale-value risk under it. Two MEASURED reads from data/vehicle_collateral.json:
+   (a) per-province DIESEL SHARE of the car(รย.1)+pickup(รย.3) registered fleet (DLT dataset_1_1_04) —
+       where diesel dominates, resale is most exposed as the fleet electrifies; and
+   (b) the NATIONAL collateral BRAND mix (DLT first registrations) — Toyota+Isuzu pickups, Honda/Toyota
+       cars, BYD/EV rising. Brand is NATIONAL ONLY (no measured brand×province in reachable Thai open
+       data) — said plainly. Lazy-loaded; graceful/null-safe when absent. */
+let VCOLL=null, vcollLoaded=false, vcollPromise=null;
+function loadVehicleCollateral(){
+  if(vcollPromise) return vcollPromise;
+  vcollLoaded=true;
+  vcollPromise=fetch('data/vehicle_collateral.json').then(r=>r.ok?r.json():null)
+    .then(j=>{VCOLL=j||null;return VCOLL;}).catch(()=>{VCOLL=null;return null;});
+  return vcollPromise;
+}
+function renderDieselCollateral(){
+  const vb=$('#dcollat-verdict'), grid=$('#dcollat-brand'), tbl=$('#dcollattbl'), note=$('#dcollat-note');
+  if(!tbl) return;
+  if(!vcollLoaded){ loadVehicleCollateral().then(()=>{ try{renderDieselCollateral();}catch(e){} }); return; }
+  if(!VCOLL||!VCOLL.provinces||!VCOLL.provinces.length){
+    if(vb) vb.style.display='none';
+    if(grid) grid.innerHTML='';
+    if(note) note.textContent='Vehicle-title collateral data not available (data/vehicle_collateral.json missing).';
+    return;
+  }
+  const meta=VCOLL.meta||{}, nat=meta.national||{}, provs=VCOLL.provinces, bm=VCOLL.national_brand_mix;
+  const top=provs.slice(0,10);
+  const dcol=v=>v>=70?'var(--agri)':v>=60?'var(--gold)':'var(--collat)';
+  // ---- answer-first verdict ----
+  if(vb){
+    const t3=provs.slice(0,3).map(p=>p.th).join(', ');
+    const pk=(bm&&bm.pickup_top_brands||[]).slice(0,2).map(b=>b.b.charAt(0)+b.b.slice(1).toLowerCase()).join(' + ');
+    vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🛻 <b>National pickup-title collateral is ${pk||'Toyota + Isuzu'}-led</b> — diesel is <b>${nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'}</b> of the car+pickup title fleet, highest in <b>${t3}</b>, where the EV transition most threatens resale.</div>`+
+      `<div class="sub" style="margin-top:4px">Diesel share ${TAG_M} DLT dataset_1_1_04 (${meta.vintage||'—'}) · brand mix ${TAG_M} DLT first registrations, <b>national only</b> ${TAG_E}<span style="opacity:.7"> (no measured brand×province in reachable Thai open data)</span></div>`;
+  }
+  // ---- national brand-mix readout (mcards) ----
+  if(grid){
+    const cards=[];
+    if(bm){
+      const nm=b=>b?b.b.charAt(0)+b.b.slice(1).toLowerCase():'';
+      const pk=bm.pickup_top_brands||[], cr=bm.car_top_brands||[];
+      if(pk.length) cards.push({k:'Pickup titles (national)',v:[nm(pk[0]),nm(pk[1])].filter(Boolean).join(' + '),d:'first-regis leaders',cls:'',
+        n:'MEASURED (DLT first registrations, '+(bm.vintage_be||'—')+'). '+pk.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. National only.'});
+      if(cr.length) cards.push({k:'Car titles (national)',v:[nm(cr.find(b=>!/YAMAHA|HONDA CUB|KUBOTA/i.test(b.b))||cr[0])].filter(Boolean).join('')||nm(cr[0]),d:'first-regis leader',cls:'',
+        n:'MEASURED (DLT first registrations). '+cr.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. Includes motorcycles; national only.'});
+      if(bm.ev_only_share_pct!=null) cards.push({k:'New-EV share (national)',v:bm.ev_only_share_pct+'%',d:'rising ▲',cls:'up',
+        n:'MEASURED floor — pure-EV marques as a share of new car regis ('+(bm.vintage_be||'—')+'). BYD-led; the leading indicator for the diesel-pickup resale watch.'});
+    }
+    cards.push({k:'Diesel share (national)',v:(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'),d:'of car+pickup fleet',cls:'down',
+      n:'MEASURED (DLT dataset_1_1_04) — diesel\'s share of the registered car+pickup title-able stock. Higher = more resale exposure to the EV transition.'});
+    grid.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+      <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+      <div class="n">${c.n}</div></div>`).join('');
+  }
+  // ---- per-province diesel-share table ----
+  if(note) note.innerHTML='The diesel pickup is AutoX\'s core title collateral, and the EV/diesel transition is the resale risk under it. '+
+    'These provinces carry the highest <b>diesel share</b> of the registered <b>car+pickup</b> title fleet — where recovery values are most exposed as Thailand electrifies. '+
+    'All shares are <b>measured</b> (DLT dataset_1_1_04, '+(meta.vintage||'—')+'). Nationally diesel is <b>'+(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—')+'</b> of the car+pickup fleet. '+
+    '<b>Brand is national only</b> — a measured brand×province cross is not in reachable Thai open data.';
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-collat" title="diesel share of the car(รย.1)+pickup(รย.3) registered stock — DLT, measured">Diesel % ▲ (DLT)</th><th title="car+pickup registered stock — DLT, measured">Car+pickup stock</th><th title="diesel pickups registered — DLT, measured">Pickup diesel</th></tr>`+
+    top.map((p,i)=>{const dc=dcol(p.diesel_share_pct);
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region||'—'}</td>
+      <td>${barHTML(p.diesel_share_pct,dc)} <span class="mono" style="color:${dc}">${p.diesel_share_pct}%</span></td>
+      <td class="mono sub">${(p.car_pickup_total||0).toLocaleString()}</td>
+      <td class="mono sub">${(p.pickup_diesel||0).toLocaleString()}</td></tr>`;}).join('');
 }
 /* ---------- Collateral mix · most motorcycle-heavy provinces (objective #1, MEASURED) ----------
    Pure DLT vehicle stock split per province (moto / car / pickup / EV share of total). A ฿10k
@@ -1573,6 +1642,7 @@ function renderAcq(){
   renderRivalDensity();
   renderPeerProvince();
   renderPeerNpl();
+  renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
   // (Road-to-3,000 headroom split, sequenced expansion plan, "where to open next" opportunity board)
@@ -1869,6 +1939,54 @@ function drawPeerProvince(){
   }
 }
 
+/* ---------- MEASURED credit anchor · BoT NPL scale for the risk readout (obj #1) ----------
+   Surfaces data/credit_anchor.json (pipeline/build_credit_anchor.py ← BoT FSR 2024 text layer +
+   BoT statistics report 984). The real-world NPL + household-debt scale the ESTIMATED 0-100
+   branch-risk composite is read against — CONTEXT, never a composite input. Lazy, null-safe. */
+let CREDITANCHOR=null, creditAnchorLoaded=false;
+function renderCreditAnchor(){
+  const box=$('#creditanchor'); if(!box) return;
+  if(creditAnchorLoaded){ drawCreditAnchor(); return; }
+  fetch('data/credit_anchor.json').then(r=>r.ok?r.json():null).then(j=>{
+    CREDITANCHOR=j; creditAnchorLoaded=true; drawCreditAnchor();
+  }).catch(()=>{ CREDITANCHOR=null; creditAnchorLoaded=true; drawCreditAnchor(); });
+}
+function drawCreditAnchor(){
+  const box=$('#creditanchor'), stats=$('#creditanchorstats'); if(!box) return;
+  const metrics=(CREDITANCHOR&&Array.isArray(CREDITANCHOR.metrics))?CREDITANCHOR.metrics:[];
+  if(!metrics.length){
+    if(stats) stats.innerHTML='';
+    box.innerHTML='<b>BoT credit anchor not available.</b> <span class="sub">data/credit_anchor.json is absent — it fills in from BoT FSR 2024 + statistics report 984 on the next data refresh (pipeline/pull_bot_credit.py).</span>';
+    return;
+  }
+  const m=CREDITANCHOR.meta||{};
+  const mc={system_npl:'var(--accent)',household_debt_to_gdp:'var(--collat)',household_debt:'var(--collat)',auto_hp_debt:'var(--gold)'};
+  const by=k=>metrics.find(x=>x.key===k);
+  const npl=by('system_npl'), hh=by('household_debt'), gdp=by('household_debt_to_gdp'), auto=by('auto_hp_debt');
+  // answer-first headline
+  const head=`<b>The measured real-world scale:</b> `+
+    (npl?`system NPL <b style="color:var(--accent)">${npl.display}</b>`:'')+
+    (hh?` · household debt <b style="color:var(--collat)">${hh.display}</b>${gdp?` (${gdp.display} of GDP)`:''}`:'')+
+    (auto?`, of which vehicle hire-purchase <b style="color:var(--gold)">${auto.display}</b>${auto.share_of_hh_debt_pct!=null?` (${auto.share_of_hh_debt_pct}% of household debt)`:''}`:'')+
+    `. ${TAG_M}`;
+  const ahp=(CREDITANCHOR.auto_hp_npl)||{};
+  box.innerHTML=head+
+    `<div class="sub" style="margin-top:6px">The estimated 0–100 branch-risk score is a <b>triage rank, not a predicted NPL</b> — these BoT figures are the real-world scale it is read against, shown alongside the score, never inside it.</div>`+
+    methodBox(m.label||null,
+      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source</a>`:''}`),
+        ahp.reason_absent?`<b>Auto hire-purchase NPL:</b> ${ahp.reason_absent}`:null,
+        m.source?`Source: ${m.source}. Vintage/pulled ${m.pulled||'—'}.`:null ]);
+  if(stats){
+    stats.innerHTML=metrics.map(x=>{
+      const c=mc[x.key]||'var(--hi)';
+      const sub=[x.vintage,x.source].filter(Boolean).join(' · ');
+      return `<div class="mcard"><div class="k">${x.label}</div>`+
+        `<div class="v" style="color:${c}">${x.display}</div>`+
+        `<div class="n">${sub}</div></div>`;
+    }).join('');
+  }
+}
+
 /* ---------- peer loan quality · reported NPL benchmark (obj #1 + #2) ----------
    Surfaces data/peer_npl.json (docs/RESEARCH_DIGEST.md §B — the listed title-lenders' own
    reported NPL ratios). PEER-reported MEASURED figures — NOT an AutoX number (we hold no
@@ -1921,6 +2039,73 @@ function drawPeerNpl(){
         [`Figures are <b>reported by the peer companies themselves</b> (FY2025 / 2025 IR) — ${m.source||'docs/RESEARCH_DIGEST.md §B'}. Vintage ${m.updated||'2026-06'}.`,
          '<b>Not an AutoX/Ngern Chaiyo number.</b> We hold no measured AutoX NPL — this is the competitive quality band around us, not our own book.',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.']);
+  }
+}
+
+/* ---------- sub-scale rivals vs our footprint · PICO-finance per province (obj #2, MEASURED) ----------
+   Surfaces data/pico_competitors.json (built by pipeline/build_pico_competitors.py): per-province
+   MEASURED count of licensed PICO-finance operators (FPO registry) vs AutoX branch count, ranked by
+   how much sub-scale rivals OUTNUMBER our footprint. Fully measured — two government/own tallies, no
+   inference (unlike the ESTIMATED exit-whitespace cue below). Lazy, null-safe, graceful if absent. */
+let PICOCOMP=null, picocompLoaded=false;
+const PICOCOMP_TOPN=15;
+function renderPicoCompetitors(){
+  const tbl=$('#picocomptbl'); if(!tbl) return;
+  if(picocompLoaded){ drawPicoCompetitors(); return; }
+  fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null).then(j=>{
+    PICOCOMP=j; picocompLoaded=true; drawPicoCompetitors();
+  }).catch(()=>{ PICOCOMP=null; picocompLoaded=true; drawPicoCompetitors(); });
+}
+function drawPicoCompetitors(){
+  const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
+  const rows=(PICOCOMP&&Array.isArray(PICOCOMP.provinces))?PICOCOMP.provinces:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Sub-scale rival census not yet computed.</b> <span class="sub">Run pipeline/build_pico_competitors.py (needs the FPO PICO census) — the leaderboard fills in on the next data refresh.</span>';
+    return;
+  }
+  // measured theme tokens (contrast-safe in light + dark): PICO=gold, AutoX=teal, pressure(outnumber)=risk-red.
+  const PICO='var(--gold)', AX='var(--merch)', PRESS='var(--agri)';
+  const top=rows.slice().sort((a,b)=>(b.outnumber||0)-(a.outnumber||0)).slice(0,PICOCOMP_TOPN);
+  const maxPico=Math.max(1,...top.map(r=>r.pico_total||0));
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operator service points in the province (FPO licence registry)">PICO operators ◆</th>`+
+    `<th title="MEASURED — AutoX (เงินไชโย) branches in the province">AutoX branches ◆</th>`+
+    `<th title="MEASURED — PICO operators minus AutoX branches. Positive (red) = sub-scale rivals outnumber our footprint here.">Outnumber ◆</th>`+
+    `<th title="MEASURED — PICO operators per AutoX branch (n/a where AutoX has no branch)">Rivals / branch</th></tr>`+
+    top.map((r,i)=>{
+      const on=r.outnumber||0;
+      const onc=on>0?PRESS:AX;
+      const sign=on>0?'+':'';
+      const ratio=(r.ratio==null)?'<span class="sub">n/a</span>':`<span class="mono" style="color:${on>0?PRESS:AX}">${r.ratio.toFixed(2)}×</span>`;
+      const name=`<b>${r.th||'—'}</b>${r.en?` <span class="sub">${r.en}</span>`:''}`;
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${name}</td>
+        <td>${barHTML(r.pico_total||0,PICO,maxPico)} <span class="mono" style="color:${PICO}">${r.pico_total==null?'—':r.pico_total}</span></td>
+        <td>${barHTML(r.autox_branches||0,AX,maxPico)} <span class="mono" style="color:${AX}">${r.autox_branches==null?'—':r.autox_branches}</span></td>
+        <td><span class="mono" style="color:${onc}"><b>${sign}${on}</b></span></td>
+        <td>${ratio}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const m=PICOCOMP.meta||{}, t=top[0];
+    const nOut=m.n_provinces_pico_outnumbers_autox!=null?m.n_provinces_pico_outnumbers_autox:rows.filter(r=>(r.outnumber||0)>0).length;
+    const nProv=m.n_provinces||rows.length;
+    let verdict='';
+    if(t){
+      verdict=(t.outnumber>0)
+        ? `Sub-scale rivals outnumber AutoX most in <b style="color:var(--agri)">${t.th}${t.en?` (${t.en})`:''}</b> — <b style="color:var(--gold)">${t.pico_total}</b> licensed PICO operators vs <b style="color:var(--merch)">${t.autox_branches}</b> AutoX branches (${t.outnumber>0?'+':''}${t.outnumber}${t.ratio!=null?`, ${t.ratio.toFixed(2)}× our footprint`:''}).`
+        : `AutoX is not outnumbered by sub-scale rivals in any province on this measure; ${t.th} is the tightest at ${t.pico_total} PICO vs ${t.autox_branches} branches.`;
+    }
+    ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
+      `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches). ${TAG_M}`+
+      methodBox(null,
+        ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
+         '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
+         'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
+         'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
+         (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')]);
   }
 }
 
@@ -3275,6 +3460,7 @@ async function renderVintageDigest(){
     : 'Every figure is read from deltas.json (the snapshot diff). Region/branch proxies are ESTIMATED; the commodity board is measured/editorial price direction (World Bank).';
 }
 async function renderTrend(){
+  renderCreditAnchor();
   renderVintageDigest();
   renderPeerOutliers();
   renderSiegeTable();

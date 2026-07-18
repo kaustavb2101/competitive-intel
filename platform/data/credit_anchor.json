@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "title": "BoT credit-quality anchor — measured NPL scale for the risk readout",
+    "generated_by": "pipeline/build_credit_anchor.py",
+    "label": "MEASURED — Bank of Thailand. The real-world NPL scale + household-debt backdrop the modelled 0-100 branch-risk triage score is read against. Context only; it does not feed the composite.",
+    "source": "ธนาคารแห่งประเทศไทย (ธปท.) — Financial Stability Report 2024 (รายงานการประเมินเสถียรภาพระบบการเงินไทย 2567) + BoT statistics report 984",
+    "provenance": "MEASURED. Pure projection of source-data/bot_credit.json (BoT FSR 2024 text layer + BoT statistics report 984). Nothing modelled.",
+    "pulled": "2026-07-18"
+  },
+  "metrics": [
+    {
+      "key": "system_npl",
+      "label": "System NPL",
+      "value": 2.8,
+      "display": "2.8%",
+      "unit": "%",
+      "scope": "commercial banks (ธพ.), gross NPL / total loans",
+      "vintage": "end-2567 (Dec 2024)",
+      "source": "FSR 2024, p.20",
+      "source_url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf"
+    },
+    {
+      "key": "household_debt_to_gdp",
+      "label": "Household debt / GDP",
+      "value": 88.4,
+      "display": "88.4%",
+      "unit": "% of GDP",
+      "scope": "Thailand household debt / GDP",
+      "vintage": "end-2567 (Dec 2024)",
+      "source": "FSR 2024, p.6",
+      "source_url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf"
+    },
+    {
+      "key": "household_debt",
+      "label": "Household debt",
+      "value": 16.31,
+      "display": "฿16.3tn",
+      "unit": "THB",
+      "scope": "total loans to households (all purposes)",
+      "vintage": "Q2/2568",
+      "source": "BoT statistics report 984 (household loans by purpose), row 'รวม'",
+      "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=984&language=TH"
+    },
+    {
+      "key": "auto_hp_debt",
+      "label": "Vehicle hire-purchase debt",
+      "value": 1.557,
+      "display": "฿1.56tn",
+      "unit": "THB",
+      "share_of_hh_debt_pct": 9.55,
+      "scope": "auto + motorcycle purchase / hire-purchase (the vehicle-collateral loan book nearest AutoX's title-loan collateral)",
+      "vintage": "Q2/2568",
+      "source": "BoT statistics report 984, row 'ซื้อหรือเช่าซื้อรถยนต์และรถจักรยานยนต์'",
+      "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=984&language=TH"
+    }
+  ],
+  "auto_hp_npl": {
+    "value": null,
+    "reason_absent": "BoT's finest NPL-by-consumer-loan-PURPOSE split (which carries the auto hire-purchase NPL, ~2.1%) is published only via BoT's data API (apiportal.bot.or.th), geoblocked from this environment (HTTP 502). Not fabricated. Nearest MEASURED vehicle-collateral NPL scale is the vehicle-title peer band in peer_npl.json (TIDLOR ~1.5%, MTC ~2.53%)."
+  },
+  "context": "The estimated 0-100 branch-risk score is a TRIAGE RANK, not a predicted NPL. System NPL 2.8% and household debt ฿16.3tn (88% of GDP), of which vehicle hire-purchase ฿1.56tn, are the measured real-world scale it is read against."
+}

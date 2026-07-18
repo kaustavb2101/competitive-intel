@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "title": "Bank of Thailand credit-quality anchor (portfolio risk, objective #1)",
+    "generated_by": "pipeline/pull_bot_credit.py",
+    "label": "MEASURED — Bank of Thailand. System non-performing-loan (NPL) level and household-debt backdrop: the real-world scale the ESTIMATED 0-100 branch-risk triage score sits against. System NPL + household-debt/GDP from the Financial Stability Report 2024 text layer (not OCR); total household debt and the vehicle hire-purchase share from BoT statistics report 984.",
+    "source": "ธนาคารแห่งประเทศไทย (ธปท.) — Financial Stability Report 2024 (รายงานการประเมินเสถียรภาพระบบการเงินไทย 2567) + BoT statistics report 984",
+    "provenance": "MEASURED. Every figure read directly from a BoT source and spot-verified against a fixed anchor. Nothing modelled.",
+    "pulled": "2026-07-18",
+    "sources": {
+      "fsr": {
+        "url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf",
+        "name_th": "รายงานการประเมินเสถียรภาพระบบการเงินไทย 2567 (FSR 2024)",
+        "method": "text-layer PDF (not OCR)"
+      },
+      "household_by_purpose": {
+        "url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=984&language=TH",
+        "name_th": "เงินให้กู้ยืมแก่ภาคครัวเรือนจำแนกตามวัตถุประสงค์ (report 984)",
+        "method": "server-rendered HTML table (plain GET)"
+      }
+    }
+  },
+  "figures": {
+    "system_npl_pct": {
+      "value": 2.8,
+      "unit": "%",
+      "scope": "commercial banks (ธพ.), gross NPL / total loans",
+      "vintage": "end-2567 (Dec 2024)",
+      "source": "FSR 2024, p.20",
+      "source_url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf",
+      "source_th": "อัตราส่วน NPL ต่อสินเชื่อรวม (NPL ratio) ณ สิ้นปี 2567 ร้อยละ 2.8"
+    },
+    "household_debt_to_gdp_pct": {
+      "value": 88.4,
+      "unit": "% of GDP",
+      "scope": "Thailand household debt / GDP",
+      "vintage": "end-2567 (Dec 2024)",
+      "source": "FSR 2024, p.6",
+      "source_url": "https://www.bot.or.th/content/dam/bot/documents/th/research-and-publications/reports/financial-stability-report/FSR2024.pdf",
+      "source_th": "หนี้ครัวเรือนต่อ GDP ร้อยละ 88.4 ณ สิ้นปี 2567"
+    },
+    "household_debt_thb": {
+      "value_mil_thb": 16308809,
+      "value_thb": 16308809000000,
+      "value_tn_thb": 16.31,
+      "unit": "THB",
+      "scope": "total loans to households (all purposes)",
+      "vintage": "Q2/2568",
+      "source": "BoT statistics report 984 (household loans by purpose), row 'รวม'",
+      "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=984&language=TH"
+    },
+    "auto_hp_household_debt_thb": {
+      "value_mil_thb": 1557477,
+      "value_thb": 1557477000000,
+      "value_tn_thb": 1.557,
+      "share_of_hh_debt_pct": 9.55,
+      "unit": "THB",
+      "scope": "auto + motorcycle purchase / hire-purchase (the vehicle-collateral loan book nearest AutoX's title-loan collateral)",
+      "vintage": "Q2/2568",
+      "source": "BoT statistics report 984, row 'ซื้อหรือเช่าซื้อรถยนต์และรถจักรยานยนต์'",
+      "source_url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=984&language=TH"
+    },
+    "auto_hp_npl_pct": {
+      "value": null,
+      "unit": "%",
+      "scope": "auto hire-purchase NPL",
+      "reason_absent": "BoT's finest NPL-by-consumer-loan-PURPOSE split (which carries the auto hire-purchase NPL, ~2.1%) is published only via BoT's data API (apiportal.bot.or.th), geoblocked from this environment (HTTP 502). Not fabricated. Nearest MEASURED vehicle-collateral NPL scale is the vehicle-title peer band in peer_npl.json (TIDLOR ~1.5%, MTC ~2.53%)."
+    }
+  },
+  "notes": [
+    "The per-branch 0-100 branch-risk score (build_branch_risk.py) is an ESTIMATED triage rank, NOT a predicted NPL. These BoT figures are the measured real-world scale it sits against — shown alongside the score, never inside it.",
+    "system_npl_pct is the whole commercial-banking system (all collateral classes); the auto hire-purchase sub-class runs near it but is not separately sourceable here.",
+    "auto_hp_household_debt_thb is the vehicle-collateral loan EXPOSURE (nearest AutoX), not its NPL — a scale reference, not a default rate."
+  ]
+}

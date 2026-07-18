@@ -87,10 +87,45 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_pico_census.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"
   else bad "build_pico_census.py --check (pico_census.json drifted from source-data/datagoth/fpo_pico.csv)"
   fi
+  ( cd "$PIPE" && python3 build_pico_competitors.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_pico_competitors.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_pico_competitors.py --check (pico_census.json absent — upstream FPO pull, not committed)"
+  else bad "build_pico_competitors.py --check (pico_competitors.json drifted from pico_census.json/branches.json)"
+  fi
   ( cd "$PIPE" && python3 build_dbd_formation.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_dbd_formation.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_dbd_formation.py --check (source-data/datagoth/dbd_newco.csv absent — re-pullable pull_datagoth input, not committed)"
   else bad "build_dbd_formation.py --check (dbd_formation.json drifted from source-data/datagoth/dbd_newco.csv)"
+  fi
+  ( cd "$PIPE" && python3 build_occupation_income_individual.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_occupation_income_individual.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_occupation_income_individual.py --check (ilostat_labour.json or household_income_by_province.json absent — not data drift)"
+  else bad "build_occupation_income_individual.py --check (occupation_income_individual.json drifted from ilostat_labour.json/household_income_by_province.json)"
+  fi
+  ( cd "$PIPE" && python3 pull_oae_yield.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_oae_yield.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_oae_yield.py --check (committed oae_yield.json or gitignored raw scratch source-data/.oae_yield_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_oae_yield.py --check (oae_yield.json drifted from a fresh parse of the cached raw CSVs)"
+  fi
+  ( cd "$PIPE" && python3 pull_oae_farm_economics.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_oae_farm_economics.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_oae_farm_economics.py --check (committed oae_farm_economics.json or gitignored raw PDF source-data/.oae_farm_econ_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_oae_farm_economics.py --check (oae_farm_economics.json drifted from a fresh parse of the cached raw PDF)"
+  fi
+  ( cd "$PIPE" && python3 pull_bot_credit.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_bot_credit.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_bot_credit.py --check (committed bot_credit.json or gitignored raw source-data/.bot_credit_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_bot_credit.py --check (bot_credit.json drifted from a fresh parse of the cached raw FSR2024.pdf/report984.html)"
+  fi
+  ( cd "$PIPE" && python3 build_credit_anchor.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_credit_anchor.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_credit_anchor.py --check (source-data/bot_credit.json absent — network-pulled input, not drift)"
+  else bad "build_credit_anchor.py --check (credit_anchor.json drifted from source-data/bot_credit.json)"
+  fi
+  ( cd "$PIPE" && python3 build_crop_farmer_income.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_crop_farmer_income.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_crop_farmer_income.py --check (oae_yield.json/farmgate_prices/doae_planted_area/nabc_agri absent — not data drift)"
+  else bad "build_crop_farmer_income.py --check (crop_farmer_income.json drifted from oae_yield.json/farmgate_prices.json/doae_planted_area.json/nabc_agri.json)"
   fi
   ( cd "$PIPE" && python3 build_branch_vehicles.py --check >/dev/null 2>&1 ) && ok "build_branch_vehicles.py --check" || bad "build_branch_vehicles.py --check (branch_vehicles.json drifted from vehicles_by_province/branch_population)"
   ( cd "$PIPE" && python3 build_branch_recommendations.py --check >/dev/null 2>&1 ) && ok "build_branch_recommendations.py --check" || bad "build_branch_recommendations.py --check (branch_recommendations.json drifted from the per-branch layers)"
@@ -134,6 +169,11 @@ phase_check(){
   if [ "$rc" -eq 0 ]; then ok "build_ev_exposure.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_ev_exposure.py --check (scurve_by_province.json absent or output not generated — not data drift)"
   else bad "build_ev_exposure.py --check (ev_exposure.json drifted from source-data/scurve_by_province.json)"
+  fi
+  ( cd "$PIPE" && python3 build_vehicle_collateral.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_collateral.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_collateral.py --check (dlt mirror dataset_1_1_04 absent or output not generated — not data drift)"
+  else bad "build_vehicle_collateral.py --check (vehicle_collateral.json drifted from the dlt mirror / brand_trends.json)"
   fi
   ( cd "$PIPE" && python3 build_brand_trends.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_brand_trends.py --check"
