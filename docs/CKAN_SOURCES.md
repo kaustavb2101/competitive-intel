@@ -45,3 +45,22 @@ Competitor corporate store-locators (muangthaicap / sawad / tidlor / hengleasing
 the datacenter IP — the national competitor census (`competitors_census.json`, 16,503 points) was
 already pulled and can't refresh from CI. A real **loan-tape export** remains the only true owner-side
 data unlock.
+
+## ✅ PDF / OCR-unlocked sources (2026-07-18)
+`pipeline/ingest_pdf.py` (pdfplumber/PyMuPDF text tier + Tesseract-`tha` OCR tier) opened PDF-only
+data. All below are **cloud-reachable** (no Thai laptop). Deps to run the pullers: `pip install
+pdfplumber pymupdf` (+ `apt install tesseract-ocr tesseract-ocr-tha` only for scanned PDFs).
+| Source | What | Reach / tier | Wired by |
+|---|---|---|---|
+| OAE `oae.go.th/uploads/files/public/media/Cai-up-2568.pdf` | per-crop households, area, yield, farm-gate price, **net return**, + regional farm-household income/debt | 200, **text** | `pull_oae_farm_economics.py` → `oae_farm_economics.json` |
+| BoT Financial Stability Report (`bot.or.th/.../financial-stability-report/`) + stat report 984 | system NPL, household debt/GDP, vehicle-HP debt | 200, **text** | `pull_bot_credit.py` → `bot_credit.json` |
+| OAE `dataoae1104…1504` yield | kg/rai (rice per-province, others national) | 200, CSV | `pull_oae_yield.py` |
+| DLT `dataset_1_1_04` (gdcatalog) | province × type × **fuel** (diesel share) | 200, CSV | `pull_dlt_fuel.py` |
+| `datagov.mot.go.th` | MOT/transport mirror (broader than DLT's own catalog) — **reachable**, but its per-province `newcar` download URLs redirect to the blocked `data.go.th` | 200 (meta) | — |
+
+**Still owner-desktop (Thai IP) only:** `data.go.th` `newcar`/`newcarfuel` (the true vehicle
+**brand × province** cross — geoblocked from cloud; a measured brand×province may not even exist in Thai
+open data). Ready-to-run stub: `pipeline/pull_newcar_brandprovince.py` — run it from Thailand; it reports
+whether the file has a brand column. OAE per-crop **cost/rai** dedicated reports and BoT's finest
+**auto-HP NPL-by-purpose** split are also not in the reachable PDFs/CSVs (stat-portal `apiportal.bot.or.th`
+is geoblocked) — net farm income uses OAE's published net-return instead; auto-HP NPL is left null.
