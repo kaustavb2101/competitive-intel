@@ -115,7 +115,23 @@ def build():
             "poi": prev["poi"], "estates": prev["estates"], "facts": prev["facts"],
             "gov": {"factories": govp["fac"], "workers": govp["workers"],
                     "vehicles": veh, "employment": emp,
-                    "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"}}
+                    "src": "DIW factories · DLT vehicles · NSO labour (data.go.th) — measured"},
+            # Self-declared provenance stamp so this curated pilot aggregate carries its own
+            # honest label (build_provenance / the data-mandate gate read meta.*). Emitted here
+            # rather than hand-added to the JSON so it survives every rebuild of this file
+            # (a hand-stamp was previously clobbered by a regeneration — 2026-07-18 audit).
+            "meta": {
+                "label": "Rayong pilot deep-dive aggregate (curated): district rollups, "
+                         "in-province branches, hand-curated competitors, POI, estates, facts "
+                         "and the gov fold-in for the original Rayong pilot.",
+                "generated_by": "pipeline/build_rayong.py (curated pilot aggregate)",
+                "source": "source-data Rayong layers (rayong_districts geometry, branches_final "
+                          "PIP, rayong_competitors.json, factories/vehicles/employment gov "
+                          "layers). Legacy curated pilot file.",
+                "provenance": "MIXED — branch/estate/POI structure is MEASURED; competitors are "
+                              "a hand-curated Google Places list. Curated pilot aggregate, not a "
+                              "national metric.",
+            }}
 
 
 def run(check=False):

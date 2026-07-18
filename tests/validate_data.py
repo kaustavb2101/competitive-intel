@@ -4014,7 +4014,8 @@ PROVENANCE_EXEMPT = {
     # roads/water/landuse/rail OSM ground-bed layers (R6, 2026-07-06) all gained a real
     # meta.source/bbox/note stamp and now pass check_provenance() on their own merits via
     # _has_provenance() — no longer listed here on purpose. See docs/DATA_PROVENANCE.md §1 R2/R3/R6.
-    "rayong_province.json",    # curated Rayong pilot deep-dive; inputs are sourced layers + curated list
+    # rayong_province.json likewise gained a self-declared meta stamp (build_rayong.py emits it,
+    # 2026-07-18) and now passes on its own merits — no longer exempt here on purpose.
 }
 
 
