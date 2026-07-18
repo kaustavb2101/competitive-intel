@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-18T09:07:42Z",
-    "commit": "38fab71"
+    "generated_at": "2026-07-18T13:53:40+00:00",
+    "commit": "1093e37"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-18T09:07:42Z",
+      "date": "2026-07-18T13:53:40+00:00",
+      "sha": "1093e37",
+      "summary": "intel(planning): teach the exec decision queue to see DOUBLE JEOPARDY (besieged AND portfolio-stressed)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T10:23:55+00:00",
+      "sha": "7fc449b",
+      "summary": "committee: refresh autonomy plan (run 29640748080)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-18T09:07:42+00:00",
       "sha": "38fab71",
       "summary": "committee: autonomous competitor scout (run 29638549935)",
       "pillar": "market"
@@ -498,7 +510,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T08:10:38Z",
+      "date": "2026-07-18T08:10:38+00:00",
       "sha": "b4ddf4a",
       "summary": "docs(progress-log): record ux-loop rayong-province stub fix — merged #65, deploy up+gated",
       "pillar": "uxui"
@@ -510,85 +522,85 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T06:21:26Z",
+      "date": "2026-07-18T06:21:26+00:00",
       "sha": "271aad6",
       "summary": "ci(data): scheduled FPO PICO-finance registry refresh — close the last CI-reachable-but-unautomated MEASURED competitor layer",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T05:53:59Z",
+      "date": "2026-07-18T05:53:59+00:00",
       "sha": "a7d77b1",
       "summary": "committee: autonomous competitor scout (run 29632961542)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T05:33:09Z",
+      "date": "2026-07-18T05:33:09+00:00",
       "sha": "4836940",
       "summary": "committee: refresh autonomy plan (run 29632422424)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-18T05:15:24Z",
+      "date": "2026-07-18T05:15:24+00:00",
       "sha": "380a46e",
       "summary": "docs: register the PDF/OCR-unlocked sources + owner Thai-IP newcar stub",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T05:13:46Z",
+      "date": "2026-07-18T05:13:46+00:00",
       "sha": "7a39f06",
       "summary": "enrich(competition): measured sub-scale rival read — PICO operators vs AutoX by province",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T04:56:40Z",
+      "date": "2026-07-18T04:56:40+00:00",
       "sha": "ea03b5e",
       "summary": "enrich(risk): measured BoT credit-conditions anchor for the risk readout",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T04:28:31Z",
+      "date": "2026-07-18T04:28:31+00:00",
       "sha": "813f5d8",
       "summary": "enrich(vehicle): measured collateral read — province diesel share + national pickup brand mix",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T04:04:38Z",
+      "date": "2026-07-18T04:04:38+00:00",
       "sha": "8ab5a30",
       "summary": "income(farmer): recalibrate on OAE real households + add measured NET return (fixes denominator bug)",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:57:54Z",
+      "date": "2026-07-18T03:57:54+00:00",
       "sha": "a8dbcf6",
       "summary": "data: OAE farm-economics source (Cai-up-2568) — real per-crop households + net return",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:18:22Z",
+      "date": "2026-07-18T03:18:22+00:00",
       "sha": "b38db48",
       "summary": "income(app): surface individual occupation income + crop farmer-income drill-down",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:02:26Z",
+      "date": "2026-07-18T03:02:26+00:00",
       "sha": "8f99b09",
       "summary": "capability: ingest_pdf — general-purpose PDF -> text/tables/OCR extraction",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T02:56:30Z",
+      "date": "2026-07-18T02:56:30+00:00",
       "sha": "5fbb795",
       "summary": "income(farmer): measured GROSS farmer income per person by crop (WIP 2/2)",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T02:44:48Z",
+      "date": "2026-07-18T02:44:48+00:00",
       "sha": "f976b45",
       "summary": "income(occupation): measured individual per-person income by occupation (WIP 1/2)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T02:31:53Z",
+      "date": "2026-07-18T02:31:53+00:00",
       "sha": "2eb7f68",
       "summary": "docs(progress-log): record ux-loop exposure-card provenance-title fix — merged #62, deploy up+gated",
       "pillar": "uxui"
@@ -606,7 +618,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T00:17:35Z",
+      "date": "2026-07-18T00:17:35+00:00",
       "sha": "afd8ef7",
       "summary": "fix(gistda): read GISTDA_SPHERE_KEY (the repo secret name), not just GISTDA_API_KEY",
       "pillar": "feature"
@@ -618,13 +630,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-17T21:59:46Z",
+      "date": "2026-07-17T21:59:46+00:00",
       "sha": "cf1e1a9",
       "summary": "committee: refresh autonomy plan (run 29616423691)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-17T20:16:57Z",
+      "date": "2026-07-17T20:16:57+00:00",
       "sha": "f91e420",
       "summary": "docs(progress-log): record ux-loop nav-more keyboard fix — merged #57, deploy up+gated",
       "pillar": "uxui"
@@ -636,28 +648,16 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T18:24:01Z",
+      "date": "2026-07-17T18:24:01+00:00",
       "sha": "5fdc514",
       "summary": "docs: evidence-backed blocked-source ledger — stop re-probing owner-side walls",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T16:20:51Z",
+      "date": "2026-07-17T16:20:51+00:00",
       "sha": "4ca6321",
       "summary": "committee: refresh autonomy plan (run 29595713949)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-17T16:12:39Z",
-      "sha": "fa63675",
-      "summary": "chore(dashboard): refresh autonomy plan after provenance sidecar ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-17T16:12:19Z",
-      "sha": "79adb36",
-      "summary": "service(provenance): sidecar manifest clears the shame board 2 → 0 (314/314 labelled)",
-      "pillar": "feature"
     }
   ]
 }
