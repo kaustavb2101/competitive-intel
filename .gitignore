@@ -71,3 +71,7 @@ pipeline/cron_gate.out
 
 # DOAE raw pull (re-pullable via pipeline/ingest_doae.py --pull)
 source-data/doae_raw.json
+
+# OAE yield raw CSVs — re-pullable via pipeline/pull_oae_yield.py; only the
+# distilled source-data/oae_yield.json is committed, never the raw catalog CSVs.
+source-data/.oae_yield_raw/
