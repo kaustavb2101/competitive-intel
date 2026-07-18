@@ -1,0 +1,205 @@
+{
+  "meta": {
+    "title": "OAE per-household crop economics + farm-household income/debt (portfolio risk, objective #1)",
+    "generated_by": "pipeline/pull_oae_farm_economics.py",
+    "label": "MEASURED — OAE commodity-economics compendium (Cai-up 2568). Per-crop farming HOUSEHOLD counts, area, yield, farm-gate price, cost and NET RETURN (ผลตอบแทนสุทธิ, บาท/ตัน — negative = a loss); plus farm-household income and year-end DEBT by region. Text-layer extraction (not OCR).",
+    "source": "https://oae.go.th/uploads/files/public/media/Cai-up-2568.pdf",
+    "source_th": "สำนักงานเศรษฐกิจการเกษตร (สศก.) — ภาวะเศรษฐกิจการเกษตร / Cai-up 2568",
+    "pulled": "2026-07-18",
+    "crop_vintage": "2568 (crop year 2568/69, OAE forecast as of Mar 2569)",
+    "household_vintage": "2567/68p (preliminary)",
+    "crop_pages": {
+      "rice": 16,
+      "maize": 22,
+      "cassava": 24,
+      "rubber": 38,
+      "oilpalm": 40
+    },
+    "household_page": 11,
+    "extraction_method": {
+      "rice": "text",
+      "maize": "text",
+      "cassava": "text",
+      "rubber": "text",
+      "oilpalm": "text",
+      "household": "text (word-flow)"
+    },
+    "method_note": "All crop-economics + household pages are method='text' (real text layer, verified — not OCR). Font tone-marks live in a private-use area and are stripped for label matching only; digits are untouched.",
+    "units": {
+      "households": "farming households",
+      "area_rai": "rai (area_basis stated per crop: planted/harvested/tapped/bearing)",
+      "production_tons": "tonnes",
+      "yield_kg_per_rai": "kg/rai",
+      "farmgate_price_per_ton": "THB/tonne",
+      "cost_per_ton": "THB/tonne",
+      "net_return_per_ton": "THB/tonne (negative = loss)",
+      "household_economics": "THB/household/year"
+    },
+    "provenance": "MEASURED. Nothing modelled. Every crop household count, area, yield, price and net return read from the OAE text layer and spot-verified against fixed anchor values.",
+    "anchors_verified": {
+      "rice.households": 4532663.0,
+      "rice.area_rai": 61340000.0,
+      "rice.net_return_per_ton": -1433.0,
+      "cassava.net_return_per_ton": -320.0,
+      "rubber.net_return_per_ton": -2460.0,
+      "oilpalm.net_return_per_ton": 3080.0
+    },
+    "consumer": "pipeline/build_crop_farmer_income.py (real household denominator + net return)."
+  },
+  "crops": {
+    "rice": {
+      "commod_th": "ข้าวนาปี",
+      "page": 16,
+      "households": 4532663,
+      "area_rai": 61340000,
+      "area_basis": "planted (เนื้อที่เพาะปลูก)",
+      "production_tons": 26970000,
+      "yield_kg_per_rai": 440,
+      "farmgate_price_per_ton": 8105,
+      "farmgate_price_th": "ข้าวเปลือก (เฉลี่ยทุกชนิด)",
+      "cost_per_ton": 9538,
+      "net_return_per_ton": -1433,
+      "net_unit": "THB/ton",
+      "loss": true,
+      "vintage": "2568 (crop year 2568/69, OAE forecast Mar 2569)",
+      "method": "text"
+    },
+    "maize": {
+      "commod_th": "ข้าวโพดเลี้ยงสัตว์",
+      "page": 22,
+      "households": 406092,
+      "area_rai": 6293737,
+      "area_basis": "planted (เนื้อที่เพาะปลูก)",
+      "production_tons": 5055855,
+      "yield_kg_per_rai": 803,
+      "farmgate_price_per_ton": 7690,
+      "farmgate_price_th": "ข้าวโพดเลี้ยงสัตว์ ความชื้น 14.5%",
+      "cost_per_ton": 6760,
+      "net_return_per_ton": 930,
+      "net_unit": "THB/ton",
+      "loss": false,
+      "vintage": "2568 (crop year 2568/69, OAE forecast Mar 2569)",
+      "method": "text"
+    },
+    "cassava": {
+      "commod_th": "มันสำปะหลังโรงงาน",
+      "page": 24,
+      "households": 639648,
+      "area_rai": 8500667,
+      "area_basis": "harvested (เนื้อที่เก็บเกี่ยว)",
+      "production_tons": 26940941,
+      "yield_kg_per_rai": 3169,
+      "farmgate_price_per_ton": 2222,
+      "farmgate_price_th": "หัวมันสำปะหลังสด (แป้ง 25%)",
+      "cost_per_ton": null,
+      "net_return_per_ton": -320,
+      "net_unit": "THB/ton",
+      "loss": true,
+      "vintage": "2568 (crop year 2568/69, OAE forecast Mar 2569)",
+      "method": "text"
+    },
+    "rubber": {
+      "commod_th": "ยางพารา",
+      "page": 38,
+      "households": 1633782,
+      "area_rai": 22359375,
+      "area_basis": "tapped (เนื้อที่กรีดได้)",
+      "production_tons": 4837050,
+      "yield_kg_per_rai": 216,
+      "farmgate_price_per_ton": 60720,
+      "farmgate_price_th": "ยางแผ่นดิบชั้น 3",
+      "cost_per_ton": 63180,
+      "net_return_per_ton": -2460,
+      "net_unit": "THB/ton",
+      "loss": true,
+      "vintage": "2568 (crop year 2568/69, OAE forecast Mar 2569)",
+      "method": "text"
+    },
+    "oilpalm": {
+      "commod_th": "ปาล์มน้ำมัน",
+      "page": 40,
+      "households": 452988,
+      "area_rai": 6442430,
+      "area_basis": "bearing (เนื้อที่ให้ผล)",
+      "production_tons": 21139840,
+      "yield_kg_per_rai": 3281,
+      "farmgate_price_per_ton": 6090,
+      "farmgate_price_th": "ผลปาล์มทั้งทะลาย นน.>15 กก.",
+      "cost_per_ton": null,
+      "net_return_per_ton": 3080,
+      "net_unit": "THB/ton",
+      "loss": false,
+      "vintage": "2568 (crop year 2568/69, OAE forecast Mar 2569)",
+      "method": "text"
+    }
+  },
+  "household_economics": {
+    "unit": "THB/household/year",
+    "vintage": "2567/68p",
+    "regions_note": "national carries 3 vintages [2565/66, 2566/67, 2567/68p]; the four region columns are 2567/68p only.",
+    "rows": {
+      "income_total": "รายได้ (total income)",
+      "net_cash_farm_income": "รายได้เงินสดสุทธิทางการเกษตร (net cash farm income)",
+      "net_cash_hh_income": "รายได้เงินสดสุทธิครัวเรือน (net cash household income, incl off-farm)",
+      "cash_before_debt": "เงินสดคงเหลือก่อนการชำระหนี้ (cash left before debt service)",
+      "debt_year_end": "ขนาดหนี้สินปลายปี (household debt outstanding, year-end)"
+    },
+    "regions": {
+      "national": {
+        "income_total": [
+          450635,
+          461690,
+          472886
+        ],
+        "net_cash_farm_income": [
+          81616,
+          83130,
+          84779
+        ],
+        "net_cash_hh_income": [
+          302552,
+          308294,
+          318230
+        ],
+        "cash_before_debt": [
+          113048,
+          112039,
+          114883
+        ],
+        "debt_year_end": [
+          244340,
+          250012,
+          245285
+        ]
+      },
+      "North": {
+        "income_total": 379013,
+        "net_cash_farm_income": 55493,
+        "net_cash_hh_income": 245349,
+        "cash_before_debt": 65422,
+        "debt_year_end": 260163
+      },
+      "Northeast": {
+        "income_total": 324200,
+        "net_cash_farm_income": 46688,
+        "net_cash_hh_income": 260259,
+        "cash_before_debt": 117460,
+        "debt_year_end": 229862
+      },
+      "Central": {
+        "income_total": 623772,
+        "net_cash_farm_income": 115337,
+        "net_cash_hh_income": 380085,
+        "cash_before_debt": 126139,
+        "debt_year_end": 236990
+      },
+      "South": {
+        "income_total": 531664,
+        "net_cash_farm_income": 127068,
+        "net_cash_hh_income": 390065,
+        "cash_before_debt": 160033,
+        "debt_year_end": 269936
+      }
+    }
+  }
+}

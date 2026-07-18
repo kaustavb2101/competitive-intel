@@ -75,3 +75,6 @@ source-data/doae_raw.json
 # OAE yield raw CSVs — re-pullable via pipeline/pull_oae_yield.py; only the
 # distilled source-data/oae_yield.json is committed, never the raw catalog CSVs.
 source-data/.oae_yield_raw/
+
+# OAE farm-economics raw PDF — re-pullable via pipeline/pull_oae_farm_economics.py
+source-data/.oae_farm_econ_raw/
