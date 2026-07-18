@@ -162,6 +162,7 @@ var C={rival:'var(--agri,#d1544b)',moto:'var(--merch,#1c8c7d)',pickup:'#4f7bf0',
        informal:'#e0902f',formal:'#4f7bf0',income:'var(--gold,#e6b450)',pos:'#12a06e'};
 
 var DATA=null; // regions.json
+var OCCIND=null; // occupation_income_individual.json — per-person wage (national MEASURED, province ESTIMATED); null-safe
 
 function crumb(parts){ // parts:[{t,href}] last is plain
   return '<nav class="db-crumb" aria-label="Breadcrumb">'+parts.map(function(p,i){
@@ -359,7 +360,7 @@ function provinceView(d,sum,reg,rank,total){
   h+=metricRow('Factory workers','DIW measured',num(gov.workers),'');
   h+=metricRow('Formal employment','NSO',num(emp.formal),'');
   h+='</div>';
-  h+='<div>'+occTable(inc,natOcc)+'</div></div>';
+  h+='<div>'+occTable(inc,natOcc,d.province_th)+'</div></div>';
   if(facts.anchors&&facts.anchors.length){
     h+='<div style="margin-top:12px;font-size:12.5px;color:var(--mid);line-height:1.6"><b style="color:var(--dim)">Local anchors:</b> '+facts.anchors.map(esc).join(' · ')+(facts.skill_gap?('<br><b style="color:var(--dim)">Note:</b> '+esc(facts.skill_gap)):'')+'</div>';
   }
@@ -377,14 +378,23 @@ function provinceView(d,sum,reg,rank,total){
 function metricRow(label,sub,val,graphic){
   return '<div class="db-row"><div class="rl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><div class="rv">'+val+'</div><div class="rg">'+(graphic||'')+'</div></div>';
 }
-function occTable(inc,natOcc){
+function occTable(inc,natOcc,provTh){
   var keys=['Agriculture','FactoryWorkers','OfficeStaff','SMEOwners','Transport'];
-  var lab={Agriculture:'Agriculture',FactoryWorkers:'Factory',OfficeStaff:'Office',SMEOwners:'SME owner',Transport:'Transport'};
+  var lab={Agriculture:'Agriculture',FactoryWorkers:'Factory',OfficeStaff:'Office / clerical',SMEOwners:'SME owner',Transport:'Transport'};
+  // per-person individual figures (measured national / estimated province) — null-safe; keyed by Thai province name
+  var pind=(OCCIND&&OCCIND.provinces&&provTh&&OCCIND.provinces[provTh])||null;
   var rows=keys.filter(function(k){return inc[k]!=null;}).map(function(k){
     var r=(natOcc[k]?inc[k]/natOcc[k]:null),v=vsNat(r);
-    return '<div class="db-row" style="grid-template-columns:1fr auto auto;gap:10px"><div class="rl">'+lab[k]+'</div><div class="rv" style="font-size:13.5px">'+baht(inc[k])+'</div><div><span class="db-badge '+v.cls+'">'+v.txt+'</span></div></div>';
+    var ind='';
+    if(k==='SMEOwners'){
+      ind='<div class="db-row" style="grid-template-columns:1fr;padding:1px 0 5px"><div class="rl" style="color:var(--dim);font-size:10.5px">Individual: self-employed — no measured individual wage</div></div>';
+    }else if(pind&&pind[k]&&pind[k].individual_est!=null){
+      ind='<div class="db-row" style="grid-template-columns:1fr;padding:1px 0 5px"><div class="rl" style="color:var(--dim);font-size:10.5px">Individual ~'+baht(pind[k].individual_est)+'/mo <span style="color:var(--dim);font-weight:600;font-size:9px;letter-spacing:.04em">EST</span></div></div>';
+    }
+    return '<div class="db-row" style="grid-template-columns:1fr auto auto;gap:10px"><div class="rl">'+lab[k]+'</div><div class="rv" style="font-size:13.5px">'+baht(inc[k])+' <span style="color:var(--dim);font-weight:400;font-size:11px">household</span></div><div><span class="db-badge '+v.cls+'">'+v.txt+'</span></div></div>'+ind;
   }).join('');
-  return '<div class="db-rows" style="margin:0"><div class="db-row" style="grid-template-columns:1fr;padding-bottom:4px"><div class="rl" style="color:var(--dim);font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em">Income by occupation · ฿/mo · vs national</div></div>'+rows+'</div>';
+  var note=pind?'<div class="db-row" style="grid-template-columns:1fr;padding-top:5px"><div class="rl" style="color:var(--dim);font-size:10px;line-height:1.5">Household = NSO SES by occupation class (measured, multi-earner). Individual per-person: national MEASURED (ILOSTAT), province ESTIMATED. SME owners are self-employed — no measured individual wage.</div></div>':'';
+  return '<div class="db-rows" style="margin:0"><div class="db-row" style="grid-template-columns:1fr;padding-bottom:4px"><div class="rl" style="color:var(--dim);font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em">Household income by occupation class · ฿/mo · vs national</div></div>'+rows+note+'</div>';
 }
 function districtTable(d){
   var feats=(d.districts&&d.districts.features)?d.districts.features.slice():[];
@@ -404,7 +414,11 @@ function footer(){
 }
 
 // ---- boot ----
-fetch('data/regions.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
+// load the per-person occupation-income layer first (best-effort, null-safe), then the data book.
+fetch('data/occupation_income_individual.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(oi){
+  OCCIND=oi;
+  return fetch('data/regions.json').then(function(r){if(!r.ok)throw 0;return r.json();});
+}).then(function(data){
   DATA=data;
   document.getElementById('db-loading').style.display='none';
   var qs=new URLSearchParams(location.search),p=qs.get('p'),rg=qs.get('r');
