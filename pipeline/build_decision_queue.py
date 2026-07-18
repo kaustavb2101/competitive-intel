@@ -19,6 +19,9 @@ but they are NOT read here, so no expansion row can reach the exec front door.)
 Inputs (all under platform/data/, all committed, all optional — a missing layer
 just contributes no items):
   rival_pressure.json    -> DEFEND  : the most besieged branches (MEASURED geometry)
+  branch_risk.json       -> DEFEND+ : DOUBLE JEOPARDY — the besieged branch whose portfolio
+                                      composite risk is also top-quartile (index-join of the two
+                                      layers; MEASURED siege x ESTIMATED book stress)
   branch_peers.json      -> AUDIT   : branches out of line vs statistical twins (ESTIMATED)
   macro_sensitivity.json -> TIGHTEN : the worst macro-headwind province (ESTIMATED proxy)
   crop_stress.json       -> TIGHTEN : the worst crop-household-stress province (ESTIMATED)
@@ -59,6 +62,14 @@ OUT  = os.path.join(DATA, "decision_queue.json")
 # recommends opening / scouting new ground; it is a defence/audit/tighten list on the
 # existing network only.
 TYPE_BASE = {"defend": 40.0, "audit": 30.0, "tighten": 20.0}
+# DOUBLE-JEOPARDY precedence (stated openly): a branch that is BOTH besieged by rivals
+# (objective #2, MEASURED geometry) AND carries a top-quartile portfolio composite risk
+# (objective #1, ESTIMATED) is strictly more urgent than an equally-besieged branch with a
+# healthy book — so its base sits ABOVE the plain-defend base (max plain-defend = 40+10 = 50),
+# guaranteeing the double-jeopardy row leads the defend group. It renders as a `defend` chip
+# (measured rival trigger, same as the other defend rows); the estimated composite is tagged
+# inline, so the row-level measured tag and the queue footer stay accurate.
+JEOPARDY_BASE = 50.0
 GO_LABEL  = {"trend": "Risk trend →", "overview": "Overview →"}
 # plain-language driver names (same map as app.js RISK_DRIVER_LABEL)
 DRIVER_LABEL = {"household": "household leverage", "agri": "crop / drought stress",
@@ -91,6 +102,28 @@ def build():
     peers = _load("branch_peers.json")
     msens = _load("macro_sensitivity.json")
     crop  = _load("crop_stress.json")
+    brisk = _load("branch_risk.json")
+
+    # branch_risk.branches[] is INDEX-ALIGNED to branches.json, and rival_pressure's
+    # besieged[].i is that same branches.json index — so a besieged branch's portfolio
+    # composite risk is a pure index lookup (no recompute, no new estimation here). We also
+    # precompute the network top-quartile / top-decile composite cuts so the double-jeopardy
+    # row can name WHERE the book screens, deterministically, over present values only.
+    rk_branches = (brisk or {}).get("branches") or []
+    rk_present  = sorted(x["composite_risk"] for x in rk_branches
+                         if isinstance(x.get("composite_risk"), (int, float)))
+    rk_max = rk_present[-1] if rk_present else 0.0
+    rk_p75 = rk_present[int(len(rk_present) * 0.75)] if rk_present else None
+    rk_p90 = rk_present[int(len(rk_present) * 0.90)] if rk_present else None
+
+    def _risk_at(i):
+        """(composite_risk, top_driver) for branches.json index i, or (None, None)."""
+        if isinstance(i, int) and 0 <= i < len(rk_branches):
+            r = rk_branches[i]
+            cr = r.get("composite_risk")
+            if isinstance(cr, (int, float)):
+                return cr, r.get("top_driver")
+        return None, None
 
     items, used = [], []
 
@@ -107,6 +140,7 @@ def build():
             picks.append(b)
             if len(picks) == 2:
                 break
+        picked_i = {b.get("i") for b in picks}
         for b in picks:
             items.append({
                 "type": "defend",
@@ -123,6 +157,54 @@ def build():
             })
         used.append("rival_pressure.json — MEASURED rival counts/distances (merged competitor "
                     "census; Heng a sample, so counts are a lower bound)")
+
+        # ---- DOUBLE JEOPARDY — the besieged branch whose BOOK is also most stressed --------
+        # Cross-pillar synthesis (BOTH objectives at once): the pure-besieged rows above rank
+        # by rival count alone and are blind to portfolio risk — so the #1 defended branch can
+        # have a perfectly healthy book. Here we surface the branch that is besieged AND sits in
+        # the network's top-quartile portfolio composite risk: rivals press price/LTV while the
+        # book is already stressed. Pure JOIN of two committed labelled layers (rival_pressure
+        # MEASURED + branch_risk ESTIMATED) — nothing new is estimated. Deterministic pick:
+        # highest composite among the besieged, tie-break by committed besieged order (index asc);
+        # skipped if already surfaced above, if no branch clears the top-quartile cut, or if the
+        # branch_risk layer is absent.
+        if rk_present and rk_p75 is not None:
+            jp = None  # (composite, -besieged_index, branch, driver)
+            for bi, b in enumerate(besieged):
+                if b.get("i") in picked_i:
+                    continue
+                cr, td = _risk_at(b.get("i"))
+                if cr is None or cr < rk_p75:
+                    continue
+                key = (cr, -bi)
+                if jp is None or key > jp[0]:
+                    jp = (key, b, cr, td)
+            if jp is not None:
+                _, b, cr, td = jp
+                band = ("top-decile" if (rk_p90 is not None and cr >= rk_p90)
+                        else "top-quartile")
+                drv = DRIVER_LABEL.get(td, td or "mixed")
+                items.append({
+                    "type": "defend",
+                    "act": ("Defend + watch %s (%s · %s) — DOUBLE JEOPARDY: %d rival branches "
+                            "within 2 km of the door (measured; nearest %s at %s km) AND its book "
+                            "screens %s for portfolio risk (composite %s/100, estimated; top "
+                            "driver %s). Rivals pressure price/LTV while the book is already "
+                            "stressed — review both here first."
+                            % (b.get("name"), b.get("prov"), b.get("district"),
+                               b.get("n2", 0), b.get("nb"), _num(b.get("nd"), 2),
+                               band, _num(cr), drv)),
+                    "basis": "measured",              # defend TRIGGER = measured rival siege;
+                    "source": "rival_pressure.json + branch_risk.json",
+                    "go": "trend",
+                    "name": b.get("name"), "prov": b.get("prov"),
+                    "jeopardy": True, "risk": cr, "top_driver": td,
+                    "priority": round(JEOPARDY_BASE + 10.0 * (cr / rk_max if rk_max else 0.0), 2),
+                })
+                used.append("branch_risk.json — ESTIMATED composite portfolio risk (0-100), joined "
+                            "by branch index to flag the besieged branch whose book is also "
+                            "top-quartile-stressed (the estimated read is tagged inline, not "
+                            "folded into the measured rival count)")
 
     # ---- AUDIT (ESTIMATED) — top-2 twin outliers in distinct provinces -----------------
     outliers = (peers or {}).get("outliers") or []
@@ -237,23 +319,37 @@ def build():
                      "already runs; this queue is a defend/audit/tighten list on the existing book "
                      "and makes NO open / close / where-to-open recommendation.",
         "ranking": {
-            "rule": "priority = TYPE_BASE[type] + 10 x intensity (2 dp); sort priority desc, "
+            "rule": "priority = BASE[type] + 10 x intensity (2 dp); sort priority desc, "
                     "type asc, name asc.",
-            "type_base": {"defend": 40, "audit": 30, "tighten": 20},
-            "type_base_note": "EDITORIAL precedence, stated openly: defending and auditing the "
-                              "existing book outranks tightening actions in a weekly queue.",
+            "type_base": {"double_jeopardy": 50, "defend": 40, "audit": 30, "tighten": 20},
+            "type_base_note": "EDITORIAL precedence, stated openly: a DOUBLE-JEOPARDY branch "
+                              "(besieged AND top-quartile portfolio risk) outranks a plain defend, "
+                              "which outranks auditing, which outranks tightening. The "
+                              "double-jeopardy row renders as a `defend` chip (its trigger is the "
+                              "same measured rival siege) but carries a higher base so it leads the "
+                              "group; its estimated portfolio-risk read is tagged inline.",
             "intensity": {
+                "double_jeopardy": "composite_risk / max(composite_risk) over branch_risk.json "
+                                   "(estimated portfolio risk of the besieged branch)",
                 "defend": "n2 / max(n2) over the shipped besieged list (measured rivals <=2 km)",
                 "audit": "dev / max(dev) over the shipped outlier list (risk-proxy points above twins)",
                 "tighten": "macro: hits/n (share of province branches led by the headwind); "
                            "crop: agri_stress (already 0..1)",
             },
+            "double_jeopardy": "The single besieged branch (rival_pressure.json, MEASURED) whose "
+                               "portfolio composite risk (branch_risk.json, ESTIMATED) is highest "
+                               "and clears the network top-quartile cut — the intersection of the "
+                               "two objectives. Pure index-join of two committed labelled layers; "
+                               "nothing new is estimated. Emitted only when a distinct such branch "
+                               "exists and branch_risk.json is present.",
             "dedupe": "defend: distinct districts; audit: distinct provinces; crop-watch skips a "
-                      "province already queued.",
+                      "province already queued; double-jeopardy skips a branch already picked above.",
             "deterministic": "no wall clock, no randomness — same inputs give the same bytes.",
         },
         "inputs_used": used,
         "types": {"defend": "hold share where rivals crowd our door",
+                  "double_jeopardy": "a defend row flagged jeopardy=true — besieged AND "
+                                     "top-quartile portfolio risk (both objectives at once)",
                   "audit": "branch out of line vs its statistical twins",
                   "tighten": "risk headwind — tighten LTV / watch the segment"},
         "n_items": len(items),

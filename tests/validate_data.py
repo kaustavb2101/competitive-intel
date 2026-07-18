@@ -2486,10 +2486,19 @@ def check_decision_queue():
         elif not any(ch.isdigit() for ch in act):
             bad.append("%s act carries no inline number (the spec: real numbers inline)" % tag)
         src = it.get("source")
-        if not (isinstance(src, str) and src.endswith(".json")):
+        # source names one OR MORE existing .json layers. A synthesis row (e.g. the
+        # double-jeopardy defend row) may fuse two layers as "a.json + b.json"; every
+        # named part must still end in .json AND exist under platform/data — this splits
+        # and validates each, so it is strictly stronger than the single-file check.
+        parts = [p.strip() for p in src.split("+")] if isinstance(src, str) else []
+        if not parts:
             bad.append("%s source=%r not a .json layer name" % (tag, src))
-        elif not exists(src):
-            bad.append("%s source %s does not exist under platform/data" % (tag, src))
+        else:
+            for p in parts:
+                if not p.endswith(".json"):
+                    bad.append("%s source part %r not a .json layer name" % (tag, p))
+                elif not exists(p):
+                    bad.append("%s source %s does not exist under platform/data" % (tag, p))
         pri = it.get("priority")
         if not is_finite_number(pri):
             bad.append("%s priority=%r not finite" % (tag, pri))
