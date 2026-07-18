@@ -3,7 +3,7 @@
 envload.py — load local secrets from a git-ignored .env, once
 =============================================================
 Lets the pipeline scripts read API keys (DATA_GO_TH_TOKEN, NSO_TOKEN, BOT_*,
-GISTDA_API_KEY, …) from a `.env` file in the repo root instead of re-exporting
+GISTDA_SPHERE_KEY, …) from a `.env` file in the repo root instead of re-exporting
 them every run. The `.env` is git-ignored — keys stay on your machine and are
 never committed. Real shell env vars take precedence (setdefault).
 

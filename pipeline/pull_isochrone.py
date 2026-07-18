@@ -36,7 +36,7 @@ PROVIDERS (pick with --provider; default ors)
           Native units = seconds; --minutes are converted to seconds for the "range" param.
 
   gistda  GISTDA (Thai government geospatial)  https://api.sphere.gistda.or.th
-          Key env: GISTDA_API_KEY
+          Key env: GISTDA_SPHERE_KEY (repo secret name; legacy GISTDA_API_KEY also accepted)
           GISTDA's routing/isochrone endpoint shape varies by plan; this script targets the
           documented isochrone resource and normalises whatever Polygon geometry it returns into
           the same FeatureCollection above. Verify the exact path against your GISTDA plan docs.
@@ -225,9 +225,11 @@ def main():
             sys.exit("[error] ORS_KEY not set (export it or put it in repo-root .env). NEVER commit it.")
         fc = pull_ors(lat, lng, minutes_secs, args.profile, key or "DRYRUN", args.dry_run)
     else:
-        key = os.environ.get("GISTDA_API_KEY")
+        # Repo secret is named GISTDA_SPHERE_KEY (sphere.gistda.or.th); accept the legacy
+        # GISTDA_API_KEY name too so an .env carrying either still works.
+        key = os.environ.get("GISTDA_SPHERE_KEY") or os.environ.get("GISTDA_API_KEY")
         if not key and not args.dry_run:
-            sys.exit("[error] GISTDA_API_KEY not set (export it or put it in repo-root .env). NEVER commit it.")
+            sys.exit("[error] GISTDA_SPHERE_KEY (or GISTDA_API_KEY) not set (export it or put it in repo-root .env). NEVER commit it.")
         fc = pull_gistda(lat, lng, minutes_secs, key or "DRYRUN", args.dry_run)
 
     if args.dry_run:
