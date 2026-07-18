@@ -1,0 +1,150 @@
+name: Data — FPO PICO-finance competitor registry (monthly)
+
+# Refreshes the MEASURED per-province census of licensed พิโกไฟแนนซ์ (PICO-finance) operators — a
+# DIRECT small-ticket non-bank competitor class to AutoX, distinct from the big-4 title lenders. This
+# is the ONE competitor layer whose source (FPO open-data catalog, catalog.fpo.go.th) is REACHABLE
+# from GitHub-hosted runners (verified HTTP 200), unlike the data.go.th / DLT family that Cloudflare
+# geoblocks datacenter IPs. Every other CI-reachable Thai-gov feed (NABC, OAE, fuel, DIW/MOT census)
+# already has a refresh workflow; the PICO layer was the gap — its raw CSV is gitignored, so
+# build_pico_census.py --check SKIPs in the determinism gate and the committed layer was never
+# re-verified against the live registry.
+#
+# WHAT IT PRODUCES (only when the registry CONTENT changed):
+#   platform/data/pico_census.json    (pipeline/build_pico_census.py — a straight tally of the FPO CSV)
+#   platform/data/peer_province.json  (pipeline/build_peer_province.py folds the pico column in)
+#   platform/data/provenance.json     (pipeline/build_provenance.py — new/changed layer fingerprints)
+# The raw fpo_pico.csv + the puller manifest stay gitignored (not committed).
+#
+# PR-ONLY, NEVER auto-merge — deliberately. build_pico_census.py PINS the snapshot vintage/source_url
+# as constants (determinism: output = pure function of CSV content). pull_datagoth.py resolves the FPO
+# resource via CKAN search, so it auto-follows a resource ROTATION to a newer dated file — but the
+# pinned vintage constant would then go stale. A human reviewer must bump SNAPSHOT_URL/SNAPSHOT_VINTAGE
+# in pipeline/build_pico_census.py before merging a rotated snapshot; this job DETECTS a rotation
+# (manifest resource date vs the pinned constant) and flags it loudly in the PR body. It no-ops
+# cleanly when the upstream registry is unchanged (the common case — FPO updates ~monthly).
+#
+# Committed to a fresh data/pico-<run_id> branch and opened as a DRAFT PR back to the branch this ran
+# on (cron uses the default branch). NEVER pushes to a working branch — can't race a session.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monthly, 8th at 20:35 UTC (= 03:35 Bangkok) — off-minute/off-hour from the other data feeds.
+    # FPO publishes the registry on a roughly-monthly filename cadence; a monthly check is ample.
+    - cron: "35 20 8 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install deps
+        run: pip install --quiet shapely
+
+      - name: Pull the FPO PICO registry
+        run: python pipeline/pull_datagoth.py --only fpo_pico
+
+      - name: Rebuild the pico + peer layers when the registry content changed
+        id: rebuild
+        run: |
+          # build_pico_census.py --check is byte-exact against the committed layer. If the freshly
+          # pulled CSV reproduces it, the registry is unchanged and we no-op. Exit 3 = SKIP (CSV
+          # missing) should never happen here (we just pulled it) — treat it as a hard failure.
+          set +e
+          python pipeline/build_pico_census.py --check
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "registry unchanged — pico_census.json still byte-exact. Nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          elif [ "$rc" -ne 1 ]; then
+            echo "::error::build_pico_census.py --check exited $rc (expected 0=unchanged or 1=drift). Aborting."
+            exit 1
+          fi
+          echo "registry CONTENT changed — regenerating pico + peer + provenance layers."
+          python pipeline/build_pico_census.py
+          python pipeline/build_peer_province.py
+          python pipeline/build_provenance.py
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Detect an FPO resource rotation (vintage constant would go stale)
+        if: steps.rebuild.outputs.changed == 'true'
+        id: rotation
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, re, io
+          # the resolved resource filename encodes the true snapshot date: picofinanceoperate-DDMMYYYY.csv
+          url = json.load(open("source-data/datagoth/manifest.json"))["results"][0]["url"]
+          m = re.search(r"(\d{2})(\d{2})(\d{4})\.csv", url)
+          pulled = f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
+          # the pinned constant the builder stamps into meta.vintage
+          src = open("pipeline/build_pico_census.py", encoding="utf-8").read()
+          pin = re.search(r'SNAPSHOT_VINTAGE\s*=\s*"([0-9-]+)"', src)
+          pinned = pin.group(1) if pin else None
+          rotated = bool(pulled and pinned and pulled != pinned)
+          print(f"rotated={'true' if rotated else 'false'}")
+          print(f"pulled_vintage={pulled}")
+          print(f"pinned_vintage={pinned}")
+          PY
+
+      - name: Commit to a data branch + open a draft PR
+        if: steps.rebuild.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/pico-${{ github.run_id }}
+          ROTATED: ${{ steps.rotation.outputs.rotated }}
+          PULLED_VINTAGE: ${{ steps.rotation.outputs.pulled_vintage }}
+          PINNED_VINTAGE: ${{ steps.rotation.outputs.pinned_vintage }}
+        run: |
+          git add platform/data/pico_census.json platform/data/peer_province.json platform/data/provenance.json
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          OPS="$(python -c "import json;print(json.load(open('platform/data/pico_census.json'))['meta']['n_operators'])")"
+          NPROV="$(python -c "import json;print(json.load(open('platform/data/pico_census.json'))['meta']['n_provinces_present'])")"
+          git commit -m "data: FPO PICO-finance registry refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-pico-census.yml via pipeline/pull_datagoth.py --only fpo_pico (catalog.fpo.go.th, MEASURED). Rebuilt pico_census.json + peer_province.json (pico fold) + provenance.json."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated monthly FPO PICO-finance registry refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "The licensed PICO-finance registry content changed since the committed snapshot."
+            echo "**$OPS operators** across **$NPROV provinces** (MEASURED — a straight tally of the FPO registry)."
+            echo
+            if [ "$ROTATED" = "true" ]; then
+              echo "> ⚠️ **FPO resource ROTATED — action required before merge.** The pulled resource is dated"
+              echo "> \`$PULLED_VINTAGE\` but \`pipeline/build_pico_census.py\` still pins \`SNAPSHOT_VINTAGE = \"$PINNED_VINTAGE\"\`."
+              echo "> Bump \`SNAPSHOT_URL\` + \`SNAPSHOT_VINTAGE\` to the new snapshot and re-run"
+              echo "> \`python3 pipeline/build_pico_census.py\` so \`meta.vintage\` reflects the true date, then push."
+              echo
+            else
+              echo "Same resource date (\`$PINNED_VINTAGE\`) — content edited in place, no vintage bump needed."
+              echo
+            fi
+            echo "Provenance: MEASURED — FPO (Fiscal Policy Office) open-data licensed-operator registry."
+            echo "The pico column feeds the per-province peer board (#acq) as a DISTINCT small-ticket rival"
+            echo "class, separate from the big-4 title-lender ratio. Nothing fabricated."
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge (build_pico_census.py --check SKIPs there —"
+            echo "the raw CSV is gitignored — but build_peer_province.py + build_provenance.py --check gate the fold)."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: FPO PICO-finance registry refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
