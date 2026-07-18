@@ -112,6 +112,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "pull_oae_farm_economics.py --check (committed oae_farm_economics.json or gitignored raw PDF source-data/.oae_farm_econ_raw/ absent — network-pulled input, not drift)"
   else bad "pull_oae_farm_economics.py --check (oae_farm_economics.json drifted from a fresh parse of the cached raw PDF)"
   fi
+  ( cd "$PIPE" && python3 pull_nso_wages.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_nso_wages.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_nso_wages.py --check (committed nso_wages.json or gitignored raw scratch source-data/.nso_wage_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_nso_wages.py --check (nso_wages.json drifted from a fresh parse of the cached raw CSV)"
+  fi
+  ( cd "$PIPE" && python3 build_nso_wage_anchor.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_nso_wage_anchor.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_nso_wage_anchor.py --check (source-data/nso_wages.json absent — not data drift)"
+  else bad "build_nso_wage_anchor.py --check (nso_wage_anchor.json drifted from source-data/nso_wages.json)"
+  fi
   ( cd "$PIPE" && python3 pull_bot_credit.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "pull_bot_credit.py --check"
   elif [ "$rc" -eq 3 ]; then skip "pull_bot_credit.py --check (committed bot_credit.json or gitignored raw source-data/.bot_credit_raw/ absent — network-pulled input, not drift)"
