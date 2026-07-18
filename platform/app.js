@@ -1642,6 +1642,7 @@ function renderAcq(){
   renderRivalDensity();
   renderPeerProvince();
   renderPeerNpl();
+  renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
   // (Road-to-3,000 headroom split, sequenced expansion plan, "where to open next" opportunity board)
@@ -2038,6 +2039,73 @@ function drawPeerNpl(){
         [`Figures are <b>reported by the peer companies themselves</b> (FY2025 / 2025 IR) — ${m.source||'docs/RESEARCH_DIGEST.md §B'}. Vintage ${m.updated||'2026-06'}.`,
          '<b>Not an AutoX/Ngern Chaiyo number.</b> We hold no measured AutoX NPL — this is the competitive quality band around us, not our own book.',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.']);
+  }
+}
+
+/* ---------- sub-scale rivals vs our footprint · PICO-finance per province (obj #2, MEASURED) ----------
+   Surfaces data/pico_competitors.json (built by pipeline/build_pico_competitors.py): per-province
+   MEASURED count of licensed PICO-finance operators (FPO registry) vs AutoX branch count, ranked by
+   how much sub-scale rivals OUTNUMBER our footprint. Fully measured — two government/own tallies, no
+   inference (unlike the ESTIMATED exit-whitespace cue below). Lazy, null-safe, graceful if absent. */
+let PICOCOMP=null, picocompLoaded=false;
+const PICOCOMP_TOPN=15;
+function renderPicoCompetitors(){
+  const tbl=$('#picocomptbl'); if(!tbl) return;
+  if(picocompLoaded){ drawPicoCompetitors(); return; }
+  fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null).then(j=>{
+    PICOCOMP=j; picocompLoaded=true; drawPicoCompetitors();
+  }).catch(()=>{ PICOCOMP=null; picocompLoaded=true; drawPicoCompetitors(); });
+}
+function drawPicoCompetitors(){
+  const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
+  const rows=(PICOCOMP&&Array.isArray(PICOCOMP.provinces))?PICOCOMP.provinces:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Sub-scale rival census not yet computed.</b> <span class="sub">Run pipeline/build_pico_competitors.py (needs the FPO PICO census) — the leaderboard fills in on the next data refresh.</span>';
+    return;
+  }
+  // measured theme tokens (contrast-safe in light + dark): PICO=gold, AutoX=teal, pressure(outnumber)=risk-red.
+  const PICO='var(--gold)', AX='var(--merch)', PRESS='var(--agri)';
+  const top=rows.slice().sort((a,b)=>(b.outnumber||0)-(a.outnumber||0)).slice(0,PICOCOMP_TOPN);
+  const maxPico=Math.max(1,...top.map(r=>r.pico_total||0));
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
+    `<th title="MEASURED — licensed PICO-finance (พิโกไฟแนนซ์) operator service points in the province (FPO licence registry)">PICO operators ◆</th>`+
+    `<th title="MEASURED — AutoX (เงินไชโย) branches in the province">AutoX branches ◆</th>`+
+    `<th title="MEASURED — PICO operators minus AutoX branches. Positive (red) = sub-scale rivals outnumber our footprint here.">Outnumber ◆</th>`+
+    `<th title="MEASURED — PICO operators per AutoX branch (n/a where AutoX has no branch)">Rivals / branch</th></tr>`+
+    top.map((r,i)=>{
+      const on=r.outnumber||0;
+      const onc=on>0?PRESS:AX;
+      const sign=on>0?'+':'';
+      const ratio=(r.ratio==null)?'<span class="sub">n/a</span>':`<span class="mono" style="color:${on>0?PRESS:AX}">${r.ratio.toFixed(2)}×</span>`;
+      const name=`<b>${r.th||'—'}</b>${r.en?` <span class="sub">${r.en}</span>`:''}`;
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td>${name}</td>
+        <td>${barHTML(r.pico_total||0,PICO,maxPico)} <span class="mono" style="color:${PICO}">${r.pico_total==null?'—':r.pico_total}</span></td>
+        <td>${barHTML(r.autox_branches||0,AX,maxPico)} <span class="mono" style="color:${AX}">${r.autox_branches==null?'—':r.autox_branches}</span></td>
+        <td><span class="mono" style="color:${onc}"><b>${sign}${on}</b></span></td>
+        <td>${ratio}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const m=PICOCOMP.meta||{}, t=top[0];
+    const nOut=m.n_provinces_pico_outnumbers_autox!=null?m.n_provinces_pico_outnumbers_autox:rows.filter(r=>(r.outnumber||0)>0).length;
+    const nProv=m.n_provinces||rows.length;
+    let verdict='';
+    if(t){
+      verdict=(t.outnumber>0)
+        ? `Sub-scale rivals outnumber AutoX most in <b style="color:var(--agri)">${t.th}${t.en?` (${t.en})`:''}</b> — <b style="color:var(--gold)">${t.pico_total}</b> licensed PICO operators vs <b style="color:var(--merch)">${t.autox_branches}</b> AutoX branches (${t.outnumber>0?'+':''}${t.outnumber}${t.ratio!=null?`, ${t.ratio.toFixed(2)}× our footprint`:''}).`
+        : `AutoX is not outnumbered by sub-scale rivals in any province on this measure; ${t.th} is the tightest at ${t.pico_total} PICO vs ${t.autox_branches} branches.`;
+    }
+    ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
+      `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches). ${TAG_M}`+
+      methodBox(null,
+        ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
+         '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
+         'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
+         'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
+         (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')]);
   }
 }
 
