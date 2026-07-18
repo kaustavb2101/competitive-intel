@@ -95,6 +95,17 @@ html[data-theme="light"] #vignette{
 .occ .ot b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
 .occ .bar{height:7px;border-radius:4px;background:#141d2c;overflow:hidden}
 .occ .bar i{display:block;height:100%;border-radius:4px}
+.occ .ind{display:flex;justify-content:space-between;align-items:baseline;font-size:10.5px;color:var(--dim);margin-top:3px}
+.occ .ind b{font-family:'IBM Plex Mono';color:var(--mid);font-weight:600}
+html[data-theme="light"] .occ .ind{color:#7A8398}
+.answer{font-size:11.5px;color:var(--txt);line-height:1.5;margin:3px 0 9px;padding:8px 10px;
+ background:rgba(91,124,250,.08);border-left:2px solid #5B7CFA;border-radius:0 7px 7px 0}
+.answer b{color:#5B7CFA}
+html[data-theme="light"] .answer{color:#2C3444;background:rgba(91,124,250,.07)}
+/* crop farmer-income drill-down */
+.crop tr td.cn{color:#5B7CFA}
+.crop tr td.floor{color:#C8433B}
+.crop .sub{font-size:10px;color:var(--dim)}
 .foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
 
 /* right card: impacts + tables */
@@ -819,6 +830,10 @@ const EMP=(RY.gov&&RY.gov.employment)||null;
 const UNEMP=(RY.gov&&RY.gov.unemployment&&RY.gov.unemployment.unemployment_rate!=null)?RY.gov.unemployment:null;
 const INCOME=(RY.gov&&RY.gov.income&&RY.gov.income.avg_monthly_income!=null)?RY.gov.income:null;
 const INCFLOOR=(RY.gov&&RY.gov.income_floor)||{};
+// individual (per-person) income layer. OCCIND_P = this province's {cat:{household,individual_est}};
+// OCCIND_N = national MEASURED individual figures (ILOSTAT), keyed by category. Both null-safe.
+const OCCIND_P=(window.OCCIND&&window.OCCIND.provinces&&window.OCCIND.provinces[provTh])||null;
+const OCCIND_N=(function(){const m={};((window.OCCIND&&window.OCCIND.national)||[]).forEach(x=>{m[x.key]=x;});return m;})();
 function districtWorkers(d){
   if(!DISTRICTS||!DISTRICTS.features)return null;
   const f=DISTRICTS.features.find(ft=>ft.properties&&ft.properties.district===d);
@@ -893,22 +908,64 @@ function updatePanels(){
     html+='</div>';
   }
   if(INCOME){
+    // kk = category key (matches both INCOME and the individual layer). occ tag key = individual layer key.
     const OCC_INC=[['Agriculture','Agriculture','agri_ratio_to_national'],
       ['Factory workers','FactoryWorkers','factory_ratio_to_national'],
       ['SME owners','SMEOwners','sme_ratio_to_national'],
-      ['Transport','Transport',null],['Office staff','OfficeStaff',null]]
-      .map(([lab,kk,rk])=>({lab,v:INCOME[kk],ratio:rk?INCFLOOR[rk]:null})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
+      ['Transport','Transport',null],['Office staff / clerical','OfficeStaff',null]]
+      .map(([lab,kk,rk])=>({lab,kk,v:INCOME[kk],ratio:rk?INCFLOOR[rk]:null})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
     if(OCC_INC.length){
       const mx=OCC_INC[0].v;
-      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Income by occupation <span class="tag meas">measured · NSO SES 2566</span></h2>`
+      // answer-first lead: the individual office/clerical wage is far below the household figure the panel used to imply.
+      const offN=OCCIND_N.OfficeStaff;
+      const answer=(OCCIND_P&&offN)
+        ? `<div class="answer">The individual office/clerical <b>wage</b> is ~฿${fmt(Math.round(offN.individual_national/1000)*1000)}/mo nationally <span class="tag meas">measured · ILOSTAT</span> — <b>not</b> the ฿${fmt(INCOME.OfficeStaff||offN.household_national_avg)} figure below, which is whole-<b>household</b> income.</div>`
+        : '';
+      html+=`<h2 style="padding:0 0 4px;margin-top:2px">Household income by occupation class <span class="tag meas">measured · NSO SES household</span></h2>`
+        +answer
         +`<div class="occ">`+OCC_INC.map(r=>{
           const ratioLab=r.ratio!=null?` <small style="color:${r.ratio<1?'#C8433B':'#8A94A8'}">(${Math.round(r.ratio*100)}% of national avg)</small>`:'';
-          return `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo${ratioLab}</b></div>`
-          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div></div>`;
+          // individual per-person line. SMEOwners: self-employed, no measured individual wage → household-only.
+          const ip=OCCIND_P?OCCIND_P[r.kk]:null;
+          let indLine='';
+          if(r.kk==='SMEOwners'){
+            indLine=`<div class="ind"><span>Individual: self-employed — no measured individual wage</span></div>`;
+          }else if(ip&&ip.individual_est!=null){
+            indLine=`<div class="ind"><span>Individual ~<b>฿${fmt(ip.individual_est)}/mo</b></span><span class="tag est">estimated</span></div>`;
+          }
+          return `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo <span style="color:var(--dim);font-weight:400">household</span>${ratioLab}</b></div>`
+          +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div>`
+          +indLine+`</div>`;
         }).join('')+`</div>`
-        +`<div class="foot">NSO Socio-Economic Survey 2566 (2023) average monthly income by occupation — province-level, measured. "% of national avg" is a pure ratio over the unweighted 77-province mean (measured, no modelling).</div>`;
+        +`<div class="foot"><b>Household</b> figures: NSO Socio-Economic Survey 2566 (2023) by occupation class — province-level, <b>measured</b>. "% of national avg" is a pure ratio over the unweighted 77-province mean.`
+        +(OCCIND_P?` <b>Individual</b> per-person wage: national level MEASURED (ILOSTAT employee earnings); the per-province split is ESTIMATED (household × the measured national individual/household ratio). SME owners are self-employed — no measured individual wage.`:` Individual per-person figures unavailable for this province.`)
+        +`</div>`;
     }
   }
+  // ---- crop farmer-income drill-down (objective #1: portfolio risk floor for farming households) ----
+  // GROSS revenue per farming person/month, per crop, for THIS province. Measured yield/price/area/families;
+  // the per-person divisor (1.6 workers/farm) is the only estimated leg. Sugarcane excluded (no data).
+  (function(){
+    const CF=window.CROPFARM; if(!CF||!CF.crops||!provTh)return;
+    const rows=CF.crops.map(c=>{
+      const pr=(c.provinces||[]).find(x=>x&&x.province===provTh); if(!pr)return null;
+      return {crop:c.crop_en||c.crop, th:c.crop_th||'', price:c.price_thb_per_kg,
+        gpm:pr.gross_per_person_month, yld:pr.yield_kg_per_rai, ysrc:pr.yield_source,
+        rai:pr.planted_rai, fam:pr.farmer_family};
+    }).filter(Boolean).sort((a,b)=>(a.gpm||0)-(b.gpm||0)); // lowest gross-per-person first (floor-risk lens)
+    if(!rows.length)return;
+    const low=rows[0];
+    html+=`<h2 style="padding:0 0 4px;margin-top:12px">Farmer income by crop <span class="tag meas">GROSS · before costs</span></h2>`
+      +`<div class="answer">Lowest floor here: <b>${low.crop}</b> farmers gross ~<b>฿${fmt(low.gpm)}/person·mo</b> before costs. This is farm revenue per worker, not take-home pay.</div>`
+      +`<div class="crop"><table><tr><th>Crop</th><th class="mono">Gross ฿/person·mo</th><th class="mono">Yield kg/rai</th><th class="mono">฿/kg</th><th class="mono">Planted rai</th><th class="mono">Families</th></tr>`
+      +rows.map(r=>{
+        const ytag=r.ysrc==='measured'?'':' <span class="sub">est*</span>';
+        return `<tr><td class="cn">${r.crop}</td><td class="mono floor">฿${fmt(r.gpm)}</td>`
+          +`<td class="mono">${fmt(r.yld)}${ytag}</td><td class="mono">${r.price}</td>`
+          +`<td class="mono">${fmt(r.rai)}</td><td class="mono">${fmt(r.fam)}</td></tr>`;
+      }).join('')+`</table></div>`
+      +`<div class="foot"><b>GROSS farm revenue per person</b> (an income ceiling, not net take-home). Yield, farm-gate price, planted area and farming-family counts are <b>MEASURED</b> (OAE / NABC / DOAE). The per-person divisor — 1.6 workers per farm — is ESTIMATED. Rows marked <span class="sub">est*</span> use the national yield (no per-province figure published). Net income (after cost-of-production) is coming via OCR of OAE cost PDFs.</div>`;
+  })();
   if(k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
       .filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
@@ -1194,8 +1251,14 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    // crop land-use by district (SPAM 2010, ESTIMATED) — null/absent => the Crops lens self-disables.
    fetch('data/crop_landuse.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // national competitor census (measured) — filtered per-province inside initProvince; null/absent is graceful.
-   fetch('data/competitors_census.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];
+   fetch('data/competitors_census.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // individual (per-person) income by occupation — national MEASURED (ILOSTAT), per-province individual ESTIMATED.
+   // null/absent => the occupation panel still shows household income, no error.
+   fetch('data/occupation_income_individual.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // gross farmer income per person by crop, per province (MEASURED yield/price/area/families; 1.6 workers/farm ESTIMATED).
+   // null/absent => the crop drill-down simply doesn't render.
+   fetch('data/crop_farmer_income.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];window.OCCIND=a[5];window.CROPFARM=a[6];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})
