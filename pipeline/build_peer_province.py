@@ -61,7 +61,18 @@ ROOT = os.path.dirname(HERE)
 DATA = os.path.join(ROOT, "platform", "data")
 RIVDEN = os.path.join(DATA, "rival_density.json")
 PICO = os.path.join(DATA, "pico_census.json")
+VEH = os.path.join(ROOT, "source-data", "vehicles_by_province.json")
+EMP = os.path.join(ROOT, "source-data", "employment_by_province.json")
 OUT = os.path.join(DATA, "peer_province.json")
+
+# A province's registered-vehicle stock is flagged UNRELIABLE-AS-A-DENOMINATOR when it holds
+# fewer than this many vehicles per person in its labour force. The DLT registers a large share
+# of Greater-Bangkok vehicles centrally at the Bangkok office, so the inner-ring provinces
+# (Nonthaburi / Pathum Thani / Samut Prakan) report ~0.07–0.10 vehicles/worker — physically
+# implausible (< 1 vehicle per 7 workers) and a clean 3x below the next province (0.285) and
+# ~5–7x below the national median (0.499). The 0.15 cut isolates exactly those three; every
+# other province clears it. MEASURED cross-check (NSO labour force), deterministic, cited.
+VEH_PER_WORKER_FLOOR = 0.15
 
 
 def _load(p):
@@ -90,6 +101,44 @@ def build():
         pico_meta = pc.get("meta", {})
         pico_by_prov = pc.get("by_province", {}) or {}
         pico_zero = set(pc.get("zero_provinces", []) or [])
+
+    # ── optional: MEASURED denominator for a saturation read — DLT registered-vehicle stock ──
+    # Raw branch counts say who has the most doors; they do NOT say how CROWDED a province is
+    # relative to the pool we can actually lend against. For a vehicle-title lender the addressable
+    # collateral base IS the registered-vehicle stock, so title-lender branches PER 100k REGISTERED
+    # VEHICLES is the honest saturation metric: a province with 300 rivals over 3M vehicles is far
+    # less contested per unit of collateral than one with 120 rivals over 250k vehicles. vehicles is
+    # MEASURED (DLT รถจดทะเบียน stock by province); the per-100k figures are COMPUTED. Absent input
+    # (or an unmatched province) degrades every derived field to null — an honest gap, never a 0.
+    veh_by_prov, veh_meta, veh_total = {}, {}, None
+    if os.path.exists(VEH):
+        vh = _load(VEH)
+        veh_by_prov = vh.get("provinces", {}) or {}
+        veh_total = vh.get("n_vehicles")
+        veh_meta = {"source": vh.get("source"), "n_vehicles": veh_total}
+
+    # MEASURED labour-force cross-check (NSO): flags provinces whose registered-vehicle stock is
+    # physically implausible as a denominator (the Greater-Bangkok central-registration artifact).
+    emp_by_prov = {}
+    if os.path.exists(EMP):
+        emp_by_prov = (_load(EMP).get("provinces", {}) or {})
+
+    def _veh_flag(prov, vehicles):
+        # returns "low-vs-labour" when vehicles/labour-force < VEH_PER_WORKER_FLOOR, else None
+        # (also None when either input is missing — never guess a flag).
+        if not isinstance(vehicles, int):
+            return None
+        e = emp_by_prov.get(prov) or {}
+        labour = (e.get("formal") or 0) + (e.get("informal") or 0)
+        if labour <= 0:
+            return None
+        return "low-vs-labour" if (vehicles / labour) < VEH_PER_WORKER_FLOOR else None
+
+    def _per100k(n, veh):
+        # branches per 100,000 registered vehicles, 2 dp; null when the denominator is absent/0.
+        if not veh:
+            return None
+        return round(n / veh * 100000, 2)
 
     # ── roll the 928 district records up to their province ───────────────────────
     # province_th is the join key; region is carried from the first district seen (all
@@ -149,6 +198,11 @@ def build():
             pico = 0
         else:
             pico = None
+        # MEASURED registered-vehicle stock for this province (the collateral base), and the
+        # COMPUTED saturation reads over it. vehicles is None (not 0) when the DLT layer is absent
+        # or the province is unmatched, which cascades every per-100k field to null.
+        veh_row = veh_by_prov.get(e["province_th"])
+        vehicles = veh_row.get("total") if isinstance(veh_row, dict) else None
         provinces.append({
             "province_th": e["province_th"],
             "region": e["region"],
@@ -160,6 +214,11 @@ def build():
             "autox_rank": autox_rank,
             "n_ranked": n_ranked,
             "pico": pico,
+            "vehicles": vehicles,
+            "vehicle_stock_flag": _veh_flag(e["province_th"], vehicles),
+            "autox_per_100k_veh": _per100k(autox, vehicles),
+            "rivals_per_100k_veh": _per100k(rivals, vehicles),
+            "titlelender_per_100k_veh": _per100k(autox + rivals, vehicles),
             "n_districts": e["n_districts"],
             "n_outnumbered_districts": e["n_outnumbered_districts"],
         })
@@ -184,6 +243,34 @@ def build():
     pico_present = [p for p in provinces if isinstance(p["pico"], int)]
     total_pico = sum(p["pico"] for p in pico_present)
     n_pico_present = sum(1 for p in pico_present if p["pico"] > 0)
+
+    # ── vehicle-saturation rollup (MEASURED denominator, COMPUTED reads) ─────────────
+    # National saturation uses the layer's OWN matched vehicle total (sum of the provinces we
+    # joined), not the raw file's n_vehicles — so it stays consistent with the counts on the board
+    # even if a province ever fails to match. The single most-saturated province (highest
+    # title-lender branches per 100k vehicles, among provinces where AutoX is present) is the
+    # lead-with-the-answer headline the raw counts can't give.
+    veh_present = [p for p in provinces if isinstance(p.get("vehicles"), int)]
+    matched_vehicles = sum(p["vehicles"] for p in veh_present) or None
+    nat_autox_per_100k = _per100k(sum(p["autox"] for p in veh_present), matched_vehicles)
+    nat_rivals_per_100k = _per100k(sum(p["rivals"] for p in veh_present), matched_vehicles)
+    nat_titlelender_per_100k = _per100k(
+        sum(p["autox"] + p["rivals"] for p in veh_present), matched_vehicles)
+    # most-saturated province = highest title-lender density where AutoX actually operates
+    # (autox > 0) AND the vehicle denominator is reliable (NOT flagged low-vs-labour), so the
+    # headline is a real crowded market, never the Greater-Bangkok central-registration artifact.
+    n_veh_flagged = sum(1 for p in veh_present if p["vehicle_stock_flag"])
+    sat_pool = [p for p in veh_present
+                if p["autox"] > 0 and p["titlelender_per_100k_veh"] is not None
+                and not p["vehicle_stock_flag"]]
+    sat_pool.sort(key=lambda p: (-p["titlelender_per_100k_veh"], p["province_th"]))
+    most_saturated = ({
+        "province_th": sat_pool[0]["province_th"],
+        "titlelender_per_100k_veh": sat_pool[0]["titlelender_per_100k_veh"],
+        "rivals_per_100k_veh": sat_pool[0]["rivals_per_100k_veh"],
+        "autox_per_100k_veh": sat_pool[0]["autox_per_100k_veh"],
+        "vehicles": sat_pool[0]["vehicles"],
+    } if sat_pool else None)
 
     meta = {
         "generated_by": "pipeline/build_peer_province.py",
@@ -229,6 +316,25 @@ def build():
                     "int (or a MEASURED 0 where the registry lists none); null when the registry "
                     "is absent from the sandbox or the province is unmatched."
                     % (pico_meta.get("vintage") or "n/a"),
+            "vehicles": "MEASURED — DLT registered-vehicle stock for the province (รถจดทะเบียน, "
+                        "vehicles_by_province.json .total). The addressable collateral base for a "
+                        "vehicle-title lender. null when the DLT layer is absent or the province "
+                        "is unmatched (an honest gap, never a 0).",
+            "vehicle_stock_flag": "MEASURED cross-check — 'low-vs-labour' when the province's "
+                                  "registered-vehicle stock is under %.2f vehicles per person in "
+                                  "its NSO labour force (formal+informal), i.e. physically "
+                                  "implausible as a denominator. This isolates the Greater-Bangkok "
+                                  "central-registration artifact (Nonthaburi / Pathum Thani / "
+                                  "Samut Prakan register most vehicles at the Bangkok DLT office). "
+                                  "Flagged provinces keep their saturation numbers but are EXCLUDED "
+                                  "from the most-saturated headline. null = reliable (or labour "
+                                  "figure absent)." % VEH_PER_WORKER_FLOOR,
+            "autox_per_100k_veh / rivals_per_100k_veh / titlelender_per_100k_veh":
+                "COMPUTED — branches per 100,000 registered vehicles (AutoX / big-4 rivals / both), "
+                "2 dp. A SATURATION read: how crowded the province is relative to the vehicle pool "
+                "we can lend against, which raw counts cannot show. Numerator inherits the MEASURED "
+                "census's lower-bound caveat; denominator is MEASURED DLT stock. null where vehicles "
+                "is null.",
         },
         "caveats": [
             "The rival census is a LOWER BOUND: Muangthai / Srisawad / Tidlor are near-complete "
@@ -252,11 +358,26 @@ def build():
             "coordinate census, so it is not comparable district-by-district and is never summed "
             "into the big-4 'rivals' total. A province's pico=0 (สิงห์บุรี, อ่างทอง) is a MEASURED "
             "zero from the registry, while pico=null would mean the layer was unavailable.",
+            "The *_per_100k_veh saturation reads divide the (lower-bound) big-4 census by MEASURED "
+            "DLT registered-vehicle stock. The vehicle stock counts ALL registered vehicles, while "
+            "the rivals also lend against gold and cashflow — so this is a relative crowding proxy "
+            "over the vehicle collateral base, not a literal branches-per-titleable-vehicle. It "
+            "sharpens the raw count (crowded-per-collateral vs merely populous), it does not replace "
+            "it, and it makes NO open / close / expand call.",
+            "Greater-Bangkok central-registration artifact: the DLT registers a large share of "
+            "metro vehicles at the Bangkok office, so the inner-ring provinces (Nonthaburi, Pathum "
+            "Thani, Samut Prakan) report only ~0.07–0.10 vehicles per worker and their per-100k "
+            "saturation is INFLATED. Those provinces carry vehicle_stock_flag='low-vs-labour' (a "
+            "MEASURED NSO-labour cross-check) and are EXCLUDED from the most-saturated headline. "
+            "Their raw branch counts and ratios are unaffected — only the vehicle-normalised reads "
+            "are unreliable. The NATIONAL saturation is sound: vehicle stock is sum-conserved "
+            "(the ring's shortfall is Bangkok's surplus), so the distortion is per-province only.",
         ],
         "brands": brands,
         "record_format": "{province_th, region, autox, rivals, by_brand{brand:count}, ratio, "
-                         "leader, autox_rank, n_ranked, pico, n_districts, "
-                         "n_outnumbered_districts}. by_brand omits zero-count brands; autox_rank "
+                         "leader, autox_rank, n_ranked, pico, vehicles, vehicle_stock_flag, "
+                         "autox_per_100k_veh, rivals_per_100k_veh, titlelender_per_100k_veh, "
+                         "n_districts, n_outnumbered_districts}. by_brand omits zero-count brands; autox_rank "
                          "is AutoX's 1-based position of n_ranked present operators (int/null); "
                          "pico is a distinct-class int/null (not in rivals); provinces[] sorted "
                          "by (rivals-autox) desc.",
@@ -273,6 +394,19 @@ def build():
         "total_pico": total_pico,
         "n_provinces_pico_present": n_pico_present,
         "pico_available": bool(pico_by_prov),
+        "vehicle_saturation_available": bool(veh_present),
+        "n_provinces_vehicle_matched": len(veh_present),
+        "n_provinces_vehicle_flagged": n_veh_flagged,
+        "matched_vehicles": matched_vehicles,
+        "national_autox_per_100k_veh": nat_autox_per_100k,
+        "national_rivals_per_100k_veh": nat_rivals_per_100k,
+        "national_titlelender_per_100k_veh": nat_titlelender_per_100k,
+        "most_saturated_province": most_saturated,
+        "vehicle_source": {
+            "layer": "source-data/vehicles_by_province.json",
+            "source": veh_meta.get("source"),
+            "n_vehicles": veh_meta.get("n_vehicles"),
+        } if veh_present else None,
         "rival_density_source": {
             "n_districts": rd_meta.get("n_districts"),
             "total_autox": rd_meta.get("total_autox"),
@@ -321,6 +455,14 @@ def run(check=False):
         print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
               % (m["total_pico"], m["n_provinces_pico_present"],
                  (m.get("pico_source") or {}).get("vintage")))
+    if m["vehicle_saturation_available"]:
+        ms = m.get("most_saturated_province") or {}
+        print("  saturation (per 100k registered vehicles): AutoX %.2f | rivals %.2f | title-lenders %.2f"
+              % (m["national_autox_per_100k_veh"], m["national_rivals_per_100k_veh"],
+                 m["national_titlelender_per_100k_veh"]))
+        if ms:
+            print("  most-saturated market: %s (%.2f title-lender branches / 100k vehicles)"
+                  % (ms["province_th"], ms["titlelender_per_100k_veh"]))
     return 0
 
 
