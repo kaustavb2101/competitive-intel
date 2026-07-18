@@ -2532,13 +2532,18 @@ function renderExposure(){
     ['Drought-proxy (dry quartile)', drought.length, pctS(drought.length), 'Branch in the driest 25% by recent rainfall (HDX proxy)', 'var(--gold)','☀'],
     ['High agri-PD proxy', weakAgri.length, pctS(weakAgri.length), 'Estimated agri-PD risk proxy ≥ 60 (OSM/price-based, not measured)', 'var(--agri)','▲'],
   ];
+  // the .n note is line-clamped to 2 lines here (see #expocards .mcard .n in styles.css) so the 2x2
+  // row scans as one set; carry the full note (incl. the measured/estimated provenance caveat) in a
+  // title so the clipped tail stays recoverable on hover / to screen readers — no visual change.
+  const hhiNote=`${hhiLabel} · footprint spread over ${provCount} provinces · book proxy = branch count`;
   $('#expocards').innerHTML=
     `<div class="mcard"><div class="k">◆ Geographic concentration (HHI)</div>
        <div class="v" style="color:${hhiCol}">${Math.round(hhi).toLocaleString()}</div>
-       <div class="n">${hhiLabel} · footprint spread over ${provCount} provinces · book proxy = branch count</div></div>`+
-    cards.map(([k,n,p,note,col,gl])=>
-    `<div class="mcard"><div class="k">${gl} ${k}</div><div class="v" style="color:${col}">${p}</div>
-     <div class="n">${n.toLocaleString()} of ${N.toLocaleString()} branches · ${note}</div></div>`).join('');
+       <div class="n" title="${dqEsc(hhiNote)}">${hhiNote}</div></div>`+
+    cards.map(([k,n,p,note,col,gl])=>{
+    const cn=`${n.toLocaleString()} of ${N.toLocaleString()} branches · ${note}`;
+    return `<div class="mcard"><div class="k">${gl} ${k}</div><div class="v" style="color:${col}">${p}</div>
+     <div class="n" title="${dqEsc(cn)}">${cn}</div></div>`;}).join('');
   // per-region concentration table
   const byReg={};
   DATA.forEach(d=>{const r=d.r||'—'; const o=byReg[r]||(byReg[r]={n:0,str:0,dry:0,agri:0});
