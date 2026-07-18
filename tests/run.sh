@@ -102,6 +102,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "pull_oae_yield.py --check (committed oae_yield.json or gitignored raw scratch source-data/.oae_yield_raw/ absent — network-pulled input, not drift)"
   else bad "pull_oae_yield.py --check (oae_yield.json drifted from a fresh parse of the cached raw CSVs)"
   fi
+  ( cd "$PIPE" && python3 pull_oae_farm_economics.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_oae_farm_economics.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_oae_farm_economics.py --check (committed oae_farm_economics.json or gitignored raw PDF source-data/.oae_farm_econ_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_oae_farm_economics.py --check (oae_farm_economics.json drifted from a fresh parse of the cached raw PDF)"
+  fi
   ( cd "$PIPE" && python3 build_crop_farmer_income.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_crop_farmer_income.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_crop_farmer_income.py --check (oae_yield.json/farmgate_prices/doae_planted_area/nabc_agri absent — not data drift)"

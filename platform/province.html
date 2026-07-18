@@ -105,7 +105,11 @@ html[data-theme="light"] .answer{color:#2C3444;background:rgba(91,124,250,.07)}
 /* crop farmer-income drill-down */
 .crop tr td.cn{color:#5B7CFA}
 .crop tr td.floor{color:#C8433B}
+.crop tr td.neg{color:#C8433B;font-weight:600}
+.crop tr td.pos{color:#1C8C7D}
 .crop .sub{font-size:10px;color:var(--dim)}
+.hhinc{margin-top:8px;font-size:11px;line-height:1.6;color:var(--dim)}
+.hhinc b{color:var(--fg)}
 .foot{font-size:10px;color:var(--dim);line-height:1.5;margin-top:8px}
 
 /* right card: impacts + tables */
@@ -943,28 +947,44 @@ function updatePanels(){
     }
   }
   // ---- crop farmer-income drill-down (objective #1: portfolio risk floor for farming households) ----
-  // GROSS revenue per farming person/month, per crop, for THIS province. Measured yield/price/area/families;
-  // the per-person divisor (1.6 workers/farm) is the only estimated leg. Sugarcane excluded (no data).
+  // GROSS and NET revenue per farming household / person, per crop, for THIS province. Households,
+  // yield, price and NET RETURN are MEASURED (OAE Cai-up 2568); the per-person divisor (1.6 workers/
+  // farm) and the per-province overlay are the estimated legs. Vintage 2568; sugarcane excluded.
   (function(){
     const CF=window.CROPFARM; if(!CF||!CF.crops||!provTh)return;
     const rows=CF.crops.map(c=>{
       const pr=(c.provinces||[]).find(x=>x&&x.province===provTh); if(!pr)return null;
-      return {crop:c.crop_en||c.crop, th:c.crop_th||'', price:c.price_thb_per_kg,
-        gpm:pr.gross_per_person_month, yld:pr.yield_kg_per_rai, ysrc:pr.yield_source,
-        rai:pr.planted_rai, fam:pr.farmer_family};
-    }).filter(Boolean).sort((a,b)=>(a.gpm||0)-(b.gpm||0)); // lowest gross-per-person first (floor-risk lens)
-    if(!rows.length)return;
-    const low=rows[0];
-    html+=`<h2 style="padding:0 0 4px;margin-top:12px">Farmer income by crop <span class="tag meas">GROSS · before costs</span></h2>`
-      +`<div class="answer">Lowest floor here: <b>${low.crop}</b> farmers gross ~<b>฿${fmt(low.gpm)}/person·mo</b> before costs. This is farm revenue per worker, not take-home pay.</div>`
-      +`<div class="crop"><table><tr><th>Crop</th><th class="mono">Gross ฿/person·mo</th><th class="mono">Yield kg/rai</th><th class="mono">฿/kg</th><th class="mono">Planted rai</th><th class="mono">Families</th></tr>`
-      +rows.map(r=>{
-        const ytag=r.ysrc==='measured'?'':' <span class="sub">est*</span>';
-        return `<tr><td class="cn">${r.crop}</td><td class="mono floor">฿${fmt(r.gpm)}</td>`
-          +`<td class="mono">${fmt(r.yld)}${ytag}</td><td class="mono">${r.price}</td>`
-          +`<td class="mono">${fmt(r.rai)}</td><td class="mono">${fmt(r.fam)}</td></tr>`;
-      }).join('')+`</table></div>`
-      +`<div class="foot"><b>GROSS farm revenue per person</b> (an income ceiling, not net take-home). Yield, farm-gate price, planted area and farming-family counts are <b>MEASURED</b> (OAE / NABC / DOAE). The per-person divisor — 1.6 workers per farm — is ESTIMATED. Rows marked <span class="sub">est*</span> use the national yield (no per-province figure published). Net income (after cost-of-production) is coming via OCR of OAE cost PDFs.</div>`;
+      return {crop:c.crop_en||c.crop, price:c.price_thb_per_kg,
+        gpm:pr.gross_per_person_month, npm:pr.net_per_person_month,
+        nhh:pr.net_per_household_year, ghh:pr.gross_per_household_year,
+        yld:pr.yield_kg_per_rai, ysrc:pr.yield_source, loss:pr.loss};
+    }).filter(Boolean).sort((a,b)=>((a.npm==null?1e9:a.npm)-(b.npm==null?1e9:b.npm))); // worst net first
+    if(rows.length){
+      const w=rows[0]; // worst net
+      const losses=rows.filter(r=>r.loss);
+      const answer = losses.length
+        ? `<div class="answer">After costs, <b>${losses.map(r=>r.crop).join(', ')}</b> ${losses.length>1?'run':'runs'} at a <b>loss</b> here in 2568 — ${w.crop} nets ~<b style="color:#C8433B">−฿${fmt(Math.abs(w.npm))}/person·mo</b> (a real farm-gate loss, not just thin margin).</div>`
+        : `<div class="answer">Lowest net floor here: <b>${w.crop}</b> nets ~<b>฿${fmt(w.npm)}/person·mo</b> after costs (2568). This is take-home over farm costs, per worker.</div>`;
+      html+=`<h2 style="padding:0 0 4px;margin-top:12px">Farmer income by crop <span class="tag meas">GROSS + NET · 2568</span></h2>`
+        +answer
+        +`<div class="crop"><table><tr><th>Crop</th><th class="mono">Net ฿/person·mo</th><th class="mono">Gross ฿/person·mo</th><th class="mono">Net ฿/household·yr</th><th class="mono">Yield kg/rai</th><th class="mono">฿/kg</th></tr>`
+        +rows.map(r=>{
+          const ytag=r.ysrc==='measured'?'':' <span class="sub">nat*</span>';
+          const netCls=(r.npm==null)?'':(r.npm<0?'neg':'pos');
+          const netTxt=(r.npm==null)?'—':(r.npm<0?`−฿${fmt(Math.abs(r.npm))}`:`฿${fmt(r.npm)}`);
+          const nhhTxt=(r.nhh==null)?'—':(r.nhh<0?`−฿${fmt(Math.abs(r.nhh))}`:`฿${fmt(r.nhh)}`);
+          return `<tr><td class="cn">${r.crop}</td><td class="mono ${netCls}">${netTxt}</td>`
+            +`<td class="mono">฿${fmt(r.gpm)}</td><td class="mono ${netCls}">${nhhTxt}</td>`
+            +`<td class="mono">${fmt(r.yld)}${ytag}</td><td class="mono">${r.price}</td></tr>`;
+        }).join('')+`</table></div>`
+        +`<div class="foot"><b>NET</b> = OAE net return (ผลตอบแทนสุทธิ) per tonne × the household's output — a real per-household profit/<b style="color:#C8433B">loss</b> after cost of production, crop-year <b>2568</b>. Households, yield, farm-gate price and net return are <b>MEASURED</b> (OAE Cai-up compendium, text layer). The per-person divisor (1.6 workers/farm) is ESTIMATED; the per-province split is an ESTIMATED overlay of the national economics (only rice varies by measured province yield — others carry the national figure, marked <span class="sub">nat*</span>). Rice farm-gate price is the all-rice paddy average (8.1 ฿/kg), not premium jasmine spot.</div>`;
+    }
+    // whole-household income + DEBT for this region (OAE Cai-up 2567/68p) — the lender view
+    const HE=CF.meta&&CF.meta.household_economics, RMAP={North:'North',Isan:'Northeast','Central&BKK':'Central',East:'Central',South:'South'};
+    const rk=RMAP[reg], hr=HE&&HE.regions&&rk?HE.regions[rk]:null;
+    if(hr){
+      html+=`<div class="hhinc"><b>Whole farm-household (${rk} region · OAE 2567/68p):</b> net cash income <b>฿${fmt(hr.net_cash_hh_income)}/yr</b> · net cash from farming <b>฿${fmt(hr.net_cash_farm_income)}/yr</b> · year-end <b>debt ฿${fmt(hr.debt_year_end)}/household</b>. <span class="tag meas">measured · OAE</span></div>`;
+    }
   })();
   if(k){
     const rows=OCC.map(([lab,ks,col])=>({lab,col,v:ks.reduce((a,kk)=>a+(k[kk]||0),0)}))
