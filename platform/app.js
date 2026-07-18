@@ -1938,6 +1938,54 @@ function drawPeerProvince(){
   }
 }
 
+/* ---------- MEASURED credit anchor · BoT NPL scale for the risk readout (obj #1) ----------
+   Surfaces data/credit_anchor.json (pipeline/build_credit_anchor.py ← BoT FSR 2024 text layer +
+   BoT statistics report 984). The real-world NPL + household-debt scale the ESTIMATED 0-100
+   branch-risk composite is read against — CONTEXT, never a composite input. Lazy, null-safe. */
+let CREDITANCHOR=null, creditAnchorLoaded=false;
+function renderCreditAnchor(){
+  const box=$('#creditanchor'); if(!box) return;
+  if(creditAnchorLoaded){ drawCreditAnchor(); return; }
+  fetch('data/credit_anchor.json').then(r=>r.ok?r.json():null).then(j=>{
+    CREDITANCHOR=j; creditAnchorLoaded=true; drawCreditAnchor();
+  }).catch(()=>{ CREDITANCHOR=null; creditAnchorLoaded=true; drawCreditAnchor(); });
+}
+function drawCreditAnchor(){
+  const box=$('#creditanchor'), stats=$('#creditanchorstats'); if(!box) return;
+  const metrics=(CREDITANCHOR&&Array.isArray(CREDITANCHOR.metrics))?CREDITANCHOR.metrics:[];
+  if(!metrics.length){
+    if(stats) stats.innerHTML='';
+    box.innerHTML='<b>BoT credit anchor not available.</b> <span class="sub">data/credit_anchor.json is absent — it fills in from BoT FSR 2024 + statistics report 984 on the next data refresh (pipeline/pull_bot_credit.py).</span>';
+    return;
+  }
+  const m=CREDITANCHOR.meta||{};
+  const mc={system_npl:'var(--accent)',household_debt_to_gdp:'var(--collat)',household_debt:'var(--collat)',auto_hp_debt:'var(--gold)'};
+  const by=k=>metrics.find(x=>x.key===k);
+  const npl=by('system_npl'), hh=by('household_debt'), gdp=by('household_debt_to_gdp'), auto=by('auto_hp_debt');
+  // answer-first headline
+  const head=`<b>The measured real-world scale:</b> `+
+    (npl?`system NPL <b style="color:var(--accent)">${npl.display}</b>`:'')+
+    (hh?` · household debt <b style="color:var(--collat)">${hh.display}</b>${gdp?` (${gdp.display} of GDP)`:''}`:'')+
+    (auto?`, of which vehicle hire-purchase <b style="color:var(--gold)">${auto.display}</b>${auto.share_of_hh_debt_pct!=null?` (${auto.share_of_hh_debt_pct}% of household debt)`:''}`:'')+
+    `. ${TAG_M}`;
+  const ahp=(CREDITANCHOR.auto_hp_npl)||{};
+  box.innerHTML=head+
+    `<div class="sub" style="margin-top:6px">The estimated 0–100 branch-risk score is a <b>triage rank, not a predicted NPL</b> — these BoT figures are the real-world scale it is read against, shown alongside the score, never inside it.</div>`+
+    methodBox(m.label||null,
+      [ ...metrics.map(x=>`<b>${x.label}: ${x.display}</b> — ${x.scope}. ${TAG_M} ${x.source} (${x.vintage})${x.source_url?` · <a href="${x.source_url}" target="_blank" rel="noopener" style="color:var(--accent)">source</a>`:''}`),
+        ahp.reason_absent?`<b>Auto hire-purchase NPL:</b> ${ahp.reason_absent}`:null,
+        m.source?`Source: ${m.source}. Vintage/pulled ${m.pulled||'—'}.`:null ]);
+  if(stats){
+    stats.innerHTML=metrics.map(x=>{
+      const c=mc[x.key]||'var(--hi)';
+      const sub=[x.vintage,x.source].filter(Boolean).join(' · ');
+      return `<div class="mcard"><div class="k">${x.label}</div>`+
+        `<div class="v" style="color:${c}">${x.display}</div>`+
+        `<div class="n">${sub}</div></div>`;
+    }).join('');
+  }
+}
+
 /* ---------- peer loan quality · reported NPL benchmark (obj #1 + #2) ----------
    Surfaces data/peer_npl.json (docs/RESEARCH_DIGEST.md §B — the listed title-lenders' own
    reported NPL ratios). PEER-reported MEASURED figures — NOT an AutoX number (we hold no
@@ -3344,6 +3392,7 @@ async function renderVintageDigest(){
     : 'Every figure is read from deltas.json (the snapshot diff). Region/branch proxies are ESTIMATED; the commodity board is measured/editorial price direction (World Bank).';
 }
 async function renderTrend(){
+  renderCreditAnchor();
   renderVintageDigest();
   renderPeerOutliers();
   renderSiegeTable();

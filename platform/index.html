@@ -519,6 +519,15 @@
       use the <b>estimated agri-PD / merchant / collateral proxies</b> (OSM/price-based, 0–100) — not measured
       defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
 
+    <!-- MEASURED CREDIT ANCHOR — the real BoT NPL scale + household-debt backdrop the ESTIMATED
+         0-100 branch-risk composite is read against (pipeline/build_credit_anchor.py →
+         data/credit_anchor.json). Context/reference only; it does NOT feed the composite. -->
+    <h2 class="risk" style="margin-top:6px">Real-world credit scale · BoT NPL anchor <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h2>
+    <div class="insight" id="creditanchor" style="border-left-color:var(--accent)">
+      <div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div>
+    </div>
+    <div class="grid macro" id="creditanchorstats" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
+
     <!-- SINCE LAST VINTAGE — plain-language digest (pipeline/build_vintage_digest.py →
          data/vintage_digest.json). Headline + 4-8 one-sentence findings, worst first;
          every number is read from deltas.json. Calm one-liner when only one vintage exists. -->

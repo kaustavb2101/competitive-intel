@@ -107,6 +107,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "pull_oae_farm_economics.py --check (committed oae_farm_economics.json or gitignored raw PDF source-data/.oae_farm_econ_raw/ absent — network-pulled input, not drift)"
   else bad "pull_oae_farm_economics.py --check (oae_farm_economics.json drifted from a fresh parse of the cached raw PDF)"
   fi
+  ( cd "$PIPE" && python3 pull_bot_credit.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "pull_bot_credit.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "pull_bot_credit.py --check (committed bot_credit.json or gitignored raw source-data/.bot_credit_raw/ absent — network-pulled input, not drift)"
+  else bad "pull_bot_credit.py --check (bot_credit.json drifted from a fresh parse of the cached raw FSR2024.pdf/report984.html)"
+  fi
+  ( cd "$PIPE" && python3 build_credit_anchor.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_credit_anchor.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_credit_anchor.py --check (source-data/bot_credit.json absent — network-pulled input, not drift)"
+  else bad "build_credit_anchor.py --check (credit_anchor.json drifted from source-data/bot_credit.json)"
+  fi
   ( cd "$PIPE" && python3 build_crop_farmer_income.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_crop_farmer_income.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_crop_farmer_income.py --check (oae_yield.json/farmgate_prices/doae_planted_area/nabc_agri absent — not data drift)"
