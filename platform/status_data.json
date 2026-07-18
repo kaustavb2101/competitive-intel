@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-18T02:31:53Z",
-    "commit": "2eb7f68"
+    "generated_at": "2026-07-18T09:07:42Z",
+    "commit": "38fab71"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,114 @@
   ],
   "activity": [
     {
+      "date": "2026-07-18T09:07:42Z",
+      "sha": "38fab71",
+      "summary": "committee: autonomous competitor scout (run 29638549935)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-18T15:51:31+07:00",
+      "sha": "e7ae9a1",
+      "summary": "Merge pull request #63 from kaustavb2101/claude/individual-income",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-18T15:49:40+07:00",
+      "sha": "d237c9c",
+      "summary": "Merge remote-tracking branch 'origin/master' into claude/individual-income",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-18T08:10:38Z",
+      "sha": "b4ddf4a",
+      "summary": "docs(progress-log): record ux-loop rayong-province stub fix — merged #65, deploy up+gated",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-18T15:08:22+07:00",
+      "sha": "d3b3b58",
+      "summary": "ux: add favicon + light-default to the rayong-province redirect stub (#65)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-18T06:21:26Z",
+      "sha": "271aad6",
+      "summary": "ci(data): scheduled FPO PICO-finance registry refresh — close the last CI-reachable-but-unautomated MEASURED competitor layer",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-18T05:53:59Z",
+      "sha": "a7d77b1",
+      "summary": "committee: autonomous competitor scout (run 29632961542)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-18T05:33:09Z",
+      "sha": "4836940",
+      "summary": "committee: refresh autonomy plan (run 29632422424)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-18T05:15:24Z",
+      "sha": "380a46e",
+      "summary": "docs: register the PDF/OCR-unlocked sources + owner Thai-IP newcar stub",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T05:13:46Z",
+      "sha": "7a39f06",
+      "summary": "enrich(competition): measured sub-scale rival read — PICO operators vs AutoX by province",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-18T04:56:40Z",
+      "sha": "ea03b5e",
+      "summary": "enrich(risk): measured BoT credit-conditions anchor for the risk readout",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T04:28:31Z",
+      "sha": "813f5d8",
+      "summary": "enrich(vehicle): measured collateral read — province diesel share + national pickup brand mix",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T04:04:38Z",
+      "sha": "8ab5a30",
+      "summary": "income(farmer): recalibrate on OAE real households + add measured NET return (fixes denominator bug)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T03:57:54Z",
+      "sha": "a8dbcf6",
+      "summary": "data: OAE farm-economics source (Cai-up-2568) — real per-crop households + net return",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T03:18:22Z",
+      "sha": "b38db48",
+      "summary": "income(app): surface individual occupation income + crop farmer-income drill-down",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T03:02:26Z",
+      "sha": "8f99b09",
+      "summary": "capability: ingest_pdf — general-purpose PDF -> text/tables/OCR extraction",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T02:56:30Z",
+      "sha": "5fbb795",
+      "summary": "income(farmer): measured GROSS farmer income per person by crop (WIP 2/2)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-18T02:44:48Z",
+      "sha": "f976b45",
+      "summary": "income(occupation): measured individual per-person income by occupation (WIP 1/2)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-18T02:31:53Z",
       "sha": "2eb7f68",
       "summary": "docs(progress-log): record ux-loop exposure-card provenance-title fix — merged #62, deploy up+gated",
@@ -550,114 +658,6 @@
       "sha": "79adb36",
       "summary": "service(provenance): sidecar manifest clears the shame board 2 → 0 (314/314 labelled)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-17T14:15:26Z",
-      "sha": "4091ea3",
-      "summary": "docs(progress-log): record ux-loop nav-tablist fix — merged #56, deploy up+gated",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T21:12:19+07:00",
-      "sha": "c6d1c6c",
-      "summary": "ux: nav is a navigation landmark, not an invalid tablist (#56)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T10:53:17Z",
-      "sha": "cb3c5b9",
-      "summary": "committee: refresh autonomy plan (run 29574908193)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-17T10:17:14Z",
-      "sha": "e83f75b",
-      "summary": "chore(dashboard): refresh autonomy plan after provenance shame-board ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-17T10:14:04Z",
-      "sha": "d4e9b74",
-      "summary": "service(provenance): stamp the structural layers — clear the shame board 6 → 2",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-17T08:13:23Z",
-      "sha": "dc29974",
-      "summary": "docs(progress-log): record ux-loop msheet keyboard fix — merged #54, deploy up+gated",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T15:10:45+07:00",
-      "sha": "49f3a20",
-      "summary": "ux: mobile branch-sheet close handle operable by keyboard (Enter/Space) (#54)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T06:05:07Z",
-      "sha": "d18c995",
-      "summary": "committee: autonomous competitor scout (run 29558891909)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-17T05:47:37Z",
-      "sha": "19f8f98",
-      "summary": "committee: refresh autonomy plan (run 29558191357)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-17T04:32:45Z",
-      "sha": "5196c76",
-      "summary": "chore(dashboard): refresh autonomy plan after peer-NPL card ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-17T11:32:20+07:00",
-      "sha": "a47cc33",
-      "summary": "feat(peer): surface the MEASURED peer-NPL benchmark on the Competition tab (#52)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-17T02:12:19Z",
-      "sha": "30b9fe8",
-      "summary": "docs(progress-log): record ux-loop search empty-state fix — merged #51, deploy 401 (up+gated)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T09:09:58+07:00",
-      "sha": "efe1aa1",
-      "summary": "ux: search tables show a \"no results\" row instead of a blank body (#51)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T00:35:48Z",
-      "sha": "46d6448",
-      "summary": "fix(gate): regenerate fuel-price-dependent layers — master CI was red after the #49 fuel auto-commit",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-17T07:24:32+07:00",
-      "sha": "0a99e95",
-      "summary": "data: live fuel prices (2026-07-16, run 29542575688) (#49)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-17T07:23:55+07:00",
-      "sha": "0ddd80b",
-      "summary": "data: NABC live prices (2026-07-16, run 29535503219) (#48)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-17T07:15:39+07:00",
-      "sha": "747c3fc",
-      "summary": "feat(overview): surface MEASURED national labour-market backdrop on the macro board (#46)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-16T22:22:23Z",
-      "sha": "75001e6",
-      "summary": "chore(dashboard): refresh autonomy plan after site-health deploy-health fix",
-      "pillar": "deployment"
     }
   ]
 }
