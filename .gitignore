@@ -78,3 +78,9 @@ source-data/.oae_yield_raw/
 
 # OAE farm-economics raw PDF — re-pullable via pipeline/pull_oae_farm_economics.py
 source-data/.oae_farm_econ_raw/
+
+# DLT raw catalog mirror (pull_dlt_all.py / pull_dlt_fuel.py) — re-pullable INPUT CSVs from
+# gdcatalog.dlt.go.th; never committed (only the derived platform/data JSON is).
+# (data.go.th probe output from pull_newcar_brandprovince.py lands in source-data/datagoth/,
+#  already gitignored above.)
+source-data/dlt/raw/

@@ -1329,6 +1329,7 @@ function renderOverview(){
   // absent file → the wrap stays display:none and the Overview reads exactly as before.
   loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
+  renderDieselCollateral();
   renderCollatMix();
   renderRecoverySensitivity();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
@@ -1448,6 +1449,74 @@ function renderCollatOutlook(){
   if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the diesel-pickup and used-motorcycle sides both face a slow value squeeze. '+
     'If recovery values on repossessed vehicles fall, loss-given-default on the title book rises even before any change in default rates. '+
     'These directions are an <b>estimated / editorial watch</b> (no live Thai used-vehicle price index in this data); the vehicle-mix shares below are measured (DLT).';
+}
+/* ---------- Diesel-pickup collateral · per-province diesel share + national brand mix ----------
+   objective #1, MEASURED. AutoX's core title collateral is the diesel pickup; the EV/diesel
+   transition is the resale-value risk under it. Two MEASURED reads from data/vehicle_collateral.json:
+   (a) per-province DIESEL SHARE of the car(รย.1)+pickup(รย.3) registered fleet (DLT dataset_1_1_04) —
+       where diesel dominates, resale is most exposed as the fleet electrifies; and
+   (b) the NATIONAL collateral BRAND mix (DLT first registrations) — Toyota+Isuzu pickups, Honda/Toyota
+       cars, BYD/EV rising. Brand is NATIONAL ONLY (no measured brand×province in reachable Thai open
+       data) — said plainly. Lazy-loaded; graceful/null-safe when absent. */
+let VCOLL=null, vcollLoaded=false, vcollPromise=null;
+function loadVehicleCollateral(){
+  if(vcollPromise) return vcollPromise;
+  vcollLoaded=true;
+  vcollPromise=fetch('data/vehicle_collateral.json').then(r=>r.ok?r.json():null)
+    .then(j=>{VCOLL=j||null;return VCOLL;}).catch(()=>{VCOLL=null;return null;});
+  return vcollPromise;
+}
+function renderDieselCollateral(){
+  const vb=$('#dcollat-verdict'), grid=$('#dcollat-brand'), tbl=$('#dcollattbl'), note=$('#dcollat-note');
+  if(!tbl) return;
+  if(!vcollLoaded){ loadVehicleCollateral().then(()=>{ try{renderDieselCollateral();}catch(e){} }); return; }
+  if(!VCOLL||!VCOLL.provinces||!VCOLL.provinces.length){
+    if(vb) vb.style.display='none';
+    if(grid) grid.innerHTML='';
+    if(note) note.textContent='Vehicle-title collateral data not available (data/vehicle_collateral.json missing).';
+    return;
+  }
+  const meta=VCOLL.meta||{}, nat=meta.national||{}, provs=VCOLL.provinces, bm=VCOLL.national_brand_mix;
+  const top=provs.slice(0,10);
+  const dcol=v=>v>=70?'var(--agri)':v>=60?'var(--gold)':'var(--collat)';
+  // ---- answer-first verdict ----
+  if(vb){
+    const t3=provs.slice(0,3).map(p=>p.th).join(', ');
+    const pk=(bm&&bm.pickup_top_brands||[]).slice(0,2).map(b=>b.b.charAt(0)+b.b.slice(1).toLowerCase()).join(' + ');
+    vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🛻 <b>National pickup-title collateral is ${pk||'Toyota + Isuzu'}-led</b> — diesel is <b>${nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'}</b> of the car+pickup title fleet, highest in <b>${t3}</b>, where the EV transition most threatens resale.</div>`+
+      `<div class="sub" style="margin-top:4px">Diesel share ${TAG_M} DLT dataset_1_1_04 (${meta.vintage||'—'}) · brand mix ${TAG_M} DLT first registrations, <b>national only</b> ${TAG_E}<span style="opacity:.7"> (no measured brand×province in reachable Thai open data)</span></div>`;
+  }
+  // ---- national brand-mix readout (mcards) ----
+  if(grid){
+    const cards=[];
+    if(bm){
+      const nm=b=>b?b.b.charAt(0)+b.b.slice(1).toLowerCase():'';
+      const pk=bm.pickup_top_brands||[], cr=bm.car_top_brands||[];
+      if(pk.length) cards.push({k:'Pickup titles (national)',v:[nm(pk[0]),nm(pk[1])].filter(Boolean).join(' + '),d:'first-regis leaders',cls:'',
+        n:'MEASURED (DLT first registrations, '+(bm.vintage_be||'—')+'). '+pk.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. National only.'});
+      if(cr.length) cards.push({k:'Car titles (national)',v:[nm(cr.find(b=>!/YAMAHA|HONDA CUB|KUBOTA/i.test(b.b))||cr[0])].filter(Boolean).join('')||nm(cr[0]),d:'first-regis leader',cls:'',
+        n:'MEASURED (DLT first registrations). '+cr.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. Includes motorcycles; national only.'});
+      if(bm.ev_only_share_pct!=null) cards.push({k:'New-EV share (national)',v:bm.ev_only_share_pct+'%',d:'rising ▲',cls:'up',
+        n:'MEASURED floor — pure-EV marques as a share of new car regis ('+(bm.vintage_be||'—')+'). BYD-led; the leading indicator for the diesel-pickup resale watch.'});
+    }
+    cards.push({k:'Diesel share (national)',v:(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'),d:'of car+pickup fleet',cls:'down',
+      n:'MEASURED (DLT dataset_1_1_04) — diesel\'s share of the registered car+pickup title-able stock. Higher = more resale exposure to the EV transition.'});
+    grid.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+      <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+      <div class="n">${c.n}</div></div>`).join('');
+  }
+  // ---- per-province diesel-share table ----
+  if(note) note.innerHTML='The diesel pickup is AutoX\'s core title collateral, and the EV/diesel transition is the resale risk under it. '+
+    'These provinces carry the highest <b>diesel share</b> of the registered <b>car+pickup</b> title fleet — where recovery values are most exposed as Thailand electrifies. '+
+    'All shares are <b>measured</b> (DLT dataset_1_1_04, '+(meta.vintage||'—')+'). Nationally diesel is <b>'+(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—')+'</b> of the car+pickup fleet. '+
+    '<b>Brand is national only</b> — a measured brand×province cross is not in reachable Thai open data.';
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-collat" title="diesel share of the car(รย.1)+pickup(รย.3) registered stock — DLT, measured">Diesel % ▲ (DLT)</th><th title="car+pickup registered stock — DLT, measured">Car+pickup stock</th><th title="diesel pickups registered — DLT, measured">Pickup diesel</th></tr>`+
+    top.map((p,i)=>{const dc=dcol(p.diesel_share_pct);
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region||'—'}</td>
+      <td>${barHTML(p.diesel_share_pct,dc)} <span class="mono" style="color:${dc}">${p.diesel_share_pct}%</span></td>
+      <td class="mono sub">${(p.car_pickup_total||0).toLocaleString()}</td>
+      <td class="mono sub">${(p.pickup_diesel||0).toLocaleString()}</td></tr>`;}).join('');
 }
 /* ---------- Collateral mix · most motorcycle-heavy provinces (objective #1, MEASURED) ----------
    Pure DLT vehicle stock split per province (moto / car / pickup / EV share of total). A ฿10k

@@ -155,6 +155,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_ev_exposure.py --check (scurve_by_province.json absent or output not generated — not data drift)"
   else bad "build_ev_exposure.py --check (ev_exposure.json drifted from source-data/scurve_by_province.json)"
   fi
+  ( cd "$PIPE" && python3 build_vehicle_collateral.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_collateral.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_collateral.py --check (dlt mirror dataset_1_1_04 absent or output not generated — not data drift)"
+  else bad "build_vehicle_collateral.py --check (vehicle_collateral.json drifted from the dlt mirror / brand_trends.json)"
+  fi
   ( cd "$PIPE" && python3 build_brand_trends.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_brand_trends.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_brand_trends.py --check (dlt CSVs absent or output not generated — not data drift)"
