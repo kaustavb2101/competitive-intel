@@ -1,0 +1,1828 @@
+{
+  "meta": {
+    "title": "Individual (per-person) income by occupation — the borrower is an individual",
+    "generated_by": "pipeline/build_occupation_income_individual.py",
+    "deterministic": true,
+    "network_free": true,
+    "absent": false,
+    "currency": "THB/month",
+    "vintage_individual": "2025",
+    "source_individual": "ILOSTAT EAR_EMTA_SEX_OCU_NB (rplumber.ilo.org) — average monthly earnings of EMPLOYEES by ISCO-08 occupation, Thailand. MEASURED, national.",
+    "source_household": "NSO SES 2566 household income by occupation class (source-data/household_income_by_province.json). MEASURED, per-province.",
+    "provenance": {
+      "national.individual_national": "MEASURED — ILOSTAT individual employee earnings, national.",
+      "national.household_national_avg": "MEASURED — unweighted 77-province mean of the SES household figure.",
+      "provinces.*.household": "MEASURED — NSO SES 2566 household income for that province/category.",
+      "provinces.*.individual_est": "ESTIMATED — household * (measured national individual / measured national household). Province SPREAD measured; absolute individual level measured; the rescale ratio (implied earners/household) is the estimate."
+    },
+    "caveats": [
+      "Individual figures are EMPLOYEE earnings (ILOSTAT); self-employed SME owners have no measured individual wage and stay household-only.",
+      "Per-province individual is ESTIMATED (no reachable measured provincial wage source — NSO provincial LFS is geoblocked); the national individual figure is MEASURED.",
+      "Reads structural income-floor risk for the occupation, not the AutoX borrower book or realized PD."
+    ]
+  },
+  "national": [
+    {
+      "key": "Agriculture",
+      "label": "Agriculture",
+      "isco_code": "OCU_ISCO08_6",
+      "isco_label": "Skilled agricultural workers",
+      "individual_national": 8766,
+      "household_national_avg": 23486,
+      "ratio_individual_to_household": 0.3732,
+      "measured_individual": true,
+      "note": ""
+    },
+    {
+      "key": "FactoryWorkers",
+      "label": "Factory / plant",
+      "isco_code": "OCU_ISCO08_8",
+      "isco_label": "Plant & machine operators",
+      "individual_national": 14591,
+      "household_national_avg": 21971,
+      "ratio_individual_to_household": 0.6641,
+      "measured_individual": true,
+      "note": ""
+    },
+    {
+      "key": "Transport",
+      "label": "Transport",
+      "isco_code": "OCU_ISCO08_8",
+      "isco_label": "Plant & machine operators (incl. drivers)",
+      "individual_national": 14591,
+      "household_national_avg": 18547,
+      "ratio_individual_to_household": 0.7867,
+      "measured_individual": true,
+      "note": "ISCO-08 places most transport drivers in group 8 (plant/machine operators)."
+    },
+    {
+      "key": "OfficeStaff",
+      "label": "Office / clerical",
+      "isco_code": "OCU_ISCO08_4",
+      "isco_label": "Clerical support workers",
+      "individual_national": 17070,
+      "household_national_avg": 36989,
+      "ratio_individual_to_household": 0.4615,
+      "measured_individual": true,
+      "note": "SES 'office staff' is a broad class (also spans technicians/professionals/managers, which earn more individually — see the ISCO ladder); clerical is the representative core."
+    },
+    {
+      "key": "SMEOwners",
+      "label": "SME owners",
+      "isco_code": null,
+      "isco_label": null,
+      "individual_national": null,
+      "household_national_avg": 33299,
+      "measured_individual": false,
+      "note": "Self-employed, not employees — ILOSTAT earnings covers employees only, so no measured individual wage exists; household figure carried, no per-person estimate."
+    }
+  ],
+  "isco_ladder": [
+    {
+      "isco_code": "OCU_ISCO08_6",
+      "label": "Skilled agricultural",
+      "individual": 8766
+    },
+    {
+      "isco_code": "OCU_ISCO08_9",
+      "label": "Elementary",
+      "individual": 9945
+    },
+    {
+      "isco_code": "OCU_ISCO08_7",
+      "label": "Craft & trades",
+      "individual": 13650
+    },
+    {
+      "isco_code": "OCU_ISCO08_5",
+      "label": "Service & sales",
+      "individual": 13721
+    },
+    {
+      "isco_code": "OCU_ISCO08_8",
+      "label": "Plant & machine operators",
+      "individual": 14591
+    },
+    {
+      "isco_code": "OCU_ISCO08_4",
+      "label": "Clerical support",
+      "individual": 17070
+    },
+    {
+      "isco_code": "OCU_ISCO08_3",
+      "label": "Technicians",
+      "individual": 23875
+    },
+    {
+      "isco_code": "OCU_ISCO08_0",
+      "label": "Armed forces",
+      "individual": 28203
+    },
+    {
+      "isco_code": "OCU_ISCO08_2",
+      "label": "Professionals",
+      "individual": 29576
+    },
+    {
+      "isco_code": "OCU_ISCO08_1",
+      "label": "Managers",
+      "individual": 30503
+    }
+  ],
+  "provinces": {
+    "กระบี่": {
+      "OfficeStaff": {
+        "household": 40589,
+        "individual_est": 18731
+      },
+      "FactoryWorkers": {
+        "household": 20281,
+        "individual_est": 13469
+      },
+      "Transport": {
+        "household": 21537,
+        "individual_est": 16943
+      },
+      "Agriculture": {
+        "household": 20734,
+        "individual_est": 7739
+      },
+      "SMEOwners": {
+        "household": 31978,
+        "individual_est": null
+      }
+    },
+    "กรุงเทพมหานคร": {
+      "OfficeStaff": {
+        "household": 46076,
+        "individual_est": 21264
+      },
+      "FactoryWorkers": {
+        "household": 27353,
+        "individual_est": 18165
+      },
+      "Transport": {
+        "household": 22938,
+        "individual_est": 18045
+      },
+      "Agriculture": {
+        "household": 23541,
+        "individual_est": 8787
+      },
+      "SMEOwners": {
+        "household": 48801,
+        "individual_est": null
+      }
+    },
+    "กาญจนบุรี": {
+      "OfficeStaff": {
+        "household": 34749,
+        "individual_est": 16036
+      },
+      "FactoryWorkers": {
+        "household": 21192,
+        "individual_est": 14074
+      },
+      "Transport": {
+        "household": 20441,
+        "individual_est": 16081
+      },
+      "Agriculture": {
+        "household": 24630,
+        "individual_est": 9193
+      },
+      "SMEOwners": {
+        "household": 30176,
+        "individual_est": null
+      }
+    },
+    "กาฬสินธุ์": {
+      "OfficeStaff": {
+        "household": 33883,
+        "individual_est": 15637
+      },
+      "FactoryWorkers": {
+        "household": 15503,
+        "individual_est": 10296
+      },
+      "Transport": {
+        "household": 12565,
+        "individual_est": 9885
+      },
+      "Agriculture": {
+        "household": 22225,
+        "individual_est": 8295
+      },
+      "SMEOwners": {
+        "household": 34218,
+        "individual_est": null
+      }
+    },
+    "กำแพงเพชร": {
+      "OfficeStaff": {
+        "household": 29094,
+        "individual_est": 13427
+      },
+      "FactoryWorkers": {
+        "household": 26349,
+        "individual_est": 17498
+      },
+      "Transport": {
+        "household": 21569,
+        "individual_est": 16968
+      },
+      "Agriculture": {
+        "household": 21216,
+        "individual_est": 7919
+      },
+      "SMEOwners": {
+        "household": 25638,
+        "individual_est": null
+      }
+    },
+    "ขอนแก่น": {
+      "OfficeStaff": {
+        "household": 29235,
+        "individual_est": 13492
+      },
+      "FactoryWorkers": {
+        "household": 18030,
+        "individual_est": 11974
+      },
+      "Transport": {
+        "household": 19730,
+        "individual_est": 15522
+      },
+      "Agriculture": {
+        "household": 12759,
+        "individual_est": 4762
+      },
+      "SMEOwners": {
+        "household": 22200,
+        "individual_est": null
+      }
+    },
+    "จันทบุรี": {
+      "OfficeStaff": {
+        "household": 36675,
+        "individual_est": 16925
+      },
+      "FactoryWorkers": {
+        "household": 25126,
+        "individual_est": 16686
+      },
+      "Transport": {
+        "household": 20944,
+        "individual_est": 16477
+      },
+      "Agriculture": {
+        "household": 78117,
+        "individual_est": 29157
+      },
+      "SMEOwners": {
+        "household": 55751,
+        "individual_est": null
+      }
+    },
+    "ฉะเชิงเทรา": {
+      "OfficeStaff": {
+        "household": 37923,
+        "individual_est": 17501
+      },
+      "FactoryWorkers": {
+        "household": 25495,
+        "individual_est": 16931
+      },
+      "Transport": {
+        "household": 29730,
+        "individual_est": 23389
+      },
+      "Agriculture": {
+        "household": 32275,
+        "individual_est": 12046
+      },
+      "SMEOwners": {
+        "household": 34652,
+        "individual_est": null
+      }
+    },
+    "ชลบุรี": {
+      "OfficeStaff": {
+        "household": 38358,
+        "individual_est": 17702
+      },
+      "FactoryWorkers": {
+        "household": 35095,
+        "individual_est": 23307
+      },
+      "Transport": {
+        "household": 20681,
+        "individual_est": 16270
+      },
+      "Agriculture": {
+        "household": 40204,
+        "individual_est": 15006
+      },
+      "SMEOwners": {
+        "household": 44976,
+        "individual_est": null
+      }
+    },
+    "ชัยนาท": {
+      "OfficeStaff": {
+        "household": 43879,
+        "individual_est": 20250
+      },
+      "FactoryWorkers": {
+        "household": 21761,
+        "individual_est": 14452
+      },
+      "Transport": {
+        "household": 19989,
+        "individual_est": 15725
+      },
+      "Agriculture": {
+        "household": 20273,
+        "individual_est": 7567
+      },
+      "SMEOwners": {
+        "household": 31043,
+        "individual_est": null
+      }
+    },
+    "ชัยภูมิ": {
+      "OfficeStaff": {
+        "household": 36602,
+        "individual_est": 16891
+      },
+      "FactoryWorkers": {
+        "household": 22169,
+        "individual_est": 14722
+      },
+      "Transport": {
+        "household": 15729,
+        "individual_est": 12374
+      },
+      "Agriculture": {
+        "household": 22681,
+        "individual_est": 8466
+      },
+      "SMEOwners": {
+        "household": 35134,
+        "individual_est": null
+      }
+    },
+    "ชุมพร": {
+      "OfficeStaff": {
+        "household": 34578,
+        "individual_est": 15957
+      },
+      "FactoryWorkers": {
+        "household": 20155,
+        "individual_est": 13385
+      },
+      "Transport": {
+        "household": 21182,
+        "individual_est": 16664
+      },
+      "Agriculture": {
+        "household": 28285,
+        "individual_est": 10557
+      },
+      "SMEOwners": {
+        "household": 49226,
+        "individual_est": null
+      }
+    },
+    "ตรัง": {
+      "OfficeStaff": {
+        "household": 38760,
+        "individual_est": 17887
+      },
+      "FactoryWorkers": {
+        "household": 21299,
+        "individual_est": 14145
+      },
+      "Transport": {
+        "household": 16793,
+        "individual_est": 13211
+      },
+      "Agriculture": {
+        "household": 21151,
+        "individual_est": 7894
+      },
+      "SMEOwners": {
+        "household": 38894,
+        "individual_est": null
+      }
+    },
+    "ตราด": {
+      "OfficeStaff": {
+        "household": 34952,
+        "individual_est": 16130
+      },
+      "FactoryWorkers": {
+        "household": 20426,
+        "individual_est": 13565
+      },
+      "Transport": {
+        "household": 16068,
+        "individual_est": 12641
+      },
+      "Agriculture": {
+        "household": 30008,
+        "individual_est": 11200
+      },
+      "SMEOwners": {
+        "household": 35888,
+        "individual_est": null
+      }
+    },
+    "ตาก": {
+      "OfficeStaff": {
+        "household": 35898,
+        "individual_est": 16567
+      },
+      "FactoryWorkers": {
+        "household": 12557,
+        "individual_est": 8339
+      },
+      "Transport": {
+        "household": 15108,
+        "individual_est": 11886
+      },
+      "Agriculture": {
+        "household": 18316,
+        "individual_est": 6836
+      },
+      "SMEOwners": {
+        "household": 31620,
+        "individual_est": null
+      }
+    },
+    "นครนายก": {
+      "OfficeStaff": {
+        "household": 37186,
+        "individual_est": 17161
+      },
+      "FactoryWorkers": {
+        "household": 24004,
+        "individual_est": 15941
+      },
+      "Transport": {
+        "household": 17535,
+        "individual_est": 13795
+      },
+      "Agriculture": {
+        "household": 15439,
+        "individual_est": 5763
+      },
+      "SMEOwners": {
+        "household": 31432,
+        "individual_est": null
+      }
+    },
+    "นครปฐม": {
+      "OfficeStaff": {
+        "household": 37004,
+        "individual_est": 17077
+      },
+      "FactoryWorkers": {
+        "household": 23111,
+        "individual_est": 15348
+      },
+      "Transport": {
+        "household": 20244,
+        "individual_est": 15926
+      },
+      "Agriculture": {
+        "household": 36969,
+        "individual_est": 13798
+      },
+      "SMEOwners": {
+        "household": 46995,
+        "individual_est": null
+      }
+    },
+    "นครพนม": {
+      "OfficeStaff": {
+        "household": 33449,
+        "individual_est": 15436
+      },
+      "FactoryWorkers": {
+        "household": 15752,
+        "individual_est": 10461
+      },
+      "Transport": {
+        "household": 15743,
+        "individual_est": 12385
+      },
+      "Agriculture": {
+        "household": 16238,
+        "individual_est": 6061
+      },
+      "SMEOwners": {
+        "household": 32481,
+        "individual_est": null
+      }
+    },
+    "นครราชสีมา": {
+      "OfficeStaff": {
+        "household": 43316,
+        "individual_est": 19990
+      },
+      "FactoryWorkers": {
+        "household": 27790,
+        "individual_est": 18455
+      },
+      "Transport": {
+        "household": 22933,
+        "individual_est": 18041
+      },
+      "Agriculture": {
+        "household": 24065,
+        "individual_est": 8982
+      },
+      "SMEOwners": {
+        "household": 29597,
+        "individual_est": null
+      }
+    },
+    "นครศรีธรรมราช": {
+      "OfficeStaff": {
+        "household": 44296,
+        "individual_est": 20442
+      },
+      "FactoryWorkers": {
+        "household": 24236,
+        "individual_est": 16095
+      },
+      "Transport": {
+        "household": 16058,
+        "individual_est": 12633
+      },
+      "Agriculture": {
+        "household": 28500,
+        "individual_est": 10637
+      },
+      "SMEOwners": {
+        "household": 57308,
+        "individual_est": null
+      }
+    },
+    "นครสวรรค์": {
+      "OfficeStaff": {
+        "household": 29071,
+        "individual_est": 13416
+      },
+      "FactoryWorkers": {
+        "household": 16680,
+        "individual_est": 11077
+      },
+      "Transport": {
+        "household": 17690,
+        "individual_est": 13917
+      },
+      "Agriculture": {
+        "household": 28874,
+        "individual_est": 10777
+      },
+      "SMEOwners": {
+        "household": 28511,
+        "individual_est": null
+      }
+    },
+    "นนทบุรี": {
+      "OfficeStaff": {
+        "household": 40943,
+        "individual_est": 18895
+      },
+      "FactoryWorkers": {
+        "household": 24348,
+        "individual_est": 16170
+      },
+      "Transport": {
+        "household": 19682,
+        "individual_est": 15484
+      },
+      "Agriculture": {
+        "household": 15844,
+        "individual_est": 5914
+      },
+      "SMEOwners": {
+        "household": 40798,
+        "individual_est": null
+      }
+    },
+    "นราธิวาส": {
+      "OfficeStaff": {
+        "household": 32120,
+        "individual_est": 14823
+      },
+      "FactoryWorkers": {
+        "household": 15359,
+        "individual_est": 10200
+      },
+      "Transport": {
+        "household": 14300,
+        "individual_est": 11250
+      },
+      "Agriculture": {
+        "household": 7347,
+        "individual_est": 2742
+      },
+      "SMEOwners": {
+        "household": 21175,
+        "individual_est": null
+      }
+    },
+    "น่าน": {
+      "OfficeStaff": {
+        "household": 35427,
+        "individual_est": 16349
+      },
+      "FactoryWorkers": {
+        "household": 16443,
+        "individual_est": 10920
+      },
+      "Transport": {
+        "household": 19250,
+        "individual_est": 15144
+      },
+      "Agriculture": {
+        "household": 14684,
+        "individual_est": 5481
+      },
+      "SMEOwners": {
+        "household": 23866,
+        "individual_est": null
+      }
+    },
+    "บึงกาฬ": {
+      "OfficeStaff": {
+        "household": 40819,
+        "individual_est": 18838
+      },
+      "FactoryWorkers": {
+        "household": 24991,
+        "individual_est": 16597
+      },
+      "Transport": {
+        "household": 17316,
+        "individual_est": 13623
+      },
+      "Agriculture": {
+        "household": 19548,
+        "individual_est": 7296
+      },
+      "SMEOwners": {
+        "household": 35566,
+        "individual_est": null
+      }
+    },
+    "บุรีรัมย์": {
+      "OfficeStaff": {
+        "household": 37315,
+        "individual_est": 17220
+      },
+      "FactoryWorkers": {
+        "household": 17321,
+        "individual_est": 11503
+      },
+      "Transport": {
+        "household": 20477,
+        "individual_est": 16109
+      },
+      "Agriculture": {
+        "household": 20246,
+        "individual_est": 7557
+      },
+      "SMEOwners": {
+        "household": 23966,
+        "individual_est": null
+      }
+    },
+    "ปทุมธานี": {
+      "OfficeStaff": {
+        "household": 52371,
+        "individual_est": 24169
+      },
+      "FactoryWorkers": {
+        "household": 33433,
+        "individual_est": 22203
+      },
+      "Transport": {
+        "household": 27289,
+        "individual_est": 21468
+      },
+      "Agriculture": {
+        "household": 30671,
+        "individual_est": 11448
+      },
+      "SMEOwners": {
+        "household": 53713,
+        "individual_est": null
+      }
+    },
+    "ประจวบคีรีขันธ์": {
+      "OfficeStaff": {
+        "household": 36005,
+        "individual_est": 16616
+      },
+      "FactoryWorkers": {
+        "household": 18860,
+        "individual_est": 12525
+      },
+      "Transport": {
+        "household": 20335,
+        "individual_est": 15998
+      },
+      "Agriculture": {
+        "household": 21556,
+        "individual_est": 8046
+      },
+      "SMEOwners": {
+        "household": 27114,
+        "individual_est": null
+      }
+    },
+    "ปราจีนบุรี": {
+      "OfficeStaff": {
+        "household": 28465,
+        "individual_est": 13136
+      },
+      "FactoryWorkers": {
+        "household": 27006,
+        "individual_est": 17935
+      },
+      "Transport": {
+        "household": 22824,
+        "individual_est": 17956
+      },
+      "Agriculture": {
+        "household": 18556,
+        "individual_est": 6926
+      },
+      "SMEOwners": {
+        "household": 23534,
+        "individual_est": null
+      }
+    },
+    "ปัตตานี": {
+      "OfficeStaff": {
+        "household": 29457,
+        "individual_est": 13594
+      },
+      "FactoryWorkers": {
+        "household": 16663,
+        "individual_est": 11066
+      },
+      "Transport": {
+        "household": 14379,
+        "individual_est": 11312
+      },
+      "Agriculture": {
+        "household": 17496,
+        "individual_est": 6530
+      },
+      "SMEOwners": {
+        "household": 22112,
+        "individual_est": null
+      }
+    },
+    "พระนครศรีอยุธยา": {
+      "OfficeStaff": {
+        "household": 37931,
+        "individual_est": 17505
+      },
+      "FactoryWorkers": {
+        "household": 35135,
+        "individual_est": 23333
+      },
+      "Transport": {
+        "household": 23958,
+        "individual_est": 18848
+      },
+      "Agriculture": {
+        "household": 35484,
+        "individual_est": 13244
+      },
+      "SMEOwners": {
+        "household": 43181,
+        "individual_est": null
+      }
+    },
+    "พะเยา": {
+      "OfficeStaff": {
+        "household": 30594,
+        "individual_est": 14119
+      },
+      "FactoryWorkers": {
+        "household": 14105,
+        "individual_est": 9367
+      },
+      "Transport": {
+        "household": 16019,
+        "individual_est": 12602
+      },
+      "Agriculture": {
+        "household": 15336,
+        "individual_est": 5724
+      },
+      "SMEOwners": {
+        "household": 20442,
+        "individual_est": null
+      }
+    },
+    "พังงา": {
+      "OfficeStaff": {
+        "household": 34294,
+        "individual_est": 15826
+      },
+      "FactoryWorkers": {
+        "household": 26318,
+        "individual_est": 17478
+      },
+      "Transport": {
+        "household": 13865,
+        "individual_est": 10908
+      },
+      "Agriculture": {
+        "household": 18399,
+        "individual_est": 6867
+      },
+      "SMEOwners": {
+        "household": 29351,
+        "individual_est": null
+      }
+    },
+    "พัทลุง": {
+      "OfficeStaff": {
+        "household": 39943,
+        "individual_est": 18433
+      },
+      "FactoryWorkers": {
+        "household": 21501,
+        "individual_est": 14279
+      },
+      "Transport": {
+        "household": 16213,
+        "individual_est": 12755
+      },
+      "Agriculture": {
+        "household": 18998,
+        "individual_est": 7091
+      },
+      "SMEOwners": {
+        "household": 33144,
+        "individual_est": null
+      }
+    },
+    "พิจิตร": {
+      "OfficeStaff": {
+        "household": 33829,
+        "individual_est": 15612
+      },
+      "FactoryWorkers": {
+        "household": 21115,
+        "individual_est": 14023
+      },
+      "Transport": {
+        "household": 17501,
+        "individual_est": 13768
+      },
+      "Agriculture": {
+        "household": 23698,
+        "individual_est": 8845
+      },
+      "SMEOwners": {
+        "household": 22049,
+        "individual_est": null
+      }
+    },
+    "พิษณุโลก": {
+      "OfficeStaff": {
+        "household": 39061,
+        "individual_est": 18026
+      },
+      "FactoryWorkers": {
+        "household": 21988,
+        "individual_est": 14602
+      },
+      "Transport": {
+        "household": 14397,
+        "individual_est": 11326
+      },
+      "Agriculture": {
+        "household": 22335,
+        "individual_est": 8336
+      },
+      "SMEOwners": {
+        "household": 29130,
+        "individual_est": null
+      }
+    },
+    "ภูเก็ต": {
+      "OfficeStaff": {
+        "household": 48403,
+        "individual_est": 22337
+      },
+      "FactoryWorkers": {
+        "household": 29715,
+        "individual_est": 19734
+      },
+      "Transport": {
+        "household": 27115,
+        "individual_est": 21331
+      },
+      "Agriculture": {
+        "household": 34694,
+        "individual_est": 12949
+      },
+      "SMEOwners": {
+        "household": 45410,
+        "individual_est": null
+      }
+    },
+    "มหาสารคาม": {
+      "OfficeStaff": {
+        "household": 39236,
+        "individual_est": 18107
+      },
+      "FactoryWorkers": {
+        "household": 17676,
+        "individual_est": 11739
+      },
+      "Transport": {
+        "household": 19241,
+        "individual_est": 15137
+      },
+      "Agriculture": {
+        "household": 15297,
+        "individual_est": 5710
+      },
+      "SMEOwners": {
+        "household": 29341,
+        "individual_est": null
+      }
+    },
+    "มุกดาหาร": {
+      "OfficeStaff": {
+        "household": 36983,
+        "individual_est": 17067
+      },
+      "FactoryWorkers": {
+        "household": 18604,
+        "individual_est": 12355
+      },
+      "Transport": {
+        "household": 15790,
+        "individual_est": 12422
+      },
+      "Agriculture": {
+        "household": 16885,
+        "individual_est": 6302
+      },
+      "SMEOwners": {
+        "household": 27564,
+        "individual_est": null
+      }
+    },
+    "ยะลา": {
+      "OfficeStaff": {
+        "household": 33675,
+        "individual_est": 15541
+      },
+      "FactoryWorkers": {
+        "household": 19434,
+        "individual_est": 12906
+      },
+      "Transport": {
+        "household": 14905,
+        "individual_est": 11726
+      },
+      "Agriculture": {
+        "household": 13507,
+        "individual_est": 5041
+      },
+      "SMEOwners": {
+        "household": 51466,
+        "individual_est": null
+      }
+    },
+    "ยโสธร": {
+      "OfficeStaff": {
+        "household": 50521,
+        "individual_est": 23315
+      },
+      "FactoryWorkers": {
+        "household": 14920,
+        "individual_est": 9908
+      },
+      "Transport": {
+        "household": 18483,
+        "individual_est": 14541
+      },
+      "Agriculture": {
+        "household": 17639,
+        "individual_est": 6584
+      },
+      "SMEOwners": {
+        "household": 34506,
+        "individual_est": null
+      }
+    },
+    "ระนอง": {
+      "OfficeStaff": {
+        "household": 34457,
+        "individual_est": 15902
+      },
+      "FactoryWorkers": {
+        "household": 18948,
+        "individual_est": 12583
+      },
+      "Transport": {
+        "household": 19437,
+        "individual_est": 15291
+      },
+      "Agriculture": {
+        "household": 20472,
+        "individual_est": 7641
+      },
+      "SMEOwners": {
+        "household": 39451,
+        "individual_est": null
+      }
+    },
+    "ระยอง": {
+      "OfficeStaff": {
+        "household": 35831,
+        "individual_est": 16536
+      },
+      "FactoryWorkers": {
+        "household": 36970,
+        "individual_est": 24552
+      },
+      "Transport": {
+        "household": 18929,
+        "individual_est": 14892
+      },
+      "Agriculture": {
+        "household": 44041,
+        "individual_est": 16438
+      },
+      "SMEOwners": {
+        "household": 27677,
+        "individual_est": null
+      }
+    },
+    "ราชบุรี": {
+      "OfficeStaff": {
+        "household": 39552,
+        "individual_est": 18253
+      },
+      "FactoryWorkers": {
+        "household": 22982,
+        "individual_est": 15262
+      },
+      "Transport": {
+        "household": 14594,
+        "individual_est": 11481
+      },
+      "Agriculture": {
+        "household": 47453,
+        "individual_est": 17712
+      },
+      "SMEOwners": {
+        "household": 34175,
+        "individual_est": null
+      }
+    },
+    "ร้อยเอ็ด": {
+      "OfficeStaff": {
+        "household": 40670,
+        "individual_est": 18769
+      },
+      "FactoryWorkers": {
+        "household": 19585,
+        "individual_est": 13006
+      },
+      "Transport": {
+        "household": 14359,
+        "individual_est": 11296
+      },
+      "Agriculture": {
+        "household": 21349,
+        "individual_est": 7968
+      },
+      "SMEOwners": {
+        "household": 31686,
+        "individual_est": null
+      }
+    },
+    "ลพบุรี": {
+      "OfficeStaff": {
+        "household": 36135,
+        "individual_est": 16676
+      },
+      "FactoryWorkers": {
+        "household": 26255,
+        "individual_est": 17436
+      },
+      "Transport": {
+        "household": 20821,
+        "individual_est": 16380
+      },
+      "Agriculture": {
+        "household": 20320,
+        "individual_est": 7584
+      },
+      "SMEOwners": {
+        "household": 26831,
+        "individual_est": null
+      }
+    },
+    "ลำปาง": {
+      "OfficeStaff": {
+        "household": 39050,
+        "individual_est": 18021
+      },
+      "FactoryWorkers": {
+        "household": 20244,
+        "individual_est": 13444
+      },
+      "Transport": {
+        "household": 16416,
+        "individual_est": 12915
+      },
+      "Agriculture": {
+        "household": 13893,
+        "individual_est": 5185
+      },
+      "SMEOwners": {
+        "household": 33895,
+        "individual_est": null
+      }
+    },
+    "ลำพูน": {
+      "OfficeStaff": {
+        "household": 35849,
+        "individual_est": 16544
+      },
+      "FactoryWorkers": {
+        "household": 26995,
+        "individual_est": 17927
+      },
+      "Transport": {
+        "household": 23885,
+        "individual_est": 18790
+      },
+      "Agriculture": {
+        "household": 23777,
+        "individual_est": 8875
+      },
+      "SMEOwners": {
+        "household": 30396,
+        "individual_est": null
+      }
+    },
+    "ศรีสะเกษ": {
+      "OfficeStaff": {
+        "household": 28705,
+        "individual_est": 13247
+      },
+      "FactoryWorkers": {
+        "household": 17244,
+        "individual_est": 11452
+      },
+      "Transport": {
+        "household": 15627,
+        "individual_est": 12294
+      },
+      "Agriculture": {
+        "household": 39759,
+        "individual_est": 14840
+      },
+      "SMEOwners": {
+        "household": 26648,
+        "individual_est": null
+      }
+    },
+    "สกลนคร": {
+      "OfficeStaff": {
+        "household": 33768,
+        "individual_est": 15584
+      },
+      "FactoryWorkers": {
+        "household": 15920,
+        "individual_est": 10573
+      },
+      "Transport": {
+        "household": 13797,
+        "individual_est": 10854
+      },
+      "Agriculture": {
+        "household": 20307,
+        "individual_est": 7579
+      },
+      "SMEOwners": {
+        "household": 31493,
+        "individual_est": null
+      }
+    },
+    "สงขลา": {
+      "OfficeStaff": {
+        "household": 31625,
+        "individual_est": 14595
+      },
+      "FactoryWorkers": {
+        "household": 22415,
+        "individual_est": 14886
+      },
+      "Transport": {
+        "household": 18741,
+        "individual_est": 14744
+      },
+      "Agriculture": {
+        "household": 19749,
+        "individual_est": 7371
+      },
+      "SMEOwners": {
+        "household": 29431,
+        "individual_est": null
+      }
+    },
+    "สตูล": {
+      "OfficeStaff": {
+        "household": 30992,
+        "individual_est": 14302
+      },
+      "FactoryWorkers": {
+        "household": 18349,
+        "individual_est": 12186
+      },
+      "Transport": {
+        "household": 13778,
+        "individual_est": 10839
+      },
+      "Agriculture": {
+        "household": 19101,
+        "individual_est": 7129
+      },
+      "SMEOwners": {
+        "household": 34103,
+        "individual_est": null
+      }
+    },
+    "สมุทรปราการ": {
+      "OfficeStaff": {
+        "household": 40735,
+        "individual_est": 18799
+      },
+      "FactoryWorkers": {
+        "household": 30091,
+        "individual_est": 19984
+      },
+      "Transport": {
+        "household": 24833,
+        "individual_est": 19536
+      },
+      "Agriculture": {
+        "household": 23523,
+        "individual_est": 8780
+      },
+      "SMEOwners": {
+        "household": 29761,
+        "individual_est": null
+      }
+    },
+    "สมุทรสงคราม": {
+      "OfficeStaff": {
+        "household": 36854,
+        "individual_est": 17008
+      },
+      "FactoryWorkers": {
+        "household": 23259,
+        "individual_est": 15446
+      },
+      "Transport": {
+        "household": 18222,
+        "individual_est": 14335
+      },
+      "Agriculture": {
+        "household": 21477,
+        "individual_est": 8016
+      },
+      "SMEOwners": {
+        "household": 37042,
+        "individual_est": null
+      }
+    },
+    "สมุทรสาคร": {
+      "OfficeStaff": {
+        "household": 45011,
+        "individual_est": 20772
+      },
+      "FactoryWorkers": {
+        "household": 23018,
+        "individual_est": 15286
+      },
+      "Transport": {
+        "household": 21573,
+        "individual_est": 16972
+      },
+      "Agriculture": {
+        "household": 22843,
+        "individual_est": 8526
+      },
+      "SMEOwners": {
+        "household": 38787,
+        "individual_est": null
+      }
+    },
+    "สระบุรี": {
+      "OfficeStaff": {
+        "household": 39192,
+        "individual_est": 18087
+      },
+      "FactoryWorkers": {
+        "household": 36514,
+        "individual_est": 24249
+      },
+      "Transport": {
+        "household": 22406,
+        "individual_est": 17627
+      },
+      "Agriculture": {
+        "household": 27632,
+        "individual_est": 10313
+      },
+      "SMEOwners": {
+        "household": 46871,
+        "individual_est": null
+      }
+    },
+    "สระแก้ว": {
+      "OfficeStaff": {
+        "household": 29853,
+        "individual_est": 13777
+      },
+      "FactoryWorkers": {
+        "household": 18375,
+        "individual_est": 12203
+      },
+      "Transport": {
+        "household": 18480,
+        "individual_est": 14538
+      },
+      "Agriculture": {
+        "household": 23349,
+        "individual_est": 8715
+      },
+      "SMEOwners": {
+        "household": 24690,
+        "individual_est": null
+      }
+    },
+    "สิงห์บุรี": {
+      "OfficeStaff": {
+        "household": 44801,
+        "individual_est": 20675
+      },
+      "FactoryWorkers": {
+        "household": 29202,
+        "individual_est": 19393
+      },
+      "Transport": {
+        "household": 22609,
+        "individual_est": 17787
+      },
+      "Agriculture": {
+        "household": 26263,
+        "individual_est": 9802
+      },
+      "SMEOwners": {
+        "household": 28269,
+        "individual_est": null
+      }
+    },
+    "สุพรรณบุรี": {
+      "OfficeStaff": {
+        "household": 36396,
+        "individual_est": 16796
+      },
+      "FactoryWorkers": {
+        "household": 24760,
+        "individual_est": 16443
+      },
+      "Transport": {
+        "household": 14463,
+        "individual_est": 11378
+      },
+      "Agriculture": {
+        "household": 16772,
+        "individual_est": 6260
+      },
+      "SMEOwners": {
+        "household": 27352,
+        "individual_est": null
+      }
+    },
+    "สุราษฎร์ธานี": {
+      "OfficeStaff": {
+        "household": 37724,
+        "individual_est": 17409
+      },
+      "FactoryWorkers": {
+        "household": 23259,
+        "individual_est": 15446
+      },
+      "Transport": {
+        "household": 19652,
+        "individual_est": 15460
+      },
+      "Agriculture": {
+        "household": 30614,
+        "individual_est": 11426
+      },
+      "SMEOwners": {
+        "household": 37719,
+        "individual_est": null
+      }
+    },
+    "สุรินทร์": {
+      "OfficeStaff": {
+        "household": 36252,
+        "individual_est": 16730
+      },
+      "FactoryWorkers": {
+        "household": 17639,
+        "individual_est": 11714
+      },
+      "Transport": {
+        "household": 24010,
+        "individual_est": 18889
+      },
+      "Agriculture": {
+        "household": 17443,
+        "individual_est": 6510
+      },
+      "SMEOwners": {
+        "household": 27946,
+        "individual_est": null
+      }
+    },
+    "สุโขทัย": {
+      "OfficeStaff": {
+        "household": 40603,
+        "individual_est": 18738
+      },
+      "FactoryWorkers": {
+        "household": 20688,
+        "individual_est": 13739
+      },
+      "Transport": {
+        "household": 18181,
+        "individual_est": 14303
+      },
+      "Agriculture": {
+        "household": 23618,
+        "individual_est": 8815
+      },
+      "SMEOwners": {
+        "household": 31186,
+        "individual_est": null
+      }
+    },
+    "หนองคาย": {
+      "OfficeStaff": {
+        "household": 38127,
+        "individual_est": 17595
+      },
+      "FactoryWorkers": {
+        "household": 19345,
+        "individual_est": 12847
+      },
+      "Transport": {
+        "household": 24912,
+        "individual_est": 19598
+      },
+      "Agriculture": {
+        "household": 20460,
+        "individual_est": 7637
+      },
+      "SMEOwners": {
+        "household": 32497,
+        "individual_est": null
+      }
+    },
+    "หนองบัวลำภู": {
+      "OfficeStaff": {
+        "household": 31493,
+        "individual_est": 14534
+      },
+      "FactoryWorkers": {
+        "household": 20357,
+        "individual_est": 13519
+      },
+      "Transport": {
+        "household": 15145,
+        "individual_est": 11915
+      },
+      "Agriculture": {
+        "household": 35203,
+        "individual_est": 13139
+      },
+      "SMEOwners": {
+        "household": 28144,
+        "individual_est": null
+      }
+    },
+    "อำนาจเจริญ": {
+      "OfficeStaff": {
+        "household": 40992,
+        "individual_est": 18917
+      },
+      "FactoryWorkers": {
+        "household": 18575,
+        "individual_est": 12336
+      },
+      "Transport": {
+        "household": 18552,
+        "individual_est": 14595
+      },
+      "Agriculture": {
+        "household": 18477,
+        "individual_est": 6896
+      },
+      "SMEOwners": {
+        "household": 38718,
+        "individual_est": null
+      }
+    },
+    "อุดรธานี": {
+      "OfficeStaff": {
+        "household": 30008,
+        "individual_est": 13848
+      },
+      "FactoryWorkers": {
+        "household": 14486,
+        "individual_est": 9620
+      },
+      "Transport": {
+        "household": 14541,
+        "individual_est": 11439
+      },
+      "Agriculture": {
+        "household": 27150,
+        "individual_est": 10134
+      },
+      "SMEOwners": {
+        "household": 28534,
+        "individual_est": null
+      }
+    },
+    "อุตรดิตถ์": {
+      "OfficeStaff": {
+        "household": 38267,
+        "individual_est": 17660
+      },
+      "FactoryWorkers": {
+        "household": 22613,
+        "individual_est": 15017
+      },
+      "Transport": {
+        "household": 17161,
+        "individual_est": 13501
+      },
+      "Agriculture": {
+        "household": 22623,
+        "individual_est": 8444
+      },
+      "SMEOwners": {
+        "household": 27693,
+        "individual_est": null
+      }
+    },
+    "อุทัยธานี": {
+      "OfficeStaff": {
+        "household": 33864,
+        "individual_est": 15628
+      },
+      "FactoryWorkers": {
+        "household": 18297,
+        "individual_est": 12151
+      },
+      "Transport": {
+        "household": 12645,
+        "individual_est": 9948
+      },
+      "Agriculture": {
+        "household": 18044,
+        "individual_est": 6735
+      },
+      "SMEOwners": {
+        "household": 24928,
+        "individual_est": null
+      }
+    },
+    "อุบลราชธานี": {
+      "OfficeStaff": {
+        "household": 35605,
+        "individual_est": 16431
+      },
+      "FactoryWorkers": {
+        "household": 17157,
+        "individual_est": 11394
+      },
+      "Transport": {
+        "household": 13343,
+        "individual_est": 10497
+      },
+      "Agriculture": {
+        "household": 20798,
+        "individual_est": 7763
+      },
+      "SMEOwners": {
+        "household": 25208,
+        "individual_est": null
+      }
+    },
+    "อ่างทอง": {
+      "OfficeStaff": {
+        "household": 33899,
+        "individual_est": 15644
+      },
+      "FactoryWorkers": {
+        "household": 28223,
+        "individual_est": 18743
+      },
+      "Transport": {
+        "household": 17156,
+        "individual_est": 13497
+      },
+      "Agriculture": {
+        "household": 26928,
+        "individual_est": 10051
+      },
+      "SMEOwners": {
+        "household": 30714,
+        "individual_est": null
+      }
+    },
+    "เชียงราย": {
+      "OfficeStaff": {
+        "household": 26884,
+        "individual_est": 12407
+      },
+      "FactoryWorkers": {
+        "household": 17697,
+        "individual_est": 11753
+      },
+      "Transport": {
+        "household": 13085,
+        "individual_est": 10294
+      },
+      "Agriculture": {
+        "household": 15156,
+        "individual_est": 5657
+      },
+      "SMEOwners": {
+        "household": 16473,
+        "individual_est": null
+      }
+    },
+    "เชียงใหม่": {
+      "OfficeStaff": {
+        "household": 38631,
+        "individual_est": 17828
+      },
+      "FactoryWorkers": {
+        "household": 18977,
+        "individual_est": 12603
+      },
+      "Transport": {
+        "household": 31365,
+        "individual_est": 24675
+      },
+      "Agriculture": {
+        "household": 16152,
+        "individual_est": 6029
+      },
+      "SMEOwners": {
+        "household": 50813,
+        "individual_est": null
+      }
+    },
+    "เพชรบุรี": {
+      "OfficeStaff": {
+        "household": 37995,
+        "individual_est": 17534
+      },
+      "FactoryWorkers": {
+        "household": 21697,
+        "individual_est": 14409
+      },
+      "Transport": {
+        "household": 18306,
+        "individual_est": 14401
+      },
+      "Agriculture": {
+        "household": 28985,
+        "individual_est": 10818
+      },
+      "SMEOwners": {
+        "household": 34651,
+        "individual_est": null
+      }
+    },
+    "เพชรบูรณ์": {
+      "OfficeStaff": {
+        "household": 39327,
+        "individual_est": 18149
+      },
+      "FactoryWorkers": {
+        "household": 28487,
+        "individual_est": 18918
+      },
+      "Transport": {
+        "household": 20262,
+        "individual_est": 15940
+      },
+      "Agriculture": {
+        "household": 22633,
+        "individual_est": 8448
+      },
+      "SMEOwners": {
+        "household": 29069,
+        "individual_est": null
+      }
+    },
+    "เลย": {
+      "OfficeStaff": {
+        "household": 45881,
+        "individual_est": 21174
+      },
+      "FactoryWorkers": {
+        "household": 20544,
+        "individual_est": 13643
+      },
+      "Transport": {
+        "household": 15238,
+        "individual_est": 11988
+      },
+      "Agriculture": {
+        "household": 21750,
+        "individual_est": 8118
+      },
+      "SMEOwners": {
+        "household": 31430,
+        "individual_est": null
+      }
+    },
+    "แพร่": {
+      "OfficeStaff": {
+        "household": 40493,
+        "individual_est": 18687
+      },
+      "FactoryWorkers": {
+        "household": 16690,
+        "individual_est": 11084
+      },
+      "Transport": {
+        "household": 16362,
+        "individual_est": 12872
+      },
+      "Agriculture": {
+        "household": 13189,
+        "individual_est": 4923
+      },
+      "SMEOwners": {
+        "household": 29670,
+        "individual_est": null
+      }
+    },
+    "แม่ฮ่องสอน": {
+      "OfficeStaff": {
+        "household": 29663,
+        "individual_est": 13689
+      },
+      "FactoryWorkers": {
+        "household": 16622,
+        "individual_est": 11039
+      },
+      "Transport": {
+        "household": 6713,
+        "individual_est": 5281
+      },
+      "Agriculture": {
+        "household": 12435,
+        "individual_est": 4641
+      },
+      "SMEOwners": {
+        "household": 46095,
+        "individual_est": null
+      }
+    }
+  }
+}
