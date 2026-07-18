@@ -1,0 +1,37 @@
+# Normalize line endings so pipeline scripts run on Kaustav's Windows laptop
+# don't produce CRLF churn vs the LF-committed blobs (CI/Vercel are Linux).
+# Repo is already LF, so adding this is a no-op for existing files; it only
+# keeps future locally-written data/code files from flipping to CRLF.
+* text=auto eol=lf
+
+*.json      text eol=lf
+*.py        text eol=lf
+*.js        text eol=lf
+*.mjs       text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.md        text eol=lf
+*.csv       text eol=lf
+*.tsv       text eol=lf
+*.geojson   text eol=lf
+*.sh        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.txt       text eol=lf
+
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.ico       binary
+*.pdf       binary
+*.xlsx      binary
+*.xls       binary
+*.zip       binary
+*.pmtiles   binary
+*.mbtiles   binary
+*.parquet   binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary

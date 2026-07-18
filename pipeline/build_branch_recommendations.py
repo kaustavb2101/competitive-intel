@@ -86,11 +86,12 @@ def build():
         n5 = rv.get("n5") or 0
         opp = b.get("o")
 
-        # 1) ACQUISITION — high opportunity + thin competition
+        # 1) LOW COMPETITIVE PRESSURE — thin rival presence around this existing branch (a competitive-risk
+        #    read for objective #2, NOT an expand/acquire call — the product makes no where-to-open recs).
         if isinstance(opp, (int, float)) and opp >= opp_hi and n5 <= 8:
-            recs.append({"k": "acquire", "i": "📈", "tone": "good", "p": 90,
-                         "t": "Expand here: strong white-space (opportunity %d) with only %d rival(s) ≤5 km — prioritise acquisition." % (round(opp), n5),
-                         "w": [{"s": "Opportunity score · branches.json", "v": "%d (≥ p70 = %d)" % (round(opp), round(opp_hi)), "m": "est"},
+            recs.append({"k": "acquire", "i": "🟢", "tone": "good", "p": 90,
+                         "t": "Low competitive pressure: only %d rival branch(es) ≤5 km around this branch." % n5,
+                         "w": [{"s": "Under-contested score · branches.json", "v": "%d (≥ p70 = %d)" % (round(opp), round(opp_hi)), "m": "est"},
                                {"s": "Rival branches ≤5 km · rival_pressure.json", "v": "%d (≤8)" % n5, "m": "measured"}]})
         # 2) DEFEND — besieged by rivals
         if n2 >= 3:
