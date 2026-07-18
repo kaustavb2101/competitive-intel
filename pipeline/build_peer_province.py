@@ -61,6 +61,7 @@ ROOT = os.path.dirname(HERE)
 DATA = os.path.join(ROOT, "platform", "data")
 RIVDEN = os.path.join(DATA, "rival_density.json")
 PICO = os.path.join(DATA, "pico_census.json")
+VEHICLES = os.path.join(ROOT, "source-data", "vehicles_by_province.json")
 OUT = os.path.join(DATA, "peer_province.json")
 
 
@@ -90,6 +91,20 @@ def build():
         pico_meta = pc.get("meta", {})
         pico_by_prov = pc.get("by_province", {}) or {}
         pico_zero = set(pc.get("zero_provinces", []) or [])
+
+    # ── optional: fold in the MEASURED registered-vehicle stock per province ──────────
+    # vehicles_by_province.json is the DLT national vehicle census (source-data/, keyed on the
+    # same Thai province name). Vehicles are the collateral a title loan is secured against, so
+    # the number of title-loan storefronts PER 100k registered vehicles is a market-SATURATION
+    # read — how crowded the industry is relative to the addressable collateral base, i.e. a
+    # margin-erosion signal (objective #2). Counts stay MEASURED; the ratio is COMPUTED. Absent
+    # input degrades to vehicles=None / sat_per_100k=None (an honest gap, not a 0).
+    veh_by_prov, veh_src, veh_total = {}, "", 0
+    if os.path.exists(VEHICLES):
+        vj = _load(VEHICLES)
+        veh_by_prov = vj.get("provinces", {}) or {}
+        veh_src = vj.get("source", "")
+        veh_total = vj.get("n_vehicles", 0) or 0
 
     # ── roll the 928 district records up to their province ───────────────────────
     # province_th is the join key; region is carried from the first district seen (all
@@ -149,6 +164,17 @@ def build():
             pico = 0
         else:
             pico = None
+        # market saturation: title-loan operators (AutoX + big-4 rivals, coordinate census) per
+        # 100k MEASURED registered vehicles in the province — how crowded the industry is against
+        # the collateral base it lends on. operators_total is a LOWER BOUND (the rival census is),
+        # so sat_per_100k is a lower bound too. null where the vehicle stock is absent/zero.
+        veh_row = veh_by_prov.get(e["province_th"])
+        vehicles = veh_row.get("total") if isinstance(veh_row, dict) else None
+        operators_total = autox + rivals
+        if vehicles:
+            sat_per_100k = round(operators_total / vehicles * 100000, 1)
+        else:
+            sat_per_100k = None
         provinces.append({
             "province_th": e["province_th"],
             "region": e["region"],
@@ -160,9 +186,21 @@ def build():
             "autox_rank": autox_rank,
             "n_ranked": n_ranked,
             "pico": pico,
+            "vehicles": vehicles,
+            "operators_total": operators_total,
+            "sat_per_100k": sat_per_100k,
             "n_districts": e["n_districts"],
             "n_outnumbered_districts": e["n_outnumbered_districts"],
         })
+
+    # saturation rank (1 = most crowded per 100k vehicles) over the provinces that carry a value;
+    # deterministic tie-break by province_th. Written back onto each record; null where no value.
+    _sat = sorted([p for p in provinces if p["sat_per_100k"] is not None],
+                  key=lambda p: (-p["sat_per_100k"], p["province_th"]))
+    for i, p in enumerate(_sat):
+        p["sat_rank"] = i + 1
+    for p in provinces:
+        p.setdefault("sat_rank", None)
 
     # rank most-contested first: raw branch deficit (rivals − autox) desc, then province_th
     # asc for a stable tiebreak. This mirrors the district board's "most outnumbered first".
@@ -184,6 +222,28 @@ def build():
     pico_present = [p for p in provinces if isinstance(p["pico"], int)]
     total_pico = sum(p["pico"] for p in pico_present)
     n_pico_present = sum(1 for p in pico_present if p["pico"] > 0)
+
+    # saturation rollups (only provinces carrying a MEASURED vehicle stock)
+    sat_present = [p for p in provinces if p["sat_per_100k"] is not None]
+    saturation_available = bool(sat_present)
+    total_vehicles = sum(p["vehicles"] for p in sat_present)
+    _most = sorted(sat_present, key=lambda p: (-p["sat_per_100k"], p["province_th"]))
+    most_saturated = ({
+        "province_th": _most[0]["province_th"],
+        "sat_per_100k": _most[0]["sat_per_100k"],
+        "operators_total": _most[0]["operators_total"],
+        "vehicles": _most[0]["vehicles"],
+    } if _most else None)
+    least_saturated = ({
+        "province_th": _most[-1]["province_th"],
+        "sat_per_100k": _most[-1]["sat_per_100k"],
+        "operators_total": _most[-1]["operators_total"],
+        "vehicles": _most[-1]["vehicles"],
+    } if _most else None)
+    # national baseline: all censused operators (AutoX + big-4) per 100k vehicles nationwide.
+    total_operators = sum(p["operators_total"] for p in sat_present)
+    national_sat_per_100k = (round(total_operators / total_vehicles * 100000, 1)
+                             if total_vehicles else None)
 
     meta = {
         "generated_by": "pipeline/build_peer_province.py",
@@ -229,6 +289,22 @@ def build():
                     "int (or a MEASURED 0 where the registry lists none); null when the registry "
                     "is absent from the sandbox or the province is unmatched."
                     % (pico_meta.get("vintage") or "n/a"),
+            "vehicles": "MEASURED — total registered-vehicle stock in the province from the DLT "
+                        "national vehicle census (source-data/vehicles_by_province.json: %s). The "
+                        "collateral base a title loan is secured against. null when absent."
+                        % (veh_src or "n/a"),
+            "operators_total": "COMPUTED — autox + rivals (the coordinate census: AutoX + the big-4 "
+                               "brands). A LOWER BOUND because the rival census is one. Excludes the "
+                               "PICO class (a province-count, not a coordinate census).",
+            "sat_per_100k": "COMPUTED — operators_total per 100,000 registered vehicles "
+                            "(operators_total / vehicles * 1e5, 1 dp). A market-SATURATION read: how "
+                            "crowded the title-loan industry is relative to the addressable collateral "
+                            "base — a margin-erosion signal on the footprint we already run (objective "
+                            "#2). LOWER BOUND (inherits the rival-census undercount). null where the "
+                            "vehicle stock is absent. NOT a share and NOT an expansion cue.",
+            "sat_rank": "COMPUTED — 1-based rank by sat_per_100k (1 = most crowded per 100k vehicles) "
+                        "over the provinces carrying a vehicle stock; deterministic tie-break by "
+                        "province name. null where sat_per_100k is null.",
         },
         "caveats": [
             "The rival census is a LOWER BOUND: Muangthai / Srisawad / Tidlor are near-complete "
@@ -252,14 +328,22 @@ def build():
             "coordinate census, so it is not comparable district-by-district and is never summed "
             "into the big-4 'rivals' total. A province's pico=0 (สิงห์บุรี, อ่างทอง) is a MEASURED "
             "zero from the registry, while pico=null would mean the layer was unavailable.",
+            "sat_per_100k (operators per 100k vehicles) is a market-saturation / margin-pressure "
+            "signal, NOT market share and NOT an expansion cue. The denominator is TOTAL registered "
+            "vehicles (the full addressable collateral base), not filtered to title-loan-likely "
+            "vehicles, so a vehicle-rich province (e.g. Bangkok, 12.4M vehicles) reads low even where "
+            "rival branches are many. It inherits the rival census's LOWER-BOUND undercount, so it "
+            "under-states true saturation.",
         ],
         "brands": brands,
         "record_format": "{province_th, region, autox, rivals, by_brand{brand:count}, ratio, "
-                         "leader, autox_rank, n_ranked, pico, n_districts, "
-                         "n_outnumbered_districts}. by_brand omits zero-count brands; autox_rank "
-                         "is AutoX's 1-based position of n_ranked present operators (int/null); "
-                         "pico is a distinct-class int/null (not in rivals); provinces[] sorted "
-                         "by (rivals-autox) desc.",
+                         "leader, autox_rank, n_ranked, pico, vehicles, operators_total, "
+                         "sat_per_100k, sat_rank, n_districts, n_outnumbered_districts}. by_brand "
+                         "omits zero-count brands; autox_rank is AutoX's 1-based position of "
+                         "n_ranked present operators (int/null); pico is a distinct-class int/null "
+                         "(not in rivals); vehicles is MEASURED DLT stock (int/null); sat_per_100k "
+                         "= operators_total per 100k vehicles (float/null); sat_rank is 1=most "
+                         "saturated (int/null); provinces[] sorted by (rivals-autox) desc.",
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
         "n_provinces_outnumbered": n_outnumbered_prov,
@@ -273,6 +357,16 @@ def build():
         "total_pico": total_pico,
         "n_provinces_pico_present": n_pico_present,
         "pico_available": bool(pico_by_prov),
+        "saturation_available": saturation_available,
+        "total_vehicles": total_vehicles,
+        "national_sat_per_100k": national_sat_per_100k,
+        "most_saturated": most_saturated,
+        "least_saturated": least_saturated,
+        "vehicles_source": {
+            "layer": "source-data/vehicles_by_province.json",
+            "source": veh_src,
+            "n_vehicles": veh_total,
+        } if saturation_available else None,
         "rival_density_source": {
             "n_districts": rd_meta.get("n_districts"),
             "total_autox": rd_meta.get("total_autox"),
@@ -321,6 +415,10 @@ def run(check=False):
         print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
               % (m["total_pico"], m["n_provinces_pico_present"],
                  (m.get("pico_source") or {}).get("vintage")))
+    if m["saturation_available"]:
+        ms = m.get("most_saturated") or {}
+        print("  market saturation: national %.1f operators / 100k vehicles; most crowded %s (%.1f)"
+              % (m["national_sat_per_100k"], ms.get("province_th"), ms.get("sat_per_100k")))
     return 0
 
 

@@ -1810,9 +1810,14 @@ function drawPeerProvince(){
   // folded into the layer as its own `pico` column. Gate the column on the layer flag so an older
   // peer_province.json (pre-fold) degrades gracefully to the big-4-only board.
   const hasPico=m.pico_available===true;
+  // market-saturation column: title-loan operators (AutoX + big-4) per 100k registered vehicles —
+  // how crowded the industry is against the collateral base (margin-pressure signal, obj #2). Gated
+  // on the layer flag so a pre-fold peer_province.json degrades to the board without the column.
+  const hasSat=m.saturation_available===true;
   const list=recs.slice(0,PEERPROV_TOPN);
   const bh=brands.map(b=>`<th title="${b} branches in this province (MEASURED census)">${b}</th>`).join('');
   const ph=hasPico?`<th title="Licensed PICO-finance operators — a DISTINCT small-ticket rival class (MEASURED, FPO registry ${m.pico_source&&m.pico_source.vintage?m.pico_source.vintage:''})">PICO</th>`:'';
+  const sh=hasSat?`<th title="Title-loan operators (AutoX + big-4) per 100,000 registered vehicles — market saturation vs the collateral base a title loan is secured against (MEASURED counts ÷ DLT vehicle stock; a LOWER BOUND). Higher = more crowded = margin pressure. Not a share, not an expansion cue.">Sat./100k veh</th>`:'';
   // AutoX's own rank among the operators present (MEASURED counts, computed position) is
   // co-located under the AutoX count — gated on the layer field so a pre-fold file degrades.
   const hasRank=list.some(r=>r.autox_rank!=null);
@@ -1820,7 +1825,7 @@ function drawPeerProvince(){
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
     `<th title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
     bh+ph+
-    `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
+    `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+sh+
     `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
@@ -1829,6 +1834,15 @@ function drawPeerProvince(){
         return `<td class="mono"${v?'':' style="color:var(--dim)"'}>${v?v.toLocaleString():'·'}</td>`;}).join('');
       const pv=(r.pico!=null)?r.pico:0;
       const pcol=hasPico?`<td class="mono" style="color:${pv?'var(--collat)':'var(--dim)'}">${pv?pv.toLocaleString():'·'}</td>`:'';
+      // saturation cell: red when the industry is dense per unit of collateral (≥100/100k),
+      // gold in the mid band (≥50), dim otherwise. MEASURED counts ÷ MEASURED vehicle stock.
+      let scol='';
+      if(hasSat){
+        const sv=r.sat_per_100k;
+        if(sv==null){ scol=`<td class="mono" style="color:var(--dim)">·</td>`; }
+        else{ const c=sv>=100?'var(--agri)':(sv>=50?'var(--gold)':'var(--dim)');
+          scol=`<td class="mono" style="color:${c}" title="${(r.operators_total||0).toLocaleString()} operators ÷ ${(r.vehicles||0).toLocaleString()} vehicles${r.sat_rank?' · #'+r.sat_rank+' most saturated of 77':''}">${sv.toFixed(1)}</td>`; }
+      }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
@@ -1843,7 +1857,7 @@ function drawPeerProvince(){
         <td><b>${r.province_th||'—'}</b></td>
         <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b>${rankCell}</td>
         ${bcols}${pcol}
-        <td class="mono" style="color:${rc}">${ratio}</td>
+        <td class="mono" style="color:${rc}">${ratio}</td>${scol}
         <td>${lead}</td>
       </tr>`;}).join('');
   if(ro){
@@ -1856,12 +1870,17 @@ function drawPeerProvince(){
     const nProv=m.n_provinces||recs.length;
     const hasRankRollup=m.best_autox_rank!=null;
     const rankStr=hasRankRollup?` <b>By branch count AutoX is the single largest lender in <b style="color:var(--agri)">${m.n_provinces_autox_leads||0}</b> of ${nProv} provinces</b> — its best standing anywhere is <b>${ordinal(m.best_autox_rank)}</b> (in ${m.n_provinces_autox_top2||0}), it sits 3rd-or-lower in ${Math.max(0,nProv-(m.n_provinces_autox_top2||0))}, and it is the <b style="color:var(--agri)">smallest</b> of the operators present in <b>${m.n_provinces_autox_last||0}</b>.`:'';
+    // market-saturation headline: crowding vs the collateral base (registered vehicles).
+    const hasSatRollup=m.saturation_available===true&&m.most_saturated;
+    const ms=m.most_saturated||{}, ls=m.least_saturated||{};
+    const satStr=hasSatRollup?` <b>Per unit of collateral, the industry is thickest in <b style="color:var(--agri)">${ms.province_th||'—'}</b> — <b>${(ms.sat_per_100k||0).toFixed(1)}</b> title-loan operators per 100k registered vehicles</b> (vs a <b>${(m.national_sat_per_100k||0).toFixed(1)}</b> national average and just ${(ls.sat_per_100k||0).toFixed(1)} in ${ls.province_th||'—'}) — the sharpest margin-pressure read on the collateral base we lend on.`:'';
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
-      `National rival footprint: ${brandStr}.${picoStr} ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr}${satStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
+         'The <b>Sat./100k veh</b> column is title-loan operators (AutoX + big-4) per 100,000 registered vehicles — market saturation vs the collateral base (MEASURED counts ÷ DLT vehicle stock, source-data/vehicles_by_province.json). A LOWER BOUND (inherits the rival-census undercount); a margin-pressure signal, not a share and not an expansion cue. The denominator is TOTAL registered vehicles, so vehicle-rich Bangkok reads low despite many rival branches.',
          'The <b>#k/n</b> chip under the AutoX count is AutoX’s <b>rank</b> among the operators present (AutoX + big-4 brands with a branch here) — MEASURED counts, computed position. It sharpens the Leads column: two provinces both led by Muangthai can have AutoX 2nd (defensible) or last of 4 (marginalised).',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
