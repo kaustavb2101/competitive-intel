@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-17T21:59:46+00:00",
-    "commit": "cf1e1a9"
+    "generated_at": "2026-07-18T02:31:53Z",
+    "commit": "2eb7f68"
   },
   "overall": {
     "progress_pct": 96,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-17",
+    "eta_date": "2026-07-18",
     "done_items": 48,
     "in_progress_items": 2,
     "open_items": 0,
@@ -480,13 +480,43 @@
   ],
   "activity": [
     {
-      "date": "2026-07-17T21:59:46+00:00",
+      "date": "2026-07-18T02:31:53Z",
+      "sha": "2eb7f68",
+      "summary": "docs(progress-log): record ux-loop exposure-card provenance-title fix — merged #62, deploy up+gated",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-18T09:28:27+07:00",
+      "sha": "842fd88",
+      "summary": "ux: keep the exposure KPI cards' provenance caveat recoverable (#62)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-18T09:26:58+07:00",
+      "sha": "2acef4a",
+      "summary": "config: pin model roles — boss=Opus, worker=Sonnet (future-proof via tier aliases) (#61)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-18T00:17:35Z",
+      "sha": "afd8ef7",
+      "summary": "fix(gistda): read GISTDA_SPHERE_KEY (the repo secret name), not just GISTDA_API_KEY",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-18T05:19:14+07:00",
+      "sha": "5c03f61",
+      "summary": "intel(peer): place AutoX in its own national peer set — 2nd-largest title-loan network (MEASURED) (#59)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-17T21:59:46Z",
       "sha": "cf1e1a9",
       "summary": "committee: refresh autonomy plan (run 29616423691)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-17T20:16:57+00:00",
+      "date": "2026-07-17T20:16:57Z",
       "sha": "f91e420",
       "summary": "docs(progress-log): record ux-loop nav-more keyboard fix — merged #57, deploy up+gated",
       "pillar": "uxui"
@@ -498,31 +528,31 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T18:24:01+00:00",
+      "date": "2026-07-17T18:24:01Z",
       "sha": "5fdc514",
       "summary": "docs: evidence-backed blocked-source ledger — stop re-probing owner-side walls",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T16:20:51+00:00",
+      "date": "2026-07-17T16:20:51Z",
       "sha": "4ca6321",
       "summary": "committee: refresh autonomy plan (run 29595713949)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-17T16:12:39+00:00",
+      "date": "2026-07-17T16:12:39Z",
       "sha": "fa63675",
       "summary": "chore(dashboard): refresh autonomy plan after provenance sidecar ship",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T16:12:19+00:00",
+      "date": "2026-07-17T16:12:19Z",
       "sha": "79adb36",
       "summary": "service(provenance): sidecar manifest clears the shame board 2 → 0 (314/314 labelled)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T14:15:26+00:00",
+      "date": "2026-07-17T14:15:26Z",
       "sha": "4091ea3",
       "summary": "docs(progress-log): record ux-loop nav-tablist fix — merged #56, deploy up+gated",
       "pillar": "uxui"
@@ -534,25 +564,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T10:53:17+00:00",
+      "date": "2026-07-17T10:53:17Z",
       "sha": "cb3c5b9",
       "summary": "committee: refresh autonomy plan (run 29574908193)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-17T10:17:14+00:00",
+      "date": "2026-07-17T10:17:14Z",
       "sha": "e83f75b",
       "summary": "chore(dashboard): refresh autonomy plan after provenance shame-board ship",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T10:14:04+00:00",
+      "date": "2026-07-17T10:14:04Z",
       "sha": "d4e9b74",
       "summary": "service(provenance): stamp the structural layers — clear the shame board 6 → 2",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-17T08:13:23+00:00",
+      "date": "2026-07-17T08:13:23Z",
       "sha": "dc29974",
       "summary": "docs(progress-log): record ux-loop msheet keyboard fix — merged #54, deploy up+gated",
       "pillar": "uxui"
@@ -564,19 +594,19 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T06:05:07+00:00",
+      "date": "2026-07-17T06:05:07Z",
       "sha": "d18c995",
       "summary": "committee: autonomous competitor scout (run 29558891909)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-17T05:47:37+00:00",
+      "date": "2026-07-17T05:47:37Z",
       "sha": "19f8f98",
       "summary": "committee: refresh autonomy plan (run 29558191357)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-17T04:32:45+00:00",
+      "date": "2026-07-17T04:32:45Z",
       "sha": "5196c76",
       "summary": "chore(dashboard): refresh autonomy plan after peer-NPL card ship",
       "pillar": "peer"
@@ -588,7 +618,7 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-17T02:12:19+00:00",
+      "date": "2026-07-17T02:12:19Z",
       "sha": "30b9fe8",
       "summary": "docs(progress-log): record ux-loop search empty-state fix — merged #51, deploy 401 (up+gated)",
       "pillar": "uxui"
@@ -600,7 +630,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-17T00:35:48+00:00",
+      "date": "2026-07-17T00:35:48Z",
       "sha": "46d6448",
       "summary": "fix(gate): regenerate fuel-price-dependent layers — master CI was red after the #49 fuel auto-commit",
       "pillar": "deployment"
@@ -624,39 +654,9 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-16T22:22:23+00:00",
+      "date": "2026-07-16T22:22:23Z",
       "sha": "75001e6",
       "summary": "chore(dashboard): refresh autonomy plan after site-health deploy-health fix",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-16T22:19:03+00:00",
-      "sha": "8ba7638",
-      "summary": "fix(deploy-health): a rejected-credential 401 is \"site up + protected\", not a site outage",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-16T22:08:40+00:00",
-      "sha": "fb859fb",
-      "summary": "committee: refresh autonomy plan (run 29538475364)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-16T20:14:24+00:00",
-      "sha": "52e96e7",
-      "summary": "docs(progress-log): record ux-loop data-book filter/sort fix — merged #47, deploy READY",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-17T03:11:07+07:00",
-      "sha": "41c706c",
-      "summary": "ux: data book — region filter now persists when re-sorting the province table (#47)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-16T16:22:52+00:00",
-      "sha": "0ea7eb6",
-      "summary": "committee: refresh autonomy plan (run 29515234336)",
       "pillar": "deployment"
     }
   ]
