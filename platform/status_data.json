@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-18T20:14:55Z",
-    "commit": "7ed0471"
+    "generated_at": "2026-07-19T05:13:46+07:00",
+    "commit": "f820a67"
   },
   "overall": {
     "progress_pct": 96,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-18",
+    "eta_date": "2026-07-19",
     "done_items": 48,
     "in_progress_items": 2,
     "open_items": 0,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-18T20:14:55Z",
+      "date": "2026-07-19T05:13:46+07:00",
+      "sha": "f820a67",
+      "summary": "intel(peer): surface the co-equal competitive-risk objective in the command-center board thesis (#75)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-18T21:57:11+00:00",
+      "sha": "d003089",
+      "summary": "committee: refresh autonomy plan (run 29662510231)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-18T20:14:55+00:00",
       "sha": "7ed0471",
       "summary": "docs: log html lang=\"en\" a11y fix — merge + deploy-verify (PR #73)",
       "pillar": "uxui"
@@ -498,13 +510,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-18T18:16:33Z",
+      "date": "2026-07-18T18:16:33+00:00",
       "sha": "507c50d",
       "summary": "service(provenance): durably stamp rayong_province.json — clear the shame board 1 → 0",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T16:02:33Z",
+      "date": "2026-07-18T16:02:33+00:00",
       "sha": "476b97e",
       "summary": "committee: refresh autonomy plan (run 29651140425)",
       "pillar": "deployment"
@@ -522,7 +534,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T14:13:39Z",
+      "date": "2026-07-18T14:13:39+00:00",
       "sha": "4b03f9b",
       "summary": "docs: log #sim slider-label a11y fix — merge + deploy-verify (PR #70)",
       "pillar": "uxui"
@@ -534,25 +546,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T13:53:58Z",
+      "date": "2026-07-18T13:53:58+00:00",
       "sha": "f8f054e",
       "summary": "committee: refresh autonomy plan after double-jeopardy queue ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-18T13:53:40Z",
+      "date": "2026-07-18T13:53:40+00:00",
       "sha": "1093e37",
       "summary": "intel(planning): teach the exec decision queue to see DOUBLE JEOPARDY (besieged AND portfolio-stressed)",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T10:23:55Z",
+      "date": "2026-07-18T10:23:55+00:00",
       "sha": "7fc449b",
       "summary": "committee: refresh autonomy plan (run 29640748080)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-18T09:07:42Z",
+      "date": "2026-07-18T09:07:42+00:00",
       "sha": "38fab71",
       "summary": "committee: autonomous competitor scout (run 29638549935)",
       "pillar": "market"
@@ -570,7 +582,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T08:10:38Z",
+      "date": "2026-07-18T08:10:38+00:00",
       "sha": "b4ddf4a",
       "summary": "docs(progress-log): record ux-loop rayong-province stub fix — merged #65, deploy up+gated",
       "pillar": "uxui"
@@ -582,82 +594,70 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T06:21:26Z",
+      "date": "2026-07-18T06:21:26+00:00",
       "sha": "271aad6",
       "summary": "ci(data): scheduled FPO PICO-finance registry refresh — close the last CI-reachable-but-unautomated MEASURED competitor layer",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T05:53:59Z",
+      "date": "2026-07-18T05:53:59+00:00",
       "sha": "a7d77b1",
       "summary": "committee: autonomous competitor scout (run 29632961542)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T05:33:09Z",
+      "date": "2026-07-18T05:33:09+00:00",
       "sha": "4836940",
       "summary": "committee: refresh autonomy plan (run 29632422424)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-18T05:15:24Z",
+      "date": "2026-07-18T05:15:24+00:00",
       "sha": "380a46e",
       "summary": "docs: register the PDF/OCR-unlocked sources + owner Thai-IP newcar stub",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T05:13:46Z",
+      "date": "2026-07-18T05:13:46+00:00",
       "sha": "7a39f06",
       "summary": "enrich(competition): measured sub-scale rival read — PICO operators vs AutoX by province",
       "pillar": "market"
     },
     {
-      "date": "2026-07-18T04:56:40Z",
+      "date": "2026-07-18T04:56:40+00:00",
       "sha": "ea03b5e",
       "summary": "enrich(risk): measured BoT credit-conditions anchor for the risk readout",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T04:28:31Z",
+      "date": "2026-07-18T04:28:31+00:00",
       "sha": "813f5d8",
       "summary": "enrich(vehicle): measured collateral read — province diesel share + national pickup brand mix",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T04:04:38Z",
+      "date": "2026-07-18T04:04:38+00:00",
       "sha": "8ab5a30",
       "summary": "income(farmer): recalibrate on OAE real households + add measured NET return (fixes denominator bug)",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:57:54Z",
+      "date": "2026-07-18T03:57:54+00:00",
       "sha": "a8dbcf6",
       "summary": "data: OAE farm-economics source (Cai-up-2568) — real per-crop households + net return",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:18:22Z",
+      "date": "2026-07-18T03:18:22+00:00",
       "sha": "b38db48",
       "summary": "income(app): surface individual occupation income + crop farmer-income drill-down",
       "pillar": "service"
     },
     {
-      "date": "2026-07-18T03:02:26Z",
+      "date": "2026-07-18T03:02:26+00:00",
       "sha": "8f99b09",
       "summary": "capability: ingest_pdf — general-purpose PDF -> text/tables/OCR extraction",
       "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T02:56:30Z",
-      "sha": "5fbb795",
-      "summary": "income(farmer): measured GROSS farmer income per person by crop (WIP 2/2)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T02:44:48Z",
-      "sha": "f976b45",
-      "summary": "income(occupation): measured individual per-person income by occupation (WIP 1/2)",
-      "pillar": "feature"
     }
   ]
 }
