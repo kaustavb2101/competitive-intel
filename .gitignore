@@ -88,3 +88,8 @@ source-data/.bot_credit_raw/
 # (data.go.th probe output from pull_newcar_brandprovince.py lands in source-data/datagoth/,
 #  already gitignored above.)
 source-data/dlt/raw/
+
+# NSO wage-anchor raw CSV — re-pullable via pipeline/pull_nso_wages.py; only the distilled
+# source-data/nso_wages.json is committed, never the raw catalog CSV.
+source-data/.nso_wage_raw/
+.claude/settings.local.json

@@ -1,0 +1,297 @@
+{
+  "by_app_region": {
+    "Bangkok": {
+      "Agriculture": 9234,
+      "Construction": 18609,
+      "FactoryWorkers": 19295,
+      "Merchants": 18949,
+      "OfficeStaff": 29517,
+      "headline": 20682
+    },
+    "Central&BKK": {
+      "Agriculture": 9052,
+      "Construction": 15366,
+      "FactoryWorkers": 16398,
+      "Merchants": 16168,
+      "OfficeStaff": 25646,
+      "headline": 17723
+    },
+    "East": {
+      "Agriculture": 9908,
+      "Construction": 12972,
+      "FactoryWorkers": 15169,
+      "Merchants": 12393,
+      "OfficeStaff": 21501,
+      "headline": 15210
+    },
+    "Isan": {
+      "Agriculture": 7566,
+      "Construction": 9077,
+      "FactoryWorkers": 11611,
+      "Merchants": 11137,
+      "OfficeStaff": 19371,
+      "headline": 14805
+    },
+    "National": {
+      "Agriculture": null,
+      "Construction": null,
+      "FactoryWorkers": null,
+      "Merchants": null,
+      "OfficeStaff": null,
+      "headline": 15337
+    },
+    "North": {
+      "Agriculture": 6825,
+      "Construction": 9076,
+      "FactoryWorkers": 10746,
+      "Merchants": 11285,
+      "OfficeStaff": 19528,
+      "headline": 15407
+    },
+    "South": {
+      "Agriculture": 7067,
+      "Construction": 10089,
+      "FactoryWorkers": 9588,
+      "Merchants": 10711,
+      "OfficeStaff": 20043,
+      "headline": 13676
+    }
+  },
+  "by_nso_region": {
+    "กรุงเทพมหานคร": {
+      "Agriculture": 9234,
+      "Construction": 18609,
+      "FactoryWorkers": 19295,
+      "Merchants": 18949,
+      "OfficeStaff": 29517,
+      "headline": 20682
+    },
+    "ทั่วประเทศ": {
+      "Agriculture": null,
+      "Construction": null,
+      "FactoryWorkers": null,
+      "Merchants": null,
+      "OfficeStaff": null,
+      "headline": 15337
+    },
+    "ภาคกลาง": {
+      "Agriculture": 8871,
+      "Construction": 12123,
+      "FactoryWorkers": 13501,
+      "Merchants": 13386,
+      "OfficeStaff": 21776,
+      "headline": 14764
+    },
+    "ภาคตะวันออก": {
+      "Agriculture": 9908,
+      "Construction": 12972,
+      "FactoryWorkers": 15169,
+      "Merchants": 12393,
+      "OfficeStaff": 21501,
+      "headline": 15210
+    },
+    "ภาคตะวันออกเฉียงเหนือ": {
+      "Agriculture": 7566,
+      "Construction": 9077,
+      "FactoryWorkers": 11611,
+      "Merchants": 11137,
+      "OfficeStaff": 19371,
+      "headline": 14805
+    },
+    "ภาคเหนือ": {
+      "Agriculture": 6825,
+      "Construction": 9076,
+      "FactoryWorkers": 10746,
+      "Merchants": 11285,
+      "OfficeStaff": 19528,
+      "headline": 15407
+    },
+    "ภาคใต้": {
+      "Agriculture": 8573,
+      "Construction": 11612,
+      "FactoryWorkers": 11375,
+      "Merchants": 12200,
+      "OfficeStaff": 21256,
+      "headline": 14656
+    },
+    "ภาคใต้ชายแดน": {
+      "Agriculture": 5561,
+      "Construction": 8566,
+      "FactoryWorkers": 7802,
+      "Merchants": 9222,
+      "OfficeStaff": 18830,
+      "headline": 12695
+    }
+  },
+  "context": "NSO measured monthly wage, 2568 (4-quarter average): national headline (รวม) is ฿15,337/month; Bangkok is the high-wage benchmark at ฿20,682 headline / ฿29,517 office-staff; provincial regions run materially below Bangkok — e.g. Isan office-staff ฿19,371 (~66% of Bangkok).",
+  "headline_rows": [
+    {
+      "headline_ratio_to_bangkok": 0.742,
+      "headline_wage": 15337,
+      "office_staff_ratio_to_bangkok": null,
+      "office_staff_wage": null,
+      "region": "National"
+    },
+    {
+      "headline_ratio_to_bangkok": 1.0,
+      "headline_wage": 20682,
+      "office_staff_ratio_to_bangkok": 1.0,
+      "office_staff_wage": 29517,
+      "region": "Bangkok"
+    },
+    {
+      "headline_ratio_to_bangkok": 0.857,
+      "headline_wage": 17723,
+      "office_staff_ratio_to_bangkok": 0.869,
+      "office_staff_wage": 25646,
+      "region": "Central&BKK"
+    },
+    {
+      "headline_ratio_to_bangkok": 0.735,
+      "headline_wage": 15210,
+      "office_staff_ratio_to_bangkok": 0.728,
+      "office_staff_wage": 21501,
+      "region": "East"
+    },
+    {
+      "headline_ratio_to_bangkok": 0.716,
+      "headline_wage": 14805,
+      "office_staff_ratio_to_bangkok": 0.656,
+      "office_staff_wage": 19371,
+      "region": "Isan"
+    },
+    {
+      "headline_ratio_to_bangkok": 0.745,
+      "headline_wage": 15407,
+      "office_staff_ratio_to_bangkok": 0.662,
+      "office_staff_wage": 19528,
+      "region": "North"
+    },
+    {
+      "headline_ratio_to_bangkok": 0.661,
+      "headline_wage": 13676,
+      "office_staff_ratio_to_bangkok": 0.679,
+      "office_staff_wage": 20043,
+      "region": "South"
+    }
+  ],
+  "meta": {
+    "dataset_table": "LFS_02_20545_18",
+    "generated_by": "pipeline/build_nso_wage_anchor.py",
+    "label": "MEASURED — NSO Labour Force Survey average monthly wage of employees (฿/month) by region, latest complete year (4-quarter average).",
+    "multiregion_note": "Central&BKK and South each span two NSO regions; their by_app_region figure is the UNWEIGHTED mean of the constituent NSO regions (no employment weights available). The five single-region app regions are exact. by_nso_region carries the exact per-NSO-region measured values.",
+    "national_gap": "From BE2568 onward NSO's ทั่วประเทศ (national) row publishes only the all-industry aggregate (รวม) — the per-industry national breakdown present in BE2563-2567 is absent. National therefore carries the headline wage only; its per-occupation buckets are null (nothing is synthesized). ratio_to_bangkok is the fully-measured comparison.",
+    "note": "Measured reality-check on the ESTIMATED occupation-income surface (build_occupation_income*.py); not an input to any risk composite.",
+    "region_crosswalk": {
+      "Bangkok": [
+        "กรุงเทพมหานคร"
+      ],
+      "Central&BKK": [
+        "กรุงเทพมหานคร",
+        "ภาคกลาง"
+      ],
+      "East": [
+        "ภาคตะวันออก"
+      ],
+      "Isan": [
+        "ภาคตะวันออกเฉียงเหนือ"
+      ],
+      "National": [
+        "ทั่วประเทศ"
+      ],
+      "North": [
+        "ภาคเหนือ"
+      ],
+      "South": [
+        "ภาคใต้",
+        "ภาคใต้ชายแดน"
+      ]
+    },
+    "ses_industry_map": {
+      "Agriculture": [
+        "เกษตรกรรม การป่าไม้ และการประมง"
+      ],
+      "Construction": [
+        "การก่อสร้าง"
+      ],
+      "FactoryWorkers": [
+        "การผลิต"
+      ],
+      "Merchants": [
+        "การขายส่ง และการขายปลีก การซ่อมยานยนต์"
+      ],
+      "OfficeStaff": [
+        "กิจกรรมทางการเงินและการประกันภัย",
+        "กิจกรรมทางวิชาชีพ วิทยาศาสตร์ และเทคนิค",
+        "การบริหารราชการ การป้องกันประเทศ การประกันสังคม"
+      ],
+      "headline": [
+        "รวม"
+      ]
+    },
+    "source": "source-data/nso_wages.json (NSO LFS table LFS_02_20545_18, สำนักงานสถิติแห่งชาติ, MEASURED)",
+    "title": "NSO measured wage anchor — real monthly wage by region (objective #1)",
+    "unit": "THB/month",
+    "vintage": "2568 (4-quarter average)",
+    "vintage_be": "2568",
+    "vintage_ce": 2025
+  },
+  "ratio_to_bangkok": {
+    "Bangkok": {
+      "Agriculture": 1.0,
+      "Construction": 1.0,
+      "FactoryWorkers": 1.0,
+      "Merchants": 1.0,
+      "OfficeStaff": 1.0,
+      "headline": 1.0
+    },
+    "Central&BKK": {
+      "Agriculture": 0.98,
+      "Construction": 0.826,
+      "FactoryWorkers": 0.85,
+      "Merchants": 0.853,
+      "OfficeStaff": 0.869,
+      "headline": 0.857
+    },
+    "East": {
+      "Agriculture": 1.073,
+      "Construction": 0.697,
+      "FactoryWorkers": 0.786,
+      "Merchants": 0.654,
+      "OfficeStaff": 0.728,
+      "headline": 0.735
+    },
+    "Isan": {
+      "Agriculture": 0.819,
+      "Construction": 0.488,
+      "FactoryWorkers": 0.602,
+      "Merchants": 0.588,
+      "OfficeStaff": 0.656,
+      "headline": 0.716
+    },
+    "National": {
+      "Agriculture": null,
+      "Construction": null,
+      "FactoryWorkers": null,
+      "Merchants": null,
+      "OfficeStaff": null,
+      "headline": 0.742
+    },
+    "North": {
+      "Agriculture": 0.739,
+      "Construction": 0.488,
+      "FactoryWorkers": 0.557,
+      "Merchants": 0.596,
+      "OfficeStaff": 0.662,
+      "headline": 0.745
+    },
+    "South": {
+      "Agriculture": 0.765,
+      "Construction": 0.542,
+      "FactoryWorkers": 0.497,
+      "Merchants": 0.565,
+      "OfficeStaff": 0.679,
+      "headline": 0.661
+    }
+  }
+}

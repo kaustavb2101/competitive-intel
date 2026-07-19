@@ -928,6 +928,12 @@ function updatePanels(){
       const mx=OCC_INC[0].v;
       // answer-first lead: the individual office/clerical wage is far below the household figure the panel used to imply.
       const offN=OCCIND_N.OfficeStaff;
+      // NSO Labour Force Survey measured MONTHLY WAGE for this province's region (2568) — a real regional wage
+      // beside the ESTIMATED individual line. NSO measures 3 of our occupation classes by region.
+      const NW=(window.NSOWAGE&&window.NSOWAGE.by_app_region&&window.NSOWAGE.by_app_region[reg])||null;
+      const NWr2b=(window.NSOWAGE&&window.NSOWAGE.ratio_to_bangkok&&window.NSOWAGE.ratio_to_bangkok[reg])||null;
+      const NW_MAP={Agriculture:'Agriculture',FactoryWorkers:'FactoryWorkers',OfficeStaff:'OfficeStaff'};
+      const NW_YR=((window.NSOWAGE&&window.NSOWAGE.meta&&window.NSOWAGE.meta.vintage)||'').slice(0,4);
       const answer=(OCCIND_P&&offN)
         ? `<div class="answer">The individual office/clerical <b>wage</b> is ~฿${fmt(Math.round(offN.individual_national/1000)*1000)}/mo nationally <span class="tag meas">measured · ILOSTAT</span> — <b>not</b> the ฿${fmt(INCOME.OfficeStaff||offN.household_national_avg)} figure below, which is whole-<b>household</b> income.</div>`
         : '';
@@ -943,12 +949,20 @@ function updatePanels(){
           }else if(ip&&ip.individual_est!=null){
             indLine=`<div class="ind"><span>Individual ~<b>฿${fmt(ip.individual_est)}/mo</b></span><span class="tag est">estimated</span></div>`;
           }
+          // NSO measured regional wage line — a real number to check the estimated individual figure against.
+          let nwLine='';
+          const nb=NW_MAP[r.kk];
+          if(nb&&NW&&NW[nb]!=null){
+            const rb=(NWr2b&&NWr2b[nb]!=null&&reg!=='Bangkok')?` <small style="color:#8A94A8">(${Math.round(NWr2b[nb]*100)}% of Bangkok)</small>`:'';
+            nwLine=`<div class="ind"><span>NSO ${reg} wage ~<b>฿${fmt(NW[nb])}/mo</b>${rb}</span><span class="tag meas">measured · NSO LFS ${NW_YR}</span></div>`;
+          }
           return `<div class="or"><div class="ot">${r.lab}<b>฿${fmt(r.v)}/mo <span style="color:var(--dim);font-weight:400">household</span>${ratioLab}</b></div>`
           +`<div class="bar"><i style="width:${Math.max(4,Math.round(r.v/mx*100))}%;background:rgb(91,124,250)"></i></div>`
-          +indLine+`</div>`;
+          +indLine+nwLine+`</div>`;
         }).join('')+`</div>`
         +`<div class="foot"><b>Household</b> figures: NSO Socio-Economic Survey 2566 (2023) by occupation class — province-level, <b>measured</b>. "% of national avg" is a pure ratio over the unweighted 77-province mean.`
         +(OCCIND_P?` <b>Individual</b> per-person wage: national level MEASURED (ILOSTAT employee earnings); the per-province split is ESTIMATED (household × the measured national individual/household ratio). SME owners are self-employed — no measured individual wage.`:` Individual per-person figures unavailable for this province.`)
+        +(NW?` The <b>NSO ${reg} wage</b> line is the real average monthly wage for that occupation class in this region — NSO Labour Force Survey ${NW_YR} (measured), a reality-check on the estimated individual figure.`:``)
         +`</div>`;
     }
   }
@@ -1283,8 +1297,11 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    fetch('data/occupation_income_individual.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // gross farmer income per person by crop, per province (MEASURED yield/price/area/families; 1.6 workers/farm ESTIMATED).
    // null/absent => the crop drill-down simply doesn't render.
-   fetch('data/crop_farmer_income.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];window.OCCIND=a[5];window.CROPFARM=a[6];
+   fetch('data/crop_farmer_income.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // NSO Labour Force Survey measured MONTHLY WAGE by region (2568, real). A measured reality-check on the
+   // ESTIMATED individual occupation-income line. null/absent => the panel just omits the measured-wage line.
+   fetch('data/nso_wage_anchor.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];window.OCCIND=a[5];window.CROPFARM=a[6];window.NSOWAGE=a[7];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})
