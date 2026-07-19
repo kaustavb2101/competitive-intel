@@ -96,3 +96,6 @@ source-data/.nso_wage_raw/
 
 # Google Places ratings pull scratch cache
 source-data/.place_ratings_cache.json
+
+# Playwright MCP scratch (page snapshots / console logs)
+.playwright-mcp/
