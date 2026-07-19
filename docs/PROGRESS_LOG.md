@@ -298,6 +298,43 @@ could not see it.
 - **Next recommended intelligence task:** the peer-NPL card is a static 3-peer table; the natural follow-up
   is to co-locate it with the collateral-mix exposure (segment_exposure.json) so the owner reads "our book
   leans land/agri → the peer with that book runs 3.5% NPL" as one joined signal — a market-analysis fold.
+## 2026-07-17 — Integration loop: MEASURED national title-collateral fleet trend (DLT/MOT) → the TIME dimension of the collateral base — PR
+
+Integration loop (backlog #3, MOT/Excise vehicles → measured collateral layer). Verified the top
+backlog items are already shipped: FPO PICO (#1) is folded into the peer board + rival layers, DBD
+new-company formation is current (2026-06 snapshot), branch_cropland (#2) is surfaced. Of the
+data.go.th distillation items, **MOT vehicles is the one still reachable AND not yet distilled** — a
+test-pull of the department CKANs confirmed `datagov.mot.go.th` returns HTTP 200 from CI (Excise
+`catalog.excise.go.th` fails TLS through the agent proxy; `data.go.th` aggregator, DLT, BAAC/SME-bank
+stay geo-blocked — logged, not faked).
+
+- **What shipped.** `pipeline/build_vehicle_fleet.py` → `platform/data/vehicle_fleet.json`. Distils the
+  MOT/DLT open-data **national cumulative registered-vehicle stock** time series (37 Buddhist-era years,
+  2532→2568 BE / 1989→2025 CE, 25 statutory types) into AutoX's three **title-collateral classes**
+  (motorcycle / pickup / car): latest-year level, **YoY %**, and a trailing 6-year series. Deterministic
+  + network-free + `--check` byte-exact; SKIP-passes (exit 3) when the gitignored `mot_vehicles.csv` is
+  absent, exactly like `build_dbd_formation` / `build_pico_census`. Wired into the determinism gate.
+- **Why it matters (objective #1, collateral risk).** Every existing vehicle layer
+  (`vehicles_by_province.json`, `branch_vehicles.json`, the collateral-outlook board) is a
+  **single-vintage** province snapshot — none carries the TIME dimension. This adds it, and the measured
+  read is a real finding: the national **pickup-title fleet CONTRACTED −0.77% YoY** in 2568 BE
+  (7,034,858 → 6,980,358) — the **first measured confirmation** of the "diesel-pickup collateral squeeze"
+  the app previously carried only as an *editorial / estimated watch*. Motorcycle-title fleet grew just
+  **+0.92%** (growth decelerating from ~+2%/yr in 2021-22); car-title +1.81%. A contracting collateral
+  pool = a shrinking resale/recovery base behind that slice of the book, a leading signal on collateral
+  value (NOT a price — no Thai used-vehicle index is in this data; stated plainly in `meta.gaps`).
+- **Surfaced honestly.** The Overview collateral-outlook board (`renderCollatOutlook`, `platform/app.js`)
+  now shows two **MEASURED** companion cards (pickup + motorcycle fleet YoY, from `vehicle_fleet.json`,
+  lazy-loaded, graceful when absent) beside the existing editorial watch cards — putting a real number on
+  the direction the board previously only asserted. National-only granularity is labelled; the
+  per-province mix stays in the measured DLT table below.
+- **Provenance fix.** `build_provenance.py` first misclassified the layer ESTIMATED because the word
+  "synthesis" (in "no synthesis") contains the `SYNTH` marker — a false positive; reworded to "not
+  modelled" so it classifies **measured** (82 layers, 36 measured). No classifier weakened.
+- **Verification.** `bash tests/run.sh check` = **66 passed, 0 failed** (added `build_vehicle_fleet.py
+  --check` byte-exact + 446 data-integrity checks); card-build logic verified against the real JSON in an
+  isolated Node harness (pickup ▼ −0.77% red, motorcycle ▲ +0.92%); headless render of the Overview page
+  clean. Opened as a **PR** (adds a visible card to the collateral board).
 
 ## 2026-07-16 — Intelligence loop: DEPLOYMENT HEALTH — site-health probe no longer false-alarms "SITE DOWN" on a rejected credential (nightly monitor was RED 6+ nights) — SHIPPED
 

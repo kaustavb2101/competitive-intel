@@ -132,6 +132,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_vehicle_registry.py --check (source-data/datagoth/mot_vehicles.csv absent — re-pullable pull_datagoth input, not committed)"
   else bad "build_vehicle_registry.py --check (vehicle_registry.json drifted from source-data/datagoth/mot_vehicles.csv)"
   fi
+  ( cd "$PIPE" && python3 build_vehicle_fleet.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_fleet.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_fleet.py --check (source-data/datagoth/mot_vehicles.csv absent — re-pullable pull_datagoth input, not committed)"
+  else bad "build_vehicle_fleet.py --check (vehicle_fleet.json drifted from source-data/datagoth/mot_vehicles.csv)"
+  fi
   ( cd "$PIPE" && python3 build_branch_vehicles.py --check >/dev/null 2>&1 ) && ok "build_branch_vehicles.py --check" || bad "build_branch_vehicles.py --check (branch_vehicles.json drifted from vehicles_by_province/branch_population)"
   ( cd "$PIPE" && python3 build_branch_recommendations.py --check >/dev/null 2>&1 ) && ok "build_branch_recommendations.py --check" || bad "build_branch_recommendations.py --check (branch_recommendations.json drifted from the per-branch layers)"
   ( cd "$PIPE" && python3 build_regional_outlook.py --check >/dev/null 2>&1 ) && ok "build_regional_outlook.py --check" || bad "build_regional_outlook.py --check (regional_outlook.json drifted from the per-branch/rec layers)"
