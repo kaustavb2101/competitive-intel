@@ -93,3 +93,6 @@ source-data/dlt/raw/
 # source-data/nso_wages.json is committed, never the raw catalog CSV.
 source-data/.nso_wage_raw/
 .claude/settings.local.json
+
+# Google Places ratings pull scratch cache
+source-data/.place_ratings_cache.json

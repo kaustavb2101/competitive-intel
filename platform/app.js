@@ -1859,6 +1859,7 @@ function renderAcq(){
   renderRivalDensity();
   renderPeerProvince();
   renderPeerNpl();
+  renderRivRep();
   renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
@@ -2339,6 +2340,59 @@ function drawPeerNpl(){
         [`Figures are <b>reported by the peer companies themselves</b> (FY2025 / 2025 IR) — ${m.source||'docs/RESEARCH_DIGEST.md §B'}. Vintage ${m.updated||'2026-06'}.`,
          '<b>Not an AutoX/Ngern Chaiyo number.</b> We hold no measured AutoX NPL — this is the competitive quality band around us, not our own book.',
          'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.']);
+  }
+}
+
+/* ---------- rival service reputation · measured Google ratings by brand (obj #2, MEASURED sample) ----------
+   Surfaces data/rival_reputation.json (build_rival_reputation.py, from pull_place_ratings.py's Google
+   Places ratings on the located rival branches). A QUALITY layer on top of rival density: review-count-
+   weighted rating by brand. A SAMPLE (located rivals with a rating), and NOT an AutoX number (our own
+   branches carry no Google ratings). Lazy, null-safe, graceful if absent. */
+let RIVREP=null, rivrepLoaded=false;
+function renderRivRep(){
+  const tbl=$('#rivreptbl'); if(!tbl) return;
+  if(rivrepLoaded){ drawRivRep(); return; }
+  fetch('data/rival_reputation.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVREP=j; rivrepLoaded=true; drawRivRep();
+  }).catch(()=>{ RIVREP=null; rivrepLoaded=true; drawRivRep(); });
+}
+function drawRivRep(){
+  const tbl=$('#rivreptbl'), ro=$('#rivrepreadout'); if(!tbl) return;
+  const brands=(RIVREP&&Array.isArray(RIVREP.by_brand))?RIVREP.by_brand:[];
+  if(!brands.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rival reputation not yet computed.</b> <span class="sub">data/rival_reputation.json is absent — run pipeline/pull_place_ratings.py then build_rival_reputation.py.</span>';
+    return;
+  }
+  const m=RIVREP.meta||{};
+  const vals=brands.map(b=>b.rating_wavg).filter(v=>typeof v==='number');
+  const lo=Math.min(...vals), hi=Math.max(...vals);
+  // higher rating = stronger reputation (green/merch), lower = weaker (red/agri), scaled across the spread.
+  const col=v=>{ if(hi<=lo) return 'var(--merch)'; const t=(v-lo)/(hi-lo); return t>=0.67?'var(--merch)':t<=0.34?'var(--agri)':'var(--gold)'; };
+  tbl.innerHTML=`<tr><th>#</th><th>Rival brand</th>`+
+    `<th title="review-count-weighted mean Google rating across this brand's located branches">Rating ★ (wtd)</th>`+
+    `<th title="simple mean rating">Mean</th>`+
+    `<th title="located branches carrying a Google rating">Rated br.</th>`+
+    `<th title="total Google reviews across them">Reviews</th></tr>`+
+    brands.map((b,i)=>{
+      const v=(typeof b.rating_wavg==='number')?b.rating_wavg:null;
+      const c=v!=null?col(v):'var(--dim)';
+      const bar=v!=null?barHTML(v,c,5):'';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${b.brand||'—'}</b></td>
+        <td>${bar} <span class="mono" style="color:${c}"><b>${v!=null?v.toFixed(2):'—'}</b></span></td>
+        <td class="mono sub">${b.rating_mean!=null?b.rating_mean.toFixed(2):'—'}</td>
+        <td class="mono sub">${b.n_rated||0}</td>
+        <td class="mono sub">${(b.reviews||0).toLocaleString()}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const pre=m.n_rated?`<b>Across ${m.n_rated} rated rival branches (${(m.reviews||0).toLocaleString()} reviews).</b> `:'';
+    ro.innerHTML=pre+(RIVREP.headline||'')+` ${TAG_M}`+
+      methodBox(m.note||null,
+        [`<b>Measured</b> — Google Places rating + review count on the located rival branches (${m.source||'pull_place_ratings.py'}); review-count-weighted so a handful of five-star outliers can't dominate.`,
+         '<b>A sample, not the full census</b> — only located rival branches that carry a Google rating; read the brand order, not hairline gaps.',
+         '<b>Not an AutoX figure</b> — our own branches carry no Google ratings, so there is no comparable AutoX number here.']);
   }
 }
 
