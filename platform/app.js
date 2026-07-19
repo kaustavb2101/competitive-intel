@@ -1855,6 +1855,7 @@ function renderAcq(){
   renderAcqBoard();
   renderSearchDemand();
   renderPeerScore();
+  renderRivalPulse();
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
@@ -2280,11 +2281,102 @@ function drawPeerScore(){
     const byRoe=peers.filter(p=>typeof p.roe==='number');
     const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
     ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
-      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest IPO benchmark we have.`:'')+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest external benchmark we have.`:'')+
       methodBox(m.roe_caveat||null,
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the latest quarter'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.']);
+  }
+}
+
+/* ---------- rival pulse · live promotions + voice of customer (obj #2, MEASURED) ----------
+   Surfaces data/rival_pulse.json (build_rival_pulse.py, from pull_rival_promos.py [Thai-IP pull of
+   the rivals' own sites] + pull_app_reviews.py [Google Play, 5 apps incl. our own เงินไชโย]).
+   Stars/histograms/promo dates MEASURED; detractor theme buckets ESTIMATED (keyword lexicon).
+   Lazy, null-safe, graceful if absent. */
+let RIVPULSE=null, rivpulseLoaded=false;
+function renderRivalPulse(){
+  const tbl=$('#pulsesenttbl'); if(!tbl) return;
+  if(rivpulseLoaded){ drawRivalPulse(); return; }
+  fetch('data/rival_pulse.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVPULSE=j; rivpulseLoaded=true; drawRivalPulse();
+  }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; drawRivalPulse(); });
+}
+function drawRivalPulse(){
+  const tbl=$('#pulsesenttbl'), ro=$('#pulsesentreadout'),
+        plist=$('#pulsepromolist'), pro=$('#pulsepromoreadout');
+  if(!tbl) return;
+  const sent=(RIVPULSE&&Array.isArray(RIVPULSE.sentiment))?RIVPULSE.sentiment:[];
+  const promos=(RIVPULSE&&Array.isArray(RIVPULSE.promos))?RIVPULSE.promos:[];
+  const m=(RIVPULSE&&RIVPULSE.meta)||{};
+  if(!sent.length&&!promos.length){
+    tbl.innerHTML=''; if(plist) plist.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rival pulse not yet pulled.</b> <span class="sub">data/rival_pulse.json is absent — run pipeline/pull_rival_promos.py (Thai IP) + pull_app_reviews.py, then build_rival_pulse.py.</span>';
+    if(pro) pro.innerHTML='';
+    return;
+  }
+  // --- sentiment ladder (our own app highlighted) ---
+  if(sent.length){
+    tbl.innerHTML=`<tr><th>#</th><th>App</th>`+
+      `<th title="lifetime Google Play score (all ratings)">Play score</th>`+
+      `<th title="number of star ratings on the store page">Ratings</th>`+
+      `<th title="share of ALL ratings that are 1★ (lifetime histogram)">1★ share</th>`+
+      `<th title="average star of reviews in the last 90 days (from the stored newest reviews)">Last 90d</th>`+
+      `<th title="share of last-90-day reviews at 1–2★">90d 1–2★</th>`+
+      `<th title="share of stored reviews that got a developer reply — CX ops discipline">Dev reply</th>`+
+      `<th title="ESTIMATED — keyword buckets over stored 1–2★ reviews">Top detractor theme</th></tr>`+
+      sent.map((s,i)=>{
+        const own=s.own, name=own?`<b style="color:var(--gold)">${s.name}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`:`<b>${s.name}</b>`;
+        const sc=s.score!=null?s.score.toFixed(2):'—';
+        const bar=s.score!=null?barHTML(s.score,own?'var(--gold)':'var(--merch)',5):'';
+        const trendC=(s.recent90&&s.recent90.avg!=null&&s.score!=null)?(s.recent90.avg<s.score-0.15?'var(--agri)':s.recent90.avg>s.score+0.15?'var(--merch)':'var(--dim)'):'var(--dim)';
+        const th=(s.themes&&s.themes[0])?`${s.themes[0].label} <span class="sub mono">×${s.themes[0].n}</span>`:'<span class="sub">—</span>';
+        return `<tr${own?' style="background:rgba(230,180,80,.05)"':''}>
+          <td class="mono sub">${i+1}</td>
+          <td>${name} <span class="sub mono">${s.brand}</span></td>
+          <td class="mono">${bar} <b>${sc}★</b></td>
+          <td class="mono sub">${(s.ratings||0).toLocaleString()}</td>
+          <td class="mono" style="color:${(s.detractor_pct||0)>=12?'var(--agri)':'var(--dim)'}">${s.detractor_pct!=null?s.detractor_pct+'%':'—'}</td>
+          <td class="mono" style="color:${trendC}">${s.recent90&&s.recent90.avg!=null?s.recent90.avg.toFixed(2)+'★':'—'} <span class="sub">(${s.recent90?s.recent90.n:0})</span></td>
+          <td class="mono" style="color:${(s.recent90&&s.recent90.low_share_pct>=25)?'var(--agri)':'var(--dim)'}">${s.recent90&&s.recent90.low_share_pct!=null?s.recent90.low_share_pct+'%':'—'}</td>
+          <td class="mono sub">${s.reply_rate_pct!=null?s.reply_rate_pct+'%':'—'}</td>
+          <td class="sub" style="font-size:12px">${th}</td>
+        </tr>`;}).join('');
+    if(ro){
+      const own=sent.find(s=>s.own);
+      const q=(own&&own.quotes&&own.quotes.length)?`<div style="margin-top:6px">${own.quotes.map(x=>`<div class="sub" style="font-size:12px;margin-top:2px">“${x.text}” <span class="mono">— ${'★'.repeat(x.score)} · ${x.at||''}</span></div>`).join('')}</div>`:'';
+      ro.innerHTML=`${RIVPULSE.headline||''} ${TAG_M}`+q+
+        methodBox(null,
+          [`<b>Measured</b> — Google Play store pages (th/th): lifetime score + star histogram, plus the newest stored reviews per app (dated, public). Sentiment anchor ${m.sentiment_anchor||'—'}.`,
+           `<b>Our own app is on the ladder</b> — เงินไชโย (th.co.autox.chaiyo) is the only AutoX-owned number on this tab; everything else is the rivals'.`,
+           `<b>Estimated</b> — the detractor themes are keyword buckets over stored 1–2★ reviews (lexicon in the data file); read them as direction, not exact counts.`,
+           m.note_installs||'']);
+    }
+  }
+  // --- live promo feed, grouped by brand ---
+  if(plist){
+    const byBrand={};
+    promos.forEach(p=>{(byBrand[p.brand]=byBrand[p.brand]||[]).push(p);});
+    const order=['TIDLOR','SAWAD','MTC'].filter(b=>byBrand[b]);
+    plist.innerHTML=order.map(b=>{
+      const items=byBrand[b].slice(0,6);
+      const kind=items.every(i=>i.kind==='news')?' <span class="sub">(news &amp; campaigns — MTC runs no public promo page)</span>':'';
+      return `<h4 class="acqsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
+        `<table class="tbl">${items.map(p=>`<tr>
+          <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
+          <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
+        </tr>`).join('')}</table>`;
+    }).join('');
+    if(pro){
+      const nNew=promos.filter(p=>p.is_new).length;
+      pro.innerHTML=`<b>${promos.length} promotions / campaigns</b> tracked from the rivals' own websites`+
+        (nNew?` — <b style="color:var(--gold)">${nNew} new</b> since the previous pull`:'')+
+        `. Refreshed ${m.promos_pulled_at||'—'} (Thai-IP pull). ${TAG_M}`+
+        methodBox(null,
+          [`<b>Measured</b> — items published on tidlor.com (/th/promotion-activity), sawad.co.th (promotion posts) and muangthaicap.com (/news/ — MTC publishes campaigns as news). Every item carries first-seen tracking, so NEW = appeared since the previous pull.`,
+           m.promos_coverage_note||'',
+           `The corporate sites are geoblocked from foreign IPs — this feed refreshes from the Thai-IP laptop (pipeline/pull_rival_promos.py).`]);
+    }
   }
 }
 

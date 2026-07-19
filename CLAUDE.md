@@ -6,7 +6,7 @@
 ## Who this is for
 **Kaustav**, Corp Strategy Director at **AutoX / บริษัท ออโต้ เอกซ์ จำกัด** (brand **เงินไชโย / Ngern Chaiyo**),
 a Thai non-bank **title-loan lender** (SCBX subsidiary). Targets ~1M customers, ฿70bn loans,
-25% ROE, IPO ~2027. Runs **~2,015 branches today and is now consolidating / rationalising the
+25% ROE. There is NO IPO plan. Runs **~2,015 branches today and is now consolidating / rationalising the
 network, not expanding it** — there is no branch-growth target.
 
 Kaustav works from a laptop in **Thailand** and deploys to **Vercel**. He gets overwhelmed by
@@ -122,6 +122,16 @@ timeseries `--check` plus `node --check` on every page's JS.*
 - `fix_provinces.py` — province/region key normalizer (116→77, 0 `Other`). `regionmap.py` —
   province→region + tier lookup (imported widely). `bake_catchment_heights.py` — bakes per-building
   type/height into `rayong_catchment.json`.
+- **Rival pulse** (objective #2 — always-on promo + sentiment watch, on `#acq`):
+  - `pull_rival_promos.py` — **THAI-IP** pull of the rivals' OWN sites (tidlor.com promo listing,
+    sawad.co.th WP REST, muangthaicap.com news; Heng has no parseable promo page) →
+    `source-data/rival_promos.json` with per-item `first_seen`/`last_seen`, so each re-run flags NEW.
+  - `pull_app_reviews.py` — **any-IP** Google Play ratings + newest reviews for 5 title-lender apps
+    incl. AutoX's own เงินไชโย (`th.co.autox.chaiyo`) → `source-data/app_reviews.json` (review store
+    accumulates across runs, dedup by reviewId, 1,500/app cap).
+  - `build_rival_pulse.py` — deterministic `--check`; sentiment ladder (score, 1★ share, 90-day
+    trend anchored on newest review date IN the data, dev-reply rate, ESTIMATED Thai-lexicon
+    detractor themes) + promo feed → `platform/data/rival_pulse.json`.
 - `save_competitors.py` — writes `rayong_competitors.json` (hand-curated Google Places list).
 - `pull_buildings.py`, `pull_wide.py` — Overpass building-footprint pulls. `build_platform.py` —
   assembles the Rayong HTML pages from head + app + loader, wires the nav.
