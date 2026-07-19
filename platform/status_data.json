@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T17:12:18+07:00",
-    "commit": "982dcbb"
+    "generated_at": "2026-07-19T10:13:05Z",
+    "commit": "1f748a3"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T10:13:05Z",
+      "sha": "1f748a3",
+      "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
+      "pillar": "service"
+    },
+    {
       "date": "2026-07-19T17:12:18+07:00",
       "sha": "982dcbb",
       "summary": "intel(market): surface MEASURED EV-transition workforce exposure on the collateral outlook (#81)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T08:34:24+00:00",
+      "date": "2026-07-19T08:34:24Z",
       "sha": "1b6359b",
       "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
       "pillar": "3d-enrichment"
@@ -498,13 +504,13 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-19T06:24:51+00:00",
+      "date": "2026-07-19T06:24:51Z",
       "sha": "adfc920",
       "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T06:17:40+00:00",
+      "date": "2026-07-19T06:17:40Z",
       "sha": "d4d1fc0",
       "summary": "committee: autonomous competitor scout (run 29676124159)",
       "pillar": "market"
@@ -516,7 +522,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T05:32:28+00:00",
+      "date": "2026-07-19T05:32:28Z",
       "sha": "5f9db78",
       "summary": "docs: log combined province-pressure board — merge + deploy-verify (PR #78)",
       "pillar": "deployment"
@@ -546,7 +552,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T02:17:06+00:00",
+      "date": "2026-07-19T02:17:06Z",
       "sha": "38ad769",
       "summary": "docs: log JS-off <noscript> front-door fallback — merge + deploy-verify (PR #77)",
       "pillar": "deployment"
@@ -570,13 +576,13 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T00:27:33+00:00",
+      "date": "2026-07-19T00:27:33Z",
       "sha": "cb1ef20",
       "summary": "intel(fold): surface the MEASURED per-branch fuel-station count (≤10km) on the branch popup",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-18T22:15:11+00:00",
+      "date": "2026-07-18T22:15:11Z",
       "sha": "1a977ce",
       "summary": "committee: refresh autonomy plan after home-thesis competitive-clause ship",
       "pillar": "deployment"
@@ -588,13 +594,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-18T21:57:11+00:00",
+      "date": "2026-07-18T21:57:11Z",
       "sha": "d003089",
       "summary": "committee: refresh autonomy plan (run 29662510231)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-18T20:14:55+00:00",
+      "date": "2026-07-18T20:14:55Z",
       "sha": "7ed0471",
       "summary": "docs: log html lang=\"en\" a11y fix — merge + deploy-verify (PR #73)",
       "pillar": "uxui"
@@ -612,13 +618,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-18T18:16:33+00:00",
+      "date": "2026-07-18T18:16:33Z",
       "sha": "507c50d",
       "summary": "service(provenance): durably stamp rayong_province.json — clear the shame board 1 → 0",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-18T16:02:33+00:00",
+      "date": "2026-07-18T16:02:33Z",
       "sha": "476b97e",
       "summary": "committee: refresh autonomy plan (run 29651140425)",
       "pillar": "deployment"
@@ -636,7 +642,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T14:13:39+00:00",
+      "date": "2026-07-18T14:13:39Z",
       "sha": "4b03f9b",
       "summary": "docs: log #sim slider-label a11y fix — merge + deploy-verify (PR #70)",
       "pillar": "uxui"
@@ -648,16 +654,10 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-18T13:53:58+00:00",
+      "date": "2026-07-18T13:53:58Z",
       "sha": "f8f054e",
       "summary": "committee: refresh autonomy plan after double-jeopardy queue ship",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-18T13:53:40+00:00",
-      "sha": "1093e37",
-      "summary": "intel(planning): teach the exec decision queue to see DOUBLE JEOPARDY (besieged AND portfolio-stressed)",
-      "pillar": "service"
     }
   ]
 }
