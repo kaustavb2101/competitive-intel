@@ -297,12 +297,15 @@ def build():
     hh = macro.get("household_debt_gdp") or {}
     backdrop = ""
     if hh.get("yoy_change") is not None:
-        backdrop = ("Deleveraging backdrop (household debt %s%% and falling) eases borrower risk — a window to grow selectively. "
+        backdrop = ("Deleveraging backdrop (household debt %s%% and falling) eases borrower risk across the existing book. "
                     % hh.get("value")) if hh["yoy_change"] < 0 else \
                    ("Rising household leverage (%s%% of GDP) argues for caution on new exposure. " % hh.get("value"))
     top_reg = lambda kind: max(regions, key=lambda x: x["tallies"].get(kind, 0))["name"] if regions else "—"
-    headline = backdrop + "Priority: expand where white-space is thin-competition (most in %s), lead with vehicle-title products where collateral density is high (most in %s), and de-risk agri-stressed branches (most in %s)." % (
-        top_reg("acquire"), top_reg("collateral"), top_reg("agri_stress"))
+    # Risk lens on the network we already run — NO branch open/expand recommendations (see CLAUDE.md).
+    # Priority triad: competitive risk (defend the most rival-pressed branches) + portfolio (product
+    # lead where collateral is deepest, de-risk the agri-stressed tail).
+    headline = backdrop + "Priority: defend the branches under heaviest rival pressure (most in %s), lead with vehicle-title products where collateral density is high (most in %s), and de-risk agri-stressed branches (most in %s)." % (
+        top_reg("defend"), top_reg("collateral"), top_reg("agri_stress"))
 
     return {
         "meta": {
