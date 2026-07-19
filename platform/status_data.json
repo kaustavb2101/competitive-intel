@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T22:15:36+07:00",
-    "commit": "ca19d7f"
+    "generated_at": "2026-07-19T23:27:55+07:00",
+    "commit": "ef652d5"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,18 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T23:27:55+07:00",
+      "sha": "ef652d5",
+      "summary": "feat(competition): rival threat matrix — footprint × service-quality join (obj #2) (#88)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T16:02:30+00:00",
+      "sha": "caab12c",
+      "summary": "committee: refresh autonomy plan (run 29694014006)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-19T22:15:36+07:00",
       "sha": "ca19d7f",
       "summary": "feat(competition): autonomous SET listed-peer scoreboard + digital-presence section (#87)",
@@ -492,7 +504,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T14:30:35Z",
+      "date": "2026-07-19T14:30:35+00:00",
       "sha": "c56030a",
       "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
       "pillar": "service"
@@ -522,7 +534,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T12:34:00Z",
+      "date": "2026-07-19T12:34:00+00:00",
       "sha": "a117f4b",
       "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
       "pillar": "service"
@@ -534,13 +546,13 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T10:39:45Z",
+      "date": "2026-07-19T10:39:45+00:00",
       "sha": "f7da11d",
       "summary": "committee: refresh autonomy plan (run 29683693667)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T10:13:05Z",
+      "date": "2026-07-19T10:13:05+00:00",
       "sha": "1f748a3",
       "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
       "pillar": "service"
@@ -552,7 +564,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T08:34:24Z",
+      "date": "2026-07-19T08:34:24+00:00",
       "sha": "1b6359b",
       "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
       "pillar": "3d-enrichment"
@@ -564,13 +576,13 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-19T06:24:51Z",
+      "date": "2026-07-19T06:24:51+00:00",
       "sha": "adfc920",
       "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T06:17:40Z",
+      "date": "2026-07-19T06:17:40+00:00",
       "sha": "d4d1fc0",
       "summary": "committee: autonomous competitor scout (run 29676124159)",
       "pillar": "market"
@@ -582,7 +594,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T05:32:28Z",
+      "date": "2026-07-19T05:32:28+00:00",
       "sha": "5f9db78",
       "summary": "docs: log combined province-pressure board — merge + deploy-verify (PR #78)",
       "pillar": "deployment"
@@ -612,7 +624,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T02:17:06Z",
+      "date": "2026-07-19T02:17:06+00:00",
       "sha": "38ad769",
       "summary": "docs: log JS-off <noscript> front-door fallback — merge + deploy-verify (PR #77)",
       "pillar": "deployment"
@@ -636,27 +648,15 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T00:27:33Z",
+      "date": "2026-07-19T00:27:33+00:00",
       "sha": "cb1ef20",
       "summary": "intel(fold): surface the MEASURED per-branch fuel-station count (≤10km) on the branch popup",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-18T22:15:11Z",
+      "date": "2026-07-18T22:15:11+00:00",
       "sha": "1a977ce",
       "summary": "committee: refresh autonomy plan after home-thesis competitive-clause ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T05:13:46+07:00",
-      "sha": "f820a67",
-      "summary": "intel(peer): surface the co-equal competitive-risk objective in the command-center board thesis (#75)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-18T21:57:11Z",
-      "sha": "d003089",
-      "summary": "committee: refresh autonomy plan (run 29662510231)",
       "pillar": "deployment"
     }
   ]
