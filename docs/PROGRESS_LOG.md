@@ -184,6 +184,43 @@ straight from `docs/SERVICE_AUDIT.md`: clear the provenance shame board — the 
   wants a fully-clean board, teach `build_provenance.py` to read a **sidecar** provenance stamp
   (`branches.prov.json` / a small manifest) for array-shaped layers — a mechanism change, not a data change,
   so it stays gate-safe and fabrication-free.
+## 2026-07-17 — Integration loop: COLLATERAL RISK — surface the MEASURED EV-penetration layer (a dangling layer, visible nowhere) as a used-collateral value watch on Overview — PR
+
+Integration loop. A fresh dangling-layer audit of all top-level `platform/data` files (grep each
+filename against `platform/*.js|*.html`) found **12 committed layers referenced nowhere in the app**;
+of these, `ev_penetration.json` is the highest-value for the two objectives and the cleanest to
+surface. It is **MEASURED** (DLT registered-fleet fuel-type split — BEV/PHEV/hybrid/diesel per
+canonical province + a national rollup, vintage 2026-02-28), gated (`build_ev_penetration.py --check`),
+and was visible only in `provenance.json`. The owner could not see it.
+
+- **Why this layer (objective #1, portfolio/collateral risk).** AutoX is a **vehicle-title lender**
+  (motorcycle/car/pickup titles ≈ 75% of the book), so a shift to EVs softens the resale value of the
+  **used ICE vehicles backing the loan book** — a direct collateral-value signal. The existing
+  "Collateral recovery-value sensitivity" card already *asserts* "EV/PHEV transition erodes resale" as
+  a purely **editorial** watch, backed by **no measured number**. This layer supplies the real DLT data.
+- **Fix (app-only, no new data).** Added a compact **"EV transition · used-collateral value watch
+  (MEASURED · DLT)"** section on Overview, directly below the recovery-sensitivity card. `renderEvWatch()`
+  fetches `ev_penetration.json` (lazy, graceful if absent → note only), shows 3 national KPI cards
+  (**BEV 0.95%**, **electrified 2.57%**, **diesel 26.4%** of the 44.3M-vehicle fleet, all MEASURED/DLT),
+  and a table of the 8 provinces (AutoX-operating only — **joined to the network footprint** by Thai
+  name → region/branches from `provinces/index.json`) ranked by electrified share (Bangkok 6.2%, Phuket
+  3.0%, Chiang Mai 2.3% …) — where used-ICE resale softening would appear first.
+- **Honesty (deliberately un-alarmist).** The readout leads with "**real but early**": BEVs are still
+  **under 1%** of the fleet, so the ICE title book is **not yet materially threatened**. It is stamped
+  as registered-**stock** share — an **exposure proxy, NOT a used-vehicle price index** (we have no Thai
+  used-vehicle price series) — and framed as a monitorable **leading indicator**, not a present shock.
+  Every number is read from the committed layer; nothing fabricated.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **65 passed, 0 failed**. (b) `node --check
+  platform/app.js` OK. (c) No new `platform/data` file (ev_penetration.json already committed +
+  provenance-stamped), so no provenance regen needed; no secrets in diff. (d) **Headless render
+  (Chromium via `tests/lib/render.sh`):** the card draws its 3 KPI cards + 8-row province table, readout
+  numbers correct, and the QA probe reports **`data-errors="[]"` (zero page errors)**. Diff = `platform/app.js`
+  (+~60, one render fn + one call) + `platform/index.html` (+5, the section markup). Visual change →
+  opened as a PR rather than a direct master commit.
+- **Next recommended integration:** the sibling dangling MEASURED layers `thaiwater_flood.json` /
+  `thaiwater_rain.json` (live ThaiWater river/rain telemetry, keyless & cloud-reachable) are the natural
+  follow-up — a real-time flood/drought pulse to sharpen the crop-stress card (obj #1), replacing part of
+  its GLOBAL price/HDX proxy with live Thai water telemetry.
 
 ## 2026-07-17 — Intelligence loop: PEER COMPARISON — surface the MEASURED peer-NPL benchmark (a dangling layer, visible nowhere) on the Competition tab — SHIPPED
 
