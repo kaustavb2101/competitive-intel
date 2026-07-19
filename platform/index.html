@@ -22,20 +22,27 @@
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
+  <!-- Nav order = the exec storyline (the "two-risk spine"): the answer -> the backdrop -> your two
+       risks (portfolio: Exposure, Trend | competitive: Competition) -> explore. The .nav-sep spans
+       chunk it into frame | risks | explore; routing is by data-v (order-independent), so the
+       sequence is purely narrative. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
-  <a href="data.html">Data book</a>
   <a data-v="overview" href="#overview">Overview</a>
+  <span class="nav-sep" aria-hidden="true"></span>
+  <a data-v="exposure" href="#exposure" title="Portfolio risk (objective #1) — where the book sits in stress">Exposure</a>
+  <a data-v="trend" href="#trend" title="Portfolio risk (objective #1) — what is getting riskier over time">Trend</a>
+  <a data-v="acq" href="#acq" title="Competitive risk (objective #2) — rival pressure on the network we already run">Competition</a>
+  <span class="nav-sep" aria-hidden="true"></span>
   <a data-v="map" href="#map">National</a>
-  <a data-v="acq" href="#acq">Competition</a>
-  <a data-v="exposure" href="#exposure">Exposure</a>
-  <a data-v="trend" href="#trend">Trend</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
-      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
       <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
       <a data-v="market" href="#market" role="menuitem">Market</a>
       <a data-v="branches" href="#branches" role="menuitem">Branches</a>
+      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
+      <div class="nav-more-sep" aria-hidden="true"></div>
+      <a href="data.html" role="menuitem">Data book ↗</a>
       <a href="/status" role="menuitem">Status ↗</a>
     </div>
   </div>
@@ -180,6 +187,10 @@
       </div>
     </div>
     <p class="lead cc-provenance"><b>Provenance:</b> coverage-gap &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any competitive read against a local check.</p>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story</span>
+      <a data-v="overview" href="#overview">The backdrop — the macro &amp; collateral forces moving the book →</a>
+    </div>
   </section>
 
   <!-- OVERVIEW -->
@@ -259,6 +270,10 @@
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note"></p>
     <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story · risk 1 of 2</span>
+      <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
+    </div>
   </section>
 
   <!-- MAP — map is the hero: full-bleed map with the lens pill row docked on top -->
@@ -431,6 +446,10 @@
     <div class="chips" id="amprchips"></div>
     <table class="tbl" id="amprtbl"></table>
     </details>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Last stop — explore</span>
+      <a data-v="map" href="#map">See it on the map — all 2,015 branches →</a>
+    </div>
   </section>
 
   <!-- EXPOSURE / CONCENTRATION -->
@@ -454,6 +473,10 @@
         <p class="lead">Provinces ranked by a combined stress count — branches that are in a stressed-crop region <i>and/or</i> the dry quartile <i>and/or</i> carry a high agri-PD proxy. Most branches at risk first. <b>Book proxy = branch count</b>; all stress flags estimated.</p>
         <table class="tbl" id="expoprov"></table>
       </div>
+    </div>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story · still risk 1</span>
+      <a data-v="trend" href="#trend">Portfolio risk — what is getting riskier over time →</a>
     </div>
   </section>
 
@@ -606,6 +629,10 @@
       <h2 class="risk">Branch movers · biggest risk-proxy shifts</h2>
       <p class="lead">Branches whose composite risk proxy (worst of agri/merchant/collateral) moved the most. ▲ = riskier. Estimated screen.</p>
       <table class="tbl" id="trendbranches"></table>
+    </div>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story · risk 2 of 2</span>
+      <a data-v="acq" href="#acq">Competitive risk — rival pressure on the network →</a>
     </div>
   </section>
 
