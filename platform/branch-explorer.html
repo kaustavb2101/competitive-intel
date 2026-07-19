@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <script>/* set theme before paint to avoid flash; ?theme= overrides, else saved autox-theme, else light — matches the SPA front door so the default theme is consistent across pages (a saved choice still wins) */
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
@@ -256,8 +256,14 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 </style>
 </head>
 <body>
+  <noscript>
+    <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
+      <strong style="color:var(--hi);display:block;margin-bottom:6px">This 3D scene needs JavaScript enabled.</strong>
+      <span lang="th">AutoX · เงินไชโย</span> Credit Intelligence renders this branch scene entirely in the browser (WebGL). Enable JavaScript (and allow the map/font CDNs) to load it, or open the standard dashboard at <a href="index.html" style="color:var(--accent)">the front door</a>.
+    </div>
+  </noscript>
 <nav id="nav" aria-label="Main views">
-  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
   <a href="index.html#home">Home</a>
   <a href="index.html#overview">Overview</a>
   <a href="index.html#map" class="on">National</a>

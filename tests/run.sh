@@ -137,6 +137,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_crop_farmer_income.py --check (oae_yield.json/farmgate_prices/doae_planted_area/nabc_agri absent — not data drift)"
   else bad "build_crop_farmer_income.py --check (crop_farmer_income.json drifted from oae_yield.json/farmgate_prices.json/doae_planted_area.json/nabc_agri.json)"
   fi
+  ( cd "$PIPE" && python3 build_vehicle_registry.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_registry.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_registry.py --check (source-data/datagoth/mot_vehicles.csv absent — re-pullable pull_datagoth input, not committed)"
+  else bad "build_vehicle_registry.py --check (vehicle_registry.json drifted from source-data/datagoth/mot_vehicles.csv)"
+  fi
+  ( cd "$PIPE" && python3 build_vehicle_fleet.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_fleet.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_fleet.py --check (source-data/datagoth/mot_vehicles.csv absent — re-pullable pull_datagoth input, not committed)"
+  else bad "build_vehicle_fleet.py --check (vehicle_fleet.json drifted from source-data/datagoth/mot_vehicles.csv)"
+  fi
   ( cd "$PIPE" && python3 build_branch_vehicles.py --check >/dev/null 2>&1 ) && ok "build_branch_vehicles.py --check" || bad "build_branch_vehicles.py --check (branch_vehicles.json drifted from vehicles_by_province/branch_population)"
   ( cd "$PIPE" && python3 build_branch_recommendations.py --check >/dev/null 2>&1 ) && ok "build_branch_recommendations.py --check" || bad "build_branch_recommendations.py --check (branch_recommendations.json drifted from the per-branch layers)"
   ( cd "$PIPE" && python3 build_regional_outlook.py --check >/dev/null 2>&1 ) && ok "build_regional_outlook.py --check" || bad "build_regional_outlook.py --check (regional_outlook.json drifted from the per-branch/rec layers)"
@@ -211,6 +221,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_competitor_census.py --check >/dev/null 2>&1 ) && ok "build_competitor_census.py --check" || bad "build_competitor_census.py --check (competitors_census.json drifted from official-locator/national/overture censuses)"
   ( cd "$PIPE" && python3 build_rival_density.py --check >/dev/null 2>&1 ) && ok "build_rival_density.py --check" || bad "build_rival_density.py --check (rival_density.json drifted from amphoe.json/competitors_census.json/th_amphoe.geojson)"
   ( cd "$PIPE" && python3 build_peer_province.py --check >/dev/null 2>&1 ) && ok "build_peer_province.py --check" || bad "build_peer_province.py --check (peer_province.json drifted from rival_density.json — run: python3 pipeline/build_peer_province.py)"
+  ( cd "$PIPE" && python3 build_province_pressure.py --check >/dev/null 2>&1 ) && ok "build_province_pressure.py --check" || bad "build_province_pressure.py --check (province_pressure.json drifted from province_stress_index.json/peer_province.json — run: python3 pipeline/build_province_pressure.py)"
   ( cd "$PIPE" && python3 build_rival_pressure.py --check >/dev/null 2>&1 ) && ok "build_rival_pressure.py --check" || bad "build_rival_pressure.py --check (rival_pressure.json drifted from branches.json/competitors_census.json)"
   ( cd "$PIPE" && python3 ingest_heng.py --check >/dev/null 2>&1 ) && ok "ingest_heng.py --check" || bad "ingest_heng.py --check (Heng official-locator merge drifted from source-data/heng_branches.json — run: python3 pipeline/ingest_heng.py)"
   ( cd "$PIPE" && python3 build_cluster_brief.py --check >/dev/null 2>&1 ) && ok "build_cluster_brief.py --check" || bad "build_cluster_brief.py --check (cluster_brief.json drifted from branch_occupations/branches/meta board/crop_stress)"

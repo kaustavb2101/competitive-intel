@@ -454,12 +454,18 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
 </style>
 </head>
 <body>
+  <noscript>
+    <div style="max-width:640px;margin:72px auto;padding:20px 22px;background:var(--card);border:1px solid var(--cardln);border-left:3px solid #5B7CFA;border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55;position:relative;z-index:9999">
+      <strong style="color:var(--hi);display:block;margin-bottom:6px">This 3D scene needs JavaScript enabled.</strong>
+      AutoX · เงินไชโย Credit Intelligence renders this map entirely in the browser (WebGL). Enable JavaScript (and allow the map/font CDNs) to load it, or open the standard dashboard at <a href="index.html" style="color:#5B7CFA">the front door</a>.
+    </div>
+  </noscript>
 <nav id="nav" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
   <a href="index.html#home">Home</a>
   <a href="index.html#overview">Overview</a>
   <a href="index.html#map">National</a>
-  <a href="index.html#acq">Acquire</a>
+  <a href="index.html#acq">Competition</a>
   <a href="index.html#exposure">Exposure</a>
   <a href="index.html#trend">Trend</a>
   <a href="rayong-catchment.html" class="on" id="nav3d">3D map</a>
@@ -2191,30 +2197,11 @@ function buildStrip(){
     ['Markets',poiGet('fresh_market').length,'#E0C850']];
   document.getElementById('strip').insertAdjacentHTML('beforeend',
     items.filter(([n,v])=>v>0).map(([n,v,c])=>`<span class="bchip"><span class="d" style="background:${c}"></span>${n}<b>${v}</b></span>`).join(''));  // hide 0-count chips (a city with no branch/competitor/POI data shows a clean strip, not "AutoX 0 · Srisawad 0 ...")
-  // OPPORTUNITY CUE (Upgrade 3, optional): the top-scoring acquisition district for THIS city's
-  // province from opportunity_score.json — an ESTIMATED composite over MEASURED white-space +
-  // competitor gap + estimated crop-stress. Subtle, labelled, and skipped when the file is absent
-  // or no district matches the city. Provenance is honoured: the score is a composite ranking aid.
-  try{
-    const OS=window.OPPSCORE, ds=OS&&Array.isArray(OS.districts)?OS.districts:null;
-    if(ds&&ds.length){
-      const provTH=(CA.meta&&(CA.meta.province_th||CA.meta.prov))||OPP_PROV[CITY]||null;
-      const provEN=(CA.meta&&CA.meta.province)||CITY_LABEL;
-      const pool=provTH?ds.filter(d=>d.province===provTH):
-                 ds.filter(d=>(d.province||'').indexOf(provEN)>=0);
-      pool.sort((a,b)=>(b.score||0)-(a.score||0));
-      const top=pool[0];
-      if(top){
-        document.getElementById('strip').insertAdjacentHTML('beforeend',
-          `<span class="bchip" title="Highest composite opportunity-score district for ${provEN} — estimated (measured inputs)">`
-          +`<span class="d" style="background:#E6B450"></span>Top opp · ${top.name||'—'}<b>${(top.score||0).toFixed(0)}</b></span>`);
-      }
-    }
-  }catch(e){}
+  // OPPORTUNITY CUE removed (strategy pivot): a top-expansion-district "opportunity" chip contradicts
+  // the consolidation / competitive-risk framing (a high opportunity score = UNDER-competed, the
+  // opposite of competitive risk). index.html dropped the same opportunity_score leaderboard for this
+  // exact reason; the standalone 3D scene now matches it.
 }
-// city slug -> Thai province name, to match opportunity_score.json (which keys by Thai province).
-// Only used as a fallback when the catchment meta doesn't carry the province name.
-const OPP_PROV={rayong:'ระยอง',bangkok:'กรุงเทพมหานคร'};
 
 /* ---------- branch selection (drives the camera + focus ring + panels) ---------- */
 function selectBranch(b,fly){
@@ -2864,7 +2851,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // scenes (Rayong) never touch, and elsewhere only feeds competitor pegs (a second-pass layer);
    // parsing its ~1.7MB up front needlessly delayed first paint.
    Promise.resolve(null),
-   opt('data/opportunity_score.json'),
+   Promise.resolve(null),   // a[12] opportunity_score REMOVED (strategy pivot) — slot kept null so a[13]+ indices are unchanged
    // operator-configured CDN config (already fetched above) — kept in the same array slot so the
    // a[13] consumer below is unchanged.
    Promise.resolve(TILECFG),
@@ -2892,7 +2879,7 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    window.CA=a[0];window.PROV=a[1]||{};window.PROV_INDEX=a[2];
    window.ROADS=a[3];window.WATER=a[4];window.LANDUSE=a[5];window.ISO=a[6];
    window.TREES=a[7];window.RAIL=a[8];window.OCCDATA=a[9];window.NATBRANCHES=a[10];
-   window.COMPNAT=a[11];window.OPPSCORE=a[12];window.TILECFG=a[13];
+   window.COMPNAT=a[11];window.TILECFG=a[13];   // a[12] (opportunity_score) removed — strategy pivot
    window.POINAT=(a[14]&&a[14].poi)||null;
    window.BRANCHPOP=(a[15]&&a[15].values)||null;
    window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
 <head>
 <script>/* set theme before paint to avoid flash; ?theme= overrides, else saved autox-theme, else light — the shared default across every page (a saved choice still wins) */
 (function(){try{var q=new URLSearchParams(location.search).get('theme');var t=q||localStorage.getItem('autox-theme')||'light';document.documentElement.dataset.theme=(t==='dark'?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}})();</script>
@@ -21,7 +21,7 @@
  s.addEventListener('click',function(e){e.preventDefault();var m=document.getElementById('main-content');
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
-  <span class="nb">AutoX<b>·</b>เงินไชโย</span>
+  <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <a href="data.html">Data book</a>
   <a data-v="overview" href="#overview">Overview</a>
@@ -87,6 +87,14 @@
 <div id="updated" style="display:none"></div>
 
 <main id="main-content" tabindex="-1">
+  <!-- Fail honestly when JS is off / a CDN script is fully blocked: this is a Leaflet+deck.gl SPA,
+       so <main> would otherwise render blank with no explanation. Themed to the default console. -->
+  <noscript>
+    <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
+      <strong style="color:var(--hi);display:block;margin-bottom:6px">This dashboard needs JavaScript enabled.</strong>
+      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript (and allow the map/font CDNs) to load it.
+    </div>
+  </noscript>
   <!-- COMMAND CENTER (daily-use front door) -->
   <section class="view on" id="v-home">
     <div class="cc-head">
@@ -222,6 +230,11 @@
     <div class="grid macro" id="dcollat-brand"></div>
     <p class="lead" id="dcollat-note"></p>
     <table class="tbl" id="dcollattbl"></table>
+    <div id="vehreg-wrap" style="display:none">
+      <h2 class="collat">Collateral base · registered-vehicle stock (MOT, measured)</h2>
+      <p class="lead" id="vehreg-note"></p>
+      <div class="grid macro" id="vehreg-cards"></div>
+    </div>
 
     <h2 class="collat">Collateral mix · most motorcycle-heavy provinces</h2>
     <p class="lead" id="collatmix-note"></p>
@@ -231,6 +244,11 @@
     <p class="lead" id="recovery-note"></p>
     <div class="grid macro" id="recovery-cards"></div>
     <table class="tbl" id="recoverytbl"></table>
+
+    <h2 class="collat">EV transition · used-collateral value watch <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+    <p class="lead" id="ev-note"></p>
+    <div class="grid macro" id="ev-cards"></div>
+    <table class="tbl" id="evtbl"></table>
 
     <h2>Segment signals by region</h2>
     <table class="tbl" id="region"></table>
@@ -287,7 +305,7 @@
     <details class="acqsec" id="sec-search" open>
     <summary><h2 class="opp">Brand share-of-search vs rivals · title-loan search interest by province <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h2></summary>
     <p class="lead">Google Trends relative search-interest (0–100) for title-loan intent terms
-      (<span class="mono">จำนำทะเบียนรถ</span> · <span class="mono">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
+      (<span class="mono" lang="th">จำนำทะเบียนรถ</span> · <span class="mono" lang="th">สินเชื่อรถแลกเงิน</span>), plus <b>share-of-search</b> —
       how AutoX's brand searches compare to the big rivals in each province (five brands on one shared Trends axis).
       A competitive read of <b>where our brand wins or loses demand attention to rivals</b>, <b>not</b> query volume or market share.</p>
     <div class="insight" id="searchreadout" style="border-left-color:var(--gold)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
@@ -333,7 +351,7 @@
 
     <h3 class="acqsub" style="margin-top:18px">Sub-scale rivals vs our footprint · licensed PICO-finance operators per province <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h3>
     <p class="lead">Beyond the big-4 title lenders, a <b>distinct small-ticket competitor class</b>: licensed
-      <b>PICO-finance</b> (<span class="mono">พิโกไฟแนนซ์</span>) operators — counted straight from the
+      <b>PICO-finance</b> (<span class="mono" lang="th">พิโกไฟแนนซ์</span>) operators — counted straight from the
       <b>FPO government licence registry</b> (2,042 operators) and set against our own branch count, province by
       province. This is the <b>measured</b> sub-scale-rival read the fragility cue below can only infer: where
       sub-scale rivals <b>most outnumber the branches AutoX already runs</b>. Province-grain (the registry carries
@@ -458,25 +476,25 @@
         <div class="sim-ctl-h">Shocks <button id="sim-reset" class="chip no-print">↺ Reset</button></div>
 
         <div class="sim-slider">
-          <label>Crop-price shock <span class="mono" id="sim-price-v">0%</span></label>
+          <label for="sim-price">Crop-price shock <span class="mono" id="sim-price-v">0%</span></label>
           <input type="range" id="sim-price" min="-30" max="10" step="5" value="0">
           <div class="sim-hint">Move global crop prices (World Bank direction proxy). Lower = farm-gate income squeeze.</div>
         </div>
 
         <div class="sim-slider">
-          <label>Rainfall / drought <span class="mono" id="sim-rain-v">normal</span></label>
+          <label for="sim-rain">Rainfall / drought <span class="mono" id="sim-rain-v">normal</span></label>
           <input type="range" id="sim-rain" min="-30" max="20" step="5" value="0">
           <div class="sim-hint">Shift rainfall vs normal. Drier (left) raises drought hazard on crop households.</div>
         </div>
 
         <div class="sim-slider">
-          <label>Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
+          <label for="sim-veh">Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
           <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0">
           <div class="sim-hint">Used motorcycle/pickup resale value. Down = lower recovery on the title book (LGD up).</div>
         </div>
 
         <div class="sim-slider" id="sim-factory-wrap" style="display:none">
-          <label>Factory / manufacturing slowdown <span class="mono" id="sim-factory-v">0%</span></label>
+          <label for="sim-factory">Factory / manufacturing slowdown <span class="mono" id="sim-factory-v">0%</span></label>
           <input type="range" id="sim-factory" min="0" max="100" step="10" value="0">
           <div class="sim-hint">Severity of a manufacturing-sector shock on branches whose <b>measured</b> dominant borrower base is factory / auto work (Overture occupation mix). Raises the <b>estimated</b> occupation-stress on those branches. Illustrative — no loan balances.</div>
         </div>

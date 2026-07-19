@@ -465,6 +465,33 @@ function bldgDensityRec(d){
   return BLDGDEN[i]||null;
 }
 
+/* ---------- per-branch FUEL-STATION count within 10km (data/branch_fuel.json) ----------
+   Lazy-loads pipeline/build_branch_fuel.py's projection of the committed source-data/fuel_stations.json
+   (OSM amenity=fuel, Overpass pull): {meta, branches:[{n10}]}, INDEX-ALIGNED to branches.json. n10 is a
+   MEASURED OSM fuel-station count ≤10km — a vehicle-economy / rural-reach signal (where fuel sells, the
+   vehicles that back the title book live and move). OSM completeness varies, so a low/zero count is a
+   FLOOR, not a census (stated inline). Fully null-guarded: absent file → FUELSTN stays null, fuelStnRec()
+   reads null, the popup line is omitted. Nothing is fabricated. (Distinct from the LIVE fuel-PRICE
+   globals below — this is the per-branch station COUNT layer.) */
+let FUELSTN=null, fuelstnLoaded=false, fuelstnPromise=null;
+async function loadBranchFuel(){
+  if(fuelstnPromise) return fuelstnPromise;
+  fuelstnLoaded=true;
+  fuelstnPromise=(async()=>{
+    try{ const r=await fetch('data/branch_fuel.json'); if(!r.ok){FUELSTN=null;return FUELSTN;}
+      const j=await r.json(); FUELSTN=j.branches||null; }
+    catch(e){ FUELSTN=null; }
+    return FUELSTN;
+  })();
+  return fuelstnPromise;
+}
+// per-branch fuel-station record (for popups) — null when absent.
+function fuelStnRec(d){
+  if(!FUELSTN||!FUELSTN.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return FUELSTN[i]||null;
+}
+
 /* ---------- per-branch MEASURED-corrected CROP-AREA within 10km (data/branch_cropland.json) ----
    Lazy-loads pipeline/build_branch_cropland.py's output: {meta:{crops[],provenance,...},
    branches:[{ha:[…5 crops], crop_ha, dom, fac:[…]}]}, INDEX-ALIGNED to branches.json. The per-crop
@@ -1330,8 +1357,11 @@ function renderOverview(){
   loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
   renderDieselCollateral();
+  loadVehReg().then(renderVehReg);
   renderCollatMix();
   renderRecoverySensitivity();
+  // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
+  renderEvWatch();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
 }
@@ -1424,16 +1454,42 @@ function loadCollatOutlookData(){
     .then(j=>{COLLO=j||null;return COLLO;}).catch(()=>{COLLO=null;return null;});
   return colloPromise;
 }
+// MEASURED national title-collateral fleet trend (data/vehicle_fleet.json, obj#1). Adds the TIME
+// dimension the single-vintage province vehicle stock lacks — is the collateral base growing/shrinking.
+let FLEET=null, fleetLoaded=false, fleetPromise=null;
+function loadFleetData(){
+  if(fleetPromise) return fleetPromise;
+  fleetLoaded=true;
+  fleetPromise=fetch('data/vehicle_fleet.json').then(r=>r.ok?r.json():null)
+    .then(j=>{FLEET=j||null;return FLEET;}).catch(()=>{FLEET=null;return null;});
+  return fleetPromise;
+}
 function renderCollatOutlook(){
   const el=$('#collat-outlook'); if(!el) return;
   // warm the per-province outlook layer; re-render once it lands so the national card appears.
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
+  if(!fleetLoaded) loadFleetData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   const cards=[
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
     {k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
      n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book — see the motorcycle-share table below (DLT, measured).'},
   ];
+  // MEASURED national fleet trend (vehicle_fleet.json) — the collateral BASE size + whether it is
+  // growing or shrinking (DLT/MOT registry). This is the measured companion to the editorial cards
+  // above: it puts a real YoY number on the diesel-pickup / motorcycle collateral-pool direction.
+  if(FLEET&&Array.isArray(FLEET.classes)){
+    const yc=FLEET.latest_year_ce||(FLEET.meta&&FLEET.meta.latest_year_ce);
+    const byk={}; FLEET.classes.forEach(c=>byk[c.key]=c);
+    [['pickup','Pickup-title fleet'],['moto','Motorcycle-title fleet']].forEach(([k,lbl])=>{
+      const c=byk[k]; if(!c||c.yoy_pct==null) return;
+      const up=c.yoy_pct>0, v=(up?'▲ +':'▼ ')+c.yoy_pct.toFixed(2)+'%';
+      cards.push({k:lbl+' (national)', v, d:c.latest.toLocaleString()+' regd', cls:up?'up':'down',
+        n:'MEASURED · DLT/MOT registered-vehicle stock, YoY to '+(yc||'latest')+'. '+
+          (up?'Collateral pool still growing (pace vs prior years).':'Collateral pool CONTRACTING — a shrinking resale/recovery base behind this slice of the book.')+
+          ' Fleet SIZE, not resale value.'});
+    });
+  }
   // national recovery-value outlook (from collateral_outlook.json) — firming vs softening + most-at-risk.
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
@@ -1551,6 +1607,46 @@ function renderCollatMix(){
       <td class="mono sub">${p.ev!=null?p.ev+'%':'—'}</td></tr>`;}).join('');
 }
 
+/* ---------- National registered-vehicle collateral base (objective #1, MEASURED) ----------
+   The external anchor for the book's collateral mix: how large the registered-vehicle base is,
+   split into the classes AutoX lends against (motorcycle / car / pickup / agri), and how each
+   grew year-on-year — straight from the MOT open-data registry (vehicle_registry.json). MEASURED,
+   national (NOT province — that dimension is the DLT-derived table below). Lazy + null-safe: absent
+   file → the wrap stays hidden and the Overview reads exactly as before. */
+let VEHREG=null, vehregPromise=null;
+function loadVehReg(){
+  if(vehregPromise) return vehregPromise;
+  vehregPromise=fetch('data/vehicle_registry.json').then(r=>r.ok?r.json():null)
+    .then(j=>{VEHREG=j||null;return VEHREG;}).catch(()=>{VEHREG=null;return null;});
+  return vehregPromise;
+}
+function renderVehReg(){
+  const wrap=$('#vehreg-wrap'), cards=$('#vehreg-cards'), note=$('#vehreg-note');
+  if(!wrap||!cards||!VEHREG||!VEHREG.latest) return;
+  const m=VEHREG.meta||{}, g=VEHREG.latest.groups||{}, yoy=VEHREG.yoy||{};
+  const fmtM=n=>(n/1e6).toFixed(n>=1e7?1:2)+'M';
+  const arrow=v=>v==null?'':(v>0?'▲':v<0?'▼':'•');
+  const col=v=>v==null?'var(--collat)':(v>0?'var(--up)':v<0?'var(--agri)':'var(--collat)');
+  const sig=v=>v==null?'':' <span style="font-size:12px;color:'+col(v)+'">'+arrow(v)+' '+(v>0?'+':'')+v+'% YoY</span>';
+  const defs=[
+    ['motorcycle','Motorcycle title','the small-ticket title core'],
+    ['car','Car (sedan/van)','higher-ticket title'],
+    ['pickup','Pickup &amp; van','the diesel-pickup book'],
+    ['agri','Agri (tractor/farm)','agri collateral'],
+  ];
+  cards.innerHTML=defs.map(([k,lab,d])=>
+    `<div class="mcard"><div class="k">${lab}</div>`
+    +`<div class="v" style="color:var(--collat);font-size:17px">${fmtM(g[k]||0)}${sig(yoy[k])}</div>`
+    +`<div class="n">${d}</div></div>`).join('');
+  const share=m.moto_share_of_title_base_pct;
+  if(note) note.innerHTML='The collateral base AutoX lends against, from the government registry: <b>'
+    +(VEHREG.latest.title_base/1e6).toFixed(1)+'M</b> registered motorcycles, cars, pickups &amp; farm vehicles '
+    +'(of '+(VEHREG.latest.all_vehicles/1e6).toFixed(1)+'M vehicles of every type), vintage <b>'+(m.vintage||'')+'</b>. '
+    +'Motorcycles are <b>'+(share!=null?share+'%':'—')+'</b> of that title-lendable base — grounding the "≈half the book is motorcycle title" mix in a measured count rather than an assumption. '
+    +TAG_M+' · MOT registry · national (a cumulative registered stock, not new sales — see method).';
+  wrap.style.display='';
+}
+
 /* ---------- Collateral recovery-value sensitivity (objective #1, ILLUSTRATIVE) ----------
    Combines the MEASURED gold move (+62.7%, commodity board — gold collateral firming) with an
    ILLUSTRATIVE used-motorcycle value shock. We have NO loan balances and NO LTV, so we do NOT
@@ -1580,6 +1676,62 @@ function renderRecoverySensitivity(){
       <td class="mono">${p.branches}</td>
       <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
       <td class="mono" style="color:${mc}">▲ ${rank}</td></tr>`;}).join('');
+}
+
+/* ---------- EV transition · used-collateral value watch (objective #1, MEASURED) ----------
+   Surfaces data/ev_penetration.json (build_ev_penetration.py, DLT registered-fleet fuel-type
+   split — a previously dangling MEASURED layer, visible nowhere in the app). Backs the editorial
+   "EV/PHEV transition erodes resale" line in the recovery-sensitivity card with real DLT numbers.
+   IMPORTANT honesty: this is registered-STOCK share, an exposure proxy — NOT a used-vehicle price
+   index. BEV is still <1% of the national fleet, so the collateral-value threat is early, not
+   present; the value is as a monitorable leading indicator concentrated in a few provinces. */
+let EVLOADED=false, EVDATA=null;
+function renderEvWatch(){
+  const cards=$('#ev-cards'), note=$('#ev-note'), tbl=$('#evtbl'); if(!cards) return;
+  if(!EVLOADED){
+    fetch('data/ev_penetration.json').then(r=>r.ok?r.json():null).then(j=>{EVDATA=j;EVLOADED=true;try{renderEvWatch();}catch(e){}}).catch(()=>{EVLOADED=true;});
+    return;
+  }
+  if(!EVDATA||!EVDATA.meta||!EVDATA.meta.national){
+    cards.innerHTML=''; if(tbl) tbl.innerHTML='';
+    if(note) note.innerHTML='<b>EV-penetration data not available.</b> <span class="sub">data/ev_penetration.json is absent — it fills in from the DLT registered-fleet mirror on the next data refresh.</span>';
+    return;
+  }
+  const nat=EVDATA.meta.national, vin=EVDATA.meta.vintage||'';
+  const elecPct=nat.total?+( 100*((nat.bev||0)+(nat.phev||0)+(nat.hybrid||0))/nat.total ).toFixed(2):0;
+  const dieselPct=nat.total?+( 100*(nat.diesel||0)/nat.total ).toFixed(1):0;
+  const bevPct=nat.bev_pct!=null?nat.bev_pct:(nat.total?+(100*(nat.bev||0)/nat.total).toFixed(2):0);
+  cards.innerHTML=[
+    {k:'National BEV share',v:bevPct+'%',d:'of registered fleet',cls:'down',
+     n:'MEASURED (DLT) — pure battery-EV as % of the '+(nat.total||0).toLocaleString()+'-vehicle registered fleet. Still under 1% — the ICE title book is not yet materially threatened.'},
+    {k:'Electrified share',v:elecPct+'%',d:'BEV + PHEV + hybrid',cls:'down',
+     n:'MEASURED (DLT) — all electrified powertrains. The leading indicator to watch; most title collateral is still ICE.'},
+    {k:'Diesel share',v:dieselPct+'%',d:'pickups & trucks',cls:'up',
+     n:'MEASURED (DLT) — diesel (pickup/truck) share; the higher-recovery title collateral, least exposed to the EV shift so far.'},
+  ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
+    <div class="n">${c.n}</div></div>`).join('');
+  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>used vehicle titles</b>, so a shift to EVs would soften resale of the ICE cars/pickups/motorcycles backing the book. '+
+    'The transition is <b>real but early</b>: BEVs are only <b>'+bevPct+'%</b> of the registered fleet and electrified powertrains <b>'+elecPct+'%</b> (both <b>measured, DLT '+vin+'</b>). '+
+    'This is registered-<b>stock</b> share — an <b>exposure proxy, not a used-vehicle price index</b> (we have no Thai used-vehicle price series). '+
+    'It matters as a <b>leading indicator</b>: adoption is concentrated in the provinces below, where used-ICE resale softening would show first.';
+  if(!tbl) return;
+  // join the MEASURED EV layer to AutoX's own footprint (PROV branches/region) and keep only
+  // provinces AutoX operates in — ties the collateral watch to the network we actually run.
+  const byTh={}; (PROV||[]).forEach(p=>{byTh[p.th]=p;});
+  const rows=(EVDATA.provinces||[]).map(r=>{const pv=byTh[r.th]||{};
+    return {th:r.th,en:pv.en||r.th,region:pv.region||'—',branches:pv.branches||0,
+            elec:r.electrified_pct,bev:r.bev_pct,diesel:r.diesel_pct};})
+    .filter(r=>r.branches>0)
+    .sort((a,b)=>b.elec-a.elec).slice(0,8);
+  if(!rows.length){ tbl.innerHTML=''; return; }
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="BEV+PHEV+hybrid as % of registered fleet — DLT, measured">Electrified % ▲ (DLT)</th><th title="pure battery-EV share — DLT, measured">BEV %</th><th title="diesel share — DLT, measured">Diesel %</th></tr>`+
+    rows.map((r,i)=>{const ec=r.elec>=4?'var(--agri)':r.elec>=2.5?'var(--gold)':'var(--collat)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.en}</b></td><td class="sub">${r.region}</td>
+      <td class="mono">${r.branches}</td>
+      <td>${barHTML(r.elec,ec,8)} <span class="mono" style="color:${ec}">${r.elec}%</span></td>
+      <td class="mono sub">${r.bev!=null?r.bev+'%':'—'}</td>
+      <td class="mono sub">${r.diesel!=null?r.diesel+'%':'—'}</td></tr>`;}).join('');
 }
 
 /* ---------- crop-household stress (Overview card) ----------
@@ -1856,14 +2008,34 @@ function drawRivalDensity(){
    next to Muangthai / Srisawad / Tidlor / Heng separately. Lazy, graceful if absent. We DO
    NOT recompute anything here — we rank & show measured counts. A competitive-pressure read
    on the existing network; no open / expand call. */
-let PEERPROV=null, peerprovLoaded=false;
+let PEERPROV=null, peerprovLoaded=false, peerprovPromise=null;
 const PEERPROV_TOPN=20;
+// Reusable promise loader — shared by the Competition tab board AND the command-center thesis clause
+// (obj#2). Fetches once, caches, degrades to null on any error so callers stay null-safe.
+function loadPeerProvince(){
+  if(peerprovPromise) return peerprovPromise;
+  peerprovPromise=fetch('data/peer_province.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PEERPROV=j; peerprovLoaded=true; return PEERPROV; })
+    .catch(()=>{ PEERPROV=null; peerprovLoaded=true; return null; });
+  return peerprovPromise;
+}
+// COMBINED PROVINCE PRESSURE (province_pressure.json) — the deterministic JOIN of portfolio-risk
+// (province_stress_index composite_stress) x competitive-risk (peer_province rival:AutoX ratio),
+// each as a 0-100 percentile. Powers the command-center thesis' cross-objective clause: how many
+// provinces are BOTH borrower-stressed AND rival-dominated (both axes top-third) and which is worst.
+// Fetches once, caches, degrades to null on any error so the thesis clause stays null-safe.
+let PROVPRESS=null, provpressLoaded=false, provpressPromise=null;
+function loadProvincePressure(){
+  if(provpressPromise) return provpressPromise;
+  provpressPromise=fetch('data/province_pressure.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PROVPRESS=j; provpressLoaded=true; return PROVPRESS; })
+    .catch(()=>{ PROVPRESS=null; provpressLoaded=true; return null; });
+  return provpressPromise;
+}
 function renderPeerProvince(){
   const tbl=$('#peerprovtbl'); if(!tbl) return;
   if(peerprovLoaded){ drawPeerProvince(); return; }
-  fetch('data/peer_province.json').then(r=>r.ok?r.json():null).then(j=>{
-    PEERPROV=j; peerprovLoaded=true; drawPeerProvince();
-  }).catch(()=>{ PEERPROV=null; peerprovLoaded=true; drawPeerProvince(); });
+  loadPeerProvince().then(drawPeerProvince);
 }
 function drawPeerProvince(){
   const tbl=$('#peerprovtbl'), ro=$('#peerprovreadout'); if(!tbl) return;
@@ -1922,6 +2094,11 @@ function drawPeerProvince(){
     const brandStr=brands.filter(b=>pbt[b]).map(b=>`${b} ${pbt[b].toLocaleString()}`).join(' · ');
     const hasPico=m.pico_available===true;
     const picoStr=hasPico?` Behind them sits a distinct small-ticket rival class: <b style="color:var(--collat)">${(m.total_pico||0).toLocaleString()}</b> licensed PICO-finance operators across ${m.n_provinces_pico_present||0} provinces (MEASURED, FPO registry).`:'';
+    // Saturation vs the MEASURED vehicle collateral base — how crowded a market is per unit of
+    // lendable collateral, which the raw count cannot show. Metro inner-ring is excluded upstream.
+    const hasSat=m.vehicle_saturation_available===true && m.most_saturated_province;
+    const ms=m.most_saturated_province||{};
+    const satStr=hasSat?` <b>Per 100k registered vehicles</b> (the MEASURED collateral base) the ground carries <b>${(m.national_titlelender_per_100k_veh||0).toFixed(1)}</b> title-lender branches nationally (AutoX ${(m.national_autox_per_100k_veh||0).toFixed(1)} · rivals ${(m.national_rivals_per_100k_veh||0).toFixed(1)}); it is most crowded per unit of collateral in <b style="color:var(--agri)">${ms.province_th||'—'}</b> (${(ms.titlelender_per_100k_veh||0).toFixed(1)}/100k).`:'';
     // AutoX's own standing (MEASURED rank among present operators): where it sits, not just who leads.
     const nProv=m.n_provinces||recs.length;
     const hasRankRollup=m.best_autox_rank!=null;
@@ -1929,9 +2106,10 @@ function drawPeerProvince(){
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
-      `National rival footprint: ${brandStr}.${picoStr} ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr}${satStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
+         'The <b>per-100k-vehicle</b> saturation reads title-lender branches against <b>MEASURED</b> DLT registered-vehicle stock (the vehicle collateral base) — a crowding read the raw count can’t give. The three Greater-Bangkok inner-ring provinces are <b>excluded</b> from the most-crowded headline: they register most vehicles centrally at the Bangkok DLT office (a MEASURED NSO labour-force cross-check flags them), which would inflate their density. National saturation is unaffected (vehicle stock is sum-conserved).',
          'The <b>#k/n</b> chip under the AutoX count is AutoX’s <b>rank</b> among the operators present (AutoX + big-4 brands with a branch here) — MEASURED counts, computed position. It sharpens the Leads column: two provinces both led by Muangthai can have AutoX 2nd (defensible) or last of 4 (marginalised).',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
@@ -4018,6 +4196,8 @@ function initMap(){
   if(!bldgdenLoaded) loadBranchDensity();
   // warm the MEASURED-corrected per-branch crop-area popup block (SPAM×DOAE-2025). Popup-only, no lens.
   if(!croplandLoaded) loadBranchCropland();
+  // warm the MEASURED per-branch fuel-station-within-10km popup line (OSM). Popup-only, no lens.
+  if(!fuelstnLoaded) loadBranchFuel();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -4043,8 +4223,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadVehicles(),loadRecommendations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA||!FUELSTN){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4512,6 +4692,18 @@ function bldgDensityPopupHTML(d,r){
   return r('Buildings ≤10km (Overture) · measured',
     `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col);
 }
+// FUEL-STATION density line for a branch popup — MEASURED OSM amenity=fuel count ≤10km, a vehicle-
+// economy / rural-reach signal for the title book. Thresholds are anchored on the layer's own median
+// (11 = moderate). OSM completeness varies, so the count is a FLOOR (stated inline): a low/zero value
+// can mean thin OSM mapping here, not no fuel on the ground. Omitted when the file/entry is absent.
+function fuelPopupHTML(d,r){
+  const e=fuelStnRec(d); if(!e||e.n10==null) return '';
+  const n=e.n10||0;
+  const lab=n>=30?'dense':n>=11?'moderate':n>0?'thin':'none mapped';
+  const col=n>=30?'#8b90a7':n>=11?'var(--gold)':n>0?'#cda23e':'var(--mid)';
+  return r('Fuel stations ≤10km (OSM) · measured floor',
+    `${n.toLocaleString()} <span class="sub">(${lab})</span>`, col);
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -4714,7 +4906,8 @@ function popupHTML(d){
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}
-    ${bldgDensityPopupHTML(d,r)}</div>`;
+    ${bldgDensityPopupHTML(d,r)}
+    ${fuelPopupHTML(d,r)}</div>`;
 }
 function styleMarkers(){
   const l=LENS[curLens], mx=lensMax(l);
@@ -5147,6 +5340,12 @@ function renderHome(){
     // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
     // expand card, mirroring the full table already shipped on Exposure (null-safe).
     loadContestedPop().then(reHome);
+    // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
+    // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
+    loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
+    // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
+    loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -5182,6 +5381,26 @@ function renderHomeThesis(){
   }
   if(zeroDist!=null){
     clauses.push(`<b>${zeroDist.toLocaleString()}</b> district${zeroDist===1?'':'s'} have <b>no AutoX branch</b> (coverage gaps)`);
+  }
+  // obj#2 — the CO-EQUAL competitive-risk clause (CLAUDE.md: the command center aggregates competitive
+  // risk + portfolio risk into ONE readout). How universally the big-4 title-lenders outnumber the
+  // EXISTING network on local per-province density (MEASURED census, peer_province.json) — a risk read
+  // on the footprint we run, never an open/expand call. Null-safe; dropped until the layer loads.
+  const pp=(PEERPROV&&PEERPROV.meta)?PEERPROV.meta:null;
+  if(pp&&pp.n_provinces_outnumbered!=null&&pp.n_provinces){
+    const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
+    const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
+    clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
+  }
+  // THE INTERSECTION (province_pressure.json) — the sharpest cross-objective clause: how many
+  // provinces sit in BOTH the top third for borrower stress AND for rival dominance (a fragile
+  // portfolio where margin defence is hardest), and which one is worst. Both axes are relative
+  // percentiles, so this is a RANKING, not a verdict; dropped until the layer loads. Null-safe.
+  const cp=(PROVPRESS&&PROVPRESS.meta)?PROVPRESS.meta:null;
+  if(cp&&cp.n_double_pressure){
+    const w=cp.worst_province;
+    const tail=(w&&w.province_th)?`, worst is <b>${w.province_th}</b>`:'';
+    clauses.push(`<b>${cp.n_double_pressure}</b> province${cp.n_double_pressure===1?'':'s'} are <b>both stressed and outgunned</b> (top-third on portfolio risk AND rival pressure${tail})`);
   }
   if(ps){
     clauses.push(`the risk to watch is <b>${ps.province} household stress</b> (DTI ${ps.debt_to_income!=null?(+ps.debt_to_income).toFixed(2)+'×':'—'} + unemployment ${ps.unemployment_rate!=null?(+ps.unemployment_rate).toFixed(1)+'%':'—'}, composite ▲${(ps.composite_stress||0).toFixed(0)}, measured)`);

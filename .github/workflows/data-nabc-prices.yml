@@ -44,11 +44,19 @@ jobs:
           # upstream prices reproduce byte-stable.
           python pipeline/pull_nabc_prices.py --stamp "$(date -u +%F)"
 
-      - name: Rebuild branch_agri when prices changed
+      - name: Rebuild branch_agri + its downstream layers when prices changed
         run: |
+          # The live crop YoY is embedded in the rec text of branch_recommendations.json and
+          # rolled up into regional_outlook.json, and every hash lives in provenance.json — so
+          # rebuilding branch_agri alone leaves those three drifted and the gate goes red on
+          # merge (the exact fix-up work that was recurring after every price refresh). Rebuild
+          # the whole deterministic, network-free downstream chain, in dependency order.
           if git status --porcelain -- source-data/nabc_prices.json | grep -q .; then
-            echo "prices changed — rebuilding platform/data/branch_agri.json"
+            echo "prices changed — rebuilding branch_agri + downstream recs/outlook + provenance"
             python pipeline/build_branch_agri.py
+            python pipeline/build_branch_recommendations.py
+            python pipeline/build_regional_outlook.py
+            python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
           fi
@@ -59,7 +67,9 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/nabc-${{ github.run_id }}
         run: |
-          git add source-data/nabc_prices.json platform/data/branch_agri.json
+          git add source-data/nabc_prices.json platform/data/branch_agri.json \
+                  platform/data/branch_recommendations.json platform/data/regional_outlook.json \
+                  platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed data (same upstream prices). No PR opened."
             exit 0
@@ -81,7 +91,7 @@ jobs:
             echo "computed from the daily series. build_branch_agri.py prefers this live YoY over the OAE"
             echo "snapshot (per-crop, OAE fallback for crops NABC lacks). Nothing fabricated."
             echo
-            echo "Downstream layers reading branch_agri are unaffected (same shape). Run \`bash tests/run.sh check\` after merge."
+            echo "Downstream layers embedding the crop YoY (branch_recommendations, regional_outlook) and the provenance manifest are rebuilt in lockstep, so the determinism gate stays green. Run \`bash tests/run.sh check\` after merge."
           } > /tmp/pr_body.md
           gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
             --title "data: NABC live prices ($STAMP, run ${{ github.run_id }})" \

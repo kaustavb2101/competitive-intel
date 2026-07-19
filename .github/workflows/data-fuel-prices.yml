@@ -33,13 +33,26 @@ jobs:
         run: python pipeline/pull_fuel_prices.py --selftest
       - name: Pull live fuel prices
         run: python pipeline/pull_fuel_prices.py --stamp "$(date -u +%F)"
+      - name: Reproject to platform/data when prices changed
+        run: |
+          # pull_fuel_prices writes only the source; the committed derived layer
+          # (platform/data/fuel_prices.json) + the provenance manifest must be rebuilt in
+          # lockstep or the determinism gate goes red on merge. Both builders are
+          # deterministic + network-free re-projections.
+          if git status --porcelain -- source-data/fuel_prices.json | grep -q .; then
+            echo "prices changed — rebuilding platform/data/fuel_prices.json + provenance.json"
+            python pipeline/build_fuel_prices.py
+            python pipeline/build_provenance.py
+          else
+            echo "prices unchanged — nothing to rebuild."
+          fi
       - name: Commit to a data branch + open a draft PR
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/fuel-${{ github.run_id }}
         run: |
-          git add source-data/fuel_prices.json
+          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed prices. No PR opened."; exit 0
           fi
