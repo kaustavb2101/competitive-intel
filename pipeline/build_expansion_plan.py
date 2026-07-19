@@ -50,7 +50,7 @@ AMPHOE = os.path.join(REPO, "platform", "data", "amphoe.json")
 BRANCHES = os.path.join(REPO, "platform", "data", "branches.json")
 OUT = os.path.join(REPO, "platform", "data", "expansion_plan.json")
 
-TARGET = 3000     # IPO-window branch target
+TARGET = 3000     # legacy planning target (script dormant; network is consolidating)
 RISK_ALPHA = 0.25 # demand discount at risk_proxy=100 (0.25 -> a max-risk district loses 1/4 of its pull)
 NB_KM = 15.0      # cannibalization radius between district centroids
 NB_W = 0.35       # a fully-adjacent neighbor outlet counts as 0.35 of an own-district outlet

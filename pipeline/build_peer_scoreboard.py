@@ -12,7 +12,7 @@ peers' market & financial scoreboard, projected from the autonomous SET pull for
 Why this matters: AutoX is unlisted, so there is no SET row for us — but our three biggest rivals
 ARE listed and report audited quarterly financials. Their market cap, valuation and ROE are the
 measured competitive scoreboard we position against; AutoX's stated 25% ROE target sits inside the
-peer ROE ladder, which is the sharpest IPO benchmark we have. NOT an AutoX figure — the peers' own.
+peer ROE ladder — the sharpest external benchmark we have. NOT an AutoX figure — the peers' own.
 
 Note on ROE comparability: SET reports each peer's ratio as filed; TIDLOR's holding-company
 restructure inflates its reported ROE vs the others, so read the ladder with that caveat (carried in
