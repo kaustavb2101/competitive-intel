@@ -220,6 +220,11 @@ phase_check(){
   ( cd "$PIPE" && python3 build_competitor_coverage.py --check >/dev/null 2>&1 ) && ok "build_competitor_coverage.py --check" || bad "build_competitor_coverage.py --check (competitor_coverage.json drifted from the competitor census)"
   ( cd "$PIPE" && python3 build_competitor_census.py --check >/dev/null 2>&1 ) && ok "build_competitor_census.py --check" || bad "build_competitor_census.py --check (competitors_census.json drifted from official-locator/national/overture censuses)"
   ( cd "$PIPE" && python3 build_rival_density.py --check >/dev/null 2>&1 ) && ok "build_rival_density.py --check" || bad "build_rival_density.py --check (rival_density.json drifted from amphoe.json/competitors_census.json/th_amphoe.geojson)"
+  ( cd "$PIPE" && python3 build_peer_scoreboard.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_peer_scoreboard.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_peer_scoreboard.py --check (source-data/set_peers.json absent — SET pull, not data drift)"
+  else bad "build_peer_scoreboard.py --check (peer_scoreboard.json drifted from source-data/set_peers.json)"
+  fi
   ( cd "$PIPE" && python3 build_peer_province.py --check >/dev/null 2>&1 ) && ok "build_peer_province.py --check" || bad "build_peer_province.py --check (peer_province.json drifted from rival_density.json — run: python3 pipeline/build_peer_province.py)"
   ( cd "$PIPE" && python3 build_province_pressure.py --check >/dev/null 2>&1 ) && ok "build_province_pressure.py --check" || bad "build_province_pressure.py --check (province_pressure.json drifted from province_stress_index.json/peer_province.json — run: python3 pipeline/build_province_pressure.py)"
   ( cd "$PIPE" && python3 build_rival_pressure.py --check >/dev/null 2>&1 ) && ok "build_rival_pressure.py --check" || bad "build_rival_pressure.py --check (rival_pressure.json drifted from branches.json/competitors_census.json)"

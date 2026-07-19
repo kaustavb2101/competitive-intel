@@ -1854,6 +1854,7 @@ function renderAcq(){
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderAcqBoard();
   renderSearchDemand();
+  renderPeerScore();
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
@@ -2226,6 +2227,63 @@ function drawCreditAnchor(){
         `<div class="v" style="color:${c}">${x.display}</div>`+
         `<div class="n">${sub}</div></div>`;
     }).join('');
+  }
+}
+
+/* ---------- listed-peer market scoreboard · SET (obj #2, MEASURED) ----------
+   Surfaces data/peer_scoreboard.json (build_peer_scoreboard.py, from the autonomous SET pull):
+   market cap, valuation, ROE + net profit for the 3 listed title-lenders, with AutoX's 25% ROE
+   target as the reference line. MEASURED (Stock Exchange of Thailand). NOT an AutoX row (unlisted).
+   Lazy, null-safe, graceful if absent. */
+let PEERSCORE=null, peerscoreLoaded=false;
+function renderPeerScore(){
+  const tbl=$('#peerscoretbl'); if(!tbl) return;
+  if(peerscoreLoaded){ drawPeerScore(); return; }
+  fetch('data/peer_scoreboard.json').then(r=>r.ok?r.json():null).then(j=>{
+    PEERSCORE=j; peerscoreLoaded=true; drawPeerScore();
+  }).catch(()=>{ PEERSCORE=null; peerscoreLoaded=true; drawPeerScore(); });
+}
+function drawPeerScore(){
+  const tbl=$('#peerscoretbl'), ro=$('#peerscorereadout'); if(!tbl) return;
+  const peers=(PEERSCORE&&Array.isArray(PEERSCORE.peers))?PEERSCORE.peers:[];
+  if(!peers.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Listed-peer scoreboard not available.</b> <span class="sub">data/peer_scoreboard.json is absent — run pipeline/pull_set_peers.py then build_peer_scoreboard.py.</span>';
+    return;
+  }
+  const m=PEERSCORE.meta||{}, tgt=PEERSCORE.autox_roe_target;
+  const roes=peers.map(p=>p.roe).filter(v=>typeof v==='number');
+  const hiRoe=Math.max(...roes, tgt||0);
+  const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':'var(--agri)');
+  tbl.innerHTML=`<tr><th>#</th><th>Listed peer</th>`+
+    `<th title="market capitalisation (SET, price date)">Mkt cap</th>`+
+    `<th title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
+    `<th title="return on equity, latest quarter as SET reports">ROE</th>`+
+    `<th title="net profit, latest quarter">Net profit/q</th>`+
+    `<th title="price / earnings">P/E</th>`+
+    `<th title="dividend yield">Div</th></tr>`+
+    peers.map((p,i)=>{
+      const roeBar=(typeof p.roe==='number')?barHTML(p.roe,'var(--merch)',hiRoe):'';
+      return `<tr>
+        <td class="mono sub">${i+1}</td>
+        <td><b>${p.name||p.symbol}</b> <span class="sub mono">${p.symbol}</span></td>
+        <td class="mono"><b>฿${p.market_cap_bn}bn</b></td>
+        <td class="mono" style="color:${yc(p.ytd_pct)}">${p.ytd_pct>0?'+':''}${p.ytd_pct}%</td>
+        <td class="mono">${roeBar} <b>${p.roe}%</b></td>
+        <td class="mono sub">฿${p.net_profit_q_bn}bn</td>
+        <td class="mono sub">${p.pe}</td>
+        <td class="mono sub">${p.div_yield}%</td>
+      </tr>`;}).join('')+
+    (tgt?`<tr style="border-top:1px dashed var(--line)"><td></td><td><b style="color:var(--gold)">AutoX target</b> <span class="sub">(unlisted)</span></td><td class="sub">—</td><td class="sub">—</td><td class="mono"><b style="color:var(--gold)">${tgt}%</b> <span class="sub">ROE goal</span></td><td class="sub">—</td><td class="sub">—</td><td class="sub">—</td></tr>`:'');
+  if(ro){
+    const byRoe=peers.filter(p=>typeof p.roe==='number');
+    const below=byRoe.filter(p=>p.roe<tgt).map(p=>p.name), above=byRoe.filter(p=>p.roe>=tgt).map(p=>p.name);
+    ro.innerHTML=(PEERSCORE.headline||'')+` ${TAG_M}`+
+      (tgt?` <b>AutoX's ${tgt}% ROE target</b> would sit above ${below.join(' & ')||'none'}, below ${above.join(' & ')||'none'} — the sharpest IPO benchmark we have.`:'')+
+      methodBox(m.roe_caveat||null,
+        [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the latest quarter'}.`,
+         '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
+         m.roe_caveat||'ROE is each peer’s own SET-reported ratio.']);
   }
 }
 
