@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T10:13:05Z",
-    "commit": "1f748a3"
+    "generated_at": "2026-07-19T22:15:36+07:00",
+    "commit": "ca19d7f"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,66 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T22:15:36+07:00",
+      "sha": "ca19d7f",
+      "summary": "feat(competition): autonomous SET listed-peer scoreboard + digital-presence section (#87)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-19T21:56:06+07:00",
+      "sha": "25d3db5",
+      "summary": "feat(competition): measured rival service reputation (Google ratings) (#86)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T14:30:35Z",
+      "sha": "c56030a",
+      "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T21:28:24+07:00",
+      "sha": "767d865",
+      "summary": "ux: reframe Overview \"Bottom line\" off branch expansion → risk lens (#85)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T20:36:52+07:00",
+      "sha": "dcead4c",
+      "summary": "ux(agri): surface measured Thai farm-gate — stop calling it a global proxy (#84)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T20:15:03+07:00",
+      "sha": "b268e2f",
+      "summary": "ux(nav): two-risk storyline spine — coherent navigation flow (#83)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T19:42:38+07:00",
+      "sha": "9b62807",
+      "summary": "data(nso-wage): measured regional wage anchor + province income reality-check (#67)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-19T12:34:00Z",
+      "sha": "a117f4b",
+      "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T19:33:35+07:00",
+      "sha": "ebba1ea",
+      "summary": "intel(agri): surface MEASURED dry-season second-rice EXPOSURE on the crop-stress board (#82)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T10:39:45Z",
+      "sha": "f7da11d",
+      "summary": "committee: refresh autonomy plan (run 29683693667)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-19T10:13:05Z",
       "sha": "1f748a3",
       "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
@@ -597,66 +657,6 @@
       "date": "2026-07-18T21:57:11Z",
       "sha": "d003089",
       "summary": "committee: refresh autonomy plan (run 29662510231)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-18T20:14:55Z",
-      "sha": "7ed0471",
-      "summary": "docs: log html lang=\"en\" a11y fix — merge + deploy-verify (PR #73)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T03:13:54+07:00",
-      "sha": "d1f3dff",
-      "summary": "ux: set index/branch-explorer html lang=\"en\" for screen-reader correctness (#73)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T02:59:12+07:00",
-      "sha": "a799ba5",
-      "summary": "intel(peer): normalise the province peer board against the MEASURED vehicle collateral base (#72)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-18T18:16:33Z",
-      "sha": "507c50d",
-      "summary": "service(provenance): durably stamp rayong_province.json — clear the shame board 1 → 0",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-18T16:02:33Z",
-      "sha": "476b97e",
-      "summary": "committee: refresh autonomy plan (run 29651140425)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-18T21:45:04+07:00",
-      "sha": "ad0c881",
-      "summary": "fix(data page): show individual wage on data.html income-by-occupation panel (#69)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-18T21:38:28+07:00",
-      "sha": "fc516ec",
-      "summary": "ux(coherence) wave 1: purge expansion language from the live product (#71)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-18T14:13:39Z",
-      "sha": "4b03f9b",
-      "summary": "docs: log #sim slider-label a11y fix — merge + deploy-verify (PR #70)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-18T21:10:34+07:00",
-      "sha": "9c8fa6c",
-      "summary": "ux: associate #sim slider labels with their range inputs (a11y) (#70)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-18T13:53:58Z",
-      "sha": "f8f054e",
-      "summary": "committee: refresh autonomy plan after double-jeopardy queue ship",
       "pillar": "deployment"
     }
   ]
