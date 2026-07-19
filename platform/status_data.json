@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T23:27:55+07:00",
-    "commit": "ef652d5"
+    "generated_at": "2026-07-19T20:13:07Z",
+    "commit": "9b5a596"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,13 +480,73 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T20:13:07Z",
+      "sha": "9b5a596",
+      "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T03:10:11+07:00",
+      "sha": "4dee623",
+      "summary": "ux: data.html theme-color meta tracks data-theme (mobile chrome consistency) (#90)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T18:16:57Z",
+      "sha": "65322d6",
+      "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-20T00:13:45+07:00",
+      "sha": "a923da5",
+      "summary": "Merge pull request #89 from kaustavb2101/claude/rival-pulse",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T23:58:30+07:00",
+      "sha": "023d300",
+      "summary": "data(provenance): regenerate on the merged tree (96 layers — rival_pulse + rival_threat) under the WSL 3.11 mirror",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T23:57:55+07:00",
+      "sha": "2bd3383",
+      "summary": "merge origin/master into claude/rival-pulse — keep both rival_pulse + rival_threat gate blocks; provenance regenerated next",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T23:38:31+07:00",
+      "sha": "a8cd0dc",
+      "summary": "ops(rival-pulse): daily auto-refresh script for Windows Task Scheduler (Thai-IP laptop)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T16:31:27Z",
+      "sha": "52e88ef",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
+      "pillar": "market"
+    },
+    {
       "date": "2026-07-19T23:27:55+07:00",
       "sha": "ef652d5",
       "summary": "feat(competition): rival threat matrix — footprint × service-quality join (obj #2) (#88)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:02:30+00:00",
+      "date": "2026-07-19T23:23:31+07:00",
+      "sha": "435128a",
+      "summary": "data(provenance): register rival_pulse layer — regenerated under the WSL 3.11 mirror (LF tree)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T23:22:40+07:00",
+      "sha": "0f3ad78",
+      "summary": "feat(competition): rival pulse — live promo watch + measured app sentiment incl. our own เงินไชโย",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T16:02:30Z",
       "sha": "caab12c",
       "summary": "committee: refresh autonomy plan (run 29694014006)",
       "pillar": "deployment"
@@ -504,7 +564,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T14:30:35+00:00",
+      "date": "2026-07-19T14:30:35Z",
       "sha": "c56030a",
       "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
       "pillar": "service"
@@ -534,7 +594,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T12:34:00+00:00",
+      "date": "2026-07-19T12:34:00Z",
       "sha": "a117f4b",
       "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
       "pillar": "service"
@@ -546,13 +606,13 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T10:39:45+00:00",
+      "date": "2026-07-19T10:39:45Z",
       "sha": "f7da11d",
       "summary": "committee: refresh autonomy plan (run 29683693667)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T10:13:05+00:00",
+      "date": "2026-07-19T10:13:05Z",
       "sha": "1f748a3",
       "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
       "pillar": "service"
@@ -564,7 +624,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T08:34:24+00:00",
+      "date": "2026-07-19T08:34:24Z",
       "sha": "1b6359b",
       "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
       "pillar": "3d-enrichment"
@@ -576,13 +636,13 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-19T06:24:51+00:00",
+      "date": "2026-07-19T06:24:51Z",
       "sha": "adfc920",
       "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T06:17:40+00:00",
+      "date": "2026-07-19T06:17:40Z",
       "sha": "d4d1fc0",
       "summary": "committee: autonomous competitor scout (run 29676124159)",
       "pillar": "market"
@@ -594,69 +654,9 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T05:32:28+00:00",
+      "date": "2026-07-19T05:32:28Z",
       "sha": "5f9db78",
       "summary": "docs: log combined province-pressure board — merge + deploy-verify (PR #78)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T12:30:38+07:00",
-      "sha": "9e73718",
-      "summary": "intel(planning): combined province-pressure board — where the two objectives coincide (#78)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T12:29:46+07:00",
-      "sha": "5cbee20",
-      "summary": "data: NABC live prices (2026-07-18, run 29661005914) (#74)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-19T12:24:54+07:00",
-      "sha": "abe7300",
-      "summary": "integration: MEASURED national title-collateral fleet trend (DLT/MOT) (#50)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T09:20:50+07:00",
-      "sha": "ecdab55",
-      "summary": "feat(collateral): MEASURED national vehicle-registry base (MOT) + Overview readout (#55)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T02:17:06+00:00",
-      "sha": "38ad769",
-      "summary": "docs: log JS-off <noscript> front-door fallback — merge + deploy-verify (PR #77)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T09:13:40+07:00",
-      "sha": "176c897",
-      "summary": "ux: add JS-off <noscript> fallback banner on the front door (#77)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T08:22:49+07:00",
-      "sha": "092f16c",
-      "summary": "Merge pull request #76 from kaustavb2101/intel/branch-fuel-popup-fold",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-19T07:51:52+07:00",
-      "sha": "ec9ae7f",
-      "summary": "Merge pull request #53 from kaustavb2101/feat/ev-collateral-watch",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T00:27:33+00:00",
-      "sha": "cb1ef20",
-      "summary": "intel(fold): surface the MEASURED per-branch fuel-station count (≤10km) on the branch popup",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-18T22:15:11+00:00",
-      "sha": "1a977ce",
-      "summary": "committee: refresh autonomy plan after home-thesis competitive-clause ship",
       "pillar": "deployment"
     }
   ]
