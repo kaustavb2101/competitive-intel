@@ -2019,6 +2019,19 @@ function loadPeerProvince(){
     .catch(()=>{ PEERPROV=null; peerprovLoaded=true; return null; });
   return peerprovPromise;
 }
+// COMBINED PROVINCE PRESSURE (province_pressure.json) — the deterministic JOIN of portfolio-risk
+// (province_stress_index composite_stress) x competitive-risk (peer_province rival:AutoX ratio),
+// each as a 0-100 percentile. Powers the command-center thesis' cross-objective clause: how many
+// provinces are BOTH borrower-stressed AND rival-dominated (both axes top-third) and which is worst.
+// Fetches once, caches, degrades to null on any error so the thesis clause stays null-safe.
+let PROVPRESS=null, provpressLoaded=false, provpressPromise=null;
+function loadProvincePressure(){
+  if(provpressPromise) return provpressPromise;
+  provpressPromise=fetch('data/province_pressure.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PROVPRESS=j; provpressLoaded=true; return PROVPRESS; })
+    .catch(()=>{ PROVPRESS=null; provpressLoaded=true; return null; });
+  return provpressPromise;
+}
 function renderPeerProvince(){
   const tbl=$('#peerprovtbl'); if(!tbl) return;
   if(peerprovLoaded){ drawPeerProvince(); return; }
@@ -5330,6 +5343,9 @@ function renderHome(){
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
     loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
+    // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
+    loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
     const c=$('#cc-csv'), p=$('#cc-print');
     if(c) c.onclick=ccBriefCSV;
     if(p) p.onclick=()=>window.print();
@@ -5375,6 +5391,16 @@ function renderHomeThesis(){
     const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
     const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
     clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
+  }
+  // THE INTERSECTION (province_pressure.json) — the sharpest cross-objective clause: how many
+  // provinces sit in BOTH the top third for borrower stress AND for rival dominance (a fragile
+  // portfolio where margin defence is hardest), and which one is worst. Both axes are relative
+  // percentiles, so this is a RANKING, not a verdict; dropped until the layer loads. Null-safe.
+  const cp=(PROVPRESS&&PROVPRESS.meta)?PROVPRESS.meta:null;
+  if(cp&&cp.n_double_pressure){
+    const w=cp.worst_province;
+    const tail=(w&&w.province_th)?`, worst is <b>${w.province_th}</b>`:'';
+    clauses.push(`<b>${cp.n_double_pressure}</b> province${cp.n_double_pressure===1?'':'s'} are <b>both stressed and outgunned</b> (top-third on portfolio risk AND rival pressure${tail})`);
   }
   if(ps){
     clauses.push(`the risk to watch is <b>${ps.province} household stress</b> (DTI ${ps.debt_to_income!=null?(+ps.debt_to_income).toFixed(2)+'×':'—'} + unemployment ${ps.unemployment_rate!=null?(+ps.unemployment_rate).toFixed(1)+'%':'—'}, composite ▲${(ps.composite_stress||0).toFixed(0)}, measured)`);
