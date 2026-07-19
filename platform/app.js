@@ -1464,11 +1464,24 @@ function loadFleetData(){
     .then(j=>{FLEET=j||null;return FLEET;}).catch(()=>{FLEET=null;return null;});
   return fleetPromise;
 }
+// MEASURED EV-transition WORKFORCE exposure (data/ev_exposure.json, obj#1). The resale cards above read
+// the collateral ASSET side (diesel-pickup recovery value under electrification); this reads the borrower
+// INCOME side — the ICE auto-parts workforce (DIW s-curve automotive factories) whose jobs the same EV
+// transition pressures, concentrated in the Eastern industrial corridor. Exposure, NOT a job-loss forecast.
+let EVEXP=null, evexpLoaded=false, evexpPromise=null;
+function loadEvExposure(){
+  if(evexpPromise) return evexpPromise;
+  evexpLoaded=true;
+  evexpPromise=fetch('data/ev_exposure.json').then(r=>r.ok?r.json():null)
+    .then(j=>{EVEXP=j||null;return EVEXP;}).catch(()=>{EVEXP=null;return null;});
+  return evexpPromise;
+}
 function renderCollatOutlook(){
   const el=$('#collat-outlook'); if(!el) return;
   // warm the per-province outlook layer; re-render once it lands so the national card appears.
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   if(!fleetLoaded) loadFleetData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
+  if(!evexpLoaded) loadEvExposure().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   const cards=[
     {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
@@ -1490,6 +1503,21 @@ function renderCollatOutlook(){
           ' Fleet SIZE, not resale value.'});
     });
   }
+  // MEASURED EV-transition WORKFORCE exposure (ev_exposure.json) — the INCOME-side companion to the
+  // editorial diesel-pickup resale card above. Same EV transition, different channel: the ICE auto-parts
+  // jobs it pressures = borrower repayment capacity in the automotive-manufacturing provinces. Exposure
+  // (the workforce that COULD be pressured), not a forecast that these jobs are being lost now.
+  if(EVEXP&&EVEXP.meta&&EVEXP.meta.national&&EVEXP.meta.national.workers!=null){
+    const en=EVEXP.meta.national, np=EVEXP.meta.n_provinces||0;
+    const provs=Array.isArray(EVEXP.provinces)?EVEXP.provinces:(EVEXP.provinces?Object.values(EVEXP.provinces):[]);
+    const top3=provs.slice().sort((a,b)=>(b.workers||0)-(a.workers||0)).slice(0,3);
+    const t3=top3.map(p=>p.th).filter(Boolean).join(', ');
+    const wk=en.workers, wkStr=wk>=1000?Math.round(wk/1000)+'k':(''+wk);
+    cards.push({k:'ICE auto-parts jobs exposed', v:wkStr, d:'EV-transition income risk', cls:'down',
+      n:'MEASURED · '+wk.toLocaleString()+' workers across '+(en.factories||0).toLocaleString()+' automotive-group factories in '+np+' provinces (DIW s-curve census). '+
+        'The borrower-INCOME channel of the EV transition — distinct from the resale-value channel above — most concentrated in '+(t3||'the Eastern corridor')+'. '+
+        'Exposure (jobs that COULD be pressured as production electrifies), NOT a measured job-loss forecast.'});
+  }
   // national recovery-value outlook (from collateral_outlook.json) — firming vs softening + most-at-risk.
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
@@ -1504,6 +1532,7 @@ function renderCollatOutlook(){
   const note=$('#collat-note');
   if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the diesel-pickup and used-motorcycle sides both face a slow value squeeze. '+
     'If recovery values on repossessed vehicles fall, loss-given-default on the title book rises even before any change in default rates. '+
+    'The same EV transition also has an <b>income-side</b> channel — the measured ICE auto-parts workforce card is exposure (jobs that could be pressured), not a job-loss forecast. '+
     'These directions are an <b>estimated / editorial watch</b> (no live Thai used-vehicle price index in this data); the vehicle-mix shares below are measured (DLT).';
 }
 /* ---------- Diesel-pickup collateral · per-province diesel share + national brand mix ----------
