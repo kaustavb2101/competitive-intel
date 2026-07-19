@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T12:30:38+07:00",
-    "commit": "9e73718"
+    "generated_at": "2026-07-19T17:12:18+07:00",
+    "commit": "982dcbb"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,48 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T17:12:18+07:00",
+      "sha": "982dcbb",
+      "summary": "intel(market): surface MEASURED EV-transition workforce exposure on the collateral outlook (#81)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T08:34:24+00:00",
+      "sha": "1b6359b",
+      "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-19T15:30:52+07:00",
+      "sha": "8854ab8",
+      "summary": "ux: noscript fallback on the three deck.gl/WebGL pages (#80)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-19T06:24:51+00:00",
+      "sha": "adfc920",
+      "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T06:17:40+00:00",
+      "sha": "d4d1fc0",
+      "summary": "committee: autonomous competitor scout (run 29676124159)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T12:32:40+07:00",
+      "sha": "8b5b075",
+      "summary": "data: live fuel prices (2026-07-17, run 29620950967) (#60)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-19T05:32:28+00:00",
+      "sha": "5f9db78",
+      "summary": "docs: log combined province-pressure board — merge + deploy-verify (PR #78)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-19T12:30:38+07:00",
       "sha": "9e73718",
       "summary": "intel(planning): combined province-pressure board — where the two objectives coincide (#78)",
@@ -616,48 +658,6 @@
       "sha": "1093e37",
       "summary": "intel(planning): teach the exec decision queue to see DOUBLE JEOPARDY (besieged AND portfolio-stressed)",
       "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T10:23:55+00:00",
-      "sha": "7fc449b",
-      "summary": "committee: refresh autonomy plan (run 29640748080)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-18T09:07:42+00:00",
-      "sha": "38fab71",
-      "summary": "committee: autonomous competitor scout (run 29638549935)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-18T15:51:31+07:00",
-      "sha": "e7ae9a1",
-      "summary": "Merge pull request #63 from kaustavb2101/claude/individual-income",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-18T15:49:40+07:00",
-      "sha": "d237c9c",
-      "summary": "Merge remote-tracking branch 'origin/master' into claude/individual-income",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-18T08:10:38+00:00",
-      "sha": "b4ddf4a",
-      "summary": "docs(progress-log): record ux-loop rayong-province stub fix — merged #65, deploy up+gated",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-18T15:08:22+07:00",
-      "sha": "d3b3b58",
-      "summary": "ux: add favicon + light-default to the rayong-province redirect stub (#65)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-18T06:21:26+00:00",
-      "sha": "271aad6",
-      "summary": "ci(data): scheduled FPO PICO-finance registry refresh — close the last CI-reachable-but-unautomated MEASURED competitor layer",
-      "pillar": "market"
     }
   ]
 }
