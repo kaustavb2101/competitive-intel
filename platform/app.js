@@ -60,6 +60,34 @@ async function loadCropStress(){
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
 
+// Dry-season (SECOND / irrigated) rice EXPOSURE per province — MEASURED, OAE ข้าวนาปรัง planted area
+// (data/napprang.json). This is the irrigated second-crop income cushion sitting behind the drought
+// flag: a big planted area = a big buffer today AND a big vulnerability if water cuts force the second
+// crop to be skipped. Abandonment is ~0 this season (harvested≈planted), so it is framed as EXPOSURE
+// (magnitude of irrigated income at risk), NOT current stress. NAPPRANG maps Thai province name ->
+// {planted_rai,harvested_rai,production_tons,abandon_pct}. Fully null-guarded: absent file → NAPPRANG
+// stays null, the crop-stress column is omitted, nothing fabricated.
+let NAPPRANG=null, NAPPRANG_META=null, napprangLoaded=false, napprangPromise=null;
+async function loadNapprang(){
+  if(napprangPromise) return napprangPromise;
+  napprangLoaded=true;
+  napprangPromise=(async()=>{
+    try{
+      const j = await fetch('data/napprang.json').then(r=>r.json());
+      NAPPRANG=j.by_province||null; NAPPRANG_META=j.meta||null;
+    }catch(e){ NAPPRANG=null; NAPPRANG_META=null; }
+    return NAPPRANG;
+  })();
+  return napprangPromise;
+}
+// Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
+function fmtRai(n){
+  if(n==null||!isFinite(n)) return '—';
+  if(n>=1e6) return (n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M rai';
+  if(n>=1e3) return Math.round(n/1e3)+'k rai';
+  return n+' rai';
+}
+
 /* ---------- household debt-to-income (MEASURED · NSO SES, objective #1) ----------
    Lazy-loaded from data/household_risk_by_province.json (pipeline/build_household_risk.py).
    HHRISK maps Thai province name -> {debt, income, debt_to_income, stress_index}. debt + income
@@ -1364,6 +1392,7 @@ function renderOverview(){
   renderEvWatch();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
+  loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1790,11 +1819,13 @@ function renderCropStress(){
   }
   const top=CSTRESS_LIST.slice(0,8); // already sorted worst-first by agri_stress
   renderCstressVerdict(top[0]);
+  const hasNap=NAPPRANG&&Object.keys(NAPPRANG).length;
   if(note) note.innerHTML='Which crop-farming provinces are squeezing borrower income most. '+
     '<b>Agri-stress</b> is an <b>estimated triage index</b> (price proxy × drought, scaled by how much the province farms). '+
     '<b>Price YoY</b> = World Bank <b>global</b> price direction proxy (<i>not</i> Thai farm-gate). '+
-    '<b>Dominant crop</b> (OAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.';
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="World Bank GLOBAL price YoY direction proxy — not Thai farm-gate">Price YoY ◇ est</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th></tr>`+
+    '<b>Dominant crop</b> (OAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.'+
+    (hasNap?' <b>2nd-rice exposure</b> is the <b>measured</b> irrigated dry-season (second) rice planted area (OAE '+(NAPPRANG_META&&NAPPRANG_META.vintage||'')+') — the income cushion behind the drought flag; a large area is a buffer today <i>and</i> the income most at risk if water cuts skip the second crop (abandonment ~0 this season, so it reads as <b>exposure</b>, not current stress).':'');
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="World Bank GLOBAL price YoY direction proxy — not Thai farm-gate">Price YoY ◇ est</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
     top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
       const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
       const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
@@ -1805,7 +1836,7 @@ function renderCropStress(){
       <td>${barHTML(sv,bar)} <span class="mono" style="color:${sc}">${sv}</span></td>
       <td class="sub">${dom.crop||'—'} <span class="mono">${dom.share!=null?Math.round(dom.share*100)+'%':''}</span></td>
       <td class="mono" style="color:${p.price_stress<0?'var(--agri)':'var(--mid)'}">${p.price_stress!=null?(p.price_stress>0?'+':'')+p.price_stress+'%':'—'}</td>
-      <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td></tr>`;}).join('');
+      <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td>`+(hasNap?(()=>{const np=NAPPRANG[p.th]; const pr=np&&np.planted_rai; return `<td class="mono sub" title="MEASURED — OAE dry-season second-rice planted area (rai)">${pr?fmtRai(pr):'—'}</td>`;})():'')+`</tr>`;}).join('');
 }
 
 /* ---------- acquisition ---------- */
