@@ -1796,8 +1796,9 @@ function renderEvWatch(){
 
 /* ---------- crop-household stress (Overview card) ----------
    Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
-   dominant crop + share (OAE, measured), price YoY (World Bank GLOBAL direction proxy — NOT Thai
-   farm-gate), rainfall % of normal (HDX, measured). Data from data/crop_stress.json (lazy). */
+   dominant crop + share (OAE, measured), price YoY (MEASURED Thai farm-gate — NABC — for the major
+   crops rice/rubber/oil palm/cassava; World Bank global proxy only fills minor crops), rainfall %
+   of normal (HDX, measured). Data from data/crop_stress.json (lazy). */
 // LEAD WITH THE VERDICT — colored card above the crop-stress table, built ONLY from crop_stress.
 // w = the worst (most-stressed) province record; null → card hidden (graceful, no fabrication).
 function renderCstressVerdict(w){
@@ -1809,7 +1810,7 @@ function renderCstressVerdict(w){
   const drought=w.drought!=null?Math.round(w.drought*100)+'%':(w.components&&w.components.rain_pct_of_normal!=null?w.components.rain_pct_of_normal+'% of normal rain':'n/a');
   box.style.display='block';
   box.innerHTML=`<div class="verdict-line">⚠️ <b>Most stressed: ${w.th}</b> — ${dom.toLowerCase()}, price ${price}, drought ${drought}</div>`+
-    `<div class="sub" style="margin-top:4px">${w.region||''} · agri-stress ${sv}/100 (estimated triage) · price = World Bank global proxy ${TAG_E}</div>`;
+    `<div class="sub" style="margin-top:4px">${w.region||''} · agri-stress ${sv}/100 (estimated triage) · price = Thai farm-gate, NABC ${TAG_M}</div>`;
 }
 function renderCropStress(){
   const tbl=$('#cstresstbl'), note=$('#cstress-note');
@@ -1822,12 +1823,13 @@ function renderCropStress(){
   const top=CSTRESS_LIST.slice(0,8); // already sorted worst-first by agri_stress
   renderCstressVerdict(top[0]);
   const hasNap=NAPPRANG&&Object.keys(NAPPRANG).length;
-  if(note) note.innerHTML='Which crop-farming provinces are squeezing borrower income most. '+
-    '<b>Agri-stress</b> is an <b>estimated triage index</b> (price proxy × drought, scaled by how much the province farms). '+
-    '<b>Price YoY</b> = World Bank <b>global</b> price direction proxy (<i>not</i> Thai farm-gate). '+
+  if(note) note.innerHTML='Which crop-farming provinces carry the most agri-income risk. '+
+    '<b>Agri-stress</b> is an <b>estimated triage index</b> (price × drought, scaled by how much the province farms). '+
+    '<b>Price YoY</b> is now <b>measured Thai farm-gate</b> (NABC daily national averages) for the major crops — rice, rubber, oil palm, cassava — with the World Bank global proxy only filling minor crops. '+
+    'Measured farm-gate is currently running <b>above</b> last year (an income <b>tailwind</b>), so the stress you see here is <b>drought-led, not price-led</b>. '+
     '<b>Dominant crop</b> (OAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.'+
     (hasNap?' <b>2nd-rice exposure</b> is the <b>measured</b> irrigated dry-season (second) rice planted area (OAE '+(NAPPRANG_META&&NAPPRANG_META.vintage||'')+') — the income cushion behind the drought flag; a large area is a buffer today <i>and</i> the income most at risk if water cuts skip the second crop (abandonment ~0 this season, so it reads as <b>exposure</b>, not current stress).':'');
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="World Bank GLOBAL price YoY direction proxy — not Thai farm-gate">Price YoY ◇ est</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY (NABC) for the major crops; World Bank global proxy for minor crops. Positive = prices above last year (income tailwind).">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
     top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
       const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
       const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
