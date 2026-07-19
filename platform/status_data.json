@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T20:13:07Z",
-    "commit": "9b5a596"
+    "generated_at": "2026-07-20T05:18:48+07:00",
+    "commit": "2b6607d"
   },
   "overall": {
     "progress_pct": 96,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-19",
+    "eta_date": "2026-07-20",
     "done_items": 48,
     "in_progress_items": 2,
     "open_items": 0,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-19T20:13:07Z",
+      "date": "2026-07-20T05:18:48+07:00",
+      "sha": "2b6607d",
+      "summary": "service: recover 3 layers' dropped freshness stamps in the Data-room card (#92)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-19T21:59:38+00:00",
+      "sha": "7f8b491",
+      "summary": "committee: refresh autonomy plan (run 29705300641)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-19T20:13:07+00:00",
       "sha": "9b5a596",
       "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
       "pillar": "uxui"
@@ -492,7 +504,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T18:16:57Z",
+      "date": "2026-07-19T18:16:57+00:00",
       "sha": "65322d6",
       "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
       "pillar": "3d-enrichment"
@@ -522,7 +534,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:31:27Z",
+      "date": "2026-07-19T16:31:27+00:00",
       "sha": "52e88ef",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
       "pillar": "market"
@@ -546,7 +558,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:02:30Z",
+      "date": "2026-07-19T16:02:30+00:00",
       "sha": "caab12c",
       "summary": "committee: refresh autonomy plan (run 29694014006)",
       "pillar": "deployment"
@@ -564,7 +576,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T14:30:35Z",
+      "date": "2026-07-19T14:30:35+00:00",
       "sha": "c56030a",
       "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
       "pillar": "service"
@@ -594,7 +606,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T12:34:00Z",
+      "date": "2026-07-19T12:34:00+00:00",
       "sha": "a117f4b",
       "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
       "pillar": "service"
@@ -606,13 +618,13 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T10:39:45Z",
+      "date": "2026-07-19T10:39:45+00:00",
       "sha": "f7da11d",
       "summary": "committee: refresh autonomy plan (run 29683693667)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T10:13:05Z",
+      "date": "2026-07-19T10:13:05+00:00",
       "sha": "1f748a3",
       "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
       "pillar": "service"
@@ -624,7 +636,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T08:34:24Z",
+      "date": "2026-07-19T08:34:24+00:00",
       "sha": "1b6359b",
       "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
       "pillar": "3d-enrichment"
@@ -636,28 +648,16 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-19T06:24:51Z",
+      "date": "2026-07-19T06:24:51+00:00",
       "sha": "adfc920",
       "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T06:17:40Z",
+      "date": "2026-07-19T06:17:40+00:00",
       "sha": "d4d1fc0",
       "summary": "committee: autonomous competitor scout (run 29676124159)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T12:32:40+07:00",
-      "sha": "8b5b075",
-      "summary": "data: live fuel prices (2026-07-17, run 29620950967) (#60)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-19T05:32:28Z",
-      "sha": "5f9db78",
-      "summary": "docs: log combined province-pressure board — merge + deploy-verify (PR #78)",
-      "pillar": "deployment"
     }
   ]
 }
