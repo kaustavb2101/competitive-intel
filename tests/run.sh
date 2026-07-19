@@ -77,6 +77,12 @@ phase_check(){
   ( cd "$PIPE" && python3 build_poi_relevance.py --check >/dev/null 2>&1 ) && ok "build_poi_relevance.py --check" || bad "build_poi_relevance.py --check (poi_relevance.json drifted from branch_occupations.json/branches.json k10)"
   ( cd "$PIPE" && python3 build_branch_workforce.py --check >/dev/null 2>&1 ) && ok "build_branch_workforce.py --check" || bad "build_branch_workforce.py --check (branch_workforce.json drifted from branch_occupations/branch_labor/crop_stress/spam2010)"
   ( cd "$PIPE" && python3 build_branch_agri.py --check >/dev/null 2>&1 ) && ok "build_branch_agri.py --check" || bad "build_branch_agri.py --check (branch_agri.json drifted from spam2010/crop_prices/branches_final)"
+  # deterministic, network-free builders over COMMITTED inputs — added to close a silent-drift gap
+  # (each --check reproduces its committed output byte-for-byte; all inputs are git-tracked source-data).
+  ( cd "$PIPE" && python3 build_farmgate_prices.py --check >/dev/null 2>&1 ) && ok "build_farmgate_prices.py --check" || bad "build_farmgate_prices.py --check (source-data/farmgate_prices.json drifted from source-data/nabc_prices.json)"
+  ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
+  ( cd "$PIPE" && python3 build_building_tiles.py --check >/dev/null 2>&1 ) && ok "build_building_tiles.py --check" || bad "build_building_tiles.py --check (tiles_config.json drifted from branches.json/competitors_census.json)"
+  ( cd "$PIPE" && python3 build_rayong.py --check >/dev/null 2>&1 ) && ok "build_rayong.py --check" || bad "build_rayong.py --check (rayong_province.json drifted from source-data branches_final/rayong_competitors/factories_by_district/vehicles_by_province/employment_by_province)"
   ( cd "$PIPE" && python3 build_branch_cropland.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_cropland.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_branch_cropland.py --check (source-data/doae_planted_area.json absent — not data drift)"
