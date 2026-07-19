@@ -5,21 +5,47 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-17 · latest ship: provenance shame board **2 → 0** via the sidecar mechanism (§2) · against `platform/data/provenance.json`._
+_Audit run: 2026-07-19 · latest ship: three live/registry layers' dropped freshness stamps recovered in the Data-room card (§1) · against `platform/data/provenance.json` (96 layers · 327 files)._
 
 ## Headline
 
-The data room is healthy. **No broken data references, no missing fetches.** The one concrete
-gap this run **fixed**: the provenance ledger's freshness column was silently dropping 6 layers'
-real vintage stamps because `build_provenance.py` only scanned 4 vintage keys — it now scans the
-4 additional freshness fields those layers actually carry.
+The data room is healthy. **No broken data references, no missing fetches, 0 unlabelled files.**
+The one concrete gap this run **fixed**: three committed layers each stamp a real freshness date
+under a *layer-specific* key that `build_provenance.py::_vintage_of()` did not scan, so their
+vintage showed **blank** in the exec-facing Data-room card — most importantly **`rival_pulse.json`**
+(`promos_pulled_at = 2026-07-19`), the freshest live rival promo/sentiment watch. Same class of bug
+as the 2026-07-17 §1 fix (6 layers under non-standard keys); the extractor now scans the three
+additional freshness fields those layers actually carry.
+
+_Tree grew 83 → 96 layers since the last audit (rival_pulse, rival_threat, rival_reputation,
+peer_scoreboard, peer_province, pico_competitors, credit_anchor, dbd_formation, …). Re-verified:
+all 96 carry a provenance stamp (47 measured · 49 estimated · **0 unlabelled**), every one is wired
+into a live `fetch()` (or is a pipeline input like `brand_trends.json` → `vehicle_collateral.json`),
+and no `data/*.json` path referenced in the app fails to resolve._
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-`build_provenance.py::_vintage_of()` reads a layer's data vintage from its own `meta` block. It
-previously scanned only `updated / vintage / as_of / updated_to`. Six layers stamp their freshness
-under **other** real keys and were therefore showing blank in the Data-room card despite carrying a
-date:
+**2026-07-19 (this run):** a full re-scan of all 96 layers' `meta` blocks for date-shaped freshness
+fields *not* in the extractor's key list found **three** layers still dropping a real vintage from
+the Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `rival_pulse.json` | `promos_pulled_at` | 2026-07-19 | live rival promo/sentiment watch (freshest) |
+| `pico_competitors.json` | `pico_vintage` | 2026-05-22 | FPO PICO-finance licence registry |
+| `occupation_income_individual.json` | `vintage_individual` | 2025 | NSO LFS individual-income |
+
+`_vintage_of()` now also scans `pico_vintage, vintage_individual, promos_pulled_at`. Verified the
+change touches **only these three** vintage cells (`build_provenance.py --check` byte-exact; a diff
+of the regenerated ledger confirms counts/labels/sources unchanged). No date is invented — each is
+read from the layer's own committed `meta`. `rival_reputation.json` / `rival_threat.json` carry an
+explicit `vintage: null` and correctly stay blank (no rating vintage was captured).
+
+---
+
+**2026-07-17 (prior run):** `_vintage_of()` previously scanned only `updated / vintage / as_of /
+updated_to`. Six layers stamp their freshness under **other** real keys and were therefore showing
+blank in the Data-room card despite carrying a date:
 
 | Layer | Freshness key (was dropped) | Value now surfaced |
 |---|---|---|
@@ -31,17 +57,18 @@ date:
 | `macro_sensitivity.json` | `price_vintage` | 2026M06 |
 
 Extraction now scans (in priority order): `updated, vintage, as_of, updated_to, observed_to,
-price_vintage, pulled_at_utc, pulled`. A note field that merely mentions a year
+price_vintage, pico_vintage, vintage_individual, pulled_at_utc, pulled, promos_pulled_at`. A note
+field that merely mentions a year
 (`brand_trends.json::note_be_to_ce = "พ.ศ. − 543 = ค.ศ. …"`) is correctly **not** treated as a
 vintage — the extractor keys off known freshness fields, not any date-shaped string.
 
-Result: layers carrying a captured vintage rose from **5 → 11** of 78. The remaining 67 are
-derived/geometry layers whose freshness is inherited from their inputs (no independent vintage);
-their vintage-blank state is honest, not a bug.
+Result: **23 of 96** layers now carry a captured vintage (was 20 before this run's three-key fix;
+11 of 78 after the 2026-07-17 fix). The remaining 73 are derived/geometry layers whose freshness is
+inherited from their inputs (no independent vintage); their vintage-blank state is honest, not a bug.
 
-**Freshest reachable inputs today** (all measured, all recent): thaiwater flood 2026-07-11,
-thaiwater rain 2026-07-10, fuel & macro pulls 2026-07-05, search demand 2026-07-04. No stale
-live-input layer detected.
+**Freshest reachable inputs today** (all measured except the rival watch, all recent): rival-pulse
+promo pull 2026-07-19, credit anchor 2026-07-18, fuel prices 2026-07-17, thaiwater flood 2026-07-11,
+thaiwater rain 2026-07-10, search demand 2026-07-04. No stale live-input layer detected.
 
 ## 2. Provenance coverage
 
