@@ -1127,9 +1127,11 @@ $('#nav').addEventListener('click', e=>{
   showTab(v);
 });
 window.addEventListener('hashchange',()=>showTab((location.hash||'').replace('#','')));
-// command-center "→" links carry data-v but live outside #nav; jump to that tab.
+// content "→" links carry data-v but live outside #nav (command-center cards + the "Next in the
+// story" tab footers); jump to that tab. Scoped to #main-content so it never double-handles the
+// #nav links (those have their own handler) — nav is a sibling of <main>, not inside it.
 document.addEventListener('click',e=>{
-  const a=e.target.closest('#v-home a[data-v]'); if(!a) return;
+  const a=e.target.closest('#main-content a[data-v]'); if(!a) return;
   e.preventDefault(); const v=a.dataset.v; history.replaceState(null,'','#'+v); showTab(v);
 });
 // Keyboard activation for clickable table rows (role="link" tabindex=0): Enter / Space.
