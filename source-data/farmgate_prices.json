@@ -5,8 +5,8 @@
     "label": "MEASURED — Thai daily national-average prices for RAW farm commodities (farm-gate product forms: paddy, fresh cassava root, whole palm bunch, raw rubber sheet, maize). Nothing modelled.",
     "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — daily market prices, national average across quoting markets, pulled by pipeline/pull_nabc_prices.py (REACHABLE from a Thai IP and from cloud runners; verified live 2026-07-12).",
     "farmgate_note": "OAE's ราคาที่เกษตรกรขายได้ (price-farmers-received) series is not exposed as a machine-readable price resource on catalog.oae.go.th (only value-of-production datasets remain; the price series moved to the geo-blocked data.go.th aggregator). NABC's quoted products ARE the raw farm commodities farmers sell, so this stands in for farm-gate as the reachable measured Thai price layer — replacing the World Bank Pink Sheet GLOBAL proxy for price_stress. It is a national daily average, not a per-province farm-gate census.",
-    "vintage": "2026-07-16",
-    "pulled": "2026-07-16",
+    "vintage": "2026-07-17",
+    "pulled": "2026-07-18",
     "upstream": "source-data/nabc_prices.json",
     "crops_covered": [
       "cassava",
@@ -22,58 +22,58 @@
       "crop_en": "Cassava (fresh root)",
       "product_th": "หัวมันสำปะหลังสด (แป้ง 25%)",
       "category_th": "มันสำปะหลัง",
-      "price": 3.38,
+      "price": 3.42,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-16",
-      "yoy": 58.4,
+      "latest_date": "2026-07-17",
+      "yoy": 57.9,
       "n_markets": 3
     },
     "maize": {
       "crop_en": "Maize",
       "product_th": "ข้าวโพดเลี้ยงสัตว์ ความชื้น 14.5%",
       "category_th": "ข้าวโพดเลี้ยงสัตว์",
-      "price": 10.5,
+      "price": 10.47,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-16",
-      "yoy": 11.7,
+      "latest_date": "2026-07-17",
+      "yoy": 11.6,
       "n_markets": 3
     },
     "oilpalm": {
       "crop_en": "Oil palm (fresh bunch)",
       "product_th": "ผลปาล์มน้ำมันทั้งทะลาย นน. > 15 กก. ขึ้นไป",
       "category_th": "ปาล์มน้ำมัน",
-      "price": 8.28,
+      "price": 8.33,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-16",
-      "yoy": 34.3,
+      "latest_date": "2026-07-17",
+      "yoy": 33.2,
       "n_markets": 6
     },
     "rice": {
       "crop_en": "Rice (paddy)",
       "product_th": "ข้าวเปลือกเจ้าหอมมะลิ 105",
       "category_th": "ข้าวหอมมะลิ",
-      "price": 17688.33,
+      "price": 17738.33,
       "unit": "บาท/ตัน",
-      "latest_date": "2026-07-16",
-      "yoy": 11.5,
+      "latest_date": "2026-07-17",
+      "yoy": 11.8,
       "n_markets": 6
     },
     "rubber": {
       "crop_en": "Rubber (raw sheet)",
       "product_th": "ยางพาราแผ่นดิบ ชั้น 3",
       "category_th": "ยางพารา",
-      "price": 88.16,
+      "price": 85.77,
       "unit": "บาท/กก.",
-      "latest_date": "2026-07-16",
-      "yoy": 37.1,
-      "n_markets": 3
+      "latest_date": "2026-07-17",
+      "yoy": 37.5,
+      "n_markets": 2
     }
   },
   "crop_yoy": {
-    "cassava": 58.4,
-    "maize": 11.7,
-    "oilpalm": 34.3,
-    "rice": 11.5,
-    "rubber": 37.1
+    "cassava": 57.9,
+    "maize": 11.6,
+    "oilpalm": 33.2,
+    "rice": 11.8,
+    "rubber": 37.5
   }
 }
