@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-19T05:13:46+07:00",
-    "commit": "f820a67"
+    "generated_at": "2026-07-19T12:30:38+07:00",
+    "commit": "9e73718"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,66 @@
   ],
   "activity": [
     {
+      "date": "2026-07-19T12:30:38+07:00",
+      "sha": "9e73718",
+      "summary": "intel(planning): combined province-pressure board — where the two objectives coincide (#78)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-19T12:29:46+07:00",
+      "sha": "5cbee20",
+      "summary": "data: NABC live prices (2026-07-18, run 29661005914) (#74)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-19T12:24:54+07:00",
+      "sha": "abe7300",
+      "summary": "integration: MEASURED national title-collateral fleet trend (DLT/MOT) (#50)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T09:20:50+07:00",
+      "sha": "ecdab55",
+      "summary": "feat(collateral): MEASURED national vehicle-registry base (MOT) + Overview readout (#55)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T02:17:06+00:00",
+      "sha": "38ad769",
+      "summary": "docs: log JS-off <noscript> front-door fallback — merge + deploy-verify (PR #77)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-19T09:13:40+07:00",
+      "sha": "176c897",
+      "summary": "ux: add JS-off <noscript> fallback banner on the front door (#77)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-19T08:22:49+07:00",
+      "sha": "092f16c",
+      "summary": "Merge pull request #76 from kaustavb2101/intel/branch-fuel-popup-fold",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-19T07:51:52+07:00",
+      "sha": "ec9ae7f",
+      "summary": "Merge pull request #53 from kaustavb2101/feat/ev-collateral-watch",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-19T00:27:33+00:00",
+      "sha": "cb1ef20",
+      "summary": "intel(fold): surface the MEASURED per-branch fuel-station count (≤10km) on the branch popup",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-18T22:15:11+00:00",
+      "sha": "1a977ce",
+      "summary": "committee: refresh autonomy plan after home-thesis competitive-clause ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-19T05:13:46+07:00",
       "sha": "f820a67",
       "summary": "intel(peer): surface the co-equal competitive-risk objective in the command-center board thesis (#75)",
@@ -598,66 +658,6 @@
       "sha": "271aad6",
       "summary": "ci(data): scheduled FPO PICO-finance registry refresh — close the last CI-reachable-but-unautomated MEASURED competitor layer",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-18T05:53:59+00:00",
-      "sha": "a7d77b1",
-      "summary": "committee: autonomous competitor scout (run 29632961542)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-18T05:33:09+00:00",
-      "sha": "4836940",
-      "summary": "committee: refresh autonomy plan (run 29632422424)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-18T05:15:24+00:00",
-      "sha": "380a46e",
-      "summary": "docs: register the PDF/OCR-unlocked sources + owner Thai-IP newcar stub",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T05:13:46+00:00",
-      "sha": "7a39f06",
-      "summary": "enrich(competition): measured sub-scale rival read — PICO operators vs AutoX by province",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-18T04:56:40+00:00",
-      "sha": "ea03b5e",
-      "summary": "enrich(risk): measured BoT credit-conditions anchor for the risk readout",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T04:28:31+00:00",
-      "sha": "813f5d8",
-      "summary": "enrich(vehicle): measured collateral read — province diesel share + national pickup brand mix",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T04:04:38+00:00",
-      "sha": "8ab5a30",
-      "summary": "income(farmer): recalibrate on OAE real households + add measured NET return (fixes denominator bug)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T03:57:54+00:00",
-      "sha": "a8dbcf6",
-      "summary": "data: OAE farm-economics source (Cai-up-2568) — real per-crop households + net return",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T03:18:22+00:00",
-      "sha": "b38db48",
-      "summary": "income(app): surface individual occupation income + crop farmer-income drill-down",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-18T03:02:26+00:00",
-      "sha": "8f99b09",
-      "summary": "capability: ingest_pdf — general-purpose PDF -> text/tables/OCR extraction",
-      "pillar": "service"
     }
   ]
 }
