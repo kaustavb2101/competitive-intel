@@ -3,6 +3,36 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-07-19 — Integration loop: root-cause fix — price-refresh workflows now rebuild their downstream layers (SHIPPED to master)
+- **State found (not assumed):** `bash tests/run.sh check` was **RED on master — 67 passed, 3 FAILED**
+  (`build_fuel_prices.py`, `build_branch_recommendations.py`, `build_regional_outlook.py` all `--check` drifted).
+  A red gate blocks every future autonomous run, so this outranked any new integration.
+- **Root cause (a recurring bug, not a one-off):** the two daily price-refresh workflows commit an upstream
+  source refresh but don't rebuild the full downstream chain that embeds those numbers, so the gate goes red on merge:
+  - `data-fuel-prices.yml` (#60, 2026-07-17) committed `source-data/fuel_prices.json` but **never ran
+    `build_fuel_prices.py`** — the derived `platform/data/fuel_prices.json` stayed a vintage behind.
+  - `data-nabc-prices.yml` (#74, 2026-07-18) rebuilt `branch_agri.json` from the live crop YoY but **not**
+    `branch_recommendations.json` (which embeds the YoY in rec text, e.g. "rubber prices +36%"), its rollup
+    `regional_outlook.json` (agri-tailwind tallies), nor `provenance.json`. Its PR body even wrongly claimed
+    "downstream layers … are unaffected (same shape)" — true for shape, false for content.
+- **Concurrent race, then re-scoped:** mid-run the committee competitor-scout daemon (`d4d1fc0`) pushed a
+  **full** rebuild that happened to regenerate those same layers, so the data drift was resolved upstream and
+  master went green before my push landed. I reset onto their green master and **re-scoped my ship to the
+  root-cause fix alone** — the committee's full rebuild only *masks* the bug; the dedicated price workflows
+  still commit partial rebuilds and would still open a red-gate PR on the next refresh.
+- **Ship (2 CI files, master):** patched both workflows to rebuild the whole deterministic, network-free
+  downstream chain **+ provenance in lockstep** when the source changes, and to `git add` those derived files —
+  `data-fuel-prices.yml` now runs `build_fuel_prices` + `build_provenance`; `data-nabc-prices.yml` now also runs
+  `build_branch_recommendations` + `build_regional_outlook` + `build_provenance`. Fixed the misleading NABC
+  PR-body note. No app/data/visual change (the data layers are already current on master).
+- **Verified:** gate **70 passed, 0 failed** on the rebased tree; both workflow YAMLs parse (`yaml.safe_load`);
+  the full rebuild chain each workflow now runs is idempotent (no drift); diff = exactly the 2 workflow files;
+  no secrets. Direct commit to master (CI-only hardening on an already-green tree).
+- **Next recommended integration (all owner-side, value order):** (1) **real loan tape** → flips the four
+  portfolio-risk outputs SYNTHETIC → measured (`ingest_loan_tape.py --real`); (2) map **`GISTDA_SPHERE_KEY`**
+  into a workflow `env:`, then build+verify the check-crop puller to supersede the SPAM cropland baseline;
+  (3) Thai-IP re-pull + commit of `baac_credit`/`smebank_credit` for a CI-distillable formal-credit-penetration layer.
+
 ## 2026-07-19 — Intelligence loop: COMBINED PROVINCE PRESSURE — where the two objectives coincide (PR #78, SHIPPED)
 - **Ship:** `intel(planning): combined province-pressure board`. New `pipeline/build_province_pressure.py` → `platform/data/province_pressure.json`: a deterministic, network-free JOIN of the two per-province risk axes the platform already scored **separately** — portfolio risk (`province_stress_index.json` `composite_stress`, an NSO DTI+unemployment percentile) × competitive risk (`peer_province.json` rival:AutoX `ratio`, the MEASURED big-4 census). Each axis re-expressed as a comparable 0-100 percentile (same mid-rank-ties method), so the board can flag the provinces sitting high on **both**. Fields: `stress_pctile`, `contest_pctile`, `both_min` (the *weaker* axis — a province leads only when its low side is still high, so one strong axis can't inflate it), `both_mean`, a median-split `quadrant` (HH/HL/LH/LL), and the strict top-third-on-both `double_pressure` alert flag. **Today's read: 7 provinces are both borrower-stressed AND rival-outgunned** — อุตรดิตถ์ (worst, both_min 78.9), สงขลา, สุโขทัย, สตูล, พะเยา, กระบี่, ลำปาง; quadrant split HH 16 / HL 20 / LH 22 / LL 19.
 - **Why:** the command centre is meant to answer BOTH standing objectives on one screen, but no committed layer told us *where they coincide* — the sharpest single cross-objective signal (a fragile book exactly where margin defence is hardest). Makes **NO** open/close/expand call — a risk lens on the footprint we already run.
