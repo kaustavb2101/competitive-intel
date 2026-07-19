@@ -465,6 +465,33 @@ function bldgDensityRec(d){
   return BLDGDEN[i]||null;
 }
 
+/* ---------- per-branch FUEL-STATION count within 10km (data/branch_fuel.json) ----------
+   Lazy-loads pipeline/build_branch_fuel.py's projection of the committed source-data/fuel_stations.json
+   (OSM amenity=fuel, Overpass pull): {meta, branches:[{n10}]}, INDEX-ALIGNED to branches.json. n10 is a
+   MEASURED OSM fuel-station count ≤10km — a vehicle-economy / rural-reach signal (where fuel sells, the
+   vehicles that back the title book live and move). OSM completeness varies, so a low/zero count is a
+   FLOOR, not a census (stated inline). Fully null-guarded: absent file → FUELSTN stays null, fuelStnRec()
+   reads null, the popup line is omitted. Nothing is fabricated. (Distinct from the LIVE fuel-PRICE
+   globals below — this is the per-branch station COUNT layer.) */
+let FUELSTN=null, fuelstnLoaded=false, fuelstnPromise=null;
+async function loadBranchFuel(){
+  if(fuelstnPromise) return fuelstnPromise;
+  fuelstnLoaded=true;
+  fuelstnPromise=(async()=>{
+    try{ const r=await fetch('data/branch_fuel.json'); if(!r.ok){FUELSTN=null;return FUELSTN;}
+      const j=await r.json(); FUELSTN=j.branches||null; }
+    catch(e){ FUELSTN=null; }
+    return FUELSTN;
+  })();
+  return fuelstnPromise;
+}
+// per-branch fuel-station record (for popups) — null when absent.
+function fuelStnRec(d){
+  if(!FUELSTN||!FUELSTN.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  return FUELSTN[i]||null;
+}
+
 /* ---------- per-branch MEASURED-corrected CROP-AREA within 10km (data/branch_cropland.json) ----
    Lazy-loads pipeline/build_branch_cropland.py's output: {meta:{crops[],provenance,...},
    branches:[{ha:[…5 crops], crop_ha, dom, fac:[…]}]}, INDEX-ALIGNED to branches.json. The per-crop
@@ -4089,6 +4116,8 @@ function initMap(){
   if(!bldgdenLoaded) loadBranchDensity();
   // warm the MEASURED-corrected per-branch crop-area popup block (SPAM×DOAE-2025). Popup-only, no lens.
   if(!croplandLoaded) loadBranchCropland();
+  // warm the MEASURED per-branch fuel-station-within-10km popup line (OSM). Popup-only, no lens.
+  if(!fuelstnLoaded) loadBranchFuel();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -4114,8 +4143,8 @@ function selectBranch(d,m){
   // the answer-first blocks (who-to-acquire + macro chips) lazy-load; if the tap beat the fetch,
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
-  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadVehicles(),loadRecommendations()]).then(()=>{
+  if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA||!FUELSTN){
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -4583,6 +4612,18 @@ function bldgDensityPopupHTML(d,r){
   return r('Buildings ≤10km (Overture) · measured',
     `${n.toLocaleString()} <span class="sub">(${BLDGDEN_BUCKET_LABEL[e.bucket]||e.bucket})</span>`, col);
 }
+// FUEL-STATION density line for a branch popup — MEASURED OSM amenity=fuel count ≤10km, a vehicle-
+// economy / rural-reach signal for the title book. Thresholds are anchored on the layer's own median
+// (11 = moderate). OSM completeness varies, so the count is a FLOOR (stated inline): a low/zero value
+// can mean thin OSM mapping here, not no fuel on the ground. Omitted when the file/entry is absent.
+function fuelPopupHTML(d,r){
+  const e=fuelStnRec(d); if(!e||e.n10==null) return '';
+  const n=e.n10||0;
+  const lab=n>=30?'dense':n>=11?'moderate':n>0?'thin':'none mapped';
+  const col=n>=30?'#8b90a7':n>=11?'var(--gold)':n>0?'#cda23e':'var(--mid)';
+  return r('Fuel stations ≤10km (OSM) · measured floor',
+    `${n.toLocaleString()} <span class="sub">(${lab})</span>`, col);
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -4785,7 +4826,8 @@ function popupHTML(d){
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
     ${radar.map(rrow).join('')}
-    ${bldgDensityPopupHTML(d,r)}</div>`;
+    ${bldgDensityPopupHTML(d,r)}
+    ${fuelPopupHTML(d,r)}</div>`;
 }
 function styleMarkers(){
   const l=LENS[curLens], mx=lensMax(l);
