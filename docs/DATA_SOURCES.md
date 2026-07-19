@@ -10,7 +10,8 @@
 | OAE agriculture | `catalog.oae.go.th/api/3/action/...` | ✅ | CKAN/nginx, not Cloudflare-blocked. `www.oae.go.th`=200 |
 | World Bank Pink Sheet | `thedocs.worldbank.org` | ✅ | Apache. Monthly commodity prices (xlsx) |
 | **data.go.th (all hosts)** | data.go.th, opend., api. | ❌ BLOCKED | Cloudflare "Access Denied" — **IP geo-block, not auth.** Token is valid but useless from here |
-| **DLT (vehicles)** | stat.dlt.go.th, web.dlt.go.th | ❌ BLOCKED | DNS-fail / 503 |
+| **DLT (vehicles, per-province)** | stat.dlt.go.th, web.dlt.go.th, gdcatalog.dlt.go.th | ❌ BLOCKED | DNS-fail / 503. Per-province registered-vehicle stock still needs the Thai IP |
+| **MOT (vehicles, national)** | `datagov.mot.go.th` | ✅ REACHABLE | CKAN; cumulative registered vehicles by type × year (national only, not province). Folded via `pull_datagoth.py --only mot_vehicles` → `build_vehicle_registry.py` → `vehicle_registry.json` |
 | IMF / FRED / dataforthai / gdcatalog / competitor sites | various | ❌ | 403 / 503 / WAF |
 
 **The single most important fact for the handoff:** the blocked sources are blocked because this

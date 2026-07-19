@@ -1357,6 +1357,7 @@ function renderOverview(){
   loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
   renderDieselCollateral();
+  loadVehReg().then(renderVehReg);
   renderCollatMix();
   renderRecoverySensitivity();
   // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
@@ -1578,6 +1579,46 @@ function renderCollatMix(){
       <td class="mono sub">${p.car!=null?p.car+'%':'—'}</td>
       <td class="mono sub">${p.pickup!=null?p.pickup+'%':'—'}</td>
       <td class="mono sub">${p.ev!=null?p.ev+'%':'—'}</td></tr>`;}).join('');
+}
+
+/* ---------- National registered-vehicle collateral base (objective #1, MEASURED) ----------
+   The external anchor for the book's collateral mix: how large the registered-vehicle base is,
+   split into the classes AutoX lends against (motorcycle / car / pickup / agri), and how each
+   grew year-on-year — straight from the MOT open-data registry (vehicle_registry.json). MEASURED,
+   national (NOT province — that dimension is the DLT-derived table below). Lazy + null-safe: absent
+   file → the wrap stays hidden and the Overview reads exactly as before. */
+let VEHREG=null, vehregPromise=null;
+function loadVehReg(){
+  if(vehregPromise) return vehregPromise;
+  vehregPromise=fetch('data/vehicle_registry.json').then(r=>r.ok?r.json():null)
+    .then(j=>{VEHREG=j||null;return VEHREG;}).catch(()=>{VEHREG=null;return null;});
+  return vehregPromise;
+}
+function renderVehReg(){
+  const wrap=$('#vehreg-wrap'), cards=$('#vehreg-cards'), note=$('#vehreg-note');
+  if(!wrap||!cards||!VEHREG||!VEHREG.latest) return;
+  const m=VEHREG.meta||{}, g=VEHREG.latest.groups||{}, yoy=VEHREG.yoy||{};
+  const fmtM=n=>(n/1e6).toFixed(n>=1e7?1:2)+'M';
+  const arrow=v=>v==null?'':(v>0?'▲':v<0?'▼':'•');
+  const col=v=>v==null?'var(--collat)':(v>0?'var(--up)':v<0?'var(--agri)':'var(--collat)');
+  const sig=v=>v==null?'':' <span style="font-size:12px;color:'+col(v)+'">'+arrow(v)+' '+(v>0?'+':'')+v+'% YoY</span>';
+  const defs=[
+    ['motorcycle','Motorcycle title','the small-ticket title core'],
+    ['car','Car (sedan/van)','higher-ticket title'],
+    ['pickup','Pickup &amp; van','the diesel-pickup book'],
+    ['agri','Agri (tractor/farm)','agri collateral'],
+  ];
+  cards.innerHTML=defs.map(([k,lab,d])=>
+    `<div class="mcard"><div class="k">${lab}</div>`
+    +`<div class="v" style="color:var(--collat);font-size:17px">${fmtM(g[k]||0)}${sig(yoy[k])}</div>`
+    +`<div class="n">${d}</div></div>`).join('');
+  const share=m.moto_share_of_title_base_pct;
+  if(note) note.innerHTML='The collateral base AutoX lends against, from the government registry: <b>'
+    +(VEHREG.latest.title_base/1e6).toFixed(1)+'M</b> registered motorcycles, cars, pickups &amp; farm vehicles '
+    +'(of '+(VEHREG.latest.all_vehicles/1e6).toFixed(1)+'M vehicles of every type), vintage <b>'+(m.vintage||'')+'</b>. '
+    +'Motorcycles are <b>'+(share!=null?share+'%':'—')+'</b> of that title-lendable base — grounding the "≈half the book is motorcycle title" mix in a measured count rather than an assumption. '
+    +TAG_M+' · MOT registry · national (a cumulative registered stock, not new sales — see method).';
+  wrap.style.display='';
 }
 
 /* ---------- Collateral recovery-value sensitivity (objective #1, ILLUSTRATIVE) ----------
