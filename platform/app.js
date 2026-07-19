@@ -1861,6 +1861,7 @@ function renderAcq(){
   renderPeerProvince();
   renderPeerNpl();
   renderRivRep();
+  renderRivThreat();
   renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
@@ -2485,6 +2486,59 @@ function drawRivRep(){
         [`<b>Measured</b> — Google Places rating + review count on the located rival branches (${m.source||'pull_place_ratings.py'}); review-count-weighted so a handful of five-star outliers can't dominate.`,
          '<b>A sample, not the full census</b> — only located rival branches that carry a Google rating; read the brand order, not hairline gaps.',
          '<b>Not an AutoX figure</b> — our own branches carry no Google ratings, so there is no comparable AutoX number here.']);
+  }
+}
+
+/* ---------- rival threat matrix · footprint × service quality per brand (obj #2, MIXED) ----------
+   Surfaces data/rival_threat.json (build_rival_threat.py): the density × quality JOIN — each rival's
+   national footprint (company-IR headline, ESTIMATED; measured census count alongside) next to its
+   measured Google service rating, so the strongest COMBINED threat reads at a glance. Footprint axis
+   ESTIMATED-from-public-reports, service axis MEASURED (sample). Lazy, null-safe, graceful if absent. */
+let RIVTHREAT=null, rivthreatLoaded=false;
+function renderRivThreat(){
+  const tbl=$('#rivthreattbl'); if(!tbl) return;
+  if(rivthreatLoaded){ drawRivThreat(); return; }
+  fetch('data/rival_threat.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVTHREAT=j; rivthreatLoaded=true; drawRivThreat();
+  }).catch(()=>{ RIVTHREAT=null; rivthreatLoaded=true; drawRivThreat(); });
+}
+function drawRivThreat(){
+  const tbl=$('#rivthreattbl'), ro=$('#rivthreatreadout'); if(!tbl) return;
+  const rows=(RIVTHREAT&&Array.isArray(RIVTHREAT.brands))?RIVTHREAT.brands:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Rival threat matrix not yet computed.</b> <span class="sub">data/rival_threat.json is absent — run pipeline/build_rival_threat.py (needs competitor_coverage.json + rival_reputation.json).</span>';
+    return;
+  }
+  const m=RIVTHREAT.meta||{};
+  // threat_class -> theme token (contrast-safe light+dark): combined/volume = risk-red, quality = gold, contained = teal, partial = dim.
+  const cls=t=>{ if(t==='Strongest combined threat'||t==='Volume threat') return 'var(--agri)';
+                 if(t==='Quality threat') return 'var(--gold)';
+                 if(t==='Contained') return 'var(--merch)'; return 'var(--dim)'; };
+  const fmt=n=>(n==null?'—':n.toLocaleString());
+  tbl.innerHTML=`<tr><th>Rival brand</th>`+
+    `<th title="branches vs the ~2,015 AutoX runs — company-IR headline (ESTIMATED); census count in the sub-line">Footprint ×AutoX</th>`+
+    `<th title="review-count-weighted Google rating (MEASURED, located-branch sample)">Service ★</th>`+
+    `<th title="the combined read of footprint and service">Threat</th></tr>`+
+    rows.map(b=>{
+      const c=cls(b.threat_class);
+      const ratio=(typeof b.footprint_vs_autox==='number')?b.footprint_vs_autox:null;
+      const rating=(typeof b.rating_wavg==='number')?b.rating_wavg:null;
+      const fsub=b.branches_reported!=null?`${fmt(b.branches_reported)} rep · ${fmt(b.branches_found)} found`
+                 :(b.branches_found!=null?`${fmt(b.branches_found)} census · no IR`:'—');
+      const rsub=rating!=null?`${b.rating_tier||''} · ${fmt(b.reviews)} rev`:'no rating sampled';
+      return `<tr>
+        <td><b>${b.brand||'—'}</b></td>
+        <td>${ratio!=null?`<span class="mono"><b>${ratio.toFixed(2)}×</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${fsub}</span></td>
+        <td>${rating!=null?`${barHTML(rating,c,5)} <span class="mono" style="color:${c}"><b>${rating.toFixed(2)}</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${rsub}</span></td>
+        <td style="color:${c}"><b>${b.threat_class||'—'}</b></td>
+      </tr>`;}).join('');
+  if(ro){
+    ro.innerHTML=`<b>${RIVTHREAT.headline||''}</b> ${TAG_M}`+
+      methodBox(null,
+        [`<b>Footprint axis — ESTIMATED</b> (company-IR branch headline; the measured de-duped census count is shown in the sub-line). Where the census materially over-counts a brand vs its reported figure, the row says so — read the reported number.`,
+         `<b>Service axis — MEASURED</b> (Google Places rating, review-count-weighted, a located-branch sample — ${m.service_axis||'not the full census'}).`,
+         `<b>Not an AutoX figure</b> on the service axis — our own branches carry no Google ratings. This is a risk lens on the network we already run; it makes <b>no</b> open / close / expand recommendation.`]);
   }
 }
 
