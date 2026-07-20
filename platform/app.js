@@ -2172,9 +2172,23 @@ function drawPeerProvince(){
     const nProv=m.n_provinces||recs.length;
     const hasRankRollup=m.best_autox_rank!=null;
     const rankStr=hasRankRollup?` <b>By branch count AutoX is the single largest lender in <b style="color:var(--agri)">${m.n_provinces_autox_leads||0}</b> of ${nProv} provinces</b> — its best standing anywhere is <b>${ordinal(m.best_autox_rank)}</b> (in ${m.n_provinces_autox_top2||0}), it sits 3rd-or-lower in ${Math.max(0,nProv-(m.n_provinces_autox_top2||0))}, and it is the <b style="color:var(--agri)">smallest</b> of the operators present in <b>${m.n_provinces_autox_last||0}</b>.`:'';
+    // WHICH rival dominates the most ground — data-driven from the MEASURED leader tally
+    // (m.provinces_led_by, 77-province rollup of the `leader` field); degrades to the prior
+    // generic phrasing on a pre-fold peer_province.json that lacks the field.
+    const plb=m.provinces_led_by||null;
+    let leadStr='Muangthai leads the ground in most';
+    if(plb){
+      const rivalsLed=Object.entries(plb).filter(([op,n])=>op!=='AutoX'&&n>0).sort((a,b)=>b[1]-a[1]);
+      if(rivalsLed.length){
+        const [top,topN]=rivalsLed[0];
+        const rest=rivalsLed.slice(1).map(([op,n])=>`${op} ${n}`).join(', ');
+        leadStr=`<b>${top}</b> leads the ground in <b style="color:var(--agri)">${topN}</b> of ${nProv} provinces`+
+          (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
+      }
+    }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
