@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T23:11:14+07:00",
-    "commit": "cdd5812"
+    "generated_at": "2026-07-20T16:14:46Z",
+    "commit": "db0122b"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-20T16:14:46Z",
+      "sha": "db0122b",
+      "summary": "committee: refresh autonomy dashboard after peer district-contest ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-20T23:11:14+07:00",
       "sha": "cdd5812",
       "summary": "intel(peer): surface intra-province district contest on the Competition peer board (#105)",
@@ -498,7 +504,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-20T14:13:29+00:00",
+      "date": "2026-07-20T14:13:29Z",
       "sha": "d42f242",
       "summary": "docs(progress): log ux-doctitle-per-route merge+deploy+verify (PR #103)",
       "pillar": "uxui"
@@ -594,19 +600,19 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T12:17:00+00:00",
+      "date": "2026-07-20T12:17:00Z",
       "sha": "55f7c69",
       "summary": "intel(command-center): name the hardest-to-defend region in the #home board thesis (obj #2)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-20T11:51:39+00:00",
+      "date": "2026-07-20T11:51:39Z",
       "sha": "66fdc72",
       "summary": "committee: refresh autonomy plan (run 29739958395)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T10:12:20+00:00",
+      "date": "2026-07-20T10:12:20Z",
       "sha": "f9a7498",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post Sat/100k peer-column #100)",
       "pillar": "peer"
@@ -624,7 +630,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T08:13:05+00:00",
+      "date": "2026-07-20T08:13:05Z",
       "sha": "195342e",
       "summary": "docs(progress): log ux-loop data.html districtTable scope=col fix + merge/deploy-verify",
       "pillar": "uxui"
@@ -636,28 +642,22 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-20T06:37:32+00:00",
+      "date": "2026-07-20T06:37:32Z",
       "sha": "29e215f",
       "summary": "committee: autonomous competitor scout (run 29722079097)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T06:23:17+00:00",
+      "date": "2026-07-20T06:23:17Z",
       "sha": "1c40165",
       "summary": "committee: refresh autonomy plan (run 29721476385)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T06:16:11+00:00",
+      "date": "2026-07-20T06:16:11Z",
       "sha": "df46a16",
       "summary": "intel(command-center): carry the per-region defensibility read onto #home (obj #2)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-20T04:21:57+00:00",
-      "sha": "13a4f1c",
-      "summary": "committee: refresh autonomy plan + CEO dashboard (post peer-leader-tally #97)",
-      "pillar": "peer"
     }
   ]
 }
