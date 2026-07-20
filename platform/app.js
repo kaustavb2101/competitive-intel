@@ -1862,6 +1862,7 @@ function renderAcq(){
   renderPeerNpl();
   renderRivRep();
   renderRivThreat();
+  renderRivThreatRegion();
   renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
@@ -2539,6 +2540,58 @@ function drawRivThreat(){
         [`<b>Footprint axis — ESTIMATED</b> (company-IR branch headline; the measured de-duped census count is shown in the sub-line). Where the census materially over-counts a brand vs its reported figure, the row says so — read the reported number.`,
          `<b>Service axis — MEASURED</b> (Google Places rating, review-count-weighted, a located-branch sample — ${m.service_axis||'not the full census'}).`,
          `<b>Not an AutoX figure</b> on the service axis — our own branches carry no Google ratings. This is a risk lens on the network we already run; it makes <b>no</b> open / close / expand recommendation.`]);
+  }
+}
+
+/* ---------- rival threat by region · density × service quality where our branches sit (obj #2, MEASURED) ----------
+   Surfaces data/rival_threat_region.json (build_rival_threat_region.py): the same density × quality
+   join as the brand matrix, but localised to the 5 regions AutoX's branches sit in — how outgunned we
+   are on the ground (measured rivals:AutoX census ratio + share of our districts rivals lead) next to
+   how well-liked the rival field is (measured Google rating, a sample; thin samples flagged). Every
+   region is heavily outgunned, so the defensibility CLASS is service-led. Lazy, null-safe, graceful if absent. */
+let RIVTHREATREG=null, rivthreatregLoaded=false;
+function renderRivThreatRegion(){
+  const tbl=$('#rivthreatregtbl'); if(!tbl) return;
+  if(rivthreatregLoaded){ drawRivThreatRegion(); return; }
+  fetch('data/rival_threat_region.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVTHREATREG=j; rivthreatregLoaded=true; drawRivThreatRegion();
+  }).catch(()=>{ RIVTHREATREG=null; rivthreatregLoaded=true; drawRivThreatRegion(); });
+}
+function drawRivThreatRegion(){
+  const tbl=$('#rivthreatregtbl'), ro=$('#rivthreatregreadout'); if(!tbl) return;
+  const rows=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Regional rival threat not yet computed.</b> <span class="sub">data/rival_threat_region.json is absent — run pipeline/build_rival_threat_region.py (needs peer_province.json + rival_reputation.json).</span>';
+    return;
+  }
+  // class -> theme token (contrast-safe): hardest-to-defend = risk-red, beatable-on-service = teal, most-defensible = gold.
+  const cls=t=>{ if(t==='Hardest to defend') return 'var(--agri)';
+                 if(t==='Beatable on service') return 'var(--merch)';
+                 if(t==='Most defensible') return 'var(--gold)'; return 'var(--dim)'; };
+  const fmt=n=>(n==null?'—':n.toLocaleString());
+  tbl.innerHTML=`<tr><th>Region</th>`+
+    `<th title="rivals:AutoX branches within the region (MEASURED census, both sides); sub-line = share of AutoX districts where rivals lead">Outgunned ×</th>`+
+    `<th title="review-count-weighted Google rating for located rival branches (MEASURED sample); thin samples flagged">Rival service ★</th>`+
+    `<th title="service-led defensibility class — density is high everywhere">Defensibility</th></tr>`+
+    rows.map(r=>{
+      const c=cls(r.threat_class);
+      const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox:null;
+      const rating=(typeof r.rating_wavg==='number')?r.rating_wavg:null;
+      const dsub=r.pct_districts_outnumbered!=null?`rivals lead ${r.pct_districts_outnumbered}% of our districts · ${fmt(r.autox)} vs ${fmt(r.rivals)}`:'—';
+      const rsub=rating!=null?`${r.rating_tier||''} · ${fmt(r.reviews)} rev${r.thin_rating_sample?' · thin sample':''}`:'no rating sampled';
+      return `<tr>
+        <td><b>${r.region||'—'}</b></td>
+        <td>${ratio!=null?`<span class="mono"><b>${ratio.toFixed(2)}×</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${dsub}</span></td>
+        <td>${rating!=null?`${barHTML(rating,c,5)} <span class="mono" style="color:${c}"><b>${rating.toFixed(2)}</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${rsub}</span></td>
+        <td style="color:${c}"><b>${r.threat_class||'—'}</b></td>
+      </tr>`;}).join('');
+  if(ro){
+    ro.innerHTML=`<b>${RIVTHREATREG.headline||''}</b> ${TAG_M}`+
+      methodBox(null,
+        [`<b>Density axis — MEASURED</b> (rivals:AutoX census ratio within the region, both sides counted, plus the share of AutoX districts where rivals lead). Rivals outnumber us several-fold in every region.`,
+         `<b>Service axis — MEASURED</b> (Google Places rating, review-count-weighted, a located-rival sample — thin samples are flagged; read the star figure as indicative there).`,
+         `<b>Not an AutoX figure</b> on the service axis — our own branches carry no Google ratings. The class is service-led because density is high everywhere. A risk lens on the network we already run; <b>no</b> open / close / expand recommendation.`]);
   }
 }
 
