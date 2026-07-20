@@ -26,13 +26,24 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "source-data", "app_reviews.json")
 CAP = 1500                       # newest reviews kept per app
 
-# brand -> (Play appId, display, is_our_own). IDs resolved 2026-07-19 via Play developer pages.
+# brand -> (Play appId, display, is_our_own). IDs resolved 2026-07-19/20 via Play developer pages
+# + web search. Tier 2 (bank-backed จำนำทะเบียน entrants) added 2026-07-20: TISCO's Somwang, KTC's
+# dedicated พี่เบิ้ม app, GSB's เงินดีดี (Good Money), Saksiam (SET:SAK), and Krungsri's GO auto
+# super-app (Car4Cash lives inside it — score reads on the whole auto app, noted in the builder).
+# No app to track for: เงินให้ใจ (KBank — sells through K-branches/online, no consumer app),
+# ttb cash your car / KKP รถเรียกเงิน (whole-bank apps only — a bank app score wouldn't isolate
+# title-loan CX, so they are covered in rival_universe.json instead).
 APPS = {
     "AUTOX":      ("th.co.autox.chaiyo",              "เงินไชโย (AutoX)",        True),
     "TIDLOR":     ("com.ntl.cxm_mobile",              "ติดใจ โดย เงินติดล้อ",     False),
     "MTC":        ("co.th.muangthaileasing.mtls",     "เมืองไทย แคปปิตอล",        False),
     "SAWAD":      ("com.srisawad.mobileApplications", "ศรีสวัสดิ์",               False),
     "NGERNTURBO": ("com.ntbx.external.ngernturbo",    "เงินเทอร์โบ",              False),
+    "SOMWANG":    ("com.tisconet.mewang",             "สมหวัง เงินสั่งได้ (TISCO)", False),
+    "KTC_PBERM":  ("com.ktc.pberm",                   "KTC พี่เบิ้ม รถแลกเงิน",    False),
+    "GSB_MONEYDD":("com.moneydd.goodmoney",           "Good Money เงินดีดี (GSB)", False),
+    "SAKSIAM":    ("net.saksiam.northstar",           "ศักดิ์สยาม (SAK)",          False),
+    "KRUNGSRI_GO":("com.krungsriauto.superapp.go",    "GO by Krungsri Auto",      False),
 }
 
 

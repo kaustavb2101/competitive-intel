@@ -144,11 +144,16 @@ def _source_of(m):
 
 def _vintage_of(m):
     # Priority: an explicit "as-of/updated" stamp first, then a data-observation
-    # window end, then a price vintage, then a pull timestamp. These are all real
-    # freshness fields the repo's layers actually carry — nothing is invented; a
+    # window end, then a price/registry vintage, then a pull timestamp. These are all
+    # real freshness fields the repo's layers actually carry — nothing is invented; a
     # layer with none of them stays vintage-blank (the honest ABSENT state).
+    # pico_vintage (pico_competitors), vintage_individual (occupation_income_individual)
+    # and promos_pulled_at (rival_pulse — the live rival promo/sentiment watch) were
+    # each dropping a real date from the Data-room card because they stamp freshness
+    # under a layer-specific key; added below so their vintage surfaces like the rest.
     for k in ("updated", "vintage", "as_of", "updated_to",
-              "observed_to", "price_vintage", "pulled_at_utc", "pulled"):
+              "observed_to", "price_vintage", "pico_vintage", "vintage_individual",
+              "pulled_at_utc", "pulled", "promos_pulled_at"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)

@@ -1856,12 +1856,14 @@ function renderAcq(){
   renderSearchDemand();
   renderPeerScore();
   renderRivalPulse();
+  renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
   renderPeerNpl();
   renderRivRep();
   renderRivThreat();
+  renderRivThreatRegion();
   renderPicoCompetitors();
   renderExitWhitespace();
   // Strategy pivot — the network is consolidating, not growing. The former branch-growth surfaces
@@ -2127,10 +2129,18 @@ function drawPeerProvince(){
   // co-located under the AutoX count — gated on the layer field so a pre-fold file degrades.
   const hasRank=list.some(r=>r.autox_rank!=null);
   const ordinal=n=>n+(({1:'st',2:'nd',3:'rd'})[n]||'th');
+  // Per-province saturation vs the MEASURED vehicle collateral base (title-lender branches per
+  // 100k DLT registered vehicles) — the crowding read the raw count/ratio can't give, previously
+  // only in the headline. Gated on the layer flag so a pre-fold peer_province.json degrades to
+  // no column; † marks the Greater-Bangkok inner-ring (density inflated by central registration).
+  const hasSatCol=m.vehicle_saturation_available===true && list.some(r=>r.titlelender_per_100k_veh!=null);
+  const natTL=(typeof m.national_titlelender_per_100k_veh==='number')?m.national_titlelender_per_100k_veh:null;
+  const sh=hasSatCol?`<th title="Title-lender branches (AutoX + rivals) per 100,000 MEASURED DLT registered vehicles — how crowded the market is per unit of vehicle collateral, which the raw count can’t show${natTL!=null?`. National ${natTL.toFixed(1)}/100k`:''}. † = Greater-Bangkok inner-ring, density inflated by central vehicle registration (excluded from the crowding headline).">Sat/100k</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
     `<th title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
     bh+ph+
     `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
+    sh+
     `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
@@ -2139,6 +2149,21 @@ function drawPeerProvince(){
         return `<td class="mono"${v?'':' style="color:var(--dim)"'}>${v?v.toLocaleString():'·'}</td>`;}).join('');
       const pv=(r.pico!=null)?r.pico:0;
       const pcol=hasPico?`<td class="mono" style="color:${pv?'var(--collat)':'var(--dim)'}">${pv?pv.toLocaleString():'·'}</td>`:'';
+      // saturation vs the vehicle collateral base: agri when above the national line (contested per
+      // unit of collateral), gold below; flagged inner-ring shown dim with a † (inflated, off-headline).
+      let satCol='';
+      if(hasSatCol){
+        const tl=r.titlelender_per_100k_veh;
+        if(tl==null){ satCol='<td class="mono" style="color:var(--dim)">·</td>'; }
+        else{
+          const flagged=!!r.vehicle_stock_flag;
+          const scol=flagged?'var(--dim)':((natTL!=null&&tl>natTL)?'var(--agri)':'var(--gold)');
+          const dag=flagged?'<span style="color:var(--dim)"> †</span>':'';
+          const brk=[r.autox_per_100k_veh!=null?`AutoX ${r.autox_per_100k_veh.toFixed(1)}`:null,
+                     r.rivals_per_100k_veh!=null?`rivals ${r.rivals_per_100k_veh.toFixed(1)}`:null].filter(Boolean).join(' · ');
+          satCol=`<td class="mono" style="color:${scol}"${brk?` title="${brk} per 100k veh${flagged?' · inner-ring density inflated by central registration':''}"`:''}>${tl.toFixed(1)}${dag}</td>`;
+        }
+      }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
@@ -2154,6 +2179,7 @@ function drawPeerProvince(){
         <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b>${rankCell}</td>
         ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
+        ${satCol}
         <td>${lead}</td>
       </tr>`;}).join('');
   if(ro){
@@ -2171,9 +2197,23 @@ function drawPeerProvince(){
     const nProv=m.n_provinces||recs.length;
     const hasRankRollup=m.best_autox_rank!=null;
     const rankStr=hasRankRollup?` <b>By branch count AutoX is the single largest lender in <b style="color:var(--agri)">${m.n_provinces_autox_leads||0}</b> of ${nProv} provinces</b> — its best standing anywhere is <b>${ordinal(m.best_autox_rank)}</b> (in ${m.n_provinces_autox_top2||0}), it sits 3rd-or-lower in ${Math.max(0,nProv-(m.n_provinces_autox_top2||0))}, and it is the <b style="color:var(--agri)">smallest</b> of the operators present in <b>${m.n_provinces_autox_last||0}</b>.`:'';
+    // WHICH rival dominates the most ground — data-driven from the MEASURED leader tally
+    // (m.provinces_led_by, 77-province rollup of the `leader` field); degrades to the prior
+    // generic phrasing on a pre-fold peer_province.json that lacks the field.
+    const plb=m.provinces_led_by||null;
+    let leadStr='Muangthai leads the ground in most';
+    if(plb){
+      const rivalsLed=Object.entries(plb).filter(([op,n])=>op!=='AutoX'&&n>0).sort((a,b)=>b[1]-a[1]);
+      if(rivalsLed.length){
+        const [top,topN]=rivalsLed[0];
+        const rest=rivalsLed.slice(1).map(([op,n])=>`${op} ${n}`).join(', ');
+        leadStr=`<b>${top}</b> leads the ground in <b style="color:var(--agri)">${topN}</b> of ${nProv} provinces`+
+          (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
+      }
+    }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), Muangthai leads the ground in most. `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
@@ -2381,6 +2421,54 @@ function drawRivalPulse(){
   }
 }
 
+/* ---------- rival universe · the full จำนำทะเบียน field (obj #2) ----------
+   Surfaces data/rival_universe.json (build_rival_universe.py): every material operator — us, the
+   branch-led non-banks, and the bank-backed entrants — with owner, model, footprint claim
+   (ESTIMATED-from-public-reports, cited in the data) and the measured Play app score joined on.
+   Lazy, null-safe, graceful if absent. */
+let RIVUNI=null, rivuniLoaded=false;
+function renderRivalUniverse(){
+  const tbl=$('#pulseunitbl'); if(!tbl) return;
+  if(rivuniLoaded){ drawRivalUniverse(); return; }
+  fetch('data/rival_universe.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVUNI=j; rivuniLoaded=true; drawRivalUniverse();
+  }).catch(()=>{ RIVUNI=null; rivuniLoaded=true; drawRivalUniverse(); });
+}
+function drawRivalUniverse(){
+  const tbl=$('#pulseunitbl'), ro=$('#pulseunireadout'); if(!tbl) return;
+  const ops=(RIVUNI&&Array.isArray(RIVUNI.operators))?RIVUNI.operators:[];
+  if(!ops.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Operator census not available.</b> <span class="sub">data/rival_universe.json is absent — run pipeline/build_rival_universe.py.</span>';
+    return;
+  }
+  const m=RIVUNI.meta||{};
+  const TIER={us:'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>',
+              nonbank:'<span class="tag" style="color:var(--agri);border:1px solid var(--agri)">NON-BANK</span>',
+              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>'};
+  tbl.innerHTML=`<tr><th></th><th>Operator</th><th>Backing</th><th>Model</th>`+
+    `<th title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
+    `<th title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+
+    ops.map(o=>{
+      const app=o.app?`<span class="mono">${o.app.score.toFixed(2)}★</span> <span class="sub mono">(${(o.app.ratings||0).toLocaleString()})</span>`:'<span class="sub">—</span>';
+      return `<tr${o.tier==='us'?' style="background:rgba(230,180,80,.05)"':''}>
+        <td>${TIER[o.tier]||''}</td>
+        <td><b lang="th">${o.name_th}</b><div class="sub" style="font-size:11px">${o.name_en||''}</div></td>
+        <td class="sub">${o.owner||''}</td>
+        <td class="sub" style="font-size:12px">${o.model||''}</td>
+        <td class="sub" style="font-size:12px">${o.footprint||''}</td>
+        <td>${app}</td>
+      </tr>`;}).join('');
+  if(ro){
+    ro.innerHTML=`${RIVUNI.headline||''} <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">estimated · public reports</span>`+
+      methodBox(null,
+        [`<b>Estimated-from-public-reports</b> — footprints are the companies' own claims (SET filings, IR, press; citations in the data file), verified ${m.verified||''}. Not our measurement.`,
+         m.market_note||'',
+         '<b>App scores are measured</b> (Google Play, joined from the sentiment ladder above).',
+         'The bank tier competes through bank branches and apps, not storefronts — it shows up as rate/margin pressure before it shows up on a map.']);
+  }
+}
+
 /* ---------- peer loan quality · reported NPL benchmark (obj #1 + #2) ----------
    Surfaces data/peer_npl.json (docs/RESEARCH_DIGEST.md §B — the listed title-lenders' own
    reported NPL ratios). PEER-reported MEASURED figures — NOT an AutoX number (we hold no
@@ -2539,6 +2627,66 @@ function drawRivThreat(){
         [`<b>Footprint axis — ESTIMATED</b> (company-IR branch headline; the measured de-duped census count is shown in the sub-line). Where the census materially over-counts a brand vs its reported figure, the row says so — read the reported number.`,
          `<b>Service axis — MEASURED</b> (Google Places rating, review-count-weighted, a located-branch sample — ${m.service_axis||'not the full census'}).`,
          `<b>Not an AutoX figure</b> on the service axis — our own branches carry no Google ratings. This is a risk lens on the network we already run; it makes <b>no</b> open / close / expand recommendation.`]);
+  }
+}
+
+/* ---------- rival threat by region · density × service quality where our branches sit (obj #2, MEASURED) ----------
+   Surfaces data/rival_threat_region.json (build_rival_threat_region.py): the same density × quality
+   join as the brand matrix, but localised to the 5 regions AutoX's branches sit in — how outgunned we
+   are on the ground (measured rivals:AutoX census ratio + share of our districts rivals lead) next to
+   how well-liked the rival field is (measured Google rating, a sample; thin samples flagged). Every
+   region is heavily outgunned, so the defensibility CLASS is service-led. Lazy, null-safe, graceful if absent. */
+let RIVTHREATREG=null, rivthreatregLoaded=false;
+/* Shared loader — populates the RIVTHREATREG global once so both the Competition table and the
+   command-center defensibility card read from the same fetch. Null-safe, idempotent. */
+function loadRivThreatRegion(){
+  if(rivthreatregLoaded) return Promise.resolve(RIVTHREATREG);
+  return fetch('data/rival_threat_region.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ RIVTHREATREG=j; rivthreatregLoaded=true; return j; })
+    .catch(()=>{ RIVTHREATREG=null; rivthreatregLoaded=true; return null; });
+}
+function renderRivThreatRegion(){
+  const tbl=$('#rivthreatregtbl'); if(!tbl) return;
+  if(rivthreatregLoaded){ drawRivThreatRegion(); return; }
+  fetch('data/rival_threat_region.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVTHREATREG=j; rivthreatregLoaded=true; drawRivThreatRegion();
+  }).catch(()=>{ RIVTHREATREG=null; rivthreatregLoaded=true; drawRivThreatRegion(); });
+}
+function drawRivThreatRegion(){
+  const tbl=$('#rivthreatregtbl'), ro=$('#rivthreatregreadout'); if(!tbl) return;
+  const rows=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:[];
+  if(!rows.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Regional rival threat not yet computed.</b> <span class="sub">data/rival_threat_region.json is absent — run pipeline/build_rival_threat_region.py (needs peer_province.json + rival_reputation.json).</span>';
+    return;
+  }
+  // class -> theme token (contrast-safe): hardest-to-defend = risk-red, beatable-on-service = teal, most-defensible = gold.
+  const cls=t=>{ if(t==='Hardest to defend') return 'var(--agri)';
+                 if(t==='Beatable on service') return 'var(--merch)';
+                 if(t==='Most defensible') return 'var(--gold)'; return 'var(--dim)'; };
+  const fmt=n=>(n==null?'—':n.toLocaleString());
+  tbl.innerHTML=`<tr><th>Region</th>`+
+    `<th title="rivals:AutoX branches within the region (MEASURED census, both sides); sub-line = share of AutoX districts where rivals lead">Outgunned ×</th>`+
+    `<th title="review-count-weighted Google rating for located rival branches (MEASURED sample); thin samples flagged">Rival service ★</th>`+
+    `<th title="service-led defensibility class — density is high everywhere">Defensibility</th></tr>`+
+    rows.map(r=>{
+      const c=cls(r.threat_class);
+      const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox:null;
+      const rating=(typeof r.rating_wavg==='number')?r.rating_wavg:null;
+      const dsub=r.pct_districts_outnumbered!=null?`rivals lead ${r.pct_districts_outnumbered}% of our districts · ${fmt(r.autox)} vs ${fmt(r.rivals)}`:'—';
+      const rsub=rating!=null?`${r.rating_tier||''} · ${fmt(r.reviews)} rev${r.thin_rating_sample?' · thin sample':''}`:'no rating sampled';
+      return `<tr>
+        <td><b>${r.region||'—'}</b></td>
+        <td>${ratio!=null?`<span class="mono"><b>${ratio.toFixed(2)}×</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${dsub}</span></td>
+        <td>${rating!=null?`${barHTML(rating,c,5)} <span class="mono" style="color:${c}"><b>${rating.toFixed(2)}</b></span>`:'<span class="sub">—</span>'}<span class="sub" style="display:block">${rsub}</span></td>
+        <td style="color:${c}"><b>${r.threat_class||'—'}</b></td>
+      </tr>`;}).join('');
+  if(ro){
+    ro.innerHTML=`<b>${RIVTHREATREG.headline||''}</b> ${TAG_M}`+
+      methodBox(null,
+        [`<b>Density axis — MEASURED</b> (rivals:AutoX census ratio within the region, both sides counted, plus the share of AutoX districts where rivals lead). Rivals outnumber us several-fold in every region.`,
+         `<b>Service axis — MEASURED</b> (Google Places rating, review-count-weighted, a located-rival sample — thin samples are flagged; read the star figure as indicative there).`,
+         `<b>Not an AutoX figure</b> on the service axis — our own branches carry no Google ratings. The class is service-led because density is high everywhere. A risk lens on the network we already run; <b>no</b> open / close / expand recommendation.`]);
   }
 }
 
@@ -5613,6 +5761,37 @@ function renderHomeRegions(){
   body.innerHTML=rows+`<div class="sub" style="margin-top:6px;color:var(--dim)">Per-branch recommendations rolled up by region · full situation → action detail on the Overview.</div>`;
   wrap.style.display='';
 }
+/* Command-center "Where the network is hardest to defend" card — the per-region density × service
+   read (data/rival_threat_region.json, the same MEASURED layer the Competition tab renders), rolled
+   onto the front door so the hardest-to-defend regions sit beside the portfolio-risk headline.
+   Reuses the RIVTHREATREG global (loaded lazily below). Objective #2. Null-safe: no rows → card hidden. */
+function renderHomeDefend(){
+  const wrap=$('#cc-defend'), body=$('#cc-defend-body');
+  if(!wrap||!body) return;
+  const rows=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:[];
+  if(!rows.length) return;                                   // stay hidden until the fetch resolves
+  // class -> theme token (same mapping as the Competition tab): hardest = risk-red, beatable = teal, defensible = gold.
+  const cls=t=>{ if(t==='Hardest to defend') return 'var(--agri)';
+                 if(t==='Beatable on service') return 'var(--merch)';
+                 if(t==='Most defensible') return 'var(--gold)'; return 'var(--dim)'; };
+  // hardest-to-defend first, then most-outgunned — lead with the region that needs the most defending.
+  const ordered=rows.slice().sort((a,b)=>{
+    const hard=x=>x.threat_class==='Hardest to defend'?0:1;
+    if(hard(a)!==hard(b)) return hard(a)-hard(b);
+    return (b.rivals_vs_autox||0)-(a.rivals_vs_autox||0);
+  });
+  body.innerHTML=ordered.map(r=>{
+    const c=cls(r.threat_class);
+    const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox.toFixed(1)+'×':'—';
+    const rating=(typeof r.rating_wavg==='number')?r.rating_wavg.toFixed(2)+'★':'—';
+    return `<div class="cc-row">
+      <span class="l"><b style="border-left:3px solid ${c};padding-left:7px">${r.region||'—'}</b>
+        <span class="s">outgunned ${ratio} · rival service ${rating}${r.thin_rating_sample?' · thin sample':''}</span></span>
+      <span class="r" style="color:${c}"><b>${r.threat_class||'—'}</b></span></div>`;
+  }).join('')+
+  `<div class="sub" style="margin-top:6px;color:var(--dim)">Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. Full detail → Competition.</div>`;
+  wrap.style.display='';
+}
 function renderHome(){
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
@@ -5620,6 +5799,7 @@ function renderHome(){
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
+  renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
   renderHomeRegions();      // regional_outlook.json — recommendation by region (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
@@ -5665,6 +5845,9 @@ function renderHome(){
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
     loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
+    // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
+    loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
     loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
@@ -5713,6 +5896,25 @@ function renderHomeThesis(){
     const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
     const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
     clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
+  }
+  // obj#2 — the per-region DEFENSIBILITY discriminator (rival_threat_region.json, the same MEASURED
+  // density×service layer the #cc-defend card renders). Density is high in every region (the clause
+  // above), so the sharp read is SERVICE: which region's rival field is both dense AND best-loved,
+  // i.e. hardest to take share from. Names the hardest-to-defend ground in prose beside the portfolio
+  // verdict — the front door's job is one blended readout. Null-safe; dropped until the layer loads.
+  const rt=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:null;
+  if(rt&&rt.length){
+    const hard=rt.filter(r=>r.threat_class==='Hardest to defend');
+    if(hard.length){
+      // lead the rating with the sharpest hard region: best-loved rival service, preferring a non-thin sample.
+      const lead=hard.slice().sort((a,b)=>{
+        if(!!a.thin_rating_sample!==!!b.thin_rating_sample) return a.thin_rating_sample?1:-1;
+        return (b.rating_wavg||0)-(a.rating_wavg||0);
+      })[0];
+      const names=hard.map(r=>r.region).join(' &amp; ');
+      const rr=(typeof lead.rating_wavg==='number')?lead.rating_wavg.toFixed(2)+'★':'—';
+      clauses.push(`the ground <b>hardest to defend</b> is <b>${names}</b> (rivals both densest and best-loved, up to ${rr}${lead.thin_rating_sample?', thin sample':''}, measured)`);
+    }
   }
   // THE INTERSECTION (province_pressure.json) — the sharpest cross-objective clause: how many
   // provinces sit in BOTH the top third for borrower stress AND for rival dominance (a fragile
