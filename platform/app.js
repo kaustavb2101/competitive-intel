@@ -60,6 +60,15 @@ async function loadCropStress(){
 }
 let CSTRESS_META=null, CSTRESS_LIST=[];
 
+// per-amphoe drought — lazy-loaded from data/drought_district.json (objective #1). MODELLED OAE SPEI
+// (ERA5-Land reanalysis): a DISTRICT-grain read behind the province crop-stress verdict. Promise-cached.
+let droughtdPromise=null;
+function loadDroughtDistrict(){
+  if(droughtdPromise) return droughtdPromise;
+  droughtdPromise=fetch('data/drought_district.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  return droughtdPromise;
+}
+
 // Dry-season (SECOND / irrigated) rice EXPOSURE per province — MEASURED, OAE ข้าวนาปรัง planted area
 // (data/napprang.json). This is the irrigated second-crop income cushion sitting behind the drought
 // flag: a big planted area = a big buffer today AND a big vulnerability if water cuts force the second
@@ -1400,6 +1409,8 @@ function renderOverview(){
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
+  // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
+  loadDroughtDistrict().then(renderDroughtDistrict);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1846,6 +1857,33 @@ function renderCropStress(){
       <td class="sub">${dom.crop||'—'} <span class="mono">${dom.share!=null?Math.round(dom.share*100)+'%':''}</span></td>
       <td class="mono" style="color:${p.price_stress<0?'var(--agri)':'var(--mid)'}">${p.price_stress!=null?(p.price_stress>0?'+':'')+p.price_stress+'%':'—'}</td>
       <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td>`+(hasNap?(()=>{const np=NAPPRANG[p.th]; const pr=np&&np.planted_rai; return `<td class="mono sub" title="MEASURED — OAE dry-season second-rice planted area (rai)">${pr?fmtRai(pr):'—'}</td>`;})():'')+`</tr>`;}).join('');
+}
+
+/* ---------- district drought (OAE SPEI) · Overview card, objective #1 ----------
+   MODELLED per-amphoe SPEI (ERA5-Land reanalysis, OAE) — a DISTRICT-grain sharpening of the province
+   crop-stress verdict above (whose drought input is a coarser HDX rainfall proxy). It names the
+   specific driest districts the province table can't resolve. Honestly labelled MODELLED (a model
+   product, not a measured observation, not a disaster declaration). Null-safe: absent / shapeless
+   file → the whole card stays hidden and the Overview reads exactly as before. */
+function renderDroughtDistrict(j){
+  const wrap=$('#drought-district-wrap'); if(!wrap) return;
+  const ds=j&&Array.isArray(j.districts)?j.districts:null;
+  if(!ds||!ds.length){ wrap.style.display='none'; return; }
+  const m=j.meta||{}, c=m.counts||{}, snap=m.snapshot||'';
+  const total=ds.length, mworse=(c.extreme||0)+(c.severe||0)+(c.moderate||0);
+  wrap.style.display='block';
+  const v=$('#drought-district-verdict');
+  if(v) v.innerHTML=`<div class="verdict-line">🌾 <b>District drought:</b> ${mworse} of ${total} districts at moderate-or-worse on OAE's SPEI${snap?` (${snap})`:''} — <b style="color:var(--agri)">${c.extreme||0} extreme</b>, <span style="color:var(--gold)">${c.severe||0} severe</span>, ${c.moderate||0} moderate.</div>`+
+    `<div class="sub" style="margin-top:4px">A sharper district-grain read behind the province crop-stress verdict above · ${provChip('e','modelled','OAE SPEI')}</div>`;
+  const note=$('#drought-district-note');
+  if(note) note.innerHTML='<b>SPEI</b> (Standardized Precipitation-Evapotranspiration Index) is a <b>MODELLED</b> drought index OAE computes from ERA5-Land reanalysis — an official model product, <b>not</b> station rainfall and <b>not</b> a disaster declaration. Lower (more negative) = drier. The crop-stress table above uses a coarser HDX rainfall proxy; this resolves the same signal to the <b>district</b>.';
+  // top driest CLEAN districts — drop suspect-zero grid gaps + ambiguous name→polygon joins for
+  // honesty (never attribute a drought reading to an uncertain district). Already sorted driest-first.
+  const clean=ds.filter(x=>x&&x.cls&&!x.suspect_zero&&!x.join_ambiguous&&x.spei!=null).slice(0,8);
+  const col=cl=>cl==='extreme'?'var(--agri)':cl==='severe'?'var(--gold)':'var(--mid)';
+  const tbl=$('#drought-district-tbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th>Severity</th></tr>`+
+    clean.map((x,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${x.name_th||x.name_en||x.code}</b></td><td class="sub">${x.province_th||'—'}</td><td class="mono" style="color:${col(x.cls)}">${x.spei.toFixed(2)}</td><td><span class="tag" style="color:${col(x.cls)};border:1px solid ${col(x.cls)}">${x.cls}</span></td></tr>`).join('');
 }
 
 /* ---------- acquisition ---------- */

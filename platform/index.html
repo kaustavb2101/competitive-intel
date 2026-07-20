@@ -279,6 +279,13 @@
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note"></p>
     <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+    <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
+         read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
+    <div id="drought-district-wrap" style="display:none">
+      <div class="verdict v-warn" id="drought-district-verdict"></div>
+      <p class="lead" id="drought-district-note"></p>
+      <table class="tbl" id="drought-district-tbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
