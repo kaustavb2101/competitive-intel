@@ -5847,7 +5847,7 @@ function renderHome(){
     loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
     // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
     // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
-    loadRivThreatRegion().then(()=>{ if(onHome()) renderHomeDefend(); });
+    loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
     loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
@@ -5896,6 +5896,25 @@ function renderHomeThesis(){
     const nOut=pp.n_provinces_outnumbered, nP=pp.n_provinces;
     const scope=(nOut>=nP)?`all <b>${nP}</b> provinces`:`<b>${nOut}</b> of ${nP} provinces`;
     clauses.push(`the big-4 rivals <b>outnumber AutoX</b> in ${scope} on local density (measured)`);
+  }
+  // obj#2 — the per-region DEFENSIBILITY discriminator (rival_threat_region.json, the same MEASURED
+  // density×service layer the #cc-defend card renders). Density is high in every region (the clause
+  // above), so the sharp read is SERVICE: which region's rival field is both dense AND best-loved,
+  // i.e. hardest to take share from. Names the hardest-to-defend ground in prose beside the portfolio
+  // verdict — the front door's job is one blended readout. Null-safe; dropped until the layer loads.
+  const rt=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:null;
+  if(rt&&rt.length){
+    const hard=rt.filter(r=>r.threat_class==='Hardest to defend');
+    if(hard.length){
+      // lead the rating with the sharpest hard region: best-loved rival service, preferring a non-thin sample.
+      const lead=hard.slice().sort((a,b)=>{
+        if(!!a.thin_rating_sample!==!!b.thin_rating_sample) return a.thin_rating_sample?1:-1;
+        return (b.rating_wavg||0)-(a.rating_wavg||0);
+      })[0];
+      const names=hard.map(r=>r.region).join(' &amp; ');
+      const rr=(typeof lead.rating_wavg==='number')?lead.rating_wavg.toFixed(2)+'★':'—';
+      clauses.push(`the ground <b>hardest to defend</b> is <b>${names}</b> (rivals both densest and best-loved, up to ${rr}${lead.thin_rating_sample?', thin sample':''}, measured)`);
+    }
   }
   // THE INTERSECTION (province_pressure.json) — the sharpest cross-objective clause: how many
   // provinces sit in BOTH the top third for borrower stress AND for rival dominance (a fragile
