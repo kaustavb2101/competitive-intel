@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T05:18:48+07:00",
-    "commit": "2b6607d"
+    "generated_at": "2026-07-20T11:19:36+07:00",
+    "commit": "c34646a"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,36 @@
   ],
   "activity": [
     {
+      "date": "2026-07-20T11:19:36+07:00",
+      "sha": "c34646a",
+      "summary": "intel(peer): data-drive the leading-rival headline off a MEASURED province-leader tally (#97)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-20T02:11:48+00:00",
+      "sha": "f8886e9",
+      "summary": "docs(progress): log ux-loop data.html sortable-header keyboard/aria fix + deploy-verify (#96)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T09:09:09+07:00",
+      "sha": "0f9e421",
+      "summary": "ux: data.html sortable column headers keyboard-operable + aria-sort (#96)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T09:00:07+07:00",
+      "sha": "56a4d70",
+      "summary": "intel(competition): per-region rival threat cut — density × service where our branches sit (obj #2) (#95)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T22:19:32+00:00",
+      "sha": "5d83bba",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post freshness-stamp fix #92)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-20T05:18:48+07:00",
       "sha": "2b6607d",
       "summary": "service: recover 3 layers' dropped freshness stamps in the Data-room card (#92)",
@@ -628,36 +658,6 @@
       "sha": "1f748a3",
       "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
       "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T17:12:18+07:00",
-      "sha": "982dcbb",
-      "summary": "intel(market): surface MEASURED EV-transition workforce exposure on the collateral outlook (#81)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T08:34:24+00:00",
-      "sha": "1b6359b",
-      "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-19T15:30:52+07:00",
-      "sha": "8854ab8",
-      "summary": "ux: noscript fallback on the three deck.gl/WebGL pages (#80)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-19T06:24:51+00:00",
-      "sha": "adfc920",
-      "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T06:17:40+00:00",
-      "sha": "d4d1fc0",
-      "summary": "committee: autonomous competitor scout (run 29676124159)",
-      "pillar": "market"
     }
   ]
 }
