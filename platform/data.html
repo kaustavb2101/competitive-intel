@@ -207,10 +207,82 @@ function renderNational(){
   h+='<div class="db-chiprow" id="regfilter"><button class="db-chip on" data-r="">All 77</button>'+
      regions.map(function(r){return '<button class="db-chip" data-r="'+esc(r.region)+'">'+esc(r.label)+' ('+r.n_provinces+')</button>';}).join('')+'</div>';
   h+=provinceTable(allProv);
+  // lens rankings — the National-map lenses as ranked, actionable lists (owner feedback 2026-07-20:
+  // "the powerful data in the national map view is lost on me since it's not actionable")
+  h+='<div class="db-sec"><span class="n">L</span> Lens rankings — the National-map signals as ranked lists <span class="db-badge" style="color:var(--gold,#e6b450)">ESTIMATED composites</span></div>';
+  h+='<p class="db-sub">The same per-branch and per-district lens scores the National map colors its dots with — ranked here so they are actionable. Scores are <b>estimated composites over measured inputs</b> (POI counts, factories, workers, rainfall, population are measured; the blend into one score is a model). Top 40 shown per lens.</p>';
+  h+='<div class="db-chiprow" id="blchips">'+BLENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-bl="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
+  h+='<div id="lensbr" class="db-note">Loading branch lenses…</div>';
+  h+='<div class="db-chiprow" style="margin-top:14px" id="alchips">'+ALENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-al="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
+  h+='<div id="lensam" class="db-note">Loading district lenses…</div>';
   h+=footer();
   document.getElementById('db-root').innerHTML=h;
   wireTable(allProv);
   wireFilter(allProv);
+  loadLenses();
+}
+
+// ---- lens rankings (National-map lenses, made actionable in the book) ----
+var BR=null, AMR=null;
+var BLENS=[
+  {k:'a',t:'Agri-PD',color:'var(--agri,#d1544b)',note:'agri exposure / drought-PD pressure around the branch'},
+  {k:'m',t:'Merchant',color:'var(--merch,#1c8c7d)',note:'merchant / market-economy depth around the branch'},
+  {k:'c',t:'Collateral',color:'#7A4FE0',note:'vehicle & gold collateral depth around the branch'},
+  {k:'o',t:'Coverage',color:'var(--gold,#e6b450)',note:'under-served demand around the branch'}];
+var ALENS=[
+  {k:'whitespace',t:'District coverage gap',color:'var(--gold,#e6b450)',note:'district demand vs branch presence (0-branch districts included)'},
+  {k:'risk_proxy',t:'District risk proxy',color:'var(--agri,#d1544b)',note:'district stress composite (agri stress, unemployment, informality)'}];
+function loadLenses(){
+  if(!document.getElementById('lensbr')) return;
+  Promise.all([
+    fetch('data/branches.json').then(function(r){return r.ok?r.json():null;}),
+    fetch('data/amphoe.json').then(function(r){return r.ok?r.json():null;})
+  ]).then(function(res){
+    BR=res[0]||[]; AMR=(res[1]&&res[1].amphoe)||[];
+    drawBrLens('a'); drawAmLens('whitespace'); wireLensChips();
+  }).catch(function(){
+    var e1=document.getElementById('lensbr'); if(e1) e1.textContent='Lens data unavailable (data/branches.json).';
+    var e2=document.getElementById('lensam'); if(e2) e2.textContent='';
+  });
+}
+function lensBar(v,hi,color){var w=hi>0?Math.max(2,Math.round(v/hi*100)):0;return '<div class="db-bar" style="min-width:70px"><i style="width:'+w+'%;background:'+color+'"></i></div>';}
+function drawBrLens(k){
+  var el=document.getElementById('lensbr'); if(!el||!BR.length) return;
+  var L=null; BLENS.forEach(function(x){if(x.k===k)L=x;});
+  var rows=BR.slice().sort(function(a,b){return (b[k]||0)-(a[k]||0);}).slice(0,40);
+  var hi=rows.length?(rows[0][k]||0):0;
+  var h='<p class="db-sub" style="margin:4px 0 6px">'+esc(L.note)+' — our '+num(BR.length)+' branches, highest first.</p>';
+  h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>#</th><th>Branch</th><th>Province</th><th>District</th><th>'+esc(L.t)+' score</th><th>Pop ≤10km</th><th>Workers</th><th>Factories</th></tr></thead><tbody>';
+  rows.forEach(function(b,i){
+    h+='<tr><td>'+(i+1)+'</td><td class="name" lang="th">'+esc(b.n)+'</td><td>'+esc(b.v)+'</td><td lang="th">'+esc(b.d||'—')+'</td>'+
+       '<td><div style="display:flex;align-items:center;gap:8px">'+lensBar(b[k]||0,hi,L.color)+'<b>'+((b[k]==null)?'—':Number(b[k]).toFixed(1))+'</b></div></td>'+
+       '<td>'+num(b.pop)+'</td><td>'+num(b.dwork)+'</td><td>'+num(b.dfac)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  el.className=''; el.innerHTML=h;
+}
+function drawAmLens(k){
+  var el=document.getElementById('lensam'); if(!el||!AMR.length) return;
+  var L=null; ALENS.forEach(function(x){if(x.k===k)L=x;});
+  var rows=AMR.slice().sort(function(a,b){return (b[k]||0)-(a[k]||0);}).slice(0,40);
+  var hi=rows.length?(rows[0][k]||0):0;
+  var h='<p class="db-sub" style="margin:4px 0 6px">'+esc(L.note)+' — all 928 districts, highest first.</p>';
+  h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>#</th><th>District</th><th>Province</th><th>AutoX branches</th><th>Demand</th><th>'+esc(L.t)+'</th><th>Workers</th></tr></thead><tbody>';
+  rows.forEach(function(a,i){
+    h+='<tr><td>'+(i+1)+'</td><td class="name" lang="th">'+esc(a.name)+'<span class="en"> '+esc(a.name_en||'')+'</span></td><td lang="th">'+esc(a.province_th)+'</td>'+
+       '<td class="'+(a.branches===0?'hot':'')+'">'+num(a.branches)+'</td><td>'+((a.demand==null)?'—':Number(a.demand).toFixed(0))+'</td>'+
+       '<td><div style="display:flex;align-items:center;gap:8px">'+lensBar(a[k]||0,hi,L.color)+'<b>'+((a[k]==null)?'—':Number(a[k]).toFixed(1))+'</b></div></td>'+
+       '<td>'+num(a.workers)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  el.className=''; el.innerHTML=h;
+}
+function wireLensChips(){
+  var bc=document.getElementById('blchips'), ac=document.getElementById('alchips');
+  if(bc) bc.addEventListener('click',function(e){var b=e.target.closest('button[data-bl]');if(!b)return;
+    bc.querySelectorAll('.db-chip').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); drawBrLens(b.getAttribute('data-bl'));});
+  if(ac) ac.addEventListener('click',function(e){var b=e.target.closest('button[data-al]');if(!b)return;
+    ac.querySelectorAll('.db-chip').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); drawAmLens(b.getAttribute('data-al'));});
 }
 
 var COLS=[
