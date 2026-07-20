@@ -246,6 +246,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_threat.py --check (rival_reputation.json absent — Google Places pull, not data drift)"
   else bad "build_rival_threat.py --check (rival_threat.json drifted from competitor_coverage.json/rival_reputation.json — run: python3 pipeline/build_rival_threat.py)"
   fi
+  ( cd "$PIPE" && python3 build_rival_threat_region.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_rival_threat_region.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_rival_threat_region.py --check (rival_reputation.json absent — Google Places pull, not data drift)"
+  else bad "build_rival_threat_region.py --check (rival_threat_region.json drifted from peer_province.json/rival_reputation.json — run: python3 pipeline/build_rival_threat_region.py)"
+  fi
   ( cd "$PIPE" && python3 build_peer_province.py --check >/dev/null 2>&1 ) && ok "build_peer_province.py --check" || bad "build_peer_province.py --check (peer_province.json drifted from rival_density.json — run: python3 pipeline/build_peer_province.py)"
   ( cd "$PIPE" && python3 build_province_pressure.py --check >/dev/null 2>&1 ) && ok "build_province_pressure.py --check" || bad "build_province_pressure.py --check (province_pressure.json drifted from province_stress_index.json/peer_province.json — run: python3 pipeline/build_province_pressure.py)"
   ( cd "$PIPE" && python3 build_rival_pressure.py --check >/dev/null 2>&1 ) && ok "build_rival_pressure.py --check" || bad "build_rival_pressure.py --check (rival_pressure.json drifted from branches.json/competitors_census.json)"
