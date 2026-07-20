@@ -405,7 +405,7 @@ function districtTable(d){
   var feats=(d.districts&&d.districts.features)?d.districts.features.slice():[];
   if(!feats.length)return '<div class="db-note" style="padding:20px 0">No district breakdown for this province.</div>';
   feats.sort(function(a,b){return (b.properties.competitors||0)-(a.properties.competitors||0);});
-  var h='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>District</th><th>AutoX</th><th>Rivals</th><th>Working-age</th><th>DIW workers</th></tr></thead><tbody>';
+  var h='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th scope="col">District</th><th scope="col">AutoX</th><th scope="col">Rivals</th><th scope="col">Working-age</th><th scope="col">DIW workers</th></tr></thead><tbody>';
   feats.forEach(function(f){var p=f.properties||{};var contested=(p.competitors||0)>(p.branches||0);
     h+='<tr style="cursor:default"><td class="name">'+esc(p.district||p.shapeName||'—')+'</td><td>'+num(p.branches||0)+'</td><td class="'+(contested?'hot':'')+'">'+num(p.competitors||0)+'</td><td>'+num(p.workingage||0)+'</td><td>'+num(p.real_workers||0)+'</td></tr>';
   });
