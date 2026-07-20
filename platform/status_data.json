@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T16:14:46Z",
-    "commit": "db0122b"
+    "generated_at": "2026-07-21T04:19:19+07:00",
+    "commit": "38432f5"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-21",
+    "eta_date": "2026-07-22",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,6 +480,24 @@
   ],
   "activity": [
     {
+      "date": "2026-07-21T04:19:19+07:00",
+      "sha": "38432f5",
+      "summary": "Merge pull request #106 from kaustavb2101/claude/intel-loop-20260720-drought-district",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T18:25:23Z",
+      "sha": "be4aa48",
+      "summary": "intel(overview): surface the dark district-drought (OAE SPEI) layer on the crop-stress card",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-20T16:37:04Z",
+      "sha": "061f951",
+      "summary": "committee: refresh autonomy plan (run 29760280059)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-20T16:14:46Z",
       "sha": "db0122b",
       "summary": "committee: refresh autonomy dashboard after peer district-contest ship",
@@ -640,24 +658,6 @@
       "sha": "6031a9c",
       "summary": "ux: add scope=col to data.html districtTable headers (a11y) (#99)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T06:37:32Z",
-      "sha": "29e215f",
-      "summary": "committee: autonomous competitor scout (run 29722079097)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-20T06:23:17Z",
-      "sha": "1c40165",
-      "summary": "committee: refresh autonomy plan (run 29721476385)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-20T06:16:11Z",
-      "sha": "df46a16",
-      "summary": "intel(command-center): carry the per-region defensibility read onto #home (obj #2)",
-      "pillar": "feature"
     }
   ]
 }
