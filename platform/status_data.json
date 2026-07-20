@@ -2,17 +2,17 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T10:12:20Z",
-    "commit": "f9a7498"
+    "generated_at": "2026-07-20T23:11:14+07:00",
+    "commit": "cdd5812"
   },
   "overall": {
-    "progress_pct": 96,
+    "progress_pct": 94,
     "status": "on-track",
-    "eta_days": 0,
-    "eta_date": "2026-07-20",
-    "done_items": 48,
+    "eta_days": 1,
+    "eta_date": "2026-07-21",
+    "done_items": 47,
     "in_progress_items": 2,
-    "open_items": 0,
+    "open_items": 1,
     "total_items": 50
   },
   "loops": [
@@ -102,8 +102,8 @@
     {
       "key": "deployment",
       "label": "Deployment & autonomy",
-      "progress_pct": 100,
-      "done": 6,
+      "progress_pct": 83,
+      "done": 5,
       "total": 6,
       "status": "on-track",
       "items": [
@@ -145,7 +145,7 @@
         {
           "id": "dep-access",
           "title": "Access protection on the deployment (sensitive branch-level PD)",
-          "state": "done",
+          "state": "open",
           "priority": 3,
           "evidence": "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; fail-open when unset. Verified live (401 without creds, 200 with the password)."
         }
@@ -480,7 +480,133 @@
   ],
   "activity": [
     {
-      "date": "2026-07-20T10:12:20Z",
+      "date": "2026-07-20T23:11:14+07:00",
+      "sha": "cdd5812",
+      "summary": "intel(peer): surface intra-province district contest on the Competition peer board (#105)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-20T21:29:47+07:00",
+      "sha": "7b79afa",
+      "summary": "Merge pull request #104 from kaustavb2101/claude/ingest-wave",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T21:13:57+07:00",
+      "sha": "7f9c980",
+      "summary": "data(provenance): register ingest-wave layers (102) + crop_farmer_income refresh under the WSL 3.11 mirror",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-20T14:13:29+00:00",
+      "sha": "d42f242",
+      "summary": "docs(progress): log ux-doctitle-per-route merge+deploy+verify (PR #103)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T21:12:02+07:00",
+      "sha": "d0c61d1",
+      "summary": "feat(ingest): Thai-gov PDF ingest wave — farmer margin, district drought, 2026Q1 LFS, BoT regional debt (obj #1)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-20T21:10:32+07:00",
+      "sha": "6f21fa1",
+      "summary": "ux: per-route browser-tab title in SPA showTab (#103)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T20:52:43+07:00",
+      "sha": "0151445",
+      "summary": "Merge pull request #93 from kaustavb2101/data/fuel-29708243885",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:39:46+07:00",
+      "sha": "3d9dbaf",
+      "summary": "Merge pull request #102 from kaustavb2101/claude/databook-lenses",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:36:22+07:00",
+      "sha": "5215821",
+      "summary": "data(provenance): regenerate on merged fuel tree under the WSL 3.11 mirror",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:34:43+07:00",
+      "sha": "288822d",
+      "summary": "merge master into fuel data branch (provenance regenerated next)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:29:04+07:00",
+      "sha": "7243ef9",
+      "summary": "Merge pull request #91 from kaustavb2101/data/nabc-29703830951",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:24:33+07:00",
+      "sha": "b1462e9",
+      "summary": "ux(databook): lens rankings — the National-map signals as ranked, actionable lists (owner feedback)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T20:13:05+07:00",
+      "sha": "852d3d2",
+      "summary": "data(nabc): regenerate downstream farm-gate chain (farmgate_prices -> crop_stress -> provenance) under the CI 3.11 mirror — the pull workflow committed only the raw NABC prices, failing the gate",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-20T20:01:43+07:00",
+      "sha": "94d3c4a",
+      "summary": "merge master into nabc data branch",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T20:00:52+07:00",
+      "sha": "afe6bf0",
+      "summary": "ops(access): disable the password gate — office networks block the Basic-Auth prompt; keep for later",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-20T19:59:22+07:00",
+      "sha": "c603a7f",
+      "summary": "Merge pull request #101 from kaustavb2101/claude/home-thesis-defensibility",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T19:55:23+07:00",
+      "sha": "870195f",
+      "summary": "Merge pull request #94 from kaustavb2101/claude/rival-universe",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-20T19:44:47+07:00",
+      "sha": "2e16fec",
+      "summary": "data(provenance): regenerate on merged tree (98 layers) under the WSL 3.11 mirror",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T19:44:19+07:00",
+      "sha": "6bbee20",
+      "summary": "merge origin/master into claude/rival-universe (provenance regenerated next)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-20T12:17:00+00:00",
+      "sha": "55f7c69",
+      "summary": "intel(command-center): name the hardest-to-defend region in the #home board thesis (obj #2)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-20T11:51:39+00:00",
+      "sha": "66fdc72",
+      "summary": "committee: refresh autonomy plan (run 29739958395)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-20T10:12:20+00:00",
       "sha": "f9a7498",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post Sat/100k peer-column #100)",
       "pillar": "peer"
@@ -498,7 +624,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T08:13:05Z",
+      "date": "2026-07-20T08:13:05+00:00",
       "sha": "195342e",
       "summary": "docs(progress): log ux-loop data.html districtTable scope=col fix + merge/deploy-verify",
       "pillar": "uxui"
@@ -510,154 +636,28 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-20T06:37:32Z",
+      "date": "2026-07-20T06:37:32+00:00",
       "sha": "29e215f",
       "summary": "committee: autonomous competitor scout (run 29722079097)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T06:23:17Z",
+      "date": "2026-07-20T06:23:17+00:00",
       "sha": "1c40165",
       "summary": "committee: refresh autonomy plan (run 29721476385)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T06:16:11Z",
+      "date": "2026-07-20T06:16:11+00:00",
       "sha": "df46a16",
       "summary": "intel(command-center): carry the per-region defensibility read onto #home (obj #2)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-20T04:21:57Z",
+      "date": "2026-07-20T04:21:57+00:00",
       "sha": "13a4f1c",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post peer-leader-tally #97)",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-07-20T11:19:36+07:00",
-      "sha": "c34646a",
-      "summary": "intel(peer): data-drive the leading-rival headline off a MEASURED province-leader tally (#97)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-20T02:11:48Z",
-      "sha": "f8886e9",
-      "summary": "docs(progress): log ux-loop data.html sortable-header keyboard/aria fix + deploy-verify (#96)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T09:09:09+07:00",
-      "sha": "0f9e421",
-      "summary": "ux: data.html sortable column headers keyboard-operable + aria-sort (#96)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T09:00:07+07:00",
-      "sha": "56a4d70",
-      "summary": "intel(competition): per-region rival threat cut — density × service where our branches sit (obj #2) (#95)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T22:19:32Z",
-      "sha": "5d83bba",
-      "summary": "committee: refresh autonomy plan + CEO dashboard (post freshness-stamp fix #92)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-20T05:18:48+07:00",
-      "sha": "2b6607d",
-      "summary": "service: recover 3 layers' dropped freshness stamps in the Data-room card (#92)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-19T21:59:38Z",
-      "sha": "7f8b491",
-      "summary": "committee: refresh autonomy plan (run 29705300641)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T20:13:07Z",
-      "sha": "9b5a596",
-      "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T03:10:11+07:00",
-      "sha": "4dee623",
-      "summary": "ux: data.html theme-color meta tracks data-theme (mobile chrome consistency) (#90)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T18:16:57Z",
-      "sha": "65322d6",
-      "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-20T00:13:45+07:00",
-      "sha": "a923da5",
-      "summary": "Merge pull request #89 from kaustavb2101/claude/rival-pulse",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:58:30+07:00",
-      "sha": "023d300",
-      "summary": "data(provenance): regenerate on the merged tree (96 layers — rival_pulse + rival_threat) under the WSL 3.11 mirror",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:57:55+07:00",
-      "sha": "2bd3383",
-      "summary": "merge origin/master into claude/rival-pulse — keep both rival_pulse + rival_threat gate blocks; provenance regenerated next",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:38:31+07:00",
-      "sha": "a8cd0dc",
-      "summary": "ops(rival-pulse): daily auto-refresh script for Windows Task Scheduler (Thai-IP laptop)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T16:31:27Z",
-      "sha": "52e88ef",
-      "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:27:55+07:00",
-      "sha": "ef652d5",
-      "summary": "feat(competition): rival threat matrix — footprint × service-quality join (obj #2) (#88)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:23:31+07:00",
-      "sha": "435128a",
-      "summary": "data(provenance): register rival_pulse layer — regenerated under the WSL 3.11 mirror (LF tree)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T23:22:40+07:00",
-      "sha": "0f3ad78",
-      "summary": "feat(competition): rival pulse — live promo watch + measured app sentiment incl. our own เงินไชโย",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T16:02:30Z",
-      "sha": "caab12c",
-      "summary": "committee: refresh autonomy plan (run 29694014006)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T22:15:36+07:00",
-      "sha": "ca19d7f",
-      "summary": "feat(competition): autonomous SET listed-peer scoreboard + digital-presence section (#87)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-19T21:56:06+07:00",
-      "sha": "25d3db5",
-      "summary": "feat(competition): measured rival service reputation (Google ratings) (#86)",
-      "pillar": "market"
     }
   ]
 }
