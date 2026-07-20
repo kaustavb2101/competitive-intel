@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T17:11:46+07:00",
-    "commit": "a105ead"
+    "generated_at": "2026-07-20T10:12:20Z",
+    "commit": "f9a7498"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-20T10:12:20Z",
+      "sha": "f9a7498",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post Sat/100k peer-column #100)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-20T17:11:46+07:00",
       "sha": "a105ead",
       "summary": "intel(peer): per-province Sat/100k vehicle-saturation column on the Competition peer board (obj #2) (#100)",
@@ -492,7 +498,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T08:13:05+00:00",
+      "date": "2026-07-20T08:13:05Z",
       "sha": "195342e",
       "summary": "docs(progress): log ux-loop data.html districtTable scope=col fix + merge/deploy-verify",
       "pillar": "uxui"
@@ -504,25 +510,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-20T06:37:32+00:00",
+      "date": "2026-07-20T06:37:32Z",
       "sha": "29e215f",
       "summary": "committee: autonomous competitor scout (run 29722079097)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T06:23:17+00:00",
+      "date": "2026-07-20T06:23:17Z",
       "sha": "1c40165",
       "summary": "committee: refresh autonomy plan (run 29721476385)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T06:16:11+00:00",
+      "date": "2026-07-20T06:16:11Z",
       "sha": "df46a16",
       "summary": "intel(command-center): carry the per-region defensibility read onto #home (obj #2)",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-20T04:21:57+00:00",
+      "date": "2026-07-20T04:21:57Z",
       "sha": "13a4f1c",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post peer-leader-tally #97)",
       "pillar": "peer"
@@ -534,7 +540,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T02:11:48+00:00",
+      "date": "2026-07-20T02:11:48Z",
       "sha": "f8886e9",
       "summary": "docs(progress): log ux-loop data.html sortable-header keyboard/aria fix + deploy-verify (#96)",
       "pillar": "uxui"
@@ -552,7 +558,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T22:19:32+00:00",
+      "date": "2026-07-19T22:19:32Z",
       "sha": "5d83bba",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post freshness-stamp fix #92)",
       "pillar": "deployment"
@@ -564,13 +570,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T21:59:38+00:00",
+      "date": "2026-07-19T21:59:38Z",
       "sha": "7f8b491",
       "summary": "committee: refresh autonomy plan (run 29705300641)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T20:13:07+00:00",
+      "date": "2026-07-19T20:13:07Z",
       "sha": "9b5a596",
       "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
       "pillar": "uxui"
@@ -582,7 +588,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T18:16:57+00:00",
+      "date": "2026-07-19T18:16:57Z",
       "sha": "65322d6",
       "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
       "pillar": "3d-enrichment"
@@ -612,7 +618,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:31:27+00:00",
+      "date": "2026-07-19T16:31:27Z",
       "sha": "52e88ef",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
       "pillar": "market"
@@ -636,7 +642,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:02:30+00:00",
+      "date": "2026-07-19T16:02:30Z",
       "sha": "caab12c",
       "summary": "committee: refresh autonomy plan (run 29694014006)",
       "pillar": "deployment"
@@ -652,12 +658,6 @@
       "sha": "25d3db5",
       "summary": "feat(competition): measured rival service reputation (Google ratings) (#86)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T14:30:35+00:00",
-      "sha": "c56030a",
-      "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
-      "pillar": "service"
     }
   ]
 }
