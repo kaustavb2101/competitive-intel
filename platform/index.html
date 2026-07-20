@@ -159,6 +159,16 @@
         <div class="cc-card-b" id="cc-movers-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
+      <!-- WHERE THE NETWORK IS HARDEST TO DEFEND (data/rival_threat_region.json) — the per-region
+           density × service read (same MEASURED layer the Competition tab uses), surfaced on the
+           front door so the hardest-to-defend regions sit beside the portfolio-risk headline.
+           Objective #2 (competitive risk on the footprint we already run). Null-safe: absent → hidden. -->
+      <div class="cc-card cc-card-wide" id="cc-defend" style="display:none">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>Where the network is hardest to defend
+          <a class="cc-link no-print" data-v="acq">Competition →</a></div>
+        <div class="cc-card-b" id="cc-defend-body"></div>
+      </div>
+
       <!-- RECOMMENDATION BY REGION (data/regional_outlook.json) — the per-branch recs rolled up to
            the 5 regions: each region's #1 action + branch count. Leads the front door with the
            regional answer; full detail on the Overview. Null-safe: absent file → card hidden. -->

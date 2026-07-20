@@ -2564,6 +2564,14 @@ function drawRivThreat(){
    how well-liked the rival field is (measured Google rating, a sample; thin samples flagged). Every
    region is heavily outgunned, so the defensibility CLASS is service-led. Lazy, null-safe, graceful if absent. */
 let RIVTHREATREG=null, rivthreatregLoaded=false;
+/* Shared loader — populates the RIVTHREATREG global once so both the Competition table and the
+   command-center defensibility card read from the same fetch. Null-safe, idempotent. */
+function loadRivThreatRegion(){
+  if(rivthreatregLoaded) return Promise.resolve(RIVTHREATREG);
+  return fetch('data/rival_threat_region.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ RIVTHREATREG=j; rivthreatregLoaded=true; return j; })
+    .catch(()=>{ RIVTHREATREG=null; rivthreatregLoaded=true; return null; });
+}
 function renderRivThreatRegion(){
   const tbl=$('#rivthreatregtbl'); if(!tbl) return;
   if(rivthreatregLoaded){ drawRivThreatRegion(); return; }
@@ -5680,6 +5688,37 @@ function renderHomeRegions(){
   body.innerHTML=rows+`<div class="sub" style="margin-top:6px;color:var(--dim)">Per-branch recommendations rolled up by region · full situation → action detail on the Overview.</div>`;
   wrap.style.display='';
 }
+/* Command-center "Where the network is hardest to defend" card — the per-region density × service
+   read (data/rival_threat_region.json, the same MEASURED layer the Competition tab renders), rolled
+   onto the front door so the hardest-to-defend regions sit beside the portfolio-risk headline.
+   Reuses the RIVTHREATREG global (loaded lazily below). Objective #2. Null-safe: no rows → card hidden. */
+function renderHomeDefend(){
+  const wrap=$('#cc-defend'), body=$('#cc-defend-body');
+  if(!wrap||!body) return;
+  const rows=(RIVTHREATREG&&Array.isArray(RIVTHREATREG.regions))?RIVTHREATREG.regions:[];
+  if(!rows.length) return;                                   // stay hidden until the fetch resolves
+  // class -> theme token (same mapping as the Competition tab): hardest = risk-red, beatable = teal, defensible = gold.
+  const cls=t=>{ if(t==='Hardest to defend') return 'var(--agri)';
+                 if(t==='Beatable on service') return 'var(--merch)';
+                 if(t==='Most defensible') return 'var(--gold)'; return 'var(--dim)'; };
+  // hardest-to-defend first, then most-outgunned — lead with the region that needs the most defending.
+  const ordered=rows.slice().sort((a,b)=>{
+    const hard=x=>x.threat_class==='Hardest to defend'?0:1;
+    if(hard(a)!==hard(b)) return hard(a)-hard(b);
+    return (b.rivals_vs_autox||0)-(a.rivals_vs_autox||0);
+  });
+  body.innerHTML=ordered.map(r=>{
+    const c=cls(r.threat_class);
+    const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox.toFixed(1)+'×':'—';
+    const rating=(typeof r.rating_wavg==='number')?r.rating_wavg.toFixed(2)+'★':'—';
+    return `<div class="cc-row">
+      <span class="l"><b style="border-left:3px solid ${c};padding-left:7px">${r.region||'—'}</b>
+        <span class="s">outgunned ${ratio} · rival service ${rating}${r.thin_rating_sample?' · thin sample':''}</span></span>
+      <span class="r" style="color:${c}"><b>${r.threat_class||'—'}</b></span></div>`;
+  }).join('')+
+  `<div class="sub" style="margin-top:6px;color:var(--dim)">Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. Full detail → Competition.</div>`;
+  wrap.style.display='';
+}
 function renderHome(){
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
@@ -5687,6 +5726,7 @@ function renderHome(){
   renderHomeWhitespace();   // uses META (estates/mws/cws) immediately; amphoe when loaded
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
+  renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
   renderHomeRegions();      // regional_outlook.json — recommendation by region (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
@@ -5732,6 +5772,9 @@ function renderHome(){
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
     loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
+    // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
+    loadRivThreatRegion().then(()=>{ if(onHome()) renderHomeDefend(); });
     // obj#1 x obj#2 — the INTERSECTION clause: provinces both borrower-stressed AND rival-dominated
     // (province_pressure.json, a deterministic join of the two per-province axes). Null-safe re-render.
     loadProvincePressure().then(()=>{ if(onHome()) renderHomeThesis(); });
