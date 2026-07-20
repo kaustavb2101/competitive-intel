@@ -1856,6 +1856,7 @@ function renderAcq(){
   renderSearchDemand();
   renderPeerScore();
   renderRivalPulse();
+  renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
   renderPeerProvince();
@@ -2378,6 +2379,54 @@ function drawRivalPulse(){
            m.promos_coverage_note||'',
            `The corporate sites are geoblocked from foreign IPs — this feed refreshes from the Thai-IP laptop (pipeline/pull_rival_promos.py).`]);
     }
+  }
+}
+
+/* ---------- rival universe · the full จำนำทะเบียน field (obj #2) ----------
+   Surfaces data/rival_universe.json (build_rival_universe.py): every material operator — us, the
+   branch-led non-banks, and the bank-backed entrants — with owner, model, footprint claim
+   (ESTIMATED-from-public-reports, cited in the data) and the measured Play app score joined on.
+   Lazy, null-safe, graceful if absent. */
+let RIVUNI=null, rivuniLoaded=false;
+function renderRivalUniverse(){
+  const tbl=$('#pulseunitbl'); if(!tbl) return;
+  if(rivuniLoaded){ drawRivalUniverse(); return; }
+  fetch('data/rival_universe.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVUNI=j; rivuniLoaded=true; drawRivalUniverse();
+  }).catch(()=>{ RIVUNI=null; rivuniLoaded=true; drawRivalUniverse(); });
+}
+function drawRivalUniverse(){
+  const tbl=$('#pulseunitbl'), ro=$('#pulseunireadout'); if(!tbl) return;
+  const ops=(RIVUNI&&Array.isArray(RIVUNI.operators))?RIVUNI.operators:[];
+  if(!ops.length){
+    tbl.innerHTML='';
+    if(ro) ro.innerHTML='<b>Operator census not available.</b> <span class="sub">data/rival_universe.json is absent — run pipeline/build_rival_universe.py.</span>';
+    return;
+  }
+  const m=RIVUNI.meta||{};
+  const TIER={us:'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>',
+              nonbank:'<span class="tag" style="color:var(--agri);border:1px solid var(--agri)">NON-BANK</span>',
+              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>'};
+  tbl.innerHTML=`<tr><th></th><th>Operator</th><th>Backing</th><th>Model</th>`+
+    `<th title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
+    `<th title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+
+    ops.map(o=>{
+      const app=o.app?`<span class="mono">${o.app.score.toFixed(2)}★</span> <span class="sub mono">(${(o.app.ratings||0).toLocaleString()})</span>`:'<span class="sub">—</span>';
+      return `<tr${o.tier==='us'?' style="background:rgba(230,180,80,.05)"':''}>
+        <td>${TIER[o.tier]||''}</td>
+        <td><b lang="th">${o.name_th}</b><div class="sub" style="font-size:11px">${o.name_en||''}</div></td>
+        <td class="sub">${o.owner||''}</td>
+        <td class="sub" style="font-size:12px">${o.model||''}</td>
+        <td class="sub" style="font-size:12px">${o.footprint||''}</td>
+        <td>${app}</td>
+      </tr>`;}).join('');
+  if(ro){
+    ro.innerHTML=`${RIVUNI.headline||''} <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">estimated · public reports</span>`+
+      methodBox(null,
+        [`<b>Estimated-from-public-reports</b> — footprints are the companies' own claims (SET filings, IR, press; citations in the data file), verified ${m.verified||''}. Not our measurement.`,
+         m.market_note||'',
+         '<b>App scores are measured</b> (Google Play, joined from the sentiment ladder above).',
+         'The bank tier competes through bank branches and apps, not storefronts — it shows up as rate/margin pressure before it shows up on a map.']);
   }
 }
 

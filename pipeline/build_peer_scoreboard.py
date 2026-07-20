@@ -34,7 +34,7 @@ IN = os.path.join(ROOT, "source-data", "set_peers.json")
 OUT = os.path.join(ROOT, "platform", "data", "peer_scoreboard.json")
 
 AUTOX_ROE_TARGET = 25.0        # AutoX's stated ROE target (CLAUDE.md) — the reference line
-SHORT = {"MTC": "Muangthai Capital", "TIDLOR": "Ngern Tid Lor", "SAWAD": "Srisawad"}
+SHORT = {"MTC": "Muangthai Capital", "TIDLOR": "Ngern Tid Lor", "SAWAD": "Srisawad", "TURBO": "Ngern Turbo"}
 
 
 def _bn(thousands):

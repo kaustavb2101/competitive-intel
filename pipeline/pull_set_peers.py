@@ -29,7 +29,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "source-data", "set_peers.json")
-DEFAULT_SYMS = ["MTC", "TIDLOR", "SAWAD"]
+DEFAULT_SYMS = ["MTC", "TIDLOR", "SAWAD", "TURBO"]   # TURBO listed on SET 2025 — the 4th public title-lender
 
 # the async fetch run INSIDE the loaded SET page — same-origin, so it bypasses the external 403.
 PAGE_FETCH_JS = r"""
