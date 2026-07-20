@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T11:19:36+07:00",
-    "commit": "c34646a"
+    "generated_at": "2026-07-20T04:21:57Z",
+    "commit": "13a4f1c"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-20T04:21:57Z",
+      "sha": "13a4f1c",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post peer-leader-tally #97)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-20T11:19:36+07:00",
       "sha": "c34646a",
       "summary": "intel(peer): data-drive the leading-rival headline off a MEASURED province-leader tally (#97)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-20T02:11:48+00:00",
+      "date": "2026-07-20T02:11:48Z",
       "sha": "f8886e9",
       "summary": "docs(progress): log ux-loop data.html sortable-header keyboard/aria fix + deploy-verify (#96)",
       "pillar": "uxui"
@@ -504,7 +510,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T22:19:32+00:00",
+      "date": "2026-07-19T22:19:32Z",
       "sha": "5d83bba",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post freshness-stamp fix #92)",
       "pillar": "deployment"
@@ -516,13 +522,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T21:59:38+00:00",
+      "date": "2026-07-19T21:59:38Z",
       "sha": "7f8b491",
       "summary": "committee: refresh autonomy plan (run 29705300641)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T20:13:07+00:00",
+      "date": "2026-07-19T20:13:07Z",
       "sha": "9b5a596",
       "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
       "pillar": "uxui"
@@ -534,7 +540,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T18:16:57+00:00",
+      "date": "2026-07-19T18:16:57Z",
       "sha": "65322d6",
       "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
       "pillar": "3d-enrichment"
@@ -564,7 +570,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:31:27+00:00",
+      "date": "2026-07-19T16:31:27Z",
       "sha": "52e88ef",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
       "pillar": "market"
@@ -588,7 +594,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:02:30+00:00",
+      "date": "2026-07-19T16:02:30Z",
       "sha": "caab12c",
       "summary": "committee: refresh autonomy plan (run 29694014006)",
       "pillar": "deployment"
@@ -606,7 +612,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T14:30:35+00:00",
+      "date": "2026-07-19T14:30:35Z",
       "sha": "c56030a",
       "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
       "pillar": "service"
@@ -636,7 +642,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T12:34:00+00:00",
+      "date": "2026-07-19T12:34:00Z",
       "sha": "a117f4b",
       "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
       "pillar": "service"
@@ -648,16 +654,10 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-19T10:39:45+00:00",
+      "date": "2026-07-19T10:39:45Z",
       "sha": "f7da11d",
       "summary": "committee: refresh autonomy plan (run 29683693667)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T10:13:05+00:00",
-      "sha": "1f748a3",
-      "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
-      "pillar": "service"
     }
   ]
 }
