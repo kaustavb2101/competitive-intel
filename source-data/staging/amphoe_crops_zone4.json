@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "zone": 4,
+    "zone_th": "สศท.4 (สำนักงานเศรษฐกิจการเกษตรที่ 4, ขอนแก่น)",
+    "zone_provinces": ["ขอนแก่น", "มหาสารคาม", "ร้อยเอ็ด", "กาฬสินธุ์"],
+    "urls_checked": [
+      "https://zone4.oae.go.th/",
+      "https://zone4.oae.go.th/%E0%B8%82%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%B9%E0%B8%A5%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A0%E0%B8%B2%E0%B8%9E/ (direct zone6-style slug guess)",
+      "https://zone4.oae.go.th/sitemap.xml, /wp-sitemap.xml (wp-sitemap-index)",
+      "https://zone4.oae.go.th/wp-sitemap-posts-page-1.xml (all 26 pages enumerated)",
+      "https://zone4.oae.go.th/wp-json/wp/v2/search?search=เอกภาพ (0 results)",
+      "https://zone4.oae.go.th/wp-json/wp/v2/search?search=อำเภอ (49 results, none crop-data pages)",
+      "https://zone4.oae.go.th/wp-json/wp/v2/media?search=เอกภาพ (0 results)",
+      "https://zone4.oae.go.th/category/publication_documents/ + doc_information/ + doc_research/ (เอกสารเผยแพร่ + ส่วนสารสนเทศการเกษตร + ส่วนวิจัยและประเมินผล publication categories)",
+      "https://zone4.oae.go.th/agricultural_economic_zone_development_plan/ and its child agricultural_economic_situation/ (ส่วนแผนพัฒนาเขตเศรษฐกิจเกษตร)",
+      "WebSearch: site:zone4.oae.go.th ข้อมูลเอกภาพ อำเภอ; site:zone4.oae.go.th filetype:pdf อำเภอ เนื้อที่เพาะปลูก ผลผลิต; exact zone6-style filenames (ข้าวนาปี-66-67.pdf etc.); \"ข้อมูลเอกภาพ\" wp-content uploads across zone4/5/7/11"
+    ],
+    "route": "NOT FOUND — no equivalent of Zone 6's 'ข้อมูลเอกภาพ' amphoe-comparison PDF page could be located on zone4.oae.go.th by any method tried.",
+    "findings": [
+      "The exact zone6-style URL slug /ข้อมูลเอกภาพ/ 404s on zone4.",
+      "The complete WordPress page inventory (wp-sitemap-posts-page-1.xml, 26 pages) contains no page with a title or slug resembling ข้อมูลเอกภาพ, เอกภาพ, or a crop x อำเภอ comparison table.",
+      "zone4's ส่วนสารสนเทศการเกษตร (Agricultural Information division) publication category and ส่วนแผนพัฒนาเขตเศรษฐกิจเกษตร (zone economic development plan) category both resolve, but every PDF linked from them is either (a) a shared central oae.go.th/uploads/files/<hash>.pdf circular/report of unclear scope, or (b) zone4's 'Annual Agricultural Economic Situation Report (ROAE Outlook) 2025' — one PDF per province (Kalasin, Khonkaen, Mahasarakam, Roi Et), which is a PROVINCE-level macro narrative report (matches Route A's known province-level ceiling), not an amphoe x crop comparison table.",
+      "wp-json search for 'เอกภาพ' returns zero hits; search for 'อำเภอ' returns 49 hits, all field-visit / meeting news posts, none a data-table page.",
+      "Google site: search (multiple keyword and exact-filename variants) surfaces no zone4.oae.go.th page or PDF matching the ekaparb pattern."
+    ],
+    "conclusion": "Zone 4 does not appear to publish a public, WordPress-hosted, amphoe-level 'ข้อมูลเอกภาพ' PDF series the way Zone 6 does (or, if it exists, it is not linked from any page/sitemap/search-index this session could reach). No rows extracted — nothing to parse. No fabrication.",
+    "retrieved": "2026-07-20",
+    "parse_notes": []
+  },
+  "rows": []
+}

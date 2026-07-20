@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "zone": 11,
+    "zone_th": "สศท.11 (สำนักงานเศรษฐกิจการเกษตรที่ 11, อุบลราชธานี)",
+    "zone_provinces_note": "News posts pulled during this sweep reference field work in อุบลราชธานี (HQ), อำนาจเจริญ, and ศรีสะเกษ, consistent with the commonly-cited Zone 11 grouping (Ubon Ratchathani, Si Sa Ket, Yasothon, Amnat Charoen), but the full list was not independently confirmed against an official org page this session.",
+    "urls_checked": [
+      "https://zone11.oae.go.th/ (this site is a modern Angular/React-style SPA — the static HTML home page has NO .pdf hrefs and no visible เอกภาพ text, unlike zone4/5/6/7's server-rendered WordPress; content is loaded client-side)",
+      "https://zone11.oae.go.th/%E0%B8%82%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%B9%E0%B8%A5%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A0%E0%B8%B2%E0%B8%9E/ (zone6-style slug guess — 404)",
+      "https://zone11.oae.go.th/sitemap.xml, /wp-sitemap.xml (both fall back to serving the SPA's index.html, not a real sitemap)",
+      "https://zone11.oae.go.th/wp-json/wp/v2/search?search=เอกภาพ (16 hits — ALL are news posts about the ekaparb PROCESS/committee work, e.g. 'สศก. มุ่งพัฒนาข้อมูลเอกภาพด้านการเกษตร', SCP provincial-committee meeting minutes; none is a finished district-comparison data release, none has an attached PDF)",
+      "https://zone11.oae.go.th/wp-json/wp/v2/search?search=อำเภอ (50 hits, all news posts, none a data-table page)",
+      "https://zone11.oae.go.th/wp-json/wp/v2/media?search=เอกภาพ (0 results)",
+      "https://zone11.oae.go.th/wp-json/wp/v2/pages?per_page=100 (all 42 pages enumerated: no ข้อมูลเอกภาพ page; closest are 'ข้อมูลเศรษฐกิจการเกษตร' (/agricultural-economics-information/) and two live province-level dashboards 'แดชบอร์ดสินค้าเกษตรพืชไร่รายจังหวัด' / '...พืชสวนรายจังหวัด' — both are embedded interactive dashboards (Power BI-style), province-level per their titles, not downloadable amphoe PDFs, and not pulled per the brief's PDF-only scope)",
+      "https://zone11.oae.go.th/news-press/1639/ (the top-ranked 'เอกภาพ' news hit, dated 24 June 2025 — an announcement piece about the national push for unified agri data quality; no PDF attachment)",
+      "https://zone11.oae.go.th/agricultural-economics-information/ (only 1 PDF link found, to a shared central oae.go.th/uploads/files/<hash>.pdf, not amphoe-level)",
+      "WebSearch: site:zone11.oae.go.th ข้อมูลเอกภาพ อำเภอ filetype:pdf; filetype:pdf อำเภอ เนื้อที่เพาะปลูก ผลผลิต; exact zone6-style filenames; \"ข้อมูลเอกภาพ\" wp-content uploads"
+    ],
+    "route": "NOT FOUND — no equivalent of Zone 6's 'ข้อมูลเอกภาพ' amphoe-comparison PDF page could be located on zone11.oae.go.th by any method tried.",
+    "findings": [
+      "zone11's OWN internal search for 'เอกภาพ' (16 hits) confirms the office is actively engaged in the national ekaparb data-unification initiative, but every hit is a news/process post, never a finished district-level data table.",
+      "The two province-level commodity dashboards ('แดชบอร์ดสินค้าเกษตรพืชไร่รายจังหวัด' and '...พืชสวนรายจังหวัด') are the closest thing zone11 has to a structured crop-data product; they were NOT extracted because (a) they are live interactive dashboards, not PDFs, and (b) their titles indicate province-level, not amphoe-level, granularity — extracting them would require a different (dashboard-scraping) approach outside this sweep's PDF-matching scope.",
+      "No wp-content/uploads PDF matching a crop x amphoe comparison table was found via any discovery path."
+    ],
+    "conclusion": "Zone 11 does not appear to publish a public, amphoe-level 'ข้อมูลเอกภาพ' PDF series (or, if it exists, it is not linked from any page/sitemap/search-index this session could reach). No rows extracted — nothing to parse. No fabrication.",
+    "retrieved": "2026-07-20",
+    "parse_notes": []
+  },
+  "rows": []
+}
