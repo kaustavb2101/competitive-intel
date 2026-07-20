@@ -201,6 +201,10 @@ def _extract_field(lines, sub, idx):
             toks = NUM.findall(l)
             if len(toks) > idx:
                 return _fnum(toks[idx])
+            # short row: some crops print fewer year-columns on this line (cassava & oil-palm
+            # cost rows carry 3 tokens, not 4) — the NEWEST year is always the last token.
+            if toks:
+                return _fnum(toks[-1])
     return None
 
 

@@ -99,3 +99,6 @@ source-data/.place_ratings_cache.json
 
 # Playwright MCP scratch (page snapshots / console logs)
 .playwright-mcp/
+
+# Thai-gov ingest wave raw downloads (PDFs/CSVs, 70MB+) — staging JSONs are the committed artifact
+source-data/raw/

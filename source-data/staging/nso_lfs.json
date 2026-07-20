@@ -1,0 +1,2499 @@
+{
+  "meta": {
+    "urls": [
+      "https://catalogapi.nso.go.th/api/index?table=ST_02_2005005_4&format=csv",
+      "https://catalogapi.nso.go.th/api/index?table=LFS_02_20546_01&format=csv",
+      "https://catalogapi.nso.go.th/api/index?table=OS_02_0001_03&format=csv"
+    ],
+    "urls_checked_but_not_used": {
+      "https://catalogapi.nso.go.th/api/index?table=ST_02_2005006_6&format=csv": "employed by sex x province — newest vintage in this export is stale (2566 Q4 / Q4-2023); superseded here by ST_02_2005005_4's own employed status, which is current to 2569 Q1."
+    },
+    "vintage": "BE 2569 ไตรมาส 1 (CE 2026 Q1)",
+    "retrieved": "2026-07-20",
+    "label": "MEASURED — NSO Labour Force Survey (สำรวจภาวะการทำงานของประชากร)",
+    "unit": "thousand persons (พันคน) unless noted otherwise",
+    "province_count": 77,
+    "province_count_expected": 77,
+    "tables": {
+      "ST_02_2005005_4": "labor force status (employed/unemployed/seasonal-waiting) x sex x province, quarterly",
+      "LFS_02_20546_01": "employed persons by age group x province, quarterly (sex-combined)"
+    },
+    "gaps_not_available_at_province_level": [
+      "Employment by industry (LFS_02_20535_8) and by occupation (LFS_02_20535_7) are published only down to ภาค (region, 6 regions), never จังหวัด (province, 77) — confirmed by inspecting every resource under CKAN package 0706_02_0002.",
+      "Informal vs formal employment counts (OS_02_0007_* informal, OS_02_0006_* formal) are published by sex/age/occupation/industry or by ภาค (region) only — no province breakdown exists in the catalog (checked package 0706_02_0007 / 0706_02_0006). The already-vendored source-data/employment_by_province.json (76 provinces, formal/informal head-counts) predates this ingest and is NOT an NSO-catalog province table by this method — left untouched, provenance unverified by this run.",
+      "Average wage/earnings: the only wage table is LFS_02_20545_18, region x industry x quarter (already vendored as source-data/nso_wages.json via pipeline/pull_nso_wages.py) — no province-level wage table exists in the catalog (checked package 0706_02_0019).",
+      "Underemployment (ผู้ทำงานต่ำระดับด้านชั่วโมงการทำงาน): tables 0706_02_0014/0706_02_0025 publish only a national rate/count by age group or sex — no province breakdown found (explicit catalog search for province-level underemployment returned 0 results)."
+    ],
+    "parse_notes": [
+      "ST_02_2005005_4: 9633 raw rows, newest (year_be, quarter)=('2569', 'ไตรมาส 1'); earlier vintages back to ('2563', 'ไตรมาส 1').",
+      "LFS_02_20546_01: 16630 raw rows, newest (year_be, quarter)=('2569', 'ไตรมาส 1'); earlier vintages back to ('2563', '1').",
+      "cross-check OK: LFS_02_20546_01 age-group sums reproduce ST_02_2005005_4 employed totals within 0.5k persons for every province in the newest common quarter (('2569', 'ไตรมาส 1'))."
+    ]
+  },
+  "provinces": [
+    {
+      "name_th": "กระบี่",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 266.44,
+      "employed_k": 262.7,
+      "unemployed_k": 3.74,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.4,
+      "employment_rate_pct": 98.6,
+      "male": {
+        "employed_k": 138.58,
+        "unemployed_k": 0.97,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 124.12,
+        "unemployed_k": 2.77,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.68,
+        "20-24 ปี": 21.25,
+        "25-29 ปี": 30.07,
+        "30-34 ปี": 29.67,
+        "35-39 ปี": 27.38,
+        "40-49 ปี": 55.52,
+        "50-59 ปี": 51.42,
+        "60 ปีขึ้นไป": 43.7
+      }
+    },
+    {
+      "name_th": "กรุงเทพมหานคร",
+      "region_nso": "กรุงเทพมหานคร",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 5918.61,
+      "employed_k": 5881.5,
+      "unemployed_k": 37.11,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.63,
+      "employment_rate_pct": 99.37,
+      "male": {
+        "employed_k": 3009.24,
+        "unemployed_k": 20.36,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 2872.26,
+        "unemployed_k": 16.75,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 53.72,
+        "20-24 ปี": 270.28,
+        "25-29 ปี": 547.99,
+        "30-34 ปี": 704.51,
+        "35-39 ปี": 835.72,
+        "40-49 ปี": 1674.54,
+        "50-59 ปี": 1243.35,
+        "60 ปีขึ้นไป": 551.39
+      }
+    },
+    {
+      "name_th": "กาญจนบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 502.54,
+      "employed_k": 494.03,
+      "unemployed_k": 8.1,
+      "seasonal_waiting_k": 0.41,
+      "unemployment_rate_pct": 1.61,
+      "employment_rate_pct": 98.31,
+      "male": {
+        "employed_k": 265.22,
+        "unemployed_k": 5.28,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 228.81,
+        "unemployed_k": 2.82,
+        "seasonal_waiting_k": 0.41
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 10.19,
+        "20-24 ปี": 35.02,
+        "25-29 ปี": 49.07,
+        "30-34 ปี": 49.55,
+        "35-39 ปี": 47.69,
+        "40-49 ปี": 101.42,
+        "50-59 ปี": 109.35,
+        "60 ปีขึ้นไป": 91.75
+      }
+    },
+    {
+      "name_th": "กาฬสินธุ์",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 400.28,
+      "employed_k": 387.53,
+      "unemployed_k": 2.6,
+      "seasonal_waiting_k": 10.15,
+      "unemployment_rate_pct": 0.65,
+      "employment_rate_pct": 96.81,
+      "male": {
+        "employed_k": 210.94,
+        "unemployed_k": 1.19,
+        "seasonal_waiting_k": 4.17
+      },
+      "female": {
+        "employed_k": 176.59,
+        "unemployed_k": 1.41,
+        "seasonal_waiting_k": 5.98
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.75,
+        "20-24 ปี": 30.69,
+        "25-29 ปี": 45.18,
+        "30-34 ปี": 39.51,
+        "35-39 ปี": 28.86,
+        "40-49 ปี": 67.36,
+        "50-59 ปี": 97.58,
+        "60 ปีขึ้นไป": 75.6
+      }
+    },
+    {
+      "name_th": "กำแพงเพชร",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 461.42,
+      "employed_k": 457.77,
+      "unemployed_k": 2.54,
+      "seasonal_waiting_k": 1.11,
+      "unemployment_rate_pct": 0.55,
+      "employment_rate_pct": 99.21,
+      "male": {
+        "employed_k": 236.31,
+        "unemployed_k": 1.53,
+        "seasonal_waiting_k": 1.11
+      },
+      "female": {
+        "employed_k": 221.46,
+        "unemployed_k": 1.01,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.55,
+        "20-24 ปี": 31.85,
+        "25-29 ปี": 49.34,
+        "30-34 ปี": 46.39,
+        "35-39 ปี": 35.63,
+        "40-49 ปี": 77.92,
+        "50-59 ปี": 99.95,
+        "60 ปีขึ้นไป": 107.14
+      }
+    },
+    {
+      "name_th": "ขอนแก่น",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 963.91,
+      "employed_k": 939.02,
+      "unemployed_k": 5.75,
+      "seasonal_waiting_k": 19.14,
+      "unemployment_rate_pct": 0.6,
+      "employment_rate_pct": 97.42,
+      "male": {
+        "employed_k": 483.21,
+        "unemployed_k": 0.55,
+        "seasonal_waiting_k": 9.97
+      },
+      "female": {
+        "employed_k": 455.81,
+        "unemployed_k": 5.2,
+        "seasonal_waiting_k": 9.17
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.47,
+        "20-24 ปี": 70.41,
+        "25-29 ปี": 120.62,
+        "30-34 ปี": 100.82,
+        "35-39 ปี": 70.36,
+        "40-49 ปี": 168.73,
+        "50-59 ปี": 246.96,
+        "60 ปีขึ้นไป": 154.64
+      }
+    },
+    {
+      "name_th": "จันทบุรี",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 390.66,
+      "employed_k": 386.35,
+      "unemployed_k": 4.05,
+      "seasonal_waiting_k": 0.26,
+      "unemployment_rate_pct": 1.04,
+      "employment_rate_pct": 98.9,
+      "male": {
+        "employed_k": 199.25,
+        "unemployed_k": 2.1,
+        "seasonal_waiting_k": 0.26
+      },
+      "female": {
+        "employed_k": 187.1,
+        "unemployed_k": 1.95,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.74,
+        "20-24 ปี": 27.08,
+        "25-29 ปี": 41.83,
+        "30-34 ปี": 43.44,
+        "35-39 ปี": 42.69,
+        "40-49 ปี": 93.16,
+        "50-59 ปี": 75.94,
+        "60 ปีขึ้นไป": 55.47
+      }
+    },
+    {
+      "name_th": "ฉะเชิงเทรา",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 632.69,
+      "employed_k": 627.97,
+      "unemployed_k": 4.72,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.75,
+      "employment_rate_pct": 99.25,
+      "male": {
+        "employed_k": 340.2,
+        "unemployed_k": 0.69,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 287.77,
+        "unemployed_k": 4.03,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.02,
+        "20-24 ปี": 49.72,
+        "25-29 ปี": 89.2,
+        "30-34 ปี": 85.67,
+        "35-39 ปี": 77.15,
+        "40-49 ปี": 149.63,
+        "50-59 ปี": 112.51,
+        "60 ปีขึ้นไป": 55.07
+      }
+    },
+    {
+      "name_th": "ชลบุรี",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1315.78,
+      "employed_k": 1307.49,
+      "unemployed_k": 8.29,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.63,
+      "employment_rate_pct": 99.37,
+      "male": {
+        "employed_k": 680.45,
+        "unemployed_k": 1.7,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 627.04,
+        "unemployed_k": 6.59,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 12.17,
+        "20-24 ปี": 124.42,
+        "25-29 ปี": 154.43,
+        "30-34 ปี": 166.21,
+        "35-39 ปี": 154.49,
+        "40-49 ปี": 330.32,
+        "50-59 ปี": 233.94,
+        "60 ปีขึ้นไป": 131.51
+      }
+    },
+    {
+      "name_th": "ชัยนาท",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 178.4,
+      "employed_k": 176.12,
+      "unemployed_k": 2.17,
+      "seasonal_waiting_k": 0.11,
+      "unemployment_rate_pct": 1.22,
+      "employment_rate_pct": 98.72,
+      "male": {
+        "employed_k": 92.86,
+        "unemployed_k": 1.3,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 83.26,
+        "unemployed_k": 0.87,
+        "seasonal_waiting_k": 0.11
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 0.84,
+        "20-24 ปี": 13.74,
+        "25-29 ปี": 16.68,
+        "30-34 ปี": 17.46,
+        "35-39 ปี": 19.42,
+        "40-49 ปี": 39.18,
+        "50-59 ปี": 37.89,
+        "60 ปีขึ้นไป": 30.91
+      }
+    },
+    {
+      "name_th": "ชัยภูมิ",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 487.52,
+      "employed_k": 477.57,
+      "unemployed_k": 1.28,
+      "seasonal_waiting_k": 8.67,
+      "unemployment_rate_pct": 0.26,
+      "employment_rate_pct": 97.96,
+      "male": {
+        "employed_k": 260.7,
+        "unemployed_k": 0.59,
+        "seasonal_waiting_k": 3.13
+      },
+      "female": {
+        "employed_k": 216.87,
+        "unemployed_k": 0.69,
+        "seasonal_waiting_k": 5.54
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 10.17,
+        "20-24 ปี": 34.58,
+        "25-29 ปี": 55.16,
+        "30-34 ปี": 43.86,
+        "35-39 ปี": 34.7,
+        "40-49 ปี": 79.7,
+        "50-59 ปี": 118.8,
+        "60 ปีขึ้นไป": 100.61
+      }
+    },
+    {
+      "name_th": "ชุมพร",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 297.52,
+      "employed_k": 296.3,
+      "unemployed_k": 1.22,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.41,
+      "employment_rate_pct": 99.59,
+      "male": {
+        "employed_k": 162.84,
+        "unemployed_k": 0.48,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 133.46,
+        "unemployed_k": 0.74,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.47,
+        "20-24 ปี": 26.12,
+        "25-29 ปี": 35.66,
+        "30-34 ปี": 35.64,
+        "35-39 ปี": 32.94,
+        "40-49 ปี": 59.5,
+        "50-59 ปี": 58.19,
+        "60 ปีขึ้นไป": 42.78
+      }
+    },
+    {
+      "name_th": "ตรัง",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 392.26,
+      "employed_k": 388.54,
+      "unemployed_k": 3.72,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.95,
+      "employment_rate_pct": 99.05,
+      "male": {
+        "employed_k": 200.86,
+        "unemployed_k": 1.53,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 187.68,
+        "unemployed_k": 2.19,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.65,
+        "20-24 ปี": 32.01,
+        "25-29 ปี": 42.65,
+        "30-34 ปี": 41.6,
+        "35-39 ปี": 40.19,
+        "40-49 ปี": 80.41,
+        "50-59 ปี": 81.18,
+        "60 ปีขึ้นไป": 63.85
+      }
+    },
+    {
+      "name_th": "ตราด",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 182.35,
+      "employed_k": 181.38,
+      "unemployed_k": 0.97,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.53,
+      "employment_rate_pct": 99.47,
+      "male": {
+        "employed_k": 97.62,
+        "unemployed_k": 0.76,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 83.76,
+        "unemployed_k": 0.21,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.15,
+        "20-24 ปี": 13.88,
+        "25-29 ปี": 18.22,
+        "30-34 ปี": 20.09,
+        "35-39 ปี": 20.66,
+        "40-49 ปี": 44.49,
+        "50-59 ปี": 38.41,
+        "60 ปีขึ้นไป": 22.46
+      }
+    },
+    {
+      "name_th": "ตาก",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 292.35,
+      "employed_k": 286.06,
+      "unemployed_k": 5.52,
+      "seasonal_waiting_k": 0.77,
+      "unemployment_rate_pct": 1.89,
+      "employment_rate_pct": 97.85,
+      "male": {
+        "employed_k": 157.75,
+        "unemployed_k": 1.38,
+        "seasonal_waiting_k": 0.71
+      },
+      "female": {
+        "employed_k": 128.31,
+        "unemployed_k": 4.14,
+        "seasonal_waiting_k": 0.06
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.57,
+        "20-24 ปี": 25.26,
+        "25-29 ปี": 31.49,
+        "30-34 ปี": 30.48,
+        "35-39 ปี": 24.67,
+        "40-49 ปี": 53.78,
+        "50-59 ปี": 60.54,
+        "60 ปีขึ้นไป": 54.27
+      }
+    },
+    {
+      "name_th": "นครนายก",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 160.19,
+      "employed_k": 159.61,
+      "unemployed_k": 0.43,
+      "seasonal_waiting_k": 0.15,
+      "unemployment_rate_pct": 0.27,
+      "employment_rate_pct": 99.64,
+      "male": {
+        "employed_k": 85.43,
+        "unemployed_k": 0.43,
+        "seasonal_waiting_k": 0.02
+      },
+      "female": {
+        "employed_k": 74.18,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.13
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.54,
+        "20-24 ปี": 11.79,
+        "25-29 ปี": 18.57,
+        "30-34 ปี": 19.24,
+        "35-39 ปี": 18.78,
+        "40-49 ปี": 39.56,
+        "50-59 ปี": 34.27,
+        "60 ปีขึ้นไป": 15.86
+      }
+    },
+    {
+      "name_th": "นครปฐม",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 906.63,
+      "employed_k": 904.71,
+      "unemployed_k": 1.92,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.21,
+      "employment_rate_pct": 99.79,
+      "male": {
+        "employed_k": 448.4,
+        "unemployed_k": 1.28,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 456.31,
+        "unemployed_k": 0.64,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.52,
+        "20-24 ปี": 54.63,
+        "25-29 ปี": 110.11,
+        "30-34 ปี": 117.92,
+        "35-39 ปี": 117.92,
+        "40-49 ปี": 233.18,
+        "50-59 ปี": 174.92,
+        "60 ปีขึ้นไป": 86.51
+      }
+    },
+    {
+      "name_th": "นครพนม",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 290.5,
+      "employed_k": 272.55,
+      "unemployed_k": 3.06,
+      "seasonal_waiting_k": 14.89,
+      "unemployment_rate_pct": 1.05,
+      "employment_rate_pct": 93.82,
+      "male": {
+        "employed_k": 145.01,
+        "unemployed_k": 0.43,
+        "seasonal_waiting_k": 6.13
+      },
+      "female": {
+        "employed_k": 127.54,
+        "unemployed_k": 2.63,
+        "seasonal_waiting_k": 8.76
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.69,
+        "20-24 ปี": 23.73,
+        "25-29 ปี": 29.29,
+        "30-34 ปี": 27.14,
+        "35-39 ปี": 19.6,
+        "40-49 ปี": 46.8,
+        "50-59 ปี": 67.9,
+        "60 ปีขึ้นไป": 56.39
+      }
+    },
+    {
+      "name_th": "นครราชสีมา",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1278.62,
+      "employed_k": 1207.08,
+      "unemployed_k": 19.24,
+      "seasonal_waiting_k": 52.3,
+      "unemployment_rate_pct": 1.5,
+      "employment_rate_pct": 94.4,
+      "male": {
+        "employed_k": 657.2,
+        "unemployed_k": 8.29,
+        "seasonal_waiting_k": 20.96
+      },
+      "female": {
+        "employed_k": 549.88,
+        "unemployed_k": 10.95,
+        "seasonal_waiting_k": 31.34
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 30.98,
+        "20-24 ปี": 112.11,
+        "25-29 ปี": 156.27,
+        "30-34 ปี": 115.42,
+        "35-39 ปี": 94.81,
+        "40-49 ปี": 212.51,
+        "50-59 ปี": 288.6,
+        "60 ปีขึ้นไป": 196.38
+      }
+    },
+    {
+      "name_th": "นครศรีธรรมราช",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 912.63,
+      "employed_k": 902.73,
+      "unemployed_k": 8.95,
+      "seasonal_waiting_k": 0.95,
+      "unemployment_rate_pct": 0.98,
+      "employment_rate_pct": 98.92,
+      "male": {
+        "employed_k": 468.44,
+        "unemployed_k": 3.47,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 434.29,
+        "unemployed_k": 5.48,
+        "seasonal_waiting_k": 0.95
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 12.61,
+        "20-24 ปี": 69.55,
+        "25-29 ปี": 99.22,
+        "30-34 ปี": 96.01,
+        "35-39 ปี": 93.4,
+        "40-49 ปี": 192.14,
+        "50-59 ปี": 192.53,
+        "60 ปีขึ้นไป": 147.26
+      }
+    },
+    {
+      "name_th": "นครสวรรค์",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 505.74,
+      "employed_k": 490.63,
+      "unemployed_k": 3.48,
+      "seasonal_waiting_k": 11.63,
+      "unemployment_rate_pct": 0.69,
+      "employment_rate_pct": 97.01,
+      "male": {
+        "employed_k": 254.46,
+        "unemployed_k": 2.96,
+        "seasonal_waiting_k": 5.93
+      },
+      "female": {
+        "employed_k": 236.17,
+        "unemployed_k": 0.52,
+        "seasonal_waiting_k": 5.7
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.65,
+        "20-24 ปี": 39.89,
+        "25-29 ปี": 48.02,
+        "30-34 ปี": 51.52,
+        "35-39 ปี": 41.28,
+        "40-49 ปี": 88.36,
+        "50-59 ปี": 110.29,
+        "60 ปีขึ้นไป": 107.63
+      }
+    },
+    {
+      "name_th": "นนทบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1248.17,
+      "employed_k": 1231.72,
+      "unemployed_k": 15.9,
+      "seasonal_waiting_k": 0.55,
+      "unemployment_rate_pct": 1.27,
+      "employment_rate_pct": 98.68,
+      "male": {
+        "employed_k": 614.18,
+        "unemployed_k": 7.96,
+        "seasonal_waiting_k": 0.55
+      },
+      "female": {
+        "employed_k": 617.54,
+        "unemployed_k": 7.94,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 11.98,
+        "20-24 ปี": 62.7,
+        "25-29 ปี": 149.21,
+        "30-34 ปี": 161.49,
+        "35-39 ปี": 178.79,
+        "40-49 ปี": 343.29,
+        "50-59 ปี": 257.61,
+        "60 ปีขึ้นไป": 66.66
+      }
+    },
+    {
+      "name_th": "นราธิวาส",
+      "region_nso": "ภาคใต้ชายแดน",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 396.36,
+      "employed_k": 386.35,
+      "unemployed_k": 10.01,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 2.53,
+      "employment_rate_pct": 97.47,
+      "male": {
+        "employed_k": 224.09,
+        "unemployed_k": 1.69,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 162.26,
+        "unemployed_k": 8.32,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.59,
+        "20-24 ปี": 28.21,
+        "25-29 ปี": 37.46,
+        "30-34 ปี": 42.51,
+        "35-39 ปี": 41.33,
+        "40-49 ปี": 86.38,
+        "50-59 ปี": 86.07,
+        "60 ปีขึ้นไป": 57.79
+      }
+    },
+    {
+      "name_th": "น่าน",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 259.06,
+      "employed_k": 258.24,
+      "unemployed_k": 0.35,
+      "seasonal_waiting_k": 0.47,
+      "unemployment_rate_pct": 0.14,
+      "employment_rate_pct": 99.68,
+      "male": {
+        "employed_k": 134.95,
+        "unemployed_k": 0.26,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 123.29,
+        "unemployed_k": 0.09,
+        "seasonal_waiting_k": 0.47
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.99,
+        "20-24 ปี": 20.92,
+        "25-29 ปี": 25.44,
+        "30-34 ปี": 24.32,
+        "35-39 ปี": 21.17,
+        "40-49 ปี": 46.93,
+        "50-59 ปี": 59.01,
+        "60 ปีขึ้นไป": 57.45
+      }
+    },
+    {
+      "name_th": "บึงกาฬ",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 193.26,
+      "employed_k": 192.03,
+      "unemployed_k": 0.0,
+      "seasonal_waiting_k": 1.23,
+      "unemployment_rate_pct": 0.0,
+      "employment_rate_pct": 99.36,
+      "male": {
+        "employed_k": 102.11,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.44
+      },
+      "female": {
+        "employed_k": 89.92,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.79
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.55,
+        "20-24 ปี": 23.45,
+        "25-29 ปี": 22.17,
+        "30-34 ปี": 19.87,
+        "35-39 ปี": 14.19,
+        "40-49 ปี": 34.34,
+        "50-59 ปี": 50.95,
+        "60 ปีขึ้นไป": 24.51
+      }
+    },
+    {
+      "name_th": "บุรีรัมย์",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 653.76,
+      "employed_k": 620.35,
+      "unemployed_k": 13.53,
+      "seasonal_waiting_k": 19.88,
+      "unemployment_rate_pct": 2.07,
+      "employment_rate_pct": 94.89,
+      "male": {
+        "employed_k": 328.63,
+        "unemployed_k": 8.05,
+        "seasonal_waiting_k": 10.42
+      },
+      "female": {
+        "employed_k": 291.72,
+        "unemployed_k": 5.48,
+        "seasonal_waiting_k": 9.46
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 7.49,
+        "20-24 ปี": 45.08,
+        "25-29 ปี": 58.8,
+        "30-34 ปี": 60.8,
+        "35-39 ปี": 42.81,
+        "40-49 ปี": 103.8,
+        "50-59 ปี": 154.63,
+        "60 ปีขึ้นไป": 146.95
+      }
+    },
+    {
+      "name_th": "ปทุมธานี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1243.74,
+      "employed_k": 1213.18,
+      "unemployed_k": 28.83,
+      "seasonal_waiting_k": 1.73,
+      "unemployment_rate_pct": 2.32,
+      "employment_rate_pct": 97.54,
+      "male": {
+        "employed_k": 627.16,
+        "unemployed_k": 18.33,
+        "seasonal_waiting_k": 1.73
+      },
+      "female": {
+        "employed_k": 586.02,
+        "unemployed_k": 10.5,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.76,
+        "20-24 ปี": 72.35,
+        "25-29 ปี": 140.57,
+        "30-34 ปี": 162.83,
+        "35-39 ปี": 163.86,
+        "40-49 ปี": 331.27,
+        "50-59 ปี": 245.51,
+        "60 ปีขึ้นไป": 87.03
+      }
+    },
+    {
+      "name_th": "ประจวบคีรีขันธ์",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 293.16,
+      "employed_k": 289.95,
+      "unemployed_k": 2.91,
+      "seasonal_waiting_k": 0.3,
+      "unemployment_rate_pct": 0.99,
+      "employment_rate_pct": 98.91,
+      "male": {
+        "employed_k": 154.27,
+        "unemployed_k": 1.89,
+        "seasonal_waiting_k": 0.3
+      },
+      "female": {
+        "employed_k": 135.68,
+        "unemployed_k": 1.02,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.34,
+        "20-24 ปี": 27.29,
+        "25-29 ปี": 30.08,
+        "30-34 ปี": 30.22,
+        "35-39 ปี": 28.45,
+        "40-49 ปี": 55.03,
+        "50-59 ปี": 60.94,
+        "60 ปีขึ้นไป": 51.59
+      }
+    },
+    {
+      "name_th": "ปราจีนบุรี",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 406.78,
+      "employed_k": 402.79,
+      "unemployed_k": 3.99,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.98,
+      "employment_rate_pct": 99.02,
+      "male": {
+        "employed_k": 209.46,
+        "unemployed_k": 1.8,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 193.33,
+        "unemployed_k": 2.19,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.19,
+        "20-24 ปี": 18.89,
+        "25-29 ปี": 46.19,
+        "30-34 ปี": 51.59,
+        "35-39 ปี": 47.17,
+        "40-49 ปี": 106.73,
+        "50-59 ปี": 80.73,
+        "60 ปีขึ้นไป": 47.3
+      }
+    },
+    {
+      "name_th": "ปัตตานี",
+      "region_nso": "ภาคใต้ชายแดน",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 340.44,
+      "employed_k": 336.78,
+      "unemployed_k": 3.66,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.08,
+      "employment_rate_pct": 98.92,
+      "male": {
+        "employed_k": 191.76,
+        "unemployed_k": 1.58,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 145.02,
+        "unemployed_k": 2.08,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.94,
+        "20-24 ปี": 28.62,
+        "25-29 ปี": 34.93,
+        "30-34 ปี": 33.92,
+        "35-39 ปี": 37.9,
+        "40-49 ปี": 75.33,
+        "50-59 ปี": 75.52,
+        "60 ปีขึ้นไป": 45.63
+      }
+    },
+    {
+      "name_th": "พระนครศรีอยุธยา",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 543.13,
+      "employed_k": 536.52,
+      "unemployed_k": 6.61,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.22,
+      "employment_rate_pct": 98.78,
+      "male": {
+        "employed_k": 287.23,
+        "unemployed_k": 4.82,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 249.29,
+        "unemployed_k": 1.79,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.11,
+        "20-24 ปี": 38.94,
+        "25-29 ปี": 65.94,
+        "30-34 ปี": 60.87,
+        "35-39 ปี": 61.51,
+        "40-49 ปี": 125.77,
+        "50-59 ปี": 106.03,
+        "60 ปีขึ้นไป": 68.35
+      }
+    },
+    {
+      "name_th": "พะเยา",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 192.19,
+      "employed_k": 189.72,
+      "unemployed_k": 1.79,
+      "seasonal_waiting_k": 0.68,
+      "unemployment_rate_pct": 0.93,
+      "employment_rate_pct": 98.71,
+      "male": {
+        "employed_k": 100.12,
+        "unemployed_k": 1.03,
+        "seasonal_waiting_k": 0.09
+      },
+      "female": {
+        "employed_k": 89.6,
+        "unemployed_k": 0.76,
+        "seasonal_waiting_k": 0.59
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.12,
+        "20-24 ปี": 8.68,
+        "25-29 ปี": 20.26,
+        "30-34 ปี": 20.4,
+        "35-39 ปี": 16.49,
+        "40-49 ปี": 36.29,
+        "50-59 ปี": 44.35,
+        "60 ปีขึ้นไป": 42.13
+      }
+    },
+    {
+      "name_th": "พังงา",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 141.38,
+      "employed_k": 140.05,
+      "unemployed_k": 1.33,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.94,
+      "employment_rate_pct": 99.06,
+      "male": {
+        "employed_k": 77.26,
+        "unemployed_k": 1.2,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 62.79,
+        "unemployed_k": 0.13,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.07,
+        "20-24 ปี": 12.47,
+        "25-29 ปี": 15.93,
+        "30-34 ปี": 16.53,
+        "35-39 ปี": 15.28,
+        "40-49 ปี": 30.92,
+        "50-59 ปี": 26.8,
+        "60 ปีขึ้นไป": 19.04
+      }
+    },
+    {
+      "name_th": "พัทลุง",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 294.07,
+      "employed_k": 291.84,
+      "unemployed_k": 1.43,
+      "seasonal_waiting_k": 0.8,
+      "unemployment_rate_pct": 0.49,
+      "employment_rate_pct": 99.24,
+      "male": {
+        "employed_k": 151.91,
+        "unemployed_k": 0.85,
+        "seasonal_waiting_k": 0.8
+      },
+      "female": {
+        "employed_k": 139.93,
+        "unemployed_k": 0.58,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.53,
+        "20-24 ปี": 25.61,
+        "25-29 ปี": 28.9,
+        "30-34 ปี": 29.29,
+        "35-39 ปี": 28.15,
+        "40-49 ปี": 62.09,
+        "50-59 ปี": 63.55,
+        "60 ปีขึ้นไป": 50.73
+      }
+    },
+    {
+      "name_th": "พิจิตร",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 289.54,
+      "employed_k": 283.04,
+      "unemployed_k": 2.35,
+      "seasonal_waiting_k": 4.15,
+      "unemployment_rate_pct": 0.81,
+      "employment_rate_pct": 97.76,
+      "male": {
+        "employed_k": 146.79,
+        "unemployed_k": 1.29,
+        "seasonal_waiting_k": 1.51
+      },
+      "female": {
+        "employed_k": 136.25,
+        "unemployed_k": 1.06,
+        "seasonal_waiting_k": 2.64
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.43,
+        "20-24 ปี": 22.91,
+        "25-29 ปี": 30.61,
+        "30-34 ปี": 29.72,
+        "35-39 ปี": 23.26,
+        "40-49 ปี": 49.59,
+        "50-59 ปี": 58.75,
+        "60 ปีขึ้นไป": 65.76
+      }
+    },
+    {
+      "name_th": "พิษณุโลก",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 499.47,
+      "employed_k": 492.08,
+      "unemployed_k": 5.75,
+      "seasonal_waiting_k": 1.64,
+      "unemployment_rate_pct": 1.15,
+      "employment_rate_pct": 98.52,
+      "male": {
+        "employed_k": 261.34,
+        "unemployed_k": 1.57,
+        "seasonal_waiting_k": 0.55
+      },
+      "female": {
+        "employed_k": 230.74,
+        "unemployed_k": 4.18,
+        "seasonal_waiting_k": 1.09
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.24,
+        "20-24 ปี": 33.17,
+        "25-29 ปี": 54.4,
+        "30-34 ปี": 51.77,
+        "35-39 ปี": 40.82,
+        "40-49 ปี": 92.12,
+        "50-59 ปี": 113.53,
+        "60 ปีขึ้นไป": 101.02
+      }
+    },
+    {
+      "name_th": "ภูเก็ต",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 371.55,
+      "employed_k": 368.19,
+      "unemployed_k": 3.36,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.9,
+      "employment_rate_pct": 99.1,
+      "male": {
+        "employed_k": 198.08,
+        "unemployed_k": 1.94,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 170.11,
+        "unemployed_k": 1.42,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 7.68,
+        "20-24 ปี": 38.02,
+        "25-29 ปี": 48.0,
+        "30-34 ปี": 44.86,
+        "35-39 ปี": 39.78,
+        "40-49 ปี": 78.64,
+        "50-59 ปี": 68.96,
+        "60 ปีขึ้นไป": 42.26
+      }
+    },
+    {
+      "name_th": "มหาสารคาม",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 396.84,
+      "employed_k": 388.74,
+      "unemployed_k": 2.8,
+      "seasonal_waiting_k": 5.3,
+      "unemployment_rate_pct": 0.71,
+      "employment_rate_pct": 97.96,
+      "male": {
+        "employed_k": 203.76,
+        "unemployed_k": 2.7,
+        "seasonal_waiting_k": 3.44
+      },
+      "female": {
+        "employed_k": 184.98,
+        "unemployed_k": 0.1,
+        "seasonal_waiting_k": 1.86
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.71,
+        "20-24 ปี": 24.65,
+        "25-29 ปี": 46.14,
+        "30-34 ปี": 37.62,
+        "35-39 ปี": 30.17,
+        "40-49 ปี": 66.76,
+        "50-59 ปี": 99.04,
+        "60 ปีขึ้นไป": 82.65
+      }
+    },
+    {
+      "name_th": "มุกดาหาร",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 250.42,
+      "employed_k": 245.19,
+      "unemployed_k": 1.98,
+      "seasonal_waiting_k": 3.25,
+      "unemployment_rate_pct": 0.79,
+      "employment_rate_pct": 97.91,
+      "male": {
+        "employed_k": 127.25,
+        "unemployed_k": 1.47,
+        "seasonal_waiting_k": 0.8
+      },
+      "female": {
+        "employed_k": 117.94,
+        "unemployed_k": 0.51,
+        "seasonal_waiting_k": 2.45
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.67,
+        "20-24 ปี": 27.27,
+        "25-29 ปี": 28.16,
+        "30-34 ปี": 24.8,
+        "35-39 ปี": 17.13,
+        "40-49 ปี": 41.42,
+        "50-59 ปี": 62.48,
+        "60 ปีขึ้นไป": 37.25
+      }
+    },
+    {
+      "name_th": "ยะลา",
+      "region_nso": "ภาคใต้ชายแดน",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 260.36,
+      "employed_k": 257.45,
+      "unemployed_k": 2.73,
+      "seasonal_waiting_k": 0.18,
+      "unemployment_rate_pct": 1.05,
+      "employment_rate_pct": 98.88,
+      "male": {
+        "employed_k": 144.44,
+        "unemployed_k": 1.84,
+        "seasonal_waiting_k": 0.18
+      },
+      "female": {
+        "employed_k": 113.01,
+        "unemployed_k": 0.89,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 0.74,
+        "20-24 ปี": 16.67,
+        "25-29 ปี": 28.6,
+        "30-34 ปี": 27.42,
+        "35-39 ปี": 27.53,
+        "40-49 ปี": 58.84,
+        "50-59 ปี": 61.81,
+        "60 ปีขึ้นไป": 35.82
+      }
+    },
+    {
+      "name_th": "ยโสธร",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 265.58,
+      "employed_k": 251.64,
+      "unemployed_k": 2.92,
+      "seasonal_waiting_k": 11.02,
+      "unemployment_rate_pct": 1.1,
+      "employment_rate_pct": 94.75,
+      "male": {
+        "employed_k": 129.69,
+        "unemployed_k": 1.22,
+        "seasonal_waiting_k": 4.63
+      },
+      "female": {
+        "employed_k": 121.95,
+        "unemployed_k": 1.7,
+        "seasonal_waiting_k": 6.39
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.86,
+        "20-24 ปี": 23.53,
+        "25-29 ปี": 28.8,
+        "30-34 ปี": 23.13,
+        "35-39 ปี": 17.02,
+        "40-49 ปี": 41.29,
+        "50-59 ปี": 61.4,
+        "60 ปีขึ้นไป": 52.6
+      }
+    },
+    {
+      "name_th": "ระนอง",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 175.58,
+      "employed_k": 175.45,
+      "unemployed_k": 0.13,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.07,
+      "employment_rate_pct": 99.93,
+      "male": {
+        "employed_k": 97.62,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 77.83,
+        "unemployed_k": 0.13,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.0,
+        "20-24 ปี": 18.63,
+        "25-29 ปี": 21.62,
+        "30-34 ปี": 20.72,
+        "35-39 ปี": 19.26,
+        "40-49 ปี": 36.83,
+        "50-59 ปี": 33.54,
+        "60 ปีขึ้นไป": 20.85
+      }
+    },
+    {
+      "name_th": "ระยอง",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 800.46,
+      "employed_k": 794.55,
+      "unemployed_k": 5.91,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.74,
+      "employment_rate_pct": 99.26,
+      "male": {
+        "employed_k": 425.48,
+        "unemployed_k": 2.36,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 369.07,
+        "unemployed_k": 3.55,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.49,
+        "20-24 ปี": 79.57,
+        "25-29 ปี": 100.55,
+        "30-34 ปี": 102.47,
+        "35-39 ปี": 91.81,
+        "40-49 ปี": 180.23,
+        "50-59 ปี": 141.15,
+        "60 ปีขึ้นไป": 89.29
+      }
+    },
+    {
+      "name_th": "ราชบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 483.62,
+      "employed_k": 478.36,
+      "unemployed_k": 4.52,
+      "seasonal_waiting_k": 0.74,
+      "unemployment_rate_pct": 0.93,
+      "employment_rate_pct": 98.91,
+      "male": {
+        "employed_k": 252.94,
+        "unemployed_k": 3.05,
+        "seasonal_waiting_k": 0.34
+      },
+      "female": {
+        "employed_k": 225.42,
+        "unemployed_k": 1.47,
+        "seasonal_waiting_k": 0.4
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 9.11,
+        "20-24 ปี": 42.54,
+        "25-29 ปี": 54.46,
+        "30-34 ปี": 50.11,
+        "35-39 ปี": 47.69,
+        "40-49 ปี": 95.85,
+        "50-59 ปี": 99.36,
+        "60 ปีขึ้นไป": 79.25
+      }
+    },
+    {
+      "name_th": "ร้อยเอ็ด",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 571.77,
+      "employed_k": 553.7,
+      "unemployed_k": 5.18,
+      "seasonal_waiting_k": 12.89,
+      "unemployment_rate_pct": 0.91,
+      "employment_rate_pct": 96.84,
+      "male": {
+        "employed_k": 297.74,
+        "unemployed_k": 0.83,
+        "seasonal_waiting_k": 5.5
+      },
+      "female": {
+        "employed_k": 255.96,
+        "unemployed_k": 4.35,
+        "seasonal_waiting_k": 7.39
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.93,
+        "20-24 ปี": 53.75,
+        "25-29 ปี": 62.43,
+        "30-34 ปี": 54.43,
+        "35-39 ปี": 39.41,
+        "40-49 ปี": 85.93,
+        "50-59 ปี": 132.94,
+        "60 ปีขึ้นไป": 119.89
+      }
+    },
+    {
+      "name_th": "ลพบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 463.06,
+      "employed_k": 454.72,
+      "unemployed_k": 7.95,
+      "seasonal_waiting_k": 0.39,
+      "unemployment_rate_pct": 1.72,
+      "employment_rate_pct": 98.2,
+      "male": {
+        "employed_k": 242.35,
+        "unemployed_k": 4.45,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 212.37,
+        "unemployed_k": 3.5,
+        "seasonal_waiting_k": 0.39
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.31,
+        "20-24 ปี": 31.57,
+        "25-29 ปี": 49.97,
+        "30-34 ปี": 50.79,
+        "35-39 ปี": 45.06,
+        "40-49 ปี": 97.24,
+        "50-59 ปี": 96.64,
+        "60 ปีขึ้นไป": 78.16
+      }
+    },
+    {
+      "name_th": "ลำปาง",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 371.45,
+      "employed_k": 368.4,
+      "unemployed_k": 0.89,
+      "seasonal_waiting_k": 2.16,
+      "unemployment_rate_pct": 0.24,
+      "employment_rate_pct": 99.18,
+      "male": {
+        "employed_k": 195.73,
+        "unemployed_k": 0.89,
+        "seasonal_waiting_k": 1.37
+      },
+      "female": {
+        "employed_k": 172.67,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.79
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.28,
+        "20-24 ปี": 30.11,
+        "25-29 ปี": 40.5,
+        "30-34 ปี": 39.09,
+        "35-39 ปี": 31.46,
+        "40-49 ปี": 70.22,
+        "50-59 ปี": 81.52,
+        "60 ปีขึ้นไป": 74.22
+      }
+    },
+    {
+      "name_th": "ลำพูน",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 231.15,
+      "employed_k": 230.28,
+      "unemployed_k": 0.87,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.38,
+      "employment_rate_pct": 99.62,
+      "male": {
+        "employed_k": 115.36,
+        "unemployed_k": 0.14,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 114.92,
+        "unemployed_k": 0.73,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.73,
+        "20-24 ปี": 21.13,
+        "25-29 ปี": 26.15,
+        "30-34 ปี": 25.19,
+        "35-39 ปี": 20.1,
+        "40-49 ปี": 40.42,
+        "50-59 ปี": 48.13,
+        "60 ปีขึ้นไป": 47.43
+      }
+    },
+    {
+      "name_th": "ศรีสะเกษ",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 542.09,
+      "employed_k": 533.33,
+      "unemployed_k": 2.22,
+      "seasonal_waiting_k": 6.54,
+      "unemployment_rate_pct": 0.41,
+      "employment_rate_pct": 98.38,
+      "male": {
+        "employed_k": 268.33,
+        "unemployed_k": 0.66,
+        "seasonal_waiting_k": 3.21
+      },
+      "female": {
+        "employed_k": 265.0,
+        "unemployed_k": 1.56,
+        "seasonal_waiting_k": 3.33
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.48,
+        "20-24 ปี": 39.62,
+        "25-29 ปี": 51.53,
+        "30-34 ปี": 51.64,
+        "35-39 ปี": 33.5,
+        "40-49 ปี": 84.48,
+        "50-59 ปี": 128.69,
+        "60 ปีขึ้นไป": 138.4
+      }
+    },
+    {
+      "name_th": "สกลนคร",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 398.29,
+      "employed_k": 394.77,
+      "unemployed_k": 0.24,
+      "seasonal_waiting_k": 3.28,
+      "unemployment_rate_pct": 0.06,
+      "employment_rate_pct": 99.12,
+      "male": {
+        "employed_k": 220.65,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 1.38
+      },
+      "female": {
+        "employed_k": 174.12,
+        "unemployed_k": 0.24,
+        "seasonal_waiting_k": 1.9
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.39,
+        "20-24 ปี": 36.98,
+        "25-29 ปี": 56.76,
+        "30-34 ปี": 45.02,
+        "35-39 ปี": 28.33,
+        "40-49 ปี": 71.19,
+        "50-59 ปี": 95.97,
+        "60 ปีขึ้นไป": 56.15
+      }
+    },
+    {
+      "name_th": "สงขลา",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 970.78,
+      "employed_k": 957.49,
+      "unemployed_k": 13.29,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.37,
+      "employment_rate_pct": 98.63,
+      "male": {
+        "employed_k": 500.8,
+        "unemployed_k": 4.14,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 456.69,
+        "unemployed_k": 9.15,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 10.37,
+        "20-24 ปี": 58.92,
+        "25-29 ปี": 117.16,
+        "30-34 ปี": 107.38,
+        "35-39 ปี": 104.12,
+        "40-49 ปี": 210.96,
+        "50-59 ปี": 210.39,
+        "60 ปีขึ้นไป": 138.18
+      }
+    },
+    {
+      "name_th": "สตูล",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 170.88,
+      "employed_k": 168.09,
+      "unemployed_k": 2.79,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.63,
+      "employment_rate_pct": 98.37,
+      "male": {
+        "employed_k": 91.58,
+        "unemployed_k": 0.7,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 76.51,
+        "unemployed_k": 2.09,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.51,
+        "20-24 ปี": 14.61,
+        "25-29 ปี": 18.32,
+        "30-34 ปี": 17.01,
+        "35-39 ปี": 17.88,
+        "40-49 ปี": 38.61,
+        "50-59 ปี": 37.17,
+        "60 ปีขึ้นไป": 22.98
+      }
+    },
+    {
+      "name_th": "สมุทรปราการ",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1597.85,
+      "employed_k": 1580.24,
+      "unemployed_k": 14.95,
+      "seasonal_waiting_k": 2.66,
+      "unemployment_rate_pct": 0.94,
+      "employment_rate_pct": 98.9,
+      "male": {
+        "employed_k": 805.79,
+        "unemployed_k": 10.69,
+        "seasonal_waiting_k": 2.66
+      },
+      "female": {
+        "employed_k": 774.45,
+        "unemployed_k": 4.26,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 18.96,
+        "20-24 ปี": 108.59,
+        "25-29 ปี": 174.93,
+        "30-34 ปี": 203.43,
+        "35-39 ปี": 210.1,
+        "40-49 ปี": 417.04,
+        "50-59 ปี": 307.12,
+        "60 ปีขึ้นไป": 140.07
+      }
+    },
+    {
+      "name_th": "สมุทรสงคราม",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 106.62,
+      "employed_k": 106.0,
+      "unemployed_k": 0.62,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.58,
+      "employment_rate_pct": 99.42,
+      "male": {
+        "employed_k": 57.14,
+        "unemployed_k": 0.23,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 48.86,
+        "unemployed_k": 0.39,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.83,
+        "20-24 ปี": 10.23,
+        "25-29 ปี": 12.05,
+        "30-34 ปี": 11.19,
+        "35-39 ปี": 9.98,
+        "40-49 ปี": 20.72,
+        "50-59 ปี": 20.63,
+        "60 ปีขึ้นไป": 18.35
+      }
+    },
+    {
+      "name_th": "สมุทรสาคร",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 823.34,
+      "employed_k": 815.26,
+      "unemployed_k": 8.08,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.98,
+      "employment_rate_pct": 99.02,
+      "male": {
+        "employed_k": 414.97,
+        "unemployed_k": 5.14,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 400.29,
+        "unemployed_k": 2.94,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 14.16,
+        "20-24 ปี": 92.64,
+        "25-29 ปี": 141.88,
+        "30-34 ปี": 116.56,
+        "35-39 ปี": 96.33,
+        "40-49 ปี": 173.3,
+        "50-59 ปี": 127.59,
+        "60 ปีขึ้นไป": 52.79
+      }
+    },
+    {
+      "name_th": "สระบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 456.96,
+      "employed_k": 451.77,
+      "unemployed_k": 3.91,
+      "seasonal_waiting_k": 1.28,
+      "unemployment_rate_pct": 0.86,
+      "employment_rate_pct": 98.86,
+      "male": {
+        "employed_k": 243.07,
+        "unemployed_k": 2.82,
+        "seasonal_waiting_k": 0.42
+      },
+      "female": {
+        "employed_k": 208.7,
+        "unemployed_k": 1.09,
+        "seasonal_waiting_k": 0.86
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.73,
+        "20-24 ปี": 38.16,
+        "25-29 ปี": 47.95,
+        "30-34 ปี": 52.28,
+        "35-39 ปี": 49.68,
+        "40-49 ปี": 103.87,
+        "50-59 ปี": 93.43,
+        "60 ปีขึ้นไป": 62.66
+      }
+    },
+    {
+      "name_th": "สระแก้ว",
+      "region_nso": "ภาคตะวันออก",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 419.51,
+      "employed_k": 409.1,
+      "unemployed_k": 7.51,
+      "seasonal_waiting_k": 2.9,
+      "unemployment_rate_pct": 1.79,
+      "employment_rate_pct": 97.52,
+      "male": {
+        "employed_k": 224.58,
+        "unemployed_k": 3.18,
+        "seasonal_waiting_k": 2.11
+      },
+      "female": {
+        "employed_k": 184.52,
+        "unemployed_k": 4.33,
+        "seasonal_waiting_k": 0.79
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.66,
+        "20-24 ปี": 30.48,
+        "25-29 ปี": 42.05,
+        "30-34 ปี": 48.61,
+        "35-39 ปี": 44.7,
+        "40-49 ปี": 102.43,
+        "50-59 ปี": 84.61,
+        "60 ปีขึ้นไป": 51.55
+      }
+    },
+    {
+      "name_th": "สิงห์บุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 103.98,
+      "employed_k": 102.39,
+      "unemployed_k": 1.59,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.53,
+      "employment_rate_pct": 98.47,
+      "male": {
+        "employed_k": 53.13,
+        "unemployed_k": 1.17,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 49.26,
+        "unemployed_k": 0.42,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 0.98,
+        "20-24 ปี": 6.84,
+        "25-29 ปี": 10.26,
+        "30-34 ปี": 11.21,
+        "35-39 ปี": 11.42,
+        "40-49 ปี": 22.69,
+        "50-59 ปี": 23.23,
+        "60 ปีขึ้นไป": 15.76
+      }
+    },
+    {
+      "name_th": "สุพรรณบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 498.54,
+      "employed_k": 492.69,
+      "unemployed_k": 5.01,
+      "seasonal_waiting_k": 0.84,
+      "unemployment_rate_pct": 1.0,
+      "employment_rate_pct": 98.83,
+      "male": {
+        "employed_k": 266.15,
+        "unemployed_k": 1.44,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 226.54,
+        "unemployed_k": 3.57,
+        "seasonal_waiting_k": 0.84
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.7,
+        "20-24 ปี": 33.87,
+        "25-29 ปี": 51.63,
+        "30-34 ปี": 51.66,
+        "35-39 ปี": 47.57,
+        "40-49 ปี": 103.9,
+        "50-59 ปี": 115.02,
+        "60 ปีขึ้นไป": 86.34
+      }
+    },
+    {
+      "name_th": "สุราษฎร์ธานี",
+      "region_nso": "ภาคใต้",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 733.57,
+      "employed_k": 721.32,
+      "unemployed_k": 11.28,
+      "seasonal_waiting_k": 0.97,
+      "unemployment_rate_pct": 1.54,
+      "employment_rate_pct": 98.33,
+      "male": {
+        "employed_k": 377.22,
+        "unemployed_k": 4.64,
+        "seasonal_waiting_k": 0.42
+      },
+      "female": {
+        "employed_k": 344.1,
+        "unemployed_k": 6.64,
+        "seasonal_waiting_k": 0.55
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.16,
+        "20-24 ปี": 58.04,
+        "25-29 ปี": 85.11,
+        "30-34 ปี": 83.74,
+        "35-39 ปี": 75.82,
+        "40-49 ปี": 149.18,
+        "50-59 ปี": 146.12,
+        "60 ปีขึ้นไป": 117.15
+      }
+    },
+    {
+      "name_th": "สุรินทร์",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 554.46,
+      "employed_k": 517.16,
+      "unemployed_k": 3.95,
+      "seasonal_waiting_k": 33.35,
+      "unemployment_rate_pct": 0.71,
+      "employment_rate_pct": 93.27,
+      "male": {
+        "employed_k": 267.73,
+        "unemployed_k": 0.7,
+        "seasonal_waiting_k": 18.34
+      },
+      "female": {
+        "employed_k": 249.43,
+        "unemployed_k": 3.25,
+        "seasonal_waiting_k": 15.01
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.59,
+        "20-24 ปี": 36.95,
+        "25-29 ปี": 58.02,
+        "30-34 ปี": 49.84,
+        "35-39 ปี": 37.46,
+        "40-49 ปี": 86.89,
+        "50-59 ปี": 130.43,
+        "60 ปีขึ้นไป": 110.99
+      }
+    },
+    {
+      "name_th": "สุโขทัย",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 354.95,
+      "employed_k": 345.43,
+      "unemployed_k": 8.94,
+      "seasonal_waiting_k": 0.58,
+      "unemployment_rate_pct": 2.52,
+      "employment_rate_pct": 97.32,
+      "male": {
+        "employed_k": 177.32,
+        "unemployed_k": 7.83,
+        "seasonal_waiting_k": 0.2
+      },
+      "female": {
+        "employed_k": 168.11,
+        "unemployed_k": 1.11,
+        "seasonal_waiting_k": 0.38
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.21,
+        "20-24 ปี": 24.02,
+        "25-29 ปี": 35.74,
+        "30-34 ปี": 35.35,
+        "35-39 ปี": 27.32,
+        "40-49 ปี": 61.11,
+        "50-59 ปี": 76.79,
+        "60 ปีขึ้นไป": 80.88
+      }
+    },
+    {
+      "name_th": "หนองคาย",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 227.34,
+      "employed_k": 224.03,
+      "unemployed_k": 1.01,
+      "seasonal_waiting_k": 2.3,
+      "unemployment_rate_pct": 0.44,
+      "employment_rate_pct": 98.54,
+      "male": {
+        "employed_k": 123.59,
+        "unemployed_k": 1.01,
+        "seasonal_waiting_k": 1.39
+      },
+      "female": {
+        "employed_k": 100.44,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.91
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.44,
+        "20-24 ปี": 22.65,
+        "25-29 ปี": 27.38,
+        "30-34 ปี": 22.45,
+        "35-39 ปี": 16.77,
+        "40-49 ปี": 40.57,
+        "50-59 ปี": 57.41,
+        "60 ปีขึ้นไป": 35.35
+      }
+    },
+    {
+      "name_th": "หนองบัวลำภู",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 238.11,
+      "employed_k": 225.53,
+      "unemployed_k": 5.03,
+      "seasonal_waiting_k": 7.55,
+      "unemployment_rate_pct": 2.11,
+      "employment_rate_pct": 94.72,
+      "male": {
+        "employed_k": 129.07,
+        "unemployed_k": 1.04,
+        "seasonal_waiting_k": 3.85
+      },
+      "female": {
+        "employed_k": 96.46,
+        "unemployed_k": 3.99,
+        "seasonal_waiting_k": 3.7
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.84,
+        "20-24 ปี": 18.76,
+        "25-29 ปี": 24.55,
+        "30-34 ปี": 21.29,
+        "35-39 ปี": 16.58,
+        "40-49 ปี": 42.77,
+        "50-59 ปี": 59.21,
+        "60 ปีขึ้นไป": 39.52
+      }
+    },
+    {
+      "name_th": "อำนาจเจริญ",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 159.13,
+      "employed_k": 153.18,
+      "unemployed_k": 2.33,
+      "seasonal_waiting_k": 3.62,
+      "unemployment_rate_pct": 1.46,
+      "employment_rate_pct": 96.26,
+      "male": {
+        "employed_k": 77.55,
+        "unemployed_k": 1.1,
+        "seasonal_waiting_k": 1.67
+      },
+      "female": {
+        "employed_k": 75.63,
+        "unemployed_k": 1.23,
+        "seasonal_waiting_k": 1.95
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.07,
+        "20-24 ปี": 13.44,
+        "25-29 ปี": 17.57,
+        "30-34 ปี": 13.34,
+        "35-39 ปี": 9.69,
+        "40-49 ปี": 26.54,
+        "50-59 ปี": 36.37,
+        "60 ปีขึ้นไป": 34.16
+      }
+    },
+    {
+      "name_th": "อุดรธานี",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 635.64,
+      "employed_k": 607.42,
+      "unemployed_k": 3.42,
+      "seasonal_waiting_k": 24.8,
+      "unemployment_rate_pct": 0.54,
+      "employment_rate_pct": 95.56,
+      "male": {
+        "employed_k": 329.42,
+        "unemployed_k": 1.63,
+        "seasonal_waiting_k": 8.52
+      },
+      "female": {
+        "employed_k": 278.0,
+        "unemployed_k": 1.79,
+        "seasonal_waiting_k": 16.28
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.57,
+        "20-24 ปี": 51.33,
+        "25-29 ปี": 71.53,
+        "30-34 ปี": 59.6,
+        "35-39 ปี": 45.23,
+        "40-49 ปี": 114.95,
+        "50-59 ปี": 162.13,
+        "60 ปีขึ้นไป": 98.07
+      }
+    },
+    {
+      "name_th": "อุตรดิตถ์",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 224.05,
+      "employed_k": 220.32,
+      "unemployed_k": 2.02,
+      "seasonal_waiting_k": 1.71,
+      "unemployment_rate_pct": 0.9,
+      "employment_rate_pct": 98.34,
+      "male": {
+        "employed_k": 114.35,
+        "unemployed_k": 0.59,
+        "seasonal_waiting_k": 1.38
+      },
+      "female": {
+        "employed_k": 105.97,
+        "unemployed_k": 1.43,
+        "seasonal_waiting_k": 0.33
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 2.1,
+        "20-24 ปี": 14.36,
+        "25-29 ปี": 23.21,
+        "30-34 ปี": 22.01,
+        "35-39 ปี": 18.03,
+        "40-49 ปี": 39.83,
+        "50-59 ปี": 49.62,
+        "60 ปีขึ้นไป": 51.16
+      }
+    },
+    {
+      "name_th": "อุทัยธานี",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 154.15,
+      "employed_k": 152.87,
+      "unemployed_k": 0.9,
+      "seasonal_waiting_k": 0.38,
+      "unemployment_rate_pct": 0.58,
+      "employment_rate_pct": 99.17,
+      "male": {
+        "employed_k": 81.5,
+        "unemployed_k": 0.37,
+        "seasonal_waiting_k": 0.27
+      },
+      "female": {
+        "employed_k": 71.37,
+        "unemployed_k": 0.53,
+        "seasonal_waiting_k": 0.11
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.79,
+        "20-24 ปี": 10.5,
+        "25-29 ปี": 14.76,
+        "30-34 ปี": 15.67,
+        "35-39 ปี": 12.25,
+        "40-49 ปี": 27.45,
+        "50-59 ปี": 34.1,
+        "60 ปีขึ้นไป": 36.37
+      }
+    },
+    {
+      "name_th": "อุบลราชธานี",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 867.97,
+      "employed_k": 851.48,
+      "unemployed_k": 1.2,
+      "seasonal_waiting_k": 15.29,
+      "unemployment_rate_pct": 0.14,
+      "employment_rate_pct": 98.1,
+      "male": {
+        "employed_k": 466.09,
+        "unemployed_k": 0.92,
+        "seasonal_waiting_k": 5.94
+      },
+      "female": {
+        "employed_k": 385.39,
+        "unemployed_k": 0.28,
+        "seasonal_waiting_k": 9.35
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 7.81,
+        "20-24 ปี": 71.26,
+        "25-29 ปี": 112.42,
+        "30-34 ปี": 88.72,
+        "35-39 ปี": 62.02,
+        "40-49 ปี": 149.9,
+        "50-59 ปี": 219.19,
+        "60 ปีขึ้นไป": 140.16
+      }
+    },
+    {
+      "name_th": "อ่างทอง",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 140.79,
+      "employed_k": 137.97,
+      "unemployed_k": 2.69,
+      "seasonal_waiting_k": 0.13,
+      "unemployment_rate_pct": 1.91,
+      "employment_rate_pct": 98.0,
+      "male": {
+        "employed_k": 74.9,
+        "unemployed_k": 0.96,
+        "seasonal_waiting_k": 0.13
+      },
+      "female": {
+        "employed_k": 63.07,
+        "unemployed_k": 1.73,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 0.78,
+        "20-24 ปี": 10.0,
+        "25-29 ปี": 14.36,
+        "30-34 ปี": 15.23,
+        "35-39 ปี": 14.72,
+        "40-49 ปี": 31.68,
+        "50-59 ปี": 30.22,
+        "60 ปีขึ้นไป": 20.98
+      }
+    },
+    {
+      "name_th": "เชียงราย",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 633.82,
+      "employed_k": 628.22,
+      "unemployed_k": 3.39,
+      "seasonal_waiting_k": 2.21,
+      "unemployment_rate_pct": 0.53,
+      "employment_rate_pct": 99.12,
+      "male": {
+        "employed_k": 339.95,
+        "unemployed_k": 1.4,
+        "seasonal_waiting_k": 0.99
+      },
+      "female": {
+        "employed_k": 288.27,
+        "unemployed_k": 1.99,
+        "seasonal_waiting_k": 1.22
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 5.37,
+        "20-24 ปี": 43.03,
+        "25-29 ปี": 66.04,
+        "30-34 ปี": 64.21,
+        "35-39 ปี": 54.47,
+        "40-49 ปี": 116.77,
+        "50-59 ปี": 144.9,
+        "60 ปีขึ้นไป": 133.44
+      }
+    },
+    {
+      "name_th": "เชียงใหม่",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 1056.81,
+      "employed_k": 1045.95,
+      "unemployed_k": 10.86,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 1.03,
+      "employment_rate_pct": 98.97,
+      "male": {
+        "employed_k": 543.63,
+        "unemployed_k": 4.07,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 502.32,
+        "unemployed_k": 6.79,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 21.93,
+        "20-24 ปี": 72.58,
+        "25-29 ปี": 109.54,
+        "30-34 ปี": 112.14,
+        "35-39 ปี": 90.42,
+        "40-49 ปี": 192.13,
+        "50-59 ปี": 217.61,
+        "60 ปีขึ้นไป": 229.6
+      }
+    },
+    {
+      "name_th": "เพชรบุรี",
+      "region_nso": "ภาคกลาง",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 303.42,
+      "employed_k": 301.5,
+      "unemployed_k": 1.92,
+      "seasonal_waiting_k": 0.0,
+      "unemployment_rate_pct": 0.63,
+      "employment_rate_pct": 99.37,
+      "male": {
+        "employed_k": 160.98,
+        "unemployed_k": 1.13,
+        "seasonal_waiting_k": 0.0
+      },
+      "female": {
+        "employed_k": 140.52,
+        "unemployed_k": 0.79,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.55,
+        "20-24 ปี": 21.96,
+        "25-29 ปี": 35.11,
+        "30-34 ปี": 32.13,
+        "35-39 ปี": 29.83,
+        "40-49 ปี": 60.16,
+        "50-59 ปี": 65.06,
+        "60 ปีขึ้นไป": 53.71
+      }
+    },
+    {
+      "name_th": "เพชรบูรณ์",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 511.87,
+      "employed_k": 487.77,
+      "unemployed_k": 3.67,
+      "seasonal_waiting_k": 20.43,
+      "unemployment_rate_pct": 0.72,
+      "employment_rate_pct": 95.29,
+      "male": {
+        "employed_k": 261.19,
+        "unemployed_k": 2.01,
+        "seasonal_waiting_k": 12.0
+      },
+      "female": {
+        "employed_k": 226.58,
+        "unemployed_k": 1.66,
+        "seasonal_waiting_k": 8.43
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 6.63,
+        "20-24 ปี": 34.89,
+        "25-29 ปี": 45.33,
+        "30-34 ปี": 53.1,
+        "35-39 ปี": 40.57,
+        "40-49 ปี": 87.94,
+        "50-59 ปี": 109.02,
+        "60 ปีขึ้นไป": 110.3
+      }
+    },
+    {
+      "name_th": "เลย",
+      "region_nso": "ภาคตะวันออกเฉียงเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 308.81,
+      "employed_k": 307.86,
+      "unemployed_k": 0.12,
+      "seasonal_waiting_k": 0.83,
+      "unemployment_rate_pct": 0.04,
+      "employment_rate_pct": 99.69,
+      "male": {
+        "employed_k": 155.96,
+        "unemployed_k": 0.12,
+        "seasonal_waiting_k": 0.83
+      },
+      "female": {
+        "employed_k": 151.9,
+        "unemployed_k": 0.0,
+        "seasonal_waiting_k": 0.0
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 3.92,
+        "20-24 ปี": 24.03,
+        "25-29 ปี": 32.92,
+        "30-34 ปี": 30.91,
+        "35-39 ปี": 20.62,
+        "40-49 ปี": 52.68,
+        "50-59 ปี": 77.16,
+        "60 ปีขึ้นไป": 65.62
+      }
+    },
+    {
+      "name_th": "แพร่",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 197.51,
+      "employed_k": 192.42,
+      "unemployed_k": 3.08,
+      "seasonal_waiting_k": 2.01,
+      "unemployment_rate_pct": 1.56,
+      "employment_rate_pct": 97.42,
+      "male": {
+        "employed_k": 101.25,
+        "unemployed_k": 0.92,
+        "seasonal_waiting_k": 1.44
+      },
+      "female": {
+        "employed_k": 91.17,
+        "unemployed_k": 2.16,
+        "seasonal_waiting_k": 0.57
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 1.52,
+        "20-24 ปี": 13.63,
+        "25-29 ปี": 21.39,
+        "30-34 ปี": 20.22,
+        "35-39 ปี": 17.11,
+        "40-49 ปี": 35.18,
+        "50-59 ปี": 44.82,
+        "60 ปีขึ้นไป": 38.54
+      }
+    },
+    {
+      "name_th": "แม่ฮ่องสอน",
+      "region_nso": "ภาคเหนือ",
+      "year_be": "2569",
+      "quarter": "ไตรมาส 1",
+      "labor_force_total_k": 147.68,
+      "employed_k": 143.95,
+      "unemployed_k": 0.53,
+      "seasonal_waiting_k": 3.2,
+      "unemployment_rate_pct": 0.36,
+      "employment_rate_pct": 97.47,
+      "male": {
+        "employed_k": 76.66,
+        "unemployed_k": 0.39,
+        "seasonal_waiting_k": 1.29
+      },
+      "female": {
+        "employed_k": 67.29,
+        "unemployed_k": 0.14,
+        "seasonal_waiting_k": 1.91
+      },
+      "employed_by_age_k": {
+        "15-19 ปี": 4.26,
+        "20-24 ปี": 13.0,
+        "25-29 ปี": 14.88,
+        "30-34 ปี": 15.11,
+        "35-39 ปี": 12.43,
+        "40-49 ปี": 27.17,
+        "50-59 ปี": 32.36,
+        "60 ปีขึ้นไป": 24.75
+      }
+    }
+  ]
+}
