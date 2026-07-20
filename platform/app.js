@@ -2128,10 +2128,18 @@ function drawPeerProvince(){
   // co-located under the AutoX count — gated on the layer field so a pre-fold file degrades.
   const hasRank=list.some(r=>r.autox_rank!=null);
   const ordinal=n=>n+(({1:'st',2:'nd',3:'rd'})[n]||'th');
+  // Per-province saturation vs the MEASURED vehicle collateral base (title-lender branches per
+  // 100k DLT registered vehicles) — the crowding read the raw count/ratio can't give, previously
+  // only in the headline. Gated on the layer flag so a pre-fold peer_province.json degrades to
+  // no column; † marks the Greater-Bangkok inner-ring (density inflated by central registration).
+  const hasSatCol=m.vehicle_saturation_available===true && list.some(r=>r.titlelender_per_100k_veh!=null);
+  const natTL=(typeof m.national_titlelender_per_100k_veh==='number')?m.national_titlelender_per_100k_veh:null;
+  const sh=hasSatCol?`<th title="Title-lender branches (AutoX + rivals) per 100,000 MEASURED DLT registered vehicles — how crowded the market is per unit of vehicle collateral, which the raw count can’t show${natTL!=null?`. National ${natTL.toFixed(1)}/100k`:''}. † = Greater-Bangkok inner-ring, density inflated by central vehicle registration (excluded from the crowding headline).">Sat/100k</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
     `<th title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
     bh+ph+
     `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
+    sh+
     `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
@@ -2140,6 +2148,21 @@ function drawPeerProvince(){
         return `<td class="mono"${v?'':' style="color:var(--dim)"'}>${v?v.toLocaleString():'·'}</td>`;}).join('');
       const pv=(r.pico!=null)?r.pico:0;
       const pcol=hasPico?`<td class="mono" style="color:${pv?'var(--collat)':'var(--dim)'}">${pv?pv.toLocaleString():'·'}</td>`:'';
+      // saturation vs the vehicle collateral base: agri when above the national line (contested per
+      // unit of collateral), gold below; flagged inner-ring shown dim with a † (inflated, off-headline).
+      let satCol='';
+      if(hasSatCol){
+        const tl=r.titlelender_per_100k_veh;
+        if(tl==null){ satCol='<td class="mono" style="color:var(--dim)">·</td>'; }
+        else{
+          const flagged=!!r.vehicle_stock_flag;
+          const scol=flagged?'var(--dim)':((natTL!=null&&tl>natTL)?'var(--agri)':'var(--gold)');
+          const dag=flagged?'<span style="color:var(--dim)"> †</span>':'';
+          const brk=[r.autox_per_100k_veh!=null?`AutoX ${r.autox_per_100k_veh.toFixed(1)}`:null,
+                     r.rivals_per_100k_veh!=null?`rivals ${r.rivals_per_100k_veh.toFixed(1)}`:null].filter(Boolean).join(' · ');
+          satCol=`<td class="mono" style="color:${scol}"${brk?` title="${brk} per 100k veh${flagged?' · inner-ring density inflated by central registration':''}"`:''}>${tl.toFixed(1)}${dag}</td>`;
+        }
+      }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
@@ -2155,6 +2178,7 @@ function drawPeerProvince(){
         <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b>${rankCell}</td>
         ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
+        ${satCol}
         <td>${lead}</td>
       </tr>`;}).join('');
   if(ro){
