@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "title": "OAE crop PRODUCTION COST (ต้นทุนการผลิต) — baht/rai and baht/kg, for the farmer-margin leg of crop stress (objective #1)",
+    "generated_by": "manual ingest (no pipeline build script yet — staged raw for a future build_crop_margin.py / fold into build_crop_stress.py)",
+    "label": "MEASURED (2 of 5 crops have a directly-reported baht/rai figure) + DERIVED (baht/rai back-computed from OAE's own baht/ton × kg/rai for the other crops/for cross-check). Nothing fabricated — every number traces to a specific OAE PDF page, and every derived figure is tagged method='derived' with its formula.",
+    "retrieved": "2026-07-20",
+    "urls": [
+      "https://oae.go.th/uploads/files/2026/04/27/bb9fb91abe729379.pdf",
+      "https://oae.go.th/uploads/files/public/media/Cai-up-2568.pdf",
+      "https://catalog.oae.go.th/api/3/action/package_show?id=dataoae3103",
+      "https://catalog.oae.go.th/api/3/action/package_search?q=*:*&rows=1000"
+    ],
+    "url_notes": {
+      "bb9fb91abe729379.pdf": "OAE Zone 1-12 joint study, 'Marginal Abatement Cost of GHG Emission from Main-Season Rice Production' (การศึกษาต้นทุนส่วนเพิ่มการลดก๊าซเรือนกระจก สินค้าพืชเศรษฐกิจ ข้าวนาปี), published 2026-04-27. This is the ONLY OAE document found in this pull that reports total production cost DIRECTLY in baht/rai (Table 4.1-4.3, abstract). 37-province farmer survey (267 farmers x 2 groups = 534), crop year 2567/68 (2024/25).",
+      "Cai-up-2568.pdf": "OAE Center for Agricultural Information (CAI) annual commodity-economics compendium 'Cai-up 2568' (สารสนเทศเศรษฐกิจการเกษตรรายสินค้า). Already committed at source-data/oae_farm_economics.json via pipeline/pull_oae_farm_economics.py; re-read here (raw copied to source-data/raw/oae-costs/caiup-2568.pdf) specifically for its baht/TON cost row (row 5 or 6 'ต้นทุนการผลิต (บาท/ตัน)') on the rice/maize/cassava/rubber/oilpalm commodity pages, 3-year column series 2566/2567/2568 — 2568 (rightmost) taken as the current-year figure. NOTE: the committed oae_farm_economics.json left cassava.cost_per_ton and oilpalm.cost_per_ton as null because the extraction script assumed a 4-token row for that field; the raw row for those two crops only has 3 tokens (a genuine schema difference from rice/rubber/maize, confirmed by reading the page text directly) — the values (2,130 and 3,010 THB/ton) exist on the page and are captured here. This is a known small bug in pull_oae_farm_economics.py worth fixing upstream.",
+      "catalog.oae.go.th searches": "CKAN catalog.oae.go.th was enumerated in full (57 packages, package_search q=*:* rows=1000, cached as source-data/raw/oae-costs/all_packages.json) and searched for ต้นทุน (cost) and ต้นทุนการผลิต (production cost). NO dedicated machine-readable 'production cost per rai' dataset exists in the catalog — only 3 logistics-cost datasets (transport/storage/loss cost per crop, a different concept) and dataoae3103 (the Cai-up compendium PDF, hand-parsed above). This mirrors the farmgate_prices.json finding that OAE's farm-gate PRICE series is also not machine-readable on this catalog — cost-of-production is the same story."
+    },
+    "crop_years": {
+      "rice_ghg_study": "2567/68 (2024/25 cropping season) — main-season rice only (ข้าวนาปี)",
+      "cai_up_compendium": "2568 (latest column of a 2566-2567-2568 series; rice/maize page figures are 'crop year 2568/69, OAE forecast as of Mar 2569' per the already-committed oae_farm_economics.json meta)"
+    },
+    "parse_notes": [
+      "rice has TWO independent measurements that roughly cross-check: the GHG-study survey (4,644.06 THB/rai, conventional-fertilizer farmer group, DIRECTLY reported) vs. the Cai-up compendium's cost-per-ton x yield-per-rai (4,196.72 THB/rai, DERIVED). They differ ~10%, plausible given different vintages (2567/68 actual survey vs 2568 OAE forecast) and different farmer samples (37-province survey vs national compendium average) — both are kept, neither overwrites the other.",
+      "cassava and oilpalm cost_per_ton were NOT extracted by the already-committed pull_oae_farm_economics.py (field left null) due to a column-count assumption bug; the true values (cassava 2,130 THB/ton, oilpalm 3,010 THB/ton, both crop-year 2568) were read directly off the cached PDF page text in this pull and are included here, each tagged method='derived_from_cost_per_ton' for the resulting baht/rai figure.",
+      "maize and rubber cost_per_ton WERE already correctly extracted in the committed oae_farm_economics.json (6,760 and 63,180 THB/ton respectively); baht/rai here is DERIVED from those figures x each crop's OAE-measured yield_kg_per_rai.",
+      "cash vs non-cash cost split: NOT FOUND in either source within this pull. The GHG-study PDF's detailed Table 4.1 (per printed page 51 of the report body, not the same as PDF physical page 51) likely itemises cost components (labor/fertilizer/land rent/machinery) but was not reached within this pull's time budget — logged as a gap, not fabricated.",
+      "sugarcane: NO OAE production-cost-per-rai figure found. Not covered by the Cai-up compendium (only rice/maize/cassava/rubber/oilpalm) and no dedicated OAE or OCSB (สำนักงานคณะกรรมการอ้อยและน้ำตาล) machine-readable source turned up in this search pass. OMITTED, not fabricated.",
+      "durian/longan: NO OAE production-cost-per-rai figure found; the compendium covers only the 5 major field crops, and OAE's tropical-fruit CKAN dataset ('tropical-fruits') is a VALUE-of-production series, not a cost series. OMITTED.",
+      "regional breakdown: NONE of the figures captured here are regional — all are NATIONAL averages (rice GHG study = 37-province survey average; Cai-up = national compendium figure). The task's 'regional where offered' condition was not met for any crop in this pull."
+    ],
+    "gaps": {
+      "cash_vs_noncash_split": "not extracted (see parse_notes)",
+      "sugarcane": "no cost-per-rai source found",
+      "durian_longan": "no cost-per-rai source found",
+      "regional_breakdown": "all figures are national averages only",
+      "rice_second_season": "only main-season (นาปี) rice covered by the GHG study; นาปรัง (second/dry-season rice) cost-per-rai not found in this pull"
+    },
+    "consumer": "intended for a future build_crop_margin.py that joins this against source-data/farmgate_prices.json (crop keys already align: cassava/maize/oilpalm/rice/rubber) to compute farmer margin = farmgate price - cost/kg, per crop. See report at scratchpad/ingest_reports/oae-costs.md for the join note."
+  },
+  "crops": [
+    {
+      "crop_th": "ข้าวนาปี (เกษตรกรทั่วไป, ใช้ปุ๋ยแบบทั่วไป)",
+      "crop_en": "rice (main-season, general/conventional fertilizer practice)",
+      "year": "2567/68",
+      "region": "national",
+      "cost_per_rai_baht": 4644.06,
+      "cost_per_kg_baht": 8.68,
+      "yield_kg_per_rai": 535.31,
+      "revenue_per_rai_baht": 5904.47,
+      "farmgate_price_per_kg_baht": 11.03,
+      "net_profit_per_rai_baht": 1260.41,
+      "net_profit_per_kg_baht": 2.35,
+      "method": "measured_direct",
+      "source": "bb9fb91abe729379.pdf (OAE Zone 1-12 GHG-MAC rice study, abstract + Table 4.1)",
+      "sample": "37 provinces, 267 farmers"
+    },
+    {
+      "crop_th": "ข้าวนาปี (เกษตรกรใช้ปุ๋ยตามค่าวิเคราะห์ดิน)",
+      "crop_en": "rice (main-season, soil-test-based fertilizer practice)",
+      "year": "2567/68",
+      "region": "national",
+      "cost_per_rai_baht": 4400.78,
+      "cost_per_kg_baht": 7.95,
+      "yield_kg_per_rai": 553.57,
+      "revenue_per_rai_baht": 6105.88,
+      "net_profit_per_rai_baht": 1705.1,
+      "net_profit_per_kg_baht": 3.08,
+      "method": "measured_direct",
+      "source": "bb9fb91abe729379.pdf (OAE Zone 1-12 GHG-MAC rice study, abstract + Table 4.2)",
+      "sample": "37 provinces, 267 farmers",
+      "note": "comparison/treatment group in the same study, not a separate national estimate — kept as a distinct row rather than averaged in"
+    },
+    {
+      "crop_th": "ข้าว (เฉลี่ยทุกชนิด, คอมเพนเดียม)",
+      "crop_en": "rice (all types, compendium national average)",
+      "year": "2568",
+      "region": "national",
+      "cost_per_rai_baht": 4196.72,
+      "cost_per_kg_baht": 9.538,
+      "yield_kg_per_rai": 440,
+      "cost_per_ton_baht": 9538,
+      "method": "derived_from_cost_per_ton",
+      "derivation": "cost_per_rai = cost_per_ton (measured) x yield_kg_per_rai (measured) / 1000",
+      "source": "Cai-up-2568.pdf p.16, via source-data/oae_farm_economics.json"
+    },
+    {
+      "crop_th": "ข้าวโพดเลี้ยงสัตว์",
+      "crop_en": "maize (feed corn)",
+      "year": "2568",
+      "region": "national",
+      "cost_per_rai_baht": 5428.28,
+      "cost_per_kg_baht": 6.76,
+      "yield_kg_per_rai": 803,
+      "cost_per_ton_baht": 6760,
+      "method": "derived_from_cost_per_ton",
+      "derivation": "cost_per_rai = cost_per_ton (measured) x yield_kg_per_rai (measured) / 1000",
+      "source": "Cai-up-2568.pdf p.22, via source-data/oae_farm_economics.json"
+    },
+    {
+      "crop_th": "มันสำปะหลังโรงงาน",
+      "crop_en": "cassava (factory-grade fresh root)",
+      "year": "2568",
+      "region": "national",
+      "cost_per_rai_baht": 6749.97,
+      "cost_per_kg_baht": 2.13,
+      "yield_kg_per_rai": 3169,
+      "cost_per_ton_baht": 2130,
+      "method": "derived_from_cost_per_ton",
+      "derivation": "cost_per_rai = cost_per_ton (measured) x yield_kg_per_rai (measured) / 1000",
+      "source": "Cai-up-2568.pdf p.24 (row 5, 2568 column) — read directly from the cached PDF in this pull; the committed oae_farm_economics.json has this field as null (extraction bug, see parse_notes)"
+    },
+    {
+      "crop_th": "ยางพารา (ยางแผ่นดิบ)",
+      "crop_en": "rubber (raw sheet)",
+      "year": "2568",
+      "region": "national",
+      "cost_per_rai_baht": 13646.88,
+      "cost_per_kg_baht": 63.18,
+      "yield_kg_per_rai": 216,
+      "cost_per_ton_baht": 63180,
+      "method": "derived_from_cost_per_ton",
+      "derivation": "cost_per_rai = cost_per_ton (measured) x yield_kg_per_rai (measured) / 1000",
+      "source": "Cai-up-2568.pdf p.38, via source-data/oae_farm_economics.json"
+    },
+    {
+      "crop_th": "ปาล์มน้ำมัน (ทั้งทะลาย)",
+      "crop_en": "oil palm (whole fresh fruit bunch)",
+      "year": "2568",
+      "region": "national",
+      "cost_per_rai_baht": 9875.81,
+      "cost_per_kg_baht": 3.01,
+      "yield_kg_per_rai": 3281,
+      "cost_per_ton_baht": 3010,
+      "method": "derived_from_cost_per_ton",
+      "derivation": "cost_per_rai = cost_per_ton (measured) x yield_kg_per_rai (measured) / 1000",
+      "source": "Cai-up-2568.pdf p.40 (row 6, 2568 column) — read directly from the cached PDF in this pull; the committed oae_farm_economics.json has this field as null (extraction bug, see parse_notes)"
+    }
+  ],
+  "omitted": [
+    {"crop_en": "sugarcane", "reason": "no OAE cost-per-rai source found in this pull"},
+    {"crop_en": "durian", "reason": "no OAE cost-per-rai source found in this pull"},
+    {"crop_en": "longan", "reason": "no OAE cost-per-rai source found in this pull"}
+  ]
+}

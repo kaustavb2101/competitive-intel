@@ -246,6 +246,13 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
   else bad "build_rival_universe.py --check (rival_universe.json drifted from source-data/rival_universe.json + app_reviews.json — run: python3 pipeline/build_rival_universe.py)"
   fi
+  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt; do
+    ( cd "$PIPE" && python3 "$ing.py" --check >/dev/null 2>&1 ); rc=$?
+    if [ "$rc" -eq 0 ]; then ok "$ing.py --check"
+    elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (staging source absent — ingest wave, not data drift)"
+    else bad "$ing.py --check (output drifted from source-data/staging/ — run: python3 pipeline/$ing.py)"
+    fi
+  done
   ( cd "$PIPE" && python3 build_rival_threat.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_threat.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_threat.py --check (rival_reputation.json absent — Google Places pull, not data drift)"
