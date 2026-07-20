@@ -228,6 +228,14 @@ def build():
     provinces.sort(key=lambda p: (-(p["rivals"] - p["autox"]), p["province_th"]))
 
     n_autox_leads = sum(1 for p in provinces if p["leader"] == "AutoX")
+    # provinces_led_by: how many of the 77 provinces each operator is the single largest network in
+    # (the same `leader` field, tallied). n_provinces_autox_leads already gives AutoX's own count;
+    # this extends it to every rival brand so the board can name WHICH rival dominates the most
+    # ground — and by how many provinces — from MEASURED data, instead of a hardcoded "Muangthai
+    # leads most" assertion. Ordered AutoX-first then census-brand order; zeros kept (a brand that
+    # leads nowhere is itself a signal), so the dict is deterministic and JSON-stable.
+    lead_counter = collections.Counter(p["leader"] for p in provinces)
+    provinces_led_by = {op: lead_counter.get(op, 0) for op in (["AutoX"] + brands)}
     n_outnumbered_prov = sum(1 for p in provinces if p["autox"] > 0 and p["rivals"] > p["autox"])
     # AutoX competitive-standing rollup (only provinces where AutoX is present / rankable).
     ranked = [p for p in provinces if p["autox_rank"] is not None]
@@ -295,6 +303,10 @@ def build():
             "ratio": "COMPUTED — rivals / autox, rounded 2 dp; null where autox == 0.",
             "leader": "COMPUTED — the operator (AutoX or a rival brand) with the most branches "
                       "in the province; deterministic tie-break (AutoX first, then census order).",
+            "provinces_led_by (meta)": "COMPUTED — a national tally of the `leader` field: how many "
+                                       "of the 77 provinces each operator is the single largest "
+                                       "network in. Pure aggregation of MEASURED counts; inherits "
+                                       "leader's Heng-under-count caveat.",
             "autox_rank": "COMPUTED — AutoX's 1-based rank by branch count among the operators "
                           "PRESENT in the province ({AutoX} + every big-4 brand with >0 branches), "
                           "same deterministic tie-break as `leader` (AutoX ahead on an equal "
@@ -383,6 +395,7 @@ def build():
                          "by (rivals-autox) desc.",
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
+        "provinces_led_by": provinces_led_by,
         "n_provinces_outnumbered": n_outnumbered_prov,
         "n_provinces_autox_last": n_autox_last,
         "n_provinces_autox_top2": n_autox_top2,
@@ -451,6 +464,8 @@ def run(check=False):
              ", ".join("%s %d" % (b, n) for b, n in m["per_brand_total"].items())))
     print("  provinces AutoX leads: %d | provinces outnumbered: %d"
           % (m["n_provinces_autox_leads"], m["n_provinces_outnumbered"]))
+    print("  provinces led by: %s"
+          % ", ".join("%s %d" % (op, n) for op, n in m["provinces_led_by"].items() if n))
     if m["pico_available"]:
         print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
               % (m["total_pico"], m["n_provinces_pico_present"],
