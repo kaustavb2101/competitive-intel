@@ -2141,11 +2141,18 @@ function drawPeerProvince(){
   const hasSatCol=m.vehicle_saturation_available===true && list.some(r=>r.titlelender_per_100k_veh!=null);
   const natTL=(typeof m.national_titlelender_per_100k_veh==='number')?m.national_titlelender_per_100k_veh:null;
   const sh=hasSatCol?`<th title="Title-lender branches (AutoX + rivals) per 100,000 MEASURED DLT registered vehicles — how crowded the market is per unit of vehicle collateral, which the raw count can’t show${natTL!=null?`. National ${natTL.toFixed(1)}/100k`:''}. † = Greater-Bangkok inner-ring, density inflated by central vehicle registration (excluded from the crowding headline).">Sat/100k</th>`:'';
+  // Intra-province ground contest: of a province's districts, how many is AutoX outnumbered in
+  // (MEASURED, point-in-district — n_outnumbered_districts / n_districts). This is the read the
+  // province rank/ratio can't give: a province AutoX ranks well in overall can still be outnumbered
+  // in most of its districts (ground-level contest the aggregate masks). Gated on the layer field so
+  // a pre-fold peer_province.json degrades to no column.
+  const hasDistCol=list.some(r=>r.n_districts);
+  const dh=hasDistCol?`<th title="Share of this province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district). The province rank can mask this — a good province standing can still lose most of its districts on the ground.">Dist. lost</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
     `<th title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
     bh+ph+
     `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
-    sh+
+    sh+dh+
     `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
@@ -2169,6 +2176,18 @@ function drawPeerProvince(){
           satCol=`<td class="mono" style="color:${scol}"${brk?` title="${brk} per 100k veh${flagged?' · inner-ring density inflated by central registration':''}"`:''}>${tl.toFixed(1)}${dag}</td>`;
         }
       }
+      // districts-lost cell: share of the province's districts where rivals outnumber AutoX.
+      // teal when it holds every district (0 lost), gold below two-thirds, agri at/above two-thirds.
+      let distCol='';
+      if(hasDistCol){
+        const nd=r.n_districts||0, no=r.n_outnumbered_districts;
+        if(!nd||no==null){ distCol='<td class="mono" style="color:var(--dim)">·</td>'; }
+        else{
+          const share=no/nd, pct=Math.round(share*100);
+          const dcol=(no===0)?'var(--merch)':(share>=2/3?'var(--agri)':'var(--gold)');
+          distCol=`<td class="mono" style="color:${dcol}" title="AutoX is outnumbered by the big-4 in ${no} of ${nd} districts here (MEASURED, point-in-district)">${pct}%<span class="sub" style="font-weight:400"> ${no}/${nd}</span></td>`;
+        }
+      }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
@@ -2184,7 +2203,7 @@ function drawPeerProvince(){
         <td class="mono" style="color:var(--merch)"><b>${(r.autox||0).toLocaleString()}</b>${rankCell}</td>
         ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
-        ${satCol}
+        ${satCol}${distCol}
         <td>${lead}</td>
       </tr>`;}).join('');
   if(ro){
@@ -2216,14 +2235,29 @@ function drawPeerProvince(){
           (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
       }
     }
+    // Intra-province ground contest, rolled up client-side from the same MEASURED per-record fields:
+    // how many of ALL 77 provinces' districts the big-4 outnumber AutoX in, plus the "hidden contest"
+    // cases where AutoX ranks top-2 in the province yet is outnumbered in the majority of its districts
+    // (the province rank masks ground-level contest the district read exposes).
+    const withDist=recs.filter(r=>r.n_districts);
+    let distStr='';
+    if(withDist.length){
+      const totD=withDist.reduce((s,r)=>s+(r.n_districts||0),0);
+      const lostD=withDist.reduce((s,r)=>s+(r.n_outnumbered_districts||0),0);
+      const hidden=withDist.filter(r=>r.autox_rank!=null&&r.autox_rank<=2&&(r.n_outnumbered_districts/r.n_districts)>0.5)
+                           .sort((a,b)=>(b.n_outnumbered_districts/b.n_districts)-(a.n_outnumbered_districts/a.n_districts));
+      const hidStr=hidden.length?` The province rank can mask ground contest — AutoX ranks top-2 yet is outnumbered in most of its own districts in <b style="color:var(--agri)">${hidden.length}</b> province${hidden.length>1?'s':''} (worst: <b>${hidden[0].province_th}</b>, ${hidden[0].n_outnumbered_districts}/${hidden[0].n_districts}).`:'';
+      distStr=` Zooming to districts, the big-4 outnumber AutoX in <b style="color:var(--agri)">${lostD.toLocaleString()}</b> of ${totD.toLocaleString()} districts nationwide (${totD?Math.round(100*lostD/totD):0}%).${hidStr}`;
+    }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
-      `National rival footprint: ${brandStr}.${picoStr}${satStr} ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr}${satStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'The <b>per-100k-vehicle</b> saturation reads title-lender branches against <b>MEASURED</b> DLT registered-vehicle stock (the vehicle collateral base) — a crowding read the raw count can’t give. The three Greater-Bangkok inner-ring provinces are <b>excluded</b> from the most-crowded headline: they register most vehicles centrally at the Bangkok DLT office (a MEASURED NSO labour-force cross-check flags them), which would inflate their density. National saturation is unaffected (vehicle stock is sum-conserved).',
          'The <b>#k/n</b> chip under the AutoX count is AutoX’s <b>rank</b> among the operators present (AutoX + big-4 brands with a branch here) — MEASURED counts, computed position. It sharpens the Leads column: two provinces both led by Muangthai can have AutoX 2nd (defensible) or last of 4 (marginalised).',
+         'The <b>Dist. lost</b> column is the share of the province’s districts where the big-4 outnumber AutoX (MEASURED, point-in-district) — a ground-level read the province rank/ratio can’t give: AutoX can rank well in a province overall yet be outnumbered in most of its districts.',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
