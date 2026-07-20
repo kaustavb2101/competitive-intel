@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-20T05:18:48+07:00",
-    "commit": "2b6607d"
+    "generated_at": "2026-07-20T10:12:20Z",
+    "commit": "f9a7498"
   },
   "overall": {
     "progress_pct": 96,
@@ -480,19 +480,103 @@
   ],
   "activity": [
     {
+      "date": "2026-07-20T10:12:20Z",
+      "sha": "f9a7498",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post Sat/100k peer-column #100)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-20T17:11:46+07:00",
+      "sha": "a105ead",
+      "summary": "intel(peer): per-province Sat/100k vehicle-saturation column on the Competition peer board (obj #2) (#100)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-20T15:41:32+07:00",
+      "sha": "727ccf4",
+      "summary": "Merge pull request #98 from kaustavb2101/claude/home-defensibility",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T08:13:05Z",
+      "sha": "195342e",
+      "summary": "docs(progress): log ux-loop data.html districtTable scope=col fix + merge/deploy-verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T15:10:18+07:00",
+      "sha": "6031a9c",
+      "summary": "ux: add scope=col to data.html districtTable headers (a11y) (#99)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T06:37:32Z",
+      "sha": "29e215f",
+      "summary": "committee: autonomous competitor scout (run 29722079097)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-20T06:23:17Z",
+      "sha": "1c40165",
+      "summary": "committee: refresh autonomy plan (run 29721476385)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-20T06:16:11Z",
+      "sha": "df46a16",
+      "summary": "intel(command-center): carry the per-region defensibility read onto #home (obj #2)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-20T04:21:57Z",
+      "sha": "13a4f1c",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post peer-leader-tally #97)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-20T11:19:36+07:00",
+      "sha": "c34646a",
+      "summary": "intel(peer): data-drive the leading-rival headline off a MEASURED province-leader tally (#97)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-20T02:11:48Z",
+      "sha": "f8886e9",
+      "summary": "docs(progress): log ux-loop data.html sortable-header keyboard/aria fix + deploy-verify (#96)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T09:09:09+07:00",
+      "sha": "0f9e421",
+      "summary": "ux: data.html sortable column headers keyboard-operable + aria-sort (#96)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-20T09:00:07+07:00",
+      "sha": "56a4d70",
+      "summary": "intel(competition): per-region rival threat cut — density × service where our branches sit (obj #2) (#95)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-19T22:19:32Z",
+      "sha": "5d83bba",
+      "summary": "committee: refresh autonomy plan + CEO dashboard (post freshness-stamp fix #92)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-20T05:18:48+07:00",
       "sha": "2b6607d",
       "summary": "service: recover 3 layers' dropped freshness stamps in the Data-room card (#92)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-19T21:59:38+00:00",
+      "date": "2026-07-19T21:59:38Z",
       "sha": "7f8b491",
       "summary": "committee: refresh autonomy plan (run 29705300641)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-19T20:13:07+00:00",
+      "date": "2026-07-19T20:13:07Z",
       "sha": "9b5a596",
       "summary": "docs(progress): log ux-loop data.html theme-color meta ship + deploy-verify",
       "pillar": "uxui"
@@ -504,7 +588,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-19T18:16:57+00:00",
+      "date": "2026-07-19T18:16:57Z",
       "sha": "65322d6",
       "summary": "test(gate): add drift checks for 4 deterministic builders (crop_stress, farmgate_prices, building_tiles, rayong)",
       "pillar": "3d-enrichment"
@@ -534,7 +618,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:31:27+00:00",
+      "date": "2026-07-19T16:31:27Z",
       "sha": "52e88ef",
       "summary": "committee: refresh autonomy plan + CEO dashboard (post rival-threat-matrix ship)",
       "pillar": "market"
@@ -558,7 +642,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-19T16:02:30+00:00",
+      "date": "2026-07-19T16:02:30Z",
       "sha": "caab12c",
       "summary": "committee: refresh autonomy plan (run 29694014006)",
       "pillar": "deployment"
@@ -573,90 +657,6 @@
       "date": "2026-07-19T21:56:06+07:00",
       "sha": "25d3db5",
       "summary": "feat(competition): measured rival service reputation (Google ratings) (#86)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T14:30:35+00:00",
-      "sha": "c56030a",
-      "summary": "docs: log Overview \"Bottom line\" expansion→risk-lens reframe — merge + deploy-verify (PR #85)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T21:28:24+07:00",
-      "sha": "767d865",
-      "summary": "ux: reframe Overview \"Bottom line\" off branch expansion → risk lens (#85)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T20:36:52+07:00",
-      "sha": "dcead4c",
-      "summary": "ux(agri): surface measured Thai farm-gate — stop calling it a global proxy (#84)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T20:15:03+07:00",
-      "sha": "b268e2f",
-      "summary": "ux(nav): two-risk storyline spine — coherent navigation flow (#83)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T19:42:38+07:00",
-      "sha": "9b62807",
-      "summary": "data(nso-wage): measured regional wage anchor + province income reality-check (#67)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-19T12:34:00+00:00",
-      "sha": "a117f4b",
-      "summary": "docs: log dry-season second-rice EXPOSURE crop-stress fold (PR #82)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T19:33:35+07:00",
-      "sha": "ebba1ea",
-      "summary": "intel(agri): surface MEASURED dry-season second-rice EXPOSURE on the crop-stress board (#82)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T10:39:45+00:00",
-      "sha": "f7da11d",
-      "summary": "committee: refresh autonomy plan (run 29683693667)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-19T10:13:05+00:00",
-      "sha": "1f748a3",
-      "summary": "docs: log EV-transition workforce-exposure fold (PR #81) + refresh autonomy plan",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-19T17:12:18+07:00",
-      "sha": "982dcbb",
-      "summary": "intel(market): surface MEASURED EV-transition workforce exposure on the collateral outlook (#81)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-19T08:34:24+00:00",
-      "sha": "1b6359b",
-      "summary": "docs: log noscript fallback on the 3D pages — merge + deploy-verify (PR #80)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-19T15:30:52+07:00",
-      "sha": "8854ab8",
-      "summary": "ux: noscript fallback on the three deck.gl/WebGL pages (#80)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-19T06:24:51+00:00",
-      "sha": "adfc920",
-      "summary": "ci(data): rebuild downstream layers in the price-refresh workflows",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-19T06:17:40+00:00",
-      "sha": "d4d1fc0",
-      "summary": "committee: autonomous competitor scout (run 29676124159)",
       "pillar": "market"
     }
   ]
