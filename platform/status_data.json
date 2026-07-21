@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-21T04:19:19+07:00",
-    "commit": "38432f5"
+    "generated_at": "2026-07-21T06:17:31Z",
+    "commit": "e042307"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,54 @@
   ],
   "activity": [
     {
+      "date": "2026-07-21T06:17:31Z",
+      "sha": "e042307",
+      "summary": "committee: autonomous competitor scout (run 29806431444)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-21T07:01:11+07:00",
+      "sha": "10f6566",
+      "summary": "Merge pull request #109 from kaustavb2101/data/fuel-29787837144",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-21T07:01:07+07:00",
+      "sha": "7cdf7cb",
+      "summary": "Merge pull request #108 from kaustavb2101/data/macro-29783990125",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-21T07:01:02+07:00",
+      "sha": "4d7002d",
+      "summary": "Merge pull request #107 from kaustavb2101/data/nabc-29780658104",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T23:38:48Z",
+      "sha": "31bd0ee",
+      "summary": "data: live fuel prices (2026-07-20, run 29787837144)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T22:29:54Z",
+      "sha": "49f6b9e",
+      "summary": "data: macro indicators (2026-07-20, run 29783990125)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-20T22:06:28Z",
+      "sha": "8ce0747",
+      "summary": "committee: refresh autonomy plan (run 29782658062)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-20T21:36:29Z",
+      "sha": "4b0bf31",
+      "summary": "data: NABC live prices (2026-07-20, run 29780658104)",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-07-21T04:19:19+07:00",
       "sha": "38432f5",
       "summary": "Merge pull request #106 from kaustavb2101/claude/intel-loop-20260720-drought-district",
@@ -610,54 +658,6 @@
       "sha": "2e16fec",
       "summary": "data(provenance): regenerate on merged tree (98 layers) under the WSL 3.11 mirror",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T19:44:19+07:00",
-      "sha": "6bbee20",
-      "summary": "merge origin/master into claude/rival-universe (provenance regenerated next)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-20T12:17:00Z",
-      "sha": "55f7c69",
-      "summary": "intel(command-center): name the hardest-to-defend region in the #home board thesis (obj #2)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-20T11:51:39Z",
-      "sha": "66fdc72",
-      "summary": "committee: refresh autonomy plan (run 29739958395)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-20T10:12:20Z",
-      "sha": "f9a7498",
-      "summary": "committee: refresh autonomy plan + CEO dashboard (post Sat/100k peer-column #100)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-20T17:11:46+07:00",
-      "sha": "a105ead",
-      "summary": "intel(peer): per-province Sat/100k vehicle-saturation column on the Competition peer board (obj #2) (#100)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-20T15:41:32+07:00",
-      "sha": "727ccf4",
-      "summary": "Merge pull request #98 from kaustavb2101/claude/home-defensibility",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T08:13:05Z",
-      "sha": "195342e",
-      "summary": "docs(progress): log ux-loop data.html districtTable scope=col fix + merge/deploy-verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T15:10:18+07:00",
-      "sha": "6031a9c",
-      "summary": "ux: add scope=col to data.html districtTable headers (a11y) (#99)",
-      "pillar": "uxui"
     }
   ]
 }
