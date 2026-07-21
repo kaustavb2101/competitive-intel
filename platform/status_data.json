@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-21T06:17:31Z",
-    "commit": "e042307"
+    "generated_at": "2026-07-21T11:13:26Z",
+    "commit": "94eb28b"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-21T11:13:26Z",
+      "sha": "94eb28b",
+      "summary": "committee: refresh autonomy plan (run 29825183866)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-21T06:17:31Z",
       "sha": "e042307",
       "summary": "committee: autonomous competitor scout (run 29806431444)",
@@ -652,12 +658,6 @@
       "sha": "870195f",
       "summary": "Merge pull request #94 from kaustavb2101/claude/rival-universe",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-20T19:44:47+07:00",
-      "sha": "2e16fec",
-      "summary": "data(provenance): regenerate on merged tree (98 layers) under the WSL 3.11 mirror",
-      "pillar": "data-integration"
     }
   ]
 }
