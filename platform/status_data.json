@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-21T11:13:26Z",
-    "commit": "94eb28b"
+    "generated_at": "2026-07-21T16:27:33Z",
+    "commit": "a12b153"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-21T16:27:33Z",
+      "sha": "a12b153",
+      "summary": "committee: refresh autonomy plan (run 29848581320)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-21T11:13:26Z",
       "sha": "94eb28b",
       "summary": "committee: refresh autonomy plan (run 29825183866)",
@@ -652,12 +658,6 @@
       "sha": "c603a7f",
       "summary": "Merge pull request #101 from kaustavb2101/claude/home-thesis-defensibility",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T19:55:23+07:00",
-      "sha": "870195f",
-      "summary": "Merge pull request #94 from kaustavb2101/claude/rival-universe",
-      "pillar": "market"
     }
   ]
 }
