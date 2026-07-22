@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-22T11:14:16Z",
-    "commit": "ef35bc7"
+    "generated_at": "2026-07-22T16:25:07Z",
+    "commit": "424a3de"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-22T16:25:07Z",
+      "sha": "424a3de",
+      "summary": "committee: refresh autonomy plan (run 29937813924)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-22T11:14:16Z",
       "sha": "ef35bc7",
       "summary": "committee: refresh autonomy plan (run 29914868565)",
@@ -652,12 +658,6 @@
       "sha": "7243ef9",
       "summary": "Merge pull request #91 from kaustavb2101/data/nabc-29703830951",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:24:33+07:00",
-      "sha": "b1462e9",
-      "summary": "ux(databook): lens rankings — the National-map signals as ranked, actionable lists (owner feedback)",
-      "pillar": "uxui"
     }
   ]
 }
