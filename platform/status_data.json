@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-21T16:27:33Z",
-    "commit": "a12b153"
+    "generated_at": "2026-07-21T22:08:51Z",
+    "commit": "475f4ac"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-21T22:08:51Z",
+      "sha": "475f4ac",
+      "summary": "committee: refresh autonomy plan (run 29872623012)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-21T16:27:33Z",
       "sha": "a12b153",
       "summary": "committee: refresh autonomy plan (run 29848581320)",
@@ -652,12 +658,6 @@
       "sha": "afe6bf0",
       "summary": "ops(access): disable the password gate — office networks block the Basic-Auth prompt; keep for later",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-20T19:59:22+07:00",
-      "sha": "c603a7f",
-      "summary": "Merge pull request #101 from kaustavb2101/claude/home-thesis-defensibility",
-      "pillar": "data-integration"
     }
   ]
 }
