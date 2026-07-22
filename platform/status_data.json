@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-21T22:08:51Z",
-    "commit": "475f4ac"
+    "generated_at": "2026-07-22T06:16:07Z",
+    "commit": "7acda54"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-22",
+    "eta_date": "2026-07-23",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,6 +480,18 @@
   ],
   "activity": [
     {
+      "date": "2026-07-22T06:16:07Z",
+      "sha": "7acda54",
+      "summary": "committee: autonomous competitor scout (run 29896067501)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-22T05:56:00Z",
+      "sha": "cfeecc5",
+      "summary": "committee: refresh autonomy plan (run 29895129300)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-21T22:08:51Z",
       "sha": "475f4ac",
       "summary": "committee: refresh autonomy plan (run 29872623012)",
@@ -646,18 +658,6 @@
       "sha": "852d3d2",
       "summary": "data(nabc): regenerate downstream farm-gate chain (farmgate_prices -> crop_stress -> provenance) under the CI 3.11 mirror — the pull workflow committed only the raw NABC prices, failing the gate",
       "pillar": "service"
-    },
-    {
-      "date": "2026-07-20T20:01:43+07:00",
-      "sha": "94d3c4a",
-      "summary": "merge master into nabc data branch",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:00:52+07:00",
-      "sha": "afe6bf0",
-      "summary": "ops(access): disable the password gate — office networks block the Basic-Auth prompt; keep for later",
-      "pillar": "deployment"
     }
   ]
 }
