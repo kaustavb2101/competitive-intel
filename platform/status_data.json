@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-22T06:16:07Z",
-    "commit": "7acda54"
+    "generated_at": "2026-07-22T11:14:16Z",
+    "commit": "ef35bc7"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-22T11:14:16Z",
+      "sha": "ef35bc7",
+      "summary": "committee: refresh autonomy plan (run 29914868565)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-22T06:16:07Z",
       "sha": "7acda54",
       "summary": "committee: autonomous competitor scout (run 29896067501)",
@@ -652,12 +658,6 @@
       "sha": "b1462e9",
       "summary": "ux(databook): lens rankings — the National-map signals as ranked, actionable lists (owner feedback)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T20:13:05+07:00",
-      "sha": "852d3d2",
-      "summary": "data(nabc): regenerate downstream farm-gate chain (farmgate_prices -> crop_stress -> provenance) under the CI 3.11 mirror — the pull workflow committed only the raw NABC prices, failing the gate",
-      "pillar": "service"
     }
   ]
 }
