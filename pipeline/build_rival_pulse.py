@@ -8,6 +8,9 @@ build_rival_pulse.py — RIVAL PULSE (objective #2): promotions the competitors 
                                         (pull_rival_promos.py · Thai-IP pull, first_seen tracked)
        source-data/app_reviews.json    MEASURED Google Play ratings + newest reviews, 5 apps incl.
                                         AutoX's own เงินไชโย (pull_app_reviews.py · any IP)
+       source-data/promo_taxonomy.json ESTIMATED LLM product/type/audience classification per promo
+                                        (classify_promos_llm.py · NVIDIA NIM; optional — the promo
+                                        landscape section degrades to absent when this file is)
   out: platform/data/rival_pulse.json  sentiment ladder (score, detractor share, 90-day trend,
                                         detractor themes, dev-reply rate, quotes) + promo feed
 
@@ -31,6 +34,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IN_PROMOS = os.path.join(ROOT, "source-data", "rival_promos.json")
 IN_REVIEWS = os.path.join(ROOT, "source-data", "app_reviews.json")
+IN_TAX = os.path.join(ROOT, "source-data", "promo_taxonomy.json")
 OUT = os.path.join(ROOT, "platform", "data", "rival_pulse.json")
 
 # ESTIMATED theme lexicon — Thai keywords bucketed over 1–2★ reviews. Transparent + auditable.
@@ -102,17 +106,52 @@ def build():
 
     sent, anchor = _sentiment(reviews_doc) if reviews_doc else ([], None)
 
+    tax_doc = json.load(open(IN_TAX, encoding="utf-8")) if os.path.exists(IN_TAX) else None
+    tax = (tax_doc or {}).get("items", {})
+
     promo_items, promo_meta = [], {}
     if promos_doc:
         promo_meta = promos_doc.get("meta", {})
         pulled = promo_meta.get("pulled_at")
         for it in promos_doc.get("items", []):
-            promo_items.append({
+            row = {
                 "brand": it["brand"], "kind": it["kind"], "title": it["title"],
                 "detail": it.get("detail"), "date": it.get("date"), "url": it["url"],
                 "first_seen": it.get("first_seen"),
                 "is_new": it.get("first_seen") == pulled,
-            })
+            }
+            c = tax.get(it["url"])
+            if c and c.get("title") == it["title"]:      # classification is for THIS title
+                row["cls"] = {"product": c["product"], "promo_type": c["promo_type"],
+                              "audience": c["audience"], "pricing": c.get("pricing"),
+                              "feature": c.get("feature")}
+            promo_items.append(row)
+
+    # --- promo landscape: the summarized by-product view (ESTIMATED classification over
+    #     MEASURED items); absent when classify_promos_llm.py hasn't run ---
+    landscape = None
+    classified = [p for p in promo_items if p.get("cls")]
+    if classified:
+        prods = {}
+        for p in classified:
+            prods.setdefault(p["cls"]["product"], []).append(p)
+        by_product = []
+        for prod, items in sorted(prods.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+            by_product.append({"product": prod, "n": len(items), "items": [
+                {"brand": p["brand"], "title": p["title"], "url": p["url"],
+                 "date": p.get("date"), "is_new": p["is_new"],
+                 "promo_type": p["cls"]["promo_type"], "pricing": p["cls"]["pricing"],
+                 "feature": p["cls"]["feature"], "audience": p["cls"]["audience"]}
+                for p in sorted(items, key=lambda x: (x["brand"], x.get("date") or "", x["url"]))]})
+        type_counts = {}
+        for p in classified:
+            type_counts[p["cls"]["promo_type"]] = type_counts.get(p["cls"]["promo_type"], 0) + 1
+        landscape = {
+            "by_product": by_product,
+            "type_counts": dict(sorted(type_counts.items(), key=lambda kv: (-kv[1], kv[0]))),
+            "n_classified": len(classified), "n_total": len(promo_items),
+            "model_note": (tax_doc or {}).get("meta", {}).get("label"),
+        }
 
     headline = ""
     own = next((r for r in sent if r["own"]), None)
@@ -150,6 +189,7 @@ def build():
         "headline": headline,
         "sentiment": sent,
         "promos": promo_items,
+        "promo_landscape": landscape,
     }
 
 

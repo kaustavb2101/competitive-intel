@@ -2585,6 +2585,42 @@ function drawRivalPulse(){
            m.note_installs||'']);
     }
   }
+  // --- promo landscape: summarized by product / type / pricing (ESTIMATED LLM classification
+  //     over MEASURED items; classify_promos_llm.py). Falls back to the raw feed when absent. ---
+  const land=RIVPULSE&&RIVPULSE.promo_landscape;
+  const lbox=$('#pulsepromolandscape'), rawwrap=$('#pulsepromorawwrap');
+  const PRODL={title_loan_motorcycle:'Motorcycle title loan',title_loan_car:'Car title loan',
+    title_loan_pickup:'Pickup title loan',title_loan_truck:'Truck title loan',
+    title_loan_land:'Land title loan',personal_loan:'Personal loan',nano_finance:'Nano finance',
+    hire_purchase:'Hire purchase',insurance_broking:'Insurance',corporate_or_ir:'Corporate / IR',
+    other:'Other'};
+  const TYPEL={rate_discount:'Rate cut',cashback:'Cashback',free_gift:'Free gift',
+    lucky_draw:'Lucky draw',fee_waiver:'Fee waiver',fast_approval:'Fast approval',
+    credit_line_boost:'Bigger line',refinance_offer:'Refinance',payment_relief:'Payment relief',
+    partnership:'Partnership',brand_campaign:'Brand campaign',corporate_news:'Corporate news',
+    content_marketing:'Article / tips',other:'Other'};
+  const TYPEC={rate_discount:'var(--gold)',cashback:'var(--merch)',free_gift:'var(--merch)',
+    lucky_draw:'var(--merch)',fee_waiver:'var(--gold)',fast_approval:'var(--accent)',
+    credit_line_boost:'var(--accent)',refinance_offer:'var(--collat)',payment_relief:'var(--collat)',
+    partnership:'var(--dim)',brand_campaign:'var(--dim)',corporate_news:'var(--dim)',other:'var(--dim)'};
+  if(lbox){
+    if(land&&land.by_product&&land.by_product.length){
+      const chips=Object.entries(land.type_counts||{}).map(([t,n])=>
+        `<span class="tag" style="color:${TYPEC[t]||'var(--dim)'};border:1px solid ${TYPEC[t]||'var(--dim)'};margin-right:6px">${TYPEL[t]||t} ×${n}</span>`).join('');
+      lbox.innerHTML=`<div style="margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
+        land.by_product.map(g=>`<h4 class="acqsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
+          `<table class="tbl">${g.items.map(p=>`<tr>
+            <td class="mono" style="white-space:nowrap"><b>${p.brand}</b></td>
+            <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
+            <td class="mono" style="color:var(--gold);white-space:nowrap">${p.pricing||'<span class="sub">—</span>'}</td>
+            <td class="sub" style="font-size:12px">${p.feature||''}</td>
+            <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener" style="font-size:12px">${p.title}</a></td>
+          </tr>`).join('')}</table>`).join('');
+    } else {
+      lbox.innerHTML='';
+      if(rawwrap) rawwrap.open=true;   // no classification yet — show the raw feed un-collapsed
+    }
+  }
   // --- live promo feed, grouped by brand ---
   if(plist){
     const byBrand={};
