@@ -4950,6 +4950,19 @@ function wireBranchSheet(s,b,body){
     // Enter/Space like a native button — wire keyboard activation so it's operable by keyboard.
     h.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); closeBranchSheet(); } }); }
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeBranchSheet(); });
+  // WCAG 2.4.3 focus trap: #msheet is aria-modal, so Tab must cycle WITHIN it — otherwise Tab
+  // from the last control lands on the map/nav behind the backdrop. Wrap first↔last (the handle
+  // is first, the body's links follow); only the boundaries are intercepted, interior tabbing
+  // stays native. Empty body → keep focus on the handle rather than let it escape.
+  s.addEventListener('keydown',e=>{
+    if(e.key!=='Tab') return;
+    const f=s.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    const list=Array.prototype.filter.call(f,el=>el.offsetParent!==null);
+    if(!list.length){ e.preventDefault(); s.focus(); return; }
+    const first=list[0], last=list[list.length-1], a=document.activeElement;
+    if(e.shiftKey){ if(a===first||a===s){ e.preventDefault(); last.focus(); } }
+    else if(a===last){ e.preventDefault(); first.focus(); }
+  });
   // simple swipe-down-to-close: arm on touchstart unless the body is mid-scroll (so internal
   // scrolling never fights the gesture); a downward drag past the threshold closes the sheet.
   s.addEventListener('touchstart',e=>{
