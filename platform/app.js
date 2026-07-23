@@ -89,6 +89,24 @@ async function loadNapprang(){
   })();
   return napprangPromise;
 }
+// Farmer margin — MEASURED inputs, DERIVED arithmetic (data/crop_margin.json, objective #1). Joins
+// OAE production cost (baht/kg, crop year 2567/68) against the live NABC farm-gate price per crop, so
+// the read is whether current prices cover the cost of growing = agri repayment capacity behind the
+// title book. The margin itself is DERIVED and the two vintages differ, so it reads as DIRECTION, not
+// decimals. CMARGIN is the crops array; fully null-guarded: absent file → CMARGIN stays null, the
+// Overview card stays hidden (see renderCropMargin), nothing fabricated.
+let CMARGIN=null, CMARGIN_META=null, CMARGIN_HEAD=null, cmarginPromise=null;
+async function loadCropMargin(){
+  if(cmarginPromise) return cmarginPromise;
+  cmarginPromise=(async()=>{
+    try{
+      const j = await fetch('data/crop_margin.json').then(r=>r.json());
+      CMARGIN=Array.isArray(j.crops)?j.crops:null; CMARGIN_META=j.meta||null; CMARGIN_HEAD=j.headline||null;
+    }catch(e){ CMARGIN=null; CMARGIN_META=null; CMARGIN_HEAD=null; }
+    return CMARGIN;
+  })();
+  return cmarginPromise;
+}
 // Provincial labour market — MEASURED, NSO Labour Force Survey 2026 Q1, all 77 provinces
 // (data/province_lfs.json). Carries per-province unemployment_rate_pct + seasonal_share_pct (the
 // share of the labour force "seasonally waiting" — idle between agricultural seasons). Obj #1: an
@@ -1432,6 +1450,9 @@ function renderOverview(){
   // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
   // backdrop behind the agri-PD book. Null-safe: absent file → the block stays hidden.
   loadProvinceLfs().then(renderProvinceLfs);
+  // MEASURED farmer margin (crop_margin.json, OAE cost vs live NABC farm-gate price, obj #1) — do
+  // current prices cover the cost of growing = agri repayment capacity. Null-safe: absent → hidden.
+  loadCropMargin().then(renderCropMargin);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1937,6 +1958,41 @@ function renderProvinceLfs(){
         `<td>${barHTML(Math.min(100,s*12),c)} <span class="mono" style="color:${c}">${s.toFixed(1)}%</span></td>`+
         `<td class="mono">${(p.unemployment_rate_pct||0).toFixed(1)}%</td>`+
         `<td class="mono sub">${Math.round(p.labor_force_k||0)}k</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// Farmer margin card (data/crop_margin.json) — MEASURED farm-gate price vs OAE cost per crop (obj #1).
+// Leads with the thinnest-cushion crop (risk lens): which crops' growers have least buffer if prices
+// soften. Null-guarded: absent/empty layer → the wrap stays hidden, nothing fabricated.
+function renderCropMargin(){
+  const wrap=$('#cm-wrap');
+  if(!wrap) return;
+  const rows=Array.isArray(CMARGIN)?CMARGIN.filter(c=>c&&c.crop_en&&c.margin_pct_of_price!=null):[];
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const nClear=rows.filter(c=>(c.margin_per_rai||0)>0).length;
+  // thinnest cushion first — the risk-relevant ordering (least buffer if farm-gate softens).
+  const byMargin=rows.slice().sort((a,b)=>(a.margin_pct_of_price||0)-(b.margin_pct_of_price||0));
+  const thin=byMargin[0], fat=byMargin[byMargin.length-1];
+  const omitted=(CMARGIN_META&&Array.isArray(CMARGIN_META.omitted_crops))?CMARGIN_META.omitted_crops:[];
+  const note=$('#cm-note');
+  if(note) note.innerHTML=`<b>Measured</b> — OAE production cost (crop year 2567/68) vs the live NABC farm-gate price per crop; `+
+    `the margin itself is <b>derived</b> and the two vintages differ, so read <b>direction, not decimals</b>. `+
+    `Farm-gate price currently covers OAE cost on <b>${nClear} of ${rows.length}</b> joined crop rows — every crop clears its cost today, `+
+    `so agri cash-flow (repayment capacity behind the title book) is intact for now. The thinnest cushion is `+
+    `<b>${thin.crop_en}</b> (margin ${(thin.margin_pct_of_price||0).toFixed(0)}% of price — most exposed if prices soften), `+
+    `the fattest <b>${fat.crop_en}</b> (${(fat.margin_pct_of_price||0).toFixed(0)}%).`+
+    (omitted.length?` Crops without a joined cost/price pair are omitted (${omitted.join(', ')}).`:'');
+  const tbl=$('#cmtbl');
+  if(tbl) tbl.innerHTML=`<tr><th>Crop</th><th title="Live farm-gate price, ฿/kg (measured, NABC)">Farm-gate ฿/kg</th><th title="Year-on-year change in farm-gate price">YoY</th><th title="OAE production cost, ฿/kg (measured, crop year 2567/68)">Cost ฿/kg</th><th title="Derived margin per rai (price − cost) × yield">Margin ฿/rai</th><th title="Derived margin as a share of farm-gate price — the cushion before a loss">Margin %</th></tr>`+
+    byMargin.map(c=>{const m=c.margin_pct_of_price||0;const col=m>=50?'var(--merch)':m>=33?'var(--gold)':'var(--agri)';
+      const yoy=c.price_yoy_pct;const ycol=yoy>0?'var(--merch)':yoy<0?'var(--agri)':'var(--mid)';
+      const deriv=c.cost_method==='derived_from_cost_per_ton';
+      return `<tr><td><b>${c.crop_en}</b></td>`+
+        `<td class="mono">${(c.price_kg||0).toFixed(2)}</td>`+
+        `<td class="mono sub" style="color:${ycol}">${yoy!=null?(yoy>0?'+':'')+yoy.toFixed(0)+'%':'—'}</td>`+
+        `<td class="mono sub"${deriv?' title="cost back-computed from OAE ฿/ton × yield (derived)"':''}>${(c.cost_kg||0).toFixed(2)}${deriv?'◆':''}</td>`+
+        `<td class="mono">${c.margin_per_rai!=null?'฿'+Math.round(c.margin_per_rai).toLocaleString('en-US'):'—'}</td>`+
+        `<td>${barHTML(Math.min(100,m),col)} <span class="mono" style="color:${col}">${m.toFixed(0)}%</span></td></tr>`;}).join('');
   wrap.style.display='';
 }
 

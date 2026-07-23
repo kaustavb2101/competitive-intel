@@ -295,6 +295,16 @@
       <p class="lead" id="lfs-note"></p>
       <table class="tbl" id="lfstbl"></table>
     </div>
+    <!-- Farmer margin (data/crop_margin.json) — MEASURED OAE production cost vs live NABC farm-gate
+         price per crop (obj #1). The measured reality behind the estimated crop-stress proxy above:
+         do current prices actually cover the cost of growing = agri repayment capacity behind the
+         title book. Margin arithmetic is derived (vintages differ → read direction). Rendered by
+         renderCropMargin(); hidden gracefully until the layer loads. -->
+    <div id="cm-wrap" style="display:none">
+      <h2 class="risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED inputs · OAE + NABC</span></h2>
+      <p class="lead" id="cm-note"></p>
+      <table class="tbl" id="cmtbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
