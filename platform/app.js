@@ -2937,9 +2937,10 @@ function renderAcqBoard(){
   buildAcqNorms();
   if(!$('#acqchips').dataset.init){
     const regions=['all',...Array.from(new Set(DATA.map(d=>d.r)))];
-    $('#acqchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}">${r==='all'?'All regions':r}</button>`).join('');
+    $('#acqchips').setAttribute('role','group'); $('#acqchips').setAttribute('aria-label','Filter by region');
+    $('#acqchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All regions':r}</button>`).join('');
     $('#acqchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-      $('#acqchips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+      $('#acqchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
       acqRegion=b.dataset.r; drawAcqBoard();};
     $('#acqcsv').onclick=acqCSV; $('#acqchips').dataset.init='1';
   }
@@ -3255,9 +3256,10 @@ function drawProvinceChoropleth(){
 function ampChips(id,cur,onPick){
   const box=$(id); if(!box||box.dataset.init) return;
   const regions=['all',...Array.from(new Set(AMP.map(a=>a.region)))];
-  box.innerHTML=regions.map(r=>`<button class="chip ${r===cur?'on':''}" data-r="${r}">${r==='all'?'All regions':r}</button>`).join('');
+  box.setAttribute('role','group'); box.setAttribute('aria-label','Filter by region');
+  box.innerHTML=regions.map(r=>`<button class="chip ${r===cur?'on':''}" data-r="${r}" aria-pressed="${r===cur}">${r==='all'?'All regions':r}</button>`).join('');
   box.onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-    box.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b)); onPick(b.dataset.r);};
+    box.querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));}); onPick(b.dataset.r);};
   box.dataset.init='1';
 }
 // readable district label: Thai name where measured, else the English shapeName.
@@ -4533,11 +4535,12 @@ function renderRiskSub(){
   const wrap=$('#riskSub'); if(!wrap) return;
   if(curLens!=='risk'){ wrap.style.display='none'; wrap.innerHTML=''; return; }
   wrap.style.display='flex';
+  wrap.setAttribute('role','group'); wrap.setAttribute('aria-label','Risk proxy metric');
   const opts=[['composite','Composite (worst of 3)'],['a','Agri-PD ●'],['m','Merchant ◆'],['c','Collateral ▲']];
   wrap.innerHTML='<span class="sub" style="align-self:center;margin-right:2px">Risk proxy:</span>'+
-    opts.map(([k,t])=>`<button class="chip ${k===riskMetric?'on':''}" data-rm="${k}">${t}</button>`).join('');
+    opts.map(([k,t])=>`<button class="chip ${k===riskMetric?'on':''}" data-rm="${k}" aria-pressed="${k===riskMetric}">${t}</button>`).join('');
   wrap.onclick=e=>{const b=e.target.closest('[data-rm]'); if(!b)return; riskMetric=b.dataset.rm;
-    wrap.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+    wrap.querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
     renderLegend(); if(mapReady) styleMarkers();};
 }
 function hexRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
@@ -5603,9 +5606,10 @@ async function renderProvinces(){
   }
   if(!$('#provchips').dataset.init){
     const regions=['all',...Array.from(new Set(PROV.map(p=>p.region)))];
-    $('#provchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}">${r==='all'?'All':r}</button>`).join('');
+    $('#provchips').setAttribute('role','group'); $('#provchips').setAttribute('aria-label','Filter by region');
+    $('#provchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All':r}</button>`).join('');
     $('#provchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-      document.querySelectorAll('#provchips .chip').forEach(c=>c.classList.toggle('on',c===b));
+      document.querySelectorAll('#provchips .chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
       provRegion=b.dataset.r; drawProv();};
     $('#provsearch').oninput=drawProv; $('#provchips').dataset.init='1';
   }
@@ -5671,9 +5675,10 @@ function renderMarket(){
    .then(()=>{
     if(!$('#mktchips').dataset.init){
       const regions=['all',...Array.from(new Set(PROV.map(p=>p.region)))];
-      $('#mktchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}">${r==='all'?'All':r}</button>`).join('');
+      $('#mktchips').setAttribute('role','group'); $('#mktchips').setAttribute('aria-label','Filter by region');
+      $('#mktchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All':r}</button>`).join('');
       $('#mktchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-        document.querySelectorAll('#mktchips .chip').forEach(c=>c.classList.toggle('on',c===b));
+        document.querySelectorAll('#mktchips .chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
         mktRegion=b.dataset.r; drawMarket();};
       $('#mktsearch').oninput=drawMarket; $('#mktchips').dataset.init='1';
       $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
