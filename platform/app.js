@@ -89,6 +89,24 @@ async function loadNapprang(){
   })();
   return napprangPromise;
 }
+// Provincial labour market — MEASURED, NSO Labour Force Survey 2026 Q1, all 77 provinces
+// (data/province_lfs.json). Carries per-province unemployment_rate_pct + seasonal_share_pct (the
+// share of the labour force "seasonally waiting" — idle between agricultural seasons). Obj #1: an
+// income-timing backdrop behind the agri-PD book. Fully null-guarded: absent file → LFS stays null,
+// the Overview block stays hidden (see renderProvinceLfs), nothing fabricated.
+let LFS=null, LFS_META=null, lfsPromise=null;
+async function loadProvinceLfs(){
+  if(lfsPromise) return lfsPromise;
+  lfsPromise=(async()=>{
+    try{
+      const j = await fetch('data/province_lfs.json').then(r=>r.json());
+      LFS=j.provinces||null; LFS_META=j.meta||null;
+    }catch(e){ LFS=null; LFS_META=null; }
+    return LFS;
+  })();
+  return lfsPromise;
+}
+
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
   if(n==null||!isFinite(n)) return '—';
@@ -1411,6 +1429,9 @@ function renderOverview(){
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
   // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
   loadDroughtDistrict().then(renderDroughtDistrict);
+  // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
+  // backdrop behind the agri-PD book. Null-safe: absent file → the block stays hidden.
+  loadProvinceLfs().then(renderProvinceLfs);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1884,6 +1905,39 @@ function renderDroughtDistrict(j){
   const tbl=$('#drought-district-tbl');
   if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th>Severity</th></tr>`+
     clean.map((x,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${x.name_th||x.name_en||x.code}</b></td><td class="sub">${x.province_th||'—'}</td><td class="mono" style="color:${col(x.cls)}">${x.spei.toFixed(2)}</td><td><span class="tag" style="color:${col(x.cls)};border:1px solid ${col(x.cls)}">${x.cls}</span></td></tr>`).join('');
+}
+
+/* ---------- provincial labour stress (MEASURED · NSO LFS 2026 Q1, obj #1) ----------
+   Reads data/province_lfs.json. Thai headline unemployment is uniformly low, so the sharper obj-#1
+   signal is the seasonal-waiting share (agri off-season idle labour) — it marks the Isan rice-belt
+   provinces where borrower cash-flow is most seasonal/lumpy, behind the agri-PD book. Leads the table
+   with that, carries unemployment alongside, and states the measured national headline. Null-safe:
+   absent/empty layer → the wrap stays hidden, nothing fabricated. */
+function renderProvinceLfs(){
+  const wrap=$('#lfs-wrap');
+  if(!wrap) return;
+  const rows=Array.isArray(LFS)?LFS.filter(p=>p&&p.name_th):[];
+  if(!rows.length){ wrap.style.display='none'; return; }
+  // MEASURED national headline unemployment (labour-force-weighted, computed from the layer's own rows).
+  const totLf=rows.reduce((s,p)=>s+(p.labor_force_k||0),0);
+  const natUnemp=totLf?rows.reduce((s,p)=>s+(p.unemployment_rate_pct||0)*(p.labor_force_k||0),0)/totLf:0;
+  const topUnemp=rows.slice().sort((a,b)=>(b.unemployment_rate_pct||0)-(a.unemployment_rate_pct||0)).slice(0,3);
+  // lead the table by seasonal-waiting share (the discriminator); carry unemployment alongside.
+  const bySeas=rows.slice().sort((a,b)=>(b.seasonal_share_pct||0)-(a.seasonal_share_pct||0)).slice(0,8);
+  const note=$('#lfs-note');
+  if(note) note.innerHTML=`<b>Measured</b> — NSO Labour Force Survey ${LFS_META&&LFS_META.vintage?LFS_META.vintage:'2026 Q1'}, all 77 provinces. `+
+    `Thailand's headline unemployment is uniformly low (national ${natUnemp.toFixed(1)}%, labour-force-weighted), so the `+
+    `sharper objective-#1 signal is the <b>seasonal-waiting share</b> — the slice of the labour force idle between `+
+    `agricultural seasons, which marks where borrower cash-flow is most seasonal (concentrated in the Isan rice belt, `+
+    `behind the agri-PD book). Highest headline unemployment: ${topUnemp.map(p=>`${p.name_th} ${(p.unemployment_rate_pct||0).toFixed(1)}%`).join(', ')}.`;
+  const tbl=$('#lfstbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="Share of the labour force seasonally waiting — idle between agricultural seasons (measured, NSO LFS)">Seasonal idle ●</th><th title="Unemployment rate (measured, NSO LFS)">Unemp. ●</th><th title="Labour force, thousands (measured, NSO LFS)">Labour force</th></tr>`+
+    bySeas.map((p,i)=>{const s=p.seasonal_share_pct||0;const c=s>=4?'var(--agri)':s>=2?'var(--gold)':'var(--mid)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.name_th}</b></td>`+
+        `<td>${barHTML(Math.min(100,s*12),c)} <span class="mono" style="color:${c}">${s.toFixed(1)}%</span></td>`+
+        `<td class="mono">${(p.unemployment_rate_pct||0).toFixed(1)}%</td>`+
+        `<td class="mono sub">${Math.round(p.labor_force_k||0)}k</td></tr>`;}).join('');
+  wrap.style.display='';
 }
 
 /* ---------- acquisition ---------- */
