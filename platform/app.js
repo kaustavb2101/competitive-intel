@@ -123,6 +123,22 @@ async function loadCropMargin(){
   })();
   return marginPromise;
 }
+// Regional household-debt backdrop — MEASURED (Bank of Thailand Regional Letters over NSO SES data;
+// data/region_debt.json). National / region / province series; per-figure vintages carried (mixed:
+// SES 2019 / 2023, debt-to-GDP Q2 2025). Obj #1: the household-debt stress backdrop behind the whole
+// book. Fully null-guarded: absent file → REGDEBT stays null, the Overview block stays hidden.
+let REGDEBT=null, REGDEBT_META=null, regdebtPromise=null;
+async function loadRegionDebt(){
+  if(regdebtPromise) return regdebtPromise;
+  regdebtPromise=(async()=>{
+    try{
+      const j = await fetch('data/region_debt.json').then(r=>r.json());
+      REGDEBT=j.series&&typeof j.series==='object'?j.series:null; REGDEBT_META=j.meta||null;
+    }catch(e){ REGDEBT=null; REGDEBT_META=null; }
+    return REGDEBT;
+  })();
+  return regdebtPromise;
+}
 
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
@@ -1452,6 +1468,9 @@ function renderOverview(){
   // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
   // backdrop behind the agri-PD book. Null-safe: absent file → the block stays hidden.
   loadProvinceLfs().then(renderProvinceLfs);
+  // MEASURED regional household-debt backdrop (region_debt.json, BoT over NSO SES, obj #1) — the
+  // debt-stress backdrop behind the whole book. Null-safe: absent file → the block stays hidden.
+  loadRegionDebt().then(renderRegionDebt);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1997,6 +2016,53 @@ function renderCropMargin(){
         `<td class="mono sub">${c.price_kg!=null?'฿'+c.price_kg:'—'}</td>`+
         `<td class="mono sub">${c.cost_kg!=null?'฿'+c.cost_kg:'—'}</td>`+
         `<td>${basis}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+/* ---------- regional household-debt backdrop (MEASURED · BoT over NSO SES, obj #1) ----------
+   Reads data/region_debt.json. The layer carries mixed-vintage measured series at three grains; this
+   card surfaces only the clean, single-value-per-geo indicators to stay honest: the national headline
+   (debt-to-GDP, <3-month financial-cushion share, avg debt/household) and the one region indicator with
+   exactly one measured value per region — unstable_income_share_pct (SES 2019) — the sharpest obj-#1
+   comparable, since income instability is a core PD driver. Below it, BoT's 5 named provinces by
+   vulnerable-household share. Vintages differ (SES 2019/2023, debt-to-GDP Q2 2025) so the copy says
+   read direction, not decimals. Null-safe: absent/empty layer → the wrap stays hidden, nothing made up. */
+function renderRegionDebt(){
+  const wrap=$('#regiondebt-wrap'); if(!wrap) return;
+  const S=REGDEBT&&typeof REGDEBT==='object'?REGDEBT:null;
+  const nat=S&&Array.isArray(S.national)?S.national:[];
+  const reg=S&&Array.isArray(S.region)?S.region:[];
+  const prov=S&&Array.isArray(S.province)?S.province:[];
+  // region income-instability: exactly one measured value per region (2019) — the clean comparable.
+  const unstable=reg.filter(x=>x&&x.indicator==='unstable_income_share_pct'&&x.value!=null)
+    .sort((a,b)=>(b.value||0)-(a.value||0));
+  if(!nat.length||!unstable.length){ wrap.style.display='none'; return; }
+  const pick=(arr,ind)=>{const r=arr.find(x=>x&&x.indicator===ind&&x.geo==null&&x.value!=null);return r||null;};
+  const dgdp=pick(nat,'household_debt_to_gdp_pct');
+  const cushion=pick(nat,'financial_cushion_under_3mo_share_pct');
+  const dph=pick(nat,'debt_per_household_thb');
+  const agri=unstable.filter(r=>r.geo!=='Central');
+  const central=unstable.find(r=>r.geo==='Central');
+  const ratio=(central&&central.value)?(unstable[0].value/central.value):null;
+  const note=$('#regiondebt-note');
+  if(note) note.innerHTML=`<b>Measured</b> — Bank of Thailand regional read over NSO Socio-Economic Survey data. `+
+    (cushion?`<b>${cushion.value}% of Thai households hold less than 3 months of financial cushion</b> (SES ${(String(cushion.vintage).match(/\((\d{4})\)/)||[,String(cushion.vintage)])[1]})`:'')+
+    (dgdp?`; national household debt runs <b>${dgdp.value}% of GDP</b> (${(String(dgdp.vintage).match(/\(([^)]+)\)/)||[,dgdp.vintage])[1]})`:'')+
+    (dph?`, averaging ฿${Math.round(dph.value).toLocaleString('en-US')} per indebted household`:'')+`. `+
+    `Income instability — a core PD driver — is highest in the agricultural regions`+
+    (ratio&&central?`, running about ${ratio.toFixed(1)}× the Central rate (${unstable[0].geo} ${unstable[0].value}% vs Central ${central.value}%)`:'')+
+    `, exactly where the agri-PD book sits. BoT publishes no routine province table — region is the honest grain; vintages differ, so <b>read direction, not decimals</b>.`;
+  const tbl=$('#regiondebt-tbl');
+  if(tbl) tbl.innerHTML=`<tr><th>Region</th><th title="Share of households with unstable income — a core PD driver (measured, NSO SES 2019)">Unstable income ●</th></tr>`+
+    unstable.map(r=>{const v=r.value||0;const c=v>=30?'var(--agri)':v>=20?'var(--gold)':'var(--merch)';
+      return `<tr><td><b>${r.geo}</b></td><td>${barHTML(Math.min(100,v*2.2),c)} <span class="mono" style="color:${c}">${v}%</span></td></tr>`;}).join('');
+  // BoT's 5 named provinces by vulnerable-household share (SES 2019) — a below-region sharpening.
+  const pv=prov.filter(x=>x&&x.indicator==='vulnerable_household_share_pct'&&x.value!=null)
+    .sort((a,b)=>(b.value||0)-(a.value||0));
+  const foot=$('#regiondebt-foot');
+  if(foot) foot.innerHTML=pv.length?`<span class="sub">BoT names ${pv.length} provinces by vulnerable-household share (SES 2019): `+
+    pv.map((p,i)=>`${p.geo} <span class="mono" style="color:${(p.value||0)>=28?'var(--agri)':'var(--gold)'}">${p.value}%</span>`).join(' · ')+
+    ` — most-fragile first, all in the Isan / South agri belt.</span>`:'';
   wrap.style.display='';
 }
 

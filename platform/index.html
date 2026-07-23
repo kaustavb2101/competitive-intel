@@ -305,6 +305,17 @@
       <p class="lead" id="lfs-note"></p>
       <table class="tbl" id="lfstbl"></table>
     </div>
+    <!-- Regional household-debt backdrop (data/region_debt.json) — MEASURED Bank of Thailand read over
+         NSO Socio-Economic Survey data (obj #1). BoT publishes no routine province table, so region is
+         the honest grain; the card surfaces the clean single-value indicators only (national headline +
+         per-region income-instability), plus BoT's 5 named vulnerable provinces. Mixed vintages → the
+         copy says read direction, not decimals. Rendered by renderRegionDebt(); hidden until it loads. -->
+    <div id="regiondebt-wrap" style="display:none">
+      <h2 class="risk">Household-debt backdrop <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · Bank of Thailand / NSO SES</span></h2>
+      <p class="lead" id="regiondebt-note"></p>
+      <table class="tbl" id="regiondebt-tbl"></table>
+      <p class="lead" id="regiondebt-foot" style="margin-top:8px"></p>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
