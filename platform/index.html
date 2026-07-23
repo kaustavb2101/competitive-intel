@@ -325,6 +325,18 @@
       <p class="lead" id="regdebt-note"></p>
       <table class="tbl" id="regdebttbl"></table>
     </div>
+    <!-- Logistics-SME (hauler) pulse (data/truck_flow.json) — MEASURED DLT truck registration actions,
+         trailing-12m vs the prior 12m (obj #1). An owner-operator hauler is a classic heavy-title
+         borrower; a contracting truck fleet = that segment's cash flow thinning, and a two-for-one on
+         obj #1 (borrower livelihood AND used-truck collateral). Nationally the fleet is still growing,
+         so the card leads with that cushion then names the province pockets where new-truck demand is
+         contracting. Rendered by renderTruckFlow(); hidden gracefully until the layer loads. -->
+    <div id="truckflow-wrap" style="display:none">
+      <h2 class="risk">Logistics-SME pulse · truck-fleet flow <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
+      <div class="verdict" id="truckflow-verdict" style="display:none"></div>
+      <p class="lead" id="truckflow-note"></p>
+      <table class="tbl" id="truckflowtbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
