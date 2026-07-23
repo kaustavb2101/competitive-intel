@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-23T20:23:03Z",
-    "commit": "0a1b301"
+    "generated_at": "2026-07-24T05:20:45+07:00",
+    "commit": "fdca24a"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-24",
+    "eta_date": "2026-07-25",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-23T20:23:03Z",
+      "date": "2026-07-24T05:20:45+07:00",
+      "sha": "fdca24a",
+      "summary": "intel(overview): surface MEASURED logistics-SME truck-fleet pulse (DLT, obj #1) (#131)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-23T22:14:59+00:00",
+      "sha": "a0136e7",
+      "summary": "committee: refresh autonomy plan (run 30048841499)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-23T20:23:03+00:00",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
@@ -618,7 +630,7 @@
       "pillar": "3d-enrichment"
     },
     {
-      "date": "2026-07-23T14:43:45Z",
+      "date": "2026-07-23T14:43:45+00:00",
       "sha": "4ce908c",
       "summary": "ux: trap focus within the mobile branch-detail modal sheet (WCAG 2.4.3)",
       "pillar": "uxui"
@@ -646,18 +658,6 @@
       "sha": "a479a9b",
       "summary": "data(catchments): Overture 3D building catchments wave 1/3 — full-province max pull, slim-canonical",
       "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-23T20:51:53+07:00",
-      "sha": "5ea26bb",
-      "summary": "Merge branch 'master' of https://github.com/kaustavb2101/competitive-intel",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-23T20:51:05+07:00",
-      "sha": "2a8c860",
-      "summary": "Merge remote-tracking branch 'origin/claude/amphoe-crops'",
-      "pillar": "service"
     }
   ]
 }
