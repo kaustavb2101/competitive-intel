@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-23T11:14:31+07:00",
-    "commit": "813b0a0"
+    "generated_at": "2026-07-23T04:18:18Z",
+    "commit": "12da1c2"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-23T04:18:18Z",
+      "sha": "12da1c2",
+      "summary": "committee: refresh autonomy plan after province-lfs ship (2026-07-23)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-23T11:14:31+07:00",
       "sha": "813b0a0",
       "summary": "intel(overview): surface MEASURED provincial labour stress (NSO LFS 2026 Q1, obj #1) (#117)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T03:19:43+00:00",
+      "date": "2026-07-23T03:19:43Z",
       "sha": "0a6b852",
       "summary": "docs: log ux-chip-aria-pressed merge+deploy+verify (2026-07-23)",
       "pillar": "uxui"
@@ -498,55 +504,55 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-22T22:10:20+00:00",
+      "date": "2026-07-22T22:10:20Z",
       "sha": "43a74d7",
       "summary": "committee: refresh autonomy plan (run 29961845950)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-22T16:25:07+00:00",
+      "date": "2026-07-22T16:25:07Z",
       "sha": "424a3de",
       "summary": "committee: refresh autonomy plan (run 29937813924)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-22T11:14:16+00:00",
+      "date": "2026-07-22T11:14:16Z",
       "sha": "ef35bc7",
       "summary": "committee: refresh autonomy plan (run 29914868565)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-22T06:16:07+00:00",
+      "date": "2026-07-22T06:16:07Z",
       "sha": "7acda54",
       "summary": "committee: autonomous competitor scout (run 29896067501)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-22T05:56:00+00:00",
+      "date": "2026-07-22T05:56:00Z",
       "sha": "cfeecc5",
       "summary": "committee: refresh autonomy plan (run 29895129300)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T22:08:51+00:00",
+      "date": "2026-07-21T22:08:51Z",
       "sha": "475f4ac",
       "summary": "committee: refresh autonomy plan (run 29872623012)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T16:27:33+00:00",
+      "date": "2026-07-21T16:27:33Z",
       "sha": "a12b153",
       "summary": "committee: refresh autonomy plan (run 29848581320)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T11:13:26+00:00",
+      "date": "2026-07-21T11:13:26Z",
       "sha": "94eb28b",
       "summary": "committee: refresh autonomy plan (run 29825183866)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T06:17:31+00:00",
+      "date": "2026-07-21T06:17:31Z",
       "sha": "e042307",
       "summary": "committee: autonomous competitor scout (run 29806431444)",
       "pillar": "market"
@@ -570,25 +576,25 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T23:38:48+00:00",
+      "date": "2026-07-20T23:38:48Z",
       "sha": "31bd0ee",
       "summary": "data: live fuel prices (2026-07-20, run 29787837144)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T22:29:54+00:00",
+      "date": "2026-07-20T22:29:54Z",
       "sha": "49f6b9e",
       "summary": "data: macro indicators (2026-07-20, run 29783990125)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T22:06:28+00:00",
+      "date": "2026-07-20T22:06:28Z",
       "sha": "8ce0747",
       "summary": "committee: refresh autonomy plan (run 29782658062)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T21:36:29+00:00",
+      "date": "2026-07-20T21:36:29Z",
       "sha": "4b0bf31",
       "summary": "data: NABC live prices (2026-07-20, run 29780658104)",
       "pillar": "data-integration"
@@ -600,19 +606,19 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T18:25:23+00:00",
+      "date": "2026-07-20T18:25:23Z",
       "sha": "be4aa48",
       "summary": "intel(overview): surface the dark district-drought (OAE SPEI) layer on the crop-stress card",
       "pillar": "service"
     },
     {
-      "date": "2026-07-20T16:37:04+00:00",
+      "date": "2026-07-20T16:37:04Z",
       "sha": "061f951",
       "summary": "committee: refresh autonomy plan (run 29760280059)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T16:14:46+00:00",
+      "date": "2026-07-20T16:14:46Z",
       "sha": "db0122b",
       "summary": "committee: refresh autonomy dashboard after peer district-contest ship",
       "pillar": "peer"
@@ -636,7 +642,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-20T14:13:29+00:00",
+      "date": "2026-07-20T14:13:29Z",
       "sha": "d42f242",
       "summary": "docs(progress): log ux-doctitle-per-route merge+deploy+verify (PR #103)",
       "pillar": "uxui"
@@ -652,12 +658,6 @@
       "sha": "6f21fa1",
       "summary": "ux: per-route browser-tab title in SPA showTab (#103)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T20:52:43+07:00",
-      "sha": "0151445",
-      "summary": "Merge pull request #93 from kaustavb2101/data/fuel-29708243885",
-      "pillar": "data-integration"
     }
   ]
 }
