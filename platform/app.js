@@ -69,6 +69,17 @@ function loadDroughtDistrict(){
   return droughtdPromise;
 }
 
+// farmer margin — lazy-loaded from data/crop_margin.json (objective #1). MEASURED inputs (OAE crop-year
+// production cost + NABC live farm-gate price); the per-rai margin is DERIVED subtraction. Answers the
+// repayment-capacity question behind crop stress: even under drought, a crop that clears its cost still
+// services debt; a crop whose margin is thin is the repayment edge. Promise-cached, null-safe.
+let cropMarginPromise=null;
+function loadCropMargin(){
+  if(cropMarginPromise) return cropMarginPromise;
+  cropMarginPromise=fetch('data/crop_margin.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  return cropMarginPromise;
+}
+
 // Dry-season (SECOND / irrigated) rice EXPOSURE per province — MEASURED, OAE ข้าวนาปรัง planted area
 // (data/napprang.json). This is the irrigated second-crop income cushion sitting behind the drought
 // flag: a big planted area = a big buffer today AND a big vulnerability if water cuts force the second
@@ -1411,6 +1422,8 @@ function renderOverview(){
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
   // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
   loadDroughtDistrict().then(renderDroughtDistrict);
+  // farmer margin (obj #1), MEASURED inputs — repayment-capacity read behind crop stress + drought.
+  loadCropMargin().then(renderCropMargin);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1884,6 +1897,39 @@ function renderDroughtDistrict(j){
   const tbl=$('#drought-district-tbl');
   if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th>Severity</th></tr>`+
     clean.map((x,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${x.name_th||x.name_en||x.code}</b></td><td class="sub">${x.province_th||'—'}</td><td class="mono" style="color:${col(x.cls)}">${x.spei.toFixed(2)}</td><td><span class="tag" style="color:${col(x.cls)};border:1px solid ${col(x.cls)}">${x.cls}</span></td></tr>`).join('');
+}
+
+// Farmer margin card (obj #1) — data/crop_margin.json. The repayment-capacity companion to the drought
+// read above: crop stress tells you rainfall/price hazard, this tells you whether the crop currently
+// clears its OWN production cost (a positive margin = the agri borrower can service debt this season; a
+// thin margin = the repayment edge). MEASURED inputs (OAE cost year 2567/68 · NABC live farm-gate),
+// DERIVED margin arithmetic across two vintages → read direction, not decimals. Null-safe: absent/empty
+// file → card stays hidden and the Overview reads exactly as before.
+function renderCropMargin(j){
+  const wrap=$('#crop-margin-wrap'); if(!wrap) return;
+  const cr=j&&Array.isArray(j.crops)?j.crops.filter(x=>x&&x.margin_per_rai!=null&&x.margin_pct_of_price!=null):null;
+  if(!cr||!cr.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  const m=j.meta||{};
+  const nClear=cr.filter(x=>x.margin_per_rai>0).length, total=cr.length;
+  // thinnest margin first — the crop closest to not covering its cost is the repayment risk edge.
+  const rows=cr.slice().sort((a,b)=>a.margin_pct_of_price-b.margin_pct_of_price);
+  const thin=rows[0];
+  const asof=cr[0].price_asof||m.cost_ingested||'';
+  const col=p=>p>=45?'var(--merch)':p>=30?'var(--gold)':'var(--agri)';
+  const v=$('#crop-margin-verdict');
+  if(v) v.innerHTML=`<div class="verdict-line">🧾 <b>Farmer margin:</b> farm-gate price clears OAE production cost on <b style="color:var(--merch)">${nClear} of ${total}</b> joined crop rows — agri borrowers can currently service debt on every crop the layer joins. Thinnest: <b style="color:${col(thin.margin_pct_of_price)}">${thin.crop_en||thin.crop}</b> at <b>${thin.margin_pct_of_price.toFixed(0)}%</b> of price${thin.price_yoy_pct!=null?` (price ${thin.price_yoy_pct>=0?'+':''}${thin.price_yoy_pct.toFixed(0)}% YoY)`:''}.</div>`+
+    `<div class="sub" style="margin-top:4px">The repayment-capacity companion to the crop-stress + drought read above · ${provChip('m','measured','OAE cost · NABC price')}</div>`;
+  const note=$('#crop-margin-note');
+  if(note) note.innerHTML='<b>MEASURED inputs</b> — OAE production-cost reports (crop year 2567/68) and NABC live national farm-gate prices'+(asof?` (as of ${asof})`:'')+'. The per-rai margin is a <b>DERIVED</b> subtraction and the two inputs carry <b>different vintages</b>, so read <b>direction and ranking, not the decimals</b>. Rows tagged <span class="mono">derived</span> back-compute ฿/rai from OAE ฿/ton × yield; <span class="mono">measured</span> rows report ฿/rai directly.';
+  const tbl=$('#crop-margin-tbl');
+  if(tbl) tbl.innerHTML=`<tr><th>Crop</th><th title="NABC live national farm-gate price">฿/kg price</th><th title="OAE reported/derived production cost">฿/kg cost</th><th title="Derived margin per rai">Margin ฿/rai</th><th title="Margin as a share of farm-gate price — lower = thinner repayment cushion">Margin %</th></tr>`+
+    rows.map(x=>{const c=col(x.margin_pct_of_price);const meas=x.cost_method==='measured_direct';
+      return `<tr><td><b>${x.crop_en||x.crop}</b> <span class="tag" style="color:var(--mid);border:1px solid var(--line)" title="${meas?'฿/rai cost reported directly by OAE':'฿/rai back-computed from OAE ฿/ton × yield'}">${meas?'measured':'derived'}</span></td>`+
+        `<td class="mono">${x.price_kg!=null?x.price_kg.toFixed(2):'—'}${x.price_yoy_pct!=null?` <span class="sub">${x.price_yoy_pct>=0?'+':''}${x.price_yoy_pct.toFixed(0)}%</span>`:''}</td>`+
+        `<td class="mono sub">${x.cost_kg!=null?x.cost_kg.toFixed(2):'—'}</td>`+
+        `<td class="mono">${x.margin_per_rai!=null?Math.round(x.margin_per_rai).toLocaleString():'—'}</td>`+
+        `<td class="mono" style="color:${c}"><b>${x.margin_pct_of_price.toFixed(0)}%</b></td></tr>`;}).join('');
 }
 
 /* ---------- acquisition ---------- */

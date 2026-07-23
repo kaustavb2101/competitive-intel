@@ -286,6 +286,14 @@
       <p class="lead" id="drought-district-note"></p>
       <table class="tbl" id="drought-district-tbl"></table>
     </div>
+    <!-- Farmer margin (obj #1) — repayment-capacity companion to crop stress + drought: does each crop
+         currently clear its OWN OAE production cost? MEASURED inputs (OAE cost · NABC farm-gate), DERIVED
+         margin. Rendered from data/crop_margin.json; hidden gracefully if absent. -->
+    <div id="crop-margin-wrap" style="display:none">
+      <div class="verdict v-warn" id="crop-margin-verdict"></div>
+      <p class="lead" id="crop-margin-note"></p>
+      <table class="tbl" id="crop-margin-tbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
