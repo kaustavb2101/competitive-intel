@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-22T16:25:07Z",
-    "commit": "424a3de"
+    "generated_at": "2026-07-23T11:14:31+07:00",
+    "commit": "813b0a0"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-23",
+    "eta_date": "2026-07-24",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,49 +480,73 @@
   ],
   "activity": [
     {
-      "date": "2026-07-22T16:25:07Z",
+      "date": "2026-07-23T11:14:31+07:00",
+      "sha": "813b0a0",
+      "summary": "intel(overview): surface MEASURED provincial labour stress (NSO LFS 2026 Q1, obj #1) (#117)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-23T03:19:43+00:00",
+      "sha": "0a6b852",
+      "summary": "docs: log ux-chip-aria-pressed merge+deploy+verify (2026-07-23)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-23T10:17:04+07:00",
+      "sha": "48dbc0b",
+      "summary": "ux: expose aria-pressed on SPA filter chips (WCAG 4.1.2) (#115)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-22T22:10:20+00:00",
+      "sha": "43a74d7",
+      "summary": "committee: refresh autonomy plan (run 29961845950)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-22T16:25:07+00:00",
       "sha": "424a3de",
       "summary": "committee: refresh autonomy plan (run 29937813924)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-22T11:14:16Z",
+      "date": "2026-07-22T11:14:16+00:00",
       "sha": "ef35bc7",
       "summary": "committee: refresh autonomy plan (run 29914868565)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-22T06:16:07Z",
+      "date": "2026-07-22T06:16:07+00:00",
       "sha": "7acda54",
       "summary": "committee: autonomous competitor scout (run 29896067501)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-22T05:56:00Z",
+      "date": "2026-07-22T05:56:00+00:00",
       "sha": "cfeecc5",
       "summary": "committee: refresh autonomy plan (run 29895129300)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T22:08:51Z",
+      "date": "2026-07-21T22:08:51+00:00",
       "sha": "475f4ac",
       "summary": "committee: refresh autonomy plan (run 29872623012)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T16:27:33Z",
+      "date": "2026-07-21T16:27:33+00:00",
       "sha": "a12b153",
       "summary": "committee: refresh autonomy plan (run 29848581320)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T11:13:26Z",
+      "date": "2026-07-21T11:13:26+00:00",
       "sha": "94eb28b",
       "summary": "committee: refresh autonomy plan (run 29825183866)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-21T06:17:31Z",
+      "date": "2026-07-21T06:17:31+00:00",
       "sha": "e042307",
       "summary": "committee: autonomous competitor scout (run 29806431444)",
       "pillar": "market"
@@ -546,25 +570,25 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T23:38:48Z",
+      "date": "2026-07-20T23:38:48+00:00",
       "sha": "31bd0ee",
       "summary": "data: live fuel prices (2026-07-20, run 29787837144)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T22:29:54Z",
+      "date": "2026-07-20T22:29:54+00:00",
       "sha": "49f6b9e",
       "summary": "data: macro indicators (2026-07-20, run 29783990125)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T22:06:28Z",
+      "date": "2026-07-20T22:06:28+00:00",
       "sha": "8ce0747",
       "summary": "committee: refresh autonomy plan (run 29782658062)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T21:36:29Z",
+      "date": "2026-07-20T21:36:29+00:00",
       "sha": "4b0bf31",
       "summary": "data: NABC live prices (2026-07-20, run 29780658104)",
       "pillar": "data-integration"
@@ -576,19 +600,19 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-20T18:25:23Z",
+      "date": "2026-07-20T18:25:23+00:00",
       "sha": "be4aa48",
       "summary": "intel(overview): surface the dark district-drought (OAE SPEI) layer on the crop-stress card",
       "pillar": "service"
     },
     {
-      "date": "2026-07-20T16:37:04Z",
+      "date": "2026-07-20T16:37:04+00:00",
       "sha": "061f951",
       "summary": "committee: refresh autonomy plan (run 29760280059)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-20T16:14:46Z",
+      "date": "2026-07-20T16:14:46+00:00",
       "sha": "db0122b",
       "summary": "committee: refresh autonomy dashboard after peer district-contest ship",
       "pillar": "peer"
@@ -612,7 +636,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-20T14:13:29Z",
+      "date": "2026-07-20T14:13:29+00:00",
       "sha": "d42f242",
       "summary": "docs(progress): log ux-doctitle-per-route merge+deploy+verify (PR #103)",
       "pillar": "uxui"
@@ -633,30 +657,6 @@
       "date": "2026-07-20T20:52:43+07:00",
       "sha": "0151445",
       "summary": "Merge pull request #93 from kaustavb2101/data/fuel-29708243885",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:39:46+07:00",
-      "sha": "3d9dbaf",
-      "summary": "Merge pull request #102 from kaustavb2101/claude/databook-lenses",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:36:22+07:00",
-      "sha": "5215821",
-      "summary": "data(provenance): regenerate on merged fuel tree under the WSL 3.11 mirror",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:34:43+07:00",
-      "sha": "288822d",
-      "summary": "merge master into fuel data branch (provenance regenerated next)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:29:04+07:00",
-      "sha": "7243ef9",
-      "summary": "Merge pull request #91 from kaustavb2101/data/nabc-29703830951",
       "pillar": "data-integration"
     }
   ]

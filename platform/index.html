@@ -294,6 +294,15 @@
       <p class="lead" id="crop-margin-note"></p>
       <table class="tbl" id="crop-margin-tbl"></table>
     </div>
+    <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
+         (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
+         seasonal-waiting share (agri off-season idle labour) that marks where borrower cash-flow is
+         most seasonal. Rendered by renderProvinceLfs(); hidden gracefully until the layer loads. -->
+    <div id="lfs-wrap" style="display:none">
+      <h2 class="risk">Provincial labour stress <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · NSO LFS 2026 Q1</span></h2>
+      <p class="lead" id="lfs-note"></p>
+      <table class="tbl" id="lfstbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
