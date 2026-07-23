@@ -279,6 +279,16 @@
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note"></p>
     <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
+         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
+         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
+         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
+    <div id="margin-wrap" style="display:none">
+      <h2 class="risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h2>
+      <div class="verdict" id="margin-verdict" style="display:none"></div>
+      <p class="lead" id="margin-note"></p>
+      <table class="tbl" id="margintbl"></table>
+    </div>
     <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
          read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
     <div id="drought-district-wrap" style="display:none">

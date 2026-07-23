@@ -106,6 +106,23 @@ async function loadProvinceLfs(){
   })();
   return lfsPromise;
 }
+// Farmer margin — MEASURED inputs (OAE production cost, crop year 2567/68 · NABC farm-gate prices,
+// live), DERIVED margin arithmetic (data/crop_margin.json). Per crop row: price_kg / cost_kg /
+// margin_per_rai / margin_pct_of_price / cost_method (measured_direct vs derived_from_cost_per_ton).
+// Obj #1: the income cushion behind the agri-PD book — does the price the stress table quotes actually
+// clear cost? Fully null-guarded: absent file → MARGIN stays null, the Overview block stays hidden.
+let MARGIN=null, MARGIN_META=null, MARGIN_HEAD=null, marginPromise=null;
+async function loadCropMargin(){
+  if(marginPromise) return marginPromise;
+  marginPromise=(async()=>{
+    try{
+      const j = await fetch('data/crop_margin.json').then(r=>r.json());
+      MARGIN=Array.isArray(j.crops)?j.crops:null; MARGIN_META=j.meta||null; MARGIN_HEAD=j.headline||null;
+    }catch(e){ MARGIN=null; MARGIN_META=null; MARGIN_HEAD=null; }
+    return MARGIN;
+  })();
+  return marginPromise;
+}
 
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
@@ -1427,6 +1444,9 @@ function renderOverview(){
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
+  // MEASURED farm-gate price vs MEASURED OAE cost → DERIVED farmer margin (crop_margin.json, obj #1) —
+  // the income cushion behind the agri-PD book. Null-safe: absent file → the block stays hidden.
+  loadCropMargin().then(renderCropMargin);
   // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
   loadDroughtDistrict().then(renderDroughtDistrict);
   // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
@@ -1937,6 +1957,46 @@ function renderProvinceLfs(){
         `<td>${barHTML(Math.min(100,s*12),c)} <span class="mono" style="color:${c}">${s.toFixed(1)}%</span></td>`+
         `<td class="mono">${(p.unemployment_rate_pct||0).toFixed(1)}%</td>`+
         `<td class="mono sub">${Math.round(p.labor_force_k||0)}k</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// Farmer margin card (Overview, obj #1) — MEASURED farm-gate price vs MEASURED OAE cost, DERIVED
+// margin. Leads with the TIGHTEST cushion (lowest margin % of price) — the crop closest to the edge,
+// the risk-relevant read behind the agri-PD book. Null-safe: no rows → the whole block stays hidden.
+function renderCropMargin(){
+  const wrap=$('#margin-wrap'); if(!wrap) return;
+  const rows=Array.isArray(MARGIN)?MARGIN.filter(c=>c&&c.margin_pct_of_price!=null):[];
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const money=v=>(v==null||!isFinite(v))?'—':'฿'+Math.round(v).toLocaleString('en-US');
+  // sort tightest-margin first (the crop nearest to not clearing cost = the risk read)
+  const by=rows.slice().sort((a,b)=>(a.margin_pct_of_price||0)-(b.margin_pct_of_price||0));
+  const clears=rows.filter(c=>(c.margin_per_rai||0)>0).length;
+  const tight=by[0];
+  const vb=$('#margin-verdict');
+  if(vb){
+    const clearsAll=clears===rows.length;
+    vb.className='verdict'+(clearsAll?'':' v-warn'); vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">${clearsAll?'✅':'⚠️'} <b>Farm-gate price clears OAE cost on ${clears} of ${rows.length} crop rows.</b> `+
+      `Tightest cushion: <b>${tight.crop_th||tight.crop}</b> at ${(tight.margin_pct_of_price||0).toFixed(0)}% of price (${money(tight.margin_per_rai)}/rai)</div>`+
+      `<div class="sub" style="margin-top:4px">Prices are the current income tailwind — the margins say the same crops flagged for drought in the stress table are still <b>clearing cost today</b>; the risk is the cushion narrowing, not a loss. Inputs ${TAG_M} · margin derived.</div>`;
+  }
+  const note=$('#margin-note');
+  if(note) note.innerHTML='Does the <b>measured farm-gate price</b> the stress table quotes actually cover the '+
+    '<b>measured OAE production cost</b>? Sorted <b>tightest cushion first</b> — the crop nearest the edge. '+
+    '<b>Inputs are measured</b> (OAE cost reports crop year 2567/68 · NABC daily farm-gate prices); the '+
+    '<b>margin arithmetic is derived</b> and the two vintages differ, so <b>read direction, not decimals</b>. '+
+    'Rows marked <i>measured ฿/rai</i> carry OAE’s own per-rai cost; <i>derived</i> rows back-compute it from OAE’s ฿/ton × yield.'+
+    (MARGIN_META&&Array.isArray(MARGIN_META.omitted_crops)&&MARGIN_META.omitted_crops.length?' Omitted (no joined cost/price): '+MARGIN_META.omitted_crops.join(', ')+'.':'');
+  const tbl=$('#margintbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Crop</th><th title="DERIVED — farm-gate price minus OAE production cost, per rai">Margin/rai ◇</th><th title="DERIVED — margin as a share of the farm-gate price; lower = thinner cushion">Cushion % ◇</th><th title="MEASURED — NABC daily national-average farm-gate price">Price/kg ◆</th><th title="MEASURED — OAE production cost per kg (crop year 2567/68)">Cost/kg ◆</th><th title="Whether OAE reported ฿/rai directly (measured) or it was back-computed from ฿/ton × yield (derived)">Cost basis</th></tr>`+
+    by.map((c,i)=>{const m=c.margin_pct_of_price||0; const col=m<30?'var(--agri)':m<45?'var(--gold)':'var(--merch)';
+      const basis=c.cost_method==='measured_direct'?'<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">measured ฿/rai</span>':'<span class="sub">derived</span>';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${c.crop_th||c.crop}</b></td>`+
+        `<td class="mono">${money(c.margin_per_rai)}</td>`+
+        `<td>${barHTML(Math.min(100,m),col)} <span class="mono" style="color:${col}">${m.toFixed(0)}%</span></td>`+
+        `<td class="mono sub">${c.price_kg!=null?'฿'+c.price_kg:'—'}</td>`+
+        `<td class="mono sub">${c.cost_kg!=null?'฿'+c.cost_kg:'—'}</td>`+
+        `<td>${basis}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 
