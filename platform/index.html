@@ -305,6 +305,17 @@
       <p class="lead" id="lfs-note"></p>
       <table class="tbl" id="lfstbl"></table>
     </div>
+    <!-- Regional household-debt backdrop (data/region_debt.json) — MEASURED Bank of Thailand regional
+         letters over NSO SES (obj #1). Household leverage is a direct portfolio-risk backdrop: where
+         borrower households carry the most debt, an income shock bites soonest. BoT publishes no routine
+         province table, so region is the honest grain; the debt-per-household cut is the most recent
+         common vintage (SES 2566/2023). Rendered by renderRegionDebt(); hidden gracefully until load. -->
+    <div id="regdebt-wrap" style="display:none">
+      <h2 class="risk">Regional household-debt backdrop <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT over NSO SES</span></h2>
+      <div class="verdict" id="regdebt-verdict" style="display:none"></div>
+      <p class="lead" id="regdebt-note"></p>
+      <table class="tbl" id="regdebttbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
