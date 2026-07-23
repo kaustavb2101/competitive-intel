@@ -4842,7 +4842,7 @@ function selectBranch(d,m){
    desktop (clearRadius + clearLeadSites) so lead-site pins never outlive the sheet. Null-guarded:
    absent #msheet nodes (older HTML) → falls back to the Leaflet popup. z-index sits above the map
    (nav bar 2000) but below the nav More menu (2100). */
-let sheetBranchIdx=-1, sheetTouchY=null;
+let sheetBranchIdx=-1, sheetTouchY=null, sheetReturnFocus=null;
 function isMobileSheet(){
   try{ return matchMedia('(max-width:600px)').matches ||
        (matchMedia('(pointer:coarse)').matches && window.innerWidth<=700); }
@@ -4853,11 +4853,17 @@ function openBranchSheet(d){
   const s=sheetEl(), b=document.getElementById('msheet-backdrop'),
         body=document.getElementById('msheet-body');
   if(!s||!b||!body) return;                      // nodes absent → selectBranch's popup path still works
+  // WCAG 2.4.3 / ARIA modal-dialog practice: remember what to restore focus to, then move
+  // focus into the dialog so keyboard + screen-reader users land inside it (not stranded on the
+  // now-inert map behind the aria-modal backdrop). Skip stealing focus if the opener wasn't a
+  // real focus (e.g. a tap on a map marker leaves focus on <body>).
+  const prev=document.activeElement;
+  sheetReturnFocus=(prev && prev!==document.body && s!==prev && !s.contains(prev)) ? prev : null;
   sheetBranchIdx=idxOf(d);
   body.innerHTML=popupHTML(d);
   body.scrollTop=0;
   b.hidden=false; s.hidden=false;
-  requestAnimationFrame(()=>{ s.classList.add('open'); b.classList.add('open'); });
+  requestAnimationFrame(()=>{ s.classList.add('open'); b.classList.add('open'); try{ s.focus(); }catch(e){} });
   if(!s._wired){ wireBranchSheet(s,b,body); s._wired=true; }
 }
 function isSheetOpenFor(d){ const s=sheetEl(); return !!(s&&!s.hidden&&sheetBranchIdx===idxOf(d)); }
@@ -4868,6 +4874,10 @@ function closeBranchSheet(){
   sheetBranchIdx=-1;
   s.classList.remove('open'); if(b) b.classList.remove('open');
   setTimeout(()=>{ s.hidden=true; if(b) b.hidden=true; },180);   // let the slide-down play
+  // WCAG 2.4.3: hand focus back to whatever opened the sheet, so the keyboard user isn't
+  // dropped at the top of the document after the dialog closes.
+  const rf=sheetReturnFocus; sheetReturnFocus=null;
+  if(rf && rf.isConnected){ try{ rf.focus(); }catch(e){} }
   // same cleanup the Leaflet popupclose handlers perform on desktop
   try{ clearRadius(); }catch(e){}
   try{ clearLeadSites(); }catch(e){}
