@@ -4200,12 +4200,12 @@ function syncSimFactoryVisibility(){
   const wrap=$('#sim-factory-wrap'), note=$('#sim-factory-note');
   if(wrap) wrap.style.display=has?'':'none';
   if(note) note.style.display=has?'none':'';
-  if(!has){ simState.factory=0; const inp=$('#sim-factory'); if(inp) inp.value=0; const lab=$('#sim-factory-v'); if(lab) lab.textContent='0%'; }
+  if(!has){ simState.factory=0; const inp=$('#sim-factory'); if(inp){ inp.value=0; inp.setAttribute('aria-valuetext','0%'); } const lab=$('#sim-factory-v'); if(lab) lab.textContent='0%'; }
 }
 function wireSim(){
   simWired=true;
   const bind=(id,key,fmt)=>{const inp=$(id); if(!inp) return;
-    inp.oninput=()=>{simState[key]=+inp.value; const lab=$(id+'-v'); if(lab&&fmt) lab.textContent=fmt(+inp.value); computeSim();};};
+    inp.oninput=()=>{simState[key]=+inp.value; const lab=$(id+'-v'); if(fmt){const t=fmt(+inp.value); if(lab) lab.textContent=t; inp.setAttribute('aria-valuetext',t);} computeSim();};};
   bind('#sim-price','price',v=>(v>0?'+':'')+v+'%');
   bind('#sim-rain','rain',v=>v===0?'normal':(v>0?'wetter +':'drier ')+v+'%');
   bind('#sim-veh','veh',v=>(v>0?'+':'')+v+'%');
@@ -4215,8 +4215,8 @@ function wireSim(){
 }
 function simReset(){
   simState.price=0; simState.rain=0; simState.veh=0; simState.factory=0; simState.botcap=false;
-  const set=(id,v)=>{const e=$(id); if(e) e.value=v;};
-  set('#sim-price',0); set('#sim-rain',0); set('#sim-veh',0); set('#sim-factory',0);
+  const set=(id,v,vt)=>{const e=$(id); if(e){ e.value=v; e.setAttribute('aria-valuetext',vt); }};
+  set('#sim-price',0,'0%'); set('#sim-rain',0,'normal'); set('#sim-veh',0,'0%'); set('#sim-factory',0,'0%');
   const bot=$('#sim-botcap'); if(bot) bot.checked=false;
   $('#sim-price-v')&&($('#sim-price-v').textContent='0%');
   $('#sim-rain-v')&&($('#sim-rain-v').textContent='normal');
