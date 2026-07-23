@@ -123,6 +123,23 @@ async function loadCropMargin(){
   })();
   return marginPromise;
 }
+// Regional household-debt backdrop — MEASURED (Bank of Thailand regional letters over NSO Socio-Economic
+// Survey [SES] data; per-series vintages carried, the 4-region debt-per-household cut = SES 2566/2023, the
+// most recent common vintage). Obj #1: household leverage is a DIRECT portfolio-risk backdrop — where
+// borrower households already carry the most debt, an income shock bites soonest. Fully null-guarded:
+// absent file → REGDEBT stays null, the Overview block stays hidden (see renderRegionDebt), nothing faked.
+let REGDEBT=null, REGDEBT_META=null, REGDEBT_HEAD=null, regdebtPromise=null;
+async function loadRegionDebt(){
+  if(regdebtPromise) return regdebtPromise;
+  regdebtPromise=(async()=>{
+    try{
+      const j = await fetch('data/region_debt.json').then(r=>r.json());
+      REGDEBT=(j&&j.series)?j.series:null; REGDEBT_META=j.meta||null; REGDEBT_HEAD=j.headline||null;
+    }catch(e){ REGDEBT=null; REGDEBT_META=null; REGDEBT_HEAD=null; }
+    return REGDEBT;
+  })();
+  return regdebtPromise;
+}
 
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
@@ -1452,6 +1469,9 @@ function renderOverview(){
   // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
   // backdrop behind the agri-PD book. Null-safe: absent file → the block stays hidden.
   loadProvinceLfs().then(renderProvinceLfs);
+  // MEASURED regional household-debt backdrop (region_debt.json, BoT over NSO SES, obj #1) — the borrower-
+  // leverage floor under portfolio risk. Null-safe: absent file → the block stays hidden.
+  loadRegionDebt().then(renderRegionDebt);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -1997,6 +2017,50 @@ function renderCropMargin(){
         `<td class="mono sub">${c.price_kg!=null?'฿'+c.price_kg:'—'}</td>`+
         `<td class="mono sub">${c.cost_kg!=null?'฿'+c.cost_kg:'—'}</td>`+
         `<td>${basis}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// Regional household-debt backdrop card (Overview, obj #1) — MEASURED Bank of Thailand regional letters
+// over NSO SES. Leads with the national debt-to-GDP macro headline, then the 4-region debt-per-household
+// cut at the most recent COMMON vintage (SES 2566/2023) sorted heaviest-first — the borrower-leverage
+// backdrop behind the book. The layer carries mixed 2009–2023 vintages per series, so we pick one clean
+// comparable cut and flag the rest ("read direction, not decimals"). Null-safe: no clean region rows at
+// the common vintage → the whole block stays hidden (nothing fabricated).
+function renderRegionDebt(){
+  const wrap=$('#regdebt-wrap'); if(!wrap) return;
+  const S=REGDEBT||{};
+  const money=v=>(v==null||!isFinite(v))?'—':'฿'+Math.round(v).toLocaleString('en-US');
+  // 4-region debt-per-household at the most recent common vintage (SES 2566/2023); dedup by region.
+  const reg=(Array.isArray(S.region)?S.region:[]).filter(r=>r&&r.indicator==='debt_per_household_thb'&&/2566/.test(r.vintage||'')&&r.value!=null);
+  const byGeo={}; reg.forEach(r=>{ byGeo[r.geo]=r; });
+  const rows=Object.values(byGeo).sort((a,b)=>(b.value||0)-(a.value||0));
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const TH_REG={North:'ภาคเหนือ',Northeast:'ภาคอีสาน',Central:'ภาคกลาง',South:'ภาคใต้',Bangkok:'กรุงเทพฯ',East:'ภาคตะวันออก'};
+  const nat=Array.isArray(S.national)?S.national:[];
+  const natOne=ind=>{const c=nat.filter(r=>r&&r.indicator===ind&&r.value!=null); return c.length?c[c.length-1]:null;};
+  const gdp=natOne('household_debt_to_gdp_pct'), cushion=natOne('financial_cushion_under_3mo_share_pct');
+  // BoT's own province examples of the vulnerable-household share (Isan agri belt), if present.
+  const prov=(Array.isArray(S.province)?S.province:[]).filter(r=>r&&r.indicator==='vulnerable_household_share_pct'&&r.value!=null).sort((a,b)=>(b.value||0)-(a.value||0));
+  const max=rows[0].value||1, heaviest=rows[0];
+  const vb=$('#regdebt-verdict');
+  if(vb){
+    vb.className='verdict v-warn'; vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">📉 <b>Household leverage is the macro backdrop under portfolio risk${gdp?`: BoT puts household debt at ${gdp.value}% of GDP`:''}${gdp?` (${gdp.vintage})`:''}.</b> `+
+      `Regionally the heaviest household debt sits in <b>${TH_REG[heaviest.geo]||heaviest.geo}</b> at ${money(heaviest.value)}/household (SES 2023)</div>`+
+      `<div class="sub" style="margin-top:4px">${cushion?`~${cushion.value}% of Thai households hold under 3 months' financial cushion (${cushion.vintage}). `:''}`+
+      `Where households already carry the most debt, an income shock bites soonest — the leverage floor beneath the agri-PD / title book. ${TAG_M}.</div>`;
+  }
+  const note=$('#regdebt-note');
+  if(note) note.innerHTML='<b>Measured</b> — Bank of Thailand regional letters over NSO Socio-Economic Survey (SES) data. '+
+    'BoT publishes no routine province table, so <b>region is the honest grain</b>; the debt-per-household cut below is the '+
+    'most recent <b>common</b> vintage (SES 2566 / 2023). Other series in this layer carry mixed 2009–2023 vintages, so '+
+    '<b>read direction, not decimals</b>.'+
+    (prov.length?` BoT's own province examples put the <b>vulnerable-household share</b> highest in the Isan agri belt — ${prov.slice(0,3).map(p=>`${p.geo} ${p.value}%`).join(', ')} (2019), exactly where the agri-PD book sits.`:'');
+  const tbl=$('#regdebttbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Region</th><th title="MEASURED — average debt per household, NSO SES 2566 (2023), carried in BoT regional letters">Debt / household ◆</th></tr>`+
+    rows.map((r,i)=>{const v=r.value||0; const c=v>=200000?'var(--agri)':v>=180000?'var(--gold)':'var(--merch)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${TH_REG[r.geo]||r.geo}</b></td>`+
+        `<td>${barHTML(Math.round(100*v/max),c)} <span class="mono" style="color:${c}">${money(v)}</span></td></tr>`;}).join('');
   wrap.style.display='';
 }
 
