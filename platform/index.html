@@ -259,6 +259,16 @@
     <div class="grid macro" id="dcollat-brand"></div>
     <p class="lead" id="dcollat-note"></p>
     <table class="tbl" id="dcollattbl"></table>
+    <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
+         the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
+         being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
+         hidden until the layer loads (null-safe). -->
+    <div id="btrend-wrap" style="display:none">
+      <h2 class="collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+      <div class="verdict v-warn" id="btrend-verdict" style="display:none"></div>
+      <p class="lead" id="btrend-note"></p>
+      <table class="tbl" id="btrendtbl"></table>
+    </div>
     <div id="vehreg-wrap" style="display:none">
       <h2 class="collat">Collateral base · registered-vehicle stock (MOT, measured)</h2>
       <p class="lead" id="vehreg-note"></p>

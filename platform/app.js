@@ -123,6 +123,23 @@ async function loadCropMargin(){
   })();
   return marginPromise;
 }
+// New-vehicle first-registration TREND (data/brand_trends.json, DLT first registrations by year).
+// Obj #1, collateral outlook: which vehicles enter the fleet today become tomorrow's used-title
+// collateral pool. The diesel-share card above is a point-in-time snapshot; this carries the TIME
+// dimension — how fast the future used-pickup collateral pool is replenished at source. Null-safe:
+// absent / malformed file → BTREND stays null and the Overview block stays hidden.
+let BTREND=null, btrendPromise=null;
+async function loadBrandTrends(){
+  if(btrendPromise) return btrendPromise;
+  btrendPromise=(async()=>{
+    try{
+      const j = await fetch('data/brand_trends.json').then(r=>r.json());
+      BTREND=(j&&j.new_regis_trend&&typeof j.new_regis_trend==='object')?j:null;
+    }catch(e){ BTREND=null; }
+    return BTREND;
+  })();
+  return btrendPromise;
+}
 // Regional household-debt backdrop — MEASURED (Bank of Thailand regional letters over NSO Socio-Economic
 // Survey [SES] data; per-series vintages carried, the 4-region debt-per-household cut = SES 2566/2023, the
 // most recent common vintage). Obj #1: household leverage is a DIRECT portfolio-risk backdrop — where
@@ -1471,6 +1488,9 @@ function renderOverview(){
   loadMacroSens().then(renderMacroWatchlist);
   renderCollatOutlook();
   renderDieselCollateral();
+  // MEASURED new-pickup inflow trend (brand_trends.json, DLT) — the TIME dimension behind the
+  // diesel-share snapshot: how fast the future used-pickup collateral pool replenishes. Null-safe.
+  loadBrandTrends().then(renderBrandTrends);
   loadVehReg().then(renderVehReg);
   renderCollatMix();
   renderRecoverySensitivity();
@@ -2038,6 +2058,58 @@ function renderCropMargin(){
         `<td class="mono sub">${c.price_kg!=null?'฿'+c.price_kg:'—'}</td>`+
         `<td class="mono sub">${c.cost_kg!=null?'฿'+c.cost_kg:'—'}</td>`+
         `<td>${basis}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+/* ---------- New-pickup inflow trend · the future used-collateral pool (Overview, obj #1) ----------
+   MEASURED — DLT first registrations by class per Buddhist-era year (data/brand_trends.json).
+   The diesel-share card above is a snapshot; this is the TIME dimension it lacks: the diesel pickup
+   is AutoX's core auto-title collateral (~25% of the book), and how fast NEW pickups enter the fleet
+   sets how fast the future USED-pickup collateral pool (what AutoX lends against + recovers on) is
+   replenished. Leads with the pickup-inflow change vs the whole-market change, notes the rising EV
+   share as the used-value leading indicator. Null-safe: absent/thin file → wrap stays hidden. */
+function renderBrandTrends(){
+  const wrap=$('#btrend-wrap'); if(!wrap) return;
+  const d=BTREND, t=d&&d.new_regis_trend;
+  const yrs=t?Object.keys(t).filter(y=>t[y]&&t[y].pickup!=null).sort():[];
+  if(!t||yrs.length<2){ wrap.style.display='none'; return; }
+  const be2ce=y=>String((+y)-543);
+  const num=v=>(v==null||!isFinite(v))?'—':(+v).toLocaleString('en-US');
+  const first=t[yrs[0]], last=t[yrs[yrs.length-1]];
+  const pk0=first.pickup||0, pk1=last.pickup||0;
+  const pkChg=pk0?((pk1-pk0)/pk0*100):null;
+  const totChg=(first.total)?((last.total-first.total)/first.total*100):null;
+  const ev=(d.ytd&&d.ytd.ev_only_share_pct!=null)?d.ytd.ev_only_share_pct:null;
+  const evYr=(d.ytd&&d.ytd.year_be)?be2ce(d.ytd.year_be):'';
+  const pct=v=>(v==null)?'—':(v<0?'−':'+')+Math.abs(v).toFixed(0)+'%';
+  // ---- answer-first verdict ----
+  const vb=$('#btrend-verdict');
+  if(vb){
+    vb.className='verdict v-warn'; vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${be2ce(yrs[0])}→${be2ce(yrs[yrs.length-1])} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
+      `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
+  }
+  // ---- note ----
+  const note=$('#btrend-note');
+  if(note) note.innerHTML='First registrations (new vehicles entering the fleet) by class — the <b>inflow that becomes tomorrow’s used-vehicle collateral</b>. '+
+    'Pickups are AutoX’s core title collateral (~25% of the book); passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
+    'All counts are <b>measured</b> (DLT first-registration registry). Years are Buddhist-era (พ.ศ. − 543 = ค.ศ., e.g. 2568 = 2025).';
+  // ---- per-year table (pickup bar-scaled to its own max) ----
+  const tbl=$('#btrendtbl');
+  if(tbl){
+    const pkMax=Math.max(...yrs.map(y=>t[y].pickup||0),1);
+    tbl.innerHTML=`<tr><th>Year</th><th title="MEASURED — DLT first registrations, pickup trucks (รย.3): AutoX’s core title collateral">Pickup titles ◆</th><th title="MEASURED — DLT first registrations, passenger cars">Passenger cars ◆</th><th title="MEASURED — DLT first registrations, all vehicle classes incl. motorcycles">All new regis ◆</th></tr>`+
+      yrs.map((y,i)=>{
+        const r=t[y], w=Math.round((r.pickup||0)/pkMax*100);
+        const prev=i>0?t[yrs[i-1]].pickup:null;
+        const yoy=(prev)?((r.pickup-prev)/prev*100):null;
+        const yoyTxt=yoy!=null?` <span class="mono sub" style="color:${yoy<0?'var(--agri)':'var(--merch)'}">${pct(yoy)}</span>`:'';
+        return `<tr><td class="mono">${be2ce(y)}<span class="sub"> · ${y}</span></td>`+
+          `<td>${barHTML(w,'var(--collat)')} <span class="mono">${num(r.pickup)}</span>${yoyTxt}</td>`+
+          `<td class="mono sub">${num(r.passenger)}</td>`+
+          `<td class="mono sub">${num(r.total)}</td></tr>`;
+      }).join('');
+  }
   wrap.style.display='';
 }
 
