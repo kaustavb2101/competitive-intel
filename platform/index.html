@@ -646,25 +646,25 @@
 
         <div class="sim-slider">
           <label for="sim-price">Crop-price shock <span class="mono" id="sim-price-v">0%</span></label>
-          <input type="range" id="sim-price" min="-30" max="10" step="5" value="0">
+          <input type="range" id="sim-price" min="-30" max="10" step="5" value="0" aria-valuetext="0%">
           <div class="sim-hint">Move global crop prices (World Bank direction proxy). Lower = farm-gate income squeeze.</div>
         </div>
 
         <div class="sim-slider">
           <label for="sim-rain">Rainfall / drought <span class="mono" id="sim-rain-v">normal</span></label>
-          <input type="range" id="sim-rain" min="-30" max="20" step="5" value="0">
+          <input type="range" id="sim-rain" min="-30" max="20" step="5" value="0" aria-valuetext="normal">
           <div class="sim-hint">Shift rainfall vs normal. Drier (left) raises drought hazard on crop households.</div>
         </div>
 
         <div class="sim-slider">
           <label for="sim-veh">Used-vehicle value move <span class="mono" id="sim-veh-v">0%</span></label>
-          <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0">
+          <input type="range" id="sim-veh" min="-30" max="20" step="5" value="0" aria-valuetext="0%">
           <div class="sim-hint">Used motorcycle/pickup resale value. Down = lower recovery on the title book (LGD up).</div>
         </div>
 
         <div class="sim-slider" id="sim-factory-wrap" style="display:none">
           <label for="sim-factory">Factory / manufacturing slowdown <span class="mono" id="sim-factory-v">0%</span></label>
-          <input type="range" id="sim-factory" min="0" max="100" step="10" value="0">
+          <input type="range" id="sim-factory" min="0" max="100" step="10" value="0" aria-valuetext="0%">
           <div class="sim-hint">Severity of a manufacturing-sector shock on branches whose <b>measured</b> dominant borrower base is factory / auto work (Overture occupation mix). Raises the <b>estimated</b> occupation-stress on those branches. Illustrative — no loan balances.</div>
         </div>
         <div class="sim-slider" id="sim-factory-note" style="display:none">
