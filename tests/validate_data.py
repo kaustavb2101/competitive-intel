@@ -4067,8 +4067,15 @@ def _all_data_json_rels():
 
 def _is_exempt(rel):
     """rel uses '/' separators. Province deep-dives all share the build_province.py
-    exemption (R1); match the whole provinces/ subtree by prefix. Everything else must be
-    named literally in PROVENANCE_EXEMPT (kept narrow on purpose)."""
+    exemption (R1); match the whole provinces/ subtree by prefix. The <slug>_catchment.json
+    family (77 provinces since the 2026-07-20 full-province Overture max pull) is geometry-only
+    Overture building footprints for the 3D scenes — coordinates, NOT decision metrics
+    (DATA_PROVENANCE.md R2/R3); its provenance is carried family-wise by build_provenance.py
+    (FAMILY_KINDS) because the max re-pull rewrote the files without per-file meta stamps.
+    Restore in-file meta.source stamps at the next planned re-pull, then narrow this again.
+    Everything else must be named literally in PROVENANCE_EXEMPT (kept narrow on purpose)."""
+    if re.fullmatch(r"[a-z0-9-]+_catchment\.json", rel):
+        return True
     return rel in PROVENANCE_EXEMPT or rel.startswith("provinces/")
 
 
