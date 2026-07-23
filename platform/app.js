@@ -3654,6 +3654,31 @@ function renderExposureTape(){
         <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
   }
+  const fr=$('#expo-tape-frontier');
+  if(fr&&Array.isArray(TAPE.npat_frontier)){
+    const cells=TAPE.npat_frontier.slice(0,18);
+    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>30+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
+      cells.map(c=>{
+        const read=c.npat_margin_avg>=0
+          ?(c.dpd30p_pct>=28?'<span style="color:var(--gold)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
+          :(c.dpd30p_pct<24?'<span style="color:var(--agri)">unprofitably safe</span>':'<span style="color:var(--agri)">re-price</span>');
+        return `<tr><td>${c.occupation}</td><td class="mono sub">${c.region}</td>
+          <td class="mono sub">${c.n.toLocaleString()}</td>
+          <td class="mono">${c.dpd30p_pct}%</td>
+          <td class="mono" style="color:${c.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${c.npat_margin_avg.toLocaleString()}</td>
+          <td class="sub" style="font-size:12px">${read}</td></tr>`;}).join('');
+  }
+  const co=$('#expo-tape-coll');
+  if(co&&TAPE.collateral_brands){
+    const brands=Object.entries(TAPE.collateral_brands).slice(0,10);
+    const bands=[...new Set(brands.flatMap(([,d])=>Object.keys(d)))].sort();
+    co.innerHTML=`<tr><th>Brand</th>`+bands.map(b=>`<th class="mono" style="font-size:10px">${b.replace(/^\d\.\(?|\)?yr\.$/g,'')}y</th>`).join('')+`</tr>`+
+      brands.map(([br,d])=>`<tr><td><b>${br}</b></td>`+bands.map(b=>{
+        const c=d[b];
+        if(!c) return '<td class="sub">—</td>';
+        return `<td class="mono" style="font-size:11px" title="${c.n} accounts · ${c.dpd30p_pct}% 30+dpd">${(c.eval_avg/1000).toFixed(0)}k<br><span style="color:${c.dpd30p_pct>=30?'var(--agri)':'var(--dim)'};font-size:10px">${c.dpd30p_pct}%</span></td>`;
+      }).join('')+`</tr>`).join('');
+  }
 }
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
