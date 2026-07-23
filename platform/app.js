@@ -140,6 +140,24 @@ async function loadRegionDebt(){
   })();
   return regdebtPromise;
 }
+// Logistics-SME (hauler) pulse — MEASURED DLT truck-registration actions (trucks, private + for-hire),
+// trailing-12m vs the prior 12m (data/truck_flow.json). Per province: new_regis_12m / transfers_12m /
+// dereg_12m / net_flow_12m / new_regis_yoy_pct. Obj #1: an owner-operator hauler is a classic heavy-title
+// borrower — contracting truck flow = that segment's cash flow thinning in the province, and a two-for-one
+// (borrower livelihood AND used-truck collateral liquidity). Fully null-guarded: absent file → TRUCKFLOW
+// stays null, the Overview block stays hidden (see renderTruckFlow), nothing fabricated.
+let TRUCKFLOW=null, TRUCKFLOW_META=null, truckflowPromise=null;
+async function loadTruckFlow(){
+  if(truckflowPromise) return truckflowPromise;
+  truckflowPromise=(async()=>{
+    try{
+      const j = await fetch('data/truck_flow.json').then(r=>r.json());
+      TRUCKFLOW=Array.isArray(j.provinces)?j.provinces:null; TRUCKFLOW_META=j.meta||null;
+    }catch(e){ TRUCKFLOW=null; TRUCKFLOW_META=null; }
+    return TRUCKFLOW;
+  })();
+  return truckflowPromise;
+}
 
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
@@ -1472,6 +1490,9 @@ function renderOverview(){
   // MEASURED regional household-debt backdrop (region_debt.json, BoT over NSO SES, obj #1) — the borrower-
   // leverage floor under portfolio risk. Null-safe: absent file → the block stays hidden.
   loadRegionDebt().then(renderRegionDebt);
+  // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
+  // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
+  loadTruckFlow().then(renderTruckFlow);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -2061,6 +2082,55 @@ function renderRegionDebt(){
     rows.map((r,i)=>{const v=r.value||0; const c=v>=200000?'var(--agri)':v>=180000?'var(--gold)':'var(--merch)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${TH_REG[r.geo]||r.geo}</b></td>`+
         `<td>${barHTML(Math.round(100*v/max),c)} <span class="mono" style="color:${c}">${money(v)}</span></td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// Logistics-SME pulse card (Overview, obj #1) — MEASURED DLT truck-registration flow. Nationally the
+// fleet is still growing (new registrations outrunning deregistrations), so the card leads with that
+// cushion, then names the province pockets where new-truck DEMAND is contracting YoY — the sharpest
+// segment-stress read the layer carries, and the intended sort ("worst-first by new_regis_yoy_pct").
+// A modest base floor (≥250 new/12m) drops small-sample YoY noise; net fleet flow + used-market
+// transfers carried alongside. Null-safe: no rows → the whole block stays hidden (nothing fabricated).
+function renderTruckFlow(){
+  const wrap=$('#truckflow-wrap'); if(!wrap) return;
+  const rows=Array.isArray(TRUCKFLOW)?TRUCKFLOW.filter(p=>p&&p.th&&p.new_regis_yoy_pct!=null):[];
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  const pct=v=>(v==null||!isFinite(v)?'—':(v>=0?'+':'')+v.toFixed(1)+'%');
+  // national headline (measured) — prefer the layer's own national rollup, else sum the rows.
+  const nat=(TRUCKFLOW_META&&TRUCKFLOW_META.national)||null;
+  const natNew=nat?nat.new_regis_12m:rows.reduce((s,p)=>s+(p.new_regis_12m||0),0);
+  const natDereg=nat?nat.dereg_12m:rows.reduce((s,p)=>s+(p.dereg_12m||0),0);
+  const natNet=natNew-natDereg;
+  const natYoy=nat&&nat.new_regis_yoy_pct!=null?nat.new_regis_yoy_pct:null;
+  // segment-stress read: contracting new-truck demand YoY, worst-first, with a small-base floor.
+  const sized=rows.filter(p=>(p.new_regis_12m||0)>=250);
+  const by=sized.slice().sort((a,b)=>(a.new_regis_yoy_pct||0)-(b.new_regis_yoy_pct||0)).slice(0,8);
+  const nContract=sized.filter(p=>(p.new_regis_yoy_pct||0)<0).length;
+  const worst=by[0];
+  const vb=$('#truckflow-verdict');
+  if(vb){
+    const growing=natNet>0;
+    vb.className='verdict'+(growing?'':' v-warn'); vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">${growing?'✅':'📉'} <b>The truck fleet is ${growing?'still growing':'contracting'} nationally${natYoy!=null?` — new-truck registrations ${pct(natYoy)} YoY`:''}${growing?` (net +${num(natNet)} trucks)`:` (net ${num(natNet)})`}.</b> `+
+      `The heavy-title hauler segment is a tailwind in aggregate, not a stress.</div>`+
+      `<div class="sub" style="margin-top:4px">But new-truck demand is <b>contracting YoY in ${nContract} of ${sized.length}</b> sizeable-base provinces${worst?` — steepest: <b>${worst.th}</b> ${pct(worst.new_regis_yoy_pct)}`:''}. An owner-operator hauler is a classic heavy-title borrower, so a thinning truck pulse marks where that segment's cash flow — and used-truck collateral — is softening. ${TAG_M}.</div>`;
+  }
+  const note=$('#truckflow-note');
+  if(note) note.innerHTML='<b>Measured</b> — DLT truck-registration actions (trucks, private + for-hire), '+
+    'trailing-12-month sums vs the same window a year earlier'+(TRUCKFLOW_META&&TRUCKFLOW_META.window&&TRUCKFLOW_META.window.current?` (${TRUCKFLOW_META.window.current[0]}–${TRUCKFLOW_META.window.current[1]})`:'')+'. '+
+    'Sorted <b>worst YoY new-registration momentum first</b> — the hauler segment pulling back on new trucks. '+
+    'A <b>base floor of ≥250 new registrations/12m</b> is applied to drop small-sample YoY noise. '+
+    '<b>Net fleet</b> = new − deregistrations (negative = the province’s fleet is shrinking); '+
+    '<b>used transfers</b> is ownership-transfer volume — the used-truck market’s liquidity, which sets how easily that collateral clears.';
+  const tbl=$('#truckflowtbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="MEASURED — new truck registrations in the trailing 12 months, and the change vs the prior 12 months">New /12m · YoY ●</th><th title="MEASURED — new registrations minus deregistrations; negative = the fleet is contracting">Net fleet ●</th><th title="MEASURED — ownership transfers, a read on used-truck market liquidity">Used transfers ●</th></tr>`+
+    by.map((p,i)=>{const y=p.new_regis_yoy_pct||0; const c=y<-10?'var(--agri)':y<0?'var(--gold)':'var(--merch)';
+      const nf=p.net_flow_12m||0; const nfc=nf<0?'var(--agri)':nf<50?'var(--gold)':'var(--merch)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td>`+
+        `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
+        `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
+        `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 
