@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "zone": 5,
+    "zone_th": "สศท.5 (สำนักงานเศรษฐกิจการเกษตรที่ 5, นครราชสีมา)",
+    "zone_provinces": ["นครราชสีมา", "ชัยภูมิ", "บุรีรัมย์", "สุรินทร์"],
+    "note": "Re-checked deeper per instruction (prior session only surface-checked zone5's homepage + one category page).",
+    "urls_checked": [
+      "https://zone5.oae.go.th/ (600KB home, full re-grep for .pdf hrefs and เอกภาพ mentions)",
+      "https://zone5.oae.go.th/%E0%B8%82%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%B9%E0%B8%A5%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A0%E0%B8%B2%E0%B8%9E/ (zone6-style slug guess — 404)",
+      "https://zone5.oae.go.th/sitemap.xml, /sitemap_index.xml, /wp-sitemap.xml, /wp-sitemap-posts-post-1.xml (all 404 — site returns a generic 404 page for every sitemap path tried)",
+      "https://zone5.oae.go.th/wp-json/wp/v2/search, /media, /categories (ALL 404 — this site's WP REST API is fully disabled/blocked, unlike zone4/6/7/11; likely a security-plugin lockdown)",
+      "https://zone5.oae.go.th/robots.txt (only generic AI/content-signal boilerplate, no Sitemap: or Disallow: lines — not informative)",
+      "https://zone5.oae.go.th/?page_id=432 ('งานบริการ E-Service' page — no crop-data or เอกภาพ links)",
+      "https://zone5.oae.go.th/?s=%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A0%E0%B8%B2%E0%B8%9E — WordPress FRONT-END search (bypasses the blocked REST API): 2 hits, both meeting-committee news posts (p=4181 SCP committee meeting Chaiyaphum; p=4924 info-division internal staff meeting #3/2569), neither a data page, neither has an attached PDF beyond the shared central oae.go.th circular already seen elsewhere",
+      "https://zone5.oae.go.th/blog/, /category/news/ (both 404 — zone5's news archive uses a different, non-default URL scheme not discovered)",
+      "WebSearch: site:zone5.oae.go.th ข้อมูลเอกภาพ; site:zone5.oae.go.th filetype:pdf อำเภอ เนื้อที่เพาะปลูก; exact zone6-style filenames; \"ข้อมูลเอกภาพ\" wp-content uploads"
+    ],
+    "route": "NOT FOUND — confirms and extends the prior session's finding. Zone 5 (the correct 'Isan' office named in the brief) does not surface any amphoe-level crop PDF through its homepage, sitemap, REST API, front-end search, or Google's index.",
+    "findings": [
+      "Zone5's own site-search for 'เอกภาพ' (bypassing its disabled wp-json) returns only 2 unrelated meeting-news posts — no data-release post or page.",
+      "Zone5 is the only one of the 4 zones swept whose WordPress REST API (/wp-json/) is entirely blocked (404 on every endpoint), and whose sitemap.xml/wp-sitemap.xml are also 404 — this materially limited automated discovery versus zone4/7/11, but the front-end ?s= search still worked and found nothing.",
+      "The single January-2026 committee-meeting news post found in the PRIOR session ('...สู่ความเป็นเอกภาพระดับภาคด้านพืชภาคตะวันออกเฉียงเหนือ ครั้งที่ 1/2569') is about STANDARDIZING zone-wide plant data going forward — it documents that this unification work was still at the committee/process stage for the Northeast region, not yet published as a finished district PDF series at the time of writing.",
+      "Zone5's wp-content/uploads/ IS used normally (site images May-Nov 2025 confirmed via grep) — the mechanism exists, but no crop-comparison PDFs were found uploaded there via any discovery path tried."
+    ],
+    "conclusion": "Isan coverage via Zone 5 was NOT obtained, despite deeper re-checking (site map attempts, front-end search, news posts) as instructed. No rows extracted — nothing to parse. No fabrication.",
+    "retrieved": "2026-07-20",
+    "parse_notes": []
+  },
+  "rows": []
+}

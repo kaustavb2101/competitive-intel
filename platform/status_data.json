@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-22T16:25:07Z",
-    "commit": "424a3de"
+    "generated_at": "2026-07-23T10:27:04Z",
+    "commit": "9944d07"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-23",
+    "eta_date": "2026-07-24",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,6 +480,66 @@
   ],
   "activity": [
     {
+      "date": "2026-07-23T10:27:04Z",
+      "sha": "9944d07",
+      "summary": "committee: refresh autonomy plan after crop-margin ship (2026-07-23)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-23T17:24:17+07:00",
+      "sha": "67db881",
+      "summary": "intel(overview): surface MEASURED farmer margin — farm-gate price vs OAE cost (obj #1) (#120)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-23T15:14:20+07:00",
+      "sha": "f349cbd",
+      "summary": "ux: manage focus for the mobile branch-detail modal (WCAG 2.4.3) (#119)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-23T06:20:06Z",
+      "sha": "e91433d",
+      "summary": "committee: autonomous competitor scout (run 29984579467)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-23T06:06:57Z",
+      "sha": "8834b95",
+      "summary": "committee: refresh autonomy plan (run 29983999081)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-23T04:18:18Z",
+      "sha": "12da1c2",
+      "summary": "committee: refresh autonomy plan after province-lfs ship (2026-07-23)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-23T11:14:31+07:00",
+      "sha": "813b0a0",
+      "summary": "intel(overview): surface MEASURED provincial labour stress (NSO LFS 2026 Q1, obj #1) (#117)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-23T03:19:43Z",
+      "sha": "0a6b852",
+      "summary": "docs: log ux-chip-aria-pressed merge+deploy+verify (2026-07-23)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-23T10:17:04+07:00",
+      "sha": "48dbc0b",
+      "summary": "ux: expose aria-pressed on SPA filter chips (WCAG 4.1.2) (#115)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-22T22:10:20Z",
+      "sha": "43a74d7",
+      "summary": "committee: refresh autonomy plan (run 29961845950)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-22T16:25:07Z",
       "sha": "424a3de",
       "summary": "committee: refresh autonomy plan (run 29937813924)",
@@ -598,66 +658,6 @@
       "sha": "cdd5812",
       "summary": "intel(peer): surface intra-province district contest on the Competition peer board (#105)",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-07-20T21:29:47+07:00",
-      "sha": "7b79afa",
-      "summary": "Merge pull request #104 from kaustavb2101/claude/ingest-wave",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T21:13:57+07:00",
-      "sha": "7f9c980",
-      "summary": "data(provenance): register ingest-wave layers (102) + crop_farmer_income refresh under the WSL 3.11 mirror",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-20T14:13:29Z",
-      "sha": "d42f242",
-      "summary": "docs(progress): log ux-doctitle-per-route merge+deploy+verify (PR #103)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T21:12:02+07:00",
-      "sha": "d0c61d1",
-      "summary": "feat(ingest): Thai-gov PDF ingest wave — farmer margin, district drought, 2026Q1 LFS, BoT regional debt (obj #1)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-20T21:10:32+07:00",
-      "sha": "6f21fa1",
-      "summary": "ux: per-route browser-tab title in SPA showTab (#103)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-20T20:52:43+07:00",
-      "sha": "0151445",
-      "summary": "Merge pull request #93 from kaustavb2101/data/fuel-29708243885",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:39:46+07:00",
-      "sha": "3d9dbaf",
-      "summary": "Merge pull request #102 from kaustavb2101/claude/databook-lenses",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:36:22+07:00",
-      "sha": "5215821",
-      "summary": "data(provenance): regenerate on merged fuel tree under the WSL 3.11 mirror",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:34:43+07:00",
-      "sha": "288822d",
-      "summary": "merge master into fuel data branch (provenance regenerated next)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-20T20:29:04+07:00",
-      "sha": "7243ef9",
-      "summary": "Merge pull request #91 from kaustavb2101/data/nabc-29703830951",
-      "pillar": "data-integration"
     }
   ]
 }

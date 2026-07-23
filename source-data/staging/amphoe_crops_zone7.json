@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "zone": 7,
+    "zone_th": "สศท.7 (สำนักงานเศรษฐกิจการเกษตรที่ 7, ชัยนาท)",
+    "zone_hq_province": "ชัยนาท",
+    "zone_provinces_note": "Exact jurisdiction list not independently confirmed this session (a websearch for the official province list was inconclusive); news posts pulled during this sweep reference field work in ชัยนาท (HQ), สุพรรณบุรี, กำแพงเพชร, and พระนครศรีอยุธยา, but some of those were joint multi-zone studies (with สศท.4/11/12), so this is NOT asserted as zone7's definitive province list.",
+    "urls_checked": [
+      "https://zone7.oae.go.th/ (570KB home, re-grepped for .pdf hrefs and เอกภาพ mentions — found many unrelated procurement/wage-survey PDFs under wp-content/uploads, no crop-data page)",
+      "https://zone7.oae.go.th/%E0%B8%82%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%B9%E0%B8%A5%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%A0%E0%B8%B2%E0%B8%9E/ (zone6-style slug guess — 404)",
+      "https://zone7.oae.go.th/sitemap.xml, /wp-sitemap.xml (wp-sitemap-index)",
+      "https://zone7.oae.go.th/wp-sitemap-posts-page-1.xml (all 25 pages enumerated)",
+      "https://zone7.oae.go.th/wp-json/wp/v2/search?search=เอกภาพ (1 hit: a Jan-2025 committee-meeting news post about central-region crop data quality, no attached PDF)",
+      "https://zone7.oae.go.th/wp-json/wp/v2/search?search=อำเภอ (43 hits, all field-visit/meeting news posts, none a data-table page)",
+      "https://zone7.oae.go.th/wp-json/wp/v2/media?search=เอกภาพ (0 results)",
+      "https://zone7.oae.go.th/เอกสารเผยแพร่/ (publication documents — no crop-table PDFs, mostly procurement/HR reports)",
+      "https://zone7.oae.go.th/เอกสารวิจัย-และประเมินผล/ (research & evaluation docs — found 1 unrelated PDF: rice-straw supply-chain study, not amphoe crop-comparison data)",
+      "https://zone7.oae.go.th/ข้อมูลเศรษฐกิจการเกษตร/ (agricultural-economic-data page — only 1 PDF link, to a central shared oae.go.th/uploads/files/<hash>.pdf, not amphoe-level)",
+      "https://zone7.oae.go.th/dashboard/ (no PDF links found)",
+      "WebSearch: site:zone7.oae.go.th ข้อมูลเอกภาพ อำเภอ; filetype:pdf อำเภอ เนื้อที่เพาะปลูก ผลผลิต; exact zone6-style filenames (ข้าวนาปี-66-67.pdf etc.); \"ข้อมูลเอกภาพ\" wp-content uploads"
+    ],
+    "route": "NOT FOUND — no equivalent of Zone 6's 'ข้อมูลเอกภาพ' amphoe-comparison PDF page could be located on zone7.oae.go.th by any method tried.",
+    "findings": [
+      "The exact zone6-style URL slug /ข้อมูลเอกภาพ/ 404s on zone7.",
+      "The complete WordPress page inventory (wp-sitemap-posts-page-1.xml, 25 pages) contains no page with a title or slug resembling ข้อมูลเอกภาพ or a crop x อำเภอ comparison table.",
+      "wp-json search for 'เอกภาพ' surfaces exactly one hit — a news post ('สศท.7 จัดประชุมคณะทำงานพัฒนาคุณภาพข้อมูลปริมาณการผลิตสินค้าเกษตรด้านพืช ภาคกลาง ครั้งที่ 1/2568') about a Central-region committee meeting to develop unified crop-production data quality — i.e. the same standardization PROCESS zone11's news also describes, with no attached finished district-comparison PDF at the time of this sweep.",
+      "zone7 does actively publish native wp-content/uploads PDFs (unlike zone4, which centralizes on oae.go.th) — confirming the mechanism exists on this site — but none found relate to amphoe-level crop production."
+    ],
+    "conclusion": "Zone 7 does not appear to publish a public, amphoe-level 'ข้อมูลเอกภาพ' PDF series (or, if it exists, it is not linked from any page/sitemap/search-index this session could reach). No rows extracted — nothing to parse. No fabrication.",
+    "retrieved": "2026-07-20",
+    "parse_notes": []
+  },
+  "rows": []
+}

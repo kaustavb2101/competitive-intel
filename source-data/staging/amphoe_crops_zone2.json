@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "zone": 2,
+    "office_th": "สำนักงานเศรษฐกิจการเกษตรที่ 2",
+    "jurisdiction": "Lower North (ภาคเหนือตอนล่าง) per zone2.oae.go.th's own footer, per-province links",
+    "provinces_confirmed_live": [
+      "พิษณุโลก",
+      "สุโขทัย",
+      "ตาก",
+      "อุตรดิตถ์",
+      "แพร่",
+      "น่าน"
+    ],
+    "provinces_note": "Confirmed live from the 6 'สำนักงานเกษตรและสหกรณ์ จังหวัด...' links in zone2.oae.go.th's own homepage footer: Phitsanulok, Sukhothai, Tak, Uttaradit, Phrae, Nan. Note this CORRECTS an initial assumption (Phrae/Nan are zone 2, not zone 1; Phetchabun is NOT in zone 2's list despite being 'Lower North' geographically — it must sit in a different OAE zone, not verified this session).",
+    "result": "NOT FOUND — no district(amphoe)-level 'ข้อมูลเอกภาพ' crop-comparison PDFs (planted/harvested area, production, yield per อำเภอ per crop) were located on this zone's public website this session, despite the zone actively running the ข้อมูลเอกภาพ coordination process internally (see evidence below). This mirrors the OAE Zone 5 result from the prior Zone-6 ingest session (also NOT FOUND).",
+    "evidence_the_process_exists_but_isnt_published_here": [
+      "Multiple 'ข่าวประชาสัมพันธ์' (PR news) posts describe this office attending/co-hosting regional 'สัมมนาเชิงปฏิบัติการจัดทำข้อมูลเอกภาพ' (ข้อมูลเอกภาพ workshop) sessions for named crops and years, i.e. the same regional data-unification process that produced Zone 6's PDFs is run here too — the finished per-amphoe output just is not published as a downloadable file on this WordPress site."
+    ],
+    "routes_tried": [
+      "Direct URL guess using Zone 6's exact working slug (zoneN.oae.go.th/ข้อมูลเอกภาพ/ percent-encoded) -> HTTP 404 on zone1, zone2, zone3 (Zone 6's page does not exist at the same path on any of these three).",
+      "Homepage menu / nav scrape (raw HTML link extraction, not just the visible menu) -> no 'ข้อมูลเอกภาพ' or 'รายอำเภอ' entry point in the main nav on any of the 3 zones.",
+      "WordPress REST API (/wp-json/wp/v2/media?search=<crop or keyword>, /wp-json/wp/v2/pages?search=<keyword>) -> zone1: works, returns only RRA survey-methodology manuals for 'ภาวะการผลิต', zero hits for 13 crop-name keywords (ข้าวนาปี, ข้าวนาปรัง, ลำไย, กระเทียม, หอมแดง, ลิ้นจี่, มันสำปะหลัง, ข้าวโพด, ยางพารา, สับปะรด, ถั่วเหลือง, ระดับอำเภอ, จำแนกรายอำเภอ) and for 'เอกภาพ'. zone3: works, returns only procurement/administrative PDFs (budget reports, complaint logs, a photocopying-service tender for a 2,380-page 'เอกภาพ' committee meeting) for the same keyword set, no crop-comparison data product. zone2: /wp-json/ itself 404s (REST API disabled server-wide) -> could not be queried this way.",
+      "Recent-media listing (all PDFs uploaded since 2025-01-01, up to 300 items, newest first) -> zone1: only 1 item surfaced (an internal M&E flow-chart PDF); zone3: 96 items surfaced, entirely procurement notices, budget/complaint reports, and monthly province PRICE bulletins (ราคารายเดือน) - no production/area/yield-by-district tables. Confirms these zones' recent public uploads skew administrative, not crop-statistics publications.",
+      "Front-end WordPress search (?s=<keyword>, raw HTML, not AI-summarized) for เอกภาพ / รายอำเภอ / ข้าวนาปี / ภาวะการผลิต -> zone1 & zone3: only found NEWS-CATEGORY posts describing attendance at regional 'ข้อมูลเอกภาพ' coordination MEETINGS (no attached finished PDF); zone2: same pattern, ~9-10 meeting-announcement posts per keyword (attending / co-hosting เอกภาพ workshops for ข้าวนาปี, ทุเรียน เงาะ ลองกอง ลำไย ลิ้นจี่ สับปะรด, มันสำปะหลัง/ข้าวนาปรัง, ยางพารา, etc across 2568/2568-69) but the posts describe the MEETING, they do not embed or link the resulting per-amphoe table.",
+      "Opened representative individual meeting-news posts directly (9 zone2 posts, 1 zone1 post) and regex-scanned the full HTML body for embedded .pdf hrefs and drive.google.com links -> every drive.google.com link found was the SAME site-wide footer boilerplate (ITA / anti-corruption / annual-budget folders), not a per-crop or per-meeting data folder; zero .pdf hrefs inside the post bodies themselves.",
+      "Zones' own e-book bookcases on AnyFlip (zone1: anyflip.com/bookcase/fabxs/ via its 'ห้องสมุดดิจิทัล' page; zone2: anyflip.com/bookcase/ylami via its 'ห้องสมุดออนไลน์'/'อีบุ๊ก สศท.2' link) -> scraped each bookcase's embedded book-title list (21 titles zone1, 60+ titles zone2). Titles are national/provincial-level publications (สถิติการเกษตรของประเทศไทย, ตัวชี้วัดเศรษฐกิจการเกษตร, KM knowledge-sharing decks, provincial fruit-tree/production reports). None of the titles contain 'อำเภอ' or 'เอกภาพ' or read as a district-comparison table product; zone3 has no AnyFlip bookcase link found on its site at all.",
+      "Zone-specific dashboard/data pages (zone3's 'Dashboard ร้อยละการกระจายของผลผลิต', zone2's 'แดชบอร์ดสินค้าเกษตรที่สำคัญ', zone1's 'Dashboard ข้อมูลเศรษฐกิจการเกษตร'/'Dashboard-ไม้ผล') -> zone3's page linked 2 PDFs, both hosted on the CENTRAL oae.go.th domain (not zone3), generic methodology documents, not amphoe data; the others are JS/Power-BI embeds, not inspected further (out of scope: interactive dashboards are not the requested PDF format and would need a browser-automation pass)."
+    ],
+    "followup_leads": [
+      "zone3.oae.go.th homepage links a 'Big Data ระดับจังหวัด' item -> https://bigdataprovince.nabc.go.th — a NABC (reachable domain per project's hard-constraints list) provincial big-data portal. It is a JS/Angular single-page app (title 'Big Data จังหวัด'), not a static page, so it could not be scraped with plain requests this session. Worth a Playwright pass in a follow-up session — NABC covers all provinces, not just one zone, so if it exposes amphoe-level crop tables it could supersede the whole zone-by-zone approach.",
+      "zone3.oae.go.th also links two province-specific Looker Studio dashboards ('ข้อมูลสารสนเทศ จ.หนองบัวลำภู', 'ข้อมูลสารสนเทศ จ.อุดรธานี') at lookerstudio.google.com — not fetched (Looker Studio requires a real browser session to render; out of scope this session) but plausibly has interactive district breakdowns worth a Playwright check.",
+      "Zone 5 (Nakhon Ratchasima / Lower Isan) was checked in the prior Zone-6 session with the same negative result as zones 1-3 here. That is now 4 of the 12 OAE zones (1, 2, 3, 5) confirmed NOT to publish Zone-6-style public per-amphoe PDFs; only Zone 6 does. A quick pass over the remaining zones (4, 7-12) would establish whether Zone 6 is a genuine outlier or whether some of the others also publish and just weren't discoverable with this session's search vocabulary.",
+      "production.doae.go.th (Route A, per the Zone-6 report) remains the only system that could in principle serve true any-crop/any-province/any-amphoe data on demand, but it stayed login-gated this session too (not re-tested, no credentials attempted)."
+    ],
+    "retrieved": "2026-07-20",
+    "no_fabrication_note": "No rows are included. Zero PDFs matching the Zone-6 pattern (or any amphoe-level crop-comparison table) were found after exhausting the routes above; rather than fabricate or force-fit unrelated PDFs (procurement notices, price bulletins, methodology manuals, meeting-attendance news) into the row schema, this shard is left empty and the negative result is documented in full so a future session does not have to repeat the same search."
+  },
+  "rows": []
+}
