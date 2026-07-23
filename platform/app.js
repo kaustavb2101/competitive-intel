@@ -3632,8 +3632,32 @@ function ampCSV(){
    Book proxy = branch count (we have no per-branch ฿ balance), labelled honestly.
    Uses branch fields already present: r (region), rain (drought proxy), a/m/c risk proxies,
    and the region's weakest-crop YoY from the commodity board. */
+function renderExposureTape(){
+  const wrap=$('#expo-tape'); if(!wrap) return;
+  if(!TAPE){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  const ltv=$('#expo-tape-ltv'), occ=$('#expo-tape-occ');
+  if(ltv&&TAPE.ltv_ladder){
+    const rows=Object.entries(TAPE.ltv_ladder).sort((a,b)=>a[0].localeCompare(b[0]));
+    const worst=Math.max(...rows.map(([,v])=>v.dpd30p_pct));
+    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts currently 30+ days past due">30+dpd</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
+        <td class="mono" style="color:${v.dpd30p_pct>=35?'var(--agri)':v.dpd30p_pct>=25?'var(--gold)':'var(--merch)'}">${barHTML(v.dpd30p_pct,'var(--agri)',worst)} <b>${v.dpd30p_pct}%</b></td>
+        <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
+  }
+  if(occ&&TAPE.occupations){
+    const rows=Object.entries(TAPE.occupations).filter(([k])=>k!=='(blank)').sort((a,b)=>b[1].n-a[1].n);
+    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>30+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
+        <td class="mono" style="color:${v.dpd30p_pct>=28?'var(--agri)':'var(--dim)'}"><b>${v.dpd30p_pct}%</b></td>
+        <td class="mono sub">${v.early_pct}%</td>
+        <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
+        <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
+  }
+}
 function renderExposure(){
   if(!DATA||!$('#expocards')||!$('#expotbl')) return;
+  loadTapeReal().then(renderExposureTape);
   const N=DATA.length;
   const pctS=n=>(100*n/N).toFixed(1)+'%';
   // 1) stressed-crop exposure: branches whose region's weakest crop is in price stress (YoY < -10%)
@@ -4400,7 +4424,36 @@ async function renderVintageDigest(){
     ? 'Findings appear automatically once a second vintage is snapshotted.'
     : 'Every figure is read from deltas.json (the snapshot diff). Region/branch proxies are ESTIMATED; the commodity board is measured/editorial price direction (World Bank).';
 }
+function renderTrendTape(){
+  const wrap=$('#trend-tape'); if(!wrap) return;
+  if(!TAPE){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  const vt=$('#trend-tape-vint'), au=$('#trend-tape-audit');
+  if(vt&&TAPE.vintage_curve){
+    // rows are "YYYY|MMa-MMbm" months-on-book bands; show year totals at comparable young bands
+    const byYear={};
+    Object.entries(TAPE.vintage_curve).forEach(([k,v])=>{
+      const [yr,band]=k.split('|'); (byYear[yr]=byYear[yr]||[]).push({band,...v});
+    });
+    const years=Object.keys(byYear).sort();
+    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th>30+dpd</th></tr>`+
+      years.map(yr=>byYear[yr].sort((a,b)=>a.band.localeCompare(b.band)).map((r,i)=>`<tr>
+        <td class="mono">${i===0?`<b>${yr}</b>`:''}</td><td class="mono sub">${r.band}</td>
+        <td class="mono sub">${r.n.toLocaleString()}</td>
+        <td class="mono" style="color:${r.dpd30p_pct>=28?'var(--agri)':r.dpd30p_pct>=20?'var(--gold)':'var(--merch)'}"><b>${r.dpd30p_pct}%</b></td>
+      </tr>`).join('')).join('');
+  }
+  if(au&&TAPE.branch_audit){
+    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th>30+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
+      TAPE.branch_audit.map((b,i)=>`<tr><td class="mono sub">${i+1}</td><td>${b.branch}</td>
+        <td class="mono sub">${b.n}</td>
+        <td class="mono" style="color:var(--agri)"><b>${b.dpd30p_pct}%</b></td>
+        <td class="mono sub">${b.early_pct}%</td>
+        <td class="mono sub">${b.fpd_pct}%</td></tr>`).join('');
+  }
+}
 async function renderTrend(){
+  loadTapeReal().then(renderTrendTape);
   renderCreditAnchor();
   renderVintageDigest();
   renderPeerOutliers();
@@ -6111,6 +6164,42 @@ function renderHomeDefend(){
   `<div class="sub" style="margin-top:6px;color:var(--dim)">Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. Full detail → Competition.</div>`;
   wrap.style.display='';
 }
+/* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
+   data/tape_real.json (build_tape_layers.py ← ingest_real_tape.py no-PII aggregates).
+   Card is hidden entirely when the layer is absent — calm, never fabricated. */
+let TAPE=null, tapePromise=null;
+function loadTapeReal(){
+  if(tapePromise) return tapePromise;
+  tapePromise=(async()=>{
+    try{
+      const r=await fetch('data/tape_real.json'); if(!r.ok) throw 0;
+      const j=await r.json();
+      TAPE=(j&&Array.isArray(j.assistance_radar))?j:null;
+    }catch(e){ TAPE=null; }
+  })();
+  return tapePromise;
+}
+function renderHomeTape(){
+  const card=$('#cc-tape'), body=$('#cc-tape-body');
+  if(!card||!body) return;
+  if(!TAPE||!TAPE.assistance_radar.length){ card.style.display='none'; return; }
+  card.style.display='';
+  const rows=TAPE.assistance_radar.slice(0,5);
+  body.innerHTML=
+    `<table class="tbl"><tr><th>Province</th>
+      <th title="X-days bucket: late but under 30dpd — assistance still works. Call this week.">Tier 1 · slipping</th>
+      <th title="Current accounts in the same stressed cell — fine today, measured stressor overhead.">Tier 2 · watch</th>
+      <th title="share of the province's districts at severe/extreme OAE SPEI">Drought</th>
+      <th>What they grow (stressed districts)</th></tr>`+
+    rows.map(r=>`<tr>
+      <td><b>${r.province}</b> <span class="sub mono">${r.n_farmers.toLocaleString()} farmers</span></td>
+      <td class="mono" style="color:var(--gold)"><b>${r.tier1_slipping.toLocaleString()}</b></td>
+      <td class="mono">${r.tier2_current_exposed.toLocaleString()}</td>
+      <td class="mono" style="color:${r.districts_severe_pct>=60?'var(--agri)':'var(--dim)'}">${r.districts_severe_pct}% <span class="sub">SPEI ${r.worst_spei}</span></td>
+      <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td>
+    </tr>`).join('')+`</table>`+
+    `<div class="sub" style="margin-top:6px;font-size:11px">${TAPE.meta.n_accounts.toLocaleString()} real accounts (no-PII aggregates, cells ≥30) · branch-join ${TAPE.meta.branch_join_pct}% · trigger: drought FIRING, crop-margin & fuel armed · ranking order ESTIMATED over MEASURED inputs</div>`;
+}
 function renderHome(){
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
@@ -6152,6 +6241,8 @@ function renderHome(){
     loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
     // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
     loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
+    // obj#1 — REAL loan-tape assistance radar (pre-emptive help targeting); calm when absent.
+    loadTapeReal().then(()=>{ if(onHome()) renderHomeTape(); });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);

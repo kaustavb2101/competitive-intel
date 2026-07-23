@@ -131,6 +131,15 @@
         <div class="cc-card-b" id="cc-queue-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
+      <!-- ASSISTANCE RADAR — REAL loan tape × OAE drought: who to help pre-emptively, where.
+           Tier 1 = X-days (slipping, <30dpd — call this week); Tier 2 = current-but-exposed.
+           Hidden entirely (calm) when data/tape_real.json is absent. -->
+      <div class="cc-card cc-card-wide" id="cc-tape" style="display:none">
+        <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>Assistance radar — pre-emptive help, by province
+          <span class="cc-link sub no-print">MEASURED real loan tape × OAE district drought · Tier 1 slipping / Tier 2 current-but-exposed</span></div>
+        <div class="cc-card-b" id="cc-tape-body"></div>
+      </div>
+
       <!-- COMPETITIVE PRESSURE -->
       <div class="cc-card" id="cc-whitespace">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Competitive pressure
@@ -568,6 +577,22 @@
     <h2 class="risk">Portfolio exposure · concentration read</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
 
+    <!-- REAL TAPE — measured portfolio truth (data/tape_real.json; hidden when absent) -->
+    <div id="expo-tape" style="display:none">
+      <h2 class="risk">The real book · measured <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
+      <p class="lead">No-PII aggregates from the real loan-level export (cells ≥30 accounts; raw stays owner-side). This section is loan-book truth, not a footprint proxy.</p>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">LTV at origination → delinquency</h3>
+          <table class="tbl" id="expo-tape-ltv"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Occupation → delinquency &amp; return</h3>
+          <table class="tbl" id="expo-tape-occ"></table>
+        </div>
+      </div>
+    </div>
+
     <!-- 2-col dashboard: KPI / region strip BESIDE the lead provinces table (fills the widescreen). -->
     <div class="dash2">
       <div class="dash2-side">
@@ -678,6 +703,23 @@
     <p class="lead">Compares the latest data vintage against the previous one. Region cards and branch movers
       use the <b>estimated agri-PD / merchant / collateral proxies</b> (OSM/price-based, 0–100) — not measured
       defaults. The commodity board is <b>editorial/measured price direction</b> (World Bank). <span id="trendvint" class="sub"></span></p>
+
+    <!-- REAL TAPE — vintage deterioration + branch audit list (data/tape_real.json; hidden when absent) -->
+    <div id="trend-tape" style="display:none">
+      <h2 class="risk" style="margin-top:6px">The real book over time · vintage read <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Disbursement year → 30+dpd today</h3>
+          <p class="lead" style="font-size:12px">Same-age comparison matters: young vintages look better only because they're young. Bands are months-on-book at the data's own anchor.</p>
+          <table class="tbl" id="trend-tape-vint"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Branch audit list · worst 30+dpd (≥100 accounts)</h3>
+          <p class="lead" style="font-size:12px">"Risky branch" ≠ "risky market" — these are the branches whose book underperforms; cross-read with the peer-twin lens before acting.</p>
+          <table class="tbl" id="trend-tape-audit"></table>
+        </div>
+      </div>
+    </div>
 
     <!-- MEASURED CREDIT ANCHOR — the real BoT NPL scale + household-debt backdrop the ESTIMATED
          0-100 branch-risk composite is read against (pipeline/build_credit_anchor.py →
