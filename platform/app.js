@@ -6367,7 +6367,79 @@ function renderHomeTape(){
     </tr>`).join('')+`</table>`+
     `<div class="sub" style="margin-top:6px;font-size:11px">${TAPE.meta.n_accounts.toLocaleString()} real accounts (no-PII aggregates, cells ≥30) · branch-join ${TAPE.meta.branch_join_pct}% · trigger: drought FIRING, crop-margin & fuel armed · ranking order ESTIMATED over MEASURED inputs</div>`;
 }
+/* FIVE-PILLAR SUMMARY BAND (owner IA 2026-07-24) — the platform's whole job on one row:
+   ① Macro ② Acquisition ③ Assistance ④ Risk ⑤ Competitor. Each card leads with ONE headline
+   metric from the committed layers and links to that pillar's detail. Every card is null-safe:
+   if its source layer isn't loaded yet it degrades to a calm pointer, never a blank or a lie.
+   Re-rendered as TAPE / competitor layers resolve. */
+function pillCard(num,name,pc,tab,big,read,foot){
+  return `<a class="pill" style="--pc:${pc}" data-v="${tab}" href="#${tab}">
+    <span class="pill-eyebrow"><span class="pill-num">${num}</span><span class="pill-name">${name}</span></span>
+    <span class="pill-big">${big||'<small>loading…</small>'}</span>
+    <span class="pill-read">${read||''}</span>
+    <span class="pill-foot">${foot||''} →</span></a>`;
+}
+function renderHomePillars(){
+  const host=$('#cc-pillars'); if(!host) return;
+  const T=TAPE, bn=n=>'฿'+(n/1e9).toFixed(1)+'bn', N=n=>Number(n).toLocaleString();
+  const cards=[];
+
+  // ① MACRO — the backdrop moving the book. Prefer live fuel + rate-cap; else a calm pointer.
+  let mBig='Macro board', mRead='Rate cap, commodities, FX &amp; fuel — the forces on the book.';
+  if(typeof FUEL!=='undefined'&&FUEL&&FUEL.headline&&FUEL.headline.diesel!=null){
+    mBig='฿'+Number(FUEL.headline.diesel).toFixed(2)+'<small>/L diesel</small>';
+    mRead='Diesel (pickup/farm borrowers), commodity board &amp; the BoT rate-cap — the macro forces on collateral values and PD.'; }
+  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Overview'));
+
+  // ② ACQUISITION — the collateral book &amp; where it concentrates (measured tape).
+  if(T&&T.collateral&&T.bucket_ladder){
+    const eco=(T.collateral.economics_by_type||[]).slice();
+    const top=eco[0], na=T.meta.n_accounts||0;
+    const share=top&&na?Math.round(top.n*100/na):null;
+    const bc=(T.collateral.branch_brand_concentration||[])[0];
+    const book=T.bucket_ladder.book_total?T.bucket_ladder.book_total.os_sum:null;
+    cards.push(pillCard(2,'Acquisition','var(--opp)','map',
+      book?bn(book)+'<small> book</small>':(top?N(top.n)+'<small> '+top.type+'</small>':''),
+      (top?`<b>${top.type}</b> ${share}% of accounts · `:'')+
+      (bc?`densest branch book: <b>${bc.branch.replace('สาขา','')}</b> ${N(bc.n)} ${bc.brand}`:'collateral concentration by branch, brand &amp; age'),
+      'National map'));
+  } else cards.push(pillCard(2,'Acquisition','var(--opp)','map','','Where the book concentrates — collateral type, brand &amp; age by branch.','National map'));
+
+  // ③ ASSISTANCE — the pre-emptive window &amp; who needs help now (measured tape).
+  if(T&&T.bucket_ladder){
+    const x=T.bucket_ladder.live_book.xdays_n;
+    const r0=(T.assistance_radar||[])[0];
+    const pe=((T.restructuring&&T.restructuring.by_status)||[]).find(s=>s.status==='Pre-emptive');
+    cards.push(pillCard(3,'Assistance','var(--agri)','exposure',
+      N(x)+'<small> in X-days</small>',
+      `Pre-emptive window (late &lt;30dpd). `+
+      (r0?`Radar #1: <b>${r0.province}</b>. `:'')+
+      (pe?`<b>${N(pe.n)}</b> already pre-emptively restructured (${pe.dpd90p_pct}% at 90+).`:''),
+      'Assistance radar'));
+  } else cards.push(pillCard(3,'Assistance','var(--agri)','exposure','','Who to help pre-emptively, before they roll — by segment &amp; province.','Assistance radar'));
+
+  // ④ RISK — the live-book NPL &amp; the 180+ legacy stock, held separately (measured tape).
+  if(T&&T.bucket_ladder){
+    const lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus;
+    cards.push(pillCard(4,'Risk','var(--collat)','trend',
+      lb.npl_live_pct+'%<small> NPL-live</small>',
+      `90–179dpd on the live book (${lb.npl_live_os_pct}% OS-weighted). Held apart: a <b>${bn(lg.os_sum)}</b> / ${N(lg.n)}-acct 180+ legacy workout stock.`,
+      'Risk trend'));
+  } else cards.push(pillCard(4,'Risk','var(--collat)','trend','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk trend'));
+
+  // ⑤ COMPETITOR — rival pressure on the network we run (measured peer census, lazy).
+  let cBig='', cRead='Where rivals outnumber the network — density, contested ground &amp; pulse.';
+  if(typeof PEERPROV!=='undefined'&&PEERPROV&&Array.isArray(PEERPROV.provinces)){
+    const distOut=PEERPROV.provinces.reduce((s,p)=>s+(p&&p.n_outnumbered_districts||0),0);
+    if(distOut){ cBig=N(distOut)+'<small> districts</small>';
+      cRead='where the big-4 out-number the existing network (measured per-district rival density).'; }
+  }
+  cards.push(pillCard(5,'Competitor','var(--merch)','acq',cBig,cRead,'Competition'));
+
+  host.innerHTML=cards.join('');
+}
 function renderHome(){
+  renderHomePillars();      // the 5-pillar summary band (null-safe; re-rendered as layers load)
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
   renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
@@ -6406,10 +6478,10 @@ function renderHome(){
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — lowest-paid occupation nationally into the risk card (null-safe, mirrors Exposure).
     loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
-    // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
-    loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
-    // obj#1 — REAL loan-tape assistance radar (pre-emptive help targeting); calm when absent.
-    loadTapeReal().then(()=>{ if(onHome()) renderHomeTape(); });
+    // live fuel prices (Bangchak daily pull) into the macro card + pillar band — null-safe.
+    loadFuelPrices().then(()=>{ if(onHome()){ renderHomeMacro(); renderHomePillars(); } });
+    // obj#1 — REAL loan-tape assistance radar (pre-emptive help targeting) + pillar band; calm when absent.
+    loadTapeReal().then(()=>{ if(onHome()){ renderHomeTape(); renderHomePillars(); } });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
@@ -6421,7 +6493,7 @@ function renderHome(){
     loadContestedPop().then(reHome);
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
-    loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    loadPeerProvince().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomePillars(); } });
     // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
     // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });
