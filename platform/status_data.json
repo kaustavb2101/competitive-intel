@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-24T20:21:26Z",
-    "commit": "b3130e0"
+    "generated_at": "2026-07-25T05:36:19+07:00",
+    "commit": "bf0f5f6"
   },
   "overall": {
     "progress_pct": 94,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-25",
+    "eta_date": "2026-07-26",
     "done_items": 47,
     "in_progress_items": 2,
     "open_items": 1,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-24T20:21:26Z",
+      "date": "2026-07-25T05:36:19+07:00",
+      "sha": "bf0f5f6",
+      "summary": "fix(service): recover the listed-peer SET scoreboard's dropped freshness vintage in the Data-room card (#152)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-24T22:15:27+00:00",
+      "sha": "815b816",
+      "summary": "committee: refresh autonomy plan (run 30130101555)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-24T20:21:26+00:00",
       "sha": "b3130e0",
       "summary": "docs: log the ux-cc-hero-card-narrow-overflow merge+deploy+verify (#150)",
       "pillar": "uxui"
@@ -510,7 +522,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T16:46:35Z",
+      "date": "2026-07-24T16:46:35+00:00",
       "sha": "8a4a624",
       "summary": "docs: log the drought-vintage service fix (#145) + refresh autonomy plan / CEO dashboard",
       "pillar": "feature"
@@ -528,7 +540,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T14:49:19Z",
+      "date": "2026-07-24T14:49:19+00:00",
       "sha": "3d3e8b8",
       "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -540,19 +552,19 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-24T12:29:08Z",
+      "date": "2026-07-24T12:29:08+00:00",
       "sha": "38cf88a",
       "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T11:12:37Z",
+      "date": "2026-07-24T11:12:37+00:00",
       "sha": "ca42d29",
       "summary": "committee: refresh autonomy plan (run 30088421749)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-24T10:27:38Z",
+      "date": "2026-07-24T10:27:38+00:00",
       "sha": "0c90e4e",
       "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
       "pillar": "deployment"
@@ -564,7 +576,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-24T08:15:57Z",
+      "date": "2026-07-24T08:15:57+00:00",
       "sha": "2322170",
       "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -588,7 +600,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T02:18:21Z",
+      "date": "2026-07-24T02:18:21+00:00",
       "sha": "7616550",
       "summary": "docs: log ux-cc-jumplink-href merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -624,7 +636,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-23T22:21:01Z",
+      "date": "2026-07-23T22:21:01+00:00",
       "sha": "fccc9d0",
       "summary": "committee: refresh autonomy plan after truck-flow ship (2026-07-23)",
       "pillar": "deployment"
@@ -636,28 +648,16 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-23T22:14:59Z",
+      "date": "2026-07-23T22:14:59+00:00",
       "sha": "a0136e7",
       "summary": "committee: refresh autonomy plan (run 30048841499)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T20:23:03Z",
+      "date": "2026-07-23T20:23:03+00:00",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T03:18:14+07:00",
-      "sha": "f58668c",
-      "summary": "ux: sim sliders announce their formatted value to screen readers (aria-valuetext) (#129)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T00:16:56+07:00",
-      "sha": "52dfcd3",
-      "summary": "data(provenance): regenerate on the healed master tree (farmgate chain + density refresh) under the WSL 3.11 mirror",
-      "pillar": "data-integration"
     }
   ]
 }
