@@ -1213,7 +1213,7 @@ function wrapTables(){
 // Per-route browser-tab titles: without these all hash routes share one <title>, so history
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
-const TAB_TITLES={home:'Command center',overview:'Overview',map:'National map',trend:'Risk trend',acq:'Competition',exposure:'Exposure',sim:'Simulator',provinces:'Provinces',market:'Market',branches:'Branches'};
+const TAB_TITLES={home:'Command center',overview:'Macro',map:'Acquisition',assist:'Assistance',exposure:'Risk',acq:'Competition',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
