@@ -616,6 +616,30 @@ html[data-theme="light"] .bchip{background:linear-gradient(180deg,#ffffff,#f3f6f
 @media(min-width:1000px){.cc-grid{grid-template-columns:1fr 1fr}}
 .cc-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
 .cc-card-wide{grid-column:1/-1}
+/* FIVE-PILLAR SUMMARY BAND (owner IA 2026-07-24). Data-book look: a row of numbered pillar
+   cards, each led by ONE big mono metric. Collapses 5->2->1 columns. Each card carries a top
+   accent hairline in its pillar colour so the journey reads left-to-right at a glance. */
+.cc-pillars{display:grid;gap:10px;grid-template-columns:repeat(5,1fr);margin:14px 0 4px}
+@media(max-width:1100px){.cc-pillars{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.cc-pillars{grid-template-columns:1fr}}
+.cc-pillars:empty{display:none}
+.pill{position:relative;display:flex;flex-direction:column;gap:5px;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:12px 13px 11px;overflow:hidden;
+  text-decoration:none;color:inherit;transition:border-color .12s,transform .12s}
+.pill::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--pc,var(--accent))}
+.pill:hover{border-color:var(--pc,var(--accent));transform:translateY(-1px)}
+.pill:focus-visible{outline:2px solid var(--pc,var(--accent));outline-offset:2px}
+.pill-eyebrow{display:flex;align-items:center;gap:7px;font:700 10px var(--sans);text-transform:uppercase;
+  letter-spacing:.6px;color:var(--dim)}
+.pill-num{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+  background:var(--pc,var(--accent));color:#0a0e17;font:700 10px var(--mono);flex:none}
+.pill-name{color:var(--hi)}
+.pill-big{font:700 21px/1.05 var(--mono);color:var(--hi);letter-spacing:-.3px;margin-top:1px;font-variant-numeric:tabular-nums}
+.pill-big small{font-size:12px;color:var(--mid);font-weight:600}
+.pill-read{font-size:11.5px;line-height:1.45;color:var(--mid);flex:1}
+.pill-read b{color:var(--txt);font-weight:600}
+.pill-foot{font-size:10.5px;color:var(--pc,var(--accent));font-weight:600;letter-spacing:.2px;margin-top:2px}
+html[data-theme="light"] .pill-num{color:#fff}
 .cc-card-h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--hi);
   text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--line2)}
 .cc-dot{width:8px;height:8px;border-radius:50%;flex:none}

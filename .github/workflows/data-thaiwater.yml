@@ -1,0 +1,102 @@
+name: Data — ThaiWater live flood + rain pulse (daily)
+
+# Refreshes the two LIVE ThaiWater telemetry layers the platform serves directly:
+#   platform/data/thaiwater_flood.json  (pipeline/pull_thaiwater_flood.py) — per-province river/
+#     reservoir water-LEVEL pulse (situation_level 1→5; ≥4 = high water / bank overflow).
+#   platform/data/thaiwater_rain.json   (pipeline/pull_thaiwater_rain.py)  — per-province 24h
+#     RAINFALL pulse (heavy ≥35.1mm, very heavy ≥90.1mm/24h).
+#
+# WHY THIS EXISTS: both pullers hit api-v3.thaiwater.net — keyless and REACHABLE from GitHub-hosted
+# runners (verified HTTP 200), unlike the data.go.th / DLT family that Cloudflare-geoblocks datacenter
+# IPs. They are the acute objective-#1 counterpart to the slower crop-stress drought read: water on the
+# ground / arriving is an immediate collections + collateral event, days before it shows in any monthly
+# series. Every OTHER live-pull layer here already has a data-*.yml refresh job; ThaiWater was the gap —
+# so its snapshots went stale (13+ days) and could not be surfaced honestly as a "live" pulse. This job
+# closes that: it keeps both layers fresh so a daily-changing telemetry card stays truthful.
+#
+# These layers are LIVE snapshots — NOT in the determinism gate (same class as the NABC / macro pulls).
+# But both ARE tracked in platform/data/provenance.json (build_provenance.py globs every data file), so a
+# refresh MUST rebuild provenance.json in lockstep or the gate goes red on merge. No downstream builder
+# consumes them, so nothing else needs rebuilding.
+#
+# Committed to a fresh data/thaiwater-<run_id> branch and opened as a DRAFT PR back to the branch this
+# ran on (cron uses the default branch). NEVER pushes to a working branch — can't race a session.
+# No-ops cleanly when the upstream telemetry is byte-identical to what is committed.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Daily, 21:20 UTC (= 04:20 Bangkok) — off-minute, clear of the other data-*.yml crons.
+    - cron: "20 21 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Pull ThaiWater live flood + rain pulse
+        run: |
+          # --stamp = pull date for provenance; the scripts embed no wall clock, so byte-identical
+          # upstream telemetry reproduces byte-stable. Each puller sys.exit()s (non-zero) if the
+          # station list looks truncated, so a partial fetch fails the job instead of writing garbage.
+          python pipeline/pull_thaiwater_flood.py --stamp "$(date -u +%F)"
+          python pipeline/pull_thaiwater_rain.py  --stamp "$(date -u +%F)"
+
+      - name: Rebuild provenance when the telemetry changed
+        run: |
+          # Both layers are tracked in provenance.json — if either changed, provenance.json must be
+          # regenerated in the same commit or the determinism gate goes red on merge. No downstream
+          # builder consumes these two layers, so provenance is the only rebuild needed.
+          if git status --porcelain -- platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json | grep -q .; then
+            echo "telemetry changed — rebuilding provenance"
+            python pipeline/build_provenance.py
+          else
+            echo "telemetry unchanged — nothing to rebuild."
+          fi
+
+      - name: Commit to a data branch + open a draft PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/thaiwater-${{ github.run_id }}
+        run: |
+          git add platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json \
+                  platform/data/provenance.json
+          if git diff --cached --quiet; then
+            echo "No change vs committed telemetry. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          STAMP="$(python -c "import json;print(json.load(open('platform/data/thaiwater_flood.json'))['meta'].get('pulled') or 'n/a')")"
+          FLOOD="$(python -c "import json;d=json.load(open('platform/data/thaiwater_flood.json'));p=d['provinces'];w=sorted(p.items(),key=lambda x:(-x[1]['max_level'],-x[1]['pct_high']))[:3];print(', '.join('%s L%d (%d/%d high)'%(k,v['max_level'],v['n_high'],v['n_stations']) for k,v in w))")"
+          RAIN="$(python -c "import json;d=json.load(open('platform/data/thaiwater_rain.json'));p=d['provinces'];w=sorted(p.items(),key=lambda x:-x[1]['max_mm'])[:3];print(', '.join('%s %.0fmm'%(k,v['max_mm']) for k,v in w))")"
+          git commit -m "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-thaiwater.yml via pull_thaiwater_flood.py + pull_thaiwater_rain.py — LIVE keyless ThaiWater telemetry (api-v3.thaiwater.net). provenance.json rebuilt in lockstep."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated daily ThaiWater live-telemetry pull (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "**Worst flood (water level):** $FLOOD"
+            echo "**Wettest (24h rain):** $RAIN"
+            echo
+            echo "Provenance: MEASURED — live per-province water-level + 24h-rainfall station aggregates"
+            echo "(ThaiWater RID/DWR/TMD/EGAT networks, keyless). These are LIVE snapshots (not in the"
+            echo "determinism gate); provenance.json is rebuilt in lockstep so the gate stays green on merge."
+            echo "Nothing fabricated. Run \`bash tests/run.sh check\` after merge."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md

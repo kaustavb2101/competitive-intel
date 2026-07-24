@@ -22,22 +22,24 @@
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
-  <!-- Nav order = the exec storyline (the "two-risk spine"): the answer -> the backdrop -> your two
-       risks (portfolio: Exposure, Trend | competitive: Competition) -> explore. The .nav-sep spans
-       chunk it into frame | risks | explore; routing is by data-v (order-independent), so the
-       sequence is purely narrative. -->
+  <!-- Nav = the FIVE-PILLAR journey (owner IA 2026-07-24): Home + Data book, then the pillars in
+       order — ① Macro (backdrop) → ② Acquisition (network & collateral concentration) →
+       ③ Assistance (who needs help now) → ④ Risk (portfolio stress, live book vs 180+ legacy) →
+       ⑤ Competitor (rival pressure). Routing is by data-v (order-independent); the sequence is the
+       narrative. Risk-trend / Provinces / Market / Branches / Simulator live under More. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <a href="data.html">Data book</a>
-  <a data-v="overview" href="#overview">Overview</a>
   <span class="nav-sep" aria-hidden="true"></span>
-  <a data-v="exposure" href="#exposure" title="Portfolio risk (objective #1) — where the book sits in stress">Exposure</a>
-  <a data-v="trend" href="#trend" title="Portfolio risk (objective #1) — what is getting riskier over time">Trend</a>
-  <a data-v="acq" href="#acq" title="Competitive risk (objective #2) — rival pressure on the network we already run">Competition</a>
+  <a data-v="overview" href="#overview" title="① Macro — the backdrop moving the book (rates, commodities, fuel, collateral outlook)">Macro</a>
+  <a data-v="map" href="#map" title="② Acquisition — the network & where the collateral book concentrates">Acquisition</a>
+  <a data-v="assist" href="#assist" title="③ Assistance — which segments are hit most & need pre-emptive help">Assistance</a>
+  <a data-v="exposure" href="#exposure" title="④ Risk — where the book sits in stress: live book vs the 180+ legacy stock">Risk</a>
+  <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
   <span class="nav-sep" aria-hidden="true"></span>
-  <a data-v="map" href="#map">National</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a data-v="trend" href="#trend" role="menuitem">Risk trend</a>
       <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
       <a data-v="market" href="#market" role="menuitem">Market</a>
       <a data-v="branches" href="#branches" role="menuitem">Branches</a>
@@ -120,6 +122,12 @@
     <!-- QW5: the verdict, in plain language — big hero statements generated from the loaded data. -->
     <div class="cc-hero" id="cc-hero" aria-live="polite"></div>
 
+    <!-- FIVE-PILLAR SUMMARY BAND (owner IA 2026-07-24): the platform's whole job on one row —
+         ① Macro ② Acquisition ③ Assistance ④ Risk ⑤ Competitor. Each card carries ONE headline
+         metric from the committed layers + a jump to that pillar's detail. Data-book look.
+         Rendered by renderHomePillars(); null-safe (a card degrades to a calm pointer). -->
+    <div class="cc-pillars" id="cc-pillars" aria-label="The five intelligence pillars"></div>
+
     <div class="cc-grid">
       <!-- THIS WEEK — DO THESE FIRST (exec decision queue, data/decision_queue.json).
            Ranked weekly actions synthesized from committed layers only; each row carries its
@@ -143,28 +151,28 @@
       <!-- COMPETITIVE PRESSURE -->
       <div class="cc-card" id="cc-whitespace">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--gold)"></span>Competitive pressure
-          <a class="cc-link no-print" data-v="acq">Competition →</a></div>
+          <a class="cc-link no-print" data-v="acq" href="#acq">Competition →</a></div>
         <div class="cc-card-b" id="cc-ws-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- WHAT IS GETTING RISKIER -->
       <div class="cc-card" id="cc-risk">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>What is getting riskier
-          <a class="cc-link no-print" data-v="exposure">Exposure →</a></div>
+          <a class="cc-link no-print" data-v="exposure" href="#exposure">Exposure →</a></div>
         <div class="cc-card-b" id="cc-risk-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- MACRO / REGULATORY -->
       <div class="cc-card" id="cc-macro">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Macro &amp; regulatory
-          <a class="cc-link no-print" data-v="overview">Overview →</a></div>
+          <a class="cc-link no-print" data-v="overview" href="#overview">Overview →</a></div>
         <div class="cc-card-b" id="cc-macro-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
       <!-- RISK MOVERS -->
       <div class="cc-card" id="cc-movers">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--collat)"></span>Risk movers
-          <a class="cc-link no-print" data-v="trend">Risk trend →</a></div>
+          <a class="cc-link no-print" data-v="trend" href="#trend">Risk trend →</a></div>
         <div class="cc-card-b" id="cc-movers-body"><div class="skel-rows" aria-hidden="true"><div class="skel-row"><span class="skel skel-line skel-w70 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w55 skel-grow"></span><span class="skel skel-pill"></span></div><div class="skel-row"><span class="skel skel-line skel-w40 skel-grow"></span><span class="skel skel-pill"></span></div></div></div>
       </div>
 
@@ -174,7 +182,7 @@
            Objective #2 (competitive risk on the footprint we already run). Null-safe: absent → hidden. -->
       <div class="cc-card cc-card-wide" id="cc-defend" style="display:none">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--agri)"></span>Where the network is hardest to defend
-          <a class="cc-link no-print" data-v="acq">Competition →</a></div>
+          <a class="cc-link no-print" data-v="acq" href="#acq">Competition →</a></div>
         <div class="cc-card-b" id="cc-defend-body"></div>
       </div>
 
@@ -183,7 +191,7 @@
            regional answer; full detail on the Overview. Null-safe: absent file → card hidden. -->
       <div class="cc-card cc-card-wide" id="cc-regions" style="display:none">
         <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Recommendation by region
-          <a class="cc-link no-print" data-v="overview">Overview →</a></div>
+          <a class="cc-link no-print" data-v="overview" href="#overview">Overview →</a></div>
         <div class="cc-card-b" id="cc-regions-body"></div>
       </div>
 
@@ -208,6 +216,39 @@
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story</span>
       <a data-v="overview" href="#overview">The backdrop — the macro &amp; collateral forces moving the book →</a>
+    </div>
+  </section>
+
+  <!-- ASSISTANCE (③ pillar) — the "who needs help now" view. Reads data/tape_real.json:
+       segments-hit-most ranked hit-list + X-days pre-emptive window + restructuring (Normal /
+       Pre-emptive / TDR — did it hold?) + the drought assistance radar. renderAssist(); every
+       block is null-safe (calm note when the tape layer is absent). -->
+  <section class="view" id="v-assist">
+    <div class="cc-head">
+      <div>
+        <h2 style="margin:0">③ Assistance — who needs help now</h2>
+        <p class="lead" id="assist-sub">Before accounts roll: the pre-emptive window, the segments hit hardest, and whether restructuring is holding. <b>MEASURED</b> real loan tape (no-PII aggregates, cells ≥30).</p>
+      </div>
+    </div>
+    <div class="assist-hero" id="assist-hero" aria-live="polite"></div>
+    <div id="assist-absent" class="note" style="display:none">The real loan-tape layer isn't loaded — <b>data/tape_real.json</b> is absent. The assistance view populates once the monthly tape drop is ingested.</div>
+
+    <h2>Segments hit most — the ranked hit-list</h2>
+    <p class="lead">Occupation × region cells with the worst blend of 90+ severity, roll pressure (30–89dpd) and X-days slippage. Score = 90+% + ½·roll% + ¼·X-days% — an <b>estimated</b> ordering over <b>measured</b> shares; cells ≥300 accounts.</p>
+    <div class="tbl-wrap"><div id="assist-segments"></div></div>
+
+    <h2>The pre-emptive window — X-days, by where it's slipping</h2>
+    <p class="lead">Accounts late but under 30dpd — the last cheap place to intervene before roll. The drought-triggered assistance radar names the provinces where farm households are slipping under measured OAE SPEI stress.</p>
+    <div class="tbl-wrap"><div id="assist-radar"></div></div>
+
+    <h2>Restructuring — did it hold?</h2>
+    <p class="lead">Against the <b>Normal</b> baseline, are the restructured books curing or re-defaulting? <b>TDR</b> and <b>Pre-emptive</b> accounts carry far higher 90+/180+ — the signal to change the cure test, not roll again. <span class="sub">Skip = payment holiday.</span></p>
+    <div class="tbl-wrap"><div id="assist-restr"></div></div>
+
+    <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan tape aggregates (no-PII, cells ≥30; raw stays on the owner's disk). Delinquency and OS shares are measured; the hit-list score and the radar priority order are estimated orderings over those measured inputs. Point-in-time tape — true roll/cure rates need month-over-month drops.</p>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story</span>
+      <a data-v="exposure" href="#exposure">Risk — where the book sits in stress, live book vs the 180+ legacy →</a>
     </div>
   </section>
 
@@ -259,6 +300,16 @@
     <div class="grid macro" id="dcollat-brand"></div>
     <p class="lead" id="dcollat-note"></p>
     <table class="tbl" id="dcollattbl"></table>
+    <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
+         the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
+         being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
+         hidden until the layer loads (null-safe). -->
+    <div id="btrend-wrap" style="display:none">
+      <h2 class="collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+      <div class="verdict v-warn" id="btrend-verdict" style="display:none"></div>
+      <p class="lead" id="btrend-note"></p>
+      <table class="tbl" id="btrendtbl"></table>
+    </div>
     <div id="vehreg-wrap" style="display:none">
       <h2 class="collat">Collateral base · registered-vehicle stock (MOT, measured)</h2>
       <p class="lead" id="vehreg-note"></p>
@@ -336,6 +387,12 @@
       <div class="verdict" id="truckflow-verdict" style="display:none"></div>
       <p class="lead" id="truckflow-note"></p>
       <table class="tbl" id="truckflowtbl"></table>
+    </div>
+    <div id="dbdform-wrap" style="display:none">
+      <h2 class="risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h2>
+      <div class="verdict" id="dbdform-verdict" style="display:none"></div>
+      <p class="lead" id="dbdform-note"></p>
+      <table class="tbl" id="dbdformtbl"></table>
     </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
@@ -592,7 +649,21 @@
     <!-- REAL TAPE — measured portfolio truth (data/tape_real.json; hidden when absent) -->
     <div id="expo-tape" style="display:none">
       <h2 class="risk">The real book · measured <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
-      <p class="lead">No-PII aggregates from the real loan-level export (cells ≥30 accounts; raw stays owner-side). This section is loan-book truth, not a footprint proxy.</p>
+      <p class="lead">No-PII aggregates from the real loan-level export (cells ≥30 accounts; raw stays owner-side). Loan-book truth, not a footprint proxy. <b>NPL-live</b> = 90–179dpd on the live book; the <b>180+ legacy</b> stock is held separately (workout inventory, not fresh risk).</p>
+      <!-- Risk headline: bucket ladder + live-book-vs-180+-legacy split + restructuring 'did it hold'. -->
+      <div id="expo-tape-books" class="grid macro" style="margin-bottom:14px"></div>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Bucket ladder · Current → NPL → legacy</h3>
+          <p class="lead" style="font-size:12px">Accounts &amp; outstanding at each stage. The 180+ bar is legacy workout stock, held apart.</p>
+          <table class="tbl" id="expo-tape-ladder"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Restructuring · did it hold?</h3>
+          <p class="lead" style="font-size:12px">Against the Normal baseline — are Pre-emptive / TDR books curing or re-defaulting? TDR at 50.8% 90+, NPAT-negative.</p>
+          <table class="tbl" id="expo-tape-restr"></table>
+        </div>
+      </div>
       <div class="dash2">
         <div class="dash2-side">
           <h3 class="acqsub">LTV at origination → delinquency</h3>
@@ -733,12 +804,12 @@
       <h2 class="risk" style="margin-top:6px">The real book over time · vintage read <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Disbursement year → 30+dpd today</h3>
+          <h3 class="acqsub">Disbursement year → 90+dpd today</h3>
           <p class="lead" style="font-size:12px">Same-age comparison matters: young vintages look better only because they're young. Bands are months-on-book at the data's own anchor.</p>
           <table class="tbl" id="trend-tape-vint"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Branch audit list · worst 30+dpd (≥100 accounts)</h3>
+          <h3 class="acqsub">Branch audit list · worst 90+dpd (≥100 accounts)</h3>
           <p class="lead" style="font-size:12px">"Risky branch" ≠ "risky market" — these are the branches whose book underperforms; cross-read with the peer-twin lens before acting.</p>
           <table class="tbl" id="trend-tape-audit"></table>
         </div>
@@ -835,6 +906,37 @@
     <div class="chips" id="mktchips"></div>
     <button id="mktcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="mkttbl"></table>
+
+    <!-- ACQUISITION LENS — collateral concentration from the real loan tape (data/tape_real.json;
+         hidden when absent). Where & what collateral the book concentrates on: type economics,
+         geographic mix, densest branch books, collateral-age risk. -->
+    <div id="mkt-coll" style="display:none">
+      <h2 class="risk" style="margin-top:28px">Collateral concentration · the acquisition lens <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
+      <p class="lead">Where and what collateral the book concentrates on — collateral <b>type</b> economics, the geographic mix, and the branches most over-indexed on a single brand. No-PII aggregates (cells ≥30 accounts). Cost structure: yield 23.99% (Land 15%) − opex 8% − CoF 2.5%.</p>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Collateral type · economics &amp; risk</h3>
+          <p class="lead" style="font-size:12px">Gross spread before credit loss. Land = thin margin (4.5%) but lowest risk (5.9% 90+).</p>
+          <table class="tbl" id="mkt-coll-econ"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Densest branch collateral books</h3>
+          <p class="lead" style="font-size:12px">Largest single-brand book at a branch — where the network is most concentrated on one make.</p>
+          <table class="tbl" id="mkt-coll-branch"></table>
+        </div>
+      </div>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Collateral type × region</h3>
+          <table class="tbl" id="mkt-coll-region"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Collateral age at origination → risk</h3>
+          <table class="tbl" id="mkt-coll-age"></table>
+        </div>
+      </div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan-tape aggregates (no-PII, cells ≥30; raw stays owner-side). Delinquency &amp; OS are measured; the economics framing (yield/spread) is management cost structure applied to measured balances.</p>
+    </div>
   </section>
 
   <div class="note">

@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-24T05:20:45+07:00",
-    "commit": "fdca24a"
+    "generated_at": "2026-07-24T10:27:38Z",
+    "commit": "0c90e4e"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,19 +480,97 @@
   ],
   "activity": [
     {
+      "date": "2026-07-24T10:27:38Z",
+      "sha": "0c90e4e",
+      "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-24T17:25:17+07:00",
+      "sha": "4cc8a4d",
+      "summary": "feat(market): surface MEASURED business-formation pulse (DBD registry) on Overview (#143)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-24T08:15:57Z",
+      "sha": "2322170",
+      "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T15:11:34+07:00",
+      "sha": "dfc127d",
+      "summary": "ux: per-route tab titles match the five-pillar nav; add missing #assist title (#142)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T09:53:07+07:00",
+      "sha": "7eaa64c",
+      "summary": "feat(acquisition): collateral-concentration tables on the Market view (#139)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T09:29:52+07:00",
+      "sha": "307241a",
+      "summary": "feat(risk): bucket-ladder + two-book split + restructuring on Exposure; lead with 90+ not 30+ (#138)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-24T02:18:21Z",
+      "sha": "7616550",
+      "summary": "docs: log ux-cc-jumplink-href merge+deploy+verify (2026-07-24)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T09:14:52+07:00",
+      "sha": "7ec9de1",
+      "summary": "ux: command-center jump links keyboard-focusable (add href) (#137)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T09:11:36+07:00",
+      "sha": "e387384",
+      "summary": "feat(databook): consolidate the loan book onto the Data book page (#136)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-24T08:58:50+07:00",
+      "sha": "b293817",
+      "summary": "feat(nav+assist): 5-pillar nav reframe + dedicated Assistance view (#135)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-24T07:53:12+07:00",
+      "sha": "1161edd",
+      "summary": "feat(tape+home): restructuring/collateral tape layer + 5-pillar home summary band (#133)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-24T06:53:31+07:00",
+      "sha": "136f370",
+      "summary": "feat(overview): surface new-pickup inflow trend (DLT) as a collateral-outlook card (#128)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-23T22:21:01Z",
+      "sha": "fccc9d0",
+      "summary": "committee: refresh autonomy plan after truck-flow ship (2026-07-23)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-24T05:20:45+07:00",
       "sha": "fdca24a",
       "summary": "intel(overview): surface MEASURED logistics-SME truck-fleet pulse (DLT, obj #1) (#131)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-23T22:14:59+00:00",
+      "date": "2026-07-23T22:14:59Z",
       "sha": "a0136e7",
       "summary": "committee: refresh autonomy plan (run 30048841499)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T20:23:03+00:00",
+      "date": "2026-07-23T20:23:03Z",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
@@ -580,84 +658,6 @@
       "sha": "9f1ffcf",
       "summary": "data(provenance): regenerate on the merged fuel tree under the WSL 3.11 mirror",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:17:21+07:00",
-      "sha": "b5489a4",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/fuel-29966758495",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:16:41+07:00",
-      "sha": "6452fb7",
-      "summary": "Merge pull request #113 from kaustavb2101/data/nabc-29959504127",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:16:22+07:00",
-      "sha": "fe64f05",
-      "summary": "Merge pull request #121 from kaustavb2101/intel-region-debt-backdrop",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:15:55+07:00",
-      "sha": "9917740",
-      "summary": "Merge pull request #123 from kaustavb2101/claude/ux-loop-20260723-1431",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-23T23:00:13+07:00",
-      "sha": "ba85c95",
-      "summary": "Merge branch 'master' into claude/ux-loop-20260723-1431",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-23T22:56:58+07:00",
-      "sha": "a407fd2",
-      "summary": "data(provenance): regenerate for the promo-landscape rival_pulse refresh under the WSL 3.11 mirror",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-23T22:53:45+07:00",
-      "sha": "2e8adea",
-      "summary": "feat(pulse): promo landscape — rival promotions summarized by product / type / pricing",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-23T22:51:59+07:00",
-      "sha": "6916fdc",
-      "summary": "test(provenance-gate): exempt the <slug>_catchment.json Overture geometry family (stamps lost in the 2026-07-20 max re-pull; family provenance stays in build_provenance.py; re-stamp at next planned re-pull)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-23T14:43:45+00:00",
-      "sha": "4ce908c",
-      "summary": "ux: trap focus within the mobile branch-detail modal sheet (WCAG 2.4.3)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-23T21:00:38+07:00",
-      "sha": "0f6b6de",
-      "summary": "data(provenance): regenerate on the catchment-complete tree (103 layers, 77/77 Overture catchments) under the WSL 3.11 mirror",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-23T20:54:21+07:00",
-      "sha": "339c3d3",
-      "summary": "data(catchments): Overture 3D building catchments wave 3/3 — 77/77 provinces complete",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-23T20:53:58+07:00",
-      "sha": "1731ef0",
-      "summary": "data(catchments): Overture 3D building catchments wave 2/3",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-23T20:53:20+07:00",
-      "sha": "a479a9b",
-      "summary": "data(catchments): Overture 3D building catchments wave 1/3 — full-province max pull, slim-canonical",
-      "pillar": "3d-enrichment"
     }
   ]
 }
