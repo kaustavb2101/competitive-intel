@@ -746,14 +746,14 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 .cc-hero{display:grid;gap:var(--s3,14px);grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
   margin:var(--s3,14px) 0 var(--s5,32px)}  /* more air below the hero so the card strip reads as a new section, not crowded against it */
 .cc-hero:empty{display:none}
-.cc-hero-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;
+.cc-hero-card{display:flex;flex-direction:column;gap:6px;text-decoration:none;min-width:0;
   background:linear-gradient(180deg,var(--raised,#232E45),var(--panel,#1A2233));
   border:1px solid var(--line);border-left:4px solid var(--hc,var(--accent));
   border-radius:14px;padding:16px 18px;box-shadow:var(--elev-1);transition:transform .15s,box-shadow .15s,border-color .15s}
 .cc-hero-card:hover{transform:translateY(-2px);box-shadow:var(--elev-2);border-color:var(--hc,var(--accent))}
 .cc-hero-card:focus-visible{outline:none;box-shadow:var(--ring)}
-.cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px}
-.cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid)}
+.cc-hero-big{font-size:21px;font-weight:700;line-height:1.22;color:var(--hi);letter-spacing:-.3px;overflow-wrap:anywhere}
+.cc-hero-sub{font-size:12.5px;line-height:1.45;color:var(--mid);overflow-wrap:anywhere}
 .cc-hero-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
 /* .cc-hero-tag is a provenance chip too (text can be mixed "measured + estimated"), so it wears
    the same pill language as .prov / .cc-tag — mono 11px, leading dot, hairline border. Kept
