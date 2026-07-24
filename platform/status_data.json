@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-24T10:27:38Z",
-    "commit": "0c90e4e"
+    "generated_at": "2026-07-24T23:45:22+07:00",
+    "commit": "0a8728e"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,7 +480,43 @@
   ],
   "activity": [
     {
-      "date": "2026-07-24T10:27:38Z",
+      "date": "2026-07-24T23:45:22+07:00",
+      "sha": "0a8728e",
+      "summary": "fix(service): recover the district-drought layer's dropped freshness vintage in the Data-room card (#145)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-24T22:58:46+07:00",
+      "sha": "2095b75",
+      "summary": "intel(overview): surface the MEASURED×MODELLED district crop × drought layer (obj #1) (#141)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-24T14:49:19+00:00",
+      "sha": "3d3e8b8",
+      "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T21:46:17+07:00",
+      "sha": "10bd831",
+      "summary": "ux: wrap command-center Assistance-radar table in .tblwrap (fix mobile page overflow) (#144)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-24T12:29:08+00:00",
+      "sha": "38cf88a",
+      "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-24T11:12:37+00:00",
+      "sha": "ca42d29",
+      "summary": "committee: refresh autonomy plan (run 30088421749)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-24T10:27:38+00:00",
       "sha": "0c90e4e",
       "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
       "pillar": "deployment"
@@ -492,7 +528,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-24T08:15:57Z",
+      "date": "2026-07-24T08:15:57+00:00",
       "sha": "2322170",
       "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -516,7 +552,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T02:18:21Z",
+      "date": "2026-07-24T02:18:21+00:00",
       "sha": "7616550",
       "summary": "docs: log ux-cc-jumplink-href merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -552,7 +588,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-23T22:21:01Z",
+      "date": "2026-07-23T22:21:01+00:00",
       "sha": "fccc9d0",
       "summary": "committee: refresh autonomy plan after truck-flow ship (2026-07-23)",
       "pillar": "deployment"
@@ -564,13 +600,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-23T22:14:59Z",
+      "date": "2026-07-23T22:14:59+00:00",
       "sha": "a0136e7",
       "summary": "committee: refresh autonomy plan (run 30048841499)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T20:23:03Z",
+      "date": "2026-07-23T20:23:03+00:00",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
@@ -622,42 +658,6 @@
       "sha": "5869804",
       "summary": "data(provenance): regenerate on the real-tape-wave tree (104 layers) under the WSL 3.11 mirror",
       "pillar": "service"
-    },
-    {
-      "date": "2026-07-23T23:42:09+07:00",
-      "sha": "1b841e3",
-      "summary": "feat(tape): the REAL loan tape lands in the product — measured obj#1 + assistance radar",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-23T23:24:58+07:00",
-      "sha": "576ef77",
-      "summary": "Merge pull request #124 from kaustavb2101/claude/promo-landscape",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:24:52+07:00",
-      "sha": "d55c529",
-      "summary": "data(provenance): regenerate on the merged promo-landscape tree under the WSL 3.11 mirror",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:21:37+07:00",
-      "sha": "22aa468",
-      "summary": "Merge remote-tracking branch 'origin/master' into claude/promo-landscape",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-23T23:20:42+07:00",
-      "sha": "6a3eca6",
-      "summary": "Merge pull request #114 from kaustavb2101/data/fuel-29966758495",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:20:36+07:00",
-      "sha": "9f1ffcf",
-      "summary": "data(provenance): regenerate on the merged fuel tree under the WSL 3.11 mirror",
-      "pillar": "data-integration"
     }
   ]
 }
