@@ -187,6 +187,26 @@ async function loadTruckFlow(){
   return truckflowPromise;
 }
 
+// Business-formation pulse — MEASURED DBD (Department of Business Development) new juristic-person
+// registrations for the snapshot month (data/dbd_formation.json). Per province: n new firms +
+// registered capital. A DEMAND / economic-vitality backdrop for BOTH objectives: where new small
+// businesses form maps the merchant / small-ticket borrower base AutoX's book draws on. It is ONE
+// month's flow (a formation pulse, not a stock of active firms) and is NOT a competitor layer and NOT
+// an open/expand cue — a vitality read on the footprint we already run. Fully null-guarded: absent
+// file → DBDFORM stays null, the Overview block stays hidden (see renderDbdForm), nothing fabricated.
+let DBDFORM=null, DBDFORM_META=null, dbdformPromise=null;
+async function loadDbdForm(){
+  if(dbdformPromise) return dbdformPromise;
+  dbdformPromise=(async()=>{
+    try{
+      const j = await fetch('data/dbd_formation.json').then(r=>r.json());
+      DBDFORM=j&&typeof j.by_province==='object'?j:null; DBDFORM_META=j&&j.meta?j.meta:null;
+    }catch(e){ DBDFORM=null; DBDFORM_META=null; }
+    return DBDFORM;
+  })();
+  return dbdformPromise;
+}
+
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
   if(n==null||!isFinite(n)) return '—';
@@ -1528,6 +1548,9 @@ function renderOverview(){
   // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
   // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
   loadTruckFlow().then(renderTruckFlow);
+  // MEASURED business-formation pulse (dbd_formation.json, DBD registry) — the small-business borrower
+  // base backdrop for the merchant book (both objectives). Null-safe: absent file → the block stays hidden.
+  loadDbdForm().then(renderDbdForm);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -2254,6 +2277,53 @@ function renderTruckFlow(){
         `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
         `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
         `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+function renderDbdForm(){
+  const wrap=$('#dbdform-wrap'); if(!wrap) return;
+  const bp=(DBDFORM&&DBDFORM.by_province&&typeof DBDFORM.by_province==='object')?DBDFORM.by_province:null;
+  // top rows: prefer the layer's own pre-sorted `top` ([prov,n,capital]); else derive from by_province.
+  let rows=Array.isArray(DBDFORM&&DBDFORM.top)?DBDFORM.top.map(t=>({th:t[0],n:t[1],cap:t[2]})):
+    (bp?Object.entries(bp).map(([k,v])=>({th:k,n:v.n||0,cap:v.capital_thb||0})).sort((a,b)=>b.n-a.n):[]);
+  rows=rows.filter(r=>r&&r.th&&r.n>0);
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const m=DBDFORM_META||{};
+  // national totals — prefer the layer's own meta rollup, else sum the province rows.
+  const natN=(typeof m.n_registrations==='number')?m.n_registrations:rows.reduce((s,r)=>s+(r.n||0),0);
+  const natCap=(typeof m.capital_thb_total==='number')?m.capital_thb_total:rows.reduce((s,r)=>s+(r.cap||0),0);
+  const nProv=(typeof m.n_provinces_present==='number')?m.n_provinces_present:Object.keys(bp||{}).length;
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  // compact ฿ formatter — bn / m.
+  const baht=v=>{ if(v==null||!isFinite(v)||v<=0) return '—';
+    if(v>=1e9) return '฿'+(v/1e9).toFixed(1)+'bn'; if(v>=1e6) return '฿'+Math.round(v/1e6)+'m'; return '฿'+Math.round(v/1e3)+'k'; };
+  // concentration read (computed client-side from the measured rows) — Bangkok share + top-5 share.
+  const bkk=bp&&bp['กรุงเทพมหานคร']?(bp['กรุงเทพมหานคร'].n||0):(rows.find(r=>r.th==='กรุงเทพมหานคร')||{}).n||0;
+  const bkkShare=natN>0?bkk/natN*100:0;
+  const top5=rows.slice(0,5).reduce((s,r)=>s+(r.n||0),0);
+  const top5Share=natN>0?top5/natN*100:0;
+  const vintage=m.snapshot_month_be?`${m.snapshot_month_be} (${m.vintage||m.snapshot_month||''})`:(m.snapshot_month||'—');
+  const vb=$('#dbdform-verdict');
+  if(vb){
+    vb.className='verdict'; vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🏢 <b>${num(natN)} new businesses formed nationwide in the ${m.snapshot_month||''} snapshot — ${baht(natCap)} registered capital, across ${num(nProv)} provinces.</b> `+
+      `This is the small-business borrower base the merchant / small-ticket book draws on.</div>`+
+      `<div class="sub" style="margin-top:4px">Formation is <b>heavily Bangkok-weighted</b> — กรุงเทพฯ alone is <b>${bkkShare.toFixed(0)}%</b> of new firms and the top-5 provinces <b>${top5Share.toFixed(0)}%</b>, so upcountry business formation (where AutoX's provincial book sits) is thin and concentrated. A demand backdrop, not a stress. ${TAG_M}.</div>`;
+  }
+  const note=$('#dbdform-note');
+  if(note) note.innerHTML='<b>Measured</b> — DBD (Department of Business Development) monthly new juristic-person registrations for the '+
+    `<b>${vintage}</b> snapshot, tallied by the registry's own head-office province. `+
+    'This is <b>one month’s formation flow</b> (a pulse), <b>not</b> a stock of active firms and <b>not</b> annualised; '+
+    'registered capital is <b>authorised at incorporation</b> (overstates deployed capital, skewed by a few large filings). '+
+    'A merchant-demand / economic-vitality backdrop for the existing footprint — it makes <b>no</b> open / close / expand call.';
+  const tbl=$('#dbdformtbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="MEASURED — new juristic-person registrations in the snapshot month">New firms ●</th><th title="share of the national monthly total">Share</th><th title="MEASURED — registered (authorised) capital at incorporation, snapshot month">Reg. capital ●</th></tr>`+
+    rows.slice(0,12).map((r,i)=>{ const sh=natN>0?r.n/natN*100:0;
+      const c=sh>=15?'var(--merch)':sh>=3?'var(--gold)':'var(--dim)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
+        `<td class="mono">${num(r.n)}</td>`+
+        `<td class="mono" style="color:${c}">${sh.toFixed(1)}%</td>`+
+        `<td class="mono sub">${baht(r.cap)}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 
