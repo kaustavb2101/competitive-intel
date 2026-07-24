@@ -6504,7 +6504,7 @@ function renderHomeTape(){
   card.style.display='';
   const rows=TAPE.assistance_radar.slice(0,5);
   body.innerHTML=
-    `<table class="tbl"><tr><th>Province</th>
+    `<div class="tblwrap"><table class="tbl"><tr><th>Province</th>
       <th title="X-days bucket: late but under 30dpd — assistance still works. Call this week.">Tier 1 · slipping</th>
       <th title="Current accounts in the same stressed cell — fine today, measured stressor overhead.">Tier 2 · watch</th>
       <th title="share of the province's districts at severe/extreme OAE SPEI">Drought</th>
@@ -6515,7 +6515,7 @@ function renderHomeTape(){
       <td class="mono">${r.tier2_current_exposed.toLocaleString()}</td>
       <td class="mono" style="color:${r.districts_severe_pct>=60?'var(--agri)':'var(--dim)'}">${r.districts_severe_pct}% <span class="sub">SPEI ${r.worst_spei}</span></td>
       <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td>
-    </tr>`).join('')+`</table>`+
+    </tr>`).join('')+`</table></div>`+
     `<div class="sub" style="margin-top:6px;font-size:11px">${TAPE.meta.n_accounts.toLocaleString()} real accounts (no-PII aggregates, cells ≥30) · branch-join ${TAPE.meta.branch_join_pct}% · trigger: drought FIRING, crop-margin & fuel armed · ranking order ESTIMATED over MEASURED inputs</div>`;
 }
 /* FIVE-PILLAR SUMMARY BAND (owner IA 2026-07-24) — the platform's whole job on one row:
