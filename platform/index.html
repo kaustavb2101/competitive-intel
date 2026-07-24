@@ -22,22 +22,24 @@
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
-  <!-- Nav order = the exec storyline (the "two-risk spine"): the answer -> the backdrop -> your two
-       risks (portfolio: Exposure, Trend | competitive: Competition) -> explore. The .nav-sep spans
-       chunk it into frame | risks | explore; routing is by data-v (order-independent), so the
-       sequence is purely narrative. -->
+  <!-- Nav = the FIVE-PILLAR journey (owner IA 2026-07-24): Home + Data book, then the pillars in
+       order — ① Macro (backdrop) → ② Acquisition (network & collateral concentration) →
+       ③ Assistance (who needs help now) → ④ Risk (portfolio stress, live book vs 180+ legacy) →
+       ⑤ Competitor (rival pressure). Routing is by data-v (order-independent); the sequence is the
+       narrative. Risk-trend / Provinces / Market / Branches / Simulator live under More. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <a href="data.html">Data book</a>
-  <a data-v="overview" href="#overview">Overview</a>
   <span class="nav-sep" aria-hidden="true"></span>
-  <a data-v="exposure" href="#exposure" title="Portfolio risk (objective #1) — where the book sits in stress">Exposure</a>
-  <a data-v="trend" href="#trend" title="Portfolio risk (objective #1) — what is getting riskier over time">Trend</a>
-  <a data-v="acq" href="#acq" title="Competitive risk (objective #2) — rival pressure on the network we already run">Competition</a>
+  <a data-v="overview" href="#overview" title="① Macro — the backdrop moving the book (rates, commodities, fuel, collateral outlook)">Macro</a>
+  <a data-v="map" href="#map" title="② Acquisition — the network & where the collateral book concentrates">Acquisition</a>
+  <a data-v="assist" href="#assist" title="③ Assistance — which segments are hit most & need pre-emptive help">Assistance</a>
+  <a data-v="exposure" href="#exposure" title="④ Risk — where the book sits in stress: live book vs the 180+ legacy stock">Risk</a>
+  <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
   <span class="nav-sep" aria-hidden="true"></span>
-  <a data-v="map" href="#map">National</a>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a data-v="trend" href="#trend" role="menuitem">Risk trend</a>
       <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
       <a data-v="market" href="#market" role="menuitem">Market</a>
       <a data-v="branches" href="#branches" role="menuitem">Branches</a>
@@ -214,6 +216,39 @@
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story</span>
       <a data-v="overview" href="#overview">The backdrop — the macro &amp; collateral forces moving the book →</a>
+    </div>
+  </section>
+
+  <!-- ASSISTANCE (③ pillar) — the "who needs help now" view. Reads data/tape_real.json:
+       segments-hit-most ranked hit-list + X-days pre-emptive window + restructuring (Normal /
+       Pre-emptive / TDR — did it hold?) + the drought assistance radar. renderAssist(); every
+       block is null-safe (calm note when the tape layer is absent). -->
+  <section class="view" id="v-assist">
+    <div class="cc-head">
+      <div>
+        <h2 style="margin:0">③ Assistance — who needs help now</h2>
+        <p class="lead" id="assist-sub">Before accounts roll: the pre-emptive window, the segments hit hardest, and whether restructuring is holding. <b>MEASURED</b> real loan tape (no-PII aggregates, cells ≥30).</p>
+      </div>
+    </div>
+    <div class="assist-hero" id="assist-hero" aria-live="polite"></div>
+    <div id="assist-absent" class="note" style="display:none">The real loan-tape layer isn't loaded — <b>data/tape_real.json</b> is absent. The assistance view populates once the monthly tape drop is ingested.</div>
+
+    <h2>Segments hit most — the ranked hit-list</h2>
+    <p class="lead">Occupation × region cells with the worst blend of 90+ severity, roll pressure (30–89dpd) and X-days slippage. Score = 90+% + ½·roll% + ¼·X-days% — an <b>estimated</b> ordering over <b>measured</b> shares; cells ≥300 accounts.</p>
+    <div class="tbl-wrap"><div id="assist-segments"></div></div>
+
+    <h2>The pre-emptive window — X-days, by where it's slipping</h2>
+    <p class="lead">Accounts late but under 30dpd — the last cheap place to intervene before roll. The drought-triggered assistance radar names the provinces where farm households are slipping under measured OAE SPEI stress.</p>
+    <div class="tbl-wrap"><div id="assist-radar"></div></div>
+
+    <h2>Restructuring — did it hold?</h2>
+    <p class="lead">Against the <b>Normal</b> baseline, are the restructured books curing or re-defaulting? <b>TDR</b> and <b>Pre-emptive</b> accounts carry far higher 90+/180+ — the signal to change the cure test, not roll again. <span class="sub">Skip = payment holiday.</span></p>
+    <div class="tbl-wrap"><div id="assist-restr"></div></div>
+
+    <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan tape aggregates (no-PII, cells ≥30; raw stays on the owner's disk). Delinquency and OS shares are measured; the hit-list score and the radar priority order are estimated orderings over those measured inputs. Point-in-time tape — true roll/cure rates need month-over-month drops.</p>
+    <div class="story-next no-print">
+      <span class="story-next-lab">Next in the story</span>
+      <a data-v="exposure" href="#exposure">Risk — where the book sits in stress, live book vs the 180+ legacy →</a>
     </div>
   </section>
 
