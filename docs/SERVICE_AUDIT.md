@@ -5,27 +5,50 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-19 · latest ship: three live/registry layers' dropped freshness stamps recovered in the Data-room card (§1) · against `platform/data/provenance.json` (96 layers · 327 files)._
+_Audit run: 2026-07-24 · latest ship: the freshly-surfaced district-drought layer's dropped freshness stamp recovered in the Data-room card (§1) · against `platform/data/provenance.json` (104 layers · 409 files)._
 
 ## Headline
 
-The data room is healthy. **No broken data references, no missing fetches, 0 unlabelled files.**
-The one concrete gap this run **fixed**: three committed layers each stamp a real freshness date
-under a *layer-specific* key that `build_provenance.py::_vintage_of()` did not scan, so their
-vintage showed **blank** in the exec-facing Data-room card — most importantly **`rival_pulse.json`**
-(`promos_pulled_at = 2026-07-19`), the freshest live rival promo/sentiment watch. Same class of bug
-as the 2026-07-17 §1 fix (6 layers under non-standard keys); the extractor now scans the three
-additional freshness fields those layers actually carry.
+The data room is healthy. **No broken data references, no missing fetches; provenance intact
+(52 measured · 51 estimated · the single standing catchment family).** The one concrete gap this
+run **fixed**: `drought_district.json` — the MODELLED OAE-SPEI district-drought layer surfaced on
+Overview only days ago (#141) — stamps its real freshness date under the key `snapshot`
+(`= 2026-06`, the SPEI reference month), which `build_provenance.py::_vintage_of()` did not scan, so
+its vintage showed **blank** in the exec-facing Data-room card. Exactly the same class of bug as the
+2026-07-17 (6 keys) and 2026-07-19 (3 keys) §1 fixes; a full re-scan of every committed layer's
+`meta` this run found `snapshot` to be the **only** remaining unscanned date-shaped freshness key,
+carried by this **one** layer — so the extractor now scans it and the drought vintage surfaces like
+the rest.
 
-_Tree grew 83 → 96 layers since the last audit (rival_pulse, rival_threat, rival_reputation,
-peer_scoreboard, peer_province, pico_competitors, credit_anchor, dbd_formation, …). Re-verified:
-all 96 carry a provenance stamp (47 measured · 49 estimated · **0 unlabelled**), every one is wired
-into a live `fetch()` (or is a pipeline input like `brand_trends.json` → `vehicle_collateral.json`),
-and no `data/*.json` path referenced in the app fails to resolve._
+_Tree grew 96 → 104 layers since the last audit (drought_district, crop_drought, the two thaiwater
+live-pulse layers, set/valuation and credit-anchor market layers, …). Re-verified this run: the
+ledger reports 104 layers (52 measured · 51 estimated · 1 unlabelled = the standing 3D building-
+catchment family, 77 files under one `family:true` row — structurally meta-less, an accepted standing
+state, not a regression); every analytical layer is wired into a live `fetch()` or is a pipeline
+input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fails to resolve._
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-**2026-07-19 (this run):** a full re-scan of all 96 layers' `meta` blocks for date-shaped freshness
+**2026-07-24 (this run):** a full re-scan of all 104 layers' `meta` blocks for date-shaped freshness
+fields *not* in the extractor's key list found **one** layer still dropping a real vintage from the
+Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `drought_district.json` | `snapshot` | 2026-06 | MODELLED OAE-SPEI per-amphoe drought (freshly surfaced, #141) |
+
+`_vintage_of()` now also scans `snapshot`, placed among the data-vintage keys (after `price_vintage`,
+ahead of any pull timestamp — `snapshot` is the SPEI reference month, a data vintage, not a pull
+time; the layer's own `retrieved: 2026-07-20` pull date is intentionally **not** surfaced as the
+freshness cell, matching how `observed_to` / `price_vintage` prefer the observation window over the
+pull stamp). Verified the change touches **only this one** vintage cell (`'' → 2026-06`); a diff of
+the regenerated ledger confirms every other field — counts, labels, sources, the files block — is
+byte-identical, and `build_provenance.py --check` passes on the recommitted ledger. No date is
+invented — `2026-06` is read from the layer's own committed `meta.snapshot`.
+
+---
+
+**2026-07-19 (prior run):** a full re-scan of all 96 layers' `meta` blocks for date-shaped freshness
 fields *not* in the extractor's key list found **three** layers still dropping a real vintage from
 the Data-room card:
 

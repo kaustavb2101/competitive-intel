@@ -151,9 +151,12 @@ def _vintage_of(m):
     # and promos_pulled_at (rival_pulse — the live rival promo/sentiment watch) were
     # each dropping a real date from the Data-room card because they stamp freshness
     # under a layer-specific key; added below so their vintage surfaces like the rest.
+    # snapshot (drought_district — the MODELLED OAE SPEI district-drought layer) is the
+    # SPEI reference month (e.g. 2026-06); it is a data-vintage, so it sits with the
+    # other observation-window keys, ahead of any pull timestamp.
     for k in ("updated", "vintage", "as_of", "updated_to",
-              "observed_to", "price_vintage", "pico_vintage", "vintage_individual",
-              "pulled_at_utc", "pulled", "promos_pulled_at"):
+              "observed_to", "price_vintage", "snapshot", "pico_vintage",
+              "vintage_individual", "pulled_at_utc", "pulled", "promos_pulled_at"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
