@@ -643,7 +643,21 @@
     <!-- REAL TAPE — measured portfolio truth (data/tape_real.json; hidden when absent) -->
     <div id="expo-tape" style="display:none">
       <h2 class="risk">The real book · measured <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
-      <p class="lead">No-PII aggregates from the real loan-level export (cells ≥30 accounts; raw stays owner-side). This section is loan-book truth, not a footprint proxy.</p>
+      <p class="lead">No-PII aggregates from the real loan-level export (cells ≥30 accounts; raw stays owner-side). Loan-book truth, not a footprint proxy. <b>NPL-live</b> = 90–179dpd on the live book; the <b>180+ legacy</b> stock is held separately (workout inventory, not fresh risk).</p>
+      <!-- Risk headline: bucket ladder + live-book-vs-180+-legacy split + restructuring 'did it hold'. -->
+      <div id="expo-tape-books" class="grid macro" style="margin-bottom:14px"></div>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Bucket ladder · Current → NPL → legacy</h3>
+          <p class="lead" style="font-size:12px">Accounts &amp; outstanding at each stage. The 180+ bar is legacy workout stock, held apart.</p>
+          <table class="tbl" id="expo-tape-ladder"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Restructuring · did it hold?</h3>
+          <p class="lead" style="font-size:12px">Against the Normal baseline — are Pre-emptive / TDR books curing or re-defaulting? TDR at 50.8% 90+, NPAT-negative.</p>
+          <table class="tbl" id="expo-tape-restr"></table>
+        </div>
+      </div>
       <div class="dash2">
         <div class="dash2-side">
           <h3 class="acqsub">LTV at origination → delinquency</h3>
@@ -784,12 +798,12 @@
       <h2 class="risk" style="margin-top:6px">The real book over time · vintage read <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
       <div class="dash2">
         <div class="dash2-side">
-          <h3 class="acqsub">Disbursement year → 30+dpd today</h3>
+          <h3 class="acqsub">Disbursement year → 90+dpd today</h3>
           <p class="lead" style="font-size:12px">Same-age comparison matters: young vintages look better only because they're young. Bands are months-on-book at the data's own anchor.</p>
           <table class="tbl" id="trend-tape-vint"></table>
         </div>
         <div class="dash2-main">
-          <h3 class="acqsub">Branch audit list · worst 30+dpd (≥100 accounts)</h3>
+          <h3 class="acqsub">Branch audit list · worst 90+dpd (≥100 accounts)</h3>
           <p class="lead" style="font-size:12px">"Risky branch" ≠ "risky market" — these are the branches whose book underperforms; cross-read with the peer-twin lens before acting.</p>
           <table class="tbl" id="trend-tape-audit"></table>
         </div>

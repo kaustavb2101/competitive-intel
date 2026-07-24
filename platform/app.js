@@ -3779,20 +3779,57 @@ function renderExposureTape(){
   const wrap=$('#expo-tape'); if(!wrap) return;
   if(!TAPE){ wrap.style.display='none'; return; }
   wrap.style.display='';
+  const N=n=>Number(n).toLocaleString(), bnf=n=>'฿'+(n/1e9).toFixed(1)+'bn';
+  const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+
+  // --- two-book split KPI cards (live book vs 180+ legacy) ---
+  const bk=$('#expo-tape-books');
+  if(bk&&TAPE.bucket_ladder){
+    const lb=TAPE.bucket_ladder.live_book, lg=TAPE.bucket_ladder.legacy_180plus, bt=TAPE.bucket_ladder.book_total;
+    bk.innerHTML=[
+      ['Whole book',N(bt.n),bnf(bt.os_sum)+' OS'],
+      ['Live book',N(lb.n),bnf(lb.os_sum)+' · Current…150dpd'],
+      ['NPL-live (90–179)',lb.npl_live_pct+'%',lb.npl_live_os_pct+'% OS-weighted'],
+      ['180+ legacy',bnf(lg.os_sum),N(lg.n)+' a/c · held apart'],
+    ].map(k=>`<div class="mcard"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+  }
+  // --- bucket ladder (Current → NPL → legacy) ---
+  const lad=$('#expo-tape-ladder');
+  if(lad&&TAPE.bucket_ladder){
+    const LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ legacy'};
+    const L=TAPE.bucket_ladder.ladder, maxN=Math.max(...L.map(x=>x.n));
+    lad.innerHTML=`<tr><th>Bucket</th><th>Accounts</th><th>OS ฿bn</th><th></th></tr>`+
+      L.map(x=>{const lg=x.bucket[0]==='8';
+        return `<tr><td class="mono">${LBL[x.bucket]||x.bucket}</td><td class="mono sub">${N(x.n)}</td>
+          <td class="mono sub">${(x.os_sum/1e9).toFixed(2)}</td>
+          <td>${barHTML(x.n,lg?'var(--collat)':'var(--accent)',maxN)}</td></tr>`;}).join('');
+  }
+  // --- restructuring: did it hold? ---
+  const rs=$('#expo-tape-restr');
+  if(rs&&TAPE.restructuring&&TAPE.restructuring.by_status){
+    const rows=['Normal','Skip','Pre-emptive','TDR'].map(s=>TAPE.restructuring.by_status.find(x=>x.status===s)).filter(Boolean);
+    rs.innerHTML=`<tr><th>Status</th><th>Accounts</th><th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/acct</th></tr>`+
+      rows.map(r=>{const neg=r.npat_margin_avg<0;
+        return `<tr><td><b>${r.status}</b></td><td class="mono sub">${N(r.n)}</td>
+          <td class="mono"><b style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+          <td class="mono" style="color:${sev(r.late180_pct)}">${r.late180_pct}%</td>
+          <td class="mono" style="color:${neg?'var(--agri)':'var(--merch)'}">${neg?'−':''}฿${N(Math.abs(r.npat_margin_avg))}</td></tr>`;}).join('');
+  }
+
   const ltv=$('#expo-tape-ltv'), occ=$('#expo-tape-occ');
   if(ltv&&TAPE.ltv_ladder){
     const rows=Object.entries(TAPE.ltv_ladder).sort((a,b)=>a[0].localeCompare(b[0]));
-    const worst=Math.max(...rows.map(([,v])=>v.dpd30p_pct));
-    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts currently 30+ days past due">30+dpd</th><th>OS ฿bn</th></tr>`+
-      rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
-        <td class="mono" style="color:${v.dpd30p_pct>=35?'var(--agri)':v.dpd30p_pct>=25?'var(--gold)':'var(--merch)'}">${barHTML(v.dpd30p_pct,'var(--agri)',worst)} <b>${v.dpd30p_pct}%</b></td>
+    const worst=Math.max(...rows.map(([,v])=>v.dpd90p_pct));
+    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts 90+ days past due">90+dpd</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}">${barHTML(v.dpd90p_pct,'var(--agri)',worst)} <b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
   }
   if(occ&&TAPE.occupations){
     const rows=Object.entries(TAPE.occupations).filter(([k])=>k!=='(blank)').sort((a,b)=>b[1].n-a[1].n);
-    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>30+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
-      rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
-        <td class="mono" style="color:${v.dpd30p_pct>=28?'var(--agri)':'var(--dim)'}"><b>${v.dpd30p_pct}%</b></td>
+    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>90+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}"><b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${v.early_pct}%</td>
         <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
@@ -3800,14 +3837,14 @@ function renderExposureTape(){
   const fr=$('#expo-tape-frontier');
   if(fr&&Array.isArray(TAPE.npat_frontier)){
     const cells=TAPE.npat_frontier.slice(0,18);
-    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>30+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
+    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>90+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
       cells.map(c=>{
         const read=c.npat_margin_avg>=0
-          ?(c.dpd30p_pct>=28?'<span style="color:var(--gold)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
-          :(c.dpd30p_pct<24?'<span style="color:var(--agri)">unprofitably safe</span>':'<span style="color:var(--agri)">re-price</span>');
+          ?(c.dpd90p_pct>=16?'<span style="color:var(--opp)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
+          :(c.dpd90p_pct<12?'<span style="color:var(--agri)">unprofitably safe</span>':'<span style="color:var(--agri)">re-price</span>');
         return `<tr><td>${c.occupation}</td><td class="mono sub">${c.region}</td>
-          <td class="mono sub">${c.n.toLocaleString()}</td>
-          <td class="mono">${c.dpd30p_pct}%</td>
+          <td class="mono sub">${N(c.n)}</td>
+          <td class="mono" style="color:${sev(c.dpd90p_pct)}">${c.dpd90p_pct}%</td>
           <td class="mono" style="color:${c.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${c.npat_margin_avg.toLocaleString()}</td>
           <td class="sub" style="font-size:12px">${read}</td></tr>`;}).join('');
   }
@@ -4604,18 +4641,18 @@ function renderTrendTape(){
       const [yr,band]=k.split('|'); (byYear[yr]=byYear[yr]||[]).push({band,...v});
     });
     const years=Object.keys(byYear).sort();
-    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th>30+dpd</th></tr>`+
+    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th title="share of the vintage 90+ days past due">90+dpd</th></tr>`+
       years.map(yr=>byYear[yr].sort((a,b)=>a.band.localeCompare(b.band)).map((r,i)=>`<tr>
         <td class="mono">${i===0?`<b>${yr}</b>`:''}</td><td class="mono sub">${r.band}</td>
         <td class="mono sub">${r.n.toLocaleString()}</td>
-        <td class="mono" style="color:${r.dpd30p_pct>=28?'var(--agri)':r.dpd30p_pct>=20?'var(--gold)':'var(--merch)'}"><b>${r.dpd30p_pct}%</b></td>
+        <td class="mono" style="color:${r.dpd90p_pct>=16?'var(--agri)':r.dpd90p_pct>=10?'var(--opp)':'var(--merch)'}"><b>${r.dpd90p_pct}%</b></td>
       </tr>`).join('')).join('');
   }
   if(au&&TAPE.branch_audit){
-    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th>30+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
+    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th title="share of the branch's accounts 90+ days past due">90+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
       TAPE.branch_audit.map((b,i)=>`<tr><td class="mono sub">${i+1}</td><td>${b.branch}</td>
         <td class="mono sub">${b.n}</td>
-        <td class="mono" style="color:var(--agri)"><b>${b.dpd30p_pct}%</b></td>
+        <td class="mono" style="color:var(--agri)"><b>${b.dpd90p_pct}%</b></td>
         <td class="mono sub">${b.early_pct}%</td>
         <td class="mono sub">${b.fpd_pct}%</td></tr>`).join('');
   }
