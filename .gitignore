@@ -102,3 +102,7 @@ source-data/.place_ratings_cache.json
 
 # Thai-gov ingest wave raw downloads (PDFs/CSVs, 70MB+) — staging JSONs are the committed artifact
 source-data/raw/
+
+# gdcatalog.go.th full harvest (harvest_gdcatalog.py) — bulk raw datasets + OCR'd PDFs, re-pullable.
+# The catalog INDEX (_catalog.jsonl) and manifest stay here too; nothing from the harvest is committed.
+source-data/gdcatalog_harvest/
