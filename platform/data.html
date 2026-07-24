@@ -39,7 +39,9 @@
 .db-sec .n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
 .db-sec2{margin:22px 0 8px;font:600 14px var(--sans,system-ui);color:var(--hi,#eef1f7);letter-spacing:-.1px}
 /* region cards */
-.db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.db-card .tape-lab{margin:9px 0 1px;font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border-top:1px solid var(--line);padding-top:8px}
+.db-card .cm.cm-tape span{color:var(--mid)}
 .db-card{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;color:inherit;transition:border-color .12s,transform .12s}
 .db-card:hover{border-color:var(--accent);transform:translateY(-2px)}
 .db-card .rt{font:700 16px/1.1 'IBM Plex Sans Thai';margin-bottom:2px}
@@ -203,9 +205,11 @@ function renderNational(){
     h+='<div class="cm"><span>Informal share</span><b>'+pct(r.informal_share_pct)+'</b></div>';
     h+='<div class="cm"><span>Motorcycle share</span><b>'+pct(r.moto_share_pct)+'</b></div>';
     h+='<div class="cm"><span>Income vs national</span><b>'+vsNat(r.avg_income_vs_national).txt+'</b></div>';
+    h+='<div class="tape-block" data-region="'+esc(r.region)+'"></div>';  // filled by fillRegionTape
     h+='</a>';
   });
   h+='</div>';
+  loadTape(fillRegionTape);   // roll the loan tape up into each region card (async, null-safe)
   // province table
   h+='<div class="db-sec"><span class="n">P</span> All 77 provinces</div>';
   h+='<div class="db-chiprow" id="regfilter"><button class="db-chip on" data-r="">All 77</button>'+
@@ -236,12 +240,38 @@ function sevColor(v){ // color a 90+ rate
   if(v<8)return 'var(--merch,#1c8c7d)'; if(v<14)return '#9CB24E';
   if(v<20)return 'var(--gold,#e6b450)'; if(v<26)return '#D97A3A'; return 'var(--agri,#d1544b)';
 }
+function nplCol(v){ // color an NPL-live rate (~3-6% scale)
+  if(v==null)return 'var(--dim,#8590a6)'; if(v>=6)return 'var(--agri,#d1544b)';
+  if(v>=5)return 'var(--gold,#e6b450)'; return '#12a06e';
+}
+// shared loan-tape cache (data/tape_real.json) — used by the loan-book section, the region cards,
+// the province page and the branch page. Fetched once, null-safe.
+var TAPE=null, tapeLoaded=false, tapeInflight=false, tapeCbs=[];
+function loadTape(cb){
+  if(tapeLoaded){ if(cb)cb(TAPE); return; }
+  if(cb)tapeCbs.push(cb);
+  if(tapeInflight)return; tapeInflight=true;
+  fetch('data/tape_real.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+   .then(function(T){TAPE=T;tapeLoaded=true;tapeInflight=false;var q=tapeCbs;tapeCbs=[];q.forEach(function(f){f&&f(TAPE);});});
+}
+// roll the loan tape up into each region card (owner ask: tape aggregated upward)
+function fillRegionTape(T){
+  var g=(T&&T.geo&&T.geo.regions)||null; if(!g)return;
+  document.querySelectorAll('.tape-block[data-region]').forEach(function(el){
+    var v=g[el.getAttribute('data-region')]; if(!v){el.innerHTML='';return;}
+    el.innerHTML=
+      '<div class="tape-lab">Loan tape · measured</div>'+
+      '<div class="cm cm-tape"><span>Loan book</span><b>'+num(v.n)+' · ฿'+(v.os_sum/1e9).toFixed(1)+'bn</b></div>'+
+      '<div class="cm cm-tape"><span>NPL-live (90–179)</span><b style="color:'+nplCol(v.npl_live_pct)+'">'+v.npl_live_pct+'%</b></div>'+
+      '<div class="cm cm-tape"><span>90+ dpd</span><b style="color:'+sevColor(v.dpd90p_pct)+'">'+v.dpd90p_pct+'%</b></div>'+
+      '<div class="cm cm-tape"><span>X-days window</span><b>'+num(Math.round(v.n*v.early_pct/100))+'</b></div>';
+  });
+}
 function bnf(n){return '฿'+(n/1e9).toFixed(2)+'bn';}
 function mnf(n){return '฿'+Math.round(n/1e6).toLocaleString('en-US')+'m';}
 function loadLoanBook(){
   var host=document.getElementById('db-loanbook'); if(!host) return;
-  fetch('data/tape_real.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
-   .then(function(T){
+  loadTape(function(T){
     if(!T||!T.bucket_ladder){ host.innerHTML='<p class="db-note">The loan-tape layer isn\'t loaded (data/tape_real.json absent). It populates once the monthly no-PII tape drop is ingested.</p>'; return; }
     var lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus, bt=T.bucket_ladder.book_total;
     var h='';
@@ -484,7 +514,10 @@ function provinceView(d,sum,reg,rank,total){
   var rivals=sum?sum.rival_branches:null, rpb=sum?sum.rivals_per_branch:null, branches=sum?sum.branches:(d.branches||[]).length;
   var h=crumb([{t:'Thailand',href:'data.html'+(THEME_QS?('?'+THEME_QS.slice(1)):'')},{t:reg?reg.label:'Region',href:reg?('?r='+encodeURIComponent(reg.region)+THEME_QS):'data.html'},{t:d.province_en||sum&&sum.en||''}]);
   h+='<h1 class="db-h1">'+esc(d.province_en||'')+'<span class="th">'+esc(d.province_th||'')+'</span></h1>';
-  h+='<p class="db-sub">'+esc(reg?reg.label:'')+' region · '+num(branches)+' AutoX branches · '+((d.districts&&d.districts.features)?d.districts.features.length:0)+' districts. Full measured readout, ordered the way a lender reads a market: competitive pressure, then the borrower pool, then the collateral behind the book.</p>';
+  h+='<p class="db-sub">'+esc(reg?reg.label:'')+' region · '+num(branches)+' AutoX branches · '+((d.districts&&d.districts.features)?d.districts.features.length:0)+' districts. Full measured readout, ordered the way a lender reads a market: the loan book, then competitive pressure, then the borrower pool, then the collateral behind it.</p>';
+
+  // SECTION 0 — the loan book (measured tape for this province; filled async, null-safe)
+  h+='<div id="prov-tape"></div>';
 
   // SECTION 1 — competitive pressure
   h+='<div class="db-sec"><span class="n">1</span> Competitive pressure</div>';
@@ -539,6 +572,26 @@ function provinceView(d,sum,reg,rank,total){
   document.getElementById('db-loading').style.display='none';
   document.getElementById('db-root').innerHTML=h;
   fillProvinceBranches(d.province_th);
+  fillProvinceTape(d.province_th);
+}
+// the measured loan book for one province (data/tape_real.json geo.provinces), unified with the
+// demographic/competitive readout above it. Null-safe: hidden when the province is below the cell
+// floor (<30 accounts) or the tape is absent.
+function fillProvinceTape(provTh){
+  var host=document.getElementById('prov-tape'); if(!host)return;
+  loadTape(function(T){
+    var v=(T&&T.geo&&T.geo.provinces)?T.geo.provinces[provTh]:null;
+    if(!v){host.innerHTML='';return;}
+    var h='<div class="db-sec"><span class="n">฿</span> Loan book — measured tape</div>';
+    h+='<div class="db-kpis">';
+    h+=kpi(num(v.n)+' <small>a/c</small>','On the tape here','฿'+(v.os_sum/1e9).toFixed(2)+'bn outstanding',true);
+    h+=kpi('<span style="color:'+nplCol(v.npl_live_pct)+'">'+v.npl_live_pct+'%</span>','NPL-live (90–179dpd)',v.npl_live_os_pct+'% OS-weighted');
+    h+=kpi('<span style="color:'+sevColor(v.dpd90p_pct)+'">'+v.dpd90p_pct+'%</span>','90+ dpd','whole-province share');
+    h+=kpi(num(Math.round(v.n*v.early_pct/100))+' <small>a/c</small>','X-days window','late &lt;30dpd · pre-emptive');
+    h+='</div>';
+    h+='<p class="db-sub" style="margin-top:-6px">Measured no-PII loan-tape aggregates for this province (cells ≥30). Roll (30–89dpd) '+v.roll_pct+'% · 180+ legacy '+v.late180_pct+'% of accounts (฿'+(v.late180_os/1e9).toFixed(2)+'bn, held separately) · avg NPAT ฿'+num(v.npat_margin_avg)+'/account.</p>';
+    host.innerHTML=h;
+  });
 }
 function fillProvinceBranches(provTh){
   var host=document.getElementById('provbranches'); if(!host)return;
@@ -716,6 +769,7 @@ function renderBranch(idxStr){
     h+=kpi('<span style="color:'+scoreCol(d.c)+'">'+Math.round(d.c)+'</span>','Collateral (est)','vehicle / gold depth');
     if(risk)h+=kpi('<span style="color:'+riskCol(risk.composite_risk)+'">'+Math.round(risk.composite_risk)+'</span>','Composite risk (est)','household+agri+occupation+seg');
     h+='</div>';
+    h+='<div id="branch-tape"></div>';   // measured loan book for this branch (async, null-safe)
     h+='<div class="db-sec2">Measured features</div><div class="db-tblwrap"><table class="db-tbl"><tbody>';
     function frow(k,v){return '<tr style="cursor:default"><td class="name">'+esc(k)+'</td><td class="mono">'+v+'</td></tr>';}
     h+=frow('Population ≤10km',num(d.pop));
@@ -743,6 +797,29 @@ function renderBranch(idxStr){
     h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'">🏙 3D branch scene →</a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'">🏙 province buildings →</a>':'')+'<a href="?branches'+THEME_QS+'">← all branches</a></div>';
     h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Lens scores &amp; composite risk are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Population / workers / factories / buildings / POI counts are MEASURED.</p>';
     document.getElementById('db-root').innerHTML=h;
+    fillBranchTape(d.n, slug);
+  });
+}
+function normBr(s){return String(s||'').replace(/เงินไชโย|สาขา|\s+/g,'');}
+var _tapeBrIdx=null;
+// measured loan book for one branch (data/tape_real.json geo.branches, top-N by size). Honest
+// note when the branch is below the extract's floor; joins by normalized branch name.
+function fillBranchTape(brName, slug){
+  var host=document.getElementById('branch-tape'); if(!host)return;
+  loadTape(function(T){
+    var g=(T&&T.geo&&T.geo.branches)||null; if(!g){host.innerHTML='';return;}
+    if(!_tapeBrIdx){_tapeBrIdx={};for(var k in g){_tapeBrIdx[normBr(k)]=g[k];}}
+    var v=_tapeBrIdx[normBr(brName)];
+    var h='<div class="db-sec2">Loan book — measured tape</div>';
+    if(!v){host.innerHTML=h+'<p class="db-sub" style="text-align:left;margin-top:2px">Below the tape extract\'s publication floor — the per-branch tape covers the larger branches (cells ≥30 accounts). This branch\'s province &amp; region loan-book roll-up is on its'+(slug?' <a href="?p='+encodeURIComponent(slug)+THEME_QS+'">province page</a>':' province page')+'.</p>';return;}
+    h+='<div class="db-kpis">';
+    h+=kpi(num(v.n)+' <small>a/c</small>','On the tape','฿'+(v.os_sum/1e9).toFixed(2)+'bn outstanding',true);
+    h+=kpi('<span style="color:'+sevColor(v.dpd90p_pct)+'">'+v.dpd90p_pct+'%</span>','90+ dpd','this branch');
+    h+=kpi('<span style="color:'+nplCol(v.npl_live_pct)+'">'+v.npl_live_pct+'%</span>','NPL-live','90–179dpd');
+    h+=kpi(v.early_pct+'%','X-days window','late &lt;30dpd · pre-emptive');
+    h+='</div>';
+    h+='<p class="db-sub" style="margin-top:-6px">Measured no-PII tape for this branch. Roll (30–89dpd) '+v.roll_pct+'% · 180+ legacy '+v.late180_pct+'% · avg NPAT ฿'+num(v.npat_margin_avg)+'/account.</p>';
+    host.innerHTML=h;
   });
 }
 
