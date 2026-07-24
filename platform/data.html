@@ -37,6 +37,7 @@
 .db-sec{margin:26px 0 12px;font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);display:flex;align-items:center;gap:8px}
 .db-sec::after{content:"";flex:1;height:1px;background:var(--line)}
 .db-sec .n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
+.db-sec2{margin:22px 0 8px;font:600 14px var(--sans,system-ui);color:var(--hi,#eef1f7);letter-spacing:-.1px}
 /* region cards */
 .db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .db-card{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;color:inherit;transition:border-color .12s,transform .12s}
@@ -189,6 +190,9 @@ function renderNational(){
   h+=kpi(baht(n.avg_income),'Avg monthly income','labour-weighted national mean');
   h+=kpi(pct(n.unemployment_rate_pct),'Unemployment','labour force '+kk(n.labor_force_k));
   h+='</div>';
+  // LOAN BOOK — the consolidated measured loan-tape tables (filled async by loadLoanBook)
+  h+='<div class="db-sec"><span class="n">L</span> The loan book — measured portfolio truth</div>';
+  h+='<div id="db-loanbook"><p class="db-note">Loading the loan book…</p></div>';
   // region cards
   h+='<div class="db-sec"><span class="n">R</span> Regions — ranked by competitive pressure</div>';
   h+='<div class="db-cards">';
@@ -220,6 +224,85 @@ function renderNational(){
   wireTable(allProv);
   wireFilter(allProv);
   loadLenses();
+  loadLoanBook();
+}
+
+// ---- LOAN BOOK — consolidated measured loan-tape tables (data/tape_real.json) ----
+// The best-formatted page (this one) is where the loan book lives: the bucket ladder + live-book
+// vs 180+-legacy split, collateral economics by type, restructuring 'did it hold', and the
+// LTV / vintage / collateral-age risk gradients. Null-safe: calm note when the tape is absent.
+function sevColor(v){ // color a 90+ rate
+  if(v==null)return 'var(--dim,#8590a6)';
+  if(v<8)return 'var(--merch,#1c8c7d)'; if(v<14)return '#9CB24E';
+  if(v<20)return 'var(--gold,#e6b450)'; if(v<26)return '#D97A3A'; return 'var(--agri,#d1544b)';
+}
+function bnf(n){return '฿'+(n/1e9).toFixed(2)+'bn';}
+function mnf(n){return '฿'+Math.round(n/1e6).toLocaleString('en-US')+'m';}
+function loadLoanBook(){
+  var host=document.getElementById('db-loanbook'); if(!host) return;
+  fetch('data/tape_real.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+   .then(function(T){
+    if(!T||!T.bucket_ladder){ host.innerHTML='<p class="db-note">The loan-tape layer isn\'t loaded (data/tape_real.json absent). It populates once the monthly no-PII tape drop is ingested.</p>'; return; }
+    var lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus, bt=T.bucket_ladder.book_total;
+    var h='';
+    h+='<p class="db-sub">MEASURED real loan tape — '+num(T.meta.n_accounts)+' accounts, no-PII aggregates (cells ≥30); raw stays on the owner\'s disk. The 180+ bucket is legacy workout stock, held SEPARATELY from the live book.</p>';
+    // KPI strip
+    h+='<div class="db-kpis">';
+    h+=kpi(num(bt.n),'Whole book',bnf(bt.os_sum)+' OS — everything on the tape',true);
+    h+=kpi(num(lb.n),'Live book',bnf(lb.os_sum)+' OS · Current…150dpd');
+    h+=kpi(lb.npl_live_pct+'%','NPL-live (90–179)',lb.npl_live_os_pct+'% OS-weighted · '+num(lb.npl_live_n)+' a/c');
+    h+=kpi(bnf(lg.os_sum),'180+ legacy',num(lg.n)+' a/c · '+lg.acct_share_pct+'% of book · held apart');
+    h+='</div>';
+    // bucket ladder
+    var LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ dpd'};
+    var lad=T.bucket_ladder.ladder, maxN=lad.reduce(function(m,x){return Math.max(m,x.n);},0);
+    h+='<div class="db-sec2">Bucket ladder — Current → NPL → legacy</div>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Bucket</th><th>Accounts</th><th>Share</th><th>Outstanding</th><th></th></tr></thead><tbody>';
+    lad.forEach(function(x){var legacy=x.bucket.charAt(0)==='8';
+      h+='<tr><td class="name">'+esc(LBL[x.bucket]||x.bucket)+(legacy?' <span class="th">legacy</span>':'')+'</td>'+
+         '<td>'+num(x.n)+'</td><td>'+(x.n*100/bt.n).toFixed(1)+'%</td><td>'+bnf(x.os_sum)+'</td>'+
+         '<td style="width:26%">'+lensBar(x.n,maxN,legacy?'#7A4FE0':'#4f7bf0')+'</td></tr>';});
+    h+='</tbody></table></div>';
+    // collateral economics
+    h+='<div class="db-sec2">Collateral economics — risk vs the spread it earns</div>';
+    h+='<p class="db-sub" style="margin:2px 0 6px">Gross spread = yield − opex (8%) − CoF (2.5%), before credit loss. Land yields 15% (4.5% spread) vs 23.99% elsewhere (13.49%), but carries the lowest risk. 90+/180+ are point-in-time stock shares, shown separately.</p>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Type</th><th>Accounts</th><th>Outstanding</th><th>Yield</th><th>Gross spread</th><th>90+</th><th>NPL-live</th><th>Avg eval</th></tr></thead><tbody>';
+    (T.collateral.economics_by_type||[]).forEach(function(r){
+      h+='<tr><td class="name">'+esc(r.type)+'</td><td>'+num(r.n)+'</td><td>'+bnf(r.os_sum)+'</td>'+
+         '<td>'+r.yield_pct+'%</td><td style="color:'+(r.gross_spread_pct<6?'var(--gold,#e6b450)':'#12a06e')+';font-weight:600">'+r.gross_spread_pct+'%</td>'+
+         '<td style="color:'+sevColor(r.dpd90p_pct)+';font-weight:600">'+r.dpd90p_pct+'%</td><td>'+r.npl_live_pct+'%</td><td>'+baht(r.eval_avg)+'</td></tr>';});
+    h+='</tbody></table></div>';
+    // restructuring
+    var rs=(T.restructuring&&T.restructuring.by_status)||[];
+    if(rs.length){
+      h+='<div class="db-sec2">Restructuring — did it hold?</div>';
+      h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Status</th><th>Accounts</th><th>Outstanding</th><th>X-days</th><th>Roll</th><th>90+</th><th>180+</th><th>NPAT/a·c</th></tr></thead><tbody>';
+      ['Normal','Skip','Pre-emptive','TDR'].forEach(function(s){var r=null;rs.forEach(function(x){if(x.status===s)r=x;});if(!r)return;var neg=r.npat_margin_avg<0;
+        h+='<tr><td class="name">'+esc(r.status)+'</td><td>'+num(r.n)+'</td><td>'+bnf(r.os_sum)+'</td>'+
+           '<td>'+r.early_pct+'%</td><td>'+r.roll_pct+'%</td>'+
+           '<td style="color:'+sevColor(r.dpd90p_pct)+';font-weight:600">'+r.dpd90p_pct+'%</td>'+
+           '<td style="color:'+sevColor(r.late180_pct)+'">'+r.late180_pct+'%</td>'+
+           '<td style="color:'+(neg?'var(--agri,#d1544b)':'#12a06e')+';font-weight:600">'+(neg?'−':'')+'฿'+num(Math.abs(r.npat_margin_avg))+'</td></tr>';});
+      h+='</tbody></table></div>';
+    }
+    // risk gradients: LTV + collateral age
+    function gradTable(obj,label,keymap){
+      if(!obj)return '';
+      var keys=Object.keys(obj).sort();
+      var g='<div class="db-sec2">'+esc(label)+'</div><div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Band</th><th>Accounts</th><th>90+</th><th>NPL-live</th><th></th></tr></thead><tbody>';
+      keys.forEach(function(k){var v=obj[k];
+        g+='<tr><td class="name">'+esc(keymap?(keymap[k]||k):k)+'</td><td>'+num(v.n)+'</td>'+
+           '<td style="color:'+sevColor(v.dpd90p_pct)+';font-weight:600">'+v.dpd90p_pct+'%</td>'+
+           '<td>'+(v.npl_live_pct==null?'—':v.npl_live_pct+'%')+'</td>'+
+           '<td style="width:24%">'+lensBar(v.dpd90p_pct,30,sevColor(v.dpd90p_pct))+'</td></tr>';});
+      return g+'</tbody></table></div>';
+    }
+    var AGL={'1.<=5 yr.':'≤5 yr','2.(5-10]yr.':'5–10 yr','3.(10-12]yr.':'10–12 yr','4.(12-15]yr.':'12–15 yr','5.(15-18]yr.':'15–18 yr','6.(18-20]yr.':'18–20 yr','7.(20-25]yr.':'20–25 yr','8.>25 yr.':'>25 yr'};
+    h+=gradTable(T.ltv_ladder,'LTV band → 90+dpd (the cleanest underwriting signal)',null);
+    h+=gradTable(T.collateral&&T.collateral.by_age,'Collateral age at origination → 90+dpd',AGL);
+    h+='<p class="db-note">Provenance: MEASURED loan-tape aggregates (no-PII, cells ≥30). Rankings/economics are estimated framings over measured shares; cost structure is management-provided. Point-in-time tape — roll/cure rates need month-over-month drops.</p>';
+    host.innerHTML=h;
+  });
 }
 
 // ---- lens rankings (National-map lenses, made actionable in the book) ----
