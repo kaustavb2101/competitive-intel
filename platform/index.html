@@ -900,6 +900,37 @@
     <div class="chips" id="mktchips"></div>
     <button id="mktcsv" class="chip" style="margin-bottom:10px">⬇ Download CSV</button>
     <table class="tbl" id="mkttbl"></table>
+
+    <!-- ACQUISITION LENS — collateral concentration from the real loan tape (data/tape_real.json;
+         hidden when absent). Where & what collateral the book concentrates on: type economics,
+         geographic mix, densest branch books, collateral-age risk. -->
+    <div id="mkt-coll" style="display:none">
+      <h2 class="risk" style="margin-top:28px">Collateral concentration · the acquisition lens <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape</span></h2>
+      <p class="lead">Where and what collateral the book concentrates on — collateral <b>type</b> economics, the geographic mix, and the branches most over-indexed on a single brand. No-PII aggregates (cells ≥30 accounts). Cost structure: yield 23.99% (Land 15%) − opex 8% − CoF 2.5%.</p>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Collateral type · economics &amp; risk</h3>
+          <p class="lead" style="font-size:12px">Gross spread before credit loss. Land = thin margin (4.5%) but lowest risk (5.9% 90+).</p>
+          <table class="tbl" id="mkt-coll-econ"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Densest branch collateral books</h3>
+          <p class="lead" style="font-size:12px">Largest single-brand book at a branch — where the network is most concentrated on one make.</p>
+          <table class="tbl" id="mkt-coll-branch"></table>
+        </div>
+      </div>
+      <div class="dash2">
+        <div class="dash2-side">
+          <h3 class="acqsub">Collateral type × region</h3>
+          <table class="tbl" id="mkt-coll-region"></table>
+        </div>
+        <div class="dash2-main">
+          <h3 class="acqsub">Collateral age at origination → risk</h3>
+          <table class="tbl" id="mkt-coll-age"></table>
+        </div>
+      </div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan-tape aggregates (no-PII, cells ≥30; raw stays owner-side). Delinquency &amp; OS are measured; the economics framing (yield/spread) is management cost structure applied to measured balances.</p>
+    </div>
   </section>
 
   <div class="note">

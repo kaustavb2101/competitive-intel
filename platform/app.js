@@ -6179,7 +6179,50 @@ function renderMarket(){
       $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
     }
     drawMarket();
+    loadTapeReal().then(renderMarketCollateral);   // acquisition lens — collateral concentration
    }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
+}
+// ACQUISITION LENS — collateral concentration from the real loan tape (TAPE.collateral): where &
+// what collateral the book concentrates on. Null-safe: the whole block hides when the tape is absent.
+function renderMarketCollateral(){
+  const host=$('#mkt-coll'); if(!host) return;
+  if(!TAPE||!TAPE.collateral){ host.style.display='none'; return; }
+  host.style.display='';
+  const C=TAPE.collateral, N=n=>Number(n).toLocaleString(), bnf=n=>'฿'+(n/1e9).toFixed(1)+'bn';
+  const kk=n=>Math.round(n/1000)+'k';
+  const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+  const ec=$('#mkt-coll-econ');
+  if(ec&&Array.isArray(C.economics_by_type)){
+    ec.innerHTML=`<tr><th>Type</th><th>Accounts</th><th>OS</th><th>Yield</th><th title="yield − opex 8% − CoF 2.5%, before credit loss">Spread</th><th>90+</th></tr>`+
+      C.economics_by_type.map(r=>`<tr><td><b>${r.type}</b></td><td class="mono sub">${N(r.n)}</td>
+        <td class="mono sub">${bnf(r.os_sum)}</td><td class="mono">${r.yield_pct}%</td>
+        <td class="mono" style="color:${r.gross_spread_pct<6?'var(--opp)':'var(--merch)'}"><b>${r.gross_spread_pct}%</b></td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const br=$('#mkt-coll-branch');
+  if(br&&Array.isArray(C.branch_brand_concentration)){
+    br.innerHTML=`<tr><th>Branch</th><th>Brand</th><th>Accounts</th><th>90+</th></tr>`+
+      C.branch_brand_concentration.slice(0,15).map(r=>`<tr><td>${(r.branch||'').replace('เงินไชโย','').replace('สาขา','')}</td>
+        <td class="sub">${r.brand}</td><td class="mono sub">${N(r.n)}</td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const rg=$('#mkt-coll-region');
+  if(rg&&Array.isArray(C.type_x_region)){
+    rg.innerHTML=`<tr><th>Type</th><th>Region</th><th>Accounts</th><th>OS</th><th>90+</th></tr>`+
+      C.type_x_region.slice(0,15).map(r=>`<tr><td><b>${r.type}</b></td><td class="sub">${r.region}</td>
+        <td class="mono sub">${N(r.n)}</td><td class="mono sub">${bnf(r.os_sum)}</td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const ag=$('#mkt-coll-age');
+  if(ag&&C.by_age){
+    const AGL={'1.<=5 yr.':'≤5 yr','2.(5-10]yr.':'5–10 yr','3.(10-12]yr.':'10–12 yr','4.(12-15]yr.':'12–15 yr','5.(15-18]yr.':'15–18 yr','6.(18-20]yr.':'18–20 yr','7.(20-25]yr.':'20–25 yr','8.>25 yr.':'>25 yr'};
+    const rows=Object.entries(C.by_age).sort((a,b)=>a[0].localeCompare(b[0]));
+    ag.innerHTML=`<tr><th>Age at origination</th><th>Accounts</th><th>90+</th><th>Avg eval</th></tr>`+
+      rows.map(([k,v])=>`<tr><td>${AGL[k]||k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}">${v.dpd90p_pct}%</td>
+        <td class="mono sub">${v.eval_avg?kk(v.eval_avg):'—'}</td></tr>`).join('');
+  }
+  wrapTables();   // wrap the dynamically-built tables so wide ones scroll on narrow columns
 }
 let mktRegion='all';
 function drawMarket(){
