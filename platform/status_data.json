@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-24T23:45:22+07:00",
-    "commit": "0a8728e"
+    "generated_at": "2026-07-24T20:21:26Z",
+    "commit": "b3130e0"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,6 +480,42 @@
   ],
   "activity": [
     {
+      "date": "2026-07-24T20:21:26Z",
+      "sha": "b3130e0",
+      "summary": "docs: log the ux-cc-hero-card-narrow-overflow merge+deploy+verify (#150)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T03:17:06+07:00",
+      "sha": "d4a7e33",
+      "summary": "ux: stop command-center hero card overflowing on 360px mobile (#150)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T01:12:31+07:00",
+      "sha": "fd41b28",
+      "summary": "feat(databook): loan-tape geo-rollup folded into region/province/branch views (#148)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-25T01:04:07+07:00",
+      "sha": "3df1e0a",
+      "summary": "feat(pipeline): gdcatalog.go.th autonomous harvester (CKAN + OCR-PDF, background long-runner) (#147)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-25T00:21:21+07:00",
+      "sha": "0313903",
+      "summary": "feat(databook): full branch browse + per-branch drill-down (#146)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-24T16:46:35Z",
+      "sha": "8a4a624",
+      "summary": "docs: log the drought-vintage service fix (#145) + refresh autonomy plan / CEO dashboard",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-24T23:45:22+07:00",
       "sha": "0a8728e",
       "summary": "fix(service): recover the district-drought layer's dropped freshness vintage in the Data-room card (#145)",
@@ -492,7 +528,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T14:49:19+00:00",
+      "date": "2026-07-24T14:49:19Z",
       "sha": "3d3e8b8",
       "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -504,19 +540,19 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-24T12:29:08+00:00",
+      "date": "2026-07-24T12:29:08Z",
       "sha": "38cf88a",
       "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T11:12:37+00:00",
+      "date": "2026-07-24T11:12:37Z",
       "sha": "ca42d29",
       "summary": "committee: refresh autonomy plan (run 30088421749)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-24T10:27:38+00:00",
+      "date": "2026-07-24T10:27:38Z",
       "sha": "0c90e4e",
       "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
       "pillar": "deployment"
@@ -528,7 +564,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-24T08:15:57+00:00",
+      "date": "2026-07-24T08:15:57Z",
       "sha": "2322170",
       "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -552,7 +588,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T02:18:21+00:00",
+      "date": "2026-07-24T02:18:21Z",
       "sha": "7616550",
       "summary": "docs: log ux-cc-jumplink-href merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -588,7 +624,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-23T22:21:01+00:00",
+      "date": "2026-07-23T22:21:01Z",
       "sha": "fccc9d0",
       "summary": "committee: refresh autonomy plan after truck-flow ship (2026-07-23)",
       "pillar": "deployment"
@@ -600,13 +636,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-23T22:14:59+00:00",
+      "date": "2026-07-23T22:14:59Z",
       "sha": "a0136e7",
       "summary": "committee: refresh autonomy plan (run 30048841499)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T20:23:03+00:00",
+      "date": "2026-07-23T20:23:03Z",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
@@ -622,42 +658,6 @@
       "sha": "52dfcd3",
       "summary": "data(provenance): regenerate on the healed master tree (farmgate chain + density refresh) under the WSL 3.11 mirror",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-24T00:12:25+07:00",
-      "sha": "61cdd70",
-      "summary": "data(density): refresh per-branch 10km building counts from the 77 province-wide catchments",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-24T00:12:24+07:00",
-      "sha": "52e2da8",
-      "summary": "fix(data): rebuild the farmgate chain downstream of #113's NABC refresh — heals red master CI",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T00:03:38+07:00",
-      "sha": "a649622",
-      "summary": "Merge pull request #127 from kaustavb2101/claude/tape-frontier",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-23T23:56:38+07:00",
-      "sha": "932bc85",
-      "summary": "feat(tape): NPAT frontier + collateral brand×age matrix on Exposure (Phase 3 of the real-tape wave)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-23T23:52:56+07:00",
-      "sha": "23cdf43",
-      "summary": "Merge pull request #126 from kaustavb2101/claude/real-tape-wave",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-23T23:47:33+07:00",
-      "sha": "5869804",
-      "summary": "data(provenance): regenerate on the real-tape-wave tree (104 layers) under the WSL 3.11 mirror",
-      "pillar": "service"
     }
   ]
 }
