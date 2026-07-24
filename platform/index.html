@@ -22,16 +22,16 @@
   if(m){m.focus();m.scrollIntoView({block:'start'});}});})();</script>
 <nav id="nav" aria-label="Main views">
   <span class="nb" lang="th">AutoX<b>·</b>เงินไชโย</span>
-  <!-- Nav = the FIVE-PILLAR journey (owner IA 2026-07-24): Home + Data book, then the pillars in
-       order — ① Macro (backdrop) → ② Acquisition (network & collateral concentration) →
-       ③ Assistance (who needs help now) → ④ Risk (portfolio stress, live book vs 180+ legacy) →
-       ⑤ Competitor (rival pressure). Routing is by data-v (order-independent); the sequence is the
-       narrative. Risk-trend / Provinces / Market / Branches / Simulator live under More. -->
+  <!-- Nav = the FIVE-PILLAR journey (owner IA 2026-07-24): the pillars in order — ① Macro (backdrop)
+       → ② Acquisition (the network, in the DATA BOOK — browse & drill all 2,015 branches; the map is
+       demoted to an optional "Map view" under More) → ③ Assistance (who needs help now) → ④ Risk
+       (portfolio stress, live book vs 180+ legacy) → ⑤ Competitor (rival pressure). Routing is by
+       data-v (order-independent); the sequence is the narrative. Data-book-first (owner 2026-07-25):
+       the branch/network surface is the data book, not the 2,015-dot Leaflet map. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
-  <a href="data.html">Data book</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <a data-v="overview" href="#overview" title="① Macro — the backdrop moving the book (rates, commodities, fuel, collateral outlook)">Macro</a>
-  <a data-v="map" href="#map" title="② Acquisition — the network & where the collateral book concentrates">Acquisition</a>
+  <a href="data.html" title="② Acquisition — the network in the data book: browse &amp; drill all 2,015 branches, province by province, with every measured feature">Acquisition</a>
   <a data-v="assist" href="#assist" title="③ Assistance — which segments are hit most & need pre-emptive help">Assistance</a>
   <a data-v="exposure" href="#exposure" title="④ Risk — where the book sits in stress: live book vs the 180+ legacy stock">Risk</a>
   <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
@@ -39,6 +39,8 @@
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+      <a href="data.html" role="menuitem">Data book ↗</a>
+      <a data-v="map" href="#map" role="menuitem" title="Optional spatial view — 2,015 branch dots on a map">Map view</a>
       <a data-v="trend" href="#trend" role="menuitem">Risk trend</a>
       <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
       <a data-v="market" href="#market" role="menuitem">Market</a>

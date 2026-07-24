@@ -214,7 +214,7 @@ function renderNational(){
   // lens rankings — the National-map lenses as ranked, actionable lists (owner feedback 2026-07-20:
   // "the powerful data in the national map view is lost on me since it's not actionable")
   h+='<div class="db-sec"><span class="n">L</span> Lens rankings — the National-map signals as ranked lists <span class="db-badge" style="color:var(--gold,#e6b450)">ESTIMATED composites</span></div>';
-  h+='<p class="db-sub">The same per-branch and per-district lens scores the National map colors its dots with — ranked here so they are actionable. Scores are <b>estimated composites over measured inputs</b> (POI counts, factories, workers, rainfall, population are measured; the blend into one score is a model). Top 40 shown per lens.</p>';
+  h+='<p class="db-sub">The same per-branch and per-district lens scores the National map colors its dots with — ranked here so they are actionable. Scores are <b>estimated composites over measured inputs</b> (POI counts, factories, workers, rainfall, population are measured; the blend into one score is a model). Top 40 shown per lens — or <a href="?branches'+THEME_QS+'"><b>browse all '+num(n.branches)+' branches →</b></a> (sort/filter/search every feature, drill into any branch).</p>';
   h+='<div class="db-chiprow" id="blchips">'+BLENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-bl="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
   h+='<div id="lensbr" class="db-note">Loading branch lenses…</div>';
   h+='<div class="db-chiprow" style="margin-top:14px" id="alchips">'+ALENS.map(function(l,i){return '<button class="db-chip'+(i===0?' on':'')+'" data-al="'+l.k+'">'+esc(l.t)+'</button>';}).join('')+'</div>';
@@ -529,11 +529,37 @@ function provinceView(d,sum,reg,rank,total){
   h+='<div class="db-sec"><span class="n">5</span> Inside the province — districts</div>';
   h+=districtTable(d);
 
+  // SECTION 6 — the province's own branches (drill province -> branch)
+  h+='<div class="db-sec"><span class="n">6</span> Branches in '+esc(d.province_en||d.province_th||'')+'</div>';
+  h+='<div id="provbranches"><p class="db-note">Loading branches…</p></div>';
+
   // demoted 3D links
   h+='<div class="db-3dlinks"><a href="rayong-catchment.html?city='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">🏙 Open 3D building scene</a><a href="province.html?p='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">▦ Open 3D district view</a></div>';
   h+=footer();
   document.getElementById('db-loading').style.display='none';
   document.getElementById('db-root').innerHTML=h;
+  fillProvinceBranches(d.province_th);
+}
+function fillProvinceBranches(provTh){
+  var host=document.getElementById('provbranches'); if(!host)return;
+  loadBranchLayers(function(){
+    var rows=[]; BR2.forEach(function(d,i){if(d&&d.v===provTh)rows.push({d:d,i:i});});
+    rows.sort(function(A,B){return (B.d.o||0)-(A.d.o||0);});
+    if(!rows.length){host.innerHTML='<p class="db-note" style="text-align:left;padding:8px 0">No per-branch records for this province.</p>';return;}
+    var h='<p class="db-sub" style="margin:2px 0 8px">All '+num(rows.length)+' branches here, highest opportunity first. Scores are estimated 0–100 lens screens; click a branch for its full readout.</p>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Branch</th><th>District</th><th>Opp</th><th>Agri-PD</th><th>Merchant</th><th>Collat</th><th>Pop ≤10km</th><th>Workers</th></tr></thead><tbody>';
+    rows.forEach(function(row){var d=row.d;
+      h+='<tr data-i="'+row.i+'" style="cursor:pointer"><td class="name" lang="th">'+esc(d.n)+'</td><td class="sub" lang="th">'+esc(d.d||'—')+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.o)+'">'+Math.round(d.o)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.a)+'">'+Math.round(d.a)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.m)+'">'+Math.round(d.m)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.c)+'">'+Math.round(d.c)+'</td>'+
+        '<td class="mono">'+num(d.pop)+'</td><td class="mono">'+num(d.dwork)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    host.innerHTML=h;
+    host.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-i'))location.href='?b='+tr.getAttribute('data-i')+THEME_QS;});
+  });
 }
 function metricRow(label,sub,val,graphic){
   return '<div class="db-row"><div class="rl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><div class="rv">'+val+'</div><div class="rg">'+(graphic||'')+'</div></div>';
@@ -573,6 +599,153 @@ function footer(){
   return '<div class="db-foot">Measured sources: DIW factories · DLT registered vehicles · NSO labour force &amp; income · big-4 rival branch census. Region figures are true rollups (counts summed; shares as ratio-of-sums; incomes labour-weighted). "vs national" uses the computed labour-weighted national mean. Bangkok’s informal/formal split is unavailable and is skipped in that ratio only.</div>';
 }
 
+// ============================ BRANCH LEVEL ============================
+// The data-book branch surface (owner IA): all 2,015 branches browsable + a per-branch drill-down
+// that consolidates the index-aligned branch layers. ?branches = the full table; ?b=<index> = one
+// branch's readout. Everything joins on the branches.json record index.
+var BR2=null, BRPROV=null, BRLAYERS={};
+function loadBranchLayers(cb){
+  if(BR2){cb();return;}
+  var need=['branches','provinces/index','branch_risk','branch_peers','branch_recommendations','branch_density','branch_occupations'];
+  Promise.all(need.map(function(f){return fetch('data/'+f+'.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}))
+   .then(function(res){
+     BR2=res[0]||[];
+     var idx=res[1], provs=Array.isArray(idx)?idx:((idx&&idx.provinces)||[]);
+     BRPROV={}; provs.forEach(function(p){BRPROV[p.th||p.name_th||p.name]=p;});
+     BRLAYERS={risk:res[2],peers:res[3],recs:res[4],density:res[5],occ:res[6]};
+     cb();
+   }).catch(function(){var el=document.getElementById('db-loading');if(el)el.textContent='Could not load data/branches.json.';});
+}
+function scoreCol(v){if(v==null)return 'var(--dim)';if(v>=67)return '#12a06e';if(v>=45)return 'var(--gold,#e6b450)';if(v>=25)return '#D97A3A';return 'var(--agri,#d1544b)';}
+function riskCol(v){if(v==null)return 'var(--dim)';if(v>=60)return 'var(--agri,#d1544b)';if(v>=40)return 'var(--gold,#e6b450)';return '#12a06e';}
+function estabTot(d){var k=d.k10;if(!k)return 0;var t=0;for(var key in k){t+=k[key]||0;}return t;}
+var BRCOLS=[
+  {t:'Branch',g:function(d){return d.n;},txt:1},
+  {t:'Province',g:function(d){return d.v;},txt:1},
+  {t:'District',g:function(d){return d.d||'';},txt:1},
+  {t:'Opportunity',g:function(d){return d.o;},score:1},
+  {t:'Agri-PD',g:function(d){return d.a;},score:1},
+  {t:'Merchant',g:function(d){return d.m;},score:1},
+  {t:'Collateral',g:function(d){return d.c;},score:1},
+  {t:'Pop ≤10km',g:function(d){return d.pop;},n:1},
+  {t:'Workers',g:function(d){return d.dwork;},n:1},
+  {t:'Factories',g:function(d){return d.dfac;},n:1},
+  {t:'Estab ≤10km',g:estabTot,n:1},
+  {t:'Rain',g:function(d){return d.rain;},n:1}
+];
+var brSort={c:3,dir:-1}, brFilter='all', brQuery='';
+function natHref(){return '?'+(THEME_QS?THEME_QS.replace(/^&/,''):'');}
+function renderBranchBrowse(){
+  loadBranchLayers(function(){
+    document.getElementById('db-loading').style.display='none';
+    var regions=['all']; BR2.forEach(function(d){if(d&&regions.indexOf(d.r)<0)regions.push(d.r);});
+    var h=crumb([{t:'Thailand (all 77)',href:natHref()},{t:'All branches'}]);
+    h+='<h1 class="db-h1">All branches — the network in numbers</h1>';
+    h+='<p class="db-sub">Every one of the '+num(BR2.length)+' AutoX branches, with all measured features and the estimated lens scores. Sort any column, filter by region, search, or download. Click a branch for its full readout.</p>';
+    h+='<div class="db-chiprow" id="brchips">'+regions.map(function(r){return '<button class="db-chip'+(r===brFilter?' on':'')+'" data-r="'+esc(r)+'">'+(r==='all'?'All 77':esc(r))+'</button>';}).join('')+'</div>';
+    h+='<input class="search" id="brsearch" type="search" placeholder="Search branch / province / district…" style="margin-bottom:10px" value="'+esc(brQuery)+'">';
+    h+='<button class="db-chip" id="brcsv" style="margin:0 0 12px">⬇ Download CSV</button>';
+    h+='<div class="db-tblwrap"><table class="db-tbl" id="brtbl"><thead><tr>';
+    BRCOLS.forEach(function(c,ci){h+='<th data-c="'+ci+'" tabindex="0" role="button">'+esc(c.t)+'</th>';});
+    h+='</tr></thead><tbody id="brbody"></tbody></table></div>';
+    h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Scores (opportunity / agri-PD / merchant / collateral) are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Pop / workers / factories / establishments / rain are MEASURED. Click any branch for its full readout.</p>';
+    document.getElementById('db-root').innerHTML=h;
+    var chips=document.getElementById('brchips');
+    chips.onclick=function(e){var b=e.target.closest('.db-chip');if(!b)return;brFilter=b.getAttribute('data-r');chips.querySelectorAll('.db-chip').forEach(function(c){c.classList.toggle('on',c===b);});fillBranchBody();};
+    var s=document.getElementById('brsearch');
+    s.oninput=function(){brQuery=s.value;fillBranchBody();};
+    document.getElementById('brtbl').querySelectorAll('th').forEach(function(th){
+      function so(){var c=+th.getAttribute('data-c');if(brSort.c===c)brSort.dir*=-1;else{brSort.c=c;brSort.dir=(BRCOLS[c].txt?1:-1);}fillBranchBody();}
+      th.addEventListener('click',so);
+      th.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();so();}});
+    });
+    document.getElementById('brbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-i'))location.href='?b='+tr.getAttribute('data-i')+THEME_QS;});
+    fillBranchBody();
+  });
+}
+function branchRows(){
+  var q=brQuery.trim().toLowerCase(), rows=[];
+  BR2.forEach(function(d,i){if(!d)return;
+    var en=(BRPROV[d.v]&&BRPROV[d.v].en)||'';
+    if((brFilter==='all'||d.r===brFilter)&&(!q||d.n.toLowerCase().indexOf(q)>=0||d.v.toLowerCase().indexOf(q)>=0||en.toLowerCase().indexOf(q)>=0||(d.d||'').toLowerCase().indexOf(q)>=0))
+      rows.push({d:d,i:i});
+  });
+  var col=BRCOLS[brSort.c];
+  rows.sort(function(A,B){var a=col.g(A.d),b=col.g(B.d);
+    if(col.txt)return brSort.dir*String(a||'').localeCompare(String(b||''));
+    return brSort.dir*((a==null?-1:a)-(b==null?-1:b));});
+  return rows;
+}
+function fillBranchBody(){
+  var rows=branchRows(), body=document.getElementById('brbody'); if(!body)return;
+  document.querySelectorAll('#brtbl th').forEach(function(th){var c=+th.getAttribute('data-c');
+    th.className=(c===brSort.c)?(brSort.dir>0?'sort-asc':'sort-desc'):'';});
+  var out='';
+  rows.forEach(function(row){var d=row.d;out+='<tr data-i="'+row.i+'" style="cursor:pointer">';
+    BRCOLS.forEach(function(c){var v=c.g(d);
+      if(c.txt)out+='<td class="'+(c.t==='Branch'?'name':'sub')+'" lang="th">'+esc(v||'—')+'</td>';
+      else if(c.score)out+='<td class="mono" style="color:'+scoreCol(v)+'">'+(v==null?'—':Math.round(v))+'</td>';
+      else out+='<td class="mono">'+num(v)+'</td>';});
+    out+='</tr>';});
+  body.innerHTML=out||'<tr><td colspan="'+BRCOLS.length+'" class="db-note" style="padding:20px">No branches match. Clear the search or region filter.</td></tr>';
+  var csv=document.getElementById('brcsv'); if(csv){csv.textContent='⬇ Download CSV ('+num(rows.length)+')';
+    csv.onclick=function(){
+      var hdr=['branch','province','region','district','opportunity_est','agri_pd_est','merchant_est','collateral_est','pop_10km','district_workers','district_factories','estab_10km','rain'];
+      var lines=[hdr.join(',')].concat(rows.map(function(row){var d=row.d;
+        return [d.n,d.v,d.r,d.d,d.o,d.a,d.m,d.c,d.pop,d.dwork,d.dfac,estabTot(d),d.rain].map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}).join(',');}));
+      var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='autox_branches.csv';a.click();URL.revokeObjectURL(a.href);
+    };}
+}
+function renderBranch(idxStr){
+  var idx=parseInt(idxStr,10);
+  loadBranchLayers(function(){
+    document.getElementById('db-loading').style.display='none';
+    var d=BR2[idx];
+    if(!d){document.getElementById('db-root').innerHTML='<p class="db-note">Branch not found. <a href="?branches'+THEME_QS+'">Back to all branches →</a></p>';return;}
+    var pv=BRPROV[d.v]||{}, slug=pv.slug;
+    var L=BRLAYERS, at=function(o){return (o&&o.branches&&o.branches[idx])||null;};
+    var risk=at(L.risk), peer=at(L.peers), recs=at(L.recs), dens=at(L.density);
+    var h=crumb([{t:'Thailand',href:natHref()},{t:d.v,href:slug?('?p='+encodeURIComponent(slug)+THEME_QS):null},{t:'All branches',href:'?branches'+THEME_QS},{t:d.n}]);
+    h+='<h1 class="db-h1" lang="th">'+esc(d.n)+' <span class="th">'+esc(d.d||'')+' · '+esc(d.v)+'</span></h1>';
+    h+='<p class="db-sub">'+esc(d.r)+' region'+(risk&&risk.code?' · <span class="mono">'+esc(risk.code)+'</span>':'')+'. The full measured feature set, the estimated lens scores, and the peer-twin benchmark for this branch.</p>';
+    h+='<div class="db-kpis">';
+    h+=kpi('<span style="color:'+scoreCol(d.o)+'">'+Math.round(d.o)+'</span>','Opportunity (est)','coverage / under-served demand');
+    h+=kpi('<span style="color:'+scoreCol(d.a)+'">'+Math.round(d.a)+'</span>','Agri-PD (est)','agri-stress exposure');
+    h+=kpi('<span style="color:'+scoreCol(d.m)+'">'+Math.round(d.m)+'</span>','Merchant (est)','trade depth ≤10km');
+    h+=kpi('<span style="color:'+scoreCol(d.c)+'">'+Math.round(d.c)+'</span>','Collateral (est)','vehicle / gold depth');
+    if(risk)h+=kpi('<span style="color:'+riskCol(risk.composite_risk)+'">'+Math.round(risk.composite_risk)+'</span>','Composite risk (est)','household+agri+occupation+seg');
+    h+='</div>';
+    h+='<div class="db-sec2">Measured features</div><div class="db-tblwrap"><table class="db-tbl"><tbody>';
+    function frow(k,v){return '<tr style="cursor:default"><td class="name">'+esc(k)+'</td><td class="mono">'+v+'</td></tr>';}
+    h+=frow('Population ≤10km',num(d.pop));
+    h+=frow('District factory workers (DIW)',num(d.dwork));
+    h+=frow('District factories (DIW)',num(d.dfac));
+    if(dens)h+=frow('Buildings ≤10km (Overture)',num(dens.buildings_10km)+' <span class="sub">'+esc((dens.bucket||'').replace(/_/g,' '))+'</span>');
+    h+=frow('Recent rainfall index',d.rain==null?'—':d.rain);
+    if(d.k10){[['ind','Industrial POI'],['bank','Banks'],['atm','ATMs'],['cvs','Convenience'],['hotel','Hotels']].forEach(function(o){if(d.k10[o[0]]!=null)h+=frow(o[1]+' ≤10km',num(d.k10[o[0]]));});}
+    if(risk&&risk.components){var cm=risk.components;for(var ck in cm){h+=frow('Risk component — '+ck,'<span style="color:'+riskCol(cm[ck])+'">'+Math.round(cm[ck])+'</span>');}}
+    h+='</tbody></table></div>';
+    if(peer){
+      h+='<div class="db-sec2">Peer-twin benchmark</div>';
+      h+='<p class="db-sub">This branch vs its 15 statistical market-twins (same 10km fingerprint, ≥25km away). dev = robust σ above/below the twin median — "risky vs its market" is not the same as "risky market".</p>';
+      h+='<div class="db-kpis">';
+      h+=kpi((peer.dev>0?'+':'')+peer.dev+'σ','vs peer twins',peer.dev>=2?'RISKY vs its market twins':peer.dev<=-1?'better than its market':'in line with its market');
+      if(peer.pm!=null)h+=kpi(peer.pm,'twin median risk','the local market baseline');
+      h+='</div>';
+    }
+    if(recs&&recs.recs&&recs.recs.length){
+      h+='<div class="db-sec2">Recommendations</div><div class="db-rows">';
+      recs.recs.forEach(function(r){var tc=r.tone==='good'?'#12a06e':r.tone==='bad'?'var(--agri,#d1544b)':'var(--mid)';
+        h+='<div class="db-row" style="grid-template-columns:28px 1fr"><div class="rl" style="font-size:16px">'+(r.i||'•')+'</div><div class="rl" style="color:'+tc+'">'+esc(r.t)+'</div></div>';});
+      h+='</div>';
+    }
+    h+='<div class="db-3dlinks"><a href="branch-explorer.html?lat='+d.y+'&lng='+d.x+'&n=1'+THEME_QS+'">🏙 3D branch scene →</a>'+(slug?'<a href="rayong-catchment.html?city='+encodeURIComponent(slug)+THEME_QS+'">🏙 province buildings →</a>':'')+'<a href="?branches'+THEME_QS+'">← all branches</a></div>';
+    h+='<p class="db-note" style="padding:14px 0 0;text-align:left">Lens scores &amp; composite risk are ESTIMATED 0–100 screens over measured inputs — not measured default rates. Population / workers / factories / buildings / POI counts are MEASURED.</p>';
+    document.getElementById('db-root').innerHTML=h;
+  });
+}
+
 // ---- boot ----
 // load the per-person occupation-income layer first (best-effort, null-safe), then the data book.
 fetch('data/occupation_income_individual.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}).then(function(oi){
@@ -581,8 +754,10 @@ fetch('data/occupation_income_individual.json').then(function(r){return r.ok?r.j
 }).then(function(data){
   DATA=data;
   document.getElementById('db-loading').style.display='none';
-  var qs=new URLSearchParams(location.search),p=qs.get('p'),rg=qs.get('r');
-  if(p)renderProvince(p);
+  var qs=new URLSearchParams(location.search),p=qs.get('p'),rg=qs.get('r'),b=qs.get('b');
+  if(b!=null&&b!=='')renderBranch(b);
+  else if(qs.has('branches'))renderBranchBrowse();
+  else if(p)renderProvince(p);
   else if(rg)renderRegion(rg);
   else renderNational();
 }).catch(function(){
