@@ -154,8 +154,13 @@ def _vintage_of(m):
     # snapshot (drought_district — the MODELLED OAE SPEI district-drought layer) is the
     # SPEI reference month (e.g. 2026-06); it is a data-vintage, so it sits with the
     # other observation-window keys, ahead of any pull timestamp.
+    # price_asof (peer_scoreboard — the MEASURED SET listed-peer market scoreboard) is the
+    # market-price observation date (e.g. 2026-07-17); it is a data-observation vintage
+    # like observed_to / price_vintage, so it sits with them, ahead of any pull timestamp
+    # (the layer cannot auto-refresh — SET is Akamai/bot-blocked from CI — so surfacing its
+    # own observation date is exactly how the exec sees how current the scoreboard is).
     for k in ("updated", "vintage", "as_of", "updated_to",
-              "observed_to", "price_vintage", "snapshot", "pico_vintage",
+              "observed_to", "price_vintage", "price_asof", "snapshot", "pico_vintage",
               "vintage_individual", "pulled_at_utc", "pulled", "promos_pulled_at"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():

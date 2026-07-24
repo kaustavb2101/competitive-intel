@@ -5,20 +5,35 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-24 · latest ship: the freshly-surfaced district-drought layer's dropped freshness stamp recovered in the Data-room card (§1) · against `platform/data/provenance.json` (104 layers · 409 files)._
+_Audit run: 2026-07-24 (pm) · latest ship: the listed-peer market scoreboard's dropped freshness stamp recovered in the Data-room card (§1) · against `platform/data/provenance.json` (104 layers · 409 files)._
 
 ## Headline
 
 The data room is healthy. **No broken data references, no missing fetches; provenance intact
 (52 measured · 51 estimated · the single standing catchment family).** The one concrete gap this
-run **fixed**: `drought_district.json` — the MODELLED OAE-SPEI district-drought layer surfaced on
-Overview only days ago (#141) — stamps its real freshness date under the key `snapshot`
-(`= 2026-06`, the SPEI reference month), which `build_provenance.py::_vintage_of()` did not scan, so
-its vintage showed **blank** in the exec-facing Data-room card. Exactly the same class of bug as the
-2026-07-17 (6 keys) and 2026-07-19 (3 keys) §1 fixes; a full re-scan of every committed layer's
-`meta` this run found `snapshot` to be the **only** remaining unscanned date-shaped freshness key,
-carried by this **one** layer — so the extractor now scans it and the drought vintage surfaces like
-the rest.
+run **fixed**: `peer_scoreboard.json` — the MEASURED SET listed-peer market scoreboard (obj #2, the
+sharpest external competitive benchmark AutoX has) — stamps its real freshness date under the key
+`price_asof` (`= 2026-07-17`, the SET price-observation date), which `build_provenance.py::_vintage_of()`
+did not scan, so its vintage showed **blank** in the exec-facing Data-room card. Exactly the same
+class of bug as the 2026-07-17 (6 keys), 2026-07-19 (3 keys) and 2026-07-24-am (`snapshot`) §1 fixes;
+a full re-scan of every committed analytical layer's `meta` this run found `price_asof` to be the one
+remaining **data-vintage** key still unscanned — so the extractor now scans it and the scoreboard
+vintage surfaces like the rest. (Four other blank-vintage layers — `amphoe_crops`, `crop_margin`,
+`region_debt`, `rival_universe` — carry only a **pull/verify** stamp, `retrieved` / `cost_ingested` /
+`verified`, which the standing convention deliberately deprioritizes vs a data-observation vintage
+[see the 2026-07-24-am note below], so their blank cells are the accepted honest ABSENT state, not a
+bug.)
+
+**Verified this run — the SET scoreboard cannot auto-refresh (a structural staleness, not a gap to
+fix with a CI job):** every other live-pull layer family in the repo now has a scheduled `data-*.yml`
+refresh job (the ThaiWater omission was closed 2026-07-24). The listed-peer scoreboard is the last
+family **without** one — but unlike ThaiWater it is **genuinely blocked from CI**: `set.or.th`'s API
+403s every external request (Akamai bot-protection) and even a headless-browser same-origin fetch from
+this datacenter sandbox got `ERR_CONNECTION_RESET` (verified this run). So SET belongs with the
+competitor corporate sites in the **owner-side / Thai-IP-only** refresh set, not the CI-refreshable
+set — building a `data-set.yml` job would build a job that cannot pull. Surfacing the layer's own
+`price_asof` observation date (this fix) is therefore exactly how the exec sees how current the
+scoreboard is; a future refresh is owner-side (`pull_set_peers.py` from a browser that clears Akamai).
 
 _Tree grew 96 → 104 layers since the last audit (drought_district, crop_drought, the two thaiwater
 live-pulse layers, set/valuation and credit-anchor market layers, …). Re-verified this run: the
@@ -29,9 +44,29 @@ input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fail
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-**2026-07-24 (this run):** a full re-scan of all 104 layers' `meta` blocks for date-shaped freshness
-fields *not* in the extractor's key list found **one** layer still dropping a real vintage from the
-Data-room card:
+**2026-07-24 (pm, this run):** a full re-scan of all analytical layers' `meta` blocks for date-shaped
+freshness fields *not* in the extractor's key list found **one** layer still dropping a real
+**data-vintage** from the Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `peer_scoreboard.json` | `price_asof` | 2026-07-17 | MEASURED SET listed-peer market scoreboard (obj #2) |
+
+`_vintage_of()` now also scans `price_asof`, placed among the data-vintage keys (right after
+`price_vintage`, ahead of any pull timestamp — `price_asof` is the SET market-price observation date,
+a data-observation vintage exactly like `observed_to` / `price_vintage`, not a pull time). Verified
+the change touches **only this one** vintage cell (`'' → 2026-07-17`); a diff of the regenerated
+ledger confirms every other field — the 104-layer counts (52 measured · 51 estimated · 1 unlabelled),
+labels, sources, the files block — is byte-identical, and `build_provenance.py --check` passes on the
+recommitted ledger. **Headless render self-review** of `index.html#home` (`data-errors:[]`, 0 JS
+errors) shows the Data-room `peer_scoreboard.json` row now reads `2026-07-17 · 2 KB` (was blank). No
+date is invented — `2026-07-17` is read from the layer's own committed `meta.price_asof`.
+
+---
+
+**2026-07-24 (am, prior run):** a full re-scan of all 104 layers' `meta` blocks for date-shaped
+freshness fields *not* in the extractor's key list found **one** layer still dropping a real vintage
+from the Data-room card:
 
 | Layer | Freshness key (was dropped) | Value now surfaced | Class |
 |---|---|---|---|
