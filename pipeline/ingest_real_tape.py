@@ -128,7 +128,7 @@ def main():
         "province", "prov_x_occ", "region", "area", "occupation", "occ_fine", "income_tier",
         "ltv_range", "vintage_ym", "vehicle_type", "product_group", "coll_age",
         "brand", "brand_x_collage", "brand_x_region", "vehicle_x_ltv", "model",
-        "occ_x_income", "occ_x_region", "branch", "dpd_bucket",
+        "occ_x_income", "occ_x_region", "branch", "dpd_bucket", "geo_region",
         # restructuring status (owner ask 2026-07-24): separate Normal / Pre-emptive / TDR / Skip
         "acc_chng", "chg_x_bucket", "chg_x_occ", "chg_x_region",
         # collateral deep-dive (owner ask 2026-07-24): the collateral BOOK crossed by
@@ -162,6 +162,10 @@ def main():
         br = str(g(r, "account_disb_Booking_Branch_Name") or "(blank)")
         hit = mname.get(norm_branch(br))
         prov = hit[0] if hit and hit[0] else "(unjoined)"
+        # geographic region from the MASTER join (East/Isan/North/South/Central&BKK) — matches
+        # regions.json, so the data book can roll the tape up to the region cards. (Distinct from
+        # the tape's own account_disb_Region field, which is an internal ops region NE1/NE2/…)
+        region_geo = hit[2] if hit and hit[2] else "(unjoined)"
         if hit:
             matched += 1
         occ = str(g(r, "account_disb_ocp_grp") or "(blank)")
@@ -199,6 +203,7 @@ def main():
             "occ_x_region": occ + "|" + region,
             "branch": br,
             "dpd_bucket": dpd,
+            "geo_region": region_geo,
             # restructuring status split (Normal / Pre-emptive / TDR / Skip)
             "acc_chng": chg,
             "chg_x_bucket": chg + "|" + stage,
