@@ -1209,6 +1209,7 @@ function showTab(v){
   document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
+  if(v==='assist') renderAssist();
   if(v==='overview') renderOverview();
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
@@ -6437,6 +6438,84 @@ function renderHomePillars(){
   cards.push(pillCard(5,'Competitor','var(--merch)','acq',cBig,cRead,'Competition'));
 
   host.innerHTML=cards.join('');
+}
+/* ③ ASSISTANCE VIEW — the "who needs help now" page (owner ask: where are the segments hit most
+   and needing assistance). Reads data/tape_real.json: segments-hit-most ranked hit-list +
+   X-days pre-emptive window (drought radar) + restructuring (Normal / Pre-emptive / TDR — did it
+   hold?). Null-safe: calm note when the tape layer is absent. */
+function assistSev(v){ // color a 90+ rate
+  if(v==null) return 'var(--dim)';
+  if(v<8) return 'var(--merch)';
+  if(v<14) return '#9CB24E';
+  if(v<20) return 'var(--gold)';
+  if(v<26) return '#D97A3A';
+  return 'var(--agri)';
+}
+function renderAssist(){
+  if(!document.getElementById('v-assist')) return;
+  loadTapeReal().then(()=>{
+    const T=TAPE, absent=$('#assist-absent'), hero=$('#assist-hero');
+    if(!T||!T.bucket_ladder){ if(absent)absent.style.display=''; if(hero)hero.innerHTML=''; return; }
+    if(absent)absent.style.display='none';
+    const N=n=>Number(n).toLocaleString(), bn=n=>'฿'+(n/1e9).toFixed(1)+'bn', mn=n=>'฿'+(n/1e6).toFixed(0)+'m';
+    const lb=T.bucket_ladder.live_book;
+    const rs=(T.restructuring&&T.restructuring.by_status)||[];
+    const pe=rs.find(s=>s.status==='Pre-emptive'), tdr=rs.find(s=>s.status==='TDR');
+    const r0=(T.assistance_radar||[])[0];
+    // hero KPI strip (reuse .mcard)
+    if(hero) hero.innerHTML=[
+      ['X-days pre-emptive window',N(lb.xdays_n),'accounts late &lt;30dpd — intervene before roll','var(--opp)'],
+      ['Rolling (30–89dpd)',N(lb.roll_n),'in the roll pipeline — recoverable middle','#D97A3A'],
+      ['Pre-emptively restructured',pe?N(pe.n):'—',pe?pe.dpd90p_pct+'% already at 90+ — bleeding':'','var(--collat)'],
+      ['TDR — restructure failing',tdr?N(tdr.n):'—',tdr?tdr.dpd90p_pct+'% at 90+, '+tdr.late180_pct+'% at 180+':'','var(--agri)'],
+    ].map(k=>`<div class="mcard" style="border-left:3px solid ${k[3]}"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+
+    // segments hit most (occ_x_region)
+    const seg=((T.segments_hit&&T.segments_hit.occ_x_region)||[]).slice(0,15);
+    $('#assist-segments').innerHTML = seg.length ? `<table class="tbl"><tr>
+        <th>Occupation × region</th><th>Accounts</th><th>OS</th>
+        <th title="90+dpd share">90+</th><th title="30–89dpd roll">Roll</th>
+        <th title="X-days slipping">X-days</th><th title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
+      seg.map(r=>`<tr>
+        <td><b>${r.occupation}</b> <span class="sub mono">· ${r.region}</span></td>
+        <td class="mono">${N(r.n)}</td><td class="mono sub">${mn(r.os_sum)}</td>
+        <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+        <td class="mono">${r.roll_pct}%</td><td class="mono" style="color:var(--opp)">${r.early_pct}%</td>
+        <td class="mono"><b>${r.score}</b></td></tr>`).join('')+`</table>` :
+      `<p class="lead sub">No occupation×region cells cleared the ≥300-account floor.</p>`;
+
+    // pre-emptive radar (province × drought)
+    const rad=(T.assistance_radar||[]).slice(0,12);
+    $('#assist-radar').innerHTML = rad.length ? `<table class="tbl"><tr>
+        <th>Province</th><th title="X-days: late but <30dpd — call this week">Tier 1 · slipping</th>
+        <th title="current accounts in the same stressed cell">Tier 2 · watch</th>
+        <th title="share of districts at severe/extreme OAE SPEI">Drought</th>
+        <th>What they grow (stressed districts)</th></tr>`+
+      rad.map(r=>`<tr>
+        <td><b>${r.province}</b> <span class="sub mono">${N(r.n_farmers)} farmers</span></td>
+        <td class="mono" style="color:var(--opp)"><b>${N(r.tier1_slipping)}</b></td>
+        <td class="mono">${N(r.tier2_current_exposed)}</td>
+        <td class="mono" style="color:${r.districts_severe_pct>=60?'var(--agri)':'var(--dim)'}">${r.districts_severe_pct}% <span class="sub">SPEI ${r.worst_spei}</span></td>
+        <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
+      `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
+
+    // restructuring — did it hold?
+    const ORD=['Normal','Skip','Pre-emptive','TDR'];
+    const rows=ORD.map(s=>rs.find(x=>x.status===s)).filter(Boolean);
+    $('#assist-restr').innerHTML = rows.length ? `<table class="tbl"><tr>
+        <th>Status</th><th>Accounts</th><th>OS</th><th>X-days</th><th>Roll</th>
+        <th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/a·c</th></tr>`+
+      rows.map(r=>{const neg=r.npat_margin_avg<0;
+        return `<tr><td><b>${r.status}</b></td>
+        <td class="mono">${N(r.n)}</td><td class="mono sub">${bn(r.os_sum)}</td>
+        <td class="mono">${r.early_pct}%</td><td class="mono">${r.roll_pct}%</td>
+        <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+        <td class="mono" style="color:${assistSev(r.late180_pct)}">${r.late180_pct}%</td>
+        <td class="mono" style="color:${neg?'var(--agri)':'var(--merch)'}"><b>${neg?'−':''}฿${N(Math.abs(r.npat_margin_avg))}</b></td></tr>`;}).join('')+`</table>` :
+      `<p class="lead sub">Restructuring split unavailable in this tape vintage.</p>`;
+
+    wrapTables();
+  });
 }
 function renderHome(){
   renderHomePillars();      // the 5-pillar summary band (null-safe; re-rendered as layers load)
