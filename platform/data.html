@@ -529,11 +529,37 @@ function provinceView(d,sum,reg,rank,total){
   h+='<div class="db-sec"><span class="n">5</span> Inside the province — districts</div>';
   h+=districtTable(d);
 
+  // SECTION 6 — the province's own branches (drill province -> branch)
+  h+='<div class="db-sec"><span class="n">6</span> Branches in '+esc(d.province_en||d.province_th||'')+'</div>';
+  h+='<div id="provbranches"><p class="db-note">Loading branches…</p></div>';
+
   // demoted 3D links
   h+='<div class="db-3dlinks"><a href="rayong-catchment.html?city='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">🏙 Open 3D building scene</a><a href="province.html?p='+encodeURIComponent(sum?sum.slug:'')+THEME_QS+'">▦ Open 3D district view</a></div>';
   h+=footer();
   document.getElementById('db-loading').style.display='none';
   document.getElementById('db-root').innerHTML=h;
+  fillProvinceBranches(d.province_th);
+}
+function fillProvinceBranches(provTh){
+  var host=document.getElementById('provbranches'); if(!host)return;
+  loadBranchLayers(function(){
+    var rows=[]; BR2.forEach(function(d,i){if(d&&d.v===provTh)rows.push({d:d,i:i});});
+    rows.sort(function(A,B){return (B.d.o||0)-(A.d.o||0);});
+    if(!rows.length){host.innerHTML='<p class="db-note" style="text-align:left;padding:8px 0">No per-branch records for this province.</p>';return;}
+    var h='<p class="db-sub" style="margin:2px 0 8px">All '+num(rows.length)+' branches here, highest opportunity first. Scores are estimated 0–100 lens screens; click a branch for its full readout.</p>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Branch</th><th>District</th><th>Opp</th><th>Agri-PD</th><th>Merchant</th><th>Collat</th><th>Pop ≤10km</th><th>Workers</th></tr></thead><tbody>';
+    rows.forEach(function(row){var d=row.d;
+      h+='<tr data-i="'+row.i+'" style="cursor:pointer"><td class="name" lang="th">'+esc(d.n)+'</td><td class="sub" lang="th">'+esc(d.d||'—')+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.o)+'">'+Math.round(d.o)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.a)+'">'+Math.round(d.a)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.m)+'">'+Math.round(d.m)+'</td>'+
+        '<td class="mono" style="color:'+scoreCol(d.c)+'">'+Math.round(d.c)+'</td>'+
+        '<td class="mono">'+num(d.pop)+'</td><td class="mono">'+num(d.dwork)+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    host.innerHTML=h;
+    host.querySelector('tbody').addEventListener('click',function(e){var tr=e.target.closest('tr');if(tr&&tr.getAttribute('data-i'))location.href='?b='+tr.getAttribute('data-i')+THEME_QS;});
+  });
 }
 function metricRow(label,sub,val,graphic){
   return '<div class="db-row"><div class="rl">'+esc(label)+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><div class="rv">'+val+'</div><div class="rg">'+(graphic||'')+'</div></div>';
