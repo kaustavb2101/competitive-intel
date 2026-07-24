@@ -318,6 +318,12 @@ def build():
         "occupations": tabs.get("occupation", {}),
         "occ_x_income": tabs.get("occ_x_income", {}),
         "provinces": tabs.get("province", {}),
+        # geographic tape rollups for the data-book drill-down (region cards / province / branch).
+        # regions keyed East/Isan/North/South/Central&BKK (matches regions.json); branches keyed by
+        # booking-branch name (top-N by size, cells n>=30 — larger branches only).
+        "geo": {"regions": tabs.get("geo_region", {}),
+                "provinces": tabs.get("province", {}),
+                "branches": tabs.get("branch", {})},
         "income_tiers": tabs.get("income_tier", {}),
         "vehicle_types": tabs.get("vehicle_type", {}),
         "product_groups": tabs.get("product_group", {}),
