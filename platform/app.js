@@ -1233,6 +1233,7 @@ function showTab(v){
   document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
+  if(v==='assist') renderAssist();
   if(v==='overview') renderOverview();
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
@@ -3858,20 +3859,57 @@ function renderExposureTape(){
   const wrap=$('#expo-tape'); if(!wrap) return;
   if(!TAPE){ wrap.style.display='none'; return; }
   wrap.style.display='';
+  const N=n=>Number(n).toLocaleString(), bnf=n=>'฿'+(n/1e9).toFixed(1)+'bn';
+  const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+
+  // --- two-book split KPI cards (live book vs 180+ legacy) ---
+  const bk=$('#expo-tape-books');
+  if(bk&&TAPE.bucket_ladder){
+    const lb=TAPE.bucket_ladder.live_book, lg=TAPE.bucket_ladder.legacy_180plus, bt=TAPE.bucket_ladder.book_total;
+    bk.innerHTML=[
+      ['Whole book',N(bt.n),bnf(bt.os_sum)+' OS'],
+      ['Live book',N(lb.n),bnf(lb.os_sum)+' · Current…150dpd'],
+      ['NPL-live (90–179)',lb.npl_live_pct+'%',lb.npl_live_os_pct+'% OS-weighted'],
+      ['180+ legacy',bnf(lg.os_sum),N(lg.n)+' a/c · held apart'],
+    ].map(k=>`<div class="mcard"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+  }
+  // --- bucket ladder (Current → NPL → legacy) ---
+  const lad=$('#expo-tape-ladder');
+  if(lad&&TAPE.bucket_ladder){
+    const LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ legacy'};
+    const L=TAPE.bucket_ladder.ladder, maxN=Math.max(...L.map(x=>x.n));
+    lad.innerHTML=`<tr><th>Bucket</th><th>Accounts</th><th>OS ฿bn</th><th></th></tr>`+
+      L.map(x=>{const lg=x.bucket[0]==='8';
+        return `<tr><td class="mono">${LBL[x.bucket]||x.bucket}</td><td class="mono sub">${N(x.n)}</td>
+          <td class="mono sub">${(x.os_sum/1e9).toFixed(2)}</td>
+          <td>${barHTML(x.n,lg?'var(--collat)':'var(--accent)',maxN)}</td></tr>`;}).join('');
+  }
+  // --- restructuring: did it hold? ---
+  const rs=$('#expo-tape-restr');
+  if(rs&&TAPE.restructuring&&TAPE.restructuring.by_status){
+    const rows=['Normal','Skip','Pre-emptive','TDR'].map(s=>TAPE.restructuring.by_status.find(x=>x.status===s)).filter(Boolean);
+    rs.innerHTML=`<tr><th>Status</th><th>Accounts</th><th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/acct</th></tr>`+
+      rows.map(r=>{const neg=r.npat_margin_avg<0;
+        return `<tr><td><b>${r.status}</b></td><td class="mono sub">${N(r.n)}</td>
+          <td class="mono"><b style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+          <td class="mono" style="color:${sev(r.late180_pct)}">${r.late180_pct}%</td>
+          <td class="mono" style="color:${neg?'var(--agri)':'var(--merch)'}">${neg?'−':''}฿${N(Math.abs(r.npat_margin_avg))}</td></tr>`;}).join('');
+  }
+
   const ltv=$('#expo-tape-ltv'), occ=$('#expo-tape-occ');
   if(ltv&&TAPE.ltv_ladder){
     const rows=Object.entries(TAPE.ltv_ladder).sort((a,b)=>a[0].localeCompare(b[0]));
-    const worst=Math.max(...rows.map(([,v])=>v.dpd30p_pct));
-    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts currently 30+ days past due">30+dpd</th><th>OS ฿bn</th></tr>`+
-      rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
-        <td class="mono" style="color:${v.dpd30p_pct>=35?'var(--agri)':v.dpd30p_pct>=25?'var(--gold)':'var(--merch)'}">${barHTML(v.dpd30p_pct,'var(--agri)',worst)} <b>${v.dpd30p_pct}%</b></td>
+    const worst=Math.max(...rows.map(([,v])=>v.dpd90p_pct));
+    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts 90+ days past due">90+dpd</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}">${barHTML(v.dpd90p_pct,'var(--agri)',worst)} <b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
   }
   if(occ&&TAPE.occupations){
     const rows=Object.entries(TAPE.occupations).filter(([k])=>k!=='(blank)').sort((a,b)=>b[1].n-a[1].n);
-    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>30+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
-      rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${v.n.toLocaleString()}</td>
-        <td class="mono" style="color:${v.dpd30p_pct>=28?'var(--agri)':'var(--dim)'}"><b>${v.dpd30p_pct}%</b></td>
+    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>90+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
+      rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}"><b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${v.early_pct}%</td>
         <td class="mono" style="color:${v.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${v.npat_margin_avg.toLocaleString()}</td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
@@ -3879,14 +3917,14 @@ function renderExposureTape(){
   const fr=$('#expo-tape-frontier');
   if(fr&&Array.isArray(TAPE.npat_frontier)){
     const cells=TAPE.npat_frontier.slice(0,18);
-    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>30+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
+    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>90+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
       cells.map(c=>{
         const read=c.npat_margin_avg>=0
-          ?(c.dpd30p_pct>=28?'<span style="color:var(--gold)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
-          :(c.dpd30p_pct<24?'<span style="color:var(--agri)">unprofitably safe</span>':'<span style="color:var(--agri)">re-price</span>');
+          ?(c.dpd90p_pct>=16?'<span style="color:var(--opp)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
+          :(c.dpd90p_pct<12?'<span style="color:var(--agri)">unprofitably safe</span>':'<span style="color:var(--agri)">re-price</span>');
         return `<tr><td>${c.occupation}</td><td class="mono sub">${c.region}</td>
-          <td class="mono sub">${c.n.toLocaleString()}</td>
-          <td class="mono">${c.dpd30p_pct}%</td>
+          <td class="mono sub">${N(c.n)}</td>
+          <td class="mono" style="color:${sev(c.dpd90p_pct)}">${c.dpd90p_pct}%</td>
           <td class="mono" style="color:${c.npat_margin_avg<0?'var(--agri)':'var(--merch)'}">${c.npat_margin_avg.toLocaleString()}</td>
           <td class="sub" style="font-size:12px">${read}</td></tr>`;}).join('');
   }
@@ -4683,18 +4721,18 @@ function renderTrendTape(){
       const [yr,band]=k.split('|'); (byYear[yr]=byYear[yr]||[]).push({band,...v});
     });
     const years=Object.keys(byYear).sort();
-    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th>30+dpd</th></tr>`+
+    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th title="share of the vintage 90+ days past due">90+dpd</th></tr>`+
       years.map(yr=>byYear[yr].sort((a,b)=>a.band.localeCompare(b.band)).map((r,i)=>`<tr>
         <td class="mono">${i===0?`<b>${yr}</b>`:''}</td><td class="mono sub">${r.band}</td>
         <td class="mono sub">${r.n.toLocaleString()}</td>
-        <td class="mono" style="color:${r.dpd30p_pct>=28?'var(--agri)':r.dpd30p_pct>=20?'var(--gold)':'var(--merch)'}"><b>${r.dpd30p_pct}%</b></td>
+        <td class="mono" style="color:${r.dpd90p_pct>=16?'var(--agri)':r.dpd90p_pct>=10?'var(--opp)':'var(--merch)'}"><b>${r.dpd90p_pct}%</b></td>
       </tr>`).join('')).join('');
   }
   if(au&&TAPE.branch_audit){
-    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th>30+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
+    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th title="share of the branch's accounts 90+ days past due">90+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
       TAPE.branch_audit.map((b,i)=>`<tr><td class="mono sub">${i+1}</td><td>${b.branch}</td>
         <td class="mono sub">${b.n}</td>
-        <td class="mono" style="color:var(--agri)"><b>${b.dpd30p_pct}%</b></td>
+        <td class="mono" style="color:var(--agri)"><b>${b.dpd90p_pct}%</b></td>
         <td class="mono sub">${b.early_pct}%</td>
         <td class="mono sub">${b.fpd_pct}%</td></tr>`).join('');
   }
@@ -6221,7 +6259,50 @@ function renderMarket(){
       $('#mktnote').textContent='Registered factory workers DIW · informal workforce NSO 2024 (some provinces n/a) · vehicles/pickups DLT · weakest crop = World Bank global price direction proxy (not Thai farm-gate), region-attributed.';
     }
     drawMarket();
+    loadTapeReal().then(renderMarketCollateral);   // acquisition lens — collateral concentration
    }).catch(()=>{ $('#mkttbl').innerHTML='<tr><td>Could not load market data.</td></tr>'; });
+}
+// ACQUISITION LENS — collateral concentration from the real loan tape (TAPE.collateral): where &
+// what collateral the book concentrates on. Null-safe: the whole block hides when the tape is absent.
+function renderMarketCollateral(){
+  const host=$('#mkt-coll'); if(!host) return;
+  if(!TAPE||!TAPE.collateral){ host.style.display='none'; return; }
+  host.style.display='';
+  const C=TAPE.collateral, N=n=>Number(n).toLocaleString(), bnf=n=>'฿'+(n/1e9).toFixed(1)+'bn';
+  const kk=n=>Math.round(n/1000)+'k';
+  const sev=v=>v==null?'var(--dim)':v<8?'var(--merch)':v<14?'#9CB24E':v<20?'var(--opp)':v<26?'#D97A3A':'var(--agri)';
+  const ec=$('#mkt-coll-econ');
+  if(ec&&Array.isArray(C.economics_by_type)){
+    ec.innerHTML=`<tr><th>Type</th><th>Accounts</th><th>OS</th><th>Yield</th><th title="yield − opex 8% − CoF 2.5%, before credit loss">Spread</th><th>90+</th></tr>`+
+      C.economics_by_type.map(r=>`<tr><td><b>${r.type}</b></td><td class="mono sub">${N(r.n)}</td>
+        <td class="mono sub">${bnf(r.os_sum)}</td><td class="mono">${r.yield_pct}%</td>
+        <td class="mono" style="color:${r.gross_spread_pct<6?'var(--opp)':'var(--merch)'}"><b>${r.gross_spread_pct}%</b></td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const br=$('#mkt-coll-branch');
+  if(br&&Array.isArray(C.branch_brand_concentration)){
+    br.innerHTML=`<tr><th>Branch</th><th>Brand</th><th>Accounts</th><th>90+</th></tr>`+
+      C.branch_brand_concentration.slice(0,15).map(r=>`<tr><td>${(r.branch||'').replace('เงินไชโย','').replace('สาขา','')}</td>
+        <td class="sub">${r.brand}</td><td class="mono sub">${N(r.n)}</td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const rg=$('#mkt-coll-region');
+  if(rg&&Array.isArray(C.type_x_region)){
+    rg.innerHTML=`<tr><th>Type</th><th>Region</th><th>Accounts</th><th>OS</th><th>90+</th></tr>`+
+      C.type_x_region.slice(0,15).map(r=>`<tr><td><b>${r.type}</b></td><td class="sub">${r.region}</td>
+        <td class="mono sub">${N(r.n)}</td><td class="mono sub">${bnf(r.os_sum)}</td>
+        <td class="mono" style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</td></tr>`).join('');
+  }
+  const ag=$('#mkt-coll-age');
+  if(ag&&C.by_age){
+    const AGL={'1.<=5 yr.':'≤5 yr','2.(5-10]yr.':'5–10 yr','3.(10-12]yr.':'10–12 yr','4.(12-15]yr.':'12–15 yr','5.(15-18]yr.':'15–18 yr','6.(18-20]yr.':'18–20 yr','7.(20-25]yr.':'20–25 yr','8.>25 yr.':'>25 yr'};
+    const rows=Object.entries(C.by_age).sort((a,b)=>a[0].localeCompare(b[0]));
+    ag.innerHTML=`<tr><th>Age at origination</th><th>Accounts</th><th>90+</th><th>Avg eval</th></tr>`+
+      rows.map(([k,v])=>`<tr><td>${AGL[k]||k}</td><td class="mono sub">${N(v.n)}</td>
+        <td class="mono" style="color:${sev(v.dpd90p_pct)}">${v.dpd90p_pct}%</td>
+        <td class="mono sub">${v.eval_avg?kk(v.eval_avg):'—'}</td></tr>`).join('');
+  }
+  wrapTables();   // wrap the dynamically-built tables so wide ones scroll on narrow columns
 }
 let mktRegion='all';
 function drawMarket(){
@@ -6354,7 +6435,7 @@ function renderHomeQueue(){
       `<span class="cc-qnum mono">${it.rank}</span>`+
       `<span class="cc-qchip q-${dqEsc(it.type)}">${dqEsc(it.type)}</span>`+
       `<div class="cc-qtxt">${dqEsc(it.act)}`+
-      ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a>${queue3DLink(it)}</span></div></div>`;
+      ` <span class="cc-qmeta">${tag} <span class="sub">· ${dqEsc(it.source)} ·</span> <a data-v="${dqEsc(it.go)}" href="#${dqEsc(it.go)}">${dqEsc(it.go_label||'open →')}</a>${queue3DLink(it)}</span></div></div>`;
   }).join('')+
   `<div class="cc-qfoot sub">Ranking is a stated editorial rule (defend &gt; audit &gt; tighten, then each layer's own magnitude) — see <span class="mono">decision_queue.json</span> meta. Defend rows are measured rival geometry; the rest are estimated screens, not measured outcomes.</div>`;
 }
@@ -6447,7 +6528,157 @@ function renderHomeTape(){
     </tr>`).join('')+`</table>`+
     `<div class="sub" style="margin-top:6px;font-size:11px">${TAPE.meta.n_accounts.toLocaleString()} real accounts (no-PII aggregates, cells ≥30) · branch-join ${TAPE.meta.branch_join_pct}% · trigger: drought FIRING, crop-margin & fuel armed · ranking order ESTIMATED over MEASURED inputs</div>`;
 }
+/* FIVE-PILLAR SUMMARY BAND (owner IA 2026-07-24) — the platform's whole job on one row:
+   ① Macro ② Acquisition ③ Assistance ④ Risk ⑤ Competitor. Each card leads with ONE headline
+   metric from the committed layers and links to that pillar's detail. Every card is null-safe:
+   if its source layer isn't loaded yet it degrades to a calm pointer, never a blank or a lie.
+   Re-rendered as TAPE / competitor layers resolve. */
+function pillCard(num,name,pc,tab,big,read,foot){
+  return `<a class="pill" style="--pc:${pc}" data-v="${tab}" href="#${tab}">
+    <span class="pill-eyebrow"><span class="pill-num">${num}</span><span class="pill-name">${name}</span></span>
+    <span class="pill-big">${big||'<small>loading…</small>'}</span>
+    <span class="pill-read">${read||''}</span>
+    <span class="pill-foot">${foot||''} →</span></a>`;
+}
+function renderHomePillars(){
+  const host=$('#cc-pillars'); if(!host) return;
+  const T=TAPE, bn=n=>'฿'+(n/1e9).toFixed(1)+'bn', N=n=>Number(n).toLocaleString();
+  const cards=[];
+
+  // ① MACRO — the backdrop moving the book. Prefer live fuel + rate-cap; else a calm pointer.
+  let mBig='Macro board', mRead='Rate cap, commodities, FX &amp; fuel — the forces on the book.';
+  if(typeof FUEL!=='undefined'&&FUEL&&FUEL.headline&&FUEL.headline.diesel!=null){
+    mBig='฿'+Number(FUEL.headline.diesel).toFixed(2)+'<small>/L diesel</small>';
+    mRead='Diesel (pickup/farm borrowers), commodity board &amp; the BoT rate-cap — the macro forces on collateral values and PD.'; }
+  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Overview'));
+
+  // ② ACQUISITION — the collateral book &amp; where it concentrates (measured tape).
+  if(T&&T.collateral&&T.bucket_ladder){
+    const eco=(T.collateral.economics_by_type||[]).slice();
+    const top=eco[0], na=T.meta.n_accounts||0;
+    const share=top&&na?Math.round(top.n*100/na):null;
+    const bc=(T.collateral.branch_brand_concentration||[])[0];
+    const book=T.bucket_ladder.book_total?T.bucket_ladder.book_total.os_sum:null;
+    cards.push(pillCard(2,'Acquisition','var(--opp)','map',
+      book?bn(book)+'<small> book</small>':(top?N(top.n)+'<small> '+top.type+'</small>':''),
+      (top?`<b>${top.type}</b> ${share}% of accounts · `:'')+
+      (bc?`densest branch book: <b>${bc.branch.replace('สาขา','')}</b> ${N(bc.n)} ${bc.brand}`:'collateral concentration by branch, brand &amp; age'),
+      'National map'));
+  } else cards.push(pillCard(2,'Acquisition','var(--opp)','map','','Where the book concentrates — collateral type, brand &amp; age by branch.','National map'));
+
+  // ③ ASSISTANCE — the pre-emptive window &amp; who needs help now (measured tape).
+  if(T&&T.bucket_ladder){
+    const x=T.bucket_ladder.live_book.xdays_n;
+    const r0=(T.assistance_radar||[])[0];
+    const pe=((T.restructuring&&T.restructuring.by_status)||[]).find(s=>s.status==='Pre-emptive');
+    cards.push(pillCard(3,'Assistance','var(--agri)','exposure',
+      N(x)+'<small> in X-days</small>',
+      `Pre-emptive window (late &lt;30dpd). `+
+      (r0?`Radar #1: <b>${r0.province}</b>. `:'')+
+      (pe?`<b>${N(pe.n)}</b> already pre-emptively restructured (${pe.dpd90p_pct}% at 90+).`:''),
+      'Assistance radar'));
+  } else cards.push(pillCard(3,'Assistance','var(--agri)','exposure','','Who to help pre-emptively, before they roll — by segment &amp; province.','Assistance radar'));
+
+  // ④ RISK — the live-book NPL &amp; the 180+ legacy stock, held separately (measured tape).
+  if(T&&T.bucket_ladder){
+    const lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus;
+    cards.push(pillCard(4,'Risk','var(--collat)','trend',
+      lb.npl_live_pct+'%<small> NPL-live</small>',
+      `90–179dpd on the live book (${lb.npl_live_os_pct}% OS-weighted). Held apart: a <b>${bn(lg.os_sum)}</b> / ${N(lg.n)}-acct 180+ legacy workout stock.`,
+      'Risk trend'));
+  } else cards.push(pillCard(4,'Risk','var(--collat)','trend','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk trend'));
+
+  // ⑤ COMPETITOR — rival pressure on the network we run (measured peer census, lazy).
+  let cBig='', cRead='Where rivals outnumber the network — density, contested ground &amp; pulse.';
+  if(typeof PEERPROV!=='undefined'&&PEERPROV&&Array.isArray(PEERPROV.provinces)){
+    const distOut=PEERPROV.provinces.reduce((s,p)=>s+(p&&p.n_outnumbered_districts||0),0);
+    if(distOut){ cBig=N(distOut)+'<small> districts</small>';
+      cRead='where the big-4 out-number the existing network (measured per-district rival density).'; }
+  }
+  cards.push(pillCard(5,'Competitor','var(--merch)','acq',cBig,cRead,'Competition'));
+
+  host.innerHTML=cards.join('');
+}
+/* ③ ASSISTANCE VIEW — the "who needs help now" page (owner ask: where are the segments hit most
+   and needing assistance). Reads data/tape_real.json: segments-hit-most ranked hit-list +
+   X-days pre-emptive window (drought radar) + restructuring (Normal / Pre-emptive / TDR — did it
+   hold?). Null-safe: calm note when the tape layer is absent. */
+function assistSev(v){ // color a 90+ rate
+  if(v==null) return 'var(--dim)';
+  if(v<8) return 'var(--merch)';
+  if(v<14) return '#9CB24E';
+  if(v<20) return 'var(--gold)';
+  if(v<26) return '#D97A3A';
+  return 'var(--agri)';
+}
+function renderAssist(){
+  if(!document.getElementById('v-assist')) return;
+  loadTapeReal().then(()=>{
+    const T=TAPE, absent=$('#assist-absent'), hero=$('#assist-hero');
+    if(!T||!T.bucket_ladder){ if(absent)absent.style.display=''; if(hero)hero.innerHTML=''; return; }
+    if(absent)absent.style.display='none';
+    const N=n=>Number(n).toLocaleString(), bn=n=>'฿'+(n/1e9).toFixed(1)+'bn', mn=n=>'฿'+(n/1e6).toFixed(0)+'m';
+    const lb=T.bucket_ladder.live_book;
+    const rs=(T.restructuring&&T.restructuring.by_status)||[];
+    const pe=rs.find(s=>s.status==='Pre-emptive'), tdr=rs.find(s=>s.status==='TDR');
+    const r0=(T.assistance_radar||[])[0];
+    // hero KPI strip (reuse .mcard)
+    if(hero) hero.innerHTML=[
+      ['X-days pre-emptive window',N(lb.xdays_n),'accounts late &lt;30dpd — intervene before roll','var(--opp)'],
+      ['Rolling (30–89dpd)',N(lb.roll_n),'in the roll pipeline — recoverable middle','#D97A3A'],
+      ['Pre-emptively restructured',pe?N(pe.n):'—',pe?pe.dpd90p_pct+'% already at 90+ — bleeding':'','var(--collat)'],
+      ['TDR — restructure failing',tdr?N(tdr.n):'—',tdr?tdr.dpd90p_pct+'% at 90+, '+tdr.late180_pct+'% at 180+':'','var(--agri)'],
+    ].map(k=>`<div class="mcard" style="border-left:3px solid ${k[3]}"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+
+    // segments hit most (occ_x_region)
+    const seg=((T.segments_hit&&T.segments_hit.occ_x_region)||[]).slice(0,15);
+    $('#assist-segments').innerHTML = seg.length ? `<table class="tbl"><tr>
+        <th>Occupation × region</th><th>Accounts</th><th>OS</th>
+        <th title="90+dpd share">90+</th><th title="30–89dpd roll">Roll</th>
+        <th title="X-days slipping">X-days</th><th title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
+      seg.map(r=>`<tr>
+        <td><b>${r.occupation}</b> <span class="sub mono">· ${r.region}</span></td>
+        <td class="mono">${N(r.n)}</td><td class="mono sub">${mn(r.os_sum)}</td>
+        <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+        <td class="mono">${r.roll_pct}%</td><td class="mono" style="color:var(--opp)">${r.early_pct}%</td>
+        <td class="mono"><b>${r.score}</b></td></tr>`).join('')+`</table>` :
+      `<p class="lead sub">No occupation×region cells cleared the ≥300-account floor.</p>`;
+
+    // pre-emptive radar (province × drought)
+    const rad=(T.assistance_radar||[]).slice(0,12);
+    $('#assist-radar').innerHTML = rad.length ? `<table class="tbl"><tr>
+        <th>Province</th><th title="X-days: late but <30dpd — call this week">Tier 1 · slipping</th>
+        <th title="current accounts in the same stressed cell">Tier 2 · watch</th>
+        <th title="share of districts at severe/extreme OAE SPEI">Drought</th>
+        <th>What they grow (stressed districts)</th></tr>`+
+      rad.map(r=>`<tr>
+        <td><b>${r.province}</b> <span class="sub mono">${N(r.n_farmers)} farmers</span></td>
+        <td class="mono" style="color:var(--opp)"><b>${N(r.tier1_slipping)}</b></td>
+        <td class="mono">${N(r.tier2_current_exposed)}</td>
+        <td class="mono" style="color:${r.districts_severe_pct>=60?'var(--agri)':'var(--dim)'}">${r.districts_severe_pct}% <span class="sub">SPEI ${r.worst_spei}</span></td>
+        <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
+      `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
+
+    // restructuring — did it hold?
+    const ORD=['Normal','Skip','Pre-emptive','TDR'];
+    const rows=ORD.map(s=>rs.find(x=>x.status===s)).filter(Boolean);
+    $('#assist-restr').innerHTML = rows.length ? `<table class="tbl"><tr>
+        <th>Status</th><th>Accounts</th><th>OS</th><th>X-days</th><th>Roll</th>
+        <th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/a·c</th></tr>`+
+      rows.map(r=>{const neg=r.npat_margin_avg<0;
+        return `<tr><td><b>${r.status}</b></td>
+        <td class="mono">${N(r.n)}</td><td class="mono sub">${bn(r.os_sum)}</td>
+        <td class="mono">${r.early_pct}%</td><td class="mono">${r.roll_pct}%</td>
+        <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
+        <td class="mono" style="color:${assistSev(r.late180_pct)}">${r.late180_pct}%</td>
+        <td class="mono" style="color:${neg?'var(--agri)':'var(--merch)'}"><b>${neg?'−':''}฿${N(Math.abs(r.npat_margin_avg))}</b></td></tr>`;}).join('')+`</table>` :
+      `<p class="lead sub">Restructuring split unavailable in this tape vintage.</p>`;
+
+    wrapTables();
+  });
+}
 function renderHome(){
+  renderHomePillars();      // the 5-pillar summary band (null-safe; re-rendered as layers load)
   renderHomeQueue();        // "This week — do these first" — exec decision queue (lazy, null-safe)
   renderHomeThesis();       // ONE board-ready risk sentence (synthesized, null-safe)
   renderHomeHero();         // QW5 — the verdict, in plain language (opportunity + household + crop)
@@ -6486,10 +6717,10 @@ function renderHome(){
     loadBranchRisk().then(()=>{ if(onHome()) renderHomeRisk(); });
     // obj#1 — lowest-paid occupation nationally into the risk card (null-safe, mirrors Exposure).
     loadOccupationIncome().then(()=>{ if(onHome()) renderHomeRisk(); });
-    // live fuel prices (Bangchak daily pull) into the macro card — null-safe, calm when absent.
-    loadFuelPrices().then(()=>{ if(onHome()) renderHomeMacro(); });
-    // obj#1 — REAL loan-tape assistance radar (pre-emptive help targeting); calm when absent.
-    loadTapeReal().then(()=>{ if(onHome()) renderHomeTape(); });
+    // live fuel prices (Bangchak daily pull) into the macro card + pillar band — null-safe.
+    loadFuelPrices().then(()=>{ if(onHome()){ renderHomeMacro(); renderHomePillars(); } });
+    // obj#1 — REAL loan-tape assistance radar (pre-emptive help targeting) + pillar band; calm when absent.
+    loadTapeReal().then(()=>{ if(onHome()){ renderHomeTape(); renderHomePillars(); } });
     // measured borrower-base + competitor census to enrich the top-district rows; null-safe re-render.
     const reHome=()=>{ if(onHome()) renderHomeWhitespace(); };
     loadAmphoeOccupations().then(reHome);
@@ -6501,7 +6732,7 @@ function renderHome(){
     loadContestedPop().then(reHome);
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
-    loadPeerProvince().then(()=>{ if(onHome()) renderHomeThesis(); });
+    loadPeerProvince().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomePillars(); } });
     // obj#2 — the per-region density × service read (rival_threat_region.json) onto the front door:
     // which regions are hardest to defend, beside the portfolio-risk headline. Null-safe re-render.
     loadRivThreatRegion().then(()=>{ if(onHome()){ renderHomeDefend(); renderHomeThesis(); } });

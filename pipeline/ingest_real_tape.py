@@ -36,8 +36,13 @@ OUT = os.path.join(ROOT, "source-data", "staging", "real_tape_aggregates.json")
 DEFAULT_SRC = r"C:\Users\Kaustav Bagchi\Downloads\alibaba receipts\Car_Brand_Group data V2.xlsx"
 
 MIN_CELL = 30           # publication floor: cells with fewer accounts are dropped
-EARLY = "2."            # dpd bucket prefix: X-days (late but <30dpd — the pre-emptive window)
-BAD = ("3.", "4.", "5.", "6.", "7.", "8.", "9.")   # 30+dpd buckets
+# The bucket ladder, owner-framed (2026-07-24): monitor customers Current -> NPL, and SEPARATE
+# the 180+ legacy stock from the live book (it is late-stage workout inventory, not fresh risk —
+# leaving it in distorts every ratio).
+EARLY = "2."                    # X-days (late <30dpd — the pre-emptive assistance window)
+ROLL = ("3.", "4.")             # 30-89dpd — the roll pipeline (recoverable middle)
+NPL_LIVE = ("5.", "6.", "7.")   # 90-179dpd — NPL of the LIVE book
+LATE = ("8.", "9.")             # 180+dpd — legacy workout stock, reported SEPARATELY
 MONTHS = {m: i + 1 for i, m in enumerate(
     ["January", "February", "March", "April", "May", "June",
      "July", "August", "September", "October", "November", "December"])}
@@ -57,8 +62,9 @@ def fnum(v):
 
 
 def new_cell():
-    # [n, n_early, n_dpd30p, n_fpd, os_sum, npat_margin_sum, eval_sum, n_eval]
-    return [0, 0, 0, 0, 0.0, 0.0, 0.0, 0]
+    # [n, n_early, n_roll, n_npl_live(90-179), n_late(180+), n_fpd,
+    #  os_sum, os_npl_live, os_late, npat_sum, eval_sum, n_eval]
+    return [0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0]
 
 
 def pack(d, floor=MIN_CELL, top=None):
@@ -68,14 +74,25 @@ def pack(d, floor=MIN_CELL, top=None):
         items = items[:top]
     out = {}
     for k, a in items:
-        row = {"n": a[0],
-               "early_pct": round(a[1] * 100.0 / a[0], 2),
-               "dpd30p_pct": round(a[2] * 100.0 / a[0], 2),
-               "fpd_pct": round(a[3] * 100.0 / a[0], 2),
-               "os_sum": round(a[4], 0),
-               "npat_margin_avg": round(a[5] / a[0], 0)}
-        if a[7]:
-            row["eval_avg"] = round(a[6] / a[7], 0)
+        n, live_n = a[0], a[0] - a[4]          # live book = everything except 180+ legacy
+        os_all, live_os = a[6], a[6] - a[8]
+        row = {"n": n,
+               "early_pct": round(a[1] * 100.0 / n, 2),     # X-days — assistance window
+               "roll_pct": round(a[2] * 100.0 / n, 2),      # 30-89 — roll pipeline
+               # NPL of the LIVE book: 90-179dpd over accounts excl. the 180+ legacy stock
+               "npl_live_pct": round(a[3] * 100.0 / live_n, 2) if live_n else None,
+               "npl_live_os_pct": round(a[7] * 100.0 / live_os, 2) if live_os else None,
+               # the legacy stock itself, reported separately (share of ALL accounts / OS)
+               "late180_pct": round(a[4] * 100.0 / n, 2),
+               "late180_os": round(a[8], 0),
+               # continuity lenses (whole-book, incl. legacy)
+               "dpd90p_pct": round((a[3] + a[4]) * 100.0 / n, 2),
+               "dpd30p_pct": round((a[2] + a[3] + a[4]) * 100.0 / n, 2),
+               "fpd_pct": round(a[5] * 100.0 / n, 2),
+               "os_sum": round(os_all, 0),
+               "npat_margin_avg": round(a[9] / n, 0)}
+        if a[11]:
+            row["eval_avg"] = round(a[10] / a[11], 0)
         out[k] = row
     return out
 
@@ -111,7 +128,16 @@ def main():
         "province", "prov_x_occ", "region", "area", "occupation", "occ_fine", "income_tier",
         "ltv_range", "vintage_ym", "vehicle_type", "product_group", "coll_age",
         "brand", "brand_x_collage", "brand_x_region", "vehicle_x_ltv", "model",
-        "occ_x_income", "occ_x_region", "branch")}
+        "occ_x_income", "occ_x_region", "branch", "dpd_bucket",
+        # restructuring status (owner ask 2026-07-24): separate Normal / Pre-emptive / TDR / Skip
+        "acc_chng", "chg_x_bucket", "chg_x_occ", "chg_x_region",
+        # collateral deep-dive (owner ask 2026-07-24): the collateral BOOK crossed by
+        # location / occupation / income / area for acquisition-concentration reads
+        "coll_segment", "coll_seg_x_region", "coll_seg_x_area",
+        "coll_seg_x_occ", "coll_seg_x_income", "coll_seg_x_bucket",
+        "collage_x_region", "collage_x_occ", "collage_x_income", "collage_x_area",
+        "brand_x_occ", "brand_x_income", "brand_x_area", "brand_x_ltv",
+        "coll_age_x_bucket", "branch_x_seg", "branch_x_brand")}
     n = matched = 0
     anchor = ""            # newest disbursement YYYY-MM in the data (determinism anchor)
     vint_curve = collections.defaultdict(new_cell)   # vintage-year|months-on-book-band
@@ -120,7 +146,9 @@ def main():
         n += 1
         dpd = str(g(r, "account_disb_dpd_bucket") or "?")
         early = dpd.startswith(EARLY)
-        bad = dpd.startswith(BAD)
+        roll = dpd.startswith(ROLL)
+        npl_live = dpd.startswith(NPL_LIVE)
+        late = dpd.startswith(LATE)
         fpd_raw = str(g(r, "F_FPD") or "").strip()
         fpd = bool(fpd_raw) and fpd_raw.lower() not in ("regular", "0", "n", "none")
         osamt = fnum(g(r, "OS")) or 0.0
@@ -137,43 +165,80 @@ def main():
         if hit:
             matched += 1
         occ = str(g(r, "account_disb_ocp_grp") or "(blank)")
+        region = str(g(r, "account_disb_Region") or "(blank)")
+        area = str(g(r, "account_disb_Area") or "(blank)")
+        income = str(g(r, "account_disb_income_tier") or "(blank)")
+        ltv = str(g(r, "LTV Range") or "(blank)")
+        brand = str(g(r, "account_disb_car_brand") or "(blank)")
+        cage = str(g(r, "account_disb_Coll_Age_originate_Group") or "(blank)")
+        cseg = str(g(r, "account_disb_coll_segment") or "(blank)")
+        chg = str(g(r, "account_disb_acc_chng_flg_groups_") or "(blank)")
+        # coarse monitoring stage for the restructuring/collateral crosses (Current->NPL->legacy)
+        stage = ("5_late180" if late else "4_npl_live" if npl_live else
+                 "3_roll" if roll else "2_xdays" if early else "1_current")
         vals = {
             "province": prov,
             "prov_x_occ": prov + "|" + occ,
-            "region": str(g(r, "account_disb_Region") or "(blank)"),
-            "area": str(g(r, "account_disb_Area") or "(blank)"),
+            "region": region,
+            "area": area,
             "occupation": occ,
             "occ_fine": str(g(r, "customer_occp_desc") or "(blank)"),
-            "income_tier": str(g(r, "account_disb_income_tier") or "(blank)"),
-            "ltv_range": str(g(r, "LTV Range") or "(blank)"),
+            "income_tier": income,
+            "ltv_range": ltv,
             "vintage_ym": ym or "(blank)",
             "vehicle_type": str(g(r, "account_disb_Vehicle_Type") or "(blank)"),
             "product_group": str(g(r, "account_disb_Product_Group") or "(blank)"),
-            "coll_age": str(g(r, "account_disb_Coll_Age_originate_Group") or "(blank)"),
-            "brand": str(g(r, "account_disb_car_brand") or "(blank)"),
-            "brand_x_collage": str(g(r, "account_disb_car_brand") or "(blank)") + "|" +
-                               str(g(r, "account_disb_Coll_Age_originate_Group") or "(blank)"),
-            "brand_x_region": str(g(r, "account_disb_car_brand") or "(blank)") + "|" +
-                              str(g(r, "account_disb_Region") or "(blank)"),
-            "vehicle_x_ltv": str(g(r, "account_disb_Vehicle_Type") or "(blank)") + "|" +
-                             str(g(r, "LTV Range") or "(blank)"),
+            "coll_age": cage,
+            "brand": brand,
+            "brand_x_collage": brand + "|" + cage,
+            "brand_x_region": brand + "|" + region,
+            "vehicle_x_ltv": str(g(r, "account_disb_Vehicle_Type") or "(blank)") + "|" + ltv,
             "model": (str(g(r, "account_disb_car_brand") or "") + " " +
                       str(g(r, "account_disb_car_model") or "")).strip() or "(blank)",
-            "occ_x_income": occ + "|" + str(g(r, "account_disb_income_tier") or "(blank)"),
-            "occ_x_region": occ + "|" + str(g(r, "account_disb_Region") or "(blank)"),
+            "occ_x_income": occ + "|" + income,
+            "occ_x_region": occ + "|" + region,
             "branch": br,
+            "dpd_bucket": dpd,
+            # restructuring status split (Normal / Pre-emptive / TDR / Skip)
+            "acc_chng": chg,
+            "chg_x_bucket": chg + "|" + stage,
+            "chg_x_occ": chg + "|" + occ,
+            "chg_x_region": chg + "|" + region,
+            # collateral book deep-dive (type = coll_segment; age = coll_age; make = brand)
+            "coll_segment": cseg,
+            "coll_seg_x_region": cseg + "|" + region,
+            "coll_seg_x_area": cseg + "|" + area,
+            "coll_seg_x_occ": cseg + "|" + occ,
+            "coll_seg_x_income": cseg + "|" + income,
+            "coll_seg_x_bucket": cseg + "|" + stage,
+            "collage_x_region": cage + "|" + region,
+            "collage_x_occ": cage + "|" + occ,
+            "collage_x_income": cage + "|" + income,
+            "collage_x_area": cage + "|" + area,
+            "coll_age_x_bucket": cage + "|" + stage,
+            "brand_x_occ": brand + "|" + occ,
+            "brand_x_income": brand + "|" + income,
+            "brand_x_area": brand + "|" + area,
+            "brand_x_ltv": brand + "|" + ltv,
+            # branch collateral-concentration (acquisition lens: what each branch is built on)
+            "branch_x_seg": br + "|" + cseg,
+            "branch_x_brand": br + "|" + brand,
         }
         for tab, key in vals.items():
             c = tabs[tab][key]
             c[0] += 1
             c[1] += 1 if early else 0
-            c[2] += 1 if bad else 0
-            c[3] += 1 if fpd else 0
-            c[4] += osamt
-            c[5] += npat
+            c[2] += 1 if roll else 0
+            c[3] += 1 if npl_live else 0
+            c[4] += 1 if late else 0
+            c[5] += 1 if fpd else 0
+            c[6] += osamt
+            c[7] += osamt if npl_live else 0.0
+            c[8] += osamt if late else 0.0
+            c[9] += npat
             if ev is not None:
-                c[6] += ev
-                c[7] += 1
+                c[10] += ev
+                c[11] += 1
         if n % 100000 == 0:
             print("  rows", n, flush=True)
 
@@ -186,7 +251,7 @@ def main():
             band = "%02d-%02dm" % (mob // 6 * 6, mob // 6 * 6 + 5)
             key = ym[:4] + "|" + band
             vc = vint_curve[key]
-            for i in range(8):
+            for i in range(12):
                 vc[i] += c[i]
 
     out = {"meta": {
@@ -198,10 +263,15 @@ def main():
         "branch_join": {"matched": matched, "pct": round(matched * 100.0 / n, 2)},
         "mob_anchor": anchor,
         "fpd_note": "F_FPD categorical: any non-Regular value counts as FPD-flagged",
+        "lens_note": ("Owner-framed lenses (2026-07-24): LIVE BOOK = Current..179dpd; "
+                      "npl_live = 90-179dpd share of the live book; the 180+ legacy stock is "
+                      "reported separately (late180) — it is workout inventory, not fresh risk. "
+                      "dpd30p/dpd90p keep the whole-book read for continuity."),
         "min_cell": MIN_CELL,
     }, "tabs": {}}
+    capped = ("model", "occ_fine", "branch", "branch_x_seg", "branch_x_brand")
     for k, d in tabs.items():
-        out["tabs"][k] = pack(d, top=400 if k in ("model", "occ_fine", "branch") else None)
+        out["tabs"][k] = pack(d, top=400 if k in capped else None)
     out["tabs"]["vintage_curve"] = pack(vint_curve, floor=100)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
