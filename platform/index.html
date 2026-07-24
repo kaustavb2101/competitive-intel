@@ -347,6 +347,18 @@
       <p class="lead" id="truckflow-note"></p>
       <table class="tbl" id="truckflowtbl"></table>
     </div>
+    <!-- Flood & rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED ThaiWater
+         station telemetry (obj #1). Water on the ground (river/reservoir stations at high-water /
+         bank-overflow) and water arriving (24h rainfall) are the leading-edge flood event that
+         stalls borrower income and blocks physical collections in agri and vehicle-title provinces
+         days before it shows in any monthly series. Point-in-time snapshots, dated to observed_to.
+         Rendered by renderFloodPulse(); hidden gracefully until the layers load. -->
+    <div id="floodpulse-wrap" style="display:none">
+      <h2 class="risk">Flood &amp; rain pulse <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · ThaiWater</span></h2>
+      <div class="verdict" id="floodpulse-verdict" style="display:none"></div>
+      <p class="lead" id="floodpulse-note"></p>
+      <table class="tbl" id="floodpulsetbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>

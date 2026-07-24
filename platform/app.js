@@ -176,6 +176,30 @@ async function loadTruckFlow(){
   return truckflowPromise;
 }
 
+// MEASURED live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json, ThaiWater
+// telemetry). Obj #1: water ON THE GROUND (river/reservoir stations at high-water / bank-overflow)
+// and water ARRIVING (24h rainfall) are the immediate flood event that stalls borrower income and
+// blocks physical collections in a province — days before it shows in any monthly series, and a
+// two-for-one on the agri-PD book AND flood-exposed vehicle collateral. Both are point-in-time
+// station snapshots, honestly dated to the layer's observed_to. Fully null-guarded: either file
+// absent → FLOOD stays null and the Overview block stays hidden (see renderFloodPulse).
+let FLOOD=null, FLOOD_META=null, RAIN=null, RAIN_META=null, floodPromise=null;
+async function loadThaiWater(){
+  if(floodPromise) return floodPromise;
+  floodPromise=(async()=>{
+    try{
+      const [fj,rj]=await Promise.all([
+        fetch('data/thaiwater_flood.json').then(r=>r.json()).catch(()=>null),
+        fetch('data/thaiwater_rain.json').then(r=>r.json()).catch(()=>null),
+      ]);
+      FLOOD=(fj&&fj.provinces&&typeof fj.provinces==='object')?fj.provinces:null; FLOOD_META=(fj&&fj.meta)||null;
+      RAIN=(rj&&rj.provinces&&typeof rj.provinces==='object')?rj.provinces:null; RAIN_META=(rj&&rj.meta)||null;
+    }catch(e){ FLOOD=null; FLOOD_META=null; RAIN=null; RAIN_META=null; }
+    return FLOOD;
+  })();
+  return floodPromise;
+}
+
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
   if(n==null||!isFinite(n)) return '—';
@@ -1513,6 +1537,9 @@ function renderOverview(){
   // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
   // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
   loadTruckFlow().then(renderTruckFlow);
+  // MEASURED flood + rain pulse (thaiwater_flood/rain.json, ThaiWater telemetry, obj #1) — the leading-
+  // edge flood signal that stalls borrower income & collections before any monthly series. Null-safe.
+  loadThaiWater().then(renderFloodPulse);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -2203,6 +2230,59 @@ function renderTruckFlow(){
         `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
         `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
         `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+/* ---------- flood & rain pulse (MEASURED · ThaiWater, objective #1) ----------
+   Twin live-telemetry snapshots folded onto the Overview strip: river/reservoir stations at
+   high-water (flood) and 24h rainfall (rain arriving). The leading-edge portfolio-risk signal —
+   flood on the ground stalls borrower cash flow and blocks collections in agri/vehicle-title
+   provinces before any monthly series moves. Both are point-in-time station aggregates, dated to
+   observed_to; nothing is fabricated. Null-safe: absent layer(s) → the block stays hidden. */
+function renderFloodPulse(){
+  const wrap=$('#floodpulse-wrap'); if(!wrap) return;
+  const fp=(FLOOD&&typeof FLOOD==='object')?FLOOD:null;
+  const provs=fp?Object.keys(fp).filter(p=>fp[p]&&typeof fp[p].max_level==='number'):[];
+  if(!provs.length){ wrap.style.display='none'; return; }
+  const rn=(RAIN&&typeof RAIN==='object')?RAIN:{};
+  const LVL={4:'high water',5:'bank overflow'};
+  // national roll-up (measured counts, not modelled)
+  const nHighProv=provs.filter(p=>fp[p].max_level>=4).length;
+  const nFloodProv=provs.filter(p=>fp[p].max_level>=5).length;         // bank overflow
+  const totHigh=provs.reduce((s,p)=>s+(fp[p].n_high||0),0);            // stations at level ≥4
+  const rainKeys=Object.keys(rn);
+  const nHeavy=rainKeys.filter(p=>(rn[p].pct_heavy||0)>0).length;
+  const nVHeavy=rainKeys.filter(p=>(rn[p].pct_very_heavy||0)>0).length;
+  const fObs=(FLOOD_META&&FLOOD_META.observed_to)||'';
+  const rObs=(RAIN_META&&RAIN_META.observed_to)||'';
+  // verdict — lead with the answer. Bank overflow anywhere = warn; else elevated-but-contained.
+  const vb=$('#floodpulse-verdict');
+  if(vb){
+    const warn=nFloodProv>0;
+    vb.className='verdict'+(warn?' v-risk':' v-warn'); vb.style.display='block';
+    const head=warn
+      ? `🌊 <b>${nFloodProv} province${nFloodProv===1?'':'s'} at bank-overflow flood</b> right now`
+      : `💧 <b>No province at bank-overflow</b> — flooding is elevated but contained`;
+    vb.innerHTML=`<div class="verdict-line">${head}: <b>${nHighProv}</b> province${nHighProv===1?'':'s'} carry river stations at high-water, <b>${totHigh}</b> station${totHigh===1?'':'s'} above the high mark nationally.</div>`+
+      `<div class="sub" style="margin-top:4px">In the last 24h, <b>${nHeavy}</b> province${nHeavy===1?'':'s'} saw heavy rain (≥35mm)${nVHeavy?`, <b>${nVHeavy}</b> very-heavy (≥90mm)`:''}. Water on the ground stalls borrower income and blocks physical collection in agri and vehicle-title provinces days before it shows in any monthly series — a two-for-one on the agri-PD book and flood-exposed collateral. ${TAG_M}.</div>`;
+  }
+  const note=$('#floodpulse-note');
+  if(note) note.innerHTML='<b>Measured</b> — ThaiWater station telemetry. <b>Flood</b> = river/reservoir water-level stations at situation-level ≥ 4 (high water) / 5 (bank overflow)'+(fObs?` (observed to ${fObs})`:'')+'; <b>24h rain</b> = rain-gauge max over the province'+(rObs?` (observed to ${rObs})`:'')+'. Sorted <b>worst flood level, then most stations high</b>. Station counts are shown so a small-base province reads honestly. A point-in-time snapshot, not a forecast.';
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  // sort: worst level, then absolute flooding-station count, then share (robust on tiny bases)
+  const by=provs.slice().sort((a,a2)=>{const A=fp[a],B=fp[a2];
+    return (B.max_level-A.max_level)||((B.n_high||0)-(A.n_high||0))||((B.pct_high||0)-(A.pct_high||0));})
+    .filter(p=>(fp[p].max_level>=4)||(fp[p].n_high>0)).slice(0,8);
+  const tbl=$('#floodpulsetbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="MEASURED — river/reservoir stations at high-water (level ≥4) out of stations reporting, and the worst level in the province">Flood stations · level ●</th><th title="MEASURED — worst 24h rainfall gauge in the province; heavy ≥35mm, very heavy ≥90mm">24h rain (max) ●</th></tr>`+
+    by.map((p,i)=>{const v=fp[p]; const lv=v.max_level;
+      const lc=lv>=5?'var(--agri)':lv>=4?'var(--gold)':'var(--merch)';
+      const r=rn[p]||{}; const mm=r.max_mm;
+      const rc=(mm>=90)?'var(--agri)':(mm>=35)?'var(--gold)':'var(--txt)';
+      const rlab=(mm==null||!isFinite(mm))?'<span class="sub">no gauge</span>':`<span class="mono" style="color:${rc}">${mm.toFixed(1)}mm</span>${mm>=90?' <span class="sub" style="color:var(--agri)">very heavy</span>':mm>=35?' <span class="sub" style="color:var(--gold)">heavy</span>':''}`;
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${p}</b></td>`+
+        `<td><span class="mono">${num(v.n_high)}/${num(v.n_stations)}</span> <span class="sub">(${(v.pct_high||0).toFixed(0)}%)</span> <span class="mono" style="color:${lc}">L${lv}${LVL[lv]?' · '+LVL[lv]:''}</span></td>`+
+        `<td>${rlab}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 
