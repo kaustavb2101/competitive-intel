@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-24T17:25:17+07:00",
-    "commit": "4cc8a4d"
+    "generated_at": "2026-07-24T10:27:38Z",
+    "commit": "0c90e4e"
   },
   "overall": {
     "progress_pct": 94,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-24T10:27:38Z",
+      "sha": "0c90e4e",
+      "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-24T17:25:17+07:00",
       "sha": "4cc8a4d",
       "summary": "feat(market): surface MEASURED business-formation pulse (DBD registry) on Overview (#143)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-24T08:15:57+00:00",
+      "date": "2026-07-24T08:15:57Z",
       "sha": "2322170",
       "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -510,7 +516,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T02:18:21+00:00",
+      "date": "2026-07-24T02:18:21Z",
       "sha": "7616550",
       "summary": "docs: log ux-cc-jumplink-href merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -546,7 +552,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-23T22:21:01+00:00",
+      "date": "2026-07-23T22:21:01Z",
       "sha": "fccc9d0",
       "summary": "committee: refresh autonomy plan after truck-flow ship (2026-07-23)",
       "pillar": "deployment"
@@ -558,13 +564,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-23T22:14:59+00:00",
+      "date": "2026-07-23T22:14:59Z",
       "sha": "a0136e7",
       "summary": "committee: refresh autonomy plan (run 30048841499)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-23T20:23:03+00:00",
+      "date": "2026-07-23T20:23:03Z",
       "sha": "0a1b301",
       "summary": "docs(progress): log the sim-slider aria-valuetext UX fix — merged (#129) + deploy-verified",
       "pillar": "uxui"
@@ -651,12 +657,6 @@
       "date": "2026-07-23T23:20:36+07:00",
       "sha": "9f1ffcf",
       "summary": "data(provenance): regenerate on the merged fuel tree under the WSL 3.11 mirror",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-23T23:17:21+07:00",
-      "sha": "b5489a4",
-      "summary": "Merge remote-tracking branch 'origin/master' into data/fuel-29966758495",
       "pillar": "data-integration"
     }
   ]
