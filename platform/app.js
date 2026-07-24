@@ -69,6 +69,17 @@ function loadDroughtDistrict(){
   return droughtdPromise;
 }
 
+// District crop × drought exposure — lazy-loaded from data/amphoe_crops.json (objective #1). MEASURED
+// planted area (OAE satellite amphoe surveys) × MODELLED drought (OAE SPEI). Names WHICH crop in WHICH
+// district carries the largest rai exposure under drought — the crop-named, portfolio-actionable read
+// behind the district-drought card above. Promise-cached.
+let amphoecropsPromise=null;
+function loadAmphoeCrops(){
+  if(amphoecropsPromise) return amphoecropsPromise;
+  amphoecropsPromise=fetch('data/amphoe_crops.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  return amphoecropsPromise;
+}
+
 // Dry-season (SECOND / irrigated) rice EXPOSURE per province — MEASURED, OAE ข้าวนาปรัง planted area
 // (data/napprang.json). This is the irrigated second-crop income cushion sitting behind the drought
 // flag: a big planted area = a big buffer today AND a big vulnerability if water cuts force the second
@@ -1505,6 +1516,9 @@ function renderOverview(){
   loadCropMargin().then(renderCropMargin);
   // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
   loadDroughtDistrict().then(renderDroughtDistrict);
+  // district crop × drought exposure (obj #1) — MEASURED OAE planted area × MODELLED OAE SPEI: names the
+  // largest crop-area exposures sitting under drought. Null-safe: absent file → the block stays hidden.
+  loadAmphoeCrops().then(renderAmphoeCrops);
   // MEASURED provincial labour stress (province_lfs.json, NSO LFS 2026 Q1, obj #1) — the seasonal-idle
   // backdrop behind the agri-PD book. Null-safe: absent file → the block stays hidden.
   loadProvinceLfs().then(renderProvinceLfs);
@@ -1987,6 +2001,42 @@ function renderDroughtDistrict(j){
   const tbl=$('#drought-district-tbl');
   if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th>Severity</th></tr>`+
     clean.map((x,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${x.name_th||x.name_en||x.code}</b></td><td class="sub">${x.province_th||'—'}</td><td class="mono" style="color:${col(x.cls)}">${x.spei.toFixed(2)}</td><td><span class="tag" style="color:${col(x.cls)};border:1px solid ${col(x.cls)}">${x.cls}</span></td></tr>`).join('');
+}
+
+// District crop × drought exposure (Overview, obj #1) — MEASURED planted area (OAE satellite amphoe
+// surveys) × MODELLED drought (OAE SPEI). The district-drought card above names the driest districts;
+// this names WHICH crop in WHICH district carries the largest rai exposure sitting under drought — the
+// crop-named, portfolio-actionable read (which slice of the agri-PD book is most exposed). Renders the
+// layer's own pre-sorted severe-or-worse hotspots (largest planted area first). Null-safe: absent /
+// shapeless layer → the wrap stays hidden, nothing fabricated.
+function renderAmphoeCrops(j){
+  const wrap=$('#amphoe-crops-wrap'); if(!wrap) return;
+  const hs=j&&Array.isArray(j.hotspots)?j.hotspots.filter(h=>h&&h.planted_rai!=null&&h.spei!=null):null;
+  if(!hs||!hs.length){ wrap.style.display='none'; return; }
+  const m=j.meta||{}, unj=m.drought_unjoined_rows;
+  wrap.style.display='block';
+  // MEASURED counts, computed from the layer's own rows (never invented). severe-or-worse cell count
+  // replicates the builder's tally exactly: UNIQUE (province,amphoe,crop) cells at severe/extreme with a
+  // positive planted area — deduped across survey vintages so it matches build_amphoe_crops's headline
+  // (the 60-row hotspots array is only the largest-area sample, not the full severe set).
+  const rows=Array.isArray(j.rows)?j.rows:[];
+  let sw;
+  if(rows.length){ const s=new Set();
+    for(const r of rows){ if((r.drought==='severe'||r.drought==='extreme')&&(r.planted_rai||0)>0) s.add(r.province_th+'|'+r.amphoe_th+'|'+r.crop); }
+    sw=s.size;
+  } else sw=hs.length;
+  const top=hs[0];
+  const rai=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  const v=$('#amphoe-crops-verdict');
+  if(v) v.innerHTML=`<div class="verdict-line">🌾 <b>Crop × drought exposure:</b> ${sw} district-crop cells sit at severe-or-worse drought across ${rows.length?rows.length.toLocaleString('en-US')+' measured':'the measured'} amphoe crop rows. `+
+    `Largest single exposure: <b>${top.crop_th||top.crop}</b> in <b>${top.province_th}·${top.amphoe_th}</b> — ${rai(top.planted_rai)} rai at SPEI ${(top.spei).toFixed(2)}.</div>`+
+    `<div class="sub" style="margin-top:4px">Which slice of the agri-PD book sits under the driest ground · ${provChip('m','measured','OAE area')} × ${provChip('e','modelled','OAE SPEI')}</div>`;
+  const note=$('#amphoe-crops-note');
+  if(note) note.innerHTML='<b>MEASURED</b> planted area (OAE Geo-Informatics satellite amphoe surveys + Zone-6 surveys, every row cites its source PDF) <b>×</b> <b>MODELLED</b> drought (OAE SPEI from ERA5-Land reanalysis — a model product, not station rainfall, not a disaster declaration; lower = drier). Name-joined district-to-district'+(unj!=null?`; ${Number(unj).toLocaleString('en-US')} rows had no drought match and are dropped, never guessed`:'')+'. <b>Do not sum across crops</b> — the two survey sources carry different vintages.';
+  const col=cl=>cl==='extreme'?'var(--agri)':cl==='severe'?'var(--gold)':'var(--mid)';
+  const tbl=$('#amphoe-crops-tbl');
+  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th>Crop</th><th title="Measured planted area, rai (OAE amphoe survey)">Planted rai ●</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th></tr>`+
+    hs.slice(0,10).map((h,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${h.amphoe_th}</b></td><td class="sub">${h.province_th}</td><td>${h.crop_th||h.crop}</td><td class="mono">${rai(h.planted_rai)}</td><td class="mono" style="color:${col(h.drought)}">${(h.spei).toFixed(2)} <span class="tag" style="color:${col(h.drought)};border:1px solid ${col(h.drought)}">${h.drought}</span></td></tr>`).join('');
 }
 
 /* ---------- provincial labour stress (MEASURED · NSO LFS 2026 Q1, obj #1) ----------

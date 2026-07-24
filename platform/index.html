@@ -356,6 +356,16 @@
       <p class="lead" id="drought-district-note"></p>
       <table class="tbl" id="drought-district-tbl"></table>
     </div>
+    <!-- District crop × drought exposure (data/amphoe_crops.json) — MEASURED OAE planted area × MODELLED
+         OAE SPEI (obj #1). The district-drought card above names the driest districts; this names WHICH
+         crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
+         actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
+    <div id="amphoe-crops-wrap" style="display:none">
+      <h2 class="risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h2>
+      <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
+      <p class="lead" id="amphoe-crops-note"></p>
+      <table class="tbl" id="amphoe-crops-tbl"></table>
+    </div>
     <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
          (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
          seasonal-waiting share (agri off-season idle labour) that marks where borrower cash-flow is
