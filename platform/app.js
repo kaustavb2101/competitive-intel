@@ -175,6 +175,24 @@ async function loadTruckFlow(){
   })();
   return truckflowPromise;
 }
+// Merchant-demand backdrop — MEASURED DBD monthly new juristic-person (company) formation
+// (data/dbd_formation.json). by_province[prov]={n, capital_thb} for the snapshot month; renderDbdFormation
+// rolls it up (client-side) to AutoX's 5 operating regions via the branches' own province→region map, so
+// it reads as demand context on the footprint we run — NOT a footprint call. Obj (merchant/SME segment):
+// where the small-business borrower base is regenerating this month. Fully null-guarded: absent file →
+// DBDFORM stays null, the Overview block stays hidden (see renderDbdFormation), nothing fabricated.
+let DBDFORM=null, DBDFORM_META=null, dbdformPromise=null;
+async function loadDbdFormation(){
+  if(dbdformPromise) return dbdformPromise;
+  dbdformPromise=(async()=>{
+    try{
+      const j = await fetch('data/dbd_formation.json').then(r=>r.json());
+      DBDFORM=(j&&j.by_province&&typeof j.by_province==='object')?j.by_province:null; DBDFORM_META=j.meta||null;
+    }catch(e){ DBDFORM=null; DBDFORM_META=null; }
+    return DBDFORM;
+  })();
+  return dbdformPromise;
+}
 
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
@@ -1514,6 +1532,9 @@ function renderOverview(){
   // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
   // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
   loadTruckFlow().then(renderTruckFlow);
+  // MEASURED merchant-demand backdrop (dbd_formation.json, DBD new-firm formation) — where the small-
+  // business borrower base is regenerating, rolled up to AutoX's regions. Null-safe: absent → hidden.
+  loadDbdFormation().then(renderDbdFormation);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -2204,6 +2225,57 @@ function renderTruckFlow(){
         `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
         `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
         `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// Merchant-demand backdrop — MEASURED DBD new-firm formation, rolled up to AutoX's operating regions.
+// A demand/economic-vitality read on the merchant (small-business owner) borrower segment. Region grain
+// (built from the branches' own province→region map) keeps it demand context, not a footprint call.
+function renderDbdFormation(){
+  const wrap=$('#dbdform-wrap'); if(!wrap) return;
+  // Need both the layer and the branch province→region map to aggregate; absent either → hide, nothing faked.
+  if(!DBDFORM || !Array.isArray(DATA) || !DATA.length){ wrap.style.display='none'; return; }
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  const pct=v=>(v==null||!isFinite(v))?'—':v.toFixed(1)+'%';
+  // province → region and AutoX branches/region, both MEASURED from the committed branch set (d.v/d.r).
+  const p2r={}, autox={};
+  DATA.forEach(d=>{ if(d&&d.v&&d.r){ if(!(d.v in p2r)) p2r[d.v]=d.r; autox[d.r]=(autox[d.r]||0)+1; } });
+  const byReg={};
+  Object.keys(DBDFORM).forEach(prov=>{ const reg=p2r[prov]; if(!reg) return; const rec=DBDFORM[prov]||{};
+    const r=byReg[reg]||(byReg[reg]={n:0,cap:0}); r.n+=(rec.n||0); r.cap+=(rec.capital_thb||0); });
+  const rows=Object.keys(byReg).map(reg=>({reg,n:byReg[reg].n,cap:byReg[reg].cap,br:autox[reg]||0}));
+  if(!rows.length){ wrap.style.display='none'; return; }
+  rows.sort((a,b)=>b.n-a.n);
+  const totN=rows.reduce((s,r)=>s+r.n,0), totCap=rows.reduce((s,r)=>s+r.cap,0);
+  const bn=v=>'฿'+(v/1e9).toFixed(2)+'bn';
+  const top=rows[0];                                   // busiest formation region
+  const dense=rows.slice().sort((a,b)=>b.br-a.br)[0];  // where AutoX is densest
+  const REGTH={'Central&BKK':'Central & Bangkok','East':'East','Isan':'Isan (Northeast)','North':'North','South':'South'};
+  const mo=(DBDFORM_META&&(DBDFORM_META.snapshot_month_be||DBDFORM_META.snapshot_month))||'';
+  const vb=$('#dbdform-verdict');
+  if(vb){
+    vb.className='verdict'; vb.style.display='block';
+    const topShare=totN?(100*top.n/totN):0, topCapShare=totCap?(100*top.cap/totCap):0;
+    vb.innerHTML=`<div class="verdict-line">📊 <b>New small-business formation is metro-concentrated — ${REGTH[top.reg]||top.reg} takes ${pct(topShare)} of the month's ${num(totN)} new firms and ${pct(topCapShare)} of registered capital.</b> `+
+      `Where the merchant / small-business borrower base is regenerating fastest.</div>`+
+      `<div class="sub" style="margin-top:4px">But AutoX's branch weight is heaviest in <b>${REGTH[dense.reg]||dense.reg}</b> (${num(dense.br)} branches)`+
+      `${dense.reg!==top.reg?`, which sees only ${pct(totN?100*dense.n/totN:0)} of new-firm formation`:''} — the merchant-demand pulse is thinnest in the agri regions where the book is densest. `+
+      `Demand context for the merchant segment, not a footprint call. ${TAG_M}.</div>`;
+  }
+  const note=$('#dbdform-note');
+  if(note) note.innerHTML='<b>Measured</b> — DBD (Department of Business Development) monthly new juristic-person registrations'+
+    (mo?` for <b>${mo}</b>`:'')+', tallied by the registry\'s own head-office province and rolled up to AutoX\'s 5 operating regions (province→region from the branch set). '+
+    'This is a <b>one-month formation flow</b>, not a stock of active businesses and not annualised. '+
+    '<b>Registered capital</b> is authorised capital at incorporation — not paid-up capital or revenue — and is dominated by a few large registrations, so read the firm counts as the demand pulse and capital as directional. '+
+    'Makes <b>no</b> open/close recommendation — a demand backdrop for the footprint we already run.';
+  const tbl=$('#dbdformtbl');
+  if(tbl) tbl.innerHTML=`<tr><th>Region</th><th title="MEASURED — new juristic-person registrations this month, and the region's share of the national total">New firms /mo · share ●</th><th title="MEASURED — registered (authorised) capital of those new firms; directional, dominated by a few large registrations">Reg. capital · share ●</th><th title="MEASURED — AutoX branches operating in the region (the footprint we run)">AutoX branches</th></tr>`+
+    rows.map(r=>{const sh=totN?100*r.n/totN:0; const c=sh>=40?'var(--merch)':sh>=15?'var(--gold)':'var(--dim)';
+      const csh=totCap?100*r.cap/totCap:0;
+      return `<tr><td><b>${REGTH[r.reg]||r.reg}</b></td>`+
+        `<td><span class="mono" style="color:${c}">${num(r.n)}</span> <span class="mono sub">${pct(sh)}</span></td>`+
+        `<td><span class="mono">${bn(r.cap)}</span> <span class="mono sub">${pct(csh)}</span></td>`+
+        `<td class="mono sub">${num(r.br)}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 

@@ -388,6 +388,18 @@
       <p class="lead" id="truckflow-note"></p>
       <table class="tbl" id="truckflowtbl"></table>
     </div>
+    <!-- Merchant-demand backdrop (data/dbd_formation.json) — MEASURED DBD monthly new juristic-person
+         registrations, tallied by the registry's own head-office province and rolled up (in the browser)
+         to AutoX's 5 operating regions. A business-formation DEMAND / economic-vitality signal for the
+         merchant / small-business borrower segment — where the small-business base is regenerating this
+         month. A one-month formation FLOW, not a stock, and NOT a footprint call (region grain, no
+         open/close recommendation). Rendered by renderDbdFormation(); hidden gracefully until load. -->
+    <div id="dbdform-wrap" style="display:none">
+      <h2 class="demand">Merchant-demand backdrop · new-firm formation <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h2>
+      <div class="verdict" id="dbdform-verdict" style="display:none"></div>
+      <p class="lead" id="dbdform-note"></p>
+      <table class="tbl" id="dbdformtbl"></table>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
