@@ -1284,7 +1284,7 @@ function showTab(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); }
-  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); }
+  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
@@ -1558,7 +1558,6 @@ function renderOverview(){
       <td class="mono" style="color:var(--agri)">${r.hi}</td>
       <td>${barHTML(r.md,'var(--merch)')} <span class="mono">${r.md}</span></td>
       <td>${barHTML(r.col,'var(--collat)')} <span class="mono">${r.col}</span></td></tr>`).join('');
-  renderBotCap();
   // lazy-load + render the province macro watchlist (macro_sensitivity.json, obj#1) — null-safe:
   // absent file → the wrap stays display:none and the Overview reads exactly as before.
   loadMacroSens().then(renderMacroWatchlist);
@@ -1659,21 +1658,6 @@ function renderMacroWatchlist(){
       +`<div class="n">${head?'Hits':'Supports'} borrower cash flow · #1 driver at ${p.hits}/${p.n} branches (est)</div></div>`;
   }).join('');
   wrap.style.display='';
-}
-
-/* ---------- BoT hire-purchase rate-cap macro card (objective #1, margin watch) ----------
-   Editorial / regulatory note. The Bank of Thailand introduced a ceiling on interest +
-   fees for car & motorcycle hire-purchase lending, effective ~Dec 2025. We deliberately do
-   NOT print a precise rate — only the direction and that it is a SECTOR-MARGIN watch, not a
-   borrower-credit signal. Clearly dated and labelled editorial. */
-function renderBotCap(){
-  const el=$('#botcap'); if(!el) return;
-  // Lead with a one-line verdict; tuck the reasoning into a method expander (scannable, caveats kept).
-  el.innerHTML=`<div class="verdict-line"><b>BoT hire-purchase rate/fee cap</b> — effective <b>~Dec 2025</b>. A sector <b>margin</b> watch, not a portfolio-credit signal.</div>`+
-    `<div class="sub" style="margin-top:4px">AutoX core is <b>title loans</b> (not hire-purchase) — direct hit limited. <span class="sub">Editorial / regulatory · no precise rate stated</span></div>`+
-    `<details class="method"><summary>Why it still matters</summary><div class="mb">`+
-    `Ceiling on interest + fees compresses yields across the auto &amp; motorcycle hire-purchase sector, and signals a <b>tightening regulatory posture</b> on vehicle-secured consumer credit — capping pricing headroom across the segment.`+
-    `</div></details>`;
 }
 
 /* ---------- Collateral outlook board (objective #1, portfolio risk) ----------
@@ -4489,41 +4473,9 @@ function renderOccConcentration(){
    provinces that worsen most. Deterministic. Exposure = branch footprint (no per-branch ฿ balance / LTV /
    elasticities — all stated). Reuses crop_stress.json (lazy) + branches.json; no new data, no server. */
 const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
-const simState={price:0,rain:0,veh:0,factory:0,botcap:false};
+const simState={price:0,rain:0,veh:0,factory:0};
 let simWired=false;
 
-/* ---------- BoT 28% title-loan rate-cap scenario (objective #1) ----------
-   REGULATORY FACT (cited): the Bank of Thailand title-loan / personal-loan interest ceiling is
-   28% APR, effective 2 Dec 2025 (Royal Decree 5 Jun 2025 → FIBA / direct BoT supervision; BoT
-   notification 25680030). Source: docs/RESEARCH_DIGEST.md (2026-06-30, Entry 1A); primary:
-   https://www.bot.or.th/content/dam/bot/fipcs/documents/FPG/2568/EngPDF/25680030.pdf
-   ⛔ NOT a measured book. This is a SCENARIO MODEL: the product buckets below — their assumed
-   effective APR and assumed share of the book — are ESTIMATED illustrative LEVERS the exec can
-   reason about, NOT AutoX's actual loan tape. When a real loan tape lands (loan_tape_derived.json),
-   replace SIM_CAP_BOOK with measured product yields + balances. Math is deliberately simple:
-   book yield = share-weighted APR; under the cap each bucket's APR = min(APR, 28). Buckets ALREADY
-   at/below 28% are unaffected; only the high-rate tail compresses. */
-const SIM_CAP_RATE=28; // % APR — the BoT title-loan ceiling (cited fact, not an assumption)
-// Illustrative title-loan book mix. share = % of book; apr = assumed effective APR (%). ASSUMPTIONS.
-const SIM_CAP_BOOK=[
-  {seg:'Motorcycle title',     apr:33, share:30},
-  {seg:'Pickup / car title',   apr:26, share:34},
-  {seg:'Land / house title',   apr:22, share:18},
-  {seg:'Agri-vehicle title',   apr:31, share:10},
-  {seg:'Top-up / small-ticket',apr:30, share:8},
-];
-// Compute book yield before vs after the 28% cap from the illustrative mix above. Pure + deterministic.
-function simCapModel(){
-  const tot=SIM_CAP_BOOK.reduce((s,b)=>s+b.share,0)||1;
-  let yBase=0, yCap=0;
-  const rows=SIM_CAP_BOOK.map(b=>{
-    const w=b.share/tot;
-    const capped=Math.min(b.apr,SIM_CAP_RATE);
-    yBase+=w*b.apr; yCap+=w*capped;
-    return {seg:b.seg,share:b.share,apr:b.apr,capped,compress:b.apr>SIM_CAP_RATE,drop:b.apr-capped};
-  });
-  return {rows,yBase,yCap,drop:yBase-yCap};
-}
 /* ---------- factory / manufacturing slowdown lever (objective #1) ----------
    Reuses the MEASURED occupation-risk layer already loaded client-side (OCCRISK, index-aligned to
    DATA). "Manufacturing base" = branches whose MEASURED dominant occupation bucket is factory or
@@ -4669,14 +4621,12 @@ function wireSim(){
   bind('#sim-rain','rain',v=>v===0?'normal':(v>0?'wetter +':'drier ')+v+'%');
   bind('#sim-veh','veh',v=>(v>0?'+':'')+v+'%');
   bind('#sim-factory','factory',v=>v+'%');
-  const bot=$('#sim-botcap'); if(bot) bot.onchange=()=>{simState.botcap=bot.checked; computeSim();};
   const rs=$('#sim-reset'); if(rs) rs.onclick=simReset;
 }
 function simReset(){
-  simState.price=0; simState.rain=0; simState.veh=0; simState.factory=0; simState.botcap=false;
+  simState.price=0; simState.rain=0; simState.veh=0; simState.factory=0;
   const set=(id,v,vt)=>{const e=$(id); if(e){ e.value=v; e.setAttribute('aria-valuetext',vt); }};
   set('#sim-price',0,'0%'); set('#sim-rain',0,'normal'); set('#sim-veh',0,'0%'); set('#sim-factory',0,'0%');
-  const bot=$('#sim-botcap'); if(bot) bot.checked=false;
   $('#sim-price-v')&&($('#sim-price-v').textContent='0%');
   $('#sim-rain-v')&&($('#sim-rain-v').textContent='normal');
   $('#sim-veh-v')&&($('#sim-veh-v').textContent='0%');
@@ -4688,7 +4638,7 @@ function renderSimVerdict(baseHiP,baseHiBr,N,shocked,scenHiP,scenHiBr){
   const box=$('#sim-verdict'); if(!box) return;
   box.style.display='block';
   if(baseHiP==null){
-    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline ready.</b> The agri what-if needs crop-stress data — the BoT 28% rate-cap scenario below works without it.</div>`;
+    box.innerHTML=`<div class="verdict-line">⚙️ <b>Baseline ready.</b> The agri what-if needs crop-stress data (data/crop_stress.json) — load it to run the crop / rainfall shock.</div>`;
     return;
   }
   if(!shocked){
@@ -4706,8 +4656,8 @@ function computeSim(){
   if(!CSTRESS_LIST||!CSTRESS_LIST.length){
     $('#sim-cards').innerHTML='';
     renderSimVerdict(null);
-    $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it. The BoT rate-cap scenario below still works (it needs no data file).';
-    $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimFactory(); renderSimCap(); return;
+    $('#sim-readout').innerHTML='Crop-stress data not available (data/crop_stress.json missing) — the agri what-if needs it.';
+    $('#sim-prov').innerHTML=''; renderSimCollat(); renderSimFactory(); return;
   }
   const brn=simBranchByProv();
   const {price,rain}=simState;
@@ -4765,22 +4715,8 @@ function computeSim(){
       `(<b>${(100*scenHiBr/N).toFixed(1)}%</b> of the network). `+
       (lead?`<b>${worse.length}</b> province${worse.length===1?'':'s'} newly tip in — worst is <b>${lead.th}</b> (${lead.region||'—'}, +${lead.delta.toFixed(0)} pts). `:`No new province crosses the high-stress line. `);
   }
-  if(simState.botcap){
-    const cap=simCapModel();
-    const compress=cap.rows.filter(r=>r.compress).sort((a,b)=>b.drop-a.drop);
-    const segList=compress.map(r=>`<b>${r.seg}</b> (${r.apr}%→28%)`).join(', ');
-    read+=`<br><br><b style="color:var(--gold)">⚖ BoT 28% rate cap (effective 2 Dec 2025):</b> `+
-      `book yield <b>${cap.yBase.toFixed(1)}%</b> → <b style="color:var(--agri)">${cap.yCap.toFixed(1)}%</b> `+
-      `(<b style="color:var(--agri)">−${cap.drop.toFixed(1)} pts</b> of yield). `+
-      (compress.length
-        ? `Products priced above 28% compress to the ceiling: ${segList}. Buckets already ≤28% are unaffected.`
-        : `No product is priced above 28% in this illustrative mix — the cap is non-binding.`);
-    read+=`<br><span class="sub">⛔ SCENARIO MODEL — illustrative product mix &amp; APRs are ASSUMPTIONS (levers), not AutoX's measured loan tape. `+
-      `28% ceiling is a cited regulatory fact (BoT notification 25680030 · Royal Decree 5 Jun 2025).</span>`;
-  }
   read+=`<br><span class="sub">ILLUSTRATIVE sensitivity — same estimated proxy, no measured elasticities / loan balances / LTV. A direction, not a number.</span>`;
   $('#sim-readout').innerHTML=read;
-  renderSimCap();
   // ----- worsening provinces table -----
   const tbl=$('#sim-prov');
   if(tbl){
@@ -4830,41 +4766,6 @@ function renderSimCollat(){
     <div class="d" style="color:${c.col}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
 }
-// BoT 28% rate-cap readout: headline yield cards + which products compress. Only shown when toggled ON.
-function renderSimCap(){
-  const wrap=$('#sim-cap'); const outer=$('#sim-cap-wrap'); if(!wrap) return;
-  if(!simState.botcap){ if(outer) outer.style.display='none'; wrap.innerHTML=''; return; }
-  if(outer) outer.style.display='block';
-  const m=simCapModel();
-  const cards=[
-    {k:'Book yield — before cap',v:m.yBase.toFixed(1)+'%',col:'var(--mid)',
-     n:'Share-weighted effective APR of the illustrative title-loan mix. ASSUMED rates, not measured.'},
-    {k:'Book yield — under 28% cap',v:m.yCap.toFixed(1)+'%',col:'var(--agri)',
-     n:'Each product capped at the BoT 28% ceiling, re-weighted by the same illustrative shares.'},
-    {k:'Yield compression',v:'−'+m.drop.toFixed(1)+' pts',col:'var(--agri)',
-     d:m.rows.filter(r=>r.compress).length+' of '+m.rows.length+' products bind',
-     n:'Lost yield from clipping the high-rate tail to 28%. Pre-tax, pre-volume — a pricing ceiling, not a credit-loss figure.'},
-  ];
-  const ch=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
-    <div class="v" style="color:${c.col}">${c.v}</div>
-    ${c.d?`<div class="d" style="color:${c.col}">${c.d}</div>`:''}
-    <div class="n">${c.n}</div></div>`).join('');
-  const rows=m.rows.slice().sort((a,b)=>b.apr-a.apr).map(r=>{
-    const col=r.compress?'var(--agri)':'var(--up)';
-    const tag=r.compress?`<span class="mono" style="color:var(--agri)">▼ caps to 28%</span>`:`<span class="mono" style="color:var(--up)">unaffected</span>`;
-    return `<tr><td><b>${r.seg}</b></td><td class="mono">${r.share}%</td>
-      <td class="mono">${r.apr}%</td><td class="mono" style="color:${col}">${r.capped.toFixed(0)}%</td>
-      <td class="mono" style="color:${r.compress?'var(--agri)':'var(--mid)'}">${r.drop>0?'−'+r.drop.toFixed(0):'—'}</td>
-      <td>${tag}</td></tr>`;}).join('');
-  wrap.innerHTML=`<div class="grid macro">${ch}</div>
-    <table class="tbl" style="margin-top:12px">
-      <tr><th>Product</th><th title="ASSUMED share of the book">Share · est</th>
-      <th title="ASSUMED effective APR">APR now · est</th><th title="APR after the 28% cap">Under cap</th>
-      <th title="APR points lost to the cap">Δ pts</th><th>Status</th></tr>${rows}</table>
-    <p class="lead" style="margin-top:6px">⛔ <b>Scenario model.</b> Product shares &amp; APRs are <b>ASSUMPTIONS</b> (levers) until a real loan tape lands — not AutoX's measured book.
-      The <b>28% ceiling is a cited regulatory fact</b>: BoT title-loan rate cap, effective <b>2 Dec 2025</b> (notification 25680030 · Royal Decree 5 Jun 2025).</p>`;
-}
-
 /* ---------- risk trend (time dimension, Phase 3) ----------
    Lazy-loads data/deltas.json (built by pipeline/timeseries.py from the snapshot
    set). With one vintage it shows a "baseline captured" message; with two it shows
@@ -6812,28 +6713,24 @@ function renderIncome(){
   });
 }
 
-/* MOVE 3 — scenario engine: LIVE / regulatory / stated-stress presets, each with its vintage (Sim). */
-const SCEN_KIND={live:['LIVE','var(--merch)'],regulatory:['REGULATORY FACT','var(--accent)'],stress:['STATED STRESS','var(--gold)']};
+/* MOVE 3 — scenario engine: LIVE / stated-stress presets, each with its vintage (Sim). */
+const SCEN_KIND={live:['LIVE','var(--merch)'],stress:['STATED STRESS','var(--gold)']};
 function renderScenarios(){
   const el=document.getElementById('sim-scenarios'); if(!el) return;
   tmliFetch('scenarios').then(j=>{
     if(!j||!Array.isArray(j.scenarios)){ tmliNote(el,'Scenario engine not yet computed — <b>data/scenarios.json</b> is absent (run pipeline/build_scenarios.py).'); return; }
     const cards=j.scenarios.map(s=>{
       const [lab,col]=SCEN_KIND[s.kind]||['',''];
-      let extra='';
-      const y=(s.effect||{}).yield;
-      if(y) extra=`<div class="scn-yield">Book yield <b>${y.yield_base}%</b> → <b style="color:var(--agri)">${y.yield_capped}%</b> <span class="s">(−${y.compression_pts} pts on the high-rate tail)</span></div>`;
       return `<div class="scn-card">
         <div class="scn-h"><span class="scn-badge" style="color:${col};border-color:${col}">${lab}</span>
           <span class="scn-vint">${s.vintage||''}</span></div>
         <h4>${s.title}</h4>
         <p class="scn-head">${s.headline}</p>
-        ${extra}
         <p class="scn-prov">${s.provenance||''}</p></div>`;
     }).join('');
     el.innerHTML=`
       <h2 class="risk">Current scenarios — refreshed weekly, not hardcoded <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">DATA LAYER</span></h2>
-      <p class="lead">The real-world shocks live right now, each stamped with its vintage. <b style="color:var(--merch)">LIVE</b> = measured current driver; <b style="color:var(--accent)">REGULATORY</b> = cited fact; <b style="color:var(--gold)">STATED STRESS</b> = a labelled hypothetical, not a forecast. Rebuilt weekly by the scenario cron from the measured signal layers. The sliders below let you run your own what-if.</p>
+      <p class="lead">The real-world shocks live right now, each stamped with its vintage. <b style="color:var(--merch)">LIVE</b> = measured current driver; <b style="color:var(--gold)">STATED STRESS</b> = a labelled hypothetical, not a forecast. Rebuilt weekly by the scenario cron from the measured signal layers. The sliders below let you run your own what-if.</p>
       <div class="scn-grid">${cards}</div>`;
   });
 }
@@ -6901,7 +6798,43 @@ function renderProducts(){
       <p class="lead">Which borrowers sit behind each collateral product, what income driver moves them, and which scenarios (above, in the simulator) hit them. Book share &amp; NPL are <b>measured</b> from the tape; the segment / driver / scenario wiring is a <b>curated</b> transmission map.</p>
       <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Product</th><th>Book share</th><th>NPL-live</th><th>Borrower segments</th><th>Income drivers</th><th>Scenarios that hit it</th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="pm-idx"><div class="ic-bt" style="margin:0 0 4px">WHEN A DRIVER MOVES, THESE BOOKS FEEL IT</div>${idx}</div>
-      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED book economics per product (share / NPL / outstanding — tape vehicle_types). The product→segment→driver→scenario wiring is a curated editorial map, labelled as such. IMF WEO / CPI-by-category / MOTS tourism feeds are not yet wired — each needs its own scheduled puller.</p>`;
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED book economics per product (share / NPL / outstanding — tape vehicle_types). The product→segment→driver→scenario wiring is a curated editorial map, labelled as such. IMF WEO macro backdrop is now wired (Overview → IMF macro outlook); CPI-by-category / MOTS tourism feeds are not yet wired — each needs its own scheduled puller.</p>`;
+  });
+}
+
+/* IMF WEO macro backdrop — Thailand growth/inflation/unemployment/debt + ASEAN peer benchmark
+   (data/imf_weo.json, pull_imf_weo.py). Actuals vs IMF projections labelled; peers = external
+   benchmark (AutoX has no IPO). Overview macro column. Null-safe: absent/empty → nothing renders. */
+const IMF_DIR={NGDP_RPCH:1,PCPIPCH:-1,LUR:-1,GGXWDG_NGDP:-1,BCA_NGDPD:1}; // +1 = higher is better
+function imfCol(code,v){ if(v==null) return 'var(--mid)'; const d=IMF_DIR[code]||0; if(!d) return 'var(--hi)';
+  return ((d>0)===(v>=0))?'var(--merch)':'var(--agri)'; }
+function renderImfWeo(){
+  const el=document.getElementById('ov-imfweo'); if(!el) return;
+  tmliFetch('imf_weo').then(j=>{
+    if(!j||!j.thailand||!Object.keys(j.thailand).length){ tmliNote(el,''); return; }  // silent when absent
+    const m=j.meta||{}, T=j.thailand, P=j.peers||{}, pn=m.peers||{};
+    const rows=Object.entries(T).map(([code,v])=>{
+      const la=v.latest_actual||{}, pr=v.projection||{};
+      return `<tr><td><b>${v.label}</b> <span class="s">${v.unit}</span></td>
+        <td class="n"><b style="color:${imfCol(code,la.val)}">${la.val!=null?la.val:'—'}</b> <span class="s">${la.year||''}</span></td>
+        <td class="n" style="color:${imfCol(code,pr.val)}">${pr.val!=null?pr.val:'—'} <span class="s">${pr.year||''}</span></td>
+        <td class="s">${v.why||''}</td></tr>`;
+    }).join('');
+    // peer benchmark for the two headline indicators
+    const bench=['NGDP_RPCH','PCPIPCH'].filter(c=>P[c]).map(c=>{
+      const order=Object.keys(pn);
+      const cells=order.map(iso=>{
+        const val=(P[c]||{})[iso]; const me=iso==='THA';
+        return `<span class="imf-peer${me?' me':''}" title="${pn[iso]||iso}">${iso} ${val!=null?val:'—'}</span>`;
+      }).join('');
+      return `<div class="imf-benchrow"><span class="imf-blab">${(T[c]||{}).label||c} <span class="s">${m.peer_bench_year||''}</span></span>${cells}</div>`;
+    }).join('');
+    el.innerHTML=`
+      <h2 style="margin-top:16px">IMF macro outlook · Thailand <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">IMF WEO</span></h2>
+      <p class="lead">The macro backdrop under borrower income — <b>actuals</b> and the <b>IMF projection</b> for the year ahead. Higher growth helps the book; higher inflation/unemployment pressure it.</p>
+      <div class="ic-scroll"><table class="ic-tbl" style="min-width:520px"><thead><tr><th>Indicator</th><th>Latest actual</th><th>IMF projection</th><th>Why it matters</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${bench?`<div class="imf-bench"><div class="ic-bt" style="margin:8px 0 4px">ASEAN external benchmark <span class="s">(${m.peer_bench_year||''} · IMF projection)</span></div>${bench}</div>`:''}
+      <p class="lead cc-provenance"><b>Provenance:</b> ${m.label||'IMF World Economic Outlook (DataMapper API).'} Source: ${(m.source||'').split(' (')[0]}. Peers are an external benchmark, not an IPO comp.</p>`;
   });
 }
 
@@ -7033,10 +6966,10 @@ function renderHomePillars(){
   const cards=[];
 
   // ① MACRO — the backdrop moving the book. Prefer live fuel + rate-cap; else a calm pointer.
-  let mBig='Macro board', mRead='Rate cap, commodities, FX &amp; fuel — the forces on the book.';
+  let mBig='Macro board', mRead='Commodities, FX &amp; fuel — the forces on the book.';
   if(typeof FUEL!=='undefined'&&FUEL&&FUEL.headline&&FUEL.headline.diesel!=null){
     mBig='฿'+Number(FUEL.headline.diesel).toFixed(2)+'<small>/L diesel</small>';
-    mRead='Diesel (pickup/farm borrowers), commodity board &amp; the BoT rate-cap — the macro forces on collateral values and PD.'; }
+    mRead='Diesel (pickup/farm borrowers) &amp; the commodity board — the macro forces on collateral values and PD.'; }
   cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Overview'));
 
   // ② ACQUISITION — the collateral book &amp; where it concentrates (measured tape).
@@ -7513,20 +7446,16 @@ function loadFuelPrices(){
   return fuelPromise;
 }
 
-// MACRO / REGULATORY — BoT rate-cap watch + key commodity moves from META.board.
+// MACRO — key commodity moves + retail fuel from META.board / FUEL.
 function renderHomeMacro(){
   const box=$('#cc-macro-body'); if(!box||!META) return;
   let html='';
-  html+=`<div class="cc-sub2" style="margin-top:0">Regulatory watch</div>`;
-  html+=ccRow(`BoT hire-purchase rate/fee cap ${TAG_E}`,
-    'car &amp; motorcycle lending · effective ~Dec 2025 · sector-margin item, not a credit signal',
-    '~Dec 2025','margin watch','#D9742B');
   // key commodity moves: 2 worst + 2 best crop/livestock YoY (borrower income drivers; gold is
   // NOT AutoX collateral, so it is excluded).
   const board=(META.board||[]);
   const agri=board.filter(b=>(b.seg==='Crops'||b.seg==='Livestock')&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy);
   const moves=agri.slice(0,2).concat(agri.slice(-2).reverse()).filter((b,i,arr)=>arr.indexOf(b)===i);
-  html+=`<div class="cc-sub2">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction · borrower income</span></div>`;
+  html+=`<div class="cc-sub2" style="margin-top:0">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction · borrower income</span></div>`;
   moves.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY',b.yoy>=0?'var(--up)':'var(--agri)'));
   // live retail fuel prices (Bangchak, daily) — diesel tracks pickup/farm borrowers, gasohol
   // tracks motorcycle borrowers, AutoX's two dominant title-loan collateral types.
@@ -7667,7 +7596,6 @@ function ccBriefCSV(){
   if(gold) rows.push(['collateral_gold','Gold',gold.note||'',(gold.yoy>0?'+':'')+gold.yoy+'%','measured']);
   rows.push(['collateral_pickup','Diesel-pickup','used-pickup glut + EV transition','pressure (down)','editorial']);
   // macro
-  rows.push(['regulatory','BoT hire-purchase rate/fee cap','effective ~Dec 2025, sector-margin','~Dec 2025','editorial']);
   (META.board||[]).filter(b=>b.seg==='Crops'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2).forEach(b=>
     rows.push(['macro_commodity',b.lab,b.note||'',(b.yoy>0?'+':'')+b.yoy+'%','measured']));
   // movers

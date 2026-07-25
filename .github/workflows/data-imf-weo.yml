@@ -1,0 +1,61 @@
+name: Data — IMF WEO macro backdrop (monthly)
+
+# Pulls Thailand's IMF World Economic Outlook macro series (real GDP growth, inflation, unemployment,
+# govt debt, current account) + ASEAN peers from the IMF DataMapper API (pipeline/pull_imf_weo.py)
+# → platform/data/imf_weo.json. WEO only refreshes twice a year (April + October), so monthly is
+# generous.
+#
+# IMPORTANT — the DataMapper sits behind Cloudflare and 403s automated (non-browser) clients after a
+# burst, so a CI runner's plain-urllib pull often comes back empty. The puller GUARDS this: an empty
+# assemble never overwrites the committed (browser-refreshed) file — it keeps the good data and exits
+# 0. So a blocked run simply no-ops; the durable file is whatever was last committed. When CI does get
+# through, it opens a DRAFT PR (WEO is a big semiannual revision worth human eyes) — no auto-merge.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "35 20 3 * *"   # 3rd of the month, 20:35 UTC — off-minute; WEO is semiannual
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Pull IMF WEO (no-ops if Cloudflare blocks the runner)
+        run: python pipeline/pull_imf_weo.py
+      - name: Rebuild provenance when the WEO file changed
+        run: |
+          # imf_weo.json lives in platform/data/, so the provenance manifest censuses it; rebuild in
+          # lockstep or the determinism gate goes red on merge. Deterministic + network-free.
+          if git status --porcelain -- platform/data/imf_weo.json | grep -q .; then
+            echo "WEO changed — rebuilding provenance.json"
+            python pipeline/build_provenance.py
+          else
+            echo "WEO unchanged (or Cloudflare-blocked no-op) — nothing to rebuild."
+          fi
+      - name: Open a draft PR when the WEO refreshed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/imf-weo-${{ github.run_id }}
+        run: |
+          git add platform/data/imf_weo.json platform/data/provenance.json
+          if git diff --cached --quiet; then echo "unchanged; no PR."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          H="$(python -c "import json;t=json.load(open('platform/data/imf_weo.json'))['thailand'].get('NGDP_RPCH',{});la=t.get('latest_actual') or {};pr=t.get('projection') or {};print('THA GDP growth %s%% (%s actual) -> %s%% (%s proj)'%(la.get('val'),la.get('year'),pr.get('val'),pr.get('year')))")"
+          git commit -m "data: IMF WEO macro backdrop ($(date -u +%F), run ${{ github.run_id }})" -m "IMF DataMapper — $H."
+          git push origin "$DATA_BRANCH"
+          printf 'Automated monthly IMF WEO pull (run %s) from `%s`.\n\n**%s**\n\nIMF World Economic Outlook via the DataMapper API. Historical years are ACTUALS; the current year onward are IMF STAFF PROJECTIONS (labelled). ASEAN peers are an EXTERNAL BENCHMARK (AutoX has no IPO).\n' \
+            "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: IMF WEO macro backdrop ($(date -u +%F))" --body-file /tmp/pr_body.md

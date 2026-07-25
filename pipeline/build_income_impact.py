@@ -83,6 +83,10 @@ def build():
     area = load(S, "crop_prov_area.json")
     board = {it["lab"]: it for it in load(S, "commodity_board.json")}
     fuel = load(P, "fuel_prices.json")
+    try:
+        energy = load(S, "energy_prices.json")
+    except FileNotFoundError:
+        energy = {}
     tape = load(P, "tape_real.json")
     prov_region = dict(REGION)
 
@@ -93,12 +97,15 @@ def build():
         if it:
             crop_yoy[akey] = it["yoy"] / 100.0
 
-    # fuel driver: the committed fuel layer carries only a same-day snapshot — no measured
-    # baseline / YoY to diff against — so the fuel CHANNEL is 0 in this vintage (we do NOT invent
-    # a baseline). The coefficients stay live so the scenario engine (move 3) can inject a fuel
-    # move; a real fuel YoY lands once timeseries captures a fuel reference.
+    # fuel driver: crude-oil YoY from the World Bank Pink Sheet (source-data/energy_prices.json) —
+    # the SAME workbook and 12-month-YoY method as the crop drivers (owner ask: use the same
+    # comparison period as crops, not a bare same-day snapshot). Global crude is a PROXY for the
+    # Thai borrower's fuel cost — Thai retail diesel is subsidy/fund-buffered, so pass-through is
+    # partial — exactly as the crop drivers are a global proxy for Thai farm-gate. +ve = cost UP,
+    # which SUBTRACTS from fuel-sensitive incomes via the negative fuel coefficients in SENS.
     diesel = fuel.get("headline", {}).get("diesel")
-    fuel_drv = 0.0
+    crude = energy.get("crude_avg") or {}
+    fuel_drv = (crude.get("yoy") or 0.0) / 100.0
 
     # ── per-province agri price shock: area-weighted over rice/rubber/oilpalm ────
     agri_shock = {}     # province -> fraction income-driver from crop prices
@@ -195,14 +202,19 @@ def build():
             "drivers": {
                 "crop_yoy_pct": {k: round(v * 100, 1) for k, v in crop_yoy.items()},
                 "diesel_thb_l": diesel,
+                "crude_usd_bbl": crude.get("latest"),
                 "fuel_move_pct": round(fuel_drv * 100, 2),
-                "fuel_note": "fuel channel = 0 this vintage — the committed fuel layer is a "
-                             "same-day snapshot with no measured baseline to diff, and we do not "
-                             "invent one. Current income pressure is therefore purely crop-driven; "
-                             "the scenario engine injects hypothetical fuel moves.",
+                "fuel_basis": ("crude-oil YoY (World Bank Pink Sheet 'Crude oil, average', %s) — the "
+                               "same source and 12-month period as the crop drivers, per the owner "
+                               "ask. Global crude is a proxy for Thai fuel cost (Thai retail diesel "
+                               "is subsidy/fund-buffered, so pass-through is partial), the same "
+                               "global-proxy caveat the crop drivers carry. +ve = fuel cost up."
+                               % (crude.get("date") or "n/a")),
+                "fuel_ytd_pct": crude.get("ytd"),
             },
             "vintage": {"income": "NSO SES 2566", "commodity": "Pink Sheet (board)",
-                        "fuel": (fuel.get("meta") or {}).get("pulled")},
+                        "fuel": (energy.get("meta") or {}).get("vintage")
+                                or (fuel.get("meta") or {}).get("pulled")},
             "occupations": SES_TH,
         },
         "regions": regions,

@@ -285,9 +285,9 @@
         <h2>Macro overlay — current conditions</h2>
         <div class="grid macro" id="macro"></div>
 
-        <h2 class="risk">Regulatory watch · BoT hire-purchase rate cap</h2>
-        <p class="lead">Portfolio objective #1 — a sector <b>margin</b> watch item, not a portfolio-credit signal.</p>
-        <div class="insight risk" id="botcap"></div>
+        <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
+             unemployment/debt with ASEAN peer benchmark. Null-safe: absent file → nothing renders. -->
+        <div id="ov-imfweo"></div>
       </div>
       <div class="dash2-main">
         <h2>Commodity board — the segments diverge</h2>
@@ -826,11 +826,6 @@
         <div class="sim-slider" id="sim-factory-note" style="display:none">
           <div class="sim-hint">Factory-slowdown lever needs the Overture occupation pull (data/occupation_risk.json) — dark until it lands.</div>
         </div>
-
-        <div class="sim-slider">
-          <label class="sim-toggle"><input type="checkbox" id="sim-botcap"> Apply BoT 28% rate cap</label>
-          <div class="sim-hint">Title-loan APR ceiling, effective <b>2 Dec 2025</b> (cited). Clips products priced above 28% to the cap and shows the book-yield hit. Scenario model — illustrative product mix, not the measured book.</div>
-        </div>
       </div>
 
       <div class="sim-out">
@@ -857,12 +852,6 @@
       <div class="grid macro" id="sim-factory-out"></div>
     </div>
 
-    <div id="sim-cap-wrap" style="display:none;margin-top:20px">
-      <h2 class="risk">BoT 28% rate cap · book-yield impact</h2>
-      <p class="lead">Headline first: book yield before vs after the 28% ceiling. The table shows which products
-        compress (priced above 28%) and which are unaffected (already at/below).</p>
-      <div id="sim-cap"></div>
-    </div>
   </section>
 
   <!-- RISK TREND (time dimension) -->
