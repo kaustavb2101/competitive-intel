@@ -93,19 +93,33 @@ def extract_pdf(src, pages=None, ocr_threshold=OCR_THRESHOLD, want_tables=True):
     try:
         out_pages = []
         counts = {"text": 0, "ocr": 0, "other": 0}
-        with pdfplumber.open(path) as pl, fitz.open(path) as fz:
-            n = len(pl.pages)
-            lo = 1 if not pages else max(1, pages[0])
-            hi = n if not pages else min(n, pages[1])
+        # fitz (PyMuPDF) is the robust reader — it opens many malformed PDFs that pdfminer/pdfplumber
+        # reject with a PdfminerException. Open it first as the backbone; the pdfplumber text layer is
+        # best-effort on top. A pdfminer failure (whole-file or per-page) FALLS BACK to OCR instead of
+        # aborting the extract (previously any PdfminerException dropped the entire document).
+        fz = fitz.open(path)
+        n = fz.page_count
+        lo = 1 if not pages else max(1, pages[0])
+        hi = n if not pages else min(n, pages[1])
+        pl = None
+        try:
+            pl = pdfplumber.open(path)
+        except Exception:
+            pl = None  # no text layer available -> OCR every page below
+        try:
             for i in range(lo - 1, hi):
-                pg = pl.pages[i]
-                text = pg.extract_text() or ""
+                text = ""
+                if pl is not None:
+                    try:
+                        text = pl.pages[i].extract_text() or ""
+                    except Exception:
+                        text = ""
                 tables = []
                 if len(text.strip()) >= ocr_threshold:
                     method = "text"
-                    if want_tables:
+                    if want_tables and pl is not None:
                         try:
-                            tables = [t for t in (pg.extract_tables() or []) if t]
+                            tables = [t for t in (pl.pages[i].extract_tables() or []) if t]
                         except Exception:
                             tables = []
                 else:
@@ -113,6 +127,16 @@ def extract_pdf(src, pages=None, ocr_threshold=OCR_THRESHOLD, want_tables=True):
                 counts["text" if method == "text" else ("ocr" if method == "ocr" else "other")] += 1
                 out_pages.append({"page": i + 1, "method": method,
                                   "text": text, "tables": tables})
+        finally:
+            if pl is not None:
+                try:
+                    pl.close()
+                except Exception:
+                    pass
+            try:
+                fz.close()
+            except Exception:
+                pass
         return {"meta": {"source": src, "n_pages": n,
                          "pages_extracted": [lo, hi], "method_counts": counts,
                          "ocr_threshold": ocr_threshold, "ocr_lang": OCR_LANG,

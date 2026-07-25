@@ -41,6 +41,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 import time
 
@@ -48,7 +49,13 @@ import requests
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-sys.path.insert(0, HERE)  # so we can import the repo's OCR pdf reader
+sys.path.insert(0, HERE)  # so we can import the repo's OCR pdf reader + the relevance rule
+
+try:
+    from gdcatalog_relevance import is_relevant
+except Exception:  # relevance rule is optional; --relevant-only is a no-op without it
+    def is_relevant(org, title, notes=""):
+        return True
 
 BASE_DEFAULT = "https://gdcatalog.go.th"
 # NOTE: gdcatalog.go.th's WAF returns HTTP 500 to unusual User-Agent strings (a custom
@@ -210,6 +217,11 @@ def main():
     ap.add_argument("--max-datasets", type=int, default=None)
     ap.add_argument("--max-mb", type=float, default=300.0, help="skip a single file bigger than this")
     ap.add_argument("--max-total-gb", type=float, default=40.0, help="hard stop for the whole run")
+    ap.add_argument("--min-free-gb", type=float, default=0.0,
+                    help="stop when the output drive has less than this much free (disk safety)")
+    ap.add_argument("--relevant-only", action="store_true",
+                    help="catalog ALL datasets but only DOWNLOAD ones relevant to AutoX "
+                         "(gdcatalog_relevance.is_relevant); the rest are logged skip_irrelevant")
     ap.add_argument("--sleep", type=float, default=0.6, help="seconds between downloads (politeness)")
     a = ap.parse_args()
 
@@ -243,9 +255,15 @@ def main():
     # fresh catalog each run (cheap, keeps the index current); manifest persists for resume
     open(catalog_path, "w", encoding="utf-8").close()
 
-    n_ds = n_res = n_dl = n_pdf = n_skip = 0
+    n_ds = n_res = n_dl = n_pdf = n_skip = n_irrel = 0
     total_bytes = 0
     t0 = time.time()
+
+    def disk_free_gb():
+        try:
+            return shutil.disk_usage(out).free / 1e9
+        except OSError:
+            return 1e9
 
     for ds in iter_datasets(a.base, log, a.query, a.max_datasets):
         n_ds += 1
@@ -259,9 +277,21 @@ def main():
                            "datastore_active": r.get("datastore_active")} for r in resources],
         })
         if n_ds % 200 == 0:
-            log("catalog progress: %d datasets indexed (%d resources, %d downloaded, %.2f GB)"
-                % (n_ds, n_res, n_dl, total_bytes / 1e9))
+            log("catalog progress: %d datasets indexed (%d resources, %d downloaded, %d irrelevant-skip, %.2f GB)"
+                % (n_ds, n_res, n_dl, n_irrel, total_bytes / 1e9))
         if a.index_only:
+            continue
+
+        # DELETE-what-isn't-relevant, applied at the source: catalog everything (done above),
+        # but only download datasets that pass the AutoX relevance rule.
+        if a.relevant_only and not is_relevant(org, ds.get("title"), ds.get("notes")):
+            for res in resources:
+                rid = res.get("id") or (res.get("url") or "")
+                if rid and rid not in done:
+                    append_jsonl(manifest_path, {"id": rid, "dataset": ds.get("name"),
+                                                 "org": org, "status": "skip_irrelevant"})
+                    done.add(rid)
+            n_irrel += 1
             continue
 
         dslug = safe(ds.get("name") or ds.get("title") or "dataset", 60)
@@ -337,16 +367,21 @@ def main():
 
             if total_bytes >= max_total:
                 log("HARD STOP: reached max-total-gb (%.1f GB). Re-run to continue." % a.max_total_gb)
-                _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, total_bytes, t0, out)
+                _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, n_irrel, total_bytes, t0, out)
+                return
+            if a.min_free_gb and disk_free_gb() < a.min_free_gb:
+                log("HARD STOP: output drive below --min-free-gb (%.1f GB free < %.1f). Re-run to continue."
+                    % (disk_free_gb(), a.min_free_gb))
+                _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, n_irrel, total_bytes, t0, out)
                 return
 
-    _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, total_bytes, t0, out)
+    _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, n_irrel, total_bytes, t0, out)
 
 
-def _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, total_bytes, t0, out):
+def _summary(log, n_ds, n_res, n_dl, n_pdf, n_skip, n_irrel, total_bytes, t0, out):
     log("-" * 70)
-    log("DONE · datasets=%d resources_seen=%d downloaded=%d pdfs_ocr=%d skipped_format=%d"
-        % (n_ds, n_res, n_dl, n_pdf, n_skip))
+    log("DONE · datasets=%d resources_seen=%d downloaded=%d pdfs_ocr=%d skipped_format=%d irrelevant_skip=%d"
+        % (n_ds, n_res, n_dl, n_pdf, n_skip, n_irrel))
     log("total=%.2f GB · elapsed=%.0f min · catalog+manifest in %s"
         % (total_bytes / 1e9, (time.time() - t0) / 60, out))
 
