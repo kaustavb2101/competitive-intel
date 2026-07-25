@@ -8,9 +8,9 @@ measured signals the rest of the pipeline already refreshes. The weekly cron
 (.github/workflows/data-scenarios.yml) re-runs this and auto-merges on a green gate.
 
 Each scenario carries measured driver values where the shock is CURRENT (crop YoY, drought census,
-the cited rate cap, rival-promo count) and clearly-labelled STATED magnitudes where it is a stress
-test. The drivers are the same shock vector the income-impact engine (build_income_impact.py) passes
-through, so a scenario and the income readout stay consistent.
+rival-promo count) and clearly-labelled STATED magnitudes where it is a stress test. The drivers are
+the same shock vector the income-impact engine (build_income_impact.py) passes through, so a scenario
+and the income readout stay consistent.
 
   in : source-data/commodity_board.json   MEASURED — commodity YoY moves (live crop shock)
        platform/data/crop_stress.json      MEASURED — per-province OAE SPEI drought census
@@ -19,9 +19,7 @@ through, so a scenario and the income readout stay consistent.
        platform/data/income_impact.json    the first-order pass-through (for the live crop effect)
   out: platform/data/scenarios.json        (--check: byte-exact reproduce)
 
-Deterministic — no LLM, no network. The rate-cap book mix (previously the SIM_CAP_BOOK constant in
-app.js) now lives here as a documented, editable ESTIMATED block so the levers change without a code
-change. Everything is labelled measured / regulatory-fact / stated-stress.
+Deterministic — no LLM, no network. Everything is labelled measured / stated-stress.
 """
 import json
 import os
@@ -32,19 +30,6 @@ P = os.path.join(ROOT, "platform", "data")
 S = os.path.join(ROOT, "source-data")
 OUT = os.path.join(P, "scenarios.json")
 
-# BoT title-loan / personal-loan ceiling — a CITED regulatory FACT (not an assumption).
-RATE_CAP = 28
-RATE_CAP_CITE = ("BoT notification 25680030, title-loan/personal-loan interest ceiling 28% APR, "
-                 "effective 2 Dec 2025 (Royal Decree 5 Jun 2025 → FIBA/BoT supervision).")
-# Illustrative title-loan book mix for the rate-cap yield read — ESTIMATED levers, moved out of
-# app.js so they refresh as data. share = % of book; apr = assumed effective APR (%).
-CAP_BOOK = [
-    {"seg": "Motorcycle title", "apr": 33, "share": 30},
-    {"seg": "Pickup / car title", "apr": 26, "share": 34},
-    {"seg": "Land / house title", "apr": 22, "share": 18},
-    {"seg": "Agri-vehicle title", "apr": 31, "share": 10},
-    {"seg": "Top-up / small-ticket", "apr": 30, "share": 8},
-]
 # stated stress magnitudes (labelled ESTIMATED — a stress test, not a forecast)
 FUEL_SPIKE_PCT = 15
 CROP_CORRECTION_PCT = -20
@@ -53,16 +38,6 @@ RICE_REVERSAL_PCT = -15
 
 def load(*path):
     return json.load(open(os.path.join(*path), encoding="utf-8"))
-
-
-def cap_yield():
-    tot = sum(b["share"] for b in CAP_BOOK) or 1
-    y_base = sum(b["share"] / tot * b["apr"] for b in CAP_BOOK)
-    y_cap = sum(b["share"] / tot * min(b["apr"], RATE_CAP) for b in CAP_BOOK)
-    rows = [{**b, "capped": min(b["apr"], RATE_CAP), "compress": b["apr"] > RATE_CAP}
-            for b in CAP_BOOK]
-    return {"rows": rows, "yield_base": round(y_base, 2), "yield_capped": round(y_cap, 2),
-            "compression_pts": round(y_base - y_cap, 2)}
 
 
 def build():
@@ -108,21 +83,7 @@ def build():
         "vintage": board_vintage,
     })
 
-    # 2) REGULATORY FACT — the 28% rate cap (cited); yield compression from the documented mix
-    cy = cap_yield()
-    scenarios.append({
-        "id": "rate_cap_28", "kind": "regulatory",
-        "title": "BoT 28% rate cap",
-        "headline": ("The 28%% APR ceiling compresses book yield by ~%.1f pts (from %.1f%% to %.1f%%) "
-                     "on the illustrative mix — only the high-rate tail (motorcycle/agri/top-up) is "
-                     "affected." % (cy["compression_pts"], cy["yield_base"], cy["yield_capped"])),
-        "drivers": {"rate_cap_apr": RATE_CAP},
-        "effect": {"channel": "book yield", "yield": cy},
-        "provenance": "REGULATORY FACT (cited) over an ESTIMATED book mix. " + RATE_CAP_CITE,
-        "vintage": "2025-12-02 (effective date)",
-    })
-
-    # 3) LIVE — drought census (OAE SPEI), the agri-stress amplifier
+    # 2) LIVE — drought census (OAE SPEI), the agri-stress amplifier
     scenarios.append({
         "id": "drought_now", "kind": "live",
         "title": "Drought — firing",
@@ -191,13 +152,12 @@ def build():
             "generated_by": "pipeline/build_scenarios.py",
             "label": "Scenarios are a DATA layer, not hardcoded UI. LIVE scenarios carry MEASURED "
                      "current driver values and refresh weekly with their source layers; STRESS "
-                     "scenarios are clearly-labelled stated tests (not forecasts); the rate cap is "
-                     "a cited regulatory fact over an ESTIMATED book mix. Each card shows its "
-                     "vintage.",
+                     "scenarios are clearly-labelled stated tests (not forecasts). Each card shows "
+                     "its vintage.",
             "refresh": "Weekly via .github/workflows/data-scenarios.yml (rebuild + auto-merge on "
                        "a green determinism gate; draft PR on a red gate).",
             "board_vintage": board_vintage,
-            "kinds": {"live": "measured current shock", "regulatory": "cited fact",
+            "kinds": {"live": "measured current shock",
                       "stress": "stated hypothetical (not a forecast)"},
         },
         "scenarios": scenarios,

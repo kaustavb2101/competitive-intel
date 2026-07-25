@@ -1,0 +1,76 @@
+name: Data — crude-oil baseline (monthly)
+
+# Pulls the World Bank Pink Sheet crude-oil series (CMO-Historical-Data-Monthly.xlsx, "Crude oil,
+# average") → source-data/energy_prices.json (pipeline/pull_energy_prices.py). This is the fuel
+# BASELINE the income engine uses: fuel headwind = crude YoY, measured off the SAME source and
+# comparison period as the crop drivers (owner directive 2026-07-25 — one consistent methodology,
+# not a mix of retail-diesel level and crop YoY). The Pink Sheet updates monthly; thedocs.worldbank.org
+# is cloud-reachable, no key.
+#
+# energy_prices.json feeds build_income_impact -> build_scenarios -> build_product_segments, so a
+# refresh rebuilds that whole chain + the provenance manifest in lockstep (all deterministic +
+# network-free) and runs the FULL determinism gate before a direct merge. Same auto-merge-on-green
+# pattern as data-fuel-prices.yml; a RED gate falls back to a draft PR.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "50 20 4 * *"   # 4th of the month, 20:50 UTC — Pink Sheet posts early each month
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install xlsx reader
+        run: pip install --quiet openpyxl
+      - name: Pull crude baseline
+        run: python pipeline/pull_energy_prices.py
+      - name: Rebuild the income/scenario chain + provenance when crude changed
+        run: |
+          if git status --porcelain -- source-data/energy_prices.json | grep -q .; then
+            echo "crude baseline changed — rebuilding income_impact -> scenarios -> product_segments -> provenance"
+            python pipeline/build_income_impact.py
+            python pipeline/build_scenarios.py
+            python pipeline/build_product_segments.py
+            python pipeline/build_provenance.py
+          else
+            echo "crude unchanged — nothing to rebuild."
+          fi
+      - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/energy-${{ github.run_id }}
+        run: |
+          git add source-data/energy_prices.json platform/data/income_impact.json \
+                  platform/data/scenarios.json platform/data/product_segments.json \
+                  platform/data/provenance.json
+          if git diff --cached --quiet; then echo "No change vs committed crude. Nothing to merge."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          H="$(python -c "import json;c=json.load(open('source-data/energy_prices.json'))['crude_avg'];print('crude avg \$%s/bbl (%s), YoY %+.1f%%, YTD %+.1f%%'%(c['latest'],c['date'],c['yoy'],c['ytd']))")"
+          git commit -m "data: crude-oil baseline ($(date -u +%F), run ${{ github.run_id }})" \
+                     -m "World Bank Pink Sheet — $H. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          if bash tests/run.sh check; then
+            echo "Gate green — auto-merging to $BASE_BRANCH."
+            git pull --rebase origin "$BASE_BRANCH"
+            git push origin "HEAD:$BASE_BRANCH"
+            echo "Crude baseline landed on $BASE_BRANCH ($H)."
+          else
+            echo "Gate RED — falling back to a draft PR for review."
+            git checkout -b "$DATA_BRANCH"
+            git push origin "$DATA_BRANCH"
+            printf 'Automated monthly crude-baseline pull (run %s) from `%s` — GATE FAILED, needs review.\n\n**%s**\n\nMEASURED — World Bank Pink Sheet crude-oil average (fuel baseline for the income engine).\n' \
+              "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: crude-oil baseline ($(date -u +%F)) [gate failed]" --body-file /tmp/pr_body.md
+          fi
