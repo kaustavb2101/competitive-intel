@@ -1,0 +1,138 @@
+name: Data — FPO SFI system credit-quality (quarterly)
+
+# Refreshes the MEASURED national credit-quality backdrop: the quarterly NPL ratio of Thailand's
+# Specialized Financial Institutions (SFIs — GSB / BAAC / GHB / SME Bank / EXIM / Islamic Bank),
+# distilled by pipeline/build_sfi_credit.py from two FPO published aggregates (msi_d501 gross+net NPL,
+# msi_d301 gross+net credit). GSB (household) + BAAC (rural/agri) system NPL is the closest PUBLIC
+# read on the household + farm repayment stress AutoX's borrowers sit inside — a leading-indicator
+# BACKDROP (obj #1), surfaced on the Overview tab.
+#
+# WHY A JOB EXISTS: the two FPO source resources are REACHABLE from GitHub-hosted runners
+# (catalog.fpo.go.th, verified HTTP 200), unlike the data.go.th / DLT family that Cloudflare geoblocks
+# datacenter IPs. Every other CI-reachable Thai-gov feed (NABC, OAE, fuel, DIW/MOT census, FPO PICO)
+# already has a refresh workflow; the SFI credit layer was the gap — FPO publishes a new quarter with
+# a lag and there was no automation to fold it in without the owner's laptop.
+#
+# WHAT IT PRODUCES (only when the published aggregates CHANGED — a new quarter or a revised figure):
+#   source-data/fpo_sfi_npl.csv     (re-pulled raw, git-tracked, LF-normalized by .gitattributes)
+#   source-data/fpo_sfi_credit.csv  (re-pulled raw, git-tracked)
+#   platform/data/sfi_credit.json   (pipeline/build_sfi_credit.py — a ratio of the two aggregates)
+#   platform/data/provenance.json   (pipeline/build_provenance.py — refreshed layer fingerprint/vintage)
+# Unlike the PICO/DBD pulls, the SFI raw CSVs ARE committed (tiny, ~14-16 KB each) so
+# build_sfi_credit.py --check stays byte-exact in the determinism gate. The layer's vintage auto-
+# derives from the newest quarter IN the data (no pinned constant to go stale), so no resource-rotation
+# handling is needed — if FPO ever rotates the resource id the pinned URL 404s and this job fails loudly.
+#
+# NO-OP SAFETY: FPO serves the CSVs with CRLF line endings but the committed blobs are LF. `git add`
+# applies `.gitattributes` (*.csv text eol=lf) so a re-pull of UNCHANGED content stages clean (no
+# spurious CRLF churn) and the job no-ops. Only a genuine content change stages a diff.
+#
+# Committed to a fresh data/sfi-<run_id> branch and opened as a DRAFT PR (never auto-merge). A human
+# reviews the new quarter before it reaches production. No-ops cleanly when the aggregates are unchanged.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monthly, 12th at 21:50 UTC (= 04:50 Bangkok) — off-minute/off-hour from the other data feeds.
+    # FPO publishes SFI quarterly with a lag; a monthly check catches the new quarter promptly and
+    # no-ops the other ~two months of the quarter (cheap).
+    - cron: "50 21 12 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Pull the two FPO SFI resources (over the committed CSVs)
+        run: |
+          set -euo pipefail
+          # Single source of truth for the resource URLs: the pinned SRC_* constants in the builder.
+          NPL_URL="$(python -c "import importlib.util as u;s=u.spec_from_file_location('b','pipeline/build_sfi_credit.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.SRC_NPL)")"
+          CREDIT_URL="$(python -c "import importlib.util as u;s=u.spec_from_file_location('b','pipeline/build_sfi_credit.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.SRC_CREDIT)")"
+          curl --fail --show-error --silent --location --retry 4 --retry-delay 5 \
+               "$NPL_URL"    -o source-data/fpo_sfi_npl.csv
+          curl --fail --show-error --silent --location --retry 4 --retry-delay 5 \
+               "$CREDIT_URL" -o source-data/fpo_sfi_credit.csv
+          # Guard against an HTML error page being saved as CSV: each must carry the FPO value-column
+          # header (ค่าข้อมูล) and at least one known item string.
+          for f in source-data/fpo_sfi_npl.csv source-data/fpo_sfi_credit.csv; do
+            if ! grep -q "ค่าข้อมูล" "$f"; then
+              echo "::error::$f does not look like the expected FPO CSV (missing ค่าข้อมูล header) — refusing to proceed."
+              exit 1
+            fi
+          done
+          grep -q "ยอดคงค้าง NPL รวม (Gross)"     source-data/fpo_sfi_npl.csv    || { echo "::error::npl CSV missing the gross-NPL item row."; exit 1; }
+          grep -q "ยอดคงค้างสินเชื่อรวม (Gross)" source-data/fpo_sfi_credit.csv || { echo "::error::credit CSV missing the gross-credit item row."; exit 1; }
+
+      - name: Rebuild the SFI layer when the published aggregates changed
+        id: rebuild
+        run: |
+          set -euo pipefail
+          # Stage the re-pulled CSVs; .gitattributes normalizes CRLF->LF so unchanged content stages
+          # clean. If nothing staged, the aggregates are unchanged and we no-op.
+          git add source-data/fpo_sfi_npl.csv source-data/fpo_sfi_credit.csv
+          if git diff --cached --quiet; then
+            echo "SFI aggregates unchanged — nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "SFI aggregates CHANGED — regenerating sfi_credit.json + provenance.json."
+          python pipeline/build_sfi_credit.py
+          python pipeline/build_provenance.py
+          # sanity: the builder's own byte-exact check must pass against the freshly built output
+          python pipeline/build_sfi_credit.py --check
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit to a data branch + open a draft PR
+        if: steps.rebuild.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/sfi-${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git add source-data/fpo_sfi_npl.csv source-data/fpo_sfi_credit.csv \
+                  platform/data/sfi_credit.json platform/data/provenance.json
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          VINTAGE="$(python -c "import json;print(json.load(open('platform/data/sfi_credit.json'))['meta']['vintage'])")"
+          RATIO="$(python -c "import json;m=json.load(open('platform/data/sfi_credit.json'))['meta'];print('%.2f'%m['latest']['npl_ratio'])")"
+          YOY="$(python -c "import json;m=json.load(open('platform/data/sfi_credit.json'))['meta'];print('%+.2f'%(m['yoy_ratio_delta_pp'] or 0))")"
+          NQ="$(python -c "import json;print(json.load(open('platform/data/sfi_credit.json'))['meta']['n_quarters'])")"
+          git commit -m "data: FPO SFI system credit-quality refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-sfi-credit.yml from catalog.fpo.go.th (msi_d501 NPL + msi_d301 credit, MEASURED). Rebuilt sfi_credit.json + provenance.json. Latest ${VINTAGE} NPL ratio ${RATIO}% (${YOY}pp YoY)."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated monthly FPO SFI system credit-quality refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "The FPO SFI published aggregates changed since the committed snapshot — a new quarter or a revised figure."
+            echo "Latest: **${VINTAGE}** system NPL ratio **${RATIO}%** (**${YOY}pp** year-on-year), ${NQ} quarters in series."
+            echo
+            echo "Provenance: **MEASURED** — FPO (Fiscal Policy Office) open-data quarterly SFI aggregates"
+            echo "(catalog.fpo.go.th: msi_d501 gross+net NPL, msi_d301 gross+net credit, THB million). The NPL"
+            echo "ratio is those two published aggregates divided — no modelling, no synthesis. It is a national"
+            echo "SYSTEM backdrop (obj #1) — NOT AutoX's own book, NOT the non-bank title-lender sector, and NOT"
+            echo "per-province; read the DIRECTION/trend, not the level. Vintage auto-derives from the data."
+            echo
+            echo "After merge \`bash tests/run.sh check\` gates it byte-exact (build_sfi_credit.py --check — the"
+            echo "raw CSVs are committed, so it never SKIPs) plus build_provenance.py --check."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: FPO SFI system credit-quality refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
