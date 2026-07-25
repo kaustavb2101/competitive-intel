@@ -87,8 +87,30 @@ def build():
     emp = load(S, "employment_by_province.json")["provinces"]
     fleet = load(S, "vehicles_by_province.json")["provinces"]
     board = load(S, "commodity_board.json")
+    crop_stress = {p["th"]: p for p in load(P, "crop_stress.json")["provinces"]}
     master = load(S, "branches_final.json")
     mrows = master if isinstance(master, list) else master.get("branches", [])
+
+    # per-crop price direction from the SAME commodity board the region chips use (World Bank Pink
+    # Sheet YoY). crop_stress crop-mix labels → board labels (measured SPAM province mix carries only
+    # Rice / Rubber / Oil palm; the board also tracks Sugar/Maize, surfaced at region level).
+    BOARD_BY = {it["lab"]: it for it in board}
+    CROP2BOARD = {"Rice": "Rice", "Rubber": "Rubber", "Oil palm": "Palm oil",
+                  "Sugarcane": "Sugar", "Maize": "Maize"}
+
+    def province_crops(pv):
+        """[{crop, share, yoy, cls}] for a province's measured crop mix, each crop tagged with its
+        Pink Sheet YoY/direction. Plus rain-%-of-normal (drought proxy). None-safe → empty list."""
+        cs = crop_stress.get(pv)
+        if not cs:
+            return [], None
+        out = []
+        for c in (cs.get("crop_mix") or []):
+            b = BOARD_BY.get(CROP2BOARD.get(c["crop"], c["crop"]))
+            out.append({"crop": c["crop"], "share": round(c.get("share") or 0.0, 3),
+                        "yoy": (b or {}).get("yoy"), "cls": (b or {}).get("cls")})
+        rain = (cs.get("components") or {}).get("rain_pct_of_normal")
+        return out, (round(rain, 1) if rain is not None else None)
 
     geo = tape["geo"]
     treg, tprov = geo["regions"], geo["provinces"]
@@ -184,6 +206,9 @@ def build():
             "per_vehicle": round(fl / c["n"]) if fl else None,
             "d_agri": dprov.get(pv),
         }
+        crops, rain = province_crops(pv)
+        provinces[pv]["crops"] = crops
+        provinces[pv]["rain_pct"] = rain
 
     # ── region cards ─────────────────────────────────────────────────────────────
     regions = []

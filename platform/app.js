@@ -1491,50 +1491,18 @@ function renderNationalOutlook(){
       +`<span style="font-size:15px;line-height:1.2">${a.i}</span>`
       +`<span style="flex:1;font:500 12px 'IBM Plex Sans Thai';color:var(--txt);line-height:1.4">${a.t}</span></div>`;
   }).join('');
-  // 4) REGIONAL IMPACT — one card per region: situation + top recs + top provinces + full province drill
-  const regs=(OUTLOOK.regions||[]).map(r=>{
-    const ac=REGION_ACCENT[r.r]||'var(--accent)';
-    const stressed=(r.top_stressed||[]).slice(0,3).map(s=>`${s.v} <span class="mono" style="color:var(--agri)">${s.score}</span>`).join(' · ');
-    const oppy=(r.top_opportunity||[]).slice(0,3).map(o=>`${o.v} <span class="mono" style="color:var(--gold)">${o.opp}</span>`).join(' · ');
-    // expandable province drill — every province in the region, biggest book first.
-    // Each summary row is CLICKABLE → toggles a detail row (metrics that justify the recommendation).
-    const provRows=(r.provinces||[]).map(p=>{
-      const a=p.action, col=a?(OUT_TONE[a.tone]||'var(--mid)'):'var(--dim)';
-      const chip=a?`<span style="color:${col};white-space:nowrap">${a.i} ${a.label}</span>`:'<span class="sub">—</span>';
-      const str=p.stress!=null?`<span class="mono" style="color:${p.stress>=25?'var(--agri)':'var(--mid)'}">${p.stress}</span>`:'<span class="sub">—</span>';
-      const opp=p.opp!=null?`<span class="mono" style="color:${p.opp>=1.5?'var(--gold)':'var(--mid)'}">${p.opp}</span>`:'<span class="sub">—</span>';
-      return `<tr onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden;this.querySelector('.pv-caret').textContent=this.nextElementSibling.hidden?'▸':'▾'" style="cursor:pointer" onmouseover="this.style.background='var(--raised)'" onmouseout="this.style.background=''">`
-        +`<td style="padding:3px 6px"><span class="pv-caret" style="color:var(--dim);font-size:9px">▸</span> <b style="font-weight:500;color:var(--txt)">${p.v}</b></td>`
-        +`<td class="mono sub" style="padding:3px 6px;text-align:right">${p.n}</td>`
-        +`<td style="padding:3px 6px;font:500 11px 'IBM Plex Sans Thai'">${chip}</td>`
-        +`<td style="padding:3px 6px;text-align:right" title="avg agri-pressure">${str}</td>`
-        +`<td style="padding:3px 6px;text-align:right" title="avg coverage gap">${opp}</td></tr>`
-        +`<tr hidden><td colspan="5" style="padding:0 6px 8px">${provDetailHTML(p)}</td></tr>`;
-    }).join('');
-    const drill=provRows?`<details style="margin-top:9px"><summary style="cursor:pointer;font:600 11px 'IBM Plex Sans Thai';color:${ac};list-style:none">▸ ${r.n_provinces} provinces in this region — click any row for full metrics</summary>`
-      +`<div style="overflow-x:auto;margin-top:6px"><table style="width:100%;border-collapse:collapse;font-size:11px">`
-      +`<tr style="color:var(--dim);font:700 9px 'IBM Plex Sans Thai';text-transform:uppercase;letter-spacing:.4px"><td style="padding:3px 6px">Province</td><td style="padding:3px 6px;text-align:right">Br</td><td style="padding:3px 6px">Priority</td><td style="padding:3px 6px;text-align:right" title="avg agri-pressure">Stress</td><td style="padding:3px 6px;text-align:right" title="avg coverage gap">Gap</td></tr>`
-      +provRows+`</table></div></details>`:'';
-    return `<div style="border:1px solid var(--line);border-top:3px solid ${ac};border-radius:8px;padding:11px 13px;background:var(--panel)">`
-      +`<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font:700 14px 'IBM Plex Sans Thai';color:var(--hi)">${r.name}</b><span class="mono sub">${r.n} branches</span></div>`
-      +`<div class="sub" style="margin:5px 0 8px;color:var(--mid);line-height:1.4">${r.situation}</div>`
-      +actions((r.recommendation||[]).slice(0,3))
-      +(stressed?`<div class="sub" style="margin-top:7px"><b style="color:var(--mid)">Most agri-stressed:</b> ${stressed}</div>`:'')
-      +(oppy?`<div class="sub" style="margin-top:2px"><b style="color:var(--mid)">Widest coverage gap:</b> ${oppy}</div>`:'')
-      +drill
-      +`</div>`;
-  }).join('');
+  // (Removed 2026-07-25, owner ask #5) The per-region "Regional impact & recommendation" cards were
+  // too generic AND recommended grow/product-push actions ("grow farm lending", "push vehicle-title")
+  // that contradict the consolidation pivot (the product makes no grow/open/expand calls). The macro
+  // situation, the factor board, and the commodities board carry the Overview; per-region depth now
+  // lives in the risk-drill (Home/Assistance/Exposure/Competition → region → province → branch).
   host.innerHTML=`<h2>National outlook — the answer up top</h2>`
     +`<div class="insight" style="border-left:3px solid var(--accent)"><b>Bottom line:</b> ${N.headline}</div>`
     +sec('Current situation','national macro backdrop')
     +`<div class="grid macro">${sit}</div>`
     +sec('Factors hitting the economy & segments','World Bank price direction + BIS rates — |YoY| ≥ 8%')
     +`<div>${fac}</div>`
-    +sec('Nationwide recommendation','the per-branch recs, rolled up · ranked by branch count')
-    +`<div>${actions(N.recommendation||[])}</div>`
-    +sec('Regional impact & recommendation','situation → action, by region')
-    +`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px">${regs}</div>`
-    +`<p class="lead" style="margin-top:12px">Every number here is a rollup of the per-branch recommendation layer (click any branch on the National map to see its own recs + evidence). Deterministic — no model in the loop. Inputs are measured/estimated as labelled in their source layers.</p>`;
+    +`<p class="lead" style="margin-top:12px">Region- and province-level depth now lives in the risk-drill (Home / Assistance / Exposure / Competition → region → province → branch), where the loan-book buckets, DTI, crops and rivals are shown together. Deterministic — no model in the loop; inputs are measured/estimated as labelled in their source layers.</p>`;
 }
 
 /* ---------- overview ---------- */
@@ -6552,7 +6520,18 @@ function icPct(x,warn,bad){ if(x==null) return '—';
 function icTrendChip(d){ if(d==null) return '';
   const w=(IMPACT.meta||{}).trend_window||{};
   const dn=d<0;
-  return `<span class="ic-trend ${dn?'dn':'up'}" title="agri-risk score change between committed vintages (${w.from||''} → ${w.to||''}); model over measured inputs. Tape-NPL deltas begin at the second monthly tape vintage.">agri-risk ${dn?'▼ eased':'▲ rising'} since Dec</span>`;}
+  return `<span class="ic-trend ${dn?'dn':'up'}" title="AGRI BACKDROP — modelled farm-household risk (crop prices + drought), change between committed vintages (${w.from||''} → ${w.to||''}). A forward farm-economy signal, SEPARATE from the loan book's measured delinquency shown by the ladder / NPL-live / book status. The two need not move together — the farm backdrop can ease while a branch's book still carries elevated NPL from earlier vintages. Tape-NPL deltas begin at the second monthly tape vintage.">agri backdrop ${dn?'▼ easing':'▲ rising'}</span>`;}
+/* Book delinquency status — MEASURED tape NPL-live / 30–89 roll LEVEL (not the agri-backdrop trend).
+   Same thresholds at region / province / branch so the book story stays consistent when you drill in,
+   and it does NOT contradict the agri-backdrop chip (different axis: current book vs forward farm signal). */
+function icBookCue(r,withLabel){
+  const npl=r.npl_live_pct, roll=r.roll_pct;
+  if(npl==null) return '<span class="s">—</span>';
+  const hot=(npl>=7||(roll!=null&&roll>=12)), warm=(npl>=5||(roll!=null&&roll>=9));
+  const [ic,lab,c]=hot?['🔴','NPL elevated','var(--agri)']:warm?['🟡','roll watch','var(--gold)']:['🟢','book clean','var(--merch)'];
+  const t=`measured tape: NPL-live ${npl.toFixed(1)}% · 30–89 roll ${roll!=null?roll.toFixed(1):'—'}% (book delinquency level — not the agri backdrop)`;
+  return `<span class="ic-bookcue" style="color:${c}" title="${t}">${ic}${withLabel===false?'':' '+lab}</span>`;
+}
 /* Bucket ladder — the whole-book delinquency ladder Current → X(pre-30) → 30–89 → 90–179 → 180+,
    summing to 100. npl_live_pct is LIVE-book-based (excludes 180+ from its denominator), so the
    90–179 whole-book segment is derived as dpd30p − roll − late180 for a bar that sums to 100. */
@@ -6578,23 +6557,44 @@ function icLadderLegend(){
 function icDTI(debt_months){ return debt_months==null?'<span class="s">—</span>'
   :`<b>${Math.round(debt_months/12*100)}%</b>`; }
 function icPctCell(x){ return x==null?'<span class="s">—</span>':x.toFixed(1)+'%'; }
+/* Crop / commodity impact for a province (owner ask #3/#6/#7): the province's MEASURED crop mix, each
+   crop tagged with its World Bank Pink Sheet YoY + direction (the same board the region chips use),
+   plus rainfall-vs-normal as a drought proxy. icCropCell = compact (province table); icCropStrip =
+   the full "farm backdrop for this province's book" strip shown at the branch drill level. */
+function icCropDir(cls){ return cls==='stress'?'▼':cls==='up'?'▲':'→'; }
+function icCropCol(cls){ return cls==='stress'?'var(--agri)':cls==='up'?'var(--merch)':'var(--dim)'; }
+function icCropCell(p){
+  const cr=(p&&p.crops)||[];
+  if(!cr.length) return '<span class="s">—</span>';
+  return cr.slice(0,2).map(c=>`<span style="color:${icCropCol(c.cls)}" title="${c.crop} ${Math.round((c.share||0)*100)}% of cropland · Pink Sheet YoY ${c.yoy!=null?(c.yoy>0?'+':'')+c.yoy+'%':'n/a'}">${c.crop.replace('Oil palm','Palm')} ${icCropDir(c.cls)}</span>`).join(' · ');
+}
+function icCropStrip(p){
+  const cr=(p&&p.crops)||[];
+  if(!cr.length) return '';
+  const chips=cr.map(c=>{
+    const cl=c.cls==='stress'?'bad':c.cls==='up'?'good':'flat';
+    const y=c.yoy!=null?`${c.yoy>0?'+':''}${c.yoy}%`:'n/a';
+    return `<span class="ic-cchip ${cl}" title="${c.crop}: ${Math.round((c.share||0)*100)}% of this province's measured cropland · World Bank Pink Sheet YoY ${y}">${c.crop} ${Math.round((c.share||0)*100)}% ${icCropDir(c.cls)} ${y}</span>`;
+  }).join('');
+  const rain=p.rain_pct!=null?`<span class="ic-cchip ${p.rain_pct<85?'bad':'flat'}" title="rainfall as % of the local normal — drought proxy (crop-stress layer)">rain ${p.rain_pct}% of normal</span>`:'';
+  return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}</div>`;
+}
 function icBranchRows(prov){
   const rows=(IMPACT.branches||{})[prov]||[];
   if(!rows.length) return `<div class="ic-note">No branch rows for this province — the tape's no-PII floor publishes only the network's larger booking branches (${(IMPACT.meta||{}).branch_note||'cells ≥30'}). Branch detail → <a href="data.html">data book</a>.</div>`;
-  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th>NPL-live</th><th>Cue</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th>NPL-live</th><th title="measured book delinquency level — not the agri backdrop">Book status</th></tr></thead><tbody>`+
     rows.map(b=>{
-      const cue=(b.npl_live_pct>=7||b.roll_pct>=12)?'🔴 assist queue':(b.npl_live_pct>=5||b.roll_pct>=9)?'🟡 watch roll':'🟢 healthy';
       return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td>
         <td>${icLadder(b)}</td>
         <td class="n">${icPctCell(b.current_pct)}</td>
         <td class="n">${icPctCell(b.early_pct)}</td>
         <td class="n">${icPct(b.npl_live_pct,5,7)}</td>
-        <td>${cue}</td></tr>`;
+        <td>${icBookCue(b)}</td></tr>`;
     }).join('')+`</tbody></table></div>`+icLadderLegend();
 }
 function icProvTable(g){
   const provs=(g.provinces||[]).map(p=>[p,(IMPACT.provinces||{})[p]]).filter(x=>x[1]);
-  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Province</th><th>Book</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th title="debt vs annual household income">DTI</th><th>Rivals</th><th>We finance</th><th>Trend</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Province</th><th>Book</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th title="90–179d, live-book denominator">NPL-live</th><th title="measured book delinquency level — not the agri backdrop">Book</th><th title="debt vs annual household income">DTI</th><th title="dominant measured crops + Pink Sheet price direction (▲ up · ▼ stress · → flat)">Crops</th><th>Rivals</th><th title="AGRI BACKDROP — modelled farm-household risk (crop prices + drought) trend; a forward farm signal, separate from the book delinquency">Agri backdrop</th></tr></thead><tbody>`+
     provs.map(([name,p])=>{
       const d=(p.d_agri!=null)?p.d_agri:(g.trend||{}).d_agri;
       const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
@@ -6606,9 +6606,11 @@ function icProvTable(g){
         <td>${icLadder(p)}</td>
         <td class="n">${icPctCell(p.current_pct)}</td>
         <td class="n">${icPctCell(p.early_pct)}</td>
+        <td class="n">${icPct(p.npl_live_pct,5,7)}</td>
+        <td>${icBookCue(p,false)}</td>
         <td class="n" title="debt vs annual household income">${icDTI(p.debt_months)}</td>
+        <td class="ic-cropcell">${icCropCell(p)}</td>
         <td class="n"${rvt}>${rv}</td>
-        <td class="n">${p.per_vehicle!=null?'1 per '+icN(p.per_vehicle)+' veh':'—'}</td>
         <td class="n">${tr}</td></tr>`;
     }).join('')+`</tbody></table></div>`+icLadderLegend();
 }
@@ -6634,7 +6636,9 @@ function icCard(g){
       <div class="ic-blk"><div class="ic-bt">LOAN BOOK <span class="m">MEASURED · TAPE</span></div>
         <div class="ic-rw"><span>Outstanding</span><b>฿${g.os_bn}bn</b></div>
         <div class="ic-rw"><span>Current (0 dpd)</span><b style="color:var(--merch)">${g.current_pct!=null?g.current_pct.toFixed(1)+'%':'—'}</b></div>
+        <div class="ic-rw"><span>X · pre-30 <span class="s">watch</span></span><b style="color:var(--gold)">${g.early_pct!=null?g.early_pct.toFixed(1)+'%':'—'}</b></div>
         <div class="ic-rw"><span>NPL-live (90–179d)</span>${icPct(g.npl_live_pct,4.7,5.3)}</div>
+        <div class="ic-rw"><span>Book status</span>${icBookCue(g)}</div>
         <div class="ic-lad-wrap">${icLadder(g)}</div></div>
       <div class="ic-blk"><div class="ic-bt">THE PEOPLE <span class="m">NSO · SES/LFS</span></div>
         <div class="ic-rw"><span>Avg individual income <span class="s">est. split</span></span><b>${p.income_ind!=null?'฿'+icN(p.income_ind)+'/mo':'—'}</b></div>
@@ -6683,6 +6687,7 @@ function icRenderLevel(mount){
     const g=icRegionOf(st.region);
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:(g?g.key:st.region),lvl:'province'},{label:st.province}])+
       `<div class="ic-drill-h"><b>${st.province}</b> — booking branches on the tape (n ≥ 30), worst NPL-live first</div>`+
+      icCropStrip((IMPACT.provinces||{})[st.province])+
       icBranchRows(st.province);
     return;
   }
@@ -7131,6 +7136,24 @@ function renderAssist(){
         <td class="mono" style="color:${r.districts_severe_pct>=60?'var(--agri)':'var(--dim)'}">${r.districts_severe_pct}% <span class="sub">SPEI ${r.worst_spei}</span></td>
         <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
+
+    // Proactive-assist PRICE lens (owner #4): Current-bucket customers exposed to a crop under DOWNWARD
+    // price pressure. Cross the commodities board (falling global YoY × book exposure) — honest empty
+    // state today (Rice/Rubber/Palm all up; the drought radar above is the live hazard).
+    tmliFetch('commodities').then(j=>{
+      const host=$('#assist-radar'); if(!host) return;
+      const board=(j&&Array.isArray(j.board))?j.board:[];
+      const falling=board.filter(c=>c.global_yoy!=null&&c.global_yoy<0);
+      const exposed=falling.filter(c=>c.exposure&&c.exposure.book_accounts);
+      let body;
+      if(exposed.length){
+        body=`<b style="color:var(--agri)">Act now:</b> ${exposed.map(c=>`<b>${c.lab}</b> ${c.global_yoy}% · ${N(c.exposure.book_accounts)} book acc in belt`).join(' · ')} — many still Current; call the Current + X-day slice before collections turn.`;
+      } else {
+        const soft=falling.map(c=>c.lab+' '+c.global_yoy+'%').join(', ');
+        body=`No exposure-mapped crop is in downward price pressure now — Rice / Rubber / Palm (the crops with province area) are all up double-digits YoY, so today's live farm hazard is <b>drought</b> (radar above), not price.${soft?` Only ${soft} ${falling.length>1?'are':'is'} down, but ${falling.length>1?'they lack':'it lacks'} a province-exposure map.`:''} This lens flags Current-bucket customers the moment an exposure-mapped crop turns down.`;
+      }
+      host.insertAdjacentHTML('beforeend',`<div class="assist-pricelens"><div class="ic-bt" style="margin:10px 0 4px">PROACTIVE ASSIST · PRICE LENS <span class="s">Current-bucket customers in a falling-price sector</span></div><p class="lead sub" style="margin:0">${body}</p></div>`);
+    });
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];
