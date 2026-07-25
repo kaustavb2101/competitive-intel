@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T08:31:52+00:00",
-    "commit": "093b41e"
+    "generated_at": "2026-07-25T10:22:55Z",
+    "commit": "3c3a794"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,7 +480,13 @@
   ],
   "activity": [
     {
-      "date": "2026-07-25T08:31:52+00:00",
+      "date": "2026-07-25T10:22:55Z",
+      "sha": "3c3a794",
+      "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-25T08:31:52Z",
       "sha": "093b41e",
       "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
       "pillar": "uxui"
@@ -492,7 +498,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T06:48:59+00:00",
+      "date": "2026-07-25T06:48:59Z",
       "sha": "93ae2e5",
       "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
       "pillar": "3d-enrichment"
@@ -504,19 +510,19 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T06:19:03+00:00",
+      "date": "2026-07-25T06:19:03Z",
       "sha": "851a577",
       "summary": "committee: autonomous competitor scout (run 30146845465)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T05:53:47+00:00",
+      "date": "2026-07-25T05:53:47Z",
       "sha": "be810de",
       "summary": "committee: refresh autonomy plan (run 30146365438)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T04:20:38+00:00",
+      "date": "2026-07-25T04:20:38Z",
       "sha": "fc4c2a3",
       "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
       "pillar": "service"
@@ -528,7 +534,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T02:46:59+00:00",
+      "date": "2026-07-25T02:46:59Z",
       "sha": "a5d0594",
       "summary": "docs: log the ux-share-metadata merge + deploy-verify result (#157)",
       "pillar": "uxui"
@@ -552,7 +558,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-25T00:24:35+00:00",
+      "date": "2026-07-25T00:24:35Z",
       "sha": "60b30d1",
       "summary": "fix(ci): rebuild the farm-gate chain when NABC prices refresh (unbreak the gate)",
       "pillar": "uxui"
@@ -576,7 +582,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T22:36:53+00:00",
+      "date": "2026-07-24T22:36:53Z",
       "sha": "97cde6c",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-scoreboard vintage fix (#152)",
       "pillar": "peer"
@@ -588,13 +594,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-24T22:15:27+00:00",
+      "date": "2026-07-24T22:15:27Z",
       "sha": "815b816",
       "summary": "committee: refresh autonomy plan (run 30130101555)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-24T20:21:26+00:00",
+      "date": "2026-07-24T20:21:26Z",
       "sha": "b3130e0",
       "summary": "docs: log the ux-cc-hero-card-narrow-overflow merge+deploy+verify (#150)",
       "pillar": "uxui"
@@ -624,7 +630,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T16:46:35+00:00",
+      "date": "2026-07-24T16:46:35Z",
       "sha": "8a4a624",
       "summary": "docs: log the drought-vintage service fix (#145) + refresh autonomy plan / CEO dashboard",
       "pillar": "feature"
@@ -642,7 +648,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T14:49:19+00:00",
+      "date": "2026-07-24T14:49:19Z",
       "sha": "3d3e8b8",
       "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -652,12 +658,6 @@
       "sha": "10bd831",
       "summary": "ux: wrap command-center Assistance-radar table in .tblwrap (fix mobile page overflow) (#144)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T12:29:08+00:00",
-      "sha": "38cf88a",
-      "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
-      "pillar": "data-integration"
     }
   ]
 }
