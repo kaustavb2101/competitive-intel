@@ -196,10 +196,16 @@ def _shape_branch_labor(d):
     return None
 
 
-def _shape_opportunity_score(d):
-    recs = d.get("districts") if isinstance(d, dict) else None
-    if not isinstance(recs, list) or not recs:
-        return "missing/empty 'districts' list"
+def _shape_decision_queue(d):
+    # The exec front-door (#home command center) marquee: "This week — do these
+    # first". Frontend reads .items (built by build_decision_queue.py). A broken
+    # build that empties this list would gut the front page, so validate it here.
+    items = d.get("items") if isinstance(d, dict) else None
+    if not isinstance(items, list) or not items:
+        return "missing/empty 'items' list"
+    r0 = items[0]
+    if not isinstance(r0, dict) or "act" not in r0:
+        return "first item missing 'act' field"
     return None
 
 
@@ -210,7 +216,11 @@ DATA_FILES = [
     ("data/amphoe_geo.json", _shape_amphoe_geo, "FeatureCollection, 928 features"),
     ("data/crop_stress.json", _shape_crop_stress, ".provinces list (~76)"),
     ("data/branch_labor.json", _shape_branch_labor, ".branches list of 2015 (index-aligned)"),
-    ("data/opportunity_score.json", _shape_opportunity_score, ".districts list (non-empty)"),
+    # Was opportunity_score.json — that growth leaderboard was dropped in the
+    # consolidation/strategy pivot (kept on disk, no live fetch), so probing it
+    # asserted a dependency the app no longer has. Swapped for the front-door's
+    # live marquee layer, the exec Decision Queue.
+    ("data/decision_queue.json", _shape_decision_queue, ".items list (ranked weekly actions)"),
 ]
 
 
