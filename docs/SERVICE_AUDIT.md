@@ -5,7 +5,7 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-24 (pm) · latest ship: the listed-peer market scoreboard's dropped freshness stamp recovered in the Data-room card (§1) · against `platform/data/provenance.json` (104 layers · 409 files)._
+_Audit run: 2026-07-25 · latest ship: the commodities board's dropped MEASURED farm-gate price vintage recovered in the Data-room card (§1) · against `platform/data/provenance.json` (**109 layers · 414 files** · 52 measured · 57 estimated · 0 unlabelled)._
 
 ## Headline
 
@@ -44,7 +44,43 @@ input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fail
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-**2026-07-24 (pm, this run):** a full re-scan of all analytical layers' `meta` blocks for date-shaped
+**2026-07-25 (this run):** the tree grew 104 → **109 layers** (414 files) since the last audit (new
+market layers landed: `commodities`, `dbd_formation`, `credit_anchor`, `peer_npl`, `napprang`,
+`vehicle_registry`, `province_lfs`, `nso_wage_anchor`, …). A full re-scan of every currently
+blank-vintage labelled layer's `meta` for date-shaped freshness fields *not* in the extractor's key
+list found **one** layer still dropping a real **data-vintage** from the Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `commodities.json` | `farmgate_vintage` | 2026-07-24 | MEASURED Thai farm-gate price observation date (global Pink Sheet × Thai farm-gate × book-exposure board) |
+
+`_vintage_of()` now also scans `farmgate_vintage`, placed among the data-vintage keys (right after
+`price_asof`, ahead of any pull timestamp — it is the Thai farm-gate price *observation* date, a
+MEASURED data-vintage exactly like `price_vintage` / `price_asof`, not a pull time). The commodities
+board carries only this price date plus a divergence note in its `meta`, so without it the exec's
+Data-room card showed the layer **blank** despite a fresh measured farm-gate vintage. Verified the
+change touches **only this one** vintage cell (`'' → 2026-07-24`); a diff of the regenerated ledger
+confirms every other field — the 109-layer counts (52 measured · 57 estimated · 0 unlabelled),
+labels, sources, the files block — is byte-identical, and `build_provenance.py --check` passes on the
+recommitted ledger. No date is invented — `2026-07-24` is read from the layer's own committed
+`meta.farmgate_vintage`.
+
+The same re-scan re-confirmed the standing accepted-blank set: `amphoe_crops` (`retrieved`),
+`crop_margin` (`cost_ingested`), `region_debt` (`retrieved`) and `rival_universe` (`verified`) carry
+only a **pull/verify** stamp, which the convention deliberately deprioritizes vs a data-observation
+vintage, so their blank cells are the honest ABSENT state, not a bug; `brand_trends.note_be_to_ce`
+is a BE→CE explainer note, not a vintage; `tape_real.mob_anchor` is a months-on-book methodology
+parameter, not a freshness date. `commodities.farmgate_vintage` was the one genuine dropped
+data-vintage this run.
+
+**Freshest reachable inputs today** (read from the regenerated ledger): thaiwater flood/rain
+2026-07-25 05:20/05:00, commodities farm-gate 2026-07-24, fuel prices 2026-07-22, macro indicators
+2026-07-20, rival-pulse promo watch 2026-07-19, credit anchor 2026-07-18, SET peer scoreboard
+2026-07-17. No stale live-input layer detected.
+
+---
+
+**2026-07-24 (pm, prior run):** a full re-scan of all analytical layers' `meta` blocks for date-shaped
 freshness fields *not* in the extractor's key list found **one** layer still dropping a real
 **data-vintage** from the Data-room card:
 
@@ -130,7 +166,7 @@ thaiwater rain 2026-07-10, search demand 2026-07-04. No stale live-input layer d
 
 ## 2. Provenance coverage
 
-- **83 layers · 314 files.** 41 measured · 42 estimated · **0 unlabelled** — the shame board is **clear**.
+- **109 layers · 414 files** (as of 2026-07-25). 52 measured · 57 estimated · **0 unlabelled** — the shame board is **clear**. _(The narrative below records the 2026-07-17 run that first cleared the board at 83 layers · 314 files; the mechanism has held the board at 0 unlabelled through every layer added since.)_
 - **Update 2026-07-17 (a), intelligence loop:** the board was **cut 6 → 2**. Four structural layers
   gained an honest self-declared `meta` stamp at the generator so they stay `--check`-reproducible:
   `meta.json` (`derive.py::build_meta` — MIXED, classifies ESTIMATED), `deltas.json` +

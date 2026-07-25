@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T04:20:38Z",
-    "commit": "fc4c2a3"
+    "generated_at": "2026-07-25T10:22:55Z",
+    "commit": "3c3a794"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,48 @@
   ],
   "activity": [
     {
+      "date": "2026-07-25T10:22:55Z",
+      "sha": "3c3a794",
+      "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-25T08:31:52Z",
+      "sha": "093b41e",
+      "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T15:29:02+07:00",
+      "sha": "f81aa3b",
+      "summary": "ux: add share metadata (description + Open Graph / Twitter card) to the other 5 routes (#162)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T06:48:59Z",
+      "sha": "93ae2e5",
+      "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-25T13:26:11+07:00",
+      "sha": "f535dcd",
+      "summary": "feat: TMLI-convergence moves 2-5 (income engine · scenarios · commodities · product map) + penetration fix (#160)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-25T06:19:03Z",
+      "sha": "851a577",
+      "summary": "committee: autonomous competitor scout (run 30146845465)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-25T05:53:47Z",
+      "sha": "be810de",
+      "summary": "committee: refresh autonomy plan (run 30146365438)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-25T04:20:38Z",
       "sha": "fc4c2a3",
       "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
@@ -615,48 +657,6 @@
       "date": "2026-07-24T21:46:17+07:00",
       "sha": "10bd831",
       "summary": "ux: wrap command-center Assistance-radar table in .tblwrap (fix mobile page overflow) (#144)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T12:29:08Z",
-      "sha": "38cf88a",
-      "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-24T11:12:37Z",
-      "sha": "ca42d29",
-      "summary": "committee: refresh autonomy plan (run 30088421749)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-24T10:27:38Z",
-      "sha": "0c90e4e",
-      "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-24T17:25:17+07:00",
-      "sha": "4cc8a4d",
-      "summary": "feat(market): surface MEASURED business-formation pulse (DBD registry) on Overview (#143)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-24T08:15:57Z",
-      "sha": "2322170",
-      "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T15:11:34+07:00",
-      "sha": "dfc127d",
-      "summary": "ux: per-route tab titles match the five-pillar nav; add missing #assist title (#142)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T09:53:07+07:00",
-      "sha": "7eaa64c",
-      "summary": "feat(acquisition): collateral-concentration tables on the Market view (#139)",
       "pillar": "uxui"
     }
   ]

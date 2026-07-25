@@ -207,6 +207,25 @@ async function loadDbdForm(){
   return dbdformPromise;
 }
 
+// SFI system credit-quality backdrop — MEASURED quarterly NPL ratio of Thailand's Specialized Financial
+// Institutions (GSB/BAAC/GHB/SME/EXIM/Islamic Bank) from FPO aggregates (data/sfi_credit.json). Obj #1
+// leading-indicator BACKDROP: GSB (household) + BAAC (rural/agri) system NPL is the closest public read
+// on the repayment stress AutoX's borrowers sit inside — a macro tide, NOT AutoX's own book and NOT
+// per-province. Null-guarded: absent/short file → SFI stays null, the Overview block stays hidden
+// (see renderSfi), nothing fabricated.
+let SFI=null, SFI_META=null, sfiPromise=null;
+async function loadSfi(){
+  if(sfiPromise) return sfiPromise;
+  sfiPromise=(async()=>{
+    try{
+      const j = await fetch('data/sfi_credit.json').then(r=>r.json());
+      SFI=(j&&Array.isArray(j.series)&&j.series.length)?j.series:null; SFI_META=j&&j.meta?j.meta:null;
+    }catch(e){ SFI=null; SFI_META=null; }
+    return SFI;
+  })();
+  return sfiPromise;
+}
+
 // Live flood + rain pulse — MEASURED live ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed
 // daily by .github/workflows/data-thaiwater.yml). Two per-province station aggregates: water LEVEL
 // (data/thaiwater_flood.json — situation_level 1→5, ≥4 = high water / bank overflow) and 24h RAINFALL
@@ -1575,6 +1594,9 @@ function renderOverview(){
   // MEASURED business-formation pulse (dbd_formation.json, DBD registry) — the small-business borrower
   // base backdrop for the merchant book (both objectives). Null-safe: absent file → the block stays hidden.
   loadDbdForm().then(renderDbdForm);
+  // MEASURED state-bank system NPL ratio (sfi_credit.json, FPO / SFI aggregates, obj #1) — the structural
+  // household + agri credit-quality tide AutoX's borrowers sit inside. Null-safe: absent file → hidden.
+  loadSfi().then(renderSfi);
   // MEASURED live flood + rain pulse (thaiwater_flood/rain.json, ThaiWater telemetry, obj #1) — the acute
   // water-on-the-ground / arriving read behind collections + collateral. Null-safe: either layer absent
   // → the block stays hidden.
@@ -2337,6 +2359,57 @@ function renderDbdForm(){
         `<td class="mono">${num(r.n)}</td>`+
         `<td class="mono" style="color:${c}">${sh.toFixed(1)}%</td>`+
         `<td class="mono sub">${baht(r.cap)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// MEASURED SFI system credit-quality backdrop. A national quarterly time-series (not per-province):
+// the last ~8 quarters of the state-bank system gross NPL ratio + a 5y peak/trough marker, with a
+// verdict on the current level and its YoY direction. Requires the layer + a latest quarter; if absent
+// the whole block stays hidden (nothing partial, nothing faked).
+function renderSfi(){
+  const wrap=$('#sfi-wrap'); if(!wrap) return;
+  const m=SFI_META||{}, lt=m.latest;
+  if(!SFI || !lt || lt.npl_ratio==null){ wrap.style.display='none'; return; }
+  const pp=v=>(v==null||!isFinite(v))?'—':(v>0?'+':'')+v.toFixed(2)+'pp';
+  const rat=v=>(v==null||!isFinite(v))?'—':v.toFixed(2)+'%';
+  const yoy=m.yoy_ratio_delta_pp, qoq=m.qoq_ratio_delta_pp;
+  // direction colour: rising NPL = risk-red, easing = merchant-teal, flat = dim.
+  const dirC=(yoy==null)?'var(--dim)':(yoy>0.05?'var(--agri)':(yoy<-0.05?'var(--merch)':'var(--dim)'));
+  const dirW=(yoy==null)?'flat':(yoy>0.05?'rising':(yoy<-0.05?'easing':'roughly flat'));
+  const peak=m.peak_ratio_5y, trough=m.trough_ratio_5y;
+  const vb=$('#sfi-verdict');
+  if(vb){
+    vb.className='verdict'; vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🏦 <b>State-bank system NPL ratio is <span style="color:${dirC}">${rat(lt.npl_ratio)}</span> at ${lt.period} — ${dirW} <span style="color:${dirC}">${pp(yoy)}</span> year-on-year.</b> `+
+      `This is the closest public read on the household + farm repayment stress AutoX's borrowers sit inside.</div>`+
+      `<div class="sub" style="margin-top:4px">The Specialized Financial Institutions (GSB household, BAAC rural/agri, GHB housing …) carry a ฿${(lt.credit_gross/1e6).toFixed(2)}tn book; ${(lt.npl_gross/1e3).toFixed(0)}bn is non-performing.`+
+      (peak?` Over the last 5 years the ratio ran between <b>${rat(trough&&trough.npl_ratio)}</b> (${trough&&trough.period}) and a <b>${rat(peak.npl_ratio)}</b> peak (${peak.period}).`:'')+
+      ` A macro backdrop / direction signal — <b>not</b> AutoX's own NPL and <b>not</b> per-province. ${TAG_M}.</div>`;
+  }
+  const note=$('#sfi-note');
+  if(note) note.innerHTML='<b>Measured</b> — FPO (Fiscal Policy Office) quarterly aggregates for Thailand’s '+
+    'Specialized Financial Institutions: gross NPL outstanding ÷ gross credit outstanding. A national '+
+    '<b>system</b> figure for all state-owned banks combined — <b>not</b> AutoX, <b>not</b> the non-bank '+
+    'title-lender sector, and <b>not</b> split by institution or province. SFI books skew to '+
+    'policy/subsidised lending, so read the <b>direction / trend</b>, not the level; the useful signal is '+
+    'that a rising state-bank NPL tide tends to lead broad household + agri repayment stress. A slow '+
+    'structural backdrop (the flood/rain card is the acute counterpart) — it makes <b>no</b> branch call.';
+  const tbl=$('#sfitbl');
+  if(tbl){
+    const last=SFI.slice(-8);
+    const maxR=Math.max(...last.map(r=>r.npl_ratio||0),0.01);
+    tbl.innerHTML=`<tr><th>Quarter</th><th title="MEASURED — gross NPL outstanding ÷ gross credit outstanding for the SFI system">System NPL ratio ●</th><th title="MEASURED — gross NPL outstanding, THB billion">NPL (฿bn) ●</th><th>Trend</th></tr>`+
+      last.map((r,i)=>{ const prev=i>0?last[i-1].npl_ratio:null;
+        const d=(prev!=null&&r.npl_ratio!=null)?r.npl_ratio-prev:null;
+        const dC=(d==null)?'var(--dim)':(d>0.02?'var(--agri)':(d<-0.02?'var(--merch)':'var(--dim)'));
+        const arrow=(d==null)?'·':(d>0.02?'▲':(d<-0.02?'▼':'▬'));
+        const w=Math.round((r.npl_ratio||0)/maxR*100);
+        const isLast=i===last.length-1;
+        return `<tr><td class="mono${isLast?'':' sub'}">${isLast?'<b>'+r.period+'</b>':r.period}</td>`+
+          `<td class="mono"><span style="display:inline-block;height:7px;width:${w}px;background:var(--agri);opacity:.5;vertical-align:middle;margin-right:6px;border-radius:2px"></span>${rat(r.npl_ratio)}</td>`+
+          `<td class="mono sub">${((r.npl_gross||0)/1e3).toFixed(0)}</td>`+
+          `<td class="mono" style="color:${dC}">${arrow} ${d==null?'—':pp(d)}</td></tr>`;}).join('');
+  }
   wrap.style.display='';
 }
 

@@ -163,9 +163,15 @@ def _vintage_of(m):
     # like observed_to / price_vintage, so it sits with them, ahead of any pull timestamp
     # (the layer cannot auto-refresh — SET is Akamai/bot-blocked from CI — so surfacing its
     # own observation date is exactly how the exec sees how current the scoreboard is).
+    # farmgate_vintage (commodities — the global Pink Sheet × Thai farm-gate × book-exposure
+    # board) is the Thai farm-gate price observation date (e.g. 2026-07-24); it is a MEASURED
+    # data-observation vintage exactly like price_vintage / price_asof, so it sits with them,
+    # ahead of any pull timestamp. The layer carries only this price date + a divergence note,
+    # so without it the commodities board showed blank in the Data-room card despite a fresh
+    # measured farm-gate vintage.
     for k in ("updated", "vintage", "as_of", "updated_to",
-              "observed_to", "price_vintage", "price_asof", "snapshot", "pico_vintage",
-              "vintage_individual", "pulled_at_utc", "pulled", "promos_pulled_at"):
+              "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "snapshot",
+              "pico_vintage", "vintage_individual", "pulled_at_utc", "pulled", "promos_pulled_at"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
