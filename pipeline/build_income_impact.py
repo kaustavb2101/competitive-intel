@@ -73,6 +73,13 @@ TAPE_TO_SES = {
 # board label → crop_prov_area key (only the three crops with province-level area)
 BOARD_TO_AREA = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm"}
 
+# SES occupation → NSO LFS wage-anchor occupation key (nso_wage_anchor.json.by_app_region).
+# The LFS employee wage is a MEASURED CROSS-CHECK only (region-grain), attached beside — never
+# replacing — the model's income base, which stays the finer province-level NSO SES individual income.
+# Transport has no LFS employee category (→ None, no anchor); SMEOwners ≈ Merchants (trade/own-account).
+NSO_WAGE_OCC = {"Agriculture": "Agriculture", "FactoryWorkers": "FactoryWorkers",
+                "OfficeStaff": "OfficeStaff", "SMEOwners": "Merchants", "Transport": None}
+
 
 def load(*path):
     return json.load(open(os.path.join(*path), encoding="utf-8"))
@@ -89,6 +96,13 @@ def build():
         energy = {}
     tape = load(P, "tape_real.json")
     prov_region = dict(REGION)
+    # MEASURED NSO LFS wage anchor (cross-check; additive). Absent → cross-check is simply omitted.
+    try:
+        wage_anchor = load(P, "nso_wage_anchor.json")
+    except FileNotFoundError:
+        wage_anchor = {}
+    wage_by_region = wage_anchor.get("by_app_region") if isinstance(wage_anchor, dict) else None
+    wage_by_region = wage_by_region if isinstance(wage_by_region, dict) else {}
 
     # crop YoY moves (fraction) for the three area-weighted crops
     crop_yoy = {}
@@ -172,7 +186,7 @@ def build():
         declining = sum(w[o] for o in SES_OCC if occ_dpct.get(o, 0.0) < 0)
         worst = min(occ_dpct.items(), key=lambda kv: kv[1]) if occ_dpct else (None, 0)
         best = max(occ_dpct.items(), key=lambda kv: kv[1]) if occ_dpct else (None, 0)
-        regions.append({
+        rec = {
             "key": r,
             "income_pressure_pct": round(pressure, 2),
             "book_share_declining_pct": round(declining * 100.0 / rtot, 1),
@@ -181,7 +195,19 @@ def build():
                           "d_pct": round(worst[1], 2)},
             "best_occ": {"occ": best[0], "th": SES_TH.get(best[0]),
                          "d_pct": round(best[1], 2)},
-        })
+        }
+        # MEASURED cross-check: NSO LFS employee wage for this region×occupation, beside (not replacing)
+        # the SES income base. Only emitted when the anchor carries the region — never fabricated.
+        wr = wage_by_region.get(r) or {}
+        if wr:
+            by_occ = {o: round(wr[NSO_WAGE_OCC[o]])
+                      for o in SES_OCC
+                      if NSO_WAGE_OCC.get(o) and isinstance(wr.get(NSO_WAGE_OCC[o]), (int, float))}
+            rec["nso_wage_ref"] = {
+                "headline": round(wr["headline"]) if isinstance(wr.get("headline"), (int, float)) else None,
+                "by_occ": by_occ,
+            }
+        regions.append(rec)
     regions.sort(key=lambda g: g["income_pressure_pct"])   # most-pressured first
 
     return {
@@ -214,8 +240,18 @@ def build():
             },
             "vintage": {"income": "NSO SES 2566", "commodity": "Pink Sheet (board)",
                         "fuel": (energy.get("meta") or {}).get("vintage")
-                                or (fuel.get("meta") or {}).get("pulled")},
+                                or (fuel.get("meta") or {}).get("pulled"),
+                        "wage_anchor": (wage_anchor.get("meta") or {}).get("vintage")},
             "occupations": SES_TH,
+            "nso_wage_anchor": (
+                "MEASURED cross-check — regions[].nso_wage_ref is the NSO Labour Force Survey average "
+                "monthly EMPLOYEE wage (฿/month) for that region×occupation, an independent anchor "
+                "attached BESIDE the model's income base, not the base itself. The base stays the finer "
+                "province-level NSO SES individual income (which counts non-wage income too), so an LFS "
+                "employee wage is NOT equal to an SES individual income — read nso_wage_ref as a "
+                "directional sanity anchor on the wage-earning occupations, not an equality. Transport "
+                "has no LFS employee category, so it carries no anchor. This layer feeds no d_pct/d_baht "
+                "— it changes no modelled number; it only exposes a second measured series for comparison."),
         },
         "regions": regions,
         "provinces": provinces,
