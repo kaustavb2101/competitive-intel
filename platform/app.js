@@ -3135,10 +3135,11 @@ function drawRivalUniverse(){
 }
 
 /* ---------- peer loan quality · reported NPL benchmark (obj #1 + #2) ----------
-   Surfaces data/peer_npl.json (docs/RESEARCH_DIGEST.md §B — the listed title-lenders' own
-   reported NPL ratios). PEER-reported MEASURED figures — NOT an AutoX number (we hold no
-   measured AutoX NPL). A pure display: rank by reported NPL, show the collateral driver, and
-   read the spread as the competitive loan-quality band. Lazy, graceful if absent. */
+   Surfaces data/peer_npl.json (build_peer_npl.py): the listed title-lenders' own reported NPL
+   ratios (docs/RESEARCH_DIGEST.md §B) PLUS a MEASURED AutoX self-anchor computed from the real
+   loan tape (tape_real.json). Ranks the reported peers by NPL, then shows AutoX as a distinct
+   MEASURED row BELOW them (NOT ranked in — different measurement basis; see the method note).
+   A pure display: read the spread as the competitive loan-quality band. Lazy, graceful if absent. */
 let PEERNPL=null, peernplLoaded=false;
 function renderPeerNpl(){
   const tbl=$('#peernpltbl'); if(!tbl) return;
@@ -3161,31 +3162,43 @@ function drawPeerNpl(){
   const lo=Math.min(...vals), hi=Math.max(...vals);
   // colour the NPL band: lower is better (green), higher worse (red), scaled across the observed spread.
   const col=v=>{ if(hi<=lo) return 'var(--merch)'; const t=(v-lo)/(hi-lo); return t<=0.34?'var(--merch)':t>=0.67?'var(--agri)':'var(--gold)'; };
-  tbl.innerHTML=`<tr><th>#</th><th>Peer</th>`+
-    `<th title="the operator's own reported non-performing-loan ratio (FY2025 / 2025 IR)">Reported NPL</th>`+
-    `<th title="the collateral mix that drives the NPL level">Collateral book</th>`+
-    `<th>Source</th></tr>`+
+  // MEASURED AutoX self-anchor (from the real loan tape). Shown as a distinct row BELOW the
+  // reported peers — NOT ranked among them (different measurement basis; see the method note).
+  const ax=(PEERNPL&&PEERNPL.autox)?PEERNPL.autox:null;
+  const axMax=ax?Math.max(hi,ax.npl_live_os_pct||0,4):Math.max(hi,4);
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Peer</th>`+
+    `<th scope="col" title="the operator's own reported non-performing-loan ratio (FY2025 / 2025 IR)">Reported NPL</th>`+
+    `<th scope="col" title="the collateral mix that drives the NPL level">Collateral book</th>`+
+    `<th scope="col">Source</th></tr>`+
     list.map((p,i)=>{
       const v=(typeof p.npl==='number')?p.npl:null;
       const label=p.npl_label?p.npl_label+'%':(v!=null?v.toFixed(2)+'%':'—');
       const c=v!=null?col(v):'var(--dim)';
-      const bar=v!=null?barHTML(v,c,Math.max(hi,4)):'';
+      const bar=v!=null?barHTML(v,c,axMax):'';
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td><b>${p.name||p.ticker||'—'}</b>${p.ticker?` <span class="sub mono">${p.ticker}</span>`:''}</td>
         <td>${bar} <span class="mono" style="color:${c}"><b>${label}</b></span></td>
         <td class="sub">${p.collateral||'—'}</td>
         <td class="sub" style="font-size:11px">${p.source||'—'}</td>
-      </tr>`;}).join('');
+      </tr>`;}).join('')+
+    (ax?`<tr style="border-top:2px solid var(--accent)">
+        <td class="mono sub" title="not ranked among the reported peers — a different measurement basis">—</td>
+        <td><b>${ax.name}</b> <span class="tag" style="color:var(--accent);border:1px solid var(--accent);font-size:10px">MEASURED · own tape</span></td>
+        <td>${barHTML(ax.npl_live_os_pct,'var(--accent)',axMax)} <span class="mono" style="color:var(--accent)"><b>${ax.npl_live_os_pct.toFixed(2)}%</b></span> <span class="sub" style="font-size:10px">live-book 90–179dpd, OS · strict 90+ ${ax.npl_90plus_os_pct.toFixed(1)}%</span></td>
+        <td class="sub">${ax.collateral||'—'}</td>
+        <td class="sub" style="font-size:11px">real loan tape (OS-weighted)</td>
+      </tr>`:'');
   if(ro){
     const best=list[0], worst=list[list.length-1];
     const spread=(vals.length>1)?`from <b style="color:var(--merch)">${best.name} ${best.npl}%</b> (${best.collateral}) to <b style="color:var(--agri)">${worst.name} ${(worst.npl_label||worst.npl)}%</b> (${worst.collateral})`:'';
+    const axLine=ax?` <b>AutoX's own book — measured from the real tape — runs NPL-live (90–179dpd) at <span style="color:var(--accent)">${ax.npl_live_os_pct.toFixed(2)}% OS-weighted</span></b>, at/above the top of that reported-peer band, consistent with its heavier motorcycle / pickup + land collateral mix.`:'';
     ro.innerHTML=`<b>The listed title-lenders' reported loan quality spans ${(hi-lo).toFixed(1)}pp</b> — ${spread}. `+
-      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL. ${TAG_M}`+
+      `The gap is a <b>collateral story</b>: vehicle/gold books run the cleanest, land / heavy-vehicle / agri books the highest NPL.${axLine} ${TAG_M}`+
       methodBox(m.note||null,
-        [`Figures are <b>reported by the peer companies themselves</b> (FY2025 / 2025 IR) — ${m.source||'docs/RESEARCH_DIGEST.md §B'}. Vintage ${m.updated||'2026-06'}.`,
-         '<b>Not an AutoX/Ngern Chaiyo number.</b> We hold no measured AutoX NPL — this is the competitive quality band around us, not our own book.',
-         'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.']);
+        [`Peer figures are <b>reported by the companies themselves</b> (FY2025 / 2025 IR) — docs/RESEARCH_DIGEST.md §B. Vintage ${m.updated||'2026-06'}.`,
+         ax?`<b>The AutoX row is MEASURED</b> from the real loan tape (${ax.basis?ax.basis.replace('MEASURED — ',''):'OS-weighted'}), not reported. ${ax.caveat||''}`:'',
+         'The spread tracks collateral mix, not operator skill alone: a heavier land / agri / heavy-vehicle book carries structurally higher NPL than a vehicle/gold book at the same underwriting discipline.'].filter(Boolean));
   }
 }
 

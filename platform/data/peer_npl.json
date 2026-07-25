@@ -1,9 +1,10 @@
 {
   "meta": {
-    "title": "Peer NPL benchmark (reported)",
-    "note": "Listed title-loan peers' reported NPL ratios. PEER figures only — NOT an AutoX/Ngern Chaiyo number (we have no measured AutoX NPL). The spread tracks collateral mix: gold/vehicle (lower NPL) vs land/agri/heavy-vehicle (higher NPL).",
-    "measured": "reported by the companies (peer figures)",
-    "source": "docs/RESEARCH_DIGEST.md §B — companies' reported NPL (FY2025 / 2025 IR)",
+    "title": "Peer NPL benchmark (reported) + AutoX measured anchor",
+    "note": "Listed title-loan peers' reported NPL ratios (their own FY2025 / 2025 IR figures) shown next to AutoX/Ngern Chaiyo's OWN book quality, MEASURED from the real loan tape. NOT a like-for-like league table — peers report on their own bases and write off / provision out deep-delinquent stock that AutoX carries SEPARATELY as 180+ legacy workout inventory — so AutoX is a distinct MEASURED anchor, not ranked inside the reported-peer list. The spread tracks collateral mix: gold/vehicle books run lower NPL, land/agri/heavy-vehicle books higher.",
+    "measured": "peers = reported by the companies; AutoX = measured from the real loan tape",
+    "source": "peers: docs/RESEARCH_DIGEST.md §B (FY2025 / 2025 IR); AutoX: platform/data/tape_real.json",
+    "generated_by": "pipeline/build_peer_npl.py",
     "updated": "2026-06"
   },
   "peers": [
@@ -29,5 +30,18 @@
       "collateral": "cars/pickups/heavy-vehicle + land/house/condo",
       "source": "2025 IR oppday deck — NPL guidance 3.5–3.6%"
     }
-  ]
+  ],
+  "autox": {
+    "name": "AutoX / Ngern Chaiyo",
+    "handle": "own book",
+    "basis": "MEASURED — real loan tape (382,735 no-PII accounts), OS-weighted",
+    "npl_live_os_pct": 6.06,
+    "npl_live_acct_pct": 4.92,
+    "npl_live_of_total_os_pct": 5.66,
+    "npl_90plus_os_pct": 12.21,
+    "legacy_180plus_os_pct": 6.55,
+    "collateral": "motorcycle / pickup / car title + land (mixed, heavier tail)",
+    "source": "MEASURED — platform/data/tape_real.json (real loan-tape aggregates, obj #1)",
+    "caveat": "NOT a like-for-like rank vs the reported peers: the headline 90-179dpd NPL-live is a share of the LIVE book, while a strict BoT 90+ (incl. the ฿3.05bn 180+ legacy workout stock the tape holds SEPARATELY as late-stage collections inventory) on the full book is higher — and listed peers write off / provision out that deep-delinquent stock, so their reported NPL sits on a different basis. Read the direction, not a precise league position."
+  }
 }
