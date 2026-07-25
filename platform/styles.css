@@ -1204,3 +1204,58 @@ html[data-theme="light"] #msheet{box-shadow:0 -12px 34px rgba(24,32,48,.22)}
 html[data-theme="light"] .vdg{background:#fff;box-shadow:var(--elev-1,none)}
 html[data-theme="light"] .vdg-chip.worse{background:rgba(192,57,47,.08)}
 html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
+
+/* ============================================================
+   IMPACT CARDS — Region → Province → Branch drill (2026-07-25)
+   5 region cards on Home + pillar front doors; press-to-drill.
+   ============================================================ */
+#cc-impact{margin:14px 0 18px}
+#assist-impact,#exposure-impact,#acq-impact{margin:10px 0 18px}
+.ic-strip-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);
+  padding-bottom:7px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.ic-strip-h .s{letter-spacing:.04em;text-transform:none;color:var(--dim);font-size:11px}
+.ic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:14px}
+@media(max-width:560px){.ic-grid{grid-template-columns:1fr}}
+.ic-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;position:relative}
+.ic-sev{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px}
+.ic-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.ic-head h3{margin:0;font-size:17px;color:var(--hi)}
+.ic-head h3 .s{color:var(--dim);font-size:13px;font-weight:400}
+.ic-meta{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.05em}
+.ic-flag{font-family:var(--mono);font-size:9.5px;padding:1px 8px;border:1px solid;border-radius:4px;letter-spacing:.08em;margin-left:auto}
+.ic-trend{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:12px;cursor:help}
+.ic-trend.dn{background:rgba(28,140,125,.14);color:var(--merch)}
+.ic-trend.up{background:rgba(200,67,59,.15);color:var(--agri)}
+.ic-blocks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.ic-blocks{grid-template-columns:1fr}}
+.ic-blk{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:8px 10px}
+.ic-bt{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ic-bt .m{font-size:8.5px;letter-spacing:.05em;color:var(--merch)}
+.ic-rw{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--mid);padding:1.5px 0}
+.ic-rw b{color:var(--txt);font-family:var(--mono);font-weight:600;font-size:12.5px;text-align:right}
+.ic-rw .s,.ic-prow .s{color:var(--dim);font-size:11px}
+.ic-rivrow,.ic-commods{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--mid)}
+.ic-rivrow b{font-family:var(--mono)}
+.ic-cchip{font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:11px;border:1px solid var(--line);cursor:help}
+.ic-cchip.bad{color:var(--agri);border-color:rgba(200,67,59,.4)}
+.ic-cchip.good{color:var(--merch);border-color:rgba(28,140,125,.4)}
+.ic-cchip.flat{color:var(--dim)}
+.ic-drill{margin-top:10px;width:100%;text-align:left;background:none;border:1px dashed var(--line);border-radius:8px;
+  color:var(--accent);font-family:var(--mono);font-size:11px;padding:7px 10px;cursor:pointer}
+.ic-drill:hover{border-color:var(--accent)}
+.ic-chev{display:inline-block;width:1em}
+.ic-provs{margin-top:8px}
+.ic-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+.ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
+.ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.ic-tbl td{color:var(--mid)}
+.ic-tbl td:first-child{color:var(--txt)}
+.ic-tbl td.n{font-family:var(--mono)}
+.ic-prow{cursor:pointer}
+.ic-prow:hover td{background:var(--accent-soft)}
+.ic-brs>td{background:var(--panel2)}
+.ic-btbl{min-width:600px}
+.ic-note{font-size:12px;color:var(--dim);padding:8px 10px;border:1px dashed var(--line);border-radius:8px}
+.ic-foot{margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6}

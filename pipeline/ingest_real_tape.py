@@ -129,6 +129,10 @@ def main():
         "ltv_range", "vintage_ym", "vehicle_type", "product_group", "coll_age",
         "brand", "brand_x_collage", "brand_x_region", "vehicle_x_ltv", "model",
         "occ_x_income", "occ_x_region", "branch", "dpd_bucket", "geo_region",
+        # geographic-region crosses (impact cards 2026-07-25): occupation mix + vehicle mix per
+        # GEO region (East/Isan/North/South/Central&BKK from the master join) — occ_x_region /
+        # vehicle_type alone can't give this (tape Region = internal ops NE1/NE2/…)
+        "occ_x_georegion", "vehicle_x_georegion",
         # restructuring status (owner ask 2026-07-24): separate Normal / Pre-emptive / TDR / Skip
         "acc_chng", "chg_x_bucket", "chg_x_occ", "chg_x_region",
         # collateral deep-dive (owner ask 2026-07-24): the collateral BOOK crossed by
@@ -201,6 +205,9 @@ def main():
                       str(g(r, "account_disb_car_model") or "")).strip() or "(blank)",
             "occ_x_income": occ + "|" + income,
             "occ_x_region": occ + "|" + region,
+            "occ_x_georegion": occ + "|" + region_geo,
+            "vehicle_x_georegion": (str(g(r, "account_disb_Vehicle_Type") or "(blank)")
+                                    + "|" + region_geo),
             "branch": br,
             "dpd_bucket": dpd,
             "geo_region": region_geo,

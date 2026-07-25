@@ -323,7 +323,12 @@ def build():
         # booking-branch name (top-N by size, cells n>=30 — larger branches only).
         "geo": {"regions": tabs.get("geo_region", {}),
                 "provinces": tabs.get("province", {}),
-                "branches": tabs.get("branch", {})},
+                "branches": tabs.get("branch", {}),
+                # impact-cards crosses (2026-07-25): book occupation mix + vehicle mix per GEO
+                # region — the ours-vs-population blocks on the region cards join these against
+                # NSO LFS / DLT fleet. Keys "<occ>|<region>" / "<vehicle>|<region>".
+                "occ_x_region": tabs.get("occ_x_georegion", {}),
+                "vehicle_x_region": tabs.get("vehicle_x_georegion", {})},
         "income_tiers": tabs.get("income_tier", {}),
         "vehicle_types": tabs.get("vehicle_type", {}),
         "product_groups": tabs.get("product_group", {}),
