@@ -46,24 +46,37 @@ jobs:
           else
             echo "prices unchanged — nothing to rebuild."
           fi
-      - name: Commit to a data branch + open a draft PR
+      - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/fuel-${{ github.run_id }}
         run: |
+          # AUTO-MERGE (owner directive 2026-07-25): the daily draft PR never auto-integrated and
+          # went provenance-stale every day. Same pattern as committee-cycle.yml — run the FULL
+          # determinism gate first; 0-failed earns a direct rebase+push to the base branch. Only a
+          # RED gate falls back to a draft PR for human eyes.
           git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/provenance.json
           if git diff --cached --quiet; then
-            echo "No change vs committed prices. No PR opened."; exit 0
+            echo "No change vs committed prices. Nothing to merge."; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$DATA_BRANCH"
           H="$(python -c "import json;h=json.load(open('source-data/fuel_prices.json'))['headline'];print('diesel B%s/L, gasohol95 B%s/L'%(h['diesel'],h['gasohol95']))")"
           git commit -m "data: live fuel prices ($(date -u +%F), run ${{ github.run_id }})" \
-                     -m "Pulled by .github/workflows/data-fuel-prices.yml — Bangchak retail ($H)."
-          git push origin "$DATA_BRANCH"
-          printf 'Automated daily fuel-price pull (run %s) from `%s`.\n\n**Headline:** %s\n\nMEASURED — Bangchak retail (Bangkok reference, THB/litre). Cloud-reachable; no key.\n' \
-            "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
-          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
-            --title "data: live fuel prices ($(date -u +%F))" --body-file /tmp/pr_body.md
+                     -m "Pulled by .github/workflows/data-fuel-prices.yml — Bangchak retail ($H). Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          if bash tests/run.sh check; then
+            echo "Gate green — auto-merging to $BASE_BRANCH."
+            # master may have advanced since checkout — rebase before pushing.
+            git pull --rebase origin "$BASE_BRANCH"
+            git push origin "HEAD:$BASE_BRANCH"
+            echo "Fuel prices landed on $BASE_BRANCH ($H)."
+          else
+            echo "Gate RED — falling back to a draft PR for review."
+            git checkout -b "$DATA_BRANCH"
+            git push origin "$DATA_BRANCH"
+            printf 'Automated daily fuel-price pull (run %s) from `%s` — GATE FAILED, needs review.\n\n**Headline:** %s\n\nMEASURED — Bangchak retail (Bangkok reference, THB/litre). Cloud-reachable; no key.\n' \
+              "${{ github.run_id }}" "$BASE_BRANCH" "$H" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: live fuel prices ($(date -u +%F)) [gate failed]" --body-file /tmp/pr_body.md
+          fi
