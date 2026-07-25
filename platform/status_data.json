@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T23:44:53+07:00",
-    "commit": "8a57df5"
+    "generated_at": "2026-07-26T03:26:27+07:00",
+    "commit": "527da01"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-26",
+    "eta_date": "2026-07-27",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -480,13 +480,37 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T03:26:27+07:00",
+      "sha": "527da01",
+      "summary": "ux: route Command-center Assistance pillar to its own detail page (#169)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T18:18:52Z",
+      "sha": "5b3fe5a",
+      "summary": "ci(data): add data-sfi-credit.yml — monthly FPO SFI credit-quality refresh",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-26T00:08:01+07:00",
+      "sha": "f488877",
+      "summary": "income engine: attach MEASURED NSO LFS wage as a cross-check (additive; \"go with A\", conservative) (#168)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-25T16:47:38Z",
+      "sha": "0180a63",
+      "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-NPL AutoX-anchor ship (#167)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-25T23:44:53+07:00",
       "sha": "8a57df5",
       "summary": "feat(peer): AutoX's own MEASURED book NPL beside the listed rivals' reported NPL (obj #2) (#167)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T16:12:47+00:00",
+      "date": "2026-07-25T16:12:47Z",
       "sha": "9a83678",
       "summary": "committee: refresh autonomy plan (run 30165011012)",
       "pillar": "deployment"
@@ -522,19 +546,19 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T10:43:23+00:00",
+      "date": "2026-07-25T10:43:23Z",
       "sha": "fd2c25b",
       "summary": "committee: refresh autonomy plan (run 30154810038)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T10:22:55+00:00",
+      "date": "2026-07-25T10:22:55Z",
       "sha": "3c3a794",
       "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T08:31:52+00:00",
+      "date": "2026-07-25T08:31:52Z",
       "sha": "093b41e",
       "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
       "pillar": "uxui"
@@ -546,7 +570,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T06:48:59+00:00",
+      "date": "2026-07-25T06:48:59Z",
       "sha": "93ae2e5",
       "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
       "pillar": "3d-enrichment"
@@ -558,19 +582,19 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T06:19:03+00:00",
+      "date": "2026-07-25T06:19:03Z",
       "sha": "851a577",
       "summary": "committee: autonomous competitor scout (run 30146845465)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T05:53:47+00:00",
+      "date": "2026-07-25T05:53:47Z",
       "sha": "be810de",
       "summary": "committee: refresh autonomy plan (run 30146365438)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T04:20:38+00:00",
+      "date": "2026-07-25T04:20:38Z",
       "sha": "fc4c2a3",
       "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
       "pillar": "service"
@@ -582,7 +606,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T02:46:59+00:00",
+      "date": "2026-07-25T02:46:59Z",
       "sha": "a5d0594",
       "summary": "docs: log the ux-share-metadata merge + deploy-verify result (#157)",
       "pillar": "uxui"
@@ -606,7 +630,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-25T00:24:35+00:00",
+      "date": "2026-07-25T00:24:35Z",
       "sha": "60b30d1",
       "summary": "fix(ci): rebuild the farm-gate chain when NABC prices refresh (unbreak the gate)",
       "pillar": "uxui"
@@ -630,34 +654,10 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T22:36:53+00:00",
+      "date": "2026-07-24T22:36:53Z",
       "sha": "97cde6c",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-scoreboard vintage fix (#152)",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-07-25T05:36:19+07:00",
-      "sha": "bf0f5f6",
-      "summary": "fix(service): recover the listed-peer SET scoreboard's dropped freshness vintage in the Data-room card (#152)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-24T22:15:27+00:00",
-      "sha": "815b816",
-      "summary": "committee: refresh autonomy plan (run 30130101555)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-24T20:21:26+00:00",
-      "sha": "b3130e0",
-      "summary": "docs: log the ux-cc-hero-card-narrow-overflow merge+deploy+verify (#150)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T03:17:06+07:00",
-      "sha": "d4a7e33",
-      "summary": "ux: stop command-center hero card overflowing on 360px mobile (#150)",
-      "pillar": "uxui"
     }
   ]
 }
