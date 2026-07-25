@@ -406,6 +406,19 @@
       <p class="lead" id="dbdform-note"></p>
       <table class="tbl" id="dbdformtbl"></table>
     </div>
+    <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
+         ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
+         The ACUTE obj-#1 counterpart to the slower crop-stress drought read: water on the ground /
+         arriving is an immediate collections + collateral event, days before it shows in any monthly
+         series. Two station-aggregate reads — river/reservoir water LEVEL (flood) and 24h RAINFALL —
+         per province. Rendered by renderThaiwater(); hidden gracefully until BOTH layers load. -->
+    <div id="thaiwater-wrap" style="display:none">
+      <h2 class="risk">Live flood &amp; rain pulse <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">MEASURED · ThaiWater (live)</span></h2>
+      <div class="verdict v-warn" id="thaiwater-verdict" style="display:none"></div>
+      <p class="lead" id="thaiwater-note"></p>
+      <div class="tblwrap"><table class="tbl" id="thaiwater-flood-tbl"></table></div>
+      <div class="tblwrap" style="margin-top:10px"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
+    </div>
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · risk 1 of 2</span>
       <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
