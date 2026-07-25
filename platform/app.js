@@ -7068,13 +7068,13 @@ function renderHomePillars(){
     const x=T.bucket_ladder.live_book.xdays_n;
     const r0=(T.assistance_radar||[])[0];
     const pe=((T.restructuring&&T.restructuring.by_status)||[]).find(s=>s.status==='Pre-emptive');
-    cards.push(pillCard(3,'Assistance','var(--agri)','exposure',
+    cards.push(pillCard(3,'Assistance','var(--agri)','assist',
       N(x)+'<small> in X-days</small>',
       `Pre-emptive window (late &lt;30dpd). `+
       (r0?`Radar #1: <b>${r0.province}</b>. `:'')+
       (pe?`<b>${N(pe.n)}</b> already pre-emptively restructured (${pe.dpd90p_pct}% at 90+).`:''),
       'Assistance radar'));
-  } else cards.push(pillCard(3,'Assistance','var(--agri)','exposure','','Who to help pre-emptively, before they roll — by segment &amp; province.','Assistance radar'));
+  } else cards.push(pillCard(3,'Assistance','var(--agri)','assist','','Who to help pre-emptively, before they roll — by segment &amp; province.','Assistance radar'));
 
   // ④ RISK — the live-book NPL &amp; the 180+ legacy stock, held separately (measured tape).
   if(T&&T.bucket_ladder){
