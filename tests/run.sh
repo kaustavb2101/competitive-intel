@@ -83,6 +83,7 @@ phase_check(){
   ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
   ( cd "$PIPE" && python3 build_building_tiles.py --check >/dev/null 2>&1 ) && ok "build_building_tiles.py --check" || bad "build_building_tiles.py --check (tiles_config.json drifted from branches.json/competitors_census.json)"
   ( cd "$PIPE" && python3 build_sfi_credit.py --check >/dev/null 2>&1 ) && ok "build_sfi_credit.py --check" || bad "build_sfi_credit.py --check (sfi_credit.json drifted from source-data/fpo_sfi_npl.csv/fpo_sfi_credit.csv)"
+  ( cd "$PIPE" && python3 build_peer_npl.py --check >/dev/null 2>&1 ) && ok "build_peer_npl.py --check" || bad "build_peer_npl.py --check (peer_npl.json drifted — the AutoX anchor from platform/data/tape_real.json or the cited peer constants; run: python3 pipeline/build_peer_npl.py)"
   ( cd "$PIPE" && python3 build_rayong.py --check >/dev/null 2>&1 ) && ok "build_rayong.py --check" || bad "build_rayong.py --check (rayong_province.json drifted from source-data branches_final/rayong_competitors/factories_by_district/vehicles_by_province/employment_by_province)"
   ( cd "$PIPE" && python3 build_branch_cropland.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_branch_cropland.py --check"
