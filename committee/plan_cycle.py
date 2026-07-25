@@ -80,6 +80,32 @@ def r2_catchments():
         return 0
 
 
+def real_tape_landed():
+    """The REAL measured loan tape has landed and is surfaced — distinct from the SYNTHETIC bridge
+    (loan_tape_derived.json). Detected from platform/data/tape_real.json carrying a MEASURED label
+    with no SYNTH marker (build_tape_layers.py's no-PII aggregate of the owner's loan-level export).
+    This is the signal the loan-tape roadmap items were always meant to flip on; the earlier logic
+    only checked the synthetic bridge, so it pinned the #1 milestone at in-progress after the real
+    tape shipped."""
+    try:
+        d = json.load(open(os.path.join(DATA, "tape_real.json"), encoding="utf-8"))
+        m = d.get("meta", {})
+        return (m.get("label", "").strip().upper().startswith("MEASURED")
+                and "SYNTH" not in json.dumps(m, ensure_ascii=False).upper())
+    except Exception:
+        return False
+
+
+def real_tape_accounts():
+    """MEASURED account count carried in tape_real.json's meta (0 if absent) — read from the
+    committed file so the evidence string stays deterministic and truthful."""
+    try:
+        d = json.load(open(os.path.join(DATA, "tape_real.json"), encoding="utf-8"))
+        return int(d.get("meta", {}).get("n_accounts") or 0)
+    except Exception:
+        return 0
+
+
 def census_provinces():
     """Distinct provinces covered by the MEASURED competitor census (national-coverage signal)."""
     try:
@@ -122,8 +148,13 @@ def build_items():
     add("data-integration", "di-diw", "DIW factory census (~66k, 77 provinces) via CKAN",
         state(rexists("committee/census.py") and rexists(".github/workflows/data-gov-census.yml")), 2,
         "committee/census.py + .github/workflows/data-gov-census.yml committed")
+    _real_tape = real_tape_landed()
     add("data-integration", "di-loan-tape", "Real loan-tape export → measured portfolio risk",
-        state(False, in_progress=rexists("pipeline/ingest_loan_tape.py") and dexists("loan_tape_derived.json")), 1,
+        state(_real_tape,
+              in_progress=(not _real_tape) and rexists("pipeline/ingest_loan_tape.py") and dexists("loan_tape_derived.json")), 1,
+        ("platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates "
+         "(%s no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export); "
+         "the SYNTHETIC bridge (loan_tape_derived.json) is superseded" % f"{real_tape_accounts():,}") if _real_tape else
         "ingest_loan_tape.py + loan_tape_derived.json present (SYNTHETIC); real no-PII export pending (NEXT_STEPS §0b)")
     add("data-integration", "di-dlt", "DLT vehicle registrations, all-province coverage",
         state(dexists("branch_vehicles.json") and rexists("source-data/vehicles_by_province.json")), 2,
@@ -225,7 +256,10 @@ def build_items():
 
     # ---- service (portfolio & risk) ----
     add("service", "svc-loan-tape", "Loan-tape portfolio outputs (90+ aging, ROI, HHI, PD)",
-        state(False, in_progress=dexists("loan_tape_derived.json")), 1,
+        state(_real_tape, in_progress=(not _real_tape) and dexists("loan_tape_derived.json")), 1,
+        ("platform/data/tape_real.json surfaced — MEASURED portfolio truth (bucket ladder / restructuring / "
+         "collateral / LTV & vintage curves / branch audit) from the real loan-level export via "
+         "build_tape_layers.py; supersedes the SYNTHETIC loan_tape_derived.json") if _real_tape else
         "loan_tape_derived.json present (SYNTHETIC); flips to measured on a real export (NEXT_STEPS §0b)")
     add("service", "svc-household-dti", "Household DTI risk lens (NSO SES, measured)",
         state(dexists("household_risk_by_province.json")), 1,
