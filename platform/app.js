@@ -6621,7 +6621,7 @@ function icCard(g){
       <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
       <span class="s">rivals lead in ${rv.pct_districts_outnumbered!=null?rv.pct_districts_outnumbered.toFixed(0):'—'}% of our districts</span></div>
     ${commods?`<div class="ic-commods"><span class="ic-bt" style="margin:0">CROP PRICES</span>${commods}</div>`:''}
-    <button type="button" class="ic-drill" data-r="${g.key}"><span class="ic-chev">▸</span> ${ (g.provinces||[]).length } provinces — press to drill</button>
+    <button type="button" class="ic-drill" data-r="${g.key}" aria-expanded="false"><span class="ic-chev">▸</span> ${ (g.provinces||[]).length } provinces — press to drill</button>
     <div class="ic-provs" data-r="${g.key}" hidden></div>
   </div>`;
 }
@@ -6650,6 +6650,7 @@ function renderImpactStrip(mountId,mode){
             if(g) pane.innerHTML=`<div class="ic-scroll">${icProvTable(g)}</div>`;
           }
           pane.hidden=!open;
+          btn.setAttribute('aria-expanded',String(open));
           btn.querySelector('.ic-chev').textContent=open?'▾':'▸';
           return;
         }
