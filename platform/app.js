@@ -6764,18 +6764,23 @@ function renderIncome(){
       const mix=Object.entries(g.book_mix||{}).sort((a,b)=>b[1]-a[1]).slice(0,3)
         .map(([o,pct])=>`${o} ${pct}%`).join(' · ');
       const best=g.best_occ||{}, worst=g.worst_occ||{};
+      const wa=g.nso_wage_ref||null;
+      const waCell=(wa&&wa.headline)
+        ? `<span title="MEASURED · NSO Labour Force Survey avg monthly EMPLOYEE wage — an independent anchor beside the SES income base, not the base itself (employee wage ≠ individual income)">฿${icN(wa.headline)}/mo</span>`
+        : '<span class="s">—</span>';
       return `<tr>
         <td><b>${g.key}</b></td>
         <td class="n"><b style="color:${pc}">${p>0?'+':''}${p}%</b></td>
         <td>${best.occ?`<span style="color:var(--merch)">${best.occ} ${best.d_pct>0?'+':''}${best.d_pct}%</span>`:'—'}</td>
         <td>${worst.occ&&worst.d_pct<0?`<span style="color:var(--agri)">${worst.occ} ${worst.d_pct}%</span>`:'<span class="s">none declining</span>'}</td>
-        <td class="s">${mix}</td></tr>`;
+        <td class="s">${mix}</td>
+        <td class="n">${waCell}</td></tr>`;
     }).join('');
     el.innerHTML=`
       <h2>Income-impact engine — what the macro move does to each region's book <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · first-order</span></h2>
       <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop tailwind.</p>
-      <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Region</th><th>Book income pressure</th><th>Best-off occupation</th><th>Worst-off occupation</th><th>Top book occupations</th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="lead cc-provenance"><b>Provenance:</b> ESTIMATED first-order pass-through. Every quantity multiplied is measured (NSO SES income, crop planted area, World Bank commodity YoY); the sensitivity coefficients (how much of a price move reaches take-home income) are a documented assumption. Read direction and relative magnitude, not precise levels.</p>`;
+      <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Region</th><th>Book income pressure</th><th>Best-off occupation</th><th>Worst-off occupation</th><th>Top book occupations</th><th title="MEASURED — NSO Labour Force Survey avg monthly EMPLOYEE wage; an independent cross-check beside the SES income base, not the base">NSO wage · LFS</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="lead cc-provenance"><b>Provenance:</b> ESTIMATED first-order pass-through. Every quantity multiplied is measured (NSO SES income, crop planted area, World Bank commodity YoY); the sensitivity coefficients (how much of a price move reaches take-home income) are a documented assumption. Read direction and relative magnitude, not precise levels. <b>NSO wage · LFS</b> is a MEASURED cross-check only — the region's Labour Force Survey employee wage (${((j.meta||{}).vintage||{}).wage_anchor||'latest'}) shown beside the model; it is an employee wage, not the SES individual income the model bases on (which counts non-wage income), so read it as a directional anchor, not an equality.</p>`;
   });
 }
 
