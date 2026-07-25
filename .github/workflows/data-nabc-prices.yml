@@ -52,10 +52,19 @@ jobs:
           # merge (the exact fix-up work that was recurring after every price refresh). Rebuild
           # the whole deterministic, network-free downstream chain, in dependency order.
           if git status --porcelain -- source-data/nabc_prices.json | grep -q .; then
-            echo "prices changed — rebuilding branch_agri + downstream recs/outlook + provenance"
+            echo "prices changed — rebuilding branch_agri + farmgate chain + downstream recs/outlook + provenance"
             python pipeline/build_branch_agri.py
             python pipeline/build_branch_recommendations.py
             python pipeline/build_regional_outlook.py
+            # NABC prices ALSO feed the farm-gate price layer and its crop-stress / crop-margin /
+            # farmer-income consumers (build_farmgate_prices.py reads nabc_prices.json; the three crop
+            # builders prefer that farm-gate layer). Omitting them left farmgate_prices.json drifted and
+            # the gate red on merge (the recurring fix-up after a price refresh). Rebuild that chain too,
+            # in dependency order (farmgate FIRST, then its consumers), before provenance.
+            python pipeline/build_farmgate_prices.py
+            python pipeline/build_crop_stress.py
+            python pipeline/build_crop_margin.py
+            python pipeline/build_crop_farmer_income.py
             python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
@@ -69,6 +78,8 @@ jobs:
         run: |
           git add source-data/nabc_prices.json platform/data/branch_agri.json \
                   platform/data/branch_recommendations.json platform/data/regional_outlook.json \
+                  source-data/farmgate_prices.json platform/data/crop_stress.json \
+                  platform/data/crop_margin.json platform/data/crop_farmer_income.json \
                   platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed data (same upstream prices). No PR opened."
