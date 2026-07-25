@@ -6553,34 +6553,64 @@ function icTrendChip(d){ if(d==null) return '';
   const w=(IMPACT.meta||{}).trend_window||{};
   const dn=d<0;
   return `<span class="ic-trend ${dn?'dn':'up'}" title="agri-risk score change between committed vintages (${w.from||''} → ${w.to||''}); model over measured inputs. Tape-NPL deltas begin at the second monthly tape vintage.">agri-risk ${dn?'▼ eased':'▲ rising'} since Dec</span>`;}
+/* Bucket ladder — the whole-book delinquency ladder Current → X(pre-30) → 30–89 → 90–179 → 180+,
+   summing to 100. npl_live_pct is LIVE-book-based (excludes 180+ from its denominator), so the
+   90–179 whole-book segment is derived as dpd30p − roll − late180 for a bar that sums to 100. */
+const IC_BUCKETS=[['current','Current','var(--merch)'],['x','X · pre-30','var(--gold)'],
+                  ['roll','30–89','#D97A3A'],['npl','90–179','var(--agri)'],['late','180+','var(--collat)']];
+function icSegs(r){
+  if(!r||r.current_pct==null||r.dpd30p_pct==null) return null;
+  const late=r.late180_pct||0, roll=r.roll_pct||0;
+  const npl=Math.max(0,+(r.dpd30p_pct-roll-late).toFixed(2));
+  return {current:r.current_pct, x:r.early_pct||0, roll:roll, npl:npl, late:late};
+}
+function icLadder(r){
+  const s=icSegs(r); if(!s) return '<span class="s">—</span>';
+  const bar=IC_BUCKETS.map(([k,lab,c])=>s[k]>0
+    ?`<span class="ic-lad-seg" style="width:${s[k]}%;background:${c}" title="${lab} ${s[k]}%"></span>`:'').join('');
+  return `<span class="ic-lad" title="Current ${s.current}% · X ${s.x}% · 30–89 ${s.roll}% · 90–179 ${s.npl}% · 180+ ${s.late}%">${bar}</span>`;
+}
+function icLadderLegend(){
+  return `<div class="ic-lad-leg">${IC_BUCKETS.map(([k,lab,c])=>`<span><i style="background:${c}"></i>${lab}</span>`).join('')}</div>`;
+}
+/* debt burden as a % of ANNUAL household income (standard DTI framing) — debt_months is months of
+   income (debt ÷ monthly income), so DTI% = debt_months ÷ 12 × 100. Owner ask: "% not months". */
+function icDTI(debt_months){ return debt_months==null?'<span class="s">—</span>'
+  :`<b>${Math.round(debt_months/12*100)}%</b>`; }
+function icPctCell(x){ return x==null?'<span class="s">—</span>':x.toFixed(1)+'%'; }
 function icBranchRows(prov){
   const rows=(IMPACT.branches||{})[prov]||[];
   if(!rows.length) return `<div class="ic-note">No branch rows for this province — the tape's no-PII floor publishes only the network's larger booking branches (${(IMPACT.meta||{}).branch_note||'cells ≥30'}). Branch detail → <a href="data.html">data book</a>.</div>`;
-  return `<table class="ic-tbl ic-btbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th>NPL-live</th><th>Rolling worse</th><th>Cue</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th>NPL-live</th><th>Cue</th></tr></thead><tbody>`+
     rows.map(b=>{
       const cue=(b.npl_live_pct>=7||b.roll_pct>=12)?'🔴 assist queue':(b.npl_live_pct>=5||b.roll_pct>=9)?'🟡 watch roll':'🟢 healthy';
-      return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td><td class="n">${icPct(b.npl_live_pct,5,7)}</td><td class="n">${icPct(b.roll_pct,9,12)}</td><td>${cue}</td></tr>`;
-    }).join('')+`</tbody></table>`;
+      return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td>
+        <td>${icLadder(b)}</td>
+        <td class="n">${icPctCell(b.current_pct)}</td>
+        <td class="n">${icPctCell(b.early_pct)}</td>
+        <td class="n">${icPct(b.npl_live_pct,5,7)}</td>
+        <td>${cue}</td></tr>`;
+    }).join('')+`</tbody></table></div>`+icLadderLegend();
 }
 function icProvTable(g){
   const provs=(g.provinces||[]).map(p=>[p,(IMPACT.provinces||{})[p]]).filter(x=>x[1]);
-  return `<table class="ic-tbl"><thead><tr><th>Province</th><th>Book</th><th>NPL-live</th><th>Rolling</th><th>Debt burden</th><th>Income /mo</th><th>Rivals</th><th>We finance</th><th>Trend</th></tr></thead><tbody>`+
+  return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Province</th><th>Book</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th title="debt vs annual household income">DTI</th><th>Rivals</th><th>We finance</th><th>Trend</th></tr></thead><tbody>`+
     provs.map(([name,p])=>{
       const d=(p.d_agri!=null)?p.d_agri:(g.trend||{}).d_agri;
       const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
-      const rv=p.rivals?`${(p.rivals.ratio!=null?p.rivals.ratio.toFixed(1):'—')}×${p.rivals.lead?' <span class="s">('+p.rivals.lead+' leads)</span>':''}`:'—';
-      return `<tr class="ic-prow" data-p="${name}" title="press for this province's branches">
+      const rv=p.rivals?`${(p.rivals.ratio!=null?p.rivals.ratio.toFixed(1):'—')}×`:'—';
+      const rvt=p.rivals&&p.rivals.lead?` title="${p.rivals.lead} leads locally"`:'';
+      return `<tr class="ic-prow" data-p="${dqEsc(name)}" title="press for this province's branches">
         <td><span class="ic-chev">▸</span> ${name}</td>
         <td class="n">฿${icN(p.os_m)}m · ${icN(p.accounts)} acc</td>
-        <td class="n">${icPct(p.npl_live_pct,5,6.5)}</td>
-        <td class="n">${icPct(p.roll_pct,9,12)}</td>
-        <td class="n">${p.debt_months!=null?p.debt_months+' mo of income':'—'}</td>
-        <td class="n">${p.income_ind!=null?'฿'+icN(p.income_ind):'—'}</td>
-        <td class="n">${rv}</td>
+        <td>${icLadder(p)}</td>
+        <td class="n">${icPctCell(p.current_pct)}</td>
+        <td class="n">${icPctCell(p.early_pct)}</td>
+        <td class="n" title="debt vs annual household income">${icDTI(p.debt_months)}</td>
+        <td class="n"${rvt}>${rv}</td>
         <td class="n">${p.per_vehicle!=null?'1 per '+icN(p.per_vehicle)+' veh':'—'}</td>
-        <td class="n">${tr}</td></tr>
-      <tr class="ic-brs" data-p="${name}" hidden><td colspan="9"></td></tr>`;
-    }).join('')+`</tbody></table>`;
+        <td class="n">${tr}</td></tr>`;
+    }).join('')+`</tbody></table></div>`+icLadderLegend();
 }
 function icCard(g){
   const [flab,fcol]=IC_FLAG[g.flag]||['',''];
@@ -6603,11 +6633,12 @@ function icCard(g){
     <div class="ic-blocks">
       <div class="ic-blk"><div class="ic-bt">LOAN BOOK <span class="m">MEASURED · TAPE</span></div>
         <div class="ic-rw"><span>Outstanding</span><b>฿${g.os_bn}bn</b></div>
+        <div class="ic-rw"><span>Current (0 dpd)</span><b style="color:var(--merch)">${g.current_pct!=null?g.current_pct.toFixed(1)+'%':'—'}</b></div>
         <div class="ic-rw"><span>NPL-live (90–179d)</span>${icPct(g.npl_live_pct,4.7,5.3)}</div>
-        <div class="ic-rw"><span>Rolling worse (30–89d)</span>${icPct(g.roll_pct,10,12)}</div></div>
+        <div class="ic-lad-wrap">${icLadder(g)}</div></div>
       <div class="ic-blk"><div class="ic-bt">THE PEOPLE <span class="m">NSO · SES/LFS</span></div>
         <div class="ic-rw"><span>Avg individual income <span class="s">est. split</span></span><b>${p.income_ind!=null?'฿'+icN(p.income_ind)+'/mo':'—'}</b></div>
-        <div class="ic-rw"><span>Household debt</span><b>${p.debt_months!=null?'≈ '+p.debt_months+' months of income':'—'}</b></div>
+        <div class="ic-rw"><span>Debt-to-income <span class="s">vs annual</span></span>${icDTI(p.debt_months)}</div>
         <div class="ic-rw"><span>Workers · informal</span><b>${p.workers_m!=null?p.workers_m+'M · '+p.informal_pct+'% informal':'—'}</b></div></div>
       <div class="ic-blk"><div class="ic-bt">VEHICLES — OURS vs ALL <span class="m">DLT + TAPE</span></div>
         <div class="ic-rw"><span>Registered fleet</span><b>${v.fleet_m}M <span class="s">(${v.fleet_pu_m}M pickup · ${v.fleet_mc_m}M moto)</span></b></div>
@@ -6621,48 +6652,70 @@ function icCard(g){
       <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
       <span class="s">rivals lead in ${rv.pct_districts_outnumbered!=null?rv.pct_districts_outnumbered.toFixed(0):'—'}% of our districts</span></div>
     ${commods?`<div class="ic-commods"><span class="ic-bt" style="margin:0">CROP PRICES</span>${commods}</div>`:''}
-    <button type="button" class="ic-drill" data-r="${g.key}"><span class="ic-chev">▸</span> ${ (g.provinces||[]).length } provinces — press to drill</button>
-    <div class="ic-provs" data-r="${g.key}" hidden></div>
+    <button type="button" class="ic-drill" data-r="${g.key}">${ (g.provinces||[]).length } provinces — drill in <span class="ic-chev">›</span></button>
   </div>`;
+}
+/* Breadcrumb drill controller (owner ask 2026-07-25): the drill was nested 3 levels deep (branch
+   table inside a colspan inside a province table inside a card) and cramped. Now ONE full-width level
+   shows at a time — region cards → a region's province table → a province's branch table — with a
+   back-crumb. Per-mount view state lives on the element so each pillar (Home/Assist/Risk/Competition)
+   drills independently and persists across tab switches. */
+function icRegionOf(key){ return IMPACT.regions.find(x=>x.key===key); }
+/* parts: [{label, lvl}] — lvl is the level to jump to when that crumb is pressed; the last part is the
+   current (non-clickable) location. Each crumb navigates directly to its own level (not just pop-one). */
+function icCrumb(parts){
+  return `<div class="ic-crumb">`+parts.map((p,i)=>
+    i<parts.length-1
+      ?`<button type="button" class="ic-back" data-lvl="${p.lvl}">${i===0?'‹ ':''}${p.label}</button><span class="ic-crumb-sep">›</span>`
+      :`<span class="ic-crumb-cur">${p.label}</span>`).join('')+`</div>`;
+}
+function icRenderLevel(mount){
+  const st=mount._icState, mode=mount._icMode, w=(IMPACT.meta||{}).trend_window||{};
+  if(st.level==='province'){
+    const g=icRegionOf(st.region);
+    if(!g){ mount._icState={level:'regions'}; return icRenderLevel(mount); }
+    mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:g.key+(g.name_th?' · '+g.name_th:'')}])+
+      `<div class="ic-drill-h"><b>${g.key}</b> — ${(g.provinces||[]).length} provinces · press a province row for its branches</div>`+
+      icProvTable(g);
+    return;
+  }
+  if(st.level==='branch'){
+    const g=icRegionOf(st.region);
+    mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:(g?g.key:st.region),lvl:'province'},{label:st.province}])+
+      `<div class="ic-drill-h"><b>${st.province}</b> — booking branches on the tape (n ≥ 30), worst NPL-live first</div>`+
+      icBranchRows(st.province);
+    return;
+  }
+  let regs=IMPACT.regions.slice();
+  if(mode&&IC_SORT[mode]) regs.sort(IC_SORT[mode]);
+  mount.innerHTML=
+    `<div class="ic-strip-h"><span>The five regions — press a region → its provinces → its branches</span>`+
+    (mode&&IC_MODE_NOTE[mode]?`<span class="s">${IC_MODE_NOTE[mode]}</span>`:'')+`</div>`+
+    icLadderLegend()+
+    `<div class="ic-grid">${regs.map(icCard).join('')}</div>`+
+    `<div class="ic-foot">All card numbers <b>measured</b> (tape ${((IMPACT.meta||{}).tape||{}).mob_anchor||''} · NSO SES/LFS · DLT fleet · rival census) except the est. individual-income split and the agri-risk trend model (${w.from||''} → ${w.to||''}). ${(IMPACT.meta||{}).occ_note||''}</div>`;
 }
 function renderImpactStrip(mountId,mode){
   const mount=document.getElementById(mountId);
   if(!mount) return;
   loadImpact().then(()=>{
     if(!IMPACT){ mount.innerHTML='<div class="ic-note">Impact cards not yet computed — data/impact_cards.json is absent (run pipeline/build_impact_cards.py).</div>'; return; }
-    let regs=IMPACT.regions.slice();
-    if(mode&&IC_SORT[mode]) regs.sort(IC_SORT[mode]);
-    const w=(IMPACT.meta||{}).trend_window||{};
-    mount.innerHTML=
-      `<div class="ic-strip-h"><span>The five regions — press a region → its provinces → its branches</span>`+
-      (mode&&IC_MODE_NOTE[mode]?`<span class="s">${IC_MODE_NOTE[mode]}</span>`:'')+`</div>`+
-      `<div class="ic-grid">${regs.map(icCard).join('')}</div>`+
-      `<div class="ic-foot">All card numbers <b>measured</b> (tape ${((IMPACT.meta||{}).tape||{}).mob_anchor||''} · NSO SES/LFS · DLT fleet · rival census) except the est. individual-income split and the agri-risk trend model (${w.from||''} → ${w.to||''}). ${(IMPACT.meta||{}).occ_note||''}</div>`;
+    mount._icMode=mode;
+    if(!mount._icState) mount._icState={level:'regions'};
+    icRenderLevel(mount);
     if(!mount.dataset.icWired){
       mount.dataset.icWired='1';
       mount.addEventListener('click',e=>{
-        const btn=e.target.closest('.ic-drill');
-        if(btn){
-          const card=btn.closest('.ic-card'), pane=card.querySelector('.ic-provs');
-          const open=pane.hidden;
-          if(open&&!pane.innerHTML){
-            const g=IMPACT.regions.find(x=>x.key===btn.dataset.r);
-            if(g) pane.innerHTML=`<div class="ic-scroll">${icProvTable(g)}</div>`;
-          }
-          pane.hidden=!open;
-          btn.querySelector('.ic-chev').textContent=open?'▾':'▸';
-          return;
-        }
+        const back=e.target.closest('.ic-back');
+        if(back){ const st=mount._icState;
+          mount._icState=(back.dataset.lvl==='province')?{level:'province',region:st.region}:{level:'regions'};
+          icRenderLevel(mount); return; }
+        const drill=e.target.closest('.ic-drill');
+        if(drill){ mount._icState={level:'province',region:drill.dataset.r};
+          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); return; }
         const prow=e.target.closest('.ic-prow');
-        if(prow){
-          const name=prow.dataset.p;
-          const brs=prow.parentElement.querySelector(`.ic-brs[data-p="${name.replace(/"/g,'\\"')}"]`);
-          if(!brs) return;
-          const open=brs.hidden;
-          if(open&&!brs.firstElementChild.innerHTML) brs.firstElementChild.innerHTML=icBranchRows(name);
-          brs.hidden=!open;
-          const ch=prow.querySelector('.ic-chev'); if(ch) ch.textContent=open?'▾':'▸';
-        }
+        if(prow){ mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
+          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); return; }
       });
     }
   });
