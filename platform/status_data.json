@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T10:22:55Z",
-    "commit": "3c3a794"
+    "generated_at": "2026-07-25T22:53:38+07:00",
+    "commit": "a38cc68"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,42 @@
   ],
   "activity": [
     {
+      "date": "2026-07-25T22:53:38+07:00",
+      "sha": "a38cc68",
+      "summary": "risk-drill v2 + Overview/front-door pivot cleanup — owner feedback batch (#1–#7) (#164)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-25T21:22:55+07:00",
+      "sha": "33d7312",
+      "summary": "docs: log the ux-impact-drill-aria-expanded merge + deploy-verify result (#165) (#166)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T21:19:07+07:00",
+      "sha": "fc7e11c",
+      "summary": "ux: aria-expanded on impact-card drill buttons (a11y, WCAG 4.1.2) (#165)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T20:47:29+07:00",
+      "sha": "98b4131",
+      "summary": "macro directives: crude fuel baseline · drop BoT rate-cap · IMF WEO backdrop (#161)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-25T20:01:24+07:00",
+      "sha": "288e278",
+      "summary": "feat(overview): SFI state-bank system NPL-ratio credit-quality backdrop (MEASURED, obj #1) (#163)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-25T10:43:23Z",
+      "sha": "fd2c25b",
+      "summary": "committee: refresh autonomy plan (run 30154810038)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-25T10:22:55Z",
       "sha": "3c3a794",
       "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
@@ -622,42 +658,6 @@
       "sha": "3df1e0a",
       "summary": "feat(pipeline): gdcatalog.go.th autonomous harvester (CKAN + OCR-PDF, background long-runner) (#147)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T00:21:21+07:00",
-      "sha": "0313903",
-      "summary": "feat(databook): full branch browse + per-branch drill-down (#146)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-24T16:46:35Z",
-      "sha": "8a4a624",
-      "summary": "docs: log the drought-vintage service fix (#145) + refresh autonomy plan / CEO dashboard",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-24T23:45:22+07:00",
-      "sha": "0a8728e",
-      "summary": "fix(service): recover the district-drought layer's dropped freshness vintage in the Data-room card (#145)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-24T22:58:46+07:00",
-      "sha": "2095b75",
-      "summary": "intel(overview): surface the MEASURED×MODELLED district crop × drought layer (obj #1) (#141)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-24T14:49:19Z",
-      "sha": "3d3e8b8",
-      "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T21:46:17+07:00",
-      "sha": "10bd831",
-      "summary": "ux: wrap command-center Assistance-radar table in .tblwrap (fix mobile page overflow) (#144)",
-      "pillar": "uxui"
     }
   ]
 }
