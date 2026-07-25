@@ -428,6 +428,18 @@
       <p class="lead" id="dbdform-note"></p>
       <table class="tbl" id="dbdformtbl"></table>
     </div>
+    <!-- SFI system credit-quality backdrop (data/sfi_credit.json) — MEASURED quarterly NPL ratio of
+         Thailand's Specialized Financial Institutions (GSB/BAAC/GHB/SME/EXIM/Islamic Bank), from the
+         FPO open-data aggregates. Obj #1 leading-indicator BACKDROP: GSB (household) + BAAC (rural/agri)
+         system NPL is the closest public read on the repayment stress AutoX's borrowers sit inside — a
+         macro tide, NOT AutoX's own book and NOT per-province. Rendered by renderSfi(); hidden until the
+         layer loads. -->
+    <div id="sfi-wrap" style="display:none">
+      <h2 class="risk">Credit-quality backdrop · state-bank system NPL <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · FPO / SFI aggregates</span></h2>
+      <div class="verdict" id="sfi-verdict" style="display:none"></div>
+      <p class="lead" id="sfi-note"></p>
+      <table class="tbl" id="sfitbl"></table>
+    </div>
     <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
          ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
          The ACUTE obj-#1 counterpart to the slower crop-stress drought read: water on the ground /
