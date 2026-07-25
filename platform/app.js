@@ -1257,7 +1257,7 @@ function wrapTables(){
 // Per-route browser-tab titles: without these all hash routes share one <title>, so history
 // entries, bookmarks and open tabs are indistinguishable (and SPA route changes are silent to
 // screen readers). Keeps the brand suffix so the tab is still recognisable at a glance.
-const TAB_TITLES={home:'Command center',overview:'Macro',map:'Acquisition',assist:'Assistance',exposure:'Risk',acq:'Competition',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
+const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'Assistance',exposure:'Risk',acq:'Competition',trend:'Risk trend',provinces:'Provinces',market:'Market',branches:'Branches',sim:'Simulator'};
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
@@ -1274,6 +1274,7 @@ function showTab(v){
   if(v==='sim') renderSim();
   if(v==='trend') renderTrend();
   if(v==='acq') loadAmphoe();
+  renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
   closeBranchSheet();   // the mobile branch sheet belongs to the map — never let it cover another tab
   window.scrollTo(0,0);
 }
@@ -6543,6 +6544,160 @@ function queue3DLink(it){
   if(pl&&pl.slug) return ` <a href="rayong-catchment.html?city=${pl.slug}${themeQS()}" title="3D building scene — ${dqEsc(pl.th||it.prov)}" style="text-decoration:none;color:var(--accent)">🏙 3D</a>`;
   return '';
 }
+/* ---------- IMPACT CARDS — the Region → Province → Branch drill (owner sign-off 2026-07-25) ----
+   data/impact_cards.json (build_impact_cards.py). Big picture first: 5 region cards, press a
+   region for its provinces, press a province for its branches. Humanized numbers by design
+   (months-of-income, 1-per-N vehicles, plain rival ratios — no analyst codes); the trend chips
+   embed the vintage deltas (the Risk-trend TAB is retired from the nav, the DIMENSION lives
+   here). Same strip fronts Assistance / Risk / Competition with a pillar-specific ranking.
+   Null-safe: absent layer → calm note, never a broken scene. */
+let IMPACT=null, impactPromise=null;
+function loadImpact(){
+  if(impactPromise) return impactPromise;
+  impactPromise=fetch('data/impact_cards.json').then(r=>r.ok?r.json():null)
+    .then(j=>{IMPACT=(j&&Array.isArray(j.regions))?j:null;}).catch(()=>{IMPACT=null;});
+  return impactPromise;
+}
+const IC_MOUNTS={home:['cc-impact',null],assist:['assist-impact','assist'],
+                 exposure:['exposure-impact','risk'],acq:['acq-impact','competition']};
+const IC_SORT={assist:(a,b)=>(b.roll_pct||0)-(a.roll_pct||0),
+               risk:(a,b)=>(b.npl_live_pct||0)-(a.npl_live_pct||0),
+               competition:(a,b)=>((b.rivals||{}).ratio||0)-((a.rivals||{}).ratio||0)};
+const IC_MODE_NOTE={assist:'ranked for this pillar: rolling-worse (30–89d) first',
+                    risk:'ranked for this pillar: NPL-live first',
+                    competition:'ranked for this pillar: most-outgunned first'};
+const IC_FLAG={'assist-first':['ASSIST FIRST','var(--agri)'],
+               'cleanest-book':['CLEANEST BOOK','var(--merch)'],
+               'thinnest-foothold':['THINNEST FOOTHOLD','var(--accent)'],
+               'watch-rivals':['WATCH RIVALS','var(--gold)'],
+               'hold-course':['HOLD COURSE','var(--merch)']};
+function icN(x){return x==null?'—':Number(x).toLocaleString('en-US');}
+function icPct(x,warn,bad){ if(x==null) return '—';
+  const c=x>=bad?'var(--agri)':x>=warn?'var(--gold)':'var(--merch)';
+  return `<b style="color:${c}">${x.toFixed(2)}%</b>`;}
+function icTrendChip(d){ if(d==null) return '';
+  const w=(IMPACT.meta||{}).trend_window||{};
+  const dn=d<0;
+  return `<span class="ic-trend ${dn?'dn':'up'}" title="agri-risk score change between committed vintages (${w.from||''} → ${w.to||''}); model over measured inputs. Tape-NPL deltas begin at the second monthly tape vintage.">agri-risk ${dn?'▼ eased':'▲ rising'} since Dec</span>`;}
+function icBranchRows(prov){
+  const rows=(IMPACT.branches||{})[prov]||[];
+  if(!rows.length) return `<div class="ic-note">No branch rows for this province — the tape's no-PII floor publishes only the network's larger booking branches (${(IMPACT.meta||{}).branch_note||'cells ≥30'}). Branch detail → <a href="data.html">data book</a>.</div>`;
+  return `<table class="ic-tbl ic-btbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th>NPL-live</th><th>Rolling worse</th><th>Cue</th></tr></thead><tbody>`+
+    rows.map(b=>{
+      const cue=(b.npl_live_pct>=7||b.roll_pct>=12)?'🔴 assist queue':(b.npl_live_pct>=5||b.roll_pct>=9)?'🟡 watch roll':'🟢 healthy';
+      return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td><td class="n">${icPct(b.npl_live_pct,5,7)}</td><td class="n">${icPct(b.roll_pct,9,12)}</td><td>${cue}</td></tr>`;
+    }).join('')+`</tbody></table>`;
+}
+function icProvTable(g){
+  const provs=(g.provinces||[]).map(p=>[p,(IMPACT.provinces||{})[p]]).filter(x=>x[1]);
+  return `<table class="ic-tbl"><thead><tr><th>Province</th><th>Book</th><th>NPL-live</th><th>Rolling</th><th>Debt burden</th><th>Income /mo</th><th>Rivals</th><th>We finance</th><th>Trend</th></tr></thead><tbody>`+
+    provs.map(([name,p])=>{
+      const d=(p.d_agri!=null)?p.d_agri:(g.trend||{}).d_agri;
+      const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
+      const rv=p.rivals?`${(p.rivals.ratio!=null?p.rivals.ratio.toFixed(1):'—')}×${p.rivals.lead?' <span class="s">('+p.rivals.lead+' leads)</span>':''}`:'—';
+      return `<tr class="ic-prow" data-p="${name}" title="press for this province's branches">
+        <td><span class="ic-chev">▸</span> ${name}</td>
+        <td class="n">฿${icN(p.os_m)}m · ${icN(p.accounts)} acc</td>
+        <td class="n">${icPct(p.npl_live_pct,5,6.5)}</td>
+        <td class="n">${icPct(p.roll_pct,9,12)}</td>
+        <td class="n">${p.debt_months!=null?p.debt_months+' mo of income':'—'}</td>
+        <td class="n">${p.income_ind!=null?'฿'+icN(p.income_ind):'—'}</td>
+        <td class="n">${rv}</td>
+        <td class="n">${p.per_vehicle!=null?'1 per '+icN(p.per_vehicle)+' veh':'—'}</td>
+        <td class="n">${tr}</td></tr>
+      <tr class="ic-brs" data-p="${name}" hidden><td colspan="9"></td></tr>`;
+    }).join('')+`</tbody></table>`;
+}
+function icCard(g){
+  const [flab,fcol]=IC_FLAG[g.flag]||['',''];
+  const p=g.people||{}, v=g.vehicles||{}, o=g.occupations||{}, rv=g.rivals||{};
+  const occ=(o.book||[]).slice(0,3).map(b=>
+    `<div class="ic-rw"><span>${b.occ} <span class="s">${b.pct}% of book</span></span><b>${b.npl_live_pct!=null?b.npl_live_pct.toFixed(1)+'% NPL':''}</b></div>`).join('');
+  const commods=(g.commodities||[]).map(c=>{
+    const cl=c.cls==='stress'?'bad':c.cls==='up'?'good':'flat';
+    const ar=c.cls==='stress'?'▼':c.cls==='up'?'▲':'→';
+    return `<span class="ic-cchip ${cl}" title="${c.note||''} — World Bank Pink Sheet YoY">${c.lab} ${ar} ${c.yoy>0?'+':''}${c.yoy}%</span>`;
+  }).join('');
+  return `<div class="ic-card" data-r="${g.key}">
+    <span class="ic-sev" style="background:${fcol}"></span>
+    <div class="ic-head">
+      <h3>${g.key} <span lang="th" class="s">· ${g.name_th}</span></h3>
+      <span class="ic-meta">${icN(g.branches)} branches · ${icN(g.accounts)} accounts</span>
+      ${icTrendChip((g.trend||{}).d_agri)}
+      ${flab?`<span class="ic-flag" style="color:${fcol};border-color:${fcol}">${flab}</span>`:''}
+    </div>
+    <div class="ic-blocks">
+      <div class="ic-blk"><div class="ic-bt">LOAN BOOK <span class="m">MEASURED · TAPE</span></div>
+        <div class="ic-rw"><span>Outstanding</span><b>฿${g.os_bn}bn</b></div>
+        <div class="ic-rw"><span>NPL-live (90–179d)</span>${icPct(g.npl_live_pct,4.7,5.3)}</div>
+        <div class="ic-rw"><span>Rolling worse (30–89d)</span>${icPct(g.roll_pct,10,12)}</div></div>
+      <div class="ic-blk"><div class="ic-bt">THE PEOPLE <span class="m">NSO · SES/LFS</span></div>
+        <div class="ic-rw"><span>Avg individual income <span class="s">est. split</span></span><b>${p.income_ind!=null?'฿'+icN(p.income_ind)+'/mo':'—'}</b></div>
+        <div class="ic-rw"><span>Household debt</span><b>${p.debt_months!=null?'≈ '+p.debt_months+' months of income':'—'}</b></div>
+        <div class="ic-rw"><span>Workers · informal</span><b>${p.workers_m!=null?p.workers_m+'M · '+p.informal_pct+'% informal':'—'}</b></div></div>
+      <div class="ic-blk"><div class="ic-bt">VEHICLES — OURS vs ALL <span class="m">DLT + TAPE</span></div>
+        <div class="ic-rw"><span>Registered fleet</span><b>${v.fleet_m}M <span class="s">(${v.fleet_pu_m}M pickup · ${v.fleet_mc_m}M moto)</span></b></div>
+        <div class="ic-rw"><span>We finance — pickups</span><b>1 per ${icN(v.per_pu)}</b></div>
+        <div class="ic-rw"><span>We finance — motos</span><b>1 per ${icN(v.per_mc)}</b></div></div>
+      <div class="ic-blk"><div class="ic-bt">OCCUPATIONS — BOOK vs WORKFORCE <span class="m">TAPE · LFS</span></div>
+        ${occ}
+        <div class="ic-rw"><span>Penetration</span><b>${o.acc_per_1k_workers!=null?o.acc_per_1k_workers+' accounts per 1,000 workers':'—'}</b></div></div>
+    </div>
+    <div class="ic-rivrow"><span class="ic-bt" style="margin:0">RIVALS</span>
+      <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
+      <span class="s">rivals lead in ${rv.pct_districts_outnumbered!=null?rv.pct_districts_outnumbered.toFixed(0):'—'}% of our districts</span></div>
+    ${commods?`<div class="ic-commods"><span class="ic-bt" style="margin:0">CROP PRICES</span>${commods}</div>`:''}
+    <button type="button" class="ic-drill" data-r="${g.key}"><span class="ic-chev">▸</span> ${ (g.provinces||[]).length } provinces — press to drill</button>
+    <div class="ic-provs" data-r="${g.key}" hidden></div>
+  </div>`;
+}
+function renderImpactStrip(mountId,mode){
+  const mount=document.getElementById(mountId);
+  if(!mount) return;
+  loadImpact().then(()=>{
+    if(!IMPACT){ mount.innerHTML='<div class="ic-note">Impact cards not yet computed — data/impact_cards.json is absent (run pipeline/build_impact_cards.py).</div>'; return; }
+    let regs=IMPACT.regions.slice();
+    if(mode&&IC_SORT[mode]) regs.sort(IC_SORT[mode]);
+    const w=(IMPACT.meta||{}).trend_window||{};
+    mount.innerHTML=
+      `<div class="ic-strip-h"><span>The five regions — press a region → its provinces → its branches</span>`+
+      (mode&&IC_MODE_NOTE[mode]?`<span class="s">${IC_MODE_NOTE[mode]}</span>`:'')+`</div>`+
+      `<div class="ic-grid">${regs.map(icCard).join('')}</div>`+
+      `<div class="ic-foot">All card numbers <b>measured</b> (tape ${((IMPACT.meta||{}).tape||{}).mob_anchor||''} · NSO SES/LFS · DLT fleet · rival census) except the est. individual-income split and the agri-risk trend model (${w.from||''} → ${w.to||''}). ${(IMPACT.meta||{}).occ_note||''}</div>`;
+    if(!mount.dataset.icWired){
+      mount.dataset.icWired='1';
+      mount.addEventListener('click',e=>{
+        const btn=e.target.closest('.ic-drill');
+        if(btn){
+          const card=btn.closest('.ic-card'), pane=card.querySelector('.ic-provs');
+          const open=pane.hidden;
+          if(open&&!pane.innerHTML){
+            const g=IMPACT.regions.find(x=>x.key===btn.dataset.r);
+            if(g) pane.innerHTML=`<div class="ic-scroll">${icProvTable(g)}</div>`;
+          }
+          pane.hidden=!open;
+          btn.querySelector('.ic-chev').textContent=open?'▾':'▸';
+          return;
+        }
+        const prow=e.target.closest('.ic-prow');
+        if(prow){
+          const name=prow.dataset.p;
+          const brs=prow.parentElement.querySelector(`.ic-brs[data-p="${name.replace(/"/g,'\\"')}"]`);
+          if(!brs) return;
+          const open=brs.hidden;
+          if(open&&!brs.firstElementChild.innerHTML) brs.firstElementChild.innerHTML=icBranchRows(name);
+          brs.hidden=!open;
+          const ch=prow.querySelector('.ic-chev'); if(ch) ch.textContent=open?'▾':'▸';
+        }
+      });
+    }
+  });
+}
+function renderImpactMounts(v){
+  const m=IC_MOUNTS[v];
+  if(m) renderImpactStrip(m[0],m[1]);
+}
+
 function renderHomeQueue(){
   const box=$('#cc-queue-body'); if(!box) return;
   if(!dqLoaded){ return; }                                   // skeleton stays until the fetch resolves

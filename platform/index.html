@@ -38,15 +38,13 @@
   <span class="nav-sep" aria-hidden="true"></span>
   <div class="nav-more" id="navMore">
     <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
+    <!-- More = 2 items (owner sign-off 2026-07-25). Retired from the menu, routes kept alive for
+         old links: Data book ↗ (duplicate of Acquisition), Risk trend (embedded in the impact
+         cards' trend chips/columns), Provinces·Market·Branches (inside the data-book drill),
+         Status (footer, "Build status (internal)"). -->
     <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
-      <a href="data.html" role="menuitem">Data book ↗</a>
       <a data-v="map" href="#map" role="menuitem" title="Optional spatial view — 2,015 branch dots on a map">Map view</a>
-      <a data-v="trend" href="#trend" role="menuitem">Risk trend</a>
-      <a data-v="provinces" href="#provinces" role="menuitem">Provinces</a>
-      <a data-v="market" href="#market" role="menuitem">Market</a>
-      <a data-v="branches" href="#branches" role="menuitem">Branches</a>
       <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
-      <a href="/status" role="menuitem">Status ↗</a>
     </div>
   </div>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
@@ -129,6 +127,14 @@
          metric from the committed layers + a jump to that pillar's detail. Data-book look.
          Rendered by renderHomePillars(); null-safe (a card degrades to a calm pointer). -->
     <div class="cc-pillars" id="cc-pillars" aria-label="The five intelligence pillars"></div>
+
+    <!-- IMPACT CARDS (owner sign-off 2026-07-25): the Region → Province → Branch drill, big
+         picture first — 5 region cards (book · people · vehicles ours-vs-fleet · occupations
+         book-vs-workforce · commodities · rivals), press a region for its provinces, press a
+         province for its branches. data/impact_cards.json (build_impact_cards.py); humanized
+         numbers by design; trend chips carry the vintage deltas (Risk-trend tab retired from
+         the nav). Null-safe: absent layer → calm note. -->
+    <div id="cc-impact" aria-label="Region impact cards — press to drill"></div>
 
     <div class="cc-grid">
       <!-- THIS WEEK — DO THESE FIRST (exec decision queue, data/decision_queue.json).
@@ -233,6 +239,7 @@
       </div>
     </div>
     <div class="assist-hero" id="assist-hero" aria-live="polite"></div>
+    <div id="assist-impact"></div><!-- impact-card drill, assistance ranking (rolling-worse first) -->
     <div id="assist-absent" class="note" style="display:none">The real loan-tape layer isn't loaded — <b>data/tape_real.json</b> is absent. The assistance view populates once the monthly tape drop is ingested.</div>
 
     <h2>Segments hit most — the ranked hit-list</h2>
@@ -448,6 +455,8 @@
       we are outnumbered, where our brand loses share-of-search, and which segments carry the most competitor
       exposure. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>. This tab makes <b>no</b> open /
       close / expansion recommendations.</p>
+
+    <div id="acq-impact"></div><!-- impact-card drill, competition ranking (most-outgunned first) -->
 
     <nav class="jumpnav no-print" id="acqjump" aria-label="Jump to section within Competition">
       <a class="chip" href="#acq" data-acq="sec-search">Brand &amp; search</a>
@@ -670,6 +679,8 @@
     <div class="verdict v-risk" id="expo-verdict" style="display:none"></div>
     <h2 class="risk">Portfolio exposure · concentration read</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
+
+    <div id="exposure-impact"></div><!-- impact-card drill, risk ranking (NPL-live first) -->
 
     <!-- REAL TAPE — measured portfolio truth (data/tape_real.json; hidden when absent) -->
     <div id="expo-tape" style="display:none">
@@ -969,6 +980,7 @@
     enrichment loop and served as data files. Provenance: World Bank Pink Sheet (prices), OAE planting-area
     (crops), WFP/HDX (drought), UNFPA (population), OpenStreetMap (13 POI layers), IMF/OECD/BoT/MOTS (macro).
     Pending the data.go.th run: DIW factories, DLT vehicle registrations.
+    <span class="no-print" style="color:var(--dim)">· <a href="/status" style="color:var(--dim)">Build status (internal)</a></span>
   </div>
 </main>
 
