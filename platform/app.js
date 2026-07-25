@@ -6928,24 +6928,17 @@ function renderHomeQueue(){
 
 /* ---- home orchestration ---- */
 let homeBooted=false;
-/* Command-center "Recommendation by region" card — the per-branch recs rolled up to the 5 regions
-   (data/regional_outlook.json, same layer the Overview uses). Each region shows its #1 action +
-   branch count. Null-safe: absent file → the card stays hidden. */
+/* Command-center "Recommendation by region" card — RETIRED 2026-07-25 (consolidation-pivot compliance).
+   It rolled data/regional_outlook.json's per-region recommendation[0] onto the exec front door, but
+   those actions are grow / product-push ("🌿 Grow farm lending", "🚙 Push vehicle-title") which the
+   pivot forbids — the product makes NO grow/open/expand calls. This is the same violation (and the same
+   data layer) as the Overview "Regional impact & recommendation" cards removed in the same batch (owner
+   ask #5); leaving it on #home while cutting it from the Overview would be inconsistent. The card is
+   hidden; the front door keeps its pivot-compliant per-region reads — cc-defend (competitive risk), the
+   impact strip (book buckets/DTI/crops/rivals) and the decision queue. regional_outlook.json stays on
+   disk because renderNationalOutlook still uses its .national headline/situation. */
 function renderHomeRegions(){
-  const wrap=$('#cc-regions'), body=$('#cc-regions-body');
-  if(!wrap||!body||!OUTLOOK||!OUTLOOK.regions||!OUTLOOK.regions.length) return;
-  const rows=OUTLOOK.regions.map(r=>{
-    const ac=(typeof REGION_ACCENT!=='undefined'&&REGION_ACCENT[r.r])||'var(--accent)';
-    const a=(r.recommendation||[])[0];
-    const col=a?((typeof OUT_TONE!=='undefined'&&OUT_TONE[a.tone])||'var(--mid)'):'var(--dim)';
-    const act=a?`${a.i} ${(a.t||'').split('—')[0].trim()}`:'—';
-    return `<div class="cc-row">
-      <span class="l"><b style="border-left:3px solid ${ac};padding-left:7px">${r.name}</b>
-        <span class="s">${r.n} branches</span></span>
-      <span class="r" style="color:${col}">${act}</span></div>`;
-  }).join('');
-  body.innerHTML=rows+`<div class="sub" style="margin-top:6px;color:var(--dim)">Per-branch recommendations rolled up by region · full situation → action detail on the Overview.</div>`;
-  wrap.style.display='';
+  const wrap=$('#cc-regions'); if(wrap) wrap.style.display='none';
 }
 /* Command-center "Where the network is hardest to defend" card — the per-region density × service
    read (data/rival_threat_region.json, the same MEASURED layer the Competition tab renders), rolled
