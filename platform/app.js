@@ -6641,7 +6641,7 @@ function icCard(g){
         <div class="ic-rw"><span>We finance — motos</span><b>1 per ${icN(v.per_mc)}</b></div></div>
       <div class="ic-blk"><div class="ic-bt">OCCUPATIONS — BOOK vs WORKFORCE <span class="m">TAPE · LFS</span></div>
         ${occ}
-        <div class="ic-rw"><span>Penetration</span><b>${o.acc_per_1k_workers!=null?o.acc_per_1k_workers+' accounts per 1,000 workers':'—'}</b></div></div>
+        <div class="ic-rw"><span>Penetration</span><b>${o.workers_per_acc!=null?'1 account per '+icN(o.workers_per_acc)+' workers':'—'}</b></div></div>
     </div>
     <div class="ic-rivrow"><span class="ic-bt" style="margin:0">RIVALS</span>
       <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
