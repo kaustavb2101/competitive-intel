@@ -225,7 +225,9 @@ def build():
                 "book": [{"occ": o, "n": v["n"],
                           "pct": round(v["n"] * 100.0 / c["n"], 1),
                           "npl_live_pct": v["npl_live_pct"]} for o, v in occ_rows[:6]],
-                "acc_per_1k_workers": round(c["n"] * 1000.0 / workers, 1),
+                # penetration as "1 account per N employed persons" (LFS employed) — same
+                # intuitive 1-per-N framing as the vehicle line, not an analyst per-1,000 rate.
+                "workers_per_acc": round(workers / c["n"]) if c["n"] else None,
             },
             "rivals": {"ours": threat[r]["autox"], "rivals": threat[r]["rivals"],
                        "ratio": threat[r]["rivals_vs_autox"],

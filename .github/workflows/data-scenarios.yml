@@ -1,0 +1,68 @@
+name: Data — scenario engine refresh (weekly)
+
+# Rebuilds platform/data/scenarios.json from the live measured signals (commodity board, OAE
+# drought census, retail diesel, rival pulse) via the income-impact pass-through, so the exec
+# scenario presets always reflect CURRENT reality instead of hardcoded constants (owner ask
+# 2026-07-25). Same auto-merge-on-green pattern as data-fuel-prices.yml: the job runs the FULL
+# determinism gate itself; 0-failed earns a direct rebase+push to the base branch; a RED gate
+# falls back to a draft PR for human eyes.
+#
+# All inputs are already committed layers refreshed by their own jobs (fuel daily, commodity/
+# drought/rival on their cadences), so this rebuild is deterministic + network-free.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 03:20 UTC (= 10:20 Bangkok) — after the weekend, off-peak.
+    - cron: "20 3 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install numpy
+      - name: Rebuild scenarios.json (+ provenance in lockstep)
+        run: |
+          # scenarios.json re-projects the committed measured layers; the provenance manifest
+          # censuses it, so both must move together or the determinism gate goes red on merge.
+          python pipeline/build_scenarios.py
+          python pipeline/build_provenance.py
+      - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/scenarios-${{ github.run_id }}
+        run: |
+          git add platform/data/scenarios.json platform/data/provenance.json
+          if git diff --cached --quiet; then
+            echo "No scenario change vs committed. Nothing to merge."; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "data: refresh scenarios.json ($(date -u +%F), run ${{ github.run_id }})" \
+                     -m "Rebuilt by .github/workflows/data-scenarios.yml from the live measured signals. Full 'bash tests/run.sh check' passed 0-failed before this auto-merge."
+          if bash tests/run.sh check; then
+            echo "Gate green — auto-merging to $BASE_BRANCH."
+            git pull --rebase origin "$BASE_BRANCH"
+            git push origin "HEAD:$BASE_BRANCH"
+            echo "Scenarios refreshed on $BASE_BRANCH."
+          else
+            echo "Gate RED — falling back to a draft PR for review."
+            git checkout -b "$DATA_BRANCH"
+            git push origin "$DATA_BRANCH"
+            printf 'Automated weekly scenario refresh (run %s) from `%s` — GATE FAILED, needs review.\n\nDeterministic rebuild of scenarios.json from the live measured layers.\n' \
+              "${{ github.run_id }}" "$BASE_BRANCH" > /tmp/pr_body.md
+            gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+              --title "data: scenario refresh ($(date -u +%F)) [gate failed]" --body-file /tmp/pr_body.md
+          fi

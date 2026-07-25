@@ -1264,14 +1264,14 @@ function showTab(v){
   document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
-  if(v==='assist') renderAssist();
-  if(v==='overview') renderOverview();
+  if(v==='assist'){ renderAssist(); renderIncome(); }
+  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
   if(v==='market') renderMarket();
-  if(v==='exposure') renderExposure();
-  if(v==='sim') renderSim();
+  if(v==='exposure'){ renderExposure(); renderProducts(); }
+  if(v==='sim'){ renderSim(); renderScenarios(); }
   if(v==='trend') renderTrend();
   if(v==='acq') loadAmphoe();
   renderImpactMounts(v);    // Region→Province→Branch drill on Home + the pillar front doors
@@ -6641,7 +6641,7 @@ function icCard(g){
         <div class="ic-rw"><span>We finance — motos</span><b>1 per ${icN(v.per_mc)}</b></div></div>
       <div class="ic-blk"><div class="ic-bt">OCCUPATIONS — BOOK vs WORKFORCE <span class="m">TAPE · LFS</span></div>
         ${occ}
-        <div class="ic-rw"><span>Penetration</span><b>${o.acc_per_1k_workers!=null?o.acc_per_1k_workers+' accounts per 1,000 workers':'—'}</b></div></div>
+        <div class="ic-rw"><span>Penetration</span><b>${o.workers_per_acc!=null?'1 account per '+icN(o.workers_per_acc)+' workers':'—'}</b></div></div>
     </div>
     <div class="ic-rivrow"><span class="ic-bt" style="margin:0">RIVALS</span>
       <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
@@ -6696,6 +6696,140 @@ function renderImpactStrip(mountId,mode){
 function renderImpactMounts(v){
   const m=IC_MOUNTS[v];
   if(m) renderImpactStrip(m[0],m[1]);
+}
+
+/* ---------- TMLI-convergence panels (owner ask 2026-07-25) — the four layers that closed the gap
+   with the retired TMLI effort. Each fetches its own data lazily, caches, and degrades to a calm
+   absent-note (never a broken scene). All numbers labelled measured / estimated / stated. ------- */
+let TMLI_CACHE={};
+function tmliFetch(name){
+  if(TMLI_CACHE[name]) return TMLI_CACHE[name];
+  TMLI_CACHE[name]=fetch('data/'+name+'.json').then(r=>r.ok?r.json():null).catch(()=>null);
+  return TMLI_CACHE[name];
+}
+function tmliNote(el,msg){ el.innerHTML=`<div class="ic-note">${msg}</div>`; }
+function icArrow(x){ return x==null?'→':x>0?'▲':x<0?'▼':'→'; }
+function icSign(x){ return x==null?'—':(x>0?'+':'')+x+'%'; }
+function icMoveColor(x,invert){ if(x==null) return 'var(--muted)';
+  const up=invert? x<0 : x>0; return up?'var(--merch)':(x===0?'var(--muted)':'var(--agri)'); }
+
+/* MOVE 2 — income-impact engine: macro moves → occupation income → book pressure (Assistance). */
+function renderIncome(){
+  const el=document.getElementById('assist-income'); if(!el) return;
+  tmliFetch('income_impact').then(j=>{
+    if(!j||!Array.isArray(j.regions)){ tmliNote(el,'Income-impact engine not yet computed — <b>data/income_impact.json</b> is absent (run pipeline/build_income_impact.py).'); return; }
+    const d=(j.meta||{}).drivers||{}, cy=d.crop_yoy_pct||{};
+    const rows=j.regions.map(g=>{
+      const p=g.income_pressure_pct, pc=icMoveColor(p);
+      const mix=Object.entries(g.book_mix||{}).sort((a,b)=>b[1]-a[1]).slice(0,3)
+        .map(([o,pct])=>`${o} ${pct}%`).join(' · ');
+      const best=g.best_occ||{}, worst=g.worst_occ||{};
+      return `<tr>
+        <td><b>${g.key}</b></td>
+        <td class="n"><b style="color:${pc}">${p>0?'+':''}${p}%</b></td>
+        <td>${best.occ?`<span style="color:var(--merch)">${best.occ} ${best.d_pct>0?'+':''}${best.d_pct}%</span>`:'—'}</td>
+        <td>${worst.occ&&worst.d_pct<0?`<span style="color:var(--agri)">${worst.occ} ${worst.d_pct}%</span>`:'<span class="s">none declining</span>'}</td>
+        <td class="s">${mix}</td></tr>`;
+    }).join('');
+    el.innerHTML=`
+      <h2>Income-impact engine — what the macro move does to each region's book <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · first-order</span></h2>
+      <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop tailwind.</p>
+      <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Region</th><th>Book income pressure</th><th>Best-off occupation</th><th>Worst-off occupation</th><th>Top book occupations</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="lead cc-provenance"><b>Provenance:</b> ESTIMATED first-order pass-through. Every quantity multiplied is measured (NSO SES income, crop planted area, World Bank commodity YoY); the sensitivity coefficients (how much of a price move reaches take-home income) are a documented assumption. Read direction and relative magnitude, not precise levels.</p>`;
+  });
+}
+
+/* MOVE 3 — scenario engine: LIVE / regulatory / stated-stress presets, each with its vintage (Sim). */
+const SCEN_KIND={live:['LIVE','var(--merch)'],regulatory:['REGULATORY FACT','var(--accent)'],stress:['STATED STRESS','var(--gold)']};
+function renderScenarios(){
+  const el=document.getElementById('sim-scenarios'); if(!el) return;
+  tmliFetch('scenarios').then(j=>{
+    if(!j||!Array.isArray(j.scenarios)){ tmliNote(el,'Scenario engine not yet computed — <b>data/scenarios.json</b> is absent (run pipeline/build_scenarios.py).'); return; }
+    const cards=j.scenarios.map(s=>{
+      const [lab,col]=SCEN_KIND[s.kind]||['',''];
+      let extra='';
+      const y=(s.effect||{}).yield;
+      if(y) extra=`<div class="scn-yield">Book yield <b>${y.yield_base}%</b> → <b style="color:var(--agri)">${y.yield_capped}%</b> <span class="s">(−${y.compression_pts} pts on the high-rate tail)</span></div>`;
+      return `<div class="scn-card">
+        <div class="scn-h"><span class="scn-badge" style="color:${col};border-color:${col}">${lab}</span>
+          <span class="scn-vint">${s.vintage||''}</span></div>
+        <h4>${s.title}</h4>
+        <p class="scn-head">${s.headline}</p>
+        ${extra}
+        <p class="scn-prov">${s.provenance||''}</p></div>`;
+    }).join('');
+    el.innerHTML=`
+      <h2 class="risk">Current scenarios — refreshed weekly, not hardcoded <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">DATA LAYER</span></h2>
+      <p class="lead">The real-world shocks live right now, each stamped with its vintage. <b style="color:var(--merch)">LIVE</b> = measured current driver; <b style="color:var(--accent)">REGULATORY</b> = cited fact; <b style="color:var(--gold)">STATED STRESS</b> = a labelled hypothetical, not a forecast. Rebuilt weekly by the scenario cron from the measured signal layers. The sliders below let you run your own what-if.</p>
+      <div class="scn-grid">${cards}</div>`;
+  });
+}
+
+/* MOVE 4 — commodities board: global Pink Sheet × Thai farm-gate × who's-exposed drill (Overview). */
+function renderCommoditiesBoard(){
+  const el=document.getElementById('ov-commodities'); if(!el) return;
+  tmliFetch('commodities').then(j=>{
+    if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
+    const rows=j.board.map((c,i)=>{
+      const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
+      const exp=c.exposure;
+      const expCell=exp?`<span class="cb-exp" data-i="${i}">${icN(exp.book_accounts)} acc <span class="cb-chev">▸</span></span>`:'<span class="s">—</span>';
+      const div=c.divergence;
+      const divCell=div==null?'<span class="s">—</span>':`<b style="color:${div>0?'var(--merch)':'var(--agri)'}">${div>0?'+':''}${div} pts</b>`;
+      let drill='';
+      if(exp){
+        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="6"><div class="cb-belt">
+          <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
+          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th></tr></thead><tbody>${
+            (exp.top||[]).map(t=>`<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td></tr>`).join('')
+          }</tbody></table></div></td></tr>`;
+      }
+      return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
+        <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
+        <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>`}</td>
+        <td class="n">${divCell}</td>
+        <td class="n">${expCell}</td>
+        <td class="s">${c.note||''}</td></tr>${drill}`;
+    }).join('');
+    const f=j.fuel||{};
+    el.innerHTML=`
+      <h2>Commodities board · global price × Thai farm-gate × who's exposed <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MEASURED prices</span></h2>
+      <p class="lead">World price (Pink Sheet YoY) beside the Thai farm-gate move, their <b>divergence</b> (where the local farmer's cash parts from the world index), and the <b>book accounts</b> sitting in each crop's growing belt — press a row to see the belt. ${f.diesel_thb_l?`Diesel now <b>฿${f.diesel_thb_l}/L</b> (${f.name}) — a cost line for pickup/haulage, not crop revenue.`:''}</p>
+      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th>World YoY</th><th>Thai farm-gate</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area); resolvable only for rice / rubber / palm (the crops with province area).</p>`;
+    if(!el.dataset.wired){ el.dataset.wired='1';
+      el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
+        const dr=el.querySelector(`.cb-drill[data-i="${x.dataset.i}"]`); if(!dr) return;
+        const open=dr.hidden; dr.hidden=!open; const ch=x.querySelector('.cb-chev'); if(ch) ch.textContent=open?'▾':'▸';});
+    }
+  });
+}
+
+/* MOVE 5 — product → segment → driver map: which book each shock hits (Exposure/Risk). */
+function renderProducts(){
+  const el=document.getElementById('exposure-products'); if(!el) return;
+  tmliFetch('product_segments').then(j=>{
+    if(!j||!Array.isArray(j.products)){ tmliNote(el,''); return; }   // silent when absent
+    const rows=j.products.map(p=>{
+      const seg=(p.segments||[]).join(' · ')||'<span class="s">—</span>';
+      const drv=(p.drivers||[]).map(d=>`<span class="pm-drv">${d}</span>`).join(' ');
+      const scn=(p.scenarios||[]).map(s=>`<span class="pm-scn">${s}</span>`).join(' ');
+      return `<tr><td><b>${p.product}</b>${p.th?` <span lang="th" class="s">${p.th}</span>`:''}</td>
+        <td class="n">${p.book_share_pct}%</td>
+        <td class="n">${icPct(p.npl_live_pct,4.7,5.3)}</td>
+        <td>${seg}</td>
+        <td>${drv}</td>
+        <td>${scn}</td></tr>`;
+    }).join('');
+    const di=j.driver_index||{};
+    const idx=Object.entries(di).map(([d,codes])=>`<div class="pm-idxrow"><span class="pm-drv">${d}</span> moves <b>${codes.join(', ')}</b></div>`).join('');
+    el.innerHTML=`
+      <h2 class="risk">Product → segment → driver map <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED book · curated map</span></h2>
+      <p class="lead">Which borrowers sit behind each collateral product, what income driver moves them, and which scenarios (above, in the simulator) hit them. Book share &amp; NPL are <b>measured</b> from the tape; the segment / driver / scenario wiring is a <b>curated</b> transmission map.</p>
+      <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Product</th><th>Book share</th><th>NPL-live</th><th>Borrower segments</th><th>Income drivers</th><th>Scenarios that hit it</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="pm-idx"><div class="ic-bt" style="margin:0 0 4px">WHEN A DRIVER MOVES, THESE BOOKS FEEL IT</div>${idx}</div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED book economics per product (share / NPL / outstanding — tape vehicle_types). The product→segment→driver→scenario wiring is a curated editorial map, labelled as such. IMF WEO / CPI-by-category / MOTS tourism feeds are not yet wired — each needs its own scheduled puller.</p>`;
+  });
 }
 
 function renderHomeQueue(){
