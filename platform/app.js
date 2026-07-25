@@ -6656,7 +6656,7 @@ function icCard(g){
       <b style="color:${rv.ratio>=9?'var(--agri)':rv.ratio>=7?'var(--gold)':'var(--merch)'}">${icN(rv.rivals)} vs ${icN(rv.ours)} (${rv.ratio!=null?rv.ratio.toFixed(1):'—'}×)</b>
       <span class="s">rivals lead in ${rv.pct_districts_outnumbered!=null?rv.pct_districts_outnumbered.toFixed(0):'—'}% of our districts</span></div>
     ${commods?`<div class="ic-commods"><span class="ic-bt" style="margin:0">CROP PRICES</span>${commods}</div>`:''}
-    <button type="button" class="ic-drill" data-r="${g.key}">${ (g.provinces||[]).length } provinces — drill in <span class="ic-chev">›</span></button>
+    <button type="button" class="ic-drill" data-r="${g.key}" aria-label="Drill into ${g.key} — show its provinces">${ (g.provinces||[]).length } provinces — drill in <span class="ic-chev">›</span></button>
   </div>`;
 }
 /* Breadcrumb drill controller (owner ask 2026-07-25): the drill was nested 3 levels deep (branch
@@ -6700,6 +6700,14 @@ function icRenderLevel(mount){
     `<div class="ic-grid">${regs.map(icCard).join('')}</div>`+
     `<div class="ic-foot">All card numbers <b>measured</b> (tape ${((IMPACT.meta||{}).tape||{}).mob_anchor||''} · NSO SES/LFS · DLT fleet · rival census) except the est. individual-income split and the agri-risk trend model (${w.from||''} → ${w.to||''}). ${(IMPACT.meta||{}).occ_note||''}</div>`;
 }
+/* a11y (reconciles fc7e11c #165): the old nested drill was a disclosure widget, so aria-expanded
+   announced its open/closed state. The breadcrumb rewrite made the drill a VIEW-SWAP navigation
+   (the region grid is replaced by the province/branch level), for which aria-expanded is the wrong
+   semantic. Instead, after a user-driven navigation we move focus to the new level's back-crumb so a
+   screen reader announces the context change. preventScroll so it never fights the scrollIntoView.
+   Not called on the initial render (renderImpactStrip → icRenderLevel) — only on click navigation —
+   so page load never steals focus. */
+function icFocusLevel(mount){ const b=mount&&mount.querySelector('.ic-back'); if(b){ try{ b.focus({preventScroll:true}); }catch(_){ b.focus(); } } }
 function renderImpactStrip(mountId,mode){
   const mount=document.getElementById(mountId);
   if(!mount) return;
@@ -6714,13 +6722,13 @@ function renderImpactStrip(mountId,mode){
         const back=e.target.closest('.ic-back');
         if(back){ const st=mount._icState;
           mount._icState=(back.dataset.lvl==='province')?{level:'province',region:st.region}:{level:'regions'};
-          icRenderLevel(mount); return; }
+          icRenderLevel(mount); icFocusLevel(mount); return; }
         const drill=e.target.closest('.ic-drill');
         if(drill){ mount._icState={level:'province',region:drill.dataset.r};
-          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); return; }
+          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount); return; }
         const prow=e.target.closest('.ic-prow');
         if(prow){ mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
-          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); return; }
+          icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount); return; }
       });
     }
   });
