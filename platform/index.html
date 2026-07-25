@@ -250,6 +250,7 @@
     </div>
     <div class="assist-hero" id="assist-hero" aria-live="polite"></div>
     <div id="assist-impact"></div><!-- impact-card drill, assistance ranking (rolling-worse first) -->
+    <div id="assist-income"></div><!-- income-impact engine: macro moves → occupation income → book pressure -->
     <div id="assist-absent" class="note" style="display:none">The real loan-tape layer isn't loaded — <b>data/tape_real.json</b> is absent. The assistance view populates once the monthly tape drop is ingested.</div>
 
     <h2>Segments hit most — the ranked hit-list</h2>
@@ -308,6 +309,10 @@
         </div>
       </div>
     </div>
+
+    <!-- Commodities board upgrade (data/commodities.json) — global Pink Sheet YoY × Thai farm-gate
+         YoY × book exposure (who's-exposed drill). Null-safe: absent file → nothing renders. -->
+    <div id="ov-commodities"></div>
 
     <h2 class="collat">Collateral outlook · vehicle-title value watch</h2>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
@@ -734,6 +739,11 @@
       </div>
     </div>
 
+    <!-- Product → segment → driver map (data/product_segments.json) — measured book economics per
+         collateral product with the curated transmission map to segments / income drivers /
+         scenarios. Null-safe: absent file → nothing renders. -->
+    <div id="exposure-products"></div>
+
     <!-- 2-col dashboard: KPI / region strip BESIDE the lead provinces table (fills the widescreen). -->
     <div class="dash2">
       <div class="dash2-side">
@@ -768,6 +778,11 @@
       it uses <b>no measured price elasticities, no loan balances, no LTV</b>. "Exposure" is counted as
       <b>branch footprint</b> (we have no per-branch ฿ balance). Treat every number as a direction, not a number.
     </div>
+
+    <!-- Scenario engine (data/scenarios.json) — LIVE / regulatory / stated-stress presets rebuilt
+         weekly from the measured signals, each carrying its vintage. Sits above the interactive
+         sliders as "the current real-world scenarios". Null-safe: absent file → nothing renders. -->
+    <div id="sim-scenarios"></div>
 
     <div class="sim-grid">
       <div class="sim-controls">
