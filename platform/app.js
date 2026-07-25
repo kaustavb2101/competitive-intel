@@ -207,6 +207,30 @@ async function loadDbdForm(){
   return dbdformPromise;
 }
 
+// Live flood + rain pulse — MEASURED live ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed
+// daily by .github/workflows/data-thaiwater.yml). Two per-province station aggregates: water LEVEL
+// (data/thaiwater_flood.json — situation_level 1→5, ≥4 = high water / bank overflow) and 24h RAINFALL
+// (data/thaiwater_rain.json — heavy ≥35.1mm, very heavy ≥90.1mm per Thai Met convention). Obj #1: water
+// on the ground / arriving is an acute collections + collateral event, days before it reaches any
+// monthly series — the fast counterpart to the slower crop-stress drought read. Fully null-guarded: if
+// EITHER layer is absent the block stays hidden (see renderThaiwater), nothing fabricated.
+let TWFLOOD=null, TWFLOOD_META=null, TWRAIN=null, TWRAIN_META=null, thaiwaterPromise=null;
+async function loadThaiwater(){
+  if(thaiwaterPromise) return thaiwaterPromise;
+  thaiwaterPromise=(async()=>{
+    try{
+      const f = await fetch('data/thaiwater_flood.json').then(r=>r.json());
+      TWFLOOD=(f&&f.provinces&&typeof f.provinces==='object')?f.provinces:null; TWFLOOD_META=f&&f.meta?f.meta:null;
+    }catch(e){ TWFLOOD=null; TWFLOOD_META=null; }
+    try{
+      const r = await fetch('data/thaiwater_rain.json').then(x=>x.json());
+      TWRAIN=(r&&r.provinces&&typeof r.provinces==='object')?r.provinces:null; TWRAIN_META=r&&r.meta?r.meta:null;
+    }catch(e){ TWRAIN=null; TWRAIN_META=null; }
+    return TWFLOOD;
+  })();
+  return thaiwaterPromise;
+}
+
 // Compact rai formatter for the second-rice exposure column ("0.91M rai" / "328k rai").
 function fmtRai(n){
   if(n==null||!isFinite(n)) return '—';
@@ -1551,6 +1575,10 @@ function renderOverview(){
   // MEASURED business-formation pulse (dbd_formation.json, DBD registry) — the small-business borrower
   // base backdrop for the merchant book (both objectives). Null-safe: absent file → the block stays hidden.
   loadDbdForm().then(renderDbdForm);
+  // MEASURED live flood + rain pulse (thaiwater_flood/rain.json, ThaiWater telemetry, obj #1) — the acute
+  // water-on-the-ground / arriving read behind collections + collateral. Null-safe: either layer absent
+  // → the block stays hidden.
+  loadThaiwater().then(renderThaiwater);
 }
 // commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
 const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
@@ -2324,6 +2352,63 @@ function renderDbdForm(){
         `<td class="mono">${num(r.n)}</td>`+
         `<td class="mono" style="color:${c}">${sh.toFixed(1)}%</td>`+
         `<td class="mono sub">${baht(r.cap)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+// MEASURED live flood + rain pulse (ThaiWater telemetry). Two per-province station aggregates rendered
+// side by side: river/reservoir water LEVEL (flood) and 24h RAINFALL. Requires BOTH layers; if either is
+// absent the whole block stays hidden (nothing partial, nothing faked).
+function renderThaiwater(){
+  const wrap=$('#thaiwater-wrap'); if(!wrap) return;
+  if(!TWFLOOD || !TWRAIN){ wrap.style.display='none'; return; }
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  const pct=v=>(v==null||!isFinite(v))?'—':(v>=10?Math.round(v):v.toFixed(0))+'%';
+  // flood rows: worst first (highest situation_level, then share of stations high).
+  const fRows=Object.entries(TWFLOOD).map(([th,v])=>({th,...v}))
+    .sort((a,b)=>(b.max_level-a.max_level)||(b.pct_high-a.pct_high)||(b.n_high-a.n_high));
+  const fHigh=fRows.filter(r=>r.max_level>=4);          // provinces with any high-water/overflow station
+  const fShow=(fHigh.length?fHigh:fRows).slice(0,10);
+  // rain rows: wettest first by max 24h mm; keep those over the Thai-Met "heavy" threshold.
+  const rRows=Object.entries(TWRAIN).map(([th,v])=>({th,...v}))
+    .sort((a,b)=>(b.max_mm||0)-(a.max_mm||0));
+  const rHeavy=rRows.filter(r=>(r.max_mm||0)>=35.1);
+  const rShow=(rHeavy.length?rHeavy:rRows).slice(0,10);
+  const fm=TWFLOOD_META||{}, rm=TWRAIN_META||{};
+  const worstF=fRows[0], worstR=rRows[0];
+  const obs=fm.observed_to||rm.observed_to||fm.pulled||'—';
+  const vb=$('#thaiwater-verdict');
+  if(vb){
+    vb.className='verdict v-warn'; vb.style.display='block';
+    const fLine=worstF&&worstF.max_level>=4
+      ? `<b>${fHigh.length}</b> province${fHigh.length===1?'':'s'} have river/reservoir stations at high water (level ≥4) — worst is <b>${worstF.th}</b> (${num(worstF.n_high)}/${num(worstF.n_stations)} stations${worstF.max_level>=5?', at bank overflow':''} high).`
+      : `No province currently shows a station at high water (level ≥4) — the highest is <b>${worstF?worstF.th:'—'}</b> at level ${worstF?worstF.max_level:'—'}.`;
+    const rLine=worstR?`Heaviest 24h rain: <b>${worstR.th}</b> at <b>${num(worstR.max_mm)}mm</b> (${pct(worstR.pct_very_heavy)} of its stations very heavy).`:'';
+    vb.innerHTML=`<div class="verdict-line">🌊 ${fLine} ${rLine}</div>`+
+      `<div class="sub" style="margin-top:4px">Water on the ground / arriving is an <b>acute</b> collections + collateral event, days before it reaches any monthly series — the fast counterpart to the crop-stress drought read above. Live snapshot, observed to <b>${obs}</b>. ${TAG_M}.</div>`;
+  }
+  const note=$('#thaiwater-note');
+  if(note) note.innerHTML='<b>Measured</b> — live per-province station aggregates from <b>ThaiWater</b> ('+
+    'RID/DWR/TMD/EGAT telemetry, keyless). <b>Left:</b> river/reservoir <b>water level</b> — situation_level '+
+    '1 (critical low) → 3 (normal) → 4 (high water) → 5 (bank overflow); n_high counts stations at level ≥4. '+
+    '<b>Right:</b> <b>24h rainfall</b> — heavy ≥35.1mm, very heavy ≥90.1mm (Thai Met convention). '+
+    'This is a <b>live snapshot</b> of the sampled station network, <b>not</b> a disaster declaration and <b>not</b> a '+
+    'catchment-weighted flood model — an acute early read on where borrower income and collections are exposed now.';
+  const ft=$('#thaiwater-flood-tbl');
+  if(ft) ft.innerHTML=`<tr><th colspan="4" style="color:var(--accent)">Water on the ground · river/reservoir level ●</th></tr>`+
+    `<tr><th>#</th><th>Province</th><th title="MEASURED — stations at situation_level ≥4 (high water / overflow) of the province's sampled stations">Stations high ●</th><th title="worst situation_level in the province (5 = bank overflow flood)">Worst level ●</th></tr>`+
+    (fShow.length?fShow.map((r,i)=>{ const c=r.max_level>=5?'var(--agri)':r.max_level>=4?'var(--gold)':'var(--dim)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
+        `<td class="mono">${num(r.n_high)}<span class="sub">/${num(r.n_stations)}</span> <span style="color:${c}">${pct(r.pct_high)}</span></td>`+
+        `<td class="mono" style="color:${c}">L${r.max_level}${r.max_level>=5?' ⚠':''}</td></tr>`;}).join('')
+      :`<tr><td colspan="4" class="sub">No station at high water in the current snapshot.</td></tr>`);
+  const rt=$('#thaiwater-rain-tbl');
+  if(rt) rt.innerHTML=`<tr><th colspan="4" style="color:var(--accent)">Rain arriving · 24h rainfall ●</th></tr>`+
+    `<tr><th>#</th><th>Province</th><th title="MEASURED — highest 24h rainfall at any station in the province">Max 24h ●</th><th title="share of the province's stations over the heavy threshold (≥35.1mm/24h)">Stations heavy ●</th></tr>`+
+    (rShow.length?rShow.map((r,i)=>{ const mm=r.max_mm||0; const c=mm>=90.1?'var(--agri)':mm>=35.1?'var(--gold)':'var(--dim)';
+      return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
+        `<td class="mono" style="color:${c}">${num(mm)}mm</td>`+
+        `<td class="mono">${pct(r.pct_heavy)}</td></tr>`;}).join('')
+      :`<tr><td colspan="4" class="sub">No heavy-rain station in the current snapshot.</td></tr>`);
   wrap.style.display='';
 }
 
