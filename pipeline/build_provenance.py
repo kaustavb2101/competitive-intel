@@ -39,7 +39,7 @@ HONESTY RULES (sacred):
 
 Deterministic + network-free. Pure function of the committed platform/data tree.
 """
-import os, re, json, glob, argparse
+import os, re, json, glob, fnmatch, argparse
 from collections import Counter
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -48,10 +48,14 @@ DATA = os.path.join(REPO, "platform", "data")
 OUT_PATH = os.path.join(DATA, "provenance.json")
 INDEX_REL = "provinces/index.json"
 SELF = "provenance.json"
-# Sidecar provenance manifest. Top-level JSON arrays (branches.json, provinces/index.json)
-# structurally cannot carry an inline `meta` block; this companion supplies their stamp so they
-# leave the shame board without a breaking {meta,data} restructure. Consumed here only — never
-# fabricates a stamp for a file that has no honest, hand-authored entry.
+# Sidecar provenance manifest. Some layers cannot practically carry an inline `meta` block:
+# top-level JSON arrays (branches.json, provinces/index.json) structurally cannot, and the large
+# network-pulled geometry families (every <slug>_catchment.json, an object-shaped {buildings,center}
+# blob re-pulled from the desktop) would need the puller + app changed to inject one. This companion
+# supplies their stamp so they leave the shame board without a breaking restructure. A stamp key is
+# either an exact relpath OR a glob pattern (e.g. "*_catchment.json") that stamps a whole family at
+# once — see _sidecar_stamp_for. Consumed here only — never fabricates a stamp for a file that has
+# no honest, hand-authored entry.
 SIDECAR = "provenance_sidecar.json"
 
 # meta keys that count as a provenance stamp (exactly the four named in the mandate).
@@ -216,13 +220,30 @@ def _resolve_sidecar_stamp(stamp):
     return stamp
 
 
+def _sidecar_stamp_for(rel, sidecar):
+    """The sidecar stamp that applies to `rel`, or None. An exact relpath key wins; otherwise the
+    first glob-pattern key (one containing '*', matched with fnmatch, sorted for determinism) that
+    matches. This lets a whole geometry family share ONE stamp (e.g. "*_catchment.json" covers all
+    77 <slug>_catchment.json files) instead of 77 per-file entries. Only a stamp that carries a real
+    PROV_KEY is honoured — an empty entry never upgrades a file."""
+    def _ok(s):
+        return isinstance(s, dict) and any(_nonempty(s.get(k)) for k in PROV_KEYS)
+    if rel in sidecar and _ok(sidecar[rel]):
+        return sidecar[rel]
+    for pat in sorted(k for k in sidecar if "*" in k):
+        if fnmatch.fnmatch(rel, pat) and _ok(sidecar[pat]):
+            return sidecar[pat]
+    return None
+
+
 def _scan_file(rel, sidecar=None):
     """Read one file -> (verdict, meta_or_None, bytes, count, count_of).
 
-    Array-shaped layers (top-level JSON arrays) cannot carry an inline meta block; when one has no
-    inline stamp we fall back to a hand-authored sidecar entry keyed by its relpath, so it leaves the
-    shame board without a breaking {meta,data} restructure. Only an honest, committed sidecar entry
-    upgrades a file — nothing is fabricated."""
+    A layer that cannot practically carry an inline meta block (a top-level JSON array, or a large
+    network-pulled geometry blob like <slug>_catchment.json) falls back to a hand-authored sidecar
+    stamp — matched by exact relpath or by a family glob (see _sidecar_stamp_for) — so it leaves the
+    shame board without a breaking restructure. Only an honest, committed sidecar entry upgrades a
+    file — nothing is fabricated."""
     path = os.path.join(DATA, rel.replace("/", os.sep))
     size = os.path.getsize(path)
     try:
@@ -231,9 +252,10 @@ def _scan_file(rel, sidecar=None):
         return "unlabelled", None, size, 0, ""
     m = _stamp_meta(d)
     count, count_of = _top_count(d)
-    if m is None and sidecar and rel in sidecar and any(
-            _nonempty(sidecar[rel].get(k)) for k in PROV_KEYS):
-        m = _resolve_sidecar_stamp(sidecar[rel])
+    if m is None and sidecar:
+        stamp = _sidecar_stamp_for(rel, sidecar)
+        if stamp is not None:
+            m = _resolve_sidecar_stamp(stamp)
     if m is None:
         return "unlabelled", None, size, count, count_of
     return _verdict_from_meta(m), m, size, count, count_of
