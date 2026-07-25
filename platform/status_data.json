@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T04:20:38Z",
-    "commit": "fc4c2a3"
+    "generated_at": "2026-07-25T08:31:52+00:00",
+    "commit": "093b41e"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,7 +480,43 @@
   ],
   "activity": [
     {
-      "date": "2026-07-25T04:20:38Z",
+      "date": "2026-07-25T08:31:52+00:00",
+      "sha": "093b41e",
+      "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T15:29:02+07:00",
+      "sha": "f81aa3b",
+      "summary": "ux: add share metadata (description + Open Graph / Twitter card) to the other 5 routes (#162)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T06:48:59+00:00",
+      "sha": "93ae2e5",
+      "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-25T13:26:11+07:00",
+      "sha": "f535dcd",
+      "summary": "feat: TMLI-convergence moves 2-5 (income engine · scenarios · commodities · product map) + penetration fix (#160)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-25T06:19:03+00:00",
+      "sha": "851a577",
+      "summary": "committee: autonomous competitor scout (run 30146845465)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-25T05:53:47+00:00",
+      "sha": "be810de",
+      "summary": "committee: refresh autonomy plan (run 30146365438)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-25T04:20:38+00:00",
       "sha": "fc4c2a3",
       "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
       "pillar": "service"
@@ -492,7 +528,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T02:46:59Z",
+      "date": "2026-07-25T02:46:59+00:00",
       "sha": "a5d0594",
       "summary": "docs: log the ux-share-metadata merge + deploy-verify result (#157)",
       "pillar": "uxui"
@@ -516,7 +552,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-25T00:24:35Z",
+      "date": "2026-07-25T00:24:35+00:00",
       "sha": "60b30d1",
       "summary": "fix(ci): rebuild the farm-gate chain when NABC prices refresh (unbreak the gate)",
       "pillar": "uxui"
@@ -540,7 +576,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T22:36:53Z",
+      "date": "2026-07-24T22:36:53+00:00",
       "sha": "97cde6c",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-scoreboard vintage fix (#152)",
       "pillar": "peer"
@@ -552,13 +588,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-24T22:15:27Z",
+      "date": "2026-07-24T22:15:27+00:00",
       "sha": "815b816",
       "summary": "committee: refresh autonomy plan (run 30130101555)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-24T20:21:26Z",
+      "date": "2026-07-24T20:21:26+00:00",
       "sha": "b3130e0",
       "summary": "docs: log the ux-cc-hero-card-narrow-overflow merge+deploy+verify (#150)",
       "pillar": "uxui"
@@ -588,7 +624,7 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-24T16:46:35Z",
+      "date": "2026-07-24T16:46:35+00:00",
       "sha": "8a4a624",
       "summary": "docs: log the drought-vintage service fix (#145) + refresh autonomy plan / CEO dashboard",
       "pillar": "feature"
@@ -606,7 +642,7 @@
       "pillar": "service"
     },
     {
-      "date": "2026-07-24T14:49:19Z",
+      "date": "2026-07-24T14:49:19+00:00",
       "sha": "3d3e8b8",
       "summary": "docs: log ux-cc-tape-table-overflow merge+deploy+verify (2026-07-24)",
       "pillar": "uxui"
@@ -618,46 +654,10 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-24T12:29:08Z",
+      "date": "2026-07-24T12:29:08+00:00",
       "sha": "38cf88a",
       "summary": "ci(data): add scheduled ThaiWater flood + rain refresh workflow",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-24T11:12:37Z",
-      "sha": "ca42d29",
-      "summary": "committee: refresh autonomy plan (run 30088421749)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-24T10:27:38Z",
-      "sha": "0c90e4e",
-      "summary": "committee: refresh autonomy plan + CEO dashboard after DBD-formation ship (#143)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-24T17:25:17+07:00",
-      "sha": "4cc8a4d",
-      "summary": "feat(market): surface MEASURED business-formation pulse (DBD registry) on Overview (#143)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-24T08:15:57Z",
-      "sha": "2322170",
-      "summary": "docs: log ux-tabtitles-pillar-drift merge+deploy+verify (2026-07-24)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T15:11:34+07:00",
-      "sha": "dfc127d",
-      "summary": "ux: per-route tab titles match the five-pillar nav; add missing #assist title (#142)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-24T09:53:07+07:00",
-      "sha": "7eaa64c",
-      "summary": "feat(acquisition): collateral-concentration tables on the Market view (#139)",
-      "pillar": "uxui"
     }
   ]
 }
