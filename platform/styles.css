@@ -697,6 +697,10 @@ html[data-theme="light"] .dr-tbl thead th{background:#eef1f6}
 .dr-tbl tr.dr-unlabelled td{background:rgba(224,87,79,.055)}
 html[data-theme="light"] .dr-tbl tr.dr-unlabelled td{background:rgba(200,67,59,.05)}
 .cc-sub2{font-size:10.5px;color:var(--dim);margin:8px 0 0}
+.dr-fresh{margin-top:3px;line-height:1.55}
+.dr-fresh b{color:var(--mid)}
+.dr-age{display:inline-block;font-size:9px;font-weight:600;color:var(--dr-m);opacity:.9;letter-spacing:.02em}
+.dr-age.dr-age-stale{color:var(--dr-u)}
 .cc-star{background:none;border:none;cursor:pointer;color:var(--dim);font-size:14px;line-height:1;padding:0 2px;vertical-align:middle}
 .cc-star.on{color:var(--gold)}
 .cc-star:hover{color:var(--gold)}
