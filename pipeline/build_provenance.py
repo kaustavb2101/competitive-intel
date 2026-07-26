@@ -41,6 +41,31 @@ Deterministic + network-free. Pure function of the committed platform/data tree.
 """
 import os, re, json, glob, fnmatch, argparse
 from collections import Counter
+from datetime import date
+
+# Strict ISO-vintage parser for the freshness readout. Matches ONLY YYYY-MM-DD or YYYY-MM at the
+# start of a vintage string (20xx, so a Buddhist-Era year like "2568 (BE)" or a coarse "2026 Q1" /
+# "2026M06" label is deliberately NOT parsed — it stays UNDATED rather than mis-aged). A YYYY-MM
+# vintage resolves to the 1st of the month (a conservative, oldest-in-period read that never
+# understates age). Nothing is invented: only clean, machine-readable dates get an age.
+ISO_VINTAGE_RE = re.compile(r"^(20\d\d)-(\d\d)(?:-(\d\d))?(?=$|[^\d])")
+STALE_DAYS = 180   # a dated layer this many days behind the freshest layer is flagged stale.
+
+
+def _parse_vintage(v):
+    """Parse a strict ISO vintage string -> datetime.date, or None if not cleanly ISO."""
+    if not isinstance(v, str):
+        return None
+    m = ISO_VINTAGE_RE.match(v.strip())
+    if not m:
+        return None
+    y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3) or 1)
+    if not (1 <= mo <= 12) or not (1 <= d <= 31):
+        return None
+    try:
+        return date(y, mo, d)
+    except ValueError:
+        return None
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)
@@ -350,6 +375,41 @@ def build():
     layers.sort(key=lambda L: (CLS_RANK[L["cls"]], L["file"]))
     unlabelled_files = sorted(unlabelled_files)
 
+    # ---- FRESHNESS readout (deterministic, no wall-clock) ------------------------------------
+    # Each layer's age is measured against the FRESHEST dated layer in the tree — a purely internal
+    # reference (the newest committed vintage), so the number never depends on when the build runs.
+    # It answers the exec question "how far behind our newest data is this layer?" Only layers that
+    # carry a clean ISO vintage (YYYY-MM / YYYY-MM-DD) get an age; the rest stay age_days=null (the
+    # honest UNDATED state — a coarse or Buddhist-Era label is never coerced into a false age).
+    dated = []
+    for L in layers:
+        dt = _parse_vintage(L.get("vintage", ""))
+        L["age_days"] = None
+        if dt is not None:
+            dated.append((dt, L))
+    freshness = None
+    if dated:
+        ref = max(dt for dt, _ in dated)
+        for dt, L in dated:
+            L["age_days"] = (ref - dt).days
+        entries = sorted(
+            ({"file": L["file"], "vintage": L["vintage"], "age_days": (ref - dt).days}
+             for dt, L in dated),
+            key=lambda e: (e["age_days"], e["file"]))
+        stale = [e for e in entries if e["age_days"] > STALE_DAYS]
+        freshness = {
+            "reference_date": ref.isoformat(),
+            "reference_note": ("age = days behind the freshest dated layer in the committed tree "
+                               "(deterministic; no wall-clock read). null age = no machine-readable "
+                               "ISO vintage — the honest undated state, never a coerced date."),
+            "stale_over_days": STALE_DAYS,
+            "n_dated": len(entries),
+            "n_undated": len(layers) - len(entries),
+            "freshest": entries[0],
+            "oldest": entries[-1],
+            "stale": sorted(stale, key=lambda e: (-e["age_days"], e["file"])),
+        }
+
     n_files = sum(L["n_files"] for L in layers)
     n_files_unlab = len(unlabelled_files)
     counts = {
@@ -379,6 +439,7 @@ def build():
         "counts": counts,
         "files": {"total": n_files, "unlabelled": n_files_unlab,
                   "labelled": n_files - n_files_unlab},
+        "freshness": freshness,
         "unlabelled_files": unlabelled_files,
         "layers": layers,
     }
