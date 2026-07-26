@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T11:30:29+07:00",
-    "commit": "3a9ba5b"
+    "generated_at": "2026-07-26T04:33:50Z",
+    "commit": "ed896b9"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,13 +480,19 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T04:33:50Z",
+      "sha": "ed896b9",
+      "summary": "committee: refresh autonomy plan + log peer-footprint deploy-verify (#173)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-26T11:30:29+07:00",
       "sha": "3a9ba5b",
       "summary": "feat(peer): MEASURED store-locator footprint ranking beside the IR-count national standing (obj #2) (#173)",
       "pillar": "peer"
     },
     {
-      "date": "2026-07-26T02:37:54+00:00",
+      "date": "2026-07-26T02:37:54Z",
       "sha": "620b818",
       "summary": "docs: log the Risk-pillar route fix — merged (#172) + deploy-verified",
       "pillar": "service"
@@ -498,25 +504,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T23:45:03+00:00",
+      "date": "2026-07-25T23:45:03Z",
       "sha": "17b0c19",
       "summary": "data: live fuel prices (2026-07-25, run 30179862740)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T22:21:05+00:00",
+      "date": "2026-07-25T22:21:05Z",
       "sha": "1bb7aad",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the site-health-probe realign",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T22:19:08+00:00",
+      "date": "2026-07-25T22:19:08Z",
       "sha": "64d069f",
       "summary": "fix(service): realign the nightly site-health probe to the live front-door",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T22:05:55+00:00",
+      "date": "2026-07-25T22:05:55Z",
       "sha": "49d6e12",
       "summary": "committee: refresh autonomy plan (run 30176705122)",
       "pillar": "deployment"
@@ -528,7 +534,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T18:18:52+00:00",
+      "date": "2026-07-25T18:18:52Z",
       "sha": "5b3fe5a",
       "summary": "ci(data): add data-sfi-credit.yml — monthly FPO SFI credit-quality refresh",
       "pillar": "data-integration"
@@ -540,7 +546,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T16:47:38+00:00",
+      "date": "2026-07-25T16:47:38Z",
       "sha": "0180a63",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-NPL AutoX-anchor ship (#167)",
       "pillar": "peer"
@@ -552,7 +558,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T16:12:47+00:00",
+      "date": "2026-07-25T16:12:47Z",
       "sha": "9a83678",
       "summary": "committee: refresh autonomy plan (run 30165011012)",
       "pillar": "deployment"
@@ -588,19 +594,19 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T10:43:23+00:00",
+      "date": "2026-07-25T10:43:23Z",
       "sha": "fd2c25b",
       "summary": "committee: refresh autonomy plan (run 30154810038)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T10:22:55+00:00",
+      "date": "2026-07-25T10:22:55Z",
       "sha": "3c3a794",
       "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T08:31:52+00:00",
+      "date": "2026-07-25T08:31:52Z",
       "sha": "093b41e",
       "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
       "pillar": "uxui"
@@ -612,7 +618,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T06:48:59+00:00",
+      "date": "2026-07-25T06:48:59Z",
       "sha": "93ae2e5",
       "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
       "pillar": "3d-enrichment"
@@ -624,19 +630,19 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T06:19:03+00:00",
+      "date": "2026-07-25T06:19:03Z",
       "sha": "851a577",
       "summary": "committee: autonomous competitor scout (run 30146845465)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T05:53:47+00:00",
+      "date": "2026-07-25T05:53:47Z",
       "sha": "be810de",
       "summary": "committee: refresh autonomy plan (run 30146365438)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T04:20:38+00:00",
+      "date": "2026-07-25T04:20:38Z",
       "sha": "fc4c2a3",
       "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
       "pillar": "service"
@@ -648,15 +654,9 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T02:46:59+00:00",
+      "date": "2026-07-25T02:46:59Z",
       "sha": "a5d0594",
       "summary": "docs: log the ux-share-metadata merge + deploy-verify result (#157)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T09:43:48+07:00",
-      "sha": "79ce150",
-      "summary": "ux: add front-door share metadata (description + Open Graph / Twitter card) (#157)",
       "pillar": "uxui"
     }
   ]
