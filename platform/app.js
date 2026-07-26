@@ -2601,13 +2601,22 @@ function drawCompCoverage(){
       nstxt=`<div style="margin-top:6px"><b>Nationally, AutoX runs the ${ordLabel(ns.autox_rank)} title-loan branch network</b> `+
         `of the ${ns.n_ranked} big operators with a cited count: ${chain}. ${TAG_M} ${TAG_E} `+
         `<span class="sub">By network size — a different question from the per-province density board above, where rivals cluster and AutoX reads as a local 3rd.</span></div>`;
+      // MEASURED-footprint reframe: rivals' full store-locator networks can outrank AutoX on
+      // points-on-the-ground even when it leads on cited listed-entity counts. All-measured, null-safe.
+      const fp=ns.footprint_measured;
+      if(fp&&fp.autox_rank&&Array.isArray(fp.ranking)){
+        const fchain=fp.ranking.map(o=>`${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ${(o.points||0).toLocaleString()}`).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>By MEASURED store-locator footprint AutoX is only ${ordLabel(fp.autox_rank)}</b> `+
+          `of ${fp.n_ranked} — points on the ground: ${fchain}. ${TAG_M} `+
+          `<span class="sub">Every number here is measured (own network + rivals' official locators); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count. Heng excluded (locator Cloudflare-blocked → lower bound).</span></div>`;
+      }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
         ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
          'Heng is the one exception — still a Google/Overture <b>SAMPLE</b> (its locator is Cloudflare-blocked), so Heng alone is a lower bound.',
          'Coverage % is a data-completeness flag, <b>not</b> market share.',
-         '<b>National standing</b> ranks operators by branch-network SIZE (AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts). Heng is excluded — no cited count. Network size ≠ market share, and differs from the local per-province density read.']);
+         '<b>National standing</b> is read two ways. (1) By branch-network SIZE — AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts (Heng excluded, no cited count). (2) By MEASURED store-locator FOOTPRINT — all points on the ground, AutoX own network vs rivals’ official locators (Heng excluded, its locator is Cloudflare-blocked → lower bound). A locator counts a group’s whole retail network beyond its listed-entity IR figure, so the two rankings can differ — both true. Neither is market share, and both differ from the local per-province density read.']);
   }
 }
 

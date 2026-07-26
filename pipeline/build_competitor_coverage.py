@@ -48,6 +48,13 @@ CENSUS_FILES = ["competitors_census.json"]
 # Canonical brand order (matches validate_data.KNOWN_COMPETITOR_BRANDS).
 BRANDS = ["Muangthai", "Tidlor", "Srisawad", "Heng"]
 
+# Brands whose `found` count is a near-COMPLETE official store-locator pull (comparable to AutoX's
+# own operating-network count) — so their MEASURED points-on-the-ground can be ranked apples-to-apples.
+# Heng is deliberately excluded: its locator is Cloudflare-blocked, so its `found` is a Google/Overture
+# SAMPLE (lower bound), and ranking AutoX above an undercount would be unsafe (mirrors the never-invent
+# rule that keeps uncited Heng out of the IR-count ranking).
+LOCATOR_COMPLETE_BRANDS = ["Muangthai", "Srisawad", "Tidlor"]
+
 # EXPECTED nationwide branch counts — CITED real public figures (ESTIMATED-from-public-reports).
 # Source per brand recorded in meta.expected_sources. Leave null when no figure can be cited.
 EXPECTED = {
@@ -113,7 +120,48 @@ def _autox_branch_count():
     return len(d) if isinstance(d, list) else None
 
 
-def _national_standing(autox_n):
+def _footprint_measured(autox_n, counts):
+    """SECOND, all-MEASURED ranking that complements the IR-count ranking: operators by physical
+    POINTS ON THE GROUND — AutoX's own operating network (branches.json) vs each near-complete-locator
+    rival's de-duplicated store-locator count (the SAME `found` figures on the brand board). Unlike the
+    IR ranking (peers = REPORTED listed-entity counts), every number here is MEASURED, so it answers a
+    different question: not "who reports the biggest listed-entity network" but "who has the most doors
+    open on the ground". Heng is excluded (its locator is Cloudflare-blocked -> `found` is a lower-bound
+    SAMPLE). Returns None when the AutoX count is unavailable."""
+    if not autox_n:
+        return None
+    pool = [{"operator": "AutoX", "points": autox_n,
+             "basis": "MEASURED (own operating network, branches.json)"}]
+    for b in LOCATOR_COMPLETE_BRANDS:
+        pts = counts.get(b)
+        if pts:
+            pool.append({"operator": b, "points": pts,
+                         "basis": "MEASURED (official store-locator, de-duplicated)"})
+    order = ["AutoX"] + BRANDS
+    ranked = sorted(pool, key=lambda o: (-o["points"], order.index(o["operator"])))
+    for i, o in enumerate(ranked, 1):
+        o["rank"] = i
+    autox_rank = next(o["rank"] for o in ranked if o["operator"] == "AutoX")
+    # brands in our set NOT ranked here (no near-complete locator) -> disclosed as lower bounds.
+    excluded = [b for b in BRANDS if b not in LOCATOR_COMPLETE_BRANDS]
+    return {
+        "autox_rank": autox_rank,
+        "n_ranked": len(ranked),
+        "ranking": ranked,
+        "excluded_lowerbound": excluded,
+        "basis": "MEASURED FOOTPRINT — physical points on the ground: AutoX's own operating network vs "
+                 "each near-complete-locator rival's de-duplicated store-locator count (the same MEASURED "
+                 "`found` figures on the brand board). Every number is MEASURED; complements the IR-count "
+                 "ranking, which uses peers' REPORTED listed-entity counts.",
+        "caveat": "Heng is excluded — its locator is Cloudflare-blocked, so its count is a lower-bound "
+                  "SAMPLE, not a near-complete network. A store-locator lists every service point, so for "
+                  "a GROUP brand this footprint exceeds the listed-entity IR count (Srisawad's 5,203 "
+                  "locator points ≈ 4.6× its 1,138 listed-entity figure). Points on the ground ≠ market "
+                  "share.",
+    }
+
+
+def _national_standing(autox_n, counts):
     """Where AutoX sits nationally among the big-4 by BRANCH-NETWORK SIZE — the read the
     found-vs-expected board hides (it never places AutoX in its own peer set). AutoX's size is
     MEASURED (its own committed network); each peer's size is its cited public 'expected' figure
@@ -142,6 +190,20 @@ def _national_standing(autox_n):
     behind = [o["operator"] for o in ranked if o["rank"] > autox_rank]
     # peers named in our brand set that carry NO cited figure -> excluded from the pool, disclosed.
     excluded = [b for b in BRANDS if not EXPECTED.get(b)]
+    footprint = _footprint_measured(autox_n, counts)
+    # The one-line reframe the exec should read: IR-count basis vs measured-footprint basis can rank
+    # AutoX differently, and both are true. Built from the two rankings, never hard-coded.
+    insight = None
+    if footprint and footprint["autox_rank"] != autox_rank:
+        ordw = {1: "largest", 2: "2nd-largest", 3: "3rd-largest", 4: "4th-largest", 5: "5th-largest"}
+        insight = (
+            "By REPORTED listed-entity branch count AutoX is the %s title-loan network; by MEASURED "
+            "store-locator footprint it is %s — a rival's near-complete retail network (which a locator "
+            "counts in full, beyond its listed-entity IR figure) overtakes AutoX on points-on-the-ground. "
+            "Both are true and answer different questions."
+            % (ordw.get(autox_rank, "#%d" % autox_rank),
+               ordw.get(footprint["autox_rank"], "#%d" % footprint["autox_rank"]))
+        )
     return {
         "autox_branches": autox_n,
         "autox_rank": autox_rank,
@@ -150,6 +212,8 @@ def _national_standing(autox_n):
         "ahead_of_autox": ahead,
         "behind_autox": behind,
         "excluded_uncited": excluded,
+        "footprint_measured": footprint,
+        "reported_vs_measured_insight": insight,
         "basis": "NETWORK SIZE — AutoX's MEASURED own-network branch count vs each peer's REPORTED "
                  "(cited public IR) branch count. A national footprint-scale read, NOT market share.",
         "caveat": "This ranks operators by total branch-NETWORK size nationally, where AutoX is the "
@@ -174,7 +238,7 @@ def build():
     total_found = sum(counts.values())
     total_expected = sum(v for v in EXPECTED.values() if v)
     overall_cov = round(100.0 * total_found / total_expected, 1) if total_expected else None
-    national_standing = _national_standing(_autox_branch_count())
+    national_standing = _national_standing(_autox_branch_count(), counts)
 
     meta = {
         "generated_by": "pipeline/build_competitor_coverage.py",
@@ -231,6 +295,11 @@ def run(check=False):
         print("  national standing (by network size): AutoX #%d of %d — %s"
               % (ns["autox_rank"], ns["n_ranked"],
                  " > ".join("%s %s" % (o["operator"], "{:,}".format(o["branches"])) for o in ns["ranking"])))
+        fp = ns.get("footprint_measured")
+        if fp:
+            print("  measured footprint (points on the ground): AutoX #%d of %d — %s"
+                  % (fp["autox_rank"], fp["n_ranked"],
+                     " > ".join("%s %s" % (o["operator"], "{:,}".format(o["points"])) for o in fp["ranking"])))
     return 0
 
 
