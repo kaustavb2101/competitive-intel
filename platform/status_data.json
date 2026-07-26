@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T10:32:58Z",
-    "commit": "0a72a0a"
+    "generated_at": "2026-07-26T14:21:10Z",
+    "commit": "db4718a"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,30 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T14:21:10Z",
+      "sha": "db4718a",
+      "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-26T21:17:46+07:00",
+      "sha": "67a5541",
+      "summary": "ux: honor prefers-reduced-motion on the deck.gl 3D pages (#177)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-26T20:12:39+07:00",
+      "sha": "adbfd96",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-25, run 30177156192) (#170)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-26T10:52:48Z",
+      "sha": "65817cc",
+      "summary": "committee: refresh autonomy plan (run 30198897374)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-26T10:32:58Z",
       "sha": "0a72a0a",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
@@ -634,30 +658,6 @@
       "sha": "98b4131",
       "summary": "macro directives: crude fuel baseline · drop BoT rate-cap · IMF WEO backdrop (#161)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T20:01:24+07:00",
-      "sha": "288e278",
-      "summary": "feat(overview): SFI state-bank system NPL-ratio credit-quality backdrop (MEASURED, obj #1) (#163)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T10:43:23Z",
-      "sha": "fd2c25b",
-      "summary": "committee: refresh autonomy plan (run 30154810038)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-25T10:22:55Z",
-      "sha": "3c3a794",
-      "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-25T08:31:52Z",
-      "sha": "093b41e",
-      "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
-      "pillar": "uxui"
     }
   ]
 }
