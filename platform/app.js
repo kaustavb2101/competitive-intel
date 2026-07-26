@@ -7062,7 +7062,12 @@ function renderHomeTape(){
    if its source layer isn't loaded yet it degrades to a calm pointer, never a blank or a lie.
    Re-rendered as TAPE / competitor layers resolve. */
 function pillCard(num,name,pc,tab,big,read,foot){
-  return `<a class="pill" style="--pc:${pc}" data-v="${tab}" href="#${tab}">
+  // `tab` is normally a same-page hash route (data-v the SPA router intercepts); a cross-page
+  // URL (e.g. data.html) carries a plain href and NO data-v so the browser navigates natively
+  // (the #main-content click delegation only catches a[data-v]).
+  const ext=/\.html?(\?|#|$)/.test(tab);
+  const nav=ext?`href="${tab}"`:`data-v="${tab}" href="#${tab}"`;
+  return `<a class="pill" style="--pc:${pc}" ${nav}>
     <span class="pill-eyebrow"><span class="pill-num">${num}</span><span class="pill-name">${name}</span></span>
     <span class="pill-big">${big||'<small>loading…</small>'}</span>
     <span class="pill-read">${read||''}</span>
@@ -7087,12 +7092,12 @@ function renderHomePillars(){
     const share=top&&na?Math.round(top.n*100/na):null;
     const bc=(T.collateral.branch_brand_concentration||[])[0];
     const book=T.bucket_ladder.book_total?T.bucket_ladder.book_total.os_sum:null;
-    cards.push(pillCard(2,'Acquisition','var(--opp)','map',
+    cards.push(pillCard(2,'Acquisition','var(--opp)','data.html',
       book?bn(book)+'<small> book</small>':(top?N(top.n)+'<small> '+top.type+'</small>':''),
       (top?`<b>${top.type}</b> ${share}% of accounts · `:'')+
       (bc?`densest branch book: <b>${bc.branch.replace('สาขา','')}</b> ${N(bc.n)} ${bc.brand}`:'collateral concentration by branch, brand &amp; age'),
-      'National map'));
-  } else cards.push(pillCard(2,'Acquisition','var(--opp)','map','','Where the book concentrates — collateral type, brand &amp; age by branch.','National map'));
+      'Data book'));
+  } else cards.push(pillCard(2,'Acquisition','var(--opp)','data.html','','Where the book concentrates — collateral type, brand &amp; age by branch.','Data book'));
 
   // ③ ASSISTANCE — the pre-emptive window &amp; who needs help now (measured tape).
   if(T&&T.bucket_ladder){
