@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T23:42:51+07:00",
-    "commit": "f42b006"
+    "generated_at": "2026-07-26T22:20:36+00:00",
+    "commit": "a342b7b"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,36 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T22:20:36+00:00",
+      "sha": "a342b7b",
+      "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-26T22:08:57+00:00",
+      "sha": "c08c0fb",
+      "summary": "committee: refresh autonomy plan (run 30222349809)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-26T20:25:35+00:00",
+      "sha": "b2cc709",
+      "summary": "docs: log ux-pillar-acquisition-wrong-route merge+deploy+verify (PR #180)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-27T03:21:53+07:00",
+      "sha": "a63cf09",
+      "summary": "ux: point the command-center ② Acquisition pillar at the data book (#180)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-26T16:43:59+00:00",
+      "sha": "e263ba3",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-07-26T23:42:51+07:00",
       "sha": "f42b006",
       "summary": "feat(service): deterministic FRESHNESS readout in the Data-room provenance census (#178)",
@@ -628,36 +658,6 @@
       "sha": "f488877",
       "summary": "income engine: attach MEASURED NSO LFS wage as a cross-check (additive; \"go with A\", conservative) (#168)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T16:47:38+00:00",
-      "sha": "0180a63",
-      "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-NPL AutoX-anchor ship (#167)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-25T23:44:53+07:00",
-      "sha": "8a57df5",
-      "summary": "feat(peer): AutoX's own MEASURED book NPL beside the listed rivals' reported NPL (obj #2) (#167)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-25T16:12:47+00:00",
-      "sha": "9a83678",
-      "summary": "committee: refresh autonomy plan (run 30165011012)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-25T22:53:38+07:00",
-      "sha": "a38cc68",
-      "summary": "risk-drill v2 + Overview/front-door pivot cleanup — owner feedback batch (#1–#7) (#164)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-25T21:22:55+07:00",
-      "sha": "33d7312",
-      "summary": "docs: log the ux-impact-drill-aria-expanded merge + deploy-verify result (#165) (#166)",
-      "pillar": "uxui"
     }
   ]
 }

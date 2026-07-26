@@ -209,6 +209,60 @@ def _shape_decision_queue(d):
     return None
 
 
+def _shape_impact_cards(d):
+    # The command-center front-door LEAD visual: the 5-region impact strip
+    # (renderImpactStrip reads IMPACT.regions). A truncated build that drops the
+    # region cards leaves the exec's first screen blank, so validate the shape.
+    regs = d.get("regions") if isinstance(d, dict) else None
+    if not isinstance(regs, list) or not regs:
+        return "missing/empty 'regions' list"
+    r0 = regs[0]
+    if not isinstance(r0, dict) or "key" not in r0 or "name_th" not in r0:
+        return "first region missing key/name_th"
+    return None
+
+
+def _shape_province_risk(d):
+    # The #home "getting riskier" verdict (obj #1): worst-first province rollup
+    # (renderHomeRisk reads .provinces). Well below 77 = a truncated build.
+    provs = d.get("provinces") if isinstance(d, dict) else None
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list"
+    if len(provs) < 70:  # 77 provinces expected; well below = truncated build
+        return "only %d provinces (expected ~77)" % len(provs)
+    if "mean_risk" not in provs[0]:
+        return "first province missing 'mean_risk'"
+    return None
+
+
+def _shape_branch_risk(d):
+    # Per-branch composite risk (obj #1), index-aligned to branches.json — the
+    # #home riskiest-branch line + the map risk lens read it. A wrong length
+    # silently misaligns every branch's risk, so assert the exact count.
+    recs = d.get("branches") if isinstance(d, dict) else None
+    if not isinstance(recs, list):
+        return "missing 'branches' list"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned), got %d" % len(recs)
+    if "composite_risk" not in recs[0]:
+        return "first record missing 'composite_risk'"
+    return None
+
+
+def _shape_tape_real(d):
+    # The MEASURED real loan-tape (obj #1 portfolio truth) — the #home pillar
+    # band + assistance radar read it. A broken/empty build guts the front
+    # door's headline risk read, so validate the headline + bucket ladder.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/empty 'headline'"
+    ladder = (d.get("bucket_ladder") or {}).get("ladder") if isinstance(d.get("bucket_ladder"), dict) else None
+    if not isinstance(ladder, list) or not ladder:
+        return "missing/empty bucket_ladder.ladder"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -221,6 +275,15 @@ DATA_FILES = [
     # asserted a dependency the app no longer has. Swapped for the front-door's
     # live marquee layer, the exec Decision Queue.
     ("data/decision_queue.json", _shape_decision_queue, ".items list (ranked weekly actions)"),
+    # Command-center (#home) front-door layers, eagerly loaded on the exec's
+    # first screen (renderHome). The probe previously covered only the default
+    # map/overview entry files, so a truncated/failed deploy of any of these
+    # would break the command center with NO phone alert — the exact "broken
+    # demo" this check exists to catch. Added to close that blind spot.
+    ("data/impact_cards.json", _shape_impact_cards, ".regions strip of 5 (front-door lead visual)"),
+    ("data/province_risk.json", _shape_province_risk, ".provinces rollup (~77, obj #1 risk verdict)"),
+    ("data/branch_risk.json", _shape_branch_risk, ".branches list of 2015 (index-aligned composite risk)"),
+    ("data/tape_real.json", _shape_tape_real, "headline + bucket_ladder (MEASURED portfolio truth)"),
 ]
 
 
