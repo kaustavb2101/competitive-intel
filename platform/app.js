@@ -7657,6 +7657,20 @@ function renderHomeDataRoom(){
       (hidden>0?` — incl. ${hidden} basemap file${hidden!==1?'s':''} inside otherwise-labelled families`:'')+
       `. These are the ones to source next.</div>`;
   }
+  // FRESHNESS pulse — lead with the answer: how far behind our newest committed data each layer
+  // sits. Age is measured against the freshest dated layer (deterministic, from build_provenance.py),
+  // so it never reads a wall clock. Only ISO-dated layers get an age; undated ones are stated plainly.
+  const fr=PROVEN.freshness;
+  if(fr&&fr.n_dated){
+    const staleN=(fr.stale||[]).length, old=fr.oldest;
+    html+=`<div class="dr-fresh cc-sub2">`+
+      `<b>Freshness</b> — newest committed data <b>${dqEsc(fr.freshest.vintage)}</b>; `+
+      `oldest dated layer <b>${old.age_days}d</b> behind (<span class="mono">${dqEsc(old.file)}</span> · ${dqEsc(old.vintage)}); `+
+      (staleN?`<b style="color:var(--dr-u)">${staleN}</b>`:`<b>0</b>`)+` of ${fr.n_dated} dated layers &gt;${fr.stale_over_days}d stale`+
+      (fr.n_undated?`. ${fr.n_undated} layers carry no machine-readable date.`:`.`)+
+      `</div>`;
+  }
+  const staleThresh=(fr&&fr.stale_over_days)||180;
   // table: layer | chip | source | vintage/size
   html+=`<div class="dr-tblwrap"><table class="tbl dr-tbl"><thead><tr>`+
     `<th>Layer</th><th>Provenance</th><th>Source / builder</th><th class="num">Vintage · size</th>`+
@@ -7668,11 +7682,12 @@ function renderHomeDataRoom(){
     const src=L.source?dqEsc(L.source):(L.cls==='unlabelled'?'<span class="dr-shame">— no meta.source / meta.provenance</span>':'—');
     const cnt=L.count?`${L.count.toLocaleString()} ${dqEsc(L.count_of||'')}`:'';
     const vint=L.vintage?dqEsc(L.vintage)+' · ':'';
+    const age=(L.age_days!=null)?`<span class="dr-age${L.age_days>staleThresh?' dr-age-stale':''}" title="${L.age_days} days behind the freshest committed layer">${L.age_days}d</span> · `:'';
     html+=`<tr class="dr-${L.cls}">`+
       `<td><span class="dr-name">${name}</span>${shame}`+(L.label?`<span class="dr-desc">${dqEsc(L.label)}</span>`:'')+`</td>`+
       `<td>${prChip(L.cls)}</td>`+
       `<td class="dr-src"><span title="${L.source?dqEsc(L.source):''}">${src}</span></td>`+
-      `<td class="num mono dr-size">${vint}${prBytes(L.bytes)}${cnt?`<span class="dr-cnt">${cnt}</span>`:''}</td>`+
+      `<td class="num mono dr-size">${vint}${age}${prBytes(L.bytes)}${cnt?`<span class="dr-cnt">${cnt}</span>`:''}</td>`+
       `</tr>`;
   });
   html+=`</tbody></table></div>`;
