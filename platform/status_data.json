@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-25T22:19:08+00:00",
-    "commit": "64d069f"
+    "generated_at": "2026-07-26T11:30:29+07:00",
+    "commit": "3a9ba5b"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-26",
+    "eta_date": "2026-07-27",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -480,6 +480,36 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T11:30:29+07:00",
+      "sha": "3a9ba5b",
+      "summary": "feat(peer): MEASURED store-locator footprint ranking beside the IR-count national standing (obj #2) (#173)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-26T02:37:54+00:00",
+      "sha": "620b818",
+      "summary": "docs: log the Risk-pillar route fix — merged (#172) + deploy-verified",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-26T09:33:17+07:00",
+      "sha": "a7aa7d2",
+      "summary": "ux: route command-center Risk pillar to #exposure, not retired #trend (#172)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-25T23:45:03+00:00",
+      "sha": "17b0c19",
+      "summary": "data: live fuel prices (2026-07-25, run 30179862740)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-25T22:21:05+00:00",
+      "sha": "1bb7aad",
+      "summary": "committee: refresh autonomy plan / CEO dashboard after the site-health-probe realign",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-25T22:19:08+00:00",
       "sha": "64d069f",
       "summary": "fix(service): realign the nightly site-health probe to the live front-door",
@@ -628,36 +658,6 @@
       "sha": "79ce150",
       "summary": "ux: add front-door share metadata (description + Open Graph / Twitter card) (#157)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T08:12:55+07:00",
-      "sha": "a81b242",
-      "summary": "ci(fuel): auto-merge the daily fuel pull when the gate is green (stop the daily stale-draft treadmill) (#156)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-25T08:06:46+07:00",
-      "sha": "178697d",
-      "summary": "feat(harvest): relevance filter + prune + robust PDF-OCR fallback (#155)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-25T00:24:35+00:00",
-      "sha": "60b30d1",
-      "summary": "fix(ci): rebuild the farm-gate chain when NABC prices refresh (unbreak the gate)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T07:12:58+07:00",
-      "sha": "a4664df",
-      "summary": "feat(overview): surface the MEASURED live flood + rain pulse (ThaiWater) + refresh telemetry (obj #1) (#149)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T07:07:30+07:00",
-      "sha": "632add9",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-24, run 30131159645) (#153)",
-      "pillar": "data-integration"
     }
   ]
 }
