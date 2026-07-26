@@ -6622,7 +6622,7 @@ function icProvTable(g){
       const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
       const rv=p.rivals?`${(p.rivals.ratio!=null?p.rivals.ratio.toFixed(1):'—')}×`:'—';
       const rvt=p.rivals&&p.rivals.lead?` title="${p.rivals.lead} leads locally"`:'';
-      return `<tr class="ic-prow" data-p="${dqEsc(name)}" title="press for this province's branches">
+      return `<tr class="ic-prow" data-p="${dqEsc(name)}" tabindex="0" role="link" title="press for this province's branches">
         <td><span class="ic-chev">▸</span> ${name}</td>
         <td class="n">฿${icN(p.os_m)}m · ${icN(p.accounts)} acc</td>
         <td>${icLadder(p)}</td>
@@ -6751,6 +6751,17 @@ function renderImpactStrip(mountId,mode){
         const prow=e.target.closest('.ic-prow');
         if(prow){ mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
           icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount); return; }
+      });
+      // Keyboard activation for the drill-down province rows (role="link" tabindex=0): Enter / Space.
+      // The .ic-drill / .ic-back controls are native <button>s (already keyboard-activatable via the
+      // click delegation); the .ic-prow <tr>s are not, so mirror the click branch here (WCAG 2.1.1).
+      mount.addEventListener('keydown',e=>{
+        if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return;
+        const prow=e.target.closest&&e.target.closest('.ic-prow');
+        if(!prow||prow!==e.target) return;
+        e.preventDefault();
+        mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
+        icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount);
       });
     }
   });
