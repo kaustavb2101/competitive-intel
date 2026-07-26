@@ -7079,11 +7079,11 @@ function renderHomePillars(){
   // ④ RISK — the live-book NPL &amp; the 180+ legacy stock, held separately (measured tape).
   if(T&&T.bucket_ladder){
     const lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus;
-    cards.push(pillCard(4,'Risk','var(--collat)','trend',
+    cards.push(pillCard(4,'Risk','var(--collat)','exposure',
       lb.npl_live_pct+'%<small> NPL-live</small>',
       `90–179dpd on the live book (${lb.npl_live_os_pct}% OS-weighted). Held apart: a <b>${bn(lg.os_sum)}</b> / ${N(lg.n)}-acct 180+ legacy workout stock.`,
-      'Risk trend'));
-  } else cards.push(pillCard(4,'Risk','var(--collat)','trend','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk trend'));
+      'Risk exposure'));
+  } else cards.push(pillCard(4,'Risk','var(--collat)','exposure','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk exposure'));
 
   // ⑤ COMPETITOR — rival pressure on the network we run (measured peer census, lazy).
   let cBig='', cRead='Where rivals outnumber the network — density, contested ground &amp; pulse.';
