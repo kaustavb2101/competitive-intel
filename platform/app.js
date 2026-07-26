@@ -2601,13 +2601,22 @@ function drawCompCoverage(){
       nstxt=`<div style="margin-top:6px"><b>Nationally, AutoX runs the ${ordLabel(ns.autox_rank)} title-loan branch network</b> `+
         `of the ${ns.n_ranked} big operators with a cited count: ${chain}. ${TAG_M} ${TAG_E} `+
         `<span class="sub">By network size — a different question from the per-province density board above, where rivals cluster and AutoX reads as a local 3rd.</span></div>`;
+      // MEASURED-footprint reframe: rivals' full store-locator networks can outrank AutoX on
+      // points-on-the-ground even when it leads on cited listed-entity counts. All-measured, null-safe.
+      const fp=ns.footprint_measured;
+      if(fp&&fp.autox_rank&&Array.isArray(fp.ranking)){
+        const fchain=fp.ranking.map(o=>`${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ${(o.points||0).toLocaleString()}`).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>By MEASURED store-locator footprint AutoX is only ${ordLabel(fp.autox_rank)}</b> `+
+          `of ${fp.n_ranked} — points on the ground: ${fchain}. ${TAG_M} `+
+          `<span class="sub">Every number here is measured (own network + rivals' official locators); a locator counts a group's whole retail network, beyond its listed-entity IR count, so Srisawad's full footprint overtakes AutoX even though AutoX leads on cited branch count. Heng excluded (locator Cloudflare-blocked → lower bound).</span></div>`;
+      }
     }
     ro.innerHTML=`<b>The census is now the near-complete rival network.</b> ${ttxt} ${TAG_M} ${TAG_E}${nstxt}`+
       methodBox(null,
         ['Muangthai, Srisawad &amp; Tidlor are pulled from each operator’s <b>official store-locator</b> (the full network) — coverage ~100%, and &gt;100% is expected because a locator lists every service point beyond the IR “branches” headline (SAWAD group ≈4.6× its listed-entity count).',
          'Heng is the one exception — still a Google/Overture <b>SAMPLE</b> (its locator is Cloudflare-blocked), so Heng alone is a lower bound.',
          'Coverage % is a data-completeness flag, <b>not</b> market share.',
-         '<b>National standing</b> ranks operators by branch-network SIZE (AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts). Heng is excluded — no cited count. Network size ≠ market share, and differs from the local per-province density read.']);
+         '<b>National standing</b> is read two ways. (1) By branch-network SIZE — AutoX = <b>MEASURED</b> own network; peers = <b>REPORTED</b> cited IR counts (Heng excluded, no cited count). (2) By MEASURED store-locator FOOTPRINT — all points on the ground, AutoX own network vs rivals’ official locators (Heng excluded, its locator is Cloudflare-blocked → lower bound). A locator counts a group’s whole retail network beyond its listed-entity IR figure, so the two rankings can differ — both true. Neither is market share, and both differ from the local per-province density read.']);
   }
 }
 
@@ -3373,14 +3382,20 @@ function drawRivThreatRegion(){
    MEASURED count of licensed PICO-finance operators (FPO registry) vs AutoX branch count, ranked by
    how much sub-scale rivals OUTNUMBER our footprint. Fully measured — two government/own tallies, no
    inference (unlike the ESTIMATED exit-whitespace cue below). Lazy, null-safe, graceful if absent. */
-let PICOCOMP=null, picocompLoaded=false;
+let PICOCOMP=null, picocompLoaded=false, picocompPromise=null;
 const PICOCOMP_TOPN=15;
+// Shared cached loader — the #acq leaderboard AND the home competitive-pressure card read one fetch.
+function loadPicoCompetitors(){
+  if(picocompPromise) return picocompPromise;
+  picocompPromise=fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PICOCOMP=j; picocompLoaded=true; return PICOCOMP; })
+    .catch(()=>{ PICOCOMP=null; picocompLoaded=true; return null; });
+  return picocompPromise;
+}
 function renderPicoCompetitors(){
   const tbl=$('#picocomptbl'); if(!tbl) return;
   if(picocompLoaded){ drawPicoCompetitors(); return; }
-  fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null).then(j=>{
-    PICOCOMP=j; picocompLoaded=true; drawPicoCompetitors();
-  }).catch(()=>{ PICOCOMP=null; picocompLoaded=true; drawPicoCompetitors(); });
+  loadPicoCompetitors().then(drawPicoCompetitors);
 }
 function drawPicoCompetitors(){
   const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
@@ -6613,7 +6628,7 @@ function icProvTable(g){
       const tr=d==null?'—':`<span style="color:${d<0?'var(--merch)':'var(--agri)'}">${d<0?'▼ easing':'▲ rising'}</span>`;
       const rv=p.rivals?`${(p.rivals.ratio!=null?p.rivals.ratio.toFixed(1):'—')}×`:'—';
       const rvt=p.rivals&&p.rivals.lead?` title="${p.rivals.lead} leads locally"`:'';
-      return `<tr class="ic-prow" data-p="${dqEsc(name)}" title="press for this province's branches">
+      return `<tr class="ic-prow" data-p="${dqEsc(name)}" tabindex="0" role="link" title="press for this province's branches">
         <td><span class="ic-chev">▸</span> ${name}</td>
         <td class="n">฿${icN(p.os_m)}m · ${icN(p.accounts)} acc</td>
         <td>${icLadder(p)}</td>
@@ -6742,6 +6757,17 @@ function renderImpactStrip(mountId,mode){
         const prow=e.target.closest('.ic-prow');
         if(prow){ mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
           icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount); return; }
+      });
+      // Keyboard activation for the drill-down province rows (role="link" tabindex=0): Enter / Space.
+      // The .ic-drill / .ic-back controls are native <button>s (already keyboard-activatable via the
+      // click delegation); the .ic-prow <tr>s are not, so mirror the click branch here (WCAG 2.1.1).
+      mount.addEventListener('keydown',e=>{
+        if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return;
+        const prow=e.target.closest&&e.target.closest('.ic-prow');
+        if(!prow||prow!==e.target) return;
+        e.preventDefault();
+        mount._icState={level:'branch',region:(mount._icState||{}).region,province:prow.dataset.p};
+        icRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount);
       });
     }
   });
@@ -7079,11 +7105,11 @@ function renderHomePillars(){
   // ④ RISK — the live-book NPL &amp; the 180+ legacy stock, held separately (measured tape).
   if(T&&T.bucket_ladder){
     const lb=T.bucket_ladder.live_book, lg=T.bucket_ladder.legacy_180plus;
-    cards.push(pillCard(4,'Risk','var(--collat)','trend',
+    cards.push(pillCard(4,'Risk','var(--collat)','exposure',
       lb.npl_live_pct+'%<small> NPL-live</small>',
       `90–179dpd on the live book (${lb.npl_live_os_pct}% OS-weighted). Held apart: a <b>${bn(lg.os_sum)}</b> / ${N(lg.n)}-acct 180+ legacy workout stock.`,
-      'Risk trend'));
-  } else cards.push(pillCard(4,'Risk','var(--collat)','trend','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk trend'));
+      'Risk exposure'));
+  } else cards.push(pillCard(4,'Risk','var(--collat)','exposure','','Bucket ladder Current→NPL, live book vs the 180+ legacy stock.','Risk exposure'));
 
   // ⑤ COMPETITOR — rival pressure on the network we run (measured peer census, lazy).
   let cBig='', cRead='Where rivals outnumber the network — density, contested ground &amp; pulse.';
@@ -7245,6 +7271,9 @@ function renderHome(){
     // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
     // expand card, mirroring the full table already shipped on Exposure (null-safe).
     loadContestedPop().then(reHome);
+    // obj#2 — sub-scale PICO-finance rival pressure (FPO registry, MEASURED): how many provinces the
+    // licensed small-ticket field outnumbers the existing footprint, mirroring the #acq leaderboard.
+    loadPicoCompetitors().then(reHome);
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
     loadPeerProvince().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomePillars(); } });
@@ -7398,6 +7427,21 @@ function renderHomeWhitespace(){
     html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
       `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
       `${t.pct}%`,'contested','var(--agri)');
+  }
+  // SUB-SCALE RIVAL PRESSURE — where the licensed PICO-finance field (a DISTINCT small-ticket rival
+  // class, FPO registry, MEASURED) outnumbers the existing AutoX footprint. An obj#2 pressure read on
+  // the network we already run (margin/contest pressure), mirroring the full leaderboard on Competition;
+  // it is NOT an open-a-branch cue. Null-safe: appears only once pico_competitors.json has loaded.
+  const pm=(PICOCOMP&&PICOCOMP.meta)||null;
+  if(pm&&pm.n_provinces_pico_outnumbers_autox!=null){
+    const prows=Array.isArray(PICOCOMP.provinces)?PICOCOMP.provinces:[];
+    let worst=null; prows.forEach(r=>{ if(!worst||(r.outnumber||0)>(worst.outnumber||0)) worst=r; });
+    const wstr=(worst&&(worst.outnumber||0)>0)
+      ? ` · worst ${worst.th} (${(worst.pico_total||0).toLocaleString()} vs ${(worst.autox_branches||0).toLocaleString()})` : '';
+    html+=`<div class="cc-sub2"${html?'':' style="margin-top:0"'}>Sub-scale rival pressure · PICO-finance ${TAG_M}</div>`;
+    html+=ccRow(`Outnumbered in ${pm.n_provinces_pico_outnumbers_autox} of ${pm.n_provinces||77} provinces`,
+      `${(pm.pico_total||0).toLocaleString()} licensed PICO operators nationally vs ${(pm.autox_total||0).toLocaleString()} AutoX branches${wstr} (FPO registry)`,
+      `${pm.n_provinces_pico_outnumbers_autox}`,'prov. outgunned','var(--agri)');
   }
   // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
   // flag on the coverage signals below, not market share. Omitted gracefully if absent.
