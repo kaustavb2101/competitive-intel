@@ -3382,14 +3382,20 @@ function drawRivThreatRegion(){
    MEASURED count of licensed PICO-finance operators (FPO registry) vs AutoX branch count, ranked by
    how much sub-scale rivals OUTNUMBER our footprint. Fully measured — two government/own tallies, no
    inference (unlike the ESTIMATED exit-whitespace cue below). Lazy, null-safe, graceful if absent. */
-let PICOCOMP=null, picocompLoaded=false;
+let PICOCOMP=null, picocompLoaded=false, picocompPromise=null;
 const PICOCOMP_TOPN=15;
+// Shared cached loader — the #acq leaderboard AND the home competitive-pressure card read one fetch.
+function loadPicoCompetitors(){
+  if(picocompPromise) return picocompPromise;
+  picocompPromise=fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PICOCOMP=j; picocompLoaded=true; return PICOCOMP; })
+    .catch(()=>{ PICOCOMP=null; picocompLoaded=true; return null; });
+  return picocompPromise;
+}
 function renderPicoCompetitors(){
   const tbl=$('#picocomptbl'); if(!tbl) return;
   if(picocompLoaded){ drawPicoCompetitors(); return; }
-  fetch('data/pico_competitors.json').then(r=>r.ok?r.json():null).then(j=>{
-    PICOCOMP=j; picocompLoaded=true; drawPicoCompetitors();
-  }).catch(()=>{ PICOCOMP=null; picocompLoaded=true; drawPicoCompetitors(); });
+  loadPicoCompetitors().then(drawPicoCompetitors);
 }
 function drawPicoCompetitors(){
   const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
@@ -7265,6 +7271,9 @@ function renderHome(){
     // obj#2 — most-contested-ground rank-1 fact (measured WorldPop × rival census) into the
     // expand card, mirroring the full table already shipped on Exposure (null-safe).
     loadContestedPop().then(reHome);
+    // obj#2 — sub-scale PICO-finance rival pressure (FPO registry, MEASURED): how many provinces the
+    // licensed small-ticket field outnumbers the existing footprint, mirroring the #acq leaderboard.
+    loadPicoCompetitors().then(reHome);
     // obj#2 — the CO-EQUAL competitive-risk clause in the board thesis: how many provinces the big-4
     // outnumber the existing network in (MEASURED per-province density). Null-safe re-render.
     loadPeerProvince().then(()=>{ if(onHome()){ renderHomeThesis(); renderHomePillars(); } });
@@ -7418,6 +7427,21 @@ function renderHomeWhitespace(){
     html+=ccRow(`${t.name||'—'} <span class="sub">${t.prov||''}${t.region?' · '+t.region:''}</span>`,
       `${(t.cpop||0).toLocaleString()} of ${(t.pop||0).toLocaleString()} catchment pop. within 2km of a rival`,
       `${t.pct}%`,'contested','var(--agri)');
+  }
+  // SUB-SCALE RIVAL PRESSURE — where the licensed PICO-finance field (a DISTINCT small-ticket rival
+  // class, FPO registry, MEASURED) outnumbers the existing AutoX footprint. An obj#2 pressure read on
+  // the network we already run (margin/contest pressure), mirroring the full leaderboard on Competition;
+  // it is NOT an open-a-branch cue. Null-safe: appears only once pico_competitors.json has loaded.
+  const pm=(PICOCOMP&&PICOCOMP.meta)||null;
+  if(pm&&pm.n_provinces_pico_outnumbers_autox!=null){
+    const prows=Array.isArray(PICOCOMP.provinces)?PICOCOMP.provinces:[];
+    let worst=null; prows.forEach(r=>{ if(!worst||(r.outnumber||0)>(worst.outnumber||0)) worst=r; });
+    const wstr=(worst&&(worst.outnumber||0)>0)
+      ? ` · worst ${worst.th} (${(worst.pico_total||0).toLocaleString()} vs ${(worst.autox_branches||0).toLocaleString()})` : '';
+    html+=`<div class="cc-sub2"${html?'':' style="margin-top:0"'}>Sub-scale rival pressure · PICO-finance ${TAG_M}</div>`;
+    html+=ccRow(`Outnumbered in ${pm.n_provinces_pico_outnumbers_autox} of ${pm.n_provinces||77} provinces`,
+      `${(pm.pico_total||0).toLocaleString()} licensed PICO operators nationally vs ${(pm.autox_total||0).toLocaleString()} AutoX branches${wstr} (FPO registry)`,
+      `${pm.n_provinces_pico_outnumbers_autox}`,'prov. outgunned','var(--agri)');
   }
   // COMPETITOR COVERAGE — national census completeness (competitor_coverage.json totals). A confidence
   // flag on the coverage signals below, not market share. Omitted gracefully if absent.
