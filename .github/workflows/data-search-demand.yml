@@ -1,0 +1,120 @@
+name: Data — Google Trends brand share-of-search (monthly)
+
+# Refreshes the ESTIMATED search-interest snapshot behind the Competition tab (#acq): per-province
+# demand for title-loan terms and the 5 title-lender brands' SHARE-OF-SEARCH on a shared 0-100 axis
+# (AutoX vs Srisawad / Tidlor / Muangthai / Heng). It is a competitive-pressure proxy (objective #2),
+# labelled ESTIMATED — Google Trends is a RELATIVE index, not absolute volume.
+#
+# WHY A JOB: every other live-pull layer family in this repo already has a scheduled data-*.yml
+# refresh (NABC / OAE / fuel / macro / gov census / overture / pico / sfi / thaiwater). The Google
+# Trends snapshot was the LONE live layer with no refresh — its source-data/google_trends.json
+# snapshot silently ages (pulled once, then stale). Google Trends (trends.google.com) is REACHABLE
+# from GitHub-hosted runners (verified: a real pytrends interest_by_region pull returned all 77
+# provinces from CI), unlike the data.go.th / DLT family that Cloudflare geoblocks datacenter IPs —
+# so unlike those, this one IS automatable cloud-side. pytrends can intermittently 429 from a
+# datacenter IP; the puller retries 3x per payload and, if it still fails, the job fails LOUDLY that
+# run (no partial snapshot is ever written — pull_google_trends.py writes the file only after all
+# payloads succeed) and is retried next month or via manual dispatch.
+#
+# WHAT IT PRODUCES (only when the DERIVED layer's substantive content changed):
+#   source-data/google_trends.json     (pipeline/pull_google_trends.py — the committed snapshot)
+#   platform/data/search_demand.json   (pipeline/build_search_demand.py — the app-facing layer)
+#   platform/data/provenance.json      (pipeline/build_provenance.py — new fingerprint for the layer)
+#
+# CHANGE DETECTION: google_trends.json stamps a fresh wall-clock pulled_at_utc every run, so a raw
+# diff is always non-empty. We therefore gate the PR on whether search_demand.json changed
+# SUBSTANTIVELY — i.e. after dropping meta.pulled_at_utc — so a run that returns identical Trends
+# values (values are what matter) no-ops cleanly instead of opening a timestamp-only churn PR.
+#
+# PR-ONLY, NEVER auto-merge — this is ESTIMATED data and the brand share-of-search reads directly on
+# the Competition tab, so a human reviews the shift before it ships. Committed to a fresh
+# data/trends-<run_id> branch and opened as a DRAFT PR back to the branch this ran on (cron uses the
+# default branch). NEVER pushes to a working branch — can't race a session.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monthly, 9th at 21:25 UTC (= 04:25 Bangkok) — off-minute/off-hour from the other data feeds.
+    - cron: "25 21 9 * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install deps
+        run: pip install --quiet pytrends==4.9.2
+
+      - name: Pull the Google Trends snapshot
+        run: python pipeline/pull_google_trends.py
+
+      - name: Rebuild the derived layer + provenance
+        run: |
+          python pipeline/build_search_demand.py
+          python pipeline/build_provenance.py
+
+      - name: Detect a substantive change (ignore the pulled_at_utc timestamp)
+        id: detect
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, subprocess
+          def canon(s):
+              d = json.loads(s)
+              d.get("meta", {}).pop("pulled_at_utc", None)
+              return json.dumps(d, sort_keys=True, ensure_ascii=False)
+          head = subprocess.run(
+              ["git", "show", "HEAD:platform/data/search_demand.json"],
+              capture_output=True, text=True).stdout
+          new = open("platform/data/search_demand.json", encoding="utf-8").read()
+          changed = (not head) or (canon(head) != canon(new))
+          print(f"changed={'true' if changed else 'false'}")
+          PY
+
+      - name: Commit to a data branch + open a draft PR
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/trends-${{ github.run_id }}
+        run: |
+          git add source-data/google_trends.json platform/data/search_demand.json platform/data/provenance.json
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          VINTAGE="$(python -c "import json;print(json.load(open('source-data/google_trends.json'))['meta']['pulled_at_utc'])")"
+          NBRANDS="$(python -c "import json;print(len(json.load(open('source-data/google_trends.json'))['brands']))")"
+          git commit -m "data: Google Trends brand share-of-search refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-search-demand.yml via pipeline/pull_google_trends.py (Google Trends, geo=TH REGION, ESTIMATED). Rebuilt search_demand.json + provenance.json."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated monthly Google Trends brand share-of-search refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "The per-province search-interest snapshot changed since the committed one (new vintage \`$VINTAGE\`, **$NBRANDS brands** on a shared axis)."
+            echo
+            echo "**ESTIMATED** — Google Trends is a RELATIVE search-interest index (0-100 within the payload),"
+            echo "NOT absolute volume; low-volume provinces are noisy. It feeds the Competition tab (#acq)"
+            echo "brand share-of-search read (AutoX vs the big-4 rivals), a competitive-pressure proxy"
+            echo "(objective #2). No open/close/expand framing; nothing fabricated — provinces Google omits"
+            echo "stay absent, not zero-filled."
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge — \`build_search_demand.py --check\` and"
+            echo "\`build_provenance.py --check\` gate the derived layer byte-exact against the committed snapshot."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: Google Trends brand share-of-search refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
