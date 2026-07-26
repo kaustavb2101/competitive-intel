@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T17:31:48+07:00",
-    "commit": "f78d97a"
+    "generated_at": "2026-07-26T10:32:58Z",
+    "commit": "0a72a0a"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T10:32:58Z",
+      "sha": "0a72a0a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-07-26T17:31:48+07:00",
       "sha": "f78d97a",
       "summary": "feat(peer): add MEASURED most-outnumbered ranking (rival:AutoX count ratio) to the peer board (obj #2) (#175)",
@@ -492,7 +498,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T08:26:19+00:00",
+      "date": "2026-07-26T08:26:19Z",
       "sha": "0511e7b",
       "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
       "pillar": "uxui"
@@ -504,25 +510,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T06:45:58+00:00",
+      "date": "2026-07-26T06:45:58Z",
       "sha": "f7b8c68",
       "summary": "ci(data): add data-search-demand.yml — monthly Google Trends brand share-of-search refresh (obj #2)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:36:49+00:00",
+      "date": "2026-07-26T06:36:49Z",
       "sha": "aef449f",
       "summary": "committee: autonomous competitor scout (run 30190942509)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:15:30+00:00",
+      "date": "2026-07-26T06:15:30Z",
       "sha": "91e3058",
       "summary": "committee: refresh autonomy plan (run 30190607406)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T04:33:50+00:00",
+      "date": "2026-07-26T04:33:50Z",
       "sha": "ed896b9",
       "summary": "committee: refresh autonomy plan + log peer-footprint deploy-verify (#173)",
       "pillar": "peer"
@@ -534,7 +540,7 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-26T02:37:54+00:00",
+      "date": "2026-07-26T02:37:54Z",
       "sha": "620b818",
       "summary": "docs: log the Risk-pillar route fix — merged (#172) + deploy-verified",
       "pillar": "service"
@@ -546,25 +552,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T23:45:03+00:00",
+      "date": "2026-07-25T23:45:03Z",
       "sha": "17b0c19",
       "summary": "data: live fuel prices (2026-07-25, run 30179862740)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T22:21:05+00:00",
+      "date": "2026-07-25T22:21:05Z",
       "sha": "1bb7aad",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the site-health-probe realign",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T22:19:08+00:00",
+      "date": "2026-07-25T22:19:08Z",
       "sha": "64d069f",
       "summary": "fix(service): realign the nightly site-health probe to the live front-door",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T22:05:55+00:00",
+      "date": "2026-07-25T22:05:55Z",
       "sha": "49d6e12",
       "summary": "committee: refresh autonomy plan (run 30176705122)",
       "pillar": "deployment"
@@ -576,7 +582,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T18:18:52+00:00",
+      "date": "2026-07-25T18:18:52Z",
       "sha": "5b3fe5a",
       "summary": "ci(data): add data-sfi-credit.yml — monthly FPO SFI credit-quality refresh",
       "pillar": "data-integration"
@@ -588,7 +594,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T16:47:38+00:00",
+      "date": "2026-07-25T16:47:38Z",
       "sha": "0180a63",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-NPL AutoX-anchor ship (#167)",
       "pillar": "peer"
@@ -600,7 +606,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-25T16:12:47+00:00",
+      "date": "2026-07-25T16:12:47Z",
       "sha": "9a83678",
       "summary": "committee: refresh autonomy plan (run 30165011012)",
       "pillar": "deployment"
@@ -636,27 +642,21 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T10:43:23+00:00",
+      "date": "2026-07-25T10:43:23Z",
       "sha": "fd2c25b",
       "summary": "committee: refresh autonomy plan (run 30154810038)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T10:22:55+00:00",
+      "date": "2026-07-25T10:22:55Z",
       "sha": "3c3a794",
       "summary": "fix(service): recover the commodities board's dropped MEASURED farm-gate price vintage in the Data-room card",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T08:31:52+00:00",
+      "date": "2026-07-25T08:31:52Z",
       "sha": "093b41e",
       "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T15:29:02+07:00",
-      "sha": "f81aa3b",
-      "summary": "ux: add share metadata (description + Open Graph / Twitter card) to the other 5 routes (#162)",
       "pillar": "uxui"
     }
   ]
