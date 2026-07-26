@@ -280,6 +280,32 @@ def build():
         "vehicles": sat_pool[0]["vehicles"],
     } if sat_pool else None)
 
+    # ── most-outnumbered rollup (rival:AutoX COUNT ratio — competitive pressure on the
+    #    footprint we ALREADY run, independent of the vehicle base) ────────────────────
+    # Ranks the provinces where AutoX is most out-fielded relative to its OWN presence:
+    # for every AutoX branch, how many big-4 rival points sit in the same province. This
+    # is the "lead-with-the-answer" ranking the per-row `ratio` hides in a 77-row table,
+    # and a DIFFERENT read from most_saturated_province (density per vehicle): a province
+    # can be only modestly dense yet leave AutoX heavily out-numbered where its own
+    # footprint is thin (e.g. น่าน 16:1 on 7 branches), while the most-saturated market
+    # by vehicle is elsewhere. `rivals` is the LOWER-BOUND census (Heng is a
+    # Cloudflare-blocked sample), so every ratio here is a FLOOR ("outnumbered at least
+    # X:1"), never over-stated. MEASURED counts, COMPUTED ratio; only AutoX-present
+    # provinces are rankable (ratio is null where autox == 0). autox/rivals are carried
+    # so the exec judges the EXPOSURE behind each ratio, not the bare multiple.
+    outnum_pool = sorted(
+        (p for p in provinces if p["autox"] > 0 and p["ratio"] is not None),
+        key=lambda p: (-p["ratio"], p["province_th"]))
+    most_outnumbered_top = [{
+        "province_th": p["province_th"],
+        "ratio": p["ratio"],
+        "autox": p["autox"],
+        "rivals": p["rivals"],
+        "leader": p["leader"],
+        "autox_rank": p["autox_rank"],
+    } for p in outnum_pool[:5]]
+    most_outnumbered_province = most_outnumbered_top[0] if most_outnumbered_top else None
+
     meta = {
         "generated_by": "pipeline/build_peer_province.py",
         "label": "PEER COMPARISON per province — MEASURED AutoX branch count next to each big-4 "
@@ -415,6 +441,8 @@ def build():
         "national_rivals_per_100k_veh": nat_rivals_per_100k,
         "national_titlelender_per_100k_veh": nat_titlelender_per_100k,
         "most_saturated_province": most_saturated,
+        "most_outnumbered_province": most_outnumbered_province,
+        "most_outnumbered_top": most_outnumbered_top,
         "vehicle_source": {
             "layer": "source-data/vehicles_by_province.json",
             "source": veh_meta.get("source"),
@@ -478,6 +506,10 @@ def run(check=False):
         if ms:
             print("  most-saturated market: %s (%.2f title-lender branches / 100k vehicles)"
                   % (ms["province_th"], ms["titlelender_per_100k_veh"]))
+    mo = m.get("most_outnumbered_province") or {}
+    if mo:
+        print("  most-outnumbered: %s (AutoX out-fielded at least %.1f:1 — %d AutoX vs %d big-4 rivals)"
+              % (mo["province_th"], mo["ratio"], mo["autox"], mo["rivals"]))
     return 0
 
 

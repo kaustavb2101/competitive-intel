@@ -2816,6 +2816,11 @@ function drawPeerProvince(){
     const hasSat=m.vehicle_saturation_available===true && m.most_saturated_province;
     const ms=m.most_saturated_province||{};
     const satStr=hasSat?` <b>Per 100k registered vehicles</b> (the MEASURED collateral base) the ground carries <b>${(m.national_titlelender_per_100k_veh||0).toFixed(1)}</b> title-lender branches nationally (AutoX ${(m.national_autox_per_100k_veh||0).toFixed(1)} · rivals ${(m.national_rivals_per_100k_veh||0).toFixed(1)}); it is most crowded per unit of collateral in <b style="color:var(--agri)">${ms.province_th||'—'}</b> (${(ms.titlelender_per_100k_veh||0).toFixed(1)}/100k).`:'';
+    // Most out-fielded relative to AutoX's OWN presence (rival:AutoX count ratio) — a competitive-
+    // pressure lead the density read can't give: where each AutoX branch faces the most rival points.
+    // ratio is a FLOOR (Heng is a lower-bound sample); autox/rivals carried so the exposure is visible.
+    const mo=m.most_outnumbered_province||null;
+    const outStr=mo?` Relative to its own footprint, AutoX is most out-fielded in <b style="color:var(--agri)">${mo.province_th}</b> — at least <b>${(mo.ratio||0).toFixed(1)}:1</b> (${mo.autox} AutoX vs ${mo.rivals} big-4 rivals).`:'';
     // AutoX's own standing (MEASURED rank among present operators): where it sits, not just who leads.
     const nProv=m.n_provinces||recs.length;
     const hasRankRollup=m.best_autox_rank!=null;
@@ -2851,7 +2856,7 @@ function drawPeerProvince(){
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
       `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
-      `National rival footprint: ${brandStr}.${picoStr}${satStr}${distStr} ${TAG_M}`+
+      `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
          'The <b>per-100k-vehicle</b> saturation reads title-lender branches against <b>MEASURED</b> DLT registered-vehicle stock (the vehicle collateral base) — a crowding read the raw count can’t give. The three Greater-Bangkok inner-ring provinces are <b>excluded</b> from the most-crowded headline: they register most vehicles centrally at the Bangkok DLT office (a MEASURED NSO labour-force cross-check flags them), which would inflate their density. National saturation is unaffected (vehicle stock is sum-conserved).',

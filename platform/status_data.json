@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T04:33:50Z",
-    "commit": "ed896b9"
+    "generated_at": "2026-07-26T10:32:58Z",
+    "commit": "0a72a0a"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,6 +480,54 @@
   ],
   "activity": [
     {
+      "date": "2026-07-26T10:32:58Z",
+      "sha": "0a72a0a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-26T17:31:48+07:00",
+      "sha": "f78d97a",
+      "summary": "feat(peer): add MEASURED most-outnumbered ranking (rival:AutoX count ratio) to the peer board (obj #2) (#175)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-26T16:18:28+07:00",
+      "sha": "38ad825",
+      "summary": "feat(home): surface MEASURED PICO-finance rival pressure on the Command center (obj #2) (#171)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-26T08:26:19Z",
+      "sha": "0511e7b",
+      "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-26T15:18:57+07:00",
+      "sha": "589232b",
+      "summary": "ux: keyboard-activate impact-card drill-down province rows (WCAG 2.1.1) (#174)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-26T06:45:58Z",
+      "sha": "f7b8c68",
+      "summary": "ci(data): add data-search-demand.yml — monthly Google Trends brand share-of-search refresh (obj #2)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-26T06:36:49Z",
+      "sha": "aef449f",
+      "summary": "committee: autonomous competitor scout (run 30190942509)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-26T06:15:30Z",
+      "sha": "91e3058",
+      "summary": "committee: refresh autonomy plan (run 30190607406)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-26T04:33:50Z",
       "sha": "ed896b9",
       "summary": "committee: refresh autonomy plan + log peer-footprint deploy-verify (#173)",
@@ -609,54 +657,6 @@
       "date": "2026-07-25T08:31:52Z",
       "sha": "093b41e",
       "summary": "docs: log the ux-share-metadata-other-pages merge + deploy-verify result (#162)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T15:29:02+07:00",
-      "sha": "f81aa3b",
-      "summary": "ux: add share metadata (description + Open Graph / Twitter card) to the other 5 routes (#162)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T06:48:59Z",
-      "sha": "93ae2e5",
-      "summary": "provenance: close the shame board (1 → 0) — stamp the 77-file catchment geometry family via a sidecar glob",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-25T13:26:11+07:00",
-      "sha": "f535dcd",
-      "summary": "feat: TMLI-convergence moves 2-5 (income engine · scenarios · commodities · product map) + penetration fix (#160)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-25T06:19:03Z",
-      "sha": "851a577",
-      "summary": "committee: autonomous competitor scout (run 30146845465)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-25T05:53:47Z",
-      "sha": "be810de",
-      "summary": "committee: refresh autonomy plan (run 30146365438)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-25T04:20:38Z",
-      "sha": "fc4c2a3",
-      "summary": "fix(planning): flip loan-tape roadmap to done — real measured tape landed but planner still showed SYNTHETIC/pending",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-25T10:25:11+07:00",
-      "sha": "f9d1e6b",
-      "summary": "feat: Impact Cards — Region → Province → Branch drill (humanized + metric cascade) (#158)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T02:46:59Z",
-      "sha": "a5d0594",
-      "summary": "docs: log the ux-share-metadata merge + deploy-verify result (#157)",
       "pillar": "uxui"
     }
   ]
