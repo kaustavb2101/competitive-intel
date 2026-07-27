@@ -188,6 +188,13 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_truck_flow.py --check (dlt mirror absent/<24mo or output not generated — not data drift)"
   else bad "build_truck_flow.py --check (truck_flow.json drifted from the dlt mirror)"
   fi
+  # collateral_flow projects the COMMITTED vehicle_flow_by_province.json (not the gitignored raw), so
+  # unlike its siblings above it byte-reproduces here rather than SKIPping.
+  ( cd "$PIPE" && python3 build_collateral_flow.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_collateral_flow.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_collateral_flow.py --check (vehicle_flow_by_province.json absent — not data drift)"
+  else bad "build_collateral_flow.py --check (collateral_flow.json drifted from vehicle_flow_by_province.json)"
+  fi
   ( cd "$PIPE" && python3 build_ev_penetration.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_ev_penetration.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_ev_penetration.py --check (dlt mirror absent or output not generated — not data drift)"
