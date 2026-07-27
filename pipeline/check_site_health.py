@@ -286,6 +286,56 @@ def _shape_collateral_flow(d):
     return None
 
 
+def _shape_truck_flow(d):
+    # The MEASURED logistics-SME (hauler) pulse (obj #1) — the Overview tab's
+    # truck-registration-flow card (renderTruckFlow reads .provinces, filtering
+    # for rows with `th` + `new_regis_yoy_pct`, and sums `new_regis_12m`). An
+    # owner-operator hauler is a classic heavy-title borrower, so a truncated
+    # deploy that drops the province rows blanks a default-route obj-#1 card
+    # with no phone alert. Sibling of collateral_flow; cover it the same way.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    p0 = provs[0]
+    if not isinstance(p0, dict) or not p0.get("th"):
+        return "first province missing 'th'"
+    if "new_regis_yoy_pct" not in p0 or "new_regis_12m" not in p0:
+        return "first province missing 'new_regis_yoy_pct'/'new_regis_12m' (card render + headline reads)"
+    return None
+
+
+def _shape_region_debt(d):
+    # The MEASURED regional household-debt backdrop (obj #1) — the Overview
+    # tab's leverage card (renderRegionDebt reads .series{national,region} and
+    # renders the heaviest-region debt-per-household read). A truncated deploy
+    # that drops the series or the debt-per-household indicator blanks the
+    # leverage-floor read on a default nav route with no phone alert. Robust to
+    # a future SES vintage bump (the indicator key is asserted, not the year).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/empty 'headline'"
+    series = d.get("series")
+    if not isinstance(series, dict):
+        return "missing 'series' object"
+    region = series.get("region")
+    if not isinstance(region, list) or not region:
+        return "missing/empty series.region list"
+    if not (isinstance(series.get("national"), list) and series["national"]):
+        return "missing/empty series.national list"
+    has_dph = any(
+        isinstance(r, dict)
+        and r.get("indicator") == "debt_per_household_thb"
+        and r.get("value") is not None
+        for r in region
+    )
+    if not has_dph:
+        return "series.region has no 'debt_per_household_thb' row (card headline read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -312,6 +362,13 @@ DATA_FILES = [
     # (moto ~50% of the book). Shipped 2026-07-27 with no probe coverage; a
     # truncated CDN deploy would blank it with no alert. Added to close that gap.
     ("data/collateral_flow.json", _shape_collateral_flow, ".regions (5 macro regions) + meta.national_mix_pct (moto/car/pickup)"),
+    # The two remaining eager Overview flow-family cards its sibling
+    # collateral_flow left uncovered (renderTruckFlow / renderRegionDebt, both
+    # loaded on the default #overview route). Same "truncated deploy blanks a
+    # default-route obj-#1 card with no alert" rationale; closes the flow-card
+    # coverage gap the 2026-07-27 collateral-flow probe ship flagged as next.
+    ("data/truck_flow.json", _shape_truck_flow, ".provinces list (~77) with new_regis_yoy_pct"),
+    ("data/region_debt.json", _shape_region_debt, ".series{national,region} + debt_per_household_thb"),
 ]
 
 
