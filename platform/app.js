@@ -3122,8 +3122,11 @@ function drawRivalPulse(){
   if(lbox){
     if(land&&land.by_product&&land.by_product.length){
       const chips=Object.entries(land.type_counts||{}).map(([t,n])=>
-        `<span class="tag" style="color:${TYPEC[t]||'var(--dim)'};border:1px solid ${TYPEC[t]||'var(--dim)'};margin-right:6px">${TYPEL[t]||t} ×${n}</span>`).join('');
-      lbox.innerHTML=`<div style="margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
+        `<span class="tag" style="color:${TYPEC[t]||'var(--dim)'};border:1px solid ${TYPEC[t]||'var(--dim)'}">${TYPEL[t]||t} ×${n}</span>`).join('');
+      // flex-wrap the chip row: the .tag chips are white-space:nowrap and joined with no
+      // whitespace, so an inline row has NO soft-wrap opportunity between them and runs off the
+      // right edge on mobile — flex+gap gives each chip its own wrap point.
+      lbox.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
         land.by_product.map(g=>`<h4 class="acqsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
           `<table class="tbl">${g.items.map(p=>`<tr>
             <td class="mono" style="white-space:nowrap"><b>${p.brand}</b></td>
@@ -3162,6 +3165,11 @@ function drawRivalPulse(){
            `The corporate sites are geoblocked from foreign IPs — this feed refreshes from the Thai-IP laptop (pipeline/pull_rival_promos.py).`]);
     }
   }
+  // The promo landscape + raw-feed tables are injected into #pulsepromolandscape / #pulsepromolist
+  // via innerHTML AFTER boot, so the boot-time wrapTables() never reached them — an unwrapped wide
+  // .tbl pushes the whole #acq route sideways on mobile. Re-run the idempotent wrapper here (it
+  // skips tables already inside a .tblwrap) so every promo table scrolls inside its own box.
+  wrapTables();
 }
 
 /* ---------- rival universe · the full จำนำทะเบียน field (obj #2) ----------
