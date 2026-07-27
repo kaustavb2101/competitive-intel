@@ -2903,6 +2903,28 @@ function drawPeerProvince(){
           (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
       }
     }
+    // WHERE that lead sits — the same MEASURED `leader` field rolled up by region
+    // (m.region_brand_leaders). The national tally hides that a network can dominate everywhere yet
+    // be genuinely contested in ONE region; this names the regional leader and flags any region where
+    // the lead is a tie or thin (<60% of the region's provinces). Degrades to '' on a pre-fold layer.
+    const rbl=m.region_brand_leaders||null;
+    let regionStr='';
+    if(rbl&&rbl.length){
+      const regByLeader={};
+      rbl.forEach(r=>{regByLeader[r.leader]=(regByLeader[r.leader]||0)+1;});
+      const domEntries=Object.entries(regByLeader).sort((a,b)=>b[1]-a[1]);
+      const domStr=(domEntries.length===1)
+        ? `<b>${domEntries[0][0]}</b> holds the most provinces in all ${rbl.length} regions`
+        : `the regional ground leader is ${domEntries.map(([op,n])=>`<b>${op}</b> in ${n}`).join(', ')}`;
+      const contested=rbl.filter(r=>{
+        const vals=Object.values(r.led_by||{}).sort((a,b)=>b-a);
+        return (vals[1]||0)>=r.n_led || (r.n_provinces && r.n_led/r.n_provinces<0.6);
+      }).map(r=>{
+        const runner=Object.entries(r.led_by||{}).filter(([op])=>op!==r.leader).sort((a,b)=>b[1]-a[1])[0];
+        return runner?`the <b style="color:var(--agri)">${r.region}</b> is contested (${r.leader} ${r.led_by[r.leader]} / ${runner[0]} ${runner[1]} of ${r.n_provinces})`:'';
+      }).filter(Boolean);
+      regionStr=` By region, ${domStr}${contested.length?' — but '+contested.join('; '):''}.`;
+    }
     // Intra-province ground contest, rolled up client-side from the same MEASURED per-record fields:
     // how many of ALL 77 provinces' districts the big-4 outnumber AutoX in, plus the "hidden contest"
     // cases where AutoX ranks top-2 in the province yet is outnumbered in the majority of its districts
@@ -2919,7 +2941,7 @@ function drawPeerProvince(){
     }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${regionStr} `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
