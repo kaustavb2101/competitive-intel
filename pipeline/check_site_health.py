@@ -263,6 +263,29 @@ def _shape_tape_real(d):
     return None
 
 
+def _shape_collateral_flow(d):
+    # The MEASURED used-collateral pulse (obj #1) — the Overview tab's lead
+    # "moto / car / pickup" registration-flow card (renderCollateralFlow reads
+    # .regions + meta.national_mix_pct). Motorcycles are ~50% of the book, so a
+    # truncated deploy that drops the region rows or the national mix blanks a
+    # primary obj-#1 exec screen with no phone alert — the exact "broken demo"
+    # this probe exists to catch. Overview is a default nav route, so cover it.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    regs = d.get("regions")
+    if not isinstance(regs, list) or len(regs) < 5:
+        return "missing/short 'regions' list (expected 5 macro regions)"
+    r0 = regs[0]
+    if not isinstance(r0, dict) or "region" not in r0 or not isinstance(r0.get("moto"), dict):
+        return "first region missing 'region'/'moto' collateral block"
+    if "transfer_rate" not in r0["moto"]:
+        return "region moto block missing 'transfer_rate'"
+    mix = (d.get("meta") or {}).get("national_mix_pct") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(mix, dict) or "moto" not in mix:
+        return "meta.national_mix_pct missing 'moto' (headline read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -284,6 +307,11 @@ DATA_FILES = [
     ("data/province_risk.json", _shape_province_risk, ".provinces rollup (~77, obj #1 risk verdict)"),
     ("data/branch_risk.json", _shape_branch_risk, ".branches list of 2015 (index-aligned composite risk)"),
     ("data/tape_real.json", _shape_tape_real, "headline + bucket_ladder (MEASURED portfolio truth)"),
+    # Overview (#overview) tab's lead used-collateral pulse card — a default nav
+    # route, MEASURED DLT registration flow, obj #1's primary collateral class
+    # (moto ~50% of the book). Shipped 2026-07-27 with no probe coverage; a
+    # truncated CDN deploy would blank it with no alert. Added to close that gap.
+    ("data/collateral_flow.json", _shape_collateral_flow, ".regions (5 macro regions) + meta.national_mix_pct (moto/car/pickup)"),
 ]
 
 
