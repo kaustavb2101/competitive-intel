@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T22:20:36+00:00",
-    "commit": "a342b7b"
+    "generated_at": "2026-07-27T04:24:35+00:00",
+    "commit": "d5138d1"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 1,
-    "eta_date": "2026-07-27",
+    "eta_date": "2026-07-28",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -480,6 +480,60 @@
   ],
   "activity": [
     {
+      "date": "2026-07-27T04:24:35+00:00",
+      "sha": "d5138d1",
+      "summary": "health(deploy): probe the Overview used-collateral pulse card (collateral_flow.json)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-27T10:54:03+07:00",
+      "sha": "5026f08",
+      "summary": "ux: surface the #branches 150-row cap instead of silently truncating (#185)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-27T09:07:37+07:00",
+      "sha": "6e65e3f",
+      "summary": "fix(gate): regenerate commodities.json after the NABC/farm-gate source refresh (#181) (#184)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-27T09:00:23+07:00",
+      "sha": "cabc123",
+      "summary": "feat(province): surface MEASURED DOAE planted area on the 77-province deep-dive (obj #1) (#176)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-27T08:55:58+07:00",
+      "sha": "154b449",
+      "summary": "feat(competition): surface PICO-finance licensing momentum (obj #2, MEASURED) (#179)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-27T08:49:15+07:00",
+      "sha": "21782c4",
+      "summary": "feat(obj#1): surface the used-collateral pulse (moto/car/pickup) by region (#183)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-27T08:43:51+07:00",
+      "sha": "4895fab",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-26, run 30222800183) (#182)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-27T08:34:37+07:00",
+      "sha": "f3ef699",
+      "summary": "data: NABC live prices (2026-07-26, run 30220598306) (#181)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-26T22:21:17+00:00",
+      "sha": "a606668",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health probe ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-26T22:20:36+00:00",
       "sha": "a342b7b",
       "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
@@ -604,60 +658,6 @@
       "sha": "3a9ba5b",
       "summary": "feat(peer): MEASURED store-locator footprint ranking beside the IR-count national standing (obj #2) (#173)",
       "pillar": "peer"
-    },
-    {
-      "date": "2026-07-26T02:37:54+00:00",
-      "sha": "620b818",
-      "summary": "docs: log the Risk-pillar route fix — merged (#172) + deploy-verified",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-26T09:33:17+07:00",
-      "sha": "a7aa7d2",
-      "summary": "ux: route command-center Risk pillar to #exposure, not retired #trend (#172)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T23:45:03+00:00",
-      "sha": "17b0c19",
-      "summary": "data: live fuel prices (2026-07-25, run 30179862740)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-25T22:21:05+00:00",
-      "sha": "1bb7aad",
-      "summary": "committee: refresh autonomy plan / CEO dashboard after the site-health-probe realign",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-25T22:19:08+00:00",
-      "sha": "64d069f",
-      "summary": "fix(service): realign the nightly site-health probe to the live front-door",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T22:05:55+00:00",
-      "sha": "49d6e12",
-      "summary": "committee: refresh autonomy plan (run 30176705122)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-26T03:26:27+07:00",
-      "sha": "527da01",
-      "summary": "ux: route Command-center Assistance pillar to its own detail page (#169)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-25T18:18:52+00:00",
-      "sha": "5b3fe5a",
-      "summary": "ci(data): add data-sfi-credit.yml — monthly FPO SFI credit-quality refresh",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-26T00:08:01+07:00",
-      "sha": "f488877",
-      "summary": "income engine: attach MEASURED NSO LFS wage as a cross-check (additive; \"go with A\", conservative) (#168)",
-      "pillar": "feature"
     }
   ]
 }
