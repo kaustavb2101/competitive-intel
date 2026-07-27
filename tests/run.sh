@@ -90,6 +90,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_branch_cropland.py --check (source-data/doae_planted_area.json absent — not data drift)"
   else bad "build_branch_cropland.py --check (branch_cropland.json drifted from spam2010/crop_landuse/doae_planted_area)"
   fi
+  ( cd "$PIPE" && python3 build_province_cropland.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_province_cropland.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_province_cropland.py --check (source-data/doae_planted_area.json absent — not data drift)"
+  else bad "build_province_cropland.py --check (province_cropland.json drifted from doae_planted_area)"
+  fi
   ( cd "$PIPE" && python3 build_pico_census.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_pico_census.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_pico_census.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"

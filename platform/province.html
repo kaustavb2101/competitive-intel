@@ -1202,7 +1202,20 @@ function renderCropLegend(){
   const order=['rice','cassava','maize','sugarcane','oilpalm','rubber'].filter(k=>present[k]);
   host.innerHTML='<span class="cl-ttl">Dominant crop</span>'+order.map(k=>{const c=CROP_COLORS[k];
     return `<span class="cl-k"><span class="sw" style="background:rgb(${c[0]},${c[1]},${c[2]})"></span>${CROP_LABEL[k]}</span>`;}).join('')
-    +'<span class="cl-src">◇ estimated · SPAM 2010 (model-allocated)</span>';
+    +'<span class="cl-src">◇ estimated · SPAM 2010 (model-allocated)</span>'
+    +measuredCropSpan();
+}
+// MEASURED magnitude line beside the ESTIMATED SPAM lens: the province's DOAE 2568/2025 registered
+// planted area (the authoritative crop-exposure total behind the model-allocated spatial pattern).
+// Rubber is INCLUDED here (DOAE carries it) though the SPAM lens can't paint it. Null-safe.
+function measuredCropSpan(){
+  const pc=window.PROVCROP; const rec=pc&&pc.provinces?pc.provinces[SLUG]:null;
+  if(!rec||!(rec.total_ha>0))return '';
+  const dom=rec.dominant?(CROP_LABEL[rec.dominant]||rec.dominant):'';
+  const domha=Math.round(rec.dominant_ha||0).toLocaleString();
+  const tot=Math.round(rec.total_ha).toLocaleString();
+  const lead=dom?` · led by ${dom} (${domha} ha)`:'';
+  return `<span class="cl-src" style="color:#5B7CFA">◆ measured · DOAE 2568: ${tot} ha planted${lead}</span>`;
 }
 (function(){var ct=document.getElementById('croptog');if(!ct)return;
   if(!hasCrop){ct.disabled=true;ct.style.opacity='.45';ct.style.cursor='not-allowed';ct.title='No crop data (SPAM) for this province';return;}
@@ -1310,8 +1323,11 @@ buildStrip();buildBldgLegend();buildLegend();buildCascade();buildProvincePanels(
    fetch('data/crop_farmer_income.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
    // NSO Labour Force Survey measured MONTHLY WAGE by region (2568, real). A measured reality-check on the
    // ESTIMATED individual occupation-income line. null/absent => the panel just omits the measured-wage line.
-   fetch('data/nso_wage_anchor.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
- ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];window.OCCIND=a[5];window.CROPFARM=a[6];window.NSOWAGE=a[7];
+   fetch('data/nso_wage_anchor.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;}),
+   // per-province MEASURED planted area by crop (DOAE farmer registry 2568/2025), keyed by slug. The
+   // authoritative measured MAGNITUDE behind the ESTIMATED SPAM crop lens. null/absent => legend omits it.
+   fetch('data/province_cropland.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+ ]).then(function(a){window.RY=a[0];window.PROV_INDEX=a[1];window.TILECFG=a[2];window.CROPLU=a[3];window.CENSUS=a[4];window.OCCIND=a[5];window.CROPFARM=a[6];window.NSOWAGE=a[7];window.PROVCROP=a[8];
    document.title=(a[0].province_en||'Province')+' · '+(a[0].region||'')+' — AutoX · เงินไชโย';
    killLoader();            // spinner gone the moment data is in hand; init draws the scene next
    window.initProvince();})
