@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-27T16:23:47+00:00",
-    "commit": "965de1e"
+    "generated_at": "2026-07-27T16:24:27Z",
+    "commit": "f5c7e47"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,13 +532,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-27T16:23:47+00:00",
+      "date": "2026-07-27T16:24:27Z",
+      "sha": "f5c7e47",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_province deploy-health probe ship",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-07-27T16:23:47Z",
       "sha": "965de1e",
       "summary": "health(deploy): probe the competition pillar's flagship exec layer (peer_province.json, obj #2)",
       "pillar": "peer"
     },
     {
-      "date": "2026-07-27T14:27:04+00:00",
+      "date": "2026-07-27T14:27:04Z",
       "sha": "7bb6ca4",
       "summary": "docs(progress): log the Road-to-3,000 thesis-bar dead-CSS UX-loop run (#189) — merge+deploy+verify",
       "pillar": "uxui"
@@ -550,13 +556,13 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T12:36:23+00:00",
+      "date": "2026-07-27T12:36:23Z",
       "sha": "3263929",
       "summary": "committee: refresh autonomy plan (run 30266165997)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T10:41:33+00:00",
+      "date": "2026-07-27T10:41:33Z",
       "sha": "528cc5e",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the honest-ETA ship",
       "pillar": "feature"
@@ -568,7 +574,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-27T08:32:04+00:00",
+      "date": "2026-07-27T08:32:04Z",
       "sha": "cf7dd16",
       "summary": "docs(progress): log the noscript-fallback UX-loop run (#186) — merge+deploy+verify",
       "pillar": "uxui"
@@ -580,31 +586,31 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T07:00:28+00:00",
+      "date": "2026-07-27T07:00:28Z",
       "sha": "08f4b0f",
       "summary": "committee: autonomous competitor scout (run 30244059030)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-27T06:42:26+00:00",
+      "date": "2026-07-27T06:42:26Z",
       "sha": "2dea9a9",
       "summary": "committee: refresh autonomy plan (run 30243246593)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T06:20:20+00:00",
+      "date": "2026-07-27T06:20:20Z",
       "sha": "fbdea96",
       "summary": "health(deploy): probe the Overview truck_flow + region_debt cards",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:25:02+00:00",
+      "date": "2026-07-27T04:25:02Z",
       "sha": "0447648",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Overview deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:24:35+00:00",
+      "date": "2026-07-27T04:24:35Z",
       "sha": "d5138d1",
       "summary": "health(deploy): probe the Overview used-collateral pulse card (collateral_flow.json)",
       "pillar": "service"
@@ -652,25 +658,25 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T22:21:17+00:00",
+      "date": "2026-07-26T22:21:17Z",
       "sha": "a606668",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:20:36+00:00",
+      "date": "2026-07-26T22:20:36Z",
       "sha": "a342b7b",
       "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:08:57+00:00",
+      "date": "2026-07-26T22:08:57Z",
       "sha": "c08c0fb",
       "summary": "committee: refresh autonomy plan (run 30222349809)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T20:25:35+00:00",
+      "date": "2026-07-26T20:25:35Z",
       "sha": "b2cc709",
       "summary": "docs: log ux-pillar-acquisition-wrong-route merge+deploy+verify (PR #180)",
       "pillar": "uxui"
@@ -682,7 +688,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T16:43:59+00:00",
+      "date": "2026-07-26T16:43:59Z",
       "sha": "e263ba3",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
       "pillar": "data-integration"
@@ -694,21 +700,15 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T16:11:56+00:00",
+      "date": "2026-07-26T16:11:56Z",
       "sha": "067bd9f",
       "summary": "committee: refresh autonomy plan (run 30209636414)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T14:21:10+00:00",
+      "date": "2026-07-26T14:21:10Z",
       "sha": "db4718a",
       "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-26T21:17:46+07:00",
-      "sha": "67a5541",
-      "summary": "ux: honor prefers-reduced-motion on the deck.gl 3D pages (#177)",
       "pillar": "3d-enrichment"
     }
   ]
