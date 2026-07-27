@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-27T16:24:27Z",
-    "commit": "f5c7e47"
+    "generated_at": "2026-07-27T20:34:44Z",
+    "commit": "d55d39f"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-07-27T20:34:44Z",
+      "sha": "d55d39f",
+      "summary": "docs(progress): log the #acq mobile-overflow UX-loop run (#190) — merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-28T03:30:43+07:00",
+      "sha": "3938cd6",
+      "summary": "ux: fix Competition (#acq) route horizontal overflow on mobile (#190)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-27T18:40:20Z",
+      "sha": "76aa0f4",
+      "summary": "feat(competition): PICO competitor census to district (อำเภอ) grain — pico_district.json (obj #2)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-27T17:06:47Z",
+      "sha": "16a2f33",
+      "summary": "committee: refresh autonomy plan (run 30287465163)",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-27T16:24:27Z",
       "sha": "f5c7e47",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_province deploy-health probe ship",
@@ -686,30 +710,6 @@
       "sha": "a63cf09",
       "summary": "ux: point the command-center ② Acquisition pillar at the data book (#180)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-26T16:43:59Z",
-      "sha": "e263ba3",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-26T23:42:51+07:00",
-      "sha": "f42b006",
-      "summary": "feat(service): deterministic FRESHNESS readout in the Data-room provenance census (#178)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-26T16:11:56Z",
-      "sha": "067bd9f",
-      "summary": "committee: refresh autonomy plan (run 30209636414)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-26T14:21:10Z",
-      "sha": "db4718a",
-      "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
-      "pillar": "3d-enrichment"
     }
   ]
 }
