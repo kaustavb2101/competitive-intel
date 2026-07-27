@@ -48,19 +48,36 @@ SNAPSHOT_VINTAGE = "2026-05-22"  # from the resource filename (DDMMYYYY)
 
 COL_TYPE = "ประเภทสำนักงาน"        # office type: สำนักงานใหญ่ (head) / สำนักสาขา (branch)
 COL_PROV = "จังหวัดที่ให้บริการ"    # province of service
+COL_LICDATE = "วันที่ได้รับใบอนุญาต"  # FPO licence-grant date (ISO YYYY-MM-DD) — the "entry" signal
 HEAD_TOKEN = "ใหญ่"                # substring identifying a head office ("สำนักงานใหญ่")
+
+# Licensing-momentum window (objective #2): operators whose licence was granted within RECENT_MONTHS
+# before the registry snapshot count as RECENT entries — a rising-competitive-pressure read (where the
+# sub-scale PICO field is NEWEST, not just densest). The cutoff is derived from the PINNED snapshot
+# vintage, NOT wall-clock, so the count is deterministic + byte-stable across re-runs.
+RECENT_MONTHS = 24
+_sy, _sm, _sd = (int(x) for x in SNAPSHOT_VINTAGE.split("-"))
+_cut = (_sy * 12 + (_sm - 1)) - RECENT_MONTHS
+CUTOFF_DATE = "%04d-%02d-%02d" % (_cut // 12, _cut % 12 + 1, _sd)  # 2026-05-22 − 24mo → 2024-05-22
+
+
+def _valid_iso(s):
+    # zero-padded YYYY-MM-DD → lexicographic compare == chronological compare (no datetime needed)
+    return (len(s) == 10 and s[4] == "-" and s[7] == "-"
+            and s[:4].isdigit() and s[5:7].isdigit() and s[8:10].isdigit())
 
 
 def build():
-    by_prov = {}          # canonical prov -> [total, head, branch, other]
+    by_prov = {}          # canonical prov -> [total, head, branch, other, recent]
     n_total = n_head = n_branch = n_other = n_unmapped = 0
+    n_recent = n_lic_parsed = n_lic_unparsed = 0
     with open(CSV_IN, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
             prov = canonical((row.get(COL_PROV) or "").strip())
             if not prov:
                 n_unmapped += 1
                 continue
-            rec = by_prov.setdefault(prov, [0, 0, 0, 0])
+            rec = by_prov.setdefault(prov, [0, 0, 0, 0, 0])
             rec[0] += 1
             n_total += 1
             otype = (row.get(COL_TYPE) or "").strip()
@@ -70,8 +87,16 @@ def build():
                 rec[2] += 1; n_branch += 1
             else:
                 rec[3] += 1; n_other += 1
+            # licence-grant recency (MEASURED, deterministic vs the pinned snapshot cutoff)
+            lic = (row.get(COL_LICDATE) or "").strip()
+            if _valid_iso(lic):
+                n_lic_parsed += 1
+                if lic >= CUTOFF_DATE:
+                    rec[4] += 1; n_recent += 1
+            else:
+                n_lic_unparsed += 1
 
-    by_province = {p: {"total": v[0], "head": v[1], "branch": v[2]}
+    by_province = {p: {"total": v[0], "head": v[1], "branch": v[2], "recent": v[4]}
                    for p, v in sorted(by_prov.items())}
     # honestly surface the "other" office-type bucket only where non-zero
     for p, v in by_prov.items():
@@ -82,6 +107,9 @@ def build():
     zero_provinces = sorted(all_canon - set(by_prov.keys()))
     top = sorted(((p, v["total"]) for p, v in by_province.items()),
                  key=lambda kv: (-kv[1], kv[0]))[:15]
+    # licensing-momentum rollup: provinces where the sub-scale PICO field is NEWEST (top by recent count)
+    top_recent = sorted(((p, v["recent"], v["total"]) for p, v in by_province.items() if v["recent"]),
+                        key=lambda t: (-t[1], t[0]))[:15]
 
     meta = {
         "generated_by": "pipeline/build_pico_census.py",
@@ -105,6 +133,22 @@ def build():
         "n_provinces_zero": len(zero_provinces),
         "office_types": {"สำนักงานใหญ่": "head office (registered HQ)",
                          "สำนักสาขา": "branch office / service point"},
+        "licence_momentum": {
+            "label": ("MEASURED licensing momentum — operators whose FPO licence-grant date "
+                      "(วันที่ได้รับใบอนุญาต) falls within the trailing %d months before the registry "
+                      "snapshot. A rising-competitive-pressure read for objective #2: where the "
+                      "sub-scale PICO rival field is NEWEST, not just densest. The cutoff is derived "
+                      "from the pinned snapshot vintage (deterministic), never wall-clock." % RECENT_MONTHS),
+            "column": "วันที่ได้รับใบอนุญาต (licence-grant date, ISO)",
+            "window_months": RECENT_MONTHS,
+            "cutoff_date": CUTOFF_DATE,
+            "snapshot_date": SNAPSHOT_VINTAGE,
+            "n_recent": n_recent,
+            "recent_share_pct": round(100.0 * n_recent / n_total, 1) if n_total else 0.0,
+            "n_licence_dates_parsed": n_lic_parsed,
+            "n_licence_dates_unparsed": n_lic_unparsed,
+            "top_recent": top_recent,
+        },
         "objective": ("Competitive risk (#2): measured density of a distinct licensed non-bank rival "
                       "class across the existing AutoX footprint, province by province."),
         "gaps": [
@@ -158,6 +202,10 @@ def main():
           % (OUT, m["n_operators"], m["n_provinces_present"], m["n_head_office"],
              m["n_branch_office"], m["n_provinces_zero"]))
     print("  top: %s" % ", ".join("%s=%d" % (p, n) for p, n in obj["top"][:6]))
+    lm = m["licence_momentum"]
+    print("  momentum: %d licensed in trailing %dmo (>=%s) = %.1f%% of field; newest: %s"
+          % (lm["n_recent"], lm["window_months"], lm["cutoff_date"], lm["recent_share_pct"],
+             ", ".join("%s=%d" % (p, r) for p, r, _ in lm["top_recent"][:6])))
     if obj["zero_provinces"]:
         print("  zero-PICO provinces: %s" % ", ".join(obj["zero_provinces"]))
 

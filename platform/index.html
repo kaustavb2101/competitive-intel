@@ -422,6 +422,19 @@
       <p class="lead" id="truckflow-note"></p>
       <table class="tbl" id="truckflowtbl"></table>
     </div>
+    <!-- Used-collateral pulse (data/collateral_flow.json) — MEASURED DLT car-law registration actions
+         (dataset_stat_1_008: motorcycle/car/pickup, the title-loan collateral classes), trailing-12m,
+         aggregated to the 5 macro regions (obj #1). Motorcycles are ~50% of the book; the card reads
+         where that core collateral is most liquid (used-market transfers = how fast repossessed units
+         clear) and where the base is attriting fastest (permanent deregistrations). REGION grain on
+         purpose — per-province ratios are confounded by central metro registration, which regional
+         aggregation cancels. Rendered by renderCollateralFlow(); hidden gracefully until the layer loads. -->
+    <div id="collflow-wrap" style="display:none">
+      <h2 class="risk">Used-collateral pulse · moto / car / pickup <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
+      <div class="verdict" id="collflow-verdict" style="display:none"></div>
+      <p class="lead" id="collflow-note"></p>
+      <table class="tbl" id="collflowtbl"></table>
+    </div>
     <div id="dbdform-wrap" style="display:none">
       <h2 class="risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h2>
       <div class="verdict" id="dbdform-verdict" style="display:none"></div>

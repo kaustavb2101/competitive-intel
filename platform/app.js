@@ -187,6 +187,27 @@ async function loadTruckFlow(){
   return truckflowPromise;
 }
 
+// Used-collateral pulse — MEASURED DLT car-law registration actions (dataset_stat_1_008: motorcycles,
+// cars, pickups — the title-loan collateral classes), trailing-12m, aggregated to the 5 macro regions
+// (data/collateral_flow.json). Obj #1: motorcycles are ~50% of the book; a more active used market
+// (higher transfer intensity) means repossessed collateral clears faster, while a higher permanent-
+// deregistration rate marks where the collateral base is attriting faster. REGION grain on purpose —
+// per-province transfer/dereg is confounded by central metro registration (see the layer's grain_why),
+// so region is the honest grain. Fully null-guarded: absent file → COLLFLOW stays null, the Overview
+// block stays hidden (see renderCollateralFlow), nothing fabricated.
+let COLLFLOW=null, COLLFLOW_META=null, collflowPromise=null;
+async function loadCollateralFlow(){
+  if(collflowPromise) return collflowPromise;
+  collflowPromise=(async()=>{
+    try{
+      const j = await fetch('data/collateral_flow.json').then(r=>r.json());
+      COLLFLOW=Array.isArray(j.regions)?j.regions:null; COLLFLOW_META=j.meta||null;
+    }catch(e){ COLLFLOW=null; COLLFLOW_META=null; }
+    return COLLFLOW;
+  })();
+  return collflowPromise;
+}
+
 // Business-formation pulse — MEASURED DBD (Department of Business Development) new juristic-person
 // registrations for the snapshot month (data/dbd_formation.json). Per province: n new firms +
 // registered capital. A DEMAND / economic-vitality backdrop for BOTH objectives: where new small
@@ -1559,6 +1580,10 @@ function renderOverview(){
   // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
   // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
   loadTruckFlow().then(renderTruckFlow);
+  // MEASURED used-collateral pulse (collateral_flow.json, DLT car-law registrations, obj #1) — where the
+  // primary title collateral (moto/car/pickup) is most liquid and where its base is attriting fastest,
+  // by region. Null-safe: absent file → the block stays hidden.
+  loadCollateralFlow().then(renderCollateralFlow);
   // MEASURED business-formation pulse (dbd_formation.json, DBD registry) — the small-business borrower
   // base backdrop for the merchant book (both objectives). Null-safe: absent file → the block stays hidden.
   loadDbdForm().then(renderDbdForm);
@@ -2280,6 +2305,45 @@ function renderTruckFlow(){
         `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
         `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
         `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
+  wrap.style.display='';
+}
+
+function renderCollateralFlow(){
+  const wrap=$('#collflow-wrap'); if(!wrap) return;
+  const rows=Array.isArray(COLLFLOW)?COLLFLOW.filter(r=>r&&r.region&&r.moto&&r.moto.transfer_rate!=null):[];
+  if(!rows.length){ wrap.style.display='none'; return; }
+  const TH_REG={'Central&BKK':'ภาคกลาง+กทม.','East':'ภาคตะวันออก','Isan':'ภาคอีสาน','North':'ภาคเหนือ','South':'ภาคใต้'};
+  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
+  const rp=v=>(v==null||!isFinite(v))?'—':(v*100).toFixed(v<0.02?2:1)+'%';   // ratio → percent
+  const nat=(COLLFLOW_META&&COLLFLOW_META.national&&COLLFLOW_META.national.moto)||null;
+  const mix=(COLLFLOW_META&&COLLFLOW_META.national_mix_pct)||null;
+  // sorted worst-attrition-first in the layer; derive lowest-liquidity independently.
+  const worstAttr=rows[0];
+  const lowLiq=rows.slice().sort((a,b)=>(a.moto.transfer_rate||0)-(b.moto.transfer_rate||0))[0];
+  const vb=$('#collflow-verdict');
+  if(vb){
+    vb.className='verdict'; vb.style.display='block';
+    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are AutoX's largest title class${mix?` — ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%)`:''}, so their used-market liquidity is what sets how fast repossessed collateral clears.</b> `+
+      `${nat?`Nationally ${rp(nat.transfer_rate)} of moto registry actions are ownership transfers, and ${rp(nat.dereg_rate)} are permanent deregistrations.`:''}</div>`+
+      `<div class="sub" style="margin-top:4px">Collateral attrition (permanent deregistration) runs fastest in <b>${TH_REG[worstAttr.region]||worstAttr.region}</b> (${rp(worstAttr.moto.dereg_rate)}), and the moto used market is thinnest — slowest to clear collateral — in <b>${TH_REG[lowLiq.region]||lowLiq.region}</b> (${rp(lowLiq.moto.transfer_rate)} transfer intensity). A backdrop read on the book we already run, not an open/close cue. ${TAG_M}.</div>`;
+  }
+  const note=$('#collflow-note');
+  const win=(COLLFLOW_META&&Array.isArray(COLLFLOW_META.window))?COLLFLOW_META.window:null;
+  if(note) note.innerHTML='<b>Measured</b> — DLT car-law registration actions (dataset_stat_1_008: motorcycle / car / pickup — the title-loan collateral classes), '+
+    'trailing-12-month sums'+(win?` (${win[0]}–${win[1]})`:'')+'. '+
+    '<b>Region is the honest grain</b>: per-province transfer/deregistration ratios are confounded by central metropolitan registration (the Bangkok-ring provinces read artifactually low, Bangkok high), which regional aggregation cancels. '+
+    'These are single-window <b>levels</b>, not a year-on-year trend. '+
+    '<b>Used-market liquidity</b> = ownership transfers ÷ all registry actions (how easily collateral clears); '+
+    '<b>attrition</b> = permanent deregistrations ÷ all registry actions (the collateral base leaving the fleet).';
+  const maxLiq=Math.max(...rows.map(r=>r.moto.transfer_rate||0),0.0001);
+  const tbl=$('#collflowtbl');
+  if(tbl) tbl.innerHTML=`<tr><th>Region</th><th title="MEASURED — motorcycle ownership transfers as a share of all car-law registry actions; a read on how liquid the used-moto market is (how fast repossessed collateral clears)">Moto used-market liquidity ●</th><th title="MEASURED — motorcycle permanent deregistrations as a share of registry actions; the collateral base leaving the fleet">Moto attrition ●</th><th title="MEASURED — total car-law registration actions for motorcycles in the window (the base)">Moto base ●</th></tr>`+
+    rows.map(r=>{const m=r.moto; const tr=m.transfer_rate||0, dr=m.dereg_rate||0;
+      const dc=dr>=0.01?'var(--agri)':dr>=0.005?'var(--gold)':'var(--merch)';
+      return `<tr><td><b>${TH_REG[r.region]||r.region}</b></td>`+
+        `<td>${barHTML(Math.round(100*tr/maxLiq),'var(--collat)')} <span class="mono">${rp(tr)}</span></td>`+
+        `<td class="mono" style="color:${dc}">${rp(dr)}</td>`+
+        `<td class="mono sub">${num(m.processed)}</td></tr>`;}).join('');
   wrap.style.display='';
 }
 
@@ -3412,6 +3476,8 @@ function drawPicoCompetitors(){
   }
   // measured theme tokens (contrast-safe in light + dark): PICO=gold, AutoX=teal, pressure(outnumber)=risk-red.
   const PICO='var(--gold)', AX='var(--merch)', PRESS='var(--agri)';
+  const m=PICOCOMP.meta||{}, lm=m.licence_momentum||null;   // MEASURED licensing-momentum rollup (may be absent)
+  const winMo=(lm&&lm.window_months)||24;
   const top=rows.slice().sort((a,b)=>(b.outnumber||0)-(a.outnumber||0)).slice(0,PICOCOMP_TOPN);
   const maxPico=Math.max(1,...top.map(r=>r.pico_total||0));
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
@@ -3428,13 +3494,13 @@ function drawPicoCompetitors(){
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td>${name}</td>
-        <td>${barHTML(r.pico_total||0,PICO,maxPico)} <span class="mono" style="color:${PICO}">${r.pico_total==null?'—':r.pico_total}</span></td>
+        <td>${barHTML(r.pico_total||0,PICO,maxPico)} <span class="mono" style="color:${PICO}">${r.pico_total==null?'—':r.pico_total}</span>${(r.pico_recent>0)?` <span class="sub" title="MEASURED — licensed in the trailing ${winMo} months (newly-arrived sub-scale rivals)">+${r.pico_recent} new</span>`:''}</td>
         <td>${barHTML(r.autox_branches||0,AX,maxPico)} <span class="mono" style="color:${AX}">${r.autox_branches==null?'—':r.autox_branches}</span></td>
         <td><span class="mono" style="color:${onc}"><b>${sign}${on}</b></span></td>
         <td>${ratio}</td>
       </tr>`;}).join('');
   if(ro){
-    const m=PICOCOMP.meta||{}, t=top[0];
+    const t=top[0];
     const nOut=m.n_provinces_pico_outnumbers_autox!=null?m.n_provinces_pico_outnumbers_autox:rows.filter(r=>(r.outnumber||0)>0).length;
     const nProv=m.n_provinces||rows.length;
     let verdict='';
@@ -3443,15 +3509,23 @@ function drawPicoCompetitors(){
         ? `Sub-scale rivals outnumber AutoX most in <b style="color:var(--agri)">${t.th}${t.en?` (${t.en})`:''}</b> — <b style="color:var(--gold)">${t.pico_total}</b> licensed PICO operators vs <b style="color:var(--merch)">${t.autox_branches}</b> AutoX branches (${t.outnumber>0?'+':''}${t.outnumber}${t.ratio!=null?`, ${t.ratio.toFixed(2)}× our footprint`:''}).`
         : `AutoX is not outnumbered by sub-scale rivals in any province on this measure; ${t.th} is the tightest at ${t.pico_total} PICO vs ${t.autox_branches} branches.`;
     }
+    // MEASURED licensing-momentum line: where the sub-scale field is NEWEST (rising pressure ≠ static density).
+    let momo='';
+    if(lm&&lm.n_recent!=null){
+      const tr=(lm.top_recent||[])[0];
+      momo=` <b>Where rival entry is newest:</b> <b style="color:var(--agri)">${lm.n_recent}</b> of ${m.pico_total!=null?m.pico_total:'—'} licensed PICO operators (${lm.recent_share_pct}%) were licensed in the trailing ${lm.window_months} months (since ${lm.cutoff_date})`+
+        (tr?` — most in <b style="color:var(--gold)">${tr.th}${tr.en?` (${tr.en})`:''}</b>, where <b>${tr.pico_recent}</b> of its ${tr.pico_total} operators are new. Rising sub-scale entry is a distinct signal from existing density.`:'.');
+    }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches). ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
+         (lm?`<b>+N new</b> / “rival entry is newest” = operators whose FPO licence-grant date (วันที่ได้รับใบอนุญาต) falls in the trailing ${lm.window_months} months before the registry snapshot (since ${lm.cutoff_date}) — MEASURED, anchored on the pinned snapshot vintage, not wall-clock. It reads rising pressure, not existing density.`:''),
          'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
          'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
-         (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')]);
+         (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')].filter(Boolean));
   }
 }
 
