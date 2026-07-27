@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-27T08:32:04+00:00",
-    "commit": "cf7dd16"
+    "generated_at": "2026-07-27T17:38:32+07:00",
+    "commit": "4ac4427"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,12 @@
   ],
   "activity": [
     {
+      "date": "2026-07-27T17:38:32+07:00",
+      "sha": "4ac4427",
+      "summary": "plan: honest CEO-dashboard ETA excluding owner-side-blocked work (#187)",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-27T08:32:04+00:00",
       "sha": "cf7dd16",
       "summary": "docs(progress): log the noscript-fallback UX-loop run (#186) — merge+deploy+verify",
@@ -704,12 +710,6 @@
       "sha": "38ad825",
       "summary": "feat(home): surface MEASURED PICO-finance rival pressure on the Command center (obj #2) (#171)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-26T08:26:19+00:00",
-      "sha": "0511e7b",
-      "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
-      "pillar": "uxui"
     }
   ]
 }
