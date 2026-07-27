@@ -336,6 +336,34 @@ def _shape_region_debt(d):
     return None
 
 
+def _shape_peer_province(d):
+    # The MEASURED per-province PEER board (obj #2 competitive risk) — the
+    # Competition surface's flagship read (drawPeerProvince reads .provinces and,
+    # per row, .autox + .by_brand to stack AutoX next to Muangthai / Srisawad /
+    # Tidlor / Heng one brand at a time) AND the command-center thesis clause
+    # (loadPeerProvince). It is the sharpest competitive-risk benchmark on the
+    # footprint we already run. A truncated deploy that drops the province rows
+    # or the per-brand split blanks the exec's competitive board with no phone
+    # alert — the same "broken demo" blind spot the obj-#1 flow-card probes
+    # closed. Robust to a future census growth (row count asserted >=70, not ==77).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    p0 = provs[0]
+    if not isinstance(p0, dict) or "autox" not in p0:
+        return "first province missing 'autox' branch count"
+    if not isinstance(p0.get("by_brand"), dict):
+        return "first province missing 'by_brand' per-rival split (board render read)"
+    if "ratio" not in p0:
+        return "first province missing 'ratio' (rival:AutoX headline read)"
+    tot = (d.get("meta") or {}).get("total_autox") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(tot, int):
+        return "meta.total_autox missing (national rollup headline)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -369,6 +397,12 @@ DATA_FILES = [
     # coverage gap the 2026-07-27 collateral-flow probe ship flagged as next.
     ("data/truck_flow.json", _shape_truck_flow, ".provinces list (~77) with new_regis_yoy_pct"),
     ("data/region_debt.json", _shape_region_debt, ".series{national,region} + debt_per_household_thb"),
+    # The competition pillar's flagship exec layer (obj #2) — the per-province
+    # peer board (AutoX next to each big-4 rival, per province) that powers the
+    # Competition surface + the command-center thesis clause. Every default-route
+    # obj-#1 flow card is now probed; this closes the matching obj-#2 blind spot
+    # so a truncated deploy that guts the competitive board triggers a phone alert.
+    ("data/peer_province.json", _shape_peer_province, ".provinces (~77) with .by_brand per-rival split + meta.total_autox"),
 ]
 
 
