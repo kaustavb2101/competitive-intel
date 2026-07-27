@@ -6330,7 +6330,8 @@ function renderBranches(){
   let rows=DATA.filter(d=>!q || d.n.toLowerCase().includes(q) || d.v.toLowerCase().includes(q)
     || ((PLOOK[d.v]&&PLOOK[d.v].en)?PLOOK[d.v].en.toLowerCase().includes(q):false));  // also match English province name (was Thai-only: 'rayong' returned 0)
   rows.sort((a,b)=> branchSort==='w' ? a.w-b.w : branchSortVal(b,branchSort)-branchSortVal(a,branchSort));
-  rows=rows.slice(0,150);
+  const total=rows.length, CAP=150;   // silent-cap guard: the table renders only the top CAP; surface the count so the ~1,865 unshown branches aren't hidden without a cue
+  rows=rows.slice(0,CAP);
   $('#branches').innerHTML = `<tr><th class="no-print"></th><th class="h-agri" title="ESTIMATED proxy (OSM/price-based, 0–100), not a measured default rate">Portfolio risk ▲ est</th><th>Branch</th><th>Prov</th><th class="h-opp" title="DIW registered factory workers in the branch district — measured">Factory workers (DIW)</th><th>Pickups (prov)</th><th>Informal (prov)</th><th>AutoX</th><th class="no-print">3D</th></tr>`+
     (rows.length ? rows.map(d=>{const pl=PLOOK[d.v]||{}; const rk=riskVal(d); const rc=rk>=60?'var(--agri)':rk>=40?'var(--gold)':'var(--merch)';
       const id=`branch:${d.n}|${d.v}`;
@@ -6344,6 +6345,7 @@ function renderBranches(){
       <td class="mono" style="color:var(--collat)">${nsoNum(pl.informal)}</td>
       <td class="mono sub">${d.w}</td>
       <td class="no-print" style="white-space:nowrap">${branch3DLinks(d,true)}</td></tr>`;}).join('')
+      +(total>CAP?`<tr class="no-print"><td colspan="9" class="cc-empty" style="padding:10px 7px">Showing the top ${CAP} of ${total.toLocaleString()} ${q?'matching ':''}branches — refine the search or change the sort to reach the rest.</td></tr>`:'')
      : `<tr><td colspan="9" class="cc-empty" style="padding:14px 7px">No branches match “${dqEsc(q)}”. Clear the search to see all 2,015.</td></tr>`);
 }
 
