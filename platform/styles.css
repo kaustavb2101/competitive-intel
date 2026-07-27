@@ -733,20 +733,15 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 
 /* QW5 — HERO VERDICT BAND: 2–3 big plain-language statements, the front door's lead.
    Cards stretch across the widescreen and click through to their detail tab. */
-/* BOARD THESIS — one spoken sentence + Road-to-3,000 bar. A quiet, wide band above the hero cards. */
+/* BOARD THESIS — one spoken risk sentence. A quiet, wide band above the hero cards.
+   (The former branch-count progress bar was removed with the consolidation pivot — the network is
+   not growing, so there is no growth target to track; see app.js renderHomeThesis.) */
 .cc-thesis{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin:var(--s3,14px) 0 2px;
   background:linear-gradient(180deg,rgba(230,180,80,.07),var(--panel,#1A2233));
   border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:13px 18px}
 .cc-thesis:empty{display:none}
 .cc-thesis-line{flex:1 1 340px;font-size:14px;line-height:1.5;color:var(--txt);letter-spacing:-.1px}
 .cc-thesis-line b{color:var(--hi);font-weight:700}
-.cc-thesis-bar{position:relative;flex:0 0 220px;height:22px;background:var(--raised,#232E45);
-  border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.cc-thesis-fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--gold),#b88a2e);
-  border-radius:999px;transition:width .6s ease}
-.cc-thesis-barlab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:10.5px;font-weight:600;letter-spacing:.3px;color:#1a1305;text-shadow:0 0 4px rgba(255,255,255,.4)}
-@media(max-width:640px){.cc-thesis-bar{flex-basis:100%}}
 .cc-hero{display:grid;gap:var(--s3,14px);grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
   margin:var(--s3,14px) 0 var(--s5,32px)}  /* more air below the hero so the card strip reads as a new section, not crowded against it */
 .cc-hero:empty{display:none}
@@ -787,12 +782,9 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   .view{display:none!important}
   #v-home{display:block!important}
   .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
-  /* board thesis: whiten the band, darken the sentence, keep the Road-to-3,000 bar readable. */
+  /* board thesis: whiten the band, darken the sentence. */
   .cc-thesis{background:#fff!important;border:1px solid #bbb!important;border-left:4px solid #b88a2e!important;break-inside:avoid;box-shadow:none!important}
   .cc-thesis-line,.cc-thesis-line b{color:#111!important}
-  .cc-thesis-bar{background:#eee!important;border-color:#bbb!important}
-  .cc-thesis-fill{background:#b88a2e!important}
-  .cc-thesis-barlab{color:#111!important;text-shadow:none!important}
   .cc-card-h,.cc-row .l,.cc-row .r,h2,h3,b{color:#111!important}
   .lead,.cc-sub2,.cc-row .l .s,.cc-row .r .s,.sub{color:#444!important}
   .cc-grid{grid-template-columns:1fr 1fr}
@@ -977,8 +969,8 @@ main{
   margin-inline:auto;
 }
 
-/* 2 · data-heavy views use the widescreen. The map, the acquisition
-   board (white-space leaderboard / Road-to-3000) and exposure grids
+/* 2 · data-heavy views use the widescreen. The map, the competition
+   board (rival density / contested-ground readout) and exposure grids
    read as dashboards, not articles — let them breathe to --maxw-wide. */
 main:has(#v-map.on),
 main:has(#v-acq.on),
