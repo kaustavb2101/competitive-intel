@@ -137,9 +137,12 @@ def build_items():
     nc = n_catchments()
     items = []
 
-    def add(pillar, iid, title, st, priority, evidence):
+    def add(pillar, iid, title, st, priority, evidence, owner_side=False):
+        # owner_side = the item cannot be closed by the autonomous loops (it needs an owner action —
+        # e.g. a Vercel env var + a live production check). Flagged so the ETA excludes it instead of
+        # perpetually promising "done tomorrow" for work no loop can finish.
         items.append({"id": iid, "pillar": pillar, "title": title, "state": st,
-                      "priority": priority, "evidence": evidence})
+                      "priority": priority, "evidence": evidence, "owner_side": bool(owner_side)})
 
     # ---- data-integration ----
     add("data-integration", "di-tmli", "Fold MEASURED TMLI province layers (NSO SES/LFS) into the risk read",
@@ -188,7 +191,8 @@ def build_items():
     add("deployment", "dep-access", "Access protection on the deployment (sensitive branch-level PD)",
         state(rexists("middleware.js") and doc_has("docs/PROGRESS_LOG.md", "ACCESS PROTECTION VERIFIED")), 3,
         "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; "
-        "fail-open when unset. Verified live (401 without creds, 200 with the password).")
+        "fail-open when unset. Verified live (401 without creds, 200 with the password).",
+        owner_side=True)
 
     # ---- feature ----
     add("feature", "feat-competitor-coverage", "Competitive coverage & rival pressure (national census)",
@@ -250,9 +254,13 @@ def build_items():
         state(dexists("contested_pop.json")), 3, "platform/data/contested_pop.json present")
     add("market", "mkt-search-sos", "Share-of-search brand read",
         state(dexists("search_demand.json")), 2, "platform/data/search_demand.json present")
+    _scout_provs = census_provinces()
     add("market", "mkt-scout-national", "National scout coverage (rotate all 77 provinces)",
-        state(census_provinces() >= 77), 2,
-        "scout rotates least-covered provinces via committee-cycle.yml; full 77 not yet complete")
+        state(_scout_provs >= 77), 2,
+        ("competitors_census.json spans all %d/77 provinces — the committee-cycle.yml scout rotation "
+         "has reached full national coverage" % _scout_provs) if _scout_provs >= 77 else
+        ("scout rotates least-covered provinces via committee-cycle.yml; %d/77 provinces covered so far"
+         % _scout_provs))
 
     # ---- service (portfolio & risk) ----
     add("service", "svc-loan-tape", "Loan-tape portfolio outputs (90+ aging, ROI, HHI, PD)",
@@ -386,16 +394,23 @@ def assemble():
             "key": key, "label": label, "progress_pct": pct, "done": done, "total": total,
             "status": pstatus,
             "items": [{"id": i["id"], "title": i["title"], "state": i["state"],
-                       "priority": i["priority"], "evidence": i["evidence"]} for i in its],
+                       "priority": i["priority"], "evidence": i["evidence"],
+                       "owner_side": i.get("owner_side", False)} for i in its],
         })
 
     done_items = sum(1 for i in items if i["state"] == "done")
     in_progress_items = sum(1 for i in items if i["state"] == "in_progress")
     open_items = sum(1 for i in items if i["state"] == "open")
+    # Split open work by who can actually finish it. Owner-side items (e.g. an env var + a live prod
+    # check) are NOT loop-closable, so the ETA — which projects the autonomous loops' throughput —
+    # must be computed over the autonomous-open subset only, else it perpetually promises "done
+    # tomorrow" for work the loops can never touch.
+    open_owner_side = sum(1 for i in items if i["state"] == "open" and i.get("owner_side"))
+    open_autonomous = open_items - open_owner_side
     total_items = len(items)
     progress_pct = round(100 * sum_done / sum_total) if sum_total else 0
 
-    eta_days = math.ceil(open_items / THROUGHPUT_PER_DAY) if open_items else 0
+    eta_days = math.ceil(open_autonomous / THROUGHPUT_PER_DAY) if open_autonomous else 0
     eta_date = (date.fromisoformat(generated_at[:10]) + timedelta(days=eta_days)).isoformat()
     overall_status = "on-track" if done_items >= open_items else "at-risk"
 
@@ -414,6 +429,8 @@ def assemble():
             "done_items": done_items,
             "in_progress_items": in_progress_items,
             "open_items": open_items,
+            "open_owner_side": open_owner_side,
+            "open_autonomous": open_autonomous,
             "total_items": total_items,
         },
         "loops": LOOPS,
@@ -441,10 +458,21 @@ def render_markdown(obj):
     L.append("")
     L.append("## Overall: %d%% complete — %s" % (o["progress_pct"], o["status"]))
     L.append("")
-    L.append("- **Done:** %d · **In progress:** %d · **Open:** %d · **Total:** %d"
-             % (o["done_items"], o["in_progress_items"], o["open_items"], o["total_items"]))
-    L.append("- **ETA (ESTIMATED):** ~%d days · by %s (at ~%d items/day)"
-             % (o["eta_days"], o["eta_date"], THROUGHPUT_PER_DAY))
+    owner_side = o.get("open_owner_side", 0)
+    autonomous = o.get("open_autonomous", o["open_items"])
+    open_note = (" (%d owner-side)" % owner_side) if owner_side else ""
+    L.append("- **Done:** %d · **In progress:** %d · **Open:** %d%s · **Total:** %d"
+             % (o["done_items"], o["in_progress_items"], o["open_items"], open_note, o["total_items"]))
+    if autonomous <= 0 and owner_side:
+        L.append("- **ETA (ESTIMATED):** no autonomously-completable items remain — the %d open "
+                 "item%s %s owner-side (need an owner action, e.g. a Vercel env var + a live check), "
+                 "not loop-closable." % (owner_side, "" if owner_side == 1 else "s",
+                                         "is" if owner_side == 1 else "are"))
+    else:
+        L.append("- **ETA (ESTIMATED):** ~%d days · by %s (at ~%d items/day over %d autonomous open "
+                 "item%s%s)" % (o["eta_days"], o["eta_date"], THROUGHPUT_PER_DAY, autonomous,
+                                "" if autonomous == 1 else "s",
+                                ("; %d more owner-side" % owner_side) if owner_side else ""))
     L.append("")
     L.append("## Autonomous loops")
     L.append("")
@@ -460,8 +488,9 @@ def render_markdown(obj):
                  % (p["label"], p["progress_pct"], p["done"], p["total"], p["status"]))
         L.append("")
         for it in p["items"]:
+            st_lbl = it["state"] + (" · owner-side" if it.get("owner_side") and it["state"] != "done" else "")
             L.append("- %s **%s** — _%s_ (P%d) — %s"
-                     % (chip.get(it["state"], "⬜"), it["title"], it["state"],
+                     % (chip.get(it["state"], "⬜"), it["title"], st_lbl,
                         it["priority"], it["evidence"]))
         L.append("")
     L.append("## Recent activity")
