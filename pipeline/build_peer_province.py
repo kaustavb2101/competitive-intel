@@ -236,6 +236,35 @@ def build():
     # leads nowhere is itself a signal), so the dict is deterministic and JSON-stable.
     lead_counter = collections.Counter(p["leader"] for p in provinces)
     provinces_led_by = {op: lead_counter.get(op, 0) for op in (["AutoX"] + brands)}
+    # region_brand_leaders: WHERE each operator's provincial leads sit. provinces_led_by names the
+    # dominant network nationally (Muangthai leads most) but hides that a rival's leads can be a
+    # single-region stronghold — Srisawad leads several provinces, but every one is in the South,
+    # invisible in the national tally. This rolls the same MEASURED `leader` field up by region so
+    # the board can name the single operator holding the most provinces in each of the ~5 regions
+    # and how concentrated that lead is. Pure aggregation of the per-record (region, leader) pair;
+    # inherits leader's Heng-under-count caveat. Ordered most-provinces-first for a stable, JSON-
+    # deterministic list, with a fixed tie-break (region name asc); the per-region tally keeps the
+    # AutoX-first + census-brand order and drops zero-count operators.
+    order = ["AutoX"] + brands
+    region_agg = collections.OrderedDict()
+    for p in provinces:
+        reg = p["region"] or "—"
+        if reg not in region_agg:
+            region_agg[reg] = {"n_provinces": 0, "led_by": collections.Counter()}
+        region_agg[reg]["n_provinces"] += 1
+        region_agg[reg]["led_by"][p["leader"]] += 1
+    region_brand_leaders = []
+    for reg, d in region_agg.items():
+        top = max(order, key=lambda k: (d["led_by"].get(k, 0), -order.index(k)))
+        led_by = {op: d["led_by"][op] for op in order if d["led_by"].get(op, 0)}
+        region_brand_leaders.append({
+            "region": reg,
+            "n_provinces": d["n_provinces"],
+            "leader": top,
+            "n_led": d["led_by"].get(top, 0),
+            "led_by": led_by,
+        })
+    region_brand_leaders.sort(key=lambda r: (-r["n_provinces"], r["region"]))
     n_outnumbered_prov = sum(1 for p in provinces if p["autox"] > 0 and p["rivals"] > p["autox"])
     # AutoX competitive-standing rollup (only provinces where AutoX is present / rankable).
     ranked = [p for p in provinces if p["autox_rank"] is not None]
@@ -333,6 +362,15 @@ def build():
                                        "of the 77 provinces each operator is the single largest "
                                        "network in. Pure aggregation of MEASURED counts; inherits "
                                        "leader's Heng-under-count caveat.",
+            "region_brand_leaders (meta)": "COMPUTED — the same `leader` field rolled up by region: "
+                                           "for each of the ~5 regions, the single operator leading "
+                                           "the most provinces (`leader`/`n_led`), the region's "
+                                           "province count, and the full per-operator lead tally "
+                                           "(`led_by`). Names WHERE each network dominates, which the "
+                                           "national provinces_led_by tally hides (e.g. a rival whose "
+                                           "leads are entirely one regional stronghold). Pure "
+                                           "aggregation of MEASURED counts; inherits leader's "
+                                           "Heng-under-count caveat.",
             "autox_rank": "COMPUTED — AutoX's 1-based rank by branch count among the operators "
                           "PRESENT in the province ({AutoX} + every big-4 brand with >0 branches), "
                           "same deterministic tie-break as `leader` (AutoX ahead on an equal "
@@ -422,6 +460,7 @@ def build():
         "n_provinces": len(provinces),
         "n_provinces_autox_leads": n_autox_leads,
         "provinces_led_by": provinces_led_by,
+        "region_brand_leaders": region_brand_leaders,
         "n_provinces_outnumbered": n_outnumbered_prov,
         "n_provinces_autox_last": n_autox_last,
         "n_provinces_autox_top2": n_autox_top2,
@@ -494,6 +533,9 @@ def run(check=False):
           % (m["n_provinces_autox_leads"], m["n_provinces_outnumbered"]))
     print("  provinces led by: %s"
           % ", ".join("%s %d" % (op, n) for op, n in m["provinces_led_by"].items() if n))
+    print("  region leaders: %s"
+          % ", ".join("%s→%s %d/%d" % (r["region"], r["leader"], r["n_led"], r["n_provinces"])
+                      for r in m["region_brand_leaders"]))
     if m["pico_available"]:
         print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
               % (m["total_pico"], m["n_provinces_pico_present"],
