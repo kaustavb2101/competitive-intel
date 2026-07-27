@@ -87,6 +87,8 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 .st-item .ti{font-size:12.5px;color:var(--txt);line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
 .st-item .ev{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
 .st-item .pr{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-left:4px}
+.st-item .pr.owner{color:var(--gold);border:1px solid rgba(230,180,80,.5);background:rgba(230,180,80,.12);
+  border-radius:5px;padding:1px 5px;text-transform:uppercase;letter-spacing:.3px}
 
 /* loops + activity */
 .st-two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-top:18px}
@@ -178,9 +180,11 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
     });
     var rows = items.map(function(it){
       var cls = STATE_CHIP[it.state] || "s-open";
+      var owner = (it.owner_side && it.state !== "done")
+        ? '<span class="pr owner" title="Requires an owner action — not autonomously completable">owner-side</span>' : '';
       return '<div class="st-item">'
         + '<span class="chip '+cls+'">'+esc(STATE_LABEL[it.state]||it.state)+'</span>'
-        + '<span class="tx"><span class="ti">'+esc(it.title)+'<span class="pr">P'+esc(it.priority)+'</span></span>'
+        + '<span class="tx"><span class="ti">'+esc(it.title)+'<span class="pr">P'+esc(it.priority)+'</span>'+owner+'</span>'
         + '<span class="ev">'+esc(it.evidence)+'</span></span></div>';
     }).join("");
     var pillClass = p.status === "on-track" ? "ontrack" : "atrisk";
@@ -200,12 +204,24 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
       +'</b> · commit <b>'+esc(m.commit||"?")+'</b> · auto-refreshes every 5 min';
 
     var pill = o.status === "on-track" ? "ontrack" : "atrisk";
+    // Owner-side open items are not loop-closable, so the throughput-based ETA is only meaningful
+    // over the autonomous-open subset. When none of those remain, say so plainly instead of
+    // projecting a "~N days" that the autonomous loops can never actually deliver.
+    var ownerSide = Number(o.open_owner_side||0);
+    var autonomous = (o.open_autonomous != null) ? Number(o.open_autonomous) : Number(o.open_items||0);
+    var etaHtml;
+    if(autonomous <= 0 && ownerSide > 0){
+      etaHtml = 'ETA <b>—</b> · '+ownerSide+' open item'+(ownerSide===1?'':'s')+' owner-side'
+        + '<span class="est" title="Needs an owner action (e.g. a Vercel env var + a live check) — the autonomous loops cannot close it">NOT LOOP-CLOSABLE</span>';
+    } else {
+      etaHtml = 'ETA <b>~'+esc(o.eta_days)+' days</b> · by <b>'+esc(o.eta_date)+'</b>'
+        + (ownerSide>0 ? '<span class="est">'+ownerSide+' OWNER-SIDE</span>' : '<span class="est">ESTIMATED</span>');
+    }
     var hero = '<div class="st-hero">'
       + '<div class="st-hero-top">'
       + '<span class="st-pct">'+esc(o.progress_pct)+'<span class="u">%</span></span>'
       + '<span class="st-pill '+pill+'">'+esc(o.status||"")+'</span>'
-      + '<span class="st-eta">ETA <b>~'+esc(o.eta_days)+' days</b> · by <b>'+esc(o.eta_date)+'</b>'
-      + '<span class="est">ESTIMATED</span></span>'
+      + '<span class="st-eta">'+etaHtml+'</span>'
       + '</div>'
       + '<div class="st-track"><div class="st-fill" style="width:'+Number(o.progress_pct||0)+'%"></div></div>'
       + '<div class="st-counts">'

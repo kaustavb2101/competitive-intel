@@ -2,17 +2,19 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-27T06:20:20Z",
-    "commit": "fbdea96"
+    "generated_at": "2026-07-27T08:32:04+00:00",
+    "commit": "cf7dd16"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
-    "eta_days": 1,
-    "eta_date": "2026-07-28",
+    "eta_days": 0,
+    "eta_date": "2026-07-27",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
+    "open_owner_side": 1,
+    "open_autonomous": 0,
     "total_items": 50
   },
   "loops": [
@@ -60,42 +62,48 @@
           "title": "Fold MEASURED TMLI province layers (NSO SES/LFS) into the risk read",
           "state": "done",
           "priority": 1,
-          "evidence": "pipeline/ingest_tmli.py + platform/data/household_risk_by_province.json present (NEXT_STEPS §0a)"
+          "evidence": "pipeline/ingest_tmli.py + platform/data/household_risk_by_province.json present (NEXT_STEPS §0a)",
+          "owner_side": false
         },
         {
           "id": "di-diw",
           "title": "DIW factory census (~66k, 77 provinces) via CKAN",
           "state": "done",
           "priority": 2,
-          "evidence": "committee/census.py + .github/workflows/data-gov-census.yml committed"
+          "evidence": "committee/census.py + .github/workflows/data-gov-census.yml committed",
+          "owner_side": false
         },
         {
           "id": "di-loan-tape",
           "title": "Real loan-tape export → measured portfolio risk",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates (382,735 no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export); the SYNTHETIC bridge (loan_tape_derived.json) is superseded"
+          "evidence": "platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates (382,735 no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export); the SYNTHETIC bridge (loan_tape_derived.json) is superseded",
+          "owner_side": false
         },
         {
           "id": "di-dlt",
           "title": "DLT vehicle registrations, all-province coverage",
           "state": "done",
           "priority": 2,
-          "evidence": "vehicles_by_province.json = DLT registered-vehicle stock across all 77 provinces (44.3M vehicles: car/pickup/moto/ev, 0 gaps); wired per-branch via branch_vehicles.json (NEXT_STEPS §2)"
+          "evidence": "vehicles_by_province.json = DLT registered-vehicle stock across all 77 provinces (44.3M vehicles: car/pickup/moto/ev, 0 gaps); wired per-branch via branch_vehicles.json (NEXT_STEPS §2)",
+          "owner_side": false
         },
         {
           "id": "di-farmgate",
           "title": "Replace GLOBAL price proxy with Thai farm-gate prices",
           "state": "done",
           "priority": 2,
-          "evidence": "source-data/farmgate_prices.json (MEASURED Thai daily national-average farm-gate prices — NABC agriapi.nabc.go.th, vintage 2026-07-02, live-verified from the Thai IP) wired into build_crop_stress.py price_stress, replacing the World Bank GLOBAL proxy for rice/rubber/oil palm"
+          "evidence": "source-data/farmgate_prices.json (MEASURED Thai daily national-average farm-gate prices — NABC agriapi.nabc.go.th, vintage 2026-07-02, live-verified from the Thai IP) wired into build_crop_stress.py price_stress, replacing the World Bank GLOBAL proxy for rice/rubber/oil palm",
+          "owner_side": false
         },
         {
           "id": "di-competitor-census",
           "title": "National competitor census (Places scout, gate-guarded)",
           "state": "done",
           "priority": 2,
-          "evidence": "competitors_census.json = 16,503 rivals across all 77 provinces + competitor_coverage.json"
+          "evidence": "competitors_census.json = 16,503 rivals across all 77 provinces + competitor_coverage.json",
+          "owner_side": false
         }
       ]
     },
@@ -112,42 +120,48 @@
           "title": "Deploy to Vercel prod + verify on a phone",
           "state": "done",
           "priority": 1,
-          "evidence": "LIVE on Vercel production (master auto-deploys); verified 200 on /, /app.js, data layers, 3D scenes + /status"
+          "evidence": "LIVE on Vercel production (master auto-deploys); verified 200 on /, /app.js, data layers, 3D scenes + /status",
+          "owner_side": false
         },
         {
           "id": "dep-committee-cron",
           "title": "Autonomous committee scout cron (gate-guarded auto-merge)",
           "state": "done",
           "priority": 2,
-          "evidence": ".github/workflows/committee-cycle.yml committed"
+          "evidence": ".github/workflows/committee-cycle.yml committed",
+          "owner_side": false
         },
         {
           "id": "dep-gov-census-ci",
           "title": "Gov census CI (DIW/DLT from any cloud IP)",
           "state": "done",
           "priority": 2,
-          "evidence": ".github/workflows/data-gov-census.yml committed"
+          "evidence": ".github/workflows/data-gov-census.yml committed",
+          "owner_side": false
         },
         {
           "id": "dep-planner-cron",
           "title": "Autonomy planner cron (this loop, every 6h)",
           "state": "done",
           "priority": 1,
-          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present"
+          "evidence": ".github/workflows/committee-planner.yml + platform/status.html present",
+          "owner_side": false
         },
         {
           "id": "dep-qa-gate",
           "title": "Determinism QA gate in CI (tests/run.sh check)",
           "state": "done",
           "priority": 2,
-          "evidence": ".github/workflows/qa.yml + tests/run.sh committed"
+          "evidence": ".github/workflows/qa.yml + tests/run.sh committed",
+          "owner_side": false
         },
         {
           "id": "dep-access",
           "title": "Access protection on the deployment (sensitive branch-level PD)",
           "state": "open",
           "priority": 3,
-          "evidence": "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; fail-open when unset. Verified live (401 without creds, 200 with the password)."
+          "evidence": "Vercel Edge Middleware (./middleware.js) HTTP Basic Auth, gated by the SITE_PASSWORD env var; fail-open when unset. Verified live (401 without creds, 200 with the password).",
+          "owner_side": true
         }
       ]
     },
@@ -164,49 +178,56 @@
           "title": "Competitive coverage & rival pressure (national census)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/competitor_coverage.json + pipeline/build_competitor_coverage.py present"
+          "evidence": "platform/data/competitor_coverage.json + pipeline/build_competitor_coverage.py present",
+          "owner_side": false
         },
         {
           "id": "feat-decision-queue",
           "title": "Exec decision queue (“This week — do these first”)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/decision_queue.json + pipeline/build_decision_queue.py present"
+          "evidence": "platform/data/decision_queue.json + pipeline/build_decision_queue.py present",
+          "owner_side": false
         },
         {
           "id": "feat-competitor-fragility",
           "title": "Competitor fragility under BoT registration deadline (market-risk lens)",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/exit_whitespace.json present"
+          "evidence": "platform/data/exit_whitespace.json present",
+          "owner_side": false
         },
         {
           "id": "feat-search-demand",
           "title": "Search demand + share-of-search board",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/search_demand.json present"
+          "evidence": "platform/data/search_demand.json present",
+          "owner_side": false
         },
         {
           "id": "feat-collateral",
           "title": "Collateral-value outlook (directional, estimated)",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/collateral_outlook.json present"
+          "evidence": "platform/data/collateral_outlook.json present",
+          "owner_side": false
         },
         {
           "id": "feat-simulator",
           "title": "Client-side portfolio what-if simulator (#sim)",
           "state": "done",
           "priority": 2,
-          "evidence": "index.html #sim simulator view present"
+          "evidence": "index.html #sim simulator view present",
+          "owner_side": false
         },
         {
           "id": "feat-status",
           "title": "CEO autonomy status dashboard (this deliverable)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/status.html + platform/status_data.json present"
+          "evidence": "platform/status.html + platform/status_data.json present",
+          "owner_side": false
         }
       ]
     },
@@ -223,56 +244,64 @@
           "title": "Fix branch-explorer dead basemap (BLOCKER)",
           "state": "done",
           "priority": 1,
-          "evidence": "UXUI_AUDIT.md marks the blocker ✅ FIXED + verified (0 console errors)"
+          "evidence": "UXUI_AUDIT.md marks the blocker ✅ FIXED + verified (0 console errors)",
+          "owner_side": false
         },
         {
           "id": "ux-isochrone-guard",
           "title": "Guard rayong isochrone/trees toggles when files absent (major)",
           "state": "done",
           "priority": 2,
-          "evidence": "rayong-catchment.html gates isochrone/trees fetch on tiles_config scenery list — no console 404; toggle self-hides when absent (UXUI_AUDIT #2)"
+          "evidence": "rayong-catchment.html gates isochrone/trees fetch on tiles_config scenery list — no console 404; toggle self-hides when absent (UXUI_AUDIT #2)",
+          "owner_side": false
         },
         {
           "id": "ux-map-overlap",
           "title": "Fix #map lens pills overlapping the zoom control on mobile (major)",
           "state": "done",
           "priority": 2,
-          "evidence": "styles.css @media(max-width:430px) moves the Leaflet zoom to bottom-right, clear of the lens pills (UXUI_AUDIT #3)"
+          "evidence": "styles.css @media(max-width:430px) moves the Leaflet zoom to bottom-right, clear of the lens pills (UXUI_AUDIT #3)",
+          "owner_side": false
         },
         {
           "id": "ux-province-overflow",
           "title": "province.html stat-chip toolbar overflow scroller (minor)",
           "state": "done",
           "priority": 3,
-          "evidence": "province.html #strip is a touch horizontal scroller (-webkit-overflow-scrolling:touch + white-space:nowrap) (UXUI_AUDIT #4)"
+          "evidence": "province.html #strip is a touch horizontal scroller (-webkit-overflow-scrolling:touch + white-space:nowrap) (UXUI_AUDIT #4)",
+          "owner_side": false
         },
         {
           "id": "ux-theme-persist",
           "title": "Persist one theme choice across pages (minor)",
           "state": "done",
           "priority": 3,
-          "evidence": "all pages read the persisted autox-theme; province/branch-explorer aligned to the SPA light default (UXUI_AUDIT #5)"
+          "evidence": "all pages read the persisted autox-theme; province/branch-explorer aligned to the SPA light default (UXUI_AUDIT #5)",
+          "owner_side": false
         },
         {
           "id": "ux-contrast",
           "title": "Darken light-theme --dim for WCAG AA on microcopy (minor)",
           "state": "done",
           "priority": 3,
-          "evidence": "styles.css light --dim darkened to #5B6678 (≈5.4:1 on #F4F6FA, clears AA) (UXUI_AUDIT #6)"
+          "evidence": "styles.css light --dim darkened to #5B6678 (≈5.4:1 on #F4F6FA, clears AA) (UXUI_AUDIT #6)",
+          "owner_side": false
         },
         {
           "id": "ux-favicon",
           "title": "Add a favicon (stop the 404) (polish)",
           "state": "done",
           "priority": 3,
-          "evidence": "platform/favicon.svg committed + linked in every page head (UXUI_AUDIT #7)"
+          "evidence": "platform/favicon.svg committed + linked in every page head (UXUI_AUDIT #7)",
+          "owner_side": false
         },
         {
           "id": "ux-branches-lead",
           "title": "Add a headline/lead line to #branches (polish)",
           "state": "done",
           "priority": 3,
-          "evidence": "index.html #branches opens with a header + lead line like the other routes (UXUI_AUDIT #8)"
+          "evidence": "index.html #branches opens with a header + lead line like the other routes (UXUI_AUDIT #8)",
+          "owner_side": false
         }
       ]
     },
@@ -289,42 +318,48 @@
           "title": "Rival pressure index per branch",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/rival_pressure.json present"
+          "evidence": "platform/data/rival_pressure.json present",
+          "owner_side": false
         },
         {
           "id": "mkt-rival-density",
           "title": "Rival density per district",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/rival_density.json present"
+          "evidence": "platform/data/rival_density.json present",
+          "owner_side": false
         },
         {
           "id": "mkt-comp-coverage",
           "title": "Competitor coverage vs our footprint",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/competitor_coverage.json present"
+          "evidence": "platform/data/competitor_coverage.json present",
+          "owner_side": false
         },
         {
           "id": "mkt-contested-pop",
           "title": "Contested population (rival catchment overlap)",
           "state": "done",
           "priority": 3,
-          "evidence": "platform/data/contested_pop.json present"
+          "evidence": "platform/data/contested_pop.json present",
+          "owner_side": false
         },
         {
           "id": "mkt-search-sos",
           "title": "Share-of-search brand read",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/search_demand.json present"
+          "evidence": "platform/data/search_demand.json present",
+          "owner_side": false
         },
         {
           "id": "mkt-scout-national",
           "title": "National scout coverage (rotate all 77 provinces)",
           "state": "done",
           "priority": 2,
-          "evidence": "scout rotates least-covered provinces via committee-cycle.yml; full 77 not yet complete"
+          "evidence": "competitors_census.json spans all 77/77 provinces — the committee-cycle.yml scout rotation has reached full national coverage",
+          "owner_side": false
         }
       ]
     },
@@ -341,42 +376,48 @@
           "title": "Loan-tape portfolio outputs (90+ aging, ROI, HHI, PD)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/tape_real.json surfaced — MEASURED portfolio truth (bucket ladder / restructuring / collateral / LTV & vintage curves / branch audit) from the real loan-level export via build_tape_layers.py; supersedes the SYNTHETIC loan_tape_derived.json"
+          "evidence": "platform/data/tape_real.json surfaced — MEASURED portfolio truth (bucket ladder / restructuring / collateral / LTV & vintage curves / branch audit) from the real loan-level export via build_tape_layers.py; supersedes the SYNTHETIC loan_tape_derived.json",
+          "owner_side": false
         },
         {
           "id": "svc-household-dti",
           "title": "Household DTI risk lens (NSO SES, measured)",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/household_risk_by_province.json present"
+          "evidence": "platform/data/household_risk_by_province.json present",
+          "owner_side": false
         },
         {
           "id": "svc-branch-risk",
           "title": "Composite per-branch risk",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/branch_risk.json present"
+          "evidence": "platform/data/branch_risk.json present",
+          "owner_side": false
         },
         {
           "id": "svc-crop-stress",
           "title": "Agri-PD crop stress (objective #1)",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/crop_stress.json present"
+          "evidence": "platform/data/crop_stress.json present",
+          "owner_side": false
         },
         {
           "id": "svc-occ-income",
           "title": "Occupation income floors (factory / agri / SME)",
           "state": "done",
           "priority": 2,
-          "evidence": "factory_income_by_province.json + agri_income_by_province.json present"
+          "evidence": "factory_income_by_province.json + agri_income_by_province.json present",
+          "owner_side": false
         },
         {
           "id": "svc-macro-exposure",
           "title": "Per-branch macro exposure",
           "state": "done",
           "priority": 3,
-          "evidence": "platform/data/macro_exposure.json present"
+          "evidence": "platform/data/macro_exposure.json present",
+          "owner_side": false
         }
       ]
     },
@@ -393,35 +434,40 @@
           "title": "Branch peer-twin outlier benchmark",
           "state": "done",
           "priority": 1,
-          "evidence": "platform/data/branch_peers.json + pipeline/build_branch_peers.py present"
+          "evidence": "platform/data/branch_peers.json + pipeline/build_branch_peers.py present",
+          "owner_side": false
         },
         {
           "id": "peer-province-stress",
           "title": "Province stress-index ranking",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/province_stress_index.json present"
+          "evidence": "platform/data/province_stress_index.json present",
+          "owner_side": false
         },
         {
           "id": "peer-province-risk",
           "title": "Province risk rollup",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/province_risk.json present"
+          "evidence": "platform/data/province_risk.json present",
+          "owner_side": false
         },
         {
           "id": "peer-segment-exposure",
           "title": "Segment × collateral concentration",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/data/segment_exposure.json present"
+          "evidence": "platform/data/segment_exposure.json present",
+          "owner_side": false
         },
         {
           "id": "peer-cluster-brief",
           "title": "Like-branch cluster brief",
           "state": "done",
           "priority": 3,
-          "evidence": "platform/data/cluster_brief.json present"
+          "evidence": "platform/data/cluster_brief.json present",
+          "owner_side": false
         }
       ]
     },
@@ -438,61 +484,91 @@
           "title": "deck.gl province district-polygon deep-dive (77)",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/province.html + platform/data/provinces/index.json present"
+          "evidence": "platform/province.html + platform/data/provinces/index.json present",
+          "owner_side": false
         },
         {
           "id": "td-branch-explorer",
           "title": "Per-branch 3D scene (live OSM buildings)",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/branch-explorer.html present"
+          "evidence": "platform/branch-explorer.html present",
+          "owner_side": false
         },
         {
           "id": "td-catchment-scene",
           "title": "Overture 3D building catchment scene",
           "state": "done",
           "priority": 2,
-          "evidence": "platform/rayong-catchment.html + platform/data/rayong_catchment.json present"
+          "evidence": "platform/rayong-catchment.html + platform/data/rayong_catchment.json present",
+          "owner_side": false
         },
         {
           "id": "td-overture-pull",
           "title": "Pull Overture building catchments per province",
           "state": "done",
           "priority": 2,
-          "evidence": "77 of 77 province catchments present (platform/data/*_catchment.json)"
+          "evidence": "77 of 77 province catchments present (platform/data/*_catchment.json)",
+          "owner_side": false
         },
         {
           "id": "td-heights",
           "title": "Bake per-building type/height into catchment scenes",
           "state": "done",
           "priority": 3,
-          "evidence": "pipeline/bake_catchment_heights.py present"
+          "evidence": "pipeline/bake_catchment_heights.py present",
+          "owner_side": false
         },
         {
           "id": "td-isochrone",
           "title": "True 15-min street-network isochrone (replace walk-radius)",
           "state": "done",
           "priority": 3,
-          "evidence": "pipeline/pull_isochrones.py + .github/workflows/data-isochrones.yml present (ORS driving-car 15-min → R2; scene prefers it over the estimated walk-radius ring)"
+          "evidence": "pipeline/pull_isochrones.py + .github/workflows/data-isochrones.yml present (ORS driving-car 15-min → R2; scene prefers it over the estimated walk-radius ring)",
+          "owner_side": false
         }
       ]
     }
   ],
   "activity": [
     {
-      "date": "2026-07-27T06:20:20Z",
+      "date": "2026-07-27T08:32:04+00:00",
+      "sha": "cf7dd16",
+      "summary": "docs(progress): log the noscript-fallback UX-loop run (#186) — merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-27T15:28:27+07:00",
+      "sha": "399e459",
+      "summary": "ux: noscript fallback on data.html + status.html (JS-off explainer) (#186)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-27T07:00:28+00:00",
+      "sha": "08f4b0f",
+      "summary": "committee: autonomous competitor scout (run 30244059030)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-27T06:42:26+00:00",
+      "sha": "2dea9a9",
+      "summary": "committee: refresh autonomy plan (run 30243246593)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-27T06:20:20+00:00",
       "sha": "fbdea96",
       "summary": "health(deploy): probe the Overview truck_flow + region_debt cards",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:25:02Z",
+      "date": "2026-07-27T04:25:02+00:00",
       "sha": "0447648",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Overview deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:24:35Z",
+      "date": "2026-07-27T04:24:35+00:00",
       "sha": "d5138d1",
       "summary": "health(deploy): probe the Overview used-collateral pulse card (collateral_flow.json)",
       "pillar": "service"
@@ -540,25 +616,25 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T22:21:17Z",
+      "date": "2026-07-26T22:21:17+00:00",
       "sha": "a606668",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:20:36Z",
+      "date": "2026-07-26T22:20:36+00:00",
       "sha": "a342b7b",
       "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:08:57Z",
+      "date": "2026-07-26T22:08:57+00:00",
       "sha": "c08c0fb",
       "summary": "committee: refresh autonomy plan (run 30222349809)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T20:25:35Z",
+      "date": "2026-07-26T20:25:35+00:00",
       "sha": "b2cc709",
       "summary": "docs: log ux-pillar-acquisition-wrong-route merge+deploy+verify (PR #180)",
       "pillar": "uxui"
@@ -570,7 +646,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T16:43:59Z",
+      "date": "2026-07-26T16:43:59+00:00",
       "sha": "e263ba3",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
       "pillar": "data-integration"
@@ -582,13 +658,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T16:11:56Z",
+      "date": "2026-07-26T16:11:56+00:00",
       "sha": "067bd9f",
       "summary": "committee: refresh autonomy plan (run 30209636414)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T14:21:10Z",
+      "date": "2026-07-26T14:21:10+00:00",
       "sha": "db4718a",
       "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
       "pillar": "3d-enrichment"
@@ -606,13 +682,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T10:52:48Z",
+      "date": "2026-07-26T10:52:48+00:00",
       "sha": "65817cc",
       "summary": "committee: refresh autonomy plan (run 30198897374)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T10:32:58Z",
+      "date": "2026-07-26T10:32:58+00:00",
       "sha": "0a72a0a",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
       "pillar": "peer"
@@ -630,34 +706,10 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T08:26:19Z",
+      "date": "2026-07-26T08:26:19+00:00",
       "sha": "0511e7b",
       "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-26T15:18:57+07:00",
-      "sha": "589232b",
-      "summary": "ux: keyboard-activate impact-card drill-down province rows (WCAG 2.1.1) (#174)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-26T06:45:58Z",
-      "sha": "f7b8c68",
-      "summary": "ci(data): add data-search-demand.yml — monthly Google Trends brand share-of-search refresh (obj #2)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-26T06:36:49Z",
-      "sha": "aef449f",
-      "summary": "committee: autonomous competitor scout (run 30190942509)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-26T06:15:30Z",
-      "sha": "91e3058",
-      "summary": "committee: refresh autonomy plan (run 30190607406)",
-      "pillar": "deployment"
     }
   ]
 }
