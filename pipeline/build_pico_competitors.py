@@ -90,6 +90,7 @@ def build():
         pico_total = rec.get("total", 0)
         pico_head = rec.get("head", 0)
         pico_branch = rec.get("branch", 0)
+        pico_recent = rec.get("recent", 0)          # MEASURED — licensed in the census momentum window
         ax = autox.get(p, 0)
         d = disp.get(p, {})
         rows.append({
@@ -100,6 +101,7 @@ def build():
             "pico_total": pico_total,
             "pico_head": pico_head,
             "pico_branch": pico_branch,
+            "pico_recent": pico_recent,                           # newly-licensed sub-scale rivals (rising pressure)
             "autox_branches": ax,
             "outnumber": pico_total - ax,                         # >0 = sub-scale rivals exceed our branches
             "ratio": round(pico_total / ax, 2) if ax else None,   # None where AutoX is absent (no denominator)
@@ -113,6 +115,19 @@ def build():
     n_autox_absent = sum(1 for r in rows if r["autox_branches"] == 0)
     pico_total_all = sum(r["pico_total"] for r in rows)
     autox_total_all = sum(r["autox_branches"] for r in rows)
+
+    # Forward the census licensing-momentum rollup, enriching top_recent with EN name / slug for display.
+    # Every field is MEASURED (a straight recency tally of licence-grant dates); nothing is inferred here.
+    cm = (pico.get("meta") or {}).get("licence_momentum") or {}
+    momentum = None
+    if cm:
+        top_recent = [{"th": p, "en": disp.get(p, {}).get("en"), "slug": disp.get(p, {}).get("slug"),
+                       "pico_recent": rc, "pico_total": tot}
+                      for p, rc, tot in cm.get("top_recent", [])]
+        momentum = {k: cm.get(k) for k in ("label", "window_months", "cutoff_date", "snapshot_date",
+                                           "n_recent", "recent_share_pct", "n_licence_dates_parsed",
+                                           "n_licence_dates_unparsed")}
+        momentum["top_recent"] = top_recent
 
     meta = {
         "generated_by": "pipeline/build_pico_competitors.py",
@@ -131,6 +146,7 @@ def build():
                       "district-grain ESTIMATED exit_whitespace cue — this leg is fully MEASURED."),
         "pico_vintage": (pico.get("meta") or {}).get("vintage"),
         "pico_source_url": (pico.get("meta") or {}).get("source_url"),
+        "licence_momentum": momentum,
         "n_provinces": len(rows),
         "n_provinces_pico_outnumbers_autox": n_outnumbered,
         "n_provinces_autox_absent": n_autox_absent,
@@ -139,6 +155,9 @@ def build():
         "autox_total": autox_total_all,
         "definitions": {
             "pico_total": "MEASURED count of licensed PICO-finance operator service points in the province (FPO registry).",
+            "pico_recent": ("MEASURED count of PICO operators in the province whose FPO licence-grant date "
+                            "falls within the momentum window (see meta.licence_momentum) — newly-licensed "
+                            "sub-scale rivals, a rising-pressure signal distinct from the static total."),
             "autox_branches": "MEASURED count of AutoX (เงินไชโย) branches in the province (branches.json, field v).",
             "outnumber": "pico_total - autox_branches. Positive = sub-scale rivals outnumber our branches.",
             "ratio": "pico_total / autox_branches (null where AutoX has no branch in the province).",
@@ -200,6 +219,11 @@ def main():
         print("  %-16s PICO=%3d  AutoX=%3d  outnumber=%+d  ratio=%s"
               % (r["th"], r["pico_total"], r["autox_branches"], r["outnumber"],
                  ("%.2f" % r["ratio"]) if r["ratio"] is not None else "n/a"))
+    lm = m.get("licence_momentum")
+    if lm:
+        print("  momentum: %d newly licensed in trailing %dmo (%.1f%%); newest: %s"
+              % (lm["n_recent"], lm["window_months"], lm["recent_share_pct"],
+                 ", ".join("%s=%d" % (t["th"], t["pico_recent"]) for t in lm["top_recent"][:6])))
 
 
 if __name__ == "__main__":
