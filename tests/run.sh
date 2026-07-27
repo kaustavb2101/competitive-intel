@@ -100,6 +100,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_pico_census.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"
   else bad "build_pico_census.py --check (pico_census.json drifted from source-data/datagoth/fpo_pico.csv)"
   fi
+  ( cd "$PIPE" && python3 build_pico_district.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_pico_district.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_pico_district.py --check (source-data/datagoth/fpo_pico.csv absent — Thai-IP pull, not committed)"
+  else bad "build_pico_district.py --check (pico_district.json drifted from fpo_pico.csv/amphoe.json)"
+  fi
   ( cd "$PIPE" && python3 build_pico_competitors.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_pico_competitors.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_pico_competitors.py --check (pico_census.json absent — upstream FPO pull, not committed)"
