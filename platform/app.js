@@ -2903,6 +2903,28 @@ function drawPeerProvince(){
           (rest?` (${rest})`:'')+(plb.AutoX>0?`, AutoX in ${plb.AutoX}`:', AutoX in none');
       }
     }
+    // WHERE that lead sits — the same MEASURED `leader` field rolled up by region
+    // (m.region_brand_leaders). The national tally hides that a network can dominate everywhere yet
+    // be genuinely contested in ONE region; this names the regional leader and flags any region where
+    // the lead is a tie or thin (<60% of the region's provinces). Degrades to '' on a pre-fold layer.
+    const rbl=m.region_brand_leaders||null;
+    let regionStr='';
+    if(rbl&&rbl.length){
+      const regByLeader={};
+      rbl.forEach(r=>{regByLeader[r.leader]=(regByLeader[r.leader]||0)+1;});
+      const domEntries=Object.entries(regByLeader).sort((a,b)=>b[1]-a[1]);
+      const domStr=(domEntries.length===1)
+        ? `<b>${domEntries[0][0]}</b> holds the most provinces in all ${rbl.length} regions`
+        : `the regional ground leader is ${domEntries.map(([op,n])=>`<b>${op}</b> in ${n}`).join(', ')}`;
+      const contested=rbl.filter(r=>{
+        const vals=Object.values(r.led_by||{}).sort((a,b)=>b-a);
+        return (vals[1]||0)>=r.n_led || (r.n_provinces && r.n_led/r.n_provinces<0.6);
+      }).map(r=>{
+        const runner=Object.entries(r.led_by||{}).filter(([op])=>op!==r.leader).sort((a,b)=>b[1]-a[1])[0];
+        return runner?`the <b style="color:var(--agri)">${r.region}</b> is contested (${r.leader} ${r.led_by[r.leader]} / ${runner[0]} ${runner[1]} of ${r.n_provinces})`:'';
+      }).filter(Boolean);
+      regionStr=` By region, ${domStr}${contested.length?' — but '+contested.join('; '):''}.`;
+    }
     // Intra-province ground contest, rolled up client-side from the same MEASURED per-record fields:
     // how many of ALL 77 provinces' districts the big-4 outnumber AutoX in, plus the "hidden contest"
     // cases where AutoX ranks top-2 in the province yet is outnumbered in the majority of its districts
@@ -2919,7 +2941,7 @@ function drawPeerProvince(){
     }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}. `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${regionStr} `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
@@ -3122,8 +3144,11 @@ function drawRivalPulse(){
   if(lbox){
     if(land&&land.by_product&&land.by_product.length){
       const chips=Object.entries(land.type_counts||{}).map(([t,n])=>
-        `<span class="tag" style="color:${TYPEC[t]||'var(--dim)'};border:1px solid ${TYPEC[t]||'var(--dim)'};margin-right:6px">${TYPEL[t]||t} ×${n}</span>`).join('');
-      lbox.innerHTML=`<div style="margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
+        `<span class="tag" style="color:${TYPEC[t]||'var(--dim)'};border:1px solid ${TYPEC[t]||'var(--dim)'}">${TYPEL[t]||t} ×${n}</span>`).join('');
+      // flex-wrap the chip row: the .tag chips are white-space:nowrap and joined with no
+      // whitespace, so an inline row has NO soft-wrap opportunity between them and runs off the
+      // right edge on mobile — flex+gap gives each chip its own wrap point.
+      lbox.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
         land.by_product.map(g=>`<h4 class="acqsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
           `<table class="tbl">${g.items.map(p=>`<tr>
             <td class="mono" style="white-space:nowrap"><b>${p.brand}</b></td>
@@ -3162,6 +3187,11 @@ function drawRivalPulse(){
            `The corporate sites are geoblocked from foreign IPs — this feed refreshes from the Thai-IP laptop (pipeline/pull_rival_promos.py).`]);
     }
   }
+  // The promo landscape + raw-feed tables are injected into #pulsepromolandscape / #pulsepromolist
+  // via innerHTML AFTER boot, so the boot-time wrapTables() never reached them — an unwrapped wide
+  // .tbl pushes the whole #acq route sideways on mobile. Re-run the idempotent wrapper here (it
+  // skips tables already inside a .tblwrap) so every promo table scrolls inside its own box.
+  wrapTables();
 }
 
 /* ---------- rival universe · the full จำนำทะเบียน field (obj #2) ----------
