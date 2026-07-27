@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-26T20:25:35Z",
-    "commit": "b2cc709"
+    "generated_at": "2026-07-26T22:20:36+00:00",
+    "commit": "a342b7b"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-26T20:25:35Z",
+      "date": "2026-07-26T22:20:36+00:00",
+      "sha": "a342b7b",
+      "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-26T22:08:57+00:00",
+      "sha": "c08c0fb",
+      "summary": "committee: refresh autonomy plan (run 30222349809)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-26T20:25:35+00:00",
       "sha": "b2cc709",
       "summary": "docs: log ux-pillar-acquisition-wrong-route merge+deploy+verify (PR #180)",
       "pillar": "uxui"
@@ -492,7 +504,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T16:43:59Z",
+      "date": "2026-07-26T16:43:59+00:00",
       "sha": "e263ba3",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
       "pillar": "data-integration"
@@ -504,13 +516,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T16:11:56Z",
+      "date": "2026-07-26T16:11:56+00:00",
       "sha": "067bd9f",
       "summary": "committee: refresh autonomy plan (run 30209636414)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T14:21:10Z",
+      "date": "2026-07-26T14:21:10+00:00",
       "sha": "db4718a",
       "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
       "pillar": "3d-enrichment"
@@ -528,13 +540,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T10:52:48Z",
+      "date": "2026-07-26T10:52:48+00:00",
       "sha": "65817cc",
       "summary": "committee: refresh autonomy plan (run 30198897374)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T10:32:58Z",
+      "date": "2026-07-26T10:32:58+00:00",
       "sha": "0a72a0a",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
       "pillar": "peer"
@@ -552,7 +564,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T08:26:19Z",
+      "date": "2026-07-26T08:26:19+00:00",
       "sha": "0511e7b",
       "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
       "pillar": "uxui"
@@ -564,25 +576,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T06:45:58Z",
+      "date": "2026-07-26T06:45:58+00:00",
       "sha": "f7b8c68",
       "summary": "ci(data): add data-search-demand.yml — monthly Google Trends brand share-of-search refresh (obj #2)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:36:49Z",
+      "date": "2026-07-26T06:36:49+00:00",
       "sha": "aef449f",
       "summary": "committee: autonomous competitor scout (run 30190942509)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:15:30Z",
+      "date": "2026-07-26T06:15:30+00:00",
       "sha": "91e3058",
       "summary": "committee: refresh autonomy plan (run 30190607406)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T04:33:50Z",
+      "date": "2026-07-26T04:33:50+00:00",
       "sha": "ed896b9",
       "summary": "committee: refresh autonomy plan + log peer-footprint deploy-verify (#173)",
       "pillar": "peer"
@@ -594,7 +606,7 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-26T02:37:54Z",
+      "date": "2026-07-26T02:37:54+00:00",
       "sha": "620b818",
       "summary": "docs: log the Risk-pillar route fix — merged (#172) + deploy-verified",
       "pillar": "service"
@@ -606,25 +618,25 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T23:45:03Z",
+      "date": "2026-07-25T23:45:03+00:00",
       "sha": "17b0c19",
       "summary": "data: live fuel prices (2026-07-25, run 30179862740)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-25T22:21:05Z",
+      "date": "2026-07-25T22:21:05+00:00",
       "sha": "1bb7aad",
       "summary": "committee: refresh autonomy plan / CEO dashboard after the site-health-probe realign",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-25T22:19:08Z",
+      "date": "2026-07-25T22:19:08+00:00",
       "sha": "64d069f",
       "summary": "fix(service): realign the nightly site-health probe to the live front-door",
       "pillar": "feature"
     },
     {
-      "date": "2026-07-25T22:05:55Z",
+      "date": "2026-07-25T22:05:55+00:00",
       "sha": "49d6e12",
       "summary": "committee: refresh autonomy plan (run 30176705122)",
       "pillar": "deployment"
@@ -636,7 +648,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-25T18:18:52Z",
+      "date": "2026-07-25T18:18:52+00:00",
       "sha": "5b3fe5a",
       "summary": "ci(data): add data-sfi-credit.yml — monthly FPO SFI credit-quality refresh",
       "pillar": "data-integration"
@@ -646,18 +658,6 @@
       "sha": "f488877",
       "summary": "income engine: attach MEASURED NSO LFS wage as a cross-check (additive; \"go with A\", conservative) (#168)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-25T16:47:38Z",
-      "sha": "0180a63",
-      "summary": "committee: refresh autonomy plan / CEO dashboard after the peer-NPL AutoX-anchor ship (#167)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-25T23:44:53+07:00",
-      "sha": "8a57df5",
-      "summary": "feat(peer): AutoX's own MEASURED book NPL beside the listed rivals' reported NPL (obj #2) (#167)",
-      "pillar": "market"
     }
   ]
 }
