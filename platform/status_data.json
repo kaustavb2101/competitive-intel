@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-27T04:24:35+00:00",
-    "commit": "d5138d1"
+    "generated_at": "2026-07-27T06:20:20Z",
+    "commit": "fbdea96"
   },
   "overall": {
     "progress_pct": 98,
@@ -480,7 +480,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-27T04:24:35+00:00",
+      "date": "2026-07-27T06:20:20Z",
+      "sha": "fbdea96",
+      "summary": "health(deploy): probe the Overview truck_flow + region_debt cards",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-27T04:25:02Z",
+      "sha": "0447648",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the Overview deploy-health probe ship",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-27T04:24:35Z",
       "sha": "d5138d1",
       "summary": "health(deploy): probe the Overview used-collateral pulse card (collateral_flow.json)",
       "pillar": "service"
@@ -528,25 +540,25 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T22:21:17+00:00",
+      "date": "2026-07-26T22:21:17Z",
       "sha": "a606668",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:20:36+00:00",
+      "date": "2026-07-26T22:20:36Z",
       "sha": "a342b7b",
       "summary": "fix(deploy-health): probe the command-center front-door layers in check_site_health",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T22:08:57+00:00",
+      "date": "2026-07-26T22:08:57Z",
       "sha": "c08c0fb",
       "summary": "committee: refresh autonomy plan (run 30222349809)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T20:25:35+00:00",
+      "date": "2026-07-26T20:25:35Z",
       "sha": "b2cc709",
       "summary": "docs: log ux-pillar-acquisition-wrong-route merge+deploy+verify (PR #180)",
       "pillar": "uxui"
@@ -558,7 +570,7 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T16:43:59+00:00",
+      "date": "2026-07-26T16:43:59Z",
       "sha": "e263ba3",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room freshness readout ship (#178)",
       "pillar": "data-integration"
@@ -570,13 +582,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T16:11:56+00:00",
+      "date": "2026-07-26T16:11:56Z",
       "sha": "067bd9f",
       "summary": "committee: refresh autonomy plan (run 30209636414)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T14:21:10+00:00",
+      "date": "2026-07-26T14:21:10Z",
       "sha": "db4718a",
       "summary": "docs: log ux-reducedmotion-3dpages merge+deploy+verify (PR #177)",
       "pillar": "3d-enrichment"
@@ -594,13 +606,13 @@
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-26T10:52:48+00:00",
+      "date": "2026-07-26T10:52:48Z",
       "sha": "65817cc",
       "summary": "committee: refresh autonomy plan (run 30198897374)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-26T10:32:58+00:00",
+      "date": "2026-07-26T10:32:58Z",
       "sha": "0a72a0a",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer most-outnumbered ship (#175)",
       "pillar": "peer"
@@ -618,7 +630,7 @@
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T08:26:19+00:00",
+      "date": "2026-07-26T08:26:19Z",
       "sha": "0511e7b",
       "summary": "docs: log the impact-prow keyboard a11y fix — merged (#174) + deploy-verified",
       "pillar": "uxui"
@@ -630,34 +642,22 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-26T06:45:58+00:00",
+      "date": "2026-07-26T06:45:58Z",
       "sha": "f7b8c68",
       "summary": "ci(data): add data-search-demand.yml — monthly Google Trends brand share-of-search refresh (obj #2)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:36:49+00:00",
+      "date": "2026-07-26T06:36:49Z",
       "sha": "aef449f",
       "summary": "committee: autonomous competitor scout (run 30190942509)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-26T06:15:30+00:00",
+      "date": "2026-07-26T06:15:30Z",
       "sha": "91e3058",
       "summary": "committee: refresh autonomy plan (run 30190607406)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-26T04:33:50+00:00",
-      "sha": "ed896b9",
-      "summary": "committee: refresh autonomy plan + log peer-footprint deploy-verify (#173)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-26T11:30:29+07:00",
-      "sha": "3a9ba5b",
-      "summary": "feat(peer): MEASURED store-locator footprint ranking beside the IR-count national standing (obj #2) (#173)",
-      "pillar": "peer"
     }
   ]
 }
