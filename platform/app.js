@@ -3491,10 +3491,20 @@ function loadPicoCompetitors(){
     .catch(()=>{ PICOCOMP=null; picocompLoaded=true; return null; });
   return picocompPromise;
 }
+// district-grain (อำเภอ) PICO census — sharpens the province read to the actual district hotspot.
+// Optional, null-safe: the card renders unchanged if the layer is absent.
+let PICODIST=null, picodistLoaded=false, picodistPromise=null;
+function loadPicoDistrict(){
+  if(picodistPromise) return picodistPromise;
+  picodistPromise=fetch('data/pico_district.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PICODIST=j; picodistLoaded=true; return PICODIST; })
+    .catch(()=>{ PICODIST=null; picodistLoaded=true; return null; });
+  return picodistPromise;
+}
 function renderPicoCompetitors(){
   const tbl=$('#picocomptbl'); if(!tbl) return;
-  if(picocompLoaded){ drawPicoCompetitors(); return; }
-  loadPicoCompetitors().then(drawPicoCompetitors);
+  if(picocompLoaded&&picodistLoaded){ drawPicoCompetitors(); return; }
+  Promise.all([loadPicoCompetitors(),loadPicoDistrict()]).then(drawPicoCompetitors);
 }
 function drawPicoCompetitors(){
   const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
@@ -3546,14 +3556,29 @@ function drawPicoCompetitors(){
       momo=` <b>Where rival entry is newest:</b> <b style="color:var(--agri)">${lm.n_recent}</b> of ${m.pico_total!=null?m.pico_total:'—'} licensed PICO operators (${lm.recent_share_pct}%) were licensed in the trailing ${lm.window_months} months (since ${lm.cutoff_date})`+
         (tr?` — most in <b style="color:var(--gold)">${tr.th}${tr.en?` (${tr.en})`:''}</b>, where <b>${tr.pico_recent}</b> of its ${tr.pico_total} operators are new. Rising sub-scale entry is a distinct signal from existing density.`:'.');
     }
+    // MEASURED district-grain (อำเภอ) line: sharpen the province read to the actual district hotspots.
+    // Sourced from the address-parsed district census; null-safe (absent → no clause, card unchanged).
+    let dist='';
+    const dm=(PICODIST&&PICODIST.meta)?PICODIST.meta:null;
+    const dtop=(PICODIST&&Array.isArray(PICODIST.top_districts))?PICODIST.top_districts:[];
+    if(dm&&dtop.length){
+      // key is "province_th|amphoe" → render as "amphoe, province_th (count)".
+      const fmt=([k,n])=>{const p=String(k).split('|');const amp=p[1]||p[0];const prov=p[1]?p[0]:'';return `<b style="color:var(--gold)">${amp}${prov?`, ${prov}`:''}</b> (${n})`;};
+      const lead=dtop.slice(0,3).map(fmt).join(', ');
+      dist=` <b>At อำเภอ (district) grain:</b> the sub-scale field clusters hardest in ${lead}`+
+        (dm.n_districts_present!=null?`, spread across <b>${dm.n_districts_present.toLocaleString()}</b> districts`:'')+
+        (dm.resolution_pct!=null?` (${dm.resolution_pct}% of operators address-resolved to the 928-district master; the rest stay in the province total)`:'')+
+        ` — the province read localised to the actual district hotspot.`;
+    }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${dist} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
          (lm?`<b>+N new</b> / “rival entry is newest” = operators whose FPO licence-grant date (วันที่ได้รับใบอนุญาต) falls in the trailing ${lm.window_months} months before the registry snapshot (since ${lm.cutoff_date}) — MEASURED, anchored on the pinned snapshot vintage, not wall-clock. It reads rising pressure, not existing density.`:''),
-         'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
+         (dm?`<b>อำเภอ (district) grain</b> = the operator's registered service address carries a district token, exact-matched to the canonical 928-district master (amphoe.json) — MEASURED, ${dm.resolution_pct!=null?`${dm.resolution_pct}% resolved`:'high resolution'}; unresolved rows stay counted in the province total, never dropped. A licence is licensed capacity, not a guaranteed active storefront, and is not a coordinate — density by district, not localised within it.`
+              :'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.'),
          'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
          (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')].filter(Boolean));
   }
