@@ -23,9 +23,12 @@ on:
         description: "How many least-covered provinces to scout this run"
         default: "5"
         type: string
-  schedule:
-    # Daily 03:40 UTC (10:40 Bangkok) — after the weekly gov-census (Mon 02:40) and geocode (Mon 03:10).
-    - cron: "40 3 * * *"
+  # PAUSED 2026-07 (owner request): the daily cron drove the autonomous commit loop (+ a QA run each
+  # push) while the owner drives the platform manually. Still runnable on demand via workflow_dispatch.
+  # To resume the autonomous cadence, uncomment the schedule below.
+  # schedule:
+  #   # Daily 03:40 UTC (10:40 Bangkok) — after the weekly gov-census (Mon 02:40) and geocode (Mon 03:10).
+  #   - cron: "40 3 * * *"
 
 # Never let two autonomous loops run at once (both write the master + push the same branch).
 concurrency:
