@@ -260,6 +260,15 @@ def build():
             if pv:
                 pico_assigned.add(key)
                 n_pico_join += 1
+            # MEASURED district-grain competitive-PRESSURE ratio: licensed PICO-finance rivals
+            # per AutoX branch IN the same district (obj #2 — pressure on the footprint we run,
+            # NOT branch expansion). Absolute density (the `pico` field) can't tell a 40-vs-30
+            # district (comfortable) from a 15-vs-1 one (heavily outnumbered); this ratio does.
+            # Only defined where AutoX operates (branches>0) — null in coverage-gap districts,
+            # a DIFFERENT story owned by the whitespace lens. A pure ratio of two MEASURED counts;
+            # kept SEPARATE from risk_proxy. round-2 so the byte-exact --check stays stable.
+            nb = recs[-1]["branches"]
+            recs[-1]["pico_ratio"] = round(pv / nb, 2) if nb > 0 else None
 
     # ── scores ───────────────────────────────────────────────────────────────────
     # demand proxy: weighted POI footfall + DIW workers, log-compressed so a few
@@ -382,6 +391,27 @@ def build():
                     "risk, obj #1). A district absent from the registry is a MEASURED zero (national "
                     "census); ~2.4% of operators are unresolved at district grain (counted honestly in "
                     "pico_district.json — the province total in pico_census.json stays authoritative).",
+        }
+        # district-grain competitive-pressure rollup (obj #2): where the network we RUN is
+        # outnumbered by sub-scale rivals street-by-street. Computed only over amphoe AutoX
+        # actually operates in (branches>0) — the "pressure on the existing footprint" lens,
+        # NOT a where-to-open cue. A pure count/ratio of two MEASURED fields.
+        operated = [r for r in recs if r["branches"] > 0 and r.get("pico_ratio") is not None]
+        outnum = sorted((r for r in operated if r["pico"] > r["branches"]),
+                        key=lambda r: (-r["pico_ratio"], -r["pico"]))
+        meta["pico_outnumber"] = {
+            "n_operated_districts": len(operated),
+            "n_outnumbered": len(outnum),
+            "note": "pico_ratio = licensed PICO-finance rivals per AutoX branch IN the district "
+                    "(MEASURED, obj #2 competitive pressure on the existing footprint). Defined only "
+                    "where branches>0 (null elsewhere — coverage gaps are the whitespace lens's story). "
+                    "'outnumbered' = a district AutoX operates in where PICO operators exceed AutoX "
+                    "branches. Kept SEPARATE from risk_proxy; makes no open/close recommendation.",
+            "most_outnumbered": [
+                {"province_th": r["province_th"], "amphoe": r["name"], "amphoe_en": r.get("name_en"),
+                 "pico": r["pico"], "branches": r["branches"], "pico_ratio": r["pico_ratio"]}
+                for r in outnum[:8]
+            ],
         }
     return {"meta": meta, "amphoe": recs, "branch_amphoe": branch_amphoe}, branch_join, len(master), fac_join, fac_attempt
 
