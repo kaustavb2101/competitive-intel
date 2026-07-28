@@ -23,6 +23,7 @@ const LENS = {
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
   dpico:{pill:'PICO rivals', label:'District PICO rivals ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry) — licensed พิโกไฟแนนซ์ (PICO-finance) operators, a DISTINCT small-ticket rival class, registered in the branch's own district (อำเภอ). Brighter = more sub-scale rivals clustered in the same district. Kept separate from the district-risk lens (this is competition, obj #2 — not portfolio risk). Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO operators (district)', amp:true, pico:true, tag:'m', val:d=>d._amp?(d._amp.pico||0):0},
+  doutnum:{pill:'Outnumbered', label:'PICO rivals per branch ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry ÷ AutoX footprint) — licensed พิโกไฟแนนซ์ (PICO-finance) operators PER AutoX branch in the same district. Unlike raw PICO density, this weighs the rival field against how many branches we run there: brighter = the existing footprint is more heavily outnumbered street-by-street (obj #2 — pressure on the network we run, not a where-to-open cue). Defined only where AutoX operates; coverage-gap districts are the white-space lens's story. Kept separate from portfolio risk. Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO rivals / AutoX branch', amp:true, pico:true, tag:'m', val:d=>(d._amp&&d._amp.pico_ratio!=null)?d._amp.pico_ratio:null},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
@@ -6086,12 +6087,20 @@ function amphoePopupHTML(d,sec,r){
   const picoLine = (a.pico!=null)
     ? r('PICO rivals in district ◆ · measured', `<span style="color:${a.pico?'var(--collat)':'#8b90a7'}">${(a.pico||0).toLocaleString()}</span> <span class="sub">licensed</span>`, a.pico?'var(--collat)':'#8b90a7')
     : '';
+  // MEASURED competitive-pressure ratio (obj #2): PICO rivals per AutoX branch in this district.
+  // Shown only where AutoX operates AND rivals exist; red when outnumbered (>1×), green when we lead.
+  const orat = a.pico_ratio;
+  const outColor = (orat!=null && orat>1) ? 'var(--agri)' : 'var(--merch)';
+  const outnumLine = (orat!=null && a.pico>0)
+    ? r('PICO rivals per branch ◆ · measured', `<span style="color:${outColor}">${orat.toFixed(orat<10?1:0)}×</span> <span class="sub">${a.pico} vs ${a.branches} branch${a.branches===1?'':'es'}</span>`, outColor)
+    : '';
   return sec('District (amphoe) — coverage & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
     + picoLine
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry)</div>`;
+    + outnumLine
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry); per-branch = PICO rivals ÷ AutoX branches here (measured, obj #2 competitive pressure)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
