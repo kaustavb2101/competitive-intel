@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-28T04:25:17+00:00",
-    "commit": "9666e97"
+    "generated_at": "2026-07-28T04:26:50Z",
+    "commit": "89b185a"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,13 +532,19 @@
   ],
   "activity": [
     {
-      "date": "2026-07-28T04:25:17+00:00",
+      "date": "2026-07-28T04:26:50Z",
+      "sha": "89b185a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the competitor_coverage deploy-health probe ship",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-28T04:25:17Z",
       "sha": "9666e97",
       "summary": "health(deploy): probe competitor_coverage.json — the last unprobed obj-#2 flagship — in the live site-health checker",
       "pillar": "market"
     },
     {
-      "date": "2026-07-28T02:19:56+00:00",
+      "date": "2026-07-28T02:19:56Z",
       "sha": "a7ca494",
       "summary": "docs(progress): log the data.html search aria-label UX-loop run (#196) — merge+deploy+verify",
       "pillar": "uxui"
@@ -550,13 +556,13 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T23:46:25+00:00",
+      "date": "2026-07-27T23:46:25Z",
       "sha": "bbb88ca",
       "summary": "data: live fuel prices (2026-07-27, run 30315043295)",
       "pillar": "data-integration"
     },
     {
-      "date": "2026-07-27T22:27:37+00:00",
+      "date": "2026-07-27T22:27:37Z",
       "sha": "3a70448",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the regional brand-leadership ship",
       "pillar": "feature"
@@ -568,13 +574,13 @@
       "pillar": "peer"
     },
     {
-      "date": "2026-07-27T22:17:27+00:00",
+      "date": "2026-07-27T22:17:27Z",
       "sha": "3b73363",
       "summary": "committee: refresh autonomy plan (run 30309829108)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T20:34:44+00:00",
+      "date": "2026-07-27T20:34:44Z",
       "sha": "d55d39f",
       "summary": "docs(progress): log the #acq mobile-overflow UX-loop run (#190) — merge+deploy+verify",
       "pillar": "uxui"
@@ -586,31 +592,31 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T18:40:20+00:00",
+      "date": "2026-07-27T18:40:20Z",
       "sha": "76aa0f4",
       "summary": "feat(competition): PICO competitor census to district (อำเภอ) grain — pico_district.json (obj #2)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-27T17:06:47+00:00",
+      "date": "2026-07-27T17:06:47Z",
       "sha": "16a2f33",
       "summary": "committee: refresh autonomy plan (run 30287465163)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T16:24:27+00:00",
+      "date": "2026-07-27T16:24:27Z",
       "sha": "f5c7e47",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_province deploy-health probe ship",
       "pillar": "peer"
     },
     {
-      "date": "2026-07-27T16:23:47+00:00",
+      "date": "2026-07-27T16:23:47Z",
       "sha": "965de1e",
       "summary": "health(deploy): probe the competition pillar's flagship exec layer (peer_province.json, obj #2)",
       "pillar": "peer"
     },
     {
-      "date": "2026-07-27T14:27:04+00:00",
+      "date": "2026-07-27T14:27:04Z",
       "sha": "7bb6ca4",
       "summary": "docs(progress): log the Road-to-3,000 thesis-bar dead-CSS UX-loop run (#189) — merge+deploy+verify",
       "pillar": "uxui"
@@ -622,13 +628,13 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T12:36:23+00:00",
+      "date": "2026-07-27T12:36:23Z",
       "sha": "3263929",
       "summary": "committee: refresh autonomy plan (run 30266165997)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T10:41:33+00:00",
+      "date": "2026-07-27T10:41:33Z",
       "sha": "528cc5e",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the honest-ETA ship",
       "pillar": "feature"
@@ -640,7 +646,7 @@
       "pillar": "feature"
     },
     {
-      "date": "2026-07-27T08:32:04+00:00",
+      "date": "2026-07-27T08:32:04Z",
       "sha": "cf7dd16",
       "summary": "docs(progress): log the noscript-fallback UX-loop run (#186) — merge+deploy+verify",
       "pillar": "uxui"
@@ -652,31 +658,31 @@
       "pillar": "uxui"
     },
     {
-      "date": "2026-07-27T07:00:28+00:00",
+      "date": "2026-07-27T07:00:28Z",
       "sha": "08f4b0f",
       "summary": "committee: autonomous competitor scout (run 30244059030)",
       "pillar": "market"
     },
     {
-      "date": "2026-07-27T06:42:26+00:00",
+      "date": "2026-07-27T06:42:26Z",
       "sha": "2dea9a9",
       "summary": "committee: refresh autonomy plan (run 30243246593)",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T06:20:20+00:00",
+      "date": "2026-07-27T06:20:20Z",
       "sha": "fbdea96",
       "summary": "health(deploy): probe the Overview truck_flow + region_debt cards",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:25:02+00:00",
+      "date": "2026-07-27T04:25:02Z",
       "sha": "0447648",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the Overview deploy-health probe ship",
       "pillar": "deployment"
     },
     {
-      "date": "2026-07-27T04:24:35+00:00",
+      "date": "2026-07-27T04:24:35Z",
       "sha": "d5138d1",
       "summary": "health(deploy): probe the Overview used-collateral pulse card (collateral_flow.json)",
       "pillar": "service"
@@ -704,12 +710,6 @@
       "sha": "154b449",
       "summary": "feat(competition): surface PICO-finance licensing momentum (obj #2, MEASURED) (#179)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-07-27T08:49:15+07:00",
-      "sha": "21782c4",
-      "summary": "feat(obj#1): surface the used-collateral pulse (moto/car/pickup) by region (#183)",
-      "pillar": "service"
     }
   ]
 }
