@@ -22,6 +22,7 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"BORROWER BASE · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
+  dpico:{pill:'PICO rivals', label:'District PICO rivals ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry) — licensed พิโกไฟแนนซ์ (PICO-finance) operators, a DISTINCT small-ticket rival class, registered in the branch's own district (อำเภอ). Brighter = more sub-scale rivals clustered in the same district. Kept separate from the district-risk lens (this is competition, obj #2 — not portfolio risk). Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO operators (district)', amp:true, pico:true, tag:'m', val:d=>d._amp?(d._amp.pico||0):0},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
@@ -3491,10 +3492,21 @@ function loadPicoCompetitors(){
     .catch(()=>{ PICOCOMP=null; picocompLoaded=true; return null; });
   return picocompPromise;
 }
+// District-grain sharpening (pico_district.json, MEASURED): the FPO registry has no coordinate, but
+// each operator's registered address carries an อำเภอ — parsed + exact-matched to the 928-district
+// master. Sharpens the province table to "where WITHIN a province the rival field clusters". Null-safe.
+let PICODIST=null, picodistLoaded=false, picodistPromise=null;
+function loadPicoDistrict(){
+  if(picodistPromise) return picodistPromise;
+  picodistPromise=fetch('data/pico_district.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PICODIST=j; picodistLoaded=true; return PICODIST; })
+    .catch(()=>{ PICODIST=null; picodistLoaded=true; return null; });
+  return picodistPromise;
+}
 function renderPicoCompetitors(){
   const tbl=$('#picocomptbl'); if(!tbl) return;
-  if(picocompLoaded){ drawPicoCompetitors(); return; }
-  loadPicoCompetitors().then(drawPicoCompetitors);
+  if(picocompLoaded&&picodistLoaded){ drawPicoCompetitors(); return; }
+  Promise.all([loadPicoCompetitors(),loadPicoDistrict()]).then(drawPicoCompetitors);
 }
 function drawPicoCompetitors(){
   const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
@@ -3546,14 +3558,25 @@ function drawPicoCompetitors(){
       momo=` <b>Where rival entry is newest:</b> <b style="color:var(--agri)">${lm.n_recent}</b> of ${m.pico_total!=null?m.pico_total:'—'} licensed PICO operators (${lm.recent_share_pct}%) were licensed in the trailing ${lm.window_months} months (since ${lm.cutoff_date})`+
         (tr?` — most in <b style="color:var(--gold)">${tr.th}${tr.en?` (${tr.en})`:''}</b>, where <b>${tr.pico_recent}</b> of its ${tr.pico_total} operators are new. Rising sub-scale entry is a distinct signal from existing density.`:'.');
     }
+    // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
+    // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
+    const dm=(PICODIST&&PICODIST.meta)||null;
+    let distClause='';
+    if(dm&&Array.isArray(PICODIST.top_districts)&&PICODIST.top_districts.length){
+      const fmtD=(k)=>{ const p=String(k).split('|'); return p.length===2?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b>${k}</b>`; };
+      const tops=PICODIST.top_districts.slice(0,4).map(d=>`${fmtD(d[0])} <span class="mono" style="color:var(--gold)">${d[1]}</span>`).join(' · ');
+      distClause=` <b>Within provinces, the rival field is not uniform:</b> parsing the อำเภอ out of each operator's registered address resolves `+
+        `<b>${dm.n_district_resolved!=null?dm.n_district_resolved.toLocaleString():'—'}</b> of ${dm.n_operators!=null?dm.n_operators.toLocaleString():'—'} operators `+
+        `(${dm.resolution_pct!=null?dm.resolution_pct:'—'}%) to <b>${dm.n_districts_present!=null?dm.n_districts_present:'—'}</b> districts — and PICO clusters in the provincial-capital (เมือง) districts: ${tops}.`;
+    }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${distClause} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
          (lm?`<b>+N new</b> / “rival entry is newest” = operators whose FPO licence-grant date (วันที่ได้รับใบอนุญาต) falls in the trailing ${lm.window_months} months before the registry snapshot (since ${lm.cutoff_date}) — MEASURED, anchored on the pinned snapshot vintage, not wall-clock. It reads rising pressure, not existing density.`:''),
-         'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
+         (dm?`<b>District grain:</b> the registry carries no coordinate, but each operator's registered address carries an อำเภอ (district) — parsed and exact-matched to the canonical 928-district master (pico_district.json), resolving <b>${dm.resolution_pct!=null?dm.resolution_pct:'—'}%</b> of operators (${dm.n_district_resolved!=null?dm.n_district_resolved.toLocaleString():'—'}/${dm.n_operators!=null?dm.n_operators.toLocaleString():'—'}) to ${dm.n_districts_present!=null?dm.n_districts_present:'—'} districts. The ${dm.n_unresolved!=null?dm.n_unresolved:'—'} unmatched (mostly districts absent from the 928-polygon master) are counted honestly in the layer, not dropped; the province totals above stay authoritative.`:'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.'),
          'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
          (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')].filter(Boolean));
   }
@@ -5250,6 +5273,9 @@ function lensAbsent(k){
   if(l.peers) return peersLoaded && !peerHasData();
   if(l.macx)  return macxDone && !macxHasData();
   if(l.cat)   return cropLuLoaded && !cropHasData();
+  // pico district-rival lens: hide only once the district layer is loaded AND it predates the
+  // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
+  if(l.pico)  return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.pico!=null);
   return false;
 }
 function renderLenses(){
@@ -6055,11 +6081,17 @@ function amphoePopupHTML(d,sec,r){
   const ws=a.whitespace, rk=a.risk_proxy;
   const wc=ws>=40?'var(--gold)':ws>=20?'#cda23e':'#8b90a7';
   const rc=rk>=55?'var(--agri)':rk>=45?'var(--gold)':'var(--merch)';
+  // MEASURED district-grain PICO-finance rival count (obj #2, competitive) — shown only when the
+  // pico fold is present on the record; a district absent from the FPO registry is a measured zero.
+  const picoLine = (a.pico!=null)
+    ? r('PICO rivals in district ◆ · measured', `<span style="color:${a.pico?'var(--collat)':'#8b90a7'}">${(a.pico||0).toLocaleString()}</span> <span class="sub">licensed</span>`, a.pico?'var(--collat)':'#8b90a7')
+    : '';
   return sec('District (amphoe) — coverage & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
+    + picoLine
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
