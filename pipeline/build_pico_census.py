@@ -15,7 +15,7 @@ INPUT  source-data/datagoth/fpo_pico.csv — the FPO open-data registry (one row
        (--only fpo_pico) from catalog.fpo.go.th. The raw CSV is gitignored + re-pullable; this
        builder's committed OUTPUT is the repo's source of truth.
 
-OUTPUT platform/data/pico_census.json — { meta, by_province{prov:{total,head,branch}}, zero_provinces, top }.
+OUTPUT platform/data/pico_census.json — { meta, by_province{prov:{total,head,branch,recent,recent_op}}, zero_provinces, top }.
        Every count is MEASURED (a straight tally of the government registry by its own province field);
        no synthesis, no scoring. Province strings are folded to the canonical 77 via regionmap.canonical.
 
@@ -49,12 +49,20 @@ SNAPSHOT_VINTAGE = "2026-05-22"  # from the resource filename (DDMMYYYY)
 COL_TYPE = "ประเภทสำนักงาน"        # office type: สำนักงานใหญ่ (head) / สำนักสาขา (branch)
 COL_PROV = "จังหวัดที่ให้บริการ"    # province of service
 COL_LICDATE = "วันที่ได้รับใบอนุญาต"  # FPO licence-grant date (ISO YYYY-MM-DD) — the "entry" signal
+COL_OPDATE = "วันที่เริ่มดำเนินการ"  # FPO commencement / go-live date (ISO) — the "actually-operating" signal
 HEAD_TOKEN = "ใหญ่"                # substring identifying a head office ("สำนักงานใหญ่")
 
 # Licensing-momentum window (objective #2): operators whose licence was granted within RECENT_MONTHS
 # before the registry snapshot count as RECENT entries — a rising-competitive-pressure read (where the
 # sub-scale PICO field is NEWEST, not just densest). The cutoff is derived from the PINNED snapshot
 # vintage, NOT wall-clock, so the count is deterministic + byte-stable across re-runs.
+#
+# We track TWO recency lenses on the same window, because they answer different questions and (measured
+# on this snapshot) diverge materially — only ~140 of ~193/200 operators overlap:
+#   • licence-grant date (COL_LICDATE)  — when FPO ISSUED the licence      → "where rival entry is newest"
+#   • commencement date  (COL_OPDATE)   — when the operator WENT LIVE      → "where rivals recently went live"
+# The commencement lens catches operators licensed >RECENT_MONTHS ago that only recently opened their
+# doors — live competitive pressure the licence-grant lens misses entirely.
 RECENT_MONTHS = 24
 _sy, _sm, _sd = (int(x) for x in SNAPSHOT_VINTAGE.split("-"))
 _cut = (_sy * 12 + (_sm - 1)) - RECENT_MONTHS
@@ -68,16 +76,17 @@ def _valid_iso(s):
 
 
 def build():
-    by_prov = {}          # canonical prov -> [total, head, branch, other, recent]
+    by_prov = {}          # canonical prov -> [total, head, branch, other, recent, recent_op]
     n_total = n_head = n_branch = n_other = n_unmapped = 0
     n_recent = n_lic_parsed = n_lic_unparsed = 0
+    n_recent_op = n_op_parsed = n_op_unparsed = n_op_after_snapshot = 0
     with open(CSV_IN, encoding="utf-8-sig") as f:
         for row in csv.DictReader(f):
             prov = canonical((row.get(COL_PROV) or "").strip())
             if not prov:
                 n_unmapped += 1
                 continue
-            rec = by_prov.setdefault(prov, [0, 0, 0, 0, 0])
+            rec = by_prov.setdefault(prov, [0, 0, 0, 0, 0, 0])
             rec[0] += 1
             n_total += 1
             otype = (row.get(COL_TYPE) or "").strip()
@@ -95,8 +104,19 @@ def build():
                     rec[4] += 1; n_recent += 1
             else:
                 n_lic_unparsed += 1
+            # commencement / go-live recency (MEASURED — the "actually-operating" lens, deterministic)
+            opd = (row.get(COL_OPDATE) or "").strip()
+            if _valid_iso(opd):
+                n_op_parsed += 1
+                if opd >= CUTOFF_DATE:
+                    rec[5] += 1; n_recent_op += 1
+                    if opd >= SNAPSHOT_VINTAGE:
+                        n_op_after_snapshot += 1   # declared/imminent go-lives at or after the snapshot
+            else:
+                n_op_unparsed += 1
 
-    by_province = {p: {"total": v[0], "head": v[1], "branch": v[2], "recent": v[4]}
+    by_province = {p: {"total": v[0], "head": v[1], "branch": v[2],
+                       "recent": v[4], "recent_op": v[5]}
                    for p, v in sorted(by_prov.items())}
     # honestly surface the "other" office-type bucket only where non-zero
     for p, v in by_prov.items():
@@ -110,6 +130,9 @@ def build():
     # licensing-momentum rollup: provinces where the sub-scale PICO field is NEWEST (top by recent count)
     top_recent = sorted(((p, v["recent"], v["total"]) for p, v in by_province.items() if v["recent"]),
                         key=lambda t: (-t[1], t[0]))[:15]
+    # operating-momentum rollup: provinces where the most PICO rivals recently WENT LIVE (top by recent_op)
+    top_recent_op = sorted(((p, v["recent_op"], v["total"]) for p, v in by_province.items() if v["recent_op"]),
+                           key=lambda t: (-t[1], t[0]))[:15]
 
     meta = {
         "generated_by": "pipeline/build_pico_census.py",
@@ -148,6 +171,29 @@ def build():
             "n_licence_dates_parsed": n_lic_parsed,
             "n_licence_dates_unparsed": n_lic_unparsed,
             "top_recent": top_recent,
+        },
+        "operating_momentum": {
+            "label": ("MEASURED operating momentum — operators whose FPO commencement / go-live date "
+                      "(วันที่เริ่มดำเนินการ) falls within the trailing %d months before the registry "
+                      "snapshot. This is the \"actually went live\" lens, distinct from licence-grant: "
+                      "it catches sub-scale rivals licensed earlier that only recently opened their "
+                      "doors — live competitive pressure the licensing lens misses. Deterministic "
+                      "cutoff (pinned snapshot vintage), never wall-clock." % RECENT_MONTHS),
+            "column": "วันที่เริ่มดำเนินการ (commencement / go-live date, ISO)",
+            "window_months": RECENT_MONTHS,
+            "cutoff_date": CUTOFF_DATE,
+            "snapshot_date": SNAPSHOT_VINTAGE,
+            "n_recent": n_recent_op,
+            "recent_share_pct": round(100.0 * n_recent_op / n_total, 1) if n_total else 0.0,
+            "n_commence_dates_parsed": n_op_parsed,
+            "n_commence_dates_unparsed": n_op_unparsed,
+            "n_at_or_after_snapshot": n_op_after_snapshot,
+            "note_at_or_after_snapshot": ("Of the recent go-lives, %d carry a commencement date at or "
+                                          "after the pinned snapshot vintage (%s) — declared / imminent "
+                                          "openings recorded in the registry; the FPO resource is "
+                                          "refreshed in place (its download filename lags its content)."
+                                          % (n_op_after_snapshot, SNAPSHOT_VINTAGE)),
+            "top_recent": top_recent_op,
         },
         "objective": ("Competitive risk (#2): measured density of a distinct licensed non-bank rival "
                       "class across the existing AutoX footprint, province by province."),
@@ -203,9 +249,14 @@ def main():
              m["n_branch_office"], m["n_provinces_zero"]))
     print("  top: %s" % ", ".join("%s=%d" % (p, n) for p, n in obj["top"][:6]))
     lm = m["licence_momentum"]
-    print("  momentum: %d licensed in trailing %dmo (>=%s) = %.1f%% of field; newest: %s"
+    print("  licence-momentum: %d licensed in trailing %dmo (>=%s) = %.1f%% of field; newest: %s"
           % (lm["n_recent"], lm["window_months"], lm["cutoff_date"], lm["recent_share_pct"],
              ", ".join("%s=%d" % (p, r) for p, r, _ in lm["top_recent"][:6])))
+    om = m["operating_momentum"]
+    print("  operating-momentum: %d went live in trailing %dmo = %.1f%% of field (%d at/after snapshot); "
+          "newest live: %s"
+          % (om["n_recent"], om["window_months"], om["recent_share_pct"], om["n_at_or_after_snapshot"],
+             ", ".join("%s=%d" % (p, r) for p, r, _ in om["top_recent"][:6])))
     if obj["zero_provinces"]:
         print("  zero-PICO provinces: %s" % ", ".join(obj["zero_provinces"]))
 
