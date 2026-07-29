@@ -789,7 +789,7 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
    shimmer skeletons); white background + black text; tables go full-width with no horizontal
    scroll; verdict cards + tables are kept and never split across a page break. */
 @media print{
-  nav,#nav,#themeToggle,.no-print,.cc-actions,
+  nav,#nav,#themeToggle,.no-print,.cc-actions,.skip-link,
   .nav-more,.nav-more-menu,.lens-more,.lens-more-menu,
   .lenses,.lens,.pill,.chips,.chip,.maphero,#map,.maplegend,.maplegend-line,
   .pi,[title]:after,.tooltip,.skel,.skel-rows{display:none!important}
