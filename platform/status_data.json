@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-28T17:42:25+07:00",
-    "commit": "c54247b"
+    "generated_at": "2026-07-28T16:31:43+00:00",
+    "commit": "42a5c7a"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-07-28T16:31:43+00:00",
+      "sha": "42a5c7a",
+      "summary": "docs(service): correct SERVICE_AUDIT §4 (deploy-weight 10x understated) + flag half-done R2 catchment migration (~2.2GB R2-duplicated in git)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-07-28T14:26:12+00:00",
+      "sha": "5a7344f",
+      "summary": "docs: log ux-skiplink-print-leak merge + deploy-verify (PR #202)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-28T21:22:51+07:00",
+      "sha": "8f20c23",
+      "summary": "ux: hide skip-link in print — stops it leaking into the PDF brief (#202)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-28T20:11:16+07:00",
+      "sha": "1cdb568",
+      "summary": "ci: pause the autonomous committee loops' cron (owner drives manually now) (#201)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-28T19:52:32+07:00",
+      "sha": "3730ec1",
+      "summary": "feat(map): district-grain \"outnumbered\" PICO lens (rivals ÷ AutoX branches, obj #2, MEASURED) (#200)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-28T11:29:28+00:00",
+      "sha": "5111e0f",
+      "summary": "committee: refresh autonomy plan (run 30354573741)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-28T10:43:19+00:00",
+      "sha": "4529105",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the district PICO-lens ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-28T17:42:25+07:00",
       "sha": "c54247b",
       "summary": "feat(map): district-grain PICO rival lens on the National map (obj #2, MEASURED) (#199)",
@@ -667,48 +709,6 @@
       "date": "2026-07-27T12:36:23+00:00",
       "sha": "3263929",
       "summary": "committee: refresh autonomy plan (run 30266165997)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-27T10:41:33+00:00",
-      "sha": "528cc5e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the honest-ETA ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-27T17:38:32+07:00",
-      "sha": "4ac4427",
-      "summary": "plan: honest CEO-dashboard ETA excluding owner-side-blocked work (#187)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-27T08:32:04+00:00",
-      "sha": "cf7dd16",
-      "summary": "docs(progress): log the noscript-fallback UX-loop run (#186) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T15:28:27+07:00",
-      "sha": "399e459",
-      "summary": "ux: noscript fallback on data.html + status.html (JS-off explainer) (#186)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T07:00:28+00:00",
-      "sha": "08f4b0f",
-      "summary": "committee: autonomous competitor scout (run 30244059030)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-27T06:42:26+00:00",
-      "sha": "2dea9a9",
-      "summary": "committee: refresh autonomy plan (run 30243246593)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-27T06:20:20+00:00",
-      "sha": "fbdea96",
-      "summary": "health(deploy): probe the Overview truck_flow + region_debt cards",
       "pillar": "deployment"
     }
   ]

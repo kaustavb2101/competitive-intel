@@ -9,9 +9,12 @@ name: Committee — autonomy planner (every 6h, gate-guarded)
 
 on:
   workflow_dispatch:
-  schedule:
-    # 03,09,15,21 UTC — offset from committee-cycle (03:40) and the improvement loops.
-    - cron: "0 3,9,15,21 * * *"
+  # PAUSED 2026-07 (owner request): the 6-hourly cron was the top AI-credit/usage consumer while the
+  # owner drives the platform manually. Still runnable on demand via workflow_dispatch. To resume the
+  # autonomous cadence, uncomment the schedule below.
+  # schedule:
+  #   # 03,09,15,21 UTC — offset from committee-cycle (03:40) and the improvement loops.
+  #   - cron: "0 3,9,15,21 * * *"
 
 # Never let two planner runs overlap (both regenerate + push the same two files to master).
 concurrency:
