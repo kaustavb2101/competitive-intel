@@ -50,7 +50,7 @@ R_EARTH = 6371000.0
 # Linux/3.11 while it may be regenerated on Windows/3.14). canonical() folds raw prov strings to the
 # 77 canonical Thai names.
 sys.path.insert(0, HERE)
-from regionmap import canonical
+from lib.regionmap import canonical
 from build_province import _rings, _bbox, _pip, _contains, _centroid  # noqa: E402  (pure PIP helpers)
 
 

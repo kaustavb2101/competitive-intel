@@ -17,7 +17,7 @@ build_branch_density.py's honest ABSENT state.
 """
 import argparse, json, math, os, sys
 from collections import defaultdict
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-data", "fuel_stations.json")

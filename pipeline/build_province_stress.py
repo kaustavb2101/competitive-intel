@@ -38,7 +38,7 @@ import json
 import os
 import sys
 
-from regionmap import REGION
+from lib.regionmap import REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

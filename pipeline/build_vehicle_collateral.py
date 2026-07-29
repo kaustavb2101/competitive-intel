@@ -36,7 +36,7 @@ import argparse, csv, glob, io, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 SRC_GLOB = os.path.join(ROOT, "source-data", "dlt", "raw", "dataset_1_1_04", "*.csv")
 BRANDS = os.path.join(ROOT, "platform", "data", "brand_trends.json")

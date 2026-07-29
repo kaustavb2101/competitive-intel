@@ -27,7 +27,7 @@ import os
 import sys
 from collections import defaultdict
 
-from regionmap import region_of
+from lib.regionmap import region_of
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-data")

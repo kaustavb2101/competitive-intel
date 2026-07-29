@@ -53,7 +53,7 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIPE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PIPE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 OUT = os.path.join(ROOT, "source-data", "oae_yield.json")
 RAW_DIR = os.path.join(ROOT, "source-data", ".oae_yield_raw")

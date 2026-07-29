@@ -20,7 +20,7 @@ import argparse, json, os, sys, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from regionmap import canonical
+from lib.regionmap import canonical
 
 RAW = os.path.join(ROOT, "source-data", "doae_raw.json")
 OUT = os.path.join(ROOT, "source-data", "doae_planted_area.json")

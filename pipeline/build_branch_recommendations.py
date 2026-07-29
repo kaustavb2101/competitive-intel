@@ -21,7 +21,7 @@ credit decision).
   python3 build_branch_recommendations.py --check
 """
 import argparse, json, os, sys
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = os.path.join(ROOT, "platform", "data")

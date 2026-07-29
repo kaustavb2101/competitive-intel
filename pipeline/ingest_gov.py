@@ -23,7 +23,7 @@ REPO = os.path.dirname(ROOT)
 DGT  = os.path.join(ROOT, "dgt_out")
 SRC  = os.path.join(REPO, "source-data")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION, norm_district
+from lib.regionmap import canonical, REGION, norm_district
 
 
 def to_int(x):

@@ -37,7 +37,7 @@ REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUT  = os.path.join(REPO, "platform", "data", "amphoe.json")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION, norm_district
+from lib.regionmap import canonical, REGION, norm_district
 
 # POI layers in osm_layers.json -> short key used in output. Items are [lng, lat].
 POI = {"ind": "industrial", "veh": "vehicle_commerce", "gold": "gold", "fmkt": "fresh_market",

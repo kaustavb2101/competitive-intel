@@ -34,7 +34,7 @@ import argparse, csv, io, json, os, ssl, sys, urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIPE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PIPE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 OUT = os.path.join(ROOT, "source-data", "oae_napprang.json")
 PKG = "https://catalog.oae.go.th/api/3/action/package_show?id=dataoae1104"

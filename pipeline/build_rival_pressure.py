@@ -28,7 +28,7 @@ build_lead_sites.py) so the national build runs in seconds.
 """
 import argparse, json, math, os
 
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)

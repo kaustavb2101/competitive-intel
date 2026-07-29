@@ -23,7 +23,7 @@ import argparse, json, os, sys, time, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regionmap import canonical
+from lib.regionmap import canonical
 
 OUT = os.path.join(ROOT, "source-data", "nabc_agri.json")
 BASE = "https://agriapi.nabc.go.th/api"

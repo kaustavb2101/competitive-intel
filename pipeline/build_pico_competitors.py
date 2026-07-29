@@ -44,7 +44,7 @@ import argparse, json, os, sys
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

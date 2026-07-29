@@ -83,8 +83,8 @@ CROP = os.path.join(DATA, "crop_stress.json")
 BOARD = os.path.join(ROOT, "source-data", "commodity_board.json")
 OUT = os.path.join(DATA, "macro_sensitivity.json")
 sys.path.insert(0, HERE)
-from regionmap import canonical
-from fingerprint import branches_fingerprint
+from lib.regionmap import canonical
+from lib.fingerprint import branches_fingerprint
 
 # fixed driver order — tie-break for equal scores and the audit order in meta.
 # NOTE: gold is deliberately excluded — AutoX lends against vehicle titles, not gold, so gold

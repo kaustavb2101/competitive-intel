@@ -25,7 +25,7 @@ import json
 import os
 import sys
 
-from regionmap import REGION
+from lib.regionmap import REGION
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P = os.path.join(ROOT, "platform", "data")

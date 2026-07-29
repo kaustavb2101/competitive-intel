@@ -53,7 +53,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 ECON = os.path.join(ROOT, "source-data", "oae_farm_economics.json")   # primary (denominator + net)
 YIELD = os.path.join(ROOT, "source-data", "oae_yield.json")           # per-province RICE yield spread

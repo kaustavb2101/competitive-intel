@@ -29,7 +29,7 @@ DATA = os.path.join(ROOT, "platform", "data")
 OUT = os.path.join(ROOT, "source-data", "perimeter_counts.json")
 R_KM = 10.0
 
-from fingerprint import branches_fingerprint  # noqa: E402  (pipeline-local helper)
+from lib.fingerprint import branches_fingerprint  # noqa: E402  (pipeline-local helper)
 
 
 def bucket(n):

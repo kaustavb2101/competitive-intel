@@ -5,7 +5,7 @@ build_building_tiles.py — national BUILDING VECTOR-TILE plan for the streaming
 The 3D pages today bake a small, per-city slice of buildings into JSON. This script
 instead PLANS a single national vector-tile archive (PMTiles) of REAL Overture Maps
 building footprints covering the 10 km catchment around EVERY AutoX branch (2,015) AND
-every competitor branch (competitors_national.json). The frontend team wires a deck.gl
+every competitor branch (competitors_census.json — the merged authoritative census). The frontend team wires a deck.gl
 streaming tile layer to it; this script just produces the run-plan + coverage geometry.
 
 WHAT IT PRODUCES
@@ -49,7 +49,7 @@ BBOX_JSON = os.path.join(OUT_DIR, "coverage_bbox.json")
 RUN_SH = os.path.join(OUT_DIR, "RUN_TILES.sh")
 
 BRANCHES = os.path.join(SRC, "branches_final.json")
-COMPETITORS = os.path.join(REPO, "platform", "data", "competitors_national.json")
+COMPETITORS = os.path.join(REPO, "platform", "data", "competitors_census.json")
 PROV_INDEX = os.path.join(REPO, "platform", "data", "provinces", "index.json")
 
 # ~10 km in degrees. 1 deg lat ~= 111 km, so 10 km ~= 0.09 deg. We pad the OVERALL bbox by
@@ -306,7 +306,7 @@ def _region_extents(pad):
     region, from that region's branch + competitor points. Splitting the national pull into ~5
     regional bboxes bounds peak disk: the owner builds one region at a time (streamed straight
     into tippecanoe, no per-region intermediate) then tile-joins them into one national archive."""
-    from regionmap import REGION, canonical
+    from lib.regionmap import REGION, canonical
     branches = _load(BRANCHES)
     comps = _load(COMPETITORS)
     citems = comps.get("items", comps) if isinstance(comps, dict) else comps

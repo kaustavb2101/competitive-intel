@@ -55,7 +55,7 @@ except ImportError:
           file=sys.stderr)
     raise SystemExit(3)
 
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BRANCHES = os.path.join(REPO, "platform", "data", "branches.json")

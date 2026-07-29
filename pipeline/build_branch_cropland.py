@@ -19,8 +19,8 @@ absent (optional upstream) so the gate never breaks on a missing pull. Index-ali
   python3 build_branch_cropland.py --check
 """
 import argparse, json, os, sys
-from fingerprint import branches_fingerprint
-from regionmap import canonical
+from lib.fingerprint import branches_fingerprint
+from lib.regionmap import canonical
 from build_branch_agri import spam_crop_cells, cell_key, haversine_km, CROPS, RADIUS_KM
 
 HERE = os.path.dirname(os.path.abspath(__file__))

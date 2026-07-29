@@ -24,7 +24,7 @@ REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUTDIR = os.path.join(REPO, "platform", "data", "provinces")
 sys.path.insert(0, ROOT)
-from regionmap import canonical, REGION, norm_district, PROVINCE_EN
+from lib.regionmap import canonical, REGION, norm_district, PROVINCE_EN
 
 # the 10 POI layers the province page expects (subset of osm_layers), output as [lat,lng]
 POI_LAYERS = ["industrial", "vehicle_commerce", "fresh_market", "gold", "bank",

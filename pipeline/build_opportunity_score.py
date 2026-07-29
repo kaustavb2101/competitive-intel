@@ -50,7 +50,7 @@ REPO = os.path.dirname(ROOT)
 DATA = os.path.join(REPO, "platform", "data")
 OUT  = os.path.join(DATA, "opportunity_score.json")
 sys.path.insert(0, ROOT)
-from regionmap import canonical
+from lib.regionmap import canonical
 
 # ── component weights (sum to 1.0 over the FULL set; renormalized per district
 #    over whichever terms are actually available). Tuned for objective #2:

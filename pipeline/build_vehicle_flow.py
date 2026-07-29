@@ -45,7 +45,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIPE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PIPE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 RAW_DIR = os.path.join(ROOT, "source-data", "dlt", "raw", "dataset_stat_1_008")
 OUT = os.path.join(ROOT, "source-data", "vehicle_flow_by_province.json")
