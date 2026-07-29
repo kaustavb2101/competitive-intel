@@ -3574,6 +3574,7 @@ function drawPicoCompetitors(){
   // measured theme tokens (contrast-safe in light + dark): PICO=gold, AutoX=teal, pressure(outnumber)=risk-red.
   const PICO='var(--gold)', AX='var(--merch)', PRESS='var(--agri)';
   const m=PICOCOMP.meta||{}, lm=m.licence_momentum||null;   // MEASURED licensing-momentum rollup (may be absent)
+  const op=m.operating_momentum||null;                      // MEASURED go-live (commencement) momentum (may be absent)
   const winMo=(lm&&lm.window_months)||24;
   const top=rows.slice().sort((a,b)=>(b.outnumber||0)-(a.outnumber||0)).slice(0,PICOCOMP_TOPN);
   const maxPico=Math.max(1,...top.map(r=>r.pico_total||0));
@@ -3613,6 +3614,14 @@ function drawPicoCompetitors(){
       momo=` <b>Where rival entry is newest:</b> <b style="color:var(--agri)">${lm.n_recent}</b> of ${m.pico_total!=null?m.pico_total:'—'} licensed PICO operators (${lm.recent_share_pct}%) were licensed in the trailing ${lm.window_months} months (since ${lm.cutoff_date})`+
         (tr?` — most in <b style="color:var(--gold)">${tr.th}${tr.en?` (${tr.en})`:''}</b>, where <b>${tr.pico_recent}</b> of its ${tr.pico_total} operators are new. Rising sub-scale entry is a distinct signal from existing density.`:'.');
     }
+    // MEASURED operating-momentum line: where rivals recently WENT LIVE (commencement date) — distinct from
+    // licence-grant, it catches operators licensed earlier that only recently opened their doors.
+    let opmo='';
+    if(op&&op.n_recent!=null){
+      const otr=(op.top_recent||[])[0];
+      opmo=` <b>Where rivals recently went live:</b> <b style="color:var(--agri)">${op.n_recent}</b> PICO operators (${op.recent_share_pct}%) began operating in the trailing ${op.window_months} months`+
+        (otr?` — most in <b style="color:var(--gold)">${otr.th}${otr.en?` (${otr.en})`:''}</b> (<b>${otr.pico_recent_op}</b>). Commencement ≠ licence-grant: some went live years after licensing, so this "actually operating" lens catches live pressure the licensing lens misses.`:'.');
+    }
     // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
     // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
     const dm=(PICODIST&&PICODIST.meta)||null;
@@ -3626,7 +3635,7 @@ function drawPicoCompetitors(){
     }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${distClause} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${opmo}${distClause} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',

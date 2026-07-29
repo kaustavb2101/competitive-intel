@@ -28,8 +28,8 @@ INPUTS  (both committed, deterministic, network-free)
   platform/data/provinces/index.json — province EN name + slug + region (for display / deep-dive link).
 
 OUTPUT  platform/data/pico_competitors.json
-  { meta, provinces:[{th,en,slug,region, pico_total,pico_head,pico_branch, autox_branches,
-                      outnumber (=pico_total-autox_branches), ratio (=pico_total/autox_branches)}],
+  { meta, provinces:[{th,en,slug,region, pico_total,pico_head,pico_branch,pico_recent,pico_recent_op,
+                      autox_branches, outnumber (=pico_total-autox_branches), ratio (=pico_total/autox_branches)}],
     top, totals }  sorted by outnumber desc (then province th).
 
 Every number is MEASURED — two government/own-footprint tallies divided; no scoring, no synthesis.
@@ -91,6 +91,7 @@ def build():
         pico_head = rec.get("head", 0)
         pico_branch = rec.get("branch", 0)
         pico_recent = rec.get("recent", 0)          # MEASURED — licensed in the census momentum window
+        pico_recent_op = rec.get("recent_op", 0)     # MEASURED — commenced/went live in the same window
         ax = autox.get(p, 0)
         d = disp.get(p, {})
         rows.append({
@@ -102,6 +103,7 @@ def build():
             "pico_head": pico_head,
             "pico_branch": pico_branch,
             "pico_recent": pico_recent,                           # newly-licensed sub-scale rivals (rising pressure)
+            "pico_recent_op": pico_recent_op,                     # sub-scale rivals that recently WENT LIVE
             "autox_branches": ax,
             "outnumber": pico_total - ax,                         # >0 = sub-scale rivals exceed our branches
             "ratio": round(pico_total / ax, 2) if ax else None,   # None where AutoX is absent (no denominator)
@@ -129,6 +131,20 @@ def build():
                                            "n_licence_dates_unparsed")}
         momentum["top_recent"] = top_recent
 
+    # Forward the census OPERATING-momentum rollup (commencement / go-live recency) the same way —
+    # the "where rivals recently went live" lens, distinct from licence-grant. Every field MEASURED.
+    om = (pico.get("meta") or {}).get("operating_momentum") or {}
+    op_momentum = None
+    if om:
+        op_top_recent = [{"th": p, "en": disp.get(p, {}).get("en"), "slug": disp.get(p, {}).get("slug"),
+                          "pico_recent_op": rc, "pico_total": tot}
+                         for p, rc, tot in om.get("top_recent", [])]
+        op_momentum = {k: om.get(k) for k in ("label", "window_months", "cutoff_date", "snapshot_date",
+                                              "n_recent", "recent_share_pct", "n_commence_dates_parsed",
+                                              "n_commence_dates_unparsed", "n_at_or_after_snapshot",
+                                              "note_at_or_after_snapshot")}
+        op_momentum["top_recent"] = op_top_recent
+
     meta = {
         "generated_by": "pipeline/build_pico_competitors.py",
         "label": ("MEASURED per-province read of sub-scale rival density vs the AutoX footprint: "
@@ -147,6 +163,7 @@ def build():
         "pico_vintage": (pico.get("meta") or {}).get("vintage"),
         "pico_source_url": (pico.get("meta") or {}).get("source_url"),
         "licence_momentum": momentum,
+        "operating_momentum": op_momentum,
         "n_provinces": len(rows),
         "n_provinces_pico_outnumbers_autox": n_outnumbered,
         "n_provinces_autox_absent": n_autox_absent,
@@ -158,6 +175,10 @@ def build():
             "pico_recent": ("MEASURED count of PICO operators in the province whose FPO licence-grant date "
                             "falls within the momentum window (see meta.licence_momentum) — newly-licensed "
                             "sub-scale rivals, a rising-pressure signal distinct from the static total."),
+            "pico_recent_op": ("MEASURED count of PICO operators in the province whose FPO commencement / "
+                               "go-live date falls within the same window (see meta.operating_momentum) — "
+                               "rivals that recently WENT LIVE, distinct from newly-licensed (some were "
+                               "licensed earlier and only recently opened)."),
             "autox_branches": "MEASURED count of AutoX (เงินไชโย) branches in the province (branches.json, field v).",
             "outnumber": "pico_total - autox_branches. Positive = sub-scale rivals outnumber our branches.",
             "ratio": "pico_total / autox_branches (null where AutoX has no branch in the province).",
@@ -221,9 +242,14 @@ def main():
                  ("%.2f" % r["ratio"]) if r["ratio"] is not None else "n/a"))
     lm = m.get("licence_momentum")
     if lm:
-        print("  momentum: %d newly licensed in trailing %dmo (%.1f%%); newest: %s"
+        print("  licence-momentum: %d newly licensed in trailing %dmo (%.1f%%); newest: %s"
               % (lm["n_recent"], lm["window_months"], lm["recent_share_pct"],
                  ", ".join("%s=%d" % (t["th"], t["pico_recent"]) for t in lm["top_recent"][:6])))
+    om = m.get("operating_momentum")
+    if om:
+        print("  operating-momentum: %d recently went live in trailing %dmo (%.1f%%); newest live: %s"
+              % (om["n_recent"], om["window_months"], om["recent_share_pct"],
+                 ", ".join("%s=%d" % (t["th"], t["pico_recent_op"]) for t in om["top_recent"][:6])))
 
 
 if __name__ == "__main__":
