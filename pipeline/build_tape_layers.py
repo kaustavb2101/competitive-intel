@@ -11,6 +11,10 @@ build_tape_layers.py — project the REAL loan-tape aggregates into the app (obj
        provinces · collateral (brand/age) · npat_frontier · branch_audit ·
        assistance_radar (Tier1 = X-days slipping / Tier2 = current-but-exposed, by province,
        drought-triggered, with the stressed crops named)
+       platform/data/tape_geo_occ.json  (assistance drill 2026-07-28)
+       occupation mix INSIDE each geography level (region -> province -> branch) with an
+       at-risk triage per cell; region/province MEASURED, branch MEASURED >=30 + the thin
+       residual ESTIMATED from the province occupation mix (basis labelled per cell)
 
 Deterministic + network-free; `--check` byte-compares; exit 3 SKIP when the staging file is
 absent (the tape is an owner-side ingest, like the other pull-fed staging inputs).
@@ -34,6 +38,7 @@ COST = {"yield_standard": 23.99, "yield_land": 15.0, "opex": 8.0, "cof": 2.5}
 IN_DROUGHT = os.path.join(ROOT, "platform", "data", "drought_district.json")
 IN_CROPS = os.path.join(ROOT, "platform", "data", "amphoe_crops.json")
 OUT = os.path.join(ROOT, "platform", "data", "tape_real.json")
+OUT_GEO_OCC = os.path.join(ROOT, "platform", "data", "tape_geo_occ.json")
 
 
 def _rows(tabs, tab, names, top=None, minn=50):
@@ -51,6 +56,110 @@ def _rows(tabs, tab, names, top=None, minn=50):
         out.append(row)
     out.sort(key=lambda r: -r["n"])
     return out[:top] if top else out
+
+
+def build_geo_occ(tape):
+    """GEOGRAPHY x OCCUPATION drill (owner ask 2026-07-28): the occupation mix INSIDE each
+    geography level (region -> province -> branch), each cell carrying an at-risk triage:
+    n_current (healthy) / n_watch_xdays (X-days — the pre-emptive assistance window) /
+    n_rolling_3089 (30-89 roll pipeline) / n_at_risk_90p (already at risk, whole-book 90+).
+    Region + province cells are MEASURED (>=min_cell floor). Branch cells are MEASURED where
+    the branch x occupation cell clears the floor; each branch's thin residual is allocated
+    over its PROVINCE occupation mix and inherits that province-cell's delinquency rates —
+    ESTIMATED, labelled per cell via basis."""
+    tabs, tmeta = tape["tabs"], tape["meta"]
+
+    def occ_cell(occ, v, n=None, basis="measured"):
+        n = v["n"] if n is None else n
+        early = int(round(n * v["early_pct"] / 100.0))
+        d30 = int(round(n * v["dpd30p_pct"] / 100.0))
+        d90 = int(round(n * v["dpd90p_pct"] / 100.0))
+        return {"occupation": occ, "n": n, "basis": basis,
+                "os_sum": v["os_sum"] if basis == "measured"
+                else round(v["os_sum"] * n / v["n"], 0),
+                "npat_margin_avg": v["npat_margin_avg"],
+                "early_pct": v["early_pct"], "roll_pct": v["roll_pct"],
+                "dpd90p_pct": v["dpd90p_pct"],
+                "n_current": max(0, n - early - d30), "n_watch_xdays": early,
+                "n_rolling_3089": max(0, d30 - d90), "n_at_risk_90p": d90}
+
+    # region level — occ_x_georegion keys "<occ>|<geo region>" (all MEASURED)
+    regions = {}
+    for key, v in tabs.get("occ_x_georegion", {}).items():
+        occ, reg = key.split("|", 1)
+        if occ == "(blank)" or reg in ("(blank)", "(unjoined)"):
+            continue
+        regions.setdefault(reg, []).append(occ_cell(occ, v))
+    for reg in regions:
+        regions[reg].sort(key=lambda c: (-c["n"], c["occupation"]))
+
+    # province level — prov_x_occ (MEASURED); doubles as the branch-residual allocation basis
+    provinces = {}
+    prov_occ = {}
+    for key, v in tabs.get("prov_x_occ", {}).items():
+        prov, occ = key.split("|", 1)
+        if prov in ("(blank)", "(unjoined)") or occ == "(blank)":
+            continue
+        provinces.setdefault(prov, []).append(occ_cell(occ, v))
+        prov_occ.setdefault(prov, {})[occ] = v
+    for p in provinces:
+        provinces[p].sort(key=lambda c: (-c["n"], c["occupation"]))
+
+    # branch level — branch_x_occ MEASURED cells + ESTIMATED residual allocation
+    bocc = collections.defaultdict(dict)
+    for key, v in tabs.get("branch_x_occ", {}).items():
+        br, occ = key.split("|", 1)
+        if occ != "(blank)":
+            bocc[br][occ] = v
+    bgeo = tape.get("branch_geo", {})
+    branches = []
+    n_meas_cells = n_est_cells = 0
+    for br, bv in tabs.get("branch_full", {}).items():
+        g = bgeo.get(br) or {}
+        prov = g.get("prov")
+        meas = bocc.get(br, {})
+        cells = [occ_cell(occ, v) for occ, v in meas.items()]
+        cells.sort(key=lambda c: (-c["n"], c["occupation"]))
+        n_meas_cells += len(cells)
+        resid = bv["n"] - sum(c["n"] for c in cells)
+        if resid >= 5 and prov in prov_occ:
+            pool = [(occ, pv) for occ, pv in prov_occ[prov].items() if occ not in meas]
+            tot = sum(pv["n"] for _, pv in pool)
+            for occ, pv in sorted(pool, key=lambda kv: (-kv[1]["n"], kv[0])):
+                en = int(round(resid * pv["n"] / float(tot))) if tot else 0
+                if en >= 5:
+                    cells.append(occ_cell(occ, pv, n=en, basis="estimated"))
+                    n_est_cells += 1
+        branches.append({"branch": br, "prov": prov, "region": g.get("region"),
+                         "n": bv["n"], "os_sum": bv["os_sum"],
+                         "early_pct": bv["early_pct"], "dpd90p_pct": bv["dpd90p_pct"],
+                         "occs": cells})
+    branches.sort(key=lambda b: (-b["n"], b["branch"]))
+
+    return {
+        "meta": {
+            "title": "Geography x occupation drill — who needs assistance, where",
+            "generated_by": "pipeline/build_tape_layers.py",
+            "label": ("MEASURED — real-tape occupation cells (>=%d floor) at region and "
+                      "province level. Branch level: MEASURED cells where the branch x "
+                      "occupation cell clears the floor; the thin residual of each branch's "
+                      "book is ESTIMATED — allocated over its province occupation mix, "
+                      "inheriting that cell's delinquency rates. basis labelled per cell."
+                      % tmeta.get("min_cell", 30)),
+            "n_accounts": tmeta.get("n_accounts"),
+            "mob_anchor": tmeta.get("mob_anchor"),
+            "min_cell": tmeta.get("min_cell", 30),
+            "cells": {"measured_branch": n_meas_cells, "estimated_branch": n_est_cells},
+            "triage_note": ("n_watch_xdays = X-days late <30dpd (the pre-emptive assistance "
+                            "window); n_rolling_3089 = 30-89dpd roll pipeline; n_at_risk_90p "
+                            "= whole-book 90+ incl. the 180+ legacy (already at risk); "
+                            "n_current = the healthy remainder. Counts are rounded from "
+                            "measured shares."),
+        },
+        "regions": regions,
+        "provinces": provinces,
+        "branches": branches,
+    }
 
 
 def build():
@@ -355,20 +464,31 @@ def main():
             print("build_tape_layers.py --check: SKIP (no real-tape staging — owner-side ingest)")
             sys.exit(3)
         sys.exit("build_tape_layers.py: run ingest_real_tape.py first")
+    tape = json.load(open(IN_TAPE, encoding="utf-8"))
     payload = serialize(build())
+    payload_geo = serialize(build_geo_occ(tape))
     if args.check:
-        if not os.path.exists(OUT):
-            sys.exit("build_tape_layers.py --check: output missing — run the builder.")
-        if open(OUT, encoding="utf-8").read() != payload:
-            sys.exit("build_tape_layers.py --check: drifted — re-run the builder.")
+        for path, want in ((OUT, payload), (OUT_GEO_OCC, payload_geo)):
+            if not os.path.exists(path):
+                sys.exit("build_tape_layers.py --check: %s missing — run the builder."
+                         % os.path.basename(path))
+            if open(path, encoding="utf-8").read() != want:
+                sys.exit("build_tape_layers.py --check: %s drifted — re-run the builder."
+                         % os.path.basename(path))
         print("build_tape_layers.py --check: OK (byte-exact)")
         return
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(payload)
+    with open(OUT_GEO_OCC, "w", encoding="utf-8") as f:
+        f.write(payload_geo)
     obj = json.loads(payload)
+    geo = json.loads(payload_geo)
     print("wrote %s — %d radar rows, %d audit branches, %d frontier cells"
           % (OUT, len(obj["assistance_radar"]), len(obj["branch_audit"]),
              len(obj["npat_frontier"])))
+    print("wrote %s — %d regions, %d provinces, %d branches (%d measured + %d estimated cells)"
+          % (OUT_GEO_OCC, len(geo["regions"]), len(geo["provinces"]), len(geo["branches"]),
+             geo["meta"]["cells"]["measured_branch"], geo["meta"]["cells"]["estimated_branch"]))
     print("headline:", obj["headline"])
 
 

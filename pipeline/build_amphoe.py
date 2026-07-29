@@ -131,6 +131,27 @@ def build():
             prov_agri[p] = round(sum(v) / len(v), 1)
             n_fallback_prov += 1
 
+    # ── district-grain PICO-finance rival count (obj #2, MEASURED, competitive) ──
+    # platform/data/pico_district.json resolves the FPO PICO-finance registry (a DISTINCT
+    # small-ticket licensed rival class) to district (อำเภอ) grain by exact province_th|amphoe
+    # name-match against THIS layer's own 928-district master — 97.6% of operators resolved. We
+    # fold the per-district operator count onto each amphoe as a MEASURED competitive signal, kept
+    # SEPARATE from risk_proxy (portfolio risk, obj #1) so the two objectives never blur. A district
+    # absent from the registry carries a MEASURED zero (national census), not "unknown". Null-safe:
+    # if the layer is absent the pico field is simply omitted (the older amphoe.json shape).
+    pico_path = os.path.join(REPO, "platform", "data", "pico_district.json")
+    pico_by_key, pico_meta = {}, None
+    if os.path.exists(pico_path):
+        pj = _load(pico_path)
+        pico_by_key = {k: (v.get("total") or 0) for k, v in (pj.get("by_district") or {}).items()}
+        pico_meta = pj.get("meta") or {}
+    # A handful of polygons share a province_th|amphoe Thai name (real district splits / naming
+    # collisions in th_amphoe.geojson — e.g. กรุงเทพมหานคร|วังทองหลาง). The registry resolved each
+    # count to ONE district identity, so we attribute it to the FIRST matching polygon (geojson order,
+    # deterministic) and give the collision twin a measured zero — never double-count. This keeps the
+    # folded total byte-equal to pico_district.json's authoritative resolved count.
+    pico_assigned, n_pico_join = set(), 0
+
     # ── spatial join: branches -> amphoe polygon (PIP, bbox prefilter) ───────────
     # branch_sid[i] = shapeID of the amphoe branch i (master order) falls inside.
     # A few branches sit just off a polygon (coast/border geometry) — those get a
@@ -229,6 +250,25 @@ def build():
             "_coll": round(sum(b.get("collateral_density", 0) for b in rows) / len(rows), 1) if rows else None,
             "_merch": round(sum(b.get("merchant_pd", 0) for b in rows) / len(rows), 1) if rows else None,
         })
+        # MEASURED district-grain PICO-finance rival count (obj #2), name-joined on province_th|amphoe.
+        # Added only when the pico layer is present so an absent layer keeps the older record shape
+        # (the map lens gates on the field being present). Measured zero for districts not in the registry.
+        if pico_meta is not None:
+            key = f"{prov}|{name}"
+            pv = pico_by_key.get(key, 0) if key not in pico_assigned else 0
+            recs[-1]["pico"] = pv
+            if pv:
+                pico_assigned.add(key)
+                n_pico_join += 1
+            # MEASURED district-grain competitive-PRESSURE ratio: licensed PICO-finance rivals
+            # per AutoX branch IN the same district (obj #2 — pressure on the footprint we run,
+            # NOT branch expansion). Absolute density (the `pico` field) can't tell a 40-vs-30
+            # district (comfortable) from a 15-vs-1 one (heavily outnumbered); this ratio does.
+            # Only defined where AutoX operates (branches>0) — null in coverage-gap districts,
+            # a DIFFERENT story owned by the whitespace lens. A pure ratio of two MEASURED counts;
+            # kept SEPARATE from risk_proxy. round-2 so the byte-exact --check stays stable.
+            nb = recs[-1]["branches"]
+            recs[-1]["pico_ratio"] = round(pv / nb, 2) if nb > 0 else None
 
     # ── scores ───────────────────────────────────────────────────────────────────
     # demand proxy: weighted POI footfall + DIW workers, log-compressed so a few
@@ -286,6 +326,16 @@ def build():
                 "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
                 "only where the amphoe has a branch so a Thai district name is readable; "
                 "see fac_measured flag per amphoe)",
+                "pico (district-grain count of licensed PICO-finance rivals name-joined "
+                "province_th|amphoe from pico_district.json — MEASURED, obj #2 competitive, "
+                "kept SEPARATE from risk_proxy; see pico_district_rivals meta. Present only "
+                "when the pico layer is; a district absent from the registry is a measured zero)",
+            ] if pico_meta is not None else [
+                "branches (point-in-polygon of branches_final.json into th_amphoe.geojson)",
+                "poi counts by type (point-in-polygon of osm_layers.json — OSM, measured)",
+                "fac/workers (DIW factories_by_district, prov|district join — MEASURED, "
+                "only where the amphoe has a branch so a Thai district name is readable; "
+                "see fac_measured flag per amphoe)",
             ],
             "province_inherited": [
                 "veh{car,pickup,moto,ev} (DLT vehicles_by_province — every amphoe inherits its province total)",
@@ -325,6 +375,44 @@ def build():
                               "PIP join; coast/border misses use nearest amphoe centroid.",
         "sorted_by": "whitespace desc",
     }
+    if pico_meta is not None:
+        meta["join_rates"]["pico_to_amphoe"] = (
+            f"{n_pico_join}/{len(recs)} amphoe carry >=1 PICO rival; "
+            f"registry has {len(pico_by_key)} district keys (name-joined province_th|amphoe)")
+        meta["pico_district_rivals"] = {
+            "source": "platform/data/pico_district.json (FPO PICO-finance registry, MEASURED)",
+            "vintage": pico_meta.get("vintage"),
+            "resolution_pct": pico_meta.get("resolution_pct"),
+            "n_districts_with_pico": sum(1 for r in recs if r.get("pico")),
+            "total_pico_operators_resolved": sum(r.get("pico", 0) for r in recs),
+            "note": "per-amphoe count of licensed พิโกไฟแนนซ์ (PICO-finance) operators — a DISTINCT "
+                    "small-ticket rival class — name-joined province_th|amphoe from pico_district.json. "
+                    "MEASURED competitive signal (obj #2), kept SEPARATE from risk_proxy (portfolio "
+                    "risk, obj #1). A district absent from the registry is a MEASURED zero (national "
+                    "census); ~2.4% of operators are unresolved at district grain (counted honestly in "
+                    "pico_district.json — the province total in pico_census.json stays authoritative).",
+        }
+        # district-grain competitive-pressure rollup (obj #2): where the network we RUN is
+        # outnumbered by sub-scale rivals street-by-street. Computed only over amphoe AutoX
+        # actually operates in (branches>0) — the "pressure on the existing footprint" lens,
+        # NOT a where-to-open cue. A pure count/ratio of two MEASURED fields.
+        operated = [r for r in recs if r["branches"] > 0 and r.get("pico_ratio") is not None]
+        outnum = sorted((r for r in operated if r["pico"] > r["branches"]),
+                        key=lambda r: (-r["pico_ratio"], -r["pico"]))
+        meta["pico_outnumber"] = {
+            "n_operated_districts": len(operated),
+            "n_outnumbered": len(outnum),
+            "note": "pico_ratio = licensed PICO-finance rivals per AutoX branch IN the district "
+                    "(MEASURED, obj #2 competitive pressure on the existing footprint). Defined only "
+                    "where branches>0 (null elsewhere — coverage gaps are the whitespace lens's story). "
+                    "'outnumbered' = a district AutoX operates in where PICO operators exceed AutoX "
+                    "branches. Kept SEPARATE from risk_proxy; makes no open/close recommendation.",
+            "most_outnumbered": [
+                {"province_th": r["province_th"], "amphoe": r["name"], "amphoe_en": r.get("name_en"),
+                 "pico": r["pico"], "branches": r["branches"], "pico_ratio": r["pico_ratio"]}
+                for r in outnum[:8]
+            ],
+        }
     return {"meta": meta, "amphoe": recs, "branch_amphoe": branch_amphoe}, branch_join, len(master), fac_join, fac_attempt
 
 
