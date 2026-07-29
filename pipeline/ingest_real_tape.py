@@ -141,7 +141,11 @@ def main():
         "coll_seg_x_occ", "coll_seg_x_income", "coll_seg_x_bucket",
         "collage_x_region", "collage_x_occ", "collage_x_income", "collage_x_area",
         "brand_x_occ", "brand_x_income", "brand_x_area", "brand_x_ltv",
-        "coll_age_x_bucket", "branch_x_seg", "branch_x_brand")}
+        "coll_age_x_bucket", "branch_x_seg", "branch_x_brand",
+        # branch-level occupation mix (assistance drill 2026-07-28): MEASURED cells >=MIN_CELL
+        # only; the thin residual of each branch's book is allocated downstream (ESTIMATED,
+        # province occupation mix) by build_tape_layers — never published below the floor here.
+        "branch_x_occ")}
     n = matched = 0
     anchor = ""            # newest disbursement YYYY-MM in the data (determinism anchor)
     vint_curve = collections.defaultdict(new_cell)   # vintage-year|months-on-book-band
@@ -235,6 +239,7 @@ def main():
             # branch collateral-concentration (acquisition lens: what each branch is built on)
             "branch_x_seg": br + "|" + cseg,
             "branch_x_brand": br + "|" + brand,
+            "branch_x_occ": br + "|" + occ,
         }
         for tab, key in vals.items():
             c = tabs[tab][key]
@@ -285,6 +290,16 @@ def main():
     for k, d in tabs.items():
         out["tabs"][k] = pack(d, top=400 if k in capped else None)
     out["tabs"]["vintage_curve"] = pack(vint_curve, floor=100)
+    # full branch census (assistance drill 2026-07-28): the "branch" tab stays top-400 for
+    # continuity with existing consumers; this UNCAPPED duplicate carries EVERY booking branch
+    # clearing the >=MIN_CELL floor, plus a count-free geo join (branch -> province/region from
+    # the committed master) so the geography drill can place each branch.
+    out["tabs"]["branch_full"] = pack(tabs["branch"])
+    out["branch_geo"] = {}
+    for b in out["tabs"]["branch_full"]:
+        hit = mname.get(norm_branch(b))
+        if hit and hit[0]:
+            out["branch_geo"][b] = {"prov": hit[0], "region": hit[2]}
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:

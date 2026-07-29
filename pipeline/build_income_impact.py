@@ -39,9 +39,14 @@ OUT = os.path.join(P, "income_impact.json")
 REGIONS = ["Isan", "Central&BKK", "South", "East", "North"]
 
 # ── SES occupations we carry baseline income for (occupation_income_individual) ──
-SES_OCC = ["Agriculture", "FactoryWorkers", "OfficeStaff", "Transport", "SMEOwners"]
+# HomeUnemployed (owner ask 2026-07-28): the tape's แม่บ้าน/ว่างงาน group, carried so EVERY tape
+# occupation gets a modelled Δincome. Its channel is documented as zero (household transfer/family
+# income — no crop or fuel pass-through modelled), so Δ = 0%, honestly, rather than absent.
+SES_OCC = ["Agriculture", "FactoryWorkers", "OfficeStaff", "Transport", "SMEOwners",
+           "HomeUnemployed"]
 SES_TH = {"Agriculture": "เกษตรกร", "FactoryWorkers": "แรงงาน/รับจ้าง",
-          "OfficeStaff": "พนักงาน/ข้าราชการ", "Transport": "ขนส่ง", "SMEOwners": "ค้าขาย/ธุรกิจ"}
+          "OfficeStaff": "พนักงาน/ข้าราชการ", "Transport": "ขนส่ง", "SMEOwners": "ค้าขาย/ธุรกิจ",
+          "HomeUnemployed": "แม่บ้าน/ว่างงาน"}
 
 # ── FIRST-ORDER sensitivity matrix (ESTIMATED, documented) ──────────────────────
 # fraction of a +1.0 (100%) driver move that reaches that occupation's take-home income.
@@ -55,6 +60,7 @@ SENS = {
     "FactoryWorkers": {"crop": 0.0, "fuel": -0.03},
     "SMEOwners":     {"crop": 0.05, "fuel": -0.05},   # mild rural-demand + own-vehicle cost
     "OfficeStaff":   {"crop": 0.0,  "fuel": 0.0},     # salaried / civil-servant — fixed short-run
+    "HomeUnemployed": {"crop": 0.0, "fuel": 0.0},     # transfer/family income — no channel modelled
 }
 
 # ── tape occupation group → SES occupation (for the book-weighted rollup) ────────
@@ -68,6 +74,7 @@ TAPE_TO_SES = {
     "ผู้ประกอบการ": "SMEOwners",
     "ธุรกิจเฉพาะ": "SMEOwners",
     "บริการ": "SMEOwners",
+    "แม่บ้าน/ว่างงาน": "HomeUnemployed",
 }
 
 # board label → crop_prov_area key (only the three crops with province-level area)
@@ -78,7 +85,8 @@ BOARD_TO_AREA = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm"}
 # replacing — the model's income base, which stays the finer province-level NSO SES individual income.
 # Transport has no LFS employee category (→ None, no anchor); SMEOwners ≈ Merchants (trade/own-account).
 NSO_WAGE_OCC = {"Agriculture": "Agriculture", "FactoryWorkers": "FactoryWorkers",
-                "OfficeStaff": "OfficeStaff", "SMEOwners": "Merchants", "Transport": None}
+                "OfficeStaff": "OfficeStaff", "SMEOwners": "Merchants", "Transport": None,
+                "HomeUnemployed": None}
 
 
 def load(*path):
@@ -142,12 +150,23 @@ def build():
         rows = {}
         for o in SES_OCC:
             base = (occs.get(o) or {}).get("individual_est")
+            src = "ses" if base else None
             if not base:
-                continue
+                # SES publishes no province income row for this occupation (SMEOwners: all 77) —
+                # fall back to the region's MEASURED NSO LFS employee wage (Merchants for
+                # SMEOwners), an ESTIMATED base at province grain, labelled base_src.
+                wr = wage_by_region.get(prov_region[pv]) or {}
+                wo = NSO_WAGE_OCC.get(o)
+                if wo and isinstance(wr.get(wo), (int, float)):
+                    base = round(wr[wo])
+                    src = "lfs_region"
             s = SENS[o]
             d_pct = s["crop"] * shock + s["fuel"] * fuel_drv
-            rows[o] = {"income": base, "d_pct": round(d_pct * 100, 2),
-                       "d_baht": round(base * d_pct)}
+            row = {"income": base, "d_pct": round(d_pct * 100, 2),
+                   "d_baht": round(base * d_pct) if base else None}
+            if src == "lfs_region":
+                row["base_src"] = src
+            rows[o] = row
         if rows:
             provinces[pv] = {
                 "region": prov_region[pv],
@@ -225,6 +244,13 @@ def build():
             "sensitivity": SENS,
             "crop_note": "province crop driver is weighted only over rice/rubber/oilpalm (the crops "
                          "with province-level planted area); sugar/maize/cassava are not weighted.",
+            "base_note": ("Where NSO SES publishes no province income row for an occupation "
+                          "(SMEOwners: all 77 provinces), the income base falls back to the "
+                          "region's MEASURED NSO LFS employee wage (Merchants for SMEOwners) — "
+                          "an ESTIMATED base at province grain, labelled base_src='lfs_region' "
+                          "on the row. HomeUnemployed (แม่บ้าน/ว่างงาน) carries a documented "
+                          "ZERO channel — transfer/family income, no crop or fuel pass-through "
+                          "modelled — so its Δ is 0%, honestly, with no income base."),
             "drivers": {
                 "crop_yoy_pct": {k: round(v * 100, 1) for k, v in crop_yoy.items()},
                 "diesel_thb_l": diesel,

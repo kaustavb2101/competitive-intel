@@ -253,8 +253,24 @@
     <div id="assist-income"></div><!-- income-impact engine: macro moves → occupation income → book pressure -->
     <div id="assist-absent" class="note" style="display:none">The real loan-tape layer isn't loaded — <b>data/tape_real.json</b> is absent. The assistance view populates once the monthly tape drop is ingested.</div>
 
-    <h2>Segments hit most — the ranked hit-list</h2>
-    <p class="lead">Occupation × region cells with the worst blend of 90+ severity, roll pressure (30–89dpd) and X-days slippage. Score = 90+% + ½·roll% + ¼·X-days% — an <b>estimated</b> ordering over <b>measured</b> shares; cells ≥300 accounts.</p>
+    <!-- Geography × occupation drill (owner ask 2026-07-28): geography-first — regions →
+         provinces → branches, the occupation mix INSIDE each level, each occupation carrying its
+         at-risk triage (Current / X-days assist window / rolling 30–89 / already at risk 90+)
+         and the expected income impact from the income engine. renderAssistOcc(); lazy-loads
+         data/tape_geo_occ.json; calm absent-note when missing. -->
+    <!-- Occupation × macro panel (owner ask 2026-07-28): BEFORE the geographic drill, show every
+         occupation group in the book, the macro channel that reaches its income, and the expected
+         income move — so the drill below reads in context. renderAssistOccMacro(). -->
+    <h2>Occupations — what the macro moves do to their income</h2>
+    <p class="lead">Every occupation group in the book and the expected move in their income — crop prices and fuel passed through the income engine, book-weighted across provinces. <b>ESTIMATED</b> first-order over <b>MEASURED</b> drivers (NSO income base, Pink Sheet YoY). This is the "why" — then drill into <b>where</b> below.</p>
+    <div id="assist-occ-macro" aria-live="polite"></div>
+
+    <h2>Occupations — who's in the book, where, and who needs help</h2>
+    <p class="lead">Drill regions → provinces → branches; every level shows its occupation mix with a triage: <b style="color:var(--gold)">X-days</b> = call now (pre-emptive window), rolling 30–89, and already at risk (90+). <b>MEASURED</b> cells ≥30 accounts; thin branch cells <b>ESTIMATED</b> from the province occupation mix (labelled EST). Δ income joins the income-impact engine (<b>ESTIMATED</b> first-order).</p>
+    <div id="assist-occ" aria-live="polite"></div>
+
+    <h2>Segments hit most — ranked for wherever you've drilled</h2>
+    <p class="lead">This table <b>follows the drill above</b> — whole book, then the region, province or branch you open. Occupations with the worst blend of 90+ severity, roll pressure (30–89dpd) and X-days slippage. Score = 90+% + ½·roll% + ¼·X-days% — an <b>estimated</b> ordering over <b>measured</b> shares; cells ≥30 accounts.</p>
     <div class="tbl-wrap"><div id="assist-segments"></div></div>
 
     <h2>The pre-emptive window — X-days, by where it's slipping</h2>
@@ -304,8 +320,9 @@
              omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
         <div id="mwatch-wrap" style="display:none">
           <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
-          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first.</p>
+          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first. <b>Press a card to list the affected branches.</b></p>
           <div class="grid macro" id="mwatch"></div>
+          <div id="mwatch-drill"></div>
         </div>
       </div>
     </div>
