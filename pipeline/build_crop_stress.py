@@ -60,6 +60,7 @@ CROP_TO_BOARD = {
     "rice": "Rice",
     "rubber": "Rubber",
     "oilpalm": "Palm oil",
+    "maize": "Maize",   # board carries Maize (GLOBAL proxy); NABC live overrides where present
 }
 # crop key in crop_prov_area.json -> commodity key in oae_farmgate_prices.json
 # (only crops with planting area can be area-weighted; the OAE landing file may
@@ -76,6 +77,8 @@ CROP_TO_NABC = {
     "rice": "rice",
     "rubber": "rubber",
     "oilpalm": "oilpalm",
+    "cassava": "cassava",   # MEASURED live NABC daily; area folded in from DOAE (see DOAE_FILE)
+    "maize": "maize",       # MEASURED live NABC daily; area folded in from DOAE (see DOAE_FILE)
 }
 NABC_FILE = "nabc_prices.json"
 # crop key in crop_prov_area.json -> crop key in farmgate_prices.json crop_yoy. This is the roadmap's
@@ -93,8 +96,17 @@ FARMGATE_FILE = "farmgate_prices.json"
 # at most this many months, else the file is treated as absent (the crop_prices
 # BE-2562 lesson: a measured-but-7-years-stale series is WORSE than the proxy).
 OAE_MAX_LAG_MONTHS = 12
+# cassava + maize planting area is ABSENT from crop_prov_area.json (OAE carries rice/rubber/oilpalm
+# only) but present, MEASURED, in the DOAE farmer registry (doae_planted_area.json, in HECTARES). Fold
+# it in so the two dominant upland borrower crops enter both the area-weighted price signal and the
+# crop_mix display, priced by the same live NABC daily feed already trusted for rice/rubber/oilpalm.
+# Absent file => cassava/maize simply do not load and the output degrades to the prior 3-crop build.
+DOAE_FILE = "doae_planted_area.json"
+DOAE_AREA_CROPS = ("cassava", "maize")   # crops area-folded from DOAE (not in crop_prov_area.json)
+HA_TO_RAI = 6.25                          # DOAE hectares -> rai (crop_prov_area.json is in rai)
 # human-readable crop labels (en) for the UI
-CROP_EN = {"rice": "Rice", "rubber": "Rubber", "oilpalm": "Oil palm"}
+CROP_EN = {"rice": "Rice", "rubber": "Rubber", "oilpalm": "Oil palm",
+           "cassava": "Cassava", "maize": "Maize"}
 
 # normalization constants (see FORMULA in module docstring)
 PRICE_SCALE = 25.0      # % YoY drop that maps price_term to 1.0
@@ -102,7 +114,6 @@ DROUGHT_FLOOR = 40.0    # rainfall shortfall (pp below normal) that maps drought
 NORMAL_RAIN = 100.0     # rain_3mo_anom value meaning "normal" precipitation
 W_PRICE = 0.6
 W_DROUGHT = 0.4
-TOP_CROPS = 3
 
 # --- double-stress flag (RESEARCH_DIGEST 2026-06-30, obj #1) -----------------
 # Research: rice AND rubber farm-gate prices softening into 2026 (global oversupply,
@@ -171,8 +182,45 @@ def load_oae(board):
     return doc
 
 
+def load_doae_area():
+    """OPTIONAL MEASURED cassava/maize planting area from the DOAE farmer registry.
+
+    Returns {crop: {prov_th: rai}} for DOAE_AREA_CROPS (hectares -> rai, rounded to
+    whole rai to match the crop_prov_area.json integer-rai convention), or {} when the
+    file is absent/malformed. Absent => cassava/maize don't load and the build degrades
+    to the prior rice/rubber/oilpalm shape (byte-identical to the pre-DOAE output).
+    """
+    path = os.path.join(SRC, DOAE_FILE)
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            provs = json.load(f)["provinces"]
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as e:
+        print("WARNING: %s present but unreadable (%s) — cassava/maize area not folded in"
+              % (DOAE_FILE, e), file=sys.stderr)
+        return {}
+    out = {c: {} for c in DOAE_AREA_CROPS}
+    for prov, crops in provs.items():
+        if not isinstance(crops, dict):
+            continue
+        for c in DOAE_AREA_CROPS:
+            ha = crops.get(c)
+            if isinstance(ha, (int, float)) and ha > 0:
+                out[c][prov] = int(round(ha * HA_TO_RAI))
+    return {c: m for c, m in out.items() if m}
+
+
 def build():
-    crop_area = load("crop_prov_area.json")   # {crop: {prov_th: rai}}
+    crop_area = load("crop_prov_area.json")   # {crop: {prov_th: rai}} — OAE rice/rubber/oilpalm
+    # fold in MEASURED cassava/maize area (DOAE farmer registry, hectares -> rai). Only crops NOT
+    # already present are added, so the OAE rice/rubber/oilpalm area is never overwritten.
+    doae_area = load_doae_area()
+    doae_area_crops = []
+    for c, m in doae_area.items():
+        if c not in crop_area:
+            crop_area[c] = m
+            doae_area_crops.append(c)
     board = load("commodity_board.json")       # list of rows
     branches = load("branches_final.json")     # list of branch dicts
 
@@ -281,10 +329,12 @@ def build():
         mix_raw = prov_area[prov]
         total_rai = sum(mix_raw.values())
 
-        # crop_mix: top N crops by area share (display: ALL crops we have area for)
+        # crop_mix: ALL crops we have planting area for, by descending area share. Listing the full
+        # mix (not a top-N slice) keeps the shares summing to 1.0 now that up to 5 crops are mapped
+        # (rice/rubber/oil palm/cassava/maize); the app reads crop_mix[0]/[1] (dominant + runner-up).
         mix_sorted = sorted(mix_raw.items(), key=lambda kv: (-kv[1], kv[0]))
         crop_mix = []
-        for ckey, rai in mix_sorted[:TOP_CROPS]:
+        for ckey, rai in mix_sorted:
             crop_mix.append({
                 "crop": CROP_EN.get(ckey, ckey),
                 "share": round(rai / total_rai, 4) if total_rai else 0.0,
@@ -333,7 +383,7 @@ def build():
         # --- double-stress: softening rice/rubber prices AND elevated drought ---
         # rice_rubber_share = combined planting-area share of rice + rubber (the two
         # crops the 2026 research calls out as price-softening). Drawn from crop_mix,
-        # which is already capped at TOP_CROPS, so this is the share among shown crops.
+        # which now lists the full mix, so this is the true rice+rubber share of province area.
         rice_rubber_share = round(
             sum(c["share"] for c in crop_mix if c["crop"] in RICE_RUBBER), 4
         )
@@ -398,7 +448,9 @@ def build():
         "n_double_stress": n_double,
         "sort": "worst-first by agri_stress (desc)",
         "fields": {
-            "crop_mix": "MEASURED — dominant crops by planting-area share (rai), OAE.",
+            "crop_mix": "MEASURED — dominant crops by planting-area share (rai): rice/rubber/oil "
+                        "palm from OAE (crop_prov_area.json), cassava/maize from the DOAE 2568 "
+                        "farmer registry (doae_planted_area.json, hectares -> rai).",
             "price_stress": "PROXY/ESTIMATED — planting-area-weighted price YoY %% across the "
                             "province's covered crops. Source = commodity_board (World Bank Pink "
                             "Sheet GLOBAL prices). This is a DIRECTION proxy, NOT Thai farm-gate.",
@@ -456,7 +508,8 @@ def build():
                                 "key (not in the AutoX branch network) — excluded from all stats.",
         },
         "provenance": {
-            "crop_prov_area.json": "OAE planting area (rai) per crop per province — MEASURED.",
+            "crop_prov_area.json": "OAE planting area (rai) per crop per province — MEASURED "
+                                   "(rice / rubber / oil palm).",
             "commodity_board.json": "World Bank Pink Sheet GLOBAL commodity prices, YoY %% — "
                                     "PROXY for direction of Thai farm-gate, not farm-gate itself.",
             "branches_final.json": "rain_3mo_anom per branch — MEASURED rainfall anomaly proxy.",
@@ -464,13 +517,23 @@ def build():
         "caveats": [
             "Global prices move with, but are not equal to, Thai farm-gate prices; treat "
             "price_stress as a direction signal only.",
-            "Only rice / rubber / oil palm are both area-mapped and priced; sugar, maize and "
+            "rice / rubber / oil palm / cassava / maize are area-mapped and priced; sugar and "
             "other crops in a province are shown in crop_mix but NOT in price_stress.",
+            "planting area is MIXED-SOURCE: rice/rubber/oil palm from OAE (crop_prov_area.json), "
+            "cassava/maize from the DOAE 2568 farmer registry (doae_planted_area.json). Both are "
+            "MEASURED but differ slightly in vintage/definition, so cross-crop area weights carry "
+            "a small source-consistency caveat.",
             "drought uses each province's own branch network; provinces with few branches have a "
             "thinner rainfall sample (see components.n_rain_branches).",
             "agri_stress is an index for triage, not a forecast of defaults.",
         ],
     }
+    if doae_area_crops:
+        meta["provenance"]["doae_planted_area.json"] = (
+            "MEASURED DOAE farmer-registry planted area (BE 2568, hectares -> rai) — folded in for "
+            "%s, the dominant upland borrower crops absent from the OAE crop_prov_area.json "
+            "(rice/rubber/oil palm only). Priced by the live NABC daily feed." %
+            ", ".join(CROP_EN.get(c, c) for c in doae_area_crops))
 
     # --- MEASURED relabel: when a measured price source (NABC live or OAE farm-gate) was used ---
     # Every mutation of meta lives inside this guard so the all-proxy output stays byte-identical to
