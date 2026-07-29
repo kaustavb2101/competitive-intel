@@ -2,6 +2,12 @@
 """
 build_expansion_plan.py — SEQUENCED Road-to-3,000 placement plan (objective #2)
 ===============================================================================
+DORMANT — The network is CONSOLIDATING (not expanding). The output
+(platform/data/expansion_plan.json) is generated but NOT rendered by any page
+in the platform. The script and file are kept for reversibility; re-surface by
+wiring expansion_plan.json into app.js when/if the strategic direction changes.
+See CLAUDE.md for context.
+-------------------------------------------------------------------------------
 The Acquisition tab's "Road to 3,000" splits the ~985 net-new branches across
 5 regions proportional to workforce headroom — useful, but it never says WHERE
 or IN WHAT ORDER. This builder produces that missing decision product: an

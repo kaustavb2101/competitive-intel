@@ -65,7 +65,7 @@ CROP = os.path.join(DATA, "crop_stress.json")
 OUT = os.path.join(DATA, "cluster_brief.json")
 
 sys.path.insert(0, HERE)
-from fingerprint import branches_fingerprint  # shared index-alignment stamp
+from lib.fingerprint import branches_fingerprint  # shared index-alignment stamp
 
 # ── EDITORIAL cutoffs (the ESTIMATED composition layer — documented in meta.thresholds) ──
 AGRI_HI = 60          # branches.a (agri_pd) at/above -> a genuine farm-belt cluster

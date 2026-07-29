@@ -33,7 +33,7 @@ zero-filled.
 import os, sys, json, time, argparse, urllib.request, urllib.parse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from envload import load_env
+from lib.envload import load_env
 load_env()
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

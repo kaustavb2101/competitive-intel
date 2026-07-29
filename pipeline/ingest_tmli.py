@@ -35,7 +35,7 @@ import os
 import re
 import sys
 
-from regionmap import REGION
+from lib.regionmap import REGION
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(os.path.dirname(ROOT), "source-data")

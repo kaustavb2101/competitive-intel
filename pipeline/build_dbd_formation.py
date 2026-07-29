@@ -36,7 +36,7 @@ input — same convention as build_pico_census / build_branch_cropland / build_b
 import argparse, csv, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

@@ -66,8 +66,17 @@ jobs:
         if: env.SKIP != '1'
         run: |
           cd pipeline && python3 derive.py
-          for pass in 1 2; do for f in build_*.py; do python3 "$f" >/dev/null 2>&1 || true; done; done
-          python3 build_provenance.py >/dev/null 2>&1 || true
+          # Exit 3 = intentional SKIP (source absent); exit 0 = success; anything else = log as warning.
+          BFAILED=()
+          for pass in 1 2; do
+            for f in build_*.py; do
+              _rc=0; python3 "$f" >/dev/null 2>&1 || _rc=$?
+              [ "$_rc" -eq 0 ] || [ "$_rc" -eq 3 ] || BFAILED+=("$f(exit $_rc)")
+            done
+          done
+          { _rc=0; python3 build_provenance.py >/dev/null 2>&1 || _rc=$?
+            [ "$_rc" -eq 0 ] || [ "$_rc" -eq 3 ] || BFAILED+=("build_provenance.py(exit $_rc)"); }
+          [ ${#BFAILED[@]} -eq 0 ] || echo "::warning::${#BFAILED[@]} builder(s) exited unexpectedly (not 0/SKIP-3): ${BFAILED[*]}"
           cd .. && bash tests/run.sh check
 
       - name: Commit + open a draft PR (only reached when the gate passed)

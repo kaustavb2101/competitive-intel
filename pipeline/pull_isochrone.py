@@ -80,7 +80,7 @@ import urllib.request
 import urllib.error
 
 try:
-    from envload import load_env
+    from lib.envload import load_env
 except Exception:  # pragma: no cover - envload is co-located, but degrade gracefully
     def load_env(*_a, **_k):
         return None

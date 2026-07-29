@@ -31,7 +31,7 @@ SRC = os.path.join(REPO, "source-data")
 OUT_DIR = os.path.join(REPO, "platform", "data")
 sys.path.insert(0, ROOT)
 try:
-    from envload import load_env; load_env()
+    from lib.envload import load_env; load_env()
 except Exception:
     pass
 

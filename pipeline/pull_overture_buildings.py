@@ -233,7 +233,7 @@ def _slug_extents():
     province, with bbox = padded union of that province's amphoe polygon bboxes.
     Pure / network-free; mirrors build_province.py's province->amphoe spatial join."""
     import build_province as bp
-    from regionmap import canonical, REGION, PROVINCE_EN
+    from lib.regionmap import canonical, REGION, PROVINCE_EN
 
     master = bp._load(os.path.join(SRC_DIR, "branches_final.json"))
     amphoe = bp._load(os.path.join(SRC_DIR, "th_amphoe.geojson"))["features"]

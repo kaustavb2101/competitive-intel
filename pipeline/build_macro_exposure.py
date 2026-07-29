@@ -78,7 +78,7 @@ BOARD = os.path.join(ROOT, "source-data", "commodity_board.json")
 META = os.path.join(DATA, "meta.json")
 OUT = os.path.join(DATA, "macro_exposure.json")
 sys.path.insert(0, HERE)
-from regionmap import canonical
+from lib.regionmap import canonical
 
 # ── the macro-factor set (6-8, only what the offline data actually supports) ─
 # Order is FIXED — it is the tie-break for the dominant factor and the index space of the

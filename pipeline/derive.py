@@ -31,8 +31,8 @@ REPO = os.path.dirname(ROOT)
 SRC  = os.path.join(REPO, "source-data")
 OUT  = os.path.join(REPO, "platform", "data")
 sys.path.insert(0, ROOT)
-from regionmap import norm_district   # shared district normalizer (Thai SARA-AM safe)
-from fingerprint import branches_fingerprint  # tamper-evident branch-order fingerprint
+from lib.regionmap import norm_district   # shared district normalizer (Thai SARA-AM safe)
+from lib.fingerprint import branches_fingerprint  # tamper-evident branch-order fingerprint
 
 # fields carried straight from the master record into the compact branch record.
 # NOTE: tourism_score/demand/fmkt10/veh10 were dropped from the per-branch record

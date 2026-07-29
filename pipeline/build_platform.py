@@ -1,3 +1,17 @@
+"""
+DEFUNCT — build_platform.py
+
+This script assembled platform/rayong-province.html and platform/rayong-catchment.html from
+source parts (rayong-head.html, rayong-app.js, catch-head.html, catch-app.js) that were kept
+alongside it in pipeline/. Those source files no longer exist — the pages are now committed
+directly as self-contained monolithic files. Running this script will hard-error on the first
+open() call.
+
+Kept on disk for historical context only. Do NOT run it. If the pages ever need regenerating
+from parts, reconstruct the source files first.
+
+Last time this produced valid output: pre-2026 consolidation of rayong-catchment.html.
+"""
 import re
 
 NAV_CSS = """

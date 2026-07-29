@@ -40,7 +40,7 @@ is absent (the CI gate has no Thai-IP pull), same convention as build_pico_censu
 import argparse, csv, json, os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regionmap import canonical
+from lib.regionmap import canonical
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

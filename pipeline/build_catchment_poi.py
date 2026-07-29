@@ -12,7 +12,7 @@ curated Rayong province file (rayong_province.json .poi) — so EVERY other prov
 
 This builder projects the committed national OSM POI pull into one bbox-filterable file the scene
 loads for ANY province, then slices to the scene's viewport client-side (mirroring how the scene
-already bbox-filters competitors_national.json). Result: every province gets the same POI richness.
+already bbox-filters competitors_census.json). Result: every province gets the same POI richness.
 
 MEASURED vs ESTIMATED (the data-mandate — stated in meta)
 ---------------------------------------------------------
@@ -115,7 +115,7 @@ def build():
         },
         "usage": "the scene (rayong-catchment.html) loads this once and bbox-filters poi[type] to "
                  "the current city's building extent — the SAME pattern it uses for "
-                 "competitors_national.json. Curated per-province .poi (Rayong) still wins when present.",
+                 "competitors_census.json. Curated per-province .poi (Rayong) still wins when present.",
         "point_format": "poi[<scene_type>] = [[lat,lng], ...], lat/lng rounded %d dp; source order "
                         "preserved (deterministic)." % NDP,
         "type_map": {t: layer for t, layer in TYPE_TO_LAYER},

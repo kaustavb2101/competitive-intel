@@ -39,8 +39,8 @@ import sys
 import argparse
 import collections
 
-from fingerprint import branches_fingerprint_from_file
-from regionmap import canonical, REGION
+from lib.fingerprint import branches_fingerprint_from_file
+from lib.regionmap import canonical, REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

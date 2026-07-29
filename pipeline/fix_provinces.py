@@ -13,7 +13,7 @@ complete. Deterministic, offline, and idempotent (safe to re-run).
     python3 fix_provinces.py --check    # report what WOULD change; exit 1 if anything unresolved
 """
 import os, json, argparse, collections
-from regionmap import canonical, region_of, REGION
+from lib.regionmap import canonical, region_of, REGION
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTER = os.path.join(os.path.dirname(ROOT), "source-data", "branches_final.json")

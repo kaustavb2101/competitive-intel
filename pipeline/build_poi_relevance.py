@@ -50,7 +50,7 @@ then skip-passes.
 """
 import os, json, argparse, sys
 
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(ROOT)

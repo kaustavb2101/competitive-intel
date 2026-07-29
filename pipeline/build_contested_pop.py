@@ -34,7 +34,7 @@ rasterio or the raster is absent, --check SKIP-passes (exit 3) like build_branch
 """
 import argparse, json, math, os
 
-from fingerprint import branches_fingerprint
+from lib.fingerprint import branches_fingerprint
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)

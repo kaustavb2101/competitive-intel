@@ -39,7 +39,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PIPE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PIPE)
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 IN = os.path.join(ROOT, "source-data", "vehicle_flow_by_province.json")
 OUT = os.path.join(ROOT, "platform", "data", "collateral_flow.json")

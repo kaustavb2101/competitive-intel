@@ -40,7 +40,7 @@ absent (CI has no such pull committed), same convention as build_dbd_formation /
 import argparse, json, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from regionmap import canonical, REGION
+from lib.regionmap import canonical, REGION
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

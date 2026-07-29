@@ -53,3 +53,24 @@ jobs:
             exit 1
           fi
           python pipeline/upload_r2.py --also-bbox
+      - name: Upload province scenery files to R2 (_places, _roads, _water, _landuse)
+        # gopt() in rayong-catchment.html already has local→R2 fallback for these files.
+        # Once they are confirmed on R2, remove them from git with:
+        #   git rm --cached 'platform/data/*_places.json' 'platform/data/*_roads.json' \
+        #                    'platform/data/*_water.json' 'platform/data/*_landuse.json'
+        # (keep the 3 pilot provinces: rayong, bangkok, chiang-mai)
+        # Until that git-rm PR lands, files stay in git as a warm fallback.
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PREFIX: ""
+        run: |
+          if [ -z "${R2_ACCOUNT_ID}" ] || [ -z "${R2_BUCKET}" ]; then
+            echo "::warning::R2 secrets not set — skipping scenery upload."
+            exit 0
+          fi
+          for glob in '*_places.json' '*_roads.json' '*_water.json' '*_landuse.json'; do
+            python pipeline/upload_r2.py --glob "$glob"
+          done

@@ -26,7 +26,7 @@ input is absent (optional upstream Thai-IP pull) so the gate never breaks on it.
   python3 build_province_cropland.py --check
 """
 import argparse, json, os, sys
-from regionmap import canonical
+from lib.regionmap import canonical
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)

@@ -15,7 +15,7 @@ datastore-backed resource, paginates, and saves raw CSVs + a manifest.
 """
 import os, sys, csv, json, time, urllib.request, urllib.parse, pathlib
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from envload import load_env
+from lib.envload import load_env
 load_env()                                  # auto-load keys from repo-root .env if present
 
 KEY = os.environ.get("DATA_GO_TH_TOKEN", "").strip()
@@ -32,7 +32,7 @@ PROV_CAP = 12         # datasets to scan per (topic × province) search
 # provincial dataset (DLT vehicles / OAE crops / NSO employment are per-province).
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
-    from regionmap import REGION
+    from lib.regionmap import REGION
     PROVINCES = sorted(REGION.keys())
 except Exception:
     PROVINCES = []

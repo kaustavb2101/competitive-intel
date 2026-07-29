@@ -19,8 +19,8 @@ opinion. Sources:
 """
 import argparse, json, os, sys
 from collections import Counter, defaultdict
-from fingerprint import branches_fingerprint
-from regionmap import canonical
+from lib.fingerprint import branches_fingerprint
+from lib.regionmap import canonical
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = os.path.join(ROOT, "platform", "data")

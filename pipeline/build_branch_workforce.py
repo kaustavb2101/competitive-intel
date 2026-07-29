@@ -53,8 +53,8 @@ Usage:
 """
 import argparse, json, math, os, sys
 
-from fingerprint import branches_fingerprint
-from regionmap import canonical
+from lib.fingerprint import branches_fingerprint
+from lib.regionmap import canonical
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
