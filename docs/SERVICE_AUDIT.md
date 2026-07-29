@@ -5,7 +5,13 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-25 · latest ship: the commodities board's dropped MEASURED farm-gate price vintage recovered in the Data-room card (§1) · against `platform/data/provenance.json` (**109 layers · 414 files** · 52 measured · 57 estimated · 0 unlabelled)._
+_Audit run: 2026-07-28 · latest finding: the R2 catchment migration left **~2.2 GB of R2-duplicated building catchments committed to git** — the deployed data-room is **10× the size §4 last recorded** (§4, corrected this run) · against `platform/data/provenance.json` (**114 layers · 419 files** · 57 measured · 57 estimated · 0 unlabelled — `build_provenance.py --check` reproduces exactly)._
+
+**Deployment health (verified live this run, 2026-07-28):** the master production alias
+(`competitive-intel-git-master-kaustav-bagchis-projects.vercel.app`) serves **HTTP 200** on `/`,
+`/app.js`, `/status`, and the key data layers (`branches.json`, `meta.json`, `peer_province.json`,
+`competitor_coverage.json`). Determinism gate **96 passed · 0 failed**; data integrity **446/446**;
+all **77/77** province catchments present; **0** broken data references. No regression.
 
 ## Headline
 
@@ -44,7 +50,7 @@ input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fail
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-**2026-07-25 (this run):** the tree grew 104 → **109 layers** (414 files) since the last audit (new
+**2026-07-25:** the tree grew 104 → **109 layers** (414 files) since the prior audit (new
 market layers landed: `commodities`, `dbd_formation`, `credit_anchor`, `peer_npl`, `napprang`,
 `vehicle_registry`, `province_lfs`, `nso_wage_anchor`, …). A full re-scan of every currently
 blank-vintage labelled layer's `meta` for date-shaped freshness fields *not* in the extractor's key
@@ -166,7 +172,7 @@ thaiwater rain 2026-07-10, search demand 2026-07-04. No stale live-input layer d
 
 ## 2. Provenance coverage
 
-- **109 layers · 414 files** (as of 2026-07-25). 52 measured · 57 estimated · **0 unlabelled** — the shame board is **clear**. _(The narrative below records the 2026-07-17 run that first cleared the board at 83 layers · 314 files; the mechanism has held the board at 0 unlabelled through every layer added since.)_
+- **114 layers · 419 files** (as of 2026-07-28). 57 measured · 57 estimated · **0 unlabelled** — the shame board is **clear**; `build_provenance.py --check` reproduces the ledger byte-for-byte. _(The narrative below records the 2026-07-17 run that first cleared the board at 83 layers · 314 files; the mechanism has held the board at 0 unlabelled through every layer added since — the tree has grown 83 → 114 layers with no regression.)_
 - **Update 2026-07-17 (a), intelligence loop:** the board was **cut 6 → 2**. Four structural layers
   gained an honest self-declared `meta` stamp at the generator so they stay `--check`-reproducible:
   `meta.json` (`derive.py::build_meta` — MIXED, classifies ESTIMATED), `deltas.json` +
@@ -194,21 +200,33 @@ so they issue no 404s — see PROGRESS_LOG 2026-07-12 (ux-loop).
 
 ## 4. Heavy-JSON load weight
 
-Total `platform/data` = **242 MB across 309 files**, dominated by the 3D building catchments:
+**Corrected 2026-07-28 (was badly stale — the old figure read "242 MB across 309 files"):** the
+git-tracked `platform/data` tree is now **2.5 GB across 497 JSON files**, overwhelmingly the 3D
+building catchments — **77 `*_catchment.json` files totalling 2.28 GB** (avg **30.3 MB** each). The
+five heaviest, all catchments, all lazy:
 
 | File | Size | Load path |
 |---|---|---|
-| `chiang-mai_catchment.json` | 40.5 MB | lazy — only on `rayong-catchment.html?city=chiang-mai` |
-| `rayong_catchment.json` | 34.2 MB | lazy — only on the Rayong 3D scene |
-| `bangkok_catchment.json` | 30.2 MB | lazy — only on the Bangkok 3D scene |
-| `bangkok_places.json` | 7.3 MB | lazy — per-province places |
-| `occupation_leads.json` | 6.8 MB | lazy — occupation-leads block |
+| `chon-buri_catchment.json` | 34.6 MB | lazy — only on `rayong-catchment.html?city=chon-buri` |
+| `chachoengsao_catchment.json` | 33.6 MB | lazy — only on that province's 3D scene |
+| `saraburi_catchment.json` | 33.1 MB | lazy — only on that province's 3D scene |
+| `khon-kaen_catchment.json` | 32.9 MB | lazy — only on that province's 3D scene |
+| `rayong_catchment.json` | 32.6 MB | lazy — the Rayong pilot scene |
 
 None load on the SPA's default routes — each is fetched only when its own heavy WebGL scene opens
-(the deliberate one-route-per-GL-context split, CLAUDE.md). The command-center / overview / map
-routes stay light. **Not a regression**; flagged as the standing weight to watch if a future change
-ever eager-loads a catchment. A precision-trim of the 30–40 MB catchments (round coordinates /
-drop sub-visible buildings) is the biggest available payload win but belongs to the 3D/UX loop.
+(the deliberate one-route-per-GL-context split, CLAUDE.md), so command-center / overview / map stay
+light. **Not a runtime regression.**
+
+**Concrete finding this run — the R2 catchment migration is half-done, leaving ~2.2 GB redundantly
+committed.** `catchments_r2.json` states the design plainly: _"Every province's `<slug>_catchment.json`
+is served (R2, with the 3 pilot provinces also in git). The 3D scene fetches local-first then R2."_
+The manifest lists only **3 provinces** as intended-git (`bangkok`, `chiang-mai`, `rayong`) with the
+other **74 meant to be R2-only** — but on disk **all 77 catchments are still git-tracked** (2.28 GB).
+So the repo and the Vercel deploy carry ~**2.2 GB of catchment data that R2 already serves**. Verified
+live this run: R2 returns **HTTP 200** for the non-pilot catchments spot-checked
+(`chon-buri`, `khon-kaen`, `roi-et`, `amnat-charoen`), and the scene's documented local-first→R2
+fallback means removing the 74 git copies would shrink the repo/deploy by ~2.2 GB while scenes fall
+back to the (verified-live) R2 objects. This is the biggest available deploy-weight win by far.
 
 ## Next service task (recommended)
 
@@ -217,9 +235,17 @@ drop sub-visible buildings) is the biggest available payload win but belongs to 
 100 % labelled**. Provenance coverage is now complete and self-sustaining (any future array-shaped
 layer just adds a sidecar entry).
 
-The next standing service target is **§4 heavy-JSON load weight**: the 30–40 MB Overture building
-catchments (`chiang-mai` 40.5 MB, `rayong` 34.2 MB, `bangkok` 30.2 MB) are the biggest available
-payload win. All three are lazy (fetched only when their own WebGL scene opens), so this is **not a
-regression** — but a precision-trim (round coordinates to ~6 dp, drop sub-visible buildings) would
-cut the 3D-scene cold-load. That belongs to the **3D/UX loop** (it changes what a scene renders), not
-this intelligence loop. For the service pillar, the data room is healthy with no open gap.
+The next standing service target is now **§4's confirmed finding: finish the R2 catchment
+migration** — untrack the **74 non-pilot `*_catchment.json` files (~2.2 GB)** that R2 already serves,
+keeping only the 3 pilots (`bangkok`, `chiang-mai`, `rayong`) in git. Evidence is in place: R2 returns
+200 for the non-pilot catchments (verified this run) and the scene fetches local-first→R2, so the
+fallback is already wired. **This intelligence loop deliberately did NOT execute the removal** — a
+~2.2 GB `git rm` changes the data source of 74 3D scenes (git → R2) and is an architecturally
+significant, owner-reviewable change, not a small autonomous edit (and the owner is currently driving
+the repo manually — see the 2026-07-28 cron-pause commit). Recommended owner-side action: `git rm`
+the 74 R2-served catchments, keep `catchments_r2.json` + the 3 pilots, and headless-render two
+non-pilot 3D scenes to confirm the R2 fallback renders before merging.
+
+Aside from that one weight item, the data room is healthy: provenance 114/114 labelled and
+`--check`-reproducible, 0 broken references, 77/77 catchments reachable, and the live deployment
+green (see the deployment-health note under **Headline**).

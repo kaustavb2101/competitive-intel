@@ -364,6 +364,34 @@ def _shape_peer_province(d):
     return None
 
 
+def _shape_competitor_coverage(d):
+    # The competition pillar's OTHER flagship read (obj #2): the national
+    # census-completeness board (drawCompCoverage reads .brands — the big-4
+    # MEASURED found-count vs ESTIMATED public-report expected — plus
+    # meta.totals for the "N measured rival branches" readout and
+    # meta.national_standing for AutoX's own network-scale rank). It is the
+    # census rollup the whole per-province peer board is built on. peer_province
+    # is already probed; this sibling was not, so a truncated deploy that empties
+    # .brands silently drops the Competition surface to its "not yet computed"
+    # placeholder with no phone alert — the same "broken demo" blind spot the
+    # peer_province + obj-#1 flow-card probes closed. Robust to census growth
+    # (asserts the 4 big brands are present, not exact counts).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or len(brands) < 4:
+        return "missing/short 'brands' list (expected the 4 big-4 rivals)"
+    b0 = brands[0]
+    if not isinstance(b0, dict) or "brand" not in b0:
+        return "first brand row missing 'brand' name"
+    if not isinstance(b0.get("found"), int):
+        return "first brand row missing 'found' MEASURED census count"
+    totals = (d.get("meta") or {}).get("totals") if isinstance(d.get("meta"), dict) else None
+    if not isinstance(totals, dict) or not isinstance(totals.get("found"), int):
+        return "meta.totals.found missing (national census headline)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -403,6 +431,12 @@ DATA_FILES = [
     # obj-#1 flow card is now probed; this closes the matching obj-#2 blind spot
     # so a truncated deploy that guts the competitive board triggers a phone alert.
     ("data/peer_province.json", _shape_peer_province, ".provinces (~77) with .by_brand per-rival split + meta.total_autox"),
+    # peer_province's sibling flagship (obj #2): the national census-completeness
+    # board the whole per-province peer read is built on. The province rows were
+    # probed above; this rollup (drawCompCoverage reads .brands + meta.totals +
+    # meta.national_standing) was the last unprobed piece of the Competition
+    # surface, so a truncated deploy could blank it with no phone alert. Closes it.
+    ("data/competitor_coverage.json", _shape_competitor_coverage, ".brands (big-4 found vs public expected) + meta.totals.found"),
 ]
 
 

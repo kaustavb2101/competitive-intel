@@ -22,6 +22,8 @@ const LENS = {
   poirel:   {pill:'Relevant POI density', label:'Title-loan-relevant POI density ◇', desc:"BORROWER BASE · MEASURED counts (Overture/OSM, a sample / lower bound) — title-loan-relevant points of interest within ~10 km of each branch (gold shops, vehicle dealers, fresh markets, farms, factories, commerce, schools). Brighter = a denser pool of likely title-loan borrowers nearby. The per-category WEIGHTING that blends them into one 0–100 score is an estimated relevance model.", color:'#E6B450', unit:'relevant-POI (0–100)', poirel:true, tag:'m', val:d=>poiRelevanceVal(d)},
   drisk:{pill:'District risk', label:'District risk ▲ est', desc:"PORTFOLIO RISK · ESTIMATED (0–100) — the branch's district risk proxy (province crop-stress + province unemployment + local collateral / merchant mix). Not a measured default rate.", color:'#C8433B', unit:'district risk (est)', est:true, amp:true, tag:'e', val:d=>d._amp?d._amp.risk_proxy:0},
   unemp:{pill:'Unemployment', label:'District unemployment ▲', desc:"PORTFOLIO RISK · MEASURED (NSO Labour Force Survey, province-inherited) — the branch's district unemployment rate, shown raw rather than blended into the composite district-risk proxy above. Brighter = a higher local jobless rate.", color:'#C8433B', unit:'% unemployment', amp:true, unemp:true, tag:'m', val:d=>d._amp?(d._amp.unemployment_rate||0):0},
+  dpico:{pill:'PICO rivals', label:'District PICO rivals ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry) — licensed พิโกไฟแนนซ์ (PICO-finance) operators, a DISTINCT small-ticket rival class, registered in the branch's own district (อำเภอ). Brighter = more sub-scale rivals clustered in the same district. Kept separate from the district-risk lens (this is competition, obj #2 — not portfolio risk). Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO operators (district)', amp:true, pico:true, tag:'m', val:d=>d._amp?(d._amp.pico||0):0},
+  doutnum:{pill:'Outnumbered', label:'PICO rivals per branch ◆', desc:"COMPETITIVE PRESSURE · MEASURED (FPO registry ÷ AutoX footprint) — licensed พิโกไฟแนนซ์ (PICO-finance) operators PER AutoX branch in the same district. Unlike raw PICO density, this weighs the rival field against how many branches we run there: brighter = the existing footprint is more heavily outnumbered street-by-street (obj #2 — pressure on the network we run, not a where-to-open cue). Defined only where AutoX operates; coverage-gap districts are the white-space lens's story. Kept separate from portfolio risk. Hidden until the district layer loads.", color:'#7A4FE0', unit:'PICO rivals / AutoX branch', amp:true, pico:true, tag:'m', val:d=>(d._amp&&d._amp.pico_ratio!=null)?d._amp.pico_ratio:null},
   crop: {pill:'Crop mix', label:'Dominant crop ◇ est', desc:"AGRI EXPOSURE · ESTIMATED (model-allocated crop areas) — each district coloured by its DOMINANT credit-relevant crop (rice / cassava / maize / sugarcane / oil palm) from SPAM 2010, a modeled spatial disaggregation of measured subnational statistics onto a ~9km grid. Shows which crop a district's borrower base depends on, so a macro move against that crop maps to exposure. Rubber is absent from SPAM (a known blind spot for the rubber belt).", color:'#4E9A6B', unit:'dominant crop', amp:true, cat:true, tag:'e', est:true, val:d=>0},
   pstress:{pill:'Province stress', label:'Province structural stress ▲ est', desc:"PORTFOLIO RISK · ESTIMATED composite (0–100) — blends the branch's province household debt-to-income percentile (NSO SES) with its province unemployment percentile (NSO LFS) into ONE 'which provinces are structurally riskiest' read, equal-weighted. Both inputs are measured; the blend + weighting are an editorial triage ordering, not a measured default rate. Hidden until the layer loads.", color:'#C8433B', unit:'stress (0–100, est)', pstr:true, prov:true, est:true, tag:'e', val:d=>pstressVal(d)},
   dsrch:{pill:'Search demand', label:'Title-loan search demand ▲ est', desc:"BRAND DEMAND · ESTIMATED (Google Trends relative index, 0–100) — how hard people in the branch's province search title-loan intent terms (จำนำทะเบียนรถ · สินเชื่อรถแลกเงิน). A demand/attention signal, NOT query volume or bookings. Hidden until the layer loads.", color:'#E6B450', unit:'search demand (0–100, est)', dsrch:true, prov:true, est:true, tag:'e', val:d=>sdemandVal(d)},
@@ -1304,7 +1306,7 @@ function showTab(v){
   document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
-  if(v==='assist'){ renderAssist(); renderIncome(); }
+  if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }
   if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
@@ -1639,18 +1641,72 @@ function renderCommodityBoard(){
 function renderMacroWatchlist(){
   const wrap=$('#mwatch-wrap'), grid=$('#mwatch');
   if(!wrap||!grid||!msensProv||!msensProv.length) return;
-  grid.innerHTML=msensProv.slice(0,8).map(p=>{
+  grid.innerHTML=msensProv.slice(0,8).map((p,i)=>{
     const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[p.driver])||{};
     const head=p.dir==='h';
     const col=head?'var(--agri)':'var(--merch)';
     const hasYoy=(typeof drv.yoy_pct==='number');
     const arrow=hasYoy?(drv.yoy_pct>0?'▲':'▼'):'▼';
     const sig=hasYoy?((drv.yoy_pct>0?'+':'')+drv.yoy_pct+'% YoY'):'rain below normal';
-    return `<div class="mcard"><div class="k">${p.th}${p.region?' · '+p.region:''}</div>`
+    return `<button type="button" class="mcard mwatch-card" data-mw="${i}" aria-label="List the ${p.hits} branches in ${p.th} moved by ${drv.label||p.driver}"><div class="k">${p.th}${p.region?' · '+p.region:''}</div>`
       +`<div class="v" style="color:${col};font-size:15px">${drv.label||p.driver} ${arrow} <span style="font-size:12px">${sig}</span></div>`
-      +`<div class="n">${head?'Hits':'Supports'} borrower cash flow · #1 driver at ${p.hits}/${p.n} branches (est)</div></div>`;
+      +`<div class="n">${head?'Hits':'Supports'} borrower cash flow · #1 driver at ${p.hits}/${p.n} branches (est) <span class="ic-chev">›</span></div></button>`;
   }).join('');
   wrap.style.display='';
+  if(!grid.dataset.mwWired){
+    grid.dataset.mwWired='1';
+    grid.addEventListener('click',e=>{
+      const c=e.target.closest('.mwatch-card'); if(!c) return;
+      const i=+c.dataset.mw;
+      const open=grid.querySelector('.mwatch-card.on');
+      if(open) open.classList.remove('on');
+      if(open===c){ const d=$('#mwatch-drill'); if(d) d.innerHTML=''; return; }
+      c.classList.add('on');
+      renderMacroWatchDrill(msensProv[i]);
+    });
+  }
+}
+/* Watchlist drill (owner ask 2026-07-28): a card names a province + its #1 macro driver — this lists
+   the actual BRANCHES that driver moves. macro_sensitivity.branches is INDEX-ALIGNED to branches.json,
+   so entry i's top-2 [key,score,dir,ctx] records identify each branch's own drivers; we keep the ones
+   whose #1 (or #2) driver matches the card, ranked by score. ctx meaning per driver comes from
+   meta.drivers[key].ctx_label (crop = % of province planted area). */
+function renderMacroWatchDrill(p){
+  const host=$('#mwatch-drill'); if(!host||!p) return;
+  if(!MSENS||!DATA){ host.innerHTML='<div class="ic-note">Branch layer still loading — press again in a moment.</div>'; return; }
+  const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[p.driver])||{};
+  const rows=[];
+  DATA.forEach((b,i)=>{
+    if(b.v!==p.th) return;
+    const recs=MSENS[i]; if(!recs||!recs.length) return;
+    const hit=recs.findIndex(r=>r[0]===p.driver);
+    if(hit<0) return;
+    const r=recs[hit];
+    rows.push({b,rank:hit+1,score:r[1],dir:r[2],ctx:r[3],
+               other:recs.find(x=>x[0]!==p.driver)});
+  });
+  rows.sort((a,b)=>a.rank-b.rank||b.score-a.score);
+  const head=p.dir==='h';
+  host.innerHTML=`<div class="ic-drill-h" style="margin:10px 0 4px"><b>${p.th}</b> — ${rows.length} branches where <b style="color:${head?'var(--agri)':'var(--merch)'}">${drv.label||p.driver}</b> is a top-2 driver${rows.length?', strongest first':''}</div>`+
+    (rows.length?`<div class="tbl-wrap"><table class="tbl"><tr>
+      <th>Branch</th><th>District</th>
+      <th title="is this the branch's #1 or #2 driver">Rank</th>
+      <th title="${(drv.ctx_label||'context').replace(/"/g,'')}">${drv.ctx_label||'Context'}</th>
+      <th title="relative 0-100, share-diluted — compare order, not magnitude (ESTIMATED)">Score</th>
+      <th title="the branch's other top driver">Also moved by</th><th></th></tr>`+
+      rows.map(r=>{
+        const o=r.other&&((msensMeta.drivers||{})[r.other[0]]||{});
+        return `<tr onclick="location.href='${branchHref(r.b)}'" tabindex="0" role="link" style="cursor:pointer">
+          <td><b>${r.b.n}</b></td><td class="sub">${r.b.d||'—'}</td>
+          <td class="mono">#${r.rank}</td>
+          <td class="mono">${r.ctx!=null?r.ctx+(String(drv.ctx_label||'').indexOf('%')>=0?'%':''):'—'}</td>
+          <td class="mono">${r.score}</td>
+          <td class="sub">${r.other?`${o.label||r.other[0]} <span class="mono">${r.other[1]}</span>`:'—'}</td>
+          <td class="n"><span class="ic-chev">›</span></td></tr>`;}).join('')+`</table></div>`
+      :`<p class="lead sub">No branch in this province carries that driver in its top two.</p>`)+
+    `<p class="lead sub" style="margin:4px 0 0">Score is an <b>ESTIMATED</b> relative 0–100 (measured price YoY × measured crop share / rain × estimated segment score) — read the order, not the magnitude. Press a row for the branch's 3D scene.</p>`;
+  wrapTables();
+  host.scrollIntoView({block:'nearest'});
 }
 
 /* ---------- Collateral outlook board (objective #1, portfolio risk) ----------
@@ -3491,10 +3547,21 @@ function loadPicoCompetitors(){
     .catch(()=>{ PICOCOMP=null; picocompLoaded=true; return null; });
   return picocompPromise;
 }
+// District-grain sharpening (pico_district.json, MEASURED): the FPO registry has no coordinate, but
+// each operator's registered address carries an อำเภอ — parsed + exact-matched to the 928-district
+// master. Sharpens the province table to "where WITHIN a province the rival field clusters". Null-safe.
+let PICODIST=null, picodistLoaded=false, picodistPromise=null;
+function loadPicoDistrict(){
+  if(picodistPromise) return picodistPromise;
+  picodistPromise=fetch('data/pico_district.json').then(r=>r.ok?r.json():null)
+    .then(j=>{ PICODIST=j; picodistLoaded=true; return PICODIST; })
+    .catch(()=>{ PICODIST=null; picodistLoaded=true; return null; });
+  return picodistPromise;
+}
 function renderPicoCompetitors(){
   const tbl=$('#picocomptbl'); if(!tbl) return;
-  if(picocompLoaded){ drawPicoCompetitors(); return; }
-  loadPicoCompetitors().then(drawPicoCompetitors);
+  if(picocompLoaded&&picodistLoaded){ drawPicoCompetitors(); return; }
+  Promise.all([loadPicoCompetitors(),loadPicoDistrict()]).then(drawPicoCompetitors);
 }
 function drawPicoCompetitors(){
   const tbl=$('#picocomptbl'), ro=$('#picocompreadout'); if(!tbl) return;
@@ -3546,14 +3613,25 @@ function drawPicoCompetitors(){
       momo=` <b>Where rival entry is newest:</b> <b style="color:var(--agri)">${lm.n_recent}</b> of ${m.pico_total!=null?m.pico_total:'—'} licensed PICO operators (${lm.recent_share_pct}%) were licensed in the trailing ${lm.window_months} months (since ${lm.cutoff_date})`+
         (tr?` — most in <b style="color:var(--gold)">${tr.th}${tr.en?` (${tr.en})`:''}</b>, where <b>${tr.pico_recent}</b> of its ${tr.pico_total} operators are new. Rising sub-scale entry is a distinct signal from existing density.`:'.');
     }
+    // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
+    // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
+    const dm=(PICODIST&&PICODIST.meta)||null;
+    let distClause='';
+    if(dm&&Array.isArray(PICODIST.top_districts)&&PICODIST.top_districts.length){
+      const fmtD=(k)=>{ const p=String(k).split('|'); return p.length===2?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b>${k}</b>`; };
+      const tops=PICODIST.top_districts.slice(0,4).map(d=>`${fmtD(d[0])} <span class="mono" style="color:var(--gold)">${d[1]}</span>`).join(' · ');
+      distClause=` <b>Within provinces, the rival field is not uniform:</b> parsing the อำเภอ out of each operator's registered address resolves `+
+        `<b>${dm.n_district_resolved!=null?dm.n_district_resolved.toLocaleString():'—'}</b> of ${dm.n_operators!=null?dm.n_operators.toLocaleString():'—'} operators `+
+        `(${dm.resolution_pct!=null?dm.resolution_pct:'—'}%) to <b>${dm.n_districts_present!=null?dm.n_districts_present:'—'}</b> districts — and PICO clusters in the provincial-capital (เมือง) districts: ${tops}.`;
+    }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${distClause} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
          (lm?`<b>+N new</b> / “rival entry is newest” = operators whose FPO licence-grant date (วันที่ได้รับใบอนุญาต) falls in the trailing ${lm.window_months} months before the registry snapshot (since ${lm.cutoff_date}) — MEASURED, anchored on the pinned snapshot vintage, not wall-clock. It reads rising pressure, not existing density.`:''),
-         'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.',
+         (dm?`<b>District grain:</b> the registry carries no coordinate, but each operator's registered address carries an อำเภอ (district) — parsed and exact-matched to the canonical 928-district master (pico_district.json), resolving <b>${dm.resolution_pct!=null?dm.resolution_pct:'—'}%</b> of operators (${dm.n_district_resolved!=null?dm.n_district_resolved.toLocaleString():'—'}/${dm.n_operators!=null?dm.n_operators.toLocaleString():'—'}) to ${dm.n_districts_present!=null?dm.n_districts_present:'—'} districts. The ${dm.n_unresolved!=null?dm.n_unresolved:'—'} unmatched (mostly districts absent from the 928-polygon master) are counted honestly in the layer, not dropped; the province totals above stay authoritative.`:'Province-grain: the registry carries a province of service (จังหวัดที่ให้บริการ), not a coordinate — so this is competitive density by province, not localised within it.'),
          'A licence is licensed capacity, not a guaranteed active storefront; PICO overlaps but is not identical to AutoX’s product.',
          (m.pico_vintage?`FPO registry snapshot ${m.pico_vintage}.`:'Source: FPO PICO-finance licence registry.')].filter(Boolean));
   }
@@ -5250,6 +5328,9 @@ function lensAbsent(k){
   if(l.peers) return peersLoaded && !peerHasData();
   if(l.macx)  return macxDone && !macxHasData();
   if(l.cat)   return cropLuLoaded && !cropHasData();
+  // pico district-rival lens: hide only once the district layer is loaded AND it predates the
+  // pico fold (no record carries a pico field) — so an older amphoe.json degrades gracefully.
+  if(l.pico)  return !!(AMP&&AMP.length)&&!AMP.some(a=>a&&a.pico!=null);
   return false;
 }
 function renderLenses(){
@@ -6055,11 +6136,25 @@ function amphoePopupHTML(d,sec,r){
   const ws=a.whitespace, rk=a.risk_proxy;
   const wc=ws>=40?'var(--gold)':ws>=20?'#cda23e':'#8b90a7';
   const rc=rk>=55?'var(--agri)':rk>=45?'var(--gold)':'var(--merch)';
+  // MEASURED district-grain PICO-finance rival count (obj #2, competitive) — shown only when the
+  // pico fold is present on the record; a district absent from the FPO registry is a measured zero.
+  const picoLine = (a.pico!=null)
+    ? r('PICO rivals in district ◆ · measured', `<span style="color:${a.pico?'var(--collat)':'#8b90a7'}">${(a.pico||0).toLocaleString()}</span> <span class="sub">licensed</span>`, a.pico?'var(--collat)':'#8b90a7')
+    : '';
+  // MEASURED competitive-pressure ratio (obj #2): PICO rivals per AutoX branch in this district.
+  // Shown only where AutoX operates AND rivals exist; red when outnumbered (>1×), green when we lead.
+  const orat = a.pico_ratio;
+  const outColor = (orat!=null && orat>1) ? 'var(--agri)' : 'var(--merch)';
+  const outnumLine = (orat!=null && a.pico>0)
+    ? r('PICO rivals per branch ◆ · measured', `<span style="color:${outColor}">${orat.toFixed(orat<10?1:0)}×</span> <span class="sub">${a.pico} vs ${a.branches} branch${a.branches===1?'':'es'}</span>`, outColor)
+    : '';
   return sec('District (amphoe) — coverage & risk')
     + r('White-space ◇ · measured', `<span style="color:${wc}">${ws}</span> <span class="sub">/100</span>`, wc)
     + r('District risk ▲ · est', `<span style="color:${rc}">${rk}</span> <span class="sub">/100</span>`, rc)
     + r('AutoX in district · measured', (a.branches||0)+(a.branches===1?' branch':' branches'), 'var(--accent)')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated)</div>`;
+    + picoLine
+    + outnumLine
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">coverage gap = district demand vs AutoX saturation (measured); risk = province-inherited agri-stress + local mix (estimated); PICO = licensed พิโกไฟแนนซ์ rivals in this district (measured, FPO registry); per-branch = PICO rivals ÷ AutoX branches here (measured, obj #2 competitive pressure)</div>`;
 }
 // ANSWER-FIRST §1 — "Who to acquire here": the branch's top-3 occupation leads from
 // branch_leads.json. Counts (n) are MEASURED (Overture establishments ≤10km, lower bound);
@@ -7250,13 +7345,296 @@ function assistSev(v){ // color a 90+ rate
   if(v<26) return '#D97A3A';
   return 'var(--agri)';
 }
+/* Geography × occupation drill (owner ask 2026-07-28): geography-first — regions → provinces →
+   branches, the occupation mix INSIDE each level. Every occupation cell carries an at-risk triage
+   (Current / X-days assist window / rolling 30–89 / already at risk 90+) and the expected income
+   impact joined from the income engine. Region + province cells MEASURED (≥30 floor); branch cells
+   MEASURED where the branch×occupation cell clears the floor, thin residual ESTIMATED from the
+   province occupation mix (chip: EST). Reads data/tape_geo_occ.json + data/income_impact.json. */
+const AOD_SES={'เกษตร':'Agriculture','รับจ้างทั่วไป':'FactoryWorkers','พนักงานบริษัท':'OfficeStaff',
+  'ข้าราชการ':'OfficeStaff','กลุ่มวิชาชีพ':'OfficeStaff','ค้าขาย':'SMEOwners',
+  'ผู้ประกอบการ':'SMEOwners','ธุรกิจเฉพาะ':'SMEOwners','บริการ':'SMEOwners',
+  'แม่บ้าน/ว่างงาน':'HomeUnemployed'};
+/* book-weighted Δincome per tape occupation over a province set (weights = province occ accounts) */
+function aodIncomeMap(inc,geo,provFilter){
+  if(!inc||!inc.provinces) return {};
+  const pairs=Array.isArray(inc.provinces)?inc.provinces:Object.entries(inc.provinces);
+  const acc={};
+  pairs.forEach(pr=>{
+    const pname=pr[0], rec=pr[1]||{};
+    if(provFilter&&!provFilter(pname,rec)) return;
+    ((geo.provinces||{})[pname]||[]).forEach(c=>{
+      const ses=AOD_SES[c.occupation]; const io=ses&&(rec.occ||{})[ses];
+      if(!io||io.d_pct==null) return;
+      const a=acc[c.occupation]||(acc[c.occupation]={w:0,dp:0,db:0,inc:0,incw:0,lfs:0});
+      a.w+=c.n; a.dp+=io.d_pct*c.n; a.db+=(io.d_baht||0)*c.n;
+      if(io.income){ a.inc+=io.income*c.n; a.incw+=c.n; if(io.base_src==='lfs_region') a.lfs+=c.n; }
+    });
+  });
+  const out={};
+  Object.keys(acc).forEach(o=>{const a=acc[o];
+    if(a.w>0) out[o]={d_pct:+(a.dp/a.w).toFixed(2),d_baht:Math.round(a.db/a.w),
+      income:a.incw?Math.round(a.inc/a.incw):null,
+      base_src:(a.incw&&a.lfs>a.incw/2)?'lfs_region':'ses'};});
+  return out;
+}
+/* THB amount at the right magnitude: billions above ฿1bn, millions above ฿1m, else comma-grouped.
+   (owner ask 2026-07-28: "฿11208m" is unreadable — it is ฿11.21bn.) */
+function aodTHB(v){
+  if(v==null) return '<span class="s">—</span>';
+  if(v>=1e9) return '฿'+(v/1e9).toFixed(2)+'bn';
+  if(v>=1e6) return '฿'+icN(+(v/1e6).toFixed(0))+'m';
+  return '฿'+icN(Math.round(v));
+}
+/* income level (NSO base) and the modelled ฿ move — the owner reads baht, not coefficients */
+function aodIncome(d){
+  if(!d||d.income==null) return '<span class="s" title="no published income base for this group — NSO SES has no province row and the LFS has no matching employee category">—</span>';
+  const lab=d.base_src==='lfs_region'?'NSO LFS employee wage (region) — ESTIMATED base at province grain'
+    :'NSO SES individual income (province) — MEASURED base';
+  return `<span title="${lab}">฿${icN(d.income)}<span class="s">/mo</span></span>`;
+}
+function aodImpact(d){
+  if(!d) return '<span class="s">—</span>';
+  if(d.d_baht==null||!d.income) return `<span class="s" title="no income base to apply the move to — no change modelled for this group">no change modelled</span>`;
+  const up=d.d_baht>0, flat=d.d_baht===0;
+  const c=flat?'var(--dim)':up?'var(--merch)':'var(--agri)';
+  if(flat) return `<b style="color:${c}" title="no macro channel reaches this occupation's income in the short run (salaried / transfer income)">฿0</b>`;
+  return `<b style="color:${c}" title="expected monthly income move — income engine, ESTIMATED first-order (${d.d_pct>0?'+':''}${d.d_pct}%)">${up?'+':'−'}฿${icN(Math.abs(d.d_baht))}<span class="s">/mo</span></b>`;
+}
+function aodDelta(d){ if(!d) return '<span class="s" title="not modelled — the income engine has no province-level income base for this occupation group">—</span>';
+  const c=d.d_pct>0?'var(--merch)':d.d_pct<0?'var(--agri)':'var(--dim)';
+  const baht=d.d_baht!=null?` (≈฿${icN(Math.abs(d.d_baht))}/mo)`:'';
+  return `<b style="color:${c}" title="expected income move for this occupation here — income-impact engine, ESTIMATED first-order${baht}">${d.d_pct>0?'+':''}${d.d_pct}%</b>`;}
+function aodBasis(b){ return b==='estimated'
+  ?'<span class="aod-est" title="thin cell — fewer than 30 accounts measured at this branch, so the split is ESTIMATED: allocated from the province occupation mix, delinquency rates inherited from that province cell">EST</span>':''; }
+/* merge measured occ cells across geographies into one occupation table (for the All-book level) */
+function aodAgg(cellLists){
+  const m={};
+  cellLists.forEach(cells=>(cells||[]).forEach(c=>{
+    const a=m[c.occupation]||(m[c.occupation]={occupation:c.occupation,basis:'measured',n:0,os_sum:0,
+      _np:0,n_current:0,n_watch_xdays:0,n_rolling_3089:0,n_at_risk_90p:0});
+    a.n+=c.n; a.os_sum+=c.os_sum; a._np+=c.npat_margin_avg*c.n;
+    a.n_current+=c.n_current; a.n_watch_xdays+=c.n_watch_xdays;
+    a.n_rolling_3089+=c.n_rolling_3089; a.n_at_risk_90p+=c.n_at_risk_90p;
+  }));
+  return Object.keys(m).map(k=>{const a=m[k]; a.npat_margin_avg=Math.round(a._np/a.n); return a;})
+    .sort((x,y)=>y.n-x.n);
+}
+function aodSummary(cells){
+  const s=(cells||[]).reduce((a,c)=>{a.n+=c.n;a.w+=c.n_watch_xdays;a.r+=c.n_at_risk_90p;return a;},{n:0,w:0,r:0});
+  return `<p class="lead" style="margin:6px 0 4px"><b style="color:var(--gold)">${icN(s.w)}</b> need pre-emptive help now (X-days) · <b style="color:var(--agri)">${icN(s.r)}</b> already at risk (90+) · of <b>${icN(s.n)}</b> accounts</p>`;
+}
+function aodOccTable(cells,inc){
+  if(!cells||!cells.length) return '<p class="lead sub">No occupation cells cleared the ≥30-account floor here.</p>';
+  const rows=cells.map(c=>{
+    const riskPct=c.n?+(c.n_at_risk_90p*100/c.n).toFixed(1):0;
+    return `<tr>
+      <td><b>${c.occupation}</b>${aodBasis(c.basis)}</td>
+      <td class="mono">${icN(c.n)}</td>
+      <td class="mono sub" title="outstanding balance">${aodTHB(c.os_sum)}</td>
+      <td class="mono" style="color:var(--merch)">${icN(c.n_current)}</td>
+      <td class="mono" style="color:var(--gold)"><b>${icN(c.n_watch_xdays)}</b></td>
+      <td class="mono" style="color:#D97A3A">${icN(c.n_rolling_3089)}</td>
+      <td class="mono"><b style="color:${assistSev(riskPct)}">${icN(c.n_at_risk_90p)}</b> <span class="s">${riskPct}%</span></td>
+      <td class="n">${aodDelta(inc[c.occupation])}</td></tr>`;
+  }).join('');
+  return `<div class="tbl-wrap"><table class="tbl"><tr>
+    <th>Occupation</th><th>Accounts</th><th>OS</th>
+    <th title="0 dpd — healthy">Current</th>
+    <th title="late but under 30dpd — the pre-emptive assistance window: call these first">X-days · assist</th>
+    <th title="30–89dpd roll pipeline — recoverable middle">Rolling</th>
+    <th title="90+dpd incl. the 180+ legacy — already at risk">At risk 90+</th>
+    <th title="expected income impact for this occupation here — income engine, ESTIMATED first-order">Δ income</th></tr>${rows}</table></div>`;
+}
+/* The ranked hit-list follows the drill (owner ask 2026-07-28: "the table below should change with
+   the drill level — it seems static"). Same ordering as the builder's segments_hit score
+   (90+% + ½·30–89% + ¼·X-days%) but recomputed for whatever geography is open, from the same
+   measured cells the drill is showing. */
+function aodSyncHitList(scope,cells){
+  const host=$('#assist-segments'); if(!host) return;
+  const rows=(cells||[]).filter(c=>c.n>=30).map(c=>{
+    const e=c.n?c.n_watch_xdays*100/c.n:0, r=c.n?c.n_rolling_3089*100/c.n:0,
+          d=c.n?c.n_at_risk_90p*100/c.n:0;
+    return {occ:c.occupation,basis:c.basis,n:c.n,os:c.os_sum,e:e,r:r,d:d,
+            score:+(d+0.5*r+0.25*e).toFixed(2)};
+  }).sort((a,b)=>b.score-a.score||b.n-a.n);
+  host.innerHTML=`<div class="ic-drill-h" style="margin:0 0 6px">Ranked for <b>${scope}</b> — worst blend of 90+ severity, roll pressure and X-days slippage</div>`+
+    (rows.length?`<table class="tbl"><tr>
+      <th>Occupation</th><th>Accounts</th><th>OS</th>
+      <th title="90+dpd share">90+</th><th title="30–89dpd roll">Roll</th>
+      <th title="X-days slipping">X-days</th><th title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
+      rows.map(x=>`<tr>
+        <td><b>${x.occ}</b>${aodBasis(x.basis)}</td>
+        <td class="mono">${icN(x.n)}</td><td class="mono sub">${aodTHB(x.os)}</td>
+        <td class="mono"><b style="color:${assistSev(x.d)}">${x.d.toFixed(2)}%</b></td>
+        <td class="mono">${x.r.toFixed(2)}%</td>
+        <td class="mono" style="color:var(--opp)">${x.e.toFixed(2)}%</td>
+        <td class="mono"><b>${x.score}</b></td></tr>`).join('')+`</table>`
+    :`<p class="lead sub">No occupation cell here clears the ≥30-account floor.</p>`);
+  wrapTables();
+}
+function aodRenderLevel(mount){
+  const st=mount._aodState, geo=mount._aodGeo, inc=mount._aodInc;
+  const provReg={};
+  (geo.branches||[]).forEach(b=>{ if(b.prov&&b.region&&!provReg[b.prov]) provReg[b.prov]=b.region; });
+  const incPairs=(inc&&inc.provinces)?(Array.isArray(inc.provinces)?inc.provinces:Object.entries(inc.provinces)):[];
+  incPairs.forEach(pr=>{
+    if(!provReg[pr[0]]&&(pr[1]||{}).region) provReg[pr[0]]=pr[1].region; });
+  if(st.level==='province'){
+    const cells=(geo.regions||{})[st.region]||[];
+    const provs=Object.keys(geo.provinces||{}).filter(p=>provReg[p]===st.region)
+      .map(p=>{const cs=geo.provinces[p];
+        const s=cs.reduce((a,c)=>{a.n+=c.n;a.w+=c.n_watch_xdays;a.r+=c.n_at_risk_90p;return a;},{n:0,w:0,r:0});
+        return {p,n:s.n,w:s.w,r:s.r,top:cs[0]?cs[0].occupation:'—'};})
+      .sort((a,b)=>b.w-a.w);
+    mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:st.region}])+
+      aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,(p,rec)=>provReg[p]===st.region))+
+      `<div class="ic-drill-h" style="margin-top:10px"><b>${st.region}</b> — ${provs.length} provinces, biggest pre-emptive workload first · press a province for its occupation mix + branches</div>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th>Province</th><th>Accounts</th><th>Top occupation</th><th>X-days · assist</th><th>At risk 90+</th><th></th></tr>`+
+      provs.map(r=>`<tr class="aod-row" data-p="${r.p}" tabindex="0" role="link">
+        <td><b>${r.p}</b></td><td class="mono">${icN(r.n)}</td><td>${r.top}</td>
+        <td class="mono" style="color:var(--gold)"><b>${icN(r.w)}</b></td>
+        <td class="mono" style="color:${assistSev(r.n?+(r.r*100/r.n).toFixed(1):0)}">${icN(r.r)}</td>
+        <td class="n"><span class="ic-chev">›</span></td></tr>`).join('')+`</table></div>`;
+    aodSyncHitList(st.region,cells);
+    return;
+  }
+  if(st.level==='branch'){
+    const cells=(geo.provinces||{})[st.province]||[];
+    const brs=(geo.branches||[]).filter(b=>b.prov===st.province)
+      .map(b=>{const meas=b.occs.filter(c=>c.basis==='measured').length, est=b.occs.length-meas;
+        return {b,meas,est,w:Math.round(b.n*(b.early_pct||0)/100),r:Math.round(b.n*(b.dpd90p_pct||0)/100)};})
+      .sort((a,b)=>b.w-a.w);
+    mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:provReg[st.province]||'—',lvl:'province'},{label:st.province}])+
+      aodSummary(cells)+aodOccTable(cells,aodIncomeMap(inc,geo,p=>p===st.province))+
+      `<div class="ic-drill-h" style="margin-top:10px"><b>${st.province}</b> — ${brs.length} branches on the tape (n ≥ 30), biggest pre-emptive workload first · press a branch for its occupation split</div>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr><th>Branch</th><th>Accounts</th><th title="occupation cells: measured ≥30 / estimated from the province mix">Split basis</th><th>X-days · assist</th><th>At risk 90+</th><th></th></tr>`+
+      brs.map(x=>`<tr class="aod-row" data-b="${x.b.branch}" tabindex="0" role="link">
+        <td><b>${x.b.branch}</b></td><td class="mono">${icN(x.b.n)}</td>
+        <td class="n">${x.meas} measured${x.est?` · <span style="color:var(--gold)">${x.est} est</span>`:''}</td>
+        <td class="mono" style="color:var(--gold)"><b>${icN(x.w)}</b></td>
+        <td class="mono" style="color:${assistSev(x.b.dpd90p_pct)}">${icN(x.r)}</td>
+        <td class="n"><span class="ic-chev">›</span></td></tr>`).join('')+`</table></div>`;
+    aodSyncHitList(st.province,cells);
+    return;
+  }
+  if(st.level==='occs'){
+    const rec=(geo.branches||[]).find(b=>b.branch===st.branch);
+    if(!rec){ mount._aodState={level:'regions'}; return aodRenderLevel(mount); }
+    const est=rec.occs.filter(c=>c.basis==='estimated');
+    mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:rec.region||'—',lvl:'province'},{label:rec.prov||'—',lvl:'branch'},{label:rec.branch}])+
+      aodSummary(rec.occs)+aodOccTable(rec.occs,aodIncomeMap(inc,geo,p=>p===rec.prov))+
+      (est.length?`<p class="lead sub" style="margin:4px 0 0"><span class="aod-est">EST</span> rows: this branch's cells under the 30-account floor, allocated from the <b>${rec.prov}</b> occupation mix with that province-cell's delinquency rates — an honest estimate, not a measurement.</p>`:'');
+    aodSyncHitList(rec.branch,rec.occs);
+    return;
+  }
+  const regs=Object.keys(geo.regions||{}).map(reg=>{
+    const cs=geo.regions[reg];
+    const s=cs.reduce((a,c)=>{a.n+=c.n;a.w+=c.n_watch_xdays;a.r+=c.n_at_risk_90p;return a;},{n:0,w:0,r:0});
+    return {reg,n:s.n,w:s.w,r:s.r,top:cs[0]?cs[0].occupation:'—'};
+  }).sort((a,b)=>b.w-a.w);
+  const all=aodAgg(Object.keys(geo.regions||{}).map(r=>geo.regions[r]));
+  const cov=((geo.meta||{}).cells||{});
+  aodSyncHitList('the whole book',all);
+  mount.innerHTML=
+    aodSummary(all)+aodOccTable(all,aodIncomeMap(inc,geo,null))+
+    `<div class="ic-drill-h" style="margin-top:10px">Drill in — press a region → its provinces → its branches (biggest pre-emptive workload first)</div>`+
+    `<div class="aod-regs">`+regs.map(r=>`<button type="button" class="mcard aod-reg" data-reg="${r.reg}" aria-label="Drill into ${r.reg}">
+      <div class="k">${r.reg}</div><div class="v">${icN(r.n)}</div>
+      <div class="n">top: ${r.top} · <b style="color:var(--gold)">${icN(r.w)}</b> assist · <b style="color:var(--agri)">${icN(r.r)}</b> at risk</div>
+      <span class="ic-chev">›</span></button>`).join('')+`</div>`+
+    `<p class="lead sub" style="margin:4px 0 0">Coverage: ${icN(cov.measured_branch)} branch×occupation cells <b>measured</b> (≥30 accounts) · ${icN(cov.estimated_branch)} thin cells <b>estimated</b> from province mixes. Region and province tables are fully measured.</p>`;
+}
+/* Occupation × macro panel (owner ask 2026-07-28): BEFORE the geographic drill — every occupation
+   group in the book, the macro channel that reaches its income (sensitivity coefficients from the
+   engine's documented matrix), and the expected book-weighted income move. Sets the "why" so the
+   geographic "where" drill below reads in context. */
+function aodChannel(sens){
+  if(!sens) return '<span class="s">—</span>';
+  if(!sens.crop&&!sens.fuel) return '<span class="s" title="no crop or fuel pass-through modelled — salaried / transfer income is fixed in the short run">no short-run channel</span>';
+  const bits=[];
+  if(sens.crop) bits.push(`<span style="color:var(--merch)" title="fraction of a crop-price move that reaches take-home income (documented first-order assumption)">crop ×${sens.crop}</span>`);
+  if(sens.fuel) bits.push(`<span style="color:${sens.fuel<0?'var(--agri)':'var(--merch)'}" title="fraction of a fuel-cost move that reaches take-home income (negative = cost)">fuel ×${sens.fuel}</span>`);
+  return bits.join(' · ');
+}
+function renderAssistOccMacro(){
+  const mount=document.getElementById('assist-occ-macro'); if(!mount) return;
+  Promise.all([tmliFetch('tape_geo_occ'),tmliFetch('income_impact')]).then(([geo,inc])=>{
+    if(!geo||!geo.regions){ tmliNote(mount,'Occupation panel not yet computed — <b>data/tape_geo_occ.json</b> is absent (run pipeline/build_tape_layers.py after the tape ingest).'); return; }
+    const all=aodAgg(Object.keys(geo.regions||{}).map(r=>geo.regions[r]));
+    const dmap=aodIncomeMap(inc,geo,null);
+    const sens=((inc||{}).meta||{}).sensitivity||{};
+    const drv=((inc||{}).meta||{}).drivers||{};
+    const tot=all.reduce((a,c)=>a+c.n,0);
+    const cy=drv.crop_yoy_pct||{};
+    const chips=[['Rice',cy.rice],['Rubber',cy.rubber],['Palm',cy.oilpalm]]
+      .filter(x=>x[1]!=null)
+      .map(x=>`<span class="ic-cchip ${x[1]<0?'bad':x[1]>0?'good':'flat'}">${x[0]} ${x[1]>0?'+':''}${x[1]}%</span>`).join('')+
+      `<span class="ic-cchip ${drv.fuel_move_pct<0?'good':drv.fuel_move_pct>0?'bad':'flat'}" title="${drv.fuel_basis||''}">Fuel ${drv.fuel_move_pct>0?'+':''}${drv.fuel_move_pct!=null?drv.fuel_move_pct:'—'}%</span>`;
+    mount.innerHTML=
+      `<div style="margin:2px 0 8px">${chips}</div>`+
+      `<div class="tbl-wrap"><table class="tbl"><tr>
+        <th>Occupation</th><th>Accounts</th><th title="share of occupation-attributed accounts">% of book</th>
+        <th title="monthly income base — NSO SES individual income where published, otherwise the region's NSO LFS employee wage">Income · NSO</th>
+        <th title="expected monthly income move from the current crop/fuel price moves — book-weighted across provinces, ESTIMATED first-order">Est. impact to income</th></tr>`+
+      all.map(c=>`<tr>
+          <td><b>${c.occupation}</b></td>
+          <td class="mono">${icN(c.n)}</td>
+          <td class="mono sub">${tot?(c.n*100/tot).toFixed(1):'—'}%</td>
+          <td class="mono">${aodIncome(dmap[c.occupation])}</td>
+          <td class="mono">${aodImpact(dmap[c.occupation])}</td></tr>`).join('')+`</table></div>`;
+    wrapTables();
+  });
+}
+function renderAssistOcc(){
+  const mount=document.getElementById('assist-occ'); if(!mount) return;
+  Promise.all([tmliFetch('tape_geo_occ'),tmliFetch('income_impact')]).then(([geo,inc])=>{
+    if(!geo||!geo.regions){ tmliNote(mount,'Occupation drill not yet computed — <b>data/tape_geo_occ.json</b> is absent (run pipeline/build_tape_layers.py after the tape ingest).'); return; }
+    mount._aodGeo=geo; mount._aodInc=inc;
+    if(!mount._aodState) mount._aodState={level:'regions'};
+    aodRenderLevel(mount);
+    if(!mount.dataset.aodWired){
+      mount.dataset.aodWired='1';
+      const go=st=>{mount._aodState=st; aodRenderLevel(mount); mount.scrollIntoView({block:'nearest'}); icFocusLevel(mount);};
+      const act=t=>{
+        const back=t.closest('.ic-back');
+        if(back){const st=mount._aodState, lvl=back.dataset.lvl;
+          if(lvl==='branch') go({level:'branch',province:st.level==='occs'?(mount._aodGeo.branches.find(b=>b.branch===st.branch)||{}).prov:st.province});
+          else if(lvl==='province'){
+            const st2=mount._aodState; let reg=st2.region;
+            if(!reg){const rec=st2.branch&&mount._aodGeo.branches.find(b=>b.branch===st2.branch);
+              reg=(rec&&rec.region)||provRegOf(mount,st2.province);}
+            go({level:'province',region:reg});
+          } else go({level:'regions'});
+          return true;}
+        const reg=t.closest('.aod-reg'); if(reg){go({level:'province',region:reg.dataset.reg}); return true;}
+        const row=t.closest('.aod-row');
+        if(row){ if(row.dataset.p) go({level:'branch',province:row.dataset.p,region:(mount._aodState||{}).region});
+                 else if(row.dataset.b) go({level:'occs',branch:row.dataset.b}); return true;}
+        return false;
+      };
+      mount.addEventListener('click',e=>{act(e.target);});
+      mount.addEventListener('keydown',e=>{
+        if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return;
+        const row=e.target.closest&&e.target.closest('.aod-row');
+        if(!row||row!==e.target) return;
+        e.preventDefault(); act(row);
+      });
+    }
+  });
+}
+function provRegOf(mount,prov){
+  const b=(mount._aodGeo.branches||[]).find(x=>x.prov===prov);
+  return b?b.region:null;
+}
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
     const T=TAPE, absent=$('#assist-absent'), hero=$('#assist-hero');
     if(!T||!T.bucket_ladder){ if(absent)absent.style.display=''; if(hero)hero.innerHTML=''; return; }
     if(absent)absent.style.display='none';
-    const N=n=>Number(n).toLocaleString(), bn=n=>'฿'+(n/1e9).toFixed(1)+'bn', mn=n=>'฿'+(n/1e6).toFixed(0)+'m';
+    // ฿ at the right magnitude everywhere on this page (owner ask 2026-07-28: "฿1075m" is unreadable)
+    const N=n=>Number(n).toLocaleString(), bn=aodTHB, mn=aodTHB;
     const lb=T.bucket_ladder.live_book;
     const rs=(T.restructuring&&T.restructuring.by_status)||[];
     const pe=rs.find(s=>s.status==='Pre-emptive'), tdr=rs.find(s=>s.status==='TDR');
@@ -7269,19 +7647,8 @@ function renderAssist(){
       ['TDR — restructure failing',tdr?N(tdr.n):'—',tdr?tdr.dpd90p_pct+'% at 90+, '+tdr.late180_pct+'% at 180+':'','var(--agri)'],
     ].map(k=>`<div class="mcard" style="border-left:3px solid ${k[3]}"><div class="k">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
 
-    // segments hit most (occ_x_region)
-    const seg=((T.segments_hit&&T.segments_hit.occ_x_region)||[]).slice(0,15);
-    $('#assist-segments').innerHTML = seg.length ? `<table class="tbl"><tr>
-        <th>Occupation × region</th><th>Accounts</th><th>OS</th>
-        <th title="90+dpd share">90+</th><th title="30–89dpd roll">Roll</th>
-        <th title="X-days slipping">X-days</th><th title="90+% + ½·roll% + ¼·X-days%">Score</th></tr>`+
-      seg.map(r=>`<tr>
-        <td><b>${r.occupation}</b> <span class="sub mono">· ${r.region}</span></td>
-        <td class="mono">${N(r.n)}</td><td class="mono sub">${mn(r.os_sum)}</td>
-        <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
-        <td class="mono">${r.roll_pct}%</td><td class="mono" style="color:var(--opp)">${r.early_pct}%</td>
-        <td class="mono"><b>${r.score}</b></td></tr>`).join('')+`</table>` :
-      `<p class="lead sub">No occupation×region cells cleared the ≥300-account floor.</p>`;
+    // "Segments hit most" is now rendered by aodSyncHitList() so it FOLLOWS the occupation drill
+    // (owner ask 2026-07-28) instead of showing a fixed national occupation×region list.
 
     // pre-emptive radar (province × drought)
     const rad=(T.assistance_radar||[]).slice(0,12);
@@ -7321,14 +7688,12 @@ function renderAssist(){
     const rows=ORD.map(s=>rs.find(x=>x.status===s)).filter(Boolean);
     $('#assist-restr').innerHTML = rows.length ? `<table class="tbl"><tr>
         <th>Status</th><th>Accounts</th><th>OS</th><th>X-days</th><th>Roll</th>
-        <th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/a·c</th></tr>`+
-      rows.map(r=>{const neg=r.npat_margin_avg<0;
-        return `<tr><td><b>${r.status}</b></td>
+        <th>90+</th><th>180+</th></tr>`+
+      rows.map(r=>`<tr><td><b>${r.status}</b></td>
         <td class="mono">${N(r.n)}</td><td class="mono sub">${bn(r.os_sum)}</td>
         <td class="mono">${r.early_pct}%</td><td class="mono">${r.roll_pct}%</td>
         <td class="mono"><b style="color:${assistSev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
-        <td class="mono" style="color:${assistSev(r.late180_pct)}">${r.late180_pct}%</td>
-        <td class="mono" style="color:${neg?'var(--agri)':'var(--merch)'}"><b>${neg?'−':''}฿${N(Math.abs(r.npat_margin_avg))}</b></td></tr>`;}).join('')+`</table>` :
+        <td class="mono" style="color:${assistSev(r.late180_pct)}">${r.late180_pct}%</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">Restructuring split unavailable in this tape vintage.</p>`;
 
     wrapTables();
