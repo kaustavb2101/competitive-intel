@@ -35,6 +35,22 @@ h2:first-child{margin-top:4px}
 .mcard .v{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--hi);margin:2px 0}
 .mcard .n{font-size:10px;color:var(--dim)}
 
+/* Assistance hero KPI strip — side-by-side cards (owner ask 2026-07-28: they stacked full-width) */
+.assist-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin:10px 0 4px}
+
+/* Assistance occupation drill (geography-first: regions → provinces → branches) */
+.aod-regs{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:8px;margin:8px 0}
+.aod-reg{text-align:left;cursor:pointer;color:inherit;font:inherit;position:relative;width:100%}
+.aod-reg .ic-chev{position:absolute;right:10px;top:9px;color:var(--dim)}
+.aod-est{font:600 9px var(--mono);color:var(--gold);border:1px solid var(--gold);border-radius:4px;padding:0 4px;margin-left:5px;vertical-align:1px;white-space:nowrap}
+.aod-row{cursor:pointer}
+.aod-row:hover td{background:rgba(91,124,250,.06)}
+
+/* Macro watchlist cards — pressable, drill to the affected branches */
+.mwatch-card{text-align:left;cursor:pointer;color:inherit;font:inherit;width:100%;display:block}
+.mwatch-card.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.mwatch-card .ic-chev{float:right;color:var(--dim)}
+
 /* insight callout */
 .insight{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:8px;padding:11px 13px;margin:10px 0;font-size:12.5px;color:#aab3c6}
 .insight b{color:var(--hi)}
