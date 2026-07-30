@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-28T16:31:43+00:00",
-    "commit": "42a5c7a"
+    "generated_at": "2026-07-30T10:21:28+00:00",
+    "commit": "bcce9f8"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-28",
+    "eta_date": "2026-07-30",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,120 @@
   ],
   "activity": [
     {
+      "date": "2026-07-30T10:21:28+00:00",
+      "sha": "bcce9f8",
+      "summary": "service(provenance): surface scenarios.json's MEASURED board_vintage in the Data-room card",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T15:21:03+07:00",
+      "sha": "72481a8",
+      "summary": "feat(acq): district-grain operating momentum (go-live date) in pico_district (#213)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-30T08:20:49+00:00",
+      "sha": "198d743",
+      "summary": "docs: log ux-provenance-prose-nav-vocab merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T15:15:35+07:00",
+      "sha": "5996118",
+      "summary": "ux: align products provenance prose to five-pillar nav label (Overview→Macro) (#214)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T04:49:08+00:00",
+      "sha": "b79c38c",
+      "summary": "docs: log ux-cc-jumplink-nav-vocab-drift merge+deploy+verify (follow-up)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T11:45:43+07:00",
+      "sha": "8b1180e",
+      "summary": "ux: align command-center jump-links to five-pillar nav labels (#211)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T04:40:06+00:00",
+      "sha": "c2388ef",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the gate-repair hotfix",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-30T04:35:46+00:00",
+      "sha": "d75ad4b",
+      "summary": "fix(gate): restore RED master determinism gate to green — realign 3 derived layers PR #207 desynced",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-29T20:38:58+07:00",
+      "sha": "bbf3acb",
+      "summary": "Researching repository structure and navigation patterns (#207)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-29T10:21:05+07:00",
+      "sha": "4891f3d",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-27, run 30310940436) (#194)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-29T10:20:09+07:00",
+      "sha": "aace6e8",
+      "summary": "feat(acq): MEASURED PICO operating-momentum lens (commencement/go-live date) on Competition (#204)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-29T10:19:22+07:00",
+      "sha": "c8c6088",
+      "summary": "data: NABC live prices (2026-07-27, run 30307178352) (#191)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-29T10:18:38+07:00",
+      "sha": "1c49aa1",
+      "summary": "feat(obj#1): widen the measured crop-stress model to cassava + maize (DOAE area × NABC farm-gate) (#188)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-07-29T10:17:54+07:00",
+      "sha": "c2990b4",
+      "summary": "data: NABC live prices (2026-07-28, run 30401112150) (#205)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-29T10:17:26+07:00",
+      "sha": "23c0af8",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-28, run 30404660084) (#206)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-29T09:38:38+07:00",
+      "sha": "0e1b1d0",
+      "summary": "assist: occupation income impact + geography x occupation drill + watchlist branch drill (#203)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-29T07:34:30+07:00",
+      "sha": "3d1284b",
+      "summary": "data: macro indicators (2026-07-27, run 30311014810) (#193)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-28T23:40:43+00:00",
+      "sha": "a74e695",
+      "summary": "data: live fuel prices (2026-07-28, run 30408596394)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-28T16:32:40+00:00",
+      "sha": "00ad711",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the SERVICE_AUDIT §4 / R2-weight ship",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-28T16:31:43+00:00",
       "sha": "42a5c7a",
       "summary": "docs(service): correct SERVICE_AUDIT §4 (deploy-weight 10x understated) + flag half-done R2 catchment migration (~2.2GB R2-duplicated in git)",
@@ -596,120 +710,6 @@
       "sha": "dd61274",
       "summary": "feat(acq): surface MEASURED district-grain PICO census on Competition tab (#197)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T06:27:14+00:00",
-      "sha": "fb7f0a2",
-      "summary": "committee: autonomous competitor scout (run 30334027506)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T05:58:48+00:00",
-      "sha": "9dcea1b",
-      "summary": "committee: refresh autonomy plan (run 30332980368)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T04:26:50+00:00",
-      "sha": "89b185a",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the competitor_coverage deploy-health probe ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T04:25:17+00:00",
-      "sha": "9666e97",
-      "summary": "health(deploy): probe competitor_coverage.json — the last unprobed obj-#2 flagship — in the live site-health checker",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T02:19:56+00:00",
-      "sha": "a7ca494",
-      "summary": "docs(progress): log the data.html search aria-label UX-loop run (#196) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T09:17:04+07:00",
-      "sha": "476fe24",
-      "summary": "ux: add aria-label to data.html branches search (WCAG 4.1.2) (#196)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T23:46:25+00:00",
-      "sha": "bbb88ca",
-      "summary": "data: live fuel prices (2026-07-27, run 30315043295)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-27T22:27:37+00:00",
-      "sha": "3a70448",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the regional brand-leadership ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-28T05:26:13+07:00",
-      "sha": "8ef771a",
-      "summary": "feat(competition): regional brand-leadership rollup on the peer board (obj #2, MEASURED) (#192)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-27T22:17:27+00:00",
-      "sha": "3b73363",
-      "summary": "committee: refresh autonomy plan (run 30309829108)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-27T20:34:44+00:00",
-      "sha": "d55d39f",
-      "summary": "docs(progress): log the #acq mobile-overflow UX-loop run (#190) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T03:30:43+07:00",
-      "sha": "3938cd6",
-      "summary": "ux: fix Competition (#acq) route horizontal overflow on mobile (#190)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T18:40:20+00:00",
-      "sha": "76aa0f4",
-      "summary": "feat(competition): PICO competitor census to district (อำเภอ) grain — pico_district.json (obj #2)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-27T17:06:47+00:00",
-      "sha": "16a2f33",
-      "summary": "committee: refresh autonomy plan (run 30287465163)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-27T16:24:27+00:00",
-      "sha": "f5c7e47",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_province deploy-health probe ship",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-27T16:23:47+00:00",
-      "sha": "965de1e",
-      "summary": "health(deploy): probe the competition pillar's flagship exec layer (peer_province.json, obj #2)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-07-27T14:27:04+00:00",
-      "sha": "7bb6ca4",
-      "summary": "docs(progress): log the Road-to-3,000 thesis-bar dead-CSS UX-loop run (#189) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T21:23:18+07:00",
-      "sha": "e1b1059",
-      "summary": "ux: remove dead Road-to-3,000 thesis-bar CSS (mandate cleanup) (#189)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T12:36:23+00:00",
-      "sha": "3263929",
-      "summary": "committee: refresh autonomy plan (run 30266165997)",
-      "pillar": "deployment"
     }
   ]
 }

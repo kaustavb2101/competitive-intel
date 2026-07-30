@@ -194,9 +194,16 @@ def _vintage_of(m):
     # ahead of any pull timestamp. The layer carries only this price date + a divergence note,
     # so without it the commodities board showed blank in the Data-room card despite a fresh
     # measured farm-gate vintage.
+    # board_vintage (scenarios — the LIVE/stress scenario engine) is the commodity/macro board
+    # month (e.g. 2026M06) that its LIVE scenarios draw their MEASURED current driver values
+    # from ("Each card shows its vintage"); it is a data-observation vintage exactly like
+    # price_vintage / farmgate_vintage, so it sits with them, ahead of any pull timestamp. The
+    # layer stamps freshness only under this key, so without it the scenario engine showed
+    # blank in the Data-room card despite carrying a real measured board vintage.
     for k in ("updated", "vintage", "as_of", "updated_to",
-              "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "snapshot",
-              "pico_vintage", "vintage_individual", "pulled_at_utc", "pulled", "promos_pulled_at"):
+              "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
+              "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc", "pulled",
+              "promos_pulled_at"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)

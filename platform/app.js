@@ -3622,6 +3622,15 @@ function drawPicoCompetitors(){
       opmo=` <b>Where rivals recently went live:</b> <b style="color:var(--agri)">${op.n_recent}</b> PICO operators (${op.recent_share_pct}%) began operating in the trailing ${op.window_months} months`+
         (otr?` — most in <b style="color:var(--gold)">${otr.th}${otr.en?` (${otr.en})`:''}</b> (<b>${otr.pico_recent_op}</b>). Commencement ≠ licence-grant: some went live years after licensing, so this "actually operating" lens catches live pressure the licensing lens misses.`:'.');
     }
+    // MEASURED district-grain go-live sharpening (pico_district.json operating_momentum): where within
+    // the provinces above rivals most recently WENT LIVE, down to the อำเภอ. Null-safe: '' if absent.
+    let opdistmo='';
+    const pdop=(PICODIST&&PICODIST.meta&&PICODIST.meta.operating_momentum)||null;
+    if(pdop&&Array.isArray(pdop.top_recent)&&pdop.top_recent.length){
+      const t=pdop.top_recent[0], p=String(t[0]).split('|');
+      const dname=(p.length===2)?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b style="color:var(--gold)">${t[0]}</b>`;
+      opdistmo=` At district grain the go-live pressure is sharpest in ${dname} — <b style="color:var(--agri)">${t[1]}</b> of its ${t[2]} operators went live in-window.`;
+    }
     // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
     // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
     const dm=(PICODIST&&PICODIST.meta)||null;
@@ -3635,7 +3644,7 @@ function drawPicoCompetitors(){
     }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${opmo}${distClause} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${opmo}${opdistmo}${distClause} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
@@ -7123,7 +7132,7 @@ function renderProducts(){
       <p class="lead">Which borrowers sit behind each collateral product, what income driver moves them, and which scenarios (above, in the simulator) hit them. Book share &amp; NPL are <b>measured</b> from the tape; the segment / driver / scenario wiring is a <b>curated</b> transmission map.</p>
       <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Product</th><th>Book share</th><th>NPL-live</th><th>Borrower segments</th><th>Income drivers</th><th>Scenarios that hit it</th></tr></thead><tbody>${rows}</tbody></table></div>
       <div class="pm-idx"><div class="ic-bt" style="margin:0 0 4px">WHEN A DRIVER MOVES, THESE BOOKS FEEL IT</div>${idx}</div>
-      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED book economics per product (share / NPL / outstanding — tape vehicle_types). The product→segment→driver→scenario wiring is a curated editorial map, labelled as such. IMF WEO macro backdrop is now wired (Overview → IMF macro outlook); CPI-by-category / MOTS tourism feeds are not yet wired — each needs its own scheduled puller.</p>`;
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED book economics per product (share / NPL / outstanding — tape vehicle_types). The product→segment→driver→scenario wiring is a curated editorial map, labelled as such. IMF WEO macro backdrop is now wired (Macro → IMF macro outlook); CPI-by-category / MOTS tourism feeds are not yet wired — each needs its own scheduled puller.</p>`;
   });
 }
 
@@ -7293,7 +7302,7 @@ function renderHomePillars(){
   if(typeof FUEL!=='undefined'&&FUEL&&FUEL.headline&&FUEL.headline.diesel!=null){
     mBig='฿'+Number(FUEL.headline.diesel).toFixed(2)+'<small>/L diesel</small>';
     mRead='Diesel (pickup/farm borrowers) &amp; the commodity board — the macro forces on collateral values and PD.'; }
-  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Overview'));
+  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Macro'));
 
   // ② ACQUISITION — the collateral book &amp; where it concentrates (measured tape).
   if(T&&T.collateral&&T.bucket_ladder){
@@ -7890,7 +7899,7 @@ function renderHomeHero(){
       subBits.push(`${cs.th}: price ${cs.price_stress!=null?(cs.price_stress>0?'+':'')+Math.round(cs.price_stress)+'%':'—'}${cs.drought!=null?' · drought '+Math.round(cs.drought*100)+'%':''}${cs.double_stress?' (rice/rubber + drought)':''}`);
     }
     heroes.push({tone:'risk',v:hh?'map':'overview',big,sub:subBits.join(' · '),
-      tag:hh?'measured + estimated':'estimated', cta:hh?'National map →':'Overview →'});
+      tag:hh?'measured + estimated':'estimated', cta:hh?'Map view →':'Macro →'});
   }
   if(!heroes.length){ box.innerHTML=''; return; }
   box.innerHTML=heroes.map(h=>{
