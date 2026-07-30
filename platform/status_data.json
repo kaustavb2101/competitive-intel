@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-30T04:35:46+00:00",
-    "commit": "d75ad4b"
+    "generated_at": "2026-07-30T10:21:28+00:00",
+    "commit": "bcce9f8"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-07-30T10:21:28+00:00",
+      "sha": "bcce9f8",
+      "summary": "service(provenance): surface scenarios.json's MEASURED board_vintage in the Data-room card",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T15:21:03+07:00",
+      "sha": "72481a8",
+      "summary": "feat(acq): district-grain operating momentum (go-live date) in pico_district (#213)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-30T08:20:49+00:00",
+      "sha": "198d743",
+      "summary": "docs: log ux-provenance-prose-nav-vocab merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T15:15:35+07:00",
+      "sha": "5996118",
+      "summary": "ux: align products provenance prose to five-pillar nav label (Overview→Macro) (#214)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T04:49:08+00:00",
+      "sha": "b79c38c",
+      "summary": "docs: log ux-cc-jumplink-nav-vocab-drift merge+deploy+verify (follow-up)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T11:45:43+07:00",
+      "sha": "8b1180e",
+      "summary": "ux: align command-center jump-links to five-pillar nav labels (#211)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T04:40:06+00:00",
+      "sha": "c2388ef",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the gate-repair hotfix",
+      "pillar": "deployment"
+    },
+    {
       "date": "2026-07-30T04:35:46+00:00",
       "sha": "d75ad4b",
       "summary": "fix(gate): restore RED master determinism gate to green — realign 3 derived layers PR #207 desynced",
@@ -667,48 +709,6 @@
       "date": "2026-07-28T14:29:12+07:00",
       "sha": "dd61274",
       "summary": "feat(acq): surface MEASURED district-grain PICO census on Competition tab (#197)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T06:27:14+00:00",
-      "sha": "fb7f0a2",
-      "summary": "committee: autonomous competitor scout (run 30334027506)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T05:58:48+00:00",
-      "sha": "9dcea1b",
-      "summary": "committee: refresh autonomy plan (run 30332980368)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T04:26:50+00:00",
-      "sha": "89b185a",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the competitor_coverage deploy-health probe ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T04:25:17+00:00",
-      "sha": "9666e97",
-      "summary": "health(deploy): probe competitor_coverage.json — the last unprobed obj-#2 flagship — in the live site-health checker",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T02:19:56+00:00",
-      "sha": "a7ca494",
-      "summary": "docs(progress): log the data.html search aria-label UX-loop run (#196) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T09:17:04+07:00",
-      "sha": "476fe24",
-      "summary": "ux: add aria-label to data.html branches search (WCAG 4.1.2) (#196)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-27T23:46:25+00:00",
-      "sha": "bbb88ca",
-      "summary": "data: live fuel prices (2026-07-27, run 30315043295)",
       "pillar": "data-integration"
     }
   ]
