@@ -392,6 +392,42 @@ def _shape_competitor_coverage(d):
     return None
 
 
+def _shape_pico_district(d):
+    # The district-grain competitive-density layer (obj #2) that sharpens the
+    # Competition surface below province level. app.js live-fetches it
+    # (picodistPromise) and renders TWO visible reads: the "Top go-live districts
+    # (recent/total)" leaderboard (renderPicoCensus reads
+    # meta.operating_momentum.top_recent, each row [district, recent, total]) and
+    # the "within provinces the rival field is not uniform — PICO clusters in the
+    # provincial-capital districts" clause (reads .top_districts +
+    # meta.n_district_resolved / resolution_pct). It is a MEASURED FPO-registry
+    # tally shipped recently with NO probe coverage, so a truncated deploy that
+    # empties it would silently blank the Competition surface's district-grain
+    # reads with no phone alert — the same "broken demo" blind spot the
+    # peer_province / competitor_coverage probes closed for the province-grain
+    # reads. Robust to registry growth (asserts shape, not exact counts).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    tops = d.get("top_districts")
+    if not isinstance(tops, list) or not tops:
+        return "missing/empty 'top_districts' list (density clause render read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not isinstance(meta.get("n_district_resolved"), int):
+        return "meta.n_district_resolved missing (district-grain prose read)"
+    op = meta.get("operating_momentum")
+    if not isinstance(op, dict):
+        return "meta.operating_momentum missing (go-live leaderboard block)"
+    tr = op.get("top_recent")
+    if not isinstance(tr, list) or not tr:
+        return "meta.operating_momentum.top_recent missing/empty (leaderboard render read)"
+    r0 = tr[0]
+    if not isinstance(r0, list) or len(r0) < 3:
+        return "top_recent[0] not a [district, recent, total] row"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -437,6 +473,14 @@ DATA_FILES = [
     # meta.national_standing) was the last unprobed piece of the Competition
     # surface, so a truncated deploy could blank it with no phone alert. Closes it.
     ("data/competitor_coverage.json", _shape_competitor_coverage, ".brands (big-4 found vs public expected) + meta.totals.found"),
+    # The district-grain competitive layer (obj #2) that sharpens the Competition
+    # surface below province level: the "Top go-live districts (recent/total)"
+    # go-live leaderboard + the provincial-capital clustering clause both render
+    # from it. peer_province + competitor_coverage now cover the province-grain
+    # competitive reads; this closes the matching district-grain blind spot so a
+    # truncated deploy that guts the recently-shipped go-live leaderboard fires a
+    # phone alert instead of silently blanking the อำเภอ reads.
+    ("data/pico_district.json", _shape_pico_district, ".top_districts + meta.operating_momentum.top_recent (go-live leaderboard)"),
 ]
 
 
