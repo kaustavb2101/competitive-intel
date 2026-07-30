@@ -57,11 +57,18 @@ SNAPSHOT_VINTAGE = "2026-05-22"  # from the resource filename (DDMMYYYY)
 COL_TYPE = "ประเภทสำนักงาน"        # office type: สำนักงานใหญ่ (head) / สำนักสาขา (branch)
 COL_PROV = "จังหวัดที่ให้บริการ"    # province of service
 COL_ADDR = "ที่อยู่"                # free-text address (carries ตำบล/อำเภอ/จังหวัด)
-COL_LICDATE = "วันที่ได้รับใบอนุญาต"  # FPO licence-grant date (ISO YYYY-MM-DD)
+COL_LICDATE = "วันที่ได้รับใบอนุญาต"  # FPO licence-grant date (ISO YYYY-MM-DD) — the "entry" signal
+COL_OPDATE = "วันที่เริ่มดำเนินการ"  # FPO commencement / go-live date (ISO) — the "actually-operating" signal
 HEAD_TOKEN = "ใหญ่"                # substring identifying a head office ("สำนักงานใหญ่")
 
-# Licensing-momentum window (objective #2) — identical definition to build_pico_census.py so the two
-# layers agree: operators licensed within RECENT_MONTHS before the pinned snapshot count as RECENT.
+# Momentum window (objective #2) — identical definition to build_pico_census.py so the two layers agree.
+# TWO recency lenses on the same trailing-RECENT_MONTHS window, tallied per DISTRICT (they answer
+# different questions and diverge materially at province grain, so they do at district grain too):
+#   • licence-grant date (COL_LICDATE) — when FPO ISSUED the licence  → "where rival ENTRY is newest"
+#   • commencement date  (COL_OPDATE)  — when the operator WENT LIVE  → "where rivals recently WENT LIVE"
+# The commencement lens catches operators licensed >RECENT_MONTHS ago that only recently opened their
+# doors — live competitive pressure the licence-grant lens misses. Cutoff derived from the pinned
+# snapshot vintage, never wall-clock, so both counts are deterministic + byte-stable across re-runs.
 RECENT_MONTHS = 24
 _sy, _sm, _sd = (int(x) for x in SNAPSHOT_VINTAGE.split("-"))
 _cut = (_sy * 12 + (_sm - 1)) - RECENT_MONTHS
@@ -99,9 +106,10 @@ def _district_master():
 
 def build():
     master = _district_master()
-    by_dist = {}          # "prov|amphoe" -> [total, head, branch, other, recent]
+    by_dist = {}          # "prov|amphoe" -> [total, head, branch, other, recent, recent_op]
     n_total = n_resolved = n_head = n_branch = n_other = 0
     n_recent = n_lic_parsed = n_lic_unparsed = 0
+    n_recent_op = n_op_parsed = n_op_unparsed = n_op_after_snapshot = 0
     n_unmapped_prov = 0
     n_no_marker = 0       # address carried no อำเภอ/เขต marker at all
     n_off_master = 0      # parsed a district token, but it is not in the 928-district master
@@ -124,7 +132,7 @@ def build():
                 continue
 
             key = "%s|%s" % (prov, amphoe)
-            rec = by_dist.setdefault(key, [0, 0, 0, 0, 0])
+            rec = by_dist.setdefault(key, [0, 0, 0, 0, 0, 0])
             rec[0] += 1
             n_resolved += 1
             otype = (row.get(COL_TYPE) or "").strip()
@@ -141,16 +149,32 @@ def build():
                     rec[4] += 1; n_recent += 1
             else:
                 n_lic_unparsed += 1
+            # commencement / go-live recency (MEASURED — the "actually-operating" lens, deterministic)
+            opd = (row.get(COL_OPDATE) or "").strip()
+            if _valid_iso(opd):
+                n_op_parsed += 1
+                if opd >= CUTOFF_DATE:
+                    rec[5] += 1; n_recent_op += 1
+                    if opd >= SNAPSHOT_VINTAGE:
+                        n_op_after_snapshot += 1   # declared/imminent go-lives at or after the snapshot
+            else:
+                n_op_unparsed += 1
 
     by_district = {}
     for k, v in sorted(by_dist.items()):
-        d = {"total": v[0], "head": v[1], "branch": v[2], "recent": v[4]}
+        d = {"total": v[0], "head": v[1], "branch": v[2], "recent": v[4], "recent_op": v[5]}
         if v[3]:
             d["other"] = v[3]
         by_district[k] = d
 
     top_districts = sorted(((k, v["total"]) for k, v in by_district.items()),
                            key=lambda kv: (-kv[1], kv[0]))[:20]
+    # licence-momentum rollup: districts where the sub-scale PICO field is NEWEST (top by recent entries)
+    top_recent = sorted(((k, v["recent"], v["total"]) for k, v in by_district.items() if v["recent"]),
+                        key=lambda t: (-t[1], t[0]))[:20]
+    # operating-momentum rollup: districts where the most PICO rivals recently WENT LIVE (top by recent_op)
+    top_recent_op = sorted(((k, v["recent_op"], v["total"]) for k, v in by_district.items() if v["recent_op"]),
+                           key=lambda t: (-t[1], t[0]))[:20]
     # honest, deterministic sample of the districts that could not be joined to the 928-master
     unresolved_samples = [{"province": p, "amphoe": a, "n": c}
                           for (p, a), c in sorted(off_master.items(), key=lambda t: (-t[1], t[0]))[:20]]
@@ -190,12 +214,39 @@ def build():
                       "date falls within the trailing %d months before the pinned registry snapshot. "
                       "Where the sub-scale PICO rival field is NEWEST, not just densest (objective #2). "
                       "Cutoff derived from the pinned snapshot vintage, never wall-clock." % RECENT_MONTHS),
+            "column": "วันที่ได้รับใบอนุญาต (licence-grant date, ISO)",
             "window_months": RECENT_MONTHS,
             "cutoff_date": CUTOFF_DATE,
             "snapshot_date": SNAPSHOT_VINTAGE,
             "n_recent": n_recent,
+            "recent_share_pct": round(100.0 * n_recent / n_resolved, 1) if n_resolved else 0.0,
             "n_licence_dates_parsed": n_lic_parsed,
             "n_licence_dates_unparsed": n_lic_unparsed,
+            "top_recent": top_recent,
+        },
+        "operating_momentum": {
+            "label": ("MEASURED operating momentum at district grain — resolved operators whose FPO "
+                      "commencement / go-live date (วันที่เริ่มดำเนินการ) falls within the trailing %d "
+                      "months before the pinned registry snapshot. The \"actually went live\" lens, "
+                      "distinct from licence-grant: it catches sub-scale rivals licensed earlier that "
+                      "only recently opened their doors — live competitive pressure the licensing lens "
+                      "misses, now localised to the อำเภอ. Deterministic cutoff (pinned snapshot "
+                      "vintage), never wall-clock." % RECENT_MONTHS),
+            "column": "วันที่เริ่มดำเนินการ (commencement / go-live date, ISO)",
+            "window_months": RECENT_MONTHS,
+            "cutoff_date": CUTOFF_DATE,
+            "snapshot_date": SNAPSHOT_VINTAGE,
+            "n_recent": n_recent_op,
+            "recent_share_pct": round(100.0 * n_recent_op / n_resolved, 1) if n_resolved else 0.0,
+            "n_commence_dates_parsed": n_op_parsed,
+            "n_commence_dates_unparsed": n_op_unparsed,
+            "n_at_or_after_snapshot": n_op_after_snapshot,
+            "note_at_or_after_snapshot": ("Of the recent go-lives, %d carry a commencement date at or "
+                                          "after the pinned snapshot vintage (%s) — declared / imminent "
+                                          "openings recorded in the registry; the FPO resource is "
+                                          "refreshed in place (its download filename lags its content)."
+                                          % (n_op_after_snapshot, SNAPSHOT_VINTAGE)),
+            "top_recent": top_recent_op,
         },
         "objective": ("Competitive risk (#2): measured DISTRICT-level density of a distinct licensed "
                       "non-bank rival class across the existing AutoX footprint — the grain below "
