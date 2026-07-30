@@ -7293,7 +7293,7 @@ function renderHomePillars(){
   if(typeof FUEL!=='undefined'&&FUEL&&FUEL.headline&&FUEL.headline.diesel!=null){
     mBig='฿'+Number(FUEL.headline.diesel).toFixed(2)+'<small>/L diesel</small>';
     mRead='Diesel (pickup/farm borrowers) &amp; the commodity board — the macro forces on collateral values and PD.'; }
-  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Overview'));
+  cards.push(pillCard(1,'Macro','var(--accent)','overview',mBig,mRead,'Macro'));
 
   // ② ACQUISITION — the collateral book &amp; where it concentrates (measured tape).
   if(T&&T.collateral&&T.bucket_ladder){
@@ -7890,7 +7890,7 @@ function renderHomeHero(){
       subBits.push(`${cs.th}: price ${cs.price_stress!=null?(cs.price_stress>0?'+':'')+Math.round(cs.price_stress)+'%':'—'}${cs.drought!=null?' · drought '+Math.round(cs.drought*100)+'%':''}${cs.double_stress?' (rice/rubber + drought)':''}`);
     }
     heroes.push({tone:'risk',v:hh?'map':'overview',big,sub:subBits.join(' · '),
-      tag:hh?'measured + estimated':'estimated', cta:hh?'National map →':'Overview →'});
+      tag:hh?'measured + estimated':'estimated', cta:hh?'Map view →':'Macro →'});
   }
   if(!heroes.length){ box.innerHTML=''; return; }
   box.innerHTML=heroes.map(h=>{
