@@ -5,7 +5,9 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-28 · latest finding: the R2 catchment migration left **~2.2 GB of R2-duplicated building catchments committed to git** — the deployed data-room is **10× the size §4 last recorded** (§4, corrected this run) · against `platform/data/provenance.json` (**114 layers · 419 files** · 57 measured · 57 estimated · 0 unlabelled — `build_provenance.py --check` reproduces exactly)._
+_Audit run: 2026-07-30 · latest finding: `scenarios.json` (the LIVE/stress scenario engine, #sim) stamps its freshness only under `board_vintage` (= `2026M06`, the commodity/macro board month its MEASURED live drivers observe), which the extractor did not scan — so it showed **blank** in the exec Data-room card despite carrying a real measured vintage; the extractor now scans `board_vintage` and the cell surfaces (§1) · against `platform/data/provenance.json` (**115 layers · 420 files** · 57 measured · 58 estimated · 0 unlabelled — `build_provenance.py --check` reproduces exactly)._
+
+_Prior audit run: 2026-07-28 · finding: the R2 catchment migration left **~2.2 GB of R2-duplicated building catchments committed to git** — the deployed data-room is **10× the size §4 last recorded** (§4, corrected that run) · against `platform/data/provenance.json` (114 layers · 419 files · 57 measured · 57 estimated · 0 unlabelled)._
 
 **Deployment health (verified live this run, 2026-07-28):** the master production alias
 (`competitive-intel-git-master-kaustav-bagchis-projects.vercel.app`) serves **HTTP 200** on `/`,
@@ -49,6 +51,37 @@ state, not a regression); every analytical layer is wired into a live `fetch()` 
 input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fails to resolve._
 
 ## 1. Freshness per layer (the fix this run shipped)
+
+**2026-07-30 (this run):** live deployment re-verified green — the master production alias
+(`competitive-intel-git-master-kaustav-bagchis-projects.vercel.app`) serves **HTTP 200** on `/`,
+`/app.js`, `/data/branches.json`, `/data/meta.json`; the `site-health.yml` cron correctly targets that
+alias. Determinism gate **96 passed · 0 failed**, data integrity **446/446**, provenance
+`--check`-reproducible, **0** broken data references (the three unresolved `data/*.json` strings are a
+code-comment path and two substring artifacts of `source-data/*`, none a live `fetch()`). A full
+re-scan of every blank-vintage labelled layer's `meta` for date-shaped keys *outside* the extractor's
+list found **one** layer still dropping a real **data-vintage** from the Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `scenarios.json` | `board_vintage` | 2026M06 | MEASURED commodity/macro board month the LIVE scenarios observe (#sim scenario engine) |
+
+`_vintage_of()` now also scans `board_vintage`, placed among the data-observation vintages (right
+after `farmgate_vintage`, ahead of any pull timestamp — it is the board month the scenario engine's
+own label commits to showing per card, a MEASURED data-vintage exactly like `price_vintage` /
+`farmgate_vintage`, not a pull time). scenarios.json is fetched live (`app.js` `tmliFetch('scenarios')`,
+rendered in `#sim`) so it appears in the exec Data-room card; it stamps freshness *only* under this
+key, so without it the row showed **blank** despite a real measured vintage. Verified the change
+touches **only this one** vintage cell (`'' → 2026M06`); a diff of the regenerated ledger confirms
+every other field — the 115-layer counts (57 measured · 58 estimated · 0 unlabelled), labels, sources,
+the files block — is byte-identical, and `build_provenance.py --check` passes on the recommitted
+ledger. No date is invented — `2026M06` is read from the layer's own committed `meta.board_vintage`.
+The standing accepted-blank set held: `amphoe_crops` (`retrieved`), `crop_margin` (`cost_ingested`),
+`region_debt` (`retrieved`), `rival_universe` (`verified`) carry only a **pull/verify** stamp (the
+convention deprioritizes those vs a data-observation vintage), and `tape_real`/`tape_geo_occ`'s
+`mob_anchor` is a months-on-book methodology parameter, not a freshness date — so their blank cells
+are the honest ABSENT state, not a bug. `board_vintage` was the one genuine dropped data-vintage.
+
+---
 
 **2026-07-25:** the tree grew 104 → **109 layers** (414 files) since the prior audit (new
 market layers landed: `commodities`, `dbd_formation`, `credit_anchor`, `peer_npl`, `napprang`,
@@ -172,7 +205,7 @@ thaiwater rain 2026-07-10, search demand 2026-07-04. No stale live-input layer d
 
 ## 2. Provenance coverage
 
-- **114 layers · 419 files** (as of 2026-07-28). 57 measured · 57 estimated · **0 unlabelled** — the shame board is **clear**; `build_provenance.py --check` reproduces the ledger byte-for-byte. _(The narrative below records the 2026-07-17 run that first cleared the board at 83 layers · 314 files; the mechanism has held the board at 0 unlabelled through every layer added since — the tree has grown 83 → 114 layers with no regression.)_
+- **115 layers · 420 files** (as of 2026-07-30). 57 measured · 58 estimated · **0 unlabelled** — the shame board is **clear**; `build_provenance.py --check` reproduces the ledger byte-for-byte. _(The narrative below records the 2026-07-17 run that first cleared the board at 83 layers · 314 files; the mechanism has held the board at 0 unlabelled through every layer added since — the tree has grown 83 → 114 layers with no regression.)_
 - **Update 2026-07-17 (a), intelligence loop:** the board was **cut 6 → 2**. Four structural layers
   gained an honest self-declared `meta` stamp at the generator so they stay `--check`-reproducible:
   `meta.json` (`derive.py::build_meta` — MIXED, classifies ESTIMATED), `deltas.json` +
