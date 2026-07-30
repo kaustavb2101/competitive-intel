@@ -3627,9 +3627,13 @@ function drawPicoCompetitors(){
     let opdistmo='';
     const pdop=(PICODIST&&PICODIST.meta&&PICODIST.meta.operating_momentum)||null;
     if(pdop&&Array.isArray(pdop.top_recent)&&pdop.top_recent.length){
-      const t=pdop.top_recent[0], p=String(t[0]).split('|');
-      const dname=(p.length===2)?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b style="color:var(--gold)">${t[0]}</b>`;
-      opdistmo=` At district grain the go-live pressure is sharpest in ${dname} — <b style="color:var(--agri)">${t[1]}</b> of its ${t[2]} operators went live in-window.`;
+      const fmtGL=(k)=>{ const p=String(k).split('|'); return p.length===2?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b style="color:var(--gold)">${k}</b>`; };
+      const t=pdop.top_recent[0];
+      opdistmo=` At district grain the go-live pressure is sharpest in ${fmtGL(t[0])} — <b style="color:var(--agri)">${t[1]}</b> of its ${t[2]} operators went live in-window.`;
+      // Compact ranked leaderboard of the top go-live districts (recent go-lives / total operators),
+      // so the exec sees the whole contested-ground list, not just the single sharpest อำเภอ.
+      const board=pdop.top_recent.slice(0,6).map(d=>`${fmtGL(d[0])} <span class="mono" style="color:var(--agri)">${d[1]}</span><span class="sub">/${d[2]}</span>`).join(' · ');
+      if(board) opdistmo+=` <b>Top go-live districts (recent/total):</b> ${board}.`;
     }
     // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
     // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
