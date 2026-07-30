@@ -2571,6 +2571,8 @@ function renderAcq(){
   renderSearchDemand();
   renderPeerScore();
   renderRivalPulse();
+  renderRivalAds();
+  renderRivalVideo();
   renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
@@ -3112,6 +3114,221 @@ function drawPeerScore(){
         [`<b>Measured</b> — Stock Exchange of Thailand (${m.source||'set.or.th'}); market cap/valuation as of ${m.price_asof||'the price date'}, fundamentals from ${m.fin_period||'the latest quarter'}.`,
          '<b>Not an AutoX row</b> — AutoX is unlisted (SCBX subsidiary); its 25% ROE target is a stated goal shown only as the reference line.',
          m.roe_caveat||'ROE is each peer’s own SET-reported ratio.']);
+  }
+}
+
+/* ---------- rival PAID ADS · Google Ads Transparency Center (obj #2, MEASURED) ----------
+   Surfaces data/rival_ads.json (build_google_ads.py, from pull_google_ads.py — runs from ANY
+   IP incl. CI, unlike the Thai-IP promo pull). Google lists every creative an advertiser ran
+   with its first/last shown date, so creative counts, live-today, run-length and format mix
+   are MEASURED. It publishes spend/impressions ONLY for election ads, so this is share-of-
+   VOLUME and the UI must never imply a spend ranking. Meta's Ad Library is not an alternative:
+   its credit-ad slice is rejected as invalid for Thailand (see pipeline/spike_meta_ads.py).
+   Lazy, null-safe, graceful when the pull has not been run. */
+let RIVADS=null, rivadsLoaded=false;
+function renderRivalAds(){
+  const tbl=$('#pulseadstbl'); if(!tbl) return;
+  if(rivadsLoaded){ drawRivalAds(); return; }
+  fetch('data/rival_ads.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVADS=j; rivadsLoaded=true; drawRivalAds();
+  }).catch(()=>{ RIVADS=null; rivadsLoaded=true; drawRivalAds(); });
+}
+// 24-month creative-launch cadence as an inline sparkline — shows WHEN each rival pushed.
+function adsSpark(series,color){
+  if(!Array.isArray(series)||!series.length) return '<span class="sub">—</span>';
+  const mx=Math.max.apply(null,series)||1, w=3, h=16;
+  const bars=series.map((v,i)=>{
+    const bh=Math.max(v>0?1:0,Math.round(h*v/mx));
+    return `<rect x="${i*w}" y="${h-bh}" width="${w-1}" height="${bh}" fill="${color}"/>`;
+  }).join('');
+  return `<svg width="${series.length*w}" height="${h}" viewBox="0 0 ${series.length*w} ${h}" `+
+         `role="img" aria-label="creative launches per month, last ${series.length} months" `+
+         `style="vertical-align:-3px">${bars}</svg>`;
+}
+function drawRivalAds(){
+  const tbl=$('#pulseadstbl'), ro=$('#pulseadsreadout'), note=$('#pulseadsnote');
+  if(!tbl) return;
+  const brands=(RIVADS&&Array.isArray(RIVADS.brands))?RIVADS.brands:[];
+  const m=(RIVADS&&RIVADS.meta)||{};
+  if(!brands.length){
+    tbl.innerHTML='';
+    if(note) note.innerHTML='';
+    ['#pulseadsrates','#pulseadsmsgs'].forEach(s=>{const el=$(s); if(el) el.innerHTML='';});
+    if(ro) ro.innerHTML='<b>Rival ad pull not yet run.</b> <span class="sub">data/rival_ads.json is absent — run pipeline/pull_google_ads.py (works from any IP), then build_google_ads.py.</span>';
+    return;
+  }
+  const tot=brands.reduce((a,b)=>a+(b.n_creatives||0),0);
+  const live=brands.reduce((a,b)=>a+(b.n_live||0),0);
+  // Advertised rates keep the basis the ad stated — %/mo and %/yr are NEVER mixed or
+  // converted here, because 1.25%/month is not 1.25%/year and pretending otherwise would
+  // invent a price comparison the ads do not make.
+  const rateTxt=r=>r?`<b>${r.value}%</b><span class="sub">/${r.basis==='month'?'mo':r.basis==='year'?'yr':'?'}</span>`:'<span class="sub">—</span>';
+  tbl.innerHTML=`<tr><th>#</th><th>Brand</th>`+
+    `<th title="distinct ad creatives Google lists for this advertiser in Thailand">Creatives</th>`+
+    `<th title="creatives Google still showed within ${m.live_window_days||2} days of the pull">Live now</th>`+
+    `<th title="creatives first shown in the last ${m.new_window_days||30} days — a fresh push">New 30d</th>`+
+    `<th title="share of all tracked creative volume — NOT share of spend (Google does not publish commercial spend)">Share of volume</th>`+
+    `<th title="median days between a creative's first and last shown date">Median run</th>`+
+    `<th title="the headline rate this operator advertises, in the basis its own copy states — %/mo and %/yr are never converted into one another">Advertised rate</th>`+
+    `<th title="ESTIMATED — the proposition its copy leans on most (keyword read over the ad text)">Lead message</th>`+
+    `<th title="creative launches per month, oldest to newest">Cadence (24 mo)</th></tr>`+
+    brands.map((b,i)=>{
+      const us=b.is_us, col=us?'var(--gold)':'var(--collat)';
+      const name=us?`<b style="color:var(--gold)">${b.brand}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`
+                  :`<b>${b.brand}</b>`;
+      const mix=Object.keys(b.kind_mix||{}).filter(k=>b.kind_mix[k])
+                 .map(k=>`${k} <span class="sub mono">${b.kind_mix[k]}</span>`).join(' · ')||'<span class="sub">—</span>';
+      return `<tr${us?' style="background:rgba(230,180,80,.05)"':''}>
+        <td class="mono sub">${i+1}</td>
+        <td>${name}<div class="sub" style="font-size:11px">${(b.advertiser_names||[]).join(' · ')||''}</div></td>
+        <td class="mono">${barHTML(b.share_of_volume_pct||0,col,100)} <b>${icN(b.n_creatives)}</b></td>
+        <td class="mono" style="color:${(b.n_live||0)>0?'var(--merch)':'var(--dim)'}">${icN(b.n_live)} <span class="sub">(${b.live_pct!=null?b.live_pct+'%':'—'})</span></td>
+        <td class="mono" style="color:${(b.n_new_30d||0)>0?'var(--gold)':'var(--dim)'}">${icN(b.n_new_30d)}</td>
+        <td class="mono">${b.share_of_volume_pct!=null?b.share_of_volume_pct+'%':'—'}</td>
+        <td class="mono sub">${b.median_run_days!=null?b.median_run_days+'d':'—'}</td>
+        <td class="mono">${rateTxt(b.headline_rate)}</td>
+        <td class="sub" style="font-size:12px">${(b.themes&&b.themes[0])?b.themes[0].label+` <span class="sub mono">${b.themes[0].pct}%</span>`:'<span class="sub">—</span>'}</td>
+        <td>${adsSpark(b.cadence,col)}</td>
+      </tr>`;}).join('');
+  // --- advertised-rate board: grouped BY BASIS so nothing implies a cross-basis ranking ---
+  const rates=$('#pulseadsrates');
+  if(rates){
+    const mr=Array.isArray(RIVADS.market_rates)?RIVADS.market_rates:[];
+    if(!mr.length){ rates.innerHTML='<p class="lead sub">No advertised rate appears in the copy we captured yet.</p>'; }
+    else{
+      const groups={month:'quoted per MONTH (ต่อเดือน)',year:'quoted per YEAR (ต่อปี)',unstated:'basis not stated in the ad'};
+      rates.innerHTML=Object.keys(groups).filter(g=>mr.some(r=>r.basis===g)).map(g=>{
+        const rows=mr.filter(r=>r.basis===g).sort((a,b)=>a.value-b.value);
+        const mx=Math.max.apply(null,rows.map(r=>r.value))||1;
+        return `<div style="margin:6px 0"><div class="sub mono" style="font-size:11px">${groups[g]}</div>`+
+          rows.map(r=>{
+            // the bar is the FROM rate the ad leads with; where the same ad also discloses a
+            // ceiling, it is printed beside it so the headline never reads as the whole offer
+            const band=(r.max!=null&&r.max>r.value)?`<span class="sub mono"> – ${r.max}%</span>`:'';
+            return `<div style="display:flex;align-items:center;gap:8px;margin:2px 0">
+            <span style="min-width:120px">${r.brand}</span>
+            ${barHTML(r.value,'var(--collat)',mx)}
+            <b class="mono">${r.value}%</b>${band}</div>`;}).join('')+`</div>`;
+      }).join('')+`<p class="sub" style="font-size:11px;margin-top:4px">Grouped by the basis each ad states. A monthly quote and an annual quote are <b>not</b> comparable numbers and are never converted here — read each within its own group. These are <b>advertised headline</b> rates, not effective yields.</p>`;
+    }
+  }
+  // --- the actual copy, per operator, newest first ---
+  const msgs=$('#pulseadsmsgs');
+  if(msgs){
+    msgs.innerHTML=brands.filter(b=>(b.messages||[]).length).map(b=>{
+      const ocr=(b.n_copy_ocr||0)>0;
+      const themes=(b.themes||[]).slice(0,6).map(t=>`<span class="chip" style="cursor:default">${t.label} <span class="sub mono">${t.n}</span></span>`).join(' ');
+      return `<details style="margin:6px 0"><summary style="cursor:pointer">
+          <b>${b.brand}</b> <span class="sub">${b.n_messages} distinct message(s) from ${icN(b.n_with_copy)} creative(s) with readable copy — ${b.copy_coverage_pct}% of its ads</span>
+          ${ocr?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">incl. OCR · ESTIMATED</span>':''}
+        </summary>
+        <div class="chips" style="margin:6px 0">${themes}</div>
+        <table class="tbl"><tr><th>Last shown</th><th>Ad copy</th><th>Creatives</th><th>Source</th></tr>`+
+        b.messages.map(m=>`<tr>
+            <td class="mono sub">${m.last||'—'}</td>
+            <td style="font-size:12px">${(m.line||'').replace(/[<>]/g,'')}</td>
+            <td class="mono sub">${m.n}</td>
+            <td class="sub mono" style="font-size:11px">${m.src==='ocr'?'<span style="color:var(--gold)">OCR · est.</span>':'render · measured'}</td>
+          </tr>`).join('')+`</table></details>`;
+    }).join('')||'<p class="lead sub">No ad copy captured yet — run the pull without --no-text (and with --ocr to read image banners).</p>';
+  }
+  if(ro){
+    const top=brands[0], us=brands.find(b=>b.is_us);
+    const pushers=brands.filter(b=>(b.n_new_30d||0)>0)
+                    .sort((a,b)=>(b.n_new_30d||0)-(a.n_new_30d||0));
+    let lead=`<b>${top.brand} runs the most paid search/display volume</b> — ${icN(top.n_creatives)} creatives (${top.share_of_volume_pct}% of the ${icN(tot)} tracked), ${icN(top.n_live)} still live.`;
+    if(pushers.length) lead+=` Freshest push: <b>${pushers[0].brand}</b> with ${icN(pushers[0].n_new_30d)} new creative(s) in the last ${m.new_window_days||30} days.`;
+    if(us) lead+=` We are running <b>${icN(us.n_creatives)}</b> (${us.share_of_volume_pct}%).`;
+    else lead+=` <b>We do not appear</b> in Google's Thai ad archive at all — no paid Google presence to compare against.`;
+    // the sharpest competitive read in this dataset: the rate rivals put in front of customers
+    const mr=(Array.isArray(RIVADS.market_rates)?RIVADS.market_rates:[]).slice()
+              .sort((a,b)=>a.value-b.value);
+    const perMo=mr.filter(r=>r.basis==='month'), perYr=mr.filter(r=>r.basis==='year');
+    let rateLine='';
+    if(perMo.length) rateLine+=` Cheapest monthly quote in market copy: <b>${perMo[0].brand} at ${perMo[0].value}%/mo</b>.`;
+    if(perYr.length) rateLine+=` Cheapest annual quote: <b>${perYr[0].brand} at ${perYr[0].value}%/yr</b>.`;
+    ro.innerHTML=lead+rateLine+` <span class="sub">${icN(live)} of ${icN(tot)} tracked creatives are live as of ${m.pulled||'the last pull'}.</span>`;
+  }
+  if(note){
+    const silent=(m.no_account_found||[]);
+    note.innerHTML=`Share-of-volume, <b>not</b> share-of-spend — ${m.limits?'Google publishes commercial ad dates and formats but not spend or impressions.':''} `+
+      (silent.length?`Checked and found <b>no Google ad account</b> in Thailand for: ${silent.join(', ')} — a genuine absence of paid Google presence, not a gap in the pull. `:'')+
+      `Source: ${m.source||'Google Ads Transparency Center'}, region ${m.region||'Thailand'}, pulled ${m.pulled||'—'}. Advertiser aggregates only — no users, no targeting, no personal data.`;
+  }
+}
+
+/* ---------- rival VIDEO pulse · YouTube Data API v3 (obj #2, MEASURED) ----------
+   Surfaces data/rival_youtube.json (build_rival_youtube.py, from pull_rival_youtube.py — the
+   official API, any IP, no scraping, brand channels only so no personal data). Includes our
+   own เงินไชโย channel as the control. Title themes reuse the ad-copy lexicon so paid and
+   organic messaging line up. Lazy, null-safe, graceful when the pull has not been run. */
+let RIVVID=null, rivvidLoaded=false;
+function renderRivalVideo(){
+  const tbl=$('#pulsevidtbl'); if(!tbl) return;
+  if(rivvidLoaded){ drawRivalVideo(); return; }
+  fetch('data/rival_youtube.json').then(r=>r.ok?r.json():null).then(j=>{
+    RIVVID=j; rivvidLoaded=true; drawRivalVideo();
+  }).catch(()=>{ RIVVID=null; rivvidLoaded=true; drawRivalVideo(); });
+}
+function drawRivalVideo(){
+  const tbl=$('#pulsevidtbl'), ro=$('#pulsevidreadout'), note=$('#pulsevidnote');
+  if(!tbl) return;
+  const ch=(RIVVID&&Array.isArray(RIVVID.channels))?RIVVID.channels:[];
+  const m=(RIVVID&&RIVVID.meta)||{};
+  if(!ch.length){
+    tbl.innerHTML=''; if(note) note.innerHTML='';
+    if(ro) ro.innerHTML='<b>Video pulse not yet pulled.</b> <span class="sub">data/rival_youtube.json is absent — set YOUTUBE_API_KEY, then run pipeline/pull_rival_youtube.py + build_rival_youtube.py.</span>';
+    return;
+  }
+  // A channel with a tiny subscriber base but a huge median view count is BUYING placement,
+  // not earning reach. Flagging it stops the table reading as organic popularity.
+  const bought=c=>c.subscribers!=null&&c.median_views_365d!=null&&c.subscribers>0&&
+                   c.median_views_365d>c.subscribers*3&&c.median_views_365d>5000;
+  tbl.innerHTML=`<tr><th>#</th><th>Operator</th>`+
+    `<th title="as published by YouTube; rounded at scale, so read as a band">Subscribers</th>`+
+    `<th title="videos published in the last 30 days">Up 30d</th>`+
+    `<th title="videos published in the last 365 days">Up 1yr</th>`+
+    `<th title="days since the most recent upload">Last post</th>`+
+    `<th title="median views of videos published in the last 365 days">Median views</th>`+
+    `<th title="likes + comments per 1,000 views on the last 365 days of uploads">Engage /1k</th>`+
+    `<th title="ESTIMATED — what its video titles push most (same lexicon as the ad copy)">Lead message</th>`+
+    `<th title="uploads per month, oldest to newest">Cadence (24 mo)</th></tr>`+
+    ch.map((c,i)=>{
+      const us=c.is_us, col=us?'var(--gold)':'var(--merch)';
+      const name=us?`<b style="color:var(--gold)">${c.brand}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`
+                  :`<b>${c.brand}</b>`;
+      const par=c.is_parent_channel?' <span class="tag" style="color:var(--dim);border:1px solid var(--dim)" title="parent auto-finance channel — markets more than title loans, excluded from share-of-voice">PARENT</span>':'';
+      const dormant=(c.uploads_365d||0)===0;
+      return `<tr${us?' style="background:rgba(230,180,80,.05)"':''}>
+        <td class="mono sub">${i+1}</td>
+        <td>${name}${par}<div class="sub" style="font-size:11px">${c.channel_title||''}</div></td>
+        <td class="mono">${icN(c.subscribers)}${c.share_of_subs_pct!=null?` <span class="sub">(${c.share_of_subs_pct}%)</span>`:''}</td>
+        <td class="mono" style="color:${(c.uploads_30d||0)>0?'var(--merch)':'var(--dim)'}">${icN(c.uploads_30d)}</td>
+        <td class="mono ${dormant?'':'sub'}" style="color:${dormant?'var(--agri)':'inherit'}">${icN(c.uploads_365d)}</td>
+        <td class="mono sub">${c.days_since_upload!=null?c.days_since_upload+'d':'—'}</td>
+        <td class="mono">${icN(c.median_views_365d)}${bought(c)?' <span class="tag" style="color:var(--collat);border:1px solid var(--collat)" title="median views far exceed the subscriber base — reach is being bought, not earned">PAID</span>':''}</td>
+        <td class="mono sub">${c.engagement_per_1k_365d!=null?c.engagement_per_1k_365d:'—'}</td>
+        <td class="sub" style="font-size:12px">${(c.themes&&c.themes[0])?c.themes[0].label:'<span class="sub">—</span>'}</td>
+        <td>${adsSpark(c.cadence,col)}</td>
+      </tr>`;}).join('');
+  if(ro){
+    const comp=ch.filter(c=>!c.is_parent_channel);
+    const busiest=comp.slice().sort((a,b)=>(b.uploads_30d||0)-(a.uploads_30d||0))[0];
+    const dormant=comp.filter(c=>(c.uploads_365d||0)===0);
+    const us=ch.find(c=>c.is_us);
+    const paid=comp.filter(bought);
+    let lead='';
+    if(busiest&&(busiest.uploads_30d||0)>0)
+      lead+=`<b>${busiest.brand} is publishing hardest right now</b> — ${icN(busiest.uploads_30d)} video(s) in the last 30 days.`;
+    if(us) lead+=` We have <b>${icN(us.subscribers)}</b> subscribers and posted <b>${icN(us.uploads_30d)}</b> in the last 30 days${us.share_of_subs_pct!=null?` (${us.share_of_subs_pct}% of the tracked field's audience)`:''}.`;
+    if(dormant.length) lead+=` <b>${dormant.map(c=>c.brand).join(', ')}</b> published nothing in a year — marketing-silent here.`;
+    if(paid.length) lead+=` <span class="sub">${paid.map(c=>c.brand).join(', ')} show views far above their subscriber base — that reach is bought, not earned.</span>`;
+    ro.innerHTML=lead;
+  }
+  if(note){
+    const none=(m.no_channel_found||[]);
+    note.innerHTML=(none.length?`No brand channel found for: ${none.join(', ')}. `:'')+
+      (m.limits||'')+` Source: ${m.source||'YouTube Data API v3'}, pulled ${m.pulled||'—'}.`;
   }
 }
 
