@@ -70,7 +70,7 @@ TYPE_BASE = {"defend": 40.0, "audit": 30.0, "tighten": 20.0}
 # (measured rival trigger, same as the other defend rows); the estimated composite is tagged
 # inline, so the row-level measured tag and the queue footer stay accurate.
 JEOPARDY_BASE = 50.0
-GO_LABEL  = {"trend": "Risk trend →", "overview": "Overview →"}
+GO_LABEL  = {"trend": "Risk trend →", "overview": "Macro →"}  # nav labels the overview route "Macro" (five-pillar re-IA); "Risk trend →" is still #trend's TAB_TITLE.
 # plain-language driver names (same map as app.js RISK_DRIVER_LABEL)
 DRIVER_LABEL = {"household": "household leverage", "agri": "crop / drought stress",
                 "occupation": "occupation concentration", "segment": "segment / collateral mix"}
