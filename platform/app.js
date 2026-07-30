@@ -3255,6 +3255,10 @@ function drawRivalAds(){
       (silent.length?`Checked and found <b>no Google ad account</b> in Thailand for: ${silent.join(', ')} — a genuine absence of paid Google presence, not a gap in the pull. `:'')+
       `Source: ${m.source||'Google Ads Transparency Center'}, region ${m.region||'Thailand'}, pulled ${m.pulled||'—'}. Advertiser aggregates only — no users, no targeting, no personal data.`;
   }
+  // The per-operator ad-copy sub-tables were injected into #pulseadsmsgs via innerHTML AFTER
+  // boot, so the boot-time wrapTables() never reached them — an unwrapped wide table can push
+  // the #acq page sideways on mobile. Re-run the idempotent wrapper (matches drawRivalPulse).
+  wrapTables();
 }
 
 /* ---------- rival VIDEO pulse · YouTube Data API v3 (obj #2, MEASURED) ----------
