@@ -110,6 +110,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_pico_competitors.py --check (pico_census.json absent — upstream FPO pull, not committed)"
   else bad "build_pico_competitors.py --check (pico_competitors.json drifted from pico_census.json/branches.json)"
   fi
+  ( cd "$PIPE" && python3 build_branch_pico.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_branch_pico.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_branch_pico.py --check (an input layer branches/amphoe/pico_district absent — not data drift)"
+  else bad "build_branch_pico.py --check (branch_pico.json drifted from amphoe.json/pico_district.json — per-branch PICO district join)"
+  fi
   ( cd "$PIPE" && python3 build_dbd_formation.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_dbd_formation.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_dbd_formation.py --check (source-data/datagoth/dbd_newco.csv absent — re-pullable pull_datagoth input, not committed)"
