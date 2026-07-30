@@ -260,6 +260,16 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_pulse.py --check (rival_promos/app_reviews sources absent — network pulls, not data drift)"
   else bad "build_rival_pulse.py --check (rival_pulse.json drifted from source-data/rival_promos.json + app_reviews.json)"
   fi
+  ( cd "$PIPE" && python3 build_google_ads.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_google_ads.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_google_ads.py --check (source-data/google_ads_raw.json absent — network pull, not data drift)"
+  else bad "build_google_ads.py --check (rival_ads.json drifted from source-data/google_ads_raw.json — run: python3 pipeline/build_google_ads.py)"
+  fi
+  ( cd "$PIPE" && python3 build_rival_youtube.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_rival_youtube.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_rival_youtube.py --check (source-data/rival_youtube_raw.json absent — network pull, not data drift)"
+  else bad "build_rival_youtube.py --check (rival_youtube.json drifted from source-data/rival_youtube_raw.json — run: python3 pipeline/build_rival_youtube.py)"
+  fi
   ( cd "$PIPE" && python3 build_rival_universe.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_universe.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
