@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-30T10:21:28+00:00",
-    "commit": "bcce9f8"
+    "generated_at": "2026-07-30T16:24:49+00:00",
+    "commit": "6cf579e"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,54 @@
   ],
   "activity": [
     {
+      "date": "2026-07-30T16:24:49+00:00",
+      "sha": "6cf579e",
+      "summary": "health(deploy): live site-health probe now guards pico_district.json",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-30T14:39:48+00:00",
+      "sha": "47a647f",
+      "summary": "docs: log ux decision-queue Overview→Macro label fix — merge+deploy+verify (#216)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T21:34:32+07:00",
+      "sha": "1ba76d5",
+      "summary": "ux: align decision-queue \"Overview →\" label to five-pillar nav (Macro) (#216)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T20:46:21+07:00",
+      "sha": "da42353",
+      "summary": "feat(acq): go-live district leaderboard on Competition — top-6 อำเภอ where PICO rivals most recently went live (#215)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-30T20:46:01+07:00",
+      "sha": "61266c8",
+      "summary": "data: live fuel prices (2026-07-29, run 30500267885) (#210)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T20:44:54+07:00",
+      "sha": "bdaad00",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-29, run 30495536913) (#209)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T20:44:10+07:00",
+      "sha": "93de7b2",
+      "summary": "data: NABC live prices (2026-07-29, run 30491512321) (#208)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T10:22:02+00:00",
+      "sha": "b6b3fdf",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the board_vintage provenance-sync ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-30T10:21:28+00:00",
       "sha": "bcce9f8",
       "summary": "service(provenance): surface scenarios.json's MEASURED board_vintage in the Data-room card",
@@ -662,54 +710,6 @@
       "sha": "8f20c23",
       "summary": "ux: hide skip-link in print — stops it leaking into the PDF brief (#202)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T20:11:16+07:00",
-      "sha": "1cdb568",
-      "summary": "ci: pause the autonomous committee loops' cron (owner drives manually now) (#201)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T19:52:32+07:00",
-      "sha": "3730ec1",
-      "summary": "feat(map): district-grain \"outnumbered\" PICO lens (rivals ÷ AutoX branches, obj #2, MEASURED) (#200)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T11:29:28+00:00",
-      "sha": "5111e0f",
-      "summary": "committee: refresh autonomy plan (run 30354573741)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T10:43:19+00:00",
-      "sha": "4529105",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the district PICO-lens ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-28T17:42:25+07:00",
-      "sha": "c54247b",
-      "summary": "feat(map): district-grain PICO rival lens on the National map (obj #2, MEASURED) (#199)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-28T08:16:25+00:00",
-      "sha": "0436b3a",
-      "summary": "docs(progress): log the rayong-province viewport pinch-zoom UX-loop run (#198) — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T15:13:41+07:00",
-      "sha": "25da30e",
-      "summary": "ux: allow pinch-zoom on rayong-province redirect stub (WCAG 1.4.4) (#198)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T14:29:12+07:00",
-      "sha": "dd61274",
-      "summary": "feat(acq): surface MEASURED district-grain PICO census on Competition tab (#197)",
-      "pillar": "data-integration"
     }
   ]
 }
