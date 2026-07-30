@@ -3622,6 +3622,15 @@ function drawPicoCompetitors(){
       opmo=` <b>Where rivals recently went live:</b> <b style="color:var(--agri)">${op.n_recent}</b> PICO operators (${op.recent_share_pct}%) began operating in the trailing ${op.window_months} months`+
         (otr?` — most in <b style="color:var(--gold)">${otr.th}${otr.en?` (${otr.en})`:''}</b> (<b>${otr.pico_recent_op}</b>). Commencement ≠ licence-grant: some went live years after licensing, so this "actually operating" lens catches live pressure the licensing lens misses.`:'.');
     }
+    // MEASURED district-grain go-live sharpening (pico_district.json operating_momentum): where within
+    // the provinces above rivals most recently WENT LIVE, down to the อำเภอ. Null-safe: '' if absent.
+    let opdistmo='';
+    const pdop=(PICODIST&&PICODIST.meta&&PICODIST.meta.operating_momentum)||null;
+    if(pdop&&Array.isArray(pdop.top_recent)&&pdop.top_recent.length){
+      const t=pdop.top_recent[0], p=String(t[0]).split('|');
+      const dname=(p.length===2)?`<b style="color:var(--gold)">${p[1]}</b> <span class="sub">${p[0]}</span>`:`<b style="color:var(--gold)">${t[0]}</b>`;
+      opdistmo=` At district grain the go-live pressure is sharpest in ${dname} — <b style="color:var(--agri)">${t[1]}</b> of its ${t[2]} operators went live in-window.`;
+    }
     // MEASURED district-grain sharpening (pico_district.json): province density is not uniform — the
     // rival field clusters in the provincial-capital (เมือง) districts. Null-safe: '' if layer absent.
     const dm=(PICODIST&&PICODIST.meta)||null;
@@ -3635,7 +3644,7 @@ function drawPicoCompetitors(){
     }
     ro.innerHTML=`<b>Where sub-scale rivals most outnumber us:</b> ${verdict} `+
       `Licensed PICO operators <b>outnumber</b> AutoX branches in <b>${nOut}</b> of ${nProv} provinces `+
-      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${opmo}${distClause} ${TAG_M}`+
+      `(${m.pico_total!=null?m.pico_total:'—'} PICO operators nationwide vs ${m.autox_total!=null?m.autox_total:'—'} AutoX branches).${momo}${opmo}${opdistmo}${distClause} ${TAG_M}`+
       methodBox(null,
         ['<b>PICO operators</b> = a straight tally of licensed พิโกไฟแนนซ์ operators per province from the <b>FPO government licence registry</b> (MEASURED). A distinct small-ticket non-bank competitor class, separate from the big-4 title lenders.',
          '<b>AutoX branches</b> = our own branch count per province (MEASURED, from branches.json). <b>Outnumber</b> = PICO − AutoX; <b>Rivals/branch</b> = PICO ÷ AutoX.',
