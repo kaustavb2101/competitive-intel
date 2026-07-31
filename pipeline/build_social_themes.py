@@ -400,6 +400,16 @@ def main():
         "brand_profile": profile,
         "meta": {
             "as_of": max(dates) if dates else None,   # newest doc IN THE DATA — never wall clock
+            # build_provenance.py scans these four keys (label/source/provenance/generated_by) to
+            # classify a layer; without at least one the layer lands in the ledger as UNLABELLED,
+            # which is the gap the ledger exists to catch. "ESTIMATED" in the label is deliberate
+            # and correct: the counts are measured but the theme buckets are editorial.
+            "label": ("Say/hear gap — MEASURED document counts against an ESTIMATED editorial Thai "
+                      "phrase list; theme buckets are judgement, not model sentiment."),
+            "generated_by": "pipeline/build_social_themes.py",
+            "source": ("demand: pantip_threads.json + app_reviews.json + apple_reviews.json + "
+                       "youtube_comments.json; supply: google_ads_raw.json + rival_promos.json + "
+                       "verified-organisation replies in pantip_threads.json"),
             "demand_docs": len(dem),
             "supply_docs": len(sup),
             "demand_sources": ["youtube_comments.json (public comments, no author identity stored)",
