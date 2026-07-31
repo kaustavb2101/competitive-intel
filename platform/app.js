@@ -7052,9 +7052,26 @@ function icCropStrip(p){
   const rain=p.rain_pct!=null?`<span class="ic-cchip ${p.rain_pct<85?'bad':'flat'}" title="rainfall as % of the local normal — drought proxy (crop-stress layer)">rain ${p.rain_pct}% of normal</span>`:'';
   return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}</div>`;
 }
+// Branch rows must RECONCILE to the province above them. They were silently short until
+// 2026-07-31 (a top-400-by-size cap upstream, on top of the n>=30 no-PII floor, dropped ~1,570
+// branches that cleared the floor). The cap is gone; this footer now states the coverage outright
+// so any future shortfall is visible in the UI instead of being discovered by eye.
+function icBranchCoverage(prov, rows){
+  const p=(IMPACT.provinces||{})[prov]||{};
+  const shown=rows.reduce((a,b)=>a+(b.n||0),0), tot=p.accounts||0;
+  const nb=p.branches!=null?p.branches:null;
+  if(!tot) return '';
+  const pct=100*shown/tot, miss=tot-shown;
+  const full=miss<=0;
+  return `<div class="ic-note">Showing <b>${icN(rows.length)}</b>${nb!=null?' of '+icN(nb):''} branches — `+
+    `<b>${icN(shown)}</b> of the province's <b>${icN(tot)}</b> accounts (<b>${pct.toFixed(1)}%</b>).`+
+    (full?' These rows reconcile to the province total.'
+         :` The remaining ${icN(miss)} sit in branches under the 30-account no-PII floor and are not published.`)+
+    ` Branch detail → <a href="data.html">data book</a>.</div>`;
+}
 function icBranchRows(prov){
   const rows=(IMPACT.branches||{})[prov]||[];
-  if(!rows.length) return `<div class="ic-note">No branch rows for this province — the tape's no-PII floor publishes only the network's larger booking branches (${(IMPACT.meta||{}).branch_note||'cells ≥30'}). Branch detail → <a href="data.html">data book</a>.</div>`;
+  if(!rows.length) return `<div class="ic-note">No branch rows for this province — every branch here sits under the 30-account no-PII floor, so none can be published. Branch detail → <a href="data.html">data book</a>.</div>`;
   return `<div class="ic-scroll"><table class="ic-tbl ic-drilltbl"><thead><tr><th>Branch (tape)</th><th>Accounts</th><th>Book ฿m</th><th class="ic-ladcol">Bucket ladder — Current→180+</th><th>Current</th><th>X · pre-30</th><th>NPL-live</th><th title="measured book delinquency level — not the agri backdrop">Book status</th></tr></thead><tbody>`+
     rows.map(b=>{
       return `<tr><td>${b.name}</td><td class="n">${icN(b.n)}</td><td class="n">${icN(b.os_m)}</td>
@@ -7063,7 +7080,7 @@ function icBranchRows(prov){
         <td class="n">${icPctCell(b.early_pct)}</td>
         <td class="n">${icPct(b.npl_live_pct,5,7)}</td>
         <td>${icBookCue(b)}</td></tr>`;
-    }).join('')+`</tbody></table></div>`+icLadderLegend();
+    }).join('')+`</tbody></table></div>`+icBranchCoverage(prov,rows)+icLadderLegend();
 }
 function icProvTable(g){
   const provs=(g.provinces||[]).map(p=>[p,(IMPACT.provinces||{})[p]]).filter(x=>x[1]);
