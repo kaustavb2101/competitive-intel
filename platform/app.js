@@ -2571,6 +2571,7 @@ function renderAcq(){
   renderSearchDemand();
   renderPeerScore();
   renderRivalPulse();
+  renderRivalIos();
   renderRivalAds();
   renderRivalVideo();
   renderRivalUniverse();
@@ -3117,6 +3118,64 @@ function drawPeerScore(){
   }
 }
 
+/* ---------- iOS app sentiment · Apple App Store TH (obj #2, MEASURED) ----------
+   Reads RIVPULSE.ios (build_rival_pulse.py <- pull_apple_reviews.py). Deliberately a SMALLER
+   table than the Play ladder: Apple publishes no review dates, no star histogram and no dev
+   replies, so no trend / detractor-share / reply-rate columns exist here rather than being
+   faked from a review sample. Two guards the data forced:
+     * rows under MIN_RATINGS are marked "thin" by the builder and must never be presented as a
+       ranking — the nominal best title rival is Saksiam at 4.67 stars from NINE ratings;
+     * the "digital" cohort is personal-loan/nano-finance, NOT title lenders, and is rendered in
+       its own block so it can never read as title-lender share. */
+function drawRivalIos(){
+  const tbl=$('#pulseiostbl'), ro=$('#pulseiosreadout'), note=$('#pulseiosnote');
+  if(!tbl) return;
+  const ios=(RIVPULSE&&Array.isArray(RIVPULSE.ios))?RIVPULSE.ios:[];
+  const im=(RIVPULSE&&RIVPULSE.ios_meta)||{};
+  if(!ios.length){
+    tbl.innerHTML=''; if(note) note.innerHTML='';
+    if(ro) ro.innerHTML='<b>Apple pull not yet run.</b> <span class="sub">source-data/apple_reviews.json is absent — run pipeline/pull_apple_reviews.py (any IP, no key), then build_rival_pulse.py.</span>';
+    return;
+  }
+  const title=ios.filter(r=>r.cohort==='title'), digital=ios.filter(r=>r.cohort==='digital');
+  const own=title.find(r=>r.own);
+  // comparisons are made ONLY against apps with enough ratings for a mean to mean anything
+  const solid=title.filter(r=>!r.own&&!r.thin&&r.score!=null);
+  const best=solid.length?solid.reduce((a,b)=>(b.score>a.score?b:a)):null;
+  const star=v=>v==null?'—':`<b class="mono">${v.toFixed?v.toFixed(2):v}</b>★`;
+  const rows=list=>list.map(r=>{
+    const us=r.own, col=us?'var(--gold)':'var(--collat)';
+    const nm=us?`<b style="color:var(--gold)">${r.name}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`:`<b>${r.name}</b>`;
+    const thin=r.thin?' <span class="tag" title="too few ratings for the average to be meaningful — shown, but never ranked or compared">thin</span>':'';
+    const th=(r.themes&&r.themes[0])?`${r.themes[0].label} <span class="sub mono">${r.themes[0].n}</span>`:'<span class="sub">—</span>';
+    const q=(r.quotes&&r.quotes[0])?`<div class="sub" style="font-size:11px;margin-top:2px">“${(r.quotes[0].text||'').replace(/</g,'&lt;')}”</div>`:'';
+    return `<tr${us?' style="background:rgba(230,180,80,.05)"':''}>
+      <td>${nm}${thin}<div class="sub" style="font-size:11px">${r.brand}</div></td>
+      <td class="mono">${barHTML(r.score||0,col,5)} ${star(r.score)}</td>
+      <td class="mono sub">${r.ratings!=null?icN(r.ratings):'—'}</td>
+      <td class="mono sub">${r.sample&&r.sample.n!=null?r.sample.n:'—'}</td>
+      <td class="mono" style="color:${(r.sample&&r.sample.low_share_pct>=40)?'var(--agri)':'var(--dim)'}">${r.sample&&r.sample.low_share_pct!=null?r.sample.low_share_pct+'%':'—'}</td>
+      <td class="sub" style="font-size:12px">${th}${q}</td></tr>`;}).join('');
+  const head=`<tr><th>App</th><th title="lifetime average rating on the Thai App Store">Rating</th>`+
+    `<th title="how many ratings that average is computed over">Ratings</th>`+
+    `<th title="reviews we have stored and read for themes">Sample</th>`+
+    `<th title="share of the WRITTEN-REVIEW sample at 1–2★. People who bother to write skew negative, so this always runs far darker than the star rating beside it (Tidlor: 76% of written reviews are 1–2★ against a 3.62★ lifetime average). Read it to compare operators against each other, never as the share of customers who are unhappy.">1–2★ of written sample</th>`+
+    `<th title="ESTIMATED — Thai keyword read over the 1–2★ reviews">Top complaint</th></tr>`;
+  tbl.innerHTML=head+rows(title);
+  if(ro&&own&&best){
+    const gap=(best.score-own.score);
+    ro.innerHTML=`<b>On iPhone our เงินไชโย app rates ${own.score.toFixed(2)}★ across ${icN(own.ratings)} ratings — ${Math.abs(gap).toFixed(2)}★ ${gap>0?'behind':'ahead of'} ${best.name} (${best.score.toFixed(2)}★, ${icN(best.ratings)}).</b> <span class="sub">Compared only against apps with enough ratings to be meaningful; thin rows are shown but not ranked.</span>`;
+  }
+  if(note){
+    const dr=digital.filter(r=>!r.thin);
+    const dn=dr.reduce((a,b)=>a+(b.ratings||0),0), tn=title.reduce((a,b)=>a+(b.ratings||0),0);
+    note.innerHTML=(digital.length?`<h3 class="acqsub" style="margin-top:16px">Who else the same borrower has on their phone <span class="tag">ADJACENT — not title lenders</span></h3>`+
+      `<p class="lead sub">Personal-loan and nano-finance apps. They do <b>not</b> lend against a vehicle book, so they are never counted in title-lender share — but they chase the same borrower with minutes-to-cash approval, and on mobile they outweigh the entire title field: <b>${icN(dn)}</b> ratings across ${dr.length} apps versus <b>${icN(tn)}</b> across all ${title.length} title lenders. That is substitution pressure on a branch-based product.</p>`+
+      `<table class="tbl">${head}${rows(digital)}</table>`:'')+
+      `<p class="sub" style="font-size:11px;margin-top:6px">${im.caveat||''}</p>`;
+  }
+}
+
 /* ---------- rival PAID ADS · Google Ads Transparency Center (obj #2, MEASURED) ----------
    Surfaces data/rival_ads.json (build_google_ads.py, from pull_google_ads.py — runs from ANY
    IP incl. CI, unlike the Thai-IP promo pull). Google lists every creative an advertiser ran
@@ -3340,11 +3399,14 @@ function drawRivalVideo(){
 let RIVPULSE=null, rivpulseLoaded=false;
 function renderRivalPulse(){
   const tbl=$('#pulsesenttbl'); if(!tbl) return;
-  if(rivpulseLoaded){ drawRivalPulse(); return; }
+  if(rivpulseLoaded){ paintPulse(); return; }
   fetch('data/rival_pulse.json').then(r=>r.ok?r.json():null).then(j=>{
-    RIVPULSE=j; rivpulseLoaded=true; drawRivalPulse();
-  }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; drawRivalPulse(); });
+    RIVPULSE=j; rivpulseLoaded=true; paintPulse();
+  }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; paintPulse(); });
 }
+// the iOS block rides on the SAME rival_pulse.json payload — paint both off one fetch
+function paintPulse(){ drawRivalPulse(); drawRivalIos(); }
+function renderRivalIos(){ renderRivalPulse(); }
 function drawRivalPulse(){
   const tbl=$('#pulsesenttbl'), ro=$('#pulsesentreadout'),
         plist=$('#pulsepromolist'), pro=$('#pulsepromoreadout');

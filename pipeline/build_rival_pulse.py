@@ -34,6 +34,12 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IN_PROMOS = os.path.join(ROOT, "source-data", "rival_promos.json")
 IN_REVIEWS = os.path.join(ROOT, "source-data", "app_reviews.json")
+IN_APPLE = os.path.join(ROOT, "source-data", "apple_reviews.json")
+
+# An app mean below this many ratings is noise, not a signal: on the Apple TH storefront the
+# nominal "best" title rival is Saksiam at 4.67 stars from NINE ratings. Such rows are still
+# shown (their absence would be its own distortion) but are never ranked or compared against.
+MIN_RATINGS = 100
 IN_TAX = os.path.join(ROOT, "source-data", "promo_taxonomy.json")
 OUT = os.path.join(ROOT, "platform", "data", "rival_pulse.json")
 
@@ -100,11 +106,74 @@ def _sentiment(doc):
     return rows, anchor
 
 
+def _ios(doc):
+    """The iOS half of app sentiment — deliberately a SMALLER shape than the Play ladder.
+
+    Apple's public feed carries no review date, no star histogram and no developer replies, so
+    the 90-day trend, the lifetime 1★/5★ shares and the reply rate simply do not exist here and
+    are not faked. Star shares are computed over the stored REVIEW SAMPLE and labelled as such —
+    they are not the lifetime population Play's histogram gives.
+
+    `averageUserRatingForCurrentVersion` is deliberately NOT carried: on the TH storefront Apple
+    returns it byte-identical to the lifetime average for all 16 tracked apps (verified
+    2026-07-31), so a "current build vs history" delta would read as a measured 0.00 change when
+    in truth there is no version-level data at all. Do not re-add it without re-checking.
+
+    Any COMPARATIVE claim is restricted to apps with >= MIN_RATINGS ratings. Without that floor
+    the "best rival" is Saksiam at 4.67★ — from nine ratings — which would have told Kaustav he
+    trails a competitor on what is statistically noise.
+    """
+    apps = doc.get("apps", {})
+    if not apps:
+        return [], {}
+    rows = []
+    for brand, a in apps.items():
+        st, store = a.get("stats", {}), a.get("reviews_store", [])
+        scores = [r["score"] for r in store if r.get("score") is not None]
+        low = [r for r in store if (r.get("score") or 5) <= 2]
+        themes = []
+        for key, label, kws in THEMES:
+            n = sum(1 for r in low if any(k in ((r.get("content") or "") +
+                                                " " + (r.get("title") or "")).lower()
+                                          for k in kws))
+            if n:
+                themes.append({"key": key, "label": label, "n": n})
+        themes.sort(key=lambda t: (-t["n"], t["key"]))
+        quotes = sorted((r for r in low if len(r.get("content") or "") >= 20),
+                        key=lambda r: (-(r.get("votes") or 0), r.get("id") or ""))[:2]
+        life, nrat = st.get("score"), st.get("ratings") or 0
+        rows.append({
+            "brand": brand, "name": a.get("name"), "own": bool(a.get("own")),
+            "cohort": a.get("cohort"), "apple_id": a.get("apple_id"),
+            "score": round(life, 2) if life is not None else None,
+            "ratings": st.get("ratings"),
+            # too few ratings for the mean to carry meaning — shown, never ranked or compared
+            "thin": nrat < MIN_RATINGS,
+            "sample": {
+                "n": len(scores),
+                "avg": round(sum(scores) / len(scores), 2) if scores else None,
+                "low_share_pct": (round(sum(1 for s in scores if s <= 2) * 100.0 / len(scores), 1)
+                                  if scores else None),
+            },
+            "released": st.get("released"),
+            "app_updated": st.get("app_updated"),
+            "themes": themes[:3],
+            "quotes": [{"score": q.get("score"), "title": q.get("title"),
+                        "text": (q.get("content") or "")[:140]} for q in quotes],
+        })
+    # title operators first (comparable to our book), then the digital cohort; score desc within
+    rows.sort(key=lambda r: (r["cohort"] != "title", r["thin"], -(r["score"] or 0), r["brand"]))
+    return rows, doc.get("meta", {})
+
+
 def build():
     promos_doc = json.load(open(IN_PROMOS, encoding="utf-8")) if os.path.exists(IN_PROMOS) else None
     reviews_doc = json.load(open(IN_REVIEWS, encoding="utf-8")) if os.path.exists(IN_REVIEWS) else None
 
     sent, anchor = _sentiment(reviews_doc) if reviews_doc else ([], None)
+
+    apple_doc = json.load(open(IN_APPLE, encoding="utf-8")) if os.path.exists(IN_APPLE) else None
+    ios, ios_meta = _ios(apple_doc) if apple_doc else ([], {})
 
     tax_doc = json.load(open(IN_TAX, encoding="utf-8")) if os.path.exists(IN_TAX) else None
     tax = (tax_doc or {}).get("items", {})
@@ -188,6 +257,14 @@ def build():
         },
         "headline": headline,
         "sentiment": sent,
+        "ios": ios,
+        "ios_meta": {
+            "store": ios_meta.get("store"),
+            "pulled_at": ios_meta.get("pulled_at"),
+            "caveat": ios_meta.get("caveat"),
+            "cohorts": ios_meta.get("cohorts"),
+            "excluded": ios_meta.get("excluded"),
+        } if ios else None,
         "promos": promo_items,
         "promo_landscape": landscape,
     }
