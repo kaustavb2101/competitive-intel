@@ -48,8 +48,7 @@ MONTHS = {m: i + 1 for i, m in enumerate(
      "July", "August", "September", "October", "November", "December"])}
 
 
-def norm_branch(s):
-    return re.sub(r"เงินไชโย|สาขา|\s+", "", str(s or ""))
+from branchkey import norm_branch, master_index  # ONE definition — see pipeline/branchkey.py
 
 
 def fnum(v):
@@ -109,10 +108,13 @@ def main():
     master = json.load(open(os.path.join(ROOT, "source-data", "branches_final.json"),
                             encoding="utf-8"))
     mrows = master if isinstance(master, list) else master.get("branches", [])
-    mname = {}
-    for m in mrows:
-        mname.setdefault(norm_branch(m.get("name")),
-                         (m.get("prov"), m.get("district"), m.get("region"), m.get("code")))
+    mname, mcoll = master_index(
+        mrows, lambda m: (m.get("prov"), m.get("district"), m.get("region"), m.get("code")))
+    if mcoll:
+        print("NOTE: %d master branch name(s) share a join key%s"
+              % (len(mcoll), " — CONFLICTING geography, resolve these"
+                 if any(c["conflicting"] for c in mcoll) else " (same geography, harmless)"),
+              file=sys.stderr)
 
     wb = openpyxl.load_workbook(a.src, read_only=True)
     ws = wb["default_1"]

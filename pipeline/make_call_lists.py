@@ -40,8 +40,7 @@ OUT_DIR = os.path.join(os.path.expanduser("~"), "Documents", "autox-assistance-p
 import re
 
 
-def norm_branch(s):
-    return re.sub(r"เงินไชโย|สาขา|\s+", "", str(s or ""))
+from branchkey import norm_branch, master_index  # ONE definition — see pipeline/branchkey.py
 
 
 def holdout(acct):
@@ -67,9 +66,15 @@ def main():
     master = json.load(open(os.path.join(ROOT, "source-data", "branches_final.json"),
                             encoding="utf-8"))
     mrows = master if isinstance(master, list) else master.get("branches", [])
-    b2prov = {}
-    for m in mrows:
-        b2prov.setdefault(norm_branch(m.get("name")), m.get("prov"))
+    b2prov, bcoll = master_index(mrows, lambda m: m.get("prov"))
+    if bcoll:
+        print("NOTE: %d master branch name(s) share a join key%s" %
+              (len(bcoll), " — CONFLICTING provinces, check these"
+               if any(c["conflicting"] for c in bcoll) else " (same province, harmless)"),
+              file=sys.stderr)
+    # Farmers booked at a branch we cannot place are DROPPED from the call list below. That is a
+    # person who does not get phoned, so it is counted and printed at the end rather than swallowed.
+    unjoined_branches, n_unjoined_acc = set(), 0
 
     wb = openpyxl.load_workbook(a.src, read_only=True)
     ws = wb["default_1"]
@@ -93,6 +98,9 @@ def main():
             continue
         br = str(g(r, "account_disb_Booking_Branch_Name") or "")
         prov = b2prov.get(norm_branch(br))
+        if prov is None:
+            unjoined_branches.add(br)
+            n_unjoined_acc += 1
         if prov not in targets:
             continue
         dpd = str(g(r, "account_disb_dpd_bucket") or "")
@@ -139,6 +147,14 @@ def main():
                 "pilot's measured cure-rate - the number that decides if the program scales.\n\n"
                 + "\n".join(summary) + "\n")
     print("wrote %s — %d lists" % (OUT_DIR, len(lists)))
+    if unjoined_branches:
+        # These are farm accounts we could not place on the master, so they were never even
+        # considered for the list. Real people, so the number is printed, not swallowed.
+        print("WARNING: %d farm account(s) at %d unplaceable branch(es) were excluded before "
+              "province targeting — they can never appear on a call list:"
+              % (n_unjoined_acc, len(unjoined_branches)), file=sys.stderr)
+        for b in sorted(unjoined_branches):
+            print("   %s" % b, file=sys.stderr)
     for s in summary:
         print(" ", s)
 
