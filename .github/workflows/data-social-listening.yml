@@ -1,0 +1,175 @@
+name: Data — social listening refresh (weekly)
+
+# Refreshes the MEASURED voice-of-customer layers behind the Competition tab (#acq): the app
+# sentiment ladders (Google Play + Apple), the comment threads under the rivals' videos, the Pantip
+# forum discussion, and the say/hear gap that reads all of them against the lender messaging on one
+# axis.
+#
+# WHY A JOB: rival_pulse.json was anchored at 2026-07-19 and drifting, while every comparable
+# any-IP pull in this repo (NABC / OAE / fuel / macro / gov census / overture / pico / sfi /
+# thaiwater / search demand) already had a scheduled refresh. The app-review pulls need no Thai
+# network and no key — there was no reason for this family to be the exception.
+#
+# WHAT RUNS WHERE (this matters — do not "simplify" it):
+#   pull_app_reviews.py      any IP, no key           — Google Play, always runs
+#   pull_apple_reviews.py    any IP, no key           — Apple RSS, always runs
+#   pull_youtube_comments.py any IP, needs YOUTUBE_API_KEY — skipped, loudly, if the secret is absent
+#   pull_pantip.py           any IP in THEORY         — see PANTIP below
+#   pull_rival_promos.py     THAI IP ONLY             — deliberately NOT here; Cloudflare blocks the
+#                                                       rivals' own sites from datacenter IPs. The
+#                                                       committed promo snapshot is reused as-is.
+#
+# PANTIP — this job is also the experiment. pull_pantip.py was proven from Kaustav's Thai
+# residential connection but has NEVER been confirmed from a datacenter IP. It is written to exit 3
+# and write NOTHING when the response does not look like the Thai-IP response, so a block can never
+# be laundered into "the market went quiet". Here we run it non-fatally and REPORT the exit code in
+# the PR body, so the first scheduled run answers the reachability question for free. If it comes
+# back blocked, drop it from this workflow and keep pulling it from the laptop.
+#
+# WHAT IT PRODUCES (only when a derived layer's substantive content changed):
+#   source-data/app_reviews.json, apple_reviews.json, youtube_comments.json, pantip_threads.json
+#   platform/data/rival_pulse.json     (pipeline/build_rival_pulse.py)
+#   platform/data/social_themes.json   (pipeline/build_social_themes.py)
+#   platform/data/provenance.json      (rebuilt LAST — it censuses every other layer)
+#
+# CHANGE DETECTION: the raw pulls stamp a fresh generated/pulled timestamp every run, so a raw diff
+# is never empty. The PR is gated on whether the DERIVED layers changed after dropping their
+# volatile meta stamps — an identical-content run no-ops instead of opening timestamp churn.
+#
+# PR-ONLY, NEVER auto-merge. These layers read directly on the Competition tab and the theme buckets
+# are ESTIMATED, so a human reviews the shift. Committed to a fresh data/social-<run_id> branch and
+# opened as a DRAFT PR against the branch this ran on. NEVER pushes to a working branch.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Tuesday 20:40 UTC (= 03:40 Bangkok Wednesday) — off-hour from the other data feeds.
+    - cron: "40 20 * * 2"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # match the determinism gate's Python
+
+      - name: Install deps
+        run: pip install --quiet google-play-scraper==1.2.7
+
+      - name: Pull Google Play reviews (any IP, no key)
+        run: python pipeline/pull_app_reviews.py
+
+      - name: Pull Apple App Store reviews (any IP, no key)
+        run: python pipeline/pull_apple_reviews.py
+
+      - name: Pull YouTube comments (needs the API key)
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -z "$YOUTUBE_API_KEY" ]; then
+            echo "::warning title=YouTube skipped::YOUTUBE_API_KEY secret is not set — comment threads not refreshed this run."
+          else
+            python pipeline/pull_youtube_comments.py
+          fi
+
+      - name: Pull Pantip (UNVERIFIED from a datacenter IP — non-fatal, reported)
+        id: pantip
+        run: |
+          set +e
+          python pipeline/pull_pantip.py
+          rc=$?
+          set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" -eq 0 ]; then
+            echo "Pantip answered from this runner."
+          elif [ "$rc" -eq 3 ]; then
+            echo "::warning title=Pantip blocked from CI::pull_pantip.py exited 3 — the runner's IP does not get the Thai-IP response. Nothing was written. Keep pulling Pantip from the laptop."
+          else
+            echo "::warning title=Pantip pull failed::pull_pantip.py exited $rc. Nothing was written."
+          fi
+
+      - name: Rebuild the derived layers, then provenance LAST
+        run: |
+          python pipeline/build_rival_pulse.py
+          python pipeline/build_social_themes.py
+          python pipeline/build_provenance.py
+
+      - name: Detect a substantive change (ignore volatile meta stamps)
+        id: detect
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, subprocess
+          VOLATILE = ("generated", "pulled_at_utc", "as_of", "built_at")
+          def canon(s):
+              d = json.loads(s)
+              for k in VOLATILE:
+                  d.get("meta", {}).pop(k, None)
+              return json.dumps(d, sort_keys=True, ensure_ascii=False)
+          changed = False
+          for f in ("platform/data/rival_pulse.json", "platform/data/social_themes.json"):
+              head = subprocess.run(["git", "show", f"HEAD:{f}"],
+                                    capture_output=True, text=True).stdout
+              try:
+                  new = open(f, encoding="utf-8").read()
+              except FileNotFoundError:
+                  continue
+              if (not head) or canon(head) != canon(new):
+                  changed = True
+          print(f"changed={'true' if changed else 'false'}")
+          PY
+
+      - name: Commit to a data branch + open a draft PR
+        if: steps.detect.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: ${{ github.ref_name }}
+          DATA_BRANCH: data/social-${{ github.run_id }}
+          PANTIP_RC: ${{ steps.pantip.outputs.rc }}
+        run: |
+          git add source-data/app_reviews.json source-data/apple_reviews.json \
+                  source-data/youtube_comments.json source-data/pantip_threads.json \
+                  platform/data/rival_pulse.json platform/data/social_themes.json \
+                  platform/data/provenance.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No net change vs committed layers. No PR opened."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$DATA_BRANCH"
+          NDEM="$(python -c "import json;print(json.load(open('platform/data/social_themes.json'))['meta']['demand_docs'])")"
+          NSUP="$(python -c "import json;print(json.load(open('platform/data/social_themes.json'))['meta']['supply_docs'])")"
+          git commit -m "data: social listening refresh (run ${{ github.run_id }})" \
+                     -m "Pulled by .github/workflows/data-social-listening.yml. Rebuilt rival_pulse.json + social_themes.json + provenance.json."
+          git push origin "$DATA_BRANCH"
+          {
+            echo "Automated weekly social-listening refresh (run ${{ github.run_id }}), dispatched from \`$BASE_BRANCH\`."
+            echo
+            echo "Now **$NDEM customer documents** against **$NSUP lender documents**."
+            echo
+            case "$PANTIP_RC" in
+              0) echo "**Pantip: reachable from this runner.** The datacenter-IP question is answered — it can stay in the schedule." ;;
+              3) echo "**Pantip: BLOCKED from this runner** (exit 3, nothing written). The committed snapshot is unchanged and still comes from the laptop. Drop Pantip from this workflow and keep pulling it from a Thai IP." ;;
+              *) echo "**Pantip: pull failed** (exit \`$PANTIP_RC\`, nothing written). Not necessarily a block — check the step log." ;;
+            esac
+            echo
+            echo "Document **counts are MEASURED**; the **theme buckets are ESTIMATED** — the phrase list is"
+            echo "editorial and ships inside \`social_themes.json\`, so a theme absent from it reads as zero."
+            echo "Brand shares are **not** comparable across a blend of sources; see \`meta.cohort_warning\`."
+            echo "No author identity is stored by any of these pulls."
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge — \`build_social_themes.py --check\`,"
+            echo "\`build_rival_pulse.py --check\` and \`build_provenance.py --check\` gate these byte-exact."
+          } > /tmp/pr_body.md
+          gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
+            --title "data: social listening refresh (run ${{ github.run_id }})" \
+            --body-file /tmp/pr_body.md
