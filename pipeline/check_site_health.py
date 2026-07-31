@@ -386,9 +386,31 @@ def _shape_competitor_coverage(d):
         return "first brand row missing 'brand' name"
     if not isinstance(b0.get("found"), int):
         return "first brand row missing 'found' MEASURED census count"
-    totals = (d.get("meta") or {}).get("totals") if isinstance(d.get("meta"), dict) else None
+    meta = d.get("meta") if isinstance(d.get("meta"), dict) else {}
+    totals = meta.get("totals")
     if not isinstance(totals, dict) or not isinstance(totals.get("found"), int):
         return "meta.totals.found missing (national census headline)"
+    # meta.national_standing powers the exec headline peer claim ("Nationally,
+    # AutoX runs the Nth-largest title-loan branch network …"). drawCompCoverage
+    # gates the whole readout on `ns && ns.autox_rank && Array.isArray(ns.ranking)`
+    # and maps each ranking row's .operator + .branches — so a truncated deploy
+    # that drops this block silently vanishes the single most exec-visible
+    # peer-comparison line with no phone alert, the exact blind spot this probe
+    # closes for the sibling reads. Mirror the render's own reads exactly; robust
+    # to roster changes (assert shape + the AutoX row is present, not counts).
+    ns = meta.get("national_standing")
+    if not isinstance(ns, dict):
+        return "meta.national_standing missing (exec network-scale peer headline)"
+    if not isinstance(ns.get("autox_rank"), int) or ns["autox_rank"] < 1:
+        return "national_standing.autox_rank missing (drawCompCoverage gates the readout on it)"
+    ranking = ns.get("ranking")
+    if not isinstance(ranking, list) or not ranking:
+        return "national_standing.ranking empty (the branch-network-size peer chain)"
+    r0 = ranking[0]
+    if not isinstance(r0, dict) or not r0.get("operator") or not isinstance(r0.get("branches"), (int, float)):
+        return "national_standing.ranking row missing 'operator'/numeric 'branches'"
+    if not any(isinstance(o, dict) and o.get("operator") == "AutoX" for o in ranking):
+        return "national_standing.ranking has no AutoX row (own network-scale anchor)"
     return None
 
 
