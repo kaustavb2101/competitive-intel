@@ -40,8 +40,14 @@ jobs:
           # lockstep or the determinism gate goes red on merge. Both builders are
           # deterministic + network-free re-projections.
           if git status --porcelain -- source-data/fuel_prices.json | grep -q .; then
-            echo "prices changed — rebuilding platform/data/fuel_prices.json + provenance.json"
+            echo "prices changed — rebuilding platform/data/fuel_prices.json + commodities.json + provenance.json"
             python pipeline/build_fuel_prices.py
+            # The unified commodities board (commodities.json) embeds the retail diesel price straight
+            # from fuel_prices.json (build_commodities.py reads it as the cost line). Refreshing fuel
+            # WITHOUT rebuilding commodities left commodities.json drifted and build_commodities.py
+            # --check RED — the recurring qa-commodities-gate-drift. Rebuild it before provenance
+            # (which censuses commodities.json's bytes/meta).
+            python pipeline/build_commodities.py
             python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
@@ -56,7 +62,7 @@ jobs:
           # went provenance-stale every day. Same pattern as committee-cycle.yml — run the FULL
           # determinism gate first; 0-failed earns a direct rebase+push to the base branch. Only a
           # RED gate falls back to a draft PR for human eyes.
-          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/provenance.json
+          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/commodities.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed prices. Nothing to merge."; exit 0
           fi

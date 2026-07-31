@@ -65,6 +65,13 @@ jobs:
             python pipeline/build_crop_stress.py
             python pipeline/build_crop_margin.py
             python pipeline/build_crop_farmer_income.py
+            # The unified commodities board (commodities.json) embeds farmgate's pulled date as its
+            # meta.farmgate_vintage and each crop's local YoY/price straight from farmgate_prices.json
+            # (build_commodities.py reads that file). Refreshing farmgate WITHOUT rebuilding commodities
+            # left commodities.json drifted and build_commodities.py --check RED on merge — the exact
+            # recurring qa-commodities-gate-drift the integration loop kept restoring by hand. Rebuild
+            # it here (after farmgate, before provenance, which censuses commodities.json's bytes/meta).
+            python pipeline/build_commodities.py
             python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
@@ -80,7 +87,7 @@ jobs:
                   platform/data/branch_recommendations.json platform/data/regional_outlook.json \
                   source-data/farmgate_prices.json platform/data/crop_stress.json \
                   platform/data/crop_margin.json platform/data/crop_farmer_income.json \
-                  platform/data/provenance.json
+                  platform/data/commodities.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed data (same upstream prices). No PR opened."
             exit 0
