@@ -2930,6 +2930,16 @@ function drawPeerProvince(){
   // province rank/ratio can't give: a province AutoX ranks well in overall can still be outnumbered
   // in most of its districts (ground-level contest the aggregate masks). Gated on the layer field so
   // a pre-fold peer_province.json degrades to no column.
+  // Rival-field concentration chip under Leads: the single big-4 brand holding the most of the
+  // province's RIVAL field (AutoX excluded) and its share — the province-grain read the summary
+  // prose only gives nationally. `leader`/`Leads` names the top operator (which can be AutoX) but
+  // says nothing about whether the OTHER competitors are one dominant brand or a fragmented split;
+  // where one rival owns a majority, that single competitor sets the local pricing AutoX faces.
+  // Gated on a SUBSTANTIAL rival field (>= the layer's own concentration floor, default 10) so a
+  // thin 1-2-branch field can't show a meaningless 100%; floors read from meta so the chip stays in
+  // lockstep with build_peer_province.py. Both underlying fields are MEASURED per-brand census counts.
+  const concMinRivals=(typeof m.rival_concentration_min_rivals==='number')?m.rival_concentration_min_rivals:10;
+  const concShare=(typeof m.rival_concentration_share_floor==='number')?m.rival_concentration_share_floor:0.5;
   const hasDistCol=list.some(r=>r.n_districts);
   const dh=hasDistCol?`<th title="Share of this province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district). The province rank can mask this — a good province standing can still lose most of its districts on the ground.">Dist. lost</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
@@ -2973,6 +2983,15 @@ function drawPeerProvince(){
         }
       }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
+      // rival-field concentration chip (AutoX-excluded): agri when one rival owns a majority of the
+      // field (single-brand-dominated — one competitor sets local pricing), gold when fragmented.
+      // Shown only where the rival field is substantial; degrades to '' on a pre-fold layer.
+      let concChip='';
+      if(r.rival_top_brand&&r.rival_top_share!=null&&(r.rivals||0)>=concMinRivals){
+        const dom=r.rival_top_share>=concShare, cpct=Math.round(r.rival_top_share*100);
+        const ccol=dom?'var(--agri)':'var(--gold)';
+        concChip=`<div class="sub" style="font-size:10px;line-height:1.15;margin-top:1px;color:${ccol}" title="Of this province's ${r.rivals} big-4 rival branches (AutoX excluded), ${r.rival_top_brand} holds the most — ${cpct}%. ${dom?'A single rival dominates the field, so local pricing is effectively set by one competitor':'The rival field is fragmented across several brands'} (MEASURED census).">field: ${r.rival_top_brand} ${cpct}%</div>`;
+      }
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
       let rankCell='';
@@ -2988,7 +3007,7 @@ function drawPeerProvince(){
         ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
         ${satCol}${distCol}
-        <td>${lead}</td>
+        <td>${lead}${concChip}</td>
       </tr>`;}).join('');
   if(ro){
     const nOut=m.n_provinces_outnumbered!=null?m.n_provinces_outnumbered:recs.filter(r=>r.autox>0&&r.rivals>r.autox).length;
