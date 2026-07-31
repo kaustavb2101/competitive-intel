@@ -154,11 +154,12 @@ def build_items():
     _real_tape = real_tape_landed()
     add("data-integration", "di-loan-tape", "Real loan-tape export → measured portfolio risk",
         state(_real_tape,
-              in_progress=(not _real_tape) and rexists("pipeline/ingest_loan_tape.py") and dexists("loan_tape_derived.json")), 1,
+              in_progress=(not _real_tape) and rexists("pipeline/ingest_real_tape.py")), 1,
         ("platform/data/tape_real.json present — MEASURED real AutoX loan-tape aggregates "
-         "(%s no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export); "
-         "the SYNTHETIC bridge (loan_tape_derived.json) is superseded" % f"{real_tape_accounts():,}") if _real_tape else
-        "ingest_loan_tape.py + loan_tape_derived.json present (SYNTHETIC); real no-PII export pending (NEXT_STEPS §0b)")
+         "(%s no-PII accounts, built by pipeline/build_tape_layers.py from the owner's loan-level export)"
+         % f"{real_tape_accounts():,}") if _real_tape else
+        "ingest_real_tape.py present but no tape_real.json — the owner-side xlsx has not been streamed yet "
+        "(TONIGHT_CHECKLIST §6). The SYNTHETIC bridge was retired 2026-07-31; there is no fallback layer.")
     add("data-integration", "di-dlt", "DLT vehicle registrations, all-province coverage",
         state(dexists("branch_vehicles.json") and rexists("source-data/vehicles_by_province.json")), 2,
         "vehicles_by_province.json = DLT registered-vehicle stock across all 77 provinces "

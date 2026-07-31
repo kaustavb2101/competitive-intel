@@ -62,7 +62,8 @@ deck.gl/WebGL scenes in one DOM crashed on mobile; separate routes each get a fr
 - `rayong-province.html` — RETIRED redirect stub → `rayong-catchment` (kept for old bookmarks).
 - `styles.css`, `vercel.json` (static, cleanUrls). Data served from `platform/data/`
   (`branches.json`, `meta.json`, `amphoe.json`, `crop_stress.json`, `deltas.json`,
-  `snapshots_index.json`, `loan_tape_derived.json`, `provinces/`, `rayong_*.json`).
+  `snapshots_index.json`, `tape_real.json`, `tape_geo_occ.json`, `social_themes.json`,
+  `provinces/`, `rayong_*.json`).
 
 **Map tech split (deliberate):** National view = Leaflet (light, reliable on mobile for 2,015 pts).
 Province / branch / Rayong views = deck.gl 8.9.35 (3D). Don't merge them into one page.
@@ -110,12 +111,22 @@ timeseries `--check` plus `node --check` on every page's JS.*
   market". Audit-first list on `#trend` (vintage-independent, labelled ESTIMATED).
 - `timeseries.py` — captures a per-vintage SNAPSHOT (label from `meta.updated`, never wall clock) +
   diffs → `source-data/snapshots/`, `platform/data/snapshots_index.json` + `deltas.json` (Risk-trend tab).
-- **Loan-tape bridge** (objective #1; synthetic until a real export lands):
-  - `loan_tape_schema.md` — the no-PII export contract (loans + monthly branch-AUM; join on branch `code`).
-  - `make_synthetic_tape.py` — deterministic SYNTHETIC tape (`loan_id` prefix `SYNTH-`); synthetic
-    files are **gitignored**.
-  - `ingest_loan_tape.py` — validates against the contract (fails loudly) → `platform/data/loan_tape_derived.json`
-    (vintage 90+ aging, branch ROI/payback, HHI concentration, PD calibration). `--real` drops the SYNTHETIC stamp.
+- **Loan tape** (objective #1) — **THE REAL TAPE LANDED 2026-07-21. It is not synthetic any more.**
+  382,735 real accounts. The raw xlsx never enters the repo; nothing published is below `MIN_CELL`
+  accounts; no account or application number is read into any output.
+  - `ingest_real_tape.py` — streams the owner-side xlsx (path via `--src` or `REAL_TAPE_XLSX`) into
+    committed no-PII aggregates → `source-data/staging/real_tape_aggregates.json`. Owner-side only,
+    NOT in the determinism gate (its input is off-repo). The months-on-book anchor is the newest
+    disbursement year-month IN THE DATA, never wall clock.
+  - `build_tape_layers.py` — the deterministic, `--check`-gated projection of that staging file into
+    `platform/data/tape_real.json` + `tape_geo_occ.json`. Everything downstream of staging IS gated.
+    Live on `#exposure`, `#trend` and `data.html`.
+  - `loan_tape_schema.md` — the original no-PII export contract; kept as the spec the export follows.
+  - `make_synthetic_tape.py` — the pre-2026-07-21 SYNTHETIC generator. Kept for reproducing old
+    vintages only; its files are gitignored. **Do not build anything new on it.**
+  - RETIRED 2026-07-31: `ingest_loan_tape.py` → `loan_tape_derived.json`. It was the synthetic-era
+    bridge, superseded by the two scripts above; the 1.1MB output had zero consumers in the app
+    (verified by grep across `app.js`/`index.html`/`data.html`) and it was still being maintained.
 - `ingest_gov.py` — folds the data.go.th pull (`pipeline/dgt_out/` CSVs) into clean source-data layers
   (DIW factories etc.). `autox_dgt_ingest.py` — the data.go.th puller. **Both blocked from a foreign
   IP; must run from Kaustav's Thai network** (see `docs/TONIGHT_CHECKLIST.md`).
@@ -186,9 +197,9 @@ cd pipeline && python3 build_amphoe.py            # amphoe.json (928-district co
 cd pipeline && python3 build_crop_stress.py       # crop_stress.json (per-province agri stress)
 cd pipeline && python3 timeseries.py              # snapshot the current vintage + rebuild deltas
 
-# loan-tape bridge (objective #1) — synthetic today; --real once a true export lands
-cd pipeline && python3 make_synthetic_tape.py     # regenerate the SYNTHETIC tape (gitignored)
-cd pipeline && python3 ingest_loan_tape.py        # → loan_tape_derived.json (4 portfolio-risk outputs)
+# REAL loan tape (objective #1) — 382,735 accounts, landed 2026-07-21. Not synthetic.
+cd pipeline && python3 ingest_real_tape.py --src <the xlsx>   # owner-side → no-PII staging aggregates
+cd pipeline && python3 build_tape_layers.py       # staging → tape_real.json + tape_geo_occ.json (gated)
 
 # QA gate (must pass before commit) — offline, deterministic
 bash tests/run.sh check
