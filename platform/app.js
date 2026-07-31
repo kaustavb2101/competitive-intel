@@ -2635,6 +2635,7 @@ function renderAcq(){
   renderRivalPulse();
   renderRivalAds();
   renderRivalVideo();
+  renderSocialThemes();
   renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
@@ -3482,6 +3483,77 @@ function renderRivalPulse(){
     RIVPULSE=j; rivpulseLoaded=true; paintPulse();
   }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; paintPulse(); });
 }
+/* SAY / HEAR GAP — data/social_themes.json (build_social_themes.py).
+   The synthesis of every reception channel on #acq: what lenders publish (ad creatives + promo
+   pages) and what customers write (Pantip, Google Play, Apple, YouTube comments) counted against
+   ONE Thai phrase list, so the two sides are comparable.
+
+   Document counts are MEASURED; the theme buckets are ESTIMATED editorial judgement. Read the
+   ORDERING, not the magnitude — an ad exists to make a claim while a comment is an unprompted
+   reaction, so the denominators differ in kind and every gap is inflated.
+   Lazy, null-safe, graceful if absent — same contract as renderRivalPulse. */
+let THEMES=null, themesLoaded=false;
+function renderSocialThemes(){
+  const tbl=$('#themestbl'); if(!tbl) return;
+  if(themesLoaded){ drawSocialThemes(); return; }
+  fetch('data/social_themes.json').then(r=>r.ok?r.json():null).then(j=>{
+    THEMES=j; themesLoaded=true; drawSocialThemes();
+  }).catch(()=>{ THEMES=null; themesLoaded=true; drawSocialThemes(); });
+}
+function drawSocialThemes(){
+  const tbl=$('#themestbl'), ro=$('#themesreadout'), cta=$('#themectatbl'), note=$('#themesnote');
+  if(!tbl) return;
+  const ans=(THEMES&&Array.isArray(THEMES.answered))?THEMES.answered:[];
+  const ctas=(THEMES&&Array.isArray(THEMES.ctas))?THEMES.ctas:[];
+  const m=(THEMES&&THEMES.meta)||{};
+  if(!ans.length){
+    tbl.innerHTML=''; if(cta) cta.innerHTML=''; if(note) note.textContent='';
+    if(ro) ro.innerHTML='<b>Social themes not yet built.</b> <span class="sub">data/social_themes.json is absent — run the pulls (pull_pantip.py, pull_app_reviews.py, pull_apple_reviews.py, pull_youtube_comments.py) then pipeline/build_social_themes.py.</span>';
+    return;
+  }
+  const pct=v=>(v==null?'—':(+v).toFixed(1)+'%');
+  // Biggest over-said first: the field's loudest message against how little it is raised back.
+  const over=ans.filter(a=>a.unanswered_pts<0).sort((a,b)=>a.unanswered_pts-b.unanswered_pts);
+  const under=ans.filter(a=>a.unanswered_pts>0&&a.kind!=='praise').sort((a,b)=>b.unanswered_pts-a.unanswered_pts);
+  if(ro){
+    const top=over[0], q=under[0];
+    ro.innerHTML=(top?`<b>The field's loudest message is its customers' quietest topic.</b> `+
+      `<b>${pct(top.supply_share_pct)}</b> of the ${(m.supply_docs||0).toLocaleString()} lender documents push `+
+      `<b>${top.label.toLowerCase()}</b>, against <b>${pct(top.demand_share_pct)}</b> of the `+
+      `${(m.demand_docs||0).toLocaleString()} customer documents raising it.`:'')+
+      (q?` <span class="sub">Biggest thing customers raise that nothing answers: <b>${q.label}</b> `+
+      `(${pct(q.demand_share_pct)}, ${(q.demand_docs||0).toLocaleString()} documents`+
+      `${q.no_counterpart?', no counterpart message at all':''}).</span>`:'');
+  }
+  tbl.innerHTML=`<tr><th>Theme</th><th>Lenders say</th><th>Customers raise</th><th>Imbalance</th><th>Read</th></tr>`+
+    over.concat(under).map(a=>{
+      const g=a.unanswered_pts, oversaid=g<0;
+      const col=oversaid?'var(--collat)':'var(--gold)';
+      return `<tr><td>${a.label}${a.thin?' <span class="sub">(thin)</span>':''}</td>`+
+        `<td class="mono">${pct(a.supply_share_pct)}</td>`+
+        `<td class="mono">${pct(a.demand_share_pct)}</td>`+
+        `<td class="mono" style="color:${col}">${g>0?'+':''}${g.toFixed(1)} pts</td>`+
+        `<td class="sub">${oversaid?'over-said by the field':(a.no_counterpart?'raised, nothing answers it':'under-answered')}</td></tr>`;
+    }).join('');
+  if(cta&&ctas.length){
+    const brandsOf=c=>Object.keys(c.brands||{}).length
+      ? Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(' · ')
+      : '<span style="color:var(--agri)">nobody</span>';
+    cta.innerHTML=`<tr><th>Call to action</th><th>Ads</th><th>Share</th><th>Who runs it</th></tr>`+
+      ctas.map(c=>`<tr><td>${c.label}</td><td class="mono">${(c.docs||0).toLocaleString()}</td>`+
+        `<td class="mono">${pct(c.share_pct)}</td><td class="sub">${brandsOf(c)}</td></tr>`).join('');
+  }
+  if(note){
+    const bysrc=m.demand_by_source||{};
+    const mix=Object.keys(bysrc).sort().map(k=>`${k} ${(bysrc[k].n||0).toLocaleString()}`).join(' · ');
+    note.innerHTML=`Customer documents: ${mix}. `+
+      `<b>Brands are not comparable across a blend of these</b> — app complaints concentrate in `+
+      `app-store reviews and barely appear in comments, so a brand whose corpus is mostly reviews `+
+      `looks worse on that theme by construction. Compare within one source.`+
+      (m.as_of?` <span class="sub">As of ${m.as_of}.</span>`:'');
+  }
+}
+
 // the iOS block rides on the SAME rival_pulse.json payload — paint both off one fetch
 function paintPulse(){ drawRivalPulse(); drawRivalIos(); }
 function drawRivalPulse(){

@@ -98,6 +98,16 @@ BRANDS = {
 CATEGORY = ["จำนำทะเบียน", "จำนำทะเบียนรถ", "รถแลกเงิน", "สินเชื่อทะเบียนรถ"]
 
 TAG_RE = re.compile(r"<[^>]+>")
+# Identity can also arrive INSIDE the words, not just in the metadata we drop at parse time:
+# support accounts routinely open with "คุณสมาชิกหมายเลข 4339341" (Pantip's pseudonymous member
+# number) and members @-mention each other. Stripping only the user object would leave those on
+# disk and quietly break the promise this file makes, so scrub the text as well.
+IDENT_RES = [
+    (re.compile(r"(สมาชิกหมายเลข)\s*\d+"), r"\1 [ตัดออก]"),
+    (re.compile(r"(?:คุณ)?สมาชิกหมายเลข\s*\d+"), "สมาชิกหมายเลข [ตัดออก]"),
+    (re.compile(r"/profile/\d+"), "/profile/[redacted]"),
+    (re.compile(r"@[A-Za-z0-9_.]{3,}"), "@[redacted]"),
+]
 STORY_RE = re.compile(r'<div class="display-post-story"[^>]*>(.*?)</div>', re.S)
 OG_RE = re.compile(r'<meta property="og:description" content="(.*?)"', re.S)
 NEXT_RE = re.compile(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', re.S)
@@ -114,12 +124,17 @@ def get(url, headers=None):
 
 
 def detag(s):
-    """Pantip stores post bodies as HTML. We want the words, not the markup."""
+    """Pantip stores post bodies as HTML. We want the words, not the markup — and not the people:
+    every identifier a writer typed into the body is scrubbed here, at the same boundary where the
+    author metadata is dropped."""
     if not s:
         return ""
     s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
     s = re.sub(r"</p>", "\n", s, flags=re.I)
-    return html.unescape(TAG_RE.sub("", s)).strip()
+    s = html.unescape(TAG_RE.sub("", s)).strip()
+    for rx, repl in IDENT_RES:
+        s = rx.sub(repl, s)
+    return s
 
 
 def search(term):
