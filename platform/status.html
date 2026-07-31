@@ -116,16 +116,43 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 <body>
 <nav id="nav" aria-label="Main views">
   <span class="nb">AutoX<b>·</b>เงินไชโย</span>
-  <a href="/#home">Home</a>
-  <a href="/#overview">Overview</a>
-  <a href="/#map">National</a>
-  <a href="/#acq">Competition</a>
-  <a href="/#exposure">Exposure</a>
-  <a href="/#trend">Trend</a>
-  <a href="/status" class="on" aria-current="page">Status</a>
+  <!-- This nav was stranded on the PRE-five-pillar labels (Overview / National / Exposure / Trend)
+       and had no Assistance or Acquisition entry at all, so anyone arriving from the index footer
+       met a menu that contradicted every other page. Brought onto the shared five-pillar nav
+       2026-07-31; tests/nav_consistency.py now fails the gate if it drifts again. No self-link —
+       the h1 says which page this is, matching province.html / the 3D pages. -->
+  <a href="index.html#home">Home</a>
+  <a href="index.html#overview">Macro</a>
+  <a href="data.html">Acquisition</a>
+  <a href="index.html#assist">Assistance</a>
+  <a href="index.html#exposure">Risk</a>
+  <a href="index.html#acq">Competition</a>
+  <div class="nav-more" id="navMore">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE = the tools tier (everything that is not a step in the five-pillar journey).
+         Must stay identical to index.html's Explore menu — tests/nav_consistency.py fails the
+         gate on drift. Branches points at the data book's browse-all, the canonical branch list. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a href="index.html#trend" role="menuitem">Risk trend</a>
+      <a href="index.html#map" role="menuitem">Map view</a>
+      <a href="index.html#provinces" role="menuitem">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem">Branches ↗</a>
+      <a href="index.html#market" role="menuitem">Market assessment</a>
+      <a href="index.html#sim" role="menuitem">Simulator</a>
+    </div>
+  </div>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
     style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☀</button>
 </nav>
+<script>/* "Explore ▾" nav dropdown — pure UI (copied from index.html) */
+(function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
+ if(!wrap||!btn||!menu)return;
+ function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
+ menu.addEventListener('click',function(){open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});})();
+</script>
 <script>/* theme toggle — shares the autox-theme key with the rest of the site */
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
  function sync(){var l=document.documentElement.dataset.theme==='light';b.textContent=l?'☀':'☾';b.setAttribute('aria-pressed',String(l));var mtc=document.querySelector('meta[name="theme-color"]');if(mtc)mtc.setAttribute('content',l?'#F4F6FA':'#0a0e17');}
@@ -142,7 +169,7 @@ html[data-theme="light"] .st-pbar{background:#e3e8f1}
 </noscript>
 <div class="st-wrap">
   <div>
-    <h1 class="st-h1">Autonomy plan — project manager</h1>
+    <h1 class="st-h1">Autonomy plan</h1>
     <p class="st-updated" id="updated">Loading the latest plan…</p>
   </div>
   <div id="app">

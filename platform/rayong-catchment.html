@@ -483,9 +483,16 @@ body.poster #ctl,body.poster #mtog,body.poster #legendwrap{display:none!importan
   <a href="index.html#acq">Competition</a>
   <a href="rayong-catchment.html" id="nav3d" hidden>3D scene</a>
   <div class="nav-more" id="navMore">
-    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
-    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE = the tools tier (everything that is not a step in the five-pillar journey).
+         Must stay identical to index.html's Explore menu - tests/nav_consistency.py fails the
+         gate on drift. Branches points at the data book's browse-all, the canonical branch list. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a href="index.html#trend" role="menuitem">Risk trend</a>
       <a href="index.html#map" role="menuitem">Map view</a>
+      <a href="index.html#provinces" role="menuitem">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem">Branches ↗</a>
+      <a href="index.html#market" role="menuitem">Market assessment</a>
       <a href="index.html#sim" role="menuitem">Simulator</a>
     </div>
   </div>

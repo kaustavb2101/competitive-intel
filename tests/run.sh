@@ -372,6 +372,18 @@ phase_check(){
     [ "$nbad" -eq 0 ] && ok "node --check inline JS of $name" || bad "node --check inline JS of $name ($nbad block(s) failed)"
   done
 
+  # nav consistency + route reachability. The main nav is hand-copied into six pages with no build
+  # step to keep them honest, and index.html builds one section per hash route with nothing
+  # asserting those routes are linked. Both failure modes had already shipped silently: status.html
+  # sat on pre-five-pillar labels for a week, and #branches/#provinces/#market rendered perfectly
+  # while being reachable only by typed URL. Verified to FAIL on nav drift, a dropped Explore entry,
+  # a reordered pillar, and a newly-orphaned route.
+  if python3 "$TESTS/nav_consistency.py"; then
+    ok "nav_consistency.py (one nav across 6 pages, no orphan routes)"
+  else
+    bad "nav_consistency.py (nav drift or an unreachable route — see report above)"
+  fi
+
   # data-integrity sub-check: assert platform/data/*.json is internally sane (offline, stdlib).
   # The determinism/syntax checks above don't look INSIDE the data; this does. Its own per-check
   # report is shown so a failure points at the exact integrity violation (an IPO-readiness gate).
