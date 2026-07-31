@@ -270,6 +270,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_google_ads.py --check (source-data/google_ads_raw.json absent — network pull, not data drift)"
   else bad "build_google_ads.py --check (rival_ads.json drifted from source-data/google_ads_raw.json — run: python3 pipeline/build_google_ads.py)"
   fi
+  ( cd "$PIPE" && python3 build_social_themes.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_social_themes.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_social_themes.py --check (youtube_comments/app_reviews/apple_reviews/pantip_threads absent — network pulls, not data drift)"
+  else bad "build_social_themes.py --check (social_themes.json drifted from the demand+supply sources — run: python3 pipeline/build_social_themes.py)"
+  fi
   ( cd "$PIPE" && python3 build_rival_youtube.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_youtube.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_youtube.py --check (source-data/rival_youtube_raw.json absent — network pull, not data drift)"

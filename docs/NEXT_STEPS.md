@@ -63,15 +63,19 @@ Rayong was the pilot template; the goal was the same deep-dive for every provinc
   province (Places, brand × province) so the deep-dive isn't competitor-blind outside Rayong; then
   template the "what impacts them" narrative by region (EEC-East, agri-Isan, tourism-South…).
 
-## 0b. Get a REAL loan tape  ⟶ highest-leverage data unlock for objective #1 (portfolio risk)
-The loan-tape bridge is built and proven on SYNTHETIC data; it flips to measured the moment a real
-export lands. Until then the four portfolio-risk outputs are stamped SYNTHETIC.
-- ✅ **Done:** the no-PII contract (`pipeline/loan_tape_schema.md`), deterministic synthetic generator
-  (`make_synthetic_tape.py`), and the validating ingest (`ingest_loan_tape.py`) that computes vintage
-  90+ aging, branch ROI/payback, HHI concentration, and proxy-vs-actual PD calibration.
-- **Next concrete step:** Kaustav exports two no-PII files from core banking per the schema
-  (`loan_tape.json` + `branch_aum_monthly.json`, join on branch `code`), drops them in `source-data/`,
-  and runs the one command in TONIGHT_CHECKLIST §loan-tape. The platform then stamps `measured`.
+## 0b. ✅ CLOSED 2026-07-21 — the REAL loan tape landed
+Was "the highest-leverage data unlock for objective #1". It is done: **382,735 real accounts**
+ingested. Nothing here is synthetic any more.
+- `ingest_real_tape.py` streams the owner-side xlsx into no-PII aggregates
+  (`source-data/staging/real_tape_aggregates.json`); the raw file never enters the repo and every
+  published cell is suppressed below `MIN_CELL` accounts.
+- `build_tape_layers.py` (deterministic, `--check`-gated) projects staging into
+  `platform/data/tape_real.json` + `tape_geo_occ.json`, live on `#exposure`, `#trend`, `data.html`.
+- The synthetic-era bridge (`ingest_loan_tape.py` → `loan_tape_derived.json`) was **retired
+  2026-07-31** — superseded, zero consumers in the app.
+
+**The remaining owner-side unlock is now a refresh cadence, not an unlock:** the tape is a
+point-in-time export, so the question is how often a new one lands, not whether one exists.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"

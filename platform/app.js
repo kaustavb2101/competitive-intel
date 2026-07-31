@@ -2628,10 +2628,14 @@ function renderAcq(){
   renderAcqBoard();
   renderSearchDemand();
   renderPeerScore();
+  // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
+  // was a bare alias for renderRivalPulse() — the fetch resolves once and paintPulse() draws Play and
+  // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
+  // data path in every review of this file. Removed 2026-07-31.
   renderRivalPulse();
-  renderRivalIos();
   renderRivalAds();
   renderRivalVideo();
+  renderSocialThemes();
   renderRivalUniverse();
   renderCompCoverage();
   renderRivalDensity();
@@ -3479,9 +3483,86 @@ function renderRivalPulse(){
     RIVPULSE=j; rivpulseLoaded=true; paintPulse();
   }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; paintPulse(); });
 }
+/* SAY / HEAR GAP — data/social_themes.json (build_social_themes.py).
+   The synthesis of every reception channel on #acq: what lenders publish (ad creatives + promo
+   pages) and what customers write (Pantip, Google Play, Apple, YouTube comments) counted against
+   ONE Thai phrase list, so the two sides are comparable.
+
+   Document counts are MEASURED; the theme buckets are ESTIMATED editorial judgement. Read the
+   ORDERING, not the magnitude — an ad exists to make a claim while a comment is an unprompted
+   reaction, so the denominators differ in kind and every gap is inflated.
+   Lazy, null-safe, graceful if absent — same contract as renderRivalPulse. */
+let THEMES=null, themesLoaded=false;
+function renderSocialThemes(){
+  const tbl=$('#themestbl'); if(!tbl) return;
+  if(themesLoaded){ drawSocialThemes(); return; }
+  fetch('data/social_themes.json').then(r=>r.ok?r.json():null).then(j=>{
+    THEMES=j; themesLoaded=true; drawSocialThemes();
+  }).catch(()=>{ THEMES=null; themesLoaded=true; drawSocialThemes(); });
+}
+function drawSocialThemes(){
+  const tbl=$('#themestbl'), ro=$('#themesreadout'), cta=$('#themectatbl'), note=$('#themesnote');
+  if(!tbl) return;
+  const ans=(THEMES&&Array.isArray(THEMES.answered))?THEMES.answered:[];
+  const ctas=(THEMES&&Array.isArray(THEMES.ctas))?THEMES.ctas:[];
+  const m=(THEMES&&THEMES.meta)||{};
+  if(!ans.length){
+    tbl.innerHTML=''; if(cta) cta.innerHTML=''; if(note) note.textContent='';
+    if(ro) ro.innerHTML='<b>Social themes not yet built.</b> <span class="sub">data/social_themes.json is absent — run the pulls (pull_pantip.py, pull_app_reviews.py, pull_apple_reviews.py, pull_youtube_comments.py) then pipeline/build_social_themes.py.</span>';
+    return;
+  }
+  const pct=v=>(v==null?'—':(+v).toFixed(1)+'%');
+  // Biggest over-said first: the field's loudest message against how little it is raised back.
+  const over=ans.filter(a=>a.unanswered_pts<0).sort((a,b)=>a.unanswered_pts-b.unanswered_pts);
+  const under=ans.filter(a=>a.unanswered_pts>0&&a.kind!=='praise').sort((a,b)=>b.unanswered_pts-a.unanswered_pts);
+  if(ro){
+    const top=over[0], q=under[0];
+    ro.innerHTML=(top?`<b>The field's loudest message is its customers' quietest topic.</b> `+
+      `<b>${pct(top.supply_share_pct)}</b> of the ${(m.supply_docs||0).toLocaleString()} lender documents push `+
+      `<b>${top.label.toLowerCase()}</b>, against <b>${pct(top.demand_share_pct)}</b> of the `+
+      `${(m.demand_docs||0).toLocaleString()} customer documents raising it.`:'')+
+      (q?` <span class="sub">Biggest thing customers raise that nothing answers: <b>${q.label}</b> `+
+      `(${pct(q.demand_share_pct)}, ${(q.demand_docs||0).toLocaleString()} documents`+
+      `${q.no_counterpart?', no counterpart message at all':''}).</span>`:'');
+  }
+  tbl.innerHTML=`<tr><th>Theme</th><th>Lenders say</th><th>Customers raise</th><th>Imbalance</th><th>Read</th></tr>`+
+    over.concat(under).map(a=>{
+      const g=a.unanswered_pts, oversaid=g<0;
+      const col=oversaid?'var(--collat)':'var(--gold)';
+      return `<tr><td>${a.label}${a.thin?' <span class="sub">(thin)</span>':''}</td>`+
+        `<td class="mono">${pct(a.supply_share_pct)}</td>`+
+        `<td class="mono">${pct(a.demand_share_pct)}</td>`+
+        `<td class="mono" style="color:${col}">${g>0?'+':''}${g.toFixed(1)} pts</td>`+
+        `<td class="sub">${oversaid?'over-said by the field':(a.no_counterpart?'raised, nothing answers it':'under-answered')}</td></tr>`;
+    }).join('');
+  if(cta&&ctas.length){
+    const brandsOf=c=>Object.keys(c.brands||{}).length
+      ? Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(' · ')
+      : '<span style="color:var(--agri)">nobody</span>';
+    // ctas is PAID only (ads + promo pages). The organic column is the same mechanic counted in the
+    // lenders' unpaid forum replies — service, not campaign. Showing both is the finding: the field
+    // behaves conversationally by hand and never buys it.
+    const org=(THEMES&&Array.isArray(THEMES.ctas_organic))?THEMES.ctas_organic:[];
+    const orgOf=k=>{const r=org.find(x=>x.key===k);return r?r.docs:0;};
+    cta.innerHTML=`<tr><th>Call to action</th><th>In paid ads</th><th>Share of paid</th><th>In organic replies</th><th>Who runs it (paid)</th></tr>`+
+      ctas.map(c=>`<tr><td>${c.label}</td><td class="mono">${(c.docs||0).toLocaleString()}</td>`+
+        `<td class="mono">${pct(c.share_pct)}</td>`+
+        `<td class="mono" style="color:var(--gold)">${orgOf(c.key)||'—'}</td>`+
+        `<td class="sub">${brandsOf(c)}</td></tr>`).join('');
+  }
+  if(note){
+    const bysrc=m.demand_by_source||{};
+    const mix=Object.keys(bysrc).sort().map(k=>`${k} ${(bysrc[k].n||0).toLocaleString()}`).join(' · ');
+    note.innerHTML=`Customer documents: ${mix}. `+
+      `<b>Brands are not comparable across a blend of these</b> — app complaints concentrate in `+
+      `app-store reviews and barely appear in comments, so a brand whose corpus is mostly reviews `+
+      `looks worse on that theme by construction. Compare within one source.`+
+      (m.as_of?` <span class="sub">As of ${m.as_of}.</span>`:'');
+  }
+}
+
 // the iOS block rides on the SAME rival_pulse.json payload — paint both off one fetch
 function paintPulse(){ drawRivalPulse(); drawRivalIos(); }
-function renderRivalIos(){ renderRivalPulse(); }
 function drawRivalPulse(){
   const tbl=$('#pulsesenttbl'), ro=$('#pulsesentreadout'),
         plist=$('#pulsepromolist'), pro=$('#pulsepromoreadout');
@@ -7588,18 +7669,15 @@ function renderHomeQueue(){
 
 /* ---- home orchestration ---- */
 let homeBooted=false;
-/* Command-center "Recommendation by region" card — RETIRED 2026-07-25 (consolidation-pivot compliance).
-   It rolled data/regional_outlook.json's per-region recommendation[0] onto the exec front door, but
-   those actions are grow / product-push ("🌿 Grow farm lending", "🚙 Push vehicle-title") which the
-   pivot forbids — the product makes NO grow/open/expand calls. This is the same violation (and the same
-   data layer) as the Overview "Regional impact & recommendation" cards removed in the same batch (owner
-   ask #5); leaving it on #home while cutting it from the Overview would be inconsistent. The card is
-   hidden; the front door keeps its pivot-compliant per-region reads — cc-defend (competitive risk), the
-   impact strip (book buckets/DTI/crops/rivals) and the decision queue. regional_outlook.json stays on
-   disk because renderNationalOutlook still uses its .national headline/situation. */
-function renderHomeRegions(){
-  const wrap=$('#cc-regions'); if(wrap) wrap.style.display='none';
-}
+/* The "Recommendation by region" card was RETIRED 2026-07-25 (consolidation-pivot compliance): its
+   per-region actions were grow / product-push ("🌿 Grow farm lending", "🚙 Push vehicle-title") and the
+   product makes NO grow/open/expand calls — the same violation, from the same data layer, as the Overview
+   "Regional impact & recommendation" cards cut in that batch. DELETED outright 2026-07-31: the retirement
+   had left the markup, a renderHomeRegions() stub whose only job was to set display:none, and two call
+   sites, so every inventory of this page kept reporting a live card that could never render.
+   Do NOT re-add it. regional_outlook.json stays on disk only for its .national headline, which
+   renderNationalOutlook() still uses. The front door's pivot-compliant per-region reads are cc-defend
+   (competitive risk), the impact strip and the decision queue. */
 /* Command-center "Where the network is hardest to defend" card — the per-region density × service
    read (data/rival_threat_region.json, the same MEASURED layer the Competition tab renders), rolled
    onto the front door so the hardest-to-defend regions sit beside the portfolio-risk headline.
@@ -7619,7 +7697,15 @@ function renderHomeDefend(){
     if(hard(a)!==hard(b)) return hard(a)-hard(b);
     return (b.rivals_vs_autox||0)-(a.rivals_vs_autox||0);
   });
-  body.innerHTML=ordered.map(r=>{
+  // SUMMARY, NOT A SECOND COPY. This card used to render EVERY region — the same rows, the same three
+  // numbers, as the Competition tab's "Rival threat by region" table, off the same file. Two identical
+  // tables one click apart is not an exec summary, it is the reader wondering which one is authoritative.
+  // The front door now carries only the regions actually classed hardest to defend (the answer), states
+  // how many of how many that is, and hands off. Competition keeps the full per-region table.
+  const hard=ordered.filter(r=>r.threat_class==='Hardest to defend');
+  // If the classifier flags none, don't show an empty card — fall back to the two most-outgunned.
+  const lead=hard.length?hard:ordered.slice(0,2);
+  body.innerHTML=lead.map(r=>{
     const c=cls(r.threat_class);
     const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox.toFixed(1)+'×':'—';
     const rating=(typeof r.rating_wavg==='number')?r.rating_wavg.toFixed(2)+'★':'—';
@@ -7628,7 +7714,7 @@ function renderHomeDefend(){
         <span class="s">outgunned ${ratio} · rival service ${rating}${r.thin_rating_sample?' · thin sample':''}</span></span>
       <span class="r" style="color:${c}"><b>${r.threat_class||'—'}</b></span></div>`;
   }).join('')+
-  `<div class="sub" style="margin-top:6px;color:var(--dim)">Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. Full detail → Competition.</div>`;
+  `<div class="sub" style="margin-top:6px;color:var(--dim)"><b>${lead.length}</b> of <b>${ordered.length}</b> regions ${hard.length?'classed hardest to defend':'shown (none classed hardest — most-outgunned instead)'}. Density &amp; service both <b>measured</b> (rival:AutoX census + Google rating sample) — rivals outnumber us in every region, so the class is service-led. All ${ordered.length} regions, with the full numbers → <a class="cc-link no-print" data-v="acq" href="#acq" style="display:inline">Competition</a>.</div>`;
   wrap.style.display='';
 }
 /* ---------- REAL loan tape · assistance radar (obj #1, MEASURED) ----------
@@ -8118,7 +8204,6 @@ function renderHome(){
   renderHomeRisk();         // uses META.region + crop_stress when loaded + PROV moto mix
   renderHomeMacro();        // META.macro + META.board
   renderHomeDefend();       // rival_threat_region.json — hardest-to-defend regions (lazy, null-safe)
-  renderHomeRegions();      // regional_outlook.json — recommendation by region (lazy, null-safe)
   renderHomeMovers();       // deltas.json
   renderWatchlist();
   renderHomeDataRoom();     // provenance.json — measured/estimated/unlabelled census (lazy, null-safe)
@@ -8131,8 +8216,6 @@ function renderHome(){
     loadProvenance().then(()=>{ if(onHome()) renderHomeDataRoom(); });
     loadAmphoe().then(()=>{ if(onHome()){ renderHomeWhitespace(); renderHomeThesis(); } });
     loadCropStress().then(()=>{ if(onHome()){ renderHomeRisk(); renderHomeHero(); renderHomeThesis(); } });
-    // recommendation-by-region card — same rollup layer the Overview uses (null-safe).
-    loadOutlook().then(()=>{ if(onHome()) renderHomeRegions(); });
     // Strategy pivot: the opportunity-score / expansion-plan loaders and their "open next" hero + growth
     // thesis have been REMOVED. The home thesis/hero now render from the risk layers only.
     // QW5 hero needs measured household leverage — lazy, null-safe re-render.
