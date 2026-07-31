@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-31T04:14:26+00:00",
-    "commit": "6ad6220"
+    "generated_at": "2026-07-31T23:27:02+07:00",
+    "commit": "bd0d91e"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,78 @@
   ],
   "activity": [
     {
+      "date": "2026-07-31T23:27:02+07:00",
+      "sha": "bd0d91e",
+      "summary": "feat(peer): rival-field concentration on the per-province peer board (obj #2) (#230)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-31T14:26:02+00:00",
+      "sha": "edf5e08",
+      "summary": "docs: log ux-static-tblwrap-missing-a11y merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T21:21:34+07:00",
+      "sha": "461b83c",
+      "summary": "ux: name the static ThaiWater scroll regions (a11y) (#228)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T12:27:58+00:00",
+      "sha": "be1fabb",
+      "summary": "health(deploy): site-health probe guards sfi_credit (Overview MEASURED state-bank NPL backdrop)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-31T17:52:42+07:00",
+      "sha": "718391a",
+      "summary": "health(deploy): site-health probe guards competitor_coverage national_standing (exec peer headline) (#227)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-31T08:21:57+00:00",
+      "sha": "2ad6426",
+      "summary": "docs: log ux-tblwrap-region-unique-name merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T15:18:34+07:00",
+      "sha": "93f1b10",
+      "summary": "ux: unique aria-label per scrollable-table region (axe landmark-unique) (#226)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T06:42:30+00:00",
+      "sha": "38488cc",
+      "summary": "fix(gate): restore RED master gate (provenance byte-census) + stop the price-bot commodities recurrence at source",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-31T12:57:48+07:00",
+      "sha": "d3efaee",
+      "summary": "ux(nav): one journey, one nav, no unreachable routes (#224)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T12:57:13+07:00",
+      "sha": "b5d6039",
+      "summary": "fix(drill): branch rows now reconcile to the province total (35.8% -> 100%) (#223)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-31T12:56:45+07:00",
+      "sha": "44b6f22",
+      "summary": "feat(competition): iOS app sentiment — Apple TH storefront, incl. the digital-lender cohort (obj #2) (#222)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-31T04:15:15+00:00",
+      "sha": "0f6ca9b",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival-pulse site-health probe ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-07-31T04:14:26+00:00",
       "sha": "6ad6220",
       "summary": "health(deploy): live site-health probe now guards the Competition rival-pulse trio",
@@ -638,78 +710,6 @@
       "sha": "da42353",
       "summary": "feat(acq): go-live district leaderboard on Competition — top-6 อำเภอ where PICO rivals most recently went live (#215)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-07-30T20:46:01+07:00",
-      "sha": "61266c8",
-      "summary": "data: live fuel prices (2026-07-29, run 30500267885) (#210)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T20:44:54+07:00",
-      "sha": "bdaad00",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-29, run 30495536913) (#209)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T20:44:10+07:00",
-      "sha": "93de7b2",
-      "summary": "data: NABC live prices (2026-07-29, run 30491512321) (#208)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T10:22:02+00:00",
-      "sha": "b6b3fdf",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the board_vintage provenance-sync ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-30T10:21:28+00:00",
-      "sha": "bcce9f8",
-      "summary": "service(provenance): surface scenarios.json's MEASURED board_vintage in the Data-room card",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T15:21:03+07:00",
-      "sha": "72481a8",
-      "summary": "feat(acq): district-grain operating momentum (go-live date) in pico_district (#213)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-30T08:20:49+00:00",
-      "sha": "198d743",
-      "summary": "docs: log ux-provenance-prose-nav-vocab merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T15:15:35+07:00",
-      "sha": "5996118",
-      "summary": "ux: align products provenance prose to five-pillar nav label (Overview→Macro) (#214)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T04:49:08+00:00",
-      "sha": "b79c38c",
-      "summary": "docs: log ux-cc-jumplink-nav-vocab-drift merge+deploy+verify (follow-up)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T11:45:43+07:00",
-      "sha": "8b1180e",
-      "summary": "ux: align command-center jump-links to five-pillar nav labels (#211)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-30T04:40:06+00:00",
-      "sha": "c2388ef",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the gate-repair hotfix",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-30T04:35:46+00:00",
-      "sha": "d75ad4b",
-      "summary": "fix(gate): restore RED master determinism gate to green — realign 3 derived layers PR #207 desynced",
-      "pillar": "deployment"
     }
   ]
 }
