@@ -403,13 +403,19 @@ def _shape_competitor_coverage(d):
         return "meta.national_standing missing (exec network-scale peer headline)"
     if not isinstance(ns.get("autox_rank"), int) or ns["autox_rank"] < 1:
         return "national_standing.autox_rank missing (drawCompCoverage gates the readout on it)"
+    if not isinstance(ns.get("n_ranked"), int) or ns["n_ranked"] < 1:
+        return "national_standing.n_ranked missing ('of the N big operators …' is rendered directly)"
     ranking = ns.get("ranking")
     if not isinstance(ranking, list) or not ranking:
         return "national_standing.ranking empty (the branch-network-size peer chain)"
-    r0 = ranking[0]
-    if not isinstance(r0, dict) or not r0.get("operator") or not isinstance(r0.get("branches"), (int, float)):
-        return "national_standing.ranking row missing 'operator'/numeric 'branches'"
-    if not any(isinstance(o, dict) and o.get("operator") == "AutoX" for o in ranking):
+    # drawCompCoverage maps EVERY ranking row (o.operator + o.branches), not just
+    # the first — so validate every row. A partial truncation like a valid first
+    # peer plus a bare {"operator":"AutoX"} would pass a first-row-only check yet
+    # render "AutoX 0", missing exactly the own-network anchor this probe guards.
+    for o in ranking:
+        if not isinstance(o, dict) or not o.get("operator") or not isinstance(o.get("branches"), (int, float)):
+            return "national_standing.ranking has a row missing 'operator'/numeric 'branches'"
+    if not any(o.get("operator") == "AutoX" for o in ranking):
         return "national_standing.ranking has no AutoX row (own network-scale anchor)"
     return None
 
