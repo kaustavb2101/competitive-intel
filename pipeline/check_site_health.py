@@ -336,6 +336,42 @@ def _shape_region_debt(d):
     return None
 
 
+def _shape_sfi_credit(d):
+    # The MEASURED state-bank (SFI) system NPL backdrop on Overview (#overview),
+    # obj #1 — renderSfi's macro credit-quality card (the closest public read on
+    # the household + farm repayment stress AutoX's borrowers sit inside). The
+    # render HIDES the whole block on `!SFI || !meta.latest || latest.npl_ratio
+    # == null`, and the quarter table maps .series[] (period / npl_ratio /
+    # npl_gross). It was the last eager Overview macro card with no deploy probe:
+    # a truncated CDN deploy that emptied/truncated sfi_credit.json would silently
+    # blank the NPL backdrop on a default nav route with no phone alert. Asserts
+    # shape (a non-empty series + a latest quarter carrying a numeric npl_ratio),
+    # not counts/values — robust to a future FPO quarter being appended.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    series = d.get("series")
+    if not isinstance(series, list) or not series:
+        return "missing/empty 'series' list (NPL quarter-table render read)"
+    s0 = series[0]
+    if not isinstance(s0, dict):
+        return "first series row is not an object"
+    if not (isinstance(s0.get("period"), str) and s0["period"].strip()):
+        return "first series row missing/empty 'period'"
+    if not isinstance(s0.get("npl_ratio"), (int, float)):
+        return "first series row missing numeric 'npl_ratio' (quarter-table render read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    latest = meta.get("latest")
+    if not isinstance(latest, dict):
+        return "missing 'meta.latest' object (card hide-gate read)"
+    if not isinstance(latest.get("npl_ratio"), (int, float)):
+        return "meta.latest missing numeric 'npl_ratio' (card headline hide-gate read)"
+    if not (isinstance(latest.get("period"), str) and latest["period"].strip()):
+        return "meta.latest missing/empty 'period' (card headline read)"
+    return None
+
+
 def _shape_peer_province(d):
     # The MEASURED per-province PEER board (obj #2 competitive risk) — the
     # Competition surface's flagship read (drawPeerProvince reads .provinces and,
@@ -585,6 +621,14 @@ DATA_FILES = [
     # coverage gap the 2026-07-27 collateral-flow probe ship flagged as next.
     ("data/truck_flow.json", _shape_truck_flow, ".provinces list (~77) with new_regis_yoy_pct"),
     ("data/region_debt.json", _shape_region_debt, ".series{national,region} + debt_per_household_thb"),
+    # The last eager Overview macro card left unprobed (renderSfi, loaded on the
+    # default #overview route): the MEASURED state-bank (SFI) system NPL backdrop,
+    # obj #1's closest public read on household + farm repayment stress. The other
+    # Overview flow/backdrop cards (collateral_flow / truck_flow / region_debt) are
+    # already probed; this closes the matching macro-NPL blind spot so a truncated
+    # deploy that guts the FPO NPL series fires a phone alert instead of silently
+    # hiding the backdrop card.
+    ("data/sfi_credit.json", _shape_sfi_credit, ".series[] (FPO quarterly) + meta.latest.npl_ratio (Overview NPL backdrop)"),
     # The competition pillar's flagship exec layer (obj #2) — the per-province
     # peer board (AutoX next to each big-4 rival, per province) that powers the
     # Competition surface + the command-center thesis clause. Every default-route
