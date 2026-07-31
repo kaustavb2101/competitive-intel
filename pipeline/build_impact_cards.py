@@ -305,8 +305,13 @@ def build():
                              "note": "trend chips = agri-risk deltas between committed "
                                      "vintages; tape-NPL deltas begin at the second monthly "
                                      "tape vintage (current tape is the first)."},
-            "branch_note": "branch rows cover the tape's top-400 booking branches "
-                           "(no-PII floor n>=30); smaller branches are suppressed.",
+            "branch_note": "branch rows cover EVERY booking branch clearing the no-PII floor "
+                           "(n>=30 accounts), so they reconcile to their province total. Until "
+                           "2026-07-31 this read a top-400-by-size tab as well as the floor, "
+                           "which silently dropped ~1,570 branches that cleared the floor and "
+                           "left the rows summing to ~36% of their own province totals; the note "
+                           "then blamed the floor for what was actually the cap. Branches still "
+                           "absent are those under 30 accounts, which stay suppressed.",
             "occ_note": "occupation split is the BOOK mix per geo region (tape cross); the "
                         "workforce side is NSO LFS employed + informal share — NSO publishes "
                         "no per-region occupation census we can join yet.",
