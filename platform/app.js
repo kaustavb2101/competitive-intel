@@ -3539,9 +3539,16 @@ function drawSocialThemes(){
     const brandsOf=c=>Object.keys(c.brands||{}).length
       ? Object.entries(c.brands).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(' · ')
       : '<span style="color:var(--agri)">nobody</span>';
-    cta.innerHTML=`<tr><th>Call to action</th><th>Ads</th><th>Share</th><th>Who runs it</th></tr>`+
+    // ctas is PAID only (ads + promo pages). The organic column is the same mechanic counted in the
+    // lenders' unpaid forum replies — service, not campaign. Showing both is the finding: the field
+    // behaves conversationally by hand and never buys it.
+    const org=(THEMES&&Array.isArray(THEMES.ctas_organic))?THEMES.ctas_organic:[];
+    const orgOf=k=>{const r=org.find(x=>x.key===k);return r?r.docs:0;};
+    cta.innerHTML=`<tr><th>Call to action</th><th>In paid ads</th><th>Share of paid</th><th>In organic replies</th><th>Who runs it (paid)</th></tr>`+
       ctas.map(c=>`<tr><td>${c.label}</td><td class="mono">${(c.docs||0).toLocaleString()}</td>`+
-        `<td class="mono">${pct(c.share_pct)}</td><td class="sub">${brandsOf(c)}</td></tr>`).join('');
+        `<td class="mono">${pct(c.share_pct)}</td>`+
+        `<td class="mono" style="color:var(--gold)">${orgOf(c.key)||'—'}</td>`+
+        `<td class="sub">${brandsOf(c)}</td></tr>`).join('');
   }
   if(note){
     const bysrc=m.demand_by_source||{};

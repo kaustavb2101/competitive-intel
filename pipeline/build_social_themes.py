@@ -357,18 +357,34 @@ def main():
         })
     answered.sort(key=lambda r: (-r["unanswered_pts"], r["demand_key"]))
 
-    # CTAs — what the supply side asks you to DO
-    ctas = []
-    for key, label, kws in CTAS:
-        n, brands = 0, collections.Counter()
-        for brand, src, date, raw in sup:
-            if hits(norm(raw), kws):
-                n += 1
-                brands[brand] += 1
-        ctas.append({"key": key, "label": label, "docs": n,
-                     "share_pct": round(100.0 * n / ns, 2),
-                     "brands": dict(sorted(brands.items()))})
-    ctas.sort(key=lambda c: (-c["docs"], c["key"]))
+    # CTAs — what the supply side asks you to DO.
+    # Counted over PAID supply only (ad creatives + promo pages). A lender's organic forum reply
+    # saying "call us" is customer SERVICE, not a campaign mechanic, and mixing the two would make
+    # a brand that answers its own threads look like it runs a call-to-action strategy. The organic
+    # ones are counted separately in ctas_organic so nothing is hidden — that split is the whole
+    # point: it is how we can say "nobody in the field runs a chat CTA in paid, and the single
+    # conversational invitation anywhere is one of ours, done by hand".
+    PAID_SRC = ("google-ads", "promo")
+    paid = [d for d in sup if d[1] in PAID_SRC]
+    organic = [d for d in sup if d[1] not in PAID_SRC]
+    n_paid = len(paid) or 1
+
+    def _cta_rows(docs, denom):
+        rows = []
+        for key, label, kws in CTAS:
+            n, brands = 0, collections.Counter()
+            for brand, src, date, raw in docs:
+                if hits(norm(raw), kws):
+                    n += 1
+                    brands[brand] += 1
+            rows.append({"key": key, "label": label, "docs": n,
+                         "share_pct": round(100.0 * n / denom, 2),
+                         "brands": dict(sorted(brands.items()))})
+        rows.sort(key=lambda c: (-c["docs"], c["key"]))
+        return rows
+
+    ctas = _cta_rows(paid, n_paid)
+    ctas_organic = _cta_rows(organic, len(organic) or 1)
 
     # per-brand demand profile — which objection dominates each lender's own audience
     brands = {}
@@ -397,6 +413,7 @@ def main():
         "gap": gap,
         "answered": answered,
         "ctas": ctas,
+        "ctas_organic": ctas_organic,
         "brand_profile": profile,
         "meta": {
             "as_of": max(dates) if dates else None,   # newest doc IN THE DATA — never wall clock
@@ -412,6 +429,14 @@ def main():
                        "verified-organisation replies in pantip_threads.json"),
             "demand_docs": len(dem),
             "supply_docs": len(sup),
+            "supply_paid_docs": len(paid),
+            "supply_organic_docs": len(organic),
+            "cta_basis": ("`ctas` counts PAID supply only (ad creatives + promo pages, n=%d) "
+                          "because a call to action is a campaign mechanic. `ctas_organic` counts "
+                          "the unpaid verified-organisation forum replies (n=%d) separately: a "
+                          "support account saying 'call us' is service, not a campaign, and "
+                          "blending the two would make a lender that answers its own threads look "
+                          "like it runs a CTA strategy." % (len(paid), len(organic))),
             "demand_sources": ["youtube_comments.json (public comments, no author identity stored)",
                                "app_reviews.json (Google Play)", "apple_reviews.json (Apple)",
                                "pantip_threads.json (forum posts + non-org comments; the opening "
