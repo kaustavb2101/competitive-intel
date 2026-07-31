@@ -1301,11 +1301,35 @@ function skelLines(specs){
     specs.map(w=>`<span class="skel skel-line ${w}"></span>`).join('')+`</div>`;
 }
 
+// The name for a scrollable-table region: the table's own section heading, so a screen-reader
+// user navigating by region can tell the ~40 tables apart instead of hearing one generic name N
+// times (axe landmark-unique). Walks back/up to the nearest preceding heading; the last heading in
+// a preceding sibling block is the closest one to the table. Returns '' when none is found.
+function tableSectionLabel(t){
+  let n=t;
+  for(let depth=0; n && n!==document.body && depth<6; depth++){
+    let p=n.previousElementSibling;
+    while(p){
+      if(/^H[1-6]$/.test(p.tagName)) return p.textContent.replace(/\s+/g,' ').trim().slice(0,80);
+      if(p.querySelectorAll){
+        const hs=p.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        if(hs.length) return hs[hs.length-1].textContent.replace(/\s+/g,' ').trim().slice(0,80);
+      }
+      p=p.previousElementSibling;
+    }
+    n=n.parentElement;
+  }
+  return '';
+}
+
 // MOBILE: wrap every wide data table in a horizontal-scroll container so a many-column .tbl
 // can never push the whole page sideways on a phone. The <table> nodes persist (only their
 // innerHTML is replaced on re-render), so wrapping each once at boot is enough and stays
 // deterministic. Idempotent — skips tables already inside a .tblwrap.
 function wrapTables(){
+  // seed from any already-labelled wrappers (prior calls / static HTML) so cross-call names stay unique.
+  const used=Object.create(null);
+  document.querySelectorAll('.tblwrap[aria-label]').forEach(w=>{ used[w.getAttribute('aria-label')]=1; });
   document.querySelectorAll('table.tbl').forEach(t=>{
     if(t.parentElement&&t.parentElement.classList.contains('tblwrap')) return;
     const w=document.createElement('div'); w.className='tblwrap';
@@ -1313,7 +1337,12 @@ function wrapTables(){
     // keyboard / screen-reader user can pan a wide table (WCAG 2.1.1 / scrollable-region-focusable).
     w.setAttribute('role','region');
     w.setAttribute('tabindex','0');
-    w.setAttribute('aria-label','Scrollable data table');
+    // Name it from its section heading, and de-dup so every scrollable region is uniquely named
+    // (axe landmark-unique) rather than all reading "Scrollable data table".
+    let base='Scrollable table: '+(tableSectionLabel(t)||'data table');
+    let lbl=base, k=1; while(used[lbl]) lbl=base+' ('+(++k)+')';
+    used[lbl]=1;
+    w.setAttribute('aria-label',lbl);
     t.parentNode.insertBefore(w,t); w.appendChild(t);
   });
 }
