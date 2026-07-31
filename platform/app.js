@@ -1225,6 +1225,29 @@ function rivpRec(d){
   if(!RIVP) return null;
   const i=idxOf(d); return (i>=0&&i<RIVP.branches.length)?RIVP.branches[i]:null;
 }
+/* ---------- per-branch LICENSED-PICO rival count in the branch's district (data/branch_pico.json) ----
+   Lazy-loads build_branch_pico.py's output: {meta, branches:[{pico,head,branch,recent}]}, INDEX-ALIGNED
+   to branches.json. Each record is the MEASURED count of licensed PICO-finance (พิโกไฟแนนซ์) operators
+   registered in THIS branch's own district (อำเภอ), joined via amphoe.json's point-in-polygon branch
+   assignment to the FPO registry (pico_district.json). This is the small-ticket rival class the big-4
+   census (rival_pressure/compPopup) is blind to. Null-guarded: absent file → PICOBR stays null and the
+   popup line is omitted. Nothing fabricated. */
+let PICOBR=null, picobrLoaded=false, picobrPromise=null;
+async function loadBranchPico(){
+  if(picobrPromise) return picobrPromise;
+  picobrLoaded=true;
+  picobrPromise=(async()=>{
+    try{ const r=await fetch('data/branch_pico.json'); if(r.ok){ const j=await r.json();
+      PICOBR=(j&&Array.isArray(j.branches))?j.branches:null; } }
+    catch(e){ PICOBR=null; }
+    return PICOBR;
+  })();
+  return picobrPromise;
+}
+function picoBrRec(d){
+  if(!PICOBR) return null;
+  const i=idxOf(d); return (i>=0&&i<PICOBR.length)?PICOBR[i]:null;
+}
 // MEASURED rival branches within CATCH_RADIUS_KM of a branch (client-side haversine over the merged
 // census). Computed only for the one open popup (≤4,384 haversines), so no precompute needed. Returns
 // null when the census is absent so the popup omits the line rather than show a fabricated 0.
@@ -3314,6 +3337,10 @@ function drawRivalAds(){
       (silent.length?`Checked and found <b>no Google ad account</b> in Thailand for: ${silent.join(', ')} — a genuine absence of paid Google presence, not a gap in the pull. `:'')+
       `Source: ${m.source||'Google Ads Transparency Center'}, region ${m.region||'Thailand'}, pulled ${m.pulled||'—'}. Advertiser aggregates only — no users, no targeting, no personal data.`;
   }
+  // The per-operator ad-copy sub-tables were injected into #pulseadsmsgs via innerHTML AFTER
+  // boot, so the boot-time wrapTables() never reached them — an unwrapped wide table can push
+  // the #acq page sideways on mobile. Re-run the idempotent wrapper (matches drawRivalPulse).
+  wrapTables();
 }
 
 /* ---------- rival VIDEO pulse · YouTube Data API v3 (obj #2, MEASURED) ----------
@@ -4133,7 +4160,7 @@ function acqCSV(){
     const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
     return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_catchment_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
@@ -4512,7 +4539,7 @@ function ampCSV(){
       (a.demand||0).toFixed(1),(a.risk_proxy||0).toFixed(1),(a.agri_stress||0).toFixed(1),
       a.unemployment_rate!=null?a.unemployment_rate.toFixed(2):'']
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_district_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
@@ -5876,6 +5903,7 @@ function initMap(){
   if(!cbrfLoaded) loadClusterBrief();
   if(!occlLoaded) loadOccLeads();
   if(!rivpLoaded) loadRivalPressure();
+  if(!picobrLoaded) loadBranchPico();
   // warm the MEASURED lead-site coordinates (OSM points behind each branch's lead board) so the
   // pins draw on the first branch tap. Optional + null-safe: absent file → LSITES stays null,
   // selectBranch simply draws nothing.
@@ -5913,7 +5941,7 @@ function selectBranch(d,m){
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
   if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA||!FUELSTN){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadBranchPico(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -6099,6 +6127,21 @@ function rivalPressureLineHTML(d){
   const siege=e.s?` <span style="color:var(--agri);font-weight:700" title="siege = ≥3 rivals within 2 km (stated rule over measured counts)">⚑ under siege</span>`:'';
   return `<div class="pr" style="margin-top:4px"><span title="measured — haversine vs the merged competitor census (official locators; Heng sample)">Rival pressure (measured)</span>`
     +`<b style="color:${col}">${e.n2} ≤2 km · ${e.n5} ≤5 km · ${near}${siege}</b></div>`;
+}
+// Licensed-PICO rival line for a branch popup — ONE compact MEASURED line from branch_pico.json:
+// how many licensed PICO-finance (พิโกไฟแนนซ์) operators are registered in THIS branch's district
+// (อำเภอ), the small-ticket rival class the big-4 census above does not include. District grain (the
+// FPO registry carries an address, not coordinates), stated in the line. A district with none is an
+// honest zero (both sides share amphoe.json's identity) — shown as "none registered". Null-guarded:
+// absent file/record → empty string, nothing fabricated.
+function picoLineHTML(d){
+  const e=picoBrRec(d); if(!e||typeof e.pico!=='number') return '';
+  const col=e.pico>=8?'var(--agri)':(e.pico>0?'var(--gold)':'var(--merch)');
+  const body=e.pico>0
+    ? `${e.pico} in อำเภอ`+(e.head||e.branch?` (${e.head} head · ${e.branch} branch)`:'')+(e.recent?` · ${e.recent} newly licensed`:'')
+    : 'none registered in อำเภอ';
+  return `<div class="pr" style="margin-top:4px"><span title="measured — licensed PICO-finance operators registered in this branch's district (FPO registry via pico_district.json, joined by amphoe); district grain, not a km radius">Licensed PICO rivals (measured)</span>`
+    +`<b style="color:${col}">${body}</b></div>`;
 }
 // Catchment block for a branch popup — three MEASURED numbers about this branch's ~10km catchment:
 // (1) reachable population INSIDE the 10km circle (WorldPop 2020, data/branch_population.json .values[i]);
@@ -6628,6 +6671,7 @@ function popupHTML(d){
     ${catchmentPopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${rivalPressureLineHTML(d)}
+    ${picoLineHTML(d)}
     ${wc?r('Region weakest crop (YoY) · est', wc.lab+' '+(wc.yoy>0?'+':'')+wc.yoy+'%', wc.yoy<0?'var(--agri)':'var(--merch)'):''}
     ${cstressPopupHTML(d,sec,r)}
     ${sec('Within 10 km (OSM · measured)')}
@@ -6933,7 +6977,7 @@ function drawMarket(){
     const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
       return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='autox_market_assessment.csv'; a.click(); URL.revokeObjectURL(a.href);
   };
@@ -8541,7 +8585,7 @@ function ccBriefCSV(){
   // watchlist
   watchLoad().forEach(w=>rows.push(['watchlist',w.label,w.sub||'',w.val||'',(w.prov||'')]));
   const csv=rows.map(r=>r.map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_command_center_brief.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
