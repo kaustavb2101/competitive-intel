@@ -222,14 +222,13 @@
         <div class="cc-card-b" id="cc-defend-body"></div>
       </div>
 
-      <!-- RECOMMENDATION BY REGION (data/regional_outlook.json) — the per-branch recs rolled up to
-           the 5 regions: each region's #1 action + branch count. Leads the front door with the
-           regional answer; full detail on the Overview. Null-safe: absent file → card hidden. -->
-      <div class="cc-card cc-card-wide" id="cc-regions" style="display:none">
-        <div class="cc-card-h"><span class="cc-dot" style="background:var(--accent)"></span>Recommendation by region
-          <a class="cc-link no-print" data-v="overview" href="#overview">Macro →</a></div>
-        <div class="cc-card-b" id="cc-regions-body"></div>
-      </div>
+      <!-- DELETED 2026-07-31: the "Recommendation by region" card. It was RETIRED on 2026-07-25 for
+           consolidation-pivot compliance — its per-region actions were grow / product-push ("Grow farm
+           lending", "Push vehicle-title") which the product does not make — but the retirement left the
+           markup, a render stub that only hid it, and two call sites behind. Dead weight that read as a
+           live card in every inventory of this page. Do NOT re-add per-region recommendations from
+           regional_outlook.json to the front door; that file stays on disk only for its .national
+           headline, which renderNationalOutlook() still uses. -->
 
       <!-- WATCHLIST -->
       <div class="cc-card cc-card-wide" id="cc-watch">
