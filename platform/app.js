@@ -4098,7 +4098,7 @@ function acqCSV(){
     const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
     return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_catchment_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
@@ -4477,7 +4477,7 @@ function ampCSV(){
       (a.demand||0).toFixed(1),(a.risk_proxy||0).toFixed(1),(a.agri_stress||0).toFixed(1),
       a.unemployment_rate!=null?a.unemployment_rate.toFixed(2):'']
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_district_coverage.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
@@ -6915,7 +6915,7 @@ function drawMarket(){
     const lines=[hdr.join(',')].concat(rows.map(p=>{const wc=regionWorstCrop(p.region);
       return [p.th,p.en,p.region,p.branches,p.workers,p.informal,p.pickup,pct(p),p.vehicles,wc?wc.lab:'',wc?wc.yoy:'']
         .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
-    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const blob=new Blob(['\ufeff',lines.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='autox_market_assessment.csv'; a.click(); URL.revokeObjectURL(a.href);
   };
@@ -8523,7 +8523,7 @@ function ccBriefCSV(){
   // watchlist
   watchLoad().forEach(w=>rows.push(['watchlist',w.label,w.sub||'',w.val||'',(w.prov||'')]));
   const csv=rows.map(r=>r.map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='autox_command_center_brief.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
