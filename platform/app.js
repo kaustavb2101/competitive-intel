@@ -7202,6 +7202,7 @@ function queue3DLink(it){
    here). Same strip fronts Assistance / Risk / Competition with a pillar-specific ranking.
    Null-safe: absent layer → calm note, never a broken scene. */
 let IMPACT=null, impactPromise=null;
+let INCIMP=null;   // income_impact.json — read by icCropIncome() on the drill's province crop strip
 function loadImpact(){
   if(impactPromise) return impactPromise;
   impactPromise=fetch('data/impact_cards.json').then(r=>r.ok?r.json():null)
@@ -7276,7 +7277,19 @@ function icCropCell(p){
   if(!cr.length) return '<span class="s">—</span>';
   return cr.slice(0,2).map(c=>`<span style="color:${icCropCol(c.cls)}" title="${c.crop} ${Math.round((c.share||0)*100)}% of cropland · Pink Sheet YoY ${c.yoy!=null?(c.yoy>0?'+':'')+c.yoy+'%':'n/a'}">${c.crop.replace('Oil palm','Palm')} ${icCropDir(c.cls)}</span>`).join(' · ');
 }
-function icCropStrip(p){
+/* What the crop mix is WORTH to the households behind this province's book. The chips above carry the
+   world price; this line carries the farmer's cash — the modelled effect of crop prices on farm income
+   and the baht/month it works out to for the Agriculture group. Null-safe: no income layer, no line. */
+function icCropIncome(prov){
+  const ip=(INCIMP&&INCIMP.provinces)?INCIMP.provinces[prov]:null;
+  if(!ip||ip.agri_price_shock_pct==null) return '';
+  const a=(ip.occ||{}).Agriculture||{}, s=ip.agri_price_shock_pct;
+  const col=s>=0?'var(--merch)':'var(--agri)';
+  return `<span class="ic-cchip ${s>=0?'good':'bad'}" title="modelled effect of this province's crop-price mix on farm-household income (income_impact.json) — ESTIMATED transmission over MEASURED prices and MEASURED NSO income levels">`+
+    `farm income <b style="color:${col}">${s>0?'+':''}${s}%</b>`+
+    (a.d_baht!=null?` ≈ ${a.d_baht>0?'+':''}฿${icN(a.d_baht)}/mo`:'')+`</span>`;
+}
+function icCropStrip(p,prov){
   const cr=(p&&p.crops)||[];
   if(!cr.length) return '';
   const chips=cr.map(c=>{
@@ -7285,7 +7298,7 @@ function icCropStrip(p){
     return `<span class="ic-cchip ${cl}" title="${c.crop}: ${Math.round((c.share||0)*100)}% of this province's measured cropland · World Bank Pink Sheet YoY ${y}">${c.crop} ${Math.round((c.share||0)*100)}% ${icCropDir(c.cls)} ${y}</span>`;
   }).join('');
   const rain=p.rain_pct!=null?`<span class="ic-cchip ${p.rain_pct<85?'bad':'flat'}" title="rainfall as % of the local normal — drought proxy (crop-stress layer)">rain ${p.rain_pct}% of normal</span>`:'';
-  return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}</div>`;
+  return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}${icCropIncome(prov)}</div>`;
 }
 // Branch rows must RECONCILE to the province above them. They were silently short until
 // 2026-07-31 (a top-400-by-size cap upstream, on top of the n>=30 no-PII floor, dropped ~1,570
@@ -7412,7 +7425,7 @@ function icRenderLevel(mount){
     const g=icRegionOf(st.region);
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:(g?g.key:st.region),lvl:'province'},{label:st.province}])+
       `<div class="ic-drill-h"><b>${st.province}</b> — booking branches on the tape (n ≥ 30), worst NPL-live first</div>`+
-      icCropStrip((IMPACT.provinces||{})[st.province])+
+      icCropStrip((IMPACT.provinces||{})[st.province],st.province)+
       icBranchRows(st.province);
     return;
   }
@@ -7436,7 +7449,11 @@ function icFocusLevel(mount){ const b=mount&&mount.querySelector('.ic-back'); if
 function renderImpactStrip(mountId,mode){
   const mount=document.getElementById(mountId);
   if(!mount) return;
-  loadImpact().then(()=>{
+  // income_impact rides along so the province crop strip can show the farmer's cash, not just the
+  // world price. It is cached by tmliFetch, so this costs one request for the whole session; a null
+  // result just means icCropIncome renders nothing.
+  Promise.all([loadImpact(),tmliFetch('income_impact')]).then(([,inc])=>{
+    if(inc&&inc.provinces) INCIMP=inc;
     if(!IMPACT){ mount.innerHTML='<div class="ic-note">Impact cards not yet computed — data/impact_cards.json is absent (run pipeline/build_impact_cards.py).</div>'; return; }
     mount._icMode=mode;
     if(!mount._icState) mount._icState={level:'regions'};
@@ -7543,10 +7560,17 @@ function renderScenarios(){
 }
 
 /* MOVE 4 — commodities board: global Pink Sheet × Thai farm-gate × who's-exposed drill (Overview). */
+/* Commodity board label -> the crop key used by assist_price_radar.json / income_impact.json crop_mix.
+   Only the crops with a province planted-area map appear here; Sugar is on the board but has no
+   province share anywhere, so it stays deliberately unmapped rather than being joined to a guess. */
+const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava'};
+const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
-  tmliFetch('commodities').then(j=>{
+  Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact')]).then(([j,APR,INC])=>{
     if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
+    const aprCrop=k=>((APR&&Array.isArray(APR.crops))?APR.crops:[]).find(c=>c.key===k)||null;
+    const incProv=p=>((INC&&INC.provinces)?INC.provinces[p]:null)||null;
     const rows=j.board.map((c,i)=>{
       const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
       const exp=c.exposure;
@@ -7555,11 +7579,25 @@ function renderCommoditiesBoard(){
       const divCell=div==null?'<span class="s">—</span>':`<b style="color:${div>0?'var(--merch)':'var(--agri)'}">${div>0?'+':''}${div} pts</b>`;
       let drill='';
       if(exp){
+        // WHO the price actually reaches. The belt table alone says "accounts near this crop"; these
+        // two lines say which OCCUPATION carries it, what the price move is worth to that household
+        // in baht a month, and how much of the book is still healthy enough to call early.
+        const ck=CB_CROP[c.lab], ap=ck?aprCrop(ck):null;
+        const bp=(exp.top||[]).map(t=>({t,ip:incProv(t.prov)})).filter(x=>x.ip);
+        const agri=bp.map(x=>x.ip.occ&&x.ip.occ.Agriculture).filter(Boolean);
+        const shocks=bp.map(x=>x.ip.agri_price_shock_pct).filter(v=>v!=null);
+        const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
+        const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
+        const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
+        const assistLine=!ap?'':`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="6"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
-          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th></tr></thead><tbody>${
-            (exp.top||[]).map(t=>`<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td></tr>`).join('')
-          }</tbody></table></div></td></tr>`;
+          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
+            (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
+              return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
+                `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
+                `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
+          }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
         <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
@@ -8123,6 +8161,67 @@ function provRegOf(mount,prov){
   const b=(mount._aodGeo.branches||[]).find(x=>x.prov===prov);
   return b?b.region:null;
 }
+/* PROACTIVE ASSIST · PRICE LENS (owner ask #4) — data/assist_price_radar.json.
+   The drought radar above answers "who is slipping now". This answers the forward question: which
+   crop price, if it turned, would put the most CURRENTLY-HEALTHY farm accounts at risk. Every crop
+   with province-level exposure is up YoY today, so `tripped` is empty — and rather than print an
+   empty box, the panel leads with the exposure that is real today (how much of the healthy farm book
+   rides on each price) and states the trip rule so the empty state is legible rather than mysterious.
+   Null-safe: absent layer → a calm note, never a broken table. */
+function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch)':'var(--muted)'; }
+function renderAssistPriceLens(){
+  const host=document.getElementById('assist-price'); if(!host) return;
+  tmliFetch('assist_price_radar').then(j=>{
+    if(!j||!Array.isArray(j.crops)||!j.crops.length){
+      tmliNote(host,'The price lens needs <b>data/assist_price_radar.json</b> — not built for this vintage. The drought radar above is unaffected.');
+      return;
+    }
+    const N=n=>Number(n).toLocaleString();
+    const trig=(j.meta&&j.meta.trigger)||{}, tripped=Array.isArray(j.tripped)?j.tripped:[];
+    const provs=Array.isArray(j.provinces)?j.provinces:[];
+    const total=(j.meta&&j.meta.n_current_x_total)||provs.reduce((a,r)=>a+(r.n_current_x||0),0);
+
+    // Lead with the answer. If something has tripped that IS the answer; otherwise the answer is the
+    // size of the healthy book and the fact that nothing is falling — said plainly, not padded.
+    const lead = tripped.length
+      ? `<b style="color:var(--agri)">${tripped.length} province${tripped.length>1?'s':''} tripped:</b> ${tripped.join(' · ')} — a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area there is in price decline. Call the Current + X-day slice before collections turn.`
+      : `<b>Nothing tripped.</b> All five mapped crops are up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
+
+    const crops=j.crops.map(c=>`<tr>
+        <td><b>${c.crop}</b></td>
+        <td class="mono" style="color:${priceDirColor(c.direction)}"><b>${c.yoy==null?'—':(c.yoy>0?'+':'')+c.yoy+'%'}</b></td>
+        <td class="mono">${N(c.n_provinces)}</td>
+        <td class="mono"><b>${N(c.n_current_x)}</b> <span class="sub">of ${N(c.n_farm_accounts)}</span></td>
+        <td class="mono sub">${aodTHB(c.os_thb)}</td>
+        <td class="sub" style="font-size:12px">${(c.top_provinces||[]).join(' · ')||'—'}</td></tr>`).join('');
+
+    // The province detail is the actionable list, but it is long — keep it collapsed so the crop
+    // rollup stays the thing you read first.
+    const top=provs.slice(0,15).map(r=>`<tr>
+        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
+        <td class="mono"><b>${N(r.n_current_x)}</b></td>
+        <td class="mono sub">${N(r.n_current)} / ${N(r.n_early)}</td>
+        <td class="mono sub">${N(r.n_farm_accounts)}</td>
+        <td class="mono sub">${aodTHB(r.os_thb)}</td>
+        <td class="sub" style="font-size:12px">${(r.crops||[]).filter(c=>c.depended_on).map(c=>`${c.crop} <span class="mono" style="color:${priceDirColor(c.direction)}">${c.yoy==null?'—':(c.yoy>0?'+':'')+c.yoy+'%'}</span>`).join(' · ')||'—'}</td></tr>`).join('');
+
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
+      <table class="tbl"><tr>
+        <th>Crop</th>
+        <th title="Thai farm-gate price, year-on-year — MEASURED NABC daily national average">Farm-gate YoY</th>
+        <th title="provinces where this crop is at least the dominance share of planted area">Provinces on it</th>
+        <th title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
+        <th title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
+        <th>Where most of it sits</th></tr>${crops}</table>
+      <details style="margin-top:10px"><summary class="sub">By province — the 15 largest healthy farm books (of ${provs.length})</summary>
+        <table class="tbl" style="margin-top:8px"><tr>
+          <th>Province</th><th>Current + X</th><th class="sub">Current / X</th>
+          <th class="sub">Farm accounts</th><th class="sub">Farm book</th><th>Crops it depends on</th></tr>${top}</table></details>
+      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. Sugarcane has a measured price but no province planted-area share, so it cannot be placed on this map.</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
@@ -8161,23 +8260,7 @@ function renderAssist(){
         <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
 
-    // Proactive-assist PRICE lens (owner #4): Current-bucket customers exposed to a crop under DOWNWARD
-    // price pressure. Cross the commodities board (falling global YoY × book exposure) — honest empty
-    // state today (Rice/Rubber/Palm all up; the drought radar above is the live hazard).
-    tmliFetch('commodities').then(j=>{
-      const host=$('#assist-radar'); if(!host) return;
-      const board=(j&&Array.isArray(j.board))?j.board:[];
-      const falling=board.filter(c=>c.global_yoy!=null&&c.global_yoy<0);
-      const exposed=falling.filter(c=>c.exposure&&c.exposure.book_accounts);
-      let body;
-      if(exposed.length){
-        body=`<b style="color:var(--agri)">Act now:</b> ${exposed.map(c=>`<b>${c.lab}</b> ${c.global_yoy}% · ${N(c.exposure.book_accounts)} book acc in belt`).join(' · ')} — many still Current; call the Current + X-day slice before collections turn.`;
-      } else {
-        const soft=falling.map(c=>c.lab+' '+c.global_yoy+'%').join(', ');
-        body=`No exposure-mapped crop is in downward price pressure now — Rice / Rubber / Palm (the crops with province area) are all up double-digits YoY, so today's live farm hazard is <b>drought</b> (radar above), not price.${soft?` Only ${soft} ${falling.length>1?'are':'is'} down, but ${falling.length>1?'they lack':'it lacks'} a province-exposure map.`:''} This lens flags Current-bucket customers the moment an exposure-mapped crop turns down.`;
-      }
-      host.insertAdjacentHTML('beforeend',`<div class="assist-pricelens"><div class="ic-bt" style="margin:10px 0 4px">PROACTIVE ASSIST · PRICE LENS <span class="s">Current-bucket customers in a falling-price sector</span></div><p class="lead sub" style="margin:0">${body}</p></div>`);
-    });
+    renderAssistPriceLens();
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];

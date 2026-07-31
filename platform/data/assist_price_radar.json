@@ -1,0 +1,3777 @@
+{
+  "meta": {
+    "title": "Proactive assistance — the healthy farm book, by the crop price it rides on",
+    "generated_by": "pipeline/build_assist_radar_price.py",
+    "deterministic": true,
+    "network_free": true,
+    "label": "MEASURED — real-tape account counts and balances crossed with MEASURED planted-area crop shares and MEASURED Thai farm-gate price YoY. The only judgement is the dominance threshold in meta.trigger. Nothing is modelled and nothing is forecast.",
+    "source": "accounts + balances: platform/data/tape_real.json (agri_impact.by_province, real no-PII tape aggregates); crop shares: platform/data/crop_stress.json (OAE crop_prov_area + DOAE 2568 registry); prices: source-data/farmgate_prices.json (NABC daily national-average farm-gate series).",
+    "price_vintage": "2026-07-23",
+    "tape_vintage": null,
+    "n_provinces": 65,
+    "n_current_x_total": 43189,
+    "sort": "provinces: most Current+X farm accounts first; crops: most exposed Current+X first",
+    "trigger": {
+      "rule": "a province is DEPENDED-ON by a crop when that crop is at least 15% of its planted area; the province TRIPS when any such crop's farm-gate YoY is below -2%.",
+      "dominant_share": 0.15,
+      "flat_band_pct": 2.0,
+      "n_tripped": 0
+    },
+    "reading": "n_current_x is the count of farm accounts that are CURRENT or only in the X (pre-30-day) bucket — the healthy population you would contact BEFORE it deteriorates. os_thb is the province's WHOLE farm book, not the Current+X slice: the tape aggregate does not expose outstanding split by bucket, and splitting it here would be fabrication.",
+    "caveats": [
+      "Not a forecast. Ranking crops by exposed accounts says how much of the healthy book rides on each price, not which price is going to move.",
+      "Sugarcane has a measured price series but no province planted-area share in crop_prov_area/DOAE, so it cannot be placed on the map here; it appears only in the per-branch agri layer. Five crops are mapped: Cassava, Maize, Oil palm, Rice, Rubber.",
+      "Province crop shares are planted AREA, not the borrower's actual crop. A farm borrower in a rice-dominant province is assumed exposed to rice; the tape does not record what any individual grows.",
+      "Drought and price are separate hazards. also_in_drought_radar marks the provinces the rainfall-driven assistance_radar already flags, so the two lists can be read together instead of double-counting."
+    ]
+  },
+  "crops": [
+    {
+      "crop": "Rice",
+      "key": "rice",
+      "yoy": 12.4,
+      "direction": "up",
+      "n_provinces": 47,
+      "n_current_x": 29198,
+      "n_farm_accounts": 38682,
+      "os_thb": 4892256181.0,
+      "top_provinces": [
+        "นครราชสีมา",
+        "อุบลราชธานี",
+        "บุรีรัมย์",
+        "ศรีสะเกษ",
+        "สกลนคร"
+      ]
+    },
+    {
+      "crop": "Rubber",
+      "key": "rubber",
+      "yoy": 38.0,
+      "direction": "up",
+      "n_provinces": 31,
+      "n_current_x": 20758,
+      "n_farm_accounts": 26738,
+      "os_thb": 3167026939.0,
+      "top_provinces": [
+        "สุราษฎร์ธานี",
+        "นครศรีธรรมราช",
+        "สกลนคร",
+        "อุดรธานี",
+        "นครพนม"
+      ]
+    },
+    {
+      "crop": "Oil palm",
+      "key": "oilpalm",
+      "yoy": 31.8,
+      "direction": "up",
+      "n_provinces": 11,
+      "n_current_x": 8589,
+      "n_farm_accounts": 10799,
+      "os_thb": 1338004865.0,
+      "top_provinces": [
+        "สุราษฎร์ธานี",
+        "นครศรีธรรมราช",
+        "ประจวบคีรีขันธ์",
+        "ชุมพร",
+        "ตรัง"
+      ]
+    },
+    {
+      "crop": "Cassava",
+      "key": "cassava",
+      "yoy": 57.3,
+      "direction": "up",
+      "n_provinces": 4,
+      "n_current_x": 3689,
+      "n_farm_accounts": 4733,
+      "os_thb": 620315556.0,
+      "top_provinces": [
+        "บึงกาฬ",
+        "ชัยภูมิ",
+        "กาญจนบุรี",
+        "กำแพงเพชร"
+      ]
+    },
+    {
+      "crop": "Maize",
+      "key": "maize",
+      "yoy": 11.3,
+      "direction": "up",
+      "n_provinces": 9,
+      "n_current_x": 2264,
+      "n_farm_accounts": 2981,
+      "os_thb": 385619988.0,
+      "top_provinces": [
+        "เพชรบูรณ์",
+        "ลพบุรี",
+        "อุทัยธานี",
+        "เชียงใหม่",
+        "สระบุรี"
+      ]
+    }
+  ],
+  "provinces": [
+    {
+      "th": "สุราษฎร์ธานี",
+      "region": "South",
+      "n_farm_accounts": 2657,
+      "current_pct": 51.57,
+      "early_pct": 26.04,
+      "n_current": 1370,
+      "n_early": 692,
+      "n_current_x": 2062,
+      "os_thb": 385595635.0,
+      "dpd90p_pct": 9.67,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.607,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.3885,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0044,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นครราชสีมา",
+      "region": "Isan",
+      "n_farm_accounts": 2521,
+      "current_pct": 54.11,
+      "early_pct": 23.36,
+      "n_current": 1364,
+      "n_early": 589,
+      "n_current_x": 1953,
+      "os_thb": 292132696.0,
+      "dpd90p_pct": 11.11,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7616,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.136,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0835,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0165,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0024,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "อุบลราชธานี",
+      "region": "Isan",
+      "n_farm_accounts": 2450,
+      "current_pct": 56.44,
+      "early_pct": 22.9,
+      "n_current": 1383,
+      "n_early": 561,
+      "n_current_x": 1944,
+      "os_thb": 284197262.0,
+      "dpd90p_pct": 9.84,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7931,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1192,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0769,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0062,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0047,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "บุรีรัมย์",
+      "region": "Isan",
+      "n_farm_accounts": 2184,
+      "current_pct": 58.11,
+      "early_pct": 23.9,
+      "n_current": 1269,
+      "n_early": 522,
+      "n_current_x": 1791,
+      "os_thb": 255906270.0,
+      "dpd90p_pct": 8.1,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8644,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0875,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0451,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0022,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0007,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นครศรีธรรมราช",
+      "region": "South",
+      "n_farm_accounts": 2242,
+      "current_pct": 52.59,
+      "early_pct": 23.77,
+      "n_current": 1179,
+      "n_early": 533,
+      "n_current_x": 1712,
+      "os_thb": 241920439.0,
+      "dpd90p_pct": 12.58,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.6812,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.2559,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0629,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ศรีสะเกษ",
+      "region": "Isan",
+      "n_farm_accounts": 1884,
+      "current_pct": 54.41,
+      "early_pct": 23.67,
+      "n_current": 1025,
+      "n_early": 446,
+      "n_current_x": 1471,
+      "os_thb": 195299920.0,
+      "dpd90p_pct": 10.4,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8586,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1039,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0284,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0068,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0023,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สกลนคร",
+      "region": "Isan",
+      "n_farm_accounts": 1707,
+      "current_pct": 54.83,
+      "early_pct": 24.14,
+      "n_current": 936,
+      "n_early": 412,
+      "n_current_x": 1348,
+      "os_thb": 188682911.0,
+      "dpd90p_pct": 10.84,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8083,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.15,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.03,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0116,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0001,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "บึงกาฬ",
+      "region": "Isan",
+      "n_farm_accounts": 1664,
+      "current_pct": 55.05,
+      "early_pct": 25.3,
+      "n_current": 916,
+      "n_early": 421,
+      "n_current_x": 1337,
+      "os_thb": 197061633.0,
+      "dpd90p_pct": 10.46,
+      "crops": [
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 1.0,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": true
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Cassava",
+      "weakest_yoy": 57.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "กาฬสินธุ์",
+      "region": "Isan",
+      "n_farm_accounts": 1841,
+      "current_pct": 45.73,
+      "early_pct": 23.74,
+      "n_current": 842,
+      "n_early": 437,
+      "n_current_x": 1279,
+      "os_thb": 228583613.0,
+      "dpd90p_pct": 17.71,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8129,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1074,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0763,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0034,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "มหาสารคาม",
+      "region": "Isan",
+      "n_farm_accounts": 1762,
+      "current_pct": 44.95,
+      "early_pct": 25.43,
+      "n_current": 792,
+      "n_early": 448,
+      "n_current_x": 1240,
+      "os_thb": 251702663.0,
+      "dpd90p_pct": 16.17,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9658,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0291,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.005,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0001,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "อุดรธานี",
+      "region": "Isan",
+      "n_farm_accounts": 1620,
+      "current_pct": 47.84,
+      "early_pct": 23.02,
+      "n_current": 775,
+      "n_early": 373,
+      "n_current_x": 1148,
+      "os_thb": 276163726.0,
+      "dpd90p_pct": 15.74,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7241,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.2075,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0567,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0116,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0001,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นครพนม",
+      "region": "Isan",
+      "n_farm_accounts": 1450,
+      "current_pct": 52.56,
+      "early_pct": 25.03,
+      "n_current": 762,
+      "n_early": 363,
+      "n_current_x": 1125,
+      "os_thb": 168659688.0,
+      "dpd90p_pct": 13.1,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.79,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1954,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0091,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0055,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สระแก้ว",
+      "region": "East",
+      "n_farm_accounts": 1169,
+      "current_pct": 63.9,
+      "early_pct": 22.24,
+      "n_current": 747,
+      "n_early": 260,
+      "n_current_x": 1007,
+      "os_thb": 105291009.0,
+      "dpd90p_pct": 7.27,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7041,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.1322,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0631,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0615,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0391,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สุรินทร์",
+      "region": "Isan",
+      "n_farm_accounts": 1292,
+      "current_pct": 51.55,
+      "early_pct": 26.08,
+      "n_current": 666,
+      "n_early": 337,
+      "n_current_x": 1003,
+      "os_thb": 150392948.0,
+      "dpd90p_pct": 10.91,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.91,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0712,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0173,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0015,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ประจวบคีรีขันธ์",
+      "region": "Central&BKK",
+      "n_farm_accounts": 1151,
+      "current_pct": 61.6,
+      "early_pct": 24.67,
+      "n_current": 709,
+      "n_early": 284,
+      "n_current_x": 993,
+      "os_thb": 141452078.0,
+      "dpd90p_pct": 4.52,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.6082,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.3411,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0487,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0013,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0007,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ร้อยเอ็ด",
+      "region": "Isan",
+      "n_farm_accounts": 1397,
+      "current_pct": 45.96,
+      "early_pct": 22.41,
+      "n_current": 642,
+      "n_early": 313,
+      "n_current_x": 955,
+      "os_thb": 176709920.0,
+      "dpd90p_pct": 16.03,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9651,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0323,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0019,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0006,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ชัยภูมิ",
+      "region": "Isan",
+      "n_farm_accounts": 1251,
+      "current_pct": 48.6,
+      "early_pct": 27.02,
+      "n_current": 608,
+      "n_early": 338,
+      "n_current_x": 946,
+      "os_thb": 192113389.0,
+      "dpd90p_pct": 11.83,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6955,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.2384,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0473,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0166,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0022,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ชุมพร",
+      "region": "South",
+      "n_farm_accounts": 1123,
+      "current_pct": 59.48,
+      "early_pct": 23.24,
+      "n_current": 668,
+      "n_early": 261,
+      "n_current_x": 929,
+      "os_thb": 137607477.0,
+      "dpd90p_pct": 8.46,
+      "crops": [
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.6125,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.3861,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0013,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "จันทบุรี",
+      "region": "East",
+      "n_farm_accounts": 1154,
+      "current_pct": 56.06,
+      "early_pct": 23.83,
+      "n_current": 647,
+      "n_early": 275,
+      "n_current_x": 922,
+      "os_thb": 139924404.0,
+      "dpd90p_pct": 11.44,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.9266,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.041,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0229,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0069,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0026,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ยะลา",
+      "region": "South",
+      "n_farm_accounts": 1138,
+      "current_pct": 59.93,
+      "early_pct": 18.54,
+      "n_current": 682,
+      "n_early": 211,
+      "n_current_x": 893,
+      "os_thb": 52299581.0,
+      "dpd90p_pct": 12.92,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.9766,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0156,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0078,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ตรัง",
+      "region": "South",
+      "n_farm_accounts": 1156,
+      "current_pct": 48.27,
+      "early_pct": 28.03,
+      "n_current": 558,
+      "n_early": 324,
+      "n_current_x": 882,
+      "os_thb": 143507209.0,
+      "dpd90p_pct": 11.85,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.7977,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.1966,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0057,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "เลย",
+      "region": "Isan",
+      "n_farm_accounts": 1210,
+      "current_pct": 45.12,
+      "early_pct": 20.83,
+      "n_current": 546,
+      "n_early": 252,
+      "n_current_x": 798,
+      "os_thb": 205227323.0,
+      "dpd90p_pct": 18.51,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.5644,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.2629,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.098,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0599,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0148,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สงขลา",
+      "region": "South",
+      "n_farm_accounts": 968,
+      "current_pct": 61.37,
+      "early_pct": 19.21,
+      "n_current": 594,
+      "n_early": 186,
+      "n_current_x": 780,
+      "os_thb": 90622126.0,
+      "dpd90p_pct": 12.4,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.8977,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0629,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0394,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "กาญจนบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 998,
+      "current_pct": 49.4,
+      "early_pct": 23.85,
+      "n_current": 493,
+      "n_early": 238,
+      "n_current_x": 731,
+      "os_thb": 112186301.0,
+      "dpd90p_pct": 14.43,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.4643,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.2569,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1622,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0888,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0278,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พัทลุง",
+      "region": "South",
+      "n_farm_accounts": 838,
+      "current_pct": 57.75,
+      "early_pct": 23.63,
+      "n_current": 484,
+      "n_early": 198,
+      "n_current_x": 682,
+      "os_thb": 72905947.0,
+      "dpd90p_pct": 9.43,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.8104,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0967,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0929,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "กำแพงเพชร",
+      "region": "North",
+      "n_farm_accounts": 820,
+      "current_pct": 53.17,
+      "early_pct": 29.15,
+      "n_current": 436,
+      "n_early": 239,
+      "n_current_x": 675,
+      "os_thb": 118954233.0,
+      "dpd90p_pct": 8.17,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6677,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.248,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0634,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0167,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0042,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "กระบี่",
+      "region": "South",
+      "n_farm_accounts": 773,
+      "current_pct": 53.68,
+      "early_pct": 27.04,
+      "n_current": 415,
+      "n_early": 209,
+      "n_current_x": 624,
+      "os_thb": 109253912.0,
+      "dpd90p_pct": 8.93,
+      "crops": [
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.6652,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.3313,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0034,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ยโสธร",
+      "region": "Isan",
+      "n_farm_accounts": 836,
+      "current_pct": 46.41,
+      "early_pct": 25.24,
+      "n_current": 388,
+      "n_early": 211,
+      "n_current_x": 599,
+      "os_thb": 108179996.0,
+      "dpd90p_pct": 15.79,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8778,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0771,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0424,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0027,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0001,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ขอนแก่น",
+      "region": "Isan",
+      "n_farm_accounts": 766,
+      "current_pct": 53.4,
+      "early_pct": 21.67,
+      "n_current": 409,
+      "n_early": 166,
+      "n_current_x": 575,
+      "os_thb": 132193574.0,
+      "dpd90p_pct": 12.14,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8992,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0679,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0314,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0008,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0008,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "อำนาจเจริญ",
+      "region": "Isan",
+      "n_farm_accounts": 732,
+      "current_pct": 50.82,
+      "early_pct": 26.64,
+      "n_current": 372,
+      "n_early": 195,
+      "n_current_x": 567,
+      "os_thb": 81322026.0,
+      "dpd90p_pct": 12.57,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8202,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.1028,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0709,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.006,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นครสวรรค์",
+      "region": "North",
+      "n_farm_accounts": 832,
+      "current_pct": 48.08,
+      "early_pct": 19.83,
+      "n_current": 400,
+      "n_early": 165,
+      "n_current_x": 565,
+      "os_thb": 129761016.0,
+      "dpd90p_pct": 19.11,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8054,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.1116,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.08,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.002,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0009,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "หนองคาย",
+      "region": "Isan",
+      "n_farm_accounts": 721,
+      "current_pct": 47.29,
+      "early_pct": 23.72,
+      "n_current": 341,
+      "n_early": 171,
+      "n_current_x": 512,
+      "os_thb": 89501969.0,
+      "dpd90p_pct": 14.29,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6185,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.3505,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0257,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0051,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0002,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สุพรรณบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 675,
+      "current_pct": 50.66,
+      "early_pct": 23.41,
+      "n_current": 342,
+      "n_early": 158,
+      "n_current_x": 500,
+      "os_thb": 79944356.0,
+      "dpd90p_pct": 13.63,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9393,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0279,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.026,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0049,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0019,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ราชบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 604,
+      "current_pct": 51.49,
+      "early_pct": 26.16,
+      "n_current": 311,
+      "n_early": 158,
+      "n_current_x": 469,
+      "os_thb": 63916713.0,
+      "dpd90p_pct": 12.75,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7558,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1506,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.052,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0401,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0015,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "เพชรบูรณ์",
+      "region": "North",
+      "n_farm_accounts": 603,
+      "current_pct": 48.09,
+      "early_pct": 24.38,
+      "n_current": 290,
+      "n_early": 147,
+      "n_current_x": 437,
+      "os_thb": 90437841.0,
+      "dpd90p_pct": 16.92,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6374,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.2559,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0502,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0478,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0086,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "มุกดาหาร",
+      "region": "Isan",
+      "n_farm_accounts": 581,
+      "current_pct": 50.6,
+      "early_pct": 23.41,
+      "n_current": 294,
+      "n_early": 136,
+      "n_current_x": 430,
+      "os_thb": 61515298.0,
+      "dpd90p_pct": 12.91,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.5915,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.3455,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0571,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0059,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นราธิวาส",
+      "region": "South",
+      "n_farm_accounts": 514,
+      "current_pct": 61.48,
+      "early_pct": 19.26,
+      "n_current": 316,
+      "n_early": 99,
+      "n_current_x": 415,
+      "os_thb": 27463659.0,
+      "dpd90p_pct": 9.73,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.8991,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0723,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0286,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ลพบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 532,
+      "current_pct": 53.94,
+      "early_pct": 23.5,
+      "n_current": 287,
+      "n_early": 125,
+      "n_current_x": 412,
+      "os_thb": 76661071.0,
+      "dpd90p_pct": 12.22,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6612,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.2503,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0851,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0021,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0013,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พิษณุโลก",
+      "region": "North",
+      "n_farm_accounts": 534,
+      "current_pct": 53.55,
+      "early_pct": 23.41,
+      "n_current": 286,
+      "n_early": 125,
+      "n_current_x": 411,
+      "os_thb": 74439839.0,
+      "dpd90p_pct": 11.8,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7158,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1622,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0658,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0474,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0087,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "อุทัยธานี",
+      "region": "North",
+      "n_farm_accounts": 541,
+      "current_pct": 46.39,
+      "early_pct": 25.88,
+      "n_current": 251,
+      "n_early": 140,
+      "n_current_x": 391,
+      "os_thb": 65294070.0,
+      "dpd90p_pct": 14.79,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6691,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.1632,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.1185,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0393,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.01,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ฉะเชิงเทรา",
+      "region": "East",
+      "n_farm_accounts": 484,
+      "current_pct": 61.16,
+      "early_pct": 18.8,
+      "n_current": 296,
+      "n_early": 91,
+      "n_current_x": 387,
+      "os_thb": 53894353.0,
+      "dpd90p_pct": 8.68,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6854,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.2514,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0426,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0188,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0018,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สตูล",
+      "region": "South",
+      "n_farm_accounts": 457,
+      "current_pct": 57.77,
+      "early_pct": 26.48,
+      "n_current": 264,
+      "n_early": 121,
+      "n_current_x": 385,
+      "os_thb": 47382469.0,
+      "dpd90p_pct": 9.19,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.7767,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.2017,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0217,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "หนองบัวลำภู",
+      "region": "Isan",
+      "n_farm_accounts": 530,
+      "current_pct": 50.56,
+      "early_pct": 21.7,
+      "n_current": 268,
+      "n_early": 115,
+      "n_current_x": 383,
+      "os_thb": 87023248.0,
+      "dpd90p_pct": 13.02,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8337,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1266,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0256,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0085,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0055,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พิจิตร",
+      "region": "North",
+      "n_farm_accounts": 455,
+      "current_pct": 48.34,
+      "early_pct": 23.74,
+      "n_current": 220,
+      "n_early": 108,
+      "n_current_x": 328,
+      "os_thb": 61992764.0,
+      "dpd90p_pct": 14.73,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9636,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0314,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0027,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0014,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.001,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พังงา",
+      "region": "South",
+      "n_farm_accounts": 392,
+      "current_pct": 56.13,
+      "early_pct": 25.51,
+      "n_current": 220,
+      "n_early": 100,
+      "n_current_x": 320,
+      "os_thb": 39740603.0,
+      "dpd90p_pct": 9.69,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.6554,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.3421,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0025,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ตราด",
+      "region": "East",
+      "n_farm_accounts": 405,
+      "current_pct": 56.04,
+      "early_pct": 21.73,
+      "n_current": 227,
+      "n_early": 88,
+      "n_current_x": 315,
+      "os_thb": 47145223.0,
+      "dpd90p_pct": 12.35,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.7958,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.1697,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0345,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "เชียงราย",
+      "region": "North",
+      "n_farm_accounts": 380,
+      "current_pct": 61.05,
+      "early_pct": 20.79,
+      "n_current": 232,
+      "n_early": 79,
+      "n_current_x": 311,
+      "os_thb": 42962760.0,
+      "dpd90p_pct": 8.42,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7012,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.2097,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0762,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0068,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0061,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ปัตตานี",
+      "region": "South",
+      "n_farm_accounts": 341,
+      "current_pct": 59.23,
+      "early_pct": 21.41,
+      "n_current": 202,
+      "n_early": 73,
+      "n_current_x": 275,
+      "os_thb": 22934834.0,
+      "dpd90p_pct": 9.68,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.8141,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.134,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0519,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "เชียงใหม่",
+      "region": "North",
+      "n_farm_accounts": 333,
+      "current_pct": 51.66,
+      "early_pct": 24.62,
+      "n_current": 172,
+      "n_early": 82,
+      "n_current_x": 254,
+      "os_thb": 37400097.0,
+      "dpd90p_pct": 11.71,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7765,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.183,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0352,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0047,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0006,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "เพชรบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 312,
+      "current_pct": 50.96,
+      "early_pct": 28.85,
+      "n_current": 159,
+      "n_early": 90,
+      "n_current_x": 249,
+      "os_thb": 33984497.0,
+      "dpd90p_pct": 8.65,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8801,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0562,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0468,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0135,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0034,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สุโขทัย",
+      "region": "North",
+      "n_farm_accounts": 354,
+      "current_pct": 43.79,
+      "early_pct": 25.14,
+      "n_current": 155,
+      "n_early": 89,
+      "n_current_x": 244,
+      "os_thb": 38914035.0,
+      "dpd90p_pct": 15.25,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8835,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0487,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0389,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0237,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0051,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ระยอง",
+      "region": "East",
+      "n_farm_accounts": 325,
+      "current_pct": 56.31,
+      "early_pct": 18.15,
+      "n_current": 183,
+      "n_early": 59,
+      "n_current_x": 242,
+      "os_thb": 44608533.0,
+      "dpd90p_pct": 13.54,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.9151,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0569,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0157,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0123,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rubber",
+      "weakest_yoy": 38.0,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ระนอง",
+      "region": "South",
+      "n_farm_accounts": 265,
+      "current_pct": 65.66,
+      "early_pct": 18.49,
+      "n_current": 174,
+      "n_early": 49,
+      "n_current_x": 223,
+      "os_thb": 21363670.0,
+      "dpd90p_pct": 9.81,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.6753,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.3237,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.0011,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Oil palm",
+      "weakest_yoy": 31.8,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ชัยนาท",
+      "region": "Central&BKK",
+      "n_farm_accounts": 345,
+      "current_pct": 39.71,
+      "early_pct": 22.61,
+      "n_current": 137,
+      "n_early": 78,
+      "n_current_x": 215,
+      "os_thb": 45563991.0,
+      "dpd90p_pct": 22.03,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9474,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0375,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0127,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0014,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0009,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "สระบุรี",
+      "region": "Central&BKK",
+      "n_farm_accounts": 241,
+      "current_pct": 55.6,
+      "early_pct": 21.99,
+      "n_current": 134,
+      "n_early": 53,
+      "n_current_x": 187,
+      "os_thb": 30357519.0,
+      "dpd90p_pct": 12.45,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6934,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.256,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0368,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.01,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0039,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ลำปาง",
+      "region": "North",
+      "n_farm_accounts": 205,
+      "current_pct": 58.54,
+      "early_pct": 27.32,
+      "n_current": 120,
+      "n_early": 56,
+      "n_current_x": 176,
+      "os_thb": 24554067.0,
+      "dpd90p_pct": 5.85,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.2904,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.054,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0525,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0031,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พะเยา",
+      "region": "North",
+      "n_farm_accounts": 206,
+      "current_pct": 64.56,
+      "early_pct": 20.39,
+      "n_current": 133,
+      "n_early": 42,
+      "n_current_x": 175,
+      "os_thb": 24248520.0,
+      "dpd90p_pct": 8.25,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7187,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.1732,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.1002,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.005,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0029,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "นครปฐม",
+      "region": "Central&BKK",
+      "n_farm_accounts": 218,
+      "current_pct": 51.37,
+      "early_pct": 24.31,
+      "n_current": 112,
+      "n_early": 53,
+      "n_current_x": 165,
+      "os_thb": 23809145.0,
+      "dpd90p_pct": 12.39,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9982,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0018,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0001,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ตาก",
+      "region": "North",
+      "n_farm_accounts": 198,
+      "current_pct": 57.57,
+      "early_pct": 22.22,
+      "n_current": 114,
+      "n_early": 44,
+      "n_current_x": 158,
+      "os_thb": 24757819.0,
+      "dpd90p_pct": 10.61,
+      "crops": [
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.4883,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.3808,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.1168,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0123,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0018,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ชลบุรี",
+      "region": "East",
+      "n_farm_accounts": 178,
+      "current_pct": 53.93,
+      "early_pct": 26.97,
+      "n_current": 96,
+      "n_early": 48,
+      "n_current_x": 144,
+      "os_thb": 23036150.0,
+      "dpd90p_pct": 11.8,
+      "crops": [
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.5159,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.2528,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.1545,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0767,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ลำพูน",
+      "region": "North",
+      "n_farm_accounts": 162,
+      "current_pct": 62.35,
+      "early_pct": 20.37,
+      "n_current": 101,
+      "n_early": 33,
+      "n_current_x": 134,
+      "os_thb": 19293915.0,
+      "dpd90p_pct": 10.49,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.6619,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.2644,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0503,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0195,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0041,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 2,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "น่าน",
+      "region": "North",
+      "n_farm_accounts": 166,
+      "current_pct": 50.61,
+      "early_pct": 18.67,
+      "n_current": 84,
+      "n_early": 31,
+      "n_current_x": 115,
+      "os_thb": 16863589.0,
+      "dpd90p_pct": 18.67,
+      "crops": [
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.3399,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.3248,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.3037,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0285,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0031,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 3,
+      "weakest_crop": "Maize",
+      "weakest_yoy": 11.3,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "ปราจีนบุรี",
+      "region": "East",
+      "n_farm_accounts": 136,
+      "current_pct": 61.04,
+      "early_pct": 22.79,
+      "n_current": 83,
+      "n_early": 31,
+      "n_current_x": 114,
+      "os_thb": 16239367.0,
+      "dpd90p_pct": 7.35,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.8287,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0732,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0369,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0331,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0281,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": true,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "อุตรดิตถ์",
+      "region": "North",
+      "n_farm_accounts": 162,
+      "current_pct": 41.98,
+      "early_pct": 21.6,
+      "n_current": 68,
+      "n_early": 35,
+      "n_current_x": 103,
+      "os_thb": 19692754.0,
+      "dpd90p_pct": 20.99,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.7841,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.1414,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0358,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Cassava",
+          "key": "cassava",
+          "share": 0.0344,
+          "yoy": 57.3,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0043,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    },
+    {
+      "th": "พระนครศรีอยุธยา",
+      "region": "Central&BKK",
+      "n_farm_accounts": 104,
+      "current_pct": 50.96,
+      "early_pct": 20.19,
+      "n_current": 53,
+      "n_early": 21,
+      "n_current_x": 74,
+      "os_thb": 12295950.0,
+      "dpd90p_pct": 11.54,
+      "crops": [
+        {
+          "crop": "Rice",
+          "key": "rice",
+          "share": 0.9992,
+          "yoy": 12.4,
+          "direction": "up",
+          "depended_on": true
+        },
+        {
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0008,
+          "yoy": 31.8,
+          "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Maize",
+          "key": "maize",
+          "share": 0.0,
+          "yoy": 11.3,
+          "direction": "up",
+          "depended_on": false
+        }
+      ],
+      "n_depended_on": 1,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 12.4,
+      "also_in_drought_radar": false,
+      "tripped": false,
+      "falling_crops": []
+    }
+  ],
+  "tripped": []
+}
