@@ -835,26 +835,26 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 .jumpnav .chip{text-decoration:none}
 [data-theme=light] .jumpnav{background:rgba(247,248,251,.92)}
 /* collapsible sections — keep the h2 look, add a disclosure caret to summary */
-details.compsec{border-top:1px solid var(--line2);margin:0}
-details.compsec:first-of-type{border-top:none}
-details.compsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+details.compsec,details.ovsec{border-top:1px solid var(--line2);margin:0}
+details.compsec:first-of-type,details.ovsec:first-of-type{border-top:none}
+details.compsec>summary,details.ovsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
   outline-offset:2px}
-details.compsec>summary::-webkit-details-marker{display:none}
-details.compsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
-details.compsec:first-of-type>summary>h2{margin-top:4px}
-details.compsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
+details.compsec>summary::-webkit-details-marker,details.ovsec>summary::-webkit-details-marker{display:none}
+details.compsec>summary>h2,details.ovsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
+details.compsec:first-of-type>summary>h2,details.ovsec:first-of-type>summary>h2{margin-top:4px}
+details.compsec>summary::after,details.ovsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
   margin-top:2px}
-details.compsec[open]>summary::after{transform:rotate(90deg)}
-details.compsec>summary:hover::after,details.compsec>summary:hover>h2{color:var(--txt)}
-details.compsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
-details.compsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
-.compsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
+details.compsec[open]>summary::after,details.ovsec[open]>summary::after{transform:rotate(90deg)}
+details.compsec>summary:hover::after,details.compsec>summary:hover>h2,details.ovsec>summary:hover::after,details.ovsec>summary:hover>h2{color:var(--txt)}
+details.compsec[open]>summary>h2,details.ovsec[open]>summary>h2{border-bottom:1px solid var(--line2);padding-bottom:6px}
+details.compsec>summary:focus-visible,details.ovsec>summary:focus-visible{outline:2px solid var(--accent);border-radius:6px}
+.compsub,.ovsub{font-size:12px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600;border-bottom:1px solid var(--line2);padding-bottom:6px}
-.compsub.opp{color:var(--opp)}
-.compsub.risk{color:#ef7d76}
+.compsub.opp,.ovsub.opp{color:var(--opp)}
+.compsub.risk,.ovsub.risk{color:#ef7d76}
 .compsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600}
-@media print{.jumpnav{display:none!important}details.compsec>summary::after{display:none}}
+@media print{.jumpnav{display:none!important}details.compsec>summary::after,details.ovsec>summary::after{display:none}}
 
 /* ============================================================
    DESIGN-SYSTEM TIGHTENING (design-sys) — appended; wins via the
@@ -885,7 +885,7 @@ h2:first-child{margin-top:var(--s2)}
 .search{font-size:var(--fz-body)}
 
 /* CAPTION (11) — labels, eyebrows, sub-notes, table heads, tags: one small size */
-.mcard .k,.cc-card-h,.tbl th,.kpi .k,.compsub,.compsub2,.sim-ctl-h,
+.mcard .k,.cc-card-h,.tbl th,.kpi .k,.compsub,.ovsub,.compsub2,.sim-ctl-h,
 .maplegend,.chip,.tag,.cc-tag,.note,.loading{font-size:var(--fz-caption);letter-spacing:.4px}
 .mcard .n,.mcard .d,.lens .ld,.cc-sub2,.cc-row .l .s,.cc-row .r .s,
 .sub,.sim-hint,.prov,.pop .pv{font-size:var(--fz-caption);letter-spacing:0}
@@ -936,7 +936,7 @@ h2::before{top:2px;bottom:2px;width:3px}
 .cc-row{border-bottom:1px solid var(--line2)}
 .cc-row:last-child{border-bottom:none}
 /* acquisition sub-heads: same calm treatment, no heavy underline */
-.compsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
+.compsub,.ovsub{border-bottom:1px solid var(--line2);padding-bottom:var(--s2);color:var(--mid)}
 
 /* ---- 5 · POLISH: unified radius + softer, consistent shadows ---- */
 .mcard,.cc-card,.lens,.insight,.verdict,.purpose,.note,.tbl,.search,

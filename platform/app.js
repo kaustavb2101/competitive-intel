@@ -1399,15 +1399,18 @@ document.addEventListener('keydown',e=>{
   if(!row||row!==e.target) return;
   e.preventDefault(); row.click();
 });
-// Acquisition in-tab jump-nav: open the target collapsible section and scroll to it.
-(function(){const j=document.getElementById('compjump'); if(!j) return;
-  j.addEventListener('click',e=>{const a=e.target.closest('[data-jump]'); if(!a) return;
-    e.preventDefault();
-    const sec=document.getElementById(a.dataset.jump); if(!sec) return;
-    sec.open=true;
-    sec.scrollIntoView({behavior:'smooth',block:'start'});
-    const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
-  });})();
+// In-tab jump-nav: open the target collapsible section and scroll to it. Delegated from document so
+// it serves EVERY .jumpnav (Competition's #compjump, Macro's #ovjump, and any added later) — it used
+// to be bound to #compjump alone, which meant a second pillar adopting the pattern silently got dead
+// chips. One listener, no per-nav wiring.
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('.jumpnav [data-jump]'); if(!a) return;
+  const sec=document.getElementById(a.dataset.jump); if(!sec) return;
+  e.preventDefault();
+  sec.open=true;
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+  const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
+});
 
 /* ---------- load ---------- */
 async function boot(){

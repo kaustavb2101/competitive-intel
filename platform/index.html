@@ -323,10 +323,22 @@
       <b>estimated/proxy</b>.</p>
     <div id="outlook"></div>
 
+    <nav class="jumpnav no-print" id="ovjump" aria-label="Jump to section within Macro">
+      <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-labour">Labour &amp; debt</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-business">Business &amp; credit</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-hazard">Live hazard</a>
+    </nav>
+
+    <details class="ovsec" id="sec-ov-macro" open>
+    <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2></summary>
+
     <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
     <div class="dash2">
       <div class="dash2-side">
-        <h2>Macro overlay — current conditions</h2>
+        <h3 class="ovsub">Macro overlay — current conditions</h3>
         <div class="grid macro" id="macro"></div>
 
         <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
@@ -334,20 +346,20 @@
         <div id="ov-imfweo"></div>
       </div>
       <div class="dash2-main">
-        <h2>Commodity board — the segments diverge</h2>
+        <h3 class="ovsub">Commodity board — the segments diverge</h3>
         <div class="insight" id="ov-keyread">
           <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) and
           livestock/forestry households move on different price cycles — see the board for current directions.
         </div>
         <div class="cols2">
-          <div><h2>Crops · under pressure</h2><table class="tbl" id="board-crops"></table></div>
-          <div><h2>Protein · forestry · firming</h2><table class="tbl" id="board-other"></table></div>
+          <div><h3 class="ovsub">Crops · under pressure</h3><table class="tbl" id="board-crops"></table></div>
+          <div><h3 class="ovsub">Protein · forestry · firming</h3><table class="tbl" id="board-other"></table></div>
         </div>
 
         <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
              omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
         <div id="mwatch-wrap" style="display:none">
-          <h2>Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h2>
+          <h3 class="ovsub">Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h3>
           <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first. <b>Press a card to list the affected branches.</b></p>
           <div class="grid macro" id="mwatch"></div>
           <div id="mwatch-drill"></div>
@@ -358,13 +370,17 @@
     <!-- Commodities board upgrade (data/commodities.json) — global Pink Sheet YoY × Thai farm-gate
          YoY × book exposure (who's-exposed drill). Null-safe: absent file → nothing renders. -->
     <div id="ov-commodities"></div>
+    </details>
 
-    <h2 class="collat">Collateral outlook · vehicle-title value watch</h2>
+    <details class="ovsec" id="sec-ov-collateral" open>
+    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2></summary>
+
+    <h3 class="ovsub collat">Collateral outlook · vehicle-title value watch</h3>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
 
-    <h2 class="collat">Diesel-pickup collateral · diesel share &amp; national brand mix</h2>
+    <h3 class="ovsub collat">Diesel-pickup collateral · diesel share &amp; national brand mix</h3>
     <div class="verdict v-warn" id="dcollat-verdict" style="display:none"></div>
     <div class="grid macro" id="dcollat-brand"></div>
     <p class="lead" id="dcollat-note"></p>
@@ -374,36 +390,40 @@
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
          hidden until the layer loads (null-safe). -->
     <div id="btrend-wrap" style="display:none">
-      <h2 class="collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+      <h3 class="ovsub collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h3>
       <div class="verdict v-warn" id="btrend-verdict" style="display:none"></div>
       <p class="lead" id="btrend-note"></p>
       <table class="tbl" id="btrendtbl"></table>
     </div>
     <div id="vehreg-wrap" style="display:none">
-      <h2 class="collat">Collateral base · registered-vehicle stock (MOT, measured)</h2>
+      <h3 class="ovsub collat">Collateral base · registered-vehicle stock (MOT, measured)</h3>
       <p class="lead" id="vehreg-note"></p>
       <div class="grid macro" id="vehreg-cards"></div>
     </div>
 
-    <h2 class="collat">Collateral mix · most motorcycle-heavy provinces</h2>
+    <h3 class="ovsub collat">Collateral mix · most motorcycle-heavy provinces</h3>
     <p class="lead" id="collatmix-note"></p>
     <table class="tbl" id="collatmixtbl"></table>
 
-    <h2 class="collat">Collateral recovery-value sensitivity · illustrative</h2>
+    <h3 class="ovsub collat">Collateral recovery-value sensitivity · illustrative</h3>
     <p class="lead" id="recovery-note"></p>
     <div class="grid macro" id="recovery-cards"></div>
     <table class="tbl" id="recoverytbl"></table>
 
-    <h2 class="collat">EV transition · used-collateral value watch <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h2>
+    <h3 class="ovsub collat">EV transition · used-collateral value watch <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h3>
     <p class="lead" id="ev-note"></p>
     <div class="grid macro" id="ev-cards"></div>
     <table class="tbl" id="evtbl"></table>
+    </details>
 
-    <h2>Segment signals by region</h2>
+    <details class="ovsec" id="sec-ov-agri" open>
+    <summary><h2 class="opp">Farm households — segments, crops, margin &amp; drought</h2></summary>
+
+    <h3 class="ovsub">Segment signals by region</h3>
     <table class="tbl" id="region"></table>
     <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle density.</p>
 
-    <h2 class="risk">Crop-household stress · worst provinces</h2>
+    <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
     <p class="lead" id="cstress-note"></p>
@@ -413,7 +433,7 @@
          arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
          cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
     <div id="margin-wrap" style="display:none">
-      <h2 class="risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h2>
+      <h3 class="ovsub risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h3>
       <div class="verdict" id="margin-verdict" style="display:none"></div>
       <p class="lead" id="margin-note"></p>
       <table class="tbl" id="margintbl"></table>
@@ -430,17 +450,22 @@
          crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
          actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
     <div id="amphoe-crops-wrap" style="display:none">
-      <h2 class="risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h2>
+      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
       <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
       <p class="lead" id="amphoe-crops-note"></p>
       <table class="tbl" id="amphoe-crops-tbl"></table>
     </div>
+    </details>
+
+    <details class="ovsec" id="sec-ov-labour">
+    <summary><h2 class="opp">Labour &amp; household debt</h2></summary>
+
     <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
          (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
          seasonal-waiting share (agri off-season idle labour) that marks where borrower cash-flow is
          most seasonal. Rendered by renderProvinceLfs(); hidden gracefully until the layer loads. -->
     <div id="lfs-wrap" style="display:none">
-      <h2 class="risk">Provincial labour stress <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · NSO LFS 2026 Q1</span></h2>
+      <h3 class="ovsub risk">Provincial labour stress <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · NSO LFS 2026 Q1</span></h3>
       <p class="lead" id="lfs-note"></p>
       <table class="tbl" id="lfstbl"></table>
     </div>
@@ -450,11 +475,16 @@
          province table, so region is the honest grain; the debt-per-household cut is the most recent
          common vintage (SES 2566/2023). Rendered by renderRegionDebt(); hidden gracefully until load. -->
     <div id="regdebt-wrap" style="display:none">
-      <h2 class="risk">Regional household-debt backdrop <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT over NSO SES</span></h2>
+      <h3 class="ovsub risk">Regional household-debt backdrop <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT over NSO SES</span></h3>
       <div class="verdict" id="regdebt-verdict" style="display:none"></div>
       <p class="lead" id="regdebt-note"></p>
       <table class="tbl" id="regdebttbl"></table>
     </div>
+    </details>
+
+    <details class="ovsec" id="sec-ov-business">
+    <summary><h2 class="opp">Business &amp; credit backdrop</h2></summary>
+
     <!-- Logistics-SME (hauler) pulse (data/truck_flow.json) — MEASURED DLT truck registration actions,
          trailing-12m vs the prior 12m (obj #1). An owner-operator hauler is a classic heavy-title
          borrower; a contracting truck fleet = that segment's cash flow thinning, and a two-for-one on
@@ -462,7 +492,7 @@
          so the card leads with that cushion then names the province pockets where new-truck demand is
          contracting. Rendered by renderTruckFlow(); hidden gracefully until the layer loads. -->
     <div id="truckflow-wrap" style="display:none">
-      <h2 class="risk">Logistics-SME pulse · truck-fleet flow <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
+      <h3 class="ovsub risk">Logistics-SME pulse · truck-fleet flow <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h3>
       <div class="verdict" id="truckflow-verdict" style="display:none"></div>
       <p class="lead" id="truckflow-note"></p>
       <table class="tbl" id="truckflowtbl"></table>
@@ -475,13 +505,13 @@
          purpose — per-province ratios are confounded by central metro registration, which regional
          aggregation cancels. Rendered by renderCollateralFlow(); hidden gracefully until the layer loads. -->
     <div id="collflow-wrap" style="display:none">
-      <h2 class="risk">Used-collateral pulse · moto / car / pickup <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h2>
+      <h3 class="ovsub risk">Used-collateral pulse · moto / car / pickup <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h3>
       <div class="verdict" id="collflow-verdict" style="display:none"></div>
       <p class="lead" id="collflow-note"></p>
       <table class="tbl" id="collflowtbl"></table>
     </div>
     <div id="dbdform-wrap" style="display:none">
-      <h2 class="risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h2>
+      <h3 class="ovsub risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h3>
       <div class="verdict" id="dbdform-verdict" style="display:none"></div>
       <p class="lead" id="dbdform-note"></p>
       <table class="tbl" id="dbdformtbl"></table>
@@ -493,11 +523,16 @@
          macro tide, NOT AutoX's own book and NOT per-province. Rendered by renderSfi(); hidden until the
          layer loads. -->
     <div id="sfi-wrap" style="display:none">
-      <h2 class="risk">Credit-quality backdrop · state-bank system NPL <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · FPO / SFI aggregates</span></h2>
+      <h3 class="ovsub risk">Credit-quality backdrop · state-bank system NPL <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · FPO / SFI aggregates</span></h3>
       <div class="verdict" id="sfi-verdict" style="display:none"></div>
       <p class="lead" id="sfi-note"></p>
       <table class="tbl" id="sfitbl"></table>
     </div>
+    </details>
+
+    <details class="ovsec" id="sec-ov-hazard">
+    <summary><h2 class="opp">Live hazard — flood &amp; rain</h2></summary>
+
     <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
          ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
          The ACUTE obj-#1 counterpart to the slower crop-stress drought read: water on the ground /
@@ -505,12 +540,14 @@
          series. Two station-aggregate reads — river/reservoir water LEVEL (flood) and 24h RAINFALL —
          per province. Rendered by renderThaiwater(); hidden gracefully until BOTH layers load. -->
     <div id="thaiwater-wrap" style="display:none">
-      <h2 class="risk">Live flood &amp; rain pulse <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">MEASURED · ThaiWater (live)</span></h2>
+      <h3 class="ovsub risk">Live flood &amp; rain pulse <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">MEASURED · ThaiWater (live)</span></h3>
       <div class="verdict v-warn" id="thaiwater-verdict" style="display:none"></div>
       <p class="lead" id="thaiwater-note"></p>
       <div class="tblwrap" role="region" tabindex="0" aria-label="Scrollable table: Live flood pulse"><table class="tbl" id="thaiwater-flood-tbl"></table></div>
       <div class="tblwrap" style="margin-top:10px" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
     </div>
+    </details>
+
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · ② of ⑤</span>
       <a href="data.html">Acquisition — the network in the data book, all 2,015 branches →</a>
