@@ -1400,10 +1400,10 @@ document.addEventListener('keydown',e=>{
   e.preventDefault(); row.click();
 });
 // Acquisition in-tab jump-nav: open the target collapsible section and scroll to it.
-(function(){const j=document.getElementById('acqjump'); if(!j) return;
-  j.addEventListener('click',e=>{const a=e.target.closest('[data-acq]'); if(!a) return;
+(function(){const j=document.getElementById('compjump'); if(!j) return;
+  j.addEventListener('click',e=>{const a=e.target.closest('[data-jump]'); if(!a) return;
     e.preventDefault();
-    const sec=document.getElementById(a.dataset.acq); if(!sec) return;
+    const sec=document.getElementById(a.dataset.jump); if(!sec) return;
     sec.open=true;
     sec.scrollIntoView({behavior:'smooth',block:'start'});
     const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
@@ -1424,7 +1424,7 @@ async function boot(){
     wrapTables();
     $('#updated').textContent = META.updated || '';
     try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); PLOOK=provLookupByName(); }catch(e){}
-    renderOverview(); renderAcq(); renderLenses(); renderBranchSort(); renderBranches();
+    renderOverview(); renderCompetition(); renderLenses(); renderBranchSort(); renderBranches();
     showTab((location.hash||'').replace('#',''));
   }catch(err){
     document.querySelector('main').insertAdjacentHTML('afterbegin',
@@ -2617,7 +2617,7 @@ function renderThaiwater(){
 }
 
 /* ---------- acquisition ---------- */
-function renderAcq(){
+function renderCompetition(){
   $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
     META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
       return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
@@ -2625,7 +2625,7 @@ function renderAcq(){
     META.mws.map(m=>`<tr><td class="mono" style="color:var(--merch)">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
-  renderAcqBoard();
+  renderGapBoard();
   renderSearchDemand();
   renderPeerScore();
   // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
@@ -3244,7 +3244,7 @@ function drawRivalIos(){
   if(note){
     const dr=digital.filter(r=>!r.thin);
     const dn=dr.reduce((a,b)=>a+(b.ratings||0),0), tn=title.reduce((a,b)=>a+(b.ratings||0),0);
-    note.innerHTML=(digital.length?`<h3 class="acqsub" style="margin-top:16px">Who else the same borrower has on their phone <span class="tag">ADJACENT — not title lenders</span></h3>`+
+    note.innerHTML=(digital.length?`<h3 class="compsub" style="margin-top:16px">Who else the same borrower has on their phone <span class="tag">ADJACENT — not title lenders</span></h3>`+
       `<p class="lead sub">Personal-loan and nano-finance apps. They do <b>not</b> lend against a vehicle book, so they are never counted in title-lender share — but they chase the same borrower with minutes-to-cash approval, and on mobile they outweigh the entire title field: <b>${icN(dn)}</b> ratings across ${dr.length} apps versus <b>${icN(tn)}</b> across all ${title.length} title lenders. That is substitution pressure on a branch-based product.</p>`+
       `<table class="tbl">${head}${rows(digital)}</table>`:'')+
       `<p class="sub" style="font-size:11px;margin-top:6px">${im.caveat||''}</p>`;
@@ -3640,7 +3640,7 @@ function drawRivalPulse(){
       // whitespace, so an inline row has NO soft-wrap opportunity between them and runs off the
       // right edge on mobile — flex+gap gives each chip its own wrap point.
       lbox.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
-        land.by_product.map(g=>`<h4 class="acqsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
+        land.by_product.map(g=>`<h4 class="compsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
           `<table class="tbl">${g.items.map(p=>`<tr>
             <td class="mono" style="white-space:nowrap"><b>${p.brand}</b></td>
             <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
@@ -3661,7 +3661,7 @@ function drawRivalPulse(){
     plist.innerHTML=order.map(b=>{
       const items=byBrand[b].slice(0,6);
       const kind=items.every(i=>i.kind==='news')?' <span class="sub">(news &amp; campaigns — MTC runs no public promo page)</span>':'';
-      return `<h4 class="acqsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
+      return `<h4 class="compsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
         `<table class="tbl">${items.map(p=>`<tr>
           <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
           <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
@@ -4156,7 +4156,7 @@ function drawExitWhitespace(){
    data already present: high demand proxy (k10 footfall + district workers + province
    pickups + precomputed 'o' opportunity) against LOW own-AutoX saturation (w = ≤10km).
    Everything here is an ESTIMATED screen, not a site-survey. */
-let acqRegion='all', acqRows=[];
+let gapRegion='all', gapRows=[];
 // White-space score v2 — a defensible screen, not a site survey. Three legs, all from data present:
 //   DEMAND  (0–1, avg of 4 proxies): footfall (cvs+rest+fmkt·3), DIW district factory workers,
 //           province pickup stock (title collateral), and the precomputed opportunity 'o'.
@@ -4165,25 +4165,25 @@ let acqRegion='all', acqRows=[];
 //           presence — we have NO national lender-branch census (only 30 hand-curated competitors
 //           in Rayong), so this is an OSM financial-density proxy, NOT a competitor count.
 // Score = demand × ownHeadroom × compHeadroom, scaled 0–100. Each leg returned for transparency.
-function acqLegs(d){
+function gapLegs(d){
   const pl=(typeof PLOOK!=='undefined'&&PLOOK)?(PLOOK[d.v]||{}):{};
   const k=d.k10||{};
   const foot=((k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3);
-  const demand=(norm(foot,ACQN.foot)+norm(d.dwork||0,ACQN.dwork)+norm(pl.pickup||0,ACQN.pickup)+norm(d.o||0,ACQN.o))/4;
+  const demand=(norm(foot,GAPN.foot)+norm(d.dwork||0,GAPN.dwork)+norm(pl.pickup||0,GAPN.pickup)+norm(d.o||0,GAPN.o))/4;
   // own-AutoX headroom: 1 at zero own branches, decays toward 0.35 floor as saturation rises.
   const ownHead=0.35+0.65*(1-Math.min(1,(d.w||0)/8));
   // competitor (financial-density proxy) headroom: dense banks+ATMs => slightly less white space.
   const fin=(k.bank||0)+(k.atm||0);
-  const compHead=0.6+0.4*(1-Math.min(1,fin/(ACQN.fin||1)));
+  const compHead=0.6+0.4*(1-Math.min(1,fin/(GAPN.fin||1)));
   return {demand,ownHead,compHead,fin};
 }
-function acqScore(d){const L=acqLegs(d); return Math.round(100*L.demand*L.ownHead*L.compHead);}
-let ACQN={};
-function buildAcqNorms(){
+function gapScore(d){const L=gapLegs(d); return Math.round(100*L.demand*L.ownHead*L.compHead);}
+let GAPN={};
+function buildGapNorms(){
   const mx=f=>Math.max(1,...DATA.map(f));
   // 90th-pct cap for the financial-density proxy so a couple of CBD outliers don't flatten everyone.
   const fins=DATA.map(d=>{const k=d.k10||{};return (k.bank||0)+(k.atm||0);}).sort((a,b)=>a-b);
-  ACQN={
+  GAPN={
     foot:mx(d=>{const k=d.k10||{};return (k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3;}),
     dwork:mx(d=>d.dwork||0),
     pickup:mx(d=>(PLOOK[d.v]||{}).pickup||0),
@@ -4192,33 +4192,33 @@ function buildAcqNorms(){
   };
 }
 function norm(v,mx){return Math.min(1,(v||0)/(mx||1));}
-function renderAcqBoard(){
-  if(!$('#acqboard')) return;
-  buildAcqNorms();
-  if(!$('#acqchips').dataset.init){
+function renderGapBoard(){
+  if(!$('#gapboard')) return;
+  buildGapNorms();
+  if(!$('#gapchips').dataset.init){
     const regions=['all',...Array.from(new Set(DATA.map(d=>d.r)))];
-    $('#acqchips').setAttribute('role','group'); $('#acqchips').setAttribute('aria-label','Filter by region');
-    $('#acqchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All regions':r}</button>`).join('');
-    $('#acqchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-      $('#acqchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
-      acqRegion=b.dataset.r; drawAcqBoard();};
-    $('#acqcsv').onclick=acqCSV; $('#acqchips').dataset.init='1';
+    $('#gapchips').setAttribute('role','group'); $('#gapchips').setAttribute('aria-label','Filter by region');
+    $('#gapchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All regions':r}</button>`).join('');
+    $('#gapchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
+      $('#gapchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
+      gapRegion=b.dataset.r; drawGapBoard();};
+    $('#gapcsv').onclick=gapCSV; $('#gapchips').dataset.init='1';
   }
-  drawAcqBoard();
+  drawGapBoard();
   // lazily fold the competitor census into the board so "underserved" can be re-read as
   // "underserved AND undercompeted". Null-safe: if the file is absent the column shows "n/a".
-  if(!compAttached) loadCompetitors().then(()=>{ drawAcqBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
+  if(!compAttached) loadCompetitors().then(()=>{ drawGapBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
 }
 // Per-region ranking: which region has the most white space on average + the single best opening.
-function drawAcqRegions(){
-  if(!$('#acqregions')) return;
+function drawGapRegions(){
+  if(!$('#gapregions')) return;
   const byReg={};
-  DATA.forEach(d=>{const r=d.r||'—'; const s=acqScore(d);
+  DATA.forEach(d=>{const r=d.r||'—'; const s=gapScore(d);
     const o=byReg[r]||(byReg[r]={r,n:0,sum:0,top:null,topS:-1});
     o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
-  $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
+  $('#gapregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
@@ -4226,30 +4226,30 @@ function drawAcqRegions(){
       <td>${barHTML(o.avg,sc,mxAvg)} <span class="mono" style="color:${sc}">${o.avg.toFixed(1)}</span></td>
       <td class="sub">${o.top.n} <span class="mono" style="color:var(--gold)">★ ${o.topS}</span> · ${o.top.v}</td></tr>`;}).join('');
   // plain-language readout: lead with the answer.
-  const best=regs[0], top1=acqRows[0];
-  if($('#acqreadout')&&best&&top1){
-    const t=top1.d, L=acqLegs(t);
+  const best=regs[0], top1=gapRows[0];
+  if($('#gapreadout')&&best&&top1){
+    const t=top1.d, L=gapLegs(t);
     const drivers=[];
     if(L.demand>=0.4) drivers.push('strong demand signals');
     if(t.w<=2) drivers.push(`almost no own AutoX nearby (${t.w} ≤10km)`);
     else if(t.w<=5) drivers.push(`thin own coverage (${t.w} ≤10km)`);
     if((t.dwork||0)>=8000) drivers.push(`${Math.round((t.dwork||0)/1000)}k factory workers in the district`);
-    const scope=acqRegion==='all'?'nationwide':`in ${acqRegion}`;
-    $('#acqreadout').innerHTML=`<b>Widest coverage gap:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
+    const scope=gapRegion==='all'?'nationwide':`in ${gapRegion}`;
+    $('#gapreadout').innerHTML=`<b>Widest coverage gap:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
       at <b style="color:var(--gold)">★ ${top1.s}</b>${drivers.length?' — '+drivers.join(', ')+'.':'.'}
       By region, <b>${best.r}</b> shows the widest average coverage gap (★ ${best.avg.toFixed(1)} across ${best.n.toLocaleString()} catchments).
       <span class="sub">Estimated coverage screen — a competitive-exposure read, not a site survey or an open-a-branch recommendation.</span>`;
   }
 }
-function drawAcqBoard(){
-  acqRows=DATA.filter(d=>acqRegion==='all'||d.r===acqRegion)
-    .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
-  drawAcqRegions();
+function drawGapBoard(){
+  gapRows=DATA.filter(d=>gapRegion==='all'||d.r===gapRegion)
+    .map(d=>({d, s:gapScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
+  drawGapRegions();
   const haveComp=compHasData();
-  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
+  $('#gaptbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
     `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
     `<th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
-    acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
+    gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
       const hd=d.w<=2?' · gap':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
       // competitor cell: measured count + an "undercompeted" flag when high white-space meets few rivals.
@@ -4271,21 +4271,21 @@ function drawAcqBoard(){
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono sub">${fin}</td></tr>`;}).join('');
   // honest one-line note under the board about the competitor column's provenance + meaning.
-  const cnote=$('#acqcompnote');
+  const cnote=$('#gapcompnote');
   if(cnote){
     if(!compLoaded){ cnote.innerHTML='<span class="sub">Loading competitor census…</span>'; }
     else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — the competitor census isn\'t loaded yet. Once it refreshes, this column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
     else {
-      const flagged=acqRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
-      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>thinly-covered AND undercompeted</b> — high coverage-gap with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
+      const flagged=gapRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
+      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${gapRows.length} catchments are <b>thinly-covered AND undercompeted</b> — high coverage-gap with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
         `Competitor counts are <b>measured</b> (Google Places) but a <b>lower bound</b>, not a lender registry.</span>`;
     }
   }
 }
-function acqCSV(){
+function gapCSV(){
   const haveComp=compHasData();
   const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','rival_branches_5km_measured_lower_bound','undercompeted_flag','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
-  const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=acqLegs(d);
+  const lines=[hdr.join(',')].concat(gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=gapLegs(d);
     const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
     return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
@@ -4534,9 +4534,9 @@ function renderAmphoe(){
   // Fold in the measured borrower-base (dominant occupation) + competitor census so the white-space
   // leaderboard reads "underserved + what borrower base + how contested". Both lazy + null-safe: if a
   // file is absent the extra cells just don't render and the original layout stands.
-  const reAcq=()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAmpBoard(); };
-  if(!aoccLoaded) loadAmphoeOccupations().then(reAcq);
-  if(!compAttached) loadCompetitors().then(reAcq);
+  const reAmphoe=()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAmpBoard(); };
+  if(!aoccLoaded) loadAmphoeOccupations().then(reAmphoe);
+  if(!compAttached) loadCompetitors().then(reAmphoe);
 }
 function drawAmpBoard(){
   ampRows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
@@ -7209,7 +7209,7 @@ function loadImpact(){
   return impactPromise;
 }
 const IC_MOUNTS={home:['cc-impact',null],assist:['assist-impact','assist'],
-                 exposure:['exposure-impact','risk'],acq:['acq-impact','competition']};
+                 exposure:['exposure-impact','risk'],acq:['competition-impact','competition']};
 const IC_SORT={assist:(a,b)=>(b.roll_pct||0)-(a.roll_pct||0),
                risk:(a,b)=>(b.npl_live_pct||0)-(a.npl_live_pct||0),
                competition:(a,b)=>((b.rivals||{}).ratio||0)-((a.rivals||{}).ratio||0)};
