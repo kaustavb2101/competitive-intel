@@ -68,24 +68,44 @@ lens whether the map or a pillar is its home, and stop half-carrying 18 of them 
 
 ---
 
-## 3. Still unresolved
+## 3. The six items — all resolved (2026-08-01)
 
-Ordered by how much confusion each causes, worst first.
+All six were closed in one pass. Kept here with what was actually done, because three of the six
+turned out to be **misdiagnosed** and the corrections are worth more than the original notes.
 
-1. **The `acq` namespace trap.** ~70 identifiers named `acq*` belong to **Competition** (`#acq`),
-   while the nav item reading "Acquisition" points at `data.html`. Anyone reading the code will
-   wire the wrong thing to the wrong pillar. Rename the identifiers, not the route (the route is
-   load-bearing in bookmarks).
-2. **Overview is a wall.** `#overview` has 24 `<h2>` sections, zero `<details>`, and no jump-nav.
-   `#acq` solved the same problem with 6 `<details>` plus a jump-nav. Apply that pattern.
-3. **`loan_tape_derived.json` is written and never read.** `ingest_loan_tape.py` produces it; no
-   page consumes it. Either surface it or retire the write — right now it is a maintained fiction.
-4. **Badge collisions on `data.html`.** `L` marks both "The loan book" and "Lens rankings"; the loan
-   book is badged `L` nationally but `฿` further down. Badges must be unique or they are noise.
-5. **Four data layers are shipped but unread:** `catchments_r2`, `pico_census`, `provenance_sidecar`,
-   `rayong_province`. Same question as (3) — surface or retire.
-6. **~95 branch names do not match `norm_branch()`**, so they silently fail to join. Small, but it
-   is a silent failure, which is the worst kind.
+1. ✅ **The `acq` namespace trap.** Identifiers prefixed `acq` belonged to **Competition** (`#acq`)
+   while the nav item reading "Acquisition" points at `data.html`. Renamed to two prefixes, because
+   two different things were hiding under one: `comp*` for the Competition VIEW (`compjump`,
+   `.compsec`, `.compsub`, `competition-impact`) and `gap*` for the coverage-GAP board inside it
+   (`gapboard`/`gapchips`/`gaptbl`/`gapregions`/`gapreadout`/`gapcompnote`, `gapRegion`/`gapRows`/
+   `gapLegs`/`gapScore`/`gapCSV`, `GAPN`/`buildGapNorms`/`drawGapBoard`/`drawGapRegions`). Plus
+   `renderAcq`→`renderCompetition`, `data-acq`→`data-jump`, and `reAcq`→`reAmphoe` — that one was
+   named after the wrong board entirely. **The route is untouched**: `#acq`, `data-v="acq"`,
+   `id="v-acq"`, the `acq:` keys and `tests/validate_data.py`'s `KNOWN_GO` literal all survive,
+   because the route is load-bearing in bookmarks.
+2. ✅ **Overview was a wall** — 24 `<h2>`, zero `<details>`, no jump-nav. Now six `<details class="ovsec">`
+   plus `#ovjump`, copying the Competition pattern rather than inventing a second one:
+   `sec-ov-macro` · `sec-ov-collateral` · `sec-ov-agri` (open) / `sec-ov-labour` · `sec-ov-business` ·
+   `sec-ov-hazard` (collapsed). Content is UNMOVED — DOM order is byte-identical, so no renderer
+   changed target. The jump-nav handler now delegates on `.jumpnav [data-jump]` instead of binding
+   `#compjump` by id, so the next pillar to adopt the pattern does not silently get dead chips.
+3. ✅ **`loan_tape_derived.json` written and never read** — retired. `ingest_loan_tape.py` and the file
+   are deleted; the real path is `ingest_real_tape.py` → `build_tape_layers.py` → `tape_real.json`.
+4. ✅ **Badge collisions on `data.html`.** `L` marked both "The loan book" and "Lens rankings", and the
+   loan book was `L` nationally but `฿` at province level. The loan book is now `฿` everywhere and
+   `L` belongs to Lens rankings alone. Badges: ฿ / R / P / L — no collisions.
+5. ✅ **"Four unread layers" — only ONE was actually unread.** `pico_census` is read by `build_amphoe`,
+   `build_baac_credit`, `build_dbd_formation` and `build_peer_province`; `provenance_sidecar` by
+   `build_provenance`; `rayong_province` by `build_catchment_poi`, `build_platform`, `build_rayong`
+   and it is gated in `tests/run.sh`. Those three are pipeline INPUTS that happen to live under
+   `platform/data`, not orphaned UI layers — the original note confused "no page reads it" with
+   "nothing reads it". Only `catchments_r2` was genuinely unread, and its silence was causing a real
+   lie: because `rayong-catchment.html` could not consult the manifest, every failure printed "3D
+   buildings for X haven't been pulled yet", which is FALSE for 74 of 77 provinces (all are served
+   from R2; only 3 are also in git). The page now reads the manifest and distinguishes "not pulled"
+   from "didn't load", and uses the manifest's `baseUrl` as a CDN fallback.
+6. ✅ **Branch names failing `norm_branch()`** — see the commit that closed it for the measured
+   before/after. The defect was as much the SILENCE as the misses.
 
 ---
 

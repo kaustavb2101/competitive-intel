@@ -91,6 +91,12 @@ BRANDS = {
     "MICRO":       ["ไมโครลิสซิ่ง"],
     "GSB_MONEYDD": ["เงินดีดี GSB"],
     "KRUNGSRI_GO": ["GO by Krungsri"],
+    # Sabuy Cash — added to the watch 2026-08-01 on the owner's ask. LATIN STRING ONLY, deliberately:
+    # its Thai trading name is not verified here, and a guessed Thai string would return silent false
+    # matches, which is worse than returning nothing. Before this brand can join the app-sentiment
+    # ladder and the ad-transparency pull it needs three verified ids that cannot be looked up from
+    # this network — Play package, Apple app id, Google ATC advertiser id (see docs/NEXT_STEPS.md).
+    "SABUY":       ["Sabuy Cash"],
 }
 
 # Category terms — the conversation that is not about any one brand. Filed under _CATEGORY so a
