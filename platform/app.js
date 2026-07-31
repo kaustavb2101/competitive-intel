@@ -1303,7 +1303,13 @@ const TAB_TITLES={home:'Command center',overview:'Macro',map:'Map view',assist:'
 function showTab(v){
   if(!v||!document.getElementById('v-'+v)) v='home';
   document.title=(TAB_TITLES[v]?TAB_TITLES[v]+' · ':'')+'AutoX · เงินไชโย';
-  document.querySelectorAll('#nav a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
+  // #navMoreMenu is RE-PARENTED to <body> by the nav script (so the dropdown escapes the nav's
+  // overflow clipping — see styles.css .nav-more-menu). It is therefore NOT matched by '#nav a',
+  // which meant no Explore route ever showed as active and the Explore button never lit up: you
+  // clicked Market and the nav gave you no confirmation of where you were. Harmless when Explore
+  // held two rarely-used items; not harmless now that five of the eleven routes live there.
+  // Scope stays nav + menu on purpose — content "→" links carry data-v too and must NOT highlight.
+  document.querySelectorAll('#nav a[data-v],#navMoreMenu a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }

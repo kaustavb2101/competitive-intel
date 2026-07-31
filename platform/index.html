@@ -37,7 +37,16 @@
        demoted to an optional "Map view" under More) → ③ Assistance (who needs help now) → ④ Risk
        (portfolio stress, live book vs 180+ legacy) → ⑤ Competitor (rival pressure). Routing is by
        data-v (order-independent); the sequence is the narrative. Data-book-first (owner 2026-07-25):
-       the branch/network surface is the data book, not the 2,015-dot Leaflet map. -->
+       the branch/network surface is the data book, not the 2,015-dot Leaflet map.
+
+       ONE JOURNEY (2026-07-31): the nav order and the in-page "Next in the story" chain used to
+       disagree — nav ran Home→Macro→Acquisition→Assistance→Risk→Competition while the story chain
+       ran Home→Macro→Risk→Trend→Competition, skipping Acquisition entirely and leaving Assistance
+       with no inbound link at all. Two orders meant neither could be learned. They are now the same
+       order, and every pillar has exactly one inbound and one outbound step:
+         Home → ① Macro → ② Acquisition (data.html) → ③ Assistance → ④ Risk → (Risk trend) → ⑤ Competition → Explore.
+       If you add or reorder a pillar, move its story-next link with it or the two drift apart again;
+       tests/nav_consistency.py fails the gate if any page's nav stops matching this one. -->
   <a data-v="home" class="on" href="#home" aria-current="page">Home</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <a data-v="overview" href="#overview" title="① Macro — the backdrop moving the book (rates, commodities, fuel, collateral outlook)">Macro</a>
@@ -47,14 +56,23 @@
   <a data-v="acq" href="#acq" title="⑤ Competitor — rival pressure on the network we already run">Competition</a>
   <span class="nav-sep" aria-hidden="true"></span>
   <div class="nav-more" id="navMore">
-    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">More ▾</button>
-    <!-- More = 2 items (owner sign-off 2026-07-25). Retired from the menu, routes kept alive for
-         old links: Data book ↗ (duplicate of Acquisition), Risk trend (embedded in the impact
-         cards' trend chips/columns), Provinces·Market·Branches (inside the data-book drill),
-         Status (footer, "Build status (internal)"). -->
-    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="More views">
+    <button type="button" class="nav-more-btn" id="navMoreBtn" aria-haspopup="true" aria-expanded="false">Explore ▾</button>
+    <!-- EXPLORE (was "More", 2 items) = the TOOLS tier: everything that is not a step in the
+         five-pillar journey above. Renamed + refilled 2026-07-31 because the 2026-07-25 cleanup
+         dropped Provinces / Market / Branches / Risk trend from the menu without giving them a
+         replacement link — they kept rendering but became reachable only by typed URL. Every
+         route the app builds is now reachable from the nav; nothing is half-retired.
+         Branches points at the DATA BOOK's browse-all, not the #branches route: data.html?branches
+         does strictly more (sort/filter/search every feature, drill into any branch) and is the
+         canonical branch list, so the menu has ONE branch door, not two. #branches stays alive
+         for old bookmarks. -->
+    <div class="nav-more-menu" id="navMoreMenu" role="menu" aria-label="Explore views">
+      <a data-v="trend" href="#trend" role="menuitem" title="The time dimension of Risk — which segments and branches are getting riskier between vintages">Risk trend</a>
       <a data-v="map" href="#map" role="menuitem" title="Optional spatial view — 2,015 branch dots on a map">Map view</a>
-      <a data-v="sim" href="#sim" role="menuitem">Simulator</a>
+      <a data-v="provinces" href="#provinces" role="menuitem" title="One click into any province's 3D building scene">Provinces 3D</a>
+      <a href="data.html?branches" role="menuitem" title="All 2,015 branches in the data book — sort, filter and search every measured feature">Branches ↗</a>
+      <a data-v="market" href="#market" role="menuitem" title="Per-province measured market numbers (factories, informal workforce, pickup stock, weakest crop price) + CSV">Market assessment</a>
+      <a data-v="sim" href="#sim" role="menuitem" title="Client-side portfolio what-if — rate, price and drought levers">Simulator</a>
     </div>
   </div>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
@@ -232,8 +250,8 @@
     </div>
     <p class="lead cc-provenance"><b>Provenance:</b> coverage-gap &amp; risk scores are estimated screens (0–100, OSM/price/DLT-based) — not site surveys or measured default rates. Branch &amp; POI counts and the DLT vehicle mix are measured; the commodity board is World Bank GLOBAL price direction (proxy, not Thai farm-gate); the diesel-pickup outlook is an editorial watch. Confirm any competitive read against a local check.</p>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story</span>
-      <a data-v="overview" href="#overview">The backdrop — the macro &amp; collateral forces moving the book →</a>
+      <span class="story-next-lab">Next in the story · ① of ⑤</span>
+      <a data-v="overview" href="#overview">Macro — the backdrop moving the book →</a>
     </div>
   </section>
 
@@ -283,7 +301,7 @@
 
     <p class="lead cc-provenance"><b>Provenance:</b> MEASURED real loan tape aggregates (no-PII, cells ≥30; raw stays on the owner's disk). Delinquency and OS shares are measured; the hit-list score and the radar priority order are estimated orderings over those measured inputs. Point-in-time tape — true roll/cure rates need month-over-month drops.</p>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story</span>
+      <span class="story-next-lab">Next in the story · ④ of ⑤</span>
       <a data-v="exposure" href="#exposure">Risk — where the book sits in stress, live book vs the 180+ legacy →</a>
     </div>
   </section>
@@ -293,6 +311,13 @@
     <!-- National outlook narrative (data/regional_outlook.json) — situation → factors → regional
          impact → recommendation by region → nationwide. Rendered by renderNationalOutlook();
          null-safe: absent file → the block stays empty and the rest of the Overview reads as before. -->
+    <!-- Pillar heading (2026-07-31): the nav says "Macro" but this tab used to open straight into
+         content, so you landed with no confirmation you were where you clicked. Every pillar now
+         announces itself with the same ①–⑤ marker the nav tooltips use. -->
+    <h2 class="opp" style="margin-bottom:4px">① Macro — the backdrop moving the book</h2>
+    <p class="lead">Rates, commodities, fuel, collateral values, drought and labour — the forces that move
+      the book before any of it shows up in delinquency. Every number is tagged <b>measured</b> or
+      <b>estimated/proxy</b>.</p>
     <div id="outlook"></div>
 
     <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
@@ -484,8 +509,8 @@
       <div class="tblwrap" style="margin-top:10px"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
     </div>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · risk 1 of 2</span>
-      <a data-v="exposure" href="#exposure">Portfolio risk — where the book sits in stress →</a>
+      <span class="story-next-lab">Next in the story · ② of ⑤</span>
+      <a href="data.html">Acquisition — the network in the data book, all 2,015 branches →</a>
     </div>
   </section>
 
@@ -507,7 +532,7 @@
   <!-- COMPETITION — competitive-risk read on the EXISTING network: rival density, contested markets,
        brand share-of-search, segment competitor exposure. NO open/close/where-to-open recommendations. -->
   <section class="view" id="v-acq">
-    <h2 class="opp" style="margin-bottom:4px">Competitive risk · where rivals pressure the existing network</h2>
+    <h2 class="opp" style="margin-bottom:4px">⑤ Competition — where rivals pressure the existing network</h2>
     <p class="lead">A risk lens on the branches AutoX <b>already runs</b> — where the rival field is densest, where
       we are outnumbered, where our brand loses share-of-search, and which segments carry the most competitor
       exposure. Every number is tagged <b>measured</b> or <b>estimated/proxy</b>. This tab makes <b>no</b> open /
@@ -751,7 +776,7 @@
   <section class="view" id="v-exposure">
     <!-- VERDICT card (generated from segment_exposure.json; omitted gracefully if absent) -->
     <div class="verdict v-risk" id="expo-verdict" style="display:none"></div>
-    <h2 class="risk">Portfolio exposure · concentration read</h2>
+    <h2 class="risk">④ Risk — portfolio exposure &amp; concentration</h2>
     <p class="lead">How much of the book sits in stressed-crop, drought-proxy or weak-segment areas. <b>Book proxy = branch count</b> (no per-branch ฿ balance in this data) — read as exposure of the <i>footprint</i>, not the loan book. All three are <b>estimated proxies</b>, labelled inline.</p>
 
     <div id="exposure-impact"></div><!-- impact-card drill, risk ranking (NPL-live first) -->
@@ -819,8 +844,8 @@
       </div>
     </div>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · still risk 1</span>
-      <a data-v="trend" href="#trend">Portfolio risk — what is getting riskier over time →</a>
+      <span class="story-next-lab">Still ④ Risk · the time dimension</span>
+      <a data-v="trend" href="#trend">Risk trend — what is getting riskier over time →</a>
     </div>
   </section>
 
@@ -986,8 +1011,8 @@
       <table class="tbl" id="trendbranches"></table>
     </div>
     <div class="story-next no-print">
-      <span class="story-next-lab">Next in the story · risk 2 of 2</span>
-      <a data-v="acq" href="#acq">Competitive risk — rival pressure on the network →</a>
+      <span class="story-next-lab">Next in the story · ⑤ of ⑤</span>
+      <a data-v="acq" href="#acq">Competition — rival pressure on the network →</a>
     </div>
   </section>
 
@@ -1053,7 +1078,10 @@
     enrichment loop and served as data files. Provenance: World Bank Pink Sheet (prices), OAE planting-area
     (crops), WFP/HDX (drought), UNFPA (population), OpenStreetMap (13 POI layers), IMF/OECD/BoT/MOTS (macro).
     Pending the data.go.th run: DIW factories, DLT vehicle registrations.
-    <span class="no-print" style="color:var(--dim)">· <a href="/status" style="color:var(--dim)">Build status (internal)</a></span>
+    <!-- One name for /status. It used to be called "Build status (internal)" here, "Autonomy plan"
+         in its <title> and "Autonomy plan — project manager" in its own <h1> — three names for one
+         page. The page IS the autonomy plan, so that is the name everywhere. -->
+    <span class="no-print" style="color:var(--dim)">· <a href="/status" style="color:var(--dim)">Autonomy plan (internal)</a></span>
   </div>
 </main>
 
