@@ -3042,6 +3042,18 @@ function drawPeerProvince(){
       }).filter(Boolean);
       regionStr=` By region, ${domStr}${contested.length?' — but '+contested.join('; '):''}.`;
     }
+    // Rival-field CONCENTRATION — is the big-4 field one dominant brand or a split? A distinct read
+    // from `leader`/rank (those can name AutoX or the top brand while saying nothing about how lopsided
+    // the RIVAL side is). Gated on the substantial-field rollup; degrades to '' on a pre-fold layer.
+    const conc=m.most_rival_concentrated_province||null;
+    let concStr='';
+    if(conc&&m.n_provinces_rival_concentrated!=null){
+      const bybrand=m.rival_concentration_by_brand||{};
+      const domBrand=Object.entries(bybrand).sort((a,b)=>b[1]-a[1])[0];
+      const domTxt=domBrand?` — usually <b>${domBrand[0]}</b>, which alone holds a majority of the field in <b style="color:var(--agri)">${domBrand[1]}</b>`:'';
+      const pct=Math.round((conc.rival_top_share||0)*100);
+      concStr=` In <b style="color:var(--agri)">${m.n_provinces_rival_concentrated}</b> of the ${m.n_provinces_rival_field_substantial} provinces with a substantial big-4 presence the rival field is <b>single-brand-dominated</b>${domTxt} — so local pricing there is set by one competitor, not a fragmented field. Most lopsided: <b>${conc.province_th}</b>, where <b>${conc.rival_top_brand}</b> holds <b>${pct}%</b> of its ${conc.rivals} big-4 rival branches.`;
+    }
     // Intra-province ground contest, rolled up client-side from the same MEASURED per-record fields:
     // how many of ALL 77 provinces' districts the big-4 outnumber AutoX in, plus the "hidden contest"
     // cases where AutoX ranks top-2 in the province yet is outnumbered in the majority of its districts
@@ -3058,7 +3070,7 @@ function drawPeerProvince(){
     }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> of 77 provinces.</b>${rankStr} `+
       `Against the full official-locator census (${(m.total_rivals||0).toLocaleString()} rival branches vs `+
-      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${regionStr} `+
+      `${(m.total_autox||0).toLocaleString()} AutoX), ${leadStr}.${regionStr}${concStr} `+
       `National rival footprint: ${brandStr}.${picoStr}${satStr}${outStr}${distStr} ${TAG_M}`+
       methodBox(null,
         ['AutoX + per-brand rival counts are <b>MEASURED</b> — a straight province rollup of the district census (rival_density.json).',
@@ -3067,6 +3079,7 @@ function drawPeerProvince(){
          'The <b>Dist. lost</b> column is the share of the province’s districts where the big-4 outnumber AutoX (MEASURED, point-in-district) — a ground-level read the province rank/ratio can’t give: AutoX can rank well in a province overall yet be outnumbered in most of its districts.',
          'Muangthai / Srisawad / Tidlor are near-complete <b>official-locator</b> networks; Heng is a Google/Overture <b>sample</b> (under-counts).',
          'The <b>PICO</b> column is a separate <b>MEASURED</b> class — licensed พิโกไฟแนนซ์ operators from the FPO registry (small-ticket, not part of the big-4 ratio).',
+         'The <b>single-brand-dominated</b> read is <b>MEASURED</b>-derived: over provinces with a substantial big-4 field (≥10 rival branches, so a tiny field can’t score a meaningless 100%), it counts those where one rival brand holds a majority of the rival branches — a lopsided field means a single competitor sets local pricing; a split field spreads the pressure. Computed share, MEASURED counts.',
          'Ratio is the merged big-4 count ÷ AutoX — a competitive-pressure signal on the existing network, not an expansion cue.']);
   }
 }

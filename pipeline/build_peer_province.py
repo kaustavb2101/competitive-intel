@@ -169,6 +169,21 @@ def build():
         rivals = sum(by_brand.values())
         autox = e["autox"]
         ratio = round(rivals / autox, 2) if autox > 0 else None
+        # rival-field CONCENTRATION: which single big-4 brand holds the most of the RIVAL field
+        # (excludes AutoX — this is a read on the competitor field's structure, not on who leads
+        # overall) and its share of all rival branches. A concentrated field (one brand holds a
+        # majority) is a materially different competitive risk from a fragmented one: where one
+        # rival dominates, that single competitor sets the local pricing/terms AutoX competes
+        # against; a fragmented field spreads margin pressure across several. This is the read
+        # `leader`/`autox_rank` hide — those can name AutoX or Muangthai as top while saying
+        # nothing about how lopsided the *rival* side is. MEASURED counts, COMPUTED share;
+        # deterministic tie-break by census order. null where the province has no rival branches.
+        if rivals > 0:
+            rival_top_brand = max(by_brand, key=lambda b: (by_brand[b], -brands.index(b)))
+            rival_top_share = round(by_brand[rival_top_brand] / rivals, 3)
+        else:
+            rival_top_brand = None
+            rival_top_share = None
         # leader = the single operator holding the most ground in the province.
         # AutoX competes as one "brand"; ties break by fixed order (AutoX first, then the
         # census's alphabetical brand order) so the result is deterministic.
@@ -211,6 +226,8 @@ def build():
             "by_brand": by_brand,
             "ratio": ratio,
             "leader": leader,
+            "rival_top_brand": rival_top_brand,
+            "rival_top_share": rival_top_share,
             "autox_rank": autox_rank,
             "n_ranked": n_ranked,
             "pico": pico,
@@ -335,6 +352,30 @@ def build():
     } for p in outnum_pool[:5]]
     most_outnumbered_province = most_outnumbered_top[0] if most_outnumbered_top else None
 
+    # ── rival-field concentration rollup (is the big-4 field single-brand-dominated or split?) ──
+    # A concentration headline over a 1- or 2-branch rival field would be a meaningless 100%, so the
+    # count + headline are gated on a SUBSTANTIAL field (>= CONC_MIN_RIVALS big-4 branches). Within
+    # that pool, a province is "single-brand-dominated" when its top rival brand holds a majority
+    # (>= CONC_SHARE) of the rival branches. Pure arithmetic on the MEASURED per-brand counts; the
+    # per-province rival_top_brand/rival_top_share above are unfloored (available for every province).
+    CONC_MIN_RIVALS = 10
+    CONC_SHARE = 0.5
+    conc_pool = [p for p in provinces
+                 if p["rivals"] >= CONC_MIN_RIVALS and p["rival_top_share"] is not None]
+    conc_provinces = [p for p in conc_pool if p["rival_top_share"] >= CONC_SHARE]
+    n_rival_concentrated = len(conc_provinces)
+    conc_brand_counter = collections.Counter(p["rival_top_brand"] for p in conc_provinces)
+    rival_concentration_by_brand = {b: conc_brand_counter[b] for b in brands if conc_brand_counter[b]}
+    conc_sorted = sorted(
+        conc_pool, key=lambda p: (-p["rival_top_share"], -p["rivals"], p["province_th"]))
+    most_rival_concentrated_province = ({
+        "province_th": conc_sorted[0]["province_th"],
+        "rival_top_brand": conc_sorted[0]["rival_top_brand"],
+        "rival_top_share": conc_sorted[0]["rival_top_share"],
+        "rivals": conc_sorted[0]["rivals"],
+        "autox": conc_sorted[0]["autox"],
+    } if conc_sorted else None)
+
     meta = {
         "generated_by": "pipeline/build_peer_province.py",
         "label": "PEER COMPARISON per province — MEASURED AutoX branch count next to each big-4 "
@@ -358,6 +399,20 @@ def build():
             "ratio": "COMPUTED — rivals / autox, rounded 2 dp; null where autox == 0.",
             "leader": "COMPUTED — the operator (AutoX or a rival brand) with the most branches "
                       "in the province; deterministic tie-break (AutoX first, then census order).",
+            "rival_top_brand / rival_top_share": "COMPUTED — the single big-4 rival brand holding "
+                      "the most of the province's RIVAL field (AutoX excluded) and its share (0-1) "
+                      "of all rival branches; deterministic tie-break by census order. A read on "
+                      "how lopsided the competitor field is: a high share means one rival dominates "
+                      "the local field (it sets the pricing AutoX competes against), a low share "
+                      "means a fragmented multi-brand field. MEASURED counts, computed share; null "
+                      "where the province has no rival branches. Inherits Heng's lower-bound caveat.",
+            "rival concentration (meta)": "COMPUTED — over provinces with a SUBSTANTIAL rival field "
+                      "(>= rival_concentration_min_rivals big-4 branches, so a 1-2-branch field can't "
+                      "score a meaningless 100%), n_provinces_rival_concentrated counts those whose "
+                      "top rival brand holds a majority (>= rival_concentration_share_floor) of the "
+                      "rival branches; rival_concentration_by_brand tallies WHICH brand dominates "
+                      "them; most_rival_concentrated_province names the single most lopsided such "
+                      "market. Pure aggregation of the MEASURED per-brand counts.",
             "provinces_led_by (meta)": "COMPUTED — a national tally of the `leader` field: how many "
                                        "of the 77 provinces each operator is the single largest "
                                        "network in. Pure aggregation of MEASURED counts; inherits "
@@ -451,7 +506,8 @@ def build():
         ],
         "brands": brands,
         "record_format": "{province_th, region, autox, rivals, by_brand{brand:count}, ratio, "
-                         "leader, autox_rank, n_ranked, pico, vehicles, vehicle_stock_flag, "
+                         "leader, rival_top_brand, rival_top_share, autox_rank, n_ranked, pico, "
+                         "vehicles, vehicle_stock_flag, "
                          "autox_per_100k_veh, rivals_per_100k_veh, titlelender_per_100k_veh, "
                          "n_districts, n_outnumbered_districts}. by_brand omits zero-count brands; autox_rank "
                          "is AutoX's 1-based position of n_ranked present operators (int/null); "
@@ -482,6 +538,12 @@ def build():
         "most_saturated_province": most_saturated,
         "most_outnumbered_province": most_outnumbered_province,
         "most_outnumbered_top": most_outnumbered_top,
+        "rival_concentration_min_rivals": CONC_MIN_RIVALS,
+        "rival_concentration_share_floor": CONC_SHARE,
+        "n_provinces_rival_field_substantial": len(conc_pool),
+        "n_provinces_rival_concentrated": n_rival_concentrated,
+        "rival_concentration_by_brand": rival_concentration_by_brand,
+        "most_rival_concentrated_province": most_rival_concentrated_province,
         "vehicle_source": {
             "layer": "source-data/vehicles_by_province.json",
             "source": veh_meta.get("source"),
@@ -536,6 +598,12 @@ def run(check=False):
     print("  region leaders: %s"
           % ", ".join("%s→%s %d/%d" % (r["region"], r["leader"], r["n_led"], r["n_provinces"])
                       for r in m["region_brand_leaders"]))
+    mc = m.get("most_rival_concentrated_province") or {}
+    print("  rival-field single-brand-dominated: %d of %d substantial-field provinces%s"
+          % (m["n_provinces_rival_concentrated"], m["n_provinces_rival_field_substantial"],
+             (" | most concentrated: %s (%s %.0f%% of %d)"
+              % (mc["province_th"], mc["rival_top_brand"], mc["rival_top_share"] * 100, mc["rivals"]))
+             if mc else ""))
     if m["pico_available"]:
         print("  licensed-PICO rivals: %d operators across %d provinces (distinct class, vintage %s)"
               % (m["total_pico"], m["n_provinces_pico_present"],
