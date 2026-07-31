@@ -428,6 +428,102 @@ def _shape_pico_district(d):
     return None
 
 
+def _shape_scenarios(d):
+    # The LIVE / stress scenario engine (#sim, a whole default-reachable nav
+    # route). renderScenarios live-fetches it (tmliFetch('scenarios')) and, when
+    # `.scenarios` is a non-empty array, renders one card per scenario reading
+    # s.kind (badge), s.title + s.headline (card body) and s.vintage. If the
+    # array is missing/empty the whole engine falls back to its "not yet
+    # computed" placeholder, so a truncated deploy that empties scenarios.json
+    # silently blanks the simulator's scenario board with no phone alert — the
+    # same "broken demo" blind spot the Competition (peer_province /
+    # competitor_coverage / pico_district) and obj-#1 flow-card probes closed for
+    # their routes. This is the last default-reachable nav route left unprobed.
+    # Robust to a future scenario-count change (asserts non-empty, not ==6).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    scns = d.get("scenarios")
+    if not isinstance(scns, list) or not scns:
+        return "missing/empty 'scenarios' list (engine render read)"
+    s0 = scns[0]
+    if not isinstance(s0, dict):
+        return "first scenario is not an object"
+    for k in ("kind", "title", "headline"):
+        if not (isinstance(s0.get(k), str) and s0[k].strip()):
+            return "first scenario missing/empty '%s' (card render read)" % k
+    return None
+
+
+def _shape_rival_pulse(d):
+    # The always-on rival sentiment watch on Competition (#acq): drawRivalPulse
+    # live-fetches it and renders the app-store sentiment ladder from .sentiment
+    # (per-brand score / detractor share / 90-day trend) plus the promo feed from
+    # .promos. If BOTH are empty it drops to a "not yet pulled" placeholder, so a
+    # truncated deploy that guts the file silently blanks the rival sentiment +
+    # promo board with no phone alert — the same blind spot the peer_province /
+    # competitor_coverage / pico_district probes closed for the other #acq reads.
+    # Robust to roster growth (asserts shape, not brand counts).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    sent = d.get("sentiment")
+    if not isinstance(sent, list) or not sent:
+        return "missing/empty 'sentiment' list (sentiment-ladder render read)"
+    s0 = sent[0]
+    if not isinstance(s0, dict):
+        return "first sentiment row is not an object"
+    if not (isinstance(s0.get("brand"), str) and s0["brand"].strip()):
+        return "first sentiment row missing/empty 'brand'"
+    if not isinstance(s0.get("score"), (int, float)):
+        return "first sentiment row missing numeric 'score' (ladder render read)"
+    if not isinstance(d.get("promos"), list):
+        return "missing 'promos' list (promo-feed render read)"
+    return None
+
+
+def _shape_rival_ads(d):
+    # The rival paid-media pulse on Competition (#acq): drawRivalAds live-fetches
+    # it and renders the per-operator Google-ad creative table from .brands
+    # (n_creatives / n_live / share-of-volume / cadence). Empty .brands drops it
+    # to a "not yet run" placeholder, so a truncated deploy that guts the file
+    # blanks the paid-media board with no phone alert. Robust to roster growth.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        return "missing/empty 'brands' list (ad-table render read)"
+    b0 = brands[0]
+    if not isinstance(b0, dict):
+        return "first brand row is not an object"
+    if not (isinstance(b0.get("brand"), str) and b0["brand"].strip()):
+        return "first brand row missing/empty 'brand'"
+    if not isinstance(b0.get("n_creatives"), (int, float)):
+        return "first brand row missing numeric 'n_creatives' (ad-table render read)"
+    return None
+
+
+def _shape_rival_youtube(d):
+    # The rival video pulse on Competition (#acq): drawRivalVideo live-fetches it
+    # and renders the per-operator YouTube table from .channels (subscribers /
+    # upload cadence / median views / engagement). Empty .channels drops it to a
+    # "not yet pulled" placeholder, so a truncated deploy that guts the file
+    # blanks the video board with no phone alert. Robust to roster growth; the
+    # render tolerates a null subscribers cell (bought-placement flag), so the
+    # probe asserts the key exists rather than a numeric value.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    ch = d.get("channels")
+    if not isinstance(ch, list) or not ch:
+        return "missing/empty 'channels' list (video-table render read)"
+    c0 = ch[0]
+    if not isinstance(c0, dict):
+        return "first channel row is not an object"
+    if not (isinstance(c0.get("brand"), str) and c0["brand"].strip()):
+        return "first channel row missing/empty 'brand'"
+    if "subscribers" not in c0:
+        return "first channel row missing 'subscribers' key (video-table render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -481,6 +577,24 @@ DATA_FILES = [
     # truncated deploy that guts the recently-shipped go-live leaderboard fires a
     # phone alert instead of silently blanking the อำเภอ reads.
     ("data/pico_district.json", _shape_pico_district, ".top_districts + meta.operating_momentum.top_recent (go-live leaderboard)"),
+    # The LIVE/stress scenario engine (#sim) — the last default-reachable nav
+    # route with no probe. renderScenarios reads .scenarios[] (kind/title/
+    # headline per card); an empty/truncated build drops the whole engine to its
+    # "not yet computed" placeholder with no phone alert. Closes the #sim gap the
+    # 2026-07-30 board_vintage provenance run flagged as the next probe target.
+    ("data/scenarios.json", _shape_scenarios, ".scenarios[] with kind/title/headline (#sim engine)"),
+    # The always-on rival-pulse trio on Competition (#acq, shipped #217): the
+    # app-store sentiment ladder (rival_pulse), the Google paid-media board
+    # (rival_ads) and the YouTube video board (rival_youtube). All three are
+    # live-fetched into the Competition surface but were the last #acq reads with
+    # no deploy probe — a truncated CDN deploy that emptied any one silently
+    # blanked its board and dropped it to a "not yet pulled" placeholder with no
+    # phone alert. Adding them closes the Competition surface's remaining
+    # deploy-health blind spot (flagged as the next probe target by the
+    # 2026-07-30 scenarios/ad-copy-wrap runs). Robust to roster growth.
+    ("data/rival_pulse.json", _shape_rival_pulse, ".sentiment ladder + .promos feed (#acq rival watch)"),
+    ("data/rival_ads.json", _shape_rival_ads, ".brands ad-creative board (#acq paid-media pulse)"),
+    ("data/rival_youtube.json", _shape_rival_youtube, ".channels video board (#acq video pulse)"),
 ]
 
 

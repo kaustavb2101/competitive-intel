@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-07-30T16:24:49+00:00",
-    "commit": "6cf579e"
+    "generated_at": "2026-07-31T04:14:26+00:00",
+    "commit": "6ad6220"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-07-30",
+    "eta_date": "2026-07-31",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,90 @@
   ],
   "activity": [
     {
+      "date": "2026-07-31T04:14:26+00:00",
+      "sha": "6ad6220",
+      "summary": "health(deploy): live site-health probe now guards the Competition rival-pulse trio",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-31T02:24:13+00:00",
+      "sha": "2421694",
+      "summary": "docs: log ux CSV UTF-8 BOM fix — merge+deploy+verify (#225)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T09:18:52+07:00",
+      "sha": "37cd2ae",
+      "summary": "ux: UTF-8 BOM on CSV exports so Excel renders Thai correctly (#225)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T00:33:43+00:00",
+      "sha": "046090d",
+      "summary": "fix(gate): realign commodities.json + provenance.json to committed sources (gate was RED on master)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-31T06:54:50+07:00",
+      "sha": "b23ebb2",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-30, run 30587395271) (#221)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-31T06:53:45+07:00",
+      "sha": "f7a893e",
+      "summary": "data: NABC live prices (2026-07-30, run 30583885072) (#220)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-31T06:53:13+07:00",
+      "sha": "af23cfd",
+      "summary": "feat(competition): per-branch licensed-PICO rival exposure (branch_pico.json) (#218)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-30T23:43:41+00:00",
+      "sha": "769b2ab",
+      "summary": "data: live fuel prices (2026-07-30, run 30591239705)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-30T22:22:12+00:00",
+      "sha": "b3a62d6",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the scenarios.json site-health probe ship",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-07-30T22:21:46+00:00",
+      "sha": "7df9394",
+      "summary": "health(deploy): live site-health probe now guards scenarios.json (#sim engine)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-07-30T20:24:05+00:00",
+      "sha": "ee657c3",
+      "summary": "docs: log ux acq ad-copy-table wrap fix — merge+deploy+verify (#219)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-31T03:21:05+07:00",
+      "sha": "dfee401",
+      "summary": "ux: wrap rival ad-copy sub-tables so #acq never overflows on mobile (#219)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-07-30T23:51:13+07:00",
+      "sha": "a4b6a3a",
+      "summary": "feat(competition): rival paid-media pulse — Google ad creatives + YouTube (obj #2) (#217)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-07-30T16:25:12+00:00",
+      "sha": "fa213b8",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the pico_district site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-07-30T16:24:49+00:00",
       "sha": "6cf579e",
       "summary": "health(deploy): live site-health probe now guards pico_district.json",
@@ -626,90 +710,6 @@
       "sha": "d75ad4b",
       "summary": "fix(gate): restore RED master determinism gate to green — realign 3 derived layers PR #207 desynced",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-29T20:38:58+07:00",
-      "sha": "bbf3acb",
-      "summary": "Researching repository structure and navigation patterns (#207)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T10:21:05+07:00",
-      "sha": "4891f3d",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-27, run 30310940436) (#194)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T10:20:09+07:00",
-      "sha": "aace6e8",
-      "summary": "feat(acq): MEASURED PICO operating-momentum lens (commencement/go-live date) on Competition (#204)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T10:19:22+07:00",
-      "sha": "c8c6088",
-      "summary": "data: NABC live prices (2026-07-27, run 30307178352) (#191)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T10:18:38+07:00",
-      "sha": "1c49aa1",
-      "summary": "feat(obj#1): widen the measured crop-stress model to cassava + maize (DOAE area × NABC farm-gate) (#188)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-07-29T10:17:54+07:00",
-      "sha": "c2990b4",
-      "summary": "data: NABC live prices (2026-07-28, run 30401112150) (#205)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T10:17:26+07:00",
-      "sha": "23c0af8",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-28, run 30404660084) (#206)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-29T09:38:38+07:00",
-      "sha": "0e1b1d0",
-      "summary": "assist: occupation income impact + geography x occupation drill + watchlist branch drill (#203)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-29T07:34:30+07:00",
-      "sha": "3d1284b",
-      "summary": "data: macro indicators (2026-07-27, run 30311014810) (#193)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T23:40:43+00:00",
-      "sha": "a74e695",
-      "summary": "data: live fuel prices (2026-07-28, run 30408596394)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-28T16:32:40+00:00",
-      "sha": "00ad711",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the SERVICE_AUDIT §4 / R2-weight ship",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-28T16:31:43+00:00",
-      "sha": "42a5c7a",
-      "summary": "docs(service): correct SERVICE_AUDIT §4 (deploy-weight 10x understated) + flag half-done R2 catchment migration (~2.2GB R2-duplicated in git)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-07-28T14:26:12+00:00",
-      "sha": "5a7344f",
-      "summary": "docs: log ux-skiplink-print-leak merge + deploy-verify (PR #202)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-28T21:22:51+07:00",
-      "sha": "8f20c23",
-      "summary": "ux: hide skip-link in print — stops it leaking into the PDF brief (#202)",
-      "pillar": "uxui"
     }
   ]
 }
