@@ -2778,31 +2778,55 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
  // time. Until a province's file exists, do NOT crash into a broken/empty GL scene: show a quiet
  // notice and a link to the always-available district view (province.html?p=<slug>). Rayong +
  // Bangkok ship with their files, so this only ever fires for not-yet-pulled provinces.
+ // data/catchments_r2.json is the manifest of which provinces actually have a building scene served.
+ // It was committed but read by nothing, so this page could only ever guess: any failure — a province
+ // that was never pulled, a CDN hiccup, a dropped connection — printed the same "haven't been pulled
+ // yet" notice. For 74 of the 77 provinces that message was simply FALSE (they are all served from
+ // R2; only 3 are also in git), and it sent the reader away from a scene that exists. The manifest
+ // lets the page tell the two cases apart and say the true one.
+ var CATALOG=null;   // {provinces:[slug], git:[slug]} once loaded; null = manifest itself absent
+ function haveScene(){ return !CATALOG||!Array.isArray(CATALOG.provinces) ? null
+                            : CATALOG.provinces.indexOf(CITY)>-1; }
  function notPulled(){
    killLoader();
    var prettyP=pretty; // already title-cased from the slug
+   var served=haveScene();   // true = manifest says it exists, so this is a LOAD failure, not absence
    var href='province.html?p='+encodeURIComponent(CITY)+
      (location.search.indexOf('theme=light')>-1?'&theme=light':'');
+   var head=served?('The 3D scene for '+prettyP+' didn’t load')
+                  :('3D buildings for '+prettyP+' haven’t been pulled yet');
+   var body=served
+     ? ('The manifest lists '+prettyP+' as served, so this is a network or CDN failure, not a missing '+
+        'pull — reloading usually fixes it. The district view works either way.')
+     : ('The Overture building scene is pulled per province from the desktop. Until then, the '+
+        'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.');
+   var foot=served?('reload to retry · manifest: data/catchments_r2.json')
+                  :('pull command: pull_overture_buildings.py --province '+CITY);
    var el=document.createElement('div');el.className='err';el.style.color='#A7B0C2';
    el.innerHTML='<div style="max-width:560px;line-height:1.6">'+
-     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+
-       '3D buildings for '+prettyP+' haven’t been pulled yet</div>'+
-     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+
-       'The Overture building scene is pulled per province from the desktop. Until then, the '+
-       'district view has '+prettyP+'’s branches, districts, POIs and 10&nbsp;km reach.</div>'+
+     '<div style="font:700 17px \'IBM Plex Sans Thai\';color:#D7DEEC;margin-bottom:10px">'+head+'</div>'+
+     '<div style="font:400 13px \'IBM Plex Sans Thai\';color:#8A94A8;margin-bottom:18px">'+body+'</div>'+
+     (served?'<a href="'+location.href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
+       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;margin-right:8px;'+
+       'font:700 13px \'IBM Plex Sans Thai\'">Try again →</a>':'')+
      '<a href="'+href+'" style="display:inline-block;padding:9px 16px;border-radius:8px;'+
-       'background:var(--blue,#5B7CFA);color:#fff;text-decoration:none;'+
+       (served?'border:1px solid #3A4256;color:#A7B0C2;background:transparent;'
+              :'background:var(--blue,#5B7CFA);color:#fff;')+'text-decoration:none;'+
        'font:700 13px \'IBM Plex Sans Thai\'">Open the '+prettyP+' district view →</a>'+
-     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+
-       'pull command: pull_overture_buildings.py --province '+CITY+'</div>'+
+     '<div style="font:400 11px \'IBM Plex Mono\';color:#5B6479;margin-top:16px">'+foot+'</div>'+
      '</div>';
    document.body.appendChild(el);
  }
  // tiles_config first: it may carry catchments.baseUrl (operator CDN, e.g. Cloudflare R2 with all
  // 77 province pulls). The catchment loader below falls back to it on a local 404, so provinces
  // too big to commit to git still render their real buildings. CDN miss => same calm notPulled().
- opt('data/tiles_config.json').then(function(TILECFG){
- var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||null;
+ Promise.all([opt('data/tiles_config.json'),opt('data/catchments_r2.json')]).then(function(cfg){
+ var TILECFG=cfg[0];
+ CATALOG=cfg[1]||null;
+ // The manifest carries its own baseUrl. Prefer tiles_config (the operator's override) and fall back
+ // to the manifest, so the CDN keeps working if only one of the two is present.
+ var cdnBase=(TILECFG&&TILECFG.catchments&&TILECFG.catchments.baseUrl)||
+             (CATALOG&&CATALOG.meta&&CATALOG.meta.baseUrl)||null;
  if(cdnBase)cdnBase=String(cdnBase).replace(/\/+$/,'');
  // Optional scenery (travel-time isochrone bands + street trees) is pulled per-province by
  // pull_isochrone.py, which has run for NO province yet — so requesting <slug>_isochrone.json /

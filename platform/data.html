@@ -246,7 +246,10 @@ function renderNational(){
   h+=kpi(pct(n.unemployment_rate_pct),'Unemployment','labour force '+kk(n.labor_force_k));
   h+='</div>';
   // LOAN BOOK — the consolidated measured loan-tape tables (filled async by loadLoanBook)
-  h+='<div class="db-sec"><span class="n">L</span> The loan book — measured portfolio truth</div>';
+  // ฿, not L: L is the Lens-rankings badge further down this same page, and the province-level loan
+  // book below is already badged ฿. One glyph per thing, and the same glyph for the same thing at
+  // every level — otherwise the badges are decoration rather than navigation.
+  h+='<div class="db-sec"><span class="n">฿</span> The loan book — measured portfolio truth</div>';
   h+='<div id="db-loanbook"><p class="db-note">Loading the loan book…</p></div>';
   // region cards
   h+='<div class="db-sec"><span class="n">R</span> Regions — ranked by competitive pressure</div>';
