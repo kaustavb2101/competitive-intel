@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-01T04:23:20+00:00",
-    "commit": "b933fb8"
+    "generated_at": "2026-08-01T10:22:33+00:00",
+    "commit": "1735a5f"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-01T10:22:33+00:00",
+      "sha": "1735a5f",
+      "summary": "health(deploy): site-health probe guards the DATA ROOM honesty census (provenance.json)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-01T08:22:05+00:00",
+      "sha": "900de78",
+      "summary": "docs: log the scope=\"col\" search-table-header UX loop (merge+deploy+verify)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T15:18:28+07:00",
+      "sha": "b864026",
+      "summary": "feat(live): the Live board — every feed, its freshness, and the four with real history (#240)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-01T15:17:08+07:00",
+      "sha": "960e96d",
+      "summary": "ux: scope=\"col\" on the three primary SPA search-table headers (a11y) (#241)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T14:46:16+07:00",
+      "sha": "9d165bf",
+      "summary": "ux(macro): Macro tab to 4.5 screens + the three confirmed branch aliases (#238)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T06:26:31+00:00",
+      "sha": "46c9b8a",
+      "summary": "health(deploy): probe the last 3 surfaced-but-unprobed exec reads (rival_density, search_demand, household_risk)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-01T04:24:13+00:00",
+      "sha": "221f3b9",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the province_pressure site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-01T04:23:20+00:00",
       "sha": "b933fb8",
       "summary": "health(deploy): site-health probe guards province_pressure.json (front-door cross-objective thesis)",
@@ -667,48 +709,6 @@
       "date": "2026-07-31T15:18:34+07:00",
       "sha": "93f1b10",
       "summary": "ux: unique aria-label per scrollable-table region (axe landmark-unique) (#226)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T06:42:30+00:00",
-      "sha": "38488cc",
-      "summary": "fix(gate): restore RED master gate (provenance byte-census) + stop the price-bot commodities recurrence at source",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-31T12:57:48+07:00",
-      "sha": "d3efaee",
-      "summary": "ux(nav): one journey, one nav, no unreachable routes (#224)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T12:57:13+07:00",
-      "sha": "b5d6039",
-      "summary": "fix(drill): branch rows now reconcile to the province total (35.8% -> 100%) (#223)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-31T12:56:45+07:00",
-      "sha": "44b6f22",
-      "summary": "feat(competition): iOS app sentiment — Apple TH storefront, incl. the digital-lender cohort (obj #2) (#222)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-31T04:15:15+00:00",
-      "sha": "0f6ca9b",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival-pulse site-health probe ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T04:14:26+00:00",
-      "sha": "6ad6220",
-      "summary": "health(deploy): live site-health probe now guards the Competition rival-pulse trio",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T02:24:13+00:00",
-      "sha": "2421694",
-      "summary": "docs: log ux CSV UTF-8 BOM fix — merge+deploy+verify (#225)",
       "pillar": "uxui"
     }
   ]
