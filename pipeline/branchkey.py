@@ -89,6 +89,25 @@ def norm_branch(s):
 MASTER_KEY_ALIASES = {
     # @chaiyo50506: 'เงินไชโย สาขาพยัคฆภูมิสัย' (typo key) -> 'สาขาพยัคฆภูมิพิสัย' (correct key)
     norm_branch("เงินไชโย สาขาพยัคฆภูมิสัย"): norm_branch("สาขาพยัคฆภูมิพิสัย"),
+
+    # @chaiyo30203: master 'เงินไชโย สาขานิคม' (ปราจีนบุรี) == tape 'สาขานิคม 304' — both rows agree
+    # on province (ปราจีนบุรี) and the owner has ruled these are the same branch, written two ways
+    # (owner ruling 2026-08-01).
+    norm_branch("เงินไชโย สาขานิคม"): norm_branch("สาขานิคม 304"),
+
+    # @chaiyo40627: master 'เงินไชโยห้วยไคร้' (เชียงราย) == tape 'สาขาห้วยไคร้ เชียงราย' — both rows
+    # agree on province (เชียงราย) and the owner has ruled these are the same branch, written two ways
+    # (owner ruling 2026-08-01).
+    norm_branch("เงินไชโยห้วยไคร้"): norm_branch("สาขาห้วยไคร้ เชียงราย"),
+
+    # @chaiyo30125: master 'เงินไชโยหัวไทร(ฉะฯ)' (ฉะเชิงเทรา) == tape 'สาขาหัวไทร ฉะเชิงเทรา' — both
+    # rows agree on province (ฉะเชิงเทรา) and the owner has ruled these are the same branch, written
+    # two ways (owner ruling 2026-08-01). NOTE: a DIFFERENT, unrelated master row — 'เงินไชโยสาขาหัวไทร'
+    # (@chaiyo70524, นครศรีธรรมราช) — also contains the word 'หัวไทร'. That row's own key is 'หัวไทร',
+    # which is distinct from this alias's new key ('หัวไทรฉะเชิงเทรา'), so @chaiyo70524 is untouched and
+    # still resolves to its own row under its own name — verified via master_index() before this entry
+    # was added.
+    norm_branch("เงินไชโยหัวไทร(ฉะฯ)"): norm_branch("สาขาหัวไทร ฉะเชิงเทรา"),
 }
 
 
