@@ -1721,8 +1721,23 @@ function renderMacroIndicators(){
   const fx=I.usd_thb;
   if(fx) cards.push([`USD/THB`, `${fx.value}`, `World Bank ${fx.period}`]);
   if(!cards.length) return;
+  // IDEMPOTENT (fixed 2026-08-01 — the board was showing household debt / policy rate / inflation /
+  // USD-THB TWICE). renderOverview() resets #macro synchronously but appends these asynchronously,
+  // so two renderOverview() calls landing before the fetch settles produce two innerHTML resets
+  // followed by two appends — both after the last reset. Clearing this appender's own cards first
+  // makes the result independent of how many times it runs.
+  host.querySelectorAll('.mcard[data-mc="ind"]').forEach(n=>n.remove());
+  // Retire the EDITORIAL card for any indicator we now measure. The board was carrying household
+  // debt twice (86.8% "Sep 2025", hand-written and unsourced, beside BIS 2025-Q4 87.5% of GDP with
+  // its YoY) and inflation twice (a "~0.3% near-zero" 2026 note beside a measured World Bank CPI).
+  // Two numbers for one indicator is worse than one: the reader has to work out which to believe.
+  // Only fires when the measured card actually renders, so an absent layer leaves META intact.
+  const SUPERSEDED=/^(household debt|inflation)/i;
+  host.querySelectorAll('.mcard:not([data-mc])').forEach(n=>{
+    const k=n.querySelector('.k'); if(k&&SUPERSEDED.test(k.textContent.trim())) n.remove();
+  });
   host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
-    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+    `<div class="mcard" data-mc="ind"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
 /* ---------- national labour-market backdrop (data/labour_context.json, obj#1) ----------
@@ -1755,8 +1770,11 @@ function renderLabourContext(){
     cards.push([`Agri jobs`, `${agri.share_pct}%`, `of employment${ynote} · NSO LFS ${agri.as_of||(emp&&emp.as_of)||''}`]);
   }
   if(!cards.length) return;
+  // idempotent for the same reason as renderMacroIndicators above (informal work / self-employed /
+  // agri jobs were each rendering twice).
+  host.querySelectorAll('.mcard[data-mc="lab"]').forEach(n=>n.remove());
   host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
-    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+    `<div class="mcard" data-mc="lab"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
 /* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
@@ -8103,15 +8121,32 @@ function renderCommoditiesBoard(){
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
         const thaiLine=cbThaiHistory(THI,c.lab);
+        // TOTAL ROW (added 2026-08-01, owner ask). build_commodities.py used to emit only the belt's
+        // six largest provinces while the line above the table quoted the whole belt, so the accounts
+        // column visibly failed to add up to its own headline — rice showed 50,742 against 138,184
+        // with the missing 63% nowhere on the page. The builder now emits every belt province, so
+        // this row is a real total and it reconciles exactly. The partial branch is kept as a
+        // guard: if a future change ever truncates the list again, the page says so instead of
+        // quietly presenting a short column as if it were complete.
+        const shown=exp.top||[], shownAcc=shown.reduce((s,t)=>s+(t.accounts||0),0),
+              shownArea=shown.reduce((s,t)=>s+(t.area_rai||0),0),
+              restProv=(exp.belt_provinces||0)-shown.length, restAcc=(exp.book_accounts||0)-shownAcc;
+        const footRow=!shown.length?'':`<tfoot><tr class="cb-foot">
+          <td><b>${restProv>0?`${shown.length} of ${exp.belt_provinces} belt provinces shown`:`Belt total · ${exp.belt_provinces} provinces`}</b></td>
+          <td class="n"><b>${icN(shownArea)}</b></td>
+          <td class="n"><b>${restProv>0?`${icN(shownAcc)} of ${icN(exp.book_accounts)}`:icN(shownAcc)}</b></td>
+          <td colspan="2" class="s">${restProv>0
+            ? `the other ${icN(restProv)} belt province${restProv===1?'':'s'} hold ${icN(restAcc)} accounts (${Math.round(restAcc/(exp.book_accounts||1)*100)}% of the belt)`
+            : `adds up to the ${icN(exp.book_accounts)} above — this is the whole belt, not a sample`}</td></tr></tfoot>`;
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
           ${areaLine}
-          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
-            (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
+          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">Planted area (rai)</th><th scope="col">Book accounts</th><th scope="col" title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th scope="col" title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
+            shown.map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
                 `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
                 `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
-          }</tbody></table>${thaiLine}${occLine}${assistLine}</div></td></tr>`;
+          }</tbody>${footRow}</table></div>${thaiLine}${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
         <td class="cb-felt" title="${isLoc?'Thai farm-gate':'world price only — no Thai farm-gate series'}">${cbBar(fv,feltMax)}${

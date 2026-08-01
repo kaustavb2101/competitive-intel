@@ -1329,6 +1329,14 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .cb-drill>td{background:var(--panel2);padding:0}
 .cb-belt{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.55}
 .cb-belt b{color:var(--hi)}
+/* Belt table now lists EVERY province in the belt (rice = 26 rows), so it scrolls inside the drill
+   rather than pushing the price history and call-list below the fold. The sticky header keeps the
+   column meanings visible while scrolling; the footer total is the row the eye is looking for. */
+.cb-belttbl{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:6px;margin-top:6px}
+.cb-belttbl table{margin-top:0!important}
+.cb-belttbl thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
+.cb-foot td{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding-top:6px;font-size:11px;vertical-align:top}
+.cb-foot .s{color:var(--mid);font-weight:400}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}

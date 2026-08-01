@@ -289,8 +289,13 @@ def build():
                 "book_accounts": book_in_belt,
                 "belt_provinces": len(belt),
                 "national_area_rai": round(national),
+                # THE WHOLE BELT, not a top-6 slice (changed 2026-08-01, owner ask). The drill quotes
+                # book_accounts for the entire belt above the table, so emitting only 6 rows made the
+                # accounts column visibly fail to add up to its own headline — for rice, the 6 shown
+                # provinces held 50,742 of 138,184 and the missing 63% was nowhere on the page. The
+                # rows now sum exactly to book_accounts and the area column sums to the belt's area.
                 "top": [{"prov": pv, "area_rai": round(a), "accounts": acc.get(pv, 0)}
-                        for pv, a in belt[:6]],
+                        for pv, a in belt],
                 "area_provenance": src["provenance"],
                 "area_source": src["source"],
                 "area_note": src["note"],
