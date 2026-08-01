@@ -18,7 +18,9 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Branch 3D Explorer — AutoX · เงินไชโย">
 <meta name="twitter:description" content="Per-branch 3D scene — 10km catchment, nearby establishments and a who-works-nearby proxy. Numbers tagged measured or estimated.">
-<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<!-- deck.gl is VENDORED (platform/vendor/), not loaded from unpkg: a 3D scene that silently
+     fails because a CDN is unreachable looks identical to a broken page. Pinned 8.9.35 bytes. -->
+<script src="vendor/deck.gl-8.9.35.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#070a11;--panel:#0e131f;--line:#1d2738;--hi:#eef1f7;--txt:#c7cedd;--mid:#8590a6;--dim:#65718c;--gold:#E0A93B;--accent:#5B7CFA;--agri:#E0574F;--merch:#23A28F}

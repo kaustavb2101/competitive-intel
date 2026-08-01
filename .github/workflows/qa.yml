@@ -2,11 +2,12 @@ name: QA
 
 # Verifies every change against the committed test suite.
 #   - determinism gate (pipeline --check + JS syntax) — no network
-#   - headless render of every platform/ page with self-hosted deck.gl/leaflet — npm registry only
+#   - headless render of every platform/ page (deck.gl/Leaflet are committed under platform/vendor/)
 #   - page-health smoke + visual regression vs tests/baseline/*.png
 #
-# NETWORK POLICY: the runner can reach the npm registry (to install deck.gl/leaflet) but the suite
-# performs NO data pulls (Overpass/Google/HDX/data.go.th are never contacted). Basemap raster tiles
+# NETWORK POLICY: the SUITE itself is now fully offline — the map libraries ship in the repo, so no
+# npm install happens at test time and NO data pulls occur (Overpass/Google/HDX/data.go.th are never
+# contacted). The job still downloads Python/Node/Chromium as toolchain setup. Basemap raster tiles
 # are intentionally blank in renders. This mirrors what the sandbox can do.
 
 on:
@@ -29,6 +30,8 @@ jobs:
           # a float-rounding boundary differently and make a byte-identical generator "drift" in CI.
           python-version: "3.11"
 
+      # Node is here for `node --check` (JS syntax gate) and to run the Playwright installer.
+      # It is NOT used to install deck.gl/Leaflet any more — those are committed in platform/vendor/.
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -61,7 +64,7 @@ jobs:
           sudo cp -r "$PW_DIR/$VER" "/opt/pw-browsers/$VER"
           ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome
 
-      # --- Phase 2+3+4: render, health smoke, visual regression (npm registry only) ---
+      # --- Phase 2+3+4: render, health smoke, visual regression (offline: vendored map libs) ---
       - name: Render + health + visual (non-blocking)
         continue-on-error: true
         run: |

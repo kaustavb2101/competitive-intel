@@ -20,7 +20,10 @@
 <meta name="twitter:description" content="Competitive-risk and portfolio-risk readouts across all 2,015 AutoX title-loan branches. Numbers tagged measured or estimated.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet is VENDORED (platform/vendor/leaflet/), not loaded from unpkg. The national map is the
+     product's most-used view and it must not depend on a third-party CDN being reachable from a Thai
+     network. leaflet.css resolves its sprites RELATIVE to itself, so images/ must stay beside it. -->
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -127,12 +130,13 @@
 <div id="updated" style="display:none"></div>
 
 <main id="main-content" tabindex="-1">
-  <!-- Fail honestly when JS is off / a CDN script is fully blocked: this is a Leaflet+deck.gl SPA,
-       so <main> would otherwise render blank with no explanation. Themed to the default console. -->
+  <!-- Fail honestly when JS is off: this is a Leaflet+deck.gl SPA, so <main> would otherwise render
+       blank with no explanation. Themed to the default console. (The map libraries themselves are
+       vendored now — only the webfont and the basemap tiles are still third-party.) -->
   <noscript>
     <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This dashboard needs JavaScript enabled.</strong>
-      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript (and allow the map/font CDNs) to load it.
+      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript to load it.
     </div>
   </noscript>
   <!-- COMMAND CENTER (daily-use front door) -->
@@ -1208,7 +1212,7 @@
   <div id="msheet-body"></div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
