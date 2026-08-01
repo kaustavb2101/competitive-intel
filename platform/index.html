@@ -347,27 +347,29 @@
     <details class="ovsec" id="sec-ov-macro" open>
     <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2><span class="ovsec-what">Answer band, commodity board with 5-year price trends, IMF backdrop</span></summary>
 
-    <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
-    <div class="dash2">
-      <div class="dash2-side">
+    <!-- SINGLE COLUMN since 2026-08-01. This was a .dash2 two-column grid (360px side rail +
+         wide main). Once the duplicate legacy commodity tables came out of the main column it held
+         only the "Key read" callout (169px) beside a 2,340px side rail — 2,171px of dead
+         whitespace — and the narrow rail was forcing the ten macro KPI cards to ~2 per row
+         (1,590px of stacked tiles). Full width they auto-fit ~9 per row (~340px). Reading order is
+         now headline KPIs → commodity board → IMF backdrop (context last). -->
         <h3 class="ovsub">Macro overlay — current conditions</h3>
         <div class="grid macro" id="macro"></div>
 
-        <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
-             unemployment/debt with ASEAN peer benchmark. Null-safe: absent file → nothing renders. -->
-        <div id="ov-imfweo"></div>
-      </div>
-      <div class="dash2-main">
         <h3 class="ovsub">Commodity board — the segments diverge</h3>
         <div class="insight" id="ov-keyread">
           <b>Key read:</b> "farmers" are not one segment. Crop households (rice, rubber, sugar, palm) and
           livestock/forestry households move on different price cycles — see the board for current directions.
         </div>
-        <div class="cols2">
-          <div><h3 class="ovsub">Crops · under pressure</h3><table class="tbl" id="board-crops"></table></div>
-          <div><h3 class="ovsub">Protein · forestry · firming</h3><table class="tbl" id="board-other"></table></div>
-        </div>
-
+        <!-- REMOVED 2026-08-01 (owner: "the macro page is still very long") — the legacy
+             "Crops · under pressure" / "Protein · forestry · firming" split tables (#board-crops,
+             #board-other). They listed the SAME ten commodities as the commodities board below
+             (Rice, Rubber, Sugar, Palm oil, Maize, Chicken, Beef, Fishmeal, Logs, Sawnwood) off the
+             same Pink Sheet vintage — the tab was rendering its commodity data twice. The board
+             below strictly supersedes them: it adds Gold, the 5-year price trend, the Thai
+             farm-gate move, the divergence between world and local, the book accounts exposed in
+             each crop's belt, and a per-crop drill. 418px of duplicate tables plus two headings.
+             The "Key read" callout above is NOT duplicated and stays. -->
         <!-- REMOVED 2026-08-01 (owner directive: no derived/composite metrics on Macro) — the province
              "macro watchlist" card grid (macro_sensitivity.json). It ranked headwind-first then by
              branches-hit, but with every mapped commodity currently UP there were ZERO headwind
@@ -377,12 +379,15 @@
              only 59 of 77 provinces. The LAYER stays — loadMacroSens() still feeds the branch drill
              and the cluster brief with real per-branch numbers; it is only this Overview card grid,
              and the estimated composite behind its ranking, that is gone. -->
-      </div>
-    </div>
 
     <!-- Commodities board upgrade (data/commodities.json) — global Pink Sheet YoY × Thai farm-gate
          YoY × book exposure (who's-exposed drill). Null-safe: absent file → nothing renders. -->
     <div id="ov-commodities"></div>
+
+    <!-- IMF WEO macro backdrop (data/imf_weo.json, pull_imf_weo.py) — Thailand growth/inflation/
+         unemployment/debt with ASEAN peer benchmark. Null-safe: absent file → nothing renders.
+         Moved below the board 2026-08-01: it is context for the numbers above, not a headline. -->
+    <div id="ov-imfweo"></div>
     </details>
 
     <details class="ovsec" id="sec-ov-agri">
