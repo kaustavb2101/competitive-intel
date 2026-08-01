@@ -2811,6 +2811,22 @@ function drawCompCoverage(){
    flag. Objective #2 — the actionable payoff of the full competitor pull. Lazy, graceful if absent. */
 let RIVDEN=null, rivdenLoaded=false;
 const RIVDEN_TOPN=20;
+// Concentration of the RIVAL field in one district: which single big-4 brand holds the most of it,
+// and its share of all rival branches there (AutoX excluded — by_brand is rivals only). MEASURED —
+// a straight read of the committed per-brand census; nothing recomputed. agri when one brand owns a
+// majority (single-brand-dominated — that one rival effectively sets the local terms AutoX competes
+// against), gold when the field is fragmented across the big-4. The same competitive-risk texture the
+// province peer board carries, one grain finer (obj #2). SUBSTANTIAL-field floor so a 1–2-branch field
+// can't score a meaningless 100%.
+const RIVDEN_CONC_MIN=10, RIVDEN_CONC_MAJ=0.5;
+function rivFieldConc(bb){
+  if(!bb||typeof bb!=='object') return null;
+  const ent=Object.entries(bb).sort((a,b)=>(b[1]-a[1])||(a[0]<b[0]?-1:1));
+  if(!ent.length) return null;
+  const tot=ent.reduce((s,e)=>s+e[1],0);
+  if(tot<RIVDEN_CONC_MIN) return null;
+  return {brand:ent[0][0], cnt:ent[0][1], tot, share:ent[0][1]/tot, dominated:(ent[0][1]/tot)>=RIVDEN_CONC_MAJ};
+}
 function renderRivalDensity(){
   const tbl=$('#rivdentbl'); if(!tbl) return;
   if(rivdenLoaded){ drawRivalDensity(); return; }
@@ -2835,10 +2851,14 @@ function drawRivalDensity(){
     `<th title="AutoX branches in this district (MEASURED)">AutoX</th>`+
     `<th title="Big-4 rival branches in this district, from the full official-locator census (MEASURED)">Rivals ◆</th>`+
     `<th title="rivals ÷ AutoX">Ratio</th>`+
-    `<th>Who holds it</th></tr>`+
+    `<th title="Which single big-4 brand holds the most of this district's rival field, and its share of all rival branches here (MEASURED). Bold = one rival owns a majority (single-brand-dominated — it sets the local terms); the sub-line is the top-2 brands by count.">Who holds it</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
       const rc=(r.rivals-r.autox)>=40?'var(--agri)':'var(--gold)';
+      const conc=rivFieldConc(r.by_brand);
+      const holds=conc
+        ? `<b style="color:${conc.dominated?'var(--agri)':'var(--gold)'}" title="Of this district's ${conc.tot} big-4 rival branches (AutoX excluded), ${conc.brand} holds the most — ${Math.round(conc.share*100)}% (${conc.dominated?'single-brand-dominated — that one rival effectively sets the local terms':'fragmented across the big-4'}). MEASURED.">${conc.brand} ${Math.round(conc.share*100)}%</b><div class="sub" style="font-weight:400">${brandStr(r.by_brand)}</div>`
+        : `<span class="sub">${brandStr(r.by_brand)}</span>`;
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td><b>${r.name||'—'}</b></td>
@@ -2846,17 +2866,33 @@ function drawRivalDensity(){
         <td class="mono">${(r.autox||0).toLocaleString()}</td>
         <td class="mono" style="color:${rc}"><b>${(r.rivals||0).toLocaleString()}</b></td>
         <td class="mono" style="color:${rc}">${ratio}</td>
-        <td class="sub">${brandStr(r.by_brand)}</td>
+        <td>${holds}</td>
       </tr>`;}).join('');
   if(ro){
     const m=RIVDEN.meta||{};
     const nOut=m.n_outnumbered!=null?m.n_outnumbered:recs.filter(r=>r.flag==='outnumbered').length;
+    // district-grain rival-field concentration (MEASURED, computed here from the committed by_brand
+    // census): of the districts with a SUBSTANTIAL big-4 field, how many are single-brand-dominated,
+    // and which brand dominates the most of them. The same texture the province peer board carries,
+    // one grain finer — a real obj#2 signal the raw deficit ranking can't give.
+    let concStr='';
+    const subF=recs.map(r=>rivFieldConc(r.by_brand)).filter(Boolean);
+    if(subF.length){
+      const nDom=subF.filter(c=>c.dominated).length;
+      const tally={}; subF.filter(c=>c.dominated).forEach(c=>{tally[c.brand]=(tally[c.brand]||0)+1;});
+      const top=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
+      concStr=`At district grain the rival field is even more lopsided than the province rollup: of the `+
+        `<b>${subF.length}</b> districts with a substantial big-4 field (≥${RIVDEN_CONC_MIN} rival branches), `+
+        `<b style="color:var(--agri)">${nDom}</b> are single-brand-dominated — one rival holds a majority`+
+        (top?`, <b>${top[0]}</b> in ${top[1]} of them`:'')+`. `;
+    }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> districts.</b> `+
       `Ranked by raw branch deficit against the FULL official-locator census (${(m.total_rivals||16393).toLocaleString()} measured rival branches). `+
-      `These are the districts where competitors already own the ground — defend or concede deliberately. ${TAG_M}`+
+      `These are the districts where competitors already own the ground — defend or concede deliberately. `+concStr+`${TAG_M}`+
       methodBox(null,
         ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
          'Rivals = the merged census (official store-locators for Muangthai/Srisawad/Tidlor; Heng is a sample).',
+         '<b>Who holds it</b> reads the concentration of the rival field: bold = one brand owns a majority (single-brand-dominated, it sets the local terms); the % is that brand’s share of the district’s rival branches. MEASURED — a straight read of the per-brand census, gated on a ≥'+RIVDEN_CONC_MIN+'-branch field so a thin field can’t score a meaningless 100%.',
          'A high ratio is a competitive-density signal, not a verdict — some dense districts are worth contesting, others conceding.']);
   }
 }
