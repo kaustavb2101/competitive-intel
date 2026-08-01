@@ -13,17 +13,38 @@ into ONE board layer with a "who's exposed" drill:
        source-data/farmgate_prices.json    MEASURED — Thai farm-gate daily price + YoY (local)
        platform/data/fuel_prices.json      MEASURED — retail diesel (the cost line)
        source-data/crop_prov_area.json      MEASURED — rice/rubber/oilpalm planted area per province
+       platform/data/province_cropland.json MEASURED — DOAE farmer registry, adds cassava + maize
+       platform/data/crop_landuse.json      MODELLED  — SPAM 2010, the only sugarcane area we hold
        platform/data/impact_cards.json      book accounts per province
        platform/data/income_impact.json     per-province crop mix (area shares)
   out: platform/data/commodities.json       (--check: byte-exact reproduce)
 
 Deterministic + network-free. Exposure is book-FOOTPRINT weighted by crop area (an ESTIMATE of which
-accounts sit under each crop — labelled), and resolvable only for the three crops with province-level
-area (rice/rubber/oilpalm); other board items carry their global/local price only, with region tags.
+accounts sit under each crop — labelled).
+
+AREA SOURCES ARE NOT INTERCHANGEABLE — this is why the registry below pins one source per crop
+rather than preferring the newest everywhere:
+  · crop_prov_area.json (rice/rubber/oilpalm) is a planted-area census.
+  · province_cropland.json is the DOAE farmer REGISTRY. Against the census it reads rice 1.10x but
+    rubber 0.46x and oilpalm 0.58x, because most rubber smallholders register with RAOT and most
+    palm growers with their mill, not DOAE. So it is used ONLY for cassava and maize, where nothing
+    else carries province area at all. Its absolute hectares are not comparable across crops; what
+    we take from it is the BELT RANKING (which provinces grow it), which survives partial
+    registration as long as under-registration is not regionally biased.
+  · Sugarcane is absent from DOAE by construction — cane growers register with the OCSB, not DOAE
+    (province_cropland.json says so in its own provenance line). Until 2026-08-01 the only cane area
+    held anywhere here was SPAM 2010, a MODELLED 5-arcmin raster, and there was no current Thai cane
+    price at all, so Sugar was the one board row with a falling WORLD price and no way to name who
+    in Thailand carries it. The OCSB pull (pipeline/ingest_ocsb_cane.py) closes BOTH: source-data/
+    ocsb_cane.json now carries MEASURED per-province cane area for production year 2565/66 and the
+    announced cane price series 2020..2025. The modelled raster it replaces understated the national
+    belt by ~1.7x (1.06m ha vs the 1.82m ha OCSB measures), which is why the sugar belt looked thin.
+    SPAM stays in AREA_SOURCES as the documented fallback but no board row points at it any more.
 """
 import json
 import os
 import sys
+from datetime import date
 
 from lib.regionmap import REGION
 
@@ -32,14 +53,164 @@ P = os.path.join(ROOT, "platform", "data")
 S = os.path.join(ROOT, "source-data")
 OUT = os.path.join(P, "commodities.json")
 
-# board label → farm-gate key (local cross-check) and crop_prov_area key (exposure)
+HA_TO_RAI = 6.25          # DOAE and SPAM publish hectares; the board reports rai, the Thai unit.
+
+# board label → farm-gate key (Thai local price cross-check)
 BOARD_TO_FARMGATE = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm",
-                     "Maize": "maize"}
-BOARD_TO_AREA = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm"}
+                     "Maize": "maize", "Cassava": "cassava"}
+
+# board label → (area source id, key inside that source). Pinned per crop on purpose; see the
+# module docstring for why the newest source is NOT preferred everywhere.
+BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
+                 "Palm oil": ("census", "oilpalm"),
+                 "Cassava": ("doae", "cassava"), "Maize": ("doae", "maize"),
+                 # Coconut and pineapple are the two steepest FALLING Thai prices on the board.
+                 # ingest_doae.py now maps all 19 registry crops instead of 5, so they finally have
+                 # a belt — a falling price you can put provinces and accounts behind.
+                 "Coconut": ("doae", "coconut"), "Pineapple": ("doae", "pineapple"),
+                 # Sugar moved off the SPAM-2010 raster onto OCSB's own measured returns on
+                 # 2026-08-01. Cane is the ONE crop where the pinned source is not a choice between
+                 # census and registry — OCSB is the register of record for every cane grower.
+                 "Sugar": ("ocsb", "sugarcane")}
+
+AREA_SOURCES = {
+    "census": {
+        "provenance": "MEASURED",
+        "source": "province planted-area census (source-data/crop_prov_area.json)",
+        "note": "Planted-area census — the fullest province count held for these three crops.",
+    },
+    "doae": {
+        "provenance": "MEASURED",
+        "source": "DOAE farmer registry 2568/2025 (platform/data/province_cropland.json)",
+        "note": "Farmer-REGISTRATION area, not a full census: against the census it reads rubber "
+                "0.46x and oilpalm 0.58x, so absolute area is not comparable across crops. What is "
+                "used here is the belt RANKING, which survives partial registration.",
+    },
+    "ocsb": {
+        "provenance": "MEASURED",
+        "source": "OCSB cane area, production year 2565/66 (source-data/ocsb_cane.json)",
+        "note": "Office of the Cane and Sugar Board administrative returns — mills report every "
+                "delivery, so this is a near-complete count rather than a survey or a registry "
+                "sample. It is the register of record for Thai cane: growers register with OCSB, "
+                "not DOAE, which is why cane is absent from the farmer registry entirely.",
+    },
+    "spam": {
+        "provenance": "MODELLED",
+        "source": "IFPRI/MapSPAM 2010 v2.0 (platform/data/crop_landuse.json)",
+        "note": "MODELLED spatial disaggregation on a 2010 base — 16 years old. RETIRED as a board "
+                "source on 2026-08-01 when the OCSB pull landed: it was carrying sugarcane, and "
+                "against OCSB's measured returns it understated the national cane belt by ~1.7x. "
+                "Kept here as documentation of what the sugar belt used to be built on.",
+    },
+}
+
+# Thai crops carrying no World Bank Pink Sheet series, so they can never reach the board from
+# commodity_board.json. Cassava is Thailand's largest crop export book and its farm-gate is the
+# biggest move this pipeline measures; leaving it off the board hid that move completely.
+LOCAL_ONLY = [
+    {"lab": "Cassava", "seg": "Crops", "reg": "Isan·N·E",
+     "note": "no World Bank series — Thai farm-gate only"},
+]
+
+# NABC categories the Pink Sheet cannot cover and build_farmgate_prices.py deliberately drops.
+# That script keeps RAW CROP farm-gate forms only (paddy, fresh root, whole bunch, raw sheet), which
+# is right for what it is, but it meant the board carried five Thai prices out of the thirteen NABC
+# publishes — and every one of the eight it dropped that still has a live YoY is a livestock,
+# fishery or orchard series. Six of them are FALLING, so a board whose only faller was a world sugar
+# price was reading "everything is up" while measured Thai livestock and fishery prices were down.
+NABC_ROWS = [
+    ("มะพร้าว", {"lab": "Coconut", "seg": "Crops", "reg": "S·E"}),
+    ("สับปะรดโรงงาน", {"lab": "Pineapple", "seg": "Crops", "reg": "E·W·N"}),
+    ("มะนาว", {"lab": "Lime", "seg": "Crops", "reg": "C·W"}),
+    ("สุกร", {"lab": "Pork", "seg": "Livestock", "reg": "C·W·E"}),
+    ("ไข่ไก่", {"lab": "Eggs", "seg": "Livestock", "reg": "C·E"}),
+    ("กุ้งขาว", {"lab": "White shrimp", "seg": "Fisheries", "reg": "S·E coast"}),
+]
+# Pink Sheet rows that gain a Thai cross-check from NABC rather than from farmgate_prices.
+BOARD_TO_NABC = {"Chicken": "ไก่"}
+
+# A NABC series is dropped when it carries no YoY, or when its last price is this far behind the
+# newest price in the same feed. Longan is the live case: it last priced 2025-09-05 with a null YoY,
+# and showing it as a current signal would be wrong.
+NABC_STALE_DAYS = 120
 
 
 def load(*path):
     return json.load(open(os.path.join(*path), encoding="utf-8"))
+
+
+def nabc_locals(nabc):
+    """category_th → price dict, dropping any series with no YoY or a stale last price.
+
+    The staleness anchor is the NEWEST latest_date IN THE FEED, never the wall clock, so the build
+    reproduces byte-for-byte from the committed file alone however long after the pull it is run.
+    Returns (kept, dropped_reasons) — the drops are published in meta rather than swallowed, so an
+    absent commodity reads as "we dropped it and here is why", not as "the market went quiet".
+    """
+    cats = nabc.get("categories") or {}
+    dates = [c.get("latest_date") for c in cats.values() if c.get("latest_date")]
+    anchor = max(dates) if dates else None
+    kept, dropped = {}, []
+    for k in sorted(cats):                       # sorted: no dependence on dict insertion order
+        c = cats[k]
+        d, y = c.get("latest_date"), c.get("yoy")
+        if y is None:
+            dropped.append("%s — no year-ago comparison in the feed" % k)
+            continue
+        if anchor and d:
+            lag = (date.fromisoformat(anchor) - date.fromisoformat(d)).days
+            if lag > NABC_STALE_DAYS:
+                dropped.append("%s — last priced %s, %d days behind the feed" % (k, d, lag))
+                continue
+        kept[k] = c
+    return kept, dropped
+
+
+def area_tables(area_census):
+    """Province → rai, per area-source id. Thai province names throughout (the book's join key)."""
+    census = {crop: {pv: a for pv, a in tbl.items() if pv in REGION}
+              for crop, tbl in area_census.items()}
+
+    doae = {}
+    for pv in load(P, "province_cropland.json")["provinces"].values():
+        th = pv.get("th")
+        if th not in REGION:
+            continue
+        for crop, ha in (pv.get("crops") or {}).items():
+            if isinstance(ha, (int, float)) and ha > 0:
+                doae.setdefault(crop, {})[th] = ha * HA_TO_RAI
+
+    spam = {}
+    for pv in load(P, "crop_landuse.json")["provinces"]:
+        th = pv.get("province_th")
+        if th not in REGION:
+            continue
+        for crop, ha in (pv.get("crop_area_ha") or {}).items():
+            if isinstance(ha, (int, float)) and ha > 0:
+                spam.setdefault(crop, {})[th] = ha * HA_TO_RAI
+
+    # OCSB is already per-province rai in Thai province names, so unlike the other three it needs
+    # no ha→rai conversion — only the same canonical-province filter.
+    cane = {pv: rec["area_rai"] for pv, rec in load(S, "ocsb_cane.json")["provinces"].items()
+            if pv in REGION and rec.get("area_rai", 0) > 0}
+
+    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane}}
+
+
+def ocsb_price():
+    """The announced cane price, shaped like a farm-gate record so the board row reads it uniformly.
+
+    It is NOT a market quote: OCSB announces one national price per season, so n_markets is left
+    absent rather than faked as 1 — the UI's thin-quote caveat would misdescribe an administered
+    price. Sugarcane reaches the board through neither farmgate_prices.json (raw-crop forms only)
+    nor NABC (daily market survey), which is why it needs its own small adapter.
+    """
+    p = load(S, "ocsb_cane.json").get("price")
+    if not p or p.get("yoy") is None:
+        return None
+    return {"price": p["latest_price"], "unit": p["unit"], "yoy": p["yoy"],
+            "latest_date": str(p["latest_year_ce"]), "n_markets": None,
+            "product": "อ้อยโรงงาน — announced cane price (~10 CCS)"}
 
 
 def build():
@@ -53,31 +224,63 @@ def build():
 
     acc = {pv: p["accounts"] for pv, p in cards["provinces"].items()}
     cmix = {pv: p["crop_mix"] for pv, p in income["provinces"].items()}
+    areas = area_tables(area)
+    # Per-province MEASURED farm income base (NSO SES, ฿/month for the Agriculture occupation) and
+    # the SAME crop sensitivity the income engine uses, so a crop-specific number computed here can
+    # never disagree with income_impact.json's own arithmetic.
+    agri_base = {pv: ((p.get("occ") or {}).get("Agriculture") or {}).get("income")
+                 for pv, p in income["provinces"].items()}
+    crop_sens = (((income.get("meta") or {}).get("sensitivity") or {})
+                 .get("Agriculture") or {}).get("crop")
+
+    ocsb = ocsb_price()
+    nabc = load(S, "nabc_prices.json")
+    nkept, ndropped = nabc_locals(nabc)
+    extra = [dict(spec, _nabc=cat) for cat, spec in NABC_ROWS if cat in nkept]
 
     items = []
-    for it in board:
+    for it in list(board) + LOCAL_ONLY + extra:
         lab = it["lab"]
+        ncat = it.get("_nabc") or BOARD_TO_NABC.get(lab)
         fgkey = BOARD_TO_FARMGATE.get(lab)
-        local = fgc.get(fgkey) if fgkey else None
+        # farmgate_prices is the curated raw-crop layer; NABC covers everything else it drops; OCSB
+        # covers sugarcane, which neither of them can see (administered price, own regulator).
+        local = ((fgc.get(fgkey) if fgkey else None) or (nkept.get(ncat) if ncat else None)
+                 or (ocsb if lab == "Sugar" else None))
         local_yoy = local.get("yoy") if local else None
+        # LOCAL_ONLY rows have no Pink Sheet series at all, so global_yoy is genuinely absent
+        # (rendered "n/a") rather than zero, and their up/stress class comes off the Thai move.
+        global_yoy = it.get("yoy")
+        cls = it.get("cls")
+        if cls is None:
+            cls = "stress" if (local_yoy is not None and local_yoy < 0) else "up"
         row = {
             "lab": lab, "seg": it.get("seg"), "reg": it.get("reg"),
-            "global_yoy": it["yoy"], "cls": it["cls"], "note": it.get("note"),
+            "global_yoy": global_yoy, "cls": cls, "note": it.get("note"),
             "global_vintage": it.get("stale"),
             "local_yoy": local_yoy,
             "local_price": (("%.2f %s" % (local["price"], local.get("unit", "")))
                             if local else None),
             "local_date": local.get("latest_date") if local else None,
-            "divergence": (round(local_yoy - it["yoy"], 1) if local_yoy is not None else None),
+            # n_markets is the honesty column: some NABC series are quoted by a single market, so
+            # the YoY is measured but thin. The UI shows it rather than averaging the caveat away.
+            "local_markets": local.get("n_markets") if local else None,
+            "local_product": (local.get("product") or local.get("product_th")) if local else None,
+            "local_source": ("OCSB announced price" if (local and local is ocsb)
+                             else "NABC daily market" if (local and ncat and not fgkey)
+                             else ("Thai farm-gate" if local else None)),
+            "divergence": (round(local_yoy - global_yoy, 1)
+                           if (local_yoy is not None and global_yoy is not None) else None),
         }
         # who's exposed — rank provinces by MEASURED planted area (the real crop belt, not
         # within-province share, which wrongly floats urban high-account provinces to the top),
         # take the core belt (provinces making up ~80% of national area), and report the book
         # accounts sitting in it.
-        akey = BOARD_TO_AREA.get(lab)
+        src_id, akey = BOARD_TO_AREA.get(lab, (None, None))
         # canonical provinces only — crop_prov_area carries an empty-key national-total row that
-        # would otherwise dominate the belt and inflate the national area.
-        ar = {pv: a for pv, a in (area.get(akey, {}) if akey else {}).items() if pv in REGION}
+        # would otherwise dominate the belt and inflate the national area. area_tables() has
+        # already dropped it for every source.
+        ar = areas.get(src_id, {}).get(akey, {}) if src_id else {}
         if ar:
             ranked = sorted(((pv, a) for pv, a in ar.items() if a > 0), key=lambda x: -x[1])
             national = sum(a for _, a in ranked) or 1
@@ -88,21 +291,64 @@ def build():
                 if cum >= 0.80 * national:
                     break
             book_in_belt = sum(acc.get(pv, 0) for pv, _ in belt)
+            src = AREA_SOURCES[src_id]
             row["exposure"] = {
                 "book_accounts": book_in_belt,
                 "belt_provinces": len(belt),
-                "national_area_rai": national,
-                "top": [{"prov": pv, "area_rai": a, "accounts": acc.get(pv, 0)}
-                        for pv, a in belt[:6]],
-                "basis": "book accounts in the crop's core belt (provinces = ~80% of national "
-                         "planted area, MEASURED); belt identifies the real growing region.",
+                "national_area_rai": round(national),
+                # THE WHOLE BELT, not a top-6 slice (changed 2026-08-01, owner ask). The drill quotes
+                # book_accounts for the entire belt above the table, so emitting only 6 rows made the
+                # accounts column visibly fail to add up to its own headline — for rice, the 6 shown
+                # provinces held 50,742 of 138,184 and the missing 63% was nowhere on the page. The
+                # rows now sum exactly to book_accounts and the area column sums to the belt's area.
+                #
+                # crop_income_pct / crop_income_baht are THIS CROP's effect (owner ask 2026-08-02).
+                # The drill previously borrowed income_impact.json's `agri_price_shock_pct`, which is
+                # the province's ALL-CROP shock and is area-weighted over rice/rubber/oilpalm ONLY.
+                # In the coconut belt that read +26.84% while coconut itself was -70.9%, because
+                # ประจวบคีรีขันธ์'s crop_mix is 61% rubber / 34% palm / 5% rice and contains no
+                # coconut at all — the column was answering a different question than the drill asks,
+                # and answering it with the opposite sign. This is conditional on the household's
+                # MAIN crop being this one (stated in the UI); it deliberately does NOT weight by the
+                # crop's area share, because belt areas come from different registries (DOAE farmer
+                # registration vs the planted-area census) and a share computed across them would be
+                # a false precision — see area_note.
+                "crop_sens": crop_sens,
+                "top": [{"prov": pv, "area_rai": round(a), "accounts": acc.get(pv, 0),
+                         "crop_income_pct": (round(crop_sens * local_yoy, 1)
+                                             if (crop_sens is not None and local_yoy is not None)
+                                             else None),
+                         "crop_income_baht": (round(agri_base[pv] * crop_sens * local_yoy / 100.0)
+                                              if (crop_sens is not None and local_yoy is not None
+                                                  and agri_base.get(pv)) else None)}
+                        for pv, a in belt],
+                "area_provenance": src["provenance"],
+                "area_source": src["source"],
+                "area_note": src["note"],
+                "basis": "book accounts in the crop's core belt (provinces = ~80%% of national "
+                         "planted area, %s); belt identifies the real growing region."
+                         % src["provenance"],
+                "income_basis": (
+                    "ESTIMATED, and conditional: the income columns are this crop's OWN effect on a "
+                    "farm household in that province whose MAIN crop is this one — "
+                    "sensitivity %s x the crop's Thai YoY, applied to the province's MEASURED NSO SES "
+                    "farm-income base. Same sensitivity the income engine uses. It is deliberately "
+                    "NOT weighted by the crop's share of local area: belt areas come from different "
+                    "registries and a cross-source share would be false precision."
+                    % crop_sens) if crop_sens is not None else None,
             }
         else:
             row["exposure"] = None
         items.append(row)
 
-    # stressed (falling) first, then biggest movers — same ordering the cards use
-    items.sort(key=lambda r: (r["cls"] != "stress", -abs(r["global_yoy"])))
+    # Stressed (falling) first, then biggest movers — same ordering the cards use, but ranked on
+    # the move the BORROWER feels (Thai farm-gate where a local series exists, world price
+    # otherwise) rather than always the world price. `lab` is the final tiebreak so equal moves
+    # can never order on dict/set iteration and break the byte-exact --check.
+    def felt(r):
+        return r["local_yoy"] if r["local_yoy"] is not None else r["global_yoy"]
+
+    items.sort(key=lambda r: (r["cls"] != "stress", -abs(felt(r) or 0), r["lab"]))
 
     diesel = (fuel.get("headline") or {}).get("diesel")
     return {
@@ -111,8 +357,29 @@ def build():
             "generated_by": "pipeline/build_commodities.py",
             "label": "MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). "
                      "Divergence = local − global. WHO'S EXPOSED is an ESTIMATED book-footprint "
-                     "read: accounts in a crop's growing provinces weighted by planted-area share; "
-                     "resolvable only for rice/rubber/oilpalm (the crops with province area).",
+                     "read: accounts in a crop's growing provinces weighted by planted-area share. "
+                     "Each exposure carries its own area_provenance — every belt on this board is "
+                     "now MEASURED: rice/rubber/oilpalm from the planted-area census, cassava/"
+                     "maize/coconut/pineapple from the DOAE farmer registry, sugarcane from OCSB's "
+                     "own returns. Rows with neither price series nor province area carry their "
+                     "global price alone, with a region tag.",
+            "nabc_excluded": ndropped,
+            "nabc_note": "Thai livestock / fishery / orchard prices come from the NABC daily market "
+                         "feed. build_farmgate_prices.py keeps raw CROP farm-gate forms only, so "
+                         "before this these series never reached the board and six FALLING measured "
+                         "Thai prices were invisible behind a board whose only faller was a world "
+                         "sugar price. Some NABC series are quoted by a single market — every row "
+                         "carries its own n_markets so a thin series is visible as thin.",
+            "sugarcane_note": "CLOSED 2026-08-01 (pipeline/ingest_ocsb_cane.py). Sugar was the "
+                              "board's one row with a falling WORLD price, a MODELLED 2010 belt "
+                              "and no Thai price at all — a move nobody could be named against. "
+                              "OCSB's own returns now give it a MEASURED 47-province belt "
+                              "(production year 2565/66) and the announced cane price falls with "
+                              "the world price rather than diverging from it. The retired SPAM "
+                              "2010 raster understated the national cane belt by ~1.7x. The cane "
+                              "price is ADMINISTERED — one announced national price per season on "
+                              "a ~10-CCS basis — so it is not a market quote and carries no "
+                              "n_markets; the OAE 2561/2562 BE snapshot stays unwired.",
             "farmgate_vintage": (fg.get("meta") or {}).get("pulled")
                                 or next((v.get("latest_date") for v in fgc.values()), None),
             "divergence_note": "A large local−global gap flags where the Thai farmer's cash reality "

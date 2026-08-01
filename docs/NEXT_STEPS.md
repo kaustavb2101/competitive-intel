@@ -3,6 +3,39 @@
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
 **For the exact Thai-laptop pulls (copy-pasteable), see `docs/TONIGHT_CHECKLIST.md`.**
 
+## 0. GISTDA repeated-flooding — VERIFIED REACHABLE, blocked on a spatial dissolve (objective #1)
+Probed 2026-08-01. GISTDA's ArcGIS server is **open from this machine, no key**:
+`https://gistdaportal.gistda.or.th/data/rest/services?f=json` lists ~40 folders (FL_Flood, GFlood,
+FR_Fire hotspots + air quality, GWater, Industrial, EEC...).
+
+The one worth having is a **FeatureServer**, so it can be aggregated server-side with no geometry
+download:
+
+    FL_Flood/FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016/FeatureServer/0
+
+It carries `flood_freq` (how many of the 12 years that ground flooded), `area_rai`, and full
+admin keys — `pv_tn`/`pv_code`, `ap_tn`/`ap_code`, `tb_tn`/`tb_code` — so it joins straight onto
+`amphoe.json`'s 928 districts. `supportsStatistics: true`; a `groupByFieldsForStatistics=pv_tn`
+query returns all 75 flood-affected provinces in one call.
+
+**THE TRAP — do not skip this.** `area_rai` is genuinely each polygon's own area
+(`area_m / 1600` checks out exactly), but the polygons **OVERLAP**: they appear to be per-event,
+not dissolved by frequency. Sukhothai returns 202,744 polygons summing to 13.2m rai against a
+province that is only ~4.1m rai; the tambon of วังลึก alone sums to 364,649 rai from 410 polygons.
+A naive `SUM(area_rai)` therefore overstates flooded area by roughly 3-9x, and the national total
+it produces (129.9m rai = 40% of Thailand) is an artifact, not a finding. **Any flooded-AREA number
+off this service needs a real spatial dissolve first** — that is a geometry job (shapely over the
+downloaded polygons per district), not a query parameter.
+
+What IS defensible without any dissolve, because it is immune to overlap:
+- `MAX(flood_freq)` per district — "this district contains ground that flooded in 11 of 12 years".
+  A clean branch-hazard flag, one grouped query, no area claim.
+- the count of districts at each max-frequency band.
+
+Deliberately NOT built on 2026-08-01 rather than shipped with a suspect area number. First action:
+`build_flood_hazard.py` doing the MAX(flood_freq) group-by onto `ap_code`, joined to `amphoe.json`;
+leave area for a later pass that dissolves geometry.
+
 ## 0a. Fold the MEASURED TMLI province layers into the risk read  ⟶ NOW UNBLOCKED (objective #1)
 The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling are now vendored
 (measured, from the Thai-network TMLI platform) and projected into clean province-keyed layers — no

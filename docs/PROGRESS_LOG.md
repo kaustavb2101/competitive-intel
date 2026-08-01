@@ -3,6 +3,86 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — agri data wave: sugarcane closed on both sides, and three layers that were already on disk
+
+PR #248. Five layers landed, two deliberately not built. Provenance 123 -> 126 (68 measured,
+0 unlabelled). Gate: 109 passed, **0 determinism failures**.
+
+- **SUGARCANE — the ask, closed.** Cane was invisible in three places at once: a MODELLED SPAM-2010
+  belt understating national area ~1.7x, no current Thai price at all, and an OAE snapshot reading
+  **+26.1%** that was stamped BE 2562 = **2019** and of the **wrong sign** against an actual
+  **-17.9%**. Root cause is structural: cane growers register with the **OCSB, not DOAE**, so every
+  registry-based layer here was blind to the crop by construction. `ingest_ocsb_cane.py` pulls OCSB's
+  own CKAN (47 provinces, 11.4m rai, production year 2565/66, 10-year series) plus the announced
+  price series 2020..2025. Sugar is now the board's third-steepest faller the borrower feels, and
+  Thai (-17.9%) is falling **faster** than world (-13.5%).
+- **Decision — the cane price is ADMINISTERED, and the layer says so everywhere.** OCSB announces one
+  national price per season at ~10 CCS. It is therefore not a market quote: it carries no
+  `n_markets`, is tagged `cadence: annual` + ADMINISTERED in the history layer, and its empty
+  province spread is labelled "cannot vary", not "unknown". Do not let a later refactor treat it as
+  a market series beside the NABC dailies.
+- **The assistance radar was reporting ZERO, and the zero was an artefact.** It mapped five crops;
+  all five happened to be rising, so it said "no province is in a falling sector" — true of what it
+  measured, false about the country. Three one-line omissions upstream hid the real fallers: coconut
+  + pineapple AREA sat unread in the DOAE response (`ingest_doae.py` mapped 5 of 19 crop columns),
+  their PRICES sat unread in `nabc_prices.json` (`build_farmgate_prices.py` had 5 of 7 quotable crops
+  allowlisted), and sugarcane had neither. Now eight crops, tripping on **22 provinces / 14,482
+  healthy (Current or X-bucket) farm accounts**. Every belt on the board is now MEASURED; no row
+  points at SPAM.
+- **Thai price HISTORY + PROVINCE SPREAD (new).** `pull_nabc_prices.py` pages ~2,200 daily records
+  per category and kept six numbers, discarding time and place. `pull_nabc_history.py` +
+  `build_thai_price_history.py` keep both: 13 categories, 19 months, 26KB. The product had **no Thai
+  price history anywhere** — every sparkline it drew was a *world* price. The spread is routinely
+  wider than the YoY the board leads with: coconut -77.3% over 18 months with a **37.0%** spread
+  between quoting provinces; rice +12.6% with **22.0%**.
+- **Farm-household P&L (new) — the correction that reframes every price claim here.** OAE surveys
+  farm households directly: **non-farm cash income is 48.8%** of a Thai farm household's cash income,
+  so a crop-price shock reaches roughly the farm half. National means only; carries a scope_warning
+  and must never be joined to a province.
+- **First ingest out of the 7.9GB gdcatalog harvest — "informal debt is not a place, it is a job".**
+  NSO measures in-system vs out-of-system household debt by region and socio-economic class, 7 waves
+  2011-2023, never read until now. Nationally informal debt is only **1.28%** and has **shrunk** from
+  2.94% — no large national pool to convert. It barely varies by region (0.84-1.54%) but varies
+  **5.1x by occupation**: transport & elementary workers 6.50%, farm/forestry/fishery labourers
+  6.36% — squarely this book's borrowers. Level is a **floor** (self-reported to a government
+  interviewer); trend and between-class ranking are the defensible reads.
+- **Decision — DOAE district crop area NOT pulled.** The only district/tambon endpoint
+  (`plants_detail/report_select`) is a farmer-RECORD search: ID card, land document, disaster claim.
+  The aggregate webservice is province-grain only (`get_data2dit`; every district variant 404s).
+  Harvesting person-level farm records to obtain a district crop total is not a trade worth making.
+- **Decision — GISTDA flooded AREA not built, and why.** The ArcGIS server is open, no key, and
+  `FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016` exposes `flood_freq` + `area_rai` + full
+  province/amphoe/tambon keys with server-side statistics. But the polygons **overlap by event**:
+  Sukhothai returns 202,744 polygons summing to 13.2m rai against a ~4.1m rai province, and a naive
+  SUM yields a national figure of 40% of Thailand. Any area number needs a spatial dissolve first.
+  `MAX(flood_freq)` per district is immune to the overlap and is the logged first build.
+- **Trap re-learned — rebuild float-sensitive layers on LINUX, not this laptop.** `branch_agri`,
+  `branch_risk`, `regional_outlook`, `opportunity_score` and `province_risk` were rebuilt on Windows
+  CPython 3.14 during the wave. They reproduced byte-exact *there* and drifted on Linux, which is
+  what CI runs. Rebuilt under the WSL uv cpython-3.11 mirror. A full Linux `--check` sweep over every
+  builder is now clean. Five more builders were also switched to `newline="
+"` writers.
+- **The map libraries are no longer a CDN call.** Four pages fetched deck.gl / Leaflet from
+  `unpkg.com` on every view — including `index.html`, the National map of all 2,015 branches. That
+  put the most-used view in the product behind a third party being reachable from a Thai network,
+  and the failure mode is the worst kind: the page loads, the library doesn't, and the result is a
+  blank canvas indistinguishable from a bug in our code. Both are now committed under
+  `platform/vendor/`, fetched from unpkg AND re-fetched from jsdelivr and byte-compared, with the
+  SHA256s recorded in `platform/vendor/README.md`. `.gitattributes` exempts that tree from eol
+  normalisation — without it git rewrites `leaflet.css` on commit and the hash stops matching
+  upstream. Two consequences worth knowing: (1) `tests/lib/render.sh` used to **sed-swap** the unpkg
+  refs to npm bundles before rendering, so a broken library reference on the real page could pass
+  QA — it now renders the shipped bytes verbatim; (2) the test suite is fully offline, npm was its
+  last network dependency. `tests/run.sh` now asserts no page has drifted back to a
+  unpkg/jsdelivr/cdnjs `<script>`, so the regression fails the gate instead of silently returning.
+- **Trap, corrected — the WSL mirror had no numpy, so `build_branch_peers` was never actually
+  checked there.** The local Linux sweep classified it ENV (missing module) and moved on; CI then
+  failed on it alone, because it sits downstream of the `branch_risk.json` rebuilt in this wave and
+  was still carrying Windows floats. `numpy==2.4.6` (the `qa.yml` pin) is now installed in the
+  mirror. A "skip" in a sweep is not a pass — count the skips.
+- **Gate note.** WSL has no `node` and no `pdfplumber`, so 11 gate entries fail there for environment
+  reasons only; both exist in CI. `node --check` passes on Windows for `app.js` and all 34 inline
+  blocks across 8 pages.
 ## 2026-08-01 — intelligence-loop (PEER/MARKET data-correctness): 15 off-polygon coastal branches were dropped from every district count — the rival:AutoX ratio was overstated by up to 31% in 5 provinces
 - **The bug (MEASURED, cross-layer reconciliation):** `amphoe.json`'s flat `branch_amphoe` index total-joined all **2,015** branches (nearest-centroid fallback for branches that PIP-miss every polygon), but the per-record `.branches` COUNT was strict-PIP-only and summed to just **2,000**. `build_amphoe.py` set `branch_sid[i]` for the 15 off-polygon coastal/border branches yet never added them to `branches_by_poly`, so they were silently absent from their district's count — and the shortfall propagated to every layer that rolls up `.branches`: `rival_density.json` (autox summed to 2000) → `peer_province.json` (autox summed to 2000). Rival brand counts reconciled EXACTLY (Muangthai 8931 / Srisawad 5203 / Tidlor 1919 / Heng 450 across all three layers); only AutoX's own denominator was under-counted.
 - **Why it matters (objective #2 — competitive risk on the footprint we run):** the missing 15 were concentrated in **6 coastal districts** (บ้านฉาง/Rayong +5, เมืองภูเก็ต/Phuket +4, สัตหีบ/Chonburi +3, ถลาง/Phuket +1, ดอนสัก/Surat Thani +1, เมืองชุมพร/Chumphon +1 — beaches/islands whose branches fall just outside the generalized coastline polygon). Because the rival:AutoX ratio uses AutoX as the denominator, under-counting AutoX **overstated** how outnumbered AutoX looked. Province-level correction (MEASURED): **Phuket 12.62 → 9.62 (was overstated by 31%)**, Rayong (the pilot province) 4.96 → 4.54, Chonburi 6.37 → 6.18, Surat Thani 10.45 → 10.21, Chumphon 9.06 → 8.56. `n_outnumbered_districts` unchanged (all corrected districts were already AutoX-present, not flipping status) — so this sharpens the ratio without moving the outnumbered-count headline.

@@ -49,6 +49,9 @@ MASTER = os.path.join(ROOT, "source-data", "branches_final.json")
 SPAM = os.path.join(ROOT, "source-data", "spam2010_th_cropgrid.json")
 CROP_PRICES = os.path.join(ROOT, "source-data", "crop_prices.json")
 NABC_PRICES = os.path.join(ROOT, "source-data", "nabc_prices.json")   # LIVE prices (preferred)
+# The consolidated Thai farm-gate layer: NABC's live dailies PLUS sugarcane's announced OCSB price,
+# which no market quotes. Top preference — see crop_price_yoy().
+FARMGATE_PRICES = os.path.join(ROOT, "source-data", "farmgate_prices.json")
 NABC_AGRI = os.path.join(ROOT, "source-data", "nabc_agri.json")       # per-province households + land use
 OUT = os.path.join(ROOT, "platform", "data", "branch_agri.json")
 
@@ -95,11 +98,20 @@ def crop_price_yoy():
     cp = _load(CROP_PRICES).get("commodities", {})
     out, src = {}, {}
     for c in CROPS:
-        ys = [v.get("yoy") for k, v in cp.items()
-              if c["oae"] in k and isinstance(v.get("yoy"), (int, float))]
+        rows = [v for k, v in cp.items()
+                if c["oae"] in k and isinstance(v.get("yoy"), (int, float))]
+        ys = [v["yoy"] for v in rows]
         if ys:
             out[c["key"]] = round(statistics.median(ys), 1)
-            src[c["key"]] = "OAE farm-gate snapshot"
+            # STATE THE VINTAGE. crop_prices.json is an OAE snapshot stamped in Buddhist-era years
+            # (2561/2562 = 2018/2019 CE) — seven years old. Labelling it only "snapshot" read as
+            # recent, so sugarcane's +26.1% was sitting beside live NABC dailies as if it were a
+            # current move. Fold BE->CE here (subtract 543) and say the year out loud.
+            yrs = sorted({int(v["year_be"]) - 543 for v in rows
+                          if str(v.get("year_be", "")).isdigit()})
+            when = ("%d" % yrs[-1]) if len(yrs) == 1 else (
+                "%d-%d" % (yrs[0], yrs[-1]) if yrs else "undated")
+            src[c["key"]] = "OAE farm-gate snapshot (%s)" % when
         else:
             out[c["key"]] = None
             src[c["key"]] = None
@@ -111,6 +123,20 @@ def crop_price_yoy():
             if isinstance(v, (int, float)):
                 out[c["key"]] = round(v, 1)
                 src[c["key"]] = "NABC live daily"
+    # Farm-gate layer overlay — wins over both, because it IS the NABC feed plus the crops NABC
+    # cannot quote. This is what finally reaches SUGARCANE. Until 2026-08-01 cane was the one crop
+    # here with no live source, so it kept the OAE snapshot's +26.1% — a 2019 number, of the WRONG
+    # SIGN: the announced cane price is -17.9%. Every cane-dominant branch was carrying price
+    # support that had reversed six years ago, which pushed its price_stress the wrong way.
+    if os.path.exists(FARMGATE_PRICES):
+        fg = _load(FARMGATE_PRICES)
+        yoys = fg.get("crop_yoy", {})
+        comm = fg.get("commodities", {})
+        for c in CROPS:
+            v = yoys.get(c["key"])
+            if isinstance(v, (int, float)):
+                out[c["key"]] = round(v, 1)
+                src[c["key"]] = (comm.get(c["key"]) or {}).get("source") or "Thai farm-gate layer"
     return out, src
 
 
@@ -277,7 +303,9 @@ def main():
         print("build_branch_agri.py --check: OK (byte-exact)")
         return
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="\n": the Windows default translates every \n to \r\n, which inflates the byte sizes
+    # build_provenance.py censuses and diverges the local tree from the LF blob CI actually reads.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(payload)
     obj = json.loads(payload)
     m = obj["meta"]

@@ -3476,8 +3476,8 @@
         {
           "province": "กระบี่",
           "region": "South",
-          "households": 59628,
-          "share_pct": 13.16,
+          "households": 59637,
+          "share_pct": 13.17,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
           "gross_per_person_month": 14802,
@@ -3528,7 +3528,7 @@
         {
           "province": "กำแพงเพชร",
           "region": "North",
-          "households": 632,
+          "households": 633,
           "share_pct": 0.14,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3567,7 +3567,7 @@
         {
           "province": "ฉะเชิงเทรา",
           "region": "East",
-          "households": 3672,
+          "households": 3673,
           "share_pct": 0.81,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3580,7 +3580,7 @@
         {
           "province": "ชลบุรี",
           "region": "East",
-          "households": 9317,
+          "households": 9319,
           "share_pct": 2.06,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3619,7 +3619,7 @@
         {
           "province": "ชุมพร",
           "region": "South",
-          "households": 72071,
+          "households": 72062,
           "share_pct": 15.91,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3632,7 +3632,7 @@
         {
           "province": "ตรัง",
           "region": "South",
-          "households": 31759,
+          "households": 31767,
           "share_pct": 7.01,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3710,7 +3710,7 @@
         {
           "province": "นครราชสีมา",
           "region": "Isan",
-          "households": 457,
+          "households": 456,
           "share_pct": 0.1,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3723,7 +3723,7 @@
         {
           "province": "นครศรีธรรมราช",
           "region": "South",
-          "households": 61015,
+          "households": 61033,
           "share_pct": 13.47,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3762,7 +3762,7 @@
         {
           "province": "นราธิวาส",
           "region": "South",
-          "households": 5900,
+          "households": 5902,
           "share_pct": 1.3,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3788,7 +3788,7 @@
         {
           "province": "บึงกาฬ",
           "region": "Isan",
-          "households": 3422,
+          "households": 3423,
           "share_pct": 0.76,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3814,7 +3814,7 @@
         {
           "province": "ปทุมธานี",
           "region": "Central&BKK",
-          "households": 1122,
+          "households": 1123,
           "share_pct": 0.25,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3827,7 +3827,7 @@
         {
           "province": "ประจวบคีรีขันธ์",
           "region": "Central&BKK",
-          "households": 10916,
+          "households": 10915,
           "share_pct": 2.41,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3853,7 +3853,7 @@
         {
           "province": "ปัตตานี",
           "region": "South",
-          "households": 2098,
+          "households": 2099,
           "share_pct": 0.46,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3892,7 +3892,7 @@
         {
           "province": "พังงา",
           "region": "South",
-          "households": 19541,
+          "households": 19546,
           "share_pct": 4.31,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3905,7 +3905,7 @@
         {
           "province": "พัทลุง",
           "region": "South",
-          "households": 12220,
+          "households": 12221,
           "share_pct": 2.7,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3931,7 +3931,7 @@
         {
           "province": "พิษณุโลก",
           "region": "North",
-          "households": 1326,
+          "households": 1325,
           "share_pct": 0.29,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -3944,7 +3944,7 @@
         {
           "province": "ภูเก็ต",
           "region": "South",
-          "households": 125,
+          "households": 126,
           "share_pct": 0.03,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4009,8 +4009,8 @@
         {
           "province": "ระนอง",
           "region": "South",
-          "households": 11850,
-          "share_pct": 2.62,
+          "households": 11804,
+          "share_pct": 2.61,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
           "gross_per_person_month": 14802,
@@ -4048,7 +4048,7 @@
         {
           "province": "ร้อยเอ็ด",
           "region": "Isan",
-          "households": 53,
+          "households": 54,
           "share_pct": 0.01,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4113,7 +4113,7 @@
         {
           "province": "สกลนคร",
           "region": "Isan",
-          "households": 2151,
+          "households": 2149,
           "share_pct": 0.47,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4126,7 +4126,7 @@
         {
           "province": "สงขลา",
           "region": "South",
-          "households": 9770,
+          "households": 9771,
           "share_pct": 2.16,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4139,7 +4139,7 @@
         {
           "province": "สตูล",
           "region": "South",
-          "households": 9051,
+          "households": 9053,
           "share_pct": 2.0,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4165,7 +4165,7 @@
         {
           "province": "สระแก้ว",
           "region": "East",
-          "households": 1657,
+          "households": 1658,
           "share_pct": 0.37,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4204,7 +4204,7 @@
         {
           "province": "สุราษฎร์ธานี",
           "region": "South",
-          "households": 99538,
+          "households": 99544,
           "share_pct": 21.97,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4217,8 +4217,8 @@
         {
           "province": "สุรินทร์",
           "region": "Isan",
-          "households": 251,
-          "share_pct": 0.06,
+          "households": 248,
+          "share_pct": 0.05,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
           "gross_per_person_month": 14802,
@@ -4282,7 +4282,7 @@
         {
           "province": "อุดรธานี",
           "region": "Isan",
-          "households": 1147,
+          "households": 1148,
           "share_pct": 0.25,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4321,7 +4321,7 @@
         {
           "province": "อุบลราชธานี",
           "region": "Isan",
-          "households": 1904,
+          "households": 1902,
           "share_pct": 0.42,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",
@@ -4399,7 +4399,7 @@
         {
           "province": "เลย",
           "region": "Isan",
-          "households": 2142,
+          "households": 2143,
           "share_pct": 0.47,
           "yield_kg_per_rai": 3281,
           "yield_source": "national",

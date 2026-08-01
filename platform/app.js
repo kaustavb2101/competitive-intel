@@ -1299,9 +1299,15 @@ function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Ma
    ============================================================================ */
 function svgEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-/* Diverging horizontal bars around a zero axis — the right shape for YoY moves,
-   because "everything is up" has to be visible at a glance rather than read
-   row by row. rows: [{label, value, color?, note?}]. Returns '' if no finite value. */
+/* Diverging horizontal bars around a zero axis — the right shape for YoY moves, because the
+   direction of a set of numbers has to be visible at a glance rather than read row by row.
+   rows: [{label, value, color?, note?}]. Returns '' if no finite value.
+
+   CURRENTLY UNUSED — the commodities board was its only caller and now draws per-row cbBar() cells
+   instead. HAZARD if you reuse it: it emits a viewBox with no intrinsic size, so `.chartwrap>svg
+   {width:100%}` scales it UNIFORMLY to the container — on a 1920px screen it rendered 1590x627 from
+   a 560x221 viewBox with 10.5px labels drawn at ~30px. `.chartwrap>svg` now carries a max-width to
+   cap that, but if you mount this outside .chartwrap, constrain it yourself. */
 function svgBars(rows,opt){
   opt=opt||{};
   const R=(rows||[]).filter(r=>r&&typeof r.value==='number'&&isFinite(r.value));
@@ -1327,6 +1333,25 @@ function svgBars(rows,opt){
   });
   parts.push('</svg>');
   return parts.join('');
+}
+
+/* Fixed-size diverging bar for ONE table cell, scaled against the column's own max.
+
+   Sized in PIXELS on purpose. The full-width commodities chart this replaced used a
+   viewBox + width:100% + preserveAspectRatio="meet", which scales UNIFORMLY to the container: on a
+   1920px screen it rendered 1590x627 from a 560x221 viewBox — a 2.84x blow-up, with 10.5px label
+   text drawn at ~30px, in a block 673px tall summarising a 409px table underneath it. A cell bar
+   must never be able to do that, so width/height are attributes and the viewBox matches them 1:1. */
+function cbBar(v, max, w) {
+  if (typeof v !== 'number' || !isFinite(v)) return '<span class="s">n/a</span>';
+  w = w || 104;
+  const h = 13, mid = w / 2, m = Math.abs(max) || 1;
+  const len = Math.max(Math.abs(v) / m * (w / 2), 1);
+  const x = v < 0 ? mid - len : mid;
+  const col = v > 0 ? 'var(--merch)' : v < 0 ? 'var(--agri)' : 'var(--dim)';
+  return `<svg class="cbcell" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">`
+    + `<line x1="${mid}" y1="0" x2="${mid}" y2="${h}" stroke="var(--line)" stroke-width="1"/>`
+    + `<rect x="${x.toFixed(1)}" y="3" width="${len.toFixed(1)}" height="${h - 6}" fill="${col}" rx="1.5"/></svg>`;
 }
 
 /* Sparkline over a numeric series. Deliberately returns '' for fewer than 4
@@ -1696,8 +1721,23 @@ function renderMacroIndicators(){
   const fx=I.usd_thb;
   if(fx) cards.push([`USD/THB`, `${fx.value}`, `World Bank ${fx.period}`]);
   if(!cards.length) return;
+  // IDEMPOTENT (fixed 2026-08-01 — the board was showing household debt / policy rate / inflation /
+  // USD-THB TWICE). renderOverview() resets #macro synchronously but appends these asynchronously,
+  // so two renderOverview() calls landing before the fetch settles produce two innerHTML resets
+  // followed by two appends — both after the last reset. Clearing this appender's own cards first
+  // makes the result independent of how many times it runs.
+  host.querySelectorAll('.mcard[data-mc="ind"]').forEach(n=>n.remove());
+  // Retire the EDITORIAL card for any indicator we now measure. The board was carrying household
+  // debt twice (86.8% "Sep 2025", hand-written and unsourced, beside BIS 2025-Q4 87.5% of GDP with
+  // its YoY) and inflation twice (a "~0.3% near-zero" 2026 note beside a measured World Bank CPI).
+  // Two numbers for one indicator is worse than one: the reader has to work out which to believe.
+  // Only fires when the measured card actually renders, so an absent layer leaves META intact.
+  const SUPERSEDED=/^(household debt|inflation)/i;
+  host.querySelectorAll('.mcard:not([data-mc])').forEach(n=>{
+    const k=n.querySelector('.k'); if(k&&SUPERSEDED.test(k.textContent.trim())) n.remove();
+  });
   host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
-    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+    `<div class="mcard" data-mc="ind"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
 /* ---------- national labour-market backdrop (data/labour_context.json, obj#1) ----------
@@ -1730,8 +1770,11 @@ function renderLabourContext(){
     cards.push([`Agri jobs`, `${agri.share_pct}%`, `of employment${ynote} · NSO LFS ${agri.as_of||(emp&&emp.as_of)||''}`]);
   }
   if(!cards.length) return;
+  // idempotent for the same reason as renderMacroIndicators above (informal work / self-employed /
+  // agri jobs were each rendering twice).
+  host.querySelectorAll('.mcard[data-mc="lab"]').forEach(n=>n.remove());
   host.insertAdjacentHTML('beforeend', cards.map(([k,v,n])=>
-    `<div class="mcard"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
+    `<div class="mcard" data-mc="lab"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join(''));
 }
 
 /* ---------- national & regional outlook narrative (data/regional_outlook.json) ----------
@@ -1859,6 +1902,9 @@ function renderOverview(){
   renderRecoverySensitivity();
   // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
   renderEvWatch();
+  // the crop mix → farm income correction (obj #1). Leads this section: it is the number the crop
+  // tables underneath it explain. Null-safe: absent layer → nothing renders.
+  renderCropMix();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
@@ -2362,11 +2408,11 @@ function renderCropStress(){
   const hasNap=NAPPRANG&&Object.keys(NAPPRANG).length;
   if(note) note.innerHTML='Which crop-farming provinces carry the most agri-income risk. '+
     '<b>Agri-stress</b> is an <b>estimated triage index</b> (price × drought, scaled by how much the province farms). '+
-    '<b>Price YoY</b> is now <b>measured Thai farm-gate</b> (NABC daily national averages) for the major crops — rice, rubber, oil palm, cassava, maize — with the World Bank global proxy only filling minor crops (sugar). '+
-    'Measured farm-gate is currently running <b>above</b> last year (an income <b>tailwind</b>), so the stress you see here is <b>drought-led, not price-led</b>. '+
+    '<b>Price YoY</b> is <b>measured Thai farm-gate</b> for all eight priced crops — rice, rubber, oil palm, cassava, maize (NABC daily averages), coconut and pineapple (NABC), sugarcane (OCSB announced price). No World Bank proxy fills any crop row here. '+
+    'Read this table WITH the crop-mix panel above it: the crops ranked here are rising, so the stress in THIS table is <b>drought-led, not price-led</b> — but three priced crops are falling hard (coconut −70.9%, pineapple −20.0%, sugarcane −17.9%) and they drive the four provinces the crop-mix panel flags. Neither table alone is the whole picture. '+
     '<b>Dominant crop</b> (OAE + DOAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.'+
     (hasNap?' <b>2nd-rice exposure</b> is the <b>measured</b> irrigated dry-season (second) rice planted area (OAE '+(NAPPRANG_META&&NAPPRANG_META.vintage||'')+') — the income cushion behind the drought flag; a large area is a buffer today <i>and</i> the income most at risk if water cuts skip the second crop (abandonment ~0 this season, so it reads as <b>exposure</b>, not current stress).':'');
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE + DOAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY (NABC) for the major crops; World Bank global proxy for minor crops. Positive = prices above last year (income tailwind).">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE + DOAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY for the province's DOMINANT crop only (NABC daily averages; OCSB for cane). Positive = above last year. This is one crop, not the province's whole mix — the crop-mix panel above weights all eight.">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
     top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
       const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
       const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
@@ -2494,7 +2540,7 @@ function renderCropMargin(){
     vb.className='verdict'+(clearsAll?'':' v-warn'); vb.style.display='block';
     vb.innerHTML=`<div class="verdict-line">${clearsAll?'✅':'⚠️'} <b>Farm-gate price clears OAE cost on ${clears} of ${rows.length} crop rows.</b> `+
       `Tightest cushion: <b>${tight.crop_th||tight.crop}</b> at ${(tight.margin_pct_of_price||0).toFixed(0)}% of price (${money(tight.margin_per_rai)}/rai)</div>`+
-      `<div class="sub" style="margin-top:4px">Prices are the current income tailwind — the margins say the same crops flagged for drought in the stress table are still <b>clearing cost today</b>; the risk is the cushion narrowing, not a loss. Inputs ${TAG_M} · margin derived.</div>`;
+      `<div class="sub" style="margin-top:4px">For the crops priced here the margins still <b>clear cost today</b>, so the risk on these rows is the cushion narrowing, not a loss. That is <b>not</b> a statement about the whole farm book: coconut, pineapple and sugarcane are all falling and none of them has a joined OAE cost row, so they cannot appear in this table at all — see the crop-mix panel above for the provinces they hit. Inputs ${TAG_M} · margin derived.</div>`;
   }
   const note=$('#margin-note');
   if(note) note.innerHTML='Does the <b>measured farm-gate price</b> the stress table quotes actually cover the '+
@@ -2519,7 +2565,8 @@ function renderCropMargin(){
 /* ---------- New-pickup inflow trend · the future used-collateral pool (Overview, obj #1) ----------
    MEASURED — DLT first registrations by class per Buddhist-era year (data/brand_trends.json).
    The diesel-share card above is a snapshot; this is the TIME dimension it lacks: the diesel pickup
-   is AutoX's core auto-title collateral (~25% of the book), and how fast NEW pickups enter the fleet
+   is AutoX's core auto-title collateral (MEASURED tape: 31.3% of accounts and 38.3% of outstanding —
+   the single largest balance exposure in the book), and how fast NEW pickups enter the fleet
    sets how fast the future USED-pickup collateral pool (what AutoX lends against + recovers on) is
    replenished. Leads with the pickup-inflow change vs the whole-market change, notes the rising EV
    share as the used-value leading indicator. Null-safe: absent/thin file → wrap stays hidden. */
@@ -2547,7 +2594,7 @@ function renderBrandTrends(){
   // ---- note ----
   const note=$('#btrend-note');
   if(note) note.innerHTML='First registrations (new vehicles entering the fleet) by class — the <b>inflow that becomes tomorrow’s used-vehicle collateral</b>. '+
-    'Pickups are AutoX’s core title collateral (~25% of the book); passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
+    'Pickups are AutoX’s core title collateral — <b>31.3% of accounts and 38.3% of outstanding</b> in the measured loan tape, the largest single balance exposure in the book; passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
     'All counts are <b>measured</b> (DLT first-registration registry). Years are Buddhist-era (พ.ศ. − 543 = ค.ศ., e.g. 2568 = 2025).';
   // ---- per-year table (pickup bar-scaled to its own max) ----
   const tbl=$('#btrendtbl');
@@ -2676,7 +2723,7 @@ function renderCollateralFlow(){
   const vb=$('#collflow-verdict');
   if(vb){
     vb.className='verdict'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are AutoX's largest title class${mix?` — ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%)`:''}, so their used-market liquidity is what sets how fast repossessed collateral clears.</b> `+
+    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are a third of AutoX's customers and a twentieth of its money — 33.3% of accounts but 5.8% of outstanding</b> (measured tape; pickups are 31.3% of accounts and 38.3% of outstanding). So moto used-market liquidity governs how fast a LOT of repossessed units clear, but very little balance.${mix?` Nationally they are ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%) — that is the market, not our book.`:''} `+
       `${nat?`Nationally ${rp(nat.transfer_rate)} of moto registry actions are ownership transfers, and ${rp(nat.dereg_rate)} are permanent deregistrations.`:''}</div>`+
       `<div class="sub" style="margin-top:4px">Collateral attrition (permanent deregistration) runs fastest in <b>${TH_REG[worstAttr.region]||worstAttr.region}</b> (${rp(worstAttr.moto.dereg_rate)}), and the moto used market is thinnest — slowest to clear collateral — in <b>${TH_REG[lowLiq.region]||lowLiq.region}</b> (${rp(lowLiq.moto.transfer_rate)} transfer intensity). A backdrop read on the book we already run, not an open/close cue. ${TAG_M}.</div>`;
   }
@@ -2856,6 +2903,45 @@ function renderThaiwater(){
 }
 
 /* ---------- acquisition ---------- */
+/* MEASURED household debt inside vs outside the formal system (data/debt_source.json, NSO).
+   The point of the block is the CLASS table, not the national number: informal borrowing barely
+   varies by region (1.3-1.5%) but varies 5x by occupation, and the two most exposed classes are
+   exactly the ones this book lends to. Leads with that, and carries the under-reporting caveat
+   next to the number rather than in a footnote, because the level is a floor and the ranking
+   is the only defensible read. */
+function renderDebtSource(){
+  const host=document.getElementById('acq-debtsource'); if(!host) return;
+  tmliFetch('debt_source').then(j=>{
+    if(!j||!Array.isArray(j.by_class)){ tmliNote(host,'Needs <b>data/debt_source.json</b> — not built for this vintage.'); return; }
+    const M=j.meta||{}, nat=j.national||[], B=n=>'฿'+Math.round(n).toLocaleString();
+    const n0=nat[0]||{}, n1=nat[nat.length-1]||{};
+    const cls=(j.by_class||[]).filter(r=>r.cls!=='รวม');
+    const top=cls[0]||{};
+    const all=(j.by_class||[]).find(r=>r.cls==='รวม')||n1;
+    const mult=all.informal_pct?(top.informal_pct/all.informal_pct):null;
+    const maxInf=Math.max(...cls.map(r=>r.informal_pct||0),1);
+    const rows=cls.map(r=>{
+      const w=Math.max((r.informal_pct||0)/maxInf*90,1);
+      return `<tr><td><b>${r.cls_en}</b></td>
+        <td class="mono">${B(r.total)}</td>
+        <td class="mono">${B(r.informal)}</td>
+        <td><span class="mono" style="color:${(r.informal_pct||0)>=3?'var(--agri)':'var(--dim)'}"><b>${r.informal_pct}%</b></span>
+          <svg width="92" height="9" viewBox="0 0 92 9" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><rect x="0" y="1" width="${w.toFixed(1)}" height="7" rx="1.5" fill="${(r.informal_pct||0)>=3?'var(--agri)':'var(--line)'}"/></svg></td>
+        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td></tr>`;}).join('');
+    const regs=(j.by_region||[]).map(r=>`<tr><td><b>${r.region_en}</b></td>
+        <td class="mono">${B(r.total)}</td><td class="mono sub">${B(r.informal)}</td>
+        <td class="mono">${r.informal_pct}%</td>
+        <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
+      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
+      <table class="tbl"><tr><th>Household type (NSO class)</th><th>Debt / household</th><th>Outside the system</th><th>Share outside</th><th class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
+      <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
+        <table class="tbl" style="margin-top:8px"><tr><th>Region</th><th>Debt / household</th><th class="sub">Outside</th><th>Share</th><th class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
+      <p class="lead sub" style="margin:8px 0 0"><b>Reading:</b> ${M.scope_warning||''} ${M.label||''}</p>`;
+    wrapTables();
+  });
+}
+
 function renderCompetition(){
   $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
     META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
@@ -2867,6 +2953,7 @@ function renderCompetition(){
   renderGapBoard();
   renderSearchDemand();
   renderPeerScore();
+  renderDebtSource();
   // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
   // was a bare alias for renderRivalPulse() — the fetch resolves once and paintPulse() draws Play and
   // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
@@ -7904,7 +7991,7 @@ function renderIncome(){
     }).join('');
     el.innerHTML=`
       <h2>Income-impact engine — what the macro move does to each region's book <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · first-order</span></h2>
-      <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop tailwind.</p>
+      <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop channel. <b style="color:var(--agri)">Read this as a THREE-crop engine.</b> It weights rice, rubber and oilpalm only — all three rising — so it reports every region positive. The <a href="#overview" data-jump="sec-ov-agri">crop-mix panel on Macro</a> weights all eight priced crops and finds four provinces falling, coconut and sugarcane led; this table cannot see them.</p>
       <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Region</th><th>Book income pressure</th><th>Best-off occupation</th><th>Worst-off occupation</th><th>Top book occupations</th><th title="MEASURED — NSO Labour Force Survey avg monthly EMPLOYEE wage; an independent cross-check beside the SES income base, not the base">NSO wage · LFS</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="lead cc-provenance"><b>Provenance:</b> ESTIMATED first-order pass-through. Every quantity multiplied is measured (NSO SES income, crop planted area, World Bank commodity YoY); the sensitivity coefficients (how much of a price move reaches take-home income) are a documented assumption. Read direction and relative magnitude, not precise levels. <b>NSO wage · LFS</b> is a MEASURED cross-check only — the region's Labour Force Survey employee wage (${((j.meta||{}).vintage||{}).wage_anchor||'latest'}) shown beside the model; it is an employee wage, not the SES individual income the model bases on (which counts non-wage income), so read it as a directional anchor, not an equality.</p>`;
   });
@@ -7934,14 +8021,53 @@ function renderScenarios(){
 
 /* MOVE 4 — commodities board: global Pink Sheet × Thai farm-gate × who's-exposed drill (Overview). */
 /* Commodity board label -> the crop key used by assist_price_radar.json / income_impact.json crop_mix.
-   Only the crops with a province planted-area map appear here; Sugar is on the board but has no
-   province share anywhere, so it stays deliberately unmapped rather than being joined to a guess. */
-const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava'};
+   Only the crops with a province planted-area map appear here. Coconut, Pineapple and Sugar joined
+   on 2026-08-01 — the first two once ingest_doae.py started reading all 19 registry crop columns
+   instead of 5, and Sugar once ingest_ocsb_cane.py landed OCSB's own 47-province cane returns (cane
+   growers register with the OCSB, so it is in no other registry here). Livestock and fisheries stay
+   unmapped on purpose: they have no planted area, so joining them to one would be a guess. */
+const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava',
+               'Coconut':'coconut','Pineapple':'pineapple','Sugar':'sugarcane'};
 const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
+
+/* THAI price trend + province spread inside a commodity drill (data/thai_price_history.json).
+   Every sparkline on the board itself is a WORLD price; this is the first Thai series the product
+   has ever drawn. The province spread is the point: a national average is one number, but paddy
+   ranges ~22% between the provinces this book lends into, which is wider than most YoY moves the
+   board leads with. Returns '' when the series is absent — the drill just loses a block. */
+function cbThaiHistory(THI,lab){
+  const s=THI&&THI.series&&THI.series[lab]; if(!s||!Array.isArray(s.values)||s.values.length<2) return '';
+  const ann=s.cadence==='annual', ch=s.change_pct;
+  const col=ch==null?'var(--dim)':ch>0?'var(--merch)':ch<0?'var(--agri)':'var(--dim)';
+  const fmt=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:2});
+  const spark=svgSpark(s.values,{w:150,h:30,
+    aria:lab+' Thai price, '+s.first_month+' to '+s.last_month,
+    title:lab+' · '+s.product+' · '+s.first_month+' → '+s.last_month+' ('+s.n_months+' points)'});
+  // Sugar is administered, so it has no province spread BY CONSTRUCTION — say which kind of empty
+  // this is rather than showing a blank that reads as missing data.
+  const spread=(s.provinces||[]).length>=2
+    ? `<div class="cb-spread"><b>Province spread ${s.spread_pct==null?'':`<span style="color:var(--gold)">${s.spread_pct}%</span>`}</b>
+        <span class="s">dearest vs cheapest quoting province, last ${THI.meta&&THI.meta.spread_note?'quarter':'window'} — a national average hides this</span>
+        <table class="ic-tbl" style="margin-top:4px"><thead><tr><th>Province</th><th>Mean ${s.unit||''}</th><th title="quotes behind that mean">Quotes</th></tr></thead><tbody>${
+        s.provinces.map(p=>`<tr><td>${p.province}</td><td class="n">${fmt(p.mean)}</td><td class="n s">${p.n}</td></tr>`).join('')
+      }</tbody></table></div>`
+    : `<div class="cb-spread s">${ann
+        ? 'No province spread — the cane price is <b>administered nationally</b>, so every province is paid the same announced rate. Empty here means <i>cannot vary</i>, not <i>unknown</i>.'
+        : 'Quoted by a single province, so there is no spread to show.'}</div>`;
+  return `<div class="cb-thai"><div class="cb-thai-hd">
+      <b>Thai price, ${s.first_month} → ${s.last_month}</b>
+      <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span>
+      ${ann?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)" title="one announced national price per season — not a market series">ANNUAL · ADMINISTERED</span>':''}
+      <span class="mono" style="color:${col}"><b>${ch==null?'':(ch>0?'+':'')+ch+'%'}</b></span>
+      <span class="s">over ${s.n_months} ${ann?'years':'months'} · ${fmt(s.min)}–${fmt(s.max)} ${s.unit||''}</span>
+    </div>
+    <div class="cb-thai-body">${spark}<span class="s">${s.product||''}</span></div>
+    ${spread}</div>`;
+}
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
   Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact'),
-               tmliFetch('commodity_history')]).then(([j,APR,INC,HIST])=>{
+               tmliFetch('commodity_history'),tmliFetch('thai_price_history')]).then(([j,APR,INC,HIST,THI])=>{
     if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
     const aprCrop=k=>((APR&&Array.isArray(APR.crops))?APR.crops:[]).find(c=>c.key===k)||null;
     const incProv=p=>((INC&&INC.provinces)?INC.provinces[p]:null)||null;
@@ -7957,8 +8083,13 @@ function renderCommoditiesBoard(){
       return svgSpark(v,{w:96,h:22,aria:lab+' 60-month price history',
         title:lab+' · '+(m[0]||'')+' → '+(m[m.length-1]||'')+' ('+v.length+' months)'});
     };
+    // The move the BORROWER feels: Thai farm-gate where a local series exists, world price
+    // otherwise. The builder already sorts the board on it; this is the same number drawn.
+    const felt=c=>c.local_yoy!=null?c.local_yoy:c.global_yoy;
+    const feltMax=Math.max(...j.board.map(c=>Math.abs(felt(c)||0)),1);
     const rows=j.board.map((c,i)=>{
       const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
+      const fv=felt(c), fc=icMoveColor(fv), isLoc=c.local_yoy!=null;
       const exp=c.exposure;
       const expCell=exp?`<span class="cb-exp" data-i="${i}">${icN(exp.book_accounts)} acc <span class="cb-chev">▸</span></span>`:'<span class="s">—</span>';
       const div=c.divergence;
@@ -7975,47 +8106,83 @@ function renderCommoditiesBoard(){
         const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
         const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
         const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
-        const assistLine=!ap?'':`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
-        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="7"><div class="cb-belt">
-          <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
-          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
-            (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
+        // A row can carry a belt but no assistable population, because the assistance radar keys off
+        // the Thai FARM-GATE series and not every crop has one. Sugar is exactly that case, and it
+        // is the ONLY falling price that also has a belt — staying silent there reads as "nothing to
+        // do" when the truth is "we cannot compute it yet". Say which of the two it is, and name the
+        // unlock. (The other fallers — coconut, pineapple, pork, shrimp, eggs, chicken — have a Thai
+        // price but no province area, so they cannot reach a belt at all.)
+        // Two DIFFERENT reasons a belt can exist with no call list, and saying the wrong one is its
+        // own error: either we hold no Thai price for the crop, or we hold one and the assistance
+        // radar does not map the crop. All eight belted crops now clear both, so this line is a
+        // guard for future rows rather than something any current commodity hits.
+        const gapLine=`<div class="cb-assist cb-gap"><b>No call-list for ${c.lab} yet:</b> ${
+          c.local_yoy==null
+            ? `the assistable-now population is computed from a <b>Thai price series</b>, and ${c.lab} has none in this repo`
+            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but the assistance radar's exposure join does not map it — it reads crop_stress.json planted-area shares, which livestock and fisheries have none of`
+        } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.</div>`;
+        const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
+        const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
+        const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
+        const thaiLine=cbThaiHistory(THI,c.lab);
+        // The income columns used to show income_impact.json's province-wide agri_price_shock_pct,
+        // which is area-weighted over rice/rubber/oilpalm ONLY — so the coconut belt read +26.84%
+        // farm income while coconut itself was down 70.9%, because ประจวบคีรีขันธ์'s crop mix is 61%
+        // rubber / 34% palm and holds no coconut at all. They now carry THIS crop's own effect, and
+        // the assumption that makes them readable is stated on the page rather than in a tooltip.
+        const incBasis=!exp.income_basis?'':`<div class="cb-incbasis"><span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span> <b>Reading the income columns:</b> they are <b>${c.lab}'s own effect</b> on a farm household in that province <b>whose main crop is ${c.lab}</b> — the crop's Thai move passed through the income engine's farm sensitivity onto that province's measured NSO SES farm income. They are not the province's all-crop farm income (a different number, driven mostly by rice, rubber and palm, and shown on the province view). Not weighted by ${c.lab}'s share of local land: belt areas come from different registries, so a cross-source share would be false precision.</div>`;
+        // TOTAL ROW (added 2026-08-01, owner ask). build_commodities.py used to emit only the belt's
+        // six largest provinces while the line above the table quoted the whole belt, so the accounts
+        // column visibly failed to add up to its own headline — rice showed 50,742 against 138,184
+        // with the missing 63% nowhere on the page. The builder now emits every belt province, so
+        // this row is a real total and it reconciles exactly. The partial branch is kept as a
+        // guard: if a future change ever truncates the list again, the page says so instead of
+        // quietly presenting a short column as if it were complete.
+        const shown=exp.top||[], shownAcc=shown.reduce((s,t)=>s+(t.accounts||0),0),
+              shownArea=shown.reduce((s,t)=>s+(t.area_rai||0),0),
+              restProv=(exp.belt_provinces||0)-shown.length, restAcc=(exp.book_accounts||0)-shownAcc;
+        const footRow=!shown.length?'':`<tfoot><tr class="cb-foot">
+          <td><b>${restProv>0?`${shown.length} of ${exp.belt_provinces} belt provinces shown`:`Belt total · ${exp.belt_provinces} provinces`}</b></td>
+          <td class="n"><b>${icN(shownArea)}</b></td>
+          <td class="n"><b>${restProv>0?`${icN(shownAcc)} of ${icN(exp.book_accounts)}`:icN(shownAcc)}</b></td>
+          <td colspan="2" class="s">${restProv>0
+            ? `the other ${icN(restProv)} belt province${restProv===1?'':'s'} hold ${icN(restAcc)} accounts (${Math.round(restAcc/(exp.book_accounts||1)*100)}% of the belt)`
+            : `adds up to the ${icN(exp.book_accounts)} above — this is the whole belt, not a sample`}</td></tr></tfoot>`;
+        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
+          <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
+          ${areaLine}
+          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">Planted area (rai)</th><th scope="col">Book accounts</th><th scope="col" title="THIS crop's effect on a farm household here whose main crop is ${c.lab} — sensitivity × the crop's Thai YoY. ESTIMATED.">${c.lab} → farm income</th><th scope="col" title="the same effect in baht, on the province's MEASURED NSO SES farm-income base">฿/month</th></tr></thead><tbody>${
+            shown.map(t=>{
+              const ipc=t.crop_income_pct, ibt=t.crop_income_baht;
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
-                `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
-                `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
-          }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
+                `<td class="n">${ipc!=null?`<span style="color:${ipc>=0?'var(--merch)':'var(--agri)'}">${ipc>0?'+':''}${ipc}%</span>`:'<span class="s">—</span>'}</td>`+
+                `<td class="n">${ibt!=null?`<span style="color:${ibt>=0?'var(--merch)':'var(--agri)'}">${ibt>0?'+':'−'}฿${icN(Math.abs(ibt))}</span>`:'<span class="s">—</span>'}</td></tr>`;}).join('')
+          }</tbody>${footRow}</table></div>${incBasis}${thaiLine}${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
+        <td class="cb-felt" title="${isLoc?'Thai farm-gate':'world price only — no Thai farm-gate series'}">${cbBar(fv,feltMax)}${
+          fv==null?'':`<b style="color:${fc}">${fv>0?'+':''}${fv}%</b>${isLoc?'':'<span class="s cb-deg">°</span>'}`}</td>
         <td class="cb-spark">${spark(c.lab)}</td>
-        <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
-        <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>`}</td>
+        <td class="n">${c.global_yoy==null?'<span class="s">n/a</span>':`<span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span>`}</td>
+        <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}" title="${[c.local_product,c.local_source,c.local_price,c.local_date].filter(Boolean).join(' · ')}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>${
+          c.local_markets?`<span class="s cb-mkt${c.local_markets<2?' thin':''}" title="${c.local_markets} market${c.local_markets>1?'s':''} quote this series${c.local_markets<2?' — a single-market quote, read it as thin':''}">${c.local_markets}mkt</span>`:''}`}</td>
         <td class="n">${divCell}</td>
         <td class="n">${expCell}</td>
         <td class="s">${c.note||''}</td></tr>${drill}`;
     }).join('');
     const f=j.fuel||{};
-    // CHART (2026-08-01): the whole board as one diverging bar, sorted by the move the BORROWER
-    // actually feels (Thai farm-gate where a local series exists, world price otherwise). Reading
-    // "everything is up except sugar" off 11 table rows takes a scan; off this it takes a glance.
-    // The table stays underneath as the evidence — the chart replaces the scanning, not the detail.
-    const bars=(j.board||[]).map(c=>{
-      const local=c.local_yoy!=null, v=local?c.local_yoy:c.global_yoy;
-      if(typeof v!=='number') return null;
-      return {label:c.lab+(local?'':' °'),value:Math.round(v*10)/10,
-        color:v>0?'var(--merch)':'var(--agri)',
-        note:(local?'Thai farm-gate':'world price only')+(c.seg?' · '+c.seg:'')};
-    }).filter(Boolean).sort((a,b)=>b.value-a.value);
+    // 2026-08-01: the standalone full-width bar chart that used to sit here was DELETED, not
+    // resized. It restated the table's own 11 numbers in a second block, and because it scaled to
+    // container width it rendered 673px tall against a 409px table. The ranking it provided is now
+    // the table's sort order and its magnitudes are the "Borrower feels" cell bars — one block
+    // instead of two, and every row carries its own bar.
     const nLoc=(j.board||[]).filter(c=>c.local_yoy!=null).length;
-    const chart=bars.length?`<div class="chartwrap"><div class="chart-h">
-        <span class="t">Every tracked commodity, by the move the borrower feels</span>
-        <span class="s">° = world price only, no Thai farm-gate series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length})</span></div>
-      ${svgBars(bars,{aria:'Commodity year-on-year moves, Thai farm-gate where available',labW:86})}</div>`:'';
     el.innerHTML=`
       <h2>Commodities board · global price × Thai farm-gate × who's exposed <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MEASURED prices</span></h2>
       <p class="lead">World price (Pink Sheet YoY) beside the Thai farm-gate move, their <b>divergence</b> (where the local farmer's cash parts from the world index), and the <b>book accounts</b> sitting in each crop's growing belt — press a row to see the belt. ${f.diesel_thb_l?`Diesel now <b>฿${f.diesel_thb_l}/L</b> (${f.name}) — a cost line for pickup/haulage, not crop revenue.`:''}</p>
-      ${chart}
-      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th>5-yr trend</th><th>World YoY</th><th>Thai farm-gate</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area); resolvable only for rice / rubber / palm (the crops with province area).</p>`;
+      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th title="Thai farm-gate where a local series exists, world price otherwise">Borrower feels</th><th>5-yr trend</th><th>World YoY</th><th title="Thai farm-gate (raw crop forms) or the NABC daily market feed for livestock, fishery and orchard series. Nmkt = how many markets quote it.">Thai price</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+        <p class="s cb-key">Sorted by the move the borrower feels. <b>°</b> = world price only, no Thai series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length}). <b>Nmkt</b> = markets quoting that Thai price; a 1mkt series is measured but thin.${((j.meta||{}).nabc_excluded||[]).length?` Excluded as stale: ${(j.meta||{}).nabc_excluded.join('; ')}.`:''}</p></div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area). Each belt states its own area source, and <b>every belt on this board is now MEASURED</b>: rice / rubber / palm from the planted-area census, cassava / maize / coconut / pineapple from the DOAE farmer registry, sugarcane from OCSB's own returns (the modelled SPAM-2010 raster it replaced understated the cane belt by ~1.7×).</p>`;
     if(!el.dataset.wired){ el.dataset.wired='1';
       el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
         const dr=el.querySelector(`.cb-drill[data-i="${x.dataset.i}"]`); if(!dr) return;
@@ -8573,6 +8740,176 @@ function provRegOf(mount,prov){
    rides on each price) and states the trip rule so the empty state is legible rather than mysterious.
    Null-safe: absent layer → a calm note, never a broken table. */
 function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch)':'var(--muted)'; }
+/* CROP MIX → FARM INCOME (data/crop_mix.json). The correction this section leads with: weighting
+   ALL EIGHT priced crops by province area, farm income is not rising everywhere. The prior engine
+   weighted rice/rubber/oilpalm only — all three up — so it reported all 77 provinces rising and was
+   structurally blind to coconut, sugarcane and pineapple. Four provinces are negative and they carry
+   real book. Null-safe: absent layer → nothing renders. */
+function renderCropMix(){
+  const host=document.getElementById('cropmix-wrap'); if(!host) return;
+  tmliFetch('crop_mix').then(j=>{
+    if(!j||!j.national||!j.provinces) return;
+    const N=j.national, M=j.meta||{}, P=j.provinces, num=n=>Number(n).toLocaleString();
+    const sign=v=>(v>0?'+':'')+v, col=v=>v<0?'var(--agri)':'var(--merch)';
+    const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
+    // One bar per province, sorted worst-first, so the shape of the country is one glance: a long
+    // green tail and a short red head. Fixed pixel geometry — a %-width SVG collapses here.
+    const all=Object.entries(P).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    const W=760,BW=Math.max(2,Math.floor(W/all.length)-1),H=54;
+    const lo=Math.min(...all.map(([,p])=>p.shock_pct)), hi=Math.max(...all.map(([,p])=>p.shock_pct));
+    const zero=H*(hi/(hi-lo||1));
+    const bars=all.map(([,p],i)=>{
+      const y=p.shock_pct>=0?zero-H*(p.shock_pct/(hi-lo||1)):zero;
+      const bh=Math.max(1,H*Math.abs(p.shock_pct)/(hi-lo||1));
+      return `<rect x="${i*(BW+1)}" y="${y.toFixed(1)}" width="${BW}" height="${bh.toFixed(1)}" fill="${col(p.shock_pct)}" opacity="${p.shock_pct<0?1:.55}"/>`;}).join('');
+    const spark=`<svg width="${all.length*(BW+1)}" height="${H+2}" viewBox="0 0 ${all.length*(BW+1)} ${H+2}" role="img" aria-label="${all.length} provinces ranked by crop-mix price shock, ${N.negative_provinces} negative">${bars}<line x1="0" y1="${zero.toFixed(1)}" x2="${all.length*(BW+1)}" y2="${zero.toFixed(1)}" stroke="var(--line)" stroke-width="1"/></svg>`;
+
+    host.innerHTML=`<h3 class="ovsub risk">Crop mix → farm income · every priced crop, weighted by province land <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
+      <div class="verdict v-warn"><b>Farm income is not rising everywhere — ${N.negative_provinces} provinces are falling, and they hold ${num(N.accounts_in_negative)} book accounts.</b>
+        Weighted across all eight priced crops, the average AutoX farm borrower's crop mix moved <b style="color:${col(N.book_weighted_shock_pct)}">${sign(N.book_weighted_shock_pct)}%</b> (median province ${sign(N.median_shock_pct)}%). But it is concentrated: the Mae Klong coconut delta is down two-thirds.
+        The previous engine weighted <b>rice, rubber and oilpalm only</b> — all three rising — and therefore reported <b>all 77 provinces up</b>. That was an artefact of the three crops it could see.</div>
+      <div class="cm-spark">${spark}<div class="s">77 provinces, worst on the left · red = falling crop mix</div></div>
+      <div id="cm-drill"></div>
+      <p class="lead sub" style="margin:8px 0 0"><b>Why you can trust the ranking:</b> the two area bases disagree on level and not on order — recomputing every crop on the DOAE registry alone moves สมุทรสงคราม from ${sign(P['สมุทรสงคราม'] ? P['สมุทรสงคราม'].shock_pct : 0)}% to ${sign(P['สมุทรสงคราม']?P['สมุทรสงคราม'].shock_pct_doae_basis:0)}% and leaves the worst-first order intact. ${M.area_basis_note||''} DOAE registration covers ${Object.entries(M.doae_coverage_vs_census||{}).map(([k,v])=>`${k} ${v}×`).join(', ')} of the census.</p>`;
+    cmDrill(j);
+    wrapTables();
+  });
+}
+
+/* Region → province → BRANCH breadcrumb for the crop-mix read. A top-10 list answers the CEO's
+   question and none of the branch team's, so this is the same number at three grains: the region
+   card is what you present, the branch table is what someone actually works on Monday. One level is
+   on screen at a time — nesting a branch table inside a province table inside a region card is what
+   made the old impact drill unreadable. Branch rows come from impact_cards.json (the same measured
+   no-PII tape aggregate the risk views use); the crop shock is the province's, applied to the
+   branch's own book, and the row is sorted by the CURRENT (healthy) balance, because that is the
+   population you can still act on before it rolls. */
+function cmDrill(j){
+  const host=document.getElementById('cm-drill'); if(!host) return;
+  const P=j.provinces, R=j.regions||{}, num=n=>Number(n).toLocaleString();
+  const sign=v=>(v==null?'—':(v>0?'+':'')+v), col=v=>v<0?'var(--agri)':'var(--merch)';
+  const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
+  const D1=v=>(v==null?null:Math.round(v*10)/10);   // the tape's 2dp reads as false precision here
+  let ST={level:'region', region:null, prov:null};
+
+  const crumb=parts=>`<div class="cm-crumb">${parts.map((p,i)=>
+    i===parts.length-1?`<span class="cm-here">${p.t}</span>`
+      :`<a href="#" data-go="${p.go}">${p.t}</a><span class="cm-sep">›</span>`).join('')}</div>`;
+
+  function regionView(){
+    const rs=Object.entries(R).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    return crumb([{t:'All regions'}])
+      +`<p class="s" style="margin:0 0 8px">Press a region to see its provinces, then a province to see its branches. Region moves are weighted by <b>book accounts</b>, not by province count — five regions are not five equal books.</p>`
+      +`<div class="cm-cards">${rs.map(([r,g])=>`<button class="cm-card" data-region="${r}">
+          <div class="cm-card-k">${r}</div>
+          <div class="cm-card-v" style="color:${col(g.shock_pct)}">${sign(g.shock_pct)}%</div>
+          <div class="cm-card-n">${num(g.accounts)} accounts · ${g.provinces} provinces${
+            g.negative?` · <b style="color:var(--agri)">${g.negative} falling (${num(g.accounts_negative)} acc)</b>`:' · none falling'}</div>
+          <div class="cm-card-n s">worst: ${g.worst_prov} ${sign(g.worst_shock)}%</div></button>`).join('')}</div>`;
+  }
+
+  function provView(region){
+    const ps=Object.entries(P).filter(([,p])=>p.region===region).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    const rows=ps.map(([th,p])=>{const d=p.crops[0];
+      return `<tr class="cm-prow" data-prov="${th}"><td><b>${th}</b> <span class="cm-chev">›</span></td>
+        <td class="n" style="color:${col(p.shock_pct)}"><b>${sign(p.shock_pct)}%</b></td>
+        <td class="n" style="color:${col(p.income_thb_month)}">${B(p.income_thb_month)}</td>
+        <td class="n">${num(p.accounts)}</td>
+        <td class="s">${d?`${d.en} <b>${Math.round(d.share*100)}%</b> of land, ${sign(d.yoy)}% → ${sign(Math.round(d.pp*10)/10)}pp`:'—'}</td>
+        <td class="n s">${sign(p.shock_pct_doae_basis)}%</td>
+        <td class="n s">${p.shock_pct_3crop_prior==null?'—':sign(D1(p.shock_pct_3crop_prior))+'%'}</td></tr>`;}).join('');
+    return crumb([{t:'All regions',go:'region'},{t:region}])
+      +`<table class="tbl cm-tbl"><tr><th scope="col">Province</th>
+        <th scope="col" title="area-weighted Thai farm-gate move across all 8 priced crops">Crop mix move</th>
+        <th scope="col" title="that move through the income engine's farm sensitivity, on the province's measured NSO SES farm income">Farm income</th>
+        <th scope="col">Book accounts</th><th scope="col">What is driving it</th>
+        <th scope="col" class="s" title="sensitivity: every crop on the DOAE registry alone">DOAE basis</th>
+        <th scope="col" class="s" title="the previous rice/rubber/palm-only figure">Prior</th></tr>${rows}</table>`;
+  }
+
+  function branchView(th){
+    const p=P[th]||{}, mix=(p.crops||[]).slice().sort((a,b)=>b.share-a.share).slice(0,4);
+    const mixLine=mix.map(c=>`${c.en} ${Math.round(c.share*100)}% <span style="color:${col(c.yoy)}">${sign(c.yoy)}%</span>`).join(' · ');
+    return tmliFetch('impact_cards').then(ic=>{
+      const bs=((ic&&ic.branches)||{})[th]||[];
+      if(!bs.length) return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
+        +`<div class="ic-note">No branch rows published for ${th} — the tape aggregate suppresses any cell under the ${((ic&&ic.meta)||{}).min_cell||30}-account floor.</div>`;
+      // Rank by the CURRENT balance, not by size: the biggest branch is not the biggest opportunity,
+      // the one with the most still-healthy accounts in a falling crop region is.
+      const rows=bs.slice().map(b=>({...b, cur:Math.round(b.n*(b.current_pct||0)/100)}))
+        .sort((a,b)=>b.cur-a.cur)
+        .map(b=>`<tr><td>${b.name}</td>
+          <td class="n">${num(b.n)}</td><td class="n">฿${b.os_m}m</td>
+          <td class="n"><b>${num(b.cur)}</b> <span class="s">(${D1(b.current_pct)}%)</span></td>
+          <td class="n s">${D1(b.early_pct)}%</td>
+          <td class="n" style="color:${(b.dpd30p_pct||0)>=20?'var(--agri)':'inherit'}">${D1(b.dpd30p_pct)}%</td>
+          <td class="n s">${D1(b.npl_live_pct)}%</td></tr>`).join('');
+      const totCur=bs.reduce((s,b)=>s+Math.round(b.n*(b.current_pct||0)/100),0);
+      const act=p.shock_pct<0
+        ? `<b style="color:var(--agri)">Action:</b> ${th}'s crop mix fell ${sign(p.shock_pct)}% — roughly ${B(p.income_thb_month)}/month off a farm household's cash. <b>${num(totCur)} accounts across these ${bs.length} branches are still Current</b>; that is the pre-emptive contact list, worked biggest-Current-book first.`
+        : `<b>Watch only:</b> ${th}'s crop mix is ${sign(p.shock_pct)}%, so there is no price-driven action here today. ${num(totCur)} accounts are Current — this is the standing exposure if the mix turns.`;
+      return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
+        +`<div class="cm-act">${act}<div class="s" style="margin-top:4px">Crop mix: ${mixLine}</div></div>`
+        +`<table class="tbl cm-tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th>
+          <th scope="col" title="outstanding balance">O/S</th>
+          <th scope="col" title="accounts with nothing past due — the population you can still act on">Current</th>
+          <th scope="col" class="s" title="X-bucket, past due but under 30 days">X</th>
+          <th scope="col" title="30+ days past due">30+</th><th scope="col" class="s" title="90-179 days">NPL live</th></tr>${rows}</table>`;
+    });
+  }
+
+  function draw(){
+    const put=html=>{host.innerHTML=html; wrapTables();};
+    if(ST.level==='region') put(regionView());
+    else if(ST.level==='prov') put(provView(ST.region));
+    else branchView(ST.prov).then(put);
+  }
+  host.addEventListener('click',e=>{
+    const card=e.target.closest('[data-region]');
+    if(card){ ST={level:'prov',region:card.dataset.region,prov:null}; draw(); return; }
+    const row=e.target.closest('.cm-prow');
+    if(row){ ST={level:'branch',region:ST.region,prov:row.dataset.prov}; draw(); return; }
+    const go=e.target.closest('[data-go]');
+    if(go){ e.preventDefault(); ST.level=go.dataset.go; draw(); }
+  });
+  draw();
+}
+
+/* MEASURED farm-household cash P&L (data/farm_household.json) — the ground under every price claim
+   in this product. The one number that changes how you read the rest is the non-farm share: a crop
+   price move reaches only the farm half of a farm household's cash. National survey means, so it is
+   framed as a backdrop and never joined to a province. */
+function renderFarmHousehold(){
+  const host=document.getElementById('assist-household'); if(!host) return;
+  tmliFetch('farm_household').then(j=>{
+    if(!j||!j.latest){ tmliNote(host,'The household backdrop needs <b>data/farm_household.json</b> — not built for this vintage.'); return; }
+    const L=j.latest, yrs=j.years||[], B=n=>'฿'+Math.round(n).toLocaleString();
+    const inc=L.income||{}, exp=L.expense||{};
+    const nf=L.nonfarm_share_of_income_pct;
+    // Farm income vs non-farm as one honest split bar — the whole point in a single glance.
+    const w=340,h=16,fs=(L.farm_share_of_income_pct||0)/100;
+    const bar=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="farm ${L.farm_share_of_income_pct}% vs non-farm ${nf}% of household cash income">
+        <rect x="0" y="0" width="${(w*fs).toFixed(1)}" height="${h}" fill="var(--agri)" rx="2"/>
+        <rect x="${(w*fs).toFixed(1)}" y="0" width="${(w*(1-fs)).toFixed(1)}" height="${h}" fill="var(--merch)" rx="2"/></svg>`;
+    const trend=yrs.map(r=>`<tr><td><b>${r.crop_year}</b></td>
+        <td class="mono">${B(r.income.farm_total)}</td>
+        <td class="mono">${B(r.income.nonfarm)}</td>
+        <td class="mono">${B(r.expense.total)}</td>
+        <td class="mono"><b>${B(r.net_cash)}</b></td>
+        <td class="mono sub">${B(r.net_cash_monthly)}</td>
+        <td class="mono sub">${r.farm_share_of_income_pct==null?'—':r.farm_share_of_income_pct+'%'}</td></tr>`).join('');
+    const hh=L.household||{};
+    host.innerHTML=`<p class="lead" style="margin:0 0 8px"><b style="color:var(--merch)">${nf}% of a farm household's cash income is non-farm</b> — so a crop-price fall reaches roughly ${L.farm_share_of_income_pct}% of what the household actually earns, not all of it. In ${L.crop_year} the average farm household took ${B(inc.total)} cash, spent ${B(exp.total)}, and cleared <b>${B(L.net_cash)}</b> for the year — <b>${B(L.net_cash_monthly)}/month</b>.</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px">${bar}
+        <span class="sub" style="font-size:12px"><span style="color:var(--agri)">■</span> farm ${L.farm_share_of_income_pct}% &nbsp; <span style="color:var(--merch)">■</span> non-farm ${nf}%</span></div>
+      <table class="tbl"><tr><th>Crop year</th><th title="crops + livestock + other farm cash">Farm cash income</th>
+        <th title="wages, remittances, off-season work — untouched by crop prices">Non-farm</th>
+        <th>Cash expense</th><th>Net cash / yr</th><th class="sub">/ month</th><th class="sub">Farm share</th></tr>${trend}</table>
+      <p class="lead sub" style="margin:8px 0 0"><b>Household:</b> head aged ${hh.head_age_years??'—'}, ${hh.household_size??'—'} people, ${hh.workers_15_64??'—'} of working age, ${hh.landholding_rai??'—'} rai held. <b>Reading:</b> ${(j.meta||{}).scope_warning||''} ${(j.meta||{}).not_covered||''}</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssistPriceLens(){
   const host=document.getElementById('assist-price'); if(!host) return;
   tmliFetch('assist_price_radar').then(j=>{
@@ -8587,9 +8924,20 @@ function renderAssistPriceLens(){
 
     // Lead with the answer. If something has tripped that IS the answer; otherwise the answer is the
     // size of the healthy book and the fact that nothing is falling — said plainly, not padded.
+    // With 22 provinces tripping, listing every name reads as noise. Lead with the size of the
+    // callable slice and WHICH falling crop is driving it; the names go in the table below.
+    const trippedRows=provs.filter(r=>r.tripped);
+    const trippedN=trippedRows.reduce((a,r)=>a+(r.n_current_x||0),0);
+    const byCrop={};
+    trippedRows.forEach(r=>(r.falling_crops||[]).forEach(c=>{
+      byCrop[c]=byCrop[c]||{n:0,prov:0};byCrop[c].n+=r.n_current_x||0;byCrop[c].prov++;}));
+    const drivers=Object.entries(byCrop).sort((a,b)=>b[1].n-a[1].n).map(([c,v])=>{
+      const yy=(j.crops.find(x=>x.crop===c)||{}).yoy;
+      return `<b>${c}</b> ${yy==null?'':`<span class="mono" style="color:var(--agri)">${yy}%</span>`} <span class="sub">(${v.prov} prov, ${N(v.n)} accounts)</span>`;}).join(' · ');
+    const named=trippedRows.slice().sort((a,b)=>(b.n_current_x||0)-(a.n_current_x||0)).slice(0,6).map(r=>r.th).join(' · ');
     const lead = tripped.length
-      ? `<b style="color:var(--agri)">${tripped.length} province${tripped.length>1?'s':''} tripped:</b> ${tripped.join(' · ')} — a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area there is in price decline. Call the Current + X-day slice before collections turn.`
-      : `<b>Nothing tripped.</b> All five mapped crops are up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
+      ? `<b style="color:var(--agri)">${N(trippedN)} healthy farm accounts are in a falling sector right now</b> — Current or X-bucket only, across <b>${tripped.length}</b> province${tripped.length>1?'s':''} where a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area is in price decline. Driven by ${drivers}. Biggest books: ${named}. This is the slice to call before collections turn.`
+      : `<b>Nothing tripped.</b> Every mapped crop is up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
 
     const crops=j.crops.map(c=>`<tr>
         <td><b>${c.crop}</b></td>
@@ -8601,8 +8949,11 @@ function renderAssistPriceLens(){
 
     // The province detail is the actionable list, but it is long — keep it collapsed so the crop
     // rollup stays the thing you read first.
-    const top=provs.slice(0,15).map(r=>`<tr>
-        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
+    // Tripped first — the file sorts by book size alone, which would bury the actionable rows
+    // under large-but-healthy ones.
+    const ordered=provs.slice().sort((a,b)=>(b.tripped?1:0)-(a.tripped?1:0)||(b.n_current_x||0)-(a.n_current_x||0));
+    const top=ordered.slice(0,15).map(r=>`<tr>
+        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.tripped?' <span class="tag" style="color:var(--agri);border-color:var(--agri)" title="a crop this province depends on is in price decline">FALLING CROP</span>':''}${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
         <td class="mono"><b>${N(r.n_current_x)}</b></td>
         <td class="mono sub">${N(r.n_current)} / ${N(r.n_early)}</td>
         <td class="mono sub">${N(r.n_farm_accounts)}</td>
@@ -8617,11 +8968,11 @@ function renderAssistPriceLens(){
         <th title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
         <th title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
         <th>Where most of it sits</th></tr>${crops}</table>
-      <details style="margin-top:10px"><summary class="sub">By province — the 15 largest healthy farm books (of ${provs.length})</summary>
+      <details style="margin-top:10px"><summary class="sub">By province — falling-crop provinces first, then the largest healthy farm books (15 of ${provs.length})</summary>
         <table class="tbl" style="margin-top:8px"><tr>
           <th>Province</th><th>Current + X</th><th class="sub">Current / X</th>
           <th class="sub">Farm accounts</th><th class="sub">Farm book</th><th>Crops it depends on</th></tr>${top}</table></details>
-      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. Sugarcane has a measured price but no province planted-area share, so it cannot be placed on this map.</p>`;
+      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. <b>Sugarcane joined this map on 1 Aug 2026</b> — cane growers register with the OCSB rather than DOAE, so it had no planted area here and its only price was a 2019 OAE snapshot reading <b>+26%</b> when the announced cane price is <b>−17.9%</b>. It now drives most of what has tripped. Livestock and fisheries (pork, shrimp, chicken, eggs) are still absent: they have no planted area to join on.</p>`;
     wrapTables();
   });
 }
@@ -8664,6 +9015,7 @@ function renderAssist(){
         <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
 
+    renderFarmHousehold();
     renderAssistPriceLens();
 
     // restructuring — did it hold?

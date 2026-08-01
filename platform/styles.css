@@ -1329,6 +1329,16 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .cb-drill>td{background:var(--panel2);padding:0}
 .cb-belt{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.55}
 .cb-belt b{color:var(--hi)}
+/* Belt table now lists EVERY province in the belt (rice = 26 rows), so it scrolls inside the drill
+   rather than pushing the price history and call-list below the fold. The sticky header keeps the
+   column meanings visible while scrolling; the footer total is the row the eye is looking for. */
+.cb-belttbl{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:6px;margin-top:6px}
+.cb-belttbl table{margin-top:0!important}
+.cb-belttbl thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
+.cb-foot td{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding-top:6px;font-size:11px;vertical-align:top}
+.cb-foot .s{color:var(--mid);font-weight:400}
+.cb-incbasis{margin:7px 0 2px;font-size:11px;line-height:1.5;color:var(--mid)}
+.cb-incbasis b{color:var(--hi)}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}
@@ -1355,7 +1365,10 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
    ============================================================ */
 .chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:9px;
   padding:11px 12px 8px;margin:8px 0 10px;overflow-x:auto}
-.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px}
+.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px;max-width:620px;margin:0 auto}
+/* max-width is a GUARD, not decoration: a viewBox svg at width:100% scales uniformly, so
+   without a cap a 560-unit chart rendered 1590px wide with ~30px label text on a 1920px
+   screen. Any future .chartwrap chart is capped near its designed size and centred. */
 .chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
   margin-bottom:7px}
 .chart-h .t{font:600 11px var(--sans);color:var(--txt);letter-spacing:.2px}
@@ -1497,3 +1510,49 @@ p.lead.lead-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:ve
   font:400 12.5px/1.7 var(--sans);color:var(--mid);max-width:78ch}
 .pq .sub{font-size:10.5px;letter-spacing:.2px}
 @media print{.pq{break-inside:avoid}}
+
+/* Commodities board — "Borrower feels" cell bar. Replaced the full-width chart that scaled to
+   1590x627 on a 1920px screen; these are fixed-pixel and cannot inflate with the container. */
+.cb-felt{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cb-felt b{font:600 11px var(--mono);margin-left:7px}
+.cb-felt .cb-deg{margin-left:2px;color:var(--dim)}
+svg.cbcell{vertical-align:middle;display:inline-block}
+.cb-key{margin:6px 2px 0;color:var(--dim)}
+.cb-areasrc{margin:7px 0 2px;font-size:11px;line-height:1.5}
+.cb-gap{border-left:2px solid var(--gold);padding-left:9px}
+/* Thai price history block inside a commodity drill. The sparkline is given fixed pixel width/height
+   attributes (not width:100%) for the same reason the cell bars are: a viewBox SVG stretched to its
+   container scales its whole coordinate system, so the line thickens as the panel widens. */
+.cb-thai{margin:9px 0 2px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
+.cb-thai-hd{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:11.5px}
+.cb-thai-body{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
+.cb-thai-body svg{flex:0 0 auto}
+.cb-spread{margin-top:7px;font-size:11px;line-height:1.5}
+.cb-spread .ic-tbl{max-width:420px}
+.cb-mkt{margin-left:5px;color:var(--dim);font-size:10px}
+.cb-mkt.thin{color:var(--gold)}
+
+/* Crop-mix → farm income (Macro · Farm households). The 77-bar rank strip needs FIXED pixel
+   width/height attributes on the <svg>; a width:100% SVG collapses to zero here. */
+.cm-spark{margin:10px 0 6px;overflow-x:auto}
+.cm-spark svg{display:block}
+.cm-spark .s{margin-top:4px;font-size:11px;color:var(--mid)}
+.cm-tbl td,.cm-tbl th{vertical-align:top}
+.cm-tbl .n{font-variant-numeric:tabular-nums;text-align:right}
+/* Crop-mix drill: region cards → province table → branch table. One level on screen at a time. */
+.cm-crumb{font-size:12px;margin:2px 0 8px;color:var(--mid)}
+.cm-crumb a{color:var(--accent);text-decoration:none}
+.cm-crumb a:hover{text-decoration:underline}
+.cm-crumb .cm-sep{margin:0 6px;color:var(--line)}
+.cm-crumb .cm-here{color:var(--hi);font-weight:600}
+.cm-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.cm-card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit}
+.cm-card:hover{border-color:var(--accent)}
+.cm-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cm-card-k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mid)}
+.cm-card-v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.cm-card-n{font-size:11px;color:var(--mid);line-height:1.45}
+.cm-prow{cursor:pointer}
+.cm-prow:hover{background:var(--panel)}
+.cm-chev{color:var(--accent)}
+.cm-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;line-height:1.55}

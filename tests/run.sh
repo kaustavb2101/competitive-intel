@@ -4,24 +4,24 @@
 # Phases (run all by default; pass a phase name to run just one):
 #   check    determinism gate: pipeline --check + node --check on app.js & every page's inline JS
 #            + data integrity (validate_data.py over platform/data/*.json)
-#   render   headless-render every page in tests/pages.manifest with self-hosted deck.gl/leaflet
+#   render   headless-render every page in tests/pages.manifest (map libs vendored in platform/vendor/)
 #   health   per-page smoke: no uncaught errors, lib init, non-blank canvas, DOM hooks present
 #   visual   compare fresh renders to tests/baseline/*.png within tolerance
 #   baseline (re)generate tests/baseline/*.png from current pages (use when a change is intended)
 #
 # Usage:
 #   tests/run.sh                 # check + render + health + visual  (the CI gate)
-#   tests/run.sh check           # offline, no chromium/npm needed beyond python
+#   tests/run.sh check           # offline, no chromium needed beyond python
 #   tests/run.sh baseline        # refresh committed baselines
 #
-# Network: ONLY the npm registry (to install deck.gl/leaflet into tests/.cache). NO data pulls.
+# Network: NONE. deck.gl + Leaflet are committed under platform/vendor/, so the whole suite —
+# determinism, render, health, visual — runs fully offline. NO data pulls, no npm registry.
 set -u
 TESTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(dirname "$TESTS")"
 PLATFORM="$REPO/platform"
 PIPE="$REPO/pipeline"
 LIB="$TESTS/lib"
-CACHE="$TESTS/.cache"
 WORK="$TESTS/.work"
 BASE="$TESTS/baseline"
 MANIFEST="$TESTS/pages.manifest"
@@ -40,18 +40,22 @@ hdr(){ printf '\n%s== %s ==%s\n' "$YLW" "$1" "$RST"; }
 manifest_rows(){ grep -vE '^\s*#' "$MANIFEST" | grep -vE '^\s*$'; }
 
 # ---------------------------------------------------------------------------
+# deck.gl + Leaflet are COMMITTED under platform/vendor/ (since 2026-08-01), so there is nothing to
+# install and the whole suite is network-free. This asserts the bundles are present and — the part
+# that matters — that no page has drifted back to a CDN <script>/<link>, which would make the render
+# phase silently depend on the network again.
 deps(){
-  if [ -f "$CACHE/node_modules/deck.gl/dist.min.js" ] && [ -f "$CACHE/node_modules/leaflet/dist/leaflet.js" ]; then
-    return 0
+  local missing=0
+  for f in vendor/deck.gl-8.9.35.min.js vendor/leaflet/leaflet.js vendor/leaflet/leaflet.css; do
+    [ -s "$PLATFORM/$f" ] || { bad "vendored bundle missing: platform/$f"; missing=1; }
+  done
+  [ "$missing" = 0 ] || return 1
+  if grep -lE '<(script|link)[^>]*(unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com)' "$PLATFORM"/*.html >/dev/null 2>&1; then
+    bad "a page loads a map library from a CDN again — vendor it into platform/vendor/ instead:"
+    grep -lE '<(script|link)[^>]*(unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com)' "$PLATFORM"/*.html | sed 's/^/         /'
+    return 1
   fi
-  hdr "installing self-hosted deps (npm registry only)"
-  mkdir -p "$CACHE"
-  # npm --prefix reads package.json from the prefix dir, so seed it there from the committed pin.
-  cp "$TESTS/package.json" "$CACHE/package.json"
-  ( cd "$CACHE" && npm install --no-audit --no-fund --no-package-lock --loglevel=error ) || {
-    bad "npm install failed (need deck.gl@8.9.35 + leaflet@1.9.4)"; return 1; }
-  [ -f "$CACHE/node_modules/deck.gl/dist.min.js" ] || { bad "deck.gl bundle missing after install"; return 1; }
-  ok "deps installed into tests/.cache/node_modules"
+  ok "map libraries vendored (platform/vendor/), no CDN <script>/<link> on any page"
 }
 
 # ---------------------------------------------------------------------------
@@ -319,7 +323,7 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
   else bad "build_rival_universe.py --check (rival_universe.json drifted from source-data/rival_universe.json + app_reviews.json — run: python3 pipeline/build_rival_universe.py)"
   fi
-  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments; do
+  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments ingest_ocsb_cane build_thai_price_history build_farm_household build_debt_source build_crop_mix; do
     ( cd "$PIPE" && python3 "$ing.py" --check >/dev/null 2>&1 ); rc=$?
     if [ "$rc" -eq 0 ]; then ok "$ing.py --check"
     elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (staging source absent — ingest wave, not data drift)"

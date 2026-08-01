@@ -20,7 +20,10 @@
 <meta name="twitter:description" content="Competitive-risk and portfolio-risk readouts across all 2,015 AutoX title-loan branches. Numbers tagged measured or estimated.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet is VENDORED (platform/vendor/leaflet/), not loaded from unpkg. The national map is the
+     product's most-used view and it must not depend on a third-party CDN being reachable from a Thai
+     network. leaflet.css resolves its sprites RELATIVE to itself, so images/ must stay beside it. -->
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -127,12 +130,13 @@
 <div id="updated" style="display:none"></div>
 
 <main id="main-content" tabindex="-1">
-  <!-- Fail honestly when JS is off / a CDN script is fully blocked: this is a Leaflet+deck.gl SPA,
-       so <main> would otherwise render blank with no explanation. Themed to the default console. -->
+  <!-- Fail honestly when JS is off: this is a Leaflet+deck.gl SPA, so <main> would otherwise render
+       blank with no explanation. Themed to the default console. (The map libraries themselves are
+       vendored now — only the webfont and the basemap tiles are still third-party.) -->
   <noscript>
     <div style="max-width:640px;margin:48px auto;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;color:var(--txt);font-size:14px;line-height:1.55">
       <strong style="color:var(--hi);display:block;margin-bottom:6px">This dashboard needs JavaScript enabled.</strong>
-      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript (and allow the map/font CDNs) to load it.
+      AutoX · เงินไชโย Credit Intelligence is an interactive map &amp; charting app that builds entirely in the browser. Enable JavaScript to load it.
     </div>
   </noscript>
   <!-- COMMAND CENTER (daily-use front door) -->
@@ -298,8 +302,12 @@
     <p class="lead">Accounts late but under 30dpd — the last cheap place to intervene before roll. The drought-triggered assistance radar names the provinces where farm households are slipping under measured OAE SPEI stress.</p>
     <div class="tbl-wrap"><div id="assist-radar"></div></div>
 
+    <h2>What a farm household actually earns — the ground under every price number</h2>
+    <p class="lead">Before reading any crop-price move: OAE surveys farm households directly, and the survey says <b>roughly half</b> a farm household's cash income is <b>non-farm</b> — wages, remittances, off-season work that no crop price touches. A price shock reaches the farm half. <b>MEASURED</b> national survey means, 5 crop years. <span class="sub">National, not per-province — a backdrop and a sanity check on the modelled per-province income, never a per-province input.</span></p>
+    <div class="tbl-wrap"><div id="assist-household"></div></div>
+
     <h2>Proactive assistance — the healthy farm book, by the crop price it rides on</h2>
-    <p class="lead">The radar above is <b>drought</b> — who is already slipping. This is the <b>price</b> side, and it looks forward: farm accounts that are <b>Current or only in the X bucket</b>, grouped by the crop their province depends on. No crop with province-level exposure is falling right now, so nothing has tripped — but these are the books that would need calling first if one turned. <b>MEASURED</b> tape counts × MEASURED planted-area shares × MEASURED Thai farm-gate prices. <span class="sub">Not a forecast.</span></p>
+    <p class="lead">The radar above is <b>drought</b> — who is already slipping. This is the <b>price</b> side, and it looks forward: farm accounts that are <b>Current or only in the X bucket</b>, grouped by the crop their province depends on. Until 1 Aug 2026 this said "nothing has tripped", because it mapped five crops and all five were rising — an artefact of what was wired, not a reading of the market. It now maps <b>eight</b>: coconut and pineapple came from the DOAE registry columns we were not reading, and sugarcane from OCSB, the register of record for cane. All three are <b>falling</b>, and the list is no longer empty. <b>MEASURED</b> tape counts × MEASURED planted-area shares × MEASURED Thai farm-gate prices. <span class="sub">Not a forecast — livestock and fisheries are still unmapped, having no planted area to join on.</span></p>
     <div class="tbl-wrap"><div id="assist-price"></div></div>
 
     <h2>Restructuring — did it hold?</h2>
@@ -411,6 +419,13 @@
          anyway: OAE planted area by province, OAE farm-gate price vs OAE production cost, OAE SPEI
          drought by district, and DLT vehicle density. META.region is untouched and still feeds the
          Command-center risk readout. -->
+
+    <!-- CROP MIX → FARM INCOME (data/crop_mix.json, build_crop_mix.py). Leads this section because
+         it is the answer the rest of it supports: with all eight priced crops weighted by province
+         area, farm income is NOT rising everywhere — four provinces are negative and they hold
+         17,287 book accounts. The prior engine weighted rice/rubber/oilpalm only, all three rising,
+         so it reported every province up. Null-safe: absent file → nothing renders. -->
+    <div id="cropmix-wrap"></div>
 
     <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
@@ -655,6 +670,16 @@
 
     <h3 class="compsub" style="margin-top:18px">Share of mind · the presence gap</h3>
     <p class="lead">Three ways a title-lender shows up: <b>search</b> (share-of-search, above), <b>map</b> (Google review reputation, in the competitor thesis below), and <b>market</b> (the SET scoreboard). AutoX leads <b>none</b> today — unlisted, thin on Google Maps, mid-pack on search — a digital-presence gap on the acquisition side, distinct from branch density and worth an ops/marketing push.</p>
+    </details>
+
+    <!-- 1.55 · THE POOL OUTSIDE THE SYSTEM — NSO household survey, in-system vs informal debt. The
+         one measured, independent read of the borrower population this product has: by region, by
+         socio-economic class, seven waves. Own section, open, because it corrects a strategy
+         assumption rather than decorating one. -->
+    <details class="compsec" id="sec-informal" open>
+    <summary><h2 class="opp">The pool outside the banking system · in-system vs informal household debt <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · NSO</span></h2></summary>
+    <p class="lead">A non-bank title lender competes for households borrowing <b>outside the formal system</b>. The National Statistical Office measures that directly — <b lang="th">หนี้ในระบบ</b> vs <b lang="th">หนี้นอกระบบ</b>, by region and by socio-economic class, across seven survey waves 2011–2023. It sat in the local gov-data harvest unread, and what it says is not what a "big informal pool" story would predict.</p>
+    <div class="tbl-wrap"><div id="acq-debtsource"></div></div>
     </details>
 
     <!-- 1.6 · RIVAL PULSE — what rivals are running right now + measured customer sentiment (incl. our own app). -->
@@ -1194,7 +1219,7 @@
   <div id="msheet-body"></div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

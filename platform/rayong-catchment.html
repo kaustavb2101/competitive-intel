@@ -19,7 +19,9 @@
 <meta name="twitter:title" content="3D catchment · AutoX · เงินไชโย">
 <meta name="twitter:description" content="Overture 3D building scene for any province — reachable population and competitive pressure around AutoX branches. Numbers tagged measured or estimated.">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
+<!-- deck.gl is VENDORED (platform/vendor/), not loaded from unpkg: a 3D scene that silently
+     fails because a CDN is unreachable looks identical to a broken page. Pinned 8.9.35 bytes. -->
+<script src="vendor/deck.gl-8.9.35.min.js"></script>
 <script src="pmtiles-layer.js"></script>
 <style>
 :root{--ink:#10131c;--paper:#f3f0ea;--card:#0e1320;--cardln:#222c41;--hi:#eef1f7;--txt:#c7cedd;--mid:#8a94a8;--dim:#6a7589;
