@@ -795,8 +795,11 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
   .pi,[title]:after,.tooltip,.skel,.skel-rows{display:none!important}
   body{background:#fff!important;color:#111!important}
   main{max-width:none!important;padding:0!important}
+  /* 2026-08-01: print the tab you are ON. This used to be a hard-coded `#v-home`, so Ctrl-P from
+     any other tab silently printed the Command Center — the reader got a document about something
+     they were not looking at. `.view.on` is the same class the SPA router already sets. */
   .view{display:none!important}
-  #v-home{display:block!important}
+  .view.on{display:block!important}
   .cc-card,.mcard,.verdict,.insight{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid;box-shadow:none!important;color:#111!important}
   /* board thesis: whiten the band, darken the sentence. */
   .cc-thesis{background:#fff!important;border:1px solid #bbb!important;border-left:4px solid #b88a2e!important;break-inside:avoid;box-shadow:none!important}
@@ -1337,3 +1340,117 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .imf-peer{font-family:var(--mono);font-size:10.5px;color:var(--dim);background:var(--panel2);
   border:1px solid var(--line2);border-radius:5px;padding:2px 6px;white-space:nowrap}
 .imf-peer.me{color:var(--accent);border-color:var(--accent);font-weight:600}
+
+/* ============================================================
+   CHART KIT (hand-rolled inline SVG — see app.js svgBars/svgSpark/svgDots).
+   No library, no CDN: this is a no-build static deploy and a CDN <script>
+   would be a new external dependency on both Vercel and the local
+   `python -m http.server` workflow. Colours come from the theme tokens so
+   light/dark are free. Nothing animates.
+   ============================================================ */
+.chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:11px 12px 8px;margin:8px 0 10px;overflow-x:auto}
+.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px}
+.chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-bottom:7px}
+.chart-h .t{font:600 11px var(--sans);color:var(--txt);letter-spacing:.2px}
+.chart-h .s{font-size:10.5px;color:var(--dim)}
+
+/* diverging bars + dot plot share the axis/label/value type */
+.cbars-ax{stroke:var(--line);stroke-width:1}
+.cbars-l{font-family:var(--sans);font-size:10.5px;fill:var(--mid);text-anchor:end;dominant-baseline:middle}
+.cbars-v{font-family:var(--mono);font-size:10.5px;text-anchor:end;dominant-baseline:middle;
+  font-variant-numeric:tabular-nums}
+.cbars-b{shape-rendering:crispEdges}
+g:hover .cbars-l{fill:var(--hi)}
+g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
+.cdot-s{stroke-width:1.4;opacity:.45}
+
+/* sparkline: sits inline beside a number in a table cell or card */
+.csp{width:108px;height:26px;vertical-align:-7px;overflow:visible}
+.csp-l{fill:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.csp-a{opacity:.12}
+.csp-p{stroke:var(--panel);stroke-width:1.2}
+.csp-none{font:400 10px var(--mono);color:var(--dim);letter-spacing:.02em;white-space:nowrap}
+
+/* two-column on wide screens — a verdict card and its table sit side by side
+   instead of stacked, which is where roughly half the Macro tab's height went.
+   Single column on anything narrower; print always single column. */
+.ovpair{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media(min-width:1180px){.ovpair{grid-template-columns:minmax(300px,.85fr) 1.15fr}}
+@media print{.ovpair{grid-template-columns:1fr!important}}
+
+/* ---------- Macro answer band (top of #overview) ----------
+   Six measured numbers, each with its move, its refresh cadence and a trend line only where
+   history actually exists on disk. Sits above everything else on the tab. */
+.answerband{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:9px;margin:12px 0 4px}
+.ab{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 11px 9px;
+  position:relative;display:flex;flex-direction:column}
+.ab-k{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.35px;line-height:1.35;
+  padding-right:2px;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.ab-cad{font:600 8.5px var(--mono);letter-spacing:.6px;padding:1px 4px;border-radius:3px;
+  border:1px solid var(--dim);color:var(--dim);white-space:nowrap}
+.ab-cad.d{color:var(--accent);border-color:var(--accent)}
+.ab-cad.m{color:var(--opp);border-color:var(--opp)}
+.ab-cad.q{color:var(--dim);border-color:var(--dim)}
+.ab-v{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--hi);letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;margin-top:5px;line-height:1.15}
+.ab-v small{font-size:11.5px;font-weight:500;color:var(--mid);letter-spacing:0}
+.ab-mv{font:600 11px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px}
+.ab-tr{margin-top:7px;min-height:26px;display:flex;align-items:center}
+.ab-s{font-size:10px;color:var(--dim);margin-top:6px;line-height:1.4}
+@media print{.answerband{grid-template-columns:repeat(3,1fr)}
+  .ab{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid}
+  .ab-v,.ab-k{color:#111!important} .ab-s,.ab-cad{color:#444!important}}
+/* trend column in the commodities board — sparkline sits in its own narrow cell */
+.cb-spark{width:104px;padding-top:4px;padding-bottom:4px}
+.cb-spark .csp{width:96px;height:22px;vertical-align:middle}
+/* one-line "what's inside" on a collapsed Overview/Competition section — a closed section still has
+   to say what it holds, or collapsing it just hides the tab from you. */
+.ovsec-what{font:400 11px var(--sans);color:var(--dim);text-transform:none;letter-spacing:0;
+  flex:0 1 auto;text-align:right;margin-left:auto;padding-left:12px;line-height:1.35}
+@media(max-width:820px){.ovsec-what{display:none}}
+details.ovsec[open]>summary .ovsec-what{opacity:.45}
+@media print{.ovsec-what{display:none}}
+
+/* ---------- print-only blocks (summary head + provenance appendix) ----------
+   Injected by preparePrint() on beforeprint and removed on afterprint, so they never
+   exist in the on-screen DOM. `.printing` is set while the dialog is open so the
+   blocks are also visible in a headless render check. */
+.print-only{display:none}
+html.printing .print-only{display:block}
+@media print{
+  .print-only{display:block!important}
+  .pr-mast{border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px}
+  .pr-brand{font:600 9.5px var(--mono);letter-spacing:1.2px;text-transform:uppercase;color:#444!important}
+  .pr-mast h1{font:700 20px var(--sans);color:#111!important;margin:6px 0 5px;letter-spacing:-.3px;
+    text-transform:none;border:none;padding:0}
+  .pr-meta{font-size:10.5px;color:#444!important}
+  .pr-sum{border:1px solid #bbb;border-left:3px solid #111;padding:12px 14px;margin-bottom:16px;
+    break-inside:avoid}
+  .pr-sum h3{font:600 10px var(--mono);letter-spacing:1px;text-transform:uppercase;color:#111!important;
+    margin:12px 0 6px;border:none;padding:0}
+  .pr-sum h3:first-child{margin-top:0}
+  .pr-kv,.pr-v{list-style:none;margin:0;padding:0}
+  .pr-kv li,.pr-v li{font-size:11.5px;color:#111!important;margin-bottom:4px;padding-left:12px;
+    position:relative;line-height:1.45}
+  .pr-kv li::before,.pr-v li::before{content:'·';position:absolute;left:2px;color:#666}
+  .pr-kv i{font-style:normal;color:#444!important}
+  .pr-toc{margin-top:4px}
+  .pr-toc th,.pr-toc td{font-size:10.5px;padding:4px 6px}
+  #print-appendix{margin-top:20px;padding-top:12px;border-top:1px solid #999;break-inside:avoid}
+  #print-appendix h3{font:600 10px var(--mono);letter-spacing:1px;text-transform:uppercase;
+    color:#111!important;border:none;padding:0;margin-bottom:8px}
+  .pr-p{font-size:10px;color:#333!important;margin-bottom:5px;line-height:1.45}
+  .pr-tags{margin-bottom:8px}
+  .pr-tags span{display:inline-block;font:600 8.5px var(--mono);letter-spacing:.6px;border:1px solid #888;
+    color:#333!important;padding:1px 5px;border-radius:3px;margin:0 4px 4px 0}
+  /* keep an SVG chart from being sliced across a page, and never print a collapsed section */
+  .chartwrap{break-inside:avoid;border:1px solid #bbb!important;background:#fff!important}
+  details.ovsec,details.compsec{break-inside:auto}
+  details.ovsec>summary>h2,details.compsec>summary>h2{break-after:avoid}
+  h3.ovsub,h3.compsub{break-after:avoid;color:#111!important}
+  .cbars-l,.cbars-v{fill:#333!important}
+  .csp-none{color:#555!important}
+  @page{margin:14mm 12mm}
+}

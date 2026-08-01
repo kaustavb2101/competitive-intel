@@ -75,8 +75,11 @@
       <a data-v="sim" href="#sim" role="menuitem" title="Client-side portfolio what-if — rate, price and drought levers">Simulator</a>
     </div>
   </div>
+  <button id="printTab" class="no-print" title="Print or save this tab as PDF — summary + every supporting table, nothing collapsed"
+    aria-label="Print this tab with its full supporting data"
+    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;height:30px;padding:0 10px;cursor:pointer;font-size:11.5px;white-space:nowrap">⎙ Print tab</button>
   <button id="themeToggle" title="Toggle light / dark" aria-label="Toggle light or dark theme" aria-pressed="false"
-    style="margin-left:auto;flex:none;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
+    style="flex:none;margin-left:8px;background:none;border:1px solid var(--line);color:var(--mid);border-radius:8px;width:32px;height:30px;cursor:pointer;font-size:14px">☾</button>
 </nav>
 <script>
 (function(){var b=document.getElementById('themeToggle');if(!b)return;
@@ -321,19 +324,28 @@
     <p class="lead">Rates, commodities, fuel, collateral values, drought and labour — the forces that move
       the book before any of it shows up in delinquency. Every number is tagged <b>measured</b> or
       <b>estimated/proxy</b>.</p>
+
+    <!-- ANSWER BAND (2026-08-01). The tab used to open into prose and then 13 screens of tables with
+         nothing ranked. This is the answer first: six MEASURED numbers, each with its move, its
+         cadence, and its trend where a trend actually exists on disk. Everything below is the
+         evidence for it. Deliberately NO composite/derived figures here — rendered by
+         renderAnswerBand(); null-safe, a tile whose source is absent is simply not emitted. -->
+    <div class="answerband" id="ov-answer" aria-label="Macro headline numbers"></div>
+    <p class="lead sub" id="ov-answer-note" style="margin:2px 0 10px"></p>
+
     <div id="outlook"></div>
 
     <nav class="jumpnav no-print" id="ovjump" aria-label="Jump to section within Macro">
       <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
-      <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
       <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
       <a class="chip" href="#overview" data-jump="sec-ov-labour">Labour &amp; debt</a>
       <a class="chip" href="#overview" data-jump="sec-ov-business">Business &amp; credit</a>
       <a class="chip" href="#overview" data-jump="sec-ov-hazard">Live hazard</a>
     </nav>
 
     <details class="ovsec" id="sec-ov-macro" open>
-    <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2></summary>
+    <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2><span class="ovsec-what">Answer band, commodity board with 5-year price trends, IMF backdrop</span></summary>
 
     <!-- 2-col dashboard: macro KPI cards + regulatory card BESIDE the commodity board (fills widescreen). -->
     <div class="dash2">
@@ -356,14 +368,15 @@
           <div><h3 class="ovsub">Protein · forestry · firming</h3><table class="tbl" id="board-other"></table></div>
         </div>
 
-        <!-- Province macro watchlist (data/macro_sensitivity.json) — hidden until the layer loads;
-             omitted gracefully when the file is absent. Cards reuse the .mcard commodity styling. -->
-        <div id="mwatch-wrap" style="display:none">
-          <h3 class="ovsub">Macro watchlist · what moves each province's book <span class="sub" style="text-transform:none;letter-spacing:0">— estimated proxy</span></h3>
-          <p class="lead">The macro driver moving the most branches per province — real global price moves (World Bank, proxy for Thai farm-gate) × measured crop shares / rain, scaled by <b>estimated</b> segment scores. Headwind provinces listed first. <b>Press a card to list the affected branches.</b></p>
-          <div class="grid macro" id="mwatch"></div>
-          <div id="mwatch-drill"></div>
-        </div>
+        <!-- REMOVED 2026-08-01 (owner directive: no derived/composite metrics on Macro) — the province
+             "macro watchlist" card grid (macro_sensitivity.json). It ranked headwind-first then by
+             branches-hit, but with every mapped commodity currently UP there were ZERO headwind
+             provinces, so the primary sort key was constant and the order degenerated into the
+             branch-count leaderboard (BKK 170 · ชลบุรี 103 · นครราชสีมา 81 …) presented as macro
+             exposure. It also claimed rice was Bangkok's #1 driver at 164/170 branches, and covered
+             only 59 of 77 provinces. The LAYER stays — loadMacroSens() still feeds the branch drill
+             and the cluster brief with real per-branch numbers; it is only this Overview card grid,
+             and the estimated composite behind its ranking, that is gone. -->
       </div>
     </div>
 
@@ -372,8 +385,54 @@
     <div id="ov-commodities"></div>
     </details>
 
-    <details class="ovsec" id="sec-ov-collateral" open>
-    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2></summary>
+    <details class="ovsec" id="sec-ov-agri">
+    <summary><h2 class="opp">Farm households — segments, crops, margin &amp; drought</h2><span class="ovsec-what">Crop stress, farm-gate vs OAE cost margin, district drought, planted-area exposure</span></summary>
+
+    <!-- REMOVED 2026-08-01 (owner directive: real numbers, not derived scores) — the "Segment signals
+         by region" table. Its Agri-PD / Elevated / Merchant / Collateral columns were counts of
+         branches above a threshold on an ESTIMATED composite (crop price stress × drought net of a
+         livestock buffer; vendor ecosystem + footfall; vehicle density) — a score of a score. The
+         MEASURED primitives underneath it are all still on this tab and are what the reader wants
+         anyway: OAE planted area by province, OAE farm-gate price vs OAE production cost, OAE SPEI
+         drought by district, and DLT vehicle density. META.region is untouched and still feeds the
+         Command-center risk readout. -->
+
+    <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
+    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
+    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
+    <p class="lead" id="cstress-note"></p>
+    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
+    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
+         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
+         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
+         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
+    <div id="margin-wrap" style="display:none">
+      <h3 class="ovsub risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h3>
+      <div class="verdict" id="margin-verdict" style="display:none"></div>
+      <p class="lead" id="margin-note"></p>
+      <table class="tbl" id="margintbl"></table>
+    </div>
+    <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
+         read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
+    <div id="drought-district-wrap" style="display:none">
+      <div class="verdict v-warn" id="drought-district-verdict"></div>
+      <p class="lead" id="drought-district-note"></p>
+      <table class="tbl" id="drought-district-tbl"></table>
+    </div>
+    <!-- District crop × drought exposure (data/amphoe_crops.json) — MEASURED OAE planted area × MODELLED
+         OAE SPEI (obj #1). The district-drought card above names the driest districts; this names WHICH
+         crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
+         actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
+    <div id="amphoe-crops-wrap" style="display:none">
+      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
+      <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
+      <p class="lead" id="amphoe-crops-note"></p>
+      <table class="tbl" id="amphoe-crops-tbl"></table>
+    </div>
+    </details>
+
+    <details class="ovsec" id="sec-ov-collateral">
+    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2><span class="ovsec-what">Recovery-value outlook, diesel-pickup share, DLT registrations, EV watch</span></summary>
 
     <h3 class="ovsub collat">Collateral outlook · vehicle-title value watch</h3>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
@@ -416,49 +475,8 @@
     <table class="tbl" id="evtbl"></table>
     </details>
 
-    <details class="ovsec" id="sec-ov-agri" open>
-    <summary><h2 class="opp">Farm households — segments, crops, margin &amp; drought</h2></summary>
-
-    <h3 class="ovsub">Segment signals by region</h3>
-    <table class="tbl" id="region"></table>
-    <p class="lead">Agri-PD = crop price stress × drought, net of livestock buffer · Merchant demand = vendor ecosystem + footfall · Collateral = vehicle density.</p>
-
-    <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
-    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
-    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note"></p>
-    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
-    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
-         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
-         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
-         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
-    <div id="margin-wrap" style="display:none">
-      <h3 class="ovsub risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h3>
-      <div class="verdict" id="margin-verdict" style="display:none"></div>
-      <p class="lead" id="margin-note"></p>
-      <table class="tbl" id="margintbl"></table>
-    </div>
-    <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
-         read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
-    <div id="drought-district-wrap" style="display:none">
-      <div class="verdict v-warn" id="drought-district-verdict"></div>
-      <p class="lead" id="drought-district-note"></p>
-      <table class="tbl" id="drought-district-tbl"></table>
-    </div>
-    <!-- District crop × drought exposure (data/amphoe_crops.json) — MEASURED OAE planted area × MODELLED
-         OAE SPEI (obj #1). The district-drought card above names the driest districts; this names WHICH
-         crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
-         actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
-    <div id="amphoe-crops-wrap" style="display:none">
-      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
-      <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
-      <p class="lead" id="amphoe-crops-note"></p>
-      <table class="tbl" id="amphoe-crops-tbl"></table>
-    </div>
-    </details>
-
     <details class="ovsec" id="sec-ov-labour">
-    <summary><h2 class="opp">Labour &amp; household debt</h2></summary>
+    <summary><h2 class="opp">Labour &amp; household debt</h2><span class="ovsec-what">NSO province labour-force stress, BoT regional household debt</span></summary>
 
     <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
          (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
@@ -483,7 +501,7 @@
     </details>
 
     <details class="ovsec" id="sec-ov-business">
-    <summary><h2 class="opp">Business &amp; credit backdrop</h2></summary>
+    <summary><h2 class="opp">Business &amp; credit backdrop</h2><span class="ovsec-what">DLT truck + used-collateral flow, DBD formation, FPO state-bank NPL</span></summary>
 
     <!-- Logistics-SME (hauler) pulse (data/truck_flow.json) — MEASURED DLT truck registration actions,
          trailing-12m vs the prior 12m (obj #1). An owner-operator hauler is a classic heavy-title
@@ -531,7 +549,7 @@
     </details>
 
     <details class="ovsec" id="sec-ov-hazard">
-    <summary><h2 class="opp">Live hazard — flood &amp; rain</h2></summary>
+    <summary><h2 class="opp">Live hazard — flood &amp; rain</h2><span class="ovsec-what">ThaiWater live river/reservoir level and 24h rainfall</span></summary>
 
     <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
          ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
