@@ -1422,7 +1422,92 @@ function tableSectionLabel(t){
 // can never push the whole page sideways on a phone. The <table> nodes persist (only their
 // innerHTML is replaced on re-render), so wrapping each once at boot is enough and stays
 // deterministic. Idempotent — skips tables already inside a .tblwrap.
+/* ---------- long-table fold (2026-08-01, owner: "the macro page is still very long") -----------
+   Measured cause: 24 tables, 17 of them 9–13 data rows, each ~420–596px of solid numbers. Nobody
+   reads row 9 of a province table on screen; they read the top of it and drill when something is
+   off. So on screen a long table shows its first FOLD_KEEP rows and folds the rest behind a
+   disclosure; the remaining rows stay in the DOM, so nothing is lost and Ctrl-F still finds them.
+
+   Print deliberately opens every <details>, so the printout keeps EVERY row — which is exactly the
+   contract the print export promises ("all the supporting data behind").
+
+   Generic and column-agnostic on purpose: it never has to guess which column means what, so it
+   cannot mislabel a table. Idempotent — renderers re-run and re-call wrapTables() freely. */
+const FOLD_KEEP=5, FOLD_MIN=8;
+function foldLongTables(root){
+  (root||document).querySelectorAll('table.tbl,table.ic-tbl').forEach(t=>{
+    if(t.dataset.folded) return;
+    const host=t.tBodies&&t.tBodies.length?t.tBodies[0]:t;
+    // data rows only — this app builds several tables as bare <tr><th> headers with no <thead>
+    const rows=[...host.children].filter(r=>r.tagName==='TR'&&!r.querySelector('th'));
+    if(rows.length<FOLD_MIN) return;
+    t.dataset.folded='1';
+    const hide=rows.slice(FOLD_KEEP);
+    hide.forEach(r=>r.classList.add('tr-folded'));
+    const cols=Math.max(1,(rows[0].children||[]).length);
+    const tr=document.createElement('tr');
+    tr.className='tr-foldctl no-print';
+    tr.innerHTML=`<td colspan="${cols}"><button type="button" class="foldbtn" aria-expanded="false">`
+      +`＋ ${hide.length} more row${hide.length===1?'':'s'}</button></td>`;
+    host.appendChild(tr);
+  });
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('.foldbtn'); if(!b) return;
+  const tbl=b.closest('table'); if(!tbl) return;
+  const open=b.getAttribute('aria-expanded')==='true';
+  tbl.querySelectorAll('.tr-folded').forEach(r=>r.classList.toggle('tr-open',!open));
+  b.setAttribute('aria-expanded',String(!open));
+  const n=tbl.querySelectorAll('.tr-folded').length;
+  b.textContent=open?`＋ ${n} more row${n===1?'':'s'}`:'－ show fewer';
+});
+
+/* Long method/caveat paragraphs are the Macro tab's second-biggest source of height after the
+   tables: 5,283 words, of which the collateral section alone carried 1,577 — more than agri and
+   labour combined. They are worth keeping (this product's credibility rests on saying how a number
+   was made) but they do not need to be open while you scan. Clamp to two lines with a "more"
+   affordance; print always shows them in full, and the provenance appendix repeats them anyway. */
+const CLAMP_CHARS=190;
+function clampLeads(root){
+  (root||document).querySelectorAll('p.lead').forEach(p=>{
+    if(p.dataset.clamped||p.closest('.print-only')) return;
+    if((p.textContent||'').trim().length<CLAMP_CHARS) return;
+    p.dataset.clamped='1'; p.classList.add('lead-clamp');
+    const b=document.createElement('button');
+    b.type='button'; b.className='clampbtn no-print'; b.textContent='more';
+    b.setAttribute('aria-expanded','false');
+    p.after(b);
+    CLAMP_PRUNE.observe(p);
+  });
+}
+/* Character count is only a cheap pre-filter. On a wide column a 200-char lead often still fits
+   inside the two allowed lines, and then the "more" button hangs off text that is already fully
+   visible — pure noise. The real test is whether the clamp actually hides anything, which needs
+   layout. We cannot measure at clamp time: wrapTables() runs while the view is still display:none
+   and most leads sit inside closed <details>, so clientHeight is 0 and every answer would be a
+   false "it overflows". So measure LAZILY — the first time each paragraph is actually painted,
+   check it and drop the clamp when nothing was hidden. Left alone if the reader already expanded it. */
+const CLAMP_PRUNE=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    const p=e.target; if(!e.isIntersecting||!p.clientHeight) return;
+    CLAMP_PRUNE.unobserve(p);
+    const b=p.nextElementSibling;
+    if(!b||!b.classList.contains('clampbtn')||b.getAttribute('aria-expanded')==='true') return;
+    if(p.scrollHeight<=p.clientHeight+2){ p.classList.remove('lead-clamp'); delete p.dataset.clamped; b.remove(); }
+  });
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('.clampbtn'); if(!b) return;
+  const p=b.previousElementSibling; if(!p) return;
+  const open=b.getAttribute('aria-expanded')==='true';
+  p.classList.toggle('lead-clamp',open);
+  b.setAttribute('aria-expanded',String(!open));
+  b.textContent=open?'more':'less';
+});
+
 function wrapTables(){
+  foldLongTables(document);
+  clampLeads(document);
   // seed from any already-labelled wrappers (prior calls / static HTML) so cross-call names stay unique.
   const used=Object.create(null);
   document.querySelectorAll('.tblwrap[aria-label]').forEach(w=>{ used[w.getAttribute('aria-label')]=1; });
@@ -1652,8 +1737,14 @@ function renderNationalOutlook(){
   const host=$('#outlook'); if(!host||!OUTLOOK||!OUTLOOK.national) return;
   const N=OUTLOOK.national;
   const sec=(t,s)=>`<div style="margin:18px 0 6px;font:700 12px 'IBM Plex Sans Thai';color:var(--mid);text-transform:uppercase;letter-spacing:.6px">${t}${s?` <span style="color:var(--dim);font-weight:500;text-transform:none;letter-spacing:0">— ${s}</span>`:''}</div>`;
-  // 1) SITUATION — national macro cards
-  const sit=(N.situation||[]).map(c=>{
+  // 1) SITUATION — national macro cards.
+  // De-duplicated against the answer band 2026-08-01: the band directly above this block already
+  // shows Household debt and Policy rate off the SAME measured BIS series, and with a trend line —
+  // so the identical figure was appearing twice within one screen. Whatever the band does not
+  // carry (inflation, USD/THB) still shows here. Keys are matched loosely because the two layers
+  // are built by different scripts (regional_outlook.json vs macro_indicators.json).
+  const IN_ANSWER_BAND=/household\s*debt|policy\s*rate/i;
+  const sit=(N.situation||[]).filter(c=>!IN_ANSWER_BAND.test(c.k||'')).map(c=>{
     const col=OUT_TONE[c.tone]||'var(--txt)';
     return `<div class="mcard"><div class="k">${c.k}</div><div class="v" style="color:${col}">${c.v}</div><div class="n">${c.d||''}${c.src?` · ${c.src}`:''}</div></div>`;
   }).join('');
@@ -1748,26 +1839,14 @@ function renderOverview(){
   // → the block stays hidden.
   loadThaiwater().then(renderThaiwater);
 }
-// commodity-board table label -> macro-exposure factor key (only rows a factor actually models).
-const BOARD_MACX_KEY={'Rice':'rice','Rubber':'rubber','Palm oil':'palm','Gold':'gold','Chicken':'livestock','Beef':'livestock'};
 function renderCommodityBoard(){
   if(!META||!META.board) return;
-  const cls=b=> (b.yoy||0)>5?'var(--up)':(b.yoy||0)<-8?'var(--agri)':(b.yoy||0)<0?'#D9742B':'#C9A227';
-  // per-row macro footprint: how many branches' customer mixes have THIS commodity's factor as
-  // their DOMINANT macro exposure (tallied from macro_exposure.json vector — count MEASURED-per-model,
-  // the exposure model itself ESTIMATED). Empty until the layer loads / when the factor tops nowhere.
-  const tally=macxLoaded?macxDomTally():null;
-  const mnote=b=>{
-    const k=BOARD_MACX_KEY[b.lab]; if(!k||!tally) return '';
-    const n=tally.all[k]||0; if(!n) return '';
-    const head=(b.yoy!=null&&b.yoy>0)?false:true;  // price up = tailwind for borrower income/collateral
-    return ` <span class="sub" style="color:${head?'var(--agri)':'var(--merch)'};font-size:10px">· ${head?'hits':'supports'} customers at ${n.toLocaleString()} branch${n===1?'':'es'} (est)</span>`;
-  };
-  const row=b=>`<tr><td>${b.lab}</td><td class="mono" style="color:${cls(b)}">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td><td class="sub">${b.reg}</td><td class="sub">${b.note}${mnote(b)}</td></tr>`;
-  const head=`<tr><th>Item</th><th>YoY</th><th>Region</th><th>Note</th></tr>`;
-  // AutoX lends against vehicle titles, not gold — exclude the Collateral (gold) row from the board.
-  $('#board-crops').innerHTML = head + META.board.filter(b=>b.seg==='Crops').map(row).join('');
-  $('#board-other').innerHTML = head + META.board.filter(b=>b.seg!=='Crops'&&b.seg!=='Collateral').map(row).join('');
+  // The two split tables this function used to write (#board-crops / #board-other) were removed
+  // 2026-08-01 as duplicates of the commodities board below — see index.html for the reasoning.
+  // What remains, and is NOT duplicated anywhere, is the Key-read callout: it names the thing the
+  // board cannot say in a row, that "farmers" are not one segment. Its numbers are injected LIVE
+  // from META.board so the sentence can never contradict the board (they were hardcoded once, and
+  // went stale at the next vintage refresh).
   // Key-read prose: inject LIVE numbers from the board so it can never contradict the table beside it
   // (was hardcoded chicken +25.6/beef +18.4/gold +62.7, stale after the vintage refresh).
   const kr=$('#ov-keyread');
