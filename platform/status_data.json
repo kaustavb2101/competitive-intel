@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-01T05:22:15+07:00",
-    "commit": "00dd0fe"
+    "generated_at": "2026-08-01T04:23:20+00:00",
+    "commit": "b933fb8"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-01T04:23:20+00:00",
+      "sha": "b933fb8",
+      "summary": "health(deploy): site-health probe guards province_pressure.json (front-door cross-objective thesis)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-01T02:30:53+00:00",
+      "sha": "b60160d",
+      "summary": "docs: log ux-pillar-narrow-overflow-wrap merge+deploy+verify (#239)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T09:28:11+07:00",
+      "sha": "9a8756d",
+      "summary": "ux: wrap long Thai tokens in the five-pillar cards (overflow-wrap) (#239)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T09:07:24+07:00",
+      "sha": "4efd5bc",
+      "summary": "ux(macro): crisper Macro tab (13.7 → 5.8 screens), charts, per-tab print — plus the tape branch-join close-out (#237)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T00:30:07+00:00",
+      "sha": "18fe207",
+      "summary": "fix(gate): realign commodities.json + provenance.json to committed sources (master was RED)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-01T07:09:19+07:00",
+      "sha": "bc08233",
+      "summary": "feat: wave 2 price-assist radar, all six NAVIGATION_MAP items, and the branch join that was losing 4.3% of the book (#231)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-01T07:06:29+07:00",
+      "sha": "47f1637",
+      "summary": "data: NABC live prices (2026-07-31, run 30666762830) (#234)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-01T07:04:22+07:00",
+      "sha": "3383f18",
+      "summary": "data: ThaiWater flood + rain pulse (2026-07-31, run 30669957429) (#236)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-31T23:43:43+00:00",
+      "sha": "8c3c1fc",
+      "summary": "data: live fuel prices (2026-07-31, run 30673517296)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-07-31T22:22:55+00:00",
+      "sha": "c515bd1",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the district-grain rival-concentration ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-01T05:22:15+07:00",
       "sha": "00dd0fe",
       "summary": "feat(competition): rival-field concentration at district grain on Competition (obj #2) (#235)",
@@ -649,66 +709,6 @@
       "date": "2026-07-31T02:24:13+00:00",
       "sha": "2421694",
       "summary": "docs: log ux CSV UTF-8 BOM fix — merge+deploy+verify (#225)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T09:18:52+07:00",
-      "sha": "37cd2ae",
-      "summary": "ux: UTF-8 BOM on CSV exports so Excel renders Thai correctly (#225)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T00:33:43+00:00",
-      "sha": "046090d",
-      "summary": "fix(gate): realign commodities.json + provenance.json to committed sources (gate was RED on master)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-31T06:54:50+07:00",
-      "sha": "b23ebb2",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-30, run 30587395271) (#221)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-31T06:53:45+07:00",
-      "sha": "f7a893e",
-      "summary": "data: NABC live prices (2026-07-30, run 30583885072) (#220)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-31T06:53:13+07:00",
-      "sha": "af23cfd",
-      "summary": "feat(competition): per-branch licensed-PICO rival exposure (branch_pico.json) (#218)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-30T23:43:41+00:00",
-      "sha": "769b2ab",
-      "summary": "data: live fuel prices (2026-07-30, run 30591239705)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-30T22:22:12+00:00",
-      "sha": "b3a62d6",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the scenarios.json site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-07-30T22:21:46+00:00",
-      "sha": "7df9394",
-      "summary": "health(deploy): live site-health probe now guards scenarios.json (#sim engine)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-30T20:24:05+00:00",
-      "sha": "ee657c3",
-      "summary": "docs: log ux acq ad-copy-table wrap fix — merge+deploy+verify (#219)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T03:21:05+07:00",
-      "sha": "dfee401",
-      "summary": "ux: wrap rival ad-copy sub-tables so #acq never overflows on mobile (#219)",
       "pillar": "uxui"
     }
   ]
