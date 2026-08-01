@@ -400,6 +400,45 @@ def _shape_peer_province(d):
     return None
 
 
+def _shape_province_pressure(d):
+    # The cross-objective SYNTHESIS layer (province_pressure.json) — the
+    # deterministic JOIN of portfolio risk (province_stress_index composite,
+    # obj #1) x competitive risk (peer_province rival:AutoX ratio, obj #2), the
+    # one read that fuses BOTH standing objectives. It powers the command-center
+    # thesis' sharpest cross-objective clause (renderHomeThesis reads
+    # meta.n_double_pressure to gate the "N provinces both stressed and
+    # outgunned" line and meta.worst_province.province_th for its tail). Its two
+    # parents (peer_province + the stress index) are probed, but the join that
+    # actually renders on the exec front door was not — a truncated deploy that
+    # guts meta.n_double_pressure silently drops the front-door intersection
+    # clause with no phone alert, the same "broken demo" blind spot the peer /
+    # coverage / flow-card probes closed. Asserts render shape (the meta gate +
+    # the province rows carrying the joined axes), not values — robust to a
+    # future SES/census vintage shifting the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    p0 = provs[0]
+    if not isinstance(p0, dict) or not (isinstance(p0.get("province_th"), str) and p0["province_th"].strip()):
+        return "first province missing 'province_th'"
+    for k in ("stress_pctile", "contest_pctile"):
+        if not isinstance(p0.get(k), (int, float)):
+            return "first province missing numeric '%s' (joined axis, board read)" % k
+    if "double_pressure" not in p0:
+        return "first province missing 'double_pressure' flag (quadrant join read)"
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object"
+    if not isinstance(meta.get("n_double_pressure"), int):
+        return "meta.n_double_pressure missing/not int (front-door thesis clause hide-gate)"
+    w = meta.get("worst_province")
+    if not isinstance(w, dict) or not (isinstance(w.get("province_th"), str) and w["province_th"].strip()):
+        return "meta.worst_province missing 'province_th' (thesis clause tail read)"
+    return None
+
+
 def _shape_competitor_coverage(d):
     # The competition pillar's OTHER flagship read (obj #2): the national
     # census-completeness board (drawCompCoverage reads .brands — the big-4
@@ -635,6 +674,15 @@ DATA_FILES = [
     # obj-#1 flow card is now probed; this closes the matching obj-#2 blind spot
     # so a truncated deploy that guts the competitive board triggers a phone alert.
     ("data/peer_province.json", _shape_peer_province, ".provinces (~77) with .by_brand per-rival split + meta.total_autox"),
+    # The cross-objective SYNTHESIS the exec front door leads with: province_pressure
+    # is the deterministic JOIN of portfolio risk (obj #1) x competitive risk (obj
+    # #2). Both parents are probed above (peer_province + province_risk/stress); the
+    # join that actually renders the command-center "N provinces both stressed and
+    # outgunned" thesis clause (renderHomeThesis reads meta.n_double_pressure +
+    # meta.worst_province) was the last front-door read with no deploy probe. A
+    # truncated deploy that guts it silently drops the intersection clause with no
+    # phone alert — closes that blind spot.
+    ("data/province_pressure.json", _shape_province_pressure, ".provinces (~77) joined axes + meta.n_double_pressure/worst_province (front-door thesis)"),
     # peer_province's sibling flagship (obj #2): the national census-completeness
     # board the whole per-province peer read is built on. The province rows were
     # probed above; this rollup (drawCompCoverage reads .brands + meta.totals +

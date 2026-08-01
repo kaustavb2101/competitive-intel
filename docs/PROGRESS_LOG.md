@@ -3,6 +3,51 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — intelligence-loop (deployment-health): site-health probe now guards `province_pressure.json` (the front-door cross-objective thesis) — committed + deployed + verified
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The autonomy backlog reads 98% (only the
+  one owner-side access-protection item open), so this run took the SERVICE/DEPLOY-HEALTH remit: audited
+  the live deployment + data room and closed one concrete monitoring gap. Baseline verified first —
+  determinism gate **103 passed, 0 failed** on latest master (`b60160d`); production alias 200 on `/`,
+  `/app.js`, `data/meta.json`, `data/branches.json`, `data/competitor_coverage.json`; **no broken
+  static data references** (102 `data/*.json` refs across every page — all present); freshness healthy
+  (live layers refresh daily, structural layers appropriately older). Two prompt-flagged items were
+  already correct and needed no change: `site-health.yml` already monitors the master production alias,
+  and `peer_province.json` (per-province per-brand peer board — pillar #1's headline ask) is already
+  built + wired + probed.
+- **Finding.** `pipeline/check_site_health.py` guards ~24 exec-facing layers (branches, meta, amphoe,
+  the obj-#1 Overview flow cards, `peer_province`, `competitor_coverage`, `pico_district`, the `#acq`
+  rival-pulse trio, `#sim` scenarios…) but **not `province_pressure.json`** — the deterministic JOIN of
+  portfolio risk (obj #1, `province_stress_index` composite) × competitive risk (obj #2, `peer_province`
+  rival:AutoX ratio). It is the one layer that fuses BOTH standing objectives, and it renders on the
+  **exec front door**: `renderHomeThesis` reads `meta.n_double_pressure` to gate the "N provinces both
+  stressed and outgunned" thesis clause and `meta.worst_province.province_th` for its tail. Both of its
+  parents are probed, but the join that actually renders was not — a truncated CDN deploy that gutted it
+  would silently drop the front-door intersection clause with **no phone alert**, the exact "broken demo"
+  blind spot the peer / coverage / flow-card probes were added to catch.
+- **Fix.** Added `_shape_province_pressure` (asserts render shape, not values — a `provinces` list ≥70
+  with the joined axes `stress_pctile`/`contest_pctile` + `double_pressure` flag, plus the meta gate
+  `n_double_pressure:int` and `worst_province.province_th`; robust to a future SES/census vintage
+  shifting counts) and registered `data/province_pressure.json` in `DATA_FILES` right after its
+  `peer_province` parent. One-file diff: `pipeline/check_site_health.py` +48 lines. **No `platform/`,
+  no data, no app-behaviour/visual change** — a monitoring-only change, so no provenance rebuild and no
+  headless render needed; direct-to-master per the loop's non-visual rule.
+- **Safeguards (all pass).** (a) `bash tests/run.sh check` → **103 passed, 0 failed** (unchanged from
+  baseline — the health probe is a live-site check, not in the determinism gate). (b) no secrets in the
+  diff (stdlib probe code only). (c) diff matches intent (one health probe for the one unguarded
+  front-door layer). (d) no-fabrication intact — the probe invents no numbers, asserts structure only.
+  Additional verification: `py_compile` OK; `check_site_health.py --local platform` → **77/77 passed**
+  (was 74; +3 for the new file's fetch/parse/shape) with the new probe green on committed data; and
+  `--base-url <master prod alias>` → **77/77 passed**, confirming the DEPLOYED `province_pressure.json`
+  already matches the asserted shape so the nightly CI probe won't false-alarm.
+- **Next recommended intelligence task.** Continue the deployment-health sweep — the remaining
+  surfaced-but-unprobed layers are `rival_density.json` (the `#acq` district-outnumbered board),
+  `search_demand.json` (share-of-search), and `household_risk_by_province.json` (the obj-#1 DTI lens).
+  Each is a same-pattern one-probe increment. Beyond monitoring, the biggest open SERVICE item remains
+  owner-side and unchanged: finishing the R2 catchment migration (`git rm` the 74 R2-served
+  `*_catchment.json`, ~2.2 GB, keeping the 3 pilots) — architecturally significant, deferred to owner
+  review per `docs/SERVICE_AUDIT.md`.
+
 ## 2026-08-01 — ux-loop: wrap long Thai tokens in the five-pillar cards (PR #239, merged + deployed + verified)
 
 - **Autonomous UX loop.** All seven original `docs/UXUI_AUDIT.md` findings are long since fixed, so this
