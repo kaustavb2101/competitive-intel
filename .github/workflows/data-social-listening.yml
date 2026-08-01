@@ -101,6 +101,7 @@ jobs:
         run: |
           python pipeline/build_rival_pulse.py
           python pipeline/build_social_themes.py
+          python pipeline/build_pantip_panel.py
           python pipeline/build_provenance.py
 
       - name: Detect a substantive change (ignore volatile meta stamps)
@@ -138,6 +139,7 @@ jobs:
           git add source-data/app_reviews.json source-data/apple_reviews.json \
                   source-data/youtube_comments.json source-data/pantip_threads.json \
                   platform/data/rival_pulse.json platform/data/social_themes.json \
+                  platform/data/pantip_panel.json \
                   platform/data/provenance.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."

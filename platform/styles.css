@@ -1487,3 +1487,13 @@ p.lead.lead-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:ve
   p.lead.lead-clamp{display:block!important;-webkit-line-clamp:none!important;overflow:visible!important}
   .clampbtn{display:none!important}
 }
+
+/* Pantip borrower quotes (#acq). Verbatim Thai, so the block is set for reading rather than
+   scanning: generous line-height, a quiet rule instead of quotation marks (Thai does not use
+   them the way English does), and a width cap so a long post does not run the panel's full
+   width. Deliberately NOT styled as a testimonial — several of these are complaints about us. */
+.qgrp{margin:10px 0 0}
+.pq{margin:6px 0 0;padding:8px 0 8px 12px;border-left:2px solid var(--line);
+  font:400 12.5px/1.7 var(--sans);color:var(--mid);max-width:78ch}
+.pq .sub{font-size:10.5px;letter-spacing:.2px}
+@media print{.pq{break-inside:avoid}}
