@@ -5,7 +5,9 @@
 > load weight. Every number here is read from the committed tree — nothing is estimated or invented.
 > Regenerate the underlying ledger with `python3 pipeline/build_provenance.py`.
 
-_Audit run: 2026-07-31 · finding: the live site-health probe's `_shape_competitor_coverage` validator asserted `.brands` + `meta.totals.found` but **not** `meta.national_standing` — the exec headline peer claim ("AutoX runs the 2nd-largest title-loan branch network"), which `drawCompCoverage` gates the whole readout on (`ns.autox_rank` + `ns.ranking`). A truncated deploy that dropped that block would silently vanish the headline with no phone alert; the probe now asserts it (shape, not counts). This run's fresh scan re-confirmed the rest of the data room is clean: provenance **118 layers · 60 measured · 58 estimated · 0 unlabelled** (`--check`-reproducible); freshness — 0 genuine dropped data-vintages across all 84 undated layers (the 7 date-shaped candidates are all the accepted pull-stamp / methodology-param blank set); **0 broken references** across 103 distinct `data/*.json` fetch refs; live master alias HTTP 200; determinism gate 100 passed · 0 failed. · against `platform/data/provenance.json` (**118 layers · 423 files** · 60 measured · 58 estimated · 0 unlabelled)._
+_Audit run: 2026-08-02 · finding: the #248 macro/agri data wave landed three MEASURED, live-fetched survey/registry layers — `debt_source` (NSO household debt-by-source), `vehicle_fleet` (DLT registered-vehicle stock) and `farm_household` (OAE farm-household cash P&L) — that each stamp their freshness ONLY under a layer-specific key the extractor did not scan (`latest_year_ce` as an **integer** calendar year on the first two, `span` as a BE crop-year window on the third), so all three showed **blank** in the exec Data-room card despite carrying a real measured data-vintage. `_vintage_of()` now scans `latest_year_ce` (with int→str coercion) and `span`, placed LAST so any proper ISO/observation key still wins; `_parse_vintage` leaves each age-blank (a bare year / BE label is never coerced into a false age), exactly like the `vintage_individual='2025'` precedent. Verified the regenerated ledger changes **only these three** vintage cells (`'' → 2023`, `'' → 2025`, `'' → 2562/63..2566/67`) — counts (68 measured · 59 estimated · 0 unlabelled), labels, sources, files, and the freshness block (n_dated 24 / n_undated 103, correct — coarse labels are not ISO-dated) are byte-identical, and `build_provenance.py --check` reproduces exactly. `crop_mix` (the fourth new layer) correctly stays vintage-blank — it is a first-order DERIVED layer inheriting freshness from its measured inputs, the honest ABSENT state. Gate 113 passed · 0 failed, data integrity 448/448. · against `platform/data/provenance.json` (**127 layers · 432 files** · 68 measured · 59 estimated · 0 unlabelled)._
+
+_Prior audit run: 2026-07-31 · finding: the live site-health probe's `_shape_competitor_coverage` validator asserted `.brands` + `meta.totals.found` but **not** `meta.national_standing` — the exec headline peer claim ("AutoX runs the 2nd-largest title-loan branch network"), which `drawCompCoverage` gates the whole readout on (`ns.autox_rank` + `ns.ranking`). A truncated deploy that dropped that block would silently vanish the headline with no phone alert; the probe now asserts it (shape, not counts). This run's fresh scan re-confirmed the rest of the data room is clean: provenance **118 layers · 60 measured · 58 estimated · 0 unlabelled** (`--check`-reproducible); freshness — 0 genuine dropped data-vintages across all 84 undated layers (the 7 date-shaped candidates are all the accepted pull-stamp / methodology-param blank set); **0 broken references** across 103 distinct `data/*.json` fetch refs; live master alias HTTP 200; determinism gate 100 passed · 0 failed. · against `platform/data/provenance.json` (**118 layers · 423 files** · 60 measured · 58 estimated · 0 unlabelled)._
 
 _Prior audit run: 2026-07-30 · finding: `scenarios.json` (the LIVE/stress scenario engine, #sim) stamps its freshness only under `board_vintage` (= `2026M06`, the commodity/macro board month its MEASURED live drivers observe), which the extractor did not scan — so it showed **blank** in the exec Data-room card despite carrying a real measured vintage; the extractor now scans `board_vintage` and the cell surfaces (§1) · against `platform/data/provenance.json` (**115 layers · 420 files** · 57 measured · 58 estimated · 0 unlabelled — `build_provenance.py --check` reproduces exactly)._
 
@@ -54,7 +56,34 @@ input; and no `data/*.json` path referenced in `platform/*.html` + `app.js` fail
 
 ## 1. Freshness per layer (the fix this run shipped)
 
-**2026-07-30 (this run):** live deployment re-verified green — the master production alias
+**2026-08-02 (this run):** a full re-scan of every currently blank-vintage labelled layer's `meta`
+for date-shaped keys *outside* the extractor's list found **three** MEASURED, live-fetched layers
+(all new since the last audit, from the #248 macro/agri wave) still dropping a real **data-vintage**
+from the Data-room card:
+
+| Layer | Freshness key (was dropped) | Value now surfaced | Class |
+|---|---|---|---|
+| `debt_source.json` | `latest_year_ce` (int) | 2023 | MEASURED — NSO household debt-by-source survey, newest wave year |
+| `vehicle_fleet.json` | `latest_year_ce` (int) | 2025 | MEASURED — DLT registered-vehicle stock, newest registry year |
+| `farm_household.json` | `span` (BE crop-years) | 2562/63..2566/67 | MEASURED — OAE farm-household cash P&L survey, observation window |
+
+`_vintage_of()` now also scans `latest_year_ce` (with int→str coercion — it is a bare calendar year,
+not a date string, exactly the `vintage_individual` NSO-year precedent, just stored as an int) and
+`span`, both placed **last** in the priority list (coarse, non-ISO labels — any proper ISO/observation
+key still wins). `_parse_vintage` leaves all three age-blank, so the freshness pulse never coerces a
+bare year or a BE crop-year window into a false age; the row's vintage cell simply surfaces the layer's
+own committed label. A diff of the regenerated ledger confirms the change touches **only these three
+vintage cells** — the 127-layer counts (68 measured · 59 estimated · 0 unlabelled), labels, sources,
+the files block, and the freshness block (n_dated 24 / n_undated 103) are byte-identical, and
+`build_provenance.py --check` passes on the recommitted ledger. No date is invented — each value is
+read from the layer's own committed `meta`. `crop_mix.json` (the fourth new layer this wave) correctly
+stays vintage-blank: it is a first-order DERIVED layer (province area × Thai farm-gate YoY × NSO
+income) whose freshness is inherited from its measured inputs, so its blank cell is the honest ABSENT
+state, not a bug.
+
+---
+
+**2026-07-30 (prior run):** live deployment re-verified green — the master production alias
 (`competitive-intel-git-master-kaustav-bagchis-projects.vercel.app`) serves **HTTP 200** on `/`,
 `/app.js`, `/data/branches.json`, `/data/meta.json`; the `site-health.yml` cron correctly targets that
 alias. Determinism gate **96 passed · 0 failed**, data integrity **446/446**, provenance

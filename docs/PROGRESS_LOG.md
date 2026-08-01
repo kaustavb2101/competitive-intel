@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — intelligence loop (SERVICE): three MEASURED survey/registry layers had their real vintage dropped from the exec Data-room card — `_vintage_of` now scans `latest_year_ce` + `span`
+
+Autonomous market & service intelligence loop, SERVICE pillar. The service audit's standing freshness
+sweep caught the #248 macro/agri data wave: it landed four new live-fetched layers, and **three of
+them stamp their freshness under a key `build_provenance.py::_vintage_of()` never scanned**, so each
+showed **blank** in the Command-center Data-room card despite being MEASURED and carrying a real
+data-vintage:
+
+- `debt_source.json` (NSO household debt-by-source survey) → `latest_year_ce = 2023` (an **integer**)
+- `vehicle_fleet.json` (DLT registered-vehicle stock) → `latest_year_ce = 2025` (an **integer**)
+- `farm_household.json` (OAE farm-household cash P&L survey) → `span = "2562/63..2566/67"` (BE crop-years)
+
+`_vintage_of()` now scans `latest_year_ce` (with int→str coercion — a bare calendar year is exactly
+the `vintage_individual='2025'` NSO-year precedent, just stored as an int) and `span`, both appended
+**last** so any ISO/observation key still wins. `_parse_vintage` leaves all three age-blank — a bare
+year or a BE crop-year window is never coerced into a false age — so the vintage cell surfaces the
+layer's own committed label while the freshness pulse's age math correctly ignores them. The fourth
+new layer, `crop_mix.json`, correctly **stays blank**: it is a first-order DERIVED layer (province area
+× Thai farm-gate YoY × NSO income) inheriting freshness from its measured inputs — the honest ABSENT
+state, not a bug.
+
+- **Safeguards (all pass):** a diff of the regenerated `provenance.json` touches **only these three
+  vintage cells** (`'' → 2023`, `'' → 2025`, `'' → 2562/63..2566/67`); the 127-layer counts
+  (68 measured · 59 estimated · 0 unlabelled), labels, sources, files block, and the freshness block
+  (n_dated 24 / n_undated 103) are byte-identical. `build_provenance.py --check` reproduces exactly;
+  determinism gate **113 passed · 0 failed**, data integrity **448/448**; `node --check` clean;
+  no secrets in the diff; no fabrication — every value read from the layer's own committed `meta`.
+  `app.js` is byte-unchanged (the three values render through the existing `L.vintage` cell path that
+  already serves 24 other layers), so no new render path — same class as the `board_vintage` /
+  `farmgate_vintage` / `price_asof` vintage-surfacing fixes, shipped the same way (direct commit).
+- **Files:** `pipeline/build_provenance.py` (+2 scan keys, int coercion, comment), regenerated
+  `platform/data/provenance.json` (3 cells), `docs/SERVICE_AUDIT.md` + this log.
+- **Recommend next:** re-verify the DLT `vehicle_fleet` / `vehicle_registry` freshness pair reconciles
+  now that both surface a vintage, and continue the standing sweep as new layers land (any future
+  survey layer stamping only a year/`span` is now covered).
+
 ## 2026-08-01 — UX loop: scope="col" on the 15 Exposure render-path tables (merged + deployed + verified)
 
 Autonomous UX-improvement loop, one surgical fix. Third slice of `ux-table-scope-sweep-appjs`
