@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-01T16:31:25+00:00",
-    "commit": "f65d620"
+    "generated_at": "2026-08-01T22:25:38+00:00",
+    "commit": "399d3e6"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-01T22:25:38+00:00",
+      "sha": "399d3e6",
+      "summary": "data(provenance): surface the three #248 survey/registry vintages the Data-room card dropped",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-01T20:20:01+00:00",
+      "sha": "3e40719",
+      "summary": "docs: log ux scope=\"col\" exposure-tables fix — merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T03:16:25+07:00",
+      "sha": "cf9cef3",
+      "summary": "ux: scope=\"col\" on the 15 Exposure (#exposure) render-path tables (#250)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T03:00:07+07:00",
+      "sha": "a75f145",
+      "summary": "Macro audit: a decision band on top, a second switcher level inside, and three numbers that were saying the wrong thing (#249)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-01T18:58:58+00:00",
+      "sha": "21500b9",
+      "summary": "data(gate): assert the amphoe total-join invariant at source in build_amphoe.py",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T01:21:58+07:00",
+      "sha": "4c111ee",
+      "summary": "Macro + agri data wave: sugarcane closed, Thai price history, farm-household P&L, informal-debt read (#248)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-01T16:32:04+00:00",
+      "sha": "f897259",
+      "summary": "chore(planner): refresh CEO dashboard stamp after the amphoe coastal-count fix",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-01T16:31:25+00:00",
       "sha": "f65d620",
       "summary": "fix(amphoe): count off-polygon coastal branches in their district — total-join .branches (2000→2015), correct the rival:AutoX ratio",
@@ -668,48 +710,6 @@
       "sha": "bc08233",
       "summary": "feat: wave 2 price-assist radar, all six NAVIGATION_MAP items, and the branch join that was losing 4.3% of the book (#231)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T07:06:29+07:00",
-      "sha": "47f1637",
-      "summary": "data: NABC live prices (2026-07-31, run 30666762830) (#234)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-01T07:04:22+07:00",
-      "sha": "3383f18",
-      "summary": "data: ThaiWater flood + rain pulse (2026-07-31, run 30669957429) (#236)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-31T23:43:43+00:00",
-      "sha": "8c3c1fc",
-      "summary": "data: live fuel prices (2026-07-31, run 30673517296)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-07-31T22:22:55+00:00",
-      "sha": "c515bd1",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the district-grain rival-concentration ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-01T05:22:15+07:00",
-      "sha": "00dd0fe",
-      "summary": "feat(competition): rival-field concentration at district grain on Competition (obj #2) (#235)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T20:23:18+00:00",
-      "sha": "16966a9",
-      "summary": "docs: log ux-branch-explorer-doctitle merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T03:20:34+07:00",
-      "sha": "8a3c5e7",
-      "summary": "ux: per-branch tab title in branch-explorer.html (#233)",
-      "pillar": "uxui"
     }
   ]
 }
