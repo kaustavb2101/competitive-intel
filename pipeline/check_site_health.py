@@ -627,6 +627,98 @@ def _shape_rival_youtube(d):
     return None
 
 
+def _shape_rival_density(d):
+    # The district-outnumbered board on Competition (#acq, obj #2): drawRivalDensity
+    # live-fetches it (renderRivalDensity) and ranks the districts where the big-4
+    # rival field most out-stations AutoX — reading .records and, per row, .autox +
+    # .rivals (the raw branch deficit the table sorts on) + .by_brand (the "who holds
+    # it" single-brand-dominance read). It is the district-grain competitive read the
+    # province peer board is built on the same census as, one grain finer. It renders
+    # on a default-reachable nav route but was the last #acq board with no deploy
+    # probe: an empty/truncated .records drops the whole board to its "not yet
+    # computed" placeholder with NO phone alert — the same "broken demo" blind spot
+    # the peer_province / competitor_coverage / pico_district probes closed for the
+    # other Competition reads. Asserts render shape, not values (robust to a future
+    # census refresh shifting counts / district totals).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    recs = d.get("records")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'records' list (board render read)"
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first record is not an object"
+    for k in ("autox", "rivals"):
+        if not isinstance(r0.get(k), (int, float)):
+            return "first record missing numeric '%s' (branch-deficit ranking read)" % k
+    if not isinstance(r0.get("by_brand"), dict):
+        return "first record missing 'by_brand' per-rival split ('who holds it' read)"
+    if not (isinstance(r0.get("province_th"), str) and r0["province_th"].strip()):
+        return "first record missing 'province_th' (board column read)"
+    return None
+
+
+def _shape_search_demand(d):
+    # The share-of-search board on Competition (#acq, obj #2, ESTIMATED): drawSearchDemand
+    # builds SDEMAND_LIST from .provinces filtered on .demand and, per row, reads
+    # .th + .demand + .autox_share + .best_rival{brand,share} + .autox_sos_rank to
+    # render the "brand vs rival search" board and its answer-first verdict clause.
+    # It is a default-reachable #acq read that live-degrades to a calm "not yet
+    # computed" notice (and the map lens hides itself) when the file is missing —
+    # graceful, but silent, so a truncated CDN deploy that guts it drops the board
+    # with no phone alert. The builder can also write an HONEST meta.absent state
+    # (Google-Trends source genuinely unavailable) that the app treats as a valid
+    # empty shape; mirror that here (absent -> OK, not an alert) so the probe fires
+    # only on a real truncation. Asserts render shape, not values.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if isinstance(meta, dict) and meta.get("absent"):
+        return None  # builder's honest source-absent guard — a valid empty shape, not a truncation
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    demand_rows = [p for p in provs if isinstance(p, dict) and p.get("demand") is not None]
+    if not demand_rows:
+        return "no province carries a numeric 'demand' (board is built from demand-bearing rows)"
+    p0 = demand_rows[0]
+    if not (isinstance(p0.get("th"), str) and p0["th"].strip()):
+        return "first demand-bearing province missing 'th' name (board column read)"
+    if not isinstance(p0.get("demand"), (int, float)):
+        return "first demand-bearing province missing numeric 'demand' (board column read)"
+    return None
+
+
+def _shape_household_risk(d):
+    # The household debt-to-income lens (obj #1 portfolio risk, MEASURED — NSO SES
+    # 2566): loadHhRisk builds HHRISK/HHRISK_LIST from .provinces filtered on
+    # .debt_to_income and, per row, reads .province + .debt_to_income (the National-map
+    # hhdti hero lens' brightness read, hhriskVal) + .stress_index. It is a MEASURED
+    # obj-#1 read that live-degrades to a hidden lens when absent — graceful but
+    # silent, so a truncated deploy that guts it drops the DTI lens with no phone
+    # alert, the same blind spot the obj-#1 flow-card / province_pressure probes
+    # closed. The builder can write an HONEST meta.absent state that the app treats
+    # as a valid empty shape; mirror it (absent -> OK). Asserts render shape, not
+    # values (robust to a future SES vintage shifting the ratios).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    meta = d.get("meta")
+    if isinstance(meta, dict) and meta.get("absent"):
+        return None  # builder's honest source-absent guard — a valid empty shape, not a truncation
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or len(provs) < 70:
+        return "missing/short 'provinces' list (expected ~77)"
+    dti_rows = [p for p in provs if isinstance(p, dict) and p.get("debt_to_income") is not None]
+    if not dti_rows:
+        return "no province carries a numeric 'debt_to_income' (the hhdti lens' brightness read)"
+    p0 = dti_rows[0]
+    if not (isinstance(p0.get("province"), str) and p0["province"].strip()):
+        return "first DTI-bearing province missing 'province' name (HHRISK map key)"
+    if not isinstance(p0.get("debt_to_income"), (int, float)):
+        return "first DTI-bearing province missing numeric 'debt_to_income' (hhriskVal read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -715,6 +807,21 @@ DATA_FILES = [
     ("data/rival_pulse.json", _shape_rival_pulse, ".sentiment ladder + .promos feed (#acq rival watch)"),
     ("data/rival_ads.json", _shape_rival_ads, ".brands ad-creative board (#acq paid-media pulse)"),
     ("data/rival_youtube.json", _shape_rival_youtube, ".channels video board (#acq video pulse)"),
+    # The three exec-facing reads flagged as the next probe targets by the 2026-08-01
+    # province_pressure run — each renders on a default-reachable route and
+    # live-degrades SILENTLY when its file is missing, so a truncated CDN deploy
+    # blanks it with no phone alert:
+    #  - rival_density: the #acq district-outnumbered board (obj #2), the district-grain
+    #    sibling of the already-probed peer_province province board;
+    #  - search_demand: the #acq share-of-search board (obj #2, ESTIMATED);
+    #  - household_risk_by_province: the obj-#1 household DTI hero map lens (MEASURED).
+    # rival_density has no absent-state (it's a straight census rollup); the other two
+    # carry the builder's honest meta.absent guard, which their probes treat as a
+    # valid empty shape (see the shape fns). Closes the last three surfaced-but-unprobed
+    # exec reads across both standing objectives.
+    ("data/rival_density.json", _shape_rival_density, ".records (928 districts) with autox/rivals/by_brand (#acq district-outnumbered board)"),
+    ("data/search_demand.json", _shape_search_demand, ".provinces (~77) with demand/autox_share/best_rival (#acq share-of-search)"),
+    ("data/household_risk_by_province.json", _shape_household_risk, ".provinces (~77) with debt_to_income (obj #1 DTI map lens)"),
 ]
 
 

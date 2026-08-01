@@ -3,6 +3,51 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — intelligence-loop (deployment-health): site-health probes now guard the last three surfaced-but-unprobed exec reads — `rival_density`, `search_demand`, `household_risk_by_province`
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The named data-integration backlog is
+  closed for CI-reachable sources (verified this run): `fpo_pico` → pico census/district/competitors +
+  per-branch PICO exposure (with National-map `dpico`/`doutnum` lenses), `branch_cropland` +
+  `province_cropland`, `dbd_newco`/`mot_vehicles`/`diw_factories` layers — all built, gated, wired, and
+  provenance-labelled (120 layers, 0 unlabelled). The remaining named items are BLOCKED from this
+  environment: BAAC/SME-bank credit needs a Thai-IP re-pull + committed raw CSV (`build_baac_credit.py`
+  is orphaned pending that), and GISTDA 40m crop-area needs `GISTDA_SPHERE_KEY`, which is **not in this
+  session's env**. So this run took the DEPLOY-HEALTH remit the last two runs established and closed the
+  concrete monitoring gap the 2026-08-01 `province_pressure` run itself teed up.
+- **Finding.** `pipeline/check_site_health.py` guarded ~24 exec-facing layers but **not** the three the
+  prior run flagged as the next probe targets — each renders on a default-reachable nav route and
+  **live-degrades SILENTLY** when its file is missing (calm placeholder / hidden map lens), so a
+  truncated CDN deploy that guts one blanks its exec read with **no phone alert**:
+  - `rival_density.json` — the `#acq` district-outnumbered board (obj #2), the district-grain sibling of
+    the already-probed `peer_province` province board (`drawRivalDensity` reads `.records` +
+    per-row `autox`/`rivals`/`by_brand`);
+  - `search_demand.json` — the `#acq` share-of-search board (obj #2, ESTIMATED; `drawSearchDemand` reads
+    `.provinces` → `.th`/`.demand`/`.autox_share`/`.best_rival`);
+  - `household_risk_by_province.json` — the obj-#1 household **debt-to-income** hero map lens (MEASURED,
+    NSO SES 2566; `loadHhRisk`/`hhriskVal` read `.provinces` → `.province`/`.debt_to_income`).
+- **Fix.** Added `_shape_rival_density`, `_shape_search_demand`, `_shape_household_risk` (each asserts
+  render SHAPE, not values — robust to a future census/SES vintage shifting counts) and registered the
+  three files in `DATA_FILES`. The two absent-able layers (`search_demand`, `household_risk`) mirror the
+  app's own `meta.absent` guard: an honest source-absent state returns OK (a valid empty shape), so the
+  probe fires only on a real truncation. One-file diff: `pipeline/check_site_health.py`. **No `platform/`,
+  no data, no app-behaviour/visual change** — monitoring-only, so no provenance rebuild and no headless
+  render needed; direct-to-master per the loop's non-visual rule.
+- **Safeguards (all pass).** (a) `py_compile` OK. (b) `check_site_health.py --local platform` → **86/86
+  passed** (was 77; +9 for the three new files' fetch/parse/shape), the three new probes green on
+  committed data. (c) Negative test: each shape fn rejects `{}`, an empty list, and a partial-row file,
+  and the two absent-able fns return OK on `meta.absent` — so the probes catch truncation without
+  false-alarming on the honest empty state. (d) `bash tests/run.sh check` → **0 failed** (the health
+  probe is a live-site check, not in the determinism gate, so the gate count is unchanged). (e) No
+  secrets in the diff (stdlib probe code only); diff scoped to the one probe file + this log.
+- **Next recommended intelligence task.** The exec-facing deploy-health sweep is now essentially
+  complete across both objectives. The highest-value OPEN items are all owner-side/env-gated: (1) set
+  `GISTDA_SPHERE_KEY` as a session-reachable secret to build the 40m satellite crop puller (item 4,
+  supersedes the SPAM baseline in `branch_cropland`); (2) a Thai-IP re-pull + committed raw CSV to
+  finish BAAC/SME-bank formal-credit **penetration** (item 3 remainder); (3) the R2 catchment migration
+  (`SERVICE_AUDIT.md`). Absent those, the remaining CI-safe monitoring increments are the second-tier
+  layers (e.g. `dbd_formation`, `sfi_credit` is already probed) — diminishing returns vs. the front-door
+  reads now all covered.
+
 ## 2026-08-01 — intelligence-loop (deployment-health): site-health probe now guards `province_pressure.json` (the front-door cross-objective thesis) — committed + deployed + verified
 
 - **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The autonomy backlog reads 98% (only the
