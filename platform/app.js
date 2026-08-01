@@ -1663,6 +1663,11 @@ function showOvPanel(id,opt){
   if(opt.scroll==='nav'&&nav) nav.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=wrap.querySelector('#'+CSS.escape(target)+' > summary');
   if(sm&&opt.scroll) sm.focus({preventScroll:true});
+  // Build the topic's own sub-switcher. Most blocks are filled by async renderers, so build now for
+  // the already-resolved ones and rebuild as the rest land — ovSubInit() is a full rebuild, so the
+  // repeats are free and the reader's chosen subsection survives them (it is keyed by label).
+  ovSubInit(target);
+  [500,1500].forEach(ms=>setTimeout(()=>{ if(OV_PANEL===target) ovSubInit(target); },ms));
 }
 /* A click on a visible summary would normally just toggle that one panel; route it through the
    switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
@@ -1671,6 +1676,92 @@ document.addEventListener('click',e=>{
   const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary'); if(!sm) return;
   e.preventDefault();
   showOvPanel(sm.parentElement.id);
+});
+
+/* ---------- SECOND level: a sub-switcher INSIDE the long topics (2026-08-02) ----------
+   Making the six topics exclusive fixed the tab-level scroll. It did not fix the scroll INSIDE a
+   topic, and that is where the length actually is: Collateral is 3,844px across 7 subsections and
+   Farm households 3,022px across 4, so choosing "Collateral" still hands the reader seven subjects
+   when they wanted one. This applies the same one-at-a-time rule a level down.
+
+   Built from the DOM rather than declared in markup on purpose: every subsection already starts with
+   an `h3.ovsub` (directly, or as the first heading of its own wrapper div), so a topic that gains or
+   loses a subsection gets the right chips with no second place to update. It rebuilds on every call
+   and is therefore idempotent — necessary because most of these blocks are filled asynchronously and
+   a block can disappear entirely when its renderer finds no data.
+
+   An "All" chip is always present: nothing this does may put content out of reach. Hiding is
+   screen-only (see .ovsub-off in styles.css) so printing still emits the whole tab, which is the
+   promise the per-tab print makes. */
+const OV_SUB={};        // section id -> the chosen subsection LABEL (survives rebuilds; index doesn't)
+const OV_SUB_MIN=3;     // below this a strip is just clutter — two headings read fine stacked
+function ovSubBlocks(sec){
+  const blocks=[];
+  [...sec.children].forEach(c=>{
+    if(c.tagName==='SUMMARY'||c.classList.contains('ovsubnav')) return;
+    const h=(c.matches&&c.matches('h3.ovsub'))?c:(c.querySelector?c.querySelector('h3.ovsub'):null);
+    if(h){
+      // Chip label = the heading up to its first "·" separator, with the MEASURED/ESTIMATED tag
+      // stripped. The full heading stays as the chip's title so nothing is lost to the shortening.
+      const cl=h.cloneNode(true); cl.querySelectorAll('.tag').forEach(t=>t.remove());
+      const full=cl.textContent.replace(/\s+/g,' ').trim();
+      let label=full.split('·')[0].trim()||full;
+      // Shortening must never drop a provenance qualifier. "Collateral recovery-value sensitivity ·
+      // illustrative" shortened to "Collateral recovery-value sensitivity" would present a scenario
+      // table under the same chip styling as the measured ones — the exact honesty the tab is built
+      // on. If the part being cut says what kind of number it is, it stays.
+      const qual=full.slice(label.length).match(/illustrativ\w*|estimat\w*|proxy|scenario\w*/i);
+      if(qual) label+=' · '+qual[0].toLowerCase();
+      blocks.push({label, full, nodes:[]});
+    }
+    if(!blocks.length) blocks.push({label:'', full:'', nodes:[]});   // preamble before any heading
+    blocks[blocks.length-1].nodes.push(c);
+  });
+  // A block whose renderer hid its own wrapper has nothing to show — no chip for it.
+  return blocks.filter(b=>b.label&&b.nodes.some(n=>n.style.display!=='none'));
+}
+function ovSubApply(sec,blocks,label){
+  const all=!label;
+  blocks.forEach(b=>b.nodes.forEach(n=>n.classList.toggle('ovsub-off',!all&&b.label!==label)));
+  const nav=sec.querySelector(':scope > .ovsubnav');
+  if(nav) nav.querySelectorAll('[data-ovsub]').forEach(c=>{
+    const on=(c.dataset.ovsub||'')===(label||'');
+    c.classList.toggle('on',on); c.setAttribute('aria-selected',String(on));
+  });
+}
+function ovSubInit(secId){
+  const sec=document.getElementById(secId); if(!sec) return;
+  let nav=sec.querySelector(':scope > .ovsubnav');
+  const blocks=ovSubBlocks(sec);
+  if(blocks.length<OV_SUB_MIN){
+    if(nav) nav.remove();
+    // Never leave content hidden by a strip that no longer exists.
+    sec.querySelectorAll('.ovsub-off').forEach(n=>n.classList.remove('ovsub-off'));
+    return;
+  }
+  if(!nav){
+    nav=document.createElement('nav');
+    nav.className='jumpnav ovsubnav no-print';
+    nav.setAttribute('aria-label','Choose one part of this topic');
+    const sm=sec.querySelector(':scope > summary');
+    sec.insertBefore(nav,sm?sm.nextSibling:sec.firstChild);
+  }
+  // The remembered choice can vanish when a block's data does — fall back to All, never to nothing.
+  let sel=OV_SUB[secId]||'';
+  if(sel&&!blocks.some(b=>b.label===sel)) sel='';
+  OV_SUB[secId]=sel;
+  nav.innerHTML=`<button type="button" class="chip" data-ovsub="" aria-selected="${!sel}">All</button>`
+    +blocks.map(b=>`<button type="button" class="chip" data-ovsub="${b.label.replace(/"/g,'&quot;')}" title="${b.full.replace(/"/g,'&quot;')}" aria-selected="${sel===b.label}">${b.label}</button>`).join('');
+  ovSubApply(sec,blocks,sel);
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest&&e.target.closest('.ovsubnav [data-ovsub]'); if(!c) return;
+  e.preventDefault();
+  const sec=c.closest('details.ovsec'); if(!sec) return;
+  OV_SUB[sec.id]=c.dataset.ovsub||'';
+  ovSubApply(sec,ovSubBlocks(sec),OV_SUB[sec.id]);
+  const nav=sec.querySelector(':scope > .ovsubnav');
+  if(nav) nav.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 
 /* ---------- load ---------- */
@@ -2059,6 +2150,11 @@ function renderMacroSoWhat(){
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('[data-swjump]'); if(!b) return;
+  // Reset the target topic to "All" first. A row promises to open the section that PROVES it, and
+  // the sub-switcher remembers whichever subsection the reader last chose there — so without this,
+  // following "pickups are 38% of outstanding" could land on the EV panel with the pickup evidence
+  // hidden. The band's promise outranks the remembered sub-selection.
+  if(typeof OV_SUB==='object'&&OV_SUB) OV_SUB[b.dataset.swjump]='';
   // Route through the SAME exclusive topic switcher the chips use, so the band can never leave two
   // topics open at once or desync the active chip.
   if(typeof showOvPanel==='function') showOvPanel(b.dataset.swjump,{scroll:'nav'});

@@ -1398,6 +1398,21 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 @media(min-width:1180px){.ovpair{grid-template-columns:minmax(300px,.85fr) 1.15fr}}
 @media print{.ovpair{grid-template-columns:1fr!important}}
 
+/* ---------- within-topic sub-switcher (second level under the Macro chips) ----------
+   SCREEN ONLY. The hide has to be !important because several renderers set an explicit inline
+   `display:block` on their own wrapper, which would otherwise win. Scoping the whole rule to
+   @media screen is what keeps printing whole: in print the rule simply does not apply, so the
+   inline/normal styles govern and every subsection is emitted. Do not "fix" this by adding a
+   print override with display:revert — that would drop grid/flex layouts back to UA defaults. */
+@media screen{ .ovsub-off{ display:none!important } }
+/* Second sticky row: sits UNDER the topic chips (which stick at 48px and are ~40px tall) with a
+   lower z-index, so scrolling a long topic keeps both levels visible and the topic row always wins
+   the overlap. Without the offset the two rows stack on the same line and hide each other. */
+.ovsubnav{top:88px;z-index:19;margin:0 0 10px;padding:6px 0 7px;border-bottom:1px dashed var(--line2)}
+.ovsubnav .chip{font-size:11.5px;padding:3px 9px;cursor:pointer;font-family:inherit}
+.ovsubnav .chip[aria-selected="true"]{border-color:var(--accent);color:var(--hi)}
+@media(max-width:720px){.ovsubnav{top:0;position:relative}}
+
 /* ---------- Macro decision band (above the answer band) ----------
    Rows, not tiles. A tile competes with the five next to it for the eye; a row is read in order, which
    is the point — this is the "what does it mean" list, and its order IS the priority. Each row is a
