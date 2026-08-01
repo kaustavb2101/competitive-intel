@@ -91,12 +91,17 @@ BRANDS = {
     "MICRO":       ["ไมโครลิสซิ่ง"],
     "GSB_MONEYDD": ["เงินดีดี GSB"],
     "KRUNGSRI_GO": ["GO by Krungsri"],
-    # Sabuy Cash — added to the watch 2026-08-01 on the owner's ask. LATIN STRING ONLY, deliberately:
-    # its Thai trading name is not verified here, and a guessed Thai string would return silent false
-    # matches, which is worse than returning nothing. Before this brand can join the app-sentiment
-    # ladder and the ad-transparency pull it needs three verified ids that cannot be looked up from
-    # this network — Play package, Apple app id, Google ATC advertiser id (see docs/NEXT_STEPS.md).
-    "SABUY":       ["Sabuy Cash"],
+    # "Sabuy Cash" was added to the watch on the owner's ask and is REPLACED here (2026-08-01) after
+    # the entity was actually checked: there is no เงินสบาย title lender. SABUY Technology renamed to
+    # WSOL Plc, and its vehicle-lending exposure is a 20% stake in CarFinn — an ONLINE BROKER that
+    # refers enquiries to Krungsri/TISCO, with no branch network and no book of its own. It is carried
+    # in rival_universe.json at tier='broker' so it is never counted as local competitive pressure.
+    #
+    # Searching the old term would have been worse than useless: "Sabuy Cash" is an unverified brand
+    # string, and the obvious Thai fallback สบาย is an everyday word ("comfortable") that appears in
+    # ordinary review text — ผ่อนสบาย, สบายใจ — so it would have returned a stream of false matches
+    # filed under a competitor that does not exist. Latin strings only, for the verified entity.
+    "WSOL_CARFINN": ["CarFinn", "คาร์ฟินน์"],
 }
 
 # Category terms — the conversation that is not about any one brand. Filed under _CATEGORY so a

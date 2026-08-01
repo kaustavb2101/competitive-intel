@@ -3948,7 +3948,12 @@ function drawRivalUniverse(){
   const m=RIVUNI.meta||{};
   const TIER={us:'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>',
               nonbank:'<span class="tag" style="color:var(--agri);border:1px solid var(--agri)">NON-BANK</span>',
-              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>'};
+              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>',
+              /* 'broker' = online origination, no branches. Listed so the operator is on the record,
+                 but never counted as local competitive pressure — the per-branch and per-province
+                 rival counts come from the geo censuses, which only hold physical service points.
+                 Without this entry the row rendered with a BLANK badge, which reads as a data bug. */
+              broker:'<span class="tag" style="color:var(--dim);border:1px dashed var(--dim)">BROKER · NO BRANCHES</span>'};
   tbl.innerHTML=`<tr><th></th><th>Operator</th><th>Backing</th><th>Model</th>`+
     `<th title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
     `<th title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+
