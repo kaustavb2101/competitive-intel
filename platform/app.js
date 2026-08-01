@@ -2881,6 +2881,45 @@ function renderThaiwater(){
 }
 
 /* ---------- acquisition ---------- */
+/* MEASURED household debt inside vs outside the formal system (data/debt_source.json, NSO).
+   The point of the block is the CLASS table, not the national number: informal borrowing barely
+   varies by region (1.3-1.5%) but varies 5x by occupation, and the two most exposed classes are
+   exactly the ones this book lends to. Leads with that, and carries the under-reporting caveat
+   next to the number rather than in a footnote, because the level is a floor and the ranking
+   is the only defensible read. */
+function renderDebtSource(){
+  const host=document.getElementById('acq-debtsource'); if(!host) return;
+  tmliFetch('debt_source').then(j=>{
+    if(!j||!Array.isArray(j.by_class)){ tmliNote(host,'Needs <b>data/debt_source.json</b> — not built for this vintage.'); return; }
+    const M=j.meta||{}, nat=j.national||[], B=n=>'฿'+Math.round(n).toLocaleString();
+    const n0=nat[0]||{}, n1=nat[nat.length-1]||{};
+    const cls=(j.by_class||[]).filter(r=>r.cls!=='รวม');
+    const top=cls[0]||{};
+    const all=(j.by_class||[]).find(r=>r.cls==='รวม')||n1;
+    const mult=all.informal_pct?(top.informal_pct/all.informal_pct):null;
+    const maxInf=Math.max(...cls.map(r=>r.informal_pct||0),1);
+    const rows=cls.map(r=>{
+      const w=Math.max((r.informal_pct||0)/maxInf*90,1);
+      return `<tr><td><b>${r.cls_en}</b></td>
+        <td class="mono">${B(r.total)}</td>
+        <td class="mono">${B(r.informal)}</td>
+        <td><span class="mono" style="color:${(r.informal_pct||0)>=3?'var(--agri)':'var(--dim)'}"><b>${r.informal_pct}%</b></span>
+          <svg width="92" height="9" viewBox="0 0 92 9" aria-hidden="true" style="vertical-align:middle;margin-left:6px"><rect x="0" y="1" width="${w.toFixed(1)}" height="7" rx="1.5" fill="${(r.informal_pct||0)>=3?'var(--agri)':'var(--line)'}"/></svg></td>
+        <td class="mono sub">${r.agri_pct==null?'—':r.agri_pct+'%'}</td></tr>`;}).join('');
+    const regs=(j.by_region||[]).map(r=>`<tr><td><b>${r.region_en}</b></td>
+        <td class="mono">${B(r.total)}</td><td class="mono sub">${B(r.informal)}</td>
+        <td class="mono">${r.informal_pct}%</td>
+        <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
+      <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
+      <table class="tbl"><tr><th>Household type (NSO class)</th><th>Debt / household</th><th>Outside the system</th><th>Share outside</th><th class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
+      <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
+        <table class="tbl" style="margin-top:8px"><tr><th>Region</th><th>Debt / household</th><th class="sub">Outside</th><th>Share</th><th class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
+      <p class="lead sub" style="margin:8px 0 0"><b>Reading:</b> ${M.scope_warning||''} ${M.label||''}</p>`;
+    wrapTables();
+  });
+}
+
 function renderCompetition(){
   $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
     META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
@@ -2892,6 +2931,7 @@ function renderCompetition(){
   renderGapBoard();
   renderSearchDemand();
   renderPeerScore();
+  renderDebtSource();
   // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
   // was a bare alias for renderRivalPulse() — the fetch resolves once and paintPulse() draws Play and
   // iOS together, so the second call only re-entered the same guarded loader. It read like a separate
