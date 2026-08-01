@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-01T10:22:33+00:00",
-    "commit": "1735a5f"
+    "generated_at": "2026-08-01T16:31:25+00:00",
+    "commit": "f65d620"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-01T16:31:25+00:00",
+      "sha": "f65d620",
+      "summary": "fix(amphoe): count off-polygon coastal branches in their district — total-join .branches (2000→2015), correct the rival:AutoX ratio",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-01T22:41:29+07:00",
+      "sha": "dc9de34",
+      "summary": "fix(ci): restore the Pantip panel that the #244 squash-merge silently dropped (#246)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-01T14:45:54+00:00",
+      "sha": "3b6a2b7",
+      "summary": "docs: log ux scope=\"col\" competition-tables fix — merge+deploy+verify (#247)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T21:42:45+07:00",
+      "sha": "1cd3743",
+      "summary": "ux: scope=\"col\" on the four Competition (#acq) route tables (#247)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T20:42:39+07:00",
+      "sha": "7f33f40",
+      "summary": "feat(live-board): daily feeds get real trend lines — history accumulated, backfilled from git (#244)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-01T20:42:00+07:00",
+      "sha": "5f168fe",
+      "summary": "feat(competition): Pantip panel — what borrowers say about each lender, in their own words (#245)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-01T20:39:07+07:00",
+      "sha": "92abffd",
+      "summary": "ux(macro): one topic at a time — the six sections become a segmented switcher (#243)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T20:39:03+07:00",
+      "sha": "5975aef",
+      "summary": "fix(competition): classify WSOL/CarFinn as a broker — it is not a title lender (#242)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-01T12:38:04+00:00",
+      "sha": "4163100",
+      "summary": "data(gate): guard the hand-maintained commodity board against its MEASURED Pink Sheet source",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-01T10:23:04+00:00",
+      "sha": "f7835e4",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-01T10:22:33+00:00",
       "sha": "1735a5f",
       "summary": "health(deploy): site-health probe guards the DATA ROOM honesty census (provenance.json)",
@@ -649,66 +709,6 @@
       "date": "2026-08-01T03:20:34+07:00",
       "sha": "8a3c5e7",
       "summary": "ux: per-branch tab title in branch-explorer.html (#233)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T01:37:54+07:00",
-      "sha": "e87049b",
-      "summary": "feat(competition): per-province rival-field concentration chip on #acq (#232)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-01T00:07:17+07:00",
-      "sha": "4c4315f",
-      "summary": "feat(social): Pantip + YouTube listening, say/hear theme engine, and the real-tape doc correction (#229)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T16:30:47+00:00",
-      "sha": "c956bda",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival-concentration peer ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T23:27:02+07:00",
-      "sha": "bd0d91e",
-      "summary": "feat(peer): rival-field concentration on the per-province peer board (obj #2) (#230)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T14:26:02+00:00",
-      "sha": "edf5e08",
-      "summary": "docs: log ux-static-tblwrap-missing-a11y merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T21:21:34+07:00",
-      "sha": "461b83c",
-      "summary": "ux: name the static ThaiWater scroll regions (a11y) (#228)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T12:27:58+00:00",
-      "sha": "be1fabb",
-      "summary": "health(deploy): site-health probe guards sfi_credit (Overview MEASURED state-bank NPL backdrop)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-07-31T17:52:42+07:00",
-      "sha": "718391a",
-      "summary": "health(deploy): site-health probe guards competitor_coverage national_standing (exec peer headline) (#227)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-07-31T08:21:57+00:00",
-      "sha": "2ad6426",
-      "summary": "docs: log ux-tblwrap-region-unique-name merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-07-31T15:18:34+07:00",
-      "sha": "93f1b10",
-      "summary": "ux: unique aria-label per scrollable-table region (axe landmark-unique) (#226)",
       "pillar": "uxui"
     }
   ]
