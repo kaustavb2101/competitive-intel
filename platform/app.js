@@ -7959,9 +7959,13 @@ function renderScenarios(){
 
 /* MOVE 4 — commodities board: global Pink Sheet × Thai farm-gate × who's-exposed drill (Overview). */
 /* Commodity board label -> the crop key used by assist_price_radar.json / income_impact.json crop_mix.
-   Only the crops with a province planted-area map appear here; Sugar is on the board but has no
-   province share anywhere, so it stays deliberately unmapped rather than being joined to a guess. */
-const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava'};
+   Only the crops with a province planted-area map appear here. Coconut, Pineapple and Sugar joined
+   on 2026-08-01 — the first two once ingest_doae.py started reading all 19 registry crop columns
+   instead of 5, and Sugar once ingest_ocsb_cane.py landed OCSB's own 47-province cane returns (cane
+   growers register with the OCSB, so it is in no other registry here). Livestock and fisheries stay
+   unmapped on purpose: they have no planted area, so joining them to one would be a guess. */
+const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava',
+               'Coconut':'coconut','Pineapple':'pineapple','Sugar':'sugarcane'};
 const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
@@ -8011,15 +8015,15 @@ function renderCommoditiesBoard(){
         // do" when the truth is "we cannot compute it yet". Say which of the two it is, and name the
         // unlock. (The other fallers — coconut, pineapple, pork, shrimp, eggs, chicken — have a Thai
         // price but no province area, so they cannot reach a belt at all.)
-        // Two DIFFERENT reasons a belt can exist with no call list, and saying the wrong one is
-        // its own error: either we hold no Thai price for the crop (sugar), or we hold one and the
-        // assistance radar simply does not map the crop yet (coconut, pineapple — priced by NABC,
-        // but the radar's exposure join reads crop_stress.json, which still carries five crops).
+        // Two DIFFERENT reasons a belt can exist with no call list, and saying the wrong one is its
+        // own error: either we hold no Thai price for the crop, or we hold one and the assistance
+        // radar does not map the crop. All eight belted crops now clear both, so this line is a
+        // guard for future rows rather than something any current commodity hits.
         const gapLine=`<div class="cb-assist cb-gap"><b>No call-list for ${c.lab} yet:</b> ${
           c.local_yoy==null
             ? `the assistable-now population is computed from a <b>Thai price series</b>, and ${c.lab} has none in this repo`
-            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but the assistance radar's exposure join still maps only rice, cassava, maize, oil palm and rubber`
-        } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.${c.lab==='Sugar'&&(j.meta||{}).sugarcane_gap?` <span class="s">${(j.meta||{}).sugarcane_gap}</span>`:''}</div>`;
+            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but the assistance radar's exposure join does not map it — it reads crop_stress.json planted-area shares, which livestock and fisheries have none of`
+        } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.</div>`;
         const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
@@ -8056,7 +8060,7 @@ function renderCommoditiesBoard(){
       <p class="lead">World price (Pink Sheet YoY) beside the Thai farm-gate move, their <b>divergence</b> (where the local farmer's cash parts from the world index), and the <b>book accounts</b> sitting in each crop's growing belt — press a row to see the belt. ${f.diesel_thb_l?`Diesel now <b>฿${f.diesel_thb_l}/L</b> (${f.name}) — a cost line for pickup/haulage, not crop revenue.`:''}</p>
       <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th title="Thai farm-gate where a local series exists, world price otherwise">Borrower feels</th><th>5-yr trend</th><th>World YoY</th><th title="Thai farm-gate (raw crop forms) or the NABC daily market feed for livestock, fishery and orchard series. Nmkt = how many markets quote it.">Thai price</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table>
         <p class="s cb-key">Sorted by the move the borrower feels. <b>°</b> = world price only, no Thai series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length}). <b>Nmkt</b> = markets quoting that Thai price; a 1mkt series is measured but thin.${((j.meta||{}).nabc_excluded||[]).length?` Excluded as stale: ${(j.meta||{}).nabc_excluded.join('; ')}.`:''}</p></div>
-      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area). Each belt states its own area source: <b>MEASURED</b> for rice / rubber / palm (planted-area census) and cassava / maize (DOAE farmer registry), <b>MODELLED</b> for sugarcane (SPAM 2010). ${(j.meta||{}).sugarcane_gap||''}</p>`;
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area). Each belt states its own area source, and <b>every belt on this board is now MEASURED</b>: rice / rubber / palm from the planted-area census, cassava / maize / coconut / pineapple from the DOAE farmer registry, sugarcane from OCSB's own returns (the modelled SPAM-2010 raster it replaced understated the cane belt by ~1.7×).</p>`;
     if(!el.dataset.wired){ el.dataset.wired='1';
       el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
         const dr=el.querySelector(`.cb-drill[data-i="${x.dataset.i}"]`); if(!dr) return;
@@ -8628,9 +8632,20 @@ function renderAssistPriceLens(){
 
     // Lead with the answer. If something has tripped that IS the answer; otherwise the answer is the
     // size of the healthy book and the fact that nothing is falling — said plainly, not padded.
+    // With 22 provinces tripping, listing every name reads as noise. Lead with the size of the
+    // callable slice and WHICH falling crop is driving it; the names go in the table below.
+    const trippedRows=provs.filter(r=>r.tripped);
+    const trippedN=trippedRows.reduce((a,r)=>a+(r.n_current_x||0),0);
+    const byCrop={};
+    trippedRows.forEach(r=>(r.falling_crops||[]).forEach(c=>{
+      byCrop[c]=byCrop[c]||{n:0,prov:0};byCrop[c].n+=r.n_current_x||0;byCrop[c].prov++;}));
+    const drivers=Object.entries(byCrop).sort((a,b)=>b[1].n-a[1].n).map(([c,v])=>{
+      const yy=(j.crops.find(x=>x.crop===c)||{}).yoy;
+      return `<b>${c}</b> ${yy==null?'':`<span class="mono" style="color:var(--agri)">${yy}%</span>`} <span class="sub">(${v.prov} prov, ${N(v.n)} accounts)</span>`;}).join(' · ');
+    const named=trippedRows.slice().sort((a,b)=>(b.n_current_x||0)-(a.n_current_x||0)).slice(0,6).map(r=>r.th).join(' · ');
     const lead = tripped.length
-      ? `<b style="color:var(--agri)">${tripped.length} province${tripped.length>1?'s':''} tripped:</b> ${tripped.join(' · ')} — a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area there is in price decline. Call the Current + X-day slice before collections turn.`
-      : `<b>Nothing tripped.</b> All five mapped crops are up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
+      ? `<b style="color:var(--agri)">${N(trippedN)} healthy farm accounts are in a falling sector right now</b> — Current or X-bucket only, across <b>${tripped.length}</b> province${tripped.length>1?'s':''} where a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area is in price decline. Driven by ${drivers}. Biggest books: ${named}. This is the slice to call before collections turn.`
+      : `<b>Nothing tripped.</b> Every mapped crop is up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
 
     const crops=j.crops.map(c=>`<tr>
         <td><b>${c.crop}</b></td>
@@ -8642,8 +8657,11 @@ function renderAssistPriceLens(){
 
     // The province detail is the actionable list, but it is long — keep it collapsed so the crop
     // rollup stays the thing you read first.
-    const top=provs.slice(0,15).map(r=>`<tr>
-        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
+    // Tripped first — the file sorts by book size alone, which would bury the actionable rows
+    // under large-but-healthy ones.
+    const ordered=provs.slice().sort((a,b)=>(b.tripped?1:0)-(a.tripped?1:0)||(b.n_current_x||0)-(a.n_current_x||0));
+    const top=ordered.slice(0,15).map(r=>`<tr>
+        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.tripped?' <span class="tag" style="color:var(--agri);border-color:var(--agri)" title="a crop this province depends on is in price decline">FALLING CROP</span>':''}${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
         <td class="mono"><b>${N(r.n_current_x)}</b></td>
         <td class="mono sub">${N(r.n_current)} / ${N(r.n_early)}</td>
         <td class="mono sub">${N(r.n_farm_accounts)}</td>
@@ -8658,11 +8676,11 @@ function renderAssistPriceLens(){
         <th title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
         <th title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
         <th>Where most of it sits</th></tr>${crops}</table>
-      <details style="margin-top:10px"><summary class="sub">By province — the 15 largest healthy farm books (of ${provs.length})</summary>
+      <details style="margin-top:10px"><summary class="sub">By province — falling-crop provinces first, then the largest healthy farm books (15 of ${provs.length})</summary>
         <table class="tbl" style="margin-top:8px"><tr>
           <th>Province</th><th>Current + X</th><th class="sub">Current / X</th>
           <th class="sub">Farm accounts</th><th class="sub">Farm book</th><th>Crops it depends on</th></tr>${top}</table></details>
-      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. Sugarcane has a measured price but no province planted-area share, so it cannot be placed on this map.</p>`;
+      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. <b>Sugarcane joined this map on 1 Aug 2026</b> — cane growers register with the OCSB rather than DOAE, so it had no planted area here and its only price was a 2019 OAE snapshot reading <b>+26%</b> when the announced cane price is <b>−17.9%</b>. It now drives most of what has tripped. Livestock and fisheries (pork, shrimp, chicken, eggs) are still absent: they have no planted area to join on.</p>`;
     wrapTables();
   });
 }

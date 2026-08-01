@@ -32,11 +32,14 @@ rather than preferring the newest everywhere:
     we take from it is the BELT RANKING (which provinces grow it), which survives partial
     registration as long as under-registration is not regionally biased.
   · Sugarcane is absent from DOAE by construction — cane growers register with the OCSB, not DOAE
-    (province_cropland.json says so in its own provenance line). The only sugarcane area in the repo
-    is SPAM 2010, a MODELLED 5-arcmin disaggregation now 16 years old, so the sugar belt is labelled
-    MODELLED and dated. There is also no CURRENT Thai cane price here: source-data/crop_prices.json
-    carries อ้อยโรงงาน but it is an OAE 2561/2562 BE (2018/2019 CE) snapshot, so it is deliberately
-    NOT wired as a farm-gate. Closing both needs an OCSB (สำนักงานคณะกรรมการอ้อยและน้ำตาลทราย) pull.
+    (province_cropland.json says so in its own provenance line). Until 2026-08-01 the only cane area
+    held anywhere here was SPAM 2010, a MODELLED 5-arcmin raster, and there was no current Thai cane
+    price at all, so Sugar was the one board row with a falling WORLD price and no way to name who
+    in Thailand carries it. The OCSB pull (pipeline/ingest_ocsb_cane.py) closes BOTH: source-data/
+    ocsb_cane.json now carries MEASURED per-province cane area for production year 2565/66 and the
+    announced cane price series 2020..2025. The modelled raster it replaces understated the national
+    belt by ~1.7x (1.06m ha vs the 1.82m ha OCSB measures), which is why the sugar belt looked thin.
+    SPAM stays in AREA_SOURCES as the documented fallback but no board row points at it any more.
 """
 import json
 import os
@@ -65,7 +68,10 @@ BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  # ingest_doae.py now maps all 19 registry crops instead of 5, so they finally have
                  # a belt — a falling price you can put provinces and accounts behind.
                  "Coconut": ("doae", "coconut"), "Pineapple": ("doae", "pineapple"),
-                 "Sugar": ("spam", "sugarcane")}
+                 # Sugar moved off the SPAM-2010 raster onto OCSB's own measured returns on
+                 # 2026-08-01. Cane is the ONE crop where the pinned source is not a choice between
+                 # census and registry — OCSB is the register of record for every cane grower.
+                 "Sugar": ("ocsb", "sugarcane")}
 
 AREA_SOURCES = {
     "census": {
@@ -80,12 +86,21 @@ AREA_SOURCES = {
                 "0.46x and oilpalm 0.58x, so absolute area is not comparable across crops. What is "
                 "used here is the belt RANKING, which survives partial registration.",
     },
+    "ocsb": {
+        "provenance": "MEASURED",
+        "source": "OCSB cane area, production year 2565/66 (source-data/ocsb_cane.json)",
+        "note": "Office of the Cane and Sugar Board administrative returns — mills report every "
+                "delivery, so this is a near-complete count rather than a survey or a registry "
+                "sample. It is the register of record for Thai cane: growers register with OCSB, "
+                "not DOAE, which is why cane is absent from the farmer registry entirely.",
+    },
     "spam": {
         "provenance": "MODELLED",
         "source": "IFPRI/MapSPAM 2010 v2.0 (platform/data/crop_landuse.json)",
-        "note": "MODELLED spatial disaggregation on a 2010 base — 16 years old. It is the only "
-                "sugarcane area held anywhere in this repo, because cane growers register with the "
-                "OCSB rather than DOAE. Read the belt as where cane grows, not as current area.",
+        "note": "MODELLED spatial disaggregation on a 2010 base — 16 years old. RETIRED as a board "
+                "source on 2026-08-01 when the OCSB pull landed: it was carrying sugarcane, and "
+                "against OCSB's measured returns it understated the national cane belt by ~1.7x. "
+                "Kept here as documentation of what the sugar belt used to be built on.",
     },
 }
 
@@ -174,7 +189,28 @@ def area_tables(area_census):
             if isinstance(ha, (int, float)) and ha > 0:
                 spam.setdefault(crop, {})[th] = ha * HA_TO_RAI
 
-    return {"census": census, "doae": doae, "spam": spam}
+    # OCSB is already per-province rai in Thai province names, so unlike the other three it needs
+    # no ha→rai conversion — only the same canonical-province filter.
+    cane = {pv: rec["area_rai"] for pv, rec in load(S, "ocsb_cane.json")["provinces"].items()
+            if pv in REGION and rec.get("area_rai", 0) > 0}
+
+    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane}}
+
+
+def ocsb_price():
+    """The announced cane price, shaped like a farm-gate record so the board row reads it uniformly.
+
+    It is NOT a market quote: OCSB announces one national price per season, so n_markets is left
+    absent rather than faked as 1 — the UI's thin-quote caveat would misdescribe an administered
+    price. Sugarcane reaches the board through neither farmgate_prices.json (raw-crop forms only)
+    nor NABC (daily market survey), which is why it needs its own small adapter.
+    """
+    p = load(S, "ocsb_cane.json").get("price")
+    if not p or p.get("yoy") is None:
+        return None
+    return {"price": p["latest_price"], "unit": p["unit"], "yoy": p["yoy"],
+            "latest_date": str(p["latest_year_ce"]), "n_markets": None,
+            "product": "อ้อยโรงงาน — announced cane price (~10 CCS)"}
 
 
 def build():
@@ -190,6 +226,7 @@ def build():
     cmix = {pv: p["crop_mix"] for pv, p in income["provinces"].items()}
     areas = area_tables(area)
 
+    ocsb = ocsb_price()
     nabc = load(S, "nabc_prices.json")
     nkept, ndropped = nabc_locals(nabc)
     extra = [dict(spec, _nabc=cat) for cat, spec in NABC_ROWS if cat in nkept]
@@ -199,8 +236,10 @@ def build():
         lab = it["lab"]
         ncat = it.get("_nabc") or BOARD_TO_NABC.get(lab)
         fgkey = BOARD_TO_FARMGATE.get(lab)
-        # farmgate_prices is the curated raw-crop layer; NABC covers everything else it drops.
-        local = (fgc.get(fgkey) if fgkey else None) or (nkept.get(ncat) if ncat else None)
+        # farmgate_prices is the curated raw-crop layer; NABC covers everything else it drops; OCSB
+        # covers sugarcane, which neither of them can see (administered price, own regulator).
+        local = ((fgc.get(fgkey) if fgkey else None) or (nkept.get(ncat) if ncat else None)
+                 or (ocsb if lab == "Sugar" else None))
         local_yoy = local.get("yoy") if local else None
         # LOCAL_ONLY rows have no Pink Sheet series at all, so global_yoy is genuinely absent
         # (rendered "n/a") rather than zero, and their up/stress class comes off the Thai move.
@@ -220,7 +259,8 @@ def build():
             # the YoY is measured but thin. The UI shows it rather than averaging the caveat away.
             "local_markets": local.get("n_markets") if local else None,
             "local_product": (local.get("product") or local.get("product_th")) if local else None,
-            "local_source": ("NABC daily market" if (local and ncat and not fgkey)
+            "local_source": ("OCSB announced price" if (local and local is ocsb)
+                             else "NABC daily market" if (local and ncat and not fgkey)
                              else ("Thai farm-gate" if local else None)),
             "divergence": (round(local_yoy - global_yoy, 1)
                            if (local_yoy is not None and global_yoy is not None) else None),
@@ -279,10 +319,11 @@ def build():
             "label": "MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). "
                      "Divergence = local − global. WHO'S EXPOSED is an ESTIMATED book-footprint "
                      "read: accounts in a crop's growing provinces weighted by planted-area share. "
-                     "Each exposure carries its own area_provenance — MEASURED for rice/rubber/"
-                     "oilpalm (census) and cassava/maize (DOAE registry), MODELLED for sugarcane "
-                     "(SPAM 2010, the only cane area held here). Rows with neither price series "
-                     "nor province area carry their global price alone, with a region tag.",
+                     "Each exposure carries its own area_provenance — every belt on this board is "
+                     "now MEASURED: rice/rubber/oilpalm from the planted-area census, cassava/"
+                     "maize/coconut/pineapple from the DOAE farmer registry, sugarcane from OCSB's "
+                     "own returns. Rows with neither price series nor province area carry their "
+                     "global price alone, with a region tag.",
             "nabc_excluded": ndropped,
             "nabc_note": "Thai livestock / fishery / orchard prices come from the NABC daily market "
                          "feed. build_farmgate_prices.py keeps raw CROP farm-gate forms only, so "
@@ -290,12 +331,16 @@ def build():
                          "Thai prices were invisible behind a board whose only faller was a world "
                          "sugar price. Some NABC series are quoted by a single market — every row "
                          "carries its own n_markets so a thin series is visible as thin.",
-            "sugarcane_gap": "Sugarcane has a MODELLED 2010 belt and NO current Thai farm-gate "
-                             "price. Cane growers register with the OCSB rather than DOAE, and the "
-                             "only Thai cane price in the repo (source-data/crop_prices.json, "
-                             "อ้อยโรงงาน) is an OAE 2561/2562 BE = 2018/2019 CE snapshot, so it is "
-                             "deliberately not wired. Sugar is currently the board's only falling "
-                             "world price, so this is the gap worth closing: it needs an OCSB pull.",
+            "sugarcane_note": "CLOSED 2026-08-01 (pipeline/ingest_ocsb_cane.py). Sugar was the "
+                              "board's one row with a falling WORLD price, a MODELLED 2010 belt "
+                              "and no Thai price at all — a move nobody could be named against. "
+                              "OCSB's own returns now give it a MEASURED 47-province belt "
+                              "(production year 2565/66) and the announced cane price falls with "
+                              "the world price rather than diverging from it. The retired SPAM "
+                              "2010 raster understated the national cane belt by ~1.7x. The cane "
+                              "price is ADMINISTERED — one announced national price per season on "
+                              "a ~10-CCS basis — so it is not a market quote and carries no "
+                              "n_markets; the OAE 2561/2562 BE snapshot stays unwired.",
             "farmgate_vintage": (fg.get("meta") or {}).get("pulled")
                                 or next((v.get("latest_date") for v in fgc.values()), None),
             "divergence_note": "A large local−global gap flags where the Thai farmer's cash reality "

@@ -49,6 +49,9 @@ MASTER = os.path.join(ROOT, "source-data", "branches_final.json")
 SPAM = os.path.join(ROOT, "source-data", "spam2010_th_cropgrid.json")
 CROP_PRICES = os.path.join(ROOT, "source-data", "crop_prices.json")
 NABC_PRICES = os.path.join(ROOT, "source-data", "nabc_prices.json")   # LIVE prices (preferred)
+# The consolidated Thai farm-gate layer: NABC's live dailies PLUS sugarcane's announced OCSB price,
+# which no market quotes. Top preference — see crop_price_yoy().
+FARMGATE_PRICES = os.path.join(ROOT, "source-data", "farmgate_prices.json")
 NABC_AGRI = os.path.join(ROOT, "source-data", "nabc_agri.json")       # per-province households + land use
 OUT = os.path.join(ROOT, "platform", "data", "branch_agri.json")
 
@@ -120,6 +123,20 @@ def crop_price_yoy():
             if isinstance(v, (int, float)):
                 out[c["key"]] = round(v, 1)
                 src[c["key"]] = "NABC live daily"
+    # Farm-gate layer overlay — wins over both, because it IS the NABC feed plus the crops NABC
+    # cannot quote. This is what finally reaches SUGARCANE. Until 2026-08-01 cane was the one crop
+    # here with no live source, so it kept the OAE snapshot's +26.1% — a 2019 number, of the WRONG
+    # SIGN: the announced cane price is -17.9%. Every cane-dominant branch was carrying price
+    # support that had reversed six years ago, which pushed its price_stress the wrong way.
+    if os.path.exists(FARMGATE_PRICES):
+        fg = _load(FARMGATE_PRICES)
+        yoys = fg.get("crop_yoy", {})
+        comm = fg.get("commodities", {})
+        for c in CROPS:
+            v = yoys.get(c["key"])
+            if isinstance(v, (int, float)):
+                out[c["key"]] = round(v, 1)
+                src[c["key"]] = (comm.get(c["key"]) or {}).get("source") or "Thai farm-gate layer"
     return out, src
 
 

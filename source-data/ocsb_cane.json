@@ -1,0 +1,466 @@
+{
+ "meta": {
+  "title": "MEASURED sugarcane area, crush and administered price (OCSB)",
+  "generated_by": "pipeline/ingest_ocsb_cane.py",
+  "sources": [
+   "OCSB CKAN opendata.ocsb.go.th -> catalog.ocsb.go.th/canearea.csv (area, crush, yield)",
+   "ราคาอ้อย via gdcatalog.go.th provincial open data (announced cane price)"
+  ],
+  "provenance": "MEASURED. Area and crush are OCSB administrative returns from the mills, not a survey or a raster; the price is the officially ANNOUNCED cane price, not a farm-gate survey mean. Sugarcane is absent from the DOAE farmer registry (cane growers register with OCSB), so this is the only measured cane belt available and it replaces the SPAM-2010 modelled one.",
+  "production_year": "2565/66",
+  "production_year_ce": 2022,
+  "n_provinces": 47,
+  "unmatched_province_names": [],
+  "spam_note": "SPAM 2010 modelled 1,056,457 ha of Thai cane; OCSB measures 1,823,812 ha in 2565/66 — the modelled raster understates the belt by ~1.7x."
+ },
+ "national": {
+  "area_rai": 11398823,
+  "area_ha": 1823811.7,
+  "cane_tonnes": 113024063,
+  "yield_t_per_rai": 9.92
+ },
+ "area_series": [
+  {
+   "year": "2556/57",
+   "year_ce": 2013,
+   "n_provinces": 48,
+   "area_rai": 10078025,
+   "cane_tonnes": 113262160
+  },
+  {
+   "year": "2557/58",
+   "year_ce": 2014,
+   "n_provinces": 47,
+   "area_rai": 10530927,
+   "cane_tonnes": 116712775
+  },
+  {
+   "year": "2558/59",
+   "year_ce": 2015,
+   "n_provinces": 47,
+   "area_rai": 11012839,
+   "cane_tonnes": 100784551
+  },
+  {
+   "year": "2559/60",
+   "year_ce": 2016,
+   "n_provinces": 47,
+   "area_rai": 10988489,
+   "cane_tonnes": 103533435
+  },
+  {
+   "year": "2560/61",
+   "year_ce": 2017,
+   "n_provinces": 47,
+   "area_rai": 11542553,
+   "cane_tonnes": 135897150
+  },
+  {
+   "year": "2561/62",
+   "year_ce": 2018,
+   "n_provinces": 47,
+   "area_rai": 12236074,
+   "cane_tonnes": 131478149
+  },
+  {
+   "year": "2562/63",
+   "year_ce": 2019,
+   "n_provinces": 47,
+   "area_rai": 11959140,
+   "cane_tonnes": 85369693
+  },
+  {
+   "year": "2563/64",
+   "year_ce": 2020,
+   "n_provinces": 47,
+   "area_rai": 10862610,
+   "cane_tonnes": 78813763
+  },
+  {
+   "year": "2564/65",
+   "year_ce": 2021,
+   "n_provinces": 47,
+   "area_rai": 11022348,
+   "cane_tonnes": 105944353
+  },
+  {
+   "year": "2565/66",
+   "year_ce": 2022,
+   "n_provinces": 47,
+   "area_rai": 11398823,
+   "cane_tonnes": 113024063
+  }
+ ],
+ "price": {
+  "unit": "บาท/กก.",
+  "series": [
+   {
+    "year_be": 2563,
+    "year_ce": 2020,
+    "price": 0.833
+   },
+   {
+    "year_be": 2564,
+    "year_ce": 2021,
+    "price": 1.002
+   },
+   {
+    "year_be": 2565,
+    "year_ce": 2022,
+    "price": 1.106
+   },
+   {
+    "year_be": 2566,
+    "year_ce": 2023,
+    "price": 1.42
+   },
+   {
+    "year_be": 2567,
+    "year_ce": 2024,
+    "price": 1.4
+   },
+   {
+    "year_be": 2568,
+    "year_ce": 2025,
+    "price": 1.15
+   }
+  ],
+  "latest_year_ce": 2025,
+  "latest_price": 1.15,
+  "prev_price": 1.4,
+  "yoy": -17.9,
+  "basis": "administered — OCSB announces one national cane price per season (~10 CCS); this is not a province-specific or survey price",
+  "source": "ราคาอ้อย, Amnat Charoen provincial open data (gdcatalog.go.th), republishing the announced OCSB cane price"
+ },
+ "provinces": {
+  "กาญจนบุรี": {
+   "area_rai": 734280,
+   "area_ha": 117484.8,
+   "cane_tonnes": 7144544,
+   "yield_t_per_rai": 9.73,
+   "ocsb_region": "กลาง"
+  },
+  "กาฬสินธุ์": {
+   "area_rai": 447058,
+   "area_ha": 71529.3,
+   "cane_tonnes": 4783521,
+   "yield_t_per_rai": 10.7,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "กำแพงเพชร": {
+   "area_rai": 774530,
+   "area_ha": 123924.8,
+   "cane_tonnes": 7086950,
+   "yield_t_per_rai": 9.15,
+   "ocsb_region": "เหนือ"
+  },
+  "ขอนแก่น": {
+   "area_rai": 651492,
+   "area_ha": 104238.7,
+   "cane_tonnes": 7003539,
+   "yield_t_per_rai": 10.75,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "จันทบุรี": {
+   "area_rai": 2362,
+   "area_ha": 377.9,
+   "cane_tonnes": 22793,
+   "yield_t_per_rai": 9.65,
+   "ocsb_region": "ตะวันออก"
+  },
+  "ฉะเชิงเทรา": {
+   "area_rai": 30525,
+   "area_ha": 4884.0,
+   "cane_tonnes": 270146,
+   "yield_t_per_rai": 8.85,
+   "ocsb_region": "ตะวันออก"
+  },
+  "ชลบุรี": {
+   "area_rai": 141319,
+   "area_ha": 22611.0,
+   "cane_tonnes": 1356662,
+   "yield_t_per_rai": 9.6,
+   "ocsb_region": "ตะวันออก"
+  },
+  "ชัยนาท": {
+   "area_rai": 156463,
+   "area_ha": 25034.1,
+   "cane_tonnes": 1414426,
+   "yield_t_per_rai": 9.04,
+   "ocsb_region": "กลาง"
+  },
+  "ชัยภูมิ": {
+   "area_rai": 564052,
+   "area_ha": 90248.3,
+   "cane_tonnes": 6035356,
+   "yield_t_per_rai": 10.7,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "ตาก": {
+   "area_rai": 10617,
+   "area_ha": 1698.7,
+   "cane_tonnes": 91519,
+   "yield_t_per_rai": 8.62,
+   "ocsb_region": "เหนือ"
+  },
+  "นครปฐม": {
+   "area_rai": 87256,
+   "area_ha": 13961.0,
+   "cane_tonnes": 750402,
+   "yield_t_per_rai": 8.6,
+   "ocsb_region": "กลาง"
+  },
+  "นครพนม": {
+   "area_rai": 16796,
+   "area_ha": 2687.4,
+   "cane_tonnes": 180557,
+   "yield_t_per_rai": 10.75,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "นครราชสีมา": {
+   "area_rai": 615166,
+   "area_ha": 98426.6,
+   "cane_tonnes": 6213177,
+   "yield_t_per_rai": 10.1,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "นครสวรรค์": {
+   "area_rai": 788223,
+   "area_ha": 126115.7,
+   "cane_tonnes": 7409296,
+   "yield_t_per_rai": 9.4,
+   "ocsb_region": "เหนือ"
+  },
+  "บึงกาฬ": {
+   "area_rai": 4568,
+   "area_ha": 730.9,
+   "cane_tonnes": 49334,
+   "yield_t_per_rai": 10.8,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "บุรีรัมย์": {
+   "area_rai": 184775,
+   "area_ha": 29564.0,
+   "cane_tonnes": 2004809,
+   "yield_t_per_rai": 10.85,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "ประจวบคีรีขันธ์": {
+   "area_rai": 48648,
+   "area_ha": 7783.7,
+   "cane_tonnes": 417886,
+   "yield_t_per_rai": 8.59,
+   "ocsb_region": "กลาง"
+  },
+  "ปราจีนบุรี": {
+   "area_rai": 41647,
+   "area_ha": 6663.5,
+   "cane_tonnes": 397729,
+   "yield_t_per_rai": 9.55,
+   "ocsb_region": "ตะวันออก"
+  },
+  "พิจิตร": {
+   "area_rai": 73733,
+   "area_ha": 11797.3,
+   "cane_tonnes": 641477,
+   "yield_t_per_rai": 8.7,
+   "ocsb_region": "เหนือ"
+  },
+  "พิษณุโลก": {
+   "area_rai": 136217,
+   "area_ha": 21794.7,
+   "cane_tonnes": 1294062,
+   "yield_t_per_rai": 9.5,
+   "ocsb_region": "เหนือ"
+  },
+  "มหาสารคาม": {
+   "area_rai": 132275,
+   "area_ha": 21164.0,
+   "cane_tonnes": 1256613,
+   "yield_t_per_rai": 9.5,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "มุกดาหาร": {
+   "area_rai": 214218,
+   "area_ha": 34274.9,
+   "cane_tonnes": 2317839,
+   "yield_t_per_rai": 10.82,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "ยโสธร": {
+   "area_rai": 102746,
+   "area_ha": 16439.4,
+   "cane_tonnes": 1053147,
+   "yield_t_per_rai": 10.25,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "ระยอง": {
+   "area_rai": 623,
+   "area_ha": 99.7,
+   "cane_tonnes": 5109,
+   "yield_t_per_rai": 8.2,
+   "ocsb_region": "ตะวันออก"
+  },
+  "ราชบุรี": {
+   "area_rai": 181732,
+   "area_ha": 29077.1,
+   "cane_tonnes": 1681021,
+   "yield_t_per_rai": 9.25,
+   "ocsb_region": "กลาง"
+  },
+  "ร้อยเอ็ด": {
+   "area_rai": 169769,
+   "area_ha": 27163.0,
+   "cane_tonnes": 1808040,
+   "yield_t_per_rai": 10.65,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "ลพบุรี": {
+   "area_rai": 678916,
+   "area_ha": 108626.6,
+   "cane_tonnes": 6381810,
+   "yield_t_per_rai": 9.4,
+   "ocsb_region": "กลาง"
+  },
+  "ศรีสะเกษ": {
+   "area_rai": 12546,
+   "area_ha": 2007.4,
+   "cane_tonnes": 121696,
+   "yield_t_per_rai": 9.7,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "สกลนคร": {
+   "area_rai": 102119,
+   "area_ha": 16339.0,
+   "cane_tonnes": 1082461,
+   "yield_t_per_rai": 10.6,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "สระบุรี": {
+   "area_rai": 147789,
+   "area_ha": 23646.2,
+   "cane_tonnes": 1278375,
+   "yield_t_per_rai": 8.65,
+   "ocsb_region": "กลาง"
+  },
+  "สระแก้ว": {
+   "area_rai": 454471,
+   "area_ha": 72715.4,
+   "cane_tonnes": 4408369,
+   "yield_t_per_rai": 9.7,
+   "ocsb_region": "ตะวันออก"
+  },
+  "สิงห์บุรี": {
+   "area_rai": 22659,
+   "area_ha": 3625.4,
+   "cane_tonnes": 245397,
+   "yield_t_per_rai": 10.83,
+   "ocsb_region": "กลาง"
+  },
+  "สุพรรณบุรี": {
+   "area_rai": 610723,
+   "area_ha": 97715.7,
+   "cane_tonnes": 5734689,
+   "yield_t_per_rai": 9.39,
+   "ocsb_region": "กลาง"
+  },
+  "สุรินทร์": {
+   "area_rai": 128713,
+   "area_ha": 20594.1,
+   "cane_tonnes": 1300001,
+   "yield_t_per_rai": 10.1,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "สุโขทัย": {
+   "area_rai": 311181,
+   "area_ha": 49789.0,
+   "cane_tonnes": 2738393,
+   "yield_t_per_rai": 8.8,
+   "ocsb_region": "เหนือ"
+  },
+  "หนองคาย": {
+   "area_rai": 73125,
+   "area_ha": 11700.0,
+   "cane_tonnes": 789750,
+   "yield_t_per_rai": 10.8,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "หนองบัวลำภู": {
+   "area_rai": 346188,
+   "area_ha": 55390.1,
+   "cane_tonnes": 3738830,
+   "yield_t_per_rai": 10.8,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "อำนาจเจริญ": {
+   "area_rai": 103675,
+   "area_ha": 16588.0,
+   "cane_tonnes": 1109323,
+   "yield_t_per_rai": 10.7,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "อุดรธานี": {
+   "area_rai": 738696,
+   "area_ha": 118191.4,
+   "cane_tonnes": 7926208,
+   "yield_t_per_rai": 10.73,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "อุตรดิตถ์": {
+   "area_rai": 113868,
+   "area_ha": 18218.9,
+   "cane_tonnes": 1024812,
+   "yield_t_per_rai": 9.0,
+   "ocsb_region": "เหนือ"
+  },
+  "อุทัยธานี": {
+   "area_rai": 307276,
+   "area_ha": 49164.2,
+   "cane_tonnes": 2900685,
+   "yield_t_per_rai": 9.44,
+   "ocsb_region": "กลาง"
+  },
+  "อุบลราชธานี": {
+   "area_rai": 4116,
+   "area_ha": 658.6,
+   "cane_tonnes": 40337,
+   "yield_t_per_rai": 9.8,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "อ่างทอง": {
+   "area_rai": 22821,
+   "area_ha": 3651.4,
+   "cane_tonnes": 246695,
+   "yield_t_per_rai": 10.81,
+   "ocsb_region": "กลาง"
+  },
+  "เพชรบุรี": {
+   "area_rai": 41229,
+   "area_ha": 6596.6,
+   "cane_tonnes": 353333,
+   "yield_t_per_rai": 8.57,
+   "ocsb_region": "กลาง"
+  },
+  "เพชรบูรณ์": {
+   "area_rai": 525123,
+   "area_ha": 84019.7,
+   "cane_tonnes": 5251230,
+   "yield_t_per_rai": 10.0,
+   "ocsb_region": "เหนือ"
+  },
+  "เลย": {
+   "area_rai": 337960,
+   "area_ha": 54073.6,
+   "cane_tonnes": 3626311,
+   "yield_t_per_rai": 10.73,
+   "ocsb_region": "ตะวันออกเฉียงเหนื่อ"
+  },
+  "แพร่": {
+   "area_rai": 4539,
+   "area_ha": 726.2,
+   "cane_tonnes": 35404,
+   "yield_t_per_rai": 7.8,
+   "ocsb_region": "เหนือ"
+  }
+ }
+}

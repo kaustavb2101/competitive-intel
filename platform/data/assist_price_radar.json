@@ -15,13 +15,13 @@
       "rule": "a province is DEPENDED-ON by a crop when that crop is at least 15% of its planted area; the province TRIPS when any such crop's farm-gate YoY is below -2%.",
       "dominant_share": 0.15,
       "flat_band_pct": 2.0,
-      "n_tripped": 0
+      "n_tripped": 22
     },
     "reading": "n_current_x is the count of farm accounts that are CURRENT or only in the X (pre-30-day) bucket — the healthy population you would contact BEFORE it deteriorates. os_thb is the province's WHOLE farm book, not the Current+X slice: the tape aggregate does not expose outstanding split by bucket, and splitting it here would be fabrication.",
     "caveats": [
       "Not a forecast. Ranking crops by exposed accounts says how much of the healthy book rides on each price, not which price is going to move.",
-      "Sugarcane cannot be placed on this map, and its only price here is STALE: the OAE snapshot is stamped BE 2562 = 2019 CE. Cane registers with the OCSB, so it has neither a current Thai price nor a DOAE planted area; it appears in the per-branch agri layer carrying that 2019 figure, labelled with its vintage.",
-      "Only 5 crops are mapped here (Cassava, Maize, Oil palm, Rice, Rubber), so 'nothing is falling' means nothing MAPPED is falling. Six measured Thai prices ARE down — coconut, pineapple, pork, white shrimp, chicken, eggs — and are shown on the Macro commodities board. They are missing from this radar because the exposure join reads crop_stress.json crop shares, which still carry only these five.",
+      "Sugarcane's price is ADMINISTERED, not quoted: OCSB announces one national cane price per season (~10 CCS basis), so its -17.9% is a set price falling, not a market clearing lower. It is measured and current either way, and it replaces the OAE BE-2562 (2019 CE) snapshot of +26.1% that this file used to carry.",
+      "Only 8 crops are mapped here (Cassava, Coconut, Maize, Oil palm, Pineapple, Rice, Rubber, Sugarcane), so a crop absent from that list cannot trip a province however far it falls. Four measured Thai fallers are still unmapped — pork, white shrimp, chicken and eggs are LIVESTOCK and fisheries, which have no planted area to join on, so they appear on the Macro commodities board with a region tag but cannot reach a province-level exposure count. That needs a livestock-holding layer, not a crop one.",
       "Province crop shares are planted AREA, not the borrower's actual crop. A farm borrower in a rice-dominant province is assumed exposed to rice; the tape does not record what any individual grows.",
       "Drought and price are separate hazards. also_in_drought_radar marks the provinces the rainfall-driven assistance_radar already flags, so the two lists can be read together instead of double-counting."
     ]
@@ -32,10 +32,10 @@
       "key": "rice",
       "yoy": 12.4,
       "direction": "up",
-      "n_provinces": 49,
-      "n_current_x": 30252,
-      "n_farm_accounts": 40121,
-      "os_thb": 5077801854.0,
+      "n_provinces": 48,
+      "n_current_x": 30101,
+      "n_farm_accounts": 39936,
+      "os_thb": 5053716539.0,
       "top_provinces": [
         "นครราชสีมา",
         "อุบลราชธานี",
@@ -49,16 +49,33 @@
       "key": "rubber",
       "yoy": 38.0,
       "direction": "up",
-      "n_provinces": 31,
-      "n_current_x": 21355,
-      "n_farm_accounts": 27503,
-      "os_thb": 3247267513.0,
+      "n_provinces": 28,
+      "n_current_x": 18737,
+      "n_farm_accounts": 24079,
+      "os_thb": 2870265526.0,
       "top_provinces": [
         "สุราษฎร์ธานี",
         "นครศรีธรรมราช",
-        "สกลนคร",
         "อุดรธานี",
-        "นครพนม"
+        "นครพนม",
+        "ชุมพร"
+      ]
+    },
+    {
+      "crop": "Sugarcane",
+      "key": "sugarcane",
+      "yoy": -17.9,
+      "direction": "down",
+      "n_provinces": 21,
+      "n_current_x": 13489,
+      "n_farm_accounts": 18118,
+      "os_thb": 2456173266.0,
+      "top_provinces": [
+        "บึงกาฬ",
+        "กาฬสินธุ์",
+        "อุดรธานี",
+        "สระแก้ว",
+        "ชัยภูมิ"
       ]
     },
     {
@@ -83,14 +100,13 @@
       "key": "cassava",
       "yoy": 57.3,
       "direction": "up",
-      "n_provinces": 4,
-      "n_current_x": 3982,
-      "n_farm_accounts": 5132,
-      "os_thb": 671681551.0,
+      "n_provinces": 3,
+      "n_current_x": 3196,
+      "n_farm_accounts": 4042,
+      "os_thb": 549220255.0,
       "top_provinces": [
         "บึงกาฬ",
         "ชัยภูมิ",
-        "กาญจนบุรี",
         "กำแพงเพชร"
       ]
     },
@@ -99,17 +115,41 @@
       "key": "maize",
       "yoy": 11.3,
       "direction": "up",
-      "n_provinces": 9,
-      "n_current_x": 2445,
-      "n_farm_accounts": 3212,
-      "os_thb": 419467604.0,
+      "n_provinces": 8,
+      "n_current_x": 1960,
+      "n_farm_accounts": 2546,
+      "os_thb": 337808056.0,
       "top_provinces": [
-        "อุทัยธานี",
         "เพชรบูรณ์",
         "ลพบุรี",
         "เชียงใหม่",
-        "สระบุรี"
+        "สระบุรี",
+        "ลำปาง"
       ]
+    },
+    {
+      "crop": "Coconut",
+      "key": "coconut",
+      "yoy": -70.9,
+      "direction": "down",
+      "n_provinces": 1,
+      "n_current_x": 993,
+      "n_farm_accounts": 1151,
+      "os_thb": 141452078.0,
+      "top_provinces": [
+        "ประจวบคีรีขันธ์"
+      ]
+    },
+    {
+      "crop": "Pineapple",
+      "key": "pineapple",
+      "yoy": -20.0,
+      "direction": "down",
+      "n_provinces": 0,
+      "n_current_x": 0,
+      "n_farm_accounts": 0,
+      "os_thb": 0,
+      "top_provinces": []
     }
   ],
   "provinces": [
@@ -128,7 +168,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.607,
+          "share": 0.602,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -136,10 +176,18 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.3885,
+          "share": 0.3853,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0082,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Rice",
@@ -155,6 +203,14 @@
           "share": 0.0,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -180,7 +236,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7616,
+          "share": 0.6722,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -188,15 +244,23 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.1361,
+          "share": 0.1201,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1171,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0835,
+          "share": 0.0737,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -204,7 +268,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0165,
+          "share": 0.0145,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -212,9 +276,25 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0024,
+          "share": 0.0021,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -240,7 +320,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7931,
+          "share": 0.7924,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -248,7 +328,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1192,
+          "share": 0.1191,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -276,6 +356,30 @@
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0008,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
       "n_depended_on": 1,
@@ -300,7 +404,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8644,
+          "share": 0.8206,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -308,15 +412,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0875,
+          "share": 0.0831,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0506,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0451,
+          "share": 0.0428,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -324,7 +436,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0022,
+          "share": 0.0021,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -332,9 +444,17 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0007,
+          "share": 0.0006,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -360,7 +480,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.6812,
+          "share": 0.6723,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -368,7 +488,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.2559,
+          "share": 0.2526,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -376,9 +496,17 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0629,
+          "share": 0.0621,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0129,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -387,6 +515,14 @@
           "share": 0.0,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -412,7 +548,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8586,
+          "share": 0.8555,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -420,7 +556,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1039,
+          "share": 0.1036,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -428,7 +564,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0284,
+          "share": 0.0283,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -442,11 +578,27 @@
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0035,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0023,
+          "share": 0.0022,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -472,18 +624,44 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 1.0,
+          "share": 0.5019,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.4421,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0456,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0105,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Cassava",
-      "weakest_yoy": 57.3,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "สกลนคร",
@@ -500,7 +678,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8083,
+          "share": 0.7785,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -508,15 +686,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.15,
+          "share": 0.1444,
           "yoy": 38.0,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0368,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.03,
+          "share": 0.0289,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -524,9 +710,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0116,
+          "share": 0.0112,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -536,9 +730,17 @@
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
+      "n_depended_on": 1,
       "weakest_crop": "Rice",
       "weakest_yoy": 12.4,
       "also_in_drought_radar": false,
@@ -560,15 +762,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9658,
+          "share": 0.9111,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0566,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0291,
+          "share": 0.0274,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -576,9 +786,17 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.005,
+          "share": 0.0048,
           "yoy": 38.0,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -587,6 +805,14 @@
           "share": 0.0001,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -612,15 +838,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8129,
+          "share": 0.6548,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1944,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1074,
+          "share": 0.0865,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -628,7 +862,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0763,
+          "share": 0.0615,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -636,9 +870,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0034,
+          "share": 0.0028,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -650,12 +892,14 @@
           "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "อุดรธานี",
@@ -672,15 +916,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7241,
+          "share": 0.5729,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2087,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.2074,
+          "share": 0.1641,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -688,7 +940,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0567,
+          "share": 0.0449,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -696,9 +948,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0116,
+          "share": 0.0092,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -710,12 +970,14 @@
           "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "นครพนม",
@@ -732,7 +994,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.79,
+          "share": 0.7826,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -740,7 +1002,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1954,
+          "share": 0.1936,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -748,9 +1010,17 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0091,
+          "share": 0.009,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0089,
+          "yoy": -17.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -759,6 +1029,22 @@
           "share": 0.0055,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0003,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -792,7 +1078,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.6125,
+          "share": 0.5956,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -800,10 +1086,18 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3861,
+          "share": 0.3755,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0276,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Rice",
@@ -811,6 +1105,14 @@
           "share": 0.0013,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -836,15 +1138,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7041,
+          "share": 0.4955,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2957,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.1322,
+          "share": 0.093,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -852,7 +1162,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0631,
+          "share": 0.0444,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -860,7 +1170,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0615,
+          "share": 0.0433,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -868,18 +1178,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0391,
+          "share": 0.0275,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0005,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": true,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ตรัง",
@@ -896,7 +1224,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.7977,
+          "share": 0.7963,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -904,7 +1232,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.1966,
+          "share": 0.1963,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -915,6 +1243,14 @@
           "share": 0.0057,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0017,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -931,6 +1267,14 @@
           "share": 0.0,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -956,7 +1300,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.91,
+          "share": 0.8771,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -964,15 +1308,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0712,
+          "share": 0.0686,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.036,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0172,
+          "share": 0.0166,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -986,11 +1338,27 @@
           "depended_on": false
         },
         {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -1016,23 +1384,47 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.6082,
+          "share": 0.3473,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.2864,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.3411,
+          "share": 0.1948,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0804,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0621,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0487,
+          "share": 0.0278,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": false
@@ -1040,7 +1432,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0013,
+          "share": 0.0007,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1048,18 +1440,20 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0007,
+          "share": 0.0004,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "n_depended_on": 3,
+      "weakest_crop": "Coconut",
+      "weakest_yoy": -70.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Coconut"
+      ]
     },
     {
       "th": "ชัยภูมิ",
@@ -1076,7 +1470,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6955,
+          "share": 0.5693,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1084,15 +1478,23 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.2384,
+          "share": 0.1951,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.18,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0473,
+          "share": 0.0387,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1100,7 +1502,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0166,
+          "share": 0.0136,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1108,18 +1510,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0022,
+          "share": 0.0018,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0013,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": true,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ร้อยเอ็ด",
@@ -1136,15 +1556,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9651,
+          "share": 0.9166,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0503,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0323,
+          "share": 0.0307,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1152,7 +1580,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0019,
+          "share": 0.0018,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1163,6 +1591,14 @@
           "share": 0.0006,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1196,7 +1632,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.9266,
+          "share": 0.9198,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1204,7 +1640,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.041,
+          "share": 0.0407,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -1212,7 +1648,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0229,
+          "share": 0.0227,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": false
@@ -1226,11 +1662,35 @@
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0046,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0026,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0025,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0002,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -1256,7 +1716,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.9766,
+          "share": 0.9754,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1275,6 +1735,22 @@
           "share": 0.0078,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0012,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -1300,7 +1776,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.5645,
+          "share": 0.4674,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1308,15 +1784,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.2629,
+          "share": 0.2177,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1684,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0979,
+          "share": 0.0811,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1324,7 +1808,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0599,
+          "share": 0.0496,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1332,18 +1816,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0148,
+          "share": 0.0122,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0031,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0004,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "กาญจนบุรี",
@@ -1358,9 +1860,17 @@
       "dpd90p_pct": 15.32,
       "crops": [
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.4801,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.4642,
+          "share": 0.239,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1368,23 +1878,23 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.257,
+          "share": 0.1323,
           "yoy": 57.3,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
         },
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1621,
+          "share": 0.0835,
           "yoy": 38.0,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
         },
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0888,
+          "share": 0.0457,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1392,18 +1902,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0278,
+          "share": 0.0143,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0041,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0009,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 3,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "สงขลา",
@@ -1420,7 +1948,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.8977,
+          "share": 0.8911,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1428,7 +1956,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0629,
+          "share": 0.0624,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": false
@@ -1436,9 +1964,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0394,
+          "share": 0.0391,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0073,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1447,6 +1983,14 @@
           "share": 0.0,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -1472,15 +2016,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6677,
+          "share": 0.474,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.29,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.248,
+          "share": 0.176,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": true
@@ -1488,7 +2040,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0634,
+          "share": 0.045,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1496,7 +2048,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0167,
+          "share": 0.0119,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1504,18 +2056,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0042,
+          "share": 0.003,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "พัทลุง",
@@ -1532,7 +2102,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.8104,
+          "share": 0.8074,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1540,7 +2110,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0967,
+          "share": 0.0964,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -1548,9 +2118,25 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0929,
+          "share": 0.0926,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0036,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0001,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1584,15 +2170,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8991,
+          "share": 0.7228,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.196,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0679,
+          "share": 0.0546,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1600,7 +2194,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0314,
+          "share": 0.0253,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1608,7 +2202,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0008,
+          "share": 0.0006,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1616,18 +2210,28 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0008,
+          "share": 0.0006,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": true,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "นครสวรรค์",
@@ -1644,15 +2248,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8054,
+          "share": 0.6453,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1987,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.1116,
+          "share": 0.0894,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1660,7 +2272,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.08,
+          "share": 0.0641,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1668,7 +2280,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.002,
+          "share": 0.0016,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1676,18 +2288,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0009,
+          "share": 0.0008,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "กระบี่",
@@ -1704,7 +2334,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.6652,
+          "share": 0.6648,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -1712,7 +2342,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3313,
+          "share": 0.3311,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1723,6 +2353,22 @@
           "share": 0.0034,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0007,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -1748,7 +2394,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8778,
+          "share": 0.8234,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1756,15 +2402,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0771,
+          "share": 0.0723,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.062,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0424,
+          "share": 0.0398,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1772,9 +2426,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0027,
+          "share": 0.0025,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1808,7 +2470,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8202,
+          "share": 0.7602,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1816,15 +2478,23 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.1028,
+          "share": 0.0953,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0731,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0709,
+          "share": 0.0658,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1832,9 +2502,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.006,
+          "share": 0.0056,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1868,7 +2546,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6185,
+          "share": 0.5746,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1876,15 +2554,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3505,
+          "share": 0.3257,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0699,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0257,
+          "share": 0.0239,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -1892,9 +2578,25 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0051,
+          "share": 0.0047,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0006,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0004,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -1928,15 +2630,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9393,
+          "share": 0.6455,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.3124,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0279,
+          "share": 0.0192,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1944,7 +2654,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.026,
+          "share": 0.0179,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1952,7 +2662,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0049,
+          "share": 0.0034,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -1960,18 +2670,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0019,
+          "share": 0.0013,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0001,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "อุทัยธานี",
@@ -1988,23 +2716,31 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6691,
+          "share": 0.5002,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2472,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.1632,
+          "share": 0.122,
           "yoy": 11.3,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
         },
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.1185,
+          "share": 0.0886,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2012,7 +2748,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0393,
+          "share": 0.0294,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -2020,18 +2756,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.01,
+          "share": 0.0075,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.005,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ราชบุรี",
@@ -2048,31 +2802,55 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7558,
+          "share": 0.4017,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.3266,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.1162,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1505,
+          "share": 0.08,
           "yoy": 38.0,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
         },
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0521,
+          "share": 0.0277,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0256,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0401,
+          "share": 0.0213,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -2080,18 +2858,20 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0015,
+          "share": 0.0008,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": true,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "เพชรบูรณ์",
@@ -2108,15 +2888,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6375,
+          "share": 0.5006,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2137,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2558,
+          "share": 0.2009,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -2124,7 +2912,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0503,
+          "share": 0.0395,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2132,7 +2920,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0478,
+          "share": 0.0376,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -2140,18 +2928,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0086,
+          "share": 0.0067,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0008,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0003,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "พิษณุโลก",
@@ -2168,7 +2974,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7158,
+          "share": 0.6709,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2176,7 +2982,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1622,
+          "share": 0.152,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2184,15 +2990,23 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0658,
+          "share": 0.0617,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0615,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0474,
+          "share": 0.0445,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2200,9 +3014,25 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0087,
+          "share": 0.0082,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0012,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2228,7 +3058,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.5915,
+          "share": 0.4639,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2236,15 +3066,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3455,
+          "share": 0.2709,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2156,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0571,
+          "share": 0.0448,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2252,9 +3090,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0059,
+          "share": 0.0046,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -2266,12 +3112,14 @@
           "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "นราธิวาส",
@@ -2288,7 +3136,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.8991,
+          "share": 0.8954,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2296,7 +3144,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0723,
+          "share": 0.072,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -2304,9 +3152,25 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0286,
+          "share": 0.0285,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0041,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2332,15 +3196,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6612,
+          "share": 0.4248,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.3574,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2503,
+          "share": 0.1608,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -2348,7 +3220,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0851,
+          "share": 0.0547,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2356,7 +3228,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0021,
+          "share": 0.0013,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -2364,18 +3236,28 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0013,
+          "share": 0.0009,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ฉะเชิงเทรา",
@@ -2392,7 +3274,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6854,
+          "share": 0.6563,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2400,7 +3282,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.2514,
+          "share": 0.2407,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2408,25 +3290,49 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0426,
+          "share": 0.0408,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0316,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0188,
+          "share": 0.018,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0095,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0018,
+          "share": 0.0017,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0013,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2452,7 +3358,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.7767,
+          "share": 0.7745,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2460,7 +3366,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.2017,
+          "share": 0.2011,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -2468,9 +3374,25 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0217,
+          "share": 0.0216,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0028,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0001,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2496,15 +3418,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8338,
+          "share": 0.6013,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2786,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1266,
+          "share": 0.0913,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -2512,7 +3442,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0256,
+          "share": 0.0185,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2520,7 +3450,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0085,
+          "share": 0.0061,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -2528,18 +3458,28 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0055,
+          "share": 0.0039,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0003,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "พิจิตร",
@@ -2556,15 +3496,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9636,
+          "share": 0.927,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0378,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0313,
+          "share": 0.0302,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2572,7 +3520,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0027,
+          "share": 0.0026,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2588,9 +3536,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.001,
+          "share": 0.0009,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2616,7 +3572,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7013,
+          "share": 0.7003,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2624,7 +3580,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.2097,
+          "share": 0.2094,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2632,7 +3588,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0761,
+          "share": 0.076,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2651,6 +3607,22 @@
           "share": 0.0061,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0012,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2676,7 +3648,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.6554,
+          "share": 0.6525,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2684,10 +3656,18 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.3421,
+          "share": 0.3406,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0044,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Rice",
@@ -2695,6 +3675,14 @@
           "share": 0.0025,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2720,7 +3708,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.7958,
+          "share": 0.7846,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2728,7 +3716,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.1697,
+          "share": 0.1673,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -2736,9 +3724,25 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0345,
+          "share": 0.034,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0137,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0004,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -2772,15 +3776,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8802,
+          "share": 0.7344,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1111,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0562,
+          "share": 0.0469,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -2788,15 +3800,31 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0468,
+          "share": 0.0391,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0301,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0244,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0135,
+          "share": 0.0113,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2804,7 +3832,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0032,
+          "share": 0.0027,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2832,7 +3860,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.9151,
+          "share": 0.9081,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2840,7 +3868,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0569,
+          "share": 0.0564,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -2848,7 +3876,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.0157,
+          "share": 0.0155,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": false
@@ -2856,9 +3884,33 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0123,
+          "share": 0.0122,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0042,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0025,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.001,
+          "yoy": -17.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -2884,7 +3936,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7765,
+          "share": 0.7761,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2892,7 +3944,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.183,
+          "share": 0.1829,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -2920,6 +3972,22 @@
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0005,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
       "n_depended_on": 2,
@@ -2944,15 +4012,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8835,
+          "share": 0.7169,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1885,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0487,
+          "share": 0.0395,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2960,7 +4036,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0389,
+          "share": 0.0316,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -2968,7 +4044,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0237,
+          "share": 0.0193,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2976,18 +4052,36 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0051,
+          "share": 0.0041,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ปัตตานี",
@@ -3004,7 +4098,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.8141,
+          "share": 0.7932,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -3012,7 +4106,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.134,
+          "share": 0.1305,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": false
@@ -3020,9 +4114,25 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0519,
+          "share": 0.0505,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0257,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3048,7 +4158,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.6753,
+          "share": 0.6722,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -3056,10 +4166,18 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.3237,
+          "share": 0.3222,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0045,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Rice",
@@ -3067,6 +4185,14 @@
           "share": 0.0011,
           "yoy": 12.4,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0001,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3092,15 +4218,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9474,
+          "share": 0.8061,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.149,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0375,
+          "share": 0.0319,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3108,7 +4242,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0127,
+          "share": 0.0108,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -3116,7 +4250,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0014,
+          "share": 0.0012,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -3124,9 +4258,25 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0009,
+          "share": 0.0008,
           "yoy": 38.0,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3152,15 +4302,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6933,
+          "share": 0.5273,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2387,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.256,
+          "share": 0.1947,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3168,7 +4326,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0369,
+          "share": 0.028,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3176,7 +4334,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.01,
+          "share": 0.0076,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -3184,18 +4342,36 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0039,
+          "share": 0.0029,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0007,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0001,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "n_depended_on": 3,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ลำปาง",
@@ -3212,7 +4388,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6001,
+          "share": 0.5988,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3220,7 +4396,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2903,
+          "share": 0.2897,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3228,7 +4404,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.054,
+          "share": 0.0539,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3236,7 +4412,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0525,
+          "share": 0.0524,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -3247,6 +4423,22 @@
           "share": 0.0031,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0017,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0004,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3272,7 +4464,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7188,
+          "share": 0.7185,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3280,7 +4472,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1732,
+          "share": 0.1731,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -3308,6 +4500,22 @@
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0003,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
         }
       ],
       "n_depended_on": 2,
@@ -3332,24 +4540,32 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9982,
+          "share": 0.7121,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
-          "crop": "Oil palm",
-          "key": "oilpalm",
-          "share": 0.0018,
-          "yoy": 31.8,
-          "direction": "up",
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2413,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0452,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         },
         {
-          "crop": "Rubber",
-          "key": "rubber",
-          "share": 0.0001,
-          "yoy": 38.0,
+          "crop": "Oil palm",
+          "key": "oilpalm",
+          "share": 0.0013,
+          "yoy": 31.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3360,14 +4576,24 @@
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
+        },
+        {
+          "crop": "Rubber",
+          "key": "rubber",
+          "share": 0.0,
+          "yoy": 38.0,
+          "direction": "up",
+          "depended_on": false
         }
       ],
-      "n_depended_on": 1,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "n_depended_on": 2,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": false,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ตาก",
@@ -3384,7 +4610,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.4882,
+          "share": 0.483,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3392,7 +4618,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.3809,
+          "share": 0.3768,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3400,7 +4626,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.1168,
+          "share": 0.1155,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3408,9 +4634,17 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0123,
+          "share": 0.0122,
           "yoy": 38.0,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0104,
+          "yoy": -17.9,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -3419,6 +4653,22 @@
           "share": 0.0018,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0003,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3444,15 +4694,23 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.5159,
+          "share": 0.3846,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.2367,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": true
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.2528,
+          "share": 0.1884,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": true
@@ -3460,17 +4718,33 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.1545,
+          "share": 0.1152,
           "yoy": 12.4,
           "direction": "up",
-          "depended_on": true
+          "depended_on": false
         },
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0768,
+          "share": 0.0572,
           "yoy": 57.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.015,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0028,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         },
         {
@@ -3483,11 +4757,13 @@
         }
       ],
       "n_depended_on": 3,
-      "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_crop": "Sugarcane",
+      "weakest_yoy": -17.9,
       "also_in_drought_radar": true,
-      "tripped": false,
-      "falling_crops": []
+      "tripped": true,
+      "falling_crops": [
+        "Sugarcane"
+      ]
     },
     {
       "th": "ปราจีนบุรี",
@@ -3504,15 +4780,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8287,
+          "share": 0.7658,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0745,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0732,
+          "share": 0.0677,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -3520,7 +4804,7 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0369,
+          "share": 0.0341,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -3528,7 +4812,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0331,
+          "share": 0.0306,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3536,9 +4820,17 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0281,
+          "share": 0.0259,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0013,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3564,7 +4856,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6619,
+          "share": 0.6613,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3572,7 +4864,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2643,
+          "share": 0.2641,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3580,7 +4872,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0503,
+          "share": 0.0502,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -3596,9 +4888,17 @@
         {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0041,
+          "share": 0.004,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0009,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3624,15 +4924,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7842,
+          "share": 0.6814,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.1244,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.1413,
+          "share": 0.1228,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -3640,7 +4948,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.0358,
+          "share": 0.0311,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": false
@@ -3648,17 +4956,33 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0344,
+          "share": 0.0299,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
         },
         {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0065,
+          "yoy": -20.0,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0043,
+          "share": 0.0038,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3684,7 +5008,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.3398,
+          "share": 0.3397,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3692,7 +5016,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.3249,
+          "share": 0.3248,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3700,7 +5024,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3038,
+          "share": 0.3037,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -3719,6 +5043,22 @@
           "share": 0.0031,
           "yoy": 31.8,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0002,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3744,15 +5084,31 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9995,
+          "share": 0.9303,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Sugarcane",
+          "key": "sugarcane",
+          "share": 0.0685,
+          "yoy": -17.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0006,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0004,
+          "share": 0.0003,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -3796,10 +5152,18 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9992,
+          "share": 0.9983,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
+        },
+        {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.001,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
         },
         {
           "crop": "Oil palm",
@@ -3815,6 +5179,14 @@
           "share": 0.0,
           "yoy": 11.3,
           "direction": "up",
+          "depended_on": false
+        },
+        {
+          "crop": "Pineapple",
+          "key": "pineapple",
+          "share": 0.0,
+          "yoy": -20.0,
+          "direction": "down",
           "depended_on": false
         }
       ],
@@ -3840,15 +5212,23 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.9953,
+          "share": 0.9791,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
         },
         {
+          "crop": "Coconut",
+          "key": "coconut",
+          "share": 0.0163,
+          "yoy": -70.9,
+          "direction": "down",
+          "depended_on": false
+        },
+        {
           "crop": "Oil palm",
           "key": "oilpalm",
-          "share": 0.0047,
+          "share": 0.0046,
           "yoy": 31.8,
           "direction": "up",
           "depended_on": false
@@ -3862,5 +5242,28 @@
       "falling_crops": []
     }
   ],
-  "tripped": []
+  "tripped": [
+    "บึงกาฬ",
+    "กาฬสินธุ์",
+    "อุดรธานี",
+    "สระแก้ว",
+    "ประจวบคีรีขันธ์",
+    "ชัยภูมิ",
+    "เลย",
+    "กาญจนบุรี",
+    "กำแพงเพชร",
+    "ขอนแก่น",
+    "นครสวรรค์",
+    "สุพรรณบุรี",
+    "อุทัยธานี",
+    "ราชบุรี",
+    "เพชรบูรณ์",
+    "มุกดาหาร",
+    "ลพบุรี",
+    "หนองบัวลำภู",
+    "สุโขทัย",
+    "สระบุรี",
+    "นครปฐม",
+    "ชลบุรี"
+  ]
 }

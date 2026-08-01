@@ -13,21 +13,24 @@ THE QUESTION THIS ANSWERS, AND THE ONE IT DOES NOT.
 The existing assistance radar (tape_real.json -> assistance_radar) is DROUGHT-driven: it finds farm
 borrowers already slipping in provinces with a rainfall deficit. That is a "who is hurting now" list.
 
-This file is the other half — the PRICE side, and it is deliberately forward-looking. The honest
-finding today is that no crop MAPPED HERE is falling: the five mapped farm-gate series are all up
-year-on-year (cassava +57%, rubber +38%, palm +32%, rice +12%, maize +11%). So a naive "who is in a
-falling sector" screen returns an empty list, and returning an empty list dressed up as insight
-would be a lie by omission.
+This file is the other half — the PRICE side, and it is deliberately forward-looking.
 
-TWO CORRECTIONS TO WHAT THAT USED TO SAY (2026-08-01):
-  · It read "every measured Thai farm-gate series is up", which was never true of the whole feed,
-    only of the five crops this file maps. NABC publishes thirteen categories and SIX are DOWN —
-    coconut -70.9%, pineapple -20.0%, pork -6.7%, white shrimp -4.3%, chicken -2.4%, eggs -1.7%.
-    They are absent here because this file's exposure join needs crop_stress.json crop shares, which
-    still carry only the original five crops. Wiring them is the next wave, not a silent omission.
-  · It quoted "sugarcane +26%" as a current move. That number is the OAE crop_prices.json snapshot
-    stamped BE 2562 = 2019 CE — seven years old. There is no current Thai cane price anywhere in
-    this repo; cane registers with the OCSB, not DOAE or NABC.
+THIS RADAR WAS EMPTY UNTIL 2026-08-01, AND THE EMPTINESS WAS AN ARTEFACT (read this before trusting
+any earlier reading of it). It mapped five crops — rice, rubber, cassava, maize, oil palm — and all
+five happened to be RISING, so it reported "no province is in a falling sector" and said so plainly.
+That statement was true of what it measured and false about the country. NABC publishes thirteen
+categories and six of them were DOWN the whole time; the three with real crop belts behind them were
+coconut (-70.9%), pineapple (-20.0%) and sugarcane (-17.9%). What kept them out was never the data
+being unavailable — it was three separate one-line omissions upstream:
+  · coconut + pineapple area sat unread in the DOAE webservice response (ingest_doae.py mapped 5 of
+    19 crop columns), and their prices sat unread in nabc_prices.json (build_farmgate_prices.py's
+    allowlist had 5 of 7 quotable crops).
+  · sugarcane had neither. Cane registers with the OCSB, not DOAE, so it was in no registry here,
+    and its price is ADMINISTERED — announced once per season — so no market feed could carry it.
+    Its only price in the repo was an OAE snapshot stamped BE 2562 = 2019 CE, quoted as if current,
+    and of the WRONG SIGN (+26.1% against an actual -17.9%).
+All three are closed now (ingest_ocsb_cane.py + the DOAE 19-crop map), the mapped set is eight, and
+the radar trips on 22 provinces. Empty was a mapping gap wearing the costume of a finding.
 
 What IS answerable, and is answered here, is the exposure question underneath it:
 
@@ -37,8 +40,8 @@ What IS answerable, and is answered here, is the exposure question underneath it
 That number is real today and does not depend on the price direction. It is the size of the book that
 would need proactive contact IF that crop turned, and it ranks the crops by how much of the healthy
 farm book rides on each. `tripped` — provinces where a depended-on crop is actually in price decline
-— is the alarm on top of it, and it is EMPTY at this vintage. That is stated plainly in meta, not
-hidden, so that when it stops being empty the change is visible rather than invented.
+— is the alarm on top of it, and it is no longer empty: 22 provinces, overwhelmingly the cane belt.
+meta.n_tripped states the count either way, so an empty vintage stays visibly empty.
 
 MEASURED vs ESTIMATED.
   * MEASURED: the account counts and outstanding balances (real loan tape, no-PII aggregates);
@@ -90,6 +93,14 @@ CROP_KEY = {
     "Cassava": "cassava",
     "Maize": "maize",
     "Oil palm": "oilpalm",
+    # 2026-08-01: the three crops that actually MOVED. Until this date every crop this radar could
+    # see was rising, so it correctly reported an empty assistable-now list — but that emptiness was
+    # an artefact of what was mapped, not of the market. Coconut (-70.9%), pineapple (-20.0%) and
+    # sugarcane (-17.9%) are the three steepest measured Thai falls, and all three now have both a
+    # price (farmgate_prices.json) and a province belt (crop_stress.json crop_mix).
+    "Coconut": "coconut",
+    "Pineapple": "pineapple",
+    "Sugarcane": "sugarcane",
 }
 
 
@@ -251,15 +262,16 @@ def build():
             "caveats": [
                 ("Not a forecast. Ranking crops by exposed accounts says how much of the healthy book "
                  "rides on each price, not which price is going to move."),
-                ("Sugarcane cannot be placed on this map, and its only price here is STALE: the OAE "
-                 "snapshot is stamped BE 2562 = 2019 CE. Cane registers with the OCSB, so it has "
-                 "neither a current Thai price nor a DOAE planted area; it appears in the per-branch "
-                 "agri layer carrying that 2019 figure, labelled with its vintage."),
+                ("Sugarcane's price is ADMINISTERED, not quoted: OCSB announces one national cane "
+                 "price per season (~10 CCS basis), so its -17.9% is a set price falling, not a "
+                 "market clearing lower. It is measured and current either way, and it replaces "
+                 "the OAE BE-2562 (2019 CE) snapshot of +26.1% that this file used to carry."),
                 ("Only " + str(len(CROP_KEY)) + " crops are mapped here (" + ", ".join(sorted(CROP_KEY))
-                 + "), so 'nothing is falling' means nothing MAPPED is falling. Six measured Thai "
-                 "prices ARE down — coconut, pineapple, pork, white shrimp, chicken, eggs — and are "
-                 "shown on the Macro commodities board. They are missing from this radar because the "
-                 "exposure join reads crop_stress.json crop shares, which still carry only these five."),
+                 + "), so a crop absent from that list cannot trip a province however far it falls. "
+                 "Four measured Thai fallers are still unmapped — pork, white shrimp, chicken and "
+                 "eggs are LIVESTOCK and fisheries, which have no planted area to join on, so they "
+                 "appear on the Macro commodities board with a region tag but cannot reach a "
+                 "province-level exposure count. That needs a livestock-holding layer, not a crop one."),
                 ("Province crop shares are planted AREA, not the borrower's actual crop. A farm "
                  "borrower in a rice-dominant province is assumed exposed to rice; the tape does not "
                  "record what any individual grows."),
