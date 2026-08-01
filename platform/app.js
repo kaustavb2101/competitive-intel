@@ -2979,10 +2979,10 @@ function drawSearchDemand(){
   // AutoX = gold accent; rivals = merchant teal — both are theme-token colors (contrast-safe in light+dark).
   const AX='var(--gold)', RV='var(--merch)';
   const list=rows.slice(0,SEARCH_TOPN);
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
-    `<th title="Google Trends relative search-interest (0–100) for title-loan intent terms — ESTIMATED, a demand signal, not query volume">Demand ▲ est</th>`+
-    `<th title="AutoX (เงินไชโย) share of the five brands' search interest in this province — ESTIMATED">AutoX share-of-search</th>`+
-    `<th title="strongest rival brand by share-of-search in this province">Best rival</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col" title="Google Trends relative search-interest (0–100) for title-loan intent terms — ESTIMATED, a demand signal, not query volume">Demand ▲ est</th>`+
+    `<th scope="col" title="AutoX (เงินไชโย) share of the five brands' search interest in this province — ESTIMATED">AutoX share-of-search</th>`+
+    `<th scope="col" title="strongest rival brand by share-of-search in this province">Best rival</th></tr>`+
     list.map((r,i)=>{
       const dem=r.demand==null?0:r.demand;
       const ash=r.autox_share;
@@ -3058,11 +3058,11 @@ function drawCompCoverage(){
   }
   // sort by coverage_pct desc (nulls last) so the best-covered brand leads.
   const list=rows.slice().sort((a,b)=>((b.coverage_pct==null?-1:b.coverage_pct)-(a.coverage_pct==null?-1:a.coverage_pct)));
-  tbl.innerHTML=`<tr><th>Brand</th>`+
-    `<th title="MEASURED — locations of this brand in our de-duplicated census (a lower bound)">Found ◆ measured</th>`+
-    `<th title="ESTIMATED-from-public-reports — the brand's publicly-reported nationwide branch count (cited company IR / annual reports)">Expected ★ public</th>`+
-    `<th title="found ÷ expected — the share of the brand's reported network we have located so far. A confidence flag, NOT market share.">Coverage</th>`+
-    `<th>Census completeness</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">Brand</th>`+
+    `<th scope="col" title="MEASURED — locations of this brand in our de-duplicated census (a lower bound)">Found ◆ measured</th>`+
+    `<th scope="col" title="ESTIMATED-from-public-reports — the brand's publicly-reported nationwide branch count (cited company IR / annual reports)">Expected ★ public</th>`+
+    `<th scope="col" title="found ÷ expected — the share of the brand's reported network we have located so far. A confidence flag, NOT market share.">Coverage</th>`+
+    `<th scope="col">Census completeness</th></tr>`+
     list.map(b=>{
       const exp=b.expected, cov=b.coverage_pct;
       const covtxt=(cov==null)?'<span class="sub">n/a</span>':`<span class="mono" style="color:var(--gold)"><b>${cov.toFixed(1)}%</b></span>`;
@@ -3152,11 +3152,11 @@ function drawRivalDensity(){
     .sort((a,b)=>((b.rivals-b.autox)-(a.rivals-a.autox))).slice(0,RIVDEN_TOPN);
   const brandStr=bb=>{ if(!bb||typeof bb!=='object')return ''; return Object.entries(bb)
     .sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} ${v}`).join(', '); };
-  tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th>`+
-    `<th title="AutoX branches in this district (MEASURED)">AutoX</th>`+
-    `<th title="Big-4 rival branches in this district, from the full official-locator census (MEASURED)">Rivals ◆</th>`+
-    `<th title="rivals ÷ AutoX">Ratio</th>`+
-    `<th title="Which single big-4 brand holds the most of this district's rival field, and its share of all rival branches here (MEASURED). Bold = one rival owns a majority (single-brand-dominated — it sets the local terms); the sub-line is the top-2 brands by count.">Who holds it</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">District</th><th scope="col">Province</th>`+
+    `<th scope="col" title="AutoX branches in this district (MEASURED)">AutoX</th>`+
+    `<th scope="col" title="Big-4 rival branches in this district, from the full official-locator census (MEASURED)">Rivals ◆</th>`+
+    `<th scope="col" title="rivals ÷ AutoX">Ratio</th>`+
+    `<th scope="col" title="Which single big-4 brand holds the most of this district's rival field, and its share of all rival branches here (MEASURED). Bold = one rival owns a majority (single-brand-dominated — it sets the local terms); the sub-line is the top-2 brands by count.">Who holds it</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
       const rc=(r.rivals-r.autox)>=40?'var(--agri)':'var(--gold)';
@@ -3253,8 +3253,8 @@ function drawPeerProvince(){
   // peer_province.json (pre-fold) degrades gracefully to the big-4-only board.
   const hasPico=m.pico_available===true;
   const list=recs.slice(0,PEERPROV_TOPN);
-  const bh=brands.map(b=>`<th title="${b} branches in this province (MEASURED census)">${b}</th>`).join('');
-  const ph=hasPico?`<th title="Licensed PICO-finance operators — a DISTINCT small-ticket rival class (MEASURED, FPO registry ${m.pico_source&&m.pico_source.vintage?m.pico_source.vintage:''})">PICO</th>`:'';
+  const bh=brands.map(b=>`<th scope="col" title="${b} branches in this province (MEASURED census)">${b}</th>`).join('');
+  const ph=hasPico?`<th scope="col" title="Licensed PICO-finance operators — a DISTINCT small-ticket rival class (MEASURED, FPO registry ${m.pico_source&&m.pico_source.vintage?m.pico_source.vintage:''})">PICO</th>`:'';
   // AutoX's own rank among the operators present (MEASURED counts, computed position) is
   // co-located under the AutoX count — gated on the layer field so a pre-fold file degrades.
   const hasRank=list.some(r=>r.autox_rank!=null);
@@ -3265,7 +3265,7 @@ function drawPeerProvince(){
   // no column; † marks the Greater-Bangkok inner-ring (density inflated by central registration).
   const hasSatCol=m.vehicle_saturation_available===true && list.some(r=>r.titlelender_per_100k_veh!=null);
   const natTL=(typeof m.national_titlelender_per_100k_veh==='number')?m.national_titlelender_per_100k_veh:null;
-  const sh=hasSatCol?`<th title="Title-lender branches (AutoX + rivals) per 100,000 MEASURED DLT registered vehicles — how crowded the market is per unit of vehicle collateral, which the raw count can’t show${natTL!=null?`. National ${natTL.toFixed(1)}/100k`:''}. † = Greater-Bangkok inner-ring, density inflated by central vehicle registration (excluded from the crowding headline).">Sat/100k</th>`:'';
+  const sh=hasSatCol?`<th scope="col" title="Title-lender branches (AutoX + rivals) per 100,000 MEASURED DLT registered vehicles — how crowded the market is per unit of vehicle collateral, which the raw count can’t show${natTL!=null?`. National ${natTL.toFixed(1)}/100k`:''}. † = Greater-Bangkok inner-ring, density inflated by central vehicle registration (excluded from the crowding headline).">Sat/100k</th>`:'';
   // Intra-province ground contest: of a province's districts, how many is AutoX outnumbered in
   // (MEASURED, point-in-district — n_outnumbered_districts / n_districts). This is the read the
   // province rank/ratio can't give: a province AutoX ranks well in overall can still be outnumbered
@@ -3282,13 +3282,13 @@ function drawPeerProvince(){
   const concMinRivals=(typeof m.rival_concentration_min_rivals==='number')?m.rival_concentration_min_rivals:10;
   const concShare=(typeof m.rival_concentration_share_floor==='number')?m.rival_concentration_share_floor:0.5;
   const hasDistCol=list.some(r=>r.n_districts);
-  const dh=hasDistCol?`<th title="Share of this province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district). The province rank can mask this — a good province standing can still lose most of its districts on the ground.">Dist. lost</th>`:'';
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
-    `<th title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
+  const dh=hasDistCol?`<th scope="col" title="Share of this province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district). The province rank can mask this — a good province standing can still lose most of its districts on the ground.">Dist. lost</th>`:'';
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th>`+
+    `<th scope="col" title="AutoX branches in this province (MEASURED, point-in-district)${hasRank?' — the #k/n chip is AutoX’s rank among the operators present here':''}">AutoX${hasRank?' <span class="sub" style="font-weight:400">·rank</span>':''}</th>`+
     bh+ph+
-    `<th title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
+    `<th scope="col" title="all big-4 rival branches ÷ AutoX">Ratio</th>`+
     sh+dh+
-    `<th title="the single operator with the most branches in the province">Leads</th></tr>`+
+    `<th scope="col" title="the single operator with the most branches in the province">Leads</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
       const rc=(r.rivals-r.autox)>=200?'var(--agri)':'var(--gold)';
