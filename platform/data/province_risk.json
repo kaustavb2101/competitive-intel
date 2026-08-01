@@ -203,8 +203,8 @@
       "province": "สกลนคร",
       "region": "Isan",
       "n_branches": 30,
-      "mean_risk": 35.5,
-      "p90_risk": 37.8,
+      "mean_risk": 35.6,
+      "p90_risk": 37.9,
       "top_driver_mix": {
         "household": 30
       }
