@@ -719,6 +719,43 @@ def _shape_household_risk(d):
     return None
 
 
+def _shape_provenance(d):
+    # The Command-center (#home) DATA ROOM card — the exec's core measured /
+    # estimated / UNLABELLED honesty census (the "shame board"), the surface the
+    # whole project's measured-vs-estimated mandate is judged on. renderHomeDataRoom
+    # eager-loads data/provenance.json on the front door (renderHome -> line ~8562)
+    # and is NULL-SAFE: when the file is missing/truncated its guard
+    # (!PROVEN || !Array.isArray(PROVEN.layers) || !PROVEN.counts) collapses the
+    # whole card to a calm "not yet computed" placeholder with NO phone alert — a
+    # truncated CDN deploy that drops the provenance census would silently blank the
+    # exec's honesty surface, exactly the "broken demo" blind spot this probe exists
+    # to catch. It was the last front-door eager read with no deploy probe. The
+    # render contract: .counts (the three-way headline split) + a non-empty .layers
+    # table (each row reads .file + .cls) + .files.total (the per-file shame note).
+    # Asserts render SHAPE, not values — robust to the census growing (it only ever
+    # gains layers); a floor guards against a truncated/emptied file.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    counts = d.get("counts")
+    if not isinstance(counts, dict):
+        return "missing 'counts' (the card's guard drops the whole Data Room without it)"
+    for k in ("layers", "measured", "estimated", "unlabelled"):
+        if not isinstance(counts.get(k), int):
+            return "counts.%s missing/non-int (the measured/estimated/unlabelled headline split)" % k
+    layers = d.get("layers")
+    if not isinstance(layers, list) or len(layers) < 50:
+        return "missing/short 'layers' table (expected the full ~120-layer census)"
+    L0 = layers[0]
+    if not isinstance(L0, dict) or not (isinstance(L0.get("file"), str) and L0["file"].strip()):
+        return "first layer row missing 'file' name (Data Room table render read)"
+    if not (isinstance(L0.get("cls"), str) and L0["cls"] in ("measured", "estimated", "unlabelled")):
+        return "first layer row missing a valid 'cls' provenance chip (measured/estimated/unlabelled)"
+    files = d.get("files")
+    if not isinstance(files, dict) or not isinstance(files.get("total"), int):
+        return "files.total missing (the per-file shame note read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -822,6 +859,16 @@ DATA_FILES = [
     ("data/rival_density.json", _shape_rival_density, ".records (928 districts) with autox/rivals/by_brand (#acq district-outnumbered board)"),
     ("data/search_demand.json", _shape_search_demand, ".provinces (~77) with demand/autox_share/best_rival (#acq share-of-search)"),
     ("data/household_risk_by_province.json", _shape_household_risk, ".provinces (~77) with debt_to_income (obj #1 DTI map lens)"),
+    # The Command-center DATA ROOM honesty census — the exec front door's core
+    # measured / estimated / UNLABELLED provenance table (renderHomeDataRoom eager-
+    # loads data/provenance.json on #home). It is the surface the project's whole
+    # measured-vs-estimated mandate is judged on and is NULL-SAFE (silently collapses
+    # to a "not yet computed" placeholder when the file is missing/truncated), so a
+    # truncated CDN deploy that guts it blanks the honesty board with no phone alert.
+    # It was the last front-door eager read still unprobed; this closes that blind
+    # spot. Asserts render shape (counts split + layers table + files.total), not
+    # values — robust to the census growing.
+    ("data/provenance.json", _shape_provenance, ".counts split + .layers (~120) census table + .files.total (Data Room honesty card)"),
 ]
 
 

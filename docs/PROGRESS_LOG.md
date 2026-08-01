@@ -3,6 +3,84 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — intelligence-loop (data-honesty): gate now guards the hand-maintained commodity board against its MEASURED Pink Sheet source (`check_commodity_board.py`) — wires the orphaned `commodities_protein.json`
+
+- **Autonomous intelligence loop, DATA-INTEGRITY pillar.** Re-verified the named integration backlog
+  is exhausted or blocked from this environment: FPO PICO competitor census, `branch_cropland`,
+  `dbd`/`mot`/`diw` layers are all built + gated + wired (per prior entries), and BAAC/SME-bank credit
+  penetration + GISTDA 40m crop-area remain BLOCKED (Thai-IP re-pull / a `GISTDA_SPHERE_KEY` **not in
+  this session's env** — confirmed absent this run). A negative-space sweep found **no unwired app
+  layer**. So this run closed a concrete honesty gap instead.
+- **Finding.** `source-data/commodity_board.json` is the canonical 11-item Pink Sheet board the app
+  renders (`derive.py` → `meta.board`, the Overview commodity board) and that ~10 downstream builders
+  consume (`build_commodities` / `build_crop_stress` / `build_collateral_outlook` / `build_impact_cards`
+  / …). It is **HAND-MAINTAINED**, and its per-commodity `yoy` + `stale` (vintage) are the **MEASURED**
+  World Bank Pink Sheet move — but **nothing enforced** that those numbers still equal the two Pink
+  Sheet source files they are transcribed from: `commodities.json` (five crops) and
+  `commodities_protein.json` (chicken/beef/fishmeal/logs/sawnwood/gold, incl. the **gold-collateral**
+  YoY). So an editor could refresh one source file and leave the board showing a stale, now-wrong
+  MEASURED number — a silent measured-vs-source drift — with no alarm. Separately,
+  `commodities_protein.json` was a **committed input with ZERO consumers** anywhere in the repo (grep-
+  verified) despite being the source of **six of the board's eleven** numbers.
+- **Fix.** Added `pipeline/check_commodity_board.py` (deterministic, network-free): for every board
+  item it asserts `yoy` == source `yoy` and `stale` == source `date`, and **fails loudly on any board
+  label not in its source map** so a newly hand-typed board number can never silently escape the
+  measured-source guard. Wired into `tests/run.sh check` with the gate's `0 ok / 2 drift / 3 absent`
+  idiom, next to the other commodity checks. This gives the orphaned `commodities_protein.json` a
+  genuine consumer and makes the board's measured honesty a gated invariant.
+- **Safeguards — all pass.** (a) `bash tests/run.sh check` = **106 passed / 0 failed** (was 105; the
+  new check is the +1; DATA VALIDATION 448/448 unchanged). (b) Positive test: OK on committed data
+  (all 11 match). Negative tests: a mutated `commodities.json` yoy → exit 2 with the exact
+  drifted item named; an unmapped new board item (`Cassava`) → exit 2 telling the maintainer to add
+  the mapping — source files restored after, tree clean. (c) No secrets in the diff. (d) **No
+  `platform/data` file created or altered, no number invented** — a read-only verifier over three
+  committed files — so no `build_provenance.py` rebuild is required and there is **no app-behaviour or
+  visual change**; committed directly to master per the loop's non-visual rule.
+- **Recommend next.** The board also carries an editorial `cls` (up/flat/stress) and per-item `note`
+  that are NOT guarded — a natural extension is a soft `cls`-vs-`yoy`-sign consistency check (mild
+  negatives are deliberately `flat`, so it needs a tolerance band, not a strict sign function). More
+  broadly, the highest-value OPEN items stay owner-side/env-gated: a session-reachable
+  `GISTDA_SPHERE_KEY` (40m satellite crop-area, supersedes the SPAM baseline) and a Thai-IP re-pull +
+  committed raw CSV to finish BAAC/SME-bank formal-credit **penetration**.
+
+## 2026-08-01 — intelligence-loop (deployment-health): the site-health probe now guards the DATA ROOM honesty census (`provenance.json`)
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** All named backlog items remain
+  closed/blocked (plan 98%: the one OPEN item is owner-side Vercel access-protection), and this run
+  re-verified the room is healthy — live master alias HTTP 200 on `/`, `/app.js`, `/status`, and every
+  exec-critical layer (`peer_province`, `competitor_coverage`, `rival_density`, `tape_real`,
+  `household_risk`, `search_demand`, `provenance`); all recent CI workflow runs green (no failing
+  crons); ThaiWater/NABC/fuel live feeds fresh (2026-07-31, on-cadence); determinism gate **105
+  passed / 0 failed**. So this run closed the concrete monitoring gap the prior probe runs teed up.
+- **Finding.** `pipeline/check_site_health.py` guarded ~27 exec-facing layers but **not**
+  `provenance.json` — the source of the Command-center (#home) **DATA ROOM** card, the exec front
+  door's core **measured / estimated / UNLABELLED** honesty census (the "shame board"), the surface
+  the project's whole measured-vs-estimated mandate is judged on. `renderHomeDataRoom` **eager-loads**
+  it on the front door and is **NULL-SAFE**: its guard (`!PROVEN || !Array.isArray(PROVEN.layers) ||
+  !PROVEN.counts`) silently collapses the whole card to a calm "not yet computed" placeholder when the
+  file is missing/truncated. So a truncated CDN deploy that dropped the census would blank the exec's
+  honesty board **with no phone alert** — the exact "broken demo" blind spot this probe exists to
+  catch, and it was the last front-door eager read still unprobed.
+- **Fix.** Added `_shape_provenance` (asserts render SHAPE — `.counts` three-way split + a non-empty
+  `.layers` census table whose first row carries a valid `file` + `cls` chip + `.files.total`; robust
+  to the census growing, a floor guards against a truncated/emptied file — **not** values, so a future
+  vintage adding layers never false-alarms) and registered `data/provenance.json` in `DATA_FILES`.
+  Verified: the local probe now covers it (`--local ../platform` → 89/89, incl. the new
+  `provenance.json shape sane` line); the validator passes the committed file and **catches** every
+  malformed shape (missing counts / empty or truncated layers / missing files.total / bad cls / non-
+  object) with a specific message — a real guard, not a no-op.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **105 passed / 0 failed**;
+  `python3 -c ast.parse` clean. (b) No secrets in the diff. (c) Diff = one CI-only file
+  (`check_site_health.py`, +47), matches intent. (d) No-fabrication intact — **no `platform/data`
+  file altered**, no number invented, shape-only assertion; provenance ledger unchanged (nothing to
+  rebuild). No visual/app change (a CI probe, not app.js/HTML/CSS/data), so committed directly to
+  master per the loop's safeguard mandate.
+- **Recommend next.** With every front-door eager read now probed, the remaining deploy-health
+  frontier is the **lazy per-route** reads that still degrade silently (e.g. the province/branch 3D
+  scene data + `data.html` layers). Separately, a SERVICE-pillar win: teach `build_provenance.py`'s
+  freshness block to flag a CI-refreshable live layer that has gone **overdue vs its own cron cadence**
+  (a silent-cron detector), which the current freshness read (age-behind-newest) does not catch.
+
 ## 2026-08-01 — UX loop: `scope="col"` on the three primary SPA search-table headers (a11y) — MERGED + deployed (PR #241)
 
 - **Shipped.** First slice of `ux-table-scope-sweep-appjs`. The three primary interactive SPA search

@@ -2,6 +2,14 @@
 /* AutoX · เงินไชโย — Credit Intelligence Platform
    Loads data files, renders overview/map/acquisition/branches. Vanilla JS, no build step. */
 
+/* Full HTML escape, for text this repo did not write. Almost everything rendered here is our own
+   derived numbers and editorial copy, but Pantip posts, app-store reviews and YouTube comments are
+   arbitrary strings typed by strangers and they reach innerHTML. Escape at the point of insertion.
+   (Two functions further down declare a local `esc` that only escapes quotes for an attribute —
+   that is a different job; this one is for element content and must not be confused with it.) */
+const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 // Real measured quantities (no indices). val() reads measured fields; color/size scale to absolute max.
 // Portfolio-risk lens is the exception: a/m/c are ESTIMATED proxies (OSM/price-based, 0–100), not measured.
 // pill = the SHORT (≈2-word) label for the hero pill row docked over the National map.
@@ -1546,7 +1554,10 @@ function showTab(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }
-  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); }
+  // showOvPanel() with no argument falls back to the first topic, so entering Macro always lands on
+  // exactly one open panel with its chip marked — including on a hard reload, where the static
+  // `open` attribute in the markup would otherwise leave the chip row showing nothing selected.
+  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); showOvPanel(OV_PANEL); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
@@ -1588,9 +1599,53 @@ document.addEventListener('click',e=>{
   const a=e.target.closest&&e.target.closest('.jumpnav [data-jump]'); if(!a) return;
   const sec=document.getElementById(a.dataset.jump); if(!sec) return;
   e.preventDefault();
+  const nav=a.closest('.jumpnav');
+  if(nav&&nav.dataset.exclusive){ showOvPanel(sec.id,{scroll:'nav'}); return; }
   sec.open=true;
   sec.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
+});
+
+/* ---------- Macro topic switcher ----------
+   The six Macro topics are still <details class="ovsec"> in the DOM. That is deliberate: the print
+   engine already expands every <details> in a view, the native element keeps its own keyboard and
+   screen-reader behaviour, and deep links keep working — so making them exclusive is a behaviour
+   change, not a markup rewrite, and nothing downstream had to learn a new structure.
+
+   What changes is that opening one CLOSES the rest, and the closed panels hide their <summary> so
+   the reader sees exactly one heading and one panel instead of six stacked headings. The chip row
+   above is the only control; it carries aria-selected so the active topic is announced.
+   Printing overrides all of it (CSS restores every summary) — the export must still contain the
+   whole tab, which is the promise the per-tab print made. */
+// Remembers the chosen topic for the session, so leaving Macro for another pillar and coming back
+// does not silently reset the reader to "Conditions & commodities".
+let OV_PANEL='sec-ov-macro';
+function showOvPanel(id,opt){
+  opt=opt||{};
+  const wrap=document.getElementById('ovswitch'), nav=document.getElementById('ovjump');
+  if(!wrap) return;
+  const secs=[...wrap.querySelectorAll('details.ovsec')];
+  const target=secs.some(s=>s.id===id)?id:(secs[0]&&secs[0].id);
+  OV_PANEL=target;
+  secs.forEach(s=>{ s.open=(s.id===target); });
+  if(nav) nav.querySelectorAll('[data-jump]').forEach(c=>{
+    const on=c.dataset.jump===target;
+    c.classList.toggle('on',on);
+    c.setAttribute('aria-selected',String(on));
+  });
+  // Scroll to the CHIP ROW, not the panel: the switcher is the thing the reader is operating, and
+  // leaving it off-screen after a switch strands them with no way back to the other five topics.
+  if(opt.scroll==='nav'&&nav) nav.scrollIntoView({behavior:'smooth',block:'start'});
+  const sm=wrap.querySelector('#'+CSS.escape(target)+' > summary');
+  if(sm&&opt.scroll) sm.focus({preventScroll:true});
+}
+/* A click on a visible summary would normally just toggle that one panel; route it through the
+   switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
+   open panel is refused — an all-closed Macro tab looks broken. */
+document.addEventListener('click',e=>{
+  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary'); if(!sm) return;
+  e.preventDefault();
+  showOvPanel(sm.parentElement.id);
 });
 
 /* ---------- load ---------- */
@@ -2819,6 +2874,7 @@ function renderCompetition(){
   renderRivalPulse();
   renderRivalAds();
   renderRivalVideo();
+  renderPantip();
   renderSocialThemes();
   renderRivalUniverse();
   renderCompCoverage();
@@ -3722,6 +3778,79 @@ function renderRivalPulse(){
     RIVPULSE=j; rivpulseLoaded=true; paintPulse();
   }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; paintPulse(); });
 }
+/* PANTIP PANEL — data/pantip_panel.json (build_pantip_panel.py).
+   Brand-level borrower voice, which the say/hear gap below deliberately averages away. Pantip is
+   the one place Thai borrowers discuss lenders unprompted and at length.
+
+   THREE THINGS THIS VIEW MUST NOT LET A READER BELIEVE:
+     1. that the threads we retrieved measure how much a brand is discussed — search caps at 10 per
+        term, so those counts are a ceiling we hit. Volume comes from Pantip's own reported total.
+     2. that the reported total is clean — สมหวัง ("wish fulfilled") and ศรีสวัสดิ์ (also a district
+        of Kanchanaburi) match far more than the lender. `match` is the measured share of sampled
+        threads that really name the brand, and it is shown on every row, not buried in a footnote.
+     3. that a rate off 10 threads is precise. Every rate is rendered as its own fraction.
+   Lazy, null-safe, graceful if absent — same contract as renderRivalPulse. */
+let PANTIP=null, pantipLoaded=false;
+function renderPantip(){
+  const tbl=$('#pantiptbl'); if(!tbl) return;
+  if(pantipLoaded){ drawPantip(); return; }
+  // The catch is attached to the FETCH, not to the draw. Chaining .catch() after a .then() that
+  // also draws means a rendering bug is caught by the "data missing" handler and re-rendered as
+  // "not yet built" — the reader is then told to go run a pipeline script for a file that is
+  // sitting right there. Keep failing-to-load and failing-to-draw distinguishable.
+  fetch('data/pantip_panel.json')
+    .then(r=>r.ok?r.json():null)
+    .catch(()=>null)
+    .then(j=>{ PANTIP=j; pantipLoaded=true; drawPantip(); });
+}
+function drawPantip(){
+  const tbl=$('#pantiptbl'), ro=$('#pantipreadout'), qs=$('#pantipquotes'), note=$('#pantipnote');
+  if(!tbl) return;
+  const rows=(PANTIP&&Array.isArray(PANTIP.brands))?PANTIP.brands:[];
+  const m=(PANTIP&&PANTIP.meta)||{};
+  if(!rows.length){
+    tbl.innerHTML=''; if(qs) qs.innerHTML=''; if(note) note.textContent='';
+    if(ro) ro.innerHTML='<b>Pantip panel not yet built.</b> <span class="sub">data/pantip_panel.json is absent — run pipeline/pull_pantip.py then pipeline/build_pantip_panel.py.</span>';
+    return;
+  }
+  const n=v=>(v==null?'—':(+v).toLocaleString('en-US'));
+  if(ro) ro.innerHTML=(PANTIP.headline?`<b>${escHtml(PANTIP.headline)}</b>`:'')+
+    (PANTIP.reply_line?`<div class="sub" style="margin-top:6px">${escHtml(PANTIP.reply_line)}</div>`:'');
+
+  tbl.innerHTML='<tr><th>Lender</th><th>Threads on Pantip</th><th>Match</th><th>Est. about the brand</th>'+
+    '<th>Replies in public</th><th>What borrowers raise</th></tr>'+
+    rows.map(b=>{
+      const us=b.is_us?' style="background:var(--raised)"':'';
+      // Match rate carries a colour only where it is low enough to change how the row is read.
+      const mp=b.precision==null?null:Math.round(b.precision*100);
+      const mcol=mp==null?'var(--dim)':(mp<50?'var(--agri)':(mp<80?'var(--gold)':'var(--merch)'));
+      const rr=b.reply_rate==null
+        ? '<span class="sub">too few threads</span>'
+        : `<span class="mono">${b.org_reply_threads}/${b.n_threads_sampled}</span> <span class="sub">(${b.reply_rate}%)</span>`;
+      return `<tr${us}><td>${b.is_us?'<b>':''}${escHtml(b.label)}${b.is_us?'</b> <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">US</span>':''}`+
+        `${b.tier==='category'?' <span class="sub">generic terms, no brand named</span>':''}</td>`+
+        `<td class="mono">${n(b.reported_total)}<span class="sub"> claimed</span></td>`+
+        `<td class="mono" style="color:${mcol}">${mp==null?'—':mp+'%'}</td>`+
+        `<td class="mono">${n(b.est_threads)}</td>`+
+        `<td>${rr}</td>`+
+        `<td class="sub">${(b.themes||[]).slice(0,3).map(t=>escHtml(t.label)).join(' · ')||'—'}</td></tr>`;
+    }).join('');
+
+  // Quotes: us first — the point of showing these is to read our own book's complaints, not the
+  // rivals'. Everything is already scrubbed and unattributed at build time.
+  if(qs){
+    const ordered=rows.slice().sort((a,b)=>(b.is_us?1:0)-(a.is_us?1:0));
+    qs.innerHTML=ordered.filter(b=>(b.quotes||[]).length).map(b=>
+      `<div class="qgrp" style="margin:10px 0 0"><div class="sub" style="font-weight:600;color:${b.is_us?'var(--accent)':'var(--mid)'}">`+
+      `${escHtml(b.label)}${b.is_us?' — us':''}</div>`+
+      b.quotes.map(q=>`<blockquote class="pq" lang="th">${escHtml(q.text)}`+
+        `<span class="sub" style="display:block;margin-top:3px" lang="en">${escHtml(q.theme)}${q.date?' · '+escHtml(q.date):''}</span></blockquote>`).join('')+
+      '</div>').join('');
+  }
+  if(note) note.innerHTML=[m.cap,m.name_collision,m.precision_bias,m.privacy]
+    .filter(Boolean).map(s=>escHtml(s)).join(' ');
+}
+
 /* SAY / HEAR GAP — data/social_themes.json (build_social_themes.py).
    The synthesis of every reception channel on #acq: what lenders publish (ad creatives + promo
    pages) and what customers write (Pantip, Google Play, Apple, YouTube comments) counted against
@@ -3948,7 +4077,12 @@ function drawRivalUniverse(){
   const m=RIVUNI.meta||{};
   const TIER={us:'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>',
               nonbank:'<span class="tag" style="color:var(--agri);border:1px solid var(--agri)">NON-BANK</span>',
-              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>'};
+              bank:'<span class="tag" style="color:var(--accent);border:1px solid var(--accent)">BANK-BACKED</span>',
+              /* 'broker' = online origination, no branches. Listed so the operator is on the record,
+                 but never counted as local competitive pressure — the per-branch and per-province
+                 rival counts come from the geo censuses, which only hold physical service points.
+                 Without this entry the row rendered with a BLANK badge, which reads as a data bug. */
+              broker:'<span class="tag" style="color:var(--dim);border:1px dashed var(--dim)">BROKER · NO BRANCHES</span>'};
   tbl.innerHTML=`<tr><th></th><th>Operator</th><th>Backing</th><th>Model</th>`+
     `<th title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
     `<th title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+

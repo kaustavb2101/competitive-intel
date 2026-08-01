@@ -336,7 +336,15 @@
 
     <div id="outlook"></div>
 
-    <nav class="jumpnav no-print" id="ovjump" aria-label="Jump to section within Macro">
+    <!-- TOPIC SWITCHER (2026-08-01). data-exclusive turns this jump-nav into a segmented control:
+         exactly ONE panel below is open at a time, so the six topics stop stacking vertically.
+         That stacking — not the length of any single topic — was what made this tab a 17-screen
+         scroll: you passed five subjects you did not ask for to reach the sixth. Folding helped
+         and was not enough, because the tab still rendered every topic in sequence.
+         The nav markup stays <a data-jump> so the ONE delegated .jumpnav handler keeps serving
+         this and Competition's #compjump alike; data-exclusive is the only opt-in. -->
+    <nav class="jumpnav ovswitch-nav no-print" id="ovjump" data-exclusive="1"
+         aria-label="Choose a Macro topic — one shows at a time">
       <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
       <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
       <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
@@ -345,6 +353,7 @@
       <a class="chip" href="#overview" data-jump="sec-ov-hazard">Live hazard</a>
     </nav>
 
+    <div class="ovswitch" id="ovswitch">
     <details class="ovsec" id="sec-ov-macro" open>
     <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2><span class="ovsec-what">Answer band, commodity board with 5-year price trends, IMF backdrop</span></summary>
 
@@ -571,6 +580,7 @@
       <div class="tblwrap" style="margin-top:10px" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
     </div>
     </details>
+    </div><!-- /.ovswitch -->
 
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · ② of ⑤</span>
@@ -682,6 +692,17 @@
     <div class="insight" id="pulsevidreadout" style="border-left-color:var(--merch)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
     <table class="tbl" id="pulsevidtbl"></table>
     <p class="lead sub" id="pulsevidnote" style="margin-top:6px"></p>
+
+    <h3 class="compsub" style="margin-top:18px">Pantip · what borrowers say about each lender, unprompted <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED text</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED volume</span></h3>
+    <p class="lead">Pantip is where Thai borrowers discuss lenders <b>at length and unprompted</b> — no review form asking them to rate anything. The say/hear gap below blends this into one axis; here it stays split by brand, in the borrowers' own words.
+      <b>Read the ranking, not the multiple.</b> Volume is Pantip's own reported total per search term, because search itself is <b>capped at 10 threads per term</b> — so the threads we retrieved are a ceiling we hit, never a measure of how much a brand is discussed. Several rival names are also ordinary Thai (<span class="mono" lang="th">สมหวัง</span> means "wish fulfilled"; <span class="mono" lang="th">ศรีสวัสดิ์</span> is also a district of Kanchanaburi), so those totals count far more than the lender — <b>match rate</b> measures how loose each one is, and it runs from 6% to 100%. It is itself measured on the friendliest slice, so every estimate here leans <b>high</b>.
+      <b>PDPA:</b> no author name, member id, handle or profile link is read at any stage, identifiers are scrubbed from the text too, and quotes are short and unattributed.</p>
+    <div class="insight" id="pantipreadout" style="border-left-color:var(--collat)"><div class="skel-rows" aria-hidden="true"><span class="skel skel-line skel-w70"></span><span class="skel skel-line skel-w55"></span></div></div>
+    <table class="tbl" id="pantiptbl"></table>
+    <h4 class="compsub" style="margin-top:14px;font-size:13px">In borrowers' own words — including about us</h4>
+    <p class="lead sub">Verbatim, unattributed, and chosen only for carrying a theme and naming the brand. Nothing is filtered for being unflattering.</p>
+    <div id="pantipquotes"></div>
+    <p class="lead sub" id="pantipnote" style="margin-top:6px"></p>
 
     <h3 class="compsub" style="margin-top:18px">Say / hear gap · what the field advertises vs what customers raise <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED counts</span> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED themes</span></h3>
     <p class="lead">Every channel above read on <b>one axis</b>. Everything customers wrote (forum posts, app reviews, comments under the rivals' videos) and everything lenders published (ad creatives, promo pages) counted against the <b>same</b> Thai phrase list — so "what the industry keeps saying" and "what customers actually raise" can be compared directly. Document <b>counts are measured</b> and re-derivable by hand; the phrase list ships inside <code>social_themes.json</code>. The <b>theme buckets are estimated</b> editorial judgement — a theme absent from the list reads as zero, so absence is not evidence of absence. Read the <b>ordering</b>, not the size of each gap: an ad exists to make a claim while a comment is an unprompted reaction, so the two denominators differ in kind.</p>

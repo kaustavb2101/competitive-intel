@@ -613,7 +613,16 @@ def main():
         if not os.path.exists(OUT):
             print("CHECK FAIL: %s does not exist" % OUT)
             sys.exit(1)
-        with open(OUT, encoding="utf-8") as f:
+        # newline="" on the READ as well as the write, so this compares what is ACTUALLY in the
+        # file. Without it, Python's universal-newline translation turns CRLF back into \n on the
+        # way in and --check passes on Windows over bytes that are not the bytes on disk.
+        #
+        # git normalises to LF on commit, so the committed blob was never wrong — the damage is
+        # local and quieter than that: build_provenance.py records os.path.getsize(), so running it
+        # on a Windows working copy censuses the INFLATED CRLF sizes and writes a provenance file
+        # that then fails --check on CI. That is the whole reason provenance has to be regenerated
+        # through the WSL LF mirror. Writing LF here removes one more reason to need it.
+        with open(OUT, encoding="utf-8", newline="") as f:
             existing = f.read()
         if existing == text:
             print("CHECK OK: %s reproduces byte-for-byte (%d provinces)" %
@@ -622,7 +631,8 @@ def main():
         print("CHECK FAIL: %s differs from a fresh build" % OUT)
         sys.exit(1)
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="" keeps the file LF on every platform — see the --check comment above.
+    with open(OUT, "w", encoding="utf-8", newline="") as f:
         f.write(text)
     print("wrote %s (%d provinces, worst-first)" % (OUT, data["meta"]["n_provinces"]))
     top = data["provinces"][:5]
