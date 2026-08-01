@@ -62,6 +62,24 @@ PR #248. Five layers landed, two deliberately not built. Provenance 123 -> 126 (
   what CI runs. Rebuilt under the WSL uv cpython-3.11 mirror. A full Linux `--check` sweep over every
   builder is now clean. Five more builders were also switched to `newline="
 "` writers.
+- **The map libraries are no longer a CDN call.** Four pages fetched deck.gl / Leaflet from
+  `unpkg.com` on every view — including `index.html`, the National map of all 2,015 branches. That
+  put the most-used view in the product behind a third party being reachable from a Thai network,
+  and the failure mode is the worst kind: the page loads, the library doesn't, and the result is a
+  blank canvas indistinguishable from a bug in our code. Both are now committed under
+  `platform/vendor/`, fetched from unpkg AND re-fetched from jsdelivr and byte-compared, with the
+  SHA256s recorded in `platform/vendor/README.md`. `.gitattributes` exempts that tree from eol
+  normalisation — without it git rewrites `leaflet.css` on commit and the hash stops matching
+  upstream. Two consequences worth knowing: (1) `tests/lib/render.sh` used to **sed-swap** the unpkg
+  refs to npm bundles before rendering, so a broken library reference on the real page could pass
+  QA — it now renders the shipped bytes verbatim; (2) the test suite is fully offline, npm was its
+  last network dependency. `tests/run.sh` now asserts no page has drifted back to a
+  unpkg/jsdelivr/cdnjs `<script>`, so the regression fails the gate instead of silently returning.
+- **Trap, corrected — the WSL mirror had no numpy, so `build_branch_peers` was never actually
+  checked there.** The local Linux sweep classified it ENV (missing module) and moved on; CI then
+  failed on it alone, because it sits downstream of the `branch_risk.json` rebuilt in this wave and
+  was still carrying Windows floats. `numpy==2.4.6` (the `qa.yml` pin) is now installed in the
+  mirror. A "skip" in a sweep is not a pass — count the skips.
 - **Gate note.** WSL has no `node` and no `pdfplumber`, so 11 gate entries fail there for environment
   reasons only; both exist in CI. `node --check` passes on Windows for `app.js` and all 34 inline
   blocks across 8 pages.
