@@ -48,6 +48,16 @@ jobs:
             # --check RED — the recurring qa-commodities-gate-drift. Rebuild it before provenance
             # (which censuses commodities.json's bytes/meta).
             python pipeline/build_commodities.py
+            # Append today's pump price to the accumulated series BEFORE the board is rebuilt.
+            # The Bangchak API publishes only today's number, so this row is the only record of it
+            # that will ever exist — miss the append and that day is gone from the diesel line for
+            # good. Keyed on the file's own meta.pulled, so a re-run the same day is a no-op.
+            python pipeline/append_history.py
+            python pipeline/build_feed_history.py
+            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+            # which then censuses its bytes.
+            python pipeline/build_live_board.py
             python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
@@ -62,7 +72,9 @@ jobs:
           # went provenance-stale every day. Same pattern as committee-cycle.yml — run the FULL
           # determinism gate first; 0-failed earns a direct rebase+push to the base branch. Only a
           # RED gate falls back to a draft PR for human eyes.
-          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/commodities.json platform/data/provenance.json
+          git add source-data/fuel_prices.json platform/data/fuel_prices.json platform/data/commodities.json \
+                  source-data/feed_history.json platform/data/feed_history.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed prices. Nothing to merge."; exit 0
           fi

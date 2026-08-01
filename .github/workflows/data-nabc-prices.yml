@@ -72,6 +72,10 @@ jobs:
             # recurring qa-commodities-gate-drift the integration loop kept restoring by hand. Rebuild
             # it here (after farmgate, before provenance, which censuses commodities.json's bytes/meta).
             python pipeline/build_commodities.py
+            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+            # which then censuses its bytes.
+            python pipeline/build_live_board.py
             python pipeline/build_provenance.py
           else
             echo "prices unchanged — nothing to rebuild."
@@ -87,7 +91,8 @@ jobs:
                   platform/data/branch_recommendations.json platform/data/regional_outlook.json \
                   source-data/farmgate_prices.json platform/data/crop_stress.json \
                   platform/data/crop_margin.json platform/data/crop_farmer_income.json \
-                  platform/data/commodities.json platform/data/provenance.json
+                  platform/data/commodities.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed data (same upstream prices). No PR opened."
             exit 0

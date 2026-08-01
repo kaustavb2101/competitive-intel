@@ -198,6 +198,13 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_commodity_history.py --check (source-data/commodity_history.json absent — owner-side Pink Sheet parse, not data drift)"
   else bad "build_commodity_history.py --check (commodity_history.json drifted from source-data/commodity_history.json — run: python3 pipeline/build_commodity_history.py)"
   fi
+  # Accumulated history for the feeds whose source only publishes "now". Gated BEFORE the live
+  # board, which reads this layer to decide which feeds have a drawable series.
+  ( cd "$PIPE" && python3 build_feed_history.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_feed_history.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_feed_history.py --check (source-data/feed_history.json absent — run: python3 pipeline/append_history.py --from-git)"
+  else bad "build_feed_history.py --check (feed_history.json drifted from the accumulator — run: python3 pipeline/build_feed_history.py)"
+  fi
   # The live board reads every other layer's meta stamp, so it drifts whenever an upstream feed is
   # re-pulled — which is exactly what it is for, and exactly why it must be gated: a stale
   # live_board.json would report a fresh feed as old (or worse, an old one as fresh).

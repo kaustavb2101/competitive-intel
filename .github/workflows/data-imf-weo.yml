@@ -37,6 +37,10 @@ jobs:
           # lockstep or the determinism gate goes red on merge. Deterministic + network-free.
           if git status --porcelain -- platform/data/imf_weo.json | grep -q .; then
             echo "WEO changed — rebuilding provenance.json"
+            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+            # which then censuses its bytes.
+            python pipeline/build_live_board.py
             python pipeline/build_provenance.py
           else
             echo "WEO unchanged (or Cloudflare-blocked no-op) — nothing to rebuild."
@@ -47,7 +51,7 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/imf-weo-${{ github.run_id }}
         run: |
-          git add platform/data/imf_weo.json platform/data/provenance.json
+          git add platform/data/imf_weo.json platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then echo "unchanged; no PR."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

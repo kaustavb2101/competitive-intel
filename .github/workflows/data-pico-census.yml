@@ -76,6 +76,10 @@ jobs:
           echo "registry CONTENT changed — regenerating pico + peer + provenance layers."
           python pipeline/build_pico_census.py
           python pipeline/build_peer_province.py
+          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+          # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+          # which then censuses its bytes.
+          python pipeline/build_live_board.py
           python pipeline/build_provenance.py
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
@@ -109,7 +113,8 @@ jobs:
           PULLED_VINTAGE: ${{ steps.rotation.outputs.pulled_vintage }}
           PINNED_VINTAGE: ${{ steps.rotation.outputs.pinned_vintage }}
         run: |
-          git add platform/data/pico_census.json platform/data/peer_province.json platform/data/provenance.json
+          git add platform/data/pico_census.json platform/data/peer_province.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0
