@@ -154,7 +154,9 @@ def main():
         print("CHECK FAIL: %s drifted — re-run build_province_risk.py" % OUT)
         sys.exit(1)
 
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="\n": the Windows default turns every \n into \r\n, inflating the byte sizes
+    # build_provenance.py censuses and diverging the local tree from the LF blob CI reads.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
     print("wrote %s (%d provinces%s)" % (
         OUT, data["meta"]["n_provinces"],
