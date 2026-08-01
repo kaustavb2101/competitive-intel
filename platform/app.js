@@ -1546,7 +1546,10 @@ function showTab(v){
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }
-  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); }
+  // showOvPanel() with no argument falls back to the first topic, so entering Macro always lands on
+  // exactly one open panel with its chip marked — including on a hard reload, where the static
+  // `open` attribute in the markup would otherwise leave the chip row showing nothing selected.
+  if(v==='overview'){ renderOverview(); renderCommoditiesBoard(); renderImfWeo(); showOvPanel(OV_PANEL); }
   if(v==='branches') renderBranches();
   if(v==='map') initMap();
   if(v==='provinces') renderProvinces();
@@ -1588,9 +1591,53 @@ document.addEventListener('click',e=>{
   const a=e.target.closest&&e.target.closest('.jumpnav [data-jump]'); if(!a) return;
   const sec=document.getElementById(a.dataset.jump); if(!sec) return;
   e.preventDefault();
+  const nav=a.closest('.jumpnav');
+  if(nav&&nav.dataset.exclusive){ showOvPanel(sec.id,{scroll:'nav'}); return; }
   sec.open=true;
   sec.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
+});
+
+/* ---------- Macro topic switcher ----------
+   The six Macro topics are still <details class="ovsec"> in the DOM. That is deliberate: the print
+   engine already expands every <details> in a view, the native element keeps its own keyboard and
+   screen-reader behaviour, and deep links keep working — so making them exclusive is a behaviour
+   change, not a markup rewrite, and nothing downstream had to learn a new structure.
+
+   What changes is that opening one CLOSES the rest, and the closed panels hide their <summary> so
+   the reader sees exactly one heading and one panel instead of six stacked headings. The chip row
+   above is the only control; it carries aria-selected so the active topic is announced.
+   Printing overrides all of it (CSS restores every summary) — the export must still contain the
+   whole tab, which is the promise the per-tab print made. */
+// Remembers the chosen topic for the session, so leaving Macro for another pillar and coming back
+// does not silently reset the reader to "Conditions & commodities".
+let OV_PANEL='sec-ov-macro';
+function showOvPanel(id,opt){
+  opt=opt||{};
+  const wrap=document.getElementById('ovswitch'), nav=document.getElementById('ovjump');
+  if(!wrap) return;
+  const secs=[...wrap.querySelectorAll('details.ovsec')];
+  const target=secs.some(s=>s.id===id)?id:(secs[0]&&secs[0].id);
+  OV_PANEL=target;
+  secs.forEach(s=>{ s.open=(s.id===target); });
+  if(nav) nav.querySelectorAll('[data-jump]').forEach(c=>{
+    const on=c.dataset.jump===target;
+    c.classList.toggle('on',on);
+    c.setAttribute('aria-selected',String(on));
+  });
+  // Scroll to the CHIP ROW, not the panel: the switcher is the thing the reader is operating, and
+  // leaving it off-screen after a switch strands them with no way back to the other five topics.
+  if(opt.scroll==='nav'&&nav) nav.scrollIntoView({behavior:'smooth',block:'start'});
+  const sm=wrap.querySelector('#'+CSS.escape(target)+' > summary');
+  if(sm&&opt.scroll) sm.focus({preventScroll:true});
+}
+/* A click on a visible summary would normally just toggle that one panel; route it through the
+   switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
+   open panel is refused — an all-closed Macro tab looks broken. */
+document.addEventListener('click',e=>{
+  const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary'); if(!sm) return;
+  e.preventDefault();
+  showOvPanel(sm.parentElement.id);
 });
 
 /* ---------- load ---------- */
