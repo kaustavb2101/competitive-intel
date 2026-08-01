@@ -3,6 +3,36 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — UX loop: `scope="col"` on the three primary SPA search-table headers (a11y) — MERGED + deployed (PR #241)
+
+- **Shipped.** First slice of `ux-table-scope-sweep-appjs`. The three primary interactive SPA search
+  tables — `#branches` (`renderBranches`), `#provtbl` (`drawProv`), `#mkttbl` (market) — built their
+  column-header rows as inline template literals with **bare `<th>`** (no `scope="col"`), so on these
+  wide tables a screen reader couldn't reliably associate each data cell with its column header
+  (WCAG 1.3.1). Added `scope="col"` to every `<th>` in the three header rows, matching `data.html`'s
+  already-scoped `#ptbl`/`districtTable` convention. All are column headers, so `scope="col"` is
+  correct throughout. Zero visual change (scope is non-presentational). Only `platform/app.js` (6 lines)
+  + the `docs/UXUI_AUDIT.md` fixed-log/backlog note touched.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **103 passed / 0 failed**;
+  `node --check platform/app.js` clean. (b) Headless render of `index.html#branches` = clean — header
+  row, 2,015 branches, lead line and "+146 more rows" cap footer all intact; settled DOM confirms all 9
+  branches `<th>` now carry `scope="col"`. (c) No secrets in the diff. (d) Diff matched intent, no stray
+  files. → squash-merged own PR #241 (`960e96d`), branch deleted.
+- **Deploy-verify.** Production alias root + `app.js` both **HTTP 200** (no regression → no rollback).
+  Note: **PR #240 ("Live board") was merged to master ~80s after #241**, so the master prod alias's
+  newest build is #240's (commit `b864026`), which QUEUED while #241's build was still building.
+  Verified authoritatively via git that #241's commit `960e96d` **is an ancestor of the master tip**
+  and the tip's `app.js` retains the change intact (Branch-header `scope="col"` fragment present, 7
+  scope lines total) — #240 landed on top without touching the edited lines. The change is permanently
+  in master and ships with whichever build (both include it) the alias lands on; at log time both new
+  production builds were still BUILDING/QUEUED, so the alias was transiently serving the prior READY
+  deploy (#238, `9d165bf`) — expected propagation lag, not a failure.
+- **Recommend next.** Continue `ux-table-scope-sweep-appjs`: the `#region`/`#acqtbl`/`#amptbl` families
+  and the competition/exposure tables still have bare `<th>`. Best done as one dedicated mechanical run
+  (many literals) rather than folded into a surgical fix. Separately, the new **`#live` Live board**
+  (#240) is now on master and unaudited by this loop — worth a mobile/overflow + provenance-label pass
+  on a future run.
+
 ## 2026-08-01 — intelligence-loop (deployment-health): site-health probes now guard the last three surfaced-but-unprobed exec reads — `rival_density`, `search_demand`, `household_risk_by_province`
 
 - **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** The named data-integration backlog is
