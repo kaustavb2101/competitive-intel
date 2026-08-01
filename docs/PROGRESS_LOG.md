@@ -3,6 +3,31 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — ux-loop: wrap long Thai tokens in the five-pillar cards (PR #239, merged + deployed + verified)
+
+- **Autonomous UX loop.** All seven original `docs/UXUI_AUDIT.md` findings are long since fixed, so this
+  run reviewed routes directly (headless renders of `#home`/`#assist`/`#acq` at 760px + a DOM-defect
+  sweep: 0 duplicate IDs, 0 missing `alt`, 0 empty `href="#"`) and found one new surgical gap.
+- **Finding `ux-pillar-narrow-overflow-wrap`.** The command-center five-pillar summary band's `.pill`
+  cards (`renderHomePillars`) render measured Thai branch/province names — Acquisition "densest branch
+  book: NAME", Competitor read, Assistance radar #1. Thai has no inter-word spaces, so a long name is a
+  single unbreakable token, and each `.pill` is `overflow:hidden`, so on a narrow phone that token would
+  be silently **clipped** at the card edge rather than wrapping. The sibling `.cc-hero-card` verdict card
+  already guards this exact case (`overflow-wrap:anywhere` on `.cc-hero-big`/`.cc-hero-sub`,
+  `ux-cc-hero-card-narrow-overflow`); the five-pillar band showed the same content class but was never
+  given the treatment.
+- **Fix.** Added `overflow-wrap:anywhere` to `.pill-big` + `.pill-read` in `styles.css` (both
+  five-pillar-only classes; the map lens `.pill.lens` shares the base `.pill` but not these text
+  children, so lens pills are untouched). CSS-only, additive — space-separated content is unaffected, so
+  zero visual change on the current data.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **102 passed / 0 failed** with the
+  change; (b) headless `#home` post-change render is **byte-identical** to pre-change (`data-errors=[]`),
+  `#assist`/`#acq` self-reviewed; (c) no secrets in the diff; (d) diff scoped to `styles.css` +
+  `UXUI_AUDIT.md` only. Squash-merged own PR #239.
+- **Deploy verified.** Master auto-deployed to Vercel; production alias `/` → **200**, `styles.css` →
+  **200** with `overflow-wrap:anywhere` present on both `.pill-big` and `.pill-read` (fix is live).
+  `index.html` → 308 is the expected `cleanUrls` redirect to `/`. No regression, no rollback.
+
 ## 2026-08-01 — fix(gate): realign commodities.json + provenance.json to committed sources (master was RED again)
 
 - **Master's determinism gate was RED** at `bc08233`: `102 → 99 passed, 3 failed`. Two coupled failures,
