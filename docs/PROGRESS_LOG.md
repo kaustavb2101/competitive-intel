@@ -3,6 +3,52 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Macro audit: a decision band on top, and three numbers that were saying the wrong thing
+
+Owner ask, ahead of MCOM: *"management needs the headlines, but working team needs branch level
+guidance on execution… perform deep audit of the macro tab… ensure all numbers are correct too. no
+stupid errors."* The band is the headline layer; the rest of this entry is what the audit actually
+found, because two of the three defects had been on the live site for weeks and both were the kind a
+reader spots from the back of the room.
+
+- **The decision band (`renderMacroSoWhat`, `#ov-sowhat`).** The tab already opened with six measured
+  numbers. A number is not an answer — the reader still has to work out which one matters and what to
+  do about it. The new band sits above it: six rows, each a *statement with a consequence*, each
+  jumping into the topic that proves it. It routes through the SAME `showOvPanel` switcher the chips
+  use, so it can never leave two topics open or desync the active chip. Every row is computed from a
+  committed layer and a row whose layer is absent is simply not emitted — it cannot invent a headline.
+- **DEFECT 1 (branch popups, 89 branches) — a rising crop price was being printed as the cause of
+  crop stress.** `build_branch_recommendations.py` rendered *"Agri stress: Rice catchment under
+  pressure (25.4, price 10.8% + dry)"*. But `agri_pressure = (0.6·price_stress + 0.4·drought)·intensity`
+  and `price_stress = max(0, −price_yoy·3)` — so a price that is UP contributes **exactly zero**.
+  Checked across the whole layer: **all 89 stressed branches have `price_stress = 0.0`**, i.e. every
+  one is drought-only, and every one was printing a positive YoY as if it were the pressure. The
+  score was right the whole time; the sentence said the opposite of the arithmetic. It now names the
+  term that actually produced the index and states plainly when the price is not contributing.
+- **DEFECT 2 (the "Bottom line", the most prominent sentence on the tab) — a size artefact reading as
+  a finding.** `top_reg` was `max(regions, key=raw count)`, which the largest region wins by
+  construction, so all three priorities resolved to "Central & Bangkok" and the sentence read like a
+  broken template. Now rate-based (share of a region's OWN branches), which separates them: rival
+  pressure Central & Bangkok 71%, crop stress Central & Bangkok 13%, and thinnest resale market
+  **Northeast · Isan** at 14% — a different map, and the one that matters for recovery.
+- **DEFECT 3 (same sentence) — a product-push clause that contradicts the consolidation pivot.**
+  *"lead with vehicle-title products where collateral density is high."* The identical phrasing had
+  already been deleted from the per-region cards on 2026-07-25 for exactly this reason and was left
+  behind in the headline. Inverted to the risk it actually describes: where the local resale market
+  is **thin**, recovery on an enforced title is weakest. The unrendered `_region_actions` /
+  `_top_action` strings ("Expand", "Grow farm lending", "Push vehicle-title") were corrected too, so
+  a future re-enable cannot reintroduce them.
+- **Two measured household-debt figures now reconcile instead of just coexisting.** BIS 2025-Q4 =
+  87.5% (answer band) and BoT Q2/2568 = 87.0% (Labour section) sat ~400px apart with no relationship
+  stated, and the BoT one rendered as bare "87%" against a precise "87.5%". Both are right — different
+  compilers, different quarters — so the fix is not to delete one: the band's BIS figure now **leads**
+  (newer vintage, carries the trend), the BoT figure is the named domestic cross-check, both print to
+  one decimal, and the 0.5pp gap is labelled definitional. `renderRegionDebt` also load-then-re-renders
+  `MACROIND`, because whichever layer lost the fetch race used to silently drop the whole clause.
+- **Note for the next audit:** the three defects above share a shape — the *computation* was correct
+  and the *sentence describing it* was not. Grep-level review does not catch that class; it needs
+  reading the rendered string against the arithmetic that produced it.
+
 ## 2026-08-01 — intelligence-loop (DATA-INTEGRITY): the coastal total-join drift now fails LOUDLY at its source — `build_amphoe.py` asserts `sum(.branches) == len(branch_amphoe) == len(master)`
 
 - **Autonomous intelligence loop, DATA-INTEGRITY pillar.** Re-verified the named integration backlog

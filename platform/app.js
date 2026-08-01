@@ -1663,6 +1663,11 @@ function showOvPanel(id,opt){
   if(opt.scroll==='nav'&&nav) nav.scrollIntoView({behavior:'smooth',block:'start'});
   const sm=wrap.querySelector('#'+CSS.escape(target)+' > summary');
   if(sm&&opt.scroll) sm.focus({preventScroll:true});
+  // Build the topic's own sub-switcher. Most blocks are filled by async renderers, so build now for
+  // the already-resolved ones and rebuild as the rest land — ovSubInit() is a full rebuild, so the
+  // repeats are free and the reader's chosen subsection survives them (it is keyed by label).
+  ovSubInit(target);
+  [500,1500].forEach(ms=>setTimeout(()=>{ if(OV_PANEL===target) ovSubInit(target); },ms));
 }
 /* A click on a visible summary would normally just toggle that one panel; route it through the
    switcher so the "one open at a time" rule holds however the reader gets there. Closing the only
@@ -1671,6 +1676,92 @@ document.addEventListener('click',e=>{
   const sm=e.target.closest&&e.target.closest('#ovswitch details.ovsec > summary'); if(!sm) return;
   e.preventDefault();
   showOvPanel(sm.parentElement.id);
+});
+
+/* ---------- SECOND level: a sub-switcher INSIDE the long topics (2026-08-02) ----------
+   Making the six topics exclusive fixed the tab-level scroll. It did not fix the scroll INSIDE a
+   topic, and that is where the length actually is: Collateral is 3,844px across 7 subsections and
+   Farm households 3,022px across 4, so choosing "Collateral" still hands the reader seven subjects
+   when they wanted one. This applies the same one-at-a-time rule a level down.
+
+   Built from the DOM rather than declared in markup on purpose: every subsection already starts with
+   an `h3.ovsub` (directly, or as the first heading of its own wrapper div), so a topic that gains or
+   loses a subsection gets the right chips with no second place to update. It rebuilds on every call
+   and is therefore idempotent — necessary because most of these blocks are filled asynchronously and
+   a block can disappear entirely when its renderer finds no data.
+
+   An "All" chip is always present: nothing this does may put content out of reach. Hiding is
+   screen-only (see .ovsub-off in styles.css) so printing still emits the whole tab, which is the
+   promise the per-tab print makes. */
+const OV_SUB={};        // section id -> the chosen subsection LABEL (survives rebuilds; index doesn't)
+const OV_SUB_MIN=3;     // below this a strip is just clutter — two headings read fine stacked
+function ovSubBlocks(sec){
+  const blocks=[];
+  [...sec.children].forEach(c=>{
+    if(c.tagName==='SUMMARY'||c.classList.contains('ovsubnav')) return;
+    const h=(c.matches&&c.matches('h3.ovsub'))?c:(c.querySelector?c.querySelector('h3.ovsub'):null);
+    if(h){
+      // Chip label = the heading up to its first "·" separator, with the MEASURED/ESTIMATED tag
+      // stripped. The full heading stays as the chip's title so nothing is lost to the shortening.
+      const cl=h.cloneNode(true); cl.querySelectorAll('.tag').forEach(t=>t.remove());
+      const full=cl.textContent.replace(/\s+/g,' ').trim();
+      let label=full.split('·')[0].trim()||full;
+      // Shortening must never drop a provenance qualifier. "Collateral recovery-value sensitivity ·
+      // illustrative" shortened to "Collateral recovery-value sensitivity" would present a scenario
+      // table under the same chip styling as the measured ones — the exact honesty the tab is built
+      // on. If the part being cut says what kind of number it is, it stays.
+      const qual=full.slice(label.length).match(/illustrativ\w*|estimat\w*|proxy|scenario\w*/i);
+      if(qual) label+=' · '+qual[0].toLowerCase();
+      blocks.push({label, full, nodes:[]});
+    }
+    if(!blocks.length) blocks.push({label:'', full:'', nodes:[]});   // preamble before any heading
+    blocks[blocks.length-1].nodes.push(c);
+  });
+  // A block whose renderer hid its own wrapper has nothing to show — no chip for it.
+  return blocks.filter(b=>b.label&&b.nodes.some(n=>n.style.display!=='none'));
+}
+function ovSubApply(sec,blocks,label){
+  const all=!label;
+  blocks.forEach(b=>b.nodes.forEach(n=>n.classList.toggle('ovsub-off',!all&&b.label!==label)));
+  const nav=sec.querySelector(':scope > .ovsubnav');
+  if(nav) nav.querySelectorAll('[data-ovsub]').forEach(c=>{
+    const on=(c.dataset.ovsub||'')===(label||'');
+    c.classList.toggle('on',on); c.setAttribute('aria-selected',String(on));
+  });
+}
+function ovSubInit(secId){
+  const sec=document.getElementById(secId); if(!sec) return;
+  let nav=sec.querySelector(':scope > .ovsubnav');
+  const blocks=ovSubBlocks(sec);
+  if(blocks.length<OV_SUB_MIN){
+    if(nav) nav.remove();
+    // Never leave content hidden by a strip that no longer exists.
+    sec.querySelectorAll('.ovsub-off').forEach(n=>n.classList.remove('ovsub-off'));
+    return;
+  }
+  if(!nav){
+    nav=document.createElement('nav');
+    nav.className='jumpnav ovsubnav no-print';
+    nav.setAttribute('aria-label','Choose one part of this topic');
+    const sm=sec.querySelector(':scope > summary');
+    sec.insertBefore(nav,sm?sm.nextSibling:sec.firstChild);
+  }
+  // The remembered choice can vanish when a block's data does — fall back to All, never to nothing.
+  let sel=OV_SUB[secId]||'';
+  if(sel&&!blocks.some(b=>b.label===sel)) sel='';
+  OV_SUB[secId]=sel;
+  nav.innerHTML=`<button type="button" class="chip" data-ovsub="" aria-selected="${!sel}">All</button>`
+    +blocks.map(b=>`<button type="button" class="chip" data-ovsub="${b.label.replace(/"/g,'&quot;')}" title="${b.full.replace(/"/g,'&quot;')}" aria-selected="${sel===b.label}">${b.label}</button>`).join('');
+  ovSubApply(sec,blocks,sel);
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest&&e.target.closest('.ovsubnav [data-ovsub]'); if(!c) return;
+  e.preventDefault();
+  const sec=c.closest('details.ovsec'); if(!sec) return;
+  OV_SUB[sec.id]=c.dataset.ovsub||'';
+  ovSubApply(sec,ovSubBlocks(sec),OV_SUB[sec.id]);
+  const nav=sec.querySelector(':scope > .ovsubnav');
+  if(nav) nav.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 
 /* ---------- load ---------- */
@@ -1891,6 +1982,7 @@ function renderOverview(){
   // The "Segment signals by region" table (#region) and the province macro watchlist were both
   // removed 2026-08-01 — see index.html for the reasoning. META.region is still consumed by the
   // Command-center risk readout, so the DATA stays; only this Macro-tab rendering of it is gone.
+  renderMacroSoWhat();
   renderAnswerBand();
   renderCollatOutlook();
   renderDieselCollateral();
@@ -1981,6 +2073,94 @@ function abTile(o){
     +(tr?`<div class="ab-tr">${tr}</div>`:'')
     +(o.sub?`<div class="ab-s">${o.sub}</div>`:'')+`</div>`;
 }
+/* ---------- Macro "so what" band (2026-08-02, owner ask) ----------
+   The band below this one is six MEASURED numbers. Numbers are not an answer: a reader still has to
+   work out which of them matters this week and what to do about it. This band is the sentence
+   version — each row is one decision-relevant statement with its consequence, and each row jumps to
+   the section that proves it, so the CEO reads the line and the branch team follows the arrow.
+   Every row is computed from a committed layer; a row whose layer is absent is simply not emitted,
+   so this can never invent a headline. Deliberately capped: if everything is urgent, nothing is. */
+function renderMacroSoWhat(){
+  const host=$('#ov-sowhat'); if(!host) return;
+  Promise.all(['crop_mix','tape_real','brand_trends','thaiwater_flood','debt_source','farm_household']
+    .map(n=>tmliFetch(n))).then(([cm,tape,bt,flood,debt,fh])=>{
+    const R=[], N=n=>Number(n).toLocaleString();
+    const row=(icon,jump,lead,tail)=>R.push({icon,jump,lead,tail});
+
+    // 1. The farm book, weighted across every priced crop. The point of the row is the CONTRAST: the
+    //    national aggregate is positive, which is exactly why the four provinces are invisible in it.
+    if(cm&&cm.national&&cm.national.negative_provinces){
+      const n=cm.national, w=n.worst&&n.worst[0];
+      row('🌾','sec-ov-agri',
+        `<b>${N(n.accounts_in_negative)} farm accounts</b> sit in <b>${n.negative_provinces} provinces whose crop mix is falling</b>${w?`, worst ${w.prov} down ${Math.abs(w.shock_pct)}%`:''}`,
+        `the book-weighted national move is <b>+${n.book_weighted_shock_pct}%</b>, so the aggregate hides them; this is concentration, not a national downturn`);
+    }
+    // 2. What the titles are worth — accounts vs balance, which the book's own tape settles.
+    const vt=tape&&tape.vehicle_types;
+    if(vt&&vt.PU&&vt.MC){
+      const tn=Object.values(vt).reduce((s,v)=>s+(v.n||0),0),
+            to=Object.values(vt).reduce((s,v)=>s+(v.os_sum||0),0);
+      const p=k=>({a:100*vt[k].n/tn, o:100*vt[k].os_sum/to});
+      const pu=p('PU'), mc=p('MC');
+      row('🛻','sec-ov-collateral',
+        `<b>Pickups are ${pu.o.toFixed(0)}% of outstanding</b> on ${pu.a.toFixed(0)}% of accounts; <b>motorcycles are ${mc.a.toFixed(0)}% of accounts on ${mc.o.toFixed(0)}%</b> of the money`,
+        'two books, not one: the same collections hour recovers a different amount of baht in each, so staff them separately');
+    }
+    // 3. The collateral pool ahead of us, not the one behind us.
+    const tr=bt&&bt.new_regis_trend, yrs=tr?Object.keys(tr).sort():[];
+    if(yrs.length>=2){
+      const a=tr[yrs[0]].pickup, b=tr[yrs[yrs.length-1]].pickup;
+      const ta=tr[yrs[0]].total, tb=tr[yrs[yrs.length-1]].total;
+      const dp=Math.round(100*(a-b)/a), dt=Math.round(100*(ta-tb)/ta);
+      if(a&&b) row('📉','sec-ov-collateral',
+        `<b>New-pickup registrations are down ${dp}%</b> since ${Number(yrs[0])-543} (${N(a)} → ${N(b)}), against ${dt}% for the whole new-vehicle market`,
+        `the used-pickup pool we will be lending against in a few years is thinning ${dt>0?(dp/dt).toFixed(1)+'× ':''}faster than the market, and pickups already carry the largest share of the balance`);
+    }
+    // 4. Live hazard: the only row here that can change between now and the meeting. Dated from the
+    //    layer's own observation stamp — "right now" would be a lie the moment the pull goes stale.
+    if(flood&&flood.provinces){
+      const ps=Object.entries(flood.provinces).filter(([,v])=>v.n_high>0)
+        .sort((a,b)=>b[1].n_high-a[1].n_high);
+      const obs=(flood.meta&&flood.meta.observed_to)||'';
+      if(ps.length) row('🌊','sec-ov-hazard',
+        `<b>${ps.length} of ${Object.keys(flood.provinces).length} provinces had river stations at high water</b>${obs?` as of ${obs}`:''}, worst ${ps[0][0]} at ${ps[0][1].n_high} of ${ps[0][1].n_stations} stations`,
+        'the only signal on this tab that moves daily; it names a collections problem days before any monthly series does');
+    }
+    // 5. Informal debt: the number everyone assumes is a region and is actually a job.
+    if(debt&&debt.national&&debt.by_class){
+      const last=debt.national[debt.national.length-1];
+      const worst=debt.by_class.slice().sort((a,b)=>(b.informal_pct||0)-(a.informal_pct||0))[0];
+      if(last&&worst) row('💸','sec-ov-labour',
+        `<b>Informal debt is ${last.informal_pct}% of household debt nationally but ${worst.informal_pct}% for ${(worst.cls_en||'the occupations we lend to').toLowerCase()}s</b>`,
+        `${(worst.informal_pct/last.informal_pct).toFixed(0)}× the national rate, and those are our borrowers' occupations: assume debt the file never shows, and read affordability accordingly`);
+    }
+    // 6. The correction that resizes every price claim on this tab.
+    if(fh&&fh.latest&&fh.latest.nonfarm_share_of_income_pct!=null) row('🏠','sec-ov-agri',
+      `<b>${fh.latest.nonfarm_share_of_income_pct}% of a farm household's cash income is non-farm</b>`,
+      'so a crop-price shock reaches roughly half of what the household actually earns — halve every price number on this tab before you act on it');
+
+    if(!R.length){ host.style.display='none'; return; }
+    host.style.display='';
+    host.innerHTML=`<div class="sw-hd">What this tab says today <span class="s">— the answer, then the evidence. Each line opens the section that proves it.</span></div>`
+      +R.map(r=>`<button class="sw-row" data-swjump="${r.jump}">
+          <span class="sw-ico" aria-hidden="true">${r.icon}</span>
+          <span class="sw-txt">${r.lead}${r.tail?` <span class="sw-tail">— ${r.tail}</span>`:''}</span>
+          <span class="sw-go" aria-hidden="true">→</span></button>`).join('');
+  }).catch(()=>{ host.style.display='none'; });
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-swjump]'); if(!b) return;
+  // Reset the target topic to "All" first. A row promises to open the section that PROVES it, and
+  // the sub-switcher remembers whichever subsection the reader last chose there — so without this,
+  // following "pickups are 38% of outstanding" could land on the EV panel with the pickup evidence
+  // hidden. The band's promise outranks the remembered sub-selection.
+  if(typeof OV_SUB==='object'&&OV_SUB) OV_SUB[b.dataset.swjump]='';
+  // Route through the SAME exclusive topic switcher the chips use, so the band can never leave two
+  // topics open at once or desync the active chip.
+  if(typeof showOvPanel==='function') showOvPanel(b.dataset.swjump,{scroll:'nav'});
+  else { const s=document.getElementById(b.dataset.swjump); if(s){ s.open=true; s.scrollIntoView({behavior:'smooth',block:'start'}); } }
+});
+
 function renderAnswerBand(){
   const host=$('#ov-answer'); if(!host) return;
   Promise.all([tmliFetch('commodities'),loadMacroIndicators(),tmliFetch('tape_real'),
@@ -2623,6 +2803,11 @@ function renderBrandTrends(){
 // the common vintage → the whole block stays hidden (nothing fabricated).
 function renderRegionDebt(){
   const wrap=$('#regdebt-wrap'); if(!wrap) return;
+  // The BIS/BoT reconciliation line below needs MACROIND, which loads on its own promise. Without
+  // this, whichever layer lost the race silently dropped the reconciliation — the exact failure the
+  // line exists to prevent. Load-then-re-render once; loadMacroIndicators() is promise-cached, so
+  // this costs one extra call at most and cannot loop.
+  if(!MACROIND&&!macroIndDone){ loadMacroIndicators().then(renderRegionDebt); }
   const S=REGDEBT||{};
   const money=v=>(v==null||!isFinite(v))?'—':'฿'+Math.round(v).toLocaleString('en-US');
   // 4-region debt-per-household at the most recent common vintage (SES 2566/2023); dedup by region.
@@ -2640,10 +2825,26 @@ function renderRegionDebt(){
   const vb=$('#regdebt-verdict');
   if(vb){
     vb.className='verdict v-warn'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">📉 <b>Household leverage is the macro backdrop under portfolio risk${gdp?`: BoT puts household debt at ${gdp.value}% of GDP`:''}${gdp?` (${gdp.vintage})`:''}.</b> `+
+    // TWO measured household-debt-to-GDP figures exist on this tab and used to sit ~400px apart with
+    // no relationship stated: BIS 2025-Q4 = 87.5% (the answer band + the Bottom line) and BoT
+    // Q2/2568 = 87.0% (here). Both are right; they are different compilers on different quarters,
+    // and BIS's own series reads 87.2–87.5 across the same window, so the gap is definitional, not an
+    // error in either. One number has to LEAD or the reader cannot tell which to quote — the band's
+    // BIS figure leads because it is the newer vintage and carries the trend line, and this becomes
+    // the named cross-check. Reconciled 2026-08-02 during the Macro audit.
+    const bisHH=(typeof MACROIND==='object'&&MACROIND&&MACROIND.indicators)?MACROIND.indicators.household_debt_gdp:null;
+    // One decimal on BOTH figures. 87.0 rendered as "87" next to a BIS "87.5" reads as a rounded
+    // number being compared to a precise one, which is the kind of avoidable ambiguity that costs a
+    // slide its credibility. The vintage string already contains its own parentheses — don't nest.
+    const hh1=v=>(v==null||!isFinite(v))?'—':Number(v).toFixed(1);
+    const vint=s=>String(s||'').replace(/^\((.*)\)$/,'$1');
+    vb.innerHTML=`<div class="verdict-line">📉 <b>Household leverage is the macro backdrop under portfolio risk${gdp?`: BoT puts household debt at ${hh1(gdp.value)}% of GDP`:''}${gdp?` · ${vint(gdp.vintage)}`:''}.</b> `+
       `Regionally the heaviest household debt sits in <b>${TH_REG[heaviest.geo]||heaviest.geo}</b> at ${money(heaviest.value)}/household (SES 2023)</div>`+
-      `<div class="sub" style="margin-top:4px">${cushion?`~${cushion.value}% of Thai households hold under 3 months' financial cushion (${cushion.vintage}). `:''}`+
-      `Where households already carry the most debt, an income shock bites soonest — the leverage floor beneath the agri-PD / title book. ${TAG_M}.</div>`;
+      `<div class="sub" style="margin-top:4px">${cushion?`~${cushion.value}% of Thai households hold under 3 months' financial cushion · ${vint(cushion.vintage)}. `:''}`+
+      `Where households already carry the most debt, an income shock bites soonest — the leverage floor beneath the agri-PD / title book. ${TAG_M}.</div>`+
+      (bisHH&&gdp&&bisHH.value!=null&&bisHH.value!==gdp.value
+        ? `<div class="sub" style="margin-top:4px">Reconciling the two figures on this tab: the headline band quotes <b>${hh1(bisHH.value)}% — BIS, ${bisHH.period}</b>; this line quotes <b>${hh1(gdp.value)}% — BoT, ${vint(gdp.vintage)}</b>. Different compilers on different quarters of the same concept — <b>lead with the BIS figure</b> (newer vintage, and the one carrying the trend), and treat BoT's as the domestic cross-check. The ${Math.abs(bisHH.value-gdp.value).toFixed(1)}pp gap is definitional, not a discrepancy; both point down.</div>`
+        : '');
   }
   const note=$('#regdebt-note');
   if(note) note.innerHTML='<b>Measured</b> — Bank of Thailand regional letters over NSO Socio-Economic Survey (SES) data. '+

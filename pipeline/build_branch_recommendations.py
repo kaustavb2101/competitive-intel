@@ -100,23 +100,45 @@ def build():
                          "w": [{"s": "Competitor branches ≤2 km · rival_pressure.json", "v": "%d (≥3)" % n2, "m": "measured"}]})
         # 3) AGRI — pressure vs tailwind
         ap = a.get("agri_pressure"); pyoy = a.get("price_yoy")
+        pstress = a.get("price_stress") or 0.0
+        dstress = a.get("drought_stress") or 0.0
+        inten = a.get("intensity") or 0.0
         pyoy_src = a.get("price_src") or "NABC/OAE"
         dom_crop = agri_crops[a["dom"]]["label"] if (a.get("dom", -1) >= 0 and a["dom"] < len(agri_crops)) else None
         if a.get("rubber_share", 0) >= 0.5:
             dom_crop = "rubber"
         if isinstance(ap, (int, float)) and ap >= 25:
+            # agri_pressure = (0.6·price_stress + 0.4·drought)·intensity, and price_stress is
+            # max(0, −price_yoy·3) — so a crop price that is UP contributes exactly ZERO to the score.
+            # This line used to print that positive YoY inside "under pressure (…, price 10.8% + dry)",
+            # which states the opposite of what the number means: it read as if a rising price were
+            # causing the stress. Every branch over the threshold today is drought-only, so the
+            # sentence now names the term that actually produced the index and says plainly when the
+            # price is not part of it. Fixed 2026-08-02 during the Macro audit.
+            p_part = 0.6 * pstress * inten
+            d_part = 0.4 * dstress * inten
             agri_why = [{"s": "Agri-pressure index · branch_agri.json", "v": "%s (≥25)" % ap, "m": "est"}]
             if pyoy is not None:
-                agri_why.append({"s": "%s price YoY · %s" % (dom_crop or "crop", pyoy_src), "v": "%s%%" % pyoy, "m": "measured"})
-            if (a.get("drought_stress") or 0) > 40:
-                agri_why.append({"s": "Drought stress · branch_agri.json", "v": "%s (>40)" % a.get("drought_stress"), "m": "est"})
+                agri_why.append({"s": "%s price YoY · %s" % (dom_crop or "crop", pyoy_src),
+                                 "v": "%+.1f%% (%s)" % (pyoy, "drag" if pstress > 0 else "not a drag"),
+                                 "m": "measured"})
+            if dstress > 40:
+                agri_why.append({"s": "Drought stress · branch_agri.json", "v": "%s (>40)" % dstress, "m": "est"})
+            if p_part >= d_part:
+                cause = "falling crop prices (%s mix %+.1f%% YoY)%s" % (
+                    dom_crop or "crop", pyoy if pyoy is not None else 0.0,
+                    " on top of dry weather" if dstress > 40 else "")
+            else:
+                ra = a.get("rain_anom")
+                cause = "dry weather%s" % ("" if ra is None else " (3-month rainfall %s%% of normal)" % ra)
+                if pyoy is not None and pstress == 0:
+                    cause += "; the %s price is %+.1f%% YoY and is NOT contributing" % (dom_crop or "crop", pyoy)
             recs.append({"k": "agri", "i": "🌾", "tone": "warn", "p": 80,
-                         "t": "Agri stress: %s catchment under pressure (%s, price %s%%%s) — tighten agri exposure, monitor collections."
-                              % (dom_crop or "farming", ap, pyoy if pyoy is not None else "n/a",
-                                 " + dry" if (a.get("drought_stress") or 0) > 40 else ""), "w": agri_why})
+                         "t": "Agri stress: %s catchment, pressure index %s — driven by %s. Tighten agri exposure, monitor collections."
+                              % (dom_crop or "farming", ap, cause), "w": agri_why})
         elif isinstance(pyoy, (int, float)) and pyoy >= 20 and (a.get("intensity") or 0) >= 0.3:
             recs.append({"k": "agri", "i": "🌾", "tone": "good", "p": 60,
-                         "t": "Agri tailwind: %s prices %+d%% and rising — collections favourable, room to grow farm lending." % (dom_crop or "crop", round(pyoy)),
+                         "t": "Agri tailwind: %s prices %+d%% and rising — farm cash improving, expect agri arrears here to hold." % (dom_crop or "crop", round(pyoy)),
                          "w": [{"s": "%s price YoY · %s" % (dom_crop or "crop", pyoy_src), "v": "%+d%% (≥20)" % round(pyoy), "m": "measured"},
                                {"s": "Agri intensity · branch_agri.json", "v": "%.2f (≥0.30)" % (a.get("intensity") or 0), "m": "est"}]})
         # 4) COLLATERAL — pickup/vehicle base
@@ -126,7 +148,10 @@ def build():
             if ps is not None:
                 col_why.append({"s": "Pickup share · branch_vehicles.json", "v": "%s%%" % ps, "m": "est"})
             recs.append({"k": "collateral", "i": "🚙", "tone": "good", "p": 70,
-                         "t": "Prime collateral: high vehicle density (score %s, pickups %s%%) — push vehicle-title products." % (cs, ps),
+                         # Risk read, not a product push (see CLAUDE.md — the product makes no
+                         # grow/expand/product-lead calls): a deep local vehicle market is what a
+                         # repossession is sold into, so it is a recovery-value statement.
+                         "t": "Prime collateral: high vehicle density (score %s, pickups %s%%) — deep local resale market, stronger recovery if a title is enforced." % (cs, ps),
                          "w": col_why})
         # 5) BORROWER BASE — dominant occupation
         if wf_rows and wf_buckets and i < len(wf_rows):
@@ -137,7 +162,7 @@ def build():
                 share = mix[dom] if dom < len(mix) else None
                 base_val = ("%s (%.0f%% of local workforce)" % (lab, share)) if isinstance(share, (int, float)) else lab
                 recs.append({"k": "base", "i": "👥", "tone": "info", "p": 40,
-                             "t": "Borrower base: mostly %s — tailor product + outreach to them." % lab.lower(),
+                             "t": "Borrower base: mostly %s — size affordability and collections around that income pattern." % lab.lower(),
                              "w": [{"s": "Dominant occupation · branch_workforce.json", "v": base_val, "m": "est"}]})
         if macro_rec:
             recs.append(dict(macro_rec))
