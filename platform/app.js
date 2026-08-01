@@ -8654,6 +8654,41 @@ function provRegOf(mount,prov){
    rides on each price) and states the trip rule so the empty state is legible rather than mysterious.
    Null-safe: absent layer → a calm note, never a broken table. */
 function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch)':'var(--muted)'; }
+/* MEASURED farm-household cash P&L (data/farm_household.json) — the ground under every price claim
+   in this product. The one number that changes how you read the rest is the non-farm share: a crop
+   price move reaches only the farm half of a farm household's cash. National survey means, so it is
+   framed as a backdrop and never joined to a province. */
+function renderFarmHousehold(){
+  const host=document.getElementById('assist-household'); if(!host) return;
+  tmliFetch('farm_household').then(j=>{
+    if(!j||!j.latest){ tmliNote(host,'The household backdrop needs <b>data/farm_household.json</b> — not built for this vintage.'); return; }
+    const L=j.latest, yrs=j.years||[], B=n=>'฿'+Math.round(n).toLocaleString();
+    const inc=L.income||{}, exp=L.expense||{};
+    const nf=L.nonfarm_share_of_income_pct;
+    // Farm income vs non-farm as one honest split bar — the whole point in a single glance.
+    const w=340,h=16,fs=(L.farm_share_of_income_pct||0)/100;
+    const bar=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="farm ${L.farm_share_of_income_pct}% vs non-farm ${nf}% of household cash income">
+        <rect x="0" y="0" width="${(w*fs).toFixed(1)}" height="${h}" fill="var(--agri)" rx="2"/>
+        <rect x="${(w*fs).toFixed(1)}" y="0" width="${(w*(1-fs)).toFixed(1)}" height="${h}" fill="var(--merch)" rx="2"/></svg>`;
+    const trend=yrs.map(r=>`<tr><td><b>${r.crop_year}</b></td>
+        <td class="mono">${B(r.income.farm_total)}</td>
+        <td class="mono">${B(r.income.nonfarm)}</td>
+        <td class="mono">${B(r.expense.total)}</td>
+        <td class="mono"><b>${B(r.net_cash)}</b></td>
+        <td class="mono sub">${B(r.net_cash_monthly)}</td>
+        <td class="mono sub">${r.farm_share_of_income_pct==null?'—':r.farm_share_of_income_pct+'%'}</td></tr>`).join('');
+    const hh=L.household||{};
+    host.innerHTML=`<p class="lead" style="margin:0 0 8px"><b style="color:var(--merch)">${nf}% of a farm household's cash income is non-farm</b> — so a crop-price fall reaches roughly ${L.farm_share_of_income_pct}% of what the household actually earns, not all of it. In ${L.crop_year} the average farm household took ${B(inc.total)} cash, spent ${B(exp.total)}, and cleared <b>${B(L.net_cash)}</b> for the year — <b>${B(L.net_cash_monthly)}/month</b>.</p>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px">${bar}
+        <span class="sub" style="font-size:12px"><span style="color:var(--agri)">■</span> farm ${L.farm_share_of_income_pct}% &nbsp; <span style="color:var(--merch)">■</span> non-farm ${nf}%</span></div>
+      <table class="tbl"><tr><th>Crop year</th><th title="crops + livestock + other farm cash">Farm cash income</th>
+        <th title="wages, remittances, off-season work — untouched by crop prices">Non-farm</th>
+        <th>Cash expense</th><th>Net cash / yr</th><th class="sub">/ month</th><th class="sub">Farm share</th></tr>${trend}</table>
+      <p class="lead sub" style="margin:8px 0 0"><b>Household:</b> head aged ${hh.head_age_years??'—'}, ${hh.household_size??'—'} people, ${hh.workers_15_64??'—'} of working age, ${hh.landholding_rai??'—'} rai held. <b>Reading:</b> ${(j.meta||{}).scope_warning||''} ${(j.meta||{}).not_covered||''}</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssistPriceLens(){
   const host=document.getElementById('assist-price'); if(!host) return;
   tmliFetch('assist_price_radar').then(j=>{
@@ -8759,6 +8794,7 @@ function renderAssist(){
         <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
 
+    renderFarmHousehold();
     renderAssistPriceLens();
 
     // restructuring — did it hold?
