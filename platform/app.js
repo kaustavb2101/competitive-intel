@@ -8011,7 +8011,15 @@ function renderCommoditiesBoard(){
         // do" when the truth is "we cannot compute it yet". Say which of the two it is, and name the
         // unlock. (The other fallers — coconut, pineapple, pork, shrimp, eggs, chicken — have a Thai
         // price but no province area, so they cannot reach a belt at all.)
-        const gapLine=`<div class="cb-assist cb-gap"><b>No call-list possible for ${c.lab}:</b> the assistable-now population is computed from the <b>Thai farm-gate</b> series, and ${c.lab} has none in this repo — so the ${icN(exp.book_accounts)} accounts above are standing exposure, not a worked list.${c.lab==='Sugar'&&(j.meta||{}).sugarcane_gap?` <span class="s">${(j.meta||{}).sugarcane_gap}</span>`:''}</div>`;
+        // Two DIFFERENT reasons a belt can exist with no call list, and saying the wrong one is
+        // its own error: either we hold no Thai price for the crop (sugar), or we hold one and the
+        // assistance radar simply does not map the crop yet (coconut, pineapple — priced by NABC,
+        // but the radar's exposure join reads crop_stress.json, which still carries five crops).
+        const gapLine=`<div class="cb-assist cb-gap"><b>No call-list for ${c.lab} yet:</b> ${
+          c.local_yoy==null
+            ? `the assistable-now population is computed from a <b>Thai price series</b>, and ${c.lab} has none in this repo`
+            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but the assistance radar's exposure join still maps only rice, cassava, maize, oil palm and rubber`
+        } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.${c.lab==='Sugar'&&(j.meta||{}).sugarcane_gap?` <span class="s">${(j.meta||{}).sugarcane_gap}</span>`:''}</div>`;
         const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;

@@ -61,6 +61,10 @@ BOARD_TO_FARMGATE = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm",
 BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  "Palm oil": ("census", "oilpalm"),
                  "Cassava": ("doae", "cassava"), "Maize": ("doae", "maize"),
+                 # Coconut and pineapple are the two steepest FALLING Thai prices on the board.
+                 # ingest_doae.py now maps all 19 registry crops instead of 5, so they finally have
+                 # a belt — a falling price you can put provinces and accounts behind.
+                 "Coconut": ("doae", "coconut"), "Pineapple": ("doae", "pineapple"),
                  "Sugar": ("spam", "sugarcane")}
 
 AREA_SOURCES = {

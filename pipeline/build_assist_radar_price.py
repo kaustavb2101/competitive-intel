@@ -14,10 +14,20 @@ The existing assistance radar (tape_real.json -> assistance_radar) is DROUGHT-dr
 borrowers already slipping in provinces with a rainfall deficit. That is a "who is hurting now" list.
 
 This file is the other half — the PRICE side, and it is deliberately forward-looking. The honest
-finding today is that NO crop with province-level exposure data is falling: every measured Thai
-farm-gate series is up year-on-year (cassava +57%, rubber +38%, palm +32%, sugarcane +26%, rice +12%,
-maize +11%). So a naive "who is in a falling sector" screen returns an empty list, and returning an
-empty list dressed up as insight would be a lie by omission.
+finding today is that no crop MAPPED HERE is falling: the five mapped farm-gate series are all up
+year-on-year (cassava +57%, rubber +38%, palm +32%, rice +12%, maize +11%). So a naive "who is in a
+falling sector" screen returns an empty list, and returning an empty list dressed up as insight
+would be a lie by omission.
+
+TWO CORRECTIONS TO WHAT THAT USED TO SAY (2026-08-01):
+  · It read "every measured Thai farm-gate series is up", which was never true of the whole feed,
+    only of the five crops this file maps. NABC publishes thirteen categories and SIX are DOWN —
+    coconut -70.9%, pineapple -20.0%, pork -6.7%, white shrimp -4.3%, chicken -2.4%, eggs -1.7%.
+    They are absent here because this file's exposure join needs crop_stress.json crop shares, which
+    still carry only the original five crops. Wiring them is the next wave, not a silent omission.
+  · It quoted "sugarcane +26%" as a current move. That number is the OAE crop_prices.json snapshot
+    stamped BE 2562 = 2019 CE — seven years old. There is no current Thai cane price anywhere in
+    this repo; cane registers with the OCSB, not DOAE or NABC.
 
 What IS answerable, and is answered here, is the exposure question underneath it:
 
@@ -241,9 +251,15 @@ def build():
             "caveats": [
                 ("Not a forecast. Ranking crops by exposed accounts says how much of the healthy book "
                  "rides on each price, not which price is going to move."),
-                ("Sugarcane has a measured price series but no province planted-area share in "
-                 "crop_prov_area/DOAE, so it cannot be placed on the map here; it appears only in the "
-                 "per-branch agri layer. Five crops are mapped: " + ", ".join(sorted(CROP_KEY)) + "."),
+                ("Sugarcane cannot be placed on this map, and its only price here is STALE: the OAE "
+                 "snapshot is stamped BE 2562 = 2019 CE. Cane registers with the OCSB, so it has "
+                 "neither a current Thai price nor a DOAE planted area; it appears in the per-branch "
+                 "agri layer carrying that 2019 figure, labelled with its vintage."),
+                ("Only " + str(len(CROP_KEY)) + " crops are mapped here (" + ", ".join(sorted(CROP_KEY))
+                 + "), so 'nothing is falling' means nothing MAPPED is falling. Six measured Thai "
+                 "prices ARE down — coconut, pineapple, pork, white shrimp, chicken, eggs — and are "
+                 "shown on the Macro commodities board. They are missing from this radar because the "
+                 "exposure join reads crop_stress.json crop shares, which still carry only these five."),
                 ("Province crop shares are planted AREA, not the borrower's actual crop. A farm "
                  "borrower in a rice-dominant province is assumed exposed to rice; the tape does not "
                  "record what any individual grows."),

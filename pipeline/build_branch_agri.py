@@ -95,11 +95,20 @@ def crop_price_yoy():
     cp = _load(CROP_PRICES).get("commodities", {})
     out, src = {}, {}
     for c in CROPS:
-        ys = [v.get("yoy") for k, v in cp.items()
-              if c["oae"] in k and isinstance(v.get("yoy"), (int, float))]
+        rows = [v for k, v in cp.items()
+                if c["oae"] in k and isinstance(v.get("yoy"), (int, float))]
+        ys = [v["yoy"] for v in rows]
         if ys:
             out[c["key"]] = round(statistics.median(ys), 1)
-            src[c["key"]] = "OAE farm-gate snapshot"
+            # STATE THE VINTAGE. crop_prices.json is an OAE snapshot stamped in Buddhist-era years
+            # (2561/2562 = 2018/2019 CE) — seven years old. Labelling it only "snapshot" read as
+            # recent, so sugarcane's +26.1% was sitting beside live NABC dailies as if it were a
+            # current move. Fold BE->CE here (subtract 543) and say the year out loud.
+            yrs = sorted({int(v["year_be"]) - 543 for v in rows
+                          if str(v.get("year_be", "")).isdigit()})
+            when = ("%d" % yrs[-1]) if len(yrs) == 1 else (
+                "%d-%d" % (yrs[0], yrs[-1]) if yrs else "undated")
+            src[c["key"]] = "OAE farm-gate snapshot (%s)" % when
         else:
             out[c["key"]] = None
             src[c["key"]] = None

@@ -20,7 +20,8 @@
     "reading": "n_current_x is the count of farm accounts that are CURRENT or only in the X (pre-30-day) bucket — the healthy population you would contact BEFORE it deteriorates. os_thb is the province's WHOLE farm book, not the Current+X slice: the tape aggregate does not expose outstanding split by bucket, and splitting it here would be fabrication.",
     "caveats": [
       "Not a forecast. Ranking crops by exposed accounts says how much of the healthy book rides on each price, not which price is going to move.",
-      "Sugarcane has a measured price series but no province planted-area share in crop_prov_area/DOAE, so it cannot be placed on the map here; it appears only in the per-branch agri layer. Five crops are mapped: Cassava, Maize, Oil palm, Rice, Rubber.",
+      "Sugarcane cannot be placed on this map, and its only price here is STALE: the OAE snapshot is stamped BE 2562 = 2019 CE. Cane registers with the OCSB, so it has neither a current Thai price nor a DOAE planted area; it appears in the per-branch agri layer carrying that 2019 figure, labelled with its vintage.",
+      "Only 5 crops are mapped here (Cassava, Maize, Oil palm, Rice, Rubber), so 'nothing is falling' means nothing MAPPED is falling. Six measured Thai prices ARE down — coconut, pineapple, pork, white shrimp, chicken, eggs — and are shown on the Macro commodities board. They are missing from this radar because the exposure join reads crop_stress.json crop shares, which still carry only these five.",
       "Province crop shares are planted AREA, not the borrower's actual crop. A farm borrower in a rice-dominant province is assumed exposed to rice; the tape does not record what any individual grows.",
       "Drought and price are separate hazards. also_in_drought_radar marks the provinces the rainfall-driven assistance_radar already flags, so the two lists can be read together instead of double-counting."
     ]
@@ -187,7 +188,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.136,
+          "share": 0.1361,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -255,7 +256,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0769,
+          "share": 0.0768,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -679,7 +680,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.2075,
+          "share": 0.2074,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -971,7 +972,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0173,
+          "share": 0.0172,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -1299,7 +1300,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.5644,
+          "share": 0.5645,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1315,7 +1316,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.098,
+          "share": 0.0979,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -1359,7 +1360,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.4643,
+          "share": 0.4642,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -1367,7 +1368,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.2569,
+          "share": 0.257,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": true
@@ -1375,7 +1376,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1622,
+          "share": 0.1621,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -1583,7 +1584,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8992,
+          "share": 0.8991,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2055,7 +2056,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.1506,
+          "share": 0.1505,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true
@@ -2063,7 +2064,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.052,
+          "share": 0.0521,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2107,7 +2108,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6374,
+          "share": 0.6375,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2115,7 +2116,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2559,
+          "share": 0.2558,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -2123,7 +2124,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0502,
+          "share": 0.0503,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -2495,7 +2496,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8337,
+          "share": 0.8338,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2563,7 +2564,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0314,
+          "share": 0.0313,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2615,7 +2616,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7012,
+          "share": 0.7013,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2631,7 +2632,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.0762,
+          "share": 0.0761,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -2771,7 +2772,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.8801,
+          "share": 0.8802,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -2803,7 +2804,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0034,
+          "share": 0.0032,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3151,7 +3152,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6934,
+          "share": 0.6933,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3167,7 +3168,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0368,
+          "share": 0.0369,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3211,7 +3212,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.6,
+          "share": 0.6001,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3219,7 +3220,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2904,
+          "share": 0.2903,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3271,7 +3272,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7187,
+          "share": 0.7188,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3383,7 +3384,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.4883,
+          "share": 0.4882,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3391,7 +3392,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.3808,
+          "share": 0.3809,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3467,7 +3468,7 @@
         {
           "crop": "Cassava",
           "key": "cassava",
-          "share": 0.0767,
+          "share": 0.0768,
           "yoy": 57.3,
           "direction": "up",
           "depended_on": false
@@ -3571,7 +3572,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.2644,
+          "share": 0.2643,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3623,7 +3624,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.7841,
+          "share": 0.7842,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3631,7 +3632,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.1414,
+          "share": 0.1413,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": false
@@ -3683,7 +3684,7 @@
         {
           "crop": "Maize",
           "key": "maize",
-          "share": 0.3399,
+          "share": 0.3398,
           "yoy": 11.3,
           "direction": "up",
           "depended_on": true
@@ -3691,7 +3692,7 @@
         {
           "crop": "Rice",
           "key": "rice",
-          "share": 0.3248,
+          "share": 0.3249,
           "yoy": 12.4,
           "direction": "up",
           "depended_on": true
@@ -3699,7 +3700,7 @@
         {
           "crop": "Rubber",
           "key": "rubber",
-          "share": 0.3037,
+          "share": 0.3038,
           "yoy": 38.0,
           "direction": "up",
           "depended_on": true

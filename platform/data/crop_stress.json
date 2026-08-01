@@ -93,8 +93,8 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.0769,
-          "area": 399770
+          "share": 0.0768,
+          "area": 399654
         },
         {
           "crop": "Maize",
@@ -114,7 +114,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 5201779,
+        "total_crop_rai": 5201663,
         "price_term": 0.0,
         "drought_term": 0.52,
         "hazard": 0.208,
@@ -146,7 +146,7 @@
         {
           "crop": "Cassava",
           "share": 0.0019,
-          "area": 6079
+          "area": 6068
         },
         {
           "crop": "Oil palm",
@@ -166,7 +166,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 3205822,
+        "total_crop_rai": 3205811,
         "price_term": 0.0,
         "drought_term": 0.7375,
         "hazard": 0.295,
@@ -197,8 +197,8 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.0173,
-          "area": 59411
+          "share": 0.0172,
+          "area": 59379
         },
         {
           "crop": "Oil palm",
@@ -213,12 +213,12 @@
       ],
       "price_stress": 15.03,
       "drought": 0.5875,
-      "crop_dependence": 0.6619,
-      "agri_stress": 0.1555,
+      "crop_dependence": 0.662,
+      "agri_stress": 0.1556,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 3443310,
+        "total_crop_rai": 3443278,
         "price_term": 0.0,
         "drought_term": 0.5875,
         "hazard": 0.235,
@@ -250,12 +250,12 @@
         {
           "crop": "Cassava",
           "share": 0.0284,
-          "area": 100188
+          "area": 100051
         },
         {
           "crop": "Maize",
           "share": 0.0068,
-          "area": 24145
+          "area": 24105
         },
         {
           "crop": "Oil palm",
@@ -270,7 +270,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 3527336,
+        "total_crop_rai": 3527159,
         "price_term": 0.0,
         "drought_term": 0.5475,
         "hazard": 0.219,
@@ -297,12 +297,12 @@
         {
           "crop": "Maize",
           "share": 0.1116,
-          "area": 354672
+          "area": 354566
         },
         {
           "crop": "Cassava",
           "share": 0.08,
-          "area": 254172
+          "area": 254201
         },
         {
           "crop": "Rubber",
@@ -322,7 +322,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 3177607,
+        "total_crop_rai": 3177530,
         "price_term": 0.0,
         "drought_term": 0.465,
         "hazard": 0.186,
@@ -354,7 +354,7 @@
         {
           "crop": "Cassava",
           "share": 0.0451,
-          "area": 156452
+          "area": 156456
         },
         {
           "crop": "Oil palm",
@@ -364,17 +364,17 @@
         {
           "crop": "Maize",
           "share": 0.0007,
-          "area": 2353
+          "area": 2344
         }
       ],
       "price_stress": 16.71,
       "drought": 0.3942,
-      "crop_dependence": 0.6668,
-      "agri_stress": 0.1051,
+      "crop_dependence": 0.6669,
+      "agri_stress": 0.1052,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 3468793,
+        "total_crop_rai": 3468788,
         "price_term": 0.0,
         "drought_term": 0.3942,
         "hazard": 0.1577,
@@ -401,7 +401,7 @@
         {
           "crop": "Cassava",
           "share": 0.0291,
-          "area": 64088
+          "area": 64147
         },
         {
           "crop": "Rubber",
@@ -421,7 +421,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2205401,
+        "total_crop_rai": 2205460,
         "price_term": 0.0,
         "drought_term": 0.605,
         "hazard": 0.242,
@@ -599,7 +599,7 @@
         {
           "crop": "Cassava",
           "share": 0.0763,
-          "area": 141379
+          "area": 141392
         },
         {
           "crop": "Oil palm",
@@ -614,12 +614,12 @@
       ],
       "price_stress": 18.64,
       "drought": 0.485,
-      "crop_dependence": 0.356,
+      "crop_dependence": 0.3561,
       "agri_stress": 0.0691,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1852062,
+        "total_crop_rai": 1852075,
         "price_term": 0.0,
         "drought_term": 0.485,
         "hazard": 0.194,
@@ -651,7 +651,7 @@
         {
           "crop": "Maize",
           "share": 0.0658,
-          "area": 136609
+          "area": 136594
         },
         {
           "crop": "Cassava",
@@ -671,7 +671,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2074953,
+        "total_crop_rai": 2074938,
         "price_term": 0.0,
         "drought_term": 0.4175,
         "hazard": 0.167,
@@ -703,7 +703,7 @@
         {
           "crop": "Cassava",
           "share": 0.0424,
-          "area": 65867
+          "area": 65868
         },
         {
           "crop": "Oil palm",
@@ -713,7 +713,7 @@
         {
           "crop": "Maize",
           "share": 0.0001,
-          "area": 94
+          "area": 88
         }
       ],
       "price_stress": 16.33,
@@ -723,7 +723,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1554201,
+        "total_crop_rai": 1554196,
         "price_term": 0.0,
         "drought_term": 0.495,
         "hazard": 0.198,
@@ -744,7 +744,7 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.7012,
+          "share": 0.7013,
           "area": 1293948
         },
         {
@@ -754,13 +754,13 @@
         },
         {
           "crop": "Maize",
-          "share": 0.0762,
-          "area": 140604
+          "share": 0.0761,
+          "area": 140461
         },
         {
           "crop": "Cassava",
           "share": 0.0068,
-          "area": 12496
+          "area": 12486
         },
         {
           "crop": "Oil palm",
@@ -775,7 +775,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1845236,
+        "total_crop_rai": 1845083,
         "price_term": 0.0,
         "drought_term": 0.4025,
         "hazard": 0.161,
@@ -783,7 +783,7 @@
         "price_coverage": 1.0,
         "n_branches": 22,
         "n_rain_branches": 22,
-        "rice_rubber_share": 0.9109,
+        "rice_rubber_share": 0.911,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -854,12 +854,12 @@
         {
           "crop": "Maize",
           "share": 0.2503,
-          "area": 305504
+          "area": 305481
         },
         {
           "crop": "Cassava",
           "share": 0.0851,
-          "area": 103863
+          "area": 103920
         },
         {
           "crop": "Oil palm",
@@ -879,7 +879,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1220521,
+        "total_crop_rai": 1220555,
         "price_term": 0.0,
         "drought_term": 0.5825,
         "hazard": 0.233,
@@ -911,7 +911,7 @@
         {
           "crop": "Cassava",
           "share": 0.03,
-          "area": 80289
+          "area": 80286
         },
         {
           "crop": "Oil palm",
@@ -931,7 +931,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2675722,
+        "total_crop_rai": 2675719,
         "price_term": 0.0,
         "drought_term": 0.2575,
         "hazard": 0.103,
@@ -952,23 +952,23 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.4643,
+          "share": 0.4642,
           "area": 365616
         },
         {
           "crop": "Cassava",
-          "share": 0.2569,
-          "area": 202272
+          "share": 0.257,
+          "area": 202376
         },
         {
           "crop": "Rubber",
-          "share": 0.1622,
+          "share": 0.1621,
           "area": 127697
         },
         {
           "crop": "Maize",
           "share": 0.0888,
-          "area": 69929
+          "area": 69923
         },
         {
           "crop": "Oil palm",
@@ -983,7 +983,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 787444,
+        "total_crop_rai": 787542,
         "price_term": 0.0,
         "drought_term": 0.87,
         "hazard": 0.348,
@@ -991,7 +991,7 @@
         "price_coverage": 1.0,
         "n_branches": 32,
         "n_rain_branches": 32,
-        "rice_rubber_share": 0.6265,
+        "rice_rubber_share": 0.6263,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1009,8 +1009,8 @@
         },
         {
           "crop": "Maize",
-          "share": 0.0314,
-          "area": 58816
+          "share": 0.0313,
+          "area": 58804
         },
         {
           "crop": "Cassava",
@@ -1035,7 +1035,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1875983,
+        "total_crop_rai": 1875971,
         "price_term": 0.0,
         "drought_term": 0.2875,
         "hazard": 0.115,
@@ -1056,13 +1056,13 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.7841,
+          "share": 0.7842,
           "area": 623563
         },
         {
           "crop": "Maize",
-          "share": 0.1414,
-          "area": 112482
+          "share": 0.1413,
+          "area": 112376
         },
         {
           "crop": "Rubber",
@@ -1087,7 +1087,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 795273,
+        "total_crop_rai": 795167,
         "price_term": 0.0,
         "drought_term": 0.67,
         "hazard": 0.268,
@@ -1095,7 +1095,7 @@
         "price_coverage": 1.0,
         "n_branches": 9,
         "n_rain_branches": 9,
-        "rice_rubber_share": 0.8199,
+        "rice_rubber_share": 0.82,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1114,7 +1114,7 @@
         {
           "crop": "Cassava",
           "share": 0.2384,
-          "area": 611472
+          "area": 611474
         },
         {
           "crop": "Rubber",
@@ -1124,7 +1124,7 @@
         {
           "crop": "Maize",
           "share": 0.0166,
-          "area": 42623
+          "area": 42608
         },
         {
           "crop": "Oil palm",
@@ -1134,12 +1134,12 @@
       ],
       "price_stress": 24.34,
       "drought": 0.205,
-      "crop_dependence": 0.4931,
+      "crop_dependence": 0.4932,
       "agri_stress": 0.0404,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2565225,
+        "total_crop_rai": 2565212,
         "price_term": 0.0,
         "drought_term": 0.205,
         "hazard": 0.082,
@@ -1165,13 +1165,13 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.136,
-          "area": 630931
+          "share": 0.1361,
+          "area": 631066
         },
         {
           "crop": "Maize",
           "share": 0.0835,
-          "area": 387416
+          "area": 387293
         },
         {
           "crop": "Rubber",
@@ -1184,14 +1184,14 @@
           "area": 11007
         }
       ],
-      "price_stress": 18.88,
+      "price_stress": 18.89,
       "drought": 0.109,
       "crop_dependence": 0.8916,
       "agri_stress": 0.0389,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 4637673,
+        "total_crop_rai": 4637685,
         "price_term": 0.0,
         "drought_term": 0.109,
         "hazard": 0.0436,
@@ -1228,12 +1228,12 @@
         {
           "crop": "Cassava",
           "share": 0.0188,
-          "area": 17422
+          "area": 17433
         },
         {
           "crop": "Maize",
           "share": 0.0018,
-          "area": 1711
+          "area": 1663
         }
       ],
       "price_stress": 20.5,
@@ -1243,7 +1243,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 926252,
+        "total_crop_rai": 926215,
         "price_term": 0.0,
         "drought_term": 0.5425,
         "hazard": 0.217,
@@ -1264,18 +1264,18 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.6374,
+          "share": 0.6375,
           "area": 1230036
         },
         {
           "crop": "Maize",
-          "share": 0.2559,
-          "area": 493844
+          "share": 0.2558,
+          "area": 493609
         },
         {
           "crop": "Cassava",
-          "share": 0.0502,
-          "area": 96939
+          "share": 0.0503,
+          "area": 96983
         },
         {
           "crop": "Rubber",
@@ -1288,14 +1288,14 @@
           "area": 16554
         }
       ],
-      "price_stress": 15.76,
+      "price_stress": 15.77,
       "drought": 0.245,
-      "crop_dependence": 0.371,
-      "agri_stress": 0.0364,
+      "crop_dependence": 0.3709,
+      "agri_stress": 0.0363,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1929642,
+        "total_crop_rai": 1929451,
         "price_term": 0.0,
         "drought_term": 0.245,
         "hazard": 0.098,
@@ -1303,7 +1303,7 @@
         "price_coverage": 1.0,
         "n_branches": 23,
         "n_rain_branches": 23,
-        "rice_rubber_share": 0.6852,
+        "rice_rubber_share": 0.6853,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1364,7 +1364,7 @@
         {
           "crop": "Cassava",
           "share": 0.1028,
-          "area": 135081
+          "area": 135062
         },
         {
           "crop": "Rubber",
@@ -1389,7 +1389,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1314039,
+        "total_crop_rai": 1314020,
         "price_term": 0.0,
         "drought_term": 0.3425,
         "hazard": 0.137,
@@ -1421,7 +1421,7 @@
         {
           "crop": "Cassava",
           "share": 0.1185,
-          "area": 110071
+          "area": 110072
         },
         {
           "crop": "Rubber",
@@ -1441,7 +1441,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 929222,
+        "total_crop_rai": 929223,
         "price_term": 0.0,
         "drought_term": 0.4825,
         "hazard": 0.193,
@@ -1524,8 +1524,8 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.0767,
-          "area": 34134
+          "share": 0.0768,
+          "area": 34161
         },
         {
           "crop": "Maize",
@@ -1535,12 +1535,12 @@
       ],
       "price_stress": 33.96,
       "drought": 0.8225,
-      "crop_dependence": 0.0855,
-      "agri_stress": 0.0281,
+      "crop_dependence": 0.0856,
+      "agri_stress": 0.0282,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 444988,
+        "total_crop_rai": 445015,
         "price_term": 0.0,
         "drought_term": 0.8225,
         "hazard": 0.329,
@@ -1567,12 +1567,12 @@
         {
           "crop": "Cassava",
           "share": 0.248,
-          "area": 470130
+          "area": 470082
         },
         {
           "crop": "Maize",
           "share": 0.0634,
-          "area": 120152
+          "area": 120130
         },
         {
           "crop": "Rubber",
@@ -1585,14 +1585,14 @@
           "area": 8038
         }
       ],
-      "price_stress": 23.98,
+      "price_stress": 23.97,
       "drought": 0.1625,
-      "crop_dependence": 0.3645,
+      "crop_dependence": 0.3644,
       "agri_stress": 0.0237,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1895812,
+        "total_crop_rai": 1895742,
         "price_term": 0.0,
         "drought_term": 0.1625,
         "hazard": 0.065,
@@ -1618,13 +1618,13 @@
         },
         {
           "crop": "Rubber",
-          "share": 0.1506,
+          "share": 0.1505,
           "area": 44528
         },
         {
           "crop": "Cassava",
-          "share": 0.052,
-          "area": 15376
+          "share": 0.0521,
+          "area": 15411
         },
         {
           "crop": "Oil palm",
@@ -1637,14 +1637,14 @@
           "area": 454
         }
       ],
-      "price_stress": 19.36,
+      "price_stress": 19.37,
       "drought": 1.0,
       "crop_dependence": 0.0569,
       "agri_stress": 0.0228,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 295740,
+        "total_crop_rai": 295775,
         "price_term": 0.0,
         "drought_term": 1.0,
         "hazard": 0.4,
@@ -1652,7 +1652,7 @@
         "price_coverage": 1.0,
         "n_branches": 27,
         "n_rain_branches": 27,
-        "rice_rubber_share": 0.9064,
+        "rice_rubber_share": 0.9063,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1665,7 +1665,7 @@
       "crop_mix": [
         {
           "crop": "Rubber",
-          "share": 0.5644,
+          "share": 0.5645,
           "area": 938069
         },
         {
@@ -1675,13 +1675,13 @@
         },
         {
           "crop": "Maize",
-          "share": 0.098,
-          "area": 162806
+          "share": 0.0979,
+          "area": 162759
         },
         {
           "crop": "Cassava",
           "share": 0.0599,
-          "area": 99593
+          "area": 99549
         },
         {
           "crop": "Oil palm",
@@ -1696,7 +1696,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1661989,
+        "total_crop_rai": 1661898,
         "price_term": 0.0,
         "drought_term": 0.175,
         "hazard": 0.07,
@@ -1704,7 +1704,7 @@
         "price_coverage": 1.0,
         "n_branches": 21,
         "n_rain_branches": 21,
-        "rice_rubber_share": 0.8273,
+        "rice_rubber_share": 0.8274,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1722,13 +1722,13 @@
         },
         {
           "crop": "Rubber",
-          "share": 0.2075,
+          "share": 0.2074,
           "area": 580859
         },
         {
           "crop": "Cassava",
           "share": 0.0567,
-          "area": 158769
+          "area": 158899
         },
         {
           "crop": "Oil palm",
@@ -1748,7 +1748,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2799925,
+        "total_crop_rai": 2800055,
         "price_term": 0.0,
         "drought_term": 0.1025,
         "hazard": 0.041,
@@ -1756,7 +1756,7 @@
         "price_coverage": 1.0,
         "n_branches": 38,
         "n_rain_branches": 38,
-        "rice_rubber_share": 0.9316,
+        "rice_rubber_share": 0.9315,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -1769,7 +1769,7 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.8801,
+          "share": 0.8802,
           "area": 272518
         },
         {
@@ -1789,18 +1789,18 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.0034,
-          "area": 1058
+          "share": 0.0032,
+          "area": 1006
         }
       ],
-      "price_stress": 14.89,
+      "price_stress": 14.88,
       "drought": 0.9225,
       "crop_dependence": 0.0595,
       "agri_stress": 0.022,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 309654,
+        "total_crop_rai": 309602,
         "price_term": 0.0,
         "drought_term": 0.9225,
         "hazard": 0.369,
@@ -1808,7 +1808,7 @@
         "price_coverage": 1.0,
         "n_branches": 20,
         "n_rain_branches": 20,
-        "rice_rubber_share": 0.9363,
+        "rice_rubber_share": 0.9364,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": true
@@ -1832,7 +1832,7 @@
         {
           "crop": "Cassava",
           "share": 0.0091,
-          "area": 17060
+          "area": 17030
         },
         {
           "crop": "Oil palm",
@@ -1842,7 +1842,7 @@
         {
           "crop": "Maize",
           "share": 0.0,
-          "area": 20
+          "area": 19
         }
       ],
       "price_stress": 17.92,
@@ -1852,7 +1852,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1877951,
+        "total_crop_rai": 1877920,
         "price_term": 0.0,
         "drought_term": 0.1525,
         "hazard": 0.061,
@@ -1884,7 +1884,7 @@
         {
           "crop": "Cassava",
           "share": 0.0571,
-          "area": 44491
+          "area": 44497
         },
         {
           "crop": "Oil palm",
@@ -1904,7 +1904,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 779376,
+        "total_crop_rai": 779382,
         "price_term": 0.0,
         "drought_term": 0.3275,
         "hazard": 0.131,
@@ -1999,17 +1999,17 @@
       "crop_mix": [
         {
           "crop": "Maize",
-          "share": 0.3399,
-          "area": 348337
+          "share": 0.3398,
+          "area": 348185
         },
         {
           "crop": "Rice",
-          "share": 0.3248,
+          "share": 0.3249,
           "area": 332949
         },
         {
           "crop": "Rubber",
-          "share": 0.3037,
+          "share": 0.3038,
           "area": 311299
         },
         {
@@ -2030,7 +2030,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1024959,
+        "total_crop_rai": 1024807,
         "price_term": 0.0,
         "drought_term": 0.2227,
         "hazard": 0.0891,
@@ -2038,7 +2038,7 @@
         "price_coverage": 1.0,
         "n_branches": 7,
         "n_rain_branches": 7,
-        "rice_rubber_share": 0.6285,
+        "rice_rubber_share": 0.6287,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2151,12 +2151,12 @@
         {
           "crop": "Cassava",
           "share": 0.1322,
-          "area": 143012
+          "area": 142966
         },
         {
           "crop": "Maize",
           "share": 0.0631,
-          "area": 68239
+          "area": 68221
         },
         {
           "crop": "Rubber",
@@ -2176,7 +2176,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1081483,
+        "total_crop_rai": 1081419,
         "price_term": 0.0,
         "drought_term": 0.1975,
         "hazard": 0.079,
@@ -2297,7 +2297,7 @@
         {
           "crop": "Maize",
           "share": 0.3631,
-          "area": 192166
+          "area": 192125
         },
         {
           "crop": "Rubber",
@@ -2322,7 +2322,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 529238,
+        "total_crop_rai": 529197,
         "price_term": 0.0,
         "drought_term": 0.355,
         "hazard": 0.142,
@@ -2442,7 +2442,7 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.7187,
+          "share": 0.7188,
           "area": 638352
         },
         {
@@ -2453,7 +2453,7 @@
         {
           "crop": "Maize",
           "share": 0.1002,
-          "area": 89039
+          "area": 88984
         },
         {
           "crop": "Cassava",
@@ -2473,7 +2473,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 888183,
+        "total_crop_rai": 888128,
         "price_term": 0.0,
         "drought_term": 0.1575,
         "hazard": 0.063,
@@ -2481,7 +2481,7 @@
         "price_coverage": 1.0,
         "n_branches": 11,
         "n_rain_branches": 11,
-        "rice_rubber_share": 0.8919,
+        "rice_rubber_share": 0.892,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2593,7 +2593,7 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.6934,
+          "share": 0.6933,
           "area": 326548
         },
         {
@@ -2603,8 +2603,8 @@
         },
         {
           "crop": "Cassava",
-          "share": 0.0368,
-          "area": 17311
+          "share": 0.0369,
+          "area": 17359
         },
         {
           "crop": "Oil palm",
@@ -2617,14 +2617,14 @@
           "area": 1818
         }
       ],
-      "price_stress": 14.06,
+      "price_stress": 14.07,
       "drought": 0.2177,
       "crop_dependence": 0.0905,
       "agri_stress": 0.0079,
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 470930,
+        "total_crop_rai": 470978,
         "price_term": 0.0,
         "drought_term": 0.2177,
         "hazard": 0.0871,
@@ -2632,7 +2632,7 @@
         "price_coverage": 1.0,
         "n_branches": 24,
         "n_rain_branches": 24,
-        "rice_rubber_share": 0.6973,
+        "rice_rubber_share": 0.6972,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -2713,7 +2713,7 @@
         {
           "crop": "Cassava",
           "share": 0.0331,
-          "area": 17088
+          "area": 17108
         },
         {
           "crop": "Maize",
@@ -2728,7 +2728,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 516546,
+        "total_crop_rai": 516566,
         "price_term": 0.0,
         "drought_term": 0.1625,
         "hazard": 0.065,
@@ -2749,18 +2749,18 @@
       "crop_mix": [
         {
           "crop": "Maize",
-          "share": 0.4883,
-          "area": 493302
+          "share": 0.4882,
+          "area": 493088
         },
         {
           "crop": "Rice",
-          "share": 0.3808,
+          "share": 0.3809,
           "area": 384705
         },
         {
           "crop": "Cassava",
           "share": 0.1168,
-          "area": 117959
+          "area": 117930
         },
         {
           "crop": "Rubber",
@@ -2780,7 +2780,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 1010254,
+        "total_crop_rai": 1010011,
         "price_term": 0.0,
         "drought_term": 0.0725,
         "hazard": 0.029,
@@ -2788,7 +2788,7 @@
         "price_coverage": 1.0,
         "n_branches": 9,
         "n_rain_branches": 9,
-        "rice_rubber_share": 0.3931,
+        "rice_rubber_share": 0.3932,
         "ds_price_softening": false,
         "ds_share_qualifies": false,
         "ds_drought_elevated": false
@@ -2987,7 +2987,7 @@
         {
           "crop": "Cassava",
           "share": 1.0,
-          "area": 5189
+          "area": 5186
         }
       ],
       "price_stress": 57.3,
@@ -2997,7 +2997,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 5189,
+        "total_crop_rai": 5186,
         "price_term": 0.0,
         "drought_term": 0.3025,
         "hazard": 0.121,
@@ -3127,8 +3127,8 @@
         },
         {
           "crop": "Maize",
-          "share": 0.2644,
-          "area": 39793
+          "share": 0.2643,
+          "area": 39787
         },
         {
           "crop": "Rubber",
@@ -3153,7 +3153,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 150528,
+        "total_crop_rai": 150522,
         "price_term": 0.0,
         "drought_term": 0.0,
         "hazard": 0.0,
@@ -3174,13 +3174,13 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.6,
+          "share": 0.6001,
           "area": 444761
         },
         {
           "crop": "Maize",
-          "share": 0.2904,
-          "area": 215288
+          "share": 0.2903,
+          "area": 215198
         },
         {
           "crop": "Cassava",
@@ -3205,7 +3205,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 741293,
+        "total_crop_rai": 741203,
         "price_term": 0.0,
         "drought_term": 0.0,
         "hazard": 0.0,
@@ -3213,7 +3213,7 @@
         "price_coverage": 1.0,
         "n_branches": 18,
         "n_rain_branches": 18,
-        "rice_rubber_share": 0.6525,
+        "rice_rubber_share": 0.6526,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3226,13 +3226,13 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.8992,
+          "share": 0.8991,
           "area": 2402112
         },
         {
           "crop": "Cassava",
           "share": 0.0679,
-          "area": 181276
+          "area": 181478
         },
         {
           "crop": "Rubber",
@@ -3240,14 +3240,14 @@
           "area": 83977
         },
         {
-          "crop": "Maize",
-          "share": 0.0008,
-          "area": 2050
-        },
-        {
           "crop": "Oil palm",
           "share": 0.0008,
           "area": 2049
+        },
+        {
+          "crop": "Maize",
+          "share": 0.0008,
+          "area": 2044
         }
       ],
       "price_stress": 16.27,
@@ -3257,7 +3257,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 2671464,
+        "total_crop_rai": 2671660,
         "price_term": 0.0,
         "drought_term": 0.0,
         "hazard": 0.0,
@@ -3265,7 +3265,7 @@
         "price_coverage": 1.0,
         "n_branches": 35,
         "n_rain_branches": 35,
-        "rice_rubber_share": 0.9306,
+        "rice_rubber_share": 0.9305,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
@@ -3278,7 +3278,7 @@
       "crop_mix": [
         {
           "crop": "Rice",
-          "share": 0.8337,
+          "share": 0.8338,
           "area": 747136
         },
         {
@@ -3289,7 +3289,7 @@
         {
           "crop": "Cassava",
           "share": 0.0256,
-          "area": 22959
+          "area": 22941
         },
         {
           "crop": "Oil palm",
@@ -3299,7 +3299,7 @@
         {
           "crop": "Maize",
           "share": 0.0055,
-          "area": 4906
+          "area": 4901
         }
       ],
       "price_stress": 16.95,
@@ -3309,7 +3309,7 @@
       "double_stress": false,
       "double_stress_score": 0.0,
       "components": {
-        "total_crop_rai": 896124,
+        "total_crop_rai": 896101,
         "price_term": 0.0,
         "drought_term": 0.0,
         "hazard": 0.0,
@@ -3317,7 +3317,7 @@
         "price_coverage": 1.0,
         "n_branches": 10,
         "n_rain_branches": 10,
-        "rice_rubber_share": 0.9603,
+        "rice_rubber_share": 0.9604,
         "ds_price_softening": false,
         "ds_share_qualifies": true,
         "ds_drought_elevated": false
