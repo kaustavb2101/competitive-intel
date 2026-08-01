@@ -323,6 +323,25 @@ def build():
     branch_amphoe = [sid_to_idx[sid] for sid in branch_sid]
     n_fallback = sum(1 for p in branch_pip if not p)
 
+    # ── data-integrity invariant: total-join, asserted at SOURCE ──────────────────
+    # Every branch must be counted in EXACTLY one district's .branches AND appear in
+    # the flat branch_amphoe index. This once diverged silently (2026-08-01: the
+    # off-polygon coastal branches were set in branch_sid but never appended to
+    # branches_by_poly, so .branches summed to 2000 while branch_amphoe held 2015,
+    # overstating rival:AutoX ratios up to 31% downstream). The gate's --check runs
+    # build(), so asserting here makes that class of drift fail LOUDLY at its origin
+    # rather than surfacing three layers away via a downstream index-alignment check.
+    _sum_branches = sum(r["branches"] for r in recs)
+    _n_master = len(master)
+    if not (_sum_branches == len(branch_amphoe) == _n_master):
+        raise SystemExit(
+            f"build_amphoe.py INVARIANT VIOLATION: sum(.branches)={_sum_branches}, "
+            f"len(branch_amphoe)={len(branch_amphoe)}, len(master)={_n_master} — "
+            "every branch must total-join exactly one district count and the flat "
+            "index (an off-polygon branch set in branch_sid must also be appended to "
+            "branches_by_poly)."
+        )
+
     meta = {
         "generated_by": "pipeline/build_amphoe.py",
         "n_amphoe": len(recs),
