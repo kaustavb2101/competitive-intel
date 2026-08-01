@@ -1539,3 +1539,20 @@ svg.cbcell{vertical-align:middle;display:inline-block}
 .cm-spark .s{margin-top:4px;font-size:11px;color:var(--mid)}
 .cm-tbl td,.cm-tbl th{vertical-align:top}
 .cm-tbl .n{font-variant-numeric:tabular-nums;text-align:right}
+/* Crop-mix drill: region cards → province table → branch table. One level on screen at a time. */
+.cm-crumb{font-size:12px;margin:2px 0 8px;color:var(--mid)}
+.cm-crumb a{color:var(--accent);text-decoration:none}
+.cm-crumb a:hover{text-decoration:underline}
+.cm-crumb .cm-sep{margin:0 6px;color:var(--line)}
+.cm-crumb .cm-here{color:var(--hi);font-weight:600}
+.cm-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.cm-card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;font:inherit;color:inherit}
+.cm-card:hover{border-color:var(--accent)}
+.cm-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cm-card-k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mid)}
+.cm-card-v{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.cm-card-n{font-size:11px;color:var(--mid);line-height:1.45}
+.cm-prow{cursor:pointer}
+.cm-prow:hover{background:var(--panel)}
+.cm-chev{color:var(--accent)}
+.cm-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;line-height:1.55}

@@ -8763,28 +8763,115 @@ function renderCropMix(){
       return `<rect x="${i*(BW+1)}" y="${y.toFixed(1)}" width="${BW}" height="${bh.toFixed(1)}" fill="${col(p.shock_pct)}" opacity="${p.shock_pct<0?1:.55}"/>`;}).join('');
     const spark=`<svg width="${all.length*(BW+1)}" height="${H+2}" viewBox="0 0 ${all.length*(BW+1)} ${H+2}" role="img" aria-label="${all.length} provinces ranked by crop-mix price shock, ${N.negative_provinces} negative">${bars}<line x1="0" y1="${zero.toFixed(1)}" x2="${all.length*(BW+1)}" y2="${zero.toFixed(1)}" stroke="var(--line)" stroke-width="1"/></svg>`;
 
-    const rows=N.worst.map(w=>{const p=P[w.prov]; const d=p.crops[0];
-      return `<tr><td><b>${w.prov}</b> <span class="s">${p.region||''}</span></td>
-        <td class="n" style="color:${col(p.shock_pct)}"><b>${sign(p.shock_pct)}%</b></td>
-        <td class="n" style="color:${col(p.income_thb_month)}"><b>${B(p.income_thb_month)}</b></td>
-        <td class="n">${num(p.accounts)}</td>
-        <td class="s">${d?`${d.en} is <b>${Math.round(d.share*100)}%</b> of its crop land and moved <b style="color:${col(d.yoy)}">${sign(d.yoy)}%</b> → ${sign(Math.round(d.pp*10)/10)}pp`:'—'}</td>
-        <td class="n s" title="same calculation with every crop on the DOAE registry alone">${sign(p.shock_pct_doae_basis)}%</td>
-        <td class="n s" title="what the previous rice/rubber/oilpalm-only engine reported">${p.shock_pct_3crop_prior==null?'—':sign(p.shock_pct_3crop_prior)+'%'}</td></tr>`;}).join('');
-
     host.innerHTML=`<h3 class="ovsub risk">Crop mix → farm income · every priced crop, weighted by province land <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
       <div class="verdict v-warn"><b>Farm income is not rising everywhere — ${N.negative_provinces} provinces are falling, and they hold ${num(N.accounts_in_negative)} book accounts.</b>
         Weighted across all eight priced crops, the average AutoX farm borrower's crop mix moved <b style="color:${col(N.book_weighted_shock_pct)}">${sign(N.book_weighted_shock_pct)}%</b> (median province ${sign(N.median_shock_pct)}%). But it is concentrated: the Mae Klong coconut delta is down two-thirds.
         The previous engine weighted <b>rice, rubber and oilpalm only</b> — all three rising — and therefore reported <b>all 77 provinces up</b>. That was an artefact of the three crops it could see.</div>
       <div class="cm-spark">${spark}<div class="s">77 provinces, worst on the left · red = falling crop mix</div></div>
-      <table class="tbl cm-tbl"><tr><th scope="col">Province</th><th scope="col" title="area-weighted Thai farm-gate move across all 8 priced crops">Crop mix move</th>
+      <div id="cm-drill"></div>
+      <p class="lead sub" style="margin:8px 0 0"><b>Why you can trust the ranking:</b> the two area bases disagree on level and not on order — recomputing every crop on the DOAE registry alone moves สมุทรสงคราม from ${sign(P['สมุทรสงคราม'] ? P['สมุทรสงคราม'].shock_pct : 0)}% to ${sign(P['สมุทรสงคราม']?P['สมุทรสงคราม'].shock_pct_doae_basis:0)}% and leaves the worst-first order intact. ${M.area_basis_note||''} DOAE registration covers ${Object.entries(M.doae_coverage_vs_census||{}).map(([k,v])=>`${k} ${v}×`).join(', ')} of the census.</p>`;
+    cmDrill(j);
+    wrapTables();
+  });
+}
+
+/* Region → province → BRANCH breadcrumb for the crop-mix read. A top-10 list answers the CEO's
+   question and none of the branch team's, so this is the same number at three grains: the region
+   card is what you present, the branch table is what someone actually works on Monday. One level is
+   on screen at a time — nesting a branch table inside a province table inside a region card is what
+   made the old impact drill unreadable. Branch rows come from impact_cards.json (the same measured
+   no-PII tape aggregate the risk views use); the crop shock is the province's, applied to the
+   branch's own book, and the row is sorted by the CURRENT (healthy) balance, because that is the
+   population you can still act on before it rolls. */
+function cmDrill(j){
+  const host=document.getElementById('cm-drill'); if(!host) return;
+  const P=j.provinces, R=j.regions||{}, num=n=>Number(n).toLocaleString();
+  const sign=v=>(v==null?'—':(v>0?'+':'')+v), col=v=>v<0?'var(--agri)':'var(--merch)';
+  const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
+  const D1=v=>(v==null?null:Math.round(v*10)/10);   // the tape's 2dp reads as false precision here
+  let ST={level:'region', region:null, prov:null};
+
+  const crumb=parts=>`<div class="cm-crumb">${parts.map((p,i)=>
+    i===parts.length-1?`<span class="cm-here">${p.t}</span>`
+      :`<a href="#" data-go="${p.go}">${p.t}</a><span class="cm-sep">›</span>`).join('')}</div>`;
+
+  function regionView(){
+    const rs=Object.entries(R).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    return crumb([{t:'All regions'}])
+      +`<p class="s" style="margin:0 0 8px">Press a region to see its provinces, then a province to see its branches. Region moves are weighted by <b>book accounts</b>, not by province count — five regions are not five equal books.</p>`
+      +`<div class="cm-cards">${rs.map(([r,g])=>`<button class="cm-card" data-region="${r}">
+          <div class="cm-card-k">${r}</div>
+          <div class="cm-card-v" style="color:${col(g.shock_pct)}">${sign(g.shock_pct)}%</div>
+          <div class="cm-card-n">${num(g.accounts)} accounts · ${g.provinces} provinces${
+            g.negative?` · <b style="color:var(--agri)">${g.negative} falling (${num(g.accounts_negative)} acc)</b>`:' · none falling'}</div>
+          <div class="cm-card-n s">worst: ${g.worst_prov} ${sign(g.worst_shock)}%</div></button>`).join('')}</div>`;
+  }
+
+  function provView(region){
+    const ps=Object.entries(P).filter(([,p])=>p.region===region).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    const rows=ps.map(([th,p])=>{const d=p.crops[0];
+      return `<tr class="cm-prow" data-prov="${th}"><td><b>${th}</b> <span class="cm-chev">›</span></td>
+        <td class="n" style="color:${col(p.shock_pct)}"><b>${sign(p.shock_pct)}%</b></td>
+        <td class="n" style="color:${col(p.income_thb_month)}">${B(p.income_thb_month)}</td>
+        <td class="n">${num(p.accounts)}</td>
+        <td class="s">${d?`${d.en} <b>${Math.round(d.share*100)}%</b> of land, ${sign(d.yoy)}% → ${sign(Math.round(d.pp*10)/10)}pp`:'—'}</td>
+        <td class="n s">${sign(p.shock_pct_doae_basis)}%</td>
+        <td class="n s">${p.shock_pct_3crop_prior==null?'—':sign(D1(p.shock_pct_3crop_prior))+'%'}</td></tr>`;}).join('');
+    return crumb([{t:'All regions',go:'region'},{t:region}])
+      +`<table class="tbl cm-tbl"><tr><th scope="col">Province</th>
+        <th scope="col" title="area-weighted Thai farm-gate move across all 8 priced crops">Crop mix move</th>
         <th scope="col" title="that move through the income engine's farm sensitivity, on the province's measured NSO SES farm income">Farm income</th>
         <th scope="col">Book accounts</th><th scope="col">What is driving it</th>
         <th scope="col" class="s" title="sensitivity: every crop on the DOAE registry alone">DOAE basis</th>
-        <th scope="col" class="s" title="the previous rice/rubber/palm-only figure">Prior</th></tr>${rows}</table>
-      <p class="lead sub" style="margin:8px 0 0"><b>Why you can trust the ranking:</b> the two area bases disagree on level and not on order — recomputing every crop on the DOAE registry alone moves สมุทรสงคราม from ${sign(P['สมุทรสงคราม'] ? P['สมุทรสงคราม'].shock_pct : 0)}% to ${sign(P['สมุทรสงคราม']?P['สมุทรสงคราม'].shock_pct_doae_basis:0)}% and leaves the worst-first order intact. ${M.area_basis_note||''} DOAE registration covers ${Object.entries(M.doae_coverage_vs_census||{}).map(([k,v])=>`${k} ${v}×`).join(', ')} of the census.</p>`;
-    wrapTables();
+        <th scope="col" class="s" title="the previous rice/rubber/palm-only figure">Prior</th></tr>${rows}</table>`;
+  }
+
+  function branchView(th){
+    const p=P[th]||{}, mix=(p.crops||[]).slice().sort((a,b)=>b.share-a.share).slice(0,4);
+    const mixLine=mix.map(c=>`${c.en} ${Math.round(c.share*100)}% <span style="color:${col(c.yoy)}">${sign(c.yoy)}%</span>`).join(' · ');
+    return tmliFetch('impact_cards').then(ic=>{
+      const bs=((ic&&ic.branches)||{})[th]||[];
+      if(!bs.length) return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
+        +`<div class="ic-note">No branch rows published for ${th} — the tape aggregate suppresses any cell under the ${((ic&&ic.meta)||{}).min_cell||30}-account floor.</div>`;
+      // Rank by the CURRENT balance, not by size: the biggest branch is not the biggest opportunity,
+      // the one with the most still-healthy accounts in a falling crop region is.
+      const rows=bs.slice().map(b=>({...b, cur:Math.round(b.n*(b.current_pct||0)/100)}))
+        .sort((a,b)=>b.cur-a.cur)
+        .map(b=>`<tr><td>${b.name}</td>
+          <td class="n">${num(b.n)}</td><td class="n">฿${b.os_m}m</td>
+          <td class="n"><b>${num(b.cur)}</b> <span class="s">(${D1(b.current_pct)}%)</span></td>
+          <td class="n s">${D1(b.early_pct)}%</td>
+          <td class="n" style="color:${(b.dpd30p_pct||0)>=20?'var(--agri)':'inherit'}">${D1(b.dpd30p_pct)}%</td>
+          <td class="n s">${D1(b.npl_live_pct)}%</td></tr>`).join('');
+      const totCur=bs.reduce((s,b)=>s+Math.round(b.n*(b.current_pct||0)/100),0);
+      const act=p.shock_pct<0
+        ? `<b style="color:var(--agri)">Action:</b> ${th}'s crop mix fell ${sign(p.shock_pct)}% — roughly ${B(p.income_thb_month)}/month off a farm household's cash. <b>${num(totCur)} accounts across these ${bs.length} branches are still Current</b>; that is the pre-emptive contact list, worked biggest-Current-book first.`
+        : `<b>Watch only:</b> ${th}'s crop mix is ${sign(p.shock_pct)}%, so there is no price-driven action here today. ${num(totCur)} accounts are Current — this is the standing exposure if the mix turns.`;
+      return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
+        +`<div class="cm-act">${act}<div class="s" style="margin-top:4px">Crop mix: ${mixLine}</div></div>`
+        +`<table class="tbl cm-tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th>
+          <th scope="col" title="outstanding balance">O/S</th>
+          <th scope="col" title="accounts with nothing past due — the population you can still act on">Current</th>
+          <th scope="col" class="s" title="X-bucket, past due but under 30 days">X</th>
+          <th scope="col" title="30+ days past due">30+</th><th scope="col" class="s" title="90-179 days">NPL live</th></tr>${rows}</table>`;
+    });
+  }
+
+  function draw(){
+    const put=html=>{host.innerHTML=html; wrapTables();};
+    if(ST.level==='region') put(regionView());
+    else if(ST.level==='prov') put(provView(ST.region));
+    else branchView(ST.prov).then(put);
+  }
+  host.addEventListener('click',e=>{
+    const card=e.target.closest('[data-region]');
+    if(card){ ST={level:'prov',region:card.dataset.region,prov:null}; draw(); return; }
+    const row=e.target.closest('.cm-prow');
+    if(row){ ST={level:'branch',region:ST.region,prov:row.dataset.prov}; draw(); return; }
+    const go=e.target.closest('[data-go]');
+    if(go){ e.preventDefault(); ST.level=go.dataset.go; draw(); }
   });
+  draw();
 }
 
 /* MEASURED farm-household cash P&L (data/farm_household.json) — the ground under every price claim

@@ -153,6 +153,27 @@ def build():
     # rather than the average province's (77 provinces are not 77 equal books).
     nat = sum(p["shock_pct"] * p["accounts"] for p in provinces.values()) / tot_acc
 
+    # Region rollup — the entry level of the drill. Weighted by BOOK ACCOUNTS, not by province count
+    # or by land: five regions are not five equal books, and the question is what the borrowers we
+    # actually lent to are living through.
+    regions = {}
+    for th, p in provinces.items():
+        r = p.get("region") or "—"
+        g = regions.setdefault(r, {"provinces": 0, "accounts": 0, "_w": 0.0, "negative": 0,
+                                   "worst_prov": None, "worst_shock": None})
+        g["provinces"] += 1
+        g["accounts"] += p["accounts"]
+        g["_w"] += p["shock_pct"] * p["accounts"]
+        if p["shock_pct"] < 0:
+            g["negative"] += 1
+            g["accounts_negative"] = g.get("accounts_negative", 0) + p["accounts"]
+        if g["worst_shock"] is None or p["shock_pct"] < g["worst_shock"]:
+            g["worst_shock"], g["worst_prov"] = p["shock_pct"], th
+    for r, g in regions.items():
+        g["shock_pct"] = round(g["_w"] / g["accounts"], 1) if g["accounts"] else None
+        g["accounts_negative"] = g.get("accounts_negative", 0)
+        del g["_w"]
+
     return {
         "meta": {
             "title": "Per-province crop mix and the farm-income effect of this year's prices",
@@ -205,6 +226,7 @@ def build():
                       "income_thb_month": p["income_thb_month"]}
                      for th, p in ranked[-4:]],
         },
+        "regions": dict(sorted(regions.items())),
         "provinces": provinces,
     }
 
