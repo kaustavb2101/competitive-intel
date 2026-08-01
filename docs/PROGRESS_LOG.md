@@ -3,6 +3,54 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — intelligence-loop (DATA-INTEGRITY): the coastal total-join drift now fails LOUDLY at its source — `build_amphoe.py` asserts `sum(.branches) == len(branch_amphoe) == len(master)`
+
+- **Autonomous intelligence loop, DATA-INTEGRITY pillar.** Re-verified the named integration backlog
+  is exhausted here. In particular the negative-space sweep flagged "11 `--check`-gated build scripts
+  missing from `tests/run.sh`" (tape_layers/region_debt/product_segments/income_impact/scenarios/
+  crop_margin/drought_district/province_lfs/amphoe_crops/impact_cards/commodities) — I built the 11
+  gate lines, then **caught that it was a FALSE POSITIVE and reverted**: `tests/run.sh` already gates
+  exactly those 11 in a `for ing in …; do python3 "$ing.py" --check; done` loop. Both the agent's grep
+  and my own literal `"$b --check"` grep missed it because the loop calls the script through a `$ing`
+  variable, not a literal string. Lesson recorded so the next run doesn't re-flag it: **grep the loop,
+  not just the literal lines.** The only genuinely-absent build (`build_baac_credit.py` →
+  `baac_credit.json`) stays BLOCKED — its `datagoth/baac02_2567` input needs a Thai IP.
+- **The improvement (the coastal-fix entry's explicitly-teed-up next task).** The 2026-08-01
+  coastal-count fix (further below) closed the bug where 15 off-polygon coastal branches were set in
+  `branch_sid` but never appended to `branches_by_poly`, so `amphoe.json`'s per-district `.branches`
+  summed to **2000** while the flat `branch_amphoe` index held **2015** — overstating the rival:AutoX
+  ratio up to **31%** (Phuket 12.62→9.62) three layers downstream. That fix relied on a *downstream*
+  index-alignment check (`rival_density`↔`amphoe`) to catch any regression. This run adds the guard the
+  coastal entry asked for: a source-level invariant in `build_amphoe.py` (right after `branch_amphoe` is
+  computed) asserting `sum(r["branches"] for r in recs) == len(branch_amphoe) == len(master)`, raising
+  `SystemExit` with the three actual counts on any violation. Because the gate's `build_amphoe.py
+  --check` runs `build()`, the whole total-join drift class now fails **at its origin**, not via a
+  coincidental downstream check.
+- **Why it matters (objectives #1 + #2).** `amphoe.json .branches` is the denominator/rollup for the
+  National district lenses, `#exposure` competitor-exposure, `rival_density`, `peer_province` and every
+  rival:AutoX ratio. A silent under-count of AutoX's own branches systematically **overstates** how
+  outnumbered the footprint looks — a competitive-risk read (#2) drawn from a portfolio-count (#1). This
+  makes that specific, already-seen failure impossible to reintroduce unnoticed.
+- **Safeguards — all pass.** (a) **Positive:** `build_amphoe.py --check` → OK, `amphoe.json` reproduces
+  byte-for-byte (928 amphoe) against the current committed vintage; the guard touches no output, only
+  asserts. (b) **Negative:** reintroducing the exact 2026-08-01 bug (dropping the fallback
+  `branches_by_poly[sid0].append(b)`) makes `--check` exit 1 with `INVARIANT VIOLATION:
+  sum(.branches)=2000, len(branch_amphoe)=2015, len(master)=2015` — the guard fires on precisely the
+  drift it targets; source restored, byte-exact again. (c) `bash tests/run.sh check` = **109 passed / 0
+  failed** (data-integrity unchanged — the guard lives inside the already-gated `build_amphoe.py
+  --check`, not a new line). (d) Diff = **one code file, `pipeline/build_amphoe.py`, +19 lines** (a
+  comment + the assertion) plus this log. **No `platform/data` file created or altered** (`amphoe.json`
+  byte-identical → no `build_provenance.py` rebuild needed), **no app.js/HTML change**, no number
+  invented. (e) No secrets in the diff.
+- **Ship.** Direct-to-master (no PR — no rendering/behaviour/visual change; a build-time guard, same
+  class as the prior `check_commodity_board.py` verifier committed direct).
+- **Next recommended intelligence task.** Generalize the guard: several other layers total-join master
+  the same way (`branch_risk`, `branch_labor`, `branch_leads`, `peer_province`, `rival_density`) — a
+  shared `assert_total_join(records, key, expected)` helper reused across those builders would make the
+  whole "per-record count must equal the flat total" invariant a gated property everywhere, not just in
+  `amphoe`. The highest-value OPEN data items remain owner-side/env-gated (Thai-IP `baac_credit` pull;
+  a session-reachable `GISTDA_SPHERE_KEY` for 40m satellite crop-area).
+
 ## 2026-08-01 — agri data wave: sugarcane closed on both sides, and three layers that were already on disk
 
 PR #248. Five layers landed, two deliberately not built. Provenance 123 -> 126 (68 measured,
