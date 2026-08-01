@@ -48,7 +48,13 @@ MONTHS = {m: i + 1 for i, m in enumerate(
      "July", "August", "September", "October", "November", "December"])}
 
 
-from branchkey import norm_branch, master_index  # ONE definition — see pipeline/branchkey.py
+from branchkey import norm_branch, master_index, area_province  # ONE definition — see pipeline/branchkey.py
+from lib.regionmap import region_of  # SAME province->region lookup as the rest of the pipeline
+
+# Rows where the name join fails AND the Area fallback also fails to place a province at all —
+# head-office bookings (e.g. 'ฝ่ายบริหารความสัมพันธ์กับธุรกิจ') and 'DS - ...' direct-sales desks.
+# An explicit, visible bucket — never merged into "(unjoined)" and never silently dropped.
+NO_PROVINCE = "(head office / direct sales)"
 
 
 def fnum(v):
@@ -110,6 +116,7 @@ def main():
     mrows = master if isinstance(master, list) else master.get("branches", [])
     mname, mcoll = master_index(
         mrows, lambda m: (m.get("prov"), m.get("district"), m.get("region"), m.get("code")))
+    provinces = {m.get("prov") for m in mrows if m.get("prov")}  # for the ops-Area fallback below
     if mcoll:
         print("NOTE: %d master branch name(s) share a join key%s"
               % (len(mcoll), " — CONFLICTING geography, resolve these"
@@ -148,7 +155,7 @@ def main():
         # only; the thin residual of each branch's book is allocated downstream (ESTIMATED,
         # province occupation mix) by build_tape_layers — never published below the floor here.
         "branch_x_occ")}
-    n = matched = 0
+    n = matched = area_fallback = no_province = 0
     anchor = ""            # newest disbursement YYYY-MM in the data (determinism anchor)
     vint_curve = collections.defaultdict(new_cell)   # vintage-year|months-on-book-band
 
@@ -171,13 +178,25 @@ def main():
             anchor = ym
         br = str(g(r, "account_disb_Booking_Branch_Name") or "(blank)")
         hit = mname.get(norm_branch(br))
-        prov = hit[0] if hit and hit[0] else "(unjoined)"
         # geographic region from the MASTER join (East/Isan/North/South/Central&BKK) — matches
         # regions.json, so the data book can roll the tape up to the region cards. (Distinct from
         # the tape's own account_disb_Region field, which is an internal ops region NE1/NE2/…)
-        region_geo = hit[2] if hit and hit[2] else "(unjoined)"
         if hit:
             matched += 1
+            prov = hit[0] if hit[0] else "(unjoined)"
+            region_geo = hit[2] if hit[2] else "(unjoined)"
+        else:
+            # NAME join failed — fall back to the tape's own ops Area (province-only: no district,
+            # no branch code; MEASURED from the tape, just coarser than a branch join).
+            ap = area_province(g(r, "account_disb_Area"), provinces)
+            if ap:
+                area_fallback += 1
+                prov = ap
+                region_geo = region_of(ap)   # SAME province->region lookup as the rest of the pipeline
+            else:
+                no_province += 1
+                prov = NO_PROVINCE
+                region_geo = NO_PROVINCE
         occ = str(g(r, "account_disb_ocp_grp") or "(blank)")
         region = str(g(r, "account_disb_Region") or "(blank)")
         area = str(g(r, "account_disb_Area") or "(blank)")
@@ -279,7 +298,20 @@ def main():
                  "raw never leaves the owner's disk; cells under %d accounts suppressed)." % MIN_CELL,
         "source": "Car_Brand_Group data V2.xlsx (loan-level export, 60 columns)",
         "n_accounts": n,
-        "branch_join": {"matched": matched, "pct": round(matched * 100.0 / n, 2)},
+        "branch_join": {
+            "matched": matched, "pct": round(matched * 100.0 / n, 2),
+            # Area fallback (2026-08): when the branch-NAME join fails, province (ONLY — no
+            # district, no branch code) is backfilled from the tape's own ops `account_disb_Area`
+            # column via pipeline/branchkey.py:area_province(). MEASURED from the tape, not a
+            # guess — just coarser than a branch join, which is why it is counted separately here
+            # rather than folded into `matched`.
+            "area_fallback_matched": area_fallback,
+            # Neither the name join nor the Area fallback placed a province at all — head-office
+            # bookings and 'DS - ...' direct-sales desks. Labelled explicitly (see NO_PROVINCE),
+            # never silently dropped or merged into a generic "(unjoined)" bucket.
+            "no_province": no_province,
+            "no_province_label": NO_PROVINCE,
+        },
         "mob_anchor": anchor,
         "fpd_note": "F_FPD categorical: any non-Regular value counts as FPD-flagged",
         "lens_note": ("Owner-framed lenses (2026-07-24): LIVE BOOK = Current..179dpd; "

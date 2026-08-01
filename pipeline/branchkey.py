@@ -73,6 +73,25 @@ def norm_branch(s):
     return _WORDS.sub("", s)
 
 
+# ── explicit master-name correction (2026-08) ────────────────────────────────────────────────
+# One master row is a plain MISSPELLING, not a naming-convention mismatch: 'เงินไชโย
+# สาขาพยัคฆภูมิสัย' (code @chaiyo50506, prov มหาสารคาม) — its own `district` field already spells
+# the town correctly as 'พยัคฆภูมิพิสัย', so the branch `name` field is simply wrong. The tape's
+# 'สาขาพยัคฆภูมิพิสัย' (484 accounts, ops Area มหาสารคาม) is the correctly-spelled name for this
+# exact branch and has no other candidate on the master, but norm_branch() cannot join it because
+# the two spellings differ. This dict is the ONLY entry: a verified, one-off correction of a single
+# master row, not a fuzzy/edit-distance rule (see the module docstring for why that class of change
+# is banned for this join — it would silently book accounts to the wrong province).
+#
+# 'เงินไชโยสาขาพยัคฆภูมิพิสัย 2' (@chaiyo50517) is a SEPARATE, owner-confirmed branch. Its
+# norm_branch() key carries the trailing '2' ('...พยัคฆภูมิพิสัย2') so it never collides with the
+# corrected key added here, and it is left untouched.
+MASTER_KEY_ALIASES = {
+    # @chaiyo50506: 'เงินไชโย สาขาพยัคฆภูมิสัย' (typo key) -> 'สาขาพยัคฆภูมิพิสัย' (correct key)
+    norm_branch("เงินไชโย สาขาพยัคฆภูมิสัย"): norm_branch("สาขาพยัคฆภูมิพิสัย"),
+}
+
+
 def master_index(mrows, value):
     """Build {key: value(row)} over the master branch list, reporting collisions rather than hiding them.
 
@@ -84,6 +103,11 @@ def master_index(mrows, value):
 
     First writer wins, and the master is iterated in its committed order, so the result is
     deterministic — the same key always resolves to the same row.
+
+    Also applies MASTER_KEY_ALIASES: a small, explicit set of verified one-off corrections to a
+    master row's own name (currently just the @chaiyo50506 spelling fix — see that dict's comment).
+    Each alias ADDS the corrected key alongside the original typo key; it never removes or
+    overwrites an existing entry, so it cannot introduce a real collision.
     """
     idx, seen = {}, {}
     for m in mrows:
@@ -98,6 +122,9 @@ def master_index(mrows, value):
             continue
         idx[k] = v
         seen[k] = [{"name": name, "value": v}]
+    for typo_key, good_key in MASTER_KEY_ALIASES.items():
+        if typo_key in idx and good_key not in idx:
+            idx[good_key] = idx[typo_key]
     collisions = []
     for k, rows in seen.items():
         if len(rows) < 2:
@@ -134,3 +161,49 @@ def join_report(idx, names):
                  "placed on the master; see branchkey.py for why each residual class is deliberately "
                  "NOT auto-matched. loan_tape_schema.md's branch_id column removes this join entirely."),
     }
+
+
+# ── ops-Area -> province fallback (2026-08) ──────────────────────────────────────────────────
+# The tape's `account_disb_Booking_Branch_Name` join above still leaves 2,126 of 382,735 accounts
+# unmatched. Those rows ALSO carry `account_disb_Area` — an ops-management area, populated on every
+# real branch row — and 1,908 of the 2,126 (89.7%) resolve straight to a master province once the
+# tape's own trailing ordinal is stripped ("อุทัยธานี 2" -> "อุทัยธานี"). This is a FALLBACK, not a
+# substitute for the name join: it is coarser (province only — no district, no branch code), so it
+# only ever applies to rows the name join already failed on, and the caller must not invent a
+# district or branch row to go with it.
+#
+# Anything left after stripping the ordinal is either a genuine non-province ops area (head office,
+# 'DS - ...' direct-sales desks — no province at all, ~218 accounts) or one of the three areas below
+# that name a city/district rather than a province. Those three are the ONLY implicit-looking
+# resolutions this function performs, and each is an explicit, verified entry — never a fuzzy rule,
+# for the same reason MASTER_KEY_ALIASES above is a fixed dict and not an edit-distance match.
+_AREA_ORDINAL = re.compile(r"\s*\d+\s*$")  # trailing ordinal: "ฉะเชิงเทรา 1" -> "ฉะเชิงเทรา"
+
+# Verified to exist verbatim in branches_final.json's `prov` values before being relied on here.
+_AREA_ALIAS = {
+    "พัทยา": "ชลบุรี",             # Pattaya is a city in Chonburi, not its own province
+    "ศรีราชา": "ชลบุรี",           # Si Racha is a district of Chonburi
+    "อยุธยา": "พระนครศรีอยุธยา",   # short form of the province name
+}
+
+
+def area_province(area, provinces):
+    """Resolve the tape's `account_disb_Area` ops string to a master province name, or None.
+
+    `provinces` is the set of valid province strings (branches_final.json's `prov` values). Returns
+    None for: empty/blank Area, any 'DS -' direct-sales office, and any Area that still isn't a
+    province after its trailing ordinal is stripped and the explicit `_AREA_ALIAS` table is checked.
+    The caller is expected to COUNT those Nones rather than drop them silently — they are either a
+    head-office / direct-sales booking or a residual this function deliberately declines to resolve.
+    """
+    s = str(area or "").strip()
+    if not s or s.startswith("DS -") or s.startswith("DS-"):
+        return None
+    base = _AREA_ORDINAL.sub("", s).strip()
+    if base == "กรุงเทพ":                 # Bangkok ops areas are numbered ("กรุงเทพ 1", "กรุงเทพ 2", ...)
+        return "กรุงเทพมหานคร"
+    if base in _AREA_ALIAS:
+        return _AREA_ALIAS[base]
+    if base in provinces:
+        return base
+    return None
