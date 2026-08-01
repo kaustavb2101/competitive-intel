@@ -171,24 +171,28 @@ REGISTRY = [
     dict(key="fuel_prices", file="fuel_prices.json", cadence="daily",
          label="Diesel · retail pump", group="Cost of living",
          what="the cost line under every vehicle-collateral borrower — pickups and trucks run on it",
-         pick=lambda d: (dig(d, "headline.diesel"), "฿/L"), measured=True),
+         pick=lambda d: (dig(d, "headline.diesel"), "฿/L"), measured=True,
+         hist_series="fuel_diesel"),
     dict(key="thaiwater_rain", file="thaiwater_rain.json", cadence="daily",
          label="Rain gauges reporting", group="Hazard",
          what="live rain telemetry behind the farm book — the early half of drought and flood",
          pick=lambda d: (sum((p or {}).get("n_stations", 0) for p in (d.get("provinces") or {}).values()) or None,
-                         "stations"), measured=True),
+                         "stations"), measured=True,
+         hist_series="rain_max_mm"),
     dict(key="thaiwater_flood", file="thaiwater_flood.json", cadence="daily",
          label="River stations above high mark", group="Hazard",
          what="branches whose catchment is flooding now — collateral and collection both stop",
          pick=lambda d: (sum((p or {}).get("n_high", 0) for p in (d.get("provinces") or {}).values()),
                          "of " + str(sum((p or {}).get("n_stations", 0)
-                                         for p in (d.get("provinces") or {}).values()))), measured=True),
+                                         for p in (d.get("provinces") or {}).values()))), measured=True,
+         hist_series="flood_high"),
 
     # ---- weekly / monthly --------------------------------------------------
     dict(key="rival_ads", file="rival_ads.json", cadence="weekly",
          label="Rivals running paid ads", group="Competition",
          what="which title lenders are buying demand right now, and at what advertised rate",
-         pick=lambda d: (_n(d.get("brands")), "brands live"), measured=True),
+         pick=lambda d: (_n(d.get("brands")), "brands live"), measured=True,
+         hist_series="rival_ads_live"),
     dict(key="rival_youtube", file="rival_youtube.json", cadence="weekly",
          label="Rival YouTube channels", group="Competition",
          what="the rivals' own broadcast reach — upload cadence and audience",
@@ -285,7 +289,8 @@ NO_HISTORY_REASON = {
     "fuel_prices": "each pull overwrites the last; appending a daily row would give a price line",
     "thaiwater_rain": "each pull overwrites the last; appending would give a rainfall line",
     "thaiwater_flood": "each pull overwrites the last; appending would give a flood-stage line",
-    "rival_ads": "creative-level first_seen/last_seen is kept, but no count series yet",
+    "rival_ads": "creative-level first_seen/last_seen is kept; the live-creative count is now being "
+                 "accumulated too, and becomes a line once several weekly pulls have landed",
     "rival_youtube": "channel stats are point-in-time; subscriber history is not stored",
     "social_themes": "theme mix is recomputed per run, not accumulated",
     "dbd_formation": "one month per pull; the DBD monthly files would stack into a series",
@@ -301,8 +306,23 @@ NO_HISTORY_REASON = {
 }
 
 
+def accumulated_history():
+    """The series append_history.py has accumulated, keyed by series name.
+
+    These are the feeds whose SOURCE only publishes 'now'. Their history is not something the
+    publisher offers — it is something this repo has been keeping, one dated row per pull, so it
+    only exists once enough pulls have landed. The registry names a series; this decides whether
+    there is yet enough of it to draw. Absent file -> no series -> every one of them keeps its
+    honest 'not retained yet' line, which is exactly the state before the accumulator ran."""
+    doc = read("feed_history.json") or {}
+    # chart_min comes from that layer's own meta rather than being restated here: one definition of
+    # "enough points to draw", owned by the builder that enforces it.
+    return doc.get("series") or {}, ((doc.get("meta") or {}).get("chart_min") or 4)
+
+
 def build():
     feeds, missing = [], []
+    accum, chart_min = accumulated_history()
     for spec in REGISTRY:
         doc = read(spec["file"])
         if doc is None:
@@ -334,8 +354,30 @@ def build():
             "source": ((doc.get("meta") or {}).get("source") or "")[:180],
             "history": spec.get("history"),
         }
-        if not spec.get("history"):
-            row["no_history"] = NO_HISTORY_REASON.get(spec["key"], "point-in-time pull")
+        # A feed with an accumulated series gets a real history block — same shape as the ones
+        # whose publisher ships history, because by this point it IS the same thing: dated
+        # observations we can draw. Until it clears the chartable bar it keeps its no-history line,
+        # so a two-point stub never masquerades as a trend.
+        acc = accum.get(spec.get("hist_series") or "")
+        if not row["history"] and acc and acc.get("chartable"):
+            row["history"] = {
+                "file": "feed_history.json", "kind": "accumulated",
+                "series": spec["hist_series"], "points": acc["n"],
+                "note": "%d observations from %s, accumulated here one pull at a time — "
+                        "the source itself publishes only today's value"
+                        % (acc["n"], acc["first_seen"]),
+            }
+        if not row["history"]:
+            # An accumulator that has started but not yet filled says so, with its real count —
+            # "waiting for 3 more nightly pulls" is a different and far more useful state than
+            # "this will never have history", and the registry's static reason cannot tell them apart.
+            if acc:
+                row["no_history"] = ("accumulating — %d observation%s since %s; the line is drawn "
+                                     "once %d have landed"
+                                     % (acc["n"], "" if acc["n"] == 1 else "s",
+                                        acc["first_seen"], chart_min))
+            else:
+                row["no_history"] = NO_HISTORY_REASON.get(spec["key"], "point-in-time pull")
         feeds.append(row)
 
     feeds.sort(key=lambda f: (f["group"], f["label"]))

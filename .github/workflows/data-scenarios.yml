@@ -37,6 +37,10 @@ jobs:
           # scenarios.json re-projects the committed measured layers; the provenance manifest
           # censuses it, so both must move together or the determinism gate goes red on merge.
           python pipeline/build_scenarios.py
+          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+          # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+          # which then censuses its bytes.
+          python pipeline/build_live_board.py
           python pipeline/build_provenance.py
       - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
@@ -44,7 +48,7 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/scenarios-${{ github.run_id }}
         run: |
-          git add platform/data/scenarios.json platform/data/provenance.json
+          git add platform/data/scenarios.json platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No scenario change vs committed. Nothing to merge."; exit 0
           fi

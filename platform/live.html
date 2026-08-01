@@ -272,8 +272,8 @@ function lineChart(pts, o) {
 
 /* ---------------------------------------------------------------- render */
 Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_history.json'),
-             jget('imf_weo.json'), jget('macro_indicators.json')]).then(function (r) {
-  var LB = r[0], SFI = r[1], CH = r[2], WEO = r[3], BIS = r[4];
+             jget('imf_weo.json'), jget('macro_indicators.json'), jget('feed_history.json')]).then(function (r) {
+  var LB = r[0], SFI = r[1], CH = r[2], WEO = r[3], BIS = r[4], FH = r[5];
   if (!LB || !LB.feeds) {
     document.getElementById('lb-note').textContent =
       'live_board.json could not be loaded — run pipeline/build_live_board.py.';
@@ -370,6 +370,53 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
         aria: 'Thailand household debt to GDP, last ' + tr.length + ' quarters' }),
       src: (BIS.meta || {}).source || '' });
   }
+  /* Accumulated series — the feeds whose publisher only ever says "today". Their history is not
+     something the source offers; it is what this repo has kept, one dated row per pull, so these
+     lines exist only because the accumulator has been running. Sub-line says exactly that, and
+     names the day the record starts, so nobody reads three weeks of diesel as three years. */
+  if (FH && FH.order && FH.order.length) {
+    var FHC = { 'fuel_diesel': 'var(--opp)', 'fuel_gasohol95': 'var(--opp)',
+                'flood_high': 'var(--agri)', 'rain_max_mm': 'var(--accent)',
+                'rain_heavy_pct': 'var(--accent)', 'rival_ads_live': 'var(--collat)' };
+    var drawn = FH.order.filter(function (k) { return FH.series[k].chartable; });
+    if (drawn.length) {
+      var drawF = function (key) {
+        var s = FH.series[key];
+        var pts = (s.dates || []).map(function (d, i) {
+          return { x: d.slice(5), y: (s.values || [])[i] };   // MM-DD: the year is in the sub-line
+        });
+        document.getElementById('lb-chart-fh').innerHTML = lineChart(pts, {
+          color: FHC[key] || 'var(--accent)', unit: s.unit || '',
+          aria: s.label + ', ' + pts.length + ' daily observations since ' + s.first_seen });
+        var mv = s.change > 0 ? '▲ +' : (s.change < 0 ? '▼ ' : '● ');
+        document.getElementById('lb-chart-fhh').innerHTML =
+          esc(s.label) + ' — ' + pts.length + ' observations since ' + esc(s.first_seen) +
+          ' · <b>' + esc(mv + fmtNum(s.change) + ' ' + (s.unit || '')) + '</b> over the record' +
+          (s.change_pct == null ? '' : ' (' + esc(fmtNum(s.change_pct)) + '%)');
+        [].forEach.call(document.querySelectorAll('#lb-fhbtns .lb-sb'), function (b) {
+          b.setAttribute('aria-pressed', String(b.dataset.k === key));
+        });
+      };
+      cards.push({ h: 'Daily feeds — accumulated here, not published as history', color: 'var(--opp)',
+        s: '<span id="lb-chart-fhh"></span>', raw: true,
+        btns: '<div class="lb-seriesbtns" id="lb-fhbtns">' + drawn.map(function (k) {
+          return '<button type="button" class="lb-sb" data-k="' + esc(k) + '" aria-pressed="false">' +
+            esc(FH.series[k].label) + '</button>'; }).join('') + '</div>',
+        mount: 'lb-chart-fh', after: function () {
+          document.getElementById('lb-fhbtns').addEventListener('click', function (e) {
+            var b = e.target.closest('.lb-sb'); if (b) drawF(b.dataset.k);
+          });
+          /* Open on the longest record — the most trend to actually look at, and today that is
+             diesel, the cost line under every vehicle-collateral borrower. Ties break on the
+             registry order so the choice stays stable between builds. */
+          drawF(drawn.reduce(function (a, b) {
+            return FH.series[b].n > FH.series[a].n ? b : a;
+          }, drawn[0]));
+        },
+        src: (FH.meta || {}).note || '' });
+    }
+  }
+
   document.getElementById('lb-charts').innerHTML = cards.map(function (c) {
     return '<div class="lb-card"><h3>' + esc(c.h) + '</h3><p class="lb-cs">' +
       (c.raw ? c.s : esc(c.s)) + '</p>' + (c.btns || '') +
@@ -403,12 +450,20 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
 
   // ---- what would unlock more trend lines
   var noHist = feeds.filter(function (f) { return !f.history && f.no_history; });
+  var accd = feeds.filter(function (f) { return (f.history || {}).kind === 'accumulated'; });
   document.getElementById('lb-unlock').innerHTML =
     '<h3>What would unlock more trend lines</h3>' +
-    '<p>' + esc(noHist.length) + ' of ' + feeds.length + ' feeds are point-in-time: each pull ' +
-    'overwrites the last, so there is a current value but no series to plot. None of them are ' +
-    'broken — they simply were not built to accumulate. Appending a dated row per pull, rather ' +
-    'than replacing the file, turns each of these into a line without changing a single source.</p>' +
+    (accd.length
+      ? '<p>' + esc(accd.length) + ' feed' + (accd.length === 1 ? '' : 's') + ' — ' +
+        accd.map(function (f) { return '<b>' + esc(f.label) + '</b>'; }).join(', ') +
+        ' — used to be on this list. Their sources still publish only today\'s value; the ' +
+        'difference is that every pull now appends a dated row instead of overwriting the file, ' +
+        'and the back history was recovered from git, where each nightly pull had been committed ' +
+        'all along. That is the fix, and it works for the rest of this list too.</p>'
+      : '') +
+    '<p>' + esc(noHist.length) + ' of ' + feeds.length + ' feeds are still point-in-time: each ' +
+    'pull overwrites the last, so there is a current value but no series to plot. None of them ' +
+    'are broken — they simply do not accumulate yet.</p>' +
     '<ul>' + noHist.map(function (f) {
       return '<li><b>' + esc(f.label) + '</b> — ' + esc(f.no_history) + '</li>';
     }).join('') + '</ul>';

@@ -62,6 +62,10 @@ jobs:
       - name: Rebuild the derived layer + provenance
         run: |
           python pipeline/build_search_demand.py
+          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+          # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+          # which then censuses its bytes.
+          python pipeline/build_live_board.py
           python pipeline/build_provenance.py
 
       - name: Detect a substantive change (ignore the pulled_at_utc timestamp)
@@ -88,7 +92,8 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/trends-${{ github.run_id }}
         run: |
-          git add source-data/google_trends.json platform/data/search_demand.json platform/data/provenance.json
+          git add source-data/google_trends.json platform/data/search_demand.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0

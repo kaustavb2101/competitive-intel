@@ -56,10 +56,19 @@ jobs:
       - name: Rebuild provenance when the telemetry changed
         run: |
           # Both layers are tracked in provenance.json — if either changed, provenance.json must be
-          # regenerated in the same commit or the determinism gate goes red on merge. No downstream
-          # builder consumes these two layers, so provenance is the only rebuild needed.
+          # regenerated in the same commit or the determinism gate goes red on merge.
           if git status --porcelain -- platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json | grep -q .; then
             echo "telemetry changed — rebuilding provenance"
+            # Append tonight's gauge readings to the accumulated series first. ThaiWater serves live
+            # telemetry with no archive, so this row is the only lasting record of it. Dated by the
+            # feed's own meta.observed_to — NOT meta.pulled: this job runs at 22:40 UTC, already the
+            # next morning in Bangkok, so pulled would file every reading a day early.
+            python pipeline/append_history.py
+            python pipeline/build_feed_history.py
+            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+            # which then censuses its bytes.
+            python pipeline/build_live_board.py
             python pipeline/build_provenance.py
           else
             echo "telemetry unchanged — nothing to rebuild."
@@ -72,7 +81,8 @@ jobs:
           DATA_BRANCH: data/thaiwater-${{ github.run_id }}
         run: |
           git add platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json \
-                  platform/data/provenance.json
+                  source-data/feed_history.json platform/data/feed_history.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No change vs committed telemetry. No PR opened."
             exit 0

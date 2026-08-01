@@ -89,6 +89,10 @@ jobs:
           fi
           echo "SFI aggregates CHANGED — regenerating sfi_credit.json + provenance.json."
           python pipeline/build_sfi_credit.py
+          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
+          # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
+          # which then censuses its bytes.
+          python pipeline/build_live_board.py
           python pipeline/build_provenance.py
           # sanity: the builder's own byte-exact check must pass against the freshly built output
           python pipeline/build_sfi_credit.py --check
@@ -103,7 +107,8 @@ jobs:
         run: |
           set -euo pipefail
           git add source-data/fpo_sfi_npl.csv source-data/fpo_sfi_credit.csv \
-                  platform/data/sfi_credit.json platform/data/provenance.json
+                  platform/data/sfi_credit.json \
+                  platform/data/live_board.json platform/data/provenance.json
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0
