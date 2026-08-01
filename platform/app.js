@@ -5362,7 +5362,7 @@ function renderExposureTape(){
   if(lad&&TAPE.bucket_ladder){
     const LBL={'1.Current':'Current','2.X_Days':'X-days','3.30_dpd':'30 dpd','4.60_dpd':'60 dpd','5.90_dpd':'90 dpd','6.120_dpd':'120 dpd','7.150_dpd':'150 dpd','8.180+_dpd':'180+ legacy'};
     const L=TAPE.bucket_ladder.ladder, maxN=Math.max(...L.map(x=>x.n));
-    lad.innerHTML=`<tr><th>Bucket</th><th>Accounts</th><th>OS ฿bn</th><th></th></tr>`+
+    lad.innerHTML=`<tr><th scope="col">Bucket</th><th scope="col">Accounts</th><th scope="col">OS ฿bn</th><th scope="col"></th></tr>`+
       L.map(x=>{const lg=x.bucket[0]==='8';
         return `<tr><td class="mono">${LBL[x.bucket]||x.bucket}</td><td class="mono sub">${N(x.n)}</td>
           <td class="mono sub">${(x.os_sum/1e9).toFixed(2)}</td>
@@ -5372,7 +5372,7 @@ function renderExposureTape(){
   const rs=$('#expo-tape-restr');
   if(rs&&TAPE.restructuring&&TAPE.restructuring.by_status){
     const rows=['Normal','Skip','Pre-emptive','TDR'].map(s=>TAPE.restructuring.by_status.find(x=>x.status===s)).filter(Boolean);
-    rs.innerHTML=`<tr><th>Status</th><th>Accounts</th><th>90+</th><th>180+</th><th title="avg NPAT margin per account">NPAT/acct</th></tr>`+
+    rs.innerHTML=`<tr><th scope="col">Status</th><th scope="col">Accounts</th><th scope="col">90+</th><th scope="col">180+</th><th scope="col" title="avg NPAT margin per account">NPAT/acct</th></tr>`+
       rows.map(r=>{const neg=r.npat_margin_avg<0;
         return `<tr><td><b>${r.status}</b></td><td class="mono sub">${N(r.n)}</td>
           <td class="mono"><b style="color:${sev(r.dpd90p_pct)}">${r.dpd90p_pct}%</b></td>
@@ -5384,14 +5384,14 @@ function renderExposureTape(){
   if(ltv&&TAPE.ltv_ladder){
     const rows=Object.entries(TAPE.ltv_ladder).sort((a,b)=>a[0].localeCompare(b[0]));
     const worst=Math.max(...rows.map(([,v])=>v.dpd90p_pct));
-    ltv.innerHTML=`<tr><th>LTV band</th><th>Accounts</th><th title="share of accounts 90+ days past due">90+dpd</th><th>OS ฿bn</th></tr>`+
+    ltv.innerHTML=`<tr><th scope="col">LTV band</th><th scope="col">Accounts</th><th scope="col" title="share of accounts 90+ days past due">90+dpd</th><th scope="col">OS ฿bn</th></tr>`+
       rows.map(([k,v])=>`<tr><td class="mono">${k}</td><td class="mono sub">${N(v.n)}</td>
         <td class="mono" style="color:${sev(v.dpd90p_pct)}">${barHTML(v.dpd90p_pct,'var(--agri)',worst)} <b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${(v.os_sum/1e9).toFixed(1)}</td></tr>`).join('');
   }
   if(occ&&TAPE.occupations){
     const rows=Object.entries(TAPE.occupations).filter(([k])=>k!=='(blank)').sort((a,b)=>b[1].n-a[1].n);
-    occ.innerHTML=`<tr><th>Occupation</th><th>Accounts</th><th>90+dpd</th><th title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th title="average NPAT margin per account, ฿">NPAT/acct</th><th>OS ฿bn</th></tr>`+
+    occ.innerHTML=`<tr><th scope="col">Occupation</th><th scope="col">Accounts</th><th scope="col">90+dpd</th><th scope="col" title="X-days: late but under 30dpd — the pre-emptive assistance window">X-days</th><th scope="col" title="average NPAT margin per account, ฿">NPAT/acct</th><th scope="col">OS ฿bn</th></tr>`+
       rows.map(([k,v])=>`<tr><td>${k}</td><td class="mono sub">${N(v.n)}</td>
         <td class="mono" style="color:${sev(v.dpd90p_pct)}"><b>${v.dpd90p_pct}%</b></td>
         <td class="mono sub">${v.early_pct}%</td>
@@ -5401,7 +5401,7 @@ function renderExposureTape(){
   const fr=$('#expo-tape-frontier');
   if(fr&&Array.isArray(TAPE.npat_frontier)){
     const cells=TAPE.npat_frontier.slice(0,18);
-    fr.innerHTML=`<tr><th>Occupation</th><th>Region</th><th>Accounts</th><th>90+dpd</th><th>NPAT/acct</th><th title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
+    fr.innerHTML=`<tr><th scope="col">Occupation</th><th scope="col">Region</th><th scope="col">Accounts</th><th scope="col">90+dpd</th><th scope="col">NPAT/acct</th><th scope="col" title="profitably risky = high dpd but positive margin; unprofitably safe = low dpd, negative margin">Read</th></tr>`+
       cells.map(c=>{
         const read=c.npat_margin_avg>=0
           ?(c.dpd90p_pct>=16?'<span style="color:var(--opp)">profitably risky</span>':'<span style="color:var(--merch)">core</span>')
@@ -5416,7 +5416,7 @@ function renderExposureTape(){
   if(co&&TAPE.collateral_brands){
     const brands=Object.entries(TAPE.collateral_brands).slice(0,10);
     const bands=[...new Set(brands.flatMap(([,d])=>Object.keys(d)))].sort();
-    co.innerHTML=`<tr><th>Brand</th>`+bands.map(b=>`<th class="mono" style="font-size:10px">${b.replace(/^\d\.\(?|\)?yr\.$/g,'')}y</th>`).join('')+`</tr>`+
+    co.innerHTML=`<tr><th scope="col">Brand</th>`+bands.map(b=>`<th scope="col" class="mono" style="font-size:10px">${b.replace(/^\d\.\(?|\)?yr\.$/g,'')}y</th>`).join('')+`</tr>`+
       brands.map(([br,d])=>`<tr><td><b>${br}</b></td>`+bands.map(b=>{
         const c=d[b];
         if(!c) return '<td class="sub">—</td>';
@@ -5474,7 +5474,7 @@ function renderExposure(){
       o.n++; const wc=regionWorstCrop(d.r); const sf=wc&&wc.yoy<-10; const df=d.rain!=null&&d.rain<=q1; const af=(d.a||0)>=60;
       if(sf)o.str++; if(df)o.dry++; if(af)o.agri++; if(sf||df||af)o.flag++;});
     const provs=Object.values(byProv).sort((a,b)=>b.flag-a.flag||b.n-a.n).slice(0,15);
-    $('#expoprov').innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th>Branches</th><th class="h-agri" title="branches carrying ≥1 stress flag (est)">Exposed (est)</th><th title="exposed share of the province's branches">Share</th><th>Flags</th></tr>`+
+    $('#expoprov').innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Branches</th><th scope="col" class="h-agri" title="branches carrying ≥1 stress flag (est)">Exposed (est)</th><th scope="col" title="exposed share of the province's branches">Share</th><th scope="col">Flags</th></tr>`+
       provs.map((o,i)=>{const sh=o.n?100*o.flag/o.n:0; const fc=sh>=66?'var(--agri)':sh>=33?'var(--gold)':'var(--mid)';
         const fl=[o.str?'▼crop':'',o.dry?'☀dry':'',o.agri?'▲agri':''].filter(Boolean).join(' · ');
         return `<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>
@@ -5482,7 +5482,7 @@ function renderExposure(){
         <td class="mono" style="color:${fc}">${sh.toFixed(0)}%</td><td class="sub">${fl||'—'}</td></tr>`;}).join('');
   }
   const regs=Object.entries(byReg).sort((a,b)=>b[1].n-a[1].n);
-  $('#expotbl').innerHTML=`<tr><th>Region</th><th>Branches</th><th class="h-agri" title="share in stressed-crop region (est)">Stressed-crop ▼ est</th><th class="h-opp" title="share in dry quartile (est)">Drought ☀ est</th><th class="h-agri" title="share with high agri-PD proxy (est)">High agri-PD ▲ est</th></tr>`+
+  $('#expotbl').innerHTML=`<tr><th scope="col">Region</th><th scope="col">Branches</th><th scope="col" class="h-agri" title="share in stressed-crop region (est)">Stressed-crop ▼ est</th><th scope="col" class="h-opp" title="share in dry quartile (est)">Drought ☀ est</th><th scope="col" class="h-agri" title="share with high agri-PD proxy (est)">High agri-PD ▲ est</th></tr>`+
     regs.map(([r,o])=>{const wc=regionWorstCrop(r);
       return `<tr><td><b>${r}</b>${wc?` <span class="sub">${wc.lab} ${wc.yoy>0?'+':''}${wc.yoy}%</span>`:''}</td>
       <td class="mono">${o.n}</td>
@@ -5532,10 +5532,10 @@ function renderContestedGround(){
       ['Population is <b>measured</b> — WorldPop 2020 (1km grid, UN-adjusted).',
        'The census misses Heng’s full network (sample) and all sub-scale local operators — contested share is a <b>lower bound</b>.',
        'Only branches with ≥25k catchment population are ranked (stated rule — keeps tiny catchments from posting empty 100%s).'])+
-    `<table class="tbl" id="expo-contested-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
-    `<th title="WorldPop 2020 population inside the 10km catchment — measured">Catchment pop</th>`+
-    `<th class="h-agri" title="people of that catchment also within 2km of a rival — measured, census lower bound">Contested people</th>`+
-    `<th class="h-agri" title="contested ÷ catchment — measured share">Share</th></tr>`+
+    `<table class="tbl" id="expo-contested-tbl"><tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Province</th>`+
+    `<th scope="col" title="WorldPop 2020 population inside the 10km catchment — measured">Catchment pop</th>`+
+    `<th scope="col" class="h-agri" title="people of that catchment also within 2km of a rival — measured, census lower bound">Contested people</th>`+
+    `<th scope="col" class="h-agri" title="contested ÷ catchment — measured share">Share</th></tr>`+
     top.map((t,rank)=>{
       const col=t.pct>=60?'var(--agri)':t.pct>=35?'var(--gold)':'var(--merch)';
       return `<tr><td class="mono sub">${rank+1}</td><td><b>${t.name||'—'}</b></td><td class="sub">${t.prov||'—'}${t.region?' · '+t.region:''}</td>`+
@@ -5701,8 +5701,8 @@ function renderRiskReadouts(){
       methodBox('The readable list of the National map composite-risk lens.',
         ['A triage rank, <b>not</b> a measured default rate.',
          'Composite is index-aligned to the branch list; driver = the dominant component of the score.'])+
-      `<table class="tbl" id="expo-brisk-tbl"><tr><th>#</th><th>Branch</th><th>Province</th>`+
-      `<th class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th title="dominant driver of the composite">Top driver</th></tr>`+
+      `<table class="tbl" id="expo-brisk-tbl"><tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Province</th>`+
+      `<th scope="col" class="h-agri" title="estimated composite risk 0–100">Composite ▲ est</th><th scope="col" title="dominant driver of the composite">Top driver</th></tr>`+
       idx.map((i,rank)=>{const e=BRISK[i], d=DATA[i];
         return `<tr><td class="mono sub">${rank+1}</td><td><b>${d.n||'—'}</b></td><td class="sub">${d.v||'—'}</td>`+
         `<td class="mono" style="color:var(--agri)">${(e.composite_risk||0).toFixed(1)}</td>`+
@@ -6027,10 +6027,10 @@ function computeSim(){
       if(!worse.length){ tbl.innerHTML='<tr><td class="sub" style="padding:10px">No province worsens materially under this shock.</td></tr>'; }
       else {
         const mx=Math.max(1,...worse.map(r=>r.delta));
-        tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches — measured footprint">Branches</th>`+
-          `<th class="h-agri" title="ESTIMATED agri-stress proxy before the shock (0–100)">Base ▲ est</th>`+
-          `<th class="h-agri" title="ESTIMATED agri-stress proxy under the shock (0–100)">Scenario ▲ est</th>`+
-          `<th class="h-agri" title="rise in the estimated agri-stress proxy">Δ est</th><th>Status</th></tr>`+
+        tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col" title="AutoX branches — measured footprint">Branches</th>`+
+          `<th scope="col" class="h-agri" title="ESTIMATED agri-stress proxy before the shock (0–100)">Base ▲ est</th>`+
+          `<th scope="col" class="h-agri" title="ESTIMATED agri-stress proxy under the shock (0–100)">Scenario ▲ est</th>`+
+          `<th scope="col" class="h-agri" title="rise in the estimated agri-stress proxy">Δ est</th><th scope="col">Status</th></tr>`+
           worse.map((r,i)=>{const sc=r.scen>=SIM_HI?'var(--agri)':r.scen>=25?'var(--gold)':'var(--mid)';
             const tag=r.isNew?'<span class="mono" style="color:var(--agri)">↑ NEW high</span>':r.scenHi?'<span class="mono" style="color:var(--gold)">stays high</span>':'<span class="sub">elevated</span>';
             return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td><td class="sub">${r.region||'—'}</td>
@@ -6122,7 +6122,7 @@ function renderTrendTape(){
       const [yr,band]=k.split('|'); (byYear[yr]=byYear[yr]||[]).push({band,...v});
     });
     const years=Object.keys(byYear).sort();
-    vt.innerHTML=`<tr><th>Vintage</th><th>Months-on-book band</th><th>Accounts</th><th title="share of the vintage 90+ days past due">90+dpd</th></tr>`+
+    vt.innerHTML=`<tr><th scope="col">Vintage</th><th scope="col">Months-on-book band</th><th scope="col">Accounts</th><th scope="col" title="share of the vintage 90+ days past due">90+dpd</th></tr>`+
       years.map(yr=>byYear[yr].sort((a,b)=>a.band.localeCompare(b.band)).map((r,i)=>`<tr>
         <td class="mono">${i===0?`<b>${yr}</b>`:''}</td><td class="mono sub">${r.band}</td>
         <td class="mono sub">${r.n.toLocaleString()}</td>
@@ -6130,7 +6130,7 @@ function renderTrendTape(){
       </tr>`).join('')).join('');
   }
   if(au&&TAPE.branch_audit){
-    au.innerHTML=`<tr><th>#</th><th>Branch</th><th>Accounts</th><th title="share of the branch's accounts 90+ days past due">90+dpd</th><th title="X-days share — the pre-emptive window">X-days</th><th title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
+    au.innerHTML=`<tr><th scope="col">#</th><th scope="col">Branch</th><th scope="col">Accounts</th><th scope="col" title="share of the branch's accounts 90+ days past due">90+dpd</th><th scope="col" title="X-days share — the pre-emptive window">X-days</th><th scope="col" title="first-payment-default share — underwriting quality at origination">FPD</th></tr>`+
       TAPE.branch_audit.map((b,i)=>`<tr><td class="mono sub">${i+1}</td><td>${b.branch}</td>
         <td class="mono sub">${b.n}</td>
         <td class="mono" style="color:var(--agri)"><b>${b.dpd90p_pct}%</b></td>
@@ -6183,7 +6183,7 @@ async function renderTrend(){
   if(BD){
     const rows=(DELTAS.board||[]).filter(b=>b.d_yoy!=null)
       .sort((a,b)=>Math.abs(b.d_yoy)-Math.abs(a.d_yoy));
-    BD.innerHTML=`<tr><th>Item</th><th>Segment</th><th>YoY now</th><th>Prior YoY</th><th title="change in the YoY figure — a fall means deepening price stress">Δ YoY · est</th></tr>`+
+    BD.innerHTML=`<tr><th scope="col">Item</th><th scope="col">Segment</th><th scope="col">YoY now</th><th scope="col">Prior YoY</th><th scope="col" title="change in the YoY figure — a fall means deepening price stress">Δ YoY · est</th></tr>`+
       (rows.length?rows.map(b=>`<tr><td>${b.lab}</td><td class="sub">${b.seg||'—'}</td>
         <td class="mono">${b.yoy!=null?(b.yoy>0?'+':'')+b.yoy+'%':'—'}</td>
         <td class="mono sub">${b.prev_yoy!=null?(b.prev_yoy>0?'+':'')+b.prev_yoy+'%':'—'}</td>
@@ -6194,7 +6194,7 @@ async function renderTrend(){
   const BR=$('#trendbranches');
   if(BR){
     const rows=DELTAS.branches||[];
-    BR.innerHTML=`<tr><th>#</th><th title="composite risk proxy = worst of agri/merchant/collateral (est)">Risk now ▲ est</th><th title="change in composite proxy vs prior vintage">Δ composite · est</th><th>Branch</th><th>Prov</th><th>Region</th><th>Δ agri</th><th>Δ merch</th><th>Δ collat</th></tr>`+
+    BR.innerHTML=`<tr><th scope="col">#</th><th scope="col" title="composite risk proxy = worst of agri/merchant/collateral (est)">Risk now ▲ est</th><th scope="col" title="change in composite proxy vs prior vintage">Δ composite · est</th><th scope="col">Branch</th><th scope="col">Prov</th><th scope="col">Region</th><th scope="col">Δ agri</th><th scope="col">Δ merch</th><th scope="col">Δ collat</th></tr>`+
       (rows.length?rows.map((d,i)=>{const rc=d.comp>=60?'var(--agri)':d.comp>=40?'var(--gold)':'var(--merch)';
         return `<tr><td class="mono sub">${i+1}</td>
         <td class="mono" style="color:${rc}">▲ ${d.comp}</td>
