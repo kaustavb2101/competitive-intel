@@ -1398,6 +1398,30 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 @media(min-width:1180px){.ovpair{grid-template-columns:minmax(300px,.85fr) 1.15fr}}
 @media print{.ovpair{grid-template-columns:1fr!important}}
 
+/* ---------- Macro decision band (above the answer band) ----------
+   Rows, not tiles. A tile competes with the five next to it for the eye; a row is read in order, which
+   is the point — this is the "what does it mean" list, and its order IS the priority. Each row is a
+   <button> so it is keyboard-reachable and announces itself as an action: every row goes somewhere. */
+.sowhat{margin:12px 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.sw-hd{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--mid);
+  padding:9px 12px 8px;border-bottom:1px solid var(--line)}
+.sw-hd .s{text-transform:none;letter-spacing:0;color:var(--dim)}
+.sw-row{display:grid;grid-template-columns:22px 1fr 16px;align-items:start;gap:9px;width:100%;
+  padding:10px 12px;background:none;border:0;border-top:1px solid var(--line);text-align:left;
+  font:inherit;color:var(--txt);cursor:pointer;line-height:1.5}
+.sw-row:first-of-type{border-top:0}
+.sw-row:hover{background:rgba(255,255,255,.04)}
+.sw-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sw-ico{font-size:15px;line-height:1.35}
+.sw-txt{font-size:13px}
+.sw-txt b{color:var(--hi);font-weight:600}
+.sw-tail{color:var(--mid);font-size:12px}
+.sw-go{color:var(--dim);font-size:13px;line-height:1.35}
+.sw-row:hover .sw-go{color:var(--accent)}
+@media print{.sowhat{background:#fff!important;border-color:#bbb!important}
+  .sw-row{color:#111!important;border-top-color:#ddd!important;break-inside:avoid}
+  .sw-tail,.sw-go,.sw-hd{color:#444!important} .sw-go{display:none}}
+
 /* ---------- Macro answer band (top of #overview) ----------
    Six measured numbers, each with its move, its refresh cadence and a trend line only where
    history actually exists on disk. Sits above everything else on the tab. */
