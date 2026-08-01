@@ -1,0 +1,24 @@
+# Derived data payloads — coordinates and numbers, not knowledge.
+# The MEANING of these files lives in the pipeline builders that write them
+# and in docs/DATA_SOURCES.md / DATA_PROVENANCE.md, which ARE indexed.
+platform/data/
+source-data/
+pipeline/dgt_out/
+pipeline/datagoth/
+
+# Binary / raster
+*.tif
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.pdf
+*.xlsx
+*.docx
+*.pptx
+
+# Generated
+graphify-out/
+node_modules/
+__pycache__/
+.venv/

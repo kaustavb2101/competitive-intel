@@ -77,6 +77,42 @@ ingested. Nothing here is synthetic any more.
 **The remaining owner-side unlock is now a refresh cadence, not an unlock:** the tape is a
 point-in-time export, so the question is how often a new one lands, not whether one exists.
 
+## 0c. Social listening — which channels we watch, and which we decided NOT to  (objective #2)
+
+The voice-of-customer corpus behind `#acq` (`social_themes.json`, `rival_pulse.json`). Settled
+2026-08-01 so the channel list stops being re-litigated.
+
+**Watched, working, and on the weekly job** (`.github/workflows/data-social-listening.yml`):
+- Google Play reviews (`pull_app_reviews.py`) — any IP, no key. 10 apps.
+- Apple App Store reviews (`pull_apple_reviews.py`) — any IP, no key. 10 apps.
+- YouTube comments (`pull_youtube_comments.py`) — any IP, **needs the `YOUTUBE_API_KEY` repo secret**;
+  the job warns loudly and skips without it. **← still unset; this is the one owner action left here.**
+- Pantip forum threads (`pull_pantip.py`) — proven from a Thai residential IP. Whether it works from a
+  GitHub runner is answered automatically by the first scheduled run (the job captures the exit code
+  into the PR body). Exits 3 and writes nothing when the response is not the Thai-IP response, so a
+  block can never be laundered into "the market went quiet".
+- The rivals' own promo pages (`pull_rival_promos.py`) — **THAI IP ONLY**, deliberately excluded from
+  CI; Cloudflare blocks datacenter IPs. Run from the laptop; the committed snapshot is reused meanwhile.
+
+**Decided AGAINST — do not build these:**
+- **TikTok — DROPPED (owner decision, 2026-08-01).** Not a gap to close later; a closed question. It
+  has no key-free public API, the scrapers that exist break constantly and read as bot traffic, and
+  the content is video whose text layer is captions and comments — the same material YouTube already
+  gives us through a supported, keyed API. The cost is recurring maintenance for a channel that
+  largely duplicates one we have.
+- **LINE — permanent blind spot.** Closed messaging; no public corpus exists at any price. Where a
+  rival's LINE OA promotion matters, it surfaces on their own promo page, which we already pull.
+- **Meta Ad Library — proven useless for this market.** No Thai commercial/credit ad coverage; tested
+  against a live token. See the `meta-ad-library-no-thailand` note. Google Ads Transparency is the
+  working paid-media channel instead (`pull_google_ads.py`).
+
+**Open item — Sabuy Cash.** Added to the Pantip watchlist 2026-08-01 with the LATIN string only
+(`pipeline/pull_pantip.py`, key `SABUY`). It is deliberately absent from the app-sentiment ladders and
+the ad-transparency pull, because each needs an id that cannot be looked up from this network and must
+not be guessed: **Play package name**, **Apple app id**, **Google ATC advertiser id** (`AR…`). Verify
+all three from the Thai IP, then extend `pull_app_reviews.py` `APPS`, `pull_apple_reviews.py` `APPS`,
+`pull_google_ads.py` `ADVERTISERS`, and the Thai search term in `pull_pantip.py` `BRANDS["SABUY"]`.
+
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
   `team_pYNrbLMZobN80m4jD7WPWybD`; set Root Directory = current folder).

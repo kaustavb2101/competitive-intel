@@ -1399,15 +1399,18 @@ document.addEventListener('keydown',e=>{
   if(!row||row!==e.target) return;
   e.preventDefault(); row.click();
 });
-// Acquisition in-tab jump-nav: open the target collapsible section and scroll to it.
-(function(){const j=document.getElementById('acqjump'); if(!j) return;
-  j.addEventListener('click',e=>{const a=e.target.closest('[data-acq]'); if(!a) return;
-    e.preventDefault();
-    const sec=document.getElementById(a.dataset.acq); if(!sec) return;
-    sec.open=true;
-    sec.scrollIntoView({behavior:'smooth',block:'start'});
-    const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
-  });})();
+// In-tab jump-nav: open the target collapsible section and scroll to it. Delegated from document so
+// it serves EVERY .jumpnav (Competition's #compjump, Macro's #ovjump, and any added later) — it used
+// to be bound to #compjump alone, which meant a second pillar adopting the pattern silently got dead
+// chips. One listener, no per-nav wiring.
+document.addEventListener('click',e=>{
+  const a=e.target.closest&&e.target.closest('.jumpnav [data-jump]'); if(!a) return;
+  const sec=document.getElementById(a.dataset.jump); if(!sec) return;
+  e.preventDefault();
+  sec.open=true;
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+  const sm=sec.querySelector('summary'); if(sm) sm.focus({preventScroll:true});
+});
 
 /* ---------- load ---------- */
 async function boot(){
@@ -1424,7 +1427,7 @@ async function boot(){
     wrapTables();
     $('#updated').textContent = META.updated || '';
     try{ PROV = await fetch('data/provinces/index.json').then(r=>r.json()); PLOOK=provLookupByName(); }catch(e){}
-    renderOverview(); renderAcq(); renderLenses(); renderBranchSort(); renderBranches();
+    renderOverview(); renderCompetition(); renderLenses(); renderBranchSort(); renderBranches();
     showTab((location.hash||'').replace('#',''));
   }catch(err){
     document.querySelector('main').insertAdjacentHTML('afterbegin',
@@ -2617,7 +2620,7 @@ function renderThaiwater(){
 }
 
 /* ---------- acquisition ---------- */
-function renderAcq(){
+function renderCompetition(){
   $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
     META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
       return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
@@ -2625,7 +2628,7 @@ function renderAcq(){
     META.mws.map(m=>`<tr><td class="mono" style="color:var(--merch)">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
   $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
-  renderAcqBoard();
+  renderGapBoard();
   renderSearchDemand();
   renderPeerScore();
   // ONE call paints both sentiment ladders. renderRivalIos() used to sit here as a second line, but it
@@ -3299,7 +3302,7 @@ function drawRivalIos(){
   if(note){
     const dr=digital.filter(r=>!r.thin);
     const dn=dr.reduce((a,b)=>a+(b.ratings||0),0), tn=title.reduce((a,b)=>a+(b.ratings||0),0);
-    note.innerHTML=(digital.length?`<h3 class="acqsub" style="margin-top:16px">Who else the same borrower has on their phone <span class="tag">ADJACENT — not title lenders</span></h3>`+
+    note.innerHTML=(digital.length?`<h3 class="compsub" style="margin-top:16px">Who else the same borrower has on their phone <span class="tag">ADJACENT — not title lenders</span></h3>`+
       `<p class="lead sub">Personal-loan and nano-finance apps. They do <b>not</b> lend against a vehicle book, so they are never counted in title-lender share — but they chase the same borrower with minutes-to-cash approval, and on mobile they outweigh the entire title field: <b>${icN(dn)}</b> ratings across ${dr.length} apps versus <b>${icN(tn)}</b> across all ${title.length} title lenders. That is substitution pressure on a branch-based product.</p>`+
       `<table class="tbl">${head}${rows(digital)}</table>`:'')+
       `<p class="sub" style="font-size:11px;margin-top:6px">${im.caveat||''}</p>`;
@@ -3695,7 +3698,7 @@ function drawRivalPulse(){
       // whitespace, so an inline row has NO soft-wrap opportunity between them and runs off the
       // right edge on mobile — flex+gap gives each chip its own wrap point.
       lbox.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 8px">${chips} <span class="tag">ESTIMATED · LLM-classified</span></div>`+
-        land.by_product.map(g=>`<h4 class="acqsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
+        land.by_product.map(g=>`<h4 class="compsub" style="margin:10px 0 4px">${PRODL[g.product]||g.product} <span class="sub mono">×${g.n}</span></h4>`+
           `<table class="tbl">${g.items.map(p=>`<tr>
             <td class="mono" style="white-space:nowrap"><b>${p.brand}</b></td>
             <td style="white-space:nowrap"><span class="tag" style="color:${TYPEC[p.promo_type]||'var(--dim)'};border:1px solid ${TYPEC[p.promo_type]||'var(--dim)'}">${TYPEL[p.promo_type]||p.promo_type}</span></td>
@@ -3716,7 +3719,7 @@ function drawRivalPulse(){
     plist.innerHTML=order.map(b=>{
       const items=byBrand[b].slice(0,6);
       const kind=items.every(i=>i.kind==='news')?' <span class="sub">(news &amp; campaigns — MTC runs no public promo page)</span>':'';
-      return `<h4 class="acqsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
+      return `<h4 class="compsub" style="margin:10px 0 4px">${b}${kind}</h4>`+
         `<table class="tbl">${items.map(p=>`<tr>
           <td class="mono sub" style="white-space:nowrap">${p.date||p.first_seen||''}</td>
           <td>${p.is_new?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">NEW</span> ':''}<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>${p.detail?`<div class="sub" style="font-size:11px">${p.detail}</div>`:''}</td>
@@ -4211,7 +4214,7 @@ function drawExitWhitespace(){
    data already present: high demand proxy (k10 footfall + district workers + province
    pickups + precomputed 'o' opportunity) against LOW own-AutoX saturation (w = ≤10km).
    Everything here is an ESTIMATED screen, not a site-survey. */
-let acqRegion='all', acqRows=[];
+let gapRegion='all', gapRows=[];
 // White-space score v2 — a defensible screen, not a site survey. Three legs, all from data present:
 //   DEMAND  (0–1, avg of 4 proxies): footfall (cvs+rest+fmkt·3), DIW district factory workers,
 //           province pickup stock (title collateral), and the precomputed opportunity 'o'.
@@ -4220,25 +4223,25 @@ let acqRegion='all', acqRows=[];
 //           presence — we have NO national lender-branch census (only 30 hand-curated competitors
 //           in Rayong), so this is an OSM financial-density proxy, NOT a competitor count.
 // Score = demand × ownHeadroom × compHeadroom, scaled 0–100. Each leg returned for transparency.
-function acqLegs(d){
+function gapLegs(d){
   const pl=(typeof PLOOK!=='undefined'&&PLOOK)?(PLOOK[d.v]||{}):{};
   const k=d.k10||{};
   const foot=((k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3);
-  const demand=(norm(foot,ACQN.foot)+norm(d.dwork||0,ACQN.dwork)+norm(pl.pickup||0,ACQN.pickup)+norm(d.o||0,ACQN.o))/4;
+  const demand=(norm(foot,GAPN.foot)+norm(d.dwork||0,GAPN.dwork)+norm(pl.pickup||0,GAPN.pickup)+norm(d.o||0,GAPN.o))/4;
   // own-AutoX headroom: 1 at zero own branches, decays toward 0.35 floor as saturation rises.
   const ownHead=0.35+0.65*(1-Math.min(1,(d.w||0)/8));
   // competitor (financial-density proxy) headroom: dense banks+ATMs => slightly less white space.
   const fin=(k.bank||0)+(k.atm||0);
-  const compHead=0.6+0.4*(1-Math.min(1,fin/(ACQN.fin||1)));
+  const compHead=0.6+0.4*(1-Math.min(1,fin/(GAPN.fin||1)));
   return {demand,ownHead,compHead,fin};
 }
-function acqScore(d){const L=acqLegs(d); return Math.round(100*L.demand*L.ownHead*L.compHead);}
-let ACQN={};
-function buildAcqNorms(){
+function gapScore(d){const L=gapLegs(d); return Math.round(100*L.demand*L.ownHead*L.compHead);}
+let GAPN={};
+function buildGapNorms(){
   const mx=f=>Math.max(1,...DATA.map(f));
   // 90th-pct cap for the financial-density proxy so a couple of CBD outliers don't flatten everyone.
   const fins=DATA.map(d=>{const k=d.k10||{};return (k.bank||0)+(k.atm||0);}).sort((a,b)=>a-b);
-  ACQN={
+  GAPN={
     foot:mx(d=>{const k=d.k10||{};return (k.cvs||0)+(k.rest||0)+(k.fmkt||0)*3;}),
     dwork:mx(d=>d.dwork||0),
     pickup:mx(d=>(PLOOK[d.v]||{}).pickup||0),
@@ -4247,33 +4250,33 @@ function buildAcqNorms(){
   };
 }
 function norm(v,mx){return Math.min(1,(v||0)/(mx||1));}
-function renderAcqBoard(){
-  if(!$('#acqboard')) return;
-  buildAcqNorms();
-  if(!$('#acqchips').dataset.init){
+function renderGapBoard(){
+  if(!$('#gapboard')) return;
+  buildGapNorms();
+  if(!$('#gapchips').dataset.init){
     const regions=['all',...Array.from(new Set(DATA.map(d=>d.r)))];
-    $('#acqchips').setAttribute('role','group'); $('#acqchips').setAttribute('aria-label','Filter by region');
-    $('#acqchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All regions':r}</button>`).join('');
-    $('#acqchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
-      $('#acqchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
-      acqRegion=b.dataset.r; drawAcqBoard();};
-    $('#acqcsv').onclick=acqCSV; $('#acqchips').dataset.init='1';
+    $('#gapchips').setAttribute('role','group'); $('#gapchips').setAttribute('aria-label','Filter by region');
+    $('#gapchips').innerHTML=regions.map((r,i)=>`<button class="chip ${i===0?'on':''}" data-r="${r}" aria-pressed="${i===0}">${r==='all'?'All regions':r}</button>`).join('');
+    $('#gapchips').onclick=e=>{const b=e.target.closest('.chip'); if(!b)return;
+      $('#gapchips').querySelectorAll('.chip').forEach(c=>{const on=c===b;c.classList.toggle('on',on);c.setAttribute('aria-pressed',String(on));});
+      gapRegion=b.dataset.r; drawGapBoard();};
+    $('#gapcsv').onclick=gapCSV; $('#gapchips').dataset.init='1';
   }
-  drawAcqBoard();
+  drawGapBoard();
   // lazily fold the competitor census into the board so "underserved" can be re-read as
   // "underserved AND undercompeted". Null-safe: if the file is absent the column shows "n/a".
-  if(!compAttached) loadCompetitors().then(()=>{ drawAcqBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
+  if(!compAttached) loadCompetitors().then(()=>{ drawGapBoard(); });  // always redraw when census lands (was guarded on v-acq being visible, so the Rivals column stuck on 'n/a' until a chip click)
 }
 // Per-region ranking: which region has the most white space on average + the single best opening.
-function drawAcqRegions(){
-  if(!$('#acqregions')) return;
+function drawGapRegions(){
+  if(!$('#gapregions')) return;
   const byReg={};
-  DATA.forEach(d=>{const r=d.r||'—'; const s=acqScore(d);
+  DATA.forEach(d=>{const r=d.r||'—'; const s=gapScore(d);
     const o=byReg[r]||(byReg[r]={r,n:0,sum:0,top:null,topS:-1});
     o.n++; o.sum+=s; if(s>o.topS){o.topS=s; o.top=d;}});
   const regs=Object.values(byReg).map(o=>({...o,avg:o.sum/o.n})).sort((a,b)=>b.avg-a.avg);
   const mxAvg=Math.max(1,...regs.map(o=>o.avg));
-  $('#acqregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
+  $('#gapregions').innerHTML=`<tr><th>#</th><th>Region</th><th>Catchments</th><th class="h-opp" title="mean coverage-gap score across the region (est)">Avg coverage-gap ★ est</th><th>Widest single gap (est)</th></tr>`+
     regs.map((o,i)=>{const sc=o.avg>=45?'var(--gold)':o.avg>=30?'var(--merch)':'var(--mid)';
       return `<tr onclick="location.href='${branchHref(o.top)}'" tabindex="0" role="link" style="cursor:pointer">
       <td class="mono sub">${i+1}</td><td><b>${o.r}</b></td>
@@ -4281,30 +4284,30 @@ function drawAcqRegions(){
       <td>${barHTML(o.avg,sc,mxAvg)} <span class="mono" style="color:${sc}">${o.avg.toFixed(1)}</span></td>
       <td class="sub">${o.top.n} <span class="mono" style="color:var(--gold)">★ ${o.topS}</span> · ${o.top.v}</td></tr>`;}).join('');
   // plain-language readout: lead with the answer.
-  const best=regs[0], top1=acqRows[0];
-  if($('#acqreadout')&&best&&top1){
-    const t=top1.d, L=acqLegs(t);
+  const best=regs[0], top1=gapRows[0];
+  if($('#gapreadout')&&best&&top1){
+    const t=top1.d, L=gapLegs(t);
     const drivers=[];
     if(L.demand>=0.4) drivers.push('strong demand signals');
     if(t.w<=2) drivers.push(`almost no own AutoX nearby (${t.w} ≤10km)`);
     else if(t.w<=5) drivers.push(`thin own coverage (${t.w} ≤10km)`);
     if((t.dwork||0)>=8000) drivers.push(`${Math.round((t.dwork||0)/1000)}k factory workers in the district`);
-    const scope=acqRegion==='all'?'nationwide':`in ${acqRegion}`;
-    $('#acqreadout').innerHTML=`<b>Widest coverage gap:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
+    const scope=gapRegion==='all'?'nationwide':`in ${gapRegion}`;
+    $('#gapreadout').innerHTML=`<b>Widest coverage gap:</b> ${t.n} (${t.v}, ${t.r}) tops the screen ${scope}
       at <b style="color:var(--gold)">★ ${top1.s}</b>${drivers.length?' — '+drivers.join(', ')+'.':'.'}
       By region, <b>${best.r}</b> shows the widest average coverage gap (★ ${best.avg.toFixed(1)} across ${best.n.toLocaleString()} catchments).
       <span class="sub">Estimated coverage screen — a competitive-exposure read, not a site survey or an open-a-branch recommendation.</span>`;
   }
 }
-function drawAcqBoard(){
-  acqRows=DATA.filter(d=>acqRegion==='all'||d.r===acqRegion)
-    .map(d=>({d, s:acqScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
-  drawAcqRegions();
+function drawGapBoard(){
+  gapRows=DATA.filter(d=>gapRegion==='all'||d.r===gapRegion)
+    .map(d=>({d, s:gapScore(d)})).sort((a,b)=>b.s-a.s).slice(0,60);
+  drawGapRegions();
   const haveComp=compHasData();
-  $('#acqtbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
+  $('#gaptbl').innerHTML=`<tr><th>#</th><th class="h-opp" title="ESTIMATED coverage-gap screen: demand proxy × own-AutoX headroom × competitor-proxy headroom (0–100)">Coverage-gap ★ est</th><th>Branch / area</th><th>Prov</th><th>Region</th><th title="own AutoX ≤10km — lower = thinner coverage">AutoX ≤10km</th>`+
     `<th class="h-collat" title="MEASURED rival title-loan / vehicle-finance branches within ~5km (Google Places, a lower bound — not a registry). Low rivals + high coverage-gap = thinly-covered AND undercompeted.">Rivals ≤5km ◆ meas</th>`+
     `<th class="h-opp" title="DIW factory workers (measured)">Workers (DIW)</th><th title="province pickup stock (DLT)">Pickups (prov)</th><th title="banks+ATMs ≤10km (OSM) — financial-density proxy for rival presence, NOT a competitor census">Fin. density ◇ est</th></tr>`+
-    acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
+    gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const sc=row.s>=60?'var(--gold)':row.s>=40?'var(--merch)':'var(--mid)';
       const hd=d.w<=2?' · gap':d.w<=5?' · thin':' · covered';
       const k=d.k10||{}; const fin=(k.bank||0)+(k.atm||0);
       // competitor cell: measured count + an "undercompeted" flag when high white-space meets few rivals.
@@ -4326,21 +4329,21 @@ function drawAcqBoard(){
       <td class="mono" style="color:var(--collat)">${naNum(pl.pickup)}</td>
       <td class="mono sub">${fin}</td></tr>`;}).join('');
   // honest one-line note under the board about the competitor column's provenance + meaning.
-  const cnote=$('#acqcompnote');
+  const cnote=$('#gapcompnote');
   if(cnote){
     if(!compLoaded){ cnote.innerHTML='<span class="sub">Loading competitor census…</span>'; }
     else if(!haveComp){ cnote.innerHTML='<span class="sub"><b>Rivals ≤5km</b> is blank — the competitor census isn\'t loaded yet. Once it refreshes, this column fills with measured rival-branch counts, turning "underserved" into "underserved <b>and</b> undercompeted".</span>'; }
     else {
-      const flagged=acqRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
-      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${acqRows.length} catchments are <b>thinly-covered AND undercompeted</b> — high coverage-gap with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
+      const flagged=gapRows.filter(row=>row.s>=40&&compCount(row.d)===0).length;
+      cnote.innerHTML=`<span class="sub"><b>✦ ${flagged}</b> of the top ${gapRows.length} catchments are <b>thinly-covered AND undercompeted</b> — high coverage-gap with <b>zero</b> measured rival branches within ${COMP_RADIUS_KM}km. `+
         `Competitor counts are <b>measured</b> (Google Places) but a <b>lower bound</b>, not a lender registry.</span>`;
     }
   }
 }
-function acqCSV(){
+function gapCSV(){
   const haveComp=compHasData();
   const hdr=['rank','whitespace_score_est','demand_proxy_0_1_est','own_headroom_0_1_est','competitor_headroom_proxy_0_1_est','branch','province','region','own_autox_10km','rival_branches_5km_measured_lower_bound','undercompeted_flag','factory_workers_diw','province_pickups_dlt','fin_density_banks_atms_10km_est','opportunity_o_est'];
-  const lines=[hdr.join(',')].concat(acqRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=acqLegs(d);
+  const lines=[hdr.join(',')].concat(gapRows.map((row,i)=>{const d=row.d, pl=PLOOK[d.v]||{}; const L=gapLegs(d);
     const cn=compCount(d); const under=haveComp&&row.s>=40&&cn===0;
     return [i+1,row.s,L.demand.toFixed(3),L.ownHead.toFixed(3),L.compHead.toFixed(3),d.n,d.v,d.r,d.w,haveComp?cn:'',under?'yes':(haveComp?'no':''),d.dwork==null?'':d.dwork,pl.pickup==null?'':pl.pickup,L.fin,d.o==null?'':d.o]
       .map(v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`).join(',');}));
@@ -4589,9 +4592,9 @@ function renderAmphoe(){
   // Fold in the measured borrower-base (dominant occupation) + competitor census so the white-space
   // leaderboard reads "underserved + what borrower base + how contested". Both lazy + null-safe: if a
   // file is absent the extra cells just don't render and the original layout stands.
-  const reAcq=()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAmpBoard(); };
-  if(!aoccLoaded) loadAmphoeOccupations().then(reAcq);
-  if(!compAttached) loadCompetitors().then(reAcq);
+  const reAmphoe=()=>{ if(document.getElementById('v-acq')&&document.getElementById('v-acq').classList.contains('on')) drawAmpBoard(); };
+  if(!aoccLoaded) loadAmphoeOccupations().then(reAmphoe);
+  if(!compAttached) loadCompetitors().then(reAmphoe);
 }
 function drawAmpBoard(){
   ampRows=AMP.filter(a=>ampRegion==='all'||a.region===ampRegion)
@@ -7257,6 +7260,7 @@ function queue3DLink(it){
    here). Same strip fronts Assistance / Risk / Competition with a pillar-specific ranking.
    Null-safe: absent layer → calm note, never a broken scene. */
 let IMPACT=null, impactPromise=null;
+let INCIMP=null;   // income_impact.json — read by icCropIncome() on the drill's province crop strip
 function loadImpact(){
   if(impactPromise) return impactPromise;
   impactPromise=fetch('data/impact_cards.json').then(r=>r.ok?r.json():null)
@@ -7264,7 +7268,7 @@ function loadImpact(){
   return impactPromise;
 }
 const IC_MOUNTS={home:['cc-impact',null],assist:['assist-impact','assist'],
-                 exposure:['exposure-impact','risk'],acq:['acq-impact','competition']};
+                 exposure:['exposure-impact','risk'],acq:['competition-impact','competition']};
 const IC_SORT={assist:(a,b)=>(b.roll_pct||0)-(a.roll_pct||0),
                risk:(a,b)=>(b.npl_live_pct||0)-(a.npl_live_pct||0),
                competition:(a,b)=>((b.rivals||{}).ratio||0)-((a.rivals||{}).ratio||0)};
@@ -7331,7 +7335,19 @@ function icCropCell(p){
   if(!cr.length) return '<span class="s">—</span>';
   return cr.slice(0,2).map(c=>`<span style="color:${icCropCol(c.cls)}" title="${c.crop} ${Math.round((c.share||0)*100)}% of cropland · Pink Sheet YoY ${c.yoy!=null?(c.yoy>0?'+':'')+c.yoy+'%':'n/a'}">${c.crop.replace('Oil palm','Palm')} ${icCropDir(c.cls)}</span>`).join(' · ');
 }
-function icCropStrip(p){
+/* What the crop mix is WORTH to the households behind this province's book. The chips above carry the
+   world price; this line carries the farmer's cash — the modelled effect of crop prices on farm income
+   and the baht/month it works out to for the Agriculture group. Null-safe: no income layer, no line. */
+function icCropIncome(prov){
+  const ip=(INCIMP&&INCIMP.provinces)?INCIMP.provinces[prov]:null;
+  if(!ip||ip.agri_price_shock_pct==null) return '';
+  const a=(ip.occ||{}).Agriculture||{}, s=ip.agri_price_shock_pct;
+  const col=s>=0?'var(--merch)':'var(--agri)';
+  return `<span class="ic-cchip ${s>=0?'good':'bad'}" title="modelled effect of this province's crop-price mix on farm-household income (income_impact.json) — ESTIMATED transmission over MEASURED prices and MEASURED NSO income levels">`+
+    `farm income <b style="color:${col}">${s>0?'+':''}${s}%</b>`+
+    (a.d_baht!=null?` ≈ ${a.d_baht>0?'+':''}฿${icN(a.d_baht)}/mo`:'')+`</span>`;
+}
+function icCropStrip(p,prov){
   const cr=(p&&p.crops)||[];
   if(!cr.length) return '';
   const chips=cr.map(c=>{
@@ -7340,7 +7356,7 @@ function icCropStrip(p){
     return `<span class="ic-cchip ${cl}" title="${c.crop}: ${Math.round((c.share||0)*100)}% of this province's measured cropland · World Bank Pink Sheet YoY ${y}">${c.crop} ${Math.round((c.share||0)*100)}% ${icCropDir(c.cls)} ${y}</span>`;
   }).join('');
   const rain=p.rain_pct!=null?`<span class="ic-cchip ${p.rain_pct<85?'bad':'flat'}" title="rainfall as % of the local normal — drought proxy (crop-stress layer)">rain ${p.rain_pct}% of normal</span>`:'';
-  return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}</div>`;
+  return `<div class="ic-cropstrip"><span class="ic-bt" style="margin:0">CROPS & COMMODITIES <span class="s">${cr.length} measured crop${cr.length>1?'s':''} · farm backdrop for this province's book · Pink Sheet YoY</span></span>${chips}${rain}${icCropIncome(prov)}</div>`;
 }
 // Branch rows must RECONCILE to the province above them. They were silently short until
 // 2026-07-31 (a top-400-by-size cap upstream, on top of the n>=30 no-PII floor, dropped ~1,570
@@ -7467,7 +7483,7 @@ function icRenderLevel(mount){
     const g=icRegionOf(st.region);
     mount.innerHTML=icCrumb([{label:'All regions',lvl:'regions'},{label:(g?g.key:st.region),lvl:'province'},{label:st.province}])+
       `<div class="ic-drill-h"><b>${st.province}</b> — booking branches on the tape (n ≥ 30), worst NPL-live first</div>`+
-      icCropStrip((IMPACT.provinces||{})[st.province])+
+      icCropStrip((IMPACT.provinces||{})[st.province],st.province)+
       icBranchRows(st.province);
     return;
   }
@@ -7491,7 +7507,11 @@ function icFocusLevel(mount){ const b=mount&&mount.querySelector('.ic-back'); if
 function renderImpactStrip(mountId,mode){
   const mount=document.getElementById(mountId);
   if(!mount) return;
-  loadImpact().then(()=>{
+  // income_impact rides along so the province crop strip can show the farmer's cash, not just the
+  // world price. It is cached by tmliFetch, so this costs one request for the whole session; a null
+  // result just means icCropIncome renders nothing.
+  Promise.all([loadImpact(),tmliFetch('income_impact')]).then(([,inc])=>{
+    if(inc&&inc.provinces) INCIMP=inc;
     if(!IMPACT){ mount.innerHTML='<div class="ic-note">Impact cards not yet computed — data/impact_cards.json is absent (run pipeline/build_impact_cards.py).</div>'; return; }
     mount._icMode=mode;
     if(!mount._icState) mount._icState={level:'regions'};
@@ -7598,10 +7618,17 @@ function renderScenarios(){
 }
 
 /* MOVE 4 — commodities board: global Pink Sheet × Thai farm-gate × who's-exposed drill (Overview). */
+/* Commodity board label -> the crop key used by assist_price_radar.json / income_impact.json crop_mix.
+   Only the crops with a province planted-area map appear here; Sugar is on the board but has no
+   province share anywhere, so it stays deliberately unmapped rather than being joined to a guess. */
+const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava'};
+const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
-  tmliFetch('commodities').then(j=>{
+  Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact')]).then(([j,APR,INC])=>{
     if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
+    const aprCrop=k=>((APR&&Array.isArray(APR.crops))?APR.crops:[]).find(c=>c.key===k)||null;
+    const incProv=p=>((INC&&INC.provinces)?INC.provinces[p]:null)||null;
     const rows=j.board.map((c,i)=>{
       const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
       const exp=c.exposure;
@@ -7610,11 +7637,25 @@ function renderCommoditiesBoard(){
       const divCell=div==null?'<span class="s">—</span>':`<b style="color:${div>0?'var(--merch)':'var(--agri)'}">${div>0?'+':''}${div} pts</b>`;
       let drill='';
       if(exp){
+        // WHO the price actually reaches. The belt table alone says "accounts near this crop"; these
+        // two lines say which OCCUPATION carries it, what the price move is worth to that household
+        // in baht a month, and how much of the book is still healthy enough to call early.
+        const ck=CB_CROP[c.lab], ap=ck?aprCrop(ck):null;
+        const bp=(exp.top||[]).map(t=>({t,ip:incProv(t.prov)})).filter(x=>x.ip);
+        const agri=bp.map(x=>x.ip.occ&&x.ip.occ.Agriculture).filter(Boolean);
+        const shocks=bp.map(x=>x.ip.agri_price_shock_pct).filter(v=>v!=null);
+        const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
+        const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
+        const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
+        const assistLine=!ap?'':`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="6"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
-          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th></tr></thead><tbody>${
-            (exp.top||[]).map(t=>`<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td></tr>`).join('')
-          }</tbody></table></div></td></tr>`;
+          <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
+            (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
+              return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
+                `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
+                `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
+          }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
         <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
@@ -8178,6 +8219,67 @@ function provRegOf(mount,prov){
   const b=(mount._aodGeo.branches||[]).find(x=>x.prov===prov);
   return b?b.region:null;
 }
+/* PROACTIVE ASSIST · PRICE LENS (owner ask #4) — data/assist_price_radar.json.
+   The drought radar above answers "who is slipping now". This answers the forward question: which
+   crop price, if it turned, would put the most CURRENTLY-HEALTHY farm accounts at risk. Every crop
+   with province-level exposure is up YoY today, so `tripped` is empty — and rather than print an
+   empty box, the panel leads with the exposure that is real today (how much of the healthy farm book
+   rides on each price) and states the trip rule so the empty state is legible rather than mysterious.
+   Null-safe: absent layer → a calm note, never a broken table. */
+function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch)':'var(--muted)'; }
+function renderAssistPriceLens(){
+  const host=document.getElementById('assist-price'); if(!host) return;
+  tmliFetch('assist_price_radar').then(j=>{
+    if(!j||!Array.isArray(j.crops)||!j.crops.length){
+      tmliNote(host,'The price lens needs <b>data/assist_price_radar.json</b> — not built for this vintage. The drought radar above is unaffected.');
+      return;
+    }
+    const N=n=>Number(n).toLocaleString();
+    const trig=(j.meta&&j.meta.trigger)||{}, tripped=Array.isArray(j.tripped)?j.tripped:[];
+    const provs=Array.isArray(j.provinces)?j.provinces:[];
+    const total=(j.meta&&j.meta.n_current_x_total)||provs.reduce((a,r)=>a+(r.n_current_x||0),0);
+
+    // Lead with the answer. If something has tripped that IS the answer; otherwise the answer is the
+    // size of the healthy book and the fact that nothing is falling — said plainly, not padded.
+    const lead = tripped.length
+      ? `<b style="color:var(--agri)">${tripped.length} province${tripped.length>1?'s':''} tripped:</b> ${tripped.join(' · ')} — a crop covering ≥${Math.round((trig.dominant_share||0)*100)}% of the planted area there is in price decline. Call the Current + X-day slice before collections turn.`
+      : `<b>Nothing tripped.</b> All five mapped crops are up year-on-year, so no province is in farm-price distress today. What is real now is the exposure: <b>${N(total)}</b> farm accounts across <b>${provs.length}</b> provinces are <b>Current or only X-bucket</b> — healthy, and riding on the prices below.`;
+
+    const crops=j.crops.map(c=>`<tr>
+        <td><b>${c.crop}</b></td>
+        <td class="mono" style="color:${priceDirColor(c.direction)}"><b>${c.yoy==null?'—':(c.yoy>0?'+':'')+c.yoy+'%'}</b></td>
+        <td class="mono">${N(c.n_provinces)}</td>
+        <td class="mono"><b>${N(c.n_current_x)}</b> <span class="sub">of ${N(c.n_farm_accounts)}</span></td>
+        <td class="mono sub">${aodTHB(c.os_thb)}</td>
+        <td class="sub" style="font-size:12px">${(c.top_provinces||[]).join(' · ')||'—'}</td></tr>`).join('');
+
+    // The province detail is the actionable list, but it is long — keep it collapsed so the crop
+    // rollup stays the thing you read first.
+    const top=provs.slice(0,15).map(r=>`<tr>
+        <td><b>${r.th}</b> <span class="sub mono">${r.region||''}</span>${r.also_in_drought_radar?' <span class="tag" title="this province is also on the drought radar above">DROUGHT TOO</span>':''}</td>
+        <td class="mono"><b>${N(r.n_current_x)}</b></td>
+        <td class="mono sub">${N(r.n_current)} / ${N(r.n_early)}</td>
+        <td class="mono sub">${N(r.n_farm_accounts)}</td>
+        <td class="mono sub">${aodTHB(r.os_thb)}</td>
+        <td class="sub" style="font-size:12px">${(r.crops||[]).filter(c=>c.depended_on).map(c=>`${c.crop} <span class="mono" style="color:${priceDirColor(c.direction)}">${c.yoy==null?'—':(c.yoy>0?'+':'')+c.yoy+'%'}</span>`).join(' · ')||'—'}</td></tr>`).join('');
+
+    host.innerHTML=`<p class="lead" style="margin:0 0 10px">${lead}</p>
+      <table class="tbl"><tr>
+        <th>Crop</th>
+        <th title="Thai farm-gate price, year-on-year — MEASURED NABC daily national average">Farm-gate YoY</th>
+        <th title="provinces where this crop is at least the dominance share of planted area">Provinces on it</th>
+        <th title="accounts that are Current or only in the X (pre-30dpd) bucket">Healthy accounts riding on it</th>
+        <th title="the whole farm book in those provinces — the tape does not split outstanding by bucket">Farm book</th>
+        <th>Where most of it sits</th></tr>${crops}</table>
+      <details style="margin-top:10px"><summary class="sub">By province — the 15 largest healthy farm books (of ${provs.length})</summary>
+        <table class="tbl" style="margin-top:8px"><tr>
+          <th>Province</th><th>Current + X</th><th class="sub">Current / X</th>
+          <th class="sub">Farm accounts</th><th class="sub">Farm book</th><th>Crops it depends on</th></tr>${top}</table></details>
+      <p class="lead sub" style="margin:10px 0 0"><b>Trips when</b> ${trig.rule||'a depended-on crop turns negative'} <b>Reading:</b> the Current/X split is by <b>account count</b>; the farm book figure is the province's whole farm outstanding — the tape aggregate does not expose balance by bucket, and splitting it here would be invention. Sugarcane has a measured price but no province planted-area share, so it cannot be placed on this map.</p>`;
+    wrapTables();
+  });
+}
+
 function renderAssist(){
   if(!document.getElementById('v-assist')) return;
   loadTapeReal().then(()=>{
@@ -8216,23 +8318,7 @@ function renderAssist(){
         <td class="sub" style="font-size:12px">${(r.stressed_crops||[]).join(' · ')||'—'}</td></tr>`).join('')+`</table>` :
       `<p class="lead sub">The drought radar is calm — no farm-household cells under severe SPEI stress right now.</p>`;
 
-    // Proactive-assist PRICE lens (owner #4): Current-bucket customers exposed to a crop under DOWNWARD
-    // price pressure. Cross the commodities board (falling global YoY × book exposure) — honest empty
-    // state today (Rice/Rubber/Palm all up; the drought radar above is the live hazard).
-    tmliFetch('commodities').then(j=>{
-      const host=$('#assist-radar'); if(!host) return;
-      const board=(j&&Array.isArray(j.board))?j.board:[];
-      const falling=board.filter(c=>c.global_yoy!=null&&c.global_yoy<0);
-      const exposed=falling.filter(c=>c.exposure&&c.exposure.book_accounts);
-      let body;
-      if(exposed.length){
-        body=`<b style="color:var(--agri)">Act now:</b> ${exposed.map(c=>`<b>${c.lab}</b> ${c.global_yoy}% · ${N(c.exposure.book_accounts)} book acc in belt`).join(' · ')} — many still Current; call the Current + X-day slice before collections turn.`;
-      } else {
-        const soft=falling.map(c=>c.lab+' '+c.global_yoy+'%').join(', ');
-        body=`No exposure-mapped crop is in downward price pressure now — Rice / Rubber / Palm (the crops with province area) are all up double-digits YoY, so today's live farm hazard is <b>drought</b> (radar above), not price.${soft?` Only ${soft} ${falling.length>1?'are':'is'} down, but ${falling.length>1?'they lack':'it lacks'} a province-exposure map.`:''} This lens flags Current-bucket customers the moment an exposure-mapped crop turns down.`;
-      }
-      host.insertAdjacentHTML('beforeend',`<div class="assist-pricelens"><div class="ic-bt" style="margin:10px 0 4px">PROACTIVE ASSIST · PRICE LENS <span class="s">Current-bucket customers in a falling-price sector</span></div><p class="lead sub" style="margin:0">${body}</p></div>`);
-    });
+    renderAssistPriceLens();
 
     // restructuring — did it hold?
     const ORD=['Normal','Skip','Pre-emptive','TDR'];

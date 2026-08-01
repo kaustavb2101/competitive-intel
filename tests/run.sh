@@ -81,6 +81,11 @@ phase_check(){
   # (each --check reproduces its committed output byte-for-byte; all inputs are git-tracked source-data).
   ( cd "$PIPE" && python3 build_farmgate_prices.py --check >/dev/null 2>&1 ) && ok "build_farmgate_prices.py --check" || bad "build_farmgate_prices.py --check (source-data/farmgate_prices.json drifted from source-data/nabc_prices.json)"
   ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
+  ( cd "$PIPE" && python3 build_assist_radar_price.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_assist_radar_price.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_assist_radar_price.py --check (tape_real.json/crop_stress.json/farmgate_prices.json absent — not data drift)"
+  else bad "build_assist_radar_price.py --check (assist_price_radar.json drifted from tape_real.json/crop_stress.json/farmgate_prices.json)"
+  fi
   ( cd "$PIPE" && python3 build_building_tiles.py --check >/dev/null 2>&1 ) && ok "build_building_tiles.py --check" || bad "build_building_tiles.py --check (tiles_config.json drifted from branches.json/competitors_census.json)"
   ( cd "$PIPE" && python3 build_sfi_credit.py --check >/dev/null 2>&1 ) && ok "build_sfi_credit.py --check" || bad "build_sfi_credit.py --check (sfi_credit.json drifted from source-data/fpo_sfi_npl.csv/fpo_sfi_credit.csv)"
   ( cd "$PIPE" && python3 build_peer_npl.py --check >/dev/null 2>&1 ) && ok "build_peer_npl.py --check" || bad "build_peer_npl.py --check (peer_npl.json drifted — the AutoX anchor from platform/data/tape_real.json or the cited peer constants; run: python3 pipeline/build_peer_npl.py)"
