@@ -3,6 +3,30 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — UX loop: scope="col" on the 15 Exposure render-path tables (merged + deployed + verified)
+
+Autonomous UX-improvement loop, one surgical fix. Third slice of `ux-table-scope-sweep-appjs`
+(a11y, WCAG 1.3.1) on the objective-#1 portfolio-risk route: `renderExposureTape` + `renderExposure`
+built 15 column-header rows as inline template literals with bare `<th>` (no `scope="col"`) — the
+real-tape bucket/restructuring/LTV/occupation/NPAT-frontier/collateral tables, the concentration
+tables (`#expoprov`/`#expotbl`/contested/twin-outlier/scenario-shock), the vintage + branch-audit
+tables, and the two risk-trend delta tables the same pass builds (`#trendboard`/`#trendbranches`).
+Added `scope="col"` to every `<th>` (incl. dynamic per-age-band collateral headers), matching
+`data.html`'s scoped convention and the primary-search + competition slices. **Zero visual change**
+(non-presentational attribute) — 22 header lines in `platform/app.js` + one audit entry.
+
+- **Safeguards (all pass):** `tests/run.sh check` 113 passed / 0 failed; headless `#exposure` render
+  identical, settled DOM `data-errors=[]` with 100 `scope="col"` present; `node --check` clean; no
+  secrets; diff matches intent, no stray files.
+- **Ship:** PR #250 (squash-merged to master as `cf9cef3`). *Branch cleanup note:* the git proxy
+  refused the delete-push (`send-pack disconnect`, 3×); the merged branch remains but is harmless.
+- **Deploy-verify:** production alias root **HTTP 200**, `/app.js` **HTTP 200**, and the deployed
+  `app.js` confirmed to carry the `scope="col"` fix (grep hit). `/index.html` → 308 is the configured
+  `cleanUrls` redirect, not a regression. No rollback needed.
+- **Recommend next:** the last bare-`<th>` families are `renderOverview` (the `#region` +
+  DLT-vehicle/agri/water commodity-board tables) and the district `#amptbl`/`#amprisk` family —
+  natural fourth/fifth slices to finish `ux-table-scope-sweep-appjs`.
+
 ## 2026-08-02 — Macro audit: a decision band on top, and three numbers that were saying the wrong thing
 
 Owner ask, ahead of MCOM: *"management needs the headlines, but working team needs branch level
