@@ -225,6 +225,13 @@ def build():
     acc = {pv: p["accounts"] for pv, p in cards["provinces"].items()}
     cmix = {pv: p["crop_mix"] for pv, p in income["provinces"].items()}
     areas = area_tables(area)
+    # Per-province MEASURED farm income base (NSO SES, ฿/month for the Agriculture occupation) and
+    # the SAME crop sensitivity the income engine uses, so a crop-specific number computed here can
+    # never disagree with income_impact.json's own arithmetic.
+    agri_base = {pv: ((p.get("occ") or {}).get("Agriculture") or {}).get("income")
+                 for pv, p in income["provinces"].items()}
+    crop_sens = (((income.get("meta") or {}).get("sensitivity") or {})
+                 .get("Agriculture") or {}).get("crop")
 
     ocsb = ocsb_price()
     nabc = load(S, "nabc_prices.json")
@@ -294,7 +301,26 @@ def build():
                 # accounts column visibly fail to add up to its own headline — for rice, the 6 shown
                 # provinces held 50,742 of 138,184 and the missing 63% was nowhere on the page. The
                 # rows now sum exactly to book_accounts and the area column sums to the belt's area.
-                "top": [{"prov": pv, "area_rai": round(a), "accounts": acc.get(pv, 0)}
+                #
+                # crop_income_pct / crop_income_baht are THIS CROP's effect (owner ask 2026-08-02).
+                # The drill previously borrowed income_impact.json's `agri_price_shock_pct`, which is
+                # the province's ALL-CROP shock and is area-weighted over rice/rubber/oilpalm ONLY.
+                # In the coconut belt that read +26.84% while coconut itself was -70.9%, because
+                # ประจวบคีรีขันธ์'s crop_mix is 61% rubber / 34% palm / 5% rice and contains no
+                # coconut at all — the column was answering a different question than the drill asks,
+                # and answering it with the opposite sign. This is conditional on the household's
+                # MAIN crop being this one (stated in the UI); it deliberately does NOT weight by the
+                # crop's area share, because belt areas come from different registries (DOAE farmer
+                # registration vs the planted-area census) and a share computed across them would be
+                # a false precision — see area_note.
+                "crop_sens": crop_sens,
+                "top": [{"prov": pv, "area_rai": round(a), "accounts": acc.get(pv, 0),
+                         "crop_income_pct": (round(crop_sens * local_yoy, 1)
+                                             if (crop_sens is not None and local_yoy is not None)
+                                             else None),
+                         "crop_income_baht": (round(agri_base[pv] * crop_sens * local_yoy / 100.0)
+                                              if (crop_sens is not None and local_yoy is not None
+                                                  and agri_base.get(pv)) else None)}
                         for pv, a in belt],
                 "area_provenance": src["provenance"],
                 "area_source": src["source"],
@@ -302,6 +328,14 @@ def build():
                 "basis": "book accounts in the crop's core belt (provinces = ~80%% of national "
                          "planted area, %s); belt identifies the real growing region."
                          % src["provenance"],
+                "income_basis": (
+                    "ESTIMATED, and conditional: the income columns are this crop's OWN effect on a "
+                    "farm household in that province whose MAIN crop is this one — "
+                    "sensitivity %s x the crop's Thai YoY, applied to the province's MEASURED NSO SES "
+                    "farm-income base. Same sensitivity the income engine uses. It is deliberately "
+                    "NOT weighted by the crop's share of local area: belt areas come from different "
+                    "registries and a cross-source share would be false precision."
+                    % crop_sens) if crop_sens is not None else None,
             }
         else:
             row["exposure"] = None

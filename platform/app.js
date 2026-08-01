@@ -8121,6 +8121,12 @@ function renderCommoditiesBoard(){
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
         const thaiLine=cbThaiHistory(THI,c.lab);
+        // The income columns used to show income_impact.json's province-wide agri_price_shock_pct,
+        // which is area-weighted over rice/rubber/oilpalm ONLY — so the coconut belt read +26.84%
+        // farm income while coconut itself was down 70.9%, because ประจวบคีรีขันธ์'s crop mix is 61%
+        // rubber / 34% palm and holds no coconut at all. They now carry THIS crop's own effect, and
+        // the assumption that makes them readable is stated on the page rather than in a tooltip.
+        const incBasis=!exp.income_basis?'':`<div class="cb-incbasis"><span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span> <b>Reading the income columns:</b> they are <b>${c.lab}'s own effect</b> on a farm household in that province <b>whose main crop is ${c.lab}</b> — the crop's Thai move passed through the income engine's farm sensitivity onto that province's measured NSO SES farm income. They are not the province's all-crop farm income (a different number, driven mostly by rice, rubber and palm, and shown on the province view). Not weighted by ${c.lab}'s share of local land: belt areas come from different registries, so a cross-source share would be false precision.</div>`;
         // TOTAL ROW (added 2026-08-01, owner ask). build_commodities.py used to emit only the belt's
         // six largest provinces while the line above the table quoted the whole belt, so the accounts
         // column visibly failed to add up to its own headline — rice showed 50,742 against 138,184
@@ -8141,12 +8147,13 @@ function renderCommoditiesBoard(){
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
           ${areaLine}
-          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">Planted area (rai)</th><th scope="col">Book accounts</th><th scope="col" title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th scope="col" title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
-            shown.map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
+          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">Planted area (rai)</th><th scope="col">Book accounts</th><th scope="col" title="THIS crop's effect on a farm household here whose main crop is ${c.lab} — sensitivity × the crop's Thai YoY. ESTIMATED.">${c.lab} → farm income</th><th scope="col" title="the same effect in baht, on the province's MEASURED NSO SES farm-income base">฿/month</th></tr></thead><tbody>${
+            shown.map(t=>{
+              const ipc=t.crop_income_pct, ibt=t.crop_income_baht;
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
-                `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
-                `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
-          }</tbody>${footRow}</table></div>${thaiLine}${occLine}${assistLine}</div></td></tr>`;
+                `<td class="n">${ipc!=null?`<span style="color:${ipc>=0?'var(--merch)':'var(--agri)'}">${ipc>0?'+':''}${ipc}%</span>`:'<span class="s">—</span>'}</td>`+
+                `<td class="n">${ibt!=null?`<span style="color:${ibt>=0?'var(--merch)':'var(--agri)'}">${ibt>0?'+':'−'}฿${icN(Math.abs(ibt))}</span>`:'<span class="s">—</span>'}</td></tr>`;}).join('')
+          }</tbody>${footRow}</table></div>${incBasis}${thaiLine}${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
         <td class="cb-felt" title="${isLoc?'Thai farm-gate':'world price only — no Thai farm-gate series'}">${cbBar(fv,feltMax)}${

@@ -1337,6 +1337,8 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .cb-belttbl thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
 .cb-foot td{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding-top:6px;font-size:11px;vertical-align:top}
 .cb-foot .s{color:var(--mid);font-weight:400}
+.cb-incbasis{margin:7px 0 2px;font-size:11px;line-height:1.5;color:var(--mid)}
+.cb-incbasis b{color:var(--hi)}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}
