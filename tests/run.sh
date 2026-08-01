@@ -81,6 +81,11 @@ phase_check(){
   # (each --check reproduces its committed output byte-for-byte; all inputs are git-tracked source-data).
   ( cd "$PIPE" && python3 build_farmgate_prices.py --check >/dev/null 2>&1 ) && ok "build_farmgate_prices.py --check" || bad "build_farmgate_prices.py --check (source-data/farmgate_prices.json drifted from source-data/nabc_prices.json)"
   ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
+  ( cd "$PIPE" && python3 check_commodity_board.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "check_commodity_board.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "check_commodity_board.py --check (commodities.json/commodities_protein.json absent — not drift)"
+  else bad "check_commodity_board.py --check (commodity_board.json yoy/vintage drifted from its MEASURED Pink Sheet source commodities.json/commodities_protein.json — run: python3 pipeline/check_commodity_board.py)"
+  fi
   ( cd "$PIPE" && python3 build_assist_radar_price.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_assist_radar_price.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_assist_radar_price.py --check (tape_real.json/crop_stress.json/farmgate_prices.json absent — not data drift)"

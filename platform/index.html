@@ -336,7 +336,15 @@
 
     <div id="outlook"></div>
 
-    <nav class="jumpnav no-print" id="ovjump" aria-label="Jump to section within Macro">
+    <!-- TOPIC SWITCHER (2026-08-01). data-exclusive turns this jump-nav into a segmented control:
+         exactly ONE panel below is open at a time, so the six topics stop stacking vertically.
+         That stacking — not the length of any single topic — was what made this tab a 17-screen
+         scroll: you passed five subjects you did not ask for to reach the sixth. Folding helped
+         and was not enough, because the tab still rendered every topic in sequence.
+         The nav markup stays <a data-jump> so the ONE delegated .jumpnav handler keeps serving
+         this and Competition's #compjump alike; data-exclusive is the only opt-in. -->
+    <nav class="jumpnav ovswitch-nav no-print" id="ovjump" data-exclusive="1"
+         aria-label="Choose a Macro topic — one shows at a time">
       <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
       <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
       <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
@@ -345,6 +353,7 @@
       <a class="chip" href="#overview" data-jump="sec-ov-hazard">Live hazard</a>
     </nav>
 
+    <div class="ovswitch" id="ovswitch">
     <details class="ovsec" id="sec-ov-macro" open>
     <summary><h2 class="opp">Conditions, commodities &amp; what moves each province</h2><span class="ovsec-what">Answer band, commodity board with 5-year price trends, IMF backdrop</span></summary>
 
@@ -571,6 +580,7 @@
       <div class="tblwrap" style="margin-top:10px" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
     </div>
     </details>
+    </div><!-- /.ovswitch -->
 
     <div class="story-next no-print">
       <span class="story-next-lab">Next in the story · ② of ⑤</span>
