@@ -193,6 +193,13 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_commodity_history.py --check (source-data/commodity_history.json absent — owner-side Pink Sheet parse, not data drift)"
   else bad "build_commodity_history.py --check (commodity_history.json drifted from source-data/commodity_history.json — run: python3 pipeline/build_commodity_history.py)"
   fi
+  # The live board reads every other layer's meta stamp, so it drifts whenever an upstream feed is
+  # re-pulled — which is exactly what it is for, and exactly why it must be gated: a stale
+  # live_board.json would report a fresh feed as old (or worse, an old one as fresh).
+  ( cd "$PIPE" && python3 build_live_board.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_live_board.py --check"
+  else bad "build_live_board.py --check (live_board.json is behind its upstream feeds' stamps — run: python3 pipeline/build_live_board.py)"
+  fi
   # --- PR#2 enrichment layers (vehicle/EV collateral erosion + hydrology + labour) ---------------
   # All deterministic + network-free over committed source-data. Each SKIPs (exit 3) when its upstream
   # pull is absent (dlt CSV mirror is NOT committed — 20MB) or its output is not yet generated — never a

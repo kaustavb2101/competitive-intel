@@ -47,6 +47,7 @@ EXPLORE = [
     ("Branches",          "data.html?branches"),
     ("Market assessment", "#market"),
     ("Simulator",         "#sim"),
+    ("Live board",        "live.html"),
 ]
 
 # Routes index.html builds that are deliberately NOT in the nav. Each needs a reason.
@@ -55,7 +56,7 @@ LEGACY_ROUTES = {
 }
 
 PAGES = ["index.html", "data.html", "province.html", "rayong-catchment.html",
-         "branch-explorer.html", "status.html"]
+         "branch-explorer.html", "status.html", "live.html"]
 
 
 class NavParser(html.parser.HTMLParser):
