@@ -420,6 +420,13 @@
          drought by district, and DLT vehicle density. META.region is untouched and still feeds the
          Command-center risk readout. -->
 
+    <!-- CROP MIX → FARM INCOME (data/crop_mix.json, build_crop_mix.py). Leads this section because
+         it is the answer the rest of it supports: with all eight priced crops weighted by province
+         area, farm income is NOT rising everywhere — four provinces are negative and they hold
+         17,287 book accounts. The prior engine weighted rice/rubber/oilpalm only, all three rising,
+         so it reported every province up. Null-safe: absent file → nothing renders. -->
+    <div id="cropmix-wrap"></div>
+
     <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
     <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
     <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>

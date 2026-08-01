@@ -1902,6 +1902,9 @@ function renderOverview(){
   renderRecoverySensitivity();
   // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
   renderEvWatch();
+  // the crop mix → farm income correction (obj #1). Leads this section: it is the number the crop
+  // tables underneath it explain. Null-safe: absent layer → nothing renders.
+  renderCropMix();
   // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
   loadCropStress().then(renderCropStress);
   loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
@@ -8736,6 +8739,54 @@ function provRegOf(mount,prov){
    rides on each price) and states the trip rule so the empty state is legible rather than mysterious.
    Null-safe: absent layer → a calm note, never a broken table. */
 function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch)':'var(--muted)'; }
+/* CROP MIX → FARM INCOME (data/crop_mix.json). The correction this section leads with: weighting
+   ALL EIGHT priced crops by province area, farm income is not rising everywhere. The prior engine
+   weighted rice/rubber/oilpalm only — all three up — so it reported all 77 provinces rising and was
+   structurally blind to coconut, sugarcane and pineapple. Four provinces are negative and they carry
+   real book. Null-safe: absent layer → nothing renders. */
+function renderCropMix(){
+  const host=document.getElementById('cropmix-wrap'); if(!host) return;
+  tmliFetch('crop_mix').then(j=>{
+    if(!j||!j.national||!j.provinces) return;
+    const N=j.national, M=j.meta||{}, P=j.provinces, num=n=>Number(n).toLocaleString();
+    const sign=v=>(v>0?'+':'')+v, col=v=>v<0?'var(--agri)':'var(--merch)';
+    const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
+    // One bar per province, sorted worst-first, so the shape of the country is one glance: a long
+    // green tail and a short red head. Fixed pixel geometry — a %-width SVG collapses here.
+    const all=Object.entries(P).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
+    const W=760,BW=Math.max(2,Math.floor(W/all.length)-1),H=54;
+    const lo=Math.min(...all.map(([,p])=>p.shock_pct)), hi=Math.max(...all.map(([,p])=>p.shock_pct));
+    const zero=H*(hi/(hi-lo||1));
+    const bars=all.map(([,p],i)=>{
+      const y=p.shock_pct>=0?zero-H*(p.shock_pct/(hi-lo||1)):zero;
+      const bh=Math.max(1,H*Math.abs(p.shock_pct)/(hi-lo||1));
+      return `<rect x="${i*(BW+1)}" y="${y.toFixed(1)}" width="${BW}" height="${bh.toFixed(1)}" fill="${col(p.shock_pct)}" opacity="${p.shock_pct<0?1:.55}"/>`;}).join('');
+    const spark=`<svg width="${all.length*(BW+1)}" height="${H+2}" viewBox="0 0 ${all.length*(BW+1)} ${H+2}" role="img" aria-label="${all.length} provinces ranked by crop-mix price shock, ${N.negative_provinces} negative">${bars}<line x1="0" y1="${zero.toFixed(1)}" x2="${all.length*(BW+1)}" y2="${zero.toFixed(1)}" stroke="var(--line)" stroke-width="1"/></svg>`;
+
+    const rows=N.worst.map(w=>{const p=P[w.prov]; const d=p.crops[0];
+      return `<tr><td><b>${w.prov}</b> <span class="s">${p.region||''}</span></td>
+        <td class="n" style="color:${col(p.shock_pct)}"><b>${sign(p.shock_pct)}%</b></td>
+        <td class="n" style="color:${col(p.income_thb_month)}"><b>${B(p.income_thb_month)}</b></td>
+        <td class="n">${num(p.accounts)}</td>
+        <td class="s">${d?`${d.en} is <b>${Math.round(d.share*100)}%</b> of its crop land and moved <b style="color:${col(d.yoy)}">${sign(d.yoy)}%</b> → ${sign(Math.round(d.pp*10)/10)}pp`:'—'}</td>
+        <td class="n s" title="same calculation with every crop on the DOAE registry alone">${sign(p.shock_pct_doae_basis)}%</td>
+        <td class="n s" title="what the previous rice/rubber/oilpalm-only engine reported">${p.shock_pct_3crop_prior==null?'—':sign(p.shock_pct_3crop_prior)+'%'}</td></tr>`;}).join('');
+
+    host.innerHTML=`<h3 class="ovsub risk">Crop mix → farm income · every priced crop, weighted by province land <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
+      <div class="verdict v-warn"><b>Farm income is not rising everywhere — ${N.negative_provinces} provinces are falling, and they hold ${num(N.accounts_in_negative)} book accounts.</b>
+        Weighted across all eight priced crops, the average AutoX farm borrower's crop mix moved <b style="color:${col(N.book_weighted_shock_pct)}">${sign(N.book_weighted_shock_pct)}%</b> (median province ${sign(N.median_shock_pct)}%). But it is concentrated: the Mae Klong coconut delta is down two-thirds.
+        The previous engine weighted <b>rice, rubber and oilpalm only</b> — all three rising — and therefore reported <b>all 77 provinces up</b>. That was an artefact of the three crops it could see.</div>
+      <div class="cm-spark">${spark}<div class="s">77 provinces, worst on the left · red = falling crop mix</div></div>
+      <table class="tbl cm-tbl"><tr><th scope="col">Province</th><th scope="col" title="area-weighted Thai farm-gate move across all 8 priced crops">Crop mix move</th>
+        <th scope="col" title="that move through the income engine's farm sensitivity, on the province's measured NSO SES farm income">Farm income</th>
+        <th scope="col">Book accounts</th><th scope="col">What is driving it</th>
+        <th scope="col" class="s" title="sensitivity: every crop on the DOAE registry alone">DOAE basis</th>
+        <th scope="col" class="s" title="the previous rice/rubber/palm-only figure">Prior</th></tr>${rows}</table>
+      <p class="lead sub" style="margin:8px 0 0"><b>Why you can trust the ranking:</b> the two area bases disagree on level and not on order — recomputing every crop on the DOAE registry alone moves สมุทรสงคราม from ${sign(P['สมุทรสงคราม'] ? P['สมุทรสงคราม'].shock_pct : 0)}% to ${sign(P['สมุทรสงคราม']?P['สมุทรสงคราม'].shock_pct_doae_basis:0)}% and leaves the worst-first order intact. ${M.area_basis_note||''} DOAE registration covers ${Object.entries(M.doae_coverage_vs_census||{}).map(([k,v])=>`${k} ${v}×`).join(', ')} of the census.</p>`;
+    wrapTables();
+  });
+}
+
 /* MEASURED farm-household cash P&L (data/farm_household.json) — the ground under every price claim
    in this product. The one number that changes how you read the rest is the non-farm share: a crop
    price move reaches only the farm half of a farm household's cash. National survey means, so it is

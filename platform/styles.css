@@ -1531,3 +1531,11 @@ svg.cbcell{vertical-align:middle;display:inline-block}
 .cb-spread .ic-tbl{max-width:420px}
 .cb-mkt{margin-left:5px;color:var(--dim);font-size:10px}
 .cb-mkt.thin{color:var(--gold)}
+
+/* Crop-mix → farm income (Macro · Farm households). The 77-bar rank strip needs FIXED pixel
+   width/height attributes on the <svg>; a width:100% SVG collapses to zero here. */
+.cm-spark{margin:10px 0 6px;overflow-x:auto}
+.cm-spark svg{display:block}
+.cm-spark .s{margin-top:4px;font-size:11px;color:var(--mid)}
+.cm-tbl td,.cm-tbl th{vertical-align:top}
+.cm-tbl .n{font-variant-numeric:tabular-nums;text-align:right}
