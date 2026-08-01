@@ -1488,36 +1488,12 @@ p.lead.lead-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:ve
   .clampbtn{display:none!important}
 }
 
-/* ============================================================================================
-   MACRO TOPIC SWITCHER (2026-08-01)
-   The six Macro topics remain <details class="ovsec"> — see showOvPanel() for why — but exactly
-   one is open at a time. Closed panels hide their <summary> entirely, so the reader sees one
-   chip row, one heading and one panel instead of six stacked headings. That stacking, not the
-   length of any one topic, is what made this tab a 17-screen scroll.
-   ============================================================================================ */
-.ovswitch details.ovsec:not([open])>summary{display:none}
-/* With only one panel ever open, the divider and the disclosure caret describe an accordion that
-   is no longer there — the chip row is the control now. */
-.ovswitch details.ovsec{border-top:none}
-.ovswitch details.ovsec>summary{cursor:default}
-.ovswitch details.ovsec>summary::after{display:none}
-.ovswitch details.ovsec[open]>summary>h2{margin-top:6px}
-/* The active chip has to read as "you are here", not "you may go here" — same treatment the nav
-   uses for the current pillar. .chip.on already carries it; this only adds the pressed affordance
-   so a segmented control does not look like six equal links. */
-.ovswitch-nav .chip[aria-selected="true"]{font-weight:600}
-.ovswitch-nav .chip:not(.on):hover{border-color:var(--accent);color:var(--accent)}
-
-@media print{
-  /* The per-tab export promises the WHOLE tab, so every topic comes back — headings included.
-     expandForPrint() reopens the <details>; these two rules undo the switcher's chrome. */
-  .ovswitch details.ovsec>summary{display:flex!important}
-  .ovswitch details.ovsec{border-top:1px solid var(--line2)}
-}
-
-/* The national-outlook situation cards use auto-FILL, not auto-fit. Once household debt and the
-   policy rate moved to the answer band (they were rendering twice on one screen), only two cards
-   remained here — and auto-fit collapses empty tracks, so those two stretched to ~800px each and
-   read as a layout error. auto-fill keeps the track width, so they stay tile-sized and line up
-   with the answer band above however many cards the outlook layer happens to carry. */
-#outlook .grid.macro{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+/* Pantip borrower quotes (#acq). Verbatim Thai, so the block is set for reading rather than
+   scanning: generous line-height, a quiet rule instead of quotation marks (Thai does not use
+   them the way English does), and a width cap so a long post does not run the panel's full
+   width. Deliberately NOT styled as a testimonial — several of these are complaints about us. */
+.qgrp{margin:10px 0 0}
+.pq{margin:6px 0 0;padding:8px 0 8px 12px;border-left:2px solid var(--line);
+  font:400 12.5px/1.7 var(--sans);color:var(--mid);max-width:78ch}
+.pq .sub{font-size:10.5px;letter-spacing:.2px}
+@media print{.pq{break-inside:avoid}}

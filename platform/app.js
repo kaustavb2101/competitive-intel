@@ -2,6 +2,14 @@
 /* AutoX · เงินไชโย — Credit Intelligence Platform
    Loads data files, renders overview/map/acquisition/branches. Vanilla JS, no build step. */
 
+/* Full HTML escape, for text this repo did not write. Almost everything rendered here is our own
+   derived numbers and editorial copy, but Pantip posts, app-store reviews and YouTube comments are
+   arbitrary strings typed by strangers and they reach innerHTML. Escape at the point of insertion.
+   (Two functions further down declare a local `esc` that only escapes quotes for an attribute —
+   that is a different job; this one is for element content and must not be confused with it.) */
+const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 // Real measured quantities (no indices). val() reads measured fields; color/size scale to absolute max.
 // Portfolio-risk lens is the exception: a/m/c are ESTIMATED proxies (OSM/price-based, 0–100), not measured.
 // pill = the SHORT (≈2-word) label for the hero pill row docked over the National map.
@@ -2866,6 +2874,7 @@ function renderCompetition(){
   renderRivalPulse();
   renderRivalAds();
   renderRivalVideo();
+  renderPantip();
   renderSocialThemes();
   renderRivalUniverse();
   renderCompCoverage();
@@ -3769,6 +3778,79 @@ function renderRivalPulse(){
     RIVPULSE=j; rivpulseLoaded=true; paintPulse();
   }).catch(()=>{ RIVPULSE=null; rivpulseLoaded=true; paintPulse(); });
 }
+/* PANTIP PANEL — data/pantip_panel.json (build_pantip_panel.py).
+   Brand-level borrower voice, which the say/hear gap below deliberately averages away. Pantip is
+   the one place Thai borrowers discuss lenders unprompted and at length.
+
+   THREE THINGS THIS VIEW MUST NOT LET A READER BELIEVE:
+     1. that the threads we retrieved measure how much a brand is discussed — search caps at 10 per
+        term, so those counts are a ceiling we hit. Volume comes from Pantip's own reported total.
+     2. that the reported total is clean — สมหวัง ("wish fulfilled") and ศรีสวัสดิ์ (also a district
+        of Kanchanaburi) match far more than the lender. `match` is the measured share of sampled
+        threads that really name the brand, and it is shown on every row, not buried in a footnote.
+     3. that a rate off 10 threads is precise. Every rate is rendered as its own fraction.
+   Lazy, null-safe, graceful if absent — same contract as renderRivalPulse. */
+let PANTIP=null, pantipLoaded=false;
+function renderPantip(){
+  const tbl=$('#pantiptbl'); if(!tbl) return;
+  if(pantipLoaded){ drawPantip(); return; }
+  // The catch is attached to the FETCH, not to the draw. Chaining .catch() after a .then() that
+  // also draws means a rendering bug is caught by the "data missing" handler and re-rendered as
+  // "not yet built" — the reader is then told to go run a pipeline script for a file that is
+  // sitting right there. Keep failing-to-load and failing-to-draw distinguishable.
+  fetch('data/pantip_panel.json')
+    .then(r=>r.ok?r.json():null)
+    .catch(()=>null)
+    .then(j=>{ PANTIP=j; pantipLoaded=true; drawPantip(); });
+}
+function drawPantip(){
+  const tbl=$('#pantiptbl'), ro=$('#pantipreadout'), qs=$('#pantipquotes'), note=$('#pantipnote');
+  if(!tbl) return;
+  const rows=(PANTIP&&Array.isArray(PANTIP.brands))?PANTIP.brands:[];
+  const m=(PANTIP&&PANTIP.meta)||{};
+  if(!rows.length){
+    tbl.innerHTML=''; if(qs) qs.innerHTML=''; if(note) note.textContent='';
+    if(ro) ro.innerHTML='<b>Pantip panel not yet built.</b> <span class="sub">data/pantip_panel.json is absent — run pipeline/pull_pantip.py then pipeline/build_pantip_panel.py.</span>';
+    return;
+  }
+  const n=v=>(v==null?'—':(+v).toLocaleString('en-US'));
+  if(ro) ro.innerHTML=(PANTIP.headline?`<b>${escHtml(PANTIP.headline)}</b>`:'')+
+    (PANTIP.reply_line?`<div class="sub" style="margin-top:6px">${escHtml(PANTIP.reply_line)}</div>`:'');
+
+  tbl.innerHTML='<tr><th>Lender</th><th>Threads on Pantip</th><th>Match</th><th>Est. about the brand</th>'+
+    '<th>Replies in public</th><th>What borrowers raise</th></tr>'+
+    rows.map(b=>{
+      const us=b.is_us?' style="background:var(--raised)"':'';
+      // Match rate carries a colour only where it is low enough to change how the row is read.
+      const mp=b.precision==null?null:Math.round(b.precision*100);
+      const mcol=mp==null?'var(--dim)':(mp<50?'var(--agri)':(mp<80?'var(--gold)':'var(--merch)'));
+      const rr=b.reply_rate==null
+        ? '<span class="sub">too few threads</span>'
+        : `<span class="mono">${b.org_reply_threads}/${b.n_threads_sampled}</span> <span class="sub">(${b.reply_rate}%)</span>`;
+      return `<tr${us}><td>${b.is_us?'<b>':''}${escHtml(b.label)}${b.is_us?'</b> <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">US</span>':''}`+
+        `${b.tier==='category'?' <span class="sub">generic terms, no brand named</span>':''}</td>`+
+        `<td class="mono">${n(b.reported_total)}<span class="sub"> claimed</span></td>`+
+        `<td class="mono" style="color:${mcol}">${mp==null?'—':mp+'%'}</td>`+
+        `<td class="mono">${n(b.est_threads)}</td>`+
+        `<td>${rr}</td>`+
+        `<td class="sub">${(b.themes||[]).slice(0,3).map(t=>escHtml(t.label)).join(' · ')||'—'}</td></tr>`;
+    }).join('');
+
+  // Quotes: us first — the point of showing these is to read our own book's complaints, not the
+  // rivals'. Everything is already scrubbed and unattributed at build time.
+  if(qs){
+    const ordered=rows.slice().sort((a,b)=>(b.is_us?1:0)-(a.is_us?1:0));
+    qs.innerHTML=ordered.filter(b=>(b.quotes||[]).length).map(b=>
+      `<div class="qgrp" style="margin:10px 0 0"><div class="sub" style="font-weight:600;color:${b.is_us?'var(--accent)':'var(--mid)'}">`+
+      `${escHtml(b.label)}${b.is_us?' — us':''}</div>`+
+      b.quotes.map(q=>`<blockquote class="pq" lang="th">${escHtml(q.text)}`+
+        `<span class="sub" style="display:block;margin-top:3px" lang="en">${escHtml(q.theme)}${q.date?' · '+escHtml(q.date):''}</span></blockquote>`).join('')+
+      '</div>').join('');
+  }
+  if(note) note.innerHTML=[m.cap,m.name_collision,m.precision_bias,m.privacy]
+    .filter(Boolean).map(s=>escHtml(s)).join(' ');
+}
+
 /* SAY / HEAR GAP — data/social_themes.json (build_social_themes.py).
    The synthesis of every reception channel on #acq: what lenders publish (ad creatives + promo
    pages) and what customers write (Pantip, Google Play, Apple, YouTube comments) counted against
