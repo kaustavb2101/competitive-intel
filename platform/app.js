@@ -1273,6 +1273,102 @@ let radiusCircle=null, showRadius=true;
 const $ = s => document.querySelector(s);
 const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
 function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Math.round(62*Math.min(v,max)/max)}px;background:${color}"></i></span>`;}
+
+/* ============================================================================
+   CHART KIT — hand-rolled inline SVG, no library, no CDN.
+   Why not Chart.js/D3: this is a no-build static deploy served straight off
+   Vercel and off `python -m http.server` locally. A CDN <script> is a new
+   external dependency on both, and the offline/local-server workflow is how
+   this app is actually developed. Bars + sparklines are the two shapes that
+   carry the load; both are ~40 lines of path generation.
+
+   All three renderers are null-safe (bad/absent input → '') and colour
+   themselves from the CSS custom properties, so light/dark come free.
+   Interaction is a native <title> tooltip — no JS, works on keyboard, and
+   costs nothing. Nothing here animates.
+   RULE: never chart an ESTIMATE. A line makes a number look more
+   authoritative than a table does, so composites/scores stay as text.
+   ============================================================================ */
+function svgEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* Diverging horizontal bars around a zero axis — the right shape for YoY moves,
+   because "everything is up" has to be visible at a glance rather than read
+   row by row. rows: [{label, value, color?, note?}]. Returns '' if no finite value. */
+function svgBars(rows,opt){
+  opt=opt||{};
+  const R=(rows||[]).filter(r=>r&&typeof r.value==='number'&&isFinite(r.value));
+  if(!R.length) return '';
+  const unit=opt.unit==null?'%':opt.unit;
+  const rowH=opt.rowH||19, padT=6, labW=opt.labW||92, numW=opt.numW||46;
+  const H=padT*2+R.length*rowH, W=560;                 // viewBox units; scales to container
+  const plotL=labW, plotR=W-numW, plotW=plotR-plotL;
+  const mx=Math.max(...R.map(r=>Math.abs(r.value)))||1;
+  const zero=opt.signed===false?plotL:plotL+plotW/2;
+  const scale=opt.signed===false?plotW/mx:(plotW/2)/mx;
+  const parts=[`<svg class="cbars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${svgEsc(opt.aria||'Bar chart')}">`];
+  parts.push(`<line class="cbars-ax" x1="${zero.toFixed(1)}" y1="${padT-2}" x2="${zero.toFixed(1)}" y2="${H-padT+2}"/>`);
+  R.forEach((r,i)=>{
+    const y=padT+i*rowH, w=Math.abs(r.value)*scale;
+    const x=r.value<0?zero-w:zero;
+    const col=r.color||(r.value>0?'var(--up)':r.value<0?'var(--agri)':'var(--dim)');
+    const txt=(r.value>0?'+':'')+r.value+unit;
+    parts.push(`<g><title>${svgEsc(r.label)}: ${svgEsc(txt)}${r.note?' — '+svgEsc(r.note):''}</title>`
+      +`<text class="cbars-l" x="${labW-8}" y="${y+rowH/2}">${svgEsc(r.label)}</text>`
+      +`<rect class="cbars-b" x="${x.toFixed(1)}" y="${y+3}" width="${Math.max(w,0.8).toFixed(1)}" height="${rowH-8}" fill="${col}" rx="1.5"/>`
+      +`<text class="cbars-v" x="${W-6}" y="${y+rowH/2}" fill="${col}">${svgEsc(txt)}</text></g>`);
+  });
+  parts.push('</svg>');
+  return parts.join('');
+}
+
+/* Sparkline over a numeric series. Deliberately returns '' for fewer than 4
+   points — a 2-point "trend" is a straight line that says something the data
+   does not support. Callers render the honest no-history marker instead. */
+function svgSpark(vals,opt){
+  opt=opt||{};
+  const V=(vals||[]).filter(v=>typeof v==='number'&&isFinite(v));
+  if(V.length<4) return '';
+  const W=opt.w||120, H=opt.h||26, p=2;
+  const lo=Math.min(...V), hi=Math.max(...V), span=(hi-lo)||1;
+  const x=i=>p+(W-2*p)*i/(V.length-1);
+  const y=v=>H-p-(H-2*p)*(v-lo)/span;
+  const d=V.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)).join(' ');
+  const col=opt.color||(V[V.length-1]>=V[0]?'var(--up)':'var(--agri)');
+  const area=opt.area===false?'':`<path class="csp-a" d="${d} L${x(V.length-1).toFixed(1)},${H} L${x(0).toFixed(1)},${H} Z" fill="${col}"/>`;
+  return `<svg class="csp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${svgEsc(opt.aria||'trend')}">`
+    +`<title>${svgEsc(opt.title||'')}</title>${area}`
+    +`<path class="csp-l" d="${d}" stroke="${col}"/>`
+    +`<circle class="csp-p" cx="${x(V.length-1).toFixed(1)}" cy="${y(V[V.length-1]).toFixed(1)}" r="1.9" fill="${col}"/></svg>`;
+}
+
+/* The honest counterpart to svgSpark: a hairline that says WHY there is no
+   line, rather than drawing one that isn't there. */
+function noHist(why){return `<span class="csp-none" title="${svgEsc(why||'')}">— ${svgEsc(why||'history not retained')}</span>`;}
+
+/* Dot plot against a reference line (rainfall vs normal, price vs 12-mo mean).
+   rows: [{label, value, ref?}] where ref defaults to 100. */
+function svgDots(rows,opt){
+  opt=opt||{};
+  const R=(rows||[]).filter(r=>r&&typeof r.value==='number'&&isFinite(r.value));
+  if(!R.length) return '';
+  const ref=opt.ref==null?100:opt.ref, unit=opt.unit==null?'%':opt.unit;
+  const rowH=17, padT=6, labW=opt.labW||96, W=560, H=padT*2+R.length*rowH;
+  const all=R.map(r=>r.value).concat([ref]);
+  const lo=Math.min(...all), hi=Math.max(...all), span=(hi-lo)||1;
+  const plotL=labW, plotR=W-42, x=v=>plotL+(plotR-plotL)*(v-lo)/span;
+  const parts=[`<svg class="cbars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${svgEsc(opt.aria||'Dot plot')}">`];
+  parts.push(`<line class="cbars-ax" x1="${x(ref).toFixed(1)}" y1="${padT-2}" x2="${x(ref).toFixed(1)}" y2="${H-padT+2}"/>`);
+  R.forEach((r,i)=>{
+    const y=padT+i*rowH+rowH/2, col=r.color||(r.value<ref?'var(--agri)':'var(--up)');
+    parts.push(`<g><title>${svgEsc(r.label)}: ${svgEsc(r.value+unit)} (normal ${ref}${unit})</title>`
+      +`<text class="cbars-l" x="${labW-8}" y="${y}">${svgEsc(r.label)}</text>`
+      +`<line class="cdot-s" x1="${x(ref).toFixed(1)}" y1="${y}" x2="${x(r.value).toFixed(1)}" y2="${y}" stroke="${col}"/>`
+      +`<circle class="cdot" cx="${x(r.value).toFixed(1)}" cy="${y}" r="3.1" fill="${col}"/>`
+      +`<text class="cbars-v" x="${W-6}" y="${y}" fill="${col}">${svgEsc(r.value+unit)}</text></g>`);
+  });
+  parts.push('</svg>');
+  return parts.join('');
+}
 // honest n/a renderer for null measured fields (Batch 1 nulled some workforce releases)
 function naNum(v){return v==null?'<span class="sub" title="Not in the NSO release we have">n/a</span>':v.toLocaleString();}
 // honest renderer for NSO province fields NOT published for a province (e.g. กรุงเทพมหานคร/Bangkok has
@@ -1603,16 +1699,10 @@ function renderOverview(){
   // fold the macro-exposure footprint into the board notes once the layer lands ("hits customers
   // at N branches"). Null-safe: absent file → renderCommodityBoard() re-runs with no extra text.
   loadMacroExposure().then(()=>{ if(macxHasData()) renderCommodityBoard(); });
-  const rc={Isan:'var(--agri)',North:'#D9742B',South:'#C9A227',East:'#3B82F6','Central&BKK':'var(--accent)'};
-  $('#region').innerHTML = `<tr><th>Region</th><th>Branches</th><th>Agri-PD</th><th>Elevated</th><th>Merchant</th><th>Collateral</th></tr>`+
-    META.region.map(r=>`<tr><td><b>${r.r}</b></td><td class="mono">${r.n}</td>
-      <td>${barHTML(r.agri,rc[r.r])} <span class="mono">${r.agri}</span></td>
-      <td class="mono" style="color:var(--agri)">${r.hi}</td>
-      <td>${barHTML(r.md,'var(--merch)')} <span class="mono">${r.md}</span></td>
-      <td>${barHTML(r.col,'var(--collat)')} <span class="mono">${r.col}</span></td></tr>`).join('');
-  // lazy-load + render the province macro watchlist (macro_sensitivity.json, obj#1) — null-safe:
-  // absent file → the wrap stays display:none and the Overview reads exactly as before.
-  loadMacroSens().then(renderMacroWatchlist);
+  // The "Segment signals by region" table (#region) and the province macro watchlist were both
+  // removed 2026-08-01 — see index.html for the reasoning. META.region is still consumed by the
+  // Command-center risk readout, so the DATA stays; only this Macro-tab rendering of it is gone.
+  renderAnswerBand();
   renderCollatOutlook();
   renderDieselCollateral();
   // MEASURED new-pickup inflow trend (brand_trends.json, DLT) — the TIME dimension behind the
@@ -1693,82 +1783,94 @@ function renderCommodityBoard(){
   }
 }
 
-/* ---------- Province macro watchlist (objective #1, data/macro_sensitivity.json) ----------
-   One .mcard per province (same styling as the macro KPI cards beside the commodity board):
-   the macro driver that is the #1 mover for the MOST branches in that province, with the real
-   Pink Sheet YoY move and how much of the province's book it moves. Headwind provinces surface
-   first (builder sort). ESTIMATED proxy over measured inputs — said in the section lead and per
-   card. Null-safe: absent file → the wrap stays hidden. */
-function renderMacroWatchlist(){
-  const wrap=$('#mwatch-wrap'), grid=$('#mwatch');
-  if(!wrap||!grid||!msensProv||!msensProv.length) return;
-  grid.innerHTML=msensProv.slice(0,8).map((p,i)=>{
-    const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[p.driver])||{};
-    const head=p.dir==='h';
-    const col=head?'var(--agri)':'var(--merch)';
-    const hasYoy=(typeof drv.yoy_pct==='number');
-    const arrow=hasYoy?(drv.yoy_pct>0?'▲':'▼'):'▼';
-    const sig=hasYoy?((drv.yoy_pct>0?'+':'')+drv.yoy_pct+'% YoY'):'rain below normal';
-    return `<button type="button" class="mcard mwatch-card" data-mw="${i}" aria-label="List the ${p.hits} branches in ${p.th} moved by ${drv.label||p.driver}"><div class="k">${p.th}${p.region?' · '+p.region:''}</div>`
-      +`<div class="v" style="color:${col};font-size:15px">${drv.label||p.driver} ${arrow} <span style="font-size:12px">${sig}</span></div>`
-      +`<div class="n">${head?'Hits':'Supports'} borrower cash flow · #1 driver at ${p.hits}/${p.n} branches (est) <span class="ic-chev">›</span></div></button>`;
-  }).join('');
-  wrap.style.display='';
-  if(!grid.dataset.mwWired){
-    grid.dataset.mwWired='1';
-    grid.addEventListener('click',e=>{
-      const c=e.target.closest('.mwatch-card'); if(!c) return;
-      const i=+c.dataset.mw;
-      const open=grid.querySelector('.mwatch-card.on');
-      if(open) open.classList.remove('on');
-      if(open===c){ const d=$('#mwatch-drill'); if(d) d.innerHTML=''; return; }
-      c.classList.add('on');
-      renderMacroWatchDrill(msensProv[i]);
+/* ---------- ANSWER BAND (top of Macro) ----------------------------------------------------
+   The tab used to open into prose and 13 screens of tables with nothing ranked. This is the
+   answer first: MEASURED headline numbers only, each with its move, its refresh cadence, and a
+   sparkline WHERE ONE HONESTLY EXISTS. Where the source stores a single point (which is most of
+   them today) it prints why there is no line rather than drawing a flat one.
+
+   Deliberately excluded: every composite/derived figure. A card at the top of the page is the
+   most authoritative position on it, and an estimate does not earn that spot.
+   Null-safe throughout: a tile whose source is absent is simply not emitted, and if nothing
+   resolves the band hides itself rather than rendering an empty shell. */
+function abTile(o){
+  const mv=o.move==null?'':`<div class="ab-mv" style="color:${o.moveColor||'var(--mid)'}">${o.move}</div>`;
+  const tr=o.spark||(o.why?noHist(o.why):'');
+  return `<div class="ab"><div class="ab-k">${o.k}${o.cad?`<span class="ab-cad ${o.cadCls||''}">${o.cad}</span>`:''}</div>`
+    +`<div class="ab-v">${o.v}${o.unit?`<small>${o.unit}</small>`:''}</div>${mv}`
+    +(tr?`<div class="ab-tr">${tr}</div>`:'')
+    +(o.sub?`<div class="ab-s">${o.sub}</div>`:'')+`</div>`;
+}
+function renderAnswerBand(){
+  const host=$('#ov-answer'); if(!host) return;
+  Promise.all([tmliFetch('commodities'),loadMacroIndicators(),tmliFetch('tape_real'),
+               tmliFetch('commodity_history')]).then(([com,mi,tape,hist])=>{
+    const T=[], sig=v=>(v>0?'+':'')+v+'%';
+    // price history, when the layer is present: label -> last N values (see build_commodity_history.py)
+    const series=lab=>{
+      if(!hist||!hist.series) return null;
+      const s=hist.series[lab]||hist.series[String(lab||'').toLowerCase()];
+      return s&&Array.isArray(s.values)?s.values:null;
+    };
+    const board=(com&&com.board)||[];
+    const pick=re=>board.find(b=>re.test(b.lab||''));
+    // 1-2. The two crops that carry the farm book, at the THAI farm-gate (measured) — not the
+    //      world price, which is what the borrower does not get paid.
+    [[/^rice/i,'Rice · Thai farm-gate','rice'],[/^rubber/i,'Rubber · Thai farm-gate','rubber']].forEach(([re,k,key])=>{
+      const b=pick(re); if(!b) return;
+      const loc=b.local_yoy, glob=b.global_yoy, v=(loc!=null?loc:glob);
+      if(v==null) return;
+      const vals=series(key);
+      T.push(abTile({k,cad:'monthly',cadCls:'m',v:sig(v).replace('%',''),unit:'% YoY',
+        move:(glob!=null&&loc!=null)?`world ${sig(glob)} · local ${loc>glob?'ahead':'behind'} ${Math.abs(Math.round((loc-glob)*10)/10)}pt`
+             :(loc==null?'world price — no Thai farm-gate series':''),
+        moveColor:v>0?'var(--merch)':'var(--agri)',
+        spark:vals?svgSpark(vals,{aria:k+' price history',title:k}):'',
+        why:vals?'':'monthly feed · history not retained yet',
+        sub:loc!=null?'MEASURED Thai farm-gate':'MEASURED world price (Pink Sheet)'}));
     });
-  }
+    // 3. Diesel — the cost line every pickup/haulage borrower pays, and the fastest-moving number here.
+    const f=com&&com.fuel;
+    if(f&&f.diesel_thb_l!=null) T.push(abTile({k:'Diesel · '+(f.name||'retail'),cad:'daily',cadCls:'d',
+      v:f.diesel_thb_l,unit:' ฿/L',move:'cost line, not revenue',moveColor:'var(--mid)',
+      why:'daily feed · history not retained yet',sub:'MEASURED Bangchak retail'}));
+    // 4-5. The credit tide. These are the ONLY two series that already ship a real history array.
+    const I=(mi&&mi.indicators)||{};
+    if(I.household_debt_gdp) { const h=I.household_debt_gdp;
+      T.push(abTile({k:'Household debt',cad:h.period||'quarterly',cadCls:'q',v:h.value,unit:'% GDP',
+        move:h.yoy_change!=null?`${h.yoy_change<0?'▼':'▲'} ${Math.abs(h.yoy_change)}pt YoY`:'',
+        moveColor:h.yoy_change<0?'var(--merch)':'var(--agri)',
+        spark:svgSpark(h.trend,{color:'var(--accent)',aria:'household debt to GDP trend',title:'BIS'}),
+        sub:'MEASURED BIS'})); }
+    if(I.policy_rate) { const p=I.policy_rate;
+      T.push(abTile({k:'Policy rate',cad:p.period||'quarterly',cadCls:'q',v:p.value,unit:'%',
+        move:p.yoy_change!=null?`${p.yoy_change<0?'▼':'▲'} ${Math.abs(p.yoy_change)}pt YoY`:'',
+        moveColor:'var(--mid)',
+        spark:svgSpark(p.trend,{color:'var(--accent)',aria:'policy rate trend',title:'BIS'}),
+        sub:'MEASURED BIS'})); }
+    // 6. Our own book, so the backdrop is never read without the thing it acts on. Live book only —
+    //    the 180+ legacy stock is held apart on purpose and blending them would flatter the number.
+    //    (regex is anchored on "of accounts" — "NPL-live (90-179dpd) 4.92%" otherwise captures the
+    //     "90" out of the bucket label rather than the rate.)
+    const hd=tape&&tape.headline&&/NPL-live[^%]*?([0-9.]+)%\s*of accounts/.exec(tape.headline);
+    if(hd) T.push(abTile({k:'Live book · NPL 90–179',cad:'tape vintage',cadCls:'q',
+      v:hd[1],unit:'% of accounts',move:'180+ legacy held separately',moveColor:'var(--mid)',
+      why:'2 vintages on disk · needs 6+ for a line',sub:'MEASURED real loan tape'}));
+
+    if(!T.length){ host.style.display='none'; return; }
+    host.style.display=''; host.innerHTML=T.join('');
+    const n=$('#ov-answer-note');
+    if(n) n.innerHTML='The answer first — every figure above is <b>measured</b>, with the source that '
+      +'publishes it and how often it can change. A trend line is drawn only where history is actually '
+      +'stored; where it says <i>history not retained yet</i> the feed is live but the pipeline keeps '
+      +'only its latest value. Everything below this line is the evidence.';
+  }).catch(()=>{ host.style.display='none'; });
 }
-/* Watchlist drill (owner ask 2026-07-28): a card names a province + its #1 macro driver — this lists
-   the actual BRANCHES that driver moves. macro_sensitivity.branches is INDEX-ALIGNED to branches.json,
-   so entry i's top-2 [key,score,dir,ctx] records identify each branch's own drivers; we keep the ones
-   whose #1 (or #2) driver matches the card, ranked by score. ctx meaning per driver comes from
-   meta.drivers[key].ctx_label (crop = % of province planted area). */
-function renderMacroWatchDrill(p){
-  const host=$('#mwatch-drill'); if(!host||!p) return;
-  if(!MSENS||!DATA){ host.innerHTML='<div class="ic-note">Branch layer still loading — press again in a moment.</div>'; return; }
-  const drv=(msensMeta&&msensMeta.drivers&&msensMeta.drivers[p.driver])||{};
-  const rows=[];
-  DATA.forEach((b,i)=>{
-    if(b.v!==p.th) return;
-    const recs=MSENS[i]; if(!recs||!recs.length) return;
-    const hit=recs.findIndex(r=>r[0]===p.driver);
-    if(hit<0) return;
-    const r=recs[hit];
-    rows.push({b,rank:hit+1,score:r[1],dir:r[2],ctx:r[3],
-               other:recs.find(x=>x[0]!==p.driver)});
-  });
-  rows.sort((a,b)=>a.rank-b.rank||b.score-a.score);
-  const head=p.dir==='h';
-  host.innerHTML=`<div class="ic-drill-h" style="margin:10px 0 4px"><b>${p.th}</b> — ${rows.length} branches where <b style="color:${head?'var(--agri)':'var(--merch)'}">${drv.label||p.driver}</b> is a top-2 driver${rows.length?', strongest first':''}</div>`+
-    (rows.length?`<div class="tbl-wrap"><table class="tbl"><tr>
-      <th>Branch</th><th>District</th>
-      <th title="is this the branch's #1 or #2 driver">Rank</th>
-      <th title="${(drv.ctx_label||'context').replace(/"/g,'')}">${drv.ctx_label||'Context'}</th>
-      <th title="relative 0-100, share-diluted — compare order, not magnitude (ESTIMATED)">Score</th>
-      <th title="the branch's other top driver">Also moved by</th><th></th></tr>`+
-      rows.map(r=>{
-        const o=r.other&&((msensMeta.drivers||{})[r.other[0]]||{});
-        return `<tr onclick="location.href='${branchHref(r.b)}'" tabindex="0" role="link" style="cursor:pointer">
-          <td><b>${r.b.n}</b></td><td class="sub">${r.b.d||'—'}</td>
-          <td class="mono">#${r.rank}</td>
-          <td class="mono">${r.ctx!=null?r.ctx+(String(drv.ctx_label||'').indexOf('%')>=0?'%':''):'—'}</td>
-          <td class="mono">${r.score}</td>
-          <td class="sub">${r.other?`${o.label||r.other[0]} <span class="mono">${r.other[1]}</span>`:'—'}</td>
-          <td class="n"><span class="ic-chev">›</span></td></tr>`;}).join('')+`</table></div>`
-      :`<p class="lead sub">No branch in this province carries that driver in its top two.</p>`)+
-    `<p class="lead sub" style="margin:4px 0 0">Score is an <b>ESTIMATED</b> relative 0–100 (measured price YoY × measured crop share / rain × estimated segment score) — read the order, not the magnitude. Press a row for the branch's 3D scene.</p>`;
-  wrapTables();
-  host.scrollIntoView({block:'nearest'});
-}
+
+/* Province macro watchlist + its branch drill were REMOVED 2026-08-01 (owner directive: no
+   derived/composite metrics on Macro). Rationale is on the deleted mount in index.html. The
+   macro_sensitivity layer itself is untouched — loadMacroSens() still feeds the branch drill
+   and the cluster brief, which quote its real per-branch numbers rather than a ranking. */
 
 /* ---------- Collateral outlook board (objective #1, portfolio risk) ----------
    Makes explicit that the two things AutoX lends against are diverging:
@@ -7625,10 +7727,23 @@ const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'mai
 const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
-  Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact')]).then(([j,APR,INC])=>{
+  Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact'),
+               tmliFetch('commodity_history')]).then(([j,APR,INC,HIST])=>{
     if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
     const aprCrop=k=>((APR&&Array.isArray(APR.crops))?APR.crops:[]).find(c=>c.key===k)||null;
     const incProv=p=>((INC&&INC.provinces)?INC.provinces[p]:null)||null;
+    // 60-month Pink Sheet price history (commodity_history.json, 2026-08-01). Until this layer
+    // landed the pipeline kept only `latest` + `yoy`, so no price chart was drawable anywhere in
+    // the product. Series keys are the board's own lowercased labels; absent series → the honest
+    // no-history marker, never a flat line.
+    const spark=lab=>{
+      const s=HIST&&HIST.series&&HIST.series[String(lab||'').toLowerCase().replace(/\s+.*$/,'')];
+      const v=s&&Array.isArray(s.values)?s.values:null;
+      if(!v) return '<span class="s">—</span>';
+      const m=s.months||[];
+      return svgSpark(v,{w:96,h:22,aria:lab+' 60-month price history',
+        title:lab+' · '+(m[0]||'')+' → '+(m[m.length-1]||'')+' ('+v.length+' months)'});
+    };
     const rows=j.board.map((c,i)=>{
       const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
       const exp=c.exposure;
@@ -7648,7 +7763,7 @@ function renderCommoditiesBoard(){
         const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
         const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
         const assistLine=!ap?'':`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
-        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="6"><div class="cb-belt">
+        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="7"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
           <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
             (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
@@ -7658,6 +7773,7 @@ function renderCommoditiesBoard(){
           }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
+        <td class="cb-spark">${spark(c.lab)}</td>
         <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
         <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>`}</td>
         <td class="n">${divCell}</td>
@@ -7665,10 +7781,27 @@ function renderCommoditiesBoard(){
         <td class="s">${c.note||''}</td></tr>${drill}`;
     }).join('');
     const f=j.fuel||{};
+    // CHART (2026-08-01): the whole board as one diverging bar, sorted by the move the BORROWER
+    // actually feels (Thai farm-gate where a local series exists, world price otherwise). Reading
+    // "everything is up except sugar" off 11 table rows takes a scan; off this it takes a glance.
+    // The table stays underneath as the evidence — the chart replaces the scanning, not the detail.
+    const bars=(j.board||[]).map(c=>{
+      const local=c.local_yoy!=null, v=local?c.local_yoy:c.global_yoy;
+      if(typeof v!=='number') return null;
+      return {label:c.lab+(local?'':' °'),value:Math.round(v*10)/10,
+        color:v>0?'var(--merch)':'var(--agri)',
+        note:(local?'Thai farm-gate':'world price only')+(c.seg?' · '+c.seg:'')};
+    }).filter(Boolean).sort((a,b)=>b.value-a.value);
+    const nLoc=(j.board||[]).filter(c=>c.local_yoy!=null).length;
+    const chart=bars.length?`<div class="chartwrap"><div class="chart-h">
+        <span class="t">Every tracked commodity, by the move the borrower feels</span>
+        <span class="s">° = world price only, no Thai farm-gate series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length})</span></div>
+      ${svgBars(bars,{aria:'Commodity year-on-year moves, Thai farm-gate where available',labW:86})}</div>`:'';
     el.innerHTML=`
       <h2>Commodities board · global price × Thai farm-gate × who's exposed <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MEASURED prices</span></h2>
       <p class="lead">World price (Pink Sheet YoY) beside the Thai farm-gate move, their <b>divergence</b> (where the local farmer's cash parts from the world index), and the <b>book accounts</b> sitting in each crop's growing belt — press a row to see the belt. ${f.diesel_thb_l?`Diesel now <b>฿${f.diesel_thb_l}/L</b> (${f.name}) — a cost line for pickup/haulage, not crop revenue.`:''}</p>
-      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th>World YoY</th><th>Thai farm-gate</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${chart}
+      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th>5-yr trend</th><th>World YoY</th><th>Thai farm-gate</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area); resolvable only for rice / rubber / palm (the crops with province area).</p>`;
     if(!el.dataset.wired){ el.dataset.wired='1';
       el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
@@ -8880,3 +9013,121 @@ function ccBriefCSV(){
 }
 
 boot();
+
+/* ============================================================================
+   PRINT / EXPORT PER TAB  (owner ask 2026-08-01)
+   -------------------------------------------------------------------------
+   Before this, @media print hard-coded `#v-home` — so whatever tab you were
+   reading, Ctrl-P silently printed the Command Center instead. Now the print
+   is OF THE TAB YOU ARE ON, and it carries two things the screen does not:
+
+     1. a written SUMMARY of the tab, generated from the same rendered DOM the
+        reader is looking at (so it can never drift from what is on screen);
+     2. ALL the supporting data — every collapsed <details> is opened, every
+        drill is un-hidden, and a provenance appendix lists each layer the tab
+        read with its measured/estimated label and vintage.
+
+   The summary is assembled from what the renderers already generate — verdict
+   cards, answer-band tiles, section headings — rather than a second, parallel
+   set of hand-written prose that would go stale the moment a number moved.
+   ============================================================================ */
+const PRINT_TITLES={'v-home':'Command centre','v-overview':'① Macro — the backdrop moving the book',
+  'v-assist':'Assistance — who needs help now','v-map':'National map','v-acq':'Competition',
+  'v-exposure':'Risk — where the book sits','v-sim':'Scenario simulator','v-trend':'Risk trend',
+  'v-branches':'Branches','v-provinces':'Provinces','v-market':'Market'};
+
+function printTxt(el){ return el?String(el.innerText||'').replace(/\s+/g,' ').trim():''; }
+
+/* Collect the tab's own generated conclusions. Verdict cards and answer tiles are
+   where the renderers already put "the answer"; lifting them is what keeps this
+   summary honest instead of inventing a second narrative. */
+function buildPrintSummary(view){
+  const bits=[];
+  const band=view.querySelector('.answerband');
+  if(band){
+    const tiles=[...band.querySelectorAll('.ab')].map(t=>{
+      const k=printTxt(t.querySelector('.ab-k')), v=printTxt(t.querySelector('.ab-v')),
+            m=printTxt(t.querySelector('.ab-mv'));
+      return k&&v?`<li><b>${k}</b> — <span class="mono">${v}</span>${m?` <i>${m}</i>`:''}</li>`:'';
+    }).filter(Boolean);
+    if(tiles.length) bits.push(`<h3>Headline numbers</h3><ul class="pr-kv">${tiles.join('')}</ul>`);
+  }
+  // The three classes the renderers use for a GENERATED conclusion, across all tabs:
+  // .verdict (Macro/Risk/Simulator), .insight (Competition — 21 of them), .cc-thesis (Command
+  // centre). Selecting only .verdict gave Competition an empty summary, which is the tab whose
+  // conclusions are most worth carrying into a printout.
+  const verdicts=[...view.querySelectorAll('.verdict,.insight,.cc-thesis')]
+    .filter(v=>v.style.display!=='none')
+    .map(v=>printTxt(v)).filter(t=>t.length>25);
+  const uniq=[...new Set(verdicts)];
+  if(uniq.length) bits.push(`<h3>What the tab concludes</h3><ul class="pr-v">`
+    +uniq.map(t=>`<li>${t}</li>`).join('')+`</ul>`);
+  const secs=[...view.querySelectorAll('details.ovsec,details.compsec')].map(d=>{
+    const h=printTxt(d.querySelector('summary h2')), w=printTxt(d.querySelector('.ovsec-what'));
+    const nT=d.querySelectorAll('table').length, nC=d.querySelectorAll('svg.cbars,svg.csp').length;
+    return h?`<tr><td><b>${h}</b></td><td>${w||''}</td><td class="mono">${nT} tables · ${nC} charts</td></tr>`:'';
+  }).filter(Boolean);
+  if(secs.length) bits.push(`<h3>What follows, in order</h3>`
+    +`<table class="tbl pr-toc"><tr><th>Section</th><th>Contents</th><th>Evidence</th></tr>${secs.join('')}</table>`);
+  return bits.length?bits.join(''):'<p>This tab has no generated summary block yet — the supporting data follows in full.</p>';
+}
+
+/* Provenance appendix: what this tab actually read, and whether each number in it is
+   measured or estimated. This is the "supporting data behind" in the auditable sense —
+   a reader who disagrees with a figure can see which layer produced it. */
+function buildPrintProvenance(view){
+  const seen=new Map();
+  view.querySelectorAll('.cc-provenance,.ic-prov,[data-prov]').forEach(el=>{
+    const t=printTxt(el); if(t.length>30&&!seen.has(t)) seen.set(t,1);
+  });
+  const tags=[...new Set([...view.querySelectorAll('.tag')].map(printTxt).filter(Boolean))];
+  let h='';
+  if(tags.length) h+=`<p class="pr-tags">${tags.map(t=>`<span>${t}</span>`).join('')}</p>`;
+  if(seen.size) h+=[...seen.keys()].map(t=>`<p class="pr-p">${t}</p>`).join('');
+  return h||'<p class="pr-p">No provenance block is emitted on this tab.</p>';
+}
+
+/* Open everything, so nothing the reader needs is hidden inside a collapsed section
+   or an un-pressed drill. Remembers prior state and restores it after printing. */
+let PRINT_STATE=null;
+function expandForPrint(view){
+  PRINT_STATE={details:[],hidden:[]};
+  view.querySelectorAll('details').forEach(d=>{ PRINT_STATE.details.push([d,d.open]); d.open=true; });
+  view.querySelectorAll('[hidden]').forEach(e=>{ PRINT_STATE.hidden.push(e); e.hidden=false; });
+}
+function restoreAfterPrint(){
+  if(!PRINT_STATE) return;
+  PRINT_STATE.details.forEach(([d,o])=>{ d.open=o; });
+  PRINT_STATE.hidden.forEach(e=>{ e.hidden=true; });
+  PRINT_STATE=null;
+  const h=document.getElementById('print-head'); if(h) h.remove();
+  const a=document.getElementById('print-appendix'); if(a) a.remove();
+  document.documentElement.classList.remove('printing');
+}
+
+function preparePrint(){
+  const view=document.querySelector('.view.on'); if(!view) return;
+  restoreAfterPrint();                       // idempotent: a second Ctrl-P must not stack blocks
+  document.documentElement.classList.add('printing');
+  expandForPrint(view);
+  const title=PRINT_TITLES[view.id]||view.id.replace(/^v-/,'');
+  const vint=(META&&META.updated)?META.updated:'';
+  const head=document.createElement('div');
+  head.id='print-head'; head.className='print-only';
+  head.innerHTML=`<div class="pr-mast"><div class="pr-brand">AutoX · เงินไชโย — credit intelligence</div>`
+    +`<h1>${title}</h1>`
+    +`<div class="pr-meta">Data vintage <b>${vint||'—'}</b> · every figure below is labelled measured or estimated`
+    +` · loan-tape figures are no-PII aggregates, cells under 30 accounts suppressed</div></div>`
+    +`<div class="pr-sum">${buildPrintSummary(view)}</div>`;
+  view.insertBefore(head,view.firstChild);
+  const app=document.createElement('div');
+  app.id='print-appendix'; app.className='print-only';
+  app.innerHTML=`<h3>Provenance — what produced these numbers</h3>${buildPrintProvenance(view)}`;
+  view.appendChild(app);
+}
+window.addEventListener('beforeprint',preparePrint);
+window.addEventListener('afterprint',restoreAfterPrint);
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('#printTab'); if(!b) return;
+  e.preventDefault(); preparePrint(); window.print();
+});

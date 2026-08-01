@@ -188,6 +188,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_fuel_prices.py --check (source-data/fuel_prices.json absent — not data drift)"
   else bad "build_fuel_prices.py --check (fuel_prices.json drifted from source-data/fuel_prices.json)"
   fi
+  ( cd "$PIPE" && python3 build_commodity_history.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_commodity_history.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_commodity_history.py --check (source-data/commodity_history.json absent — owner-side Pink Sheet parse, not data drift)"
+  else bad "build_commodity_history.py --check (commodity_history.json drifted from source-data/commodity_history.json — run: python3 pipeline/build_commodity_history.py)"
+  fi
   # --- PR#2 enrichment layers (vehicle/EV collateral erosion + hydrology + labour) ---------------
   # All deterministic + network-free over committed source-data. Each SKIPs (exit 3) when its upstream
   # pull is absent (dlt CSV mirror is NOT committed — 20MB) or its output is not yet generated — never a
