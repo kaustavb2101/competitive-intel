@@ -3,6 +3,44 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — intelligence-loop (deployment-health): the site-health probe now guards the DATA ROOM honesty census (`provenance.json`)
+
+- **Autonomous intelligence loop, DEPLOYMENT-HEALTH pillar.** All named backlog items remain
+  closed/blocked (plan 98%: the one OPEN item is owner-side Vercel access-protection), and this run
+  re-verified the room is healthy — live master alias HTTP 200 on `/`, `/app.js`, `/status`, and every
+  exec-critical layer (`peer_province`, `competitor_coverage`, `rival_density`, `tape_real`,
+  `household_risk`, `search_demand`, `provenance`); all recent CI workflow runs green (no failing
+  crons); ThaiWater/NABC/fuel live feeds fresh (2026-07-31, on-cadence); determinism gate **105
+  passed / 0 failed**. So this run closed the concrete monitoring gap the prior probe runs teed up.
+- **Finding.** `pipeline/check_site_health.py` guarded ~27 exec-facing layers but **not**
+  `provenance.json` — the source of the Command-center (#home) **DATA ROOM** card, the exec front
+  door's core **measured / estimated / UNLABELLED** honesty census (the "shame board"), the surface
+  the project's whole measured-vs-estimated mandate is judged on. `renderHomeDataRoom` **eager-loads**
+  it on the front door and is **NULL-SAFE**: its guard (`!PROVEN || !Array.isArray(PROVEN.layers) ||
+  !PROVEN.counts`) silently collapses the whole card to a calm "not yet computed" placeholder when the
+  file is missing/truncated. So a truncated CDN deploy that dropped the census would blank the exec's
+  honesty board **with no phone alert** — the exact "broken demo" blind spot this probe exists to
+  catch, and it was the last front-door eager read still unprobed.
+- **Fix.** Added `_shape_provenance` (asserts render SHAPE — `.counts` three-way split + a non-empty
+  `.layers` census table whose first row carries a valid `file` + `cls` chip + `.files.total`; robust
+  to the census growing, a floor guards against a truncated/emptied file — **not** values, so a future
+  vintage adding layers never false-alarms) and registered `data/provenance.json` in `DATA_FILES`.
+  Verified: the local probe now covers it (`--local ../platform` → 89/89, incl. the new
+  `provenance.json shape sane` line); the validator passes the committed file and **catches** every
+  malformed shape (missing counts / empty or truncated layers / missing files.total / bad cls / non-
+  object) with a specific message — a real guard, not a no-op.
+- **Safeguard protocol — all passed.** (a) `bash tests/run.sh check` = **105 passed / 0 failed**;
+  `python3 -c ast.parse` clean. (b) No secrets in the diff. (c) Diff = one CI-only file
+  (`check_site_health.py`, +47), matches intent. (d) No-fabrication intact — **no `platform/data`
+  file altered**, no number invented, shape-only assertion; provenance ledger unchanged (nothing to
+  rebuild). No visual/app change (a CI probe, not app.js/HTML/CSS/data), so committed directly to
+  master per the loop's safeguard mandate.
+- **Recommend next.** With every front-door eager read now probed, the remaining deploy-health
+  frontier is the **lazy per-route** reads that still degrade silently (e.g. the province/branch 3D
+  scene data + `data.html` layers). Separately, a SERVICE-pillar win: teach `build_provenance.py`'s
+  freshness block to flag a CI-refreshable live layer that has gone **overdue vs its own cron cadence**
+  (a silent-cron detector), which the current freshness read (age-behind-newest) does not catch.
+
 ## 2026-08-01 — UX loop: `scope="col"` on the three primary SPA search-table headers (a11y) — MERGED + deployed (PR #241)
 
 - **Shipped.** First slice of `ux-table-scope-sweep-appjs`. The three primary interactive SPA search
