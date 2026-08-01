@@ -3,6 +3,27 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-01 — fix(gate): realign commodities.json + provenance.json to committed sources (master was RED again)
+
+- **Master's determinism gate was RED** at `bc08233`: `102 → 99 passed, 3 failed`. Two coupled failures,
+  same root cause as the earlier `046090d` realign:
+  1. `build_commodities.py --check` drifted — the NABC daily-price bot (#234) refreshed
+     `source-data/farmgate_prices.json` to `2026-07-31`, but the wave-2 feature merge (#231, `bc08233`)
+     landed a `commodities.json` still carrying `farmgate_vintage: 2026-07-30`. The *only* delta on
+     regeneration was that one vintage string (`2026-07-30` → `2026-07-31`) — a straight re-read of the
+     already-committed farm-gate source, not a new pull.
+  2. `validate_data.py` — three standalone `provenance.json` rows recorded stale byte sizes vs disk
+     (`commodities.json` 5259→5260, `thaiwater_flood.json` 7140→7142, `thaiwater_rain.json` 9060→9034);
+     the ThaiWater pull (#236) and the commodities drift had moved on-disk sizes the census never re-read.
+- **Not a workflow bug.** `data-nabc-prices.yml` already rebuilds `commodities.json` + `provenance.json`
+  in lockstep; the drift came from a *later* feature PR merging a stale `commodities.json` over the
+  bot's fresh one while `farmgate_prices.json` stayed fresh — a merge-order artifact, not a missing
+  rebuild step. Nothing in the workflow needed changing.
+- **Deterministic realignment only** — every changed value is a re-read of an already-committed source;
+  no check weakened, nothing fabricated, no data vintage swapped. Regenerated `build_commodities.py`
+  then `build_provenance.py`. `bash tests/run.sh check` now **102 passed / 0 failed** (448/448
+  data-integrity, 0 remaining byte mismatches). Committed straight to master to unblock the gate.
+
 ## 2026-08-01 — Owner directive: Wave 2 (commodity-driven proactive assistance), all six NAVIGATION_MAP structural items, and the branch-name join that was silently losing 4.3% of the book — PR
 
 - **Merged first:** PR #229 (Pantip + YouTube listening, say/hear theme engine, real-tape doc correction). The `provenance.json` conflict was resolved by the rule, not by hand: rebase onto master FIRST, drop both provenance-only commits, regenerate on the WSL LF mirror under cpython-3.11.15. `build_provenance.py` records `os.path.getsize()` and rebuilds the census from the tree it runs in, so a hand-resolved provenance silently REVERTS whichever layers the other side refreshed — with no conflict marker, and master only goes red afterwards.
