@@ -368,6 +368,11 @@ html[data-theme="light"] .ctl .acts button.on{border-color:var(--accent);color:#
 const Q = new URLSearchParams(location.search);
 const LAT = parseFloat(Q.get('lat')), LNG = parseFloat(Q.get('lng'));
 const NM  = Q.get('n') ? decodeURIComponent(Q.get('n')) : 'Branch';
+// Per-branch tab title (history/bookmarks/multi-tab): the SPA + province.html + rayong-catchment.html
+// each set document.title to reflect what's on screen; this page shipped a static title, so every
+// branch shared one tab name. Set an initial title from the URL name; loadPanel() refines it to the
+// matched record's measured name + province once branches.json resolves.
+if(NM && NM!=='Branch'){try{document.title=NM+' — AutoX · เงินไชโย';}catch(e){}}
 // Basemap rasters: light (CARTO Positron, the DataProteins white base + DEFAULT) + voyager + dark, all CARTO.
 // deck.gl's TileLayer does NOT expand the {s} subdomain token (Leaflet does) — hardcode a single
 // CARTO host, matching province.html / rayong-catchment.html. Using {s} caused ERR_NAME_NOT_RESOLVED
@@ -947,6 +952,8 @@ async function loadPanel(){
     if(!best){ let bd=1e9; for(const d of data){const dd=(d.y-LAT)**2+(d.x-LNG)**2; if(dd<bd){bd=dd;best=d;}} }
     branchRec=best;
     if(!best){ $('#panel').innerHTML='<div class="note">Branch data unavailable.</div>'; return; }
+    // refine the tab title to the matched record: measured branch name + province (matches province.html)
+    try{document.title=(best.n||NM)+(best.v?' · '+best.v:'')+' — AutoX · เงินไชโย';}catch(e){}
     // re-centre on the matched branch so the scene and panel agree. Use the controlled VIEW so the
     // orbit/intro machinery stays the single source of truth.
     if(deckgl && !isNaN(best.x) && !isNaN(best.y)){

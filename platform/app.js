@@ -2814,6 +2814,22 @@ function drawCompCoverage(){
    flag. Objective #2 — the actionable payoff of the full competitor pull. Lazy, graceful if absent. */
 let RIVDEN=null, rivdenLoaded=false;
 const RIVDEN_TOPN=20;
+// Concentration of the RIVAL field in one district: which single big-4 brand holds the most of it,
+// and its share of all rival branches there (AutoX excluded — by_brand is rivals only). MEASURED —
+// a straight read of the committed per-brand census; nothing recomputed. agri when one brand owns a
+// majority (single-brand-dominated — that one rival effectively sets the local terms AutoX competes
+// against), gold when the field is fragmented across the big-4. The same competitive-risk texture the
+// province peer board carries, one grain finer (obj #2). SUBSTANTIAL-field floor so a 1–2-branch field
+// can't score a meaningless 100%.
+const RIVDEN_CONC_MIN=10, RIVDEN_CONC_MAJ=0.5;
+function rivFieldConc(bb){
+  if(!bb||typeof bb!=='object') return null;
+  const ent=Object.entries(bb).sort((a,b)=>(b[1]-a[1])||(a[0]<b[0]?-1:1));
+  if(!ent.length) return null;
+  const tot=ent.reduce((s,e)=>s+e[1],0);
+  if(tot<RIVDEN_CONC_MIN) return null;
+  return {brand:ent[0][0], cnt:ent[0][1], tot, share:ent[0][1]/tot, dominated:(ent[0][1]/tot)>=RIVDEN_CONC_MAJ};
+}
 function renderRivalDensity(){
   const tbl=$('#rivdentbl'); if(!tbl) return;
   if(rivdenLoaded){ drawRivalDensity(); return; }
@@ -2838,10 +2854,14 @@ function drawRivalDensity(){
     `<th title="AutoX branches in this district (MEASURED)">AutoX</th>`+
     `<th title="Big-4 rival branches in this district, from the full official-locator census (MEASURED)">Rivals ◆</th>`+
     `<th title="rivals ÷ AutoX">Ratio</th>`+
-    `<th>Who holds it</th></tr>`+
+    `<th title="Which single big-4 brand holds the most of this district's rival field, and its share of all rival branches here (MEASURED). Bold = one rival owns a majority (single-brand-dominated — it sets the local terms); the sub-line is the top-2 brands by count.">Who holds it</th></tr>`+
     list.map((r,i)=>{
       const ratio=(r.autox>0)?(r.rivals/r.autox).toFixed(1)+'×':'∞';
       const rc=(r.rivals-r.autox)>=40?'var(--agri)':'var(--gold)';
+      const conc=rivFieldConc(r.by_brand);
+      const holds=conc
+        ? `<b style="color:${conc.dominated?'var(--agri)':'var(--gold)'}" title="Of this district's ${conc.tot} big-4 rival branches (AutoX excluded), ${conc.brand} holds the most — ${Math.round(conc.share*100)}% (${conc.dominated?'single-brand-dominated — that one rival effectively sets the local terms':'fragmented across the big-4'}). MEASURED.">${conc.brand} ${Math.round(conc.share*100)}%</b><div class="sub" style="font-weight:400">${brandStr(r.by_brand)}</div>`
+        : `<span class="sub">${brandStr(r.by_brand)}</span>`;
       return `<tr>
         <td class="mono sub">${i+1}</td>
         <td><b>${r.name||'—'}</b></td>
@@ -2849,17 +2869,33 @@ function drawRivalDensity(){
         <td class="mono">${(r.autox||0).toLocaleString()}</td>
         <td class="mono" style="color:${rc}"><b>${(r.rivals||0).toLocaleString()}</b></td>
         <td class="mono" style="color:${rc}">${ratio}</td>
-        <td class="sub">${brandStr(r.by_brand)}</td>
+        <td>${holds}</td>
       </tr>`;}).join('');
   if(ro){
     const m=RIVDEN.meta||{};
     const nOut=m.n_outnumbered!=null?m.n_outnumbered:recs.filter(r=>r.flag==='outnumbered').length;
+    // district-grain rival-field concentration (MEASURED, computed here from the committed by_brand
+    // census): of the districts with a SUBSTANTIAL big-4 field, how many are single-brand-dominated,
+    // and which brand dominates the most of them. The same texture the province peer board carries,
+    // one grain finer — a real obj#2 signal the raw deficit ranking can't give.
+    let concStr='';
+    const subF=recs.map(r=>rivFieldConc(r.by_brand)).filter(Boolean);
+    if(subF.length){
+      const nDom=subF.filter(c=>c.dominated).length;
+      const tally={}; subF.filter(c=>c.dominated).forEach(c=>{tally[c.brand]=(tally[c.brand]||0)+1;});
+      const top=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
+      concStr=`At district grain the rival field is even more lopsided than the province rollup: of the `+
+        `<b>${subF.length}</b> districts with a substantial big-4 field (≥${RIVDEN_CONC_MIN} rival branches), `+
+        `<b style="color:var(--agri)">${nDom}</b> are single-brand-dominated — one rival holds a majority`+
+        (top?`, <b>${top[0]}</b> in ${top[1]} of them`:'')+`. `;
+    }
     ro.innerHTML=`<b>The big-4 out-station AutoX in <b style="color:var(--agri)">${nOut}</b> districts.</b> `+
       `Ranked by raw branch deficit against the FULL official-locator census (${(m.total_rivals||16393).toLocaleString()} measured rival branches). `+
-      `These are the districts where competitors already own the ground — defend or concede deliberately. ${TAG_M}`+
+      `These are the districts where competitors already own the ground — defend or concede deliberately. `+concStr+`${TAG_M}`+
       methodBox(null,
         ['AutoX + rival branch counts are <b>MEASURED</b> (point-in-district); ratio is computed.',
          'Rivals = the merged census (official store-locators for Muangthai/Srisawad/Tidlor; Heng is a sample).',
+         '<b>Who holds it</b> reads the concentration of the rival field: bold = one brand owns a majority (single-brand-dominated, it sets the local terms); the % is that brand’s share of the district’s rival branches. MEASURED — a straight read of the per-brand census, gated on a ≥'+RIVDEN_CONC_MIN+'-branch field so a thin field can’t score a meaningless 100%.',
          'A high ratio is a competitive-density signal, not a verdict — some dense districts are worth contesting, others conceding.']);
   }
 }
@@ -2933,6 +2969,16 @@ function drawPeerProvince(){
   // province rank/ratio can't give: a province AutoX ranks well in overall can still be outnumbered
   // in most of its districts (ground-level contest the aggregate masks). Gated on the layer field so
   // a pre-fold peer_province.json degrades to no column.
+  // Rival-field concentration chip under Leads: the single big-4 brand holding the most of the
+  // province's RIVAL field (AutoX excluded) and its share — the province-grain read the summary
+  // prose only gives nationally. `leader`/`Leads` names the top operator (which can be AutoX) but
+  // says nothing about whether the OTHER competitors are one dominant brand or a fragmented split;
+  // where one rival owns a majority, that single competitor sets the local pricing AutoX faces.
+  // Gated on a SUBSTANTIAL rival field (>= the layer's own concentration floor, default 10) so a
+  // thin 1-2-branch field can't show a meaningless 100%; floors read from meta so the chip stays in
+  // lockstep with build_peer_province.py. Both underlying fields are MEASURED per-brand census counts.
+  const concMinRivals=(typeof m.rival_concentration_min_rivals==='number')?m.rival_concentration_min_rivals:10;
+  const concShare=(typeof m.rival_concentration_share_floor==='number')?m.rival_concentration_share_floor:0.5;
   const hasDistCol=list.some(r=>r.n_districts);
   const dh=hasDistCol?`<th title="Share of this province's districts where the big-4 rivals outnumber AutoX (MEASURED, point-in-district). The province rank can mask this — a good province standing can still lose most of its districts on the ground.">Dist. lost</th>`:'';
   tbl.innerHTML=`<tr><th>#</th><th>Province</th>`+
@@ -2976,6 +3022,15 @@ function drawPeerProvince(){
         }
       }
       const lead=(r.leader==='AutoX')?`<span style="color:var(--merch)"><b>AutoX</b></span>`:`<span class="sub">${r.leader||'—'}</span>`;
+      // rival-field concentration chip (AutoX-excluded): agri when one rival owns a majority of the
+      // field (single-brand-dominated — one competitor sets local pricing), gold when fragmented.
+      // Shown only where the rival field is substantial; degrades to '' on a pre-fold layer.
+      let concChip='';
+      if(r.rival_top_brand&&r.rival_top_share!=null&&(r.rivals||0)>=concMinRivals){
+        const dom=r.rival_top_share>=concShare, cpct=Math.round(r.rival_top_share*100);
+        const ccol=dom?'var(--agri)':'var(--gold)';
+        concChip=`<div class="sub" style="font-size:10px;line-height:1.15;margin-top:1px;color:${ccol}" title="Of this province's ${r.rivals} big-4 rival branches (AutoX excluded), ${r.rival_top_brand} holds the most — ${cpct}%. ${dom?'A single rival dominates the field, so local pricing is effectively set by one competitor':'The rival field is fragmented across several brands'} (MEASURED census).">field: ${r.rival_top_brand} ${cpct}%</div>`;
+      }
       // AutoX rank chip: green when 1st/2nd (a defensible standing), red when it is the smallest
       // operator present (last of the pool), gold in between. Underlying counts are MEASURED.
       let rankCell='';
@@ -2991,7 +3046,7 @@ function drawPeerProvince(){
         ${bcols}${pcol}
         <td class="mono" style="color:${rc}">${ratio}</td>
         ${satCol}${distCol}
-        <td>${lead}</td>
+        <td>${lead}${concChip}</td>
       </tr>`;}).join('');
   if(ro){
     const nOut=m.n_provinces_outnumbered!=null?m.n_provinces_outnumbered:recs.filter(r=>r.autox>0&&r.rivals>r.autox).length;
