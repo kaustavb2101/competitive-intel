@@ -140,7 +140,9 @@ def main():
             sys.exit("ingest_doae.py --check: doae_planted_area.json drifted — run python3 pipeline/ingest_doae.py")
         print("ingest_doae.py --check: OK (byte-exact)")
         return
-    with open(OUT, "w", encoding="utf-8") as f:
+    # newline="\n": the Windows default translates every \n to \r\n, which inflates the byte sizes
+    # build_provenance.py censuses and diverges the local tree from the LF blob CI actually reads.
+    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
         f.write(payload)
     obj = json.loads(payload)
     print(f"wrote {OUT} ({obj['meta']['n_provinces']} provinces, year BE {obj['meta']['year_be']})")
