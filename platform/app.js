@@ -1299,9 +1299,15 @@ function barHTML(v,color,max=100){return `<span class="bar"><i style="width:${Ma
    ============================================================================ */
 function svgEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-/* Diverging horizontal bars around a zero axis — the right shape for YoY moves,
-   because "everything is up" has to be visible at a glance rather than read
-   row by row. rows: [{label, value, color?, note?}]. Returns '' if no finite value. */
+/* Diverging horizontal bars around a zero axis — the right shape for YoY moves, because the
+   direction of a set of numbers has to be visible at a glance rather than read row by row.
+   rows: [{label, value, color?, note?}]. Returns '' if no finite value.
+
+   CURRENTLY UNUSED — the commodities board was its only caller and now draws per-row cbBar() cells
+   instead. HAZARD if you reuse it: it emits a viewBox with no intrinsic size, so `.chartwrap>svg
+   {width:100%}` scales it UNIFORMLY to the container — on a 1920px screen it rendered 1590x627 from
+   a 560x221 viewBox with 10.5px labels drawn at ~30px. `.chartwrap>svg` now carries a max-width to
+   cap that, but if you mount this outside .chartwrap, constrain it yourself. */
 function svgBars(rows,opt){
   opt=opt||{};
   const R=(rows||[]).filter(r=>r&&typeof r.value==='number'&&isFinite(r.value));
@@ -1327,6 +1333,25 @@ function svgBars(rows,opt){
   });
   parts.push('</svg>');
   return parts.join('');
+}
+
+/* Fixed-size diverging bar for ONE table cell, scaled against the column's own max.
+
+   Sized in PIXELS on purpose. The full-width commodities chart this replaced used a
+   viewBox + width:100% + preserveAspectRatio="meet", which scales UNIFORMLY to the container: on a
+   1920px screen it rendered 1590x627 from a 560x221 viewBox — a 2.84x blow-up, with 10.5px label
+   text drawn at ~30px, in a block 673px tall summarising a 409px table underneath it. A cell bar
+   must never be able to do that, so width/height are attributes and the viewBox matches them 1:1. */
+function cbBar(v, max, w) {
+  if (typeof v !== 'number' || !isFinite(v)) return '<span class="s">n/a</span>';
+  w = w || 104;
+  const h = 13, mid = w / 2, m = Math.abs(max) || 1;
+  const len = Math.max(Math.abs(v) / m * (w / 2), 1);
+  const x = v < 0 ? mid - len : mid;
+  const col = v > 0 ? 'var(--merch)' : v < 0 ? 'var(--agri)' : 'var(--dim)';
+  return `<svg class="cbcell" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">`
+    + `<line x1="${mid}" y1="0" x2="${mid}" y2="${h}" stroke="var(--line)" stroke-width="1"/>`
+    + `<rect x="${x.toFixed(1)}" y="3" width="${len.toFixed(1)}" height="${h - 6}" fill="${col}" rx="1.5"/></svg>`;
 }
 
 /* Sparkline over a numeric series. Deliberately returns '' for fewer than 4
@@ -7957,8 +7982,13 @@ function renderCommoditiesBoard(){
       return svgSpark(v,{w:96,h:22,aria:lab+' 60-month price history',
         title:lab+' · '+(m[0]||'')+' → '+(m[m.length-1]||'')+' ('+v.length+' months)'});
     };
+    // The move the BORROWER feels: Thai farm-gate where a local series exists, world price
+    // otherwise. The builder already sorts the board on it; this is the same number drawn.
+    const felt=c=>c.local_yoy!=null?c.local_yoy:c.global_yoy;
+    const feltMax=Math.max(...j.board.map(c=>Math.abs(felt(c)||0)),1);
     const rows=j.board.map((c,i)=>{
       const gc=icMoveColor(c.global_yoy), lc=icMoveColor(c.local_yoy);
+      const fv=felt(c), fc=icMoveColor(fv), isLoc=c.local_yoy!=null;
       const exp=c.exposure;
       const expCell=exp?`<span class="cb-exp" data-i="${i}">${icN(exp.book_accounts)} acc <span class="cb-chev">▸</span></span>`:'<span class="s">—</span>';
       const div=c.divergence;
@@ -7975,9 +8005,19 @@ function renderCommoditiesBoard(){
         const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
         const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
         const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
-        const assistLine=!ap?'':`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
-        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="7"><div class="cb-belt">
-          <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt (${(exp.basis||'').replace(/\.$/,'')}).
+        // A row can carry a belt but no assistable population, because the assistance radar keys off
+        // the Thai FARM-GATE series and not every crop has one. Sugar is exactly that case, and it
+        // is the ONLY falling price that also has a belt — staying silent there reads as "nothing to
+        // do" when the truth is "we cannot compute it yet". Say which of the two it is, and name the
+        // unlock. (The other fallers — coconut, pineapple, pork, shrimp, eggs, chicken — have a Thai
+        // price but no province area, so they cannot reach a belt at all.)
+        const gapLine=`<div class="cb-assist cb-gap"><b>No call-list possible for ${c.lab}:</b> the assistable-now population is computed from the <b>Thai farm-gate</b> series, and ${c.lab} has none in this repo — so the ${icN(exp.book_accounts)} accounts above are standing exposure, not a worked list.${c.lab==='Sugar'&&(j.meta||{}).sugarcane_gap?` <span class="s">${(j.meta||{}).sugarcane_gap}</span>`:''}</div>`;
+        const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
+        const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
+        const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
+        drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
+          <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
+          ${areaLine}
           <table class="ic-tbl" style="margin-top:6px"><thead><tr><th>Province (belt)</th><th>Planted area (rai)</th><th>Book accounts</th><th title="crop-price effect on farm income in this province (income_impact.json)">Farm income</th><th title="modelled baht/month change for the Agriculture group">฿/month</th></tr></thead><tbody>${
             (exp.top||[]).map(t=>{const ip=incProv(t.prov), a=ip&&ip.occ&&ip.occ.Agriculture;
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
@@ -7986,36 +8026,29 @@ function renderCommoditiesBoard(){
           }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
+        <td class="cb-felt" title="${isLoc?'Thai farm-gate':'world price only — no Thai farm-gate series'}">${cbBar(fv,feltMax)}${
+          fv==null?'':`<b style="color:${fc}">${fv>0?'+':''}${fv}%</b>${isLoc?'':'<span class="s cb-deg">°</span>'}`}</td>
         <td class="cb-spark">${spark(c.lab)}</td>
-        <td class="n"><span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span></td>
-        <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>`}</td>
+        <td class="n">${c.global_yoy==null?'<span class="s">n/a</span>':`<span style="color:${gc}">${icArrow(c.global_yoy)} ${c.global_yoy>0?'+':''}${c.global_yoy}%</span>`}</td>
+        <td class="n">${c.local_yoy==null?'<span class="s">n/a</span>':`<span style="color:${lc}" title="${[c.local_product,c.local_source,c.local_price,c.local_date].filter(Boolean).join(' · ')}">${c.local_yoy>0?'+':''}${c.local_yoy}%</span>${
+          c.local_markets?`<span class="s cb-mkt${c.local_markets<2?' thin':''}" title="${c.local_markets} market${c.local_markets>1?'s':''} quote this series${c.local_markets<2?' — a single-market quote, read it as thin':''}">${c.local_markets}mkt</span>`:''}`}</td>
         <td class="n">${divCell}</td>
         <td class="n">${expCell}</td>
         <td class="s">${c.note||''}</td></tr>${drill}`;
     }).join('');
     const f=j.fuel||{};
-    // CHART (2026-08-01): the whole board as one diverging bar, sorted by the move the BORROWER
-    // actually feels (Thai farm-gate where a local series exists, world price otherwise). Reading
-    // "everything is up except sugar" off 11 table rows takes a scan; off this it takes a glance.
-    // The table stays underneath as the evidence — the chart replaces the scanning, not the detail.
-    const bars=(j.board||[]).map(c=>{
-      const local=c.local_yoy!=null, v=local?c.local_yoy:c.global_yoy;
-      if(typeof v!=='number') return null;
-      return {label:c.lab+(local?'':' °'),value:Math.round(v*10)/10,
-        color:v>0?'var(--merch)':'var(--agri)',
-        note:(local?'Thai farm-gate':'world price only')+(c.seg?' · '+c.seg:'')};
-    }).filter(Boolean).sort((a,b)=>b.value-a.value);
+    // 2026-08-01: the standalone full-width bar chart that used to sit here was DELETED, not
+    // resized. It restated the table's own 11 numbers in a second block, and because it scaled to
+    // container width it rendered 673px tall against a 409px table. The ranking it provided is now
+    // the table's sort order and its magnitudes are the "Borrower feels" cell bars — one block
+    // instead of two, and every row carries its own bar.
     const nLoc=(j.board||[]).filter(c=>c.local_yoy!=null).length;
-    const chart=bars.length?`<div class="chartwrap"><div class="chart-h">
-        <span class="t">Every tracked commodity, by the move the borrower feels</span>
-        <span class="s">° = world price only, no Thai farm-gate series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length})</span></div>
-      ${svgBars(bars,{aria:'Commodity year-on-year moves, Thai farm-gate where available',labW:86})}</div>`:'';
     el.innerHTML=`
       <h2>Commodities board · global price × Thai farm-gate × who's exposed <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MEASURED prices</span></h2>
       <p class="lead">World price (Pink Sheet YoY) beside the Thai farm-gate move, their <b>divergence</b> (where the local farmer's cash parts from the world index), and the <b>book accounts</b> sitting in each crop's growing belt — press a row to see the belt. ${f.diesel_thb_l?`Diesel now <b>฿${f.diesel_thb_l}/L</b> (${f.name}) — a cost line for pickup/haulage, not crop revenue.`:''}</p>
-      ${chart}
-      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th>5-yr trend</th><th>World YoY</th><th>Thai farm-gate</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area); resolvable only for rice / rubber / palm (the crops with province area).</p>`;
+      <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th title="Thai farm-gate where a local series exists, world price otherwise">Borrower feels</th><th>5-yr trend</th><th>World YoY</th><th title="Thai farm-gate (raw crop forms) or the NABC daily market feed for livestock, fishery and orchard series. Nmkt = how many markets quote it.">Thai price</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+        <p class="s cb-key">Sorted by the move the borrower feels. <b>°</b> = world price only, no Thai series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length}). <b>Nmkt</b> = markets quoting that Thai price; a 1mkt series is measured but thin.${((j.meta||{}).nabc_excluded||[]).length?` Excluded as stale: ${(j.meta||{}).nabc_excluded.join('; ')}.`:''}</p></div>
+      <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area). Each belt states its own area source: <b>MEASURED</b> for rice / rubber / palm (planted-area census) and cassava / maize (DOAE farmer registry), <b>MODELLED</b> for sugarcane (SPAM 2010). ${(j.meta||{}).sugarcane_gap||''}</p>`;
     if(!el.dataset.wired){ el.dataset.wired='1';
       el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
         const dr=el.querySelector(`.cb-drill[data-i="${x.dataset.i}"]`); if(!dr) return;

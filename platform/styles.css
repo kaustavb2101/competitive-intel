@@ -1355,7 +1355,10 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
    ============================================================ */
 .chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:9px;
   padding:11px 12px 8px;margin:8px 0 10px;overflow-x:auto}
-.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px}
+.chartwrap>svg{width:100%;height:auto;display:block;min-width:340px;max-width:620px;margin:0 auto}
+/* max-width is a GUARD, not decoration: a viewBox svg at width:100% scales uniformly, so
+   without a cap a 560-unit chart rendered 1590px wide with ~30px label text on a 1920px
+   screen. Any future .chartwrap chart is capped near its designed size and centred. */
 .chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
   margin-bottom:7px}
 .chart-h .t{font:600 11px var(--sans);color:var(--txt);letter-spacing:.2px}
@@ -1497,3 +1500,15 @@ p.lead.lead-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:ve
   font:400 12.5px/1.7 var(--sans);color:var(--mid);max-width:78ch}
 .pq .sub{font-size:10.5px;letter-spacing:.2px}
 @media print{.pq{break-inside:avoid}}
+
+/* Commodities board — "Borrower feels" cell bar. Replaced the full-width chart that scaled to
+   1590x627 on a 1920px screen; these are fixed-pixel and cannot inflate with the container. */
+.cb-felt{white-space:nowrap;font-variant-numeric:tabular-nums}
+.cb-felt b{font:600 11px var(--mono);margin-left:7px}
+.cb-felt .cb-deg{margin-left:2px;color:var(--dim)}
+svg.cbcell{vertical-align:middle;display:inline-block}
+.cb-key{margin:6px 2px 0;color:var(--dim)}
+.cb-areasrc{margin:7px 0 2px;font-size:11px;line-height:1.5}
+.cb-gap{border-left:2px solid var(--gold);padding-left:9px}
+.cb-mkt{margin-left:5px;color:var(--dim);font-size:10px}
+.cb-mkt.thin{color:var(--gold)}
