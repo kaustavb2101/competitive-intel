@@ -2408,11 +2408,11 @@ function renderCropStress(){
   const hasNap=NAPPRANG&&Object.keys(NAPPRANG).length;
   if(note) note.innerHTML='Which crop-farming provinces carry the most agri-income risk. '+
     '<b>Agri-stress</b> is an <b>estimated triage index</b> (price × drought, scaled by how much the province farms). '+
-    '<b>Price YoY</b> is now <b>measured Thai farm-gate</b> (NABC daily national averages) for the major crops — rice, rubber, oil palm, cassava, maize — with the World Bank global proxy only filling minor crops (sugar). '+
-    'Measured farm-gate is currently running <b>above</b> last year (an income <b>tailwind</b>), so the stress you see here is <b>drought-led, not price-led</b>. '+
+    '<b>Price YoY</b> is <b>measured Thai farm-gate</b> for all eight priced crops — rice, rubber, oil palm, cassava, maize (NABC daily averages), coconut and pineapple (NABC), sugarcane (OCSB announced price). No World Bank proxy fills any crop row here. '+
+    'Read this table WITH the crop-mix panel above it: the crops ranked here are rising, so the stress in THIS table is <b>drought-led, not price-led</b> — but three priced crops are falling hard (coconut −70.9%, pineapple −20.0%, sugarcane −17.9%) and they drive the four provinces the crop-mix panel flags. Neither table alone is the whole picture. '+
     '<b>Dominant crop</b> (OAE + DOAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.'+
     (hasNap?' <b>2nd-rice exposure</b> is the <b>measured</b> irrigated dry-season (second) rice planted area (OAE '+(NAPPRANG_META&&NAPPRANG_META.vintage||'')+') — the income cushion behind the drought flag; a large area is a buffer today <i>and</i> the income most at risk if water cuts skip the second crop (abandonment ~0 this season, so it reads as <b>exposure</b>, not current stress).':'');
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE + DOAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY (NABC) for the major crops; World Bank global proxy for minor crops. Positive = prices above last year (income tailwind).">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
+  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE + DOAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY for the province's DOMINANT crop only (NABC daily averages; OCSB for cane). Positive = above last year. This is one crop, not the province's whole mix — the crop-mix panel above weights all eight.">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
     top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
       const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
       const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
@@ -2540,7 +2540,7 @@ function renderCropMargin(){
     vb.className='verdict'+(clearsAll?'':' v-warn'); vb.style.display='block';
     vb.innerHTML=`<div class="verdict-line">${clearsAll?'✅':'⚠️'} <b>Farm-gate price clears OAE cost on ${clears} of ${rows.length} crop rows.</b> `+
       `Tightest cushion: <b>${tight.crop_th||tight.crop}</b> at ${(tight.margin_pct_of_price||0).toFixed(0)}% of price (${money(tight.margin_per_rai)}/rai)</div>`+
-      `<div class="sub" style="margin-top:4px">Prices are the current income tailwind — the margins say the same crops flagged for drought in the stress table are still <b>clearing cost today</b>; the risk is the cushion narrowing, not a loss. Inputs ${TAG_M} · margin derived.</div>`;
+      `<div class="sub" style="margin-top:4px">For the crops priced here the margins still <b>clear cost today</b>, so the risk on these rows is the cushion narrowing, not a loss. That is <b>not</b> a statement about the whole farm book: coconut, pineapple and sugarcane are all falling and none of them has a joined OAE cost row, so they cannot appear in this table at all — see the crop-mix panel above for the provinces they hit. Inputs ${TAG_M} · margin derived.</div>`;
   }
   const note=$('#margin-note');
   if(note) note.innerHTML='Does the <b>measured farm-gate price</b> the stress table quotes actually cover the '+
@@ -2565,7 +2565,8 @@ function renderCropMargin(){
 /* ---------- New-pickup inflow trend · the future used-collateral pool (Overview, obj #1) ----------
    MEASURED — DLT first registrations by class per Buddhist-era year (data/brand_trends.json).
    The diesel-share card above is a snapshot; this is the TIME dimension it lacks: the diesel pickup
-   is AutoX's core auto-title collateral (~25% of the book), and how fast NEW pickups enter the fleet
+   is AutoX's core auto-title collateral (MEASURED tape: 31.3% of accounts and 38.3% of outstanding —
+   the single largest balance exposure in the book), and how fast NEW pickups enter the fleet
    sets how fast the future USED-pickup collateral pool (what AutoX lends against + recovers on) is
    replenished. Leads with the pickup-inflow change vs the whole-market change, notes the rising EV
    share as the used-value leading indicator. Null-safe: absent/thin file → wrap stays hidden. */
@@ -2593,7 +2594,7 @@ function renderBrandTrends(){
   // ---- note ----
   const note=$('#btrend-note');
   if(note) note.innerHTML='First registrations (new vehicles entering the fleet) by class — the <b>inflow that becomes tomorrow’s used-vehicle collateral</b>. '+
-    'Pickups are AutoX’s core title collateral (~25% of the book); passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
+    'Pickups are AutoX’s core title collateral — <b>31.3% of accounts and 38.3% of outstanding</b> in the measured loan tape, the largest single balance exposure in the book; passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
     'All counts are <b>measured</b> (DLT first-registration registry). Years are Buddhist-era (พ.ศ. − 543 = ค.ศ., e.g. 2568 = 2025).';
   // ---- per-year table (pickup bar-scaled to its own max) ----
   const tbl=$('#btrendtbl');
@@ -2722,7 +2723,7 @@ function renderCollateralFlow(){
   const vb=$('#collflow-verdict');
   if(vb){
     vb.className='verdict'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are AutoX's largest title class${mix?` — ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%)`:''}, so their used-market liquidity is what sets how fast repossessed collateral clears.</b> `+
+    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are a third of AutoX's customers and a twentieth of its money — 33.3% of accounts but 5.8% of outstanding</b> (measured tape; pickups are 31.3% of accounts and 38.3% of outstanding). So moto used-market liquidity governs how fast a LOT of repossessed units clear, but very little balance.${mix?` Nationally they are ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%) — that is the market, not our book.`:''} `+
       `${nat?`Nationally ${rp(nat.transfer_rate)} of moto registry actions are ownership transfers, and ${rp(nat.dereg_rate)} are permanent deregistrations.`:''}</div>`+
       `<div class="sub" style="margin-top:4px">Collateral attrition (permanent deregistration) runs fastest in <b>${TH_REG[worstAttr.region]||worstAttr.region}</b> (${rp(worstAttr.moto.dereg_rate)}), and the moto used market is thinnest — slowest to clear collateral — in <b>${TH_REG[lowLiq.region]||lowLiq.region}</b> (${rp(lowLiq.moto.transfer_rate)} transfer intensity). A backdrop read on the book we already run, not an open/close cue. ${TAG_M}.</div>`;
   }
@@ -7990,7 +7991,7 @@ function renderIncome(){
     }).join('');
     el.innerHTML=`
       <h2>Income-impact engine — what the macro move does to each region's book <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · first-order</span></h2>
-      <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop tailwind.</p>
+      <p class="lead">Current crop prices (rice ${icSign(cy.rice)}, rubber ${icSign(cy.rubber)}, palm ${icSign(cy.oilpalm)} YoY) passed through NSO occupation incomes and weighted by each region's book mix. <b>Positive = income tailwind</b> for the book. Fuel channel is 0 this vintage (no measured baseline to diff — we don't invent one), so today's picture is purely the crop channel. <b style="color:var(--agri)">Read this as a THREE-crop engine.</b> It weights rice, rubber and oilpalm only — all three rising — so it reports every region positive. The <a href="#overview" data-jump="sec-ov-agri">crop-mix panel on Macro</a> weights all eight priced crops and finds four provinces falling, coconut and sugarcane led; this table cannot see them.</p>
       <div class="ic-scroll"><table class="ic-tbl"><thead><tr><th>Region</th><th>Book income pressure</th><th>Best-off occupation</th><th>Worst-off occupation</th><th>Top book occupations</th><th title="MEASURED — NSO Labour Force Survey avg monthly EMPLOYEE wage; an independent cross-check beside the SES income base, not the base">NSO wage · LFS</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="lead cc-provenance"><b>Provenance:</b> ESTIMATED first-order pass-through. Every quantity multiplied is measured (NSO SES income, crop planted area, World Bank commodity YoY); the sensitivity coefficients (how much of a price move reaches take-home income) are a documented assumption. Read direction and relative magnitude, not precise levels. <b>NSO wage · LFS</b> is a MEASURED cross-check only — the region's Labour Force Survey employee wage (${((j.meta||{}).vintage||{}).wage_anchor||'latest'}) shown beside the model; it is an employee wage, not the SES individual income the model bases on (which counts non-wage income), so read it as a directional anchor, not an equality.</p>`;
   });
