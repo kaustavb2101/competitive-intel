@@ -7967,10 +7967,45 @@ function renderScenarios(){
 const CB_CROP={'Rice':'rice','Rubber':'rubber','Palm oil':'oilpalm','Maize':'maize','Cassava':'cassava',
                'Coconut':'coconut','Pineapple':'pineapple','Sugar':'sugarcane'};
 const OCC_TH={Agriculture:'เกษตรกร',Transport:'ขนส่ง',FactoryWorkers:'โรงงาน',OfficeStaff:'พนักงานบริษัท',SMEOwners:'ผู้ประกอบการ'};
+
+/* THAI price trend + province spread inside a commodity drill (data/thai_price_history.json).
+   Every sparkline on the board itself is a WORLD price; this is the first Thai series the product
+   has ever drawn. The province spread is the point: a national average is one number, but paddy
+   ranges ~22% between the provinces this book lends into, which is wider than most YoY moves the
+   board leads with. Returns '' when the series is absent — the drill just loses a block. */
+function cbThaiHistory(THI,lab){
+  const s=THI&&THI.series&&THI.series[lab]; if(!s||!Array.isArray(s.values)||s.values.length<2) return '';
+  const ann=s.cadence==='annual', ch=s.change_pct;
+  const col=ch==null?'var(--dim)':ch>0?'var(--merch)':ch<0?'var(--agri)':'var(--dim)';
+  const fmt=v=>Number(v).toLocaleString(undefined,{maximumFractionDigits:2});
+  const spark=svgSpark(s.values,{w:150,h:30,
+    aria:lab+' Thai price, '+s.first_month+' to '+s.last_month,
+    title:lab+' · '+s.product+' · '+s.first_month+' → '+s.last_month+' ('+s.n_months+' points)'});
+  // Sugar is administered, so it has no province spread BY CONSTRUCTION — say which kind of empty
+  // this is rather than showing a blank that reads as missing data.
+  const spread=(s.provinces||[]).length>=2
+    ? `<div class="cb-spread"><b>Province spread ${s.spread_pct==null?'':`<span style="color:var(--gold)">${s.spread_pct}%</span>`}</b>
+        <span class="s">dearest vs cheapest quoting province, last ${THI.meta&&THI.meta.spread_note?'quarter':'window'} — a national average hides this</span>
+        <table class="ic-tbl" style="margin-top:4px"><thead><tr><th>Province</th><th>Mean ${s.unit||''}</th><th title="quotes behind that mean">Quotes</th></tr></thead><tbody>${
+        s.provinces.map(p=>`<tr><td>${p.province}</td><td class="n">${fmt(p.mean)}</td><td class="n s">${p.n}</td></tr>`).join('')
+      }</tbody></table></div>`
+    : `<div class="cb-spread s">${ann
+        ? 'No province spread — the cane price is <b>administered nationally</b>, so every province is paid the same announced rate. Empty here means <i>cannot vary</i>, not <i>unknown</i>.'
+        : 'Quoted by a single province, so there is no spread to show.'}</div>`;
+  return `<div class="cb-thai"><div class="cb-thai-hd">
+      <b>Thai price, ${s.first_month} → ${s.last_month}</b>
+      <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span>
+      ${ann?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)" title="one announced national price per season — not a market series">ANNUAL · ADMINISTERED</span>':''}
+      <span class="mono" style="color:${col}"><b>${ch==null?'':(ch>0?'+':'')+ch+'%'}</b></span>
+      <span class="s">over ${s.n_months} ${ann?'years':'months'} · ${fmt(s.min)}–${fmt(s.max)} ${s.unit||''}</span>
+    </div>
+    <div class="cb-thai-body">${spark}<span class="s">${s.product||''}</span></div>
+    ${spread}</div>`;
+}
 function renderCommoditiesBoard(){
   const el=document.getElementById('ov-commodities'); if(!el) return;
   Promise.all([tmliFetch('commodities'),tmliFetch('assist_price_radar'),tmliFetch('income_impact'),
-               tmliFetch('commodity_history')]).then(([j,APR,INC,HIST])=>{
+               tmliFetch('commodity_history'),tmliFetch('thai_price_history')]).then(([j,APR,INC,HIST,THI])=>{
     if(!j||!Array.isArray(j.board)){ tmliNote(el,''); return; }   // silent when absent — the legacy board still shows
     const aprCrop=k=>((APR&&Array.isArray(APR.crops))?APR.crops:[]).find(c=>c.key===k)||null;
     const incProv=p=>((INC&&INC.provinces)?INC.provinces[p]:null)||null;
@@ -8027,6 +8062,7 @@ function renderCommoditiesBoard(){
         const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
         const areaLine=!apv?'':`<div class="cb-areasrc"><span class="tag" style="color:${modelled?'var(--gold)':'var(--merch)'};border:1px solid ${modelled?'var(--gold)':'var(--merch)'}">${apv} area</span> <b>${exp.area_source||''}</b> — <span class="s">${exp.area_note||''}</span></div>`;
+        const thaiLine=cbThaiHistory(THI,c.lab);
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
           ${areaLine}
@@ -8035,7 +8071,7 @@ function renderCommoditiesBoard(){
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
                 `<td class="n">${ip&&ip.agri_price_shock_pct!=null?`<span style="color:${ip.agri_price_shock_pct>=0?'var(--merch)':'var(--agri)'}">${ip.agri_price_shock_pct>0?'+':''}${ip.agri_price_shock_pct}%</span>`:'<span class="s">—</span>'}</td>`+
                 `<td class="n">${a&&a.d_baht!=null?`${a.d_baht>0?'+':''}฿${icN(a.d_baht)}`:'<span class="s">—</span>'}</td></tr>`;}).join('')
-          }</tbody></table>${occLine}${assistLine}</div></td></tr>`;
+          }</tbody></table>${thaiLine}${occLine}${assistLine}</div></td></tr>`;
       }
       return `<tr class="cb-row"><td><b>${c.lab}</b> <span class="s">${c.seg||''}</span></td>
         <td class="cb-felt" title="${isLoc?'Thai farm-gate':'world price only — no Thai farm-gate series'}">${cbBar(fv,feltMax)}${

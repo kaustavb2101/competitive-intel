@@ -319,7 +319,7 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
   else bad "build_rival_universe.py --check (rival_universe.json drifted from source-data/rival_universe.json + app_reviews.json — run: python3 pipeline/build_rival_universe.py)"
   fi
-  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments; do
+  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments ingest_ocsb_cane build_thai_price_history; do
     ( cd "$PIPE" && python3 "$ing.py" --check >/dev/null 2>&1 ); rc=$?
     if [ "$rc" -eq 0 ]; then ok "$ing.py --check"
     elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (staging source absent — ingest wave, not data drift)"

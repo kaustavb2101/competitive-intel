@@ -1510,5 +1510,14 @@ svg.cbcell{vertical-align:middle;display:inline-block}
 .cb-key{margin:6px 2px 0;color:var(--dim)}
 .cb-areasrc{margin:7px 0 2px;font-size:11px;line-height:1.5}
 .cb-gap{border-left:2px solid var(--gold);padding-left:9px}
+/* Thai price history block inside a commodity drill. The sparkline is given fixed pixel width/height
+   attributes (not width:100%) for the same reason the cell bars are: a viewBox SVG stretched to its
+   container scales its whole coordinate system, so the line thickens as the panel widens. */
+.cb-thai{margin:9px 0 2px;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
+.cb-thai-hd{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:11.5px}
+.cb-thai-body{display:flex;align-items:center;gap:10px;margin-top:5px;flex-wrap:wrap}
+.cb-thai-body svg{flex:0 0 auto}
+.cb-spread{margin-top:7px;font-size:11px;line-height:1.5}
+.cb-spread .ic-tbl{max-width:420px}
 .cb-mkt{margin-left:5px;color:var(--dim);font-size:10px}
 .cb-mkt.thin{color:var(--gold)}
