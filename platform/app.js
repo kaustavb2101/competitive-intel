@@ -9538,8 +9538,10 @@ function renderCollateralBook(){
     if(vt) tmliFetch('used_vehicle_value').then(u=>{
       const S=(u||{}).series||{}, CMP=(u||{}).comparison||{}, UM=(u||{}).meta||{};
       if(!S.car||!S.truck||!S.overall){ vt.style.display='none'; return; }
-      const pp=v=>v==null?'—':(v>0?'+':'−')+Math.abs(v).toFixed(1);
-      const pct=v=>v==null?'—':(v>0?'+':'−')+Math.abs(v).toFixed(1)+'%';
+      // Sign an exact zero and it reads as a fall that did not happen — same trap as the fleet
+      // table's gap column below.
+      const pp=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1);
+      const pct=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';
       const mcol=v=>v==null?'var(--muted)':v<0?'var(--agri)':'var(--merch)';
       // Index level is NOT a rate — 66.8 on a 2015=100 base is "one third of its base year value
       // gone", so the tile shows the level, its distance from base in points, and the YoY move as
@@ -9645,8 +9647,10 @@ function renderCollateralBook(){
         lta_bus_nonsched:'Bus, charter',lta_bus_personal:'Bus, own account'};
       const num=n=>n==null?'—':Number(n).toLocaleString('en-US');
       const shp=v2=>v2==null?'<span class="gd-na">—</span>':v2.toFixed(2)+'%';
+      // An exact 0.00 gap must not be signed. `g>0?'+':'−'` rendered รย.4's genuine zero as
+      // "−0.00", which reads as a shrinking class when the class is simply unchanged.
       const gapCell=g=>g==null?'<span class="gd-na">not published</span>'
-        :`<b style="color:${g<-1?'var(--agri)':g>1?'var(--merch)':'var(--muted)'}">${g>0?'+':'−'}${Math.abs(g).toFixed(2)}</b>`;
+        :`<b style="color:${g<-1?'var(--agri)':g>1?'var(--merch)':'var(--muted)'}">${g>0?'+':g<0?'−':''}${Math.abs(g).toFixed(2)}</b>`;
       // Stock-bearing classes first, ranked by how much of the road they are; the ten stock-less
       // Land Transport classes follow, ranked by new registrations, under their own divider.
       const withS=TY.filter(t=>t.has_stock).sort((a,b)=>((NAT.stock[b.id]||{}).share_pct||0)-((NAT.stock[a.id]||{}).share_pct||0));
@@ -9670,7 +9674,11 @@ function renderCollateralBook(){
       const ry12n=(NAT.new.ry12||{}).share_pct, ry12s=(NAT.stock.ry12||{}).share_pct;
       mx.innerHTML=`<div class="verdict">
           <b>The pickup fleet is ageing without being replaced.</b> Pickups are <b>${shp(ry3s)}</b> of every vehicle registered in Thailand
-          but only <b>${shp(ry3n)}</b> of everything newly plated in the last twelve months — a <b style="color:var(--agri)">${gapCell((NAT.gap_pp||{}).ry3).replace(/<[^>]+>/g,'')} pt</b> gap.
+          but only <b>${shp(ry3n)}</b> of everything newly plated in the last twelve months${
+            (NAT.gap_pp||{}).ry3==null?''
+              // Read the number, don't strip tags off the cell formatter — a null gap would have
+              // rendered the literal words "not published pt".
+              :` — a <b style="color:${NAT.gap_pp.ry3<0?'var(--agri)':'var(--merch)'}">${NAT.gap_pp.ry3>0?'+':NAT.gap_pp.ry3<0?'−':''}${Math.abs(NAT.gap_pp.ry3).toFixed(2)} pt</b> gap`}.
           Motorcycles run the other way (${shp(ry12s)} of stock, <b>${shp(ry12n)}</b> of new).
           <span class="sub">Read against the resale block above: the class whose value has fallen furthest is also the class the country has largely stopped buying new.
           That thins the future used-pickup pool we both lend against and recover into.</span></div>
