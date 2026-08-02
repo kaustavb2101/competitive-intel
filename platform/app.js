@@ -8811,7 +8811,7 @@ function pillCard(num,name,pc,tab,big,read,foot){
     <span class="pill-eyebrow"><span class="pill-num">${num}</span><span class="pill-name">${name}</span></span>
     <span class="pill-big">${big||'<small>loading…</small>'}</span>
     <span class="pill-read">${read||''}</span>
-    <span class="pill-foot">${foot||''} →</span></a>`;
+    <span class="pill-foot">${(foot||'').replace(/\s*→\s*$/,'')} →</span></a>`;
 }
 function renderHomePillars(){
   const host=$('#cc-pillars'); if(!host) return;
