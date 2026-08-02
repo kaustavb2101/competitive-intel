@@ -3,6 +3,55 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Integration loop (objective #1): GISTDA repeated-flood hazard → per-district & per-branch MEASURED flag (`flood_hazard.json`) — PR (app-visual)
+
+Autonomous integration & improvement loop. Shipped NEXT_STEPS §0, the top OPEN backlog item that was
+verified-reachable but never built (backlog #1 FPO-PICO and #2 branch-cropland were confirmed already
+built, gated, and surfaced). GISTDA's ArcGIS "Repeated Flooding 2005-2016" FeatureServer is open from
+CI (no key, re-verified 2026-08-02), so the flood-hazard census is now a MEASURED portfolio-risk layer.
+
+**What & why (objective #1 — collateral / PD risk):** where the ground under a branch's book floods
+repeatedly, the collateral (title vehicles) and borrower cash-flow (farm/shop) carry a chronic
+recovery hazard. The layer answers "how many of the 12 years 2005-2016 did this branch's district
+flood" (`flood_freq` 1-12) per district AND per branch. Result: **1,848 / 2,015 branches** sit in a
+repeat-flood district, **685** in a CHRONIC one (≥7/12 yrs); 75 provinces flooded, Ayutthaya 16/16
+districts (classic flood-plain sanity check).
+
+**The MAX-not-SUM discipline (the trap NEXT_STEPS §0 warned about):** the GISTDA polygons OVERLAP
+(per-event, not dissolved), so any flooded-AREA total is a 3-9x overstatement artifact. This layer
+claims **no area** — only the per-district `MAX(flood_freq)`, which is immune to overlap, pulled
+server-side. Area is left for a later geometry-dissolve pass.
+
+**Pieces:**
+- `pipeline/pull_flood_hazard.py` — NETWORK (not gated); server-side `MAX(flood_freq)` grouped by
+  district in one call (838 flood-affected districts, < the 1000 maxRecordCount; bails loudly on
+  `exceededTransferLimit`) → committed `source-data/gistda_flood_hazard.json` (144 KB, re-pullable).
+  Committed so the builder's `--check` runs for REAL in CI (not a skip like the Thai-IP pulls).
+- `pipeline/build_flood_hazard.py` — DETERMINISTIC, network-free, `--check`-gated. Joins onto
+  `amphoe.json` (Thai name first, English fallback — amphoe.json stores ~86 districts in English) →
+  `platform/data/flood_hazard.json` {meta, by_province, by_district, branches[freq]}. Per-branch flag
+  via the `branch_amphoe` index. 825/838 districts resolve; the 13 unresolved are ALL zero-branch —
+  asserted at build time (`UnresolvedBranchError`), so no branch silently loses a real flood flag.
+- App: a MEASURED branch-popup line on `#map` ("Repeat-flood yrs (GISTDA 2005–16)"), lazy-loaded +
+  null-guarded, mirroring the branch_density/fuel popup-line pattern. Distinct from the LIVE
+  `thaiwater_flood.json` water-level pulse — this is the STRUCTURAL hazard.
+- Gate: `build_flood_hazard.py --check` in `tests/run.sh`; `flood_hazard.json` registered in the
+  index-alignment + fingerprint gates and given a dedicated `check_flood_hazard` in `validate_data.py`
+  (freq int 0..12, by_district 1..12, length == branches); `build_provenance.py` re-run → classified
+  **measured** (130 layers, 70 measured / 60 estimated / 0 unlabelled).
+
+**Verification:** `bash tests/run.sh check` → **116 passed, 0 failed** (all 8 new flood assertions
+green, `--check` byte-exact). `#map` renders `data-errors="[]"`; `health.sh` on the national page →
+all checks pass incl. `#map present`. The one render FAIL (`rayong-catchment.html`, a deck.gl WebGL
+scene) and the batch-health flakiness are pre-existing/environmental — that page loads **zero**
+references to app.js, so this app.js-only change cannot reach it. Because the change alters app
+visuals, shipped as a **PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number (NEXT_STEPS §0 remainder) — download the
+GISTDA polygons and dissolve per district with shapely before claiming any area; OR surface the
+`flood_hazard.json` province rollup on `#overview`/`#exposure` as a portfolio flood-exposure readout
+(the by_province layer is already built and unused in the UI).
+
 ## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
 
 Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the

@@ -656,6 +656,35 @@ function fuelStnRec(d){
   return FUELSTN[i]||null;
 }
 
+/* ---------- per-branch REPEATED-FLOOD HAZARD (data/flood_hazard.json) ----------
+   Lazy-loads pipeline/build_flood_hazard.py's projection of the GISTDA Repeated-Flooding 2005-2016
+   census: {meta, by_province, by_district, branches:[freq,...]}, INDEX-ALIGNED to branches.json.
+   branches[i] = MAX flood_freq = the count of the 12 years 2005-2016 in which the branch's district
+   flooded (0 = not in the registry). MEASURED government hazard census; only the district name-match
+   is inferred (unresolved districts are all zero-branch, so no branch loses a real flag). Immune to
+   the per-event polygon overlap that makes area totals unreliable — no flooded AREA is claimed.
+   Distinct from thaiwater_flood.json's LIVE water-level pulse — this is the STRUCTURAL hazard.
+   Fully null-guarded: absent file → FLOODHZ stays null, floodHzRec() reads null, the popup line is
+   omitted. Nothing is fabricated. */
+let FLOODHZ=null, floodhzMeta=null, floodhzLoaded=false, floodhzPromise=null;
+async function loadFloodHazard(){
+  if(floodhzPromise) return floodhzPromise;
+  floodhzLoaded=true;
+  floodhzPromise=(async()=>{
+    try{ const r=await fetch('data/flood_hazard.json'); if(!r.ok){FLOODHZ=null;return FLOODHZ;}
+      const j=await r.json(); floodhzMeta=j.meta||null; FLOODHZ=j.branches||null; }
+    catch(e){ FLOODHZ=null; floodhzMeta=null; }
+    return FLOODHZ;
+  })();
+  return floodhzPromise;
+}
+// per-branch repeated-flood frequency (for popups) — null when absent, integer 0-12 otherwise.
+function floodHzRec(d){
+  if(!FLOODHZ||!FLOODHZ.length||!DATA) return null;
+  const i=idxOf(d); if(i<0) return null;
+  const f=FLOODHZ[i]; return (f==null)?null:f;
+}
+
 /* ---------- per-branch MEASURED-corrected CROP-AREA within 10km (data/branch_cropland.json) ----
    Lazy-loads pipeline/build_branch_cropland.py's output: {meta:{crops[],provenance,...},
    branches:[{ha:[…5 crops], crop_ha, dom, fac:[…]}]}, INDEX-ALIGNED to branches.json. The per-crop
@@ -6505,6 +6534,8 @@ function initMap(){
   if(!croplandLoaded) loadBranchCropland();
   // warm the MEASURED per-branch fuel-station-within-10km popup line (OSM). Popup-only, no lens.
   if(!fuelstnLoaded) loadBranchFuel();
+  // warm the MEASURED per-branch repeated-flood-hazard popup line (GISTDA 2005-16). Popup-only, no lens.
+  if(!floodhzLoaded) loadFloodHazard();
   // if the map opened directly on the competitor lens (e.g. ?lens=comp), warm the census now.
   if(curLens==='comp' && !compAttached){
     loadCompetitors().then(()=>{ if(curLens==='comp'&&mapReady){ renderLegend(); drawCompPoints(); styleMarkers(); } });
@@ -6531,7 +6562,7 @@ function selectBranch(d,m){
   // re-render the still-open popup/sheet once they land so the FIRST read answers acquire + macro.
   // No-op when the files are absent (loaders resolve null, popupHTML output is unchanged).
   if(!LEADS||!MACX||!MSENS||!BPOP||!CPOP||!CCEN||!CBRF||!OCCL||!RIVP||!BLDGDEN||!WFDATA||!OCCDATA||!AGRIDATA||!CROPLAND||!VEHDATA||!RECDATA||!FUELSTN){
-    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadBranchPico(),loadVehicles(),loadRecommendations(),loadBranchFuel()]).then(()=>{
+    Promise.all([loadBranchLeads(),loadMacroExposure(),loadMacroSens(),loadBranchPopulation(),loadContestedPop(),loadCompetitorCensus(),loadClusterBrief(),loadOccLeads(),loadRivalPressure(),loadBranchDensity(),loadWorkforce(),loadOccupations(),loadAgri(),loadBranchCropland(),loadBranchPico(),loadVehicles(),loadRecommendations(),loadBranchFuel(),loadFloodHazard()]).then(()=>{
       if(!stillOpen()) return;
       if(sheet) setSheetBody(popupHTML(d));
       else m.getPopup().setContent(popupHTML(d));
@@ -7049,6 +7080,17 @@ function fuelPopupHTML(d,r){
   return r('Fuel stations ≤10km (OSM) · measured floor',
     `${n.toLocaleString()} <span class="sub">(${lab})</span>`, col);
 }
+// Repeated-flood hazard line for a branch popup — MEASURED GISTDA 2005-2016 census: the number of
+// the 12 years the branch's district flooded. A chronic-flood district (≥7/12) is a collateral /
+// recovery hazard on the ground the branch already lends against. Structural hazard (does it
+// repeatedly flood), distinct from the live water-level pulse. Omitted when the file/entry is absent.
+function floodHzPopupHTML(d,r){
+  const f=floodHzRec(d); if(f==null) return '';
+  const lab=f>=10?'chronic':f>=7?'frequent':f>=4?'recurrent':f>=1?'occasional':'none on record';
+  const col=f>=10?'var(--agri)':f>=7?'#cda23e':f>=4?'var(--gold)':f>=1?'#8b90a7':'var(--mid)';
+  return r('Repeat-flood yrs (GISTDA 2005–16) · measured',
+    `${f}<span class="sub">/12 (${lab})</span>`, col);
+}
 // Collateral-mix block for a branch popup — the MEASURED DLT split of the province vehicle stock.
 // Motorcycle share is highlighted as the highest-volatility / lowest-recovery title collateral.
 function collatMixPopupHTML(d,sec,r){
@@ -7258,6 +7300,7 @@ function popupHTML(d){
     ${peerPopupHTML(d,sec,r)}
     ${poiRelevancePopupHTML(d,sec,r)}
     ${amphoePopupHTML(d,sec,r)}
+    ${floodHzPopupHTML(d,r)}
     ${catchmentPopupHTML(d,sec,r)}
     ${compPopupHTML(d,sec,r)}
     ${rivalPressureLineHTML(d)}

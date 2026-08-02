@@ -3,7 +3,16 @@
 Ordered by value × unblocked-ness. Each has a concrete first action so Claude Code can just start.
 **For the exact Thai-laptop pulls (copy-pasteable), see `docs/TONIGHT_CHECKLIST.md`.**
 
-## 0. GISTDA repeated-flooding — VERIFIED REACHABLE, blocked on a spatial dissolve (objective #1)
+## 0. GISTDA repeated-flooding — ✅ SHIPPED (MAX-freq hazard flag, 2026-08-02); area still needs a dissolve (objective #1)
+**DONE (the defensible part):** `pull_flood_hazard.py` pulls the server-side MAX(flood_freq) per
+district and `build_flood_hazard.py` (deterministic, `--check`-gated) projects it into
+`platform/data/flood_hazard.json` — a per-district & per-branch repeated-flood-hazard flag
+(count of the 12 years 2005-2016 the ground flooded, 1-12). 838 flood-affected districts, 825
+joined onto `amphoe.json` (13 unresolved, all zero-branch — asserted at build time); 1,848/2,015
+branches sit in a repeat-flood district, 685 in a CHRONIC one (≥7/12 yrs). Surfaced as a MEASURED
+branch-popup line on `#map`, censused in `provenance.json`. NO area is claimed (see the trap below).
+The remaining open work is purely the flooded-AREA number, which still needs a geometry dissolve.
+
 Probed 2026-08-01. GISTDA's ArcGIS server is **open from this machine, no key**:
 `https://gistdaportal.gistda.or.th/data/rest/services?f=json` lists ~40 folders (FL_Flood, GFlood,
 FR_Fire hotspots + air quality, GWater, Industrial, EEC...).
@@ -32,9 +41,10 @@ What IS defensible without any dissolve, because it is immune to overlap:
   A clean branch-hazard flag, one grouped query, no area claim.
 - the count of districts at each max-frequency band.
 
-Deliberately NOT built on 2026-08-01 rather than shipped with a suspect area number. First action:
-`build_flood_hazard.py` doing the MAX(flood_freq) group-by onto `ap_code`, joined to `amphoe.json`;
-leave area for a later pass that dissolves geometry.
+Deliberately NOT built on 2026-08-01 rather than shipped with a suspect area number. ✅ The
+MAX(flood_freq) group-by (joined onto `amphoe.json` via Thai/English name, NOT `ap_code` — the app's
+amphoe identity is name-keyed) shipped 2026-08-02 as `build_flood_hazard.py`. **Area is still left
+for a later pass that dissolves geometry** (shapely over the downloaded polygons per district).
 
 ## 0a. Fold the MEASURED TMLI province layers into the risk read  ⟶ NOW UNBLOCKED (objective #1)
 The data.go.th / NSO / NESDC datasets that the sandbox is BLOCKED from pulling are now vendored
