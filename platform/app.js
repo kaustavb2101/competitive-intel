@@ -5506,6 +5506,8 @@ function renderExposure(){
   renderRiskReadouts();
   // OBJECTIVE #2: most contested ground — catchments where rivals sit on top of our population (measured).
   renderContestedGround();
+  // OBJECTIVE #1: repeated-flood exposure of the network — how much of the book sits on chronically-flooded ground (measured).
+  renderFloodExposure();
 }
 
 /* ---------- most contested ground · contested population (objective #2, MEASURED) ----------
@@ -5552,6 +5554,73 @@ function renderContestedGround(){
         `<td class="mono" style="color:${col}">${(t.cpop||0).toLocaleString()}</td>`+
         `<td class="mono" style="color:${col}">${t.pct}%</td></tr>`;
     }).join('')+`</table>`;
+}
+
+/* ---------- repeated-flood exposure of the network (objective #1, MEASURED, GISTDA 2005-16) ----------
+   Surfaces data/flood_hazard.json as a PORTFOLIO readout: how much of the network we already run sits
+   on repeatedly-inundated ground. The per-branch popup line on #map answers "does THIS branch flood";
+   this answers "how much of the BOOK does". Reuses loadFloodHazard() (FLOODHZ + floodhzMeta). MEASURED
+   government hazard census (GISTDA Repeated-Flooding 50k, MAX flood_freq per district; no area claimed).
+   Bands come straight from meta.branch_freq_hist; the province table is a per-branch join (FLOODHZ is
+   index-aligned to branches.json, read via floodHzRec). Lazy + graceful: absent file -> renders nothing.
+   Honest headline: nearly the whole network is flagged at freq>=1, so the risk sits in the CHRONIC tail
+   (>=7/12 yrs). DOM host created in-JS after the contested block (no index.html wiring needed). */
+function floodExpoHost(){
+  let h=document.getElementById('expo-flood');
+  if(h) return h;
+  const anchor=document.getElementById('expo-contested')||document.getElementById('expo-risk')||document.getElementById('expoprov');
+  if(!anchor||!anchor.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-flood'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+  return h;
+}
+function renderFloodExposure(){
+  const host=floodExpoHost(); if(!host) return;
+  if(!FLOODHZ||!floodhzMeta){
+    if(!floodhzLoaded) loadFloodHazard().then(()=>{ if(onExposureView()) renderFloodExposure(); });
+    host.innerHTML=''; return;                          // graceful: nothing until the layer lands
+  }
+  const m=floodhzMeta, N=m.n_branches||FLOODHZ.length||0;
+  if(!N){ host.innerHTML=''; return; }
+  const hist=m.branch_freq_hist||{};
+  const H=f=>+(hist[f]||hist[String(f)]||0);
+  // bands (branch counts) from the frequency histogram — thresholds mirror the builder's BANDS.
+  const bandDefs=[
+    ['Chronic',        '10–12 / 12 yrs', H(10)+H(11)+H(12), 'var(--agri)'],
+    ['Frequent',       '7–9 / 12 yrs',   H(7)+H(8)+H(9),    'var(--agri)'],
+    ['Recurrent',      '4–6 / 12 yrs',   H(4)+H(5)+H(6),    'var(--gold)'],
+    ['Occasional',     '1–3 / 12 yrs',   H(1)+H(2)+H(3),    'var(--mid)'],
+    ['None on record', '0 / 12 yrs',     H(0),              'var(--merch)'],
+  ];
+  const chronic=(m.n_branches_chronic!=null)?m.n_branches_chronic:(H(7)+H(8)+H(9)+H(10)+H(11)+H(12));
+  const chrPct=(100*chronic/N).toFixed(0);
+  // most flood-exposed provinces by CHRONIC branch count (per-branch join, index-aligned via floodHzRec).
+  const byProv={};
+  DATA.forEach(d=>{const f=floodHzRec(d); if(f==null) return; const v=d.v||'—';
+    const o=byProv[v]||(byProv[v]={v,r:d.r||'—',n:0,chr:0}); o.n++; if(f>=7)o.chr++;});
+  const provs=Object.values(byProv).filter(o=>o.chr>0).sort((a,b)=>b.chr-a.chr||b.n-a.n).slice(0,12);
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:0">Repeated-flood exposure of the network ${TAG_M}</h2>`+
+    `<p class="lead"><b>${chronic.toLocaleString()}</b> of ${N.toLocaleString()} branches (<b>${chrPct}%</b>) sit on `+
+    `<b>chronically-flooded ground</b> — a district that flooded in <b>≥7 of the 12 years 2005–2016</b>. This is the `+
+    `STRUCTURAL flood hazard under the collateral (title vehicles) and borrower cash-flow of the book we already run — `+
+    `<b>measured</b> (GISTDA Repeated-Flooding 50k census).</p>`+
+    methodBox('Each branch inherits its district’s MAX flood_freq — the count of the 12 years 2005–2016 any ground in the district flooded. Bands are branch counts by that frequency.',
+      ['Frequency is <b>measured</b> — GISTDA 50k repeated-flooding census (2005–2016); the only inference is the district name-match (unresolved districts are all zero-branch, so no branch loses a real flag).',
+       'Nearly the whole network is flagged at ≥1 year, so read the <b>chronic tail</b> (≥7/12), not the flagged-at-all count.',
+       'MAX(freq) per district, never area — the per-event polygons overlap, so no flooded-AREA is claimed.',
+       'STRUCTURAL hazard (does the ground repeatedly flood), distinct from the LIVE water-level pulse on the map.'])+
+    `<table class="tbl"><tr><th scope="col">Band</th><th scope="col">Flood years</th><th scope="col">Branches</th><th scope="col">Share</th></tr>`+
+    bandDefs.map(([lab,yrs,n,col])=>`<tr><td><b style="color:${col}">${lab}</b></td><td class="sub">${yrs}</td>`+
+      `<td class="mono">${n.toLocaleString()}</td><td class="mono" style="color:${col}">${(100*n/N).toFixed(1)}%</td></tr>`).join('')+
+    `</table>`+
+    (provs.length?`<h3 class="sub" style="margin:14px 0 6px">Most chronically flood-exposed provinces</h3>`+
+      `<table class="tbl"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Branches</th>`+
+      `<th scope="col" class="h-agri" title="branches in a chronic-flood district (≥7/12 yrs) — measured">Chronic</th><th scope="col" title="chronic share of the province's branches">Share</th></tr>`+
+      provs.map((o,i)=>{const sh=o.n?100*o.chr/o.n:0; const fc=sh>=50?'var(--agri)':sh>=25?'var(--gold)':'var(--mid)';
+        return `<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>`+
+          `<td class="mono">${o.n}</td><td class="mono" style="color:${fc}">${o.chr}</td>`+
+          `<td class="mono" style="color:${fc}">${sh.toFixed(0)}%</td></tr>`;}).join('')+`</table>`:'');
 }
 
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
