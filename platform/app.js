@@ -5589,7 +5589,8 @@ function renderFloodExposure(){
   }
   if(!DATA||!FLOODHZ.length){ host.innerHTML=''; return; }
   const N=DATA.length;
-  let natRep=0, natChr=0;
+  let natRep=0, natChr=0, natUnk=0;
+  const freq=new Array(13).fill(0);              // 0-12 flood years, tallied from the same join as everything else
   const byReg={}, byProv={};
   DATA.forEach(d=>{
     const f=floodHzRec(d);                       // index-safe, null when absent
@@ -5597,8 +5598,20 @@ function renderFloodExposure(){
     const ro=byReg[r]||(byReg[r]={r,n:0,rep:0,chr:0});
     const po=byProv[v]||(byProv[v]={v,r,n:0,rep:0,chr:0});
     ro.n++; po.n++;
+    if(f==null) natUnk++; else freq[Math.max(0,Math.min(12,f))]++;
     if(f!=null && f>=1){ natRep++; ro.rep++; po.rep++; if(f>=FLOOD_CHRONIC){ natChr++; ro.chr++; po.chr++; } }
   });
+  // How the network spreads across the frequency scale. Counted off the per-branch join rather than
+  // meta.branch_freq_hist so every number in this panel rests on one basis and cannot disagree with
+  // the region and province tables below.
+  const sum=(a,b)=>freq.slice(a,b+1).reduce((x,y)=>x+y,0);
+  const bands=[
+    ['Chronic',    '10–12 of 12 yrs', sum(10,12), 'var(--agri)'],
+    ['Frequent',   '7–9 of 12 yrs',   sum(7,9),   'var(--agri)'],
+    ['Recurrent',  '4–6 of 12 yrs',   sum(4,6),   'var(--gold)'],
+    ['Occasional', '1–3 of 12 yrs',   sum(1,3),   'var(--mid)'],
+    ['None on record','0 of 12 yrs',  freq[0],    'var(--merch)'],
+  ].concat(natUnk?[['No flood record','—',natUnk,'var(--dim)']]:[]);
   const pct=n=>(100*n/N).toFixed(0)+'%';
   const cCol=s=>s>=0.25?'var(--agri)':s>=0.10?'var(--gold)':'var(--mid)';
   const rCol=s=>s>=0.80?'var(--agri)':s>=0.50?'var(--gold)':'var(--mid)';
@@ -5608,15 +5621,25 @@ function renderFloodExposure(){
   const provs=Object.values(byProv).filter(o=>o.chr>0).sort((a,b)=>b.chr-a.chr||b.rep-a.rep).slice(0,12);
   host.innerHTML=
     `<h2 class="risk" style="margin-top:0">Portfolio flood-hazard exposure ${TAG_M}</h2>`+
-    `<p class="lead"><b>${natRep.toLocaleString()} of ${N.toLocaleString()} branches (${pct(natRep)})</b> sit in a district whose `+
-    `ground flooded in at least one of the 12 years ${vint}, and <b>${natChr.toLocaleString()} (${pct(natChr)})</b> in a `+
-    `<b>CHRONIC flood zone</b> — a district that flooded in ≥${FLOOD_CHRONIC} of those 12 years. This is the `+
-    `<b>structural</b> collateral- and borrower-cashflow recovery hazard sitting under the book — <b>measured</b> (${src}).</p>`+
+    `<p class="lead"><b>${natChr.toLocaleString()} of ${N.toLocaleString()} branches (${pct(natChr)})</b> sit on `+
+    `<b>chronically-flooded ground</b> — a district that flooded in ≥${FLOOD_CHRONIC} of the 12 years ${vint}. That is the `+
+    `<b>structural</b> collateral- and borrower-cashflow recovery hazard sitting under the book — <b>measured</b> (${src}).<br>`+
+    // Lead with the tail, not the flag. ${natRep} branches clear the ≥1-year bar, but at that threshold
+    // almost the entire network qualifies, so the number separates nothing and reads alarming for no
+    // reason. It is still stated — just as context, and labelled as the non-discriminating cut it is.
+    `<span class="sub">${natRep.toLocaleString()} (${pct(natRep)}) are flagged at ≥1 flood year, but almost the whole `+
+    `network clears that bar, so it separates nothing — read the chronic tail, not the flagged-at-all count.</span></p>`+
     methodBox('Each branch inherits the MAX repeated-flood frequency (0–12) of the district it sits in, from the GISTDA server-side census; REPEAT = freq ≥1, CHRONIC = freq ≥'+FLOOD_CHRONIC+'.',
       ['Frequency is <b>measured</b> — GISTDA 1:50,000 repeated-flooding census, '+vint+'.',
        'Only the district name-match is inferred; every unresolved district is zero-branch, so no branch loses a real flag.',
        'This is a <b>hazard flag</b> (did the ground flood, how often), <b>not</b> a flooded-area or loss estimate — no area is claimed (the source polygons overlap).',
        'Distinct from the LIVE ThaiWater water-level pulse on Overview — this is the standing structural hazard.'])+
+    `<h3 class="sub" style="margin:14px 0 6px">How the network spreads across the flood-frequency scale</h3>`+
+    `<div class="tbl-wrap"><table class="tbl" id="expo-flood-band"><tr><th scope="col">Band</th><th scope="col">Flood years</th>`+
+      `<th scope="col">Branches</th><th scope="col">Share</th></tr>`+
+      bands.map(([lab,yrs,n,col])=>`<tr><td><b style="color:${col}">${lab}</b></td><td class="sub">${yrs}</td>`+
+        `<td class="mono">${n.toLocaleString()}</td><td class="mono" style="color:${col}">${(100*n/N).toFixed(1)}%</td></tr>`).join('')+
+      `</table></div>`+
     `<div class="dash2"><div class="dash2-side">`+
       `<h2 class="risk">By region</h2>`+
       `<p class="lead">Share of each region's branches sitting on repeat- and chronic-flood ground. Chronic ranked first.</p>`+
