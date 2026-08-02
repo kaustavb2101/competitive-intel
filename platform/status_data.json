@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-02T16:19:43+00:00",
-    "commit": "5d21e92"
+    "generated_at": "2026-08-02T22:16:13+00:00",
+    "commit": "670d999"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,54 @@
   ],
   "activity": [
     {
+      "date": "2026-08-02T22:16:13+00:00",
+      "sha": "670d999",
+      "summary": "health(deploy): site-health probe guards macro_book.json (Overview conditions drill)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-03T03:29:24+07:00",
+      "sha": "6c96aff",
+      "summary": "fix(risk): the flood panel led with a number that separates nothing (#264)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-02T20:27:09+00:00",
+      "sha": "21b1c34",
+      "summary": "docs(progress): log ux-pillar-foot-arrow-doubled merge+deploy+verify (#265)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T03:22:27+07:00",
+      "sha": "c3b8694",
+      "summary": "ux: guard pillCard foot arrow against doubling (#265)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T02:29:28+07:00",
+      "sha": "2f16f4e",
+      "summary": "feat(risk): surface GISTDA flood layer as portfolio flood-exposure readout on #exposure (#259)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-03T01:44:36+07:00",
+      "sha": "ab635e0",
+      "summary": "docs: the 17-point review entry is merged, not \"not yet committed\"",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-03T01:36:53+07:00",
+      "sha": "286e450",
+      "summary": "feat(macro): the Macro tab on the owner's 17-point review — external data only, and none of it stale (#262)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-02T16:20:24+00:00",
+      "sha": "2227f0a",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the collateral_book site-health probe ship",
+      "pillar": "service"
+    },
+    {
       "date": "2026-08-02T16:19:43+00:00",
       "sha": "5d21e92",
       "summary": "health(deploy): site-health probe guards collateral_book.json (obj #1 collateral section)",
@@ -662,54 +710,6 @@
       "sha": "a75f145",
       "summary": "Macro audit: a decision band on top, a second switcher level inside, and three numbers that were saying the wrong thing (#249)",
       "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-01T18:58:58+00:00",
-      "sha": "21500b9",
-      "summary": "data(gate): assert the amphoe total-join invariant at source in build_amphoe.py",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T01:21:58+07:00",
-      "sha": "4c111ee",
-      "summary": "Macro + agri data wave: sugarcane closed, Thai price history, farm-household P&L, informal-debt read (#248)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-01T16:32:04+00:00",
-      "sha": "f897259",
-      "summary": "chore(planner): refresh CEO dashboard stamp after the amphoe coastal-count fix",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T16:31:25+00:00",
-      "sha": "f65d620",
-      "summary": "fix(amphoe): count off-polygon coastal branches in their district — total-join .branches (2000→2015), correct the rival:AutoX ratio",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-01T22:41:29+07:00",
-      "sha": "dc9de34",
-      "summary": "fix(ci): restore the Pantip panel that the #244 squash-merge silently dropped (#246)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-01T14:45:54+00:00",
-      "sha": "3b6a2b7",
-      "summary": "docs: log ux scope=\"col\" competition-tables fix — merge+deploy+verify (#247)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T21:42:45+07:00",
-      "sha": "1cd3743",
-      "summary": "ux: scope=\"col\" on the four Competition (#acq) route tables (#247)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T20:42:39+07:00",
-      "sha": "7f33f40",
-      "summary": "feat(live-board): daily feeds get real trend lines — history accumulated, backfilled from git (#244)",
-      "pillar": "feature"
     }
   ]
 }
