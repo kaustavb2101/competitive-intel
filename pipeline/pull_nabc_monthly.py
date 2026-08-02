@@ -16,16 +16,20 @@ reachable and working 2026-08-02:
   /api/monthly-prices/product?product_name=<exact>&year_th=<BE>&page=&limit=
 
 WHAT IT PRODUCES: source-data/nabc_monthly.json — the full monthly history (see WINDOW below) for
-three fruits that carry no other Thai price source anywhere in this repo:
+four series that carry no other Thai price source anywhere in this repo:
   · durian   — ทุเรียนหมอนทอง คละ (Monthong mixed grade), commod ทุเรียน
   · rambutan — เงาะโรงเรียน คละ (Rong Rean mixed grade), commod เงาะ
   · longan   — ลำไย, TWO grades both carried (เกรด A, เกรด AA) — build_commodities.py picks ONE
+  · beef     — โคพันธุ์ลูกผสม ขนาดกลาง (medium crossbred cattle), commod โคเนื้อ. Added 2026-08-02
+               and NOT a fruit: the board's Beef row had no Thai price at all, so it ran on the
+               World Bank index (+11.8%) while Thai cattle were in a four-year slide. Quoted in
+               บาท/ตัว — per HEAD, not per kg like the fruits. See PRODUCT_FILTERS.
 mangosteen (มังคุด) / longkong (ลองกอง) / lychee (ลิ้นจี่) were checked against BOTH endpoint
 families across every BE year 2563-2569 and are absent from all of them — do not re-add without
 new evidence; there is nothing to pull for those three.
 
 PRODUCT NAMES ARE NEVER HARDCODED-AND-TRUSTED: every name used below is re-resolved at pull time
-from /product-names against a narrow Thai-substring filter (see FRUIT_FILTERS), and the pull FAILS
+from /product-names against a narrow Thai-substring filter (see PRODUCT_FILTERS), and the pull FAILS
 LOUDLY if a filter doesn't resolve to exactly its expected count (1 for durian/rambutan, 2 for
 longan) — an upstream rename breaks the pull instead of silently mismatching a stale string.
 
@@ -61,13 +65,24 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; autox-credit-intel/1.0)"}
 BE_OFFSET = 543
 YEARS_BACK = 5     # current BE year + this many prior years — see WINDOW in the module docstring
 
-# fruit key -> (Thai-substring predicate, expected /product-names match count). Longan matches 2
+# product key -> (Thai-substring predicate, expected /product-names match count). Longan matches 2
 # (both grades); everything else matches exactly 1. No product_name string is ever hand-typed into
 # a lookup — every one used below is the literal string this predicate found.
-FRUIT_FILTERS = {
+PRODUCT_FILTERS = {
     "durian":   (lambda n: "ทุเรียนหมอนทอง" in n, 1),
     "rambutan": (lambda n: "เงาะโรงเรียน" in n, 1),
     "longan":   (lambda n: "ลำไย" in n and "เกรด" in n, 2),   # split into longan_a / longan_aa
+    # BEEF CATTLE, added 2026-08-02 — the reason this file stopped being fruit-only.
+    # The board's Beef row was running on the World Bank Pink Sheet beef index alone (+11.8%) with
+    # no Thai series, so its belt drill showed 24 provinces and 136,293 book accounts against two
+    # empty income columns: the income engine will not pass a WORLD price through to a Thai
+    # household, and correctly so. NABC's monthly family does carry a Thai one — commod โคเนื้อ,
+    # product โคพันธุ์ลูกผสม ขนาดกลาง (medium crossbred cattle), a national average in บาท/ตัว
+    # (per HEAD, not per kg like every other series here — build_commodities.py must not assume kg).
+    # It reverses the row's sign: Thai cattle have fallen from ฿34,688/head (2022-12) to
+    # ฿20,719 (2026-06), −40% off peak and −6.1% same-month YoY, while the world index rose.
+    # กระบือ (buffalo) is on the same feed and deliberately NOT pulled — no board row needs it.
+    "beef":     (lambda n: "โคพันธุ์ลูกผสม" in n, 1),
 }
 
 # VERIFIED 2026-08-02 (see the discovery notes this script was written from) — do not adjust the
@@ -81,6 +96,9 @@ ACCEPTANCE = {
                   "price": 26.27, "yoy": 60.2},
     "longan_aa": {"n_months": 54, "first_month": "2022-01", "latest_date": "2026-06",
                   "price": 34.71, "yoy": 12.4},
+    # Unlike the fruits, cattle quote EVERY month — 54 of 54 in the window, no seasonal gaps.
+    "beef":      {"n_months": 54, "first_month": "2022-01", "latest_date": "2026-06",
+                  "price": 20718.51, "yoy": -6.1},
 }
 
 
@@ -117,12 +135,12 @@ def resolve_products(year_th):
         raise RuntimeError("resolve_products: /product-names empty for year_th=%s and %s"
                            % (year_th, year_th - 1))
     out = {}
-    for fruit, (pred, expect_n) in FRUIT_FILTERS.items():
+    for key, (pred, expect_n) in PRODUCT_FILTERS.items():
         hits = sorted(n for n in names if pred(n))
         if len(hits) != expect_n:
             raise RuntimeError("resolve_products: %s expected %d product-names match(es), got %d: %s"
-                               % (fruit, expect_n, len(hits), hits))
-        if fruit == "longan":
+                               % (key, expect_n, len(hits), hits))
+        if key == "longan":
             grades = {}
             for n in hits:
                 grade = n.rsplit("เกรด", 1)[-1].strip()
@@ -132,7 +150,7 @@ def resolve_products(year_th):
             out["longan_a"] = grades["A"]
             out["longan_aa"] = grades["AA"]
         else:
-            out[fruit] = hits[0]
+            out[key] = hits[0]
     return out
 
 
@@ -244,8 +262,8 @@ def assert_acceptance(products):
             if got.get(k) != v:
                 raise AssertionError("assert_acceptance: %s.%s = %r, expected %r"
                                      % (fruit, k, got.get(k), v))
-    print("acceptance check: OK (durian/rambutan/longan_a/longan_aa match the verified 2026-08-02 facts)",
-          file=sys.stderr)
+    print("acceptance check: OK (%s match the verified 2026-08-02 facts)"
+          % "/".join(sorted(ACCEPTANCE)), file=sys.stderr)
 
 
 def payload(products, years_th, stamp):
@@ -259,8 +277,10 @@ def payload(products, years_th, stamp):
                       "BOTH year_th and (for /product) an exact product_name, which is why it read "
                       "as absent rather than gated and was never pulled before 2026-08-02.",
             "label": "MEASURED — live Thai monthly national-average farm-gate/market prices "
-                     "(durian, rambutan, longan two grades). No other Thai price source in this "
-                     "repo carries these three fruits.",
+                     "(durian, rambutan, longan two grades, beef cattle). No other Thai price "
+                     "source in this repo carries any of them.",
+            "units_differ": "Not every series is บาท/กก. — beef quotes in บาท/ตัว (per HEAD). Read "
+                            "each product's own 'unit' field; never assume a common unit here.",
             "generated_by": "pipeline/pull_nabc_monthly.py",
             "pulled": stamp,
             "window_be": be_span,
@@ -271,8 +291,10 @@ def payload(products, years_th, stamp):
                            "module docstring." % YEARS_BACK,
             "yoy_method": "Same-month year-on-year (this month vs the same calendar month one "
                           "year back), NOT pull_nabc_prices.py's rolling 30-day-window method. "
-                          "These are seasonal harvest fruits with no off-season quote at all, so a "
-                          "rolling window would compare a harvest-month price against an empty gap.",
+                          "The fruits are seasonal harvests with no off-season quote at all, so a "
+                          "rolling window would compare a harvest-month price against an empty "
+                          "gap. Beef quotes year-round and would survive either method; it uses "
+                          "the same one so every series on this feed is compared alike.",
             "products_covered": sorted(products),
             "longan_grades": "Both เกรด A and เกรด AA are carried here; build_commodities.py picks "
                              "ONE grade for the board row and states which and why.",

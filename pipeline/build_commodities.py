@@ -63,7 +63,7 @@ BOARD_TO_FARMGATE = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm",
 # by pipeline/pull_nabc_monthly.py). Added 2026-08-02. This is a DIFFERENT NABC endpoint family
 # from nabc_prices.json/NABC_ROWS below (/api/monthly-prices vs /api/daily-prices) — durian and
 # rambutan have no daily-feed presence at all, so this is checked FIRST in the local-price
-# precedence in build() and nothing else (BOARD_TO_NABC, NABC_ROWS) points at these three labels,
+# precedence in build() and nothing else (BOARD_TO_NABC, NABC_ROWS) points at any label in here,
 # so the stale daily "ลำไย" line (dropped by nabc_locals() below, see NABC_STALE_DAYS) can never
 # shadow Longan structurally — not just because it happens to be stale today.
 BOARD_TO_MONTHLY = {
@@ -74,6 +74,16 @@ BOARD_TO_MONTHLY = {
     # is the smaller export-premium grade); averaging the two would invent a synthetic product
     # neither buyer actually trades. See source-data/nabc_monthly.json meta for both series.
     "Longan": "longan_a",
+    # BEEF, added 2026-08-02 — and unlike the three above, this label is NOT monthly-only: Beef is a
+    # long-standing Pink Sheet row that simply had no Thai counterpart, so it ran on the world index
+    # alone. That was materially misleading rather than merely thin. The world beef index is +11.8%;
+    # measured Thai crossbred cattle are -6.1% same-month YoY and -40% off their 2022-12 peak
+    # (฿34,688 -> ฿20,719 per head). The board was showing 136,293 book accounts in a 24-province
+    # belt against a rising number while the farmers in it were four years into a slide, and the
+    # belt drill's two income columns sat empty because the income engine will not pass a WORLD
+    # price into a Thai household's income — correctly, but silently. Now it has a Thai price.
+    # NOTE the unit: บาท/ตัว, per HEAD. Every other series on this feed is บาท/กก.
+    "Beef": "beef",
 }
 
 # board label → (area source id, key inside that source). Pinned per crop on purpose; see the
