@@ -4,7 +4,7 @@
   "generated_by": "pipeline/pull_nabc_history.py",
   "source": "NABC Agricultural Data Service (agriapi.nabc.go.th) — the same daily-price endpoint pull_nabc_prices.py reads; this keeps the time and province dimensions that one discards.",
   "label": "MEASURED — no modelling, no interpolation. Monthly values are the plain mean of that month's quotes for the category's most-quoted product; months with fewer than 3 quotes are omitted rather than drawn from a thin sample.",
-  "pulled": "2026-08-01",
+  "pulled": "2026-08-02",
   "recent_window_days": 90,
   "province_note": "Province means cover the last 90 days of quotes, anchored on each category's own newest quote date — NOT on the wall clock, so the output is byte-reproducible. A province appears only where a market in it actually quotes the product; absence is silence, not zero.",
   "coverage_note": "History depth is bounded by how far back the API pages (~3000 records per category), so a heavily-quoted commodity reaches back fewer months than a thinly-quoted one. n_months and first_month state the real span per category instead of implying a uniform window.",
