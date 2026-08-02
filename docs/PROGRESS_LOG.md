@@ -3,6 +3,42 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
+
+Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the
+last data-feed workflow still leaking the recurring **provenance-drift** class the progress log has been
+closing feed-by-feed. `.github/workflows/data-macro.yml` (weekly BIS + World Bank macro pull → committed
+`platform/data/macro_indicators.json`) opened its draft PR **without regenerating the two layers that file
+feeds**: `provenance.json` censuses `macro_indicators.json`'s bytes (confirmed — the file is in the
+manifest) and `build_live_board.py` reads it (3 refs), so every macro refresh drifted both and the PR's own
+`bash tests/run.sh check` came up **red** on `build_provenance.py --check` (+ `validate_data.py`'s byte-size
+row) — the PR could never auto-merge green without a manual provenance regen, exactly the drift the
+imf-weo / thaiwater / fuel-price / scenarios / nabc / sfi / search-demand / social-listening feeds already
+fixed in lockstep.
+
+**Fix (mirrors the imf-weo sibling exactly):** inserted a "Rebuild live_board + provenance when
+macro_indicators changed" step between the pull and the commit — `git status --porcelain` guards on the
+file, and on change runs `build_live_board.py` then `build_provenance.py` (deterministic, network-free,
+live_board first so provenance censuses its refreshed bytes); the commit's `git add` now stages
+`macro_indicators.json` + `live_board.json` + `provenance.json` together. CI-config only — no `platform/`
+app/data/visual change, so a direct commit to master (not a PR) per the safeguard rule.
+
+**Safeguard protocol — all passed:** (a) baseline `bash tests/run.sh check` → **115 passed, 0 failed**
+(the workflow YAML is not gate-material, so the gate is unaffected by this change); (b) no secrets in diff
+(the lone `token` hit is the pre-existing `GH_TOKEN: ${{ github.token }}` Actions context ref, unchanged);
+(c) diff = only `.github/workflows/data-macro.yml` + this log entry; (d) provenance / no-fabrication intact —
+no data values touched. **Verification:** confirmed `build_live_board.py --check` and
+`build_provenance.py --check` both reproduce byte-exact on the clean tree; confirmed `macro_indicators.json`
+is in `provenance.json`'s census and read by `build_live_board.py`; a drift simulation (perturb → restore
+via `git checkout`) left the tree clean (verified `git status`). **Deploy-verify:** prod alias `/` → 200,
+`/data/meta.json` → 200, `/data/competitor_coverage.json` → 200 (no app change to regress).
+
+**Next recommended (intelligence):** audit the remaining draft-PR data workflows that commit a
+`platform/data/*` file for the same lockstep gap — spot-check `data-gov-census.yml` (commits
+`source-data/`, likely provenance-safe) and `data-overture.yml`; then a small **shared composite action**
+(`rebuild-provenance-if-changed`) would let every feed reuse one audited regen step instead of the
+copy-pasted block, killing this drift class at the source.
+
 ## 2026-08-02 — UX loop (a11y): scope="col" on the district amphoe tables — MERGED + DEPLOYED + VERIFIED (PR #255)
 
 Autonomous UX-improvement loop, safeguard-gated auto-merge. Fourth slice of `ux-table-scope-sweep-appjs`
