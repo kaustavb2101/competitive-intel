@@ -318,6 +318,26 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .mcell .md{font:600 10.5px var(--mono);font-style:normal;font-variant-numeric:tabular-nums}
 .mcell .md.up{color:var(--up)} .mcell .md.dn{color:var(--down)} .mcell .md.fl{color:var(--dim)}
 .mcell .mspark{align-self:center;margin-left:1px;opacity:.9}
+/* WHEN + WHAT IT MEANS, on the chip (owner review 2026-08-02, point 3). The period was previously
+   only in the hover title, so nothing on screen distinguished a daily FX rate from a figure eighteen
+   months old — which is how a stale 2025 inflation number survived on this page in the first place. */
+.mcell .mper{font:500 9.5px var(--mono);color:var(--dim);align-self:center;
+  border-left:1px solid var(--line);padding-left:6px;margin-left:1px;white-space:nowrap}
+/* An undated chip is marked, not left blank — see the note in compactMacro(). Dashed and italic so
+   it reads as "missing" at a glance rather than as a period nobody recognises. */
+.mcell .mper.undated{color:var(--gold);font-style:italic;border-left-style:dashed;cursor:help}
+/* The gloss wraps, so the chip becomes two lines rather than running off the strip. Only the few
+   chips whose LABEL is jargon carry one; the rest stay single-line.
+   FIXED 2026-08-02 (owner: "you have an overbleed issue here"). `.mcell` sets white-space:nowrap for
+   the single-line chips, and the gloss INHERITED it — so flex-basis:100% gave it a row of its own
+   and nowrap then forbade it from wrapping inside that row, and the sentence ran straight out
+   through the pill's right edge. The gloss has to opt back into normal wrapping explicitly, and a
+   two-line chip is a card, not a pill, so the 999px radius comes down with it. */
+.mcell.has-gloss{flex-wrap:wrap;max-width:340px;border-radius:12px;align-items:center}
+.mcell .mgl{flex-basis:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;
+  font-size:10px;line-height:1.4;color:var(--mid);margin-top:3px}
+/* `hidden` must beat the display rule on .grid.macro, or the container would still render. */
+[hidden]{display:none!important}
 /* ---------- conditions-at-our-grain block: lens nav + the NPL sparkline (points 15-17, 20-22) --- */
 .mb-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
   gap:10px;margin:0 0 8px}
@@ -357,6 +377,15 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .verdict.v-warn{background:linear-gradient(180deg,rgba(217,116,43,.13),var(--panel));border-left-color:#D9742B}
 
 /* ---------- tables: raised card, zebra, right-aligned numerics, glowing bars ---------- */
+/* `.tbl-wrap` is the hyphenated spelling of `.tblwrap` used at ten call sites that had never
+   matched any rule — so those tables had no guard rail and pushed the whole page sideways on a
+   phone (Assistance: 636px of scroll in a 390px viewport). Aliased, not renamed, so the two
+   spellings cannot drift apart again. Descendant selector, not child: index.html wraps a mount div,
+   app.js wraps the table directly. */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
+  min-width:0;overscroll-behavior-x:contain}
+.tbl-wrap .tbl{width:auto;min-width:100%}
+
 /* .tblwrap is the mobile guard rail: a wide multi-column .tbl scrolls INSIDE this box
    instead of pushing the whole page sideways. app.js wraps every table.tbl in one at boot. */
 .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);max-width:100%;
@@ -399,7 +428,7 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 #expocards .mcard{display:flex;flex-direction:column}
 #expocards .mcard .k{text-transform:none;letter-spacing:.2px;min-height:2.5em;line-height:1.3}
 #expocards .mcard .v{margin-top:auto}
-#expocards .mcard .n{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#expocards .mcard .n{overflow-wrap:anywhere}
 
 /* ---------- provenance + status tags ---------- */
 .tag{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;
@@ -701,8 +730,8 @@ html[data-theme="light"] .pill-num{color:#fff}
 .cc-link:hover{text-decoration:underline}
 .cc-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line2)}
 .cc-row:last-child{border-bottom:none}
-.cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0}
-.cc-row .l .s{display:block;font-size:10.5px;color:var(--dim)}
+.cc-row .l{font-size:12.5px;color:var(--txt);flex:1;min-width:0;overflow-wrap:anywhere}
+.cc-row .l .s{display:block;font-size:10.5px;color:var(--dim);overflow-wrap:anywhere}
 .cc-row .r{font-family:var(--mono);font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
 .cc-row .r .s{display:block;font-size:10px;font-weight:400;color:var(--dim)}
 /* .cc-tag shares ONE provenance visual language with .prov (leading dot, mono 11px,
@@ -878,9 +907,9 @@ html[data-theme="light"] .cc-qnum{background:#eef2f8;color:#11151F}
 details.compsec,details.ovsec{border-top:1px solid var(--line2);margin:0}
 details.compsec:first-of-type,details.ovsec:first-of-type{border-top:none}
 details.compsec>summary,details.ovsec>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
-  outline-offset:2px}
+  outline-offset:2px;min-width:0}
 details.compsec>summary::-webkit-details-marker,details.ovsec>summary::-webkit-details-marker{display:none}
-details.compsec>summary>h2,details.ovsec>summary>h2{flex:1;border-bottom:none;margin:18px 0;padding-bottom:0}
+details.compsec>summary>h2,details.ovsec>summary>h2{flex:1;min-width:0;border-bottom:none;margin:18px 0;padding-bottom:0}
 details.compsec:first-of-type>summary>h2,details.ovsec:first-of-type>summary>h2{margin-top:4px}
 details.compsec>summary::after,details.ovsec>summary::after{content:'▸';color:var(--dim);font-size:11px;transition:transform .15s;
   margin-top:2px}
@@ -1441,8 +1470,11 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
   border-radius:9px;padding:0 5px;margin-left:5px;text-transform:none;letter-spacing:0;white-space:nowrap}
 .uv-val{font-family:var(--mono);font-size:27px;font-weight:600;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}
 .uv-base{font-size:11px;color:var(--mid);font-variant-numeric:tabular-nums}
-.uv-spark{margin:7px 0 4px;height:30px}
+.uv-spark{margin:7px 0 4px}
 .uv-spark svg{width:100%;height:30px;display:block}
+/* The sparkline's own range, said out loud (owner review 2026-08-02, point 10). It used to live
+   only in the SVG title attribute, so the line had no stated start or end anywhere on screen. */
+.uv-sprange{display:block;font:400 9px var(--mono);color:var(--dim);letter-spacing:.02em;margin-top:2px}
 .uv-yoy{font-size:11.5px;color:var(--mid);font-variant-numeric:tabular-nums}
 .uv-sub{display:block;margin-top:5px;font-size:10.5px;line-height:1.45}
 .uv-p{font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid var(--gold);
@@ -1450,7 +1482,11 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .uv-answers{margin:6px 0 2px;line-height:1.7;font-size:13px}
 .uv-dir{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums;cursor:help}
 .uv-dirb{font-family:var(--mono);font-size:9.5px;border:1px solid;border-radius:9px;padding:1px 7px;white-space:nowrap}
-.uv-dir .s{font-size:10.5px;color:var(--dim)}
+.uv-dir .s{font-size:10.5px;color:var(--dim);line-height:1.6}
+/* The trailing window each slope was measured over, set as a quiet inline chip so the figure and
+   the months it covers can never drift apart on screen (owner review 2026-08-02, point 10). */
+.uv-w{font-size:9px;color:var(--dim);opacity:.85;white-space:nowrap;
+  border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:2px}
 /* THE RESALE-VALUE CHART — full-size because the finding is a SHAPE (slide, trough, floor) that a
    sparkline cannot carry. Two series share one y-axis, which is only legitimate because both are
    the same index on the same 2015=100 base. */
@@ -1465,6 +1501,19 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .uvc-y{font-family:var(--mono);font-size:9px;fill:var(--dim)}
 .uvc-x{font-family:var(--mono);font-size:9px;fill:var(--dim)}
 .uvc-m{font-family:var(--mono);font-size:9.5px;fill:var(--agri)}
+/* HOVER READOUT (owner review 2026-08-02, point 9). One transparent hit-band per month, each
+   carrying a pre-rendered crosshair + dots + readout that CSS reveals on :hover or :focus-within.
+   No JS listener, so nothing has to be re-bound when a window button redraws the chart, and the
+   whole thing survives a keyboard tab. pointer-events are OFF for everything except the band, so
+   the readout can never sit between the cursor and the band that draws it and flicker. */
+.uvc-hov{pointer-events:none}
+.uvc-hit{fill:transparent;pointer-events:all;cursor:crosshair}
+.uvc-hshow{opacity:0;transition:opacity .08s ease}
+.uvc-hov:hover .uvc-hshow,.uvc-hov:focus-within .uvc-hshow{opacity:1}
+.uvc-hx{stroke:var(--hi);stroke-width:1;opacity:.35;stroke-dasharray:2 2}
+.uvc-hbox{fill:var(--panel);stroke:var(--line);opacity:.97}
+.uvc-hm{font-family:var(--mono);font-size:9.5px;fill:var(--hi);font-weight:600}
+.uvc-ht{font-family:var(--mono);font-size:9.5px;font-variant-numeric:tabular-nums}
 /* On a phone the 760-unit viewBox scales to ~270px, which would render the 9-unit axis labels at
    about 3 real pixels. Rather than shrink the chart until it lies, it keeps a readable minimum
    width and scrolls inside its own box — the page itself still never scrolls sideways. */
@@ -1474,7 +1523,12 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
   .uvc-y,.uvc-x{font-size:12px}
   .uvc-m{font-size:13px}
   .uvc-baset{font-size:11px}
+  .uvc-hm,.uvc-ht{font-size:11px}
 }
+/* Touch has no hover, so the crosshair readout is a desktop affordance. On a touch screen the
+   month labels and the y-axis carry the reading instead — nothing is hidden behind a gesture that
+   device cannot make. */
+@media(hover:none){.uvc-hit{cursor:default}}
 .uvc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mid);margin-bottom:2px}
 .uvc-key{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .uvc-key i{display:inline-block;width:14px;height:3px;border-radius:2px;flex:none}
@@ -1494,6 +1548,15 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .vm-pu{margin:9px 0;padding:9px 12px;border:1px solid rgba(122,79,224,.35);border-radius:8px;
   background:var(--panel2);font-size:12px;line-height:1.55;color:var(--mid)}
 .vm-pu b{color:var(--hi)}
+/* The AutoX PU restatement (owner review 2026-08-02, point 11). It is a RESTATEMENT of two classes
+   below it, not a 29th class, so it is banded and rule-separated rather than styled like a peer row —
+   and it deliberately does not participate in the 100% sum. The ★ is the same mark on the two classes
+   it draws from, so the overlap is visible in the table rather than only in the footnote. */
+.vm-ax{background:rgba(122,79,224,.13);border-bottom:1px solid var(--collat)}
+.vm-ax td{padding-top:9px;padding-bottom:9px}
+.vm-ax .gd-geo b{color:var(--collat)}
+.vm-star{color:var(--collat);font-size:11px;margin-left:5px;cursor:help;vertical-align:1px}
+.vm-vs{font:500 10.5px var(--mono);color:var(--dim);white-space:nowrap}
 /* DLT brand mix — pickups beside passenger cars, because the finding IS the contrast (pickup
    concentrated in two nameplates, cars fragmenting toward BEV). Two columns that stack on a phone. */
 .vb-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
@@ -1517,7 +1580,7 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
    pickup first, since that is the class carrying most of the book. */
 .rz-winbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0 4px}
 .rz-win{font:500 11.5px var(--mono);color:var(--mid);background:var(--panel2);border:1px solid var(--line);
-  border-radius:7px;padding:4px 10px;cursor:pointer;letter-spacing:.02em}
+  border-radius:7px;padding:4px 10px;cursor:pointer;letter-spacing:.02em;text-align:center;line-height:1.25}
 .rz-win:hover{color:var(--txt);border-color:var(--dim)}
 .rz-win.on{color:var(--collat);border-color:var(--collat);background:rgba(122,79,224,.1)}
 .rz-win:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -1549,10 +1612,19 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .rz-kv th{text-align:left;font-weight:400;font-size:11.5px;color:var(--mid);padding:3px 0;white-space:normal}
 .rz-kv td{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--txt);
   padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap}
-/* The absent-comparison row replaces two rows with one, so it says what is missing and why rather
-   than leaving an em-dash the reader has to interpret. */
-.rz-nocmp{color:var(--gold)!important;font-size:10.5px!important;line-height:1.45;cursor:help;
-  border-top:1px dashed var(--line);padding-top:5px!important}
+/* The seasonal cross-check (owner review 2026-08-02, point 12). It is a control on the trailing
+   move above it, not a second grade, so it is set apart by a rule and quieter type — a reader who
+   stops at the rule has still read the whole answer. Its value cell wraps, because when there is no
+   year-earlier period the cell carries a sentence saying so rather than an em-dash. */
+/* Why the two readings of the same window differ, said at the number rather than in the footnote. */
+.rz-caveat td{font-size:10px;line-height:1.5;color:var(--dim);white-space:normal!important;
+  text-align:left!important;font-family:var(--sans)!important;padding:1px 0 4px!important}
+.rz-caveat td b{color:var(--mid);font-weight:600}
+.rz-xcheck th{border-top:1px dashed var(--line);padding-top:6px!important;font-size:10.5px;color:var(--dim);cursor:help}
+.rz-xcheck td{border-top:1px dashed var(--line);padding-top:6px!important;white-space:normal;font-size:10.5px}
+.rz-xcheck td .s{color:var(--dim);font-family:var(--sans);line-height:1.45}
+/* The month range under each window button — the button says "6 months", this says which six. */
+.rz-wm{display:block;font-size:9px;letter-spacing:.02em;opacity:.72;margin-top:1px;font-weight:400}
 .rz-minh{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);color:var(--dim);
   font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
 .rz-min-tbl{width:100%;margin:4px 0 0;border-collapse:collapse}
@@ -1747,7 +1819,7 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 /* one-line "what's inside" on a collapsed Overview/Competition section — a closed section still has
    to say what it holds, or collapsing it just hides the tab from you. */
 .ovsec-what{font:400 11px var(--sans);color:var(--dim);text-transform:none;letter-spacing:0;
-  flex:0 1 auto;text-align:right;margin-left:auto;padding-left:12px;line-height:1.35}
+  flex:0 1 auto;min-width:0;text-align:right;margin-left:auto;padding-left:12px;line-height:1.35}
 @media(max-width:820px){.ovsec-what{display:none}}
 details.ovsec[open]>summary .ovsec-what{opacity:.45}
 @media print{.ovsec-what{display:none}}
@@ -1877,3 +1949,10 @@ svg.cbcell{vertical-align:middle;display:inline-block}
 .cm-prow:hover{background:var(--panel)}
 .cm-chev{color:var(--accent)}
 .cm-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;line-height:1.55}
+
+/* A ThaiWater gauge reading that is physically implausible AND unsupported by the rest of its own
+   province's stations (owner 2026-08-02: "the comments and the table don't jive"). Shown, because
+   deleting a measured value would be worse, but marked and greyed so it cannot be read as the
+   province's condition — and it no longer ranks or colours the row. */
+.tw-susp{font:600 9px var(--mono);color:var(--gold);border:1px solid var(--gold);border-radius:4px;
+  padding:0 4px;margin-left:5px;white-space:nowrap;cursor:help;vertical-align:1px}

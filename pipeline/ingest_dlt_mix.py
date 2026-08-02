@@ -84,6 +84,13 @@ DIR_PPV = os.path.join(RAW, "stat_1_1_01_first_regis_vehicles_car")
 OUT = os.path.join(ROOT, "source-data", "vehicle_mix_province.json")
 WINDOW = 12  # trailing months for the new-registration mix
 
+# A trailing month can land on the PPV nameplate mirror (stat_1_1_01_first_regis_vehicles_car) as a
+# near-empty CATALOG STUB before the real file arrives — 2026-02 landed as 6 rows against a normal
+# ~1,400+, so summing it into the trailing-12 window understates the PPV share by roughly one
+# twelfth. Same rule + same threshold as the sibling build_vehicle_models.py's STUB_FRACTION, so the
+# two builders can never disagree about what a month is.
+STUB_FRACTION = 0.20
+
 THAI_MONTHS = {"มกราคม": 1, "กุมภาพันธ์": 2, "มีนาคม": 3, "เมษายน": 4, "พฤษภาคม": 5,
                "มิถุนายน": 6, "กรกฎาคม": 7, "สิงหาคม": 8, "กันยายน": 9, "ตุลาคม": 10,
                "พฤศจิกายน": 11, "ธันวาคม": 12}
@@ -143,6 +150,14 @@ def _to_int(x):
 def _be_to_ce(y):
     y = int(y)
     return y - 543 if y > 2400 else y
+
+
+def _median(xs):
+    s = sorted(xs)
+    n = len(s)
+    if not n:
+        return 0.0
+    return float(s[n // 2]) if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
 
 
 def classify_fuel(raw):
@@ -297,19 +312,43 @@ def build():
     ppv_months = _list_ppv_months(DIR_PPV)
     assert ppv_months, ("stat_1_1_01_first_regis_vehicles_car matched 0 month files — the "
                          "filename pattern drifted, see _list_ppv_months()")
-    if len(ppv_months) < WINDOW:
-        return None  # not enough months for a trailing-12 PPV window — ABSENT, not data drift
-    ppv_window = ppv_months[-WINDOW:]
-    ppv_totals = {plate: 0 for plate in PPV_NAMEPLATES}
-    for _y, _m, path in ppv_window:
-        with open(path, encoding="utf-8-sig") as f:
+    # Read every month once: its total row volume (ALL rows, not just PPV matches — the same
+    # completeness metric build_vehicle_models.py uses) plus this series' PPV-nameplate matches, so
+    # a catalog stub is detected identically in both builders.
+    ppv_keys = [(y, m) for y, m, _ in ppv_months]
+    ppv_paths = {(y, m): path for y, m, path in ppv_months}
+    ppv_month_total = {}
+    ppv_month_plates = {}
+    for key in ppv_keys:
+        total = 0
+        plates = {plate: 0 for plate in PPV_NAMEPLATES}
+        with open(ppv_paths[key], encoding="utf-8-sig") as f:
             for row in csv.DictReader(f):
-                nameplate = f"{(row.get('ยี่ห้อ') or '').strip()} {(row.get('รุ่น') or '').strip()}".upper()
                 n = _to_int(row.get("จำนวน"))
+                total += n
+                nameplate = f"{(row.get('ยี่ห้อ') or '').strip()} {(row.get('รุ่น') or '').strip()}".upper()
                 for plate in PPV_NAMEPLATES:
                     if PPV_RE[plate].search(nameplate):
-                        ppv_totals[plate] += n
+                        plates[plate] += n
                         break  # nameplates are mutually exclusive by construction
+        ppv_month_total[key] = total
+        ppv_month_plates[key] = plates
+
+    # Reference median excludes the newest month itself (which may be the very stub under test) —
+    # the same windowing rule as build_vehicle_models.py's `ref`.
+    ppv_ref = _median([ppv_month_total[k] for k in ppv_keys[-13:-1]] or
+                       [ppv_month_total[k] for k in ppv_keys])
+    ppv_stub_keys = [k for k in ppv_keys
+                      if ppv_ref and ppv_month_total[k] < STUB_FRACTION * ppv_ref]
+    ppv_clean_keys = [k for k in ppv_keys if k not in ppv_stub_keys]
+    if len(ppv_clean_keys) < WINDOW:
+        return None  # not enough COMPLETE months for a trailing-12 PPV window — ABSENT, not data drift
+    # Re-anchor on the newest COMPLETE month — never wall clock, and never a stub.
+    ppv_window_keys = ppv_clean_keys[-WINDOW:]
+    ppv_totals = {plate: 0 for plate in PPV_NAMEPLATES}
+    for key in ppv_window_keys:
+        for plate, n in ppv_month_plates[key].items():
+            ppv_totals[plate] += n
 
     # seed every MVA class (ry1..ry18, whatever the stock file actually carried) into every
     # province's new dict at 0 so consumers get a stable key set even for classes with zero
@@ -335,11 +374,12 @@ def build():
     hi = f"{common[-1][0] - 543:04d}-{common[-1][1]:02d}"
 
     ppv_new_national = {
-        "window_months": [f"{y - 543:04d}-{m:02d}" for y, m, _ in ppv_window],
+        "window_months": [f"{y - 543:04d}-{m:02d}" for y, m in ppv_window_keys],
         "total": sum(ppv_totals.values()),
         "by_nameplate": ppv_totals,
         "granularity": "NATIONAL ONLY — this DLT series has no จังหวัด column",
     }
+    excluded_stub_months = [f"{y - 543:04d}-{m:02d}" for y, m in ppv_stub_keys]
 
     return {
         "meta": {
@@ -362,10 +402,19 @@ def build():
                            "definition folds PPVs (Fortuner, MU-X, Pajero Sport, Everest, Terra, GWM Tank "
                            "300/500, and the not-yet-launched Land Cruiser FJ) into 'pickup' because they "
                            "register in รย.1 (<=7 seats), not รย.3; see ppv_new_national below. Trailing "
-                           "12 months of this series' own data.",
+                           "12 months of this series' own data, after excluding any catalog-stub month "
+                           "(see ppv_stub_rule / excluded_stub_months).",
             "stock_asof": stock_asof,
             "new_window_months": [f"{y - 543:04d}-{m:02d}" for y, m in sorted(window)],
             "new_window_label": f"{lo} -> {hi}",
+            "ppv_stub_rule": "a PPV-series month holding under %d%% of the reference median month's "
+                              "total row volume is a catalog stub, not a month, and is excluded from "
+                              "the PPV trailing-12 window, which then re-anchors on the newest complete "
+                              "month — same rule + same threshold as build_vehicle_models.py's "
+                              "STUB_FRACTION, so the two builders can never disagree about what a month "
+                              "is." % int(STUB_FRACTION * 100),
+            "excluded_stub_months": excluded_stub_months,
+            "ppv_window_months": ppv_new_national["window_months"],
             "class_labels": class_labels,
             "n_provinces": len(provinces),
             "n_dropped_stock_rows": dropped_stock_rows,
@@ -395,7 +444,9 @@ def run():
           f"({m['n_provinces']} provinces, {len(m['class_labels'])} classes, "
           f"window {m['new_window_label']}, stock as-of {m['stock_asof']}, "
           f"dropped {m['n_dropped_stock_rows']} stock rows / {m['n_dropped_new_rows']} new rows, "
-          f"PPV overlay {ppv['total']} across {len(ppv['by_nameplate'])} nameplates)")
+          f"PPV overlay {ppv['total']} across {len(ppv['by_nameplate'])} nameplates, "
+          f"PPV window {ppv['window_months'][0]} -> {ppv['window_months'][-1]}"
+          f"{', excluded stub month(s) ' + ', '.join(m['excluded_stub_months']) if m['excluded_stub_months'] else ''})")
     return 0
 
 

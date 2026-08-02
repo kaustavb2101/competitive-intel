@@ -156,6 +156,23 @@ not be guessed: **Play package name**, **Apple app id**, **Google ATC advertiser
 all three from the Thai IP, then extend `pull_app_reviews.py` `APPS`, `pull_apple_reviews.py` `APPS`,
 `pull_google_ads.py` `ADVERTISERS`, and the Thai search term in `pull_pantip.py` `BRANDS["SABUY"]`.
 
+## 0d. Macro-tab owner review follow-ups (2026-08-02) — six open items, ahead of the 2026-08-05 MCOM deck
+The 17-point markup + stale-data audit landed (see `docs/PROGRESS_LOG.md`, 2026-08-02) but is **not
+yet committed or merged** — working tree only, branch `feat/macro-review-17pt`. Six items came out of
+that review still open:
+1. Persist a trailing-12-month current-account aggregate in `build_macro_indicators.py` so the chip
+   can ship without reading as a crisis (April 2026 alone is -7,591 USD million; the trailing 12
+   months net to roughly +847M).
+2. Government debt has no Thai replacement pulled (PDMO not investigated) — the row still shows IMF.
+3. Unemployment's vintage was not re-verified this session (`labour_context.json` → `unemployment`,
+   still 2025).
+4. Co-pay ฿44bn: source and period unconfirmed. Candidate lead is "ไทยช่วยไทย พลัส" (cabinet-approved
+   2026-05-19, government portion ~ ฿49.6bn at its two-month mark) but it doesn't cleanly match
+   ฿44bn, so it was left rather than guessed.
+5. `tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.
+6. The TH/EN language switch was deferred by the owner to Thursday 2026-08-06 (lower priority than
+   the 2026-08-05 deck).
+
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
   `team_pYNrbLMZobN80m4jD7WPWybD`; set Root Directory = current folder).

@@ -30,7 +30,7 @@
 .db-crumb a{color:var(--mid);text-decoration:none;border-bottom:1px dotted transparent}
 .db-crumb a:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .db-crumb b{color:var(--dim);font-weight:500}
-.db-h1{font:700 22px/1.15 'IBM Plex Sans Thai';margin:0 0 3px;letter-spacing:-.01em}
+.db-h1{font:700 22px/1.35 'IBM Plex Sans Thai';margin:0 0 3px;letter-spacing:-.01em}
 .db-h1 .th{color:var(--dim);font-weight:500;font-size:16px;margin-left:6px}
 .db-sub{color:var(--mid);font-size:13.5px;margin:0 0 18px;max-width:70ch;line-height:1.5}
 .db-sub b{color:var(--ink,inherit);font-weight:600}
@@ -49,12 +49,12 @@
 .db-sec .n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700}
 .db-sec2{margin:22px 0 8px;font:600 14px var(--sans,system-ui);color:var(--hi,#eef1f7);letter-spacing:-.1px}
 /* region cards */
-.db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.db-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px}
 .db-card .tape-lab{margin:9px 0 1px;font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border-top:1px solid var(--line);padding-top:8px}
 .db-card .cm.cm-tape span{color:var(--mid)}
 .db-card{display:block;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;color:inherit;transition:border-color .12s,transform .12s}
 .db-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.db-card .rt{font:700 16px/1.1 'IBM Plex Sans Thai';margin-bottom:2px}
+.db-card .rt{font:700 16px/1.35 'IBM Plex Sans Thai';margin-bottom:2px}
 .db-card .rp{font-size:11.5px;color:var(--dim);margin-bottom:11px}
 .db-card .cm{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-top:1px dashed var(--line)}
 .db-card .cm b{font:600 12.5px/1 var(--mono);color:var(--ink,inherit)}
@@ -252,6 +252,13 @@ function renderNational(){
   // every level — otherwise the badges are decoration rather than navigation.
   h+='<div class="db-sec"><span class="n">฿</span> The loan book — measured portfolio truth</div>';
   h+='<div id="db-loanbook"><p class="db-note">Loading the loan book…</p></div>';
+  // COLLATERAL BOOK — MOVED HERE FROM THE MACRO TAB 2026-08-02 (owner review, points 13 + 16:
+  // "Remove and move to acquisition" / "Move this to acquisition"). Macro is EXTERNAL data; what we
+  // hold against the titles is our book, and the book lives in Acquisition. Macro keeps the external
+  // half (resale value, registered stock, new-registration mix, brand resilience) plus one sentence
+  // of exposure so the reader knows why the external move matters.
+  h+='<div class="db-sec"><span class="n">C</span> The collateral book — what we hold against the titles</div>';
+  h+='<div id="db-collatbook"><p class="db-note">Loading the collateral book…</p></div>';
   // region cards
   h+='<div class="db-sec"><span class="n">R</span> Regions — ranked by competitive pressure</div>';
   h+='<div class="db-cards">';
@@ -286,6 +293,80 @@ function renderNational(){
   wireFilter(allProv);
   loadLenses();
   loadLoanBook();
+  loadCollateralBook();
+}
+
+// ---- THE COLLATERAL BOOK (data/collateral_book.json) — moved off the Macro tab 2026-08-02 ----
+// Three tables that all answer "what do we hold, and how much room is there in it":
+//   1. the full collateral mix to 100% (every class, ranked by baht, never by account count)
+//   2. every brand on a title
+//   3. recovery headroom — how far resale can fall before the collateral stops covering the loan
+// Positions are MEASURED (real loan tape). The shock columns are ILLUSTRATIVE: no Thai used-vehicle
+// price index exists to forecast from, so the ladder is applied to measured positions and the
+// RANKING is what's real, not the forecast. Null-safe: absent file → one calm note, no empty tables.
+function loadCollateralBook(){
+  var host=document.getElementById('db-collatbook'); if(!host) return;
+  fetch('data/collateral_book.json').then(function(r){return r.ok?r.json():null;}).catch(function(){return null;})
+   .then(function(j){
+    if(!j||!j.types||!j.types.length){ host.innerHTML='<p class="db-note">The collateral book isn\'t loaded (data/collateral_book.json absent). It populates from the monthly no-PII tape drop.</p>'; return; }
+    var T=j.types, N=j.national||{}, h='';
+    var tier=function(t){return t==='core'?' <span class="th">core</span>':t==='secondary'?' <span class="th">secondary</span>':'';};
+    var head=function(v){return 100-v;};                 // the fall a class absorbs before it is underwater
+    h+='<p class="db-sub">MEASURED — accounts, outstanding and appraised value from the real loan tape (no-PII aggregates, cells ≥30). Ranked by <b>outstanding baht at every grain</b>: ranking by account count would lead with motorcycles, which are '+
+       ((T.filter(function(t){return t.type==='MC';})[0]||{}).n_share_pct||'—')+'% of accounts and '+
+       ((T.filter(function(t){return t.type==='MC';})[0]||{}).os_share_pct||'—')+'% of the money.</p>';
+    // 1 — the full mix to 100%
+    h+='<div class="db-sec2">The full mix to 100% — every collateral class</div>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Collateral</th><th>Outstanding</th><th>% of ฿</th><th>% of accts</th><th>Ticket</th><th>Appraised</th><th>Lent vs value</th><th>90+</th><th>180+</th></tr></thead><tbody>';
+    T.forEach(function(t){
+      h+='<tr><td class="name">'+esc(t.label)+tier(t.tier)+'</td><td>'+bnf(t.os)+'</td><td>'+pct(t.os_share_pct)+'</td>'+
+         '<td>'+pct(t.n_share_pct)+'</td><td>'+baht(t.ticket)+'</td>'+
+         '<td>'+(t.eval_avg==null?'—':baht(t.eval_avg))+'</td>'+
+         '<td>'+(t.ltv_proxy_pct==null?'—':pct(t.ltv_proxy_pct))+'</td>'+
+         '<td style="color:'+sevColor(t.dpd90p_pct)+';font-weight:600">'+pct(t.dpd90p_pct)+'</td>'+
+         '<td style="color:'+sevColor(t.late180_pct)+'">'+pct(t.late180_pct)+'</td></tr>';});
+    h+='</tbody></table></div>';
+    // 2 — every brand on a title
+    var BB=j.brand_book||[];
+    if(BB.length){
+      h+='<div class="db-sec2">Every brand on a title</div>';
+      h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Brand</th><th>Accounts</th><th>Outstanding</th><th>% of ฿</th><th>Ticket</th><th>Appraised</th><th>Lent vs value</th><th>90+</th><th>180+</th></tr></thead><tbody>';
+      BB.forEach(function(b){
+        h+='<tr><td class="name">'+esc(b.brand)+'</td><td>'+num(b.n)+'</td><td>'+bnf(b.os)+'</td>'+
+           '<td>'+pct(b.os_share_pct)+'</td><td>'+baht(b.ticket)+'</td>'+
+           '<td>'+(b.eval_avg==null?'—':baht(b.eval_avg))+'</td>'+
+           '<td>'+(b.ltv_proxy_pct==null?'—':pct(b.ltv_proxy_pct))+'</td>'+
+           '<td style="color:'+sevColor(b.dpd90p_pct)+';font-weight:600">'+pct(b.dpd90p_pct)+'</td>'+
+           '<td style="color:'+sevColor(b.late180_pct)+'">'+pct(b.late180_pct)+'</td></tr>';});
+      h+='</tbody></table></div>';
+    }
+    // 3 — recovery headroom (the shock ladder)
+    var WL=T.filter(function(t){return t.ltv_proxy_pct!=null;});
+    var bookHead=WL.length?Math.min.apply(null,WL.map(function(t){return head(t.ltv_proxy_pct);})):null;
+    var thinBr=null,nBr=0;
+    if(j.branches){ var all=[]; Object.keys(j.branches).forEach(function(k){all=all.concat(j.branches[k]);});
+      nBr=all.length; thinBr=all.filter(function(b){return (b.ltv_proxy_pct||0)>=60;}).length; }
+    h+='<div class="db-sec2">Recovery headroom — how far resale can fall before the collateral stops covering the loan</div>';
+    h+='<p class="db-sub" style="margin:2px 0 6px">Per class we hold the <b>measured</b> outstanding per account and the <b>measured</b> appraised value per account; <b>headroom</b> is the gap. At a '+
+       (N.ltv_proxy_pct==null?'~52':N.ltv_proxy_pct)+'% lent-to-value ratio a 10% dip changes nothing, so the ladder is scaled to the fall that actually crosses 100%. The shock columns are <b>ILLUSTRATIVE</b> — no Thai used-vehicle price index exists to forecast from — but they are applied to measured positions, so the ranking is real.'+
+       (thinBr!=null?' <b>'+thinBr+'</b> of '+num(nBr)+' branches already lend more than 60% of assessed value; nothing is uncovered until resale falls '+(bookHead==null?'far':bookHead.toFixed(0)+'%')+', but those branches reach that point first.':'')+'</p>';
+    h+='<div class="db-tblwrap"><table class="db-tbl"><thead><tr><th>Collateral</th><th>Outstanding</th><th>Ticket</th><th>Appraised</th><th>Lent vs value</th><th>Headroom</th><th>After −20%</th><th>After −35%</th><th>After −50%</th></tr></thead><tbody>';
+    T.forEach(function(t){
+      if(t.ltv_proxy_pct==null){
+        h+='<tr><td class="name">'+esc(t.label)+'</td><td>'+bnf(t.os)+'</td><td>'+baht(t.ticket)+'</td>'+
+           '<td colspan="6" style="color:var(--dim,#8590a6)">no appraised value carried on this class</td></tr>'; return; }
+      var hd=head(t.ltv_proxy_pct);
+      var cell=function(f){var cov=t.eval_avg*(1-f/100)/t.ticket*100;
+        var col=cov<100?'var(--agri,#d1544b)':cov<115?'var(--gold,#e6b450)':'#12a06e';
+        return '<td style="color:'+col+'">'+cov.toFixed(0)+'%</td>';};
+      h+='<tr><td class="name">'+esc(t.label)+tier(t.tier)+'</td><td>'+bnf(t.os)+'</td><td>'+baht(t.ticket)+'</td>'+
+         '<td>'+baht(t.eval_avg)+'</td><td>'+pct(t.ltv_proxy_pct)+'</td>'+
+         '<td style="color:'+(hd<40?'var(--agri,#d1544b)':hd<48?'var(--gold,#e6b450)':'#12a06e')+';font-weight:600">'+hd.toFixed(1)+'%</td>'+
+         cell(20)+cell(35)+cell(50)+'</tr>';});
+    h+='</tbody></table></div>';
+    h+='<p class="db-note">Cover = appraised value after the fall, as a share of what is still lent; below 100% the collateral no longer covers the loan. The external half of this question — what resale values are actually doing, what is registered, and which brands the new collateral is — lives on the <a href="index.html#overview'+(THEME_QS?'&'+THEME_QS.replace(/^&/,''):'')+'">Macro tab</a>.</p>';
+    host.innerHTML=h;
+  });
 }
 
 // ---- LOAN BOOK — consolidated measured loan-tape tables (data/tape_real.json) ----

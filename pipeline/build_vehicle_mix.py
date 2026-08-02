@@ -167,7 +167,9 @@ def build():
     # it never touches _assert_sums_100. National only — the source series has no province split,
     # so this must NOT be pushed into provinces{} or regions{} (no data supports it there).
     ppv = staging["ppv_new_national"]
-    ry3_new_count = national["new"]["ry3"]["count"]
+    ry3_new = national["new"]["ry3"]
+    ry3_new_count = ry3_new["count"]
+    ry3_new_share_pct = ry3_new["share_pct"]
     ry3_stock = national["stock"]["ry3"]
     pu_new_count = ry3_new_count + ppv["total"]
     national["pu_incl_ppv"] = {
@@ -182,6 +184,19 @@ def build():
                        "nameplate at model grain, not by registration class.",
         "granularity": "national only — no province or region breakdown is possible",
         "by_nameplate": dict(sorted(ppv["by_nameplate"].items())),
+    }
+
+    # A flatter, page-friendly restatement of the same overlay: the AutoX-basis PU count/share next
+    # to the plain รย.3 count/share it replaces, plus a one-line note naming the definition. Additive
+    # only — pu_incl_ppv above is untouched, and this key is new so nothing existing can regress.
+    national["autox_pu"] = {
+        "count": pu_new_count,
+        "share_pct": _pct(pu_new_count, national["new_total"]),
+        "ry3_count": ry3_new_count,
+        "ry3_share_pct": ry3_new_share_pct,
+        "note": "AutoX house definition: PU = รย.3 (pickup) nameplate + PPV nameplate (Fortuner, "
+                "MU-X, Pajero Sport, Everest, Terra, GWM Tank 300/500, Trailblazer, SW4, Land "
+                "Cruiser FJ) in any registration class, replacing the plain รย.3 class count/share.",
     }
 
     types = [{"id": cid, "label": class_labels[cid]["label"], "law": class_labels[cid]["law"],
@@ -208,6 +223,9 @@ def build():
             "new_window_months": staging["meta"]["new_window_months"],
             "new_window_label": staging["meta"]["new_window_label"],
             "ppv_window_months": ppv["window_months"],  # own trailing-12, see national.pu_incl_ppv
+            "excluded_stub_months": staging["meta"].get("excluded_stub_months", []),  # catalog-stub
+            # PPV months dropped from the window above (see ingest_dlt_mix.py's ppv_stub_rule) —
+            # carried through so the exclusion is auditable on the page, not just in staging.
             "fuel_buckets": FUEL_BUCKETS,
             "n_provinces": len(provinces),
             "n_regions": len(regions),

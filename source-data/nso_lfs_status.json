@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "title": "National employment by industry (agriculture share) and by work status (self-employment share) — the MEASURED quarterly NSO series behind the 'AGRI JOBS' and 'SELF-EMPLOYED' chips on the macro strip",
+    "generated_by": "pipeline/pull_nso_lfs_status.py",
+    "label": "MEASURED — สำนักงานสถิติแห่งชาติ (NSO), Labour Force Survey, tables LFS_02_20535_8 (by region x industry x sex) and LFS_02_20535_9 (by region x work-status x sex), summed to national. Thousand persons, quarterly.",
+    "source_urls": {
+      "industry": "https://catalogapi.nso.go.th/api/index?table=LFS_02_20535_8&format=csv",
+      "work_status": "https://catalogapi.nso.go.th/api/index?table=LFS_02_20535_9&format=csv"
+    },
+    "unit": "thousand persons",
+    "frequency": "quarterly",
+    "pulled": "2026-08-02",
+    "quarters_available_both_tables": [
+      "2563-ไตรมาส 1",
+      "2563-ไตรมาส 2",
+      "2563-ไตรมาส 3",
+      "2563-ไตรมาส 4",
+      "2564-ไตรมาส 1",
+      "2564-ไตรมาส 2",
+      "2564-ไตรมาส 3",
+      "2564-ไตรมาส 4",
+      "2565-ไตรมาส 1",
+      "2565-ไตรมาส 2",
+      "2565-ไตรมาส 3",
+      "2565-ไตรมาส 4",
+      "2566-ไตรมาส 1",
+      "2566-ไตรมาส 2",
+      "2566-ไตรมาส 3",
+      "2566-ไตรมาส 4",
+      "2567-ไตรมาส 1",
+      "2567-ไตรมาส 2",
+      "2567-ไตรมาส 3",
+      "2567-ไตรมาส 4",
+      "2568-ไตรมาส 1",
+      "2568-ไตรมาส 2",
+      "2568-ไตรมาส 3",
+      "2568-ไตรมาส 4",
+      "2569-ไตรมาส 1"
+    ],
+    "definitions": {
+      "agri_jobs": "share of employed persons whose industry is agriculture, forestry and fishing (เกษตรกรรม การป่าไม้ และการประมง) — same concept as labour_context.json's ILOSTAT ECO_AGGREGATE_AGR sector share.",
+      "self_employed": "(employer + own-account + contributing-family) / total employed — same concept and same three ICSE-93 classes as labour_context.json's self_employment (own_account + contributing_family + employers), excluding the ~0.02%-of-employment 'การรวมกลุ่ม' cooperative-member class from both for exact comparability."
+    },
+    "data_quality_note": "Neither table publishes a nationwide (ทั่วประเทศ) row — every total here is this script's own sum of the 7 NSO regions x 2 sexes. Rows whose SEX column is not exactly ชาย/หญิง are dropped: every row for YEAR=2567 (2024, all 4 quarters) in the work-status table has SEX and WORK_STATUS swapped in NSO's own export (a known artifact for that vintage only, confirmed by inspecting raw rows) — filtering avoids mis-summing those, at the cost of no 2567 figure from this script (the existing annual ILOSTAT-sourced 2024/2025 chips still cover that gap). The two tables independently cross-validate every clean quarter's grand total to within 0.5%.",
+    "acceptance_test": "2 spot-verified quarters (2568-ไตรมาส 1, 2569-ไตรมาส 1) checked against fixed anchors on every pull, plus a live 0.5%% cross-validation between the two source tables' grand totals; a mismatch hard-fails rather than silently landing a skewed share."
+  },
+  "latest": {
+    "year_be": "2569",
+    "quarter": "ไตรมาส 1",
+    "n_rows_industry": 289,
+    "n_rows_status": 76,
+    "employed_total_thousand": 41194.44,
+    "agriculture": {
+      "employed_thousand": 11252.79,
+      "share_pct": 27.32
+    },
+    "self_employed": {
+      "employed_thousand": 20696.58,
+      "share_pct": 50.24,
+      "components_thousand": {
+        "นายจ้าง": 973.63,
+        "ทำงานส่วนตัว": 13807.2,
+        "ช่วยธุรกิจครอบครัว": 5915.75
+      }
+    },
+    "work_status_breakdown_thousand": {
+      "การรวมกลุ่ม": 7.77,
+      "ช่วยธุรกิจครอบครัว": 5915.75,
+      "ทำงานส่วนตัว": 13807.2,
+      "นายจ้าง": 973.63,
+      "ลูกจ้างรัฐบาล": 3785.27,
+      "ลูกจ้างเอกชน": 16704.84
+    }
+  },
+  "prior_quarter": {
+    "year_be": "2568",
+    "quarter": "ไตรมาส 4",
+    "n_rows_industry": 287,
+    "n_rows_status": 75,
+    "employed_total_thousand": 39752.81,
+    "agriculture": {
+      "employed_thousand": 11481.07,
+      "share_pct": 28.88
+    },
+    "self_employed": {
+      "employed_thousand": 20212.97,
+      "share_pct": 50.85,
+      "components_thousand": {
+        "นายจ้าง": 1020.34,
+        "ทำงานส่วนตัว": 13215.81,
+        "ช่วยธุรกิจครอบครัว": 5976.82
+      }
+    },
+    "work_status_breakdown_thousand": {
+      "การรวมกลุ่ม": 12.75,
+      "ช่วยธุรกิจครอบครัว": 5976.82,
+      "ทำงานส่วนตัว": 13215.81,
+      "นายจ้าง": 1020.34,
+      "ลูกจ้างรัฐบาล": 3647.73,
+      "ลูกจ้างเอกชน": 15879.35
+    }
+  },
+  "year_ago_quarter": {
+    "year_be": "2568",
+    "quarter": "ไตรมาส 1",
+    "n_rows_industry": 286,
+    "n_rows_status": 74,
+    "employed_total_thousand": 39383.25,
+    "agriculture": {
+      "employed_thousand": 10592.23,
+      "share_pct": 26.9
+    },
+    "self_employed": {
+      "employed_thousand": 19520.11,
+      "share_pct": 49.56,
+      "components_thousand": {
+        "นายจ้าง": 1021.32,
+        "ทำงานส่วนตัว": 13149.09,
+        "ช่วยธุรกิจครอบครัว": 5349.7
+      }
+    },
+    "work_status_breakdown_thousand": {
+      "การรวมกลุ่ม": 17.4,
+      "ช่วยธุรกิจครอบครัว": 5349.7,
+      "ทำงานส่วนตัว": 13149.09,
+      "นายจ้าง": 1021.32,
+      "ลูกจ้างรัฐบาล": 3768.92,
+      "ลูกจ้างเอกชน": 16076.88
+    }
+  },
+  "trend": {
+    "vs_prior_quarter": {
+      "quarter": "2568-ไตรมาส 4",
+      "agri_employed_delta_thousand": -228.28,
+      "agri_share_delta_pp": -1.56,
+      "self_employed_share_delta_pp": -0.61
+    },
+    "vs_year_ago_quarter": {
+      "quarter": "2568-ไตรมาส 1",
+      "agri_employed_delta_thousand": 660.56,
+      "agri_share_delta_pp": 0.42,
+      "self_employed_share_delta_pp": 0.68
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "title": "Thailand real GDP growth — latest actual quarter (Quarterly GDP, QGDP)",
+    "generated_by": "pipeline/pull_nesdc_gdp.py",
+    "label": "MEASURED — Office of the National Economic and Social Development Council (NESDC / สภาพัฒน์), the actual government compiler of Thai GDP. NOT a Bank of Thailand series — BOT's own real-sector statistics page links out to NESDC rather than hosting it (verified 2026-08-02).",
+    "source": "สำนักงานสภาพัฒนาการเศรษฐกิจและสังคมแห่งชาติ (NESDC) — ผลิตภัณฑ์มวลรวมในประเทศ รายไตรมาส (Quarterly Gross Domestic Product)",
+    "source_page_url": "https://www.nesdc.go.th/",
+    "source_file_url": "https://www.nesdc.go.th/?p=110051&ddl=110052",
+    "unit": "% YoY (real, chain-volume measure) unless noted",
+    "pulled": "2026-08-02"
+  },
+  "latest": {
+    "quarter": "Q1/2569",
+    "yoy_pct": 2.8,
+    "prior_quarter": {
+      "quarter": "Q4/2568",
+      "yoy": 2.5
+    },
+    "agriculture_yoy_pct": 1.2,
+    "non_agriculture_yoy_pct": 3.0,
+    "qoq_sa_pct": 0.7
+  }
+}
