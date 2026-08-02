@@ -3,6 +3,157 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Intelligence loop (deploy-health, obj #2): site-health probe now guards `contested_pop.json` + `exit_whitespace.json` — merged to master
+
+Autonomous market & service intelligence loop, safeguard-gated auto-merge. The formal `plan_cycle.py`
+backlog shows every autonomous pillar item done (98%, the one open item owner-side), so this run took a
+genuine **service/deploy-health** finding surfaced by a fresh render-path audit: the nightly live
+site-health probe (`pipeline/check_site_health.py`) covered **27 of the ~88** SPA-fetched `data/*.json`
+layers, and **two surfaced exec reads still had no deploy probe** — each live-degrades SILENTLY (no phone
+alert) when its file is missing/truncated after a deploy:
+
+- **`contested_pop.json`** — the command-center (`#home`) "MOST CONTESTED GROUND" front-door lead
+  (`renderHomeWhitespace` reads `CPOP.top`) **and** the National-map contested lens (index-aligned
+  `.rows[i]=[pop10, contested_pop]`, obj #2).
+- **`exit_whitespace.json`** — the Competition (`#acq`) rival-fragility board under the Q1-2026 BoT
+  registration deadline (`drawExitWhitespace` reads `.districts` + `meta.competitor_census`, obj #2,
+  ESTIMATED) — the last surfaced `#acq` competitive read with no probe.
+
+**Fix.** Added `_shape_contested_pop` (asserts the `.top` leaderboard shape AND the exact **2015**
+index-aligned `.rows` length a truncated build would silently misalign) and `_shape_exit_whitespace`
+(asserts a non-empty ~928-amphoe `.districts` board carrying the sort key + component split + the
+`meta.competitor_census` block the readout headline reads — shape not values, robust to census growth),
+plus their two `DATA_FILES` entries. Probe coverage **27 → 29** exec layers.
+
+**Verified.** Negative tests confirm the validators reject empty / short / mis-aligned shapes (not
+vacuously passing); the offline `--local platform` path and the **live master production alias** both
+report **95/95 HEALTHY** with both new files served HTTP 200 and shape-sane. Determinism gate **115
+passed · 0 failed** (data integrity 448/448); this change touches only the CI probe script + docs (no
+`platform/data` file, no gated `--check` golden), so provenance is unaffected and reproduces exactly
+(130 layers · 435 files · 70 measured · 60 estimated · 0 unlabelled). No app-visual change → committed
+straight to master per the safeguard protocol. Fresh scan re-confirmed the rest of the data room clean:
+0 broken references, 0 genuine orphan signal layers. Findings recorded in `docs/SERVICE_AUDIT.md`
+(2026-08-02 (b)). **Next recommended intelligence task:** continue closing the probe gap — the highest-value
+remaining unprobed exec reads are `segment_exposure.json` (`#exposure` obj-#1 concentration) and
+`province_stress_index.json` (the obj-#1 parent of the front-door `province_pressure` synthesis).
+
+## 2026-08-02 — Integration loop (objective #1): GISTDA repeated-flood hazard → per-district & per-branch MEASURED flag (`flood_hazard.json`) — PR (app-visual)
+
+Autonomous integration & improvement loop. Shipped NEXT_STEPS §0, the top OPEN backlog item that was
+verified-reachable but never built (backlog #1 FPO-PICO and #2 branch-cropland were confirmed already
+built, gated, and surfaced). GISTDA's ArcGIS "Repeated Flooding 2005-2016" FeatureServer is open from
+CI (no key, re-verified 2026-08-02), so the flood-hazard census is now a MEASURED portfolio-risk layer.
+
+**What & why (objective #1 — collateral / PD risk):** where the ground under a branch's book floods
+repeatedly, the collateral (title vehicles) and borrower cash-flow (farm/shop) carry a chronic
+recovery hazard. The layer answers "how many of the 12 years 2005-2016 did this branch's district
+flood" (`flood_freq` 1-12) per district AND per branch. Result: **1,848 / 2,015 branches** sit in a
+repeat-flood district, **685** in a CHRONIC one (≥7/12 yrs); 75 provinces flooded, Ayutthaya 16/16
+districts (classic flood-plain sanity check).
+
+**The MAX-not-SUM discipline (the trap NEXT_STEPS §0 warned about):** the GISTDA polygons OVERLAP
+(per-event, not dissolved), so any flooded-AREA total is a 3-9x overstatement artifact. This layer
+claims **no area** — only the per-district `MAX(flood_freq)`, which is immune to overlap, pulled
+server-side. Area is left for a later geometry-dissolve pass.
+
+**Pieces:**
+- `pipeline/pull_flood_hazard.py` — NETWORK (not gated); server-side `MAX(flood_freq)` grouped by
+  district in one call (838 flood-affected districts, < the 1000 maxRecordCount; bails loudly on
+  `exceededTransferLimit`) → committed `source-data/gistda_flood_hazard.json` (144 KB, re-pullable).
+  Committed so the builder's `--check` runs for REAL in CI (not a skip like the Thai-IP pulls).
+- `pipeline/build_flood_hazard.py` — DETERMINISTIC, network-free, `--check`-gated. Joins onto
+  `amphoe.json` (Thai name first, English fallback — amphoe.json stores ~86 districts in English) →
+  `platform/data/flood_hazard.json` {meta, by_province, by_district, branches[freq]}. Per-branch flag
+  via the `branch_amphoe` index. 825/838 districts resolve; the 13 unresolved are ALL zero-branch —
+  asserted at build time (`UnresolvedBranchError`), so no branch silently loses a real flood flag.
+- App: a MEASURED branch-popup line on `#map` ("Repeat-flood yrs (GISTDA 2005–16)"), lazy-loaded +
+  null-guarded, mirroring the branch_density/fuel popup-line pattern. Distinct from the LIVE
+  `thaiwater_flood.json` water-level pulse — this is the STRUCTURAL hazard.
+- Gate: `build_flood_hazard.py --check` in `tests/run.sh`; `flood_hazard.json` registered in the
+  index-alignment + fingerprint gates and given a dedicated `check_flood_hazard` in `validate_data.py`
+  (freq int 0..12, by_district 1..12, length == branches); `build_provenance.py` re-run → classified
+  **measured** (130 layers, 70 measured / 60 estimated / 0 unlabelled).
+
+**Verification:** `bash tests/run.sh check` → **116 passed, 0 failed** (all 8 new flood assertions
+green, `--check` byte-exact). `#map` renders `data-errors="[]"`; `health.sh` on the national page →
+all checks pass incl. `#map present`. The one render FAIL (`rayong-catchment.html`, a deck.gl WebGL
+scene) and the batch-health flakiness are pre-existing/environmental — that page loads **zero**
+references to app.js, so this app.js-only change cannot reach it. Because the change alters app
+visuals, shipped as a **PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number (NEXT_STEPS §0 remainder) — download the
+GISTDA polygons and dissolve per district with shapely before claiming any area; OR surface the
+`flood_hazard.json` province rollup on `#overview`/`#exposure` as a portfolio flood-exposure readout
+(the by_province layer is already built and unused in the UI).
+
+## 2026-08-02 — UX loop: scope="col" on the Overview macro-route tables (a11y, WCAG 1.3.1) — merged + deploy-verified (PR #257)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. All seven originally-audited backlog items
+(favicon / contrast / theme / map-overlap / province-overflow / branches-lead / isochrone-guard) remain
+fixed, so this run took the highest-priority genuinely-open, auto-merge-safe item: the **fifth slice of
+`ux-table-scope-sweep-appjs`**. The other open backlog items are explicitly out of scope for an unattended
+surgical run (`ux-acquire-taxonomy-mandate` = bigger-than-surgical mandate work; `ux-viewport-user-scalable-3dpages`
+= needs on-device gesture testing).
+
+**Fix.** The ~14 Overview (`#overview`) macro-route tables in `app.js` built their column-header rows as
+inline template literals with bare `<th>` / `<th title="…">` (no `scope="col"`), so a screen reader could
+not reliably associate each data cell with its column header. Added `scope="col"` to every column `<th>`
+(EV-watch/DLT `#region`, drought SPEI, amphoe-crops, province-LFS, DLT vehicle-reg, region-debt, DBD-firms,
+SFI-NPL, ThaiWater flood+rain, informal-debt, and coverage `#estates`/`#mws`/`#cws`) and `scope="colgroup"`
+to the two ThaiWater `colspan="4"` section-title cells. Matches `data.html`'s convention and the four prior
+slices. Diff = 17-for-17 line replacement, scope-only; zero visual change (scope is non-presentational).
+Remaining bare family: the `#acq` rival-pulse/ads/YouTube/sentiment/footprint tables.
+
+**Safeguards (all passed).** (a) `tests/run.sh check` 115-passed/0-failed; (b) headless `index.html#overview`
+render `data-errors=[]`, PNG self-reviewed (layout identical), settled DOM 213 `scope="col"` + 2 `scope="colgroup"`;
+(c) no secrets in diff; (d) diff matches intent, no stray files.
+
+**Merge + deploy-verify.** Squash-merged PR #257 → master (`969a6e6`), branch deleted. Production alias
+`competitive-intel-git-master-…vercel.app`: root **200**, `/app.js` **200**, `/index.html` → **200**
+(the bare 308 is Vercel's configured `cleanUrls` redirect, not a regression). Confirmed the deployed
+`app.js` carries the change (`<th scope="col">Quarter</th>` present) — fresh build, no rollback needed.
+
+**Recommend next.** The last `ux-table-scope-sweep-appjs` slice — the `#acq` rival-pulse/ads/YouTube/
+sentiment/footprint tables — to close the a11y sweep; then `qa-visual-baseline-stale` (a deliberate
+`tests/run.sh baseline` refresh) so the CI visual-regression gate carries signal again now the five-pillar
+IA is stable.
+
+## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
+
+Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the
+last data-feed workflow still leaking the recurring **provenance-drift** class the progress log has been
+closing feed-by-feed. `.github/workflows/data-macro.yml` (weekly BIS + World Bank macro pull → committed
+`platform/data/macro_indicators.json`) opened its draft PR **without regenerating the two layers that file
+feeds**: `provenance.json` censuses `macro_indicators.json`'s bytes (confirmed — the file is in the
+manifest) and `build_live_board.py` reads it (3 refs), so every macro refresh drifted both and the PR's own
+`bash tests/run.sh check` came up **red** on `build_provenance.py --check` (+ `validate_data.py`'s byte-size
+row) — the PR could never auto-merge green without a manual provenance regen, exactly the drift the
+imf-weo / thaiwater / fuel-price / scenarios / nabc / sfi / search-demand / social-listening feeds already
+fixed in lockstep.
+
+**Fix (mirrors the imf-weo sibling exactly):** inserted a "Rebuild live_board + provenance when
+macro_indicators changed" step between the pull and the commit — `git status --porcelain` guards on the
+file, and on change runs `build_live_board.py` then `build_provenance.py` (deterministic, network-free,
+live_board first so provenance censuses its refreshed bytes); the commit's `git add` now stages
+`macro_indicators.json` + `live_board.json` + `provenance.json` together. CI-config only — no `platform/`
+app/data/visual change, so a direct commit to master (not a PR) per the safeguard rule.
+
+**Safeguard protocol — all passed:** (a) baseline `bash tests/run.sh check` → **115 passed, 0 failed**
+(the workflow YAML is not gate-material, so the gate is unaffected by this change); (b) no secrets in diff
+(the lone `token` hit is the pre-existing `GH_TOKEN: ${{ github.token }}` Actions context ref, unchanged);
+(c) diff = only `.github/workflows/data-macro.yml` + this log entry; (d) provenance / no-fabrication intact —
+no data values touched. **Verification:** confirmed `build_live_board.py --check` and
+`build_provenance.py --check` both reproduce byte-exact on the clean tree; confirmed `macro_indicators.json`
+is in `provenance.json`'s census and read by `build_live_board.py`; a drift simulation (perturb → restore
+via `git checkout`) left the tree clean (verified `git status`). **Deploy-verify:** prod alias `/` → 200,
+`/data/meta.json` → 200, `/data/competitor_coverage.json` → 200 (no app change to regress).
+
+**Next recommended (intelligence):** audit the remaining draft-PR data workflows that commit a
+`platform/data/*` file for the same lockstep gap — spot-check `data-gov-census.yml` (commits
+`source-data/`, likely provenance-safe) and `data-overture.yml`; then a small **shared composite action**
+(`rebuild-provenance-if-changed`) would let every feed reuse one audited regen step instead of the
+copy-pasted block, killing this drift class at the source.
+
 ## 2026-08-02 — UX loop (a11y): scope="col" on the district amphoe tables — MERGED + DEPLOYED + VERIFIED (PR #255)
 
 Autonomous UX-improvement loop, safeguard-gated auto-merge. Fourth slice of `ux-table-scope-sweep-appjs`

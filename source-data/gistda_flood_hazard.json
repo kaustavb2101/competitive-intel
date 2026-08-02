@@ -1,0 +1,6717 @@
+{
+ "meta": {
+  "source": "GISTDA Repeated Flooding 2005-2016 (FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016) FeatureServer — server-side MAX(flood_freq) grouped by district (amphoe).",
+  "service": "https://gistdaportal.gistda.or.th/data/rest/services/FL_Flood/FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016/FeatureServer/0",
+  "label": "MEASURED — per-district MAX(flood_freq): count of the 12 years 2005-2016 in which any ground in the district flooded (1-12). Immune to the per-event polygon overlap that makes area totals unreliable; no flooded-AREA is claimed.",
+  "data_vintage": "2005-2016",
+  "pulled": "2026-08-02",
+  "n_districts_flooded": 838,
+  "generated_by": "pipeline/pull_flood_hazard.py"
+ },
+ "districts": [
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "01",
+   "ap_tn": "พระนคร",
+   "ap_en": "Phra Nakhon",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "02",
+   "ap_tn": "ดุสิต",
+   "ap_en": "Dusit",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "03",
+   "ap_tn": "หนองจอก",
+   "ap_en": "Nong Chok",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "04",
+   "ap_tn": "บางรัก",
+   "ap_en": "Bang Rak",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "05",
+   "ap_tn": "บางเขน",
+   "ap_en": "Bang Khen",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "06",
+   "ap_tn": "บางกะปิ",
+   "ap_en": "Bang Kapi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "08",
+   "ap_tn": "ป้อมปราบศัตรูพ่าย",
+   "ap_en": "Pom Prap Sattruphai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "10",
+   "ap_tn": "มีนบุรี",
+   "ap_en": "Min Buri",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "11",
+   "ap_tn": "ลาดกระบัง",
+   "ap_en": "Lat Krabang",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "12",
+   "ap_tn": "ยานนาวา",
+   "ap_en": "Yannawa",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "13",
+   "ap_tn": "สัมพันธวงศ์",
+   "ap_en": "Samphanthawong",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "14",
+   "ap_tn": "พญาไท",
+   "ap_en": "Phaya Thai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "15",
+   "ap_tn": "ธนบุรี",
+   "ap_en": "Thon Buri",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "16",
+   "ap_tn": "บางกอกใหญ่",
+   "ap_en": "Bangkok Yai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "17",
+   "ap_tn": "ห้วยขวาง",
+   "ap_en": "Huai Khwang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "18",
+   "ap_tn": "คลองสาน",
+   "ap_en": "Khlong San",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "19",
+   "ap_tn": "ตลิ่งชัน",
+   "ap_en": "Taling Chan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "20",
+   "ap_tn": "บางกอกน้อย",
+   "ap_en": "Bangkok Noi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "21",
+   "ap_tn": "บางขุนเทียน",
+   "ap_en": "Bang Khun Thian",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "22",
+   "ap_tn": "ภาษีเจริญ",
+   "ap_en": "Phasi Charoen",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "23",
+   "ap_tn": "หนองแขม",
+   "ap_en": "Nong Khaem",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "24",
+   "ap_tn": "ราษฎร์บูรณะ",
+   "ap_en": "Rat Burana",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "25",
+   "ap_tn": "บางพลัด",
+   "ap_en": "Bang Phlat",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "26",
+   "ap_tn": "ดินแดง",
+   "ap_en": "Din Daeng",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "27",
+   "ap_tn": "บึงกุ่ม",
+   "ap_en": "Bung Kum",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "28",
+   "ap_tn": "สาทร",
+   "ap_en": "Sa Thon",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "29",
+   "ap_tn": "บางซื่อ",
+   "ap_en": "Bang Su",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "30",
+   "ap_tn": "จตุจักร",
+   "ap_en": "Chatuchak",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "31",
+   "ap_tn": "บางคอแหลม",
+   "ap_en": "Bang Kho Laem",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "32",
+   "ap_tn": "ประเวศ",
+   "ap_en": "Prawet",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "33",
+   "ap_tn": "คลองเตย",
+   "ap_en": "Khlong Toei",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "34",
+   "ap_tn": "สวนหลวง",
+   "ap_en": "Suan Luang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "35",
+   "ap_tn": "จอมทอง",
+   "ap_en": "Chom Thong",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "36",
+   "ap_tn": "ดอนเมือง",
+   "ap_en": "Don Mueang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "38",
+   "ap_tn": "ลาดพร้าว",
+   "ap_en": "Lat Phrao",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "39",
+   "ap_tn": "วัฒนา",
+   "ap_en": "Watthana",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "40",
+   "ap_tn": "บางแค",
+   "ap_en": "Bang Khae",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "41",
+   "ap_tn": "หลักสี่",
+   "ap_en": "Lak Si",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "42",
+   "ap_tn": "สายไหม",
+   "ap_en": "Sai Mai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "43",
+   "ap_tn": "คันนายาว",
+   "ap_en": "Khanna Yao",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "44",
+   "ap_tn": "สะพานสูง",
+   "ap_en": "Saphan Sung",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "45",
+   "ap_tn": "วังทองหลาง",
+   "ap_en": "Wang Thong Lang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "46",
+   "ap_tn": "คลองสามวา",
+   "ap_en": "Khlong Sam Wa",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "48",
+   "ap_tn": "ทวีวัฒนา",
+   "ap_en": "Thawi Watthana",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "49",
+   "ap_tn": "ทุ่งครุ",
+   "ap_en": "Thung Khu",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "10",
+   "pv_tn": "กรุงเทพมหานคร",
+   "ap_code": "50",
+   "ap_tn": "บางบอน",
+   "ap_en": "Bang Bon",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "11",
+   "pv_tn": "สมุทรปราการ",
+   "ap_code": "02",
+   "ap_tn": "บางบ่อ",
+   "ap_en": "Bang Bo",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "11",
+   "pv_tn": "สมุทรปราการ",
+   "ap_code": "03",
+   "ap_tn": "บางพลี",
+   "ap_en": "Bang Phli",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "11",
+   "pv_tn": "สมุทรปราการ",
+   "ap_code": "04",
+   "ap_tn": "พระประแดง",
+   "ap_en": "Phra Pradaeng",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "11",
+   "pv_tn": "สมุทรปราการ",
+   "ap_code": "06",
+   "ap_tn": "บางเสาธง",
+   "ap_en": "Bang Sao Thong",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองนนทบุรี",
+   "ap_en": "Mueang Nonthaburi",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "02",
+   "ap_tn": "บางกรวย",
+   "ap_en": "Bang Kruai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "03",
+   "ap_tn": "บางใหญ่",
+   "ap_en": "Bang Yai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "04",
+   "ap_tn": "บางบัวทอง",
+   "ap_en": "Bang Bua Thong",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "05",
+   "ap_tn": "ไทรน้อย",
+   "ap_en": "Sai Noi",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "12",
+   "pv_tn": "นนทบุรี",
+   "ap_code": "06",
+   "ap_tn": "ปากเกร็ด",
+   "ap_en": "Pak Kret",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองปทุมธานี",
+   "ap_en": "Mueang Pathum Thani",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "02",
+   "ap_tn": "คลองหลวง",
+   "ap_en": "khlong Luang",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "03",
+   "ap_tn": "ธัญบุรี",
+   "ap_en": "Thanyaburi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "04",
+   "ap_tn": "หนองเสือ",
+   "ap_en": "Nong Suea",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "05",
+   "ap_tn": "ลาดหลุมแก้ว",
+   "ap_en": "Lat Lum Kaeo",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "06",
+   "ap_tn": "ลำลูกกา",
+   "ap_en": "Lam Luk Ka",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "13",
+   "pv_tn": "ปทุมธานี",
+   "ap_code": "07",
+   "ap_tn": "สามโคก",
+   "ap_en": "Sam Khok",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "01",
+   "ap_tn": "พระนครศรีอยุธยา",
+   "ap_en": "Phra Nakhon Si Ayutthaya",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "02",
+   "ap_tn": "ท่าเรือ",
+   "ap_en": "Tha Ruea",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "03",
+   "ap_tn": "นครหลวง",
+   "ap_en": "Nakhon Luang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "04",
+   "ap_tn": "บางไทร",
+   "ap_en": "Bang Sai",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "05",
+   "ap_tn": "บางบาล",
+   "ap_en": "Bang Ban",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "06",
+   "ap_tn": "บางปะอิน",
+   "ap_en": "Bang Pa-in",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "07",
+   "ap_tn": "บางปะหัน",
+   "ap_en": "Bang Pahan",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "08",
+   "ap_tn": "ผักไห่",
+   "ap_en": "Phak Hai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "09",
+   "ap_tn": "ภาชี",
+   "ap_en": "Phachi",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "10",
+   "ap_tn": "ลาดบัวหลวง",
+   "ap_en": "Lat Bua Luang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "11",
+   "ap_tn": "วังน้อย",
+   "ap_en": "Wang Noi",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "12",
+   "ap_tn": "เสนา",
+   "ap_en": "Sena",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "13",
+   "ap_tn": "บางซ้าย",
+   "ap_en": "Bang Sai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "14",
+   "ap_tn": "อุทัย",
+   "ap_en": "Uthai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "15",
+   "ap_tn": "มหาราช",
+   "ap_en": "Maha Rat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "14",
+   "pv_tn": "พระนครศรีอยุธยา",
+   "ap_code": "16",
+   "ap_tn": "บ้านแพรก",
+   "ap_en": "Ban Phraek",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "01",
+   "ap_tn": "เมืองอ่างทอง",
+   "ap_en": "Mueang Ang Thong",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "02",
+   "ap_tn": "ไชโย",
+   "ap_en": "Chaiyo",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "03",
+   "ap_tn": "ป่าโมก",
+   "ap_en": "Pa Mok",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "04",
+   "ap_tn": "โพธิ์ทอง",
+   "ap_en": "Pho Thong",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "05",
+   "ap_tn": "แสวงหา",
+   "ap_en": "Sawaeng Ha",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "06",
+   "ap_tn": "วิเศษชัยชาญ",
+   "ap_en": "Wiset Chai Chan",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "15",
+   "pv_tn": "อ่างทอง",
+   "ap_code": "07",
+   "ap_tn": "สามโก้",
+   "ap_en": "Samko",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองลพบุรี",
+   "ap_en": "Mueang Lop Buri",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "02",
+   "ap_tn": "พัฒนานิคม",
+   "ap_en": "Phatthana Nikhom",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "03",
+   "ap_tn": "โคกสำโรง",
+   "ap_en": "Khok Samrong",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "04",
+   "ap_tn": "ชัยบาดาล",
+   "ap_en": "Chai Badan",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "05",
+   "ap_tn": "ท่าวุ้ง",
+   "ap_en": "Tha Wung",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "06",
+   "ap_tn": "บ้านหมี่",
+   "ap_en": "Ban Mi",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "07",
+   "ap_tn": "ท่าหลวง",
+   "ap_en": "Tha Luang",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "08",
+   "ap_tn": "สระโบสถ์",
+   "ap_en": "Sa Bot",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "09",
+   "ap_tn": "โคกเจริญ",
+   "ap_en": "Khok Charoen",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "10",
+   "ap_tn": "ลำสนธิ",
+   "ap_en": "Lam Sonthi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "16",
+   "pv_tn": "ลพบุรี",
+   "ap_code": "11",
+   "ap_tn": "หนองม่วง",
+   "ap_en": "Nong Muang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองสิงห์บุรี",
+   "ap_en": "Mueang Sing Buri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "02",
+   "ap_tn": "บางระจัน",
+   "ap_en": "Bang Rachan",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "03",
+   "ap_tn": "ค่ายบางระจัน",
+   "ap_en": "Khai Bang Rachan",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "04",
+   "ap_tn": "พรหมบุรี",
+   "ap_en": "Phrom Buri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "05",
+   "ap_tn": "ท่าช้าง",
+   "ap_en": "Tha Chang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "17",
+   "pv_tn": "สิงห์บุรี",
+   "ap_code": "06",
+   "ap_tn": "อินทร์บุรี",
+   "ap_en": "In Buri",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "01",
+   "ap_tn": "เมืองชัยนาท",
+   "ap_en": "Mueang Chai Nat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "02",
+   "ap_tn": "มโนรมย์",
+   "ap_en": "Manorom",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "03",
+   "ap_tn": "วัดสิงห์",
+   "ap_en": "Wat Sing",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "04",
+   "ap_tn": "สรรพยา",
+   "ap_en": "Sapphaya",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "05",
+   "ap_tn": "สรรคบุรี",
+   "ap_en": "Sankhaburi",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "06",
+   "ap_tn": "หันคา",
+   "ap_en": "Hankha",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "07",
+   "ap_tn": "หนองมะโมง",
+   "ap_en": "Nong Mamong",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "18",
+   "pv_tn": "ชัยนาท",
+   "ap_code": "08",
+   "ap_tn": "เนินขาม",
+   "ap_en": "Noen Kham",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองสระบุรี",
+   "ap_en": "Mueang Saraburi",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "02",
+   "ap_tn": "แก่งคอย",
+   "ap_en": "Kaeng Khoi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "03",
+   "ap_tn": "หนองแค",
+   "ap_en": "Nong Khae",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "04",
+   "ap_tn": "วิหารแดง",
+   "ap_en": "Wihan Daeng",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "05",
+   "ap_tn": "หนองแซง",
+   "ap_en": "Nong Saeng",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "06",
+   "ap_tn": "บ้านหมอ",
+   "ap_en": "Ban Mo",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "07",
+   "ap_tn": "ดอนพุด",
+   "ap_en": "Don Phut",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "08",
+   "ap_tn": "หนองโดน",
+   "ap_en": "Nong Don",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "09",
+   "ap_tn": "พระพุทธบาท",
+   "ap_en": "Phra Phutthabat",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "10",
+   "ap_tn": "เสาไห้",
+   "ap_en": "Sao Hai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "12",
+   "ap_tn": "วังม่วง",
+   "ap_en": "Wang Muang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "19",
+   "pv_tn": "สระบุรี",
+   "ap_code": "13",
+   "ap_tn": "เฉลิมพระเกียรติ",
+   "ap_en": "Chaloem Phra Kiet",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองชลบุรี",
+   "ap_en": "Mueang Chon Buri",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "02",
+   "ap_tn": "บ้านบึง",
+   "ap_en": "Ban Bueng",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "05",
+   "ap_tn": "พานทอง",
+   "ap_en": "Phan Thong",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "06",
+   "ap_tn": "พนัสนิคม",
+   "ap_en": "Phanat Nikhom",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "07",
+   "ap_tn": "ศรีราชา",
+   "ap_en": "Si Racha",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "10",
+   "ap_tn": "บ่อทอง",
+   "ap_en": "Bo Thong",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "20",
+   "pv_tn": "ชลบุรี",
+   "ap_code": "11",
+   "ap_tn": "เกาะจันทร์",
+   "ap_en": "Ko Chan",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "21",
+   "pv_tn": "ระยอง",
+   "ap_code": "01",
+   "ap_tn": "เมืองระยอง",
+   "ap_en": "Mueang Rayong",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "21",
+   "pv_tn": "ระยอง",
+   "ap_code": "03",
+   "ap_tn": "แกลง",
+   "ap_en": "Klaeng",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "21",
+   "pv_tn": "ระยอง",
+   "ap_code": "05",
+   "ap_tn": "บ้านค่าย",
+   "ap_en": "Ban Khai",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "21",
+   "pv_tn": "ระยอง",
+   "ap_code": "06",
+   "ap_tn": "ปลวกแดง",
+   "ap_en": "Pluak Daeng",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "21",
+   "pv_tn": "ระยอง",
+   "ap_code": "08",
+   "ap_tn": "นิคมพัฒนา",
+   "ap_en": "Nikhom Phatthana",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "22",
+   "pv_tn": "จันทบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองจันทบุรี",
+   "ap_en": "Mueang Chanthaburi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "22",
+   "pv_tn": "จันทบุรี",
+   "ap_code": "02",
+   "ap_tn": "ขลุง",
+   "ap_en": "Khlung",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "22",
+   "pv_tn": "จันทบุรี",
+   "ap_code": "03",
+   "ap_tn": "ท่าใหม่",
+   "ap_en": "Tha Mai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "22",
+   "pv_tn": "จันทบุรี",
+   "ap_code": "05",
+   "ap_tn": "มะขาม",
+   "ap_en": "Makham",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "22",
+   "pv_tn": "จันทบุรี",
+   "ap_code": "06",
+   "ap_tn": "แหลมสิงห์",
+   "ap_en": "Laem Sing",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "23",
+   "pv_tn": "ตราด",
+   "ap_code": "01",
+   "ap_tn": "เมืองตราด",
+   "ap_en": "Mueang Trat",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "23",
+   "pv_tn": "ตราด",
+   "ap_code": "03",
+   "ap_tn": "เขาสมิง",
+   "ap_en": "Khao Saming",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "01",
+   "ap_tn": "เมืองฉะเชิงเทรา",
+   "ap_en": "Mueang Chachoengsao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "02",
+   "ap_tn": "บางคล้า",
+   "ap_en": "Bang Khla",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "03",
+   "ap_tn": "บางน้ำเปรี้ยว",
+   "ap_en": "Bang Nam Priao",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "04",
+   "ap_tn": "บางปะกง",
+   "ap_en": "Bang Pakong",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "05",
+   "ap_tn": "บ้านโพธิ์",
+   "ap_en": "Ban Pho",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "06",
+   "ap_tn": "พนมสารคาม",
+   "ap_en": "Phanom Sarakham",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "07",
+   "ap_tn": "ราชสาส์น",
+   "ap_en": "Ratchasan",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "08",
+   "ap_tn": "สนามชัยเขต",
+   "ap_en": "Sanam Chai Khet",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "09",
+   "ap_tn": "แปลงยาว",
+   "ap_en": "Pleang Yao",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "10",
+   "ap_tn": "ท่าตะเกียบ",
+   "ap_en": "Tha Takiap",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "24",
+   "pv_tn": "ฉะเชิงเทรา",
+   "ap_code": "11",
+   "ap_tn": "คลองเขื่อน",
+   "ap_en": "Khlong Khuean",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองปราจีนบุรี",
+   "ap_en": "Mueang Prachin Buri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "02",
+   "ap_tn": "กบินทร์บุรี",
+   "ap_en": "Kabin Buri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "03",
+   "ap_tn": "นาดี",
+   "ap_en": "Na Di",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "06",
+   "ap_tn": "บ้านสร้าง",
+   "ap_en": "Ban Sang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "07",
+   "ap_tn": "ประจันตคาม",
+   "ap_en": "Prachantakham",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "08",
+   "ap_tn": "ศรีมหาโพธิ",
+   "ap_en": "Si Maha Phot",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "25",
+   "pv_tn": "ปราจีนบุรี",
+   "ap_code": "09",
+   "ap_tn": "ศรีมโหสถ",
+   "ap_en": "Si Mahosot",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "26",
+   "pv_tn": "นครนายก",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครนายก",
+   "ap_en": "Mueang Nakhon Nayok",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "26",
+   "pv_tn": "นครนายก",
+   "ap_code": "02",
+   "ap_tn": "ปากพลี",
+   "ap_en": "Pak Phli",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "26",
+   "pv_tn": "นครนายก",
+   "ap_code": "03",
+   "ap_tn": "บ้านนา",
+   "ap_en": "Ban Na",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "26",
+   "pv_tn": "นครนายก",
+   "ap_code": "04",
+   "ap_tn": "องครักษ์",
+   "ap_en": "Ongkharak",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "01",
+   "ap_tn": "เมืองสระแก้ว",
+   "ap_en": "Mueang Sa Kaeo",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "02",
+   "ap_tn": "คลองหาด",
+   "ap_en": "Khlong Hat",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "03",
+   "ap_tn": "ตาพระยา",
+   "ap_en": "Ta Phraya",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "04",
+   "ap_tn": "วังน้ำเย็น",
+   "ap_en": "Wang Nam Yen",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "05",
+   "ap_tn": "วัฒนานคร",
+   "ap_en": "Watthana Nakhon",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "06",
+   "ap_tn": "อรัญประเทศ",
+   "ap_en": "Aranyaprathet",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "07",
+   "ap_tn": "เขาฉกรรจ์",
+   "ap_en": "Khao Chakan",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "27",
+   "pv_tn": "สระแก้ว",
+   "ap_code": "08",
+   "ap_tn": "โคกสูง",
+   "ap_en": "Khok Sung",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครราชสีมา",
+   "ap_en": "Mueang Nakhon Ratchasima",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "02",
+   "ap_tn": "ครบุรี",
+   "ap_en": "Khon Buri",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "03",
+   "ap_tn": "เสิงสาง",
+   "ap_en": "Soeng Sang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "04",
+   "ap_tn": "คง",
+   "ap_en": "Khong",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "05",
+   "ap_tn": "บ้านเหลื่อม",
+   "ap_en": "Ban Lueam",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "06",
+   "ap_tn": "จักราช",
+   "ap_en": "Chakkarat",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "07",
+   "ap_tn": "โชคชัย",
+   "ap_en": "Chok Chai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "08",
+   "ap_tn": "ด่านขุนทด",
+   "ap_en": "Dan Khun Thot",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "09",
+   "ap_tn": "โนนไทย",
+   "ap_en": "Non Thai",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "10",
+   "ap_tn": "โนนสูง",
+   "ap_en": "Non Sung",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "11",
+   "ap_tn": "ขามสะแกแสง",
+   "ap_en": "Kham Sakaesaeng",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "12",
+   "ap_tn": "บัวใหญ่",
+   "ap_en": "Bua Yai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "13",
+   "ap_tn": "ประทาย",
+   "ap_en": "Prathai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "14",
+   "ap_tn": "ปักธงชัย",
+   "ap_en": "Pak Thong Chai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "15",
+   "ap_tn": "พิมาย",
+   "ap_en": "Phimai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "16",
+   "ap_tn": "ห้วยแถลง",
+   "ap_en": "Huai Thalaeng",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "17",
+   "ap_tn": "ชุมพวง",
+   "ap_en": "Chum Phuang",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "18",
+   "ap_tn": "สูงเนิน",
+   "ap_en": "Sung Noen",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "19",
+   "ap_tn": "ขามทะเลสอ",
+   "ap_en": "Kham Thale So",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "20",
+   "ap_tn": "สีคิ้ว",
+   "ap_en": "Si Khio",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "21",
+   "ap_tn": "ปากช่อง",
+   "ap_en": "Pak Chong",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "22",
+   "ap_tn": "หนองบุญมาก",
+   "ap_en": "Nong Bunmak",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "23",
+   "ap_tn": "แก้งสนามนาง",
+   "ap_en": "Kaeng Sanam Nang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "24",
+   "ap_tn": "โนนแดง",
+   "ap_en": "Non Daeng",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "25",
+   "ap_tn": "วังน้ำเขียว",
+   "ap_en": "Wang Nam Khiao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "26",
+   "ap_tn": "เทพารักษ์",
+   "ap_en": "Thepharak",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "27",
+   "ap_tn": "เมืองยาง",
+   "ap_en": "Mueang Yang",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "28",
+   "ap_tn": "พระทองคำ",
+   "ap_en": "Phra Thong Kham",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "29",
+   "ap_tn": "ลำทะเมนชัย",
+   "ap_en": "Lamtaman Chai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "30",
+   "ap_tn": "บัวลาย",
+   "ap_en": "Bua Lai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "31",
+   "ap_tn": "สีดา",
+   "ap_en": "Sida",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "30",
+   "pv_tn": "นครราชสีมา",
+   "ap_code": "32",
+   "ap_tn": "เฉลิมพระเกียรติ",
+   "ap_en": "Chaloem Phra Kiet",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "01",
+   "ap_tn": "เมืองบุรีรัมย์",
+   "ap_en": "Mueang Buri Ram",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "02",
+   "ap_tn": "คูเมือง",
+   "ap_en": "Khu Mueang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "03",
+   "ap_tn": "กระสัง",
+   "ap_en": "Krasang",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "04",
+   "ap_tn": "นางรอง",
+   "ap_en": "Nang Rong",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "05",
+   "ap_tn": "หนองกี่",
+   "ap_en": "Nong Ki",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "06",
+   "ap_tn": "ละหานทราย",
+   "ap_en": "Lahan Sai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "07",
+   "ap_tn": "ประโคนชัย",
+   "ap_en": "Prakhon Chai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "08",
+   "ap_tn": "บ้านกรวด",
+   "ap_en": "Ban Kruat",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "09",
+   "ap_tn": "พุทไธสง",
+   "ap_en": "Phutthaisong",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "10",
+   "ap_tn": "ลำปลายมาศ",
+   "ap_en": "Lam Plai Mat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "11",
+   "ap_tn": "สตึก",
+   "ap_en": "Satuek",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "12",
+   "ap_tn": "ปะคำ",
+   "ap_en": "Pakham",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "13",
+   "ap_tn": "นาโพธิ์",
+   "ap_en": "Na Pho",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "14",
+   "ap_tn": "หนองหงส์",
+   "ap_en": "Nong Hong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "15",
+   "ap_tn": "พลับพลาชัย",
+   "ap_en": "Phlapphla Chai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "16",
+   "ap_tn": "ห้วยราช",
+   "ap_en": "Huai Rat",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "17",
+   "ap_tn": "โนนสุวรรณ",
+   "ap_en": "Non Din Daeng",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "18",
+   "ap_tn": "ชำนิ",
+   "ap_en": "Chamni",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "19",
+   "ap_tn": "บ้านใหม่ไชยพจน์",
+   "ap_en": "Ban Mai Chaiyaphot",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "20",
+   "ap_tn": "โนนดินแดง",
+   "ap_en": "Non Din Daeng",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "21",
+   "ap_tn": "บ้านด่าน",
+   "ap_en": "Ban Dan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "22",
+   "ap_tn": "แคนดง",
+   "ap_en": "Khaen Dong",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "31",
+   "pv_tn": "บุรีรัมย์",
+   "ap_code": "23",
+   "ap_tn": "เฉลิมพระเกียรติ",
+   "ap_en": "Chaloem Phra Kiet",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "01",
+   "ap_tn": "เมืองสุรินทร์",
+   "ap_en": "Mueang Surin",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "02",
+   "ap_tn": "ชุมพลบุรี",
+   "ap_en": "Chumphon Buri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "03",
+   "ap_tn": "ท่าตูม",
+   "ap_en": "Tha Tum",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "04",
+   "ap_tn": "จอมพระ",
+   "ap_en": "Chom Phra",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "05",
+   "ap_tn": "ปราสาท",
+   "ap_en": "Prasat",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "06",
+   "ap_tn": "กาบเชิง",
+   "ap_en": "Kap Choeng",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "07",
+   "ap_tn": "รัตนบุรี",
+   "ap_en": "Rattanaburi",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "08",
+   "ap_tn": "สนม",
+   "ap_en": "Sanom",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "09",
+   "ap_tn": "ศีขรภูมิ",
+   "ap_en": "Sikhoraphum",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "10",
+   "ap_tn": "สังขะ",
+   "ap_en": "Sangkha",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "11",
+   "ap_tn": "ลำดวน",
+   "ap_en": "Lamduan",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "12",
+   "ap_tn": "สำโรงทาบ",
+   "ap_en": "Samrong Thap",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "13",
+   "ap_tn": "บัวเชด",
+   "ap_en": "Buachet",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "14",
+   "ap_tn": "พนมดงรัก",
+   "ap_en": "Phanom Dong Rak",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "15",
+   "ap_tn": "ศรีณรงค์",
+   "ap_en": "Si Narong",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "16",
+   "ap_tn": "เขวาสินรินทร์",
+   "ap_en": "Khwao Sinarin",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "32",
+   "pv_tn": "สุรินทร์",
+   "ap_code": "17",
+   "ap_tn": "โนนนารายณ์",
+   "ap_en": "Non Narai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "01",
+   "ap_tn": "เมืองศรีสะเกษ",
+   "ap_en": "Mueang Si Sa Ket",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "02",
+   "ap_tn": "ยางชุมน้อย",
+   "ap_en": "Yang Chum Noi",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "03",
+   "ap_tn": "กันทรารมย์",
+   "ap_en": "Kanthararom",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "04",
+   "ap_tn": "กันทรลักษ์",
+   "ap_en": "Kantharalak",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "05",
+   "ap_tn": "ขุขันธ์",
+   "ap_en": "Khukhan",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "06",
+   "ap_tn": "ไพรบึง",
+   "ap_en": "Phrai Bueng",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "07",
+   "ap_tn": "ปรางค์กู่",
+   "ap_en": "Prang Ku",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "08",
+   "ap_tn": "ขุนหาญ",
+   "ap_en": "Khun Han",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "09",
+   "ap_tn": "ราษีไศล",
+   "ap_en": "Rasi Salai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "10",
+   "ap_tn": "อุทุมพรพิสัย",
+   "ap_en": "Uthumphon Phisai",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "11",
+   "ap_tn": "บึงบูรพ์",
+   "ap_en": "Bueng Bun",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "12",
+   "ap_tn": "ห้วยทับทัน",
+   "ap_en": "Huai Thap Than",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "13",
+   "ap_tn": "โนนคูณ",
+   "ap_en": "Non Khun",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "14",
+   "ap_tn": "ศรีรัตนะ",
+   "ap_en": "Si Rattana",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "15",
+   "ap_tn": "น้ำเกลี้ยง",
+   "ap_en": "Nam Kliang",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "16",
+   "ap_tn": "วังหิน",
+   "ap_en": "Wang Hin",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "17",
+   "ap_tn": "ภูสิงห์",
+   "ap_en": "Phu Sing",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "18",
+   "ap_tn": "เมืองจันทร์",
+   "ap_en": "Mueang Chan",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "19",
+   "ap_tn": "เบญจลักษ์",
+   "ap_en": "Benchalak",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "20",
+   "ap_tn": "พยุห์",
+   "ap_en": "Phayu",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "21",
+   "ap_tn": "โพธิ์ศรีสุวรรณ",
+   "ap_en": "Pho Si Suwan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "33",
+   "pv_tn": "ศรีสะเกษ",
+   "ap_code": "22",
+   "ap_tn": "ศิลาลาด",
+   "ap_en": "Sila Lat",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองอุบลราชธานี",
+   "ap_en": "Mueang Ubon Ratchathani",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "02",
+   "ap_tn": "ศรีเมืองใหม่",
+   "ap_en": "Si Mueang Mai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "03",
+   "ap_tn": "โขงเจียม",
+   "ap_en": "Khong Chiam",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "04",
+   "ap_tn": "เขื่องใน",
+   "ap_en": "Khueang Nai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "05",
+   "ap_tn": "เขมราฐ",
+   "ap_en": "Khemarat",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "07",
+   "ap_tn": "เดชอุดม",
+   "ap_en": "Det Udom",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "08",
+   "ap_tn": "นาจะหลวย",
+   "ap_en": "Na Chaluai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "09",
+   "ap_tn": "น้ำยืน",
+   "ap_en": "Nam Yuen",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "10",
+   "ap_tn": "บุณฑริก",
+   "ap_en": "Boontharik",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "11",
+   "ap_tn": "ตระการพืชผล",
+   "ap_en": "Trakan Phuet Phon",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "12",
+   "ap_tn": "กุดข้าวปุ้น",
+   "ap_en": "Kut Khaopun",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "14",
+   "ap_tn": "ม่วงสามสิบ",
+   "ap_en": "Muang Sam Sip",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "15",
+   "ap_tn": "วารินชำราบ",
+   "ap_en": "Warin Chamrap",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "19",
+   "ap_tn": "พิบูลมังสาหาร",
+   "ap_en": "Phibun Mangsahan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "20",
+   "ap_tn": "ตาลสุม",
+   "ap_en": "Tan Sum",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "22",
+   "ap_tn": "สำโรง",
+   "ap_en": "Samrong",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "24",
+   "ap_tn": "ดอนมดแดง",
+   "ap_en": "Don Mot Daeng",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "25",
+   "ap_tn": "สิรินธร",
+   "ap_en": "Sirindhorn",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "26",
+   "ap_tn": "ทุ่งศรีอุดม",
+   "ap_en": "Thung Si Udom",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "29",
+   "ap_tn": "นาเยีย",
+   "ap_en": "Na Yia",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "30",
+   "ap_tn": "นาตาล",
+   "ap_en": "Na Tan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "31",
+   "ap_tn": "เหล่าเสือโก้ก",
+   "ap_en": "Lao Suea Kok",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "32",
+   "ap_tn": "สว่างวีระวงศ์",
+   "ap_en": "Sawang Wirawong",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "34",
+   "pv_tn": "อุบลราชธานี",
+   "ap_code": "33",
+   "ap_tn": "น้ำขุ่น",
+   "ap_en": "Nam Khun",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "01",
+   "ap_tn": "เมืองยโสธร",
+   "ap_en": "Mueang Yasothon",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "02",
+   "ap_tn": "ทรายมูล",
+   "ap_en": "Sai Mun",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "03",
+   "ap_tn": "กุดชุม",
+   "ap_en": "Kut Chum",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "04",
+   "ap_tn": "คำเขื่อนแก้ว",
+   "ap_en": "Kham Khuean Kaeo",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "05",
+   "ap_tn": "ป่าติ้ว",
+   "ap_en": "Pa Tio",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "06",
+   "ap_tn": "มหาชนะชัย",
+   "ap_en": "Maha Chana Chai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "07",
+   "ap_tn": "ค้อวัง",
+   "ap_en": "Kho Wang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "08",
+   "ap_tn": "เลิงนกทา",
+   "ap_en": "Loeng Nok Tha",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "35",
+   "pv_tn": "ยโสธร",
+   "ap_code": "09",
+   "ap_tn": "ไทยเจริญ",
+   "ap_en": "Thai Charoen",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "01",
+   "ap_tn": "เมืองชัยภูมิ",
+   "ap_en": "Mueang Chaiyaphum",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "02",
+   "ap_tn": "บ้านเขว้า",
+   "ap_en": "Ban Khwao",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "03",
+   "ap_tn": "คอนสวรรค์",
+   "ap_en": "Khon Sawan",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "04",
+   "ap_tn": "เกษตรสมบูรณ์",
+   "ap_en": "Kaset Sombun",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "05",
+   "ap_tn": "หนองบัวแดง",
+   "ap_en": "Nong Bua Daeng",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "06",
+   "ap_tn": "จัตุรัส",
+   "ap_en": "Chatturat",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "07",
+   "ap_tn": "บำเหน็จณรงค์",
+   "ap_en": "Bamnet Narong",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "08",
+   "ap_tn": "หนองบัวระเหว",
+   "ap_en": "Nong Bua Rawe",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "09",
+   "ap_tn": "เทพสถิต",
+   "ap_en": "Thep Sathit",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "10",
+   "ap_tn": "ภูเขียว",
+   "ap_en": "Phu Khiao",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "11",
+   "ap_tn": "บ้านแท่น",
+   "ap_en": "Ban Thaen",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "12",
+   "ap_tn": "แก้งคร้อ",
+   "ap_en": "Kaeng Khro",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "13",
+   "ap_tn": "คอนสาร",
+   "ap_en": "Khon San",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "15",
+   "ap_tn": "เนินสง่า",
+   "ap_en": "Noen Sa-nga",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "36",
+   "pv_tn": "ชัยภูมิ",
+   "ap_code": "16",
+   "ap_tn": "ซับใหญ่",
+   "ap_en": "Sap Yai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "01",
+   "ap_tn": "เมืองอำนาจเจริญ",
+   "ap_en": "Mueang Amnat Charoen",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "02",
+   "ap_tn": "ชานุมาน",
+   "ap_en": "Chanuman",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "03",
+   "ap_tn": "ปทุมราชวงศา",
+   "ap_en": "Pathum Ratchawongsa",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "04",
+   "ap_tn": "พนา",
+   "ap_en": "Phana",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "05",
+   "ap_tn": "เสนางคนิคม",
+   "ap_en": "Senangkhanikhom",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "06",
+   "ap_tn": "หัวตะพาน",
+   "ap_en": "Hua Taphan",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "37",
+   "pv_tn": "อำนาจเจริญ",
+   "ap_code": "07",
+   "ap_tn": "ลืออำนาจ",
+   "ap_en": "Lue Amnat",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "01",
+   "ap_tn": "บึงกาฬ",
+   "ap_en": "Bueng Kan",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "02",
+   "ap_tn": "พรเจริญ",
+   "ap_en": "Phon Charoen",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "03",
+   "ap_tn": "โซ่พิสัย",
+   "ap_en": "So Phisai",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "04",
+   "ap_tn": "เซกา",
+   "ap_en": "Seka",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "05",
+   "ap_tn": "ปากคาด",
+   "ap_en": "Pak Khat",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "06",
+   "ap_tn": "บึงโขงหลง",
+   "ap_en": "Bueng Khong Long",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "07",
+   "ap_tn": "ศรีวิไล",
+   "ap_en": "Si Wilai",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "38",
+   "pv_tn": "บึงกาฬ",
+   "ap_code": "08",
+   "ap_tn": "บุ่งคล้า",
+   "ap_en": "Bung Khla",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "01",
+   "ap_tn": "เมืองหนองบัวลำภู",
+   "ap_en": "Mueang Nong Bua Lam Phu",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "02",
+   "ap_tn": "นากลาง",
+   "ap_en": "Na Klang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "03",
+   "ap_tn": "โนนสัง",
+   "ap_en": "Non Sang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "04",
+   "ap_tn": "ศรีบุญเรือง",
+   "ap_en": "Si Bun Rueang",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "05",
+   "ap_tn": "สุวรรณคูหา",
+   "ap_en": "Suwannakhuha",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "39",
+   "pv_tn": "หนองบัวลำภู",
+   "ap_code": "06",
+   "ap_tn": "นาวัง",
+   "ap_en": "Na Wang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "01",
+   "ap_tn": "เมืองขอนแก่น",
+   "ap_en": "Mueang Khon Kaen",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "02",
+   "ap_tn": "บ้านฝาง",
+   "ap_en": "Ban Fang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "03",
+   "ap_tn": "พระยืน",
+   "ap_en": "Phra Yuen",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "04",
+   "ap_tn": "หนองเรือ",
+   "ap_en": "Nong Ruea",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "05",
+   "ap_tn": "ชุมแพ",
+   "ap_en": "Chum Phae",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "06",
+   "ap_tn": "สีชมพู",
+   "ap_en": "Si Chomphu",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "07",
+   "ap_tn": "น้ำพอง",
+   "ap_en": "Nam Phong",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "08",
+   "ap_tn": "อุบลรัตน์",
+   "ap_en": "Ubolratana",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "10",
+   "ap_tn": "บ้านไผ่",
+   "ap_en": "Ban Phai",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "11",
+   "ap_tn": "เปือยน้อย",
+   "ap_en": "Pueai Noi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "12",
+   "ap_tn": "พล",
+   "ap_en": "Phon",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "13",
+   "ap_tn": "แวงใหญ่",
+   "ap_en": "Waeng Yai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "14",
+   "ap_tn": "แวงน้อย",
+   "ap_en": "Waeng Noi",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "15",
+   "ap_tn": "หนองสองห้อง",
+   "ap_en": "Nong Song Hong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "16",
+   "ap_tn": "ภูเวียง",
+   "ap_en": "Phu Wiang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "17",
+   "ap_tn": "มัญจาคีรี",
+   "ap_en": "Mancha Khiri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "18",
+   "ap_tn": "ชนบท",
+   "ap_en": "Chonnabot",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "19",
+   "ap_tn": "เขาสวนกวาง",
+   "ap_en": "Khao Suan Kwang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "20",
+   "ap_tn": "ภูผาม่าน",
+   "ap_en": "Phu Phaman",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "21",
+   "ap_tn": "ซำสูง",
+   "ap_en": "Sam Sung",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "22",
+   "ap_tn": "โคกโพธิ์ไชย",
+   "ap_en": "Khok Pho Chai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "23",
+   "ap_tn": "หนองนาคำ",
+   "ap_en": "Nong Na Kham",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "24",
+   "ap_tn": "บ้านแฮด",
+   "ap_en": "Ban Haet",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "25",
+   "ap_tn": "โนนศิลา",
+   "ap_en": "Non Sila",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "40",
+   "pv_tn": "ขอนแก่น",
+   "ap_code": "26",
+   "ap_tn": "เวียงเก่า",
+   "ap_en": "Wiang Kao",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองอุดรธานี",
+   "ap_en": "Mueang Udon Thani",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "02",
+   "ap_tn": "กุดจับ",
+   "ap_en": "Kut Chap",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "03",
+   "ap_tn": "หนองวัวซอ",
+   "ap_en": "Nong Wua So",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "04",
+   "ap_tn": "กุมภวาปี",
+   "ap_en": "Kumphawapi",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "06",
+   "ap_tn": "หนองหาน",
+   "ap_en": "Nong Saeng",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "07",
+   "ap_tn": "ทุ่งฝน",
+   "ap_en": "Thung Fon",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "08",
+   "ap_tn": "ไชยวาน",
+   "ap_en": "Chai Wan",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "09",
+   "ap_tn": "ศรีธาตุ",
+   "ap_en": "Si That",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "10",
+   "ap_tn": "วังสามหมอ",
+   "ap_en": "Wang Sam Mo",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "11",
+   "ap_tn": "บ้านดุง",
+   "ap_en": "Ban Dung",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "17",
+   "ap_tn": "บ้านผือ",
+   "ap_en": "Ban Phue",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "18",
+   "ap_tn": "น้ำโสม",
+   "ap_en": "Nam Som",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "19",
+   "ap_tn": "เพ็ญ",
+   "ap_en": "Phen",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "20",
+   "ap_tn": "สร้างคอม",
+   "ap_en": "Sang Khom",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "23",
+   "ap_tn": "พิบูลย์รักษ์",
+   "ap_en": "Phibun Rak",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "24",
+   "ap_tn": "กู่แก้ว",
+   "ap_en": "Ku Kaeo",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "41",
+   "pv_tn": "อุดรธานี",
+   "ap_code": "25",
+   "ap_tn": "ประจักษ์ศิลปาคม",
+   "ap_en": "Prachaksinlapakhom",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "01",
+   "ap_tn": "เมืองเลย",
+   "ap_en": "Mueang Loei",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "03",
+   "ap_tn": "เชียงคาน",
+   "ap_en": "Chiang Khan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "05",
+   "ap_tn": "ด่านซ้าย",
+   "ap_en": "Dan Sai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "08",
+   "ap_tn": "ท่าลี่",
+   "ap_en": "Tha Li",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "10",
+   "ap_tn": "ภูกระดึง",
+   "ap_en": "Phu Kradueng",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "42",
+   "pv_tn": "เลย",
+   "ap_code": "12",
+   "ap_tn": "ผาขาว",
+   "ap_en": "Pha  Khao",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "01",
+   "ap_tn": "เมืองหนองคาย",
+   "ap_en": "Mueang Nong Khai",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "02",
+   "ap_tn": "ท่าบ่อ",
+   "ap_en": "Tha Bo",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "05",
+   "ap_tn": "โพนพิสัย",
+   "ap_en": "Phon Phisai",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "07",
+   "ap_tn": "ศรีเชียงใหม่",
+   "ap_en": "Si Chiang Mai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "08",
+   "ap_tn": "สังคม",
+   "ap_en": "Sangkhom",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "14",
+   "ap_tn": "สระใคร",
+   "ap_en": "Sakhrai",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "15",
+   "ap_tn": "เฝ้าไร่",
+   "ap_en": "Fao Rai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "16",
+   "ap_tn": "รัตนวาปี",
+   "ap_en": "Rattanawapi",
+   "maxfreq": 12
+  },
+  {
+   "pv_code": "43",
+   "pv_tn": "หนองคาย",
+   "ap_code": "17",
+   "ap_tn": "โพธิ์ตาก",
+   "ap_en": "Pho Tak",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "01",
+   "ap_tn": "เมืองมหาสารคาม",
+   "ap_en": "Mueang Maha Sarakham",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "02",
+   "ap_tn": "แกดำ",
+   "ap_en": "Kae Dam",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "03",
+   "ap_tn": "โกสุมพิสัย",
+   "ap_en": "Kosum Phisai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "04",
+   "ap_tn": "กันทรวิชัย",
+   "ap_en": "Kantharawichai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "05",
+   "ap_tn": "เชียงยืน",
+   "ap_en": "Chiang Yuen",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "06",
+   "ap_tn": "บรบือ",
+   "ap_en": "Borabue",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "07",
+   "ap_tn": "นาเชือก",
+   "ap_en": "Na Chueak",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "08",
+   "ap_tn": "พยัคฆภูมิพิสัย",
+   "ap_en": "Phayakkhaphum Phisai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "09",
+   "ap_tn": "วาปีปทุม",
+   "ap_en": "Wapi Pathum",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "10",
+   "ap_tn": "นาดูน",
+   "ap_en": "Na Dun",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "11",
+   "ap_tn": "ยางสีสุราช",
+   "ap_en": "Yang Sisurat",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "44",
+   "pv_tn": "มหาสารคาม",
+   "ap_code": "12",
+   "ap_tn": "กุดรัง",
+   "ap_en": "Kut Rang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "01",
+   "ap_tn": "เมืองร้อยเอ็ด",
+   "ap_en": "Mueang Roi Et",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "02",
+   "ap_tn": "เกษตรวิสัย",
+   "ap_en": "Kaset Wisai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "03",
+   "ap_tn": "ปทุมรัตต์",
+   "ap_en": "Pathum Rat",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "04",
+   "ap_tn": "จตุรพักตรพิมาน",
+   "ap_en": "Chaturaphak Phiman",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "05",
+   "ap_tn": "ธวัชบุรี",
+   "ap_en": "Thawat Buri",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "06",
+   "ap_tn": "พนมไพร",
+   "ap_en": "Phanom Phrai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "07",
+   "ap_tn": "โพนทอง",
+   "ap_en": "Phon Thong",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "08",
+   "ap_tn": "โพธิ์ชัย",
+   "ap_en": "Pho Chai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "09",
+   "ap_tn": "หนองพอก",
+   "ap_en": "Nong Phok",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "10",
+   "ap_tn": "เสลภูมิ",
+   "ap_en": "Selaphum",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "11",
+   "ap_tn": "สุวรรณภูมิ",
+   "ap_en": "Suwannaphum",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "12",
+   "ap_tn": "เมืองสรวง",
+   "ap_en": "Mueang Suang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "13",
+   "ap_tn": "โพนทราย",
+   "ap_en": "Phon Sai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "14",
+   "ap_tn": "อาจสามารถ",
+   "ap_en": "At Samat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "15",
+   "ap_tn": "เมยวดี",
+   "ap_en": "Moei Wadi",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "16",
+   "ap_tn": "ศรีสมเด็จ",
+   "ap_en": "Si Somdet",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "17",
+   "ap_tn": "จังหาร",
+   "ap_en": "Changhan",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "18",
+   "ap_tn": "เชียงขวัญ",
+   "ap_en": "Chiang Khwan",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "19",
+   "ap_tn": "หนองฮี",
+   "ap_en": "Nong Hi",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "45",
+   "pv_tn": "ร้อยเอ็ด",
+   "ap_code": "20",
+   "ap_tn": "ทุ่งเขาหลวง",
+   "ap_en": "Thung Khao Luang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "01",
+   "ap_tn": "เมืองกาฬสินธุ์",
+   "ap_en": "Mueang Kalasin",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "02",
+   "ap_tn": "นามน",
+   "ap_en": "Na Mon",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "03",
+   "ap_tn": "กมลาไสย",
+   "ap_en": "Kamalasai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "04",
+   "ap_tn": "ร่องคำ",
+   "ap_en": "Rong Kham",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "05",
+   "ap_tn": "กุฉินารายณ์",
+   "ap_en": "Kuchinarai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "06",
+   "ap_tn": "เขาวง",
+   "ap_en": "Khao Wong",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "07",
+   "ap_tn": "ยางตลาด",
+   "ap_en": "Yang Talat",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "08",
+   "ap_tn": "ห้วยเม็ก",
+   "ap_en": "Huai Mek",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "09",
+   "ap_tn": "สหัสขันธ์",
+   "ap_en": "Sahatsakhan",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "10",
+   "ap_tn": "คำม่วง",
+   "ap_en": "Kham Muang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "11",
+   "ap_tn": "ท่าคันโท",
+   "ap_en": "Tha Khantho",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "12",
+   "ap_tn": "หนองกุงศรี",
+   "ap_en": "Nong Kung Si",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "13",
+   "ap_tn": "สมเด็จ",
+   "ap_en": "Somdet",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "14",
+   "ap_tn": "ห้วยผึ้ง",
+   "ap_en": "Huai Phueng",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "15",
+   "ap_tn": "สามชัย",
+   "ap_en": "Sam Chai",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "16",
+   "ap_tn": "นาคู",
+   "ap_en": "Na Khu",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "17",
+   "ap_tn": "ดอนจาน",
+   "ap_en": "Don Chan",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "46",
+   "pv_tn": "กาฬสินธุ์",
+   "ap_code": "18",
+   "ap_tn": "ฆ้องชัย",
+   "ap_en": "Khong Chai",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "01",
+   "ap_tn": "เมืองสกลนคร",
+   "ap_en": "Mueang Sakon Nakhon",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "02",
+   "ap_tn": "กุสุมาลย์",
+   "ap_en": "Kusuman",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "04",
+   "ap_tn": "พรรณานิคม",
+   "ap_en": "Phanna Nikhom",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "05",
+   "ap_tn": "พังโคน",
+   "ap_en": "Phanh khon",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "06",
+   "ap_tn": "วาริชภูมิ",
+   "ap_en": "Waritchaphum",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "08",
+   "ap_tn": "วานรนิวาส",
+   "ap_en": "Wanon Niwat",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "09",
+   "ap_tn": "คำตากล้า",
+   "ap_en": "Kham Ta Kla",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "10",
+   "ap_tn": "บ้านม่วง",
+   "ap_en": "Ban Muang",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "11",
+   "ap_tn": "อากาศอำนวย",
+   "ap_en": "Akat Amnuai",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "12",
+   "ap_tn": "สว่างแดนดิน",
+   "ap_en": "Sawang Daen Din",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "13",
+   "ap_tn": "ส่องดาว",
+   "ap_en": "Song Dao",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "14",
+   "ap_tn": "เต่างอย",
+   "ap_en": "Tao Ngoi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "15",
+   "ap_tn": "โคกศรีสุพรรณ",
+   "ap_en": "Khok Si Suphan",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "16",
+   "ap_tn": "เจริญศิลป์",
+   "ap_en": "Charoen Sin",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "17",
+   "ap_tn": "โพนนาแก้ว",
+   "ap_en": "Phon Na Kaeo",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "47",
+   "pv_tn": "สกลนคร",
+   "ap_code": "18",
+   "ap_tn": "ภูพาน",
+   "ap_en": "Phu Phan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครพนม",
+   "ap_en": "Mueang Nakhon Phanom",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "02",
+   "ap_tn": "ปลาปาก",
+   "ap_en": "Pla Pak",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "03",
+   "ap_tn": "ท่าอุเทน",
+   "ap_en": "Tha Uthen",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "04",
+   "ap_tn": "บ้านแพง",
+   "ap_en": "Ban Phaeng",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "05",
+   "ap_tn": "ธาตุพนม",
+   "ap_en": "That Phanom",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "06",
+   "ap_tn": "เรณูนคร",
+   "ap_en": "Renu Nakhon",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "07",
+   "ap_tn": "นาแก",
+   "ap_en": "Na Kae",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "08",
+   "ap_tn": "ศรีสงคราม",
+   "ap_en": "Si Songkhram",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "09",
+   "ap_tn": "นาหว้า",
+   "ap_en": "Na Wa",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "10",
+   "ap_tn": "โพนสวรรค์",
+   "ap_en": "Phon Sawan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "11",
+   "ap_tn": "นาทม",
+   "ap_en": "Na Thom",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "48",
+   "pv_tn": "นครพนม",
+   "ap_code": "12",
+   "ap_tn": "วังยาง",
+   "ap_en": "Wang Yang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "01",
+   "ap_tn": "เมืองมุกดาหาร",
+   "ap_en": "Mueang Mukdahan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "02",
+   "ap_tn": "นิคมคำสร้อย",
+   "ap_en": "Nikhom Kham Soi",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "03",
+   "ap_tn": "ดอนตาล",
+   "ap_en": "Don Tan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "04",
+   "ap_tn": "ดงหลวง",
+   "ap_en": "Don Tan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "05",
+   "ap_tn": "คำชะอี",
+   "ap_en": "Khamcha-i",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "06",
+   "ap_tn": "ว่านใหญ่",
+   "ap_en": "Wan Yai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "49",
+   "pv_tn": "มุกดาหาร",
+   "ap_code": "07",
+   "ap_tn": "หนองสูง",
+   "ap_en": "Nong Sung",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "01",
+   "ap_tn": "เมืองเชียงใหม่",
+   "ap_en": "Mueang Chiang Mai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "02",
+   "ap_tn": "จอมทอง",
+   "ap_en": "Chom Thong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "03",
+   "ap_tn": "แม่แจ่ม",
+   "ap_en": "Mae Chaem",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "04",
+   "ap_tn": "เชียงดาว",
+   "ap_en": "Chiang Dao",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "05",
+   "ap_tn": "ดอยสะเก็ด",
+   "ap_en": "Doi Saket",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "06",
+   "ap_tn": "แม่แตง",
+   "ap_en": "Mae Taeng",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "07",
+   "ap_tn": "แม่ริม",
+   "ap_en": "Mae Rim",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "09",
+   "ap_tn": "ฝาง",
+   "ap_en": "Fang",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "10",
+   "ap_tn": "แม่อาย",
+   "ap_en": "Mae Ai",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "11",
+   "ap_tn": "พร้าว",
+   "ap_en": "Phrao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "12",
+   "ap_tn": "สันป่าตอง",
+   "ap_en": "San Pa Tong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "13",
+   "ap_tn": "สันกำแพง",
+   "ap_en": "San Kamphaeng",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "14",
+   "ap_tn": "สันทราย",
+   "ap_en": "San Sai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "15",
+   "ap_tn": "หางดง",
+   "ap_en": "Hang Dong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "16",
+   "ap_tn": "ฮอด",
+   "ap_en": "Hot",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "17",
+   "ap_tn": "ดอยเต่า",
+   "ap_en": "Doi Tao",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "18",
+   "ap_tn": "อมก๋อย",
+   "ap_en": "Omkoi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "19",
+   "ap_tn": "สารภี",
+   "ap_en": "Saraphi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "21",
+   "ap_tn": "ไชยปราการ",
+   "ap_en": "Chai Prakan",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "22",
+   "ap_tn": "แม่วาง",
+   "ap_en": "Mae Wang",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "23",
+   "ap_tn": "แม่ออน",
+   "ap_en": "Mae On",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "50",
+   "pv_tn": "เชียงใหม่",
+   "ap_code": "24",
+   "ap_tn": "ดอยหล่อ",
+   "ap_en": "Doi Lo",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "01",
+   "ap_tn": "เมืองลำพูน",
+   "ap_en": "Mueang Lamphun",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "02",
+   "ap_tn": "แม่ทา",
+   "ap_en": "Mae Tha",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "03",
+   "ap_tn": "บ้านโฮ่ง",
+   "ap_en": "Ban Hong",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "04",
+   "ap_tn": "ลี้",
+   "ap_en": "Li",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "06",
+   "ap_tn": "ป่าซาง",
+   "ap_en": "Pa Sang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "07",
+   "ap_tn": "บ้านธิ",
+   "ap_en": "Ban Thi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "51",
+   "pv_tn": "ลำพูน",
+   "ap_code": "08",
+   "ap_tn": "เวียงหนองล่อง",
+   "ap_en": "Wiang Nong Long",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "01",
+   "ap_tn": "เมืองลำปาง",
+   "ap_en": "Mueang Lampang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "02",
+   "ap_tn": "แม่เมาะ",
+   "ap_en": "Mae Mo",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "03",
+   "ap_tn": "เกาะคา",
+   "ap_en": "Ko kha",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "04",
+   "ap_tn": "เสริมงาม",
+   "ap_en": "Soem Ngam",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "05",
+   "ap_tn": "งาว",
+   "ap_en": "Ngao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "06",
+   "ap_tn": "แจ้ห่ม",
+   "ap_en": "Chae Hom",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "07",
+   "ap_tn": "วังเหนือ",
+   "ap_en": "Wang Nuea",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "08",
+   "ap_tn": "เถิน",
+   "ap_en": "Thoen",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "09",
+   "ap_tn": "แม่พริก",
+   "ap_en": "Mae Phrik",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "10",
+   "ap_tn": "แม่ทะ",
+   "ap_en": "Mae Tha",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "11",
+   "ap_tn": "สบปราบ",
+   "ap_en": "Sop Prap",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "12",
+   "ap_tn": "ห้างฉัตร",
+   "ap_en": "Hang Chat",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "52",
+   "pv_tn": "ลำปาง",
+   "ap_code": "13",
+   "ap_tn": "เมืองปาน",
+   "ap_en": "Mueang Pan",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "01",
+   "ap_tn": "เมืองอุตรดิตถ์",
+   "ap_en": "Mueang Uttaradit",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "02",
+   "ap_tn": "ตรอน",
+   "ap_en": "Tron",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "03",
+   "ap_tn": "ท่าปลา",
+   "ap_en": "Tha Pla",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "04",
+   "ap_tn": "น้ำปาด",
+   "ap_en": "Nam Pat",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "05",
+   "ap_tn": "ฟากท่า",
+   "ap_en": "Fak Tha",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "06",
+   "ap_tn": "บ้านโคก",
+   "ap_en": "Ban Khok",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "07",
+   "ap_tn": "พิชัย",
+   "ap_en": "Phichai",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "08",
+   "ap_tn": "ลับแล",
+   "ap_en": "Laplae",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "53",
+   "pv_tn": "อุตรดิตถ์",
+   "ap_code": "09",
+   "ap_tn": "ทองแสนขัน",
+   "ap_en": "Thong Saen Khan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "01",
+   "ap_tn": "เมืองแพร่",
+   "ap_en": "Mueang Phrae",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "02",
+   "ap_tn": "ร้องกวาง",
+   "ap_en": "Mueang Phrae",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "03",
+   "ap_tn": "ลอง",
+   "ap_en": "Long",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "04",
+   "ap_tn": "สูงเม่น",
+   "ap_en": "Sung Men",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "05",
+   "ap_tn": "เด่นชัย",
+   "ap_en": "Den Chai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "06",
+   "ap_tn": "สอง",
+   "ap_en": "Song",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "07",
+   "ap_tn": "วังชิ้น",
+   "ap_en": "Wang Chin",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "54",
+   "pv_tn": "แพร่",
+   "ap_code": "08",
+   "ap_tn": "หนองม่วงไข่",
+   "ap_en": "Nong Muang Khai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "01",
+   "ap_tn": "เมืองน่าน",
+   "ap_en": "Mueang Nan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "02",
+   "ap_tn": "แม่จริม",
+   "ap_en": "Mae Charim",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "03",
+   "ap_tn": "บ้านหลวง",
+   "ap_en": "Ban Luang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "04",
+   "ap_tn": "นาน้อย",
+   "ap_en": "Na Noi",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "05",
+   "ap_tn": "ปัว",
+   "ap_en": "Pua",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "06",
+   "ap_tn": "ท่าวังผา",
+   "ap_en": "Tha Wang Pha",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "07",
+   "ap_tn": "เวียงสา",
+   "ap_en": "Wiang Sa",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "08",
+   "ap_tn": "ทุ่งช้าง",
+   "ap_en": "Thung Chang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "09",
+   "ap_tn": "เชียงกลาง",
+   "ap_en": "Chiang Klang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "10",
+   "ap_tn": "นาหมื่น",
+   "ap_en": "Na Muen",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "11",
+   "ap_tn": "สันติสุข",
+   "ap_en": "Santi Suk",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "55",
+   "pv_tn": "น่าน",
+   "ap_code": "14",
+   "ap_tn": "ภูเพียง",
+   "ap_en": "Phu Phiang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "01",
+   "ap_tn": "เมืองพะเยา",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "02",
+   "ap_tn": "จุน",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "03",
+   "ap_tn": "เชียงคำ",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "04",
+   "ap_tn": "เชียงม่วน",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "05",
+   "ap_tn": "ดอกคำใต้",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "06",
+   "ap_tn": "ปง",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "07",
+   "ap_tn": "แม่ใจ",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "08",
+   "ap_tn": "ภูซาง",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "56",
+   "pv_tn": "พะเยา",
+   "ap_code": "09",
+   "ap_tn": "ภูกามยาว",
+   "ap_en": "Mueang Phayao",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "01",
+   "ap_tn": "เมืองเชียงราย",
+   "ap_en": "Mueang Chiang Rai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "02",
+   "ap_tn": "เวียงชัย",
+   "ap_en": "Wiang Chai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "03",
+   "ap_tn": "เชียงของ",
+   "ap_en": "Chiang Khong",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "04",
+   "ap_tn": "เทิง",
+   "ap_en": "Thoeng",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "05",
+   "ap_tn": "พาน",
+   "ap_en": "Phan",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "06",
+   "ap_tn": "ป่าแดด",
+   "ap_en": "Pa Daet",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "07",
+   "ap_tn": "แม่จัน",
+   "ap_en": "Mae Chan",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "08",
+   "ap_tn": "เชียงแสน",
+   "ap_en": "Chiang Saen",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "09",
+   "ap_tn": "แม่สาย",
+   "ap_en": "Mae Sai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "10",
+   "ap_tn": "แม่สรวย",
+   "ap_en": "Mae Suai",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "11",
+   "ap_tn": "เวียงป่าเป้า",
+   "ap_en": "Wiang Pa Pao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "12",
+   "ap_tn": "พญาเม็งราย",
+   "ap_en": "Phaya Mengrai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "13",
+   "ap_tn": "เวียงแก่น",
+   "ap_en": "Wiang Kaen",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "14",
+   "ap_tn": "ขุนตาล",
+   "ap_en": "Khun Tan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "16",
+   "ap_tn": "แม่ลาว",
+   "ap_en": "Mae Lao",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "17",
+   "ap_tn": "เวียงเชียงรุ้ง",
+   "ap_en": "Wiang Chiang Rung",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "57",
+   "pv_tn": "เชียงราย",
+   "ap_code": "18",
+   "ap_tn": "ดอยหลวง",
+   "ap_en": "Doi Luang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "58",
+   "pv_tn": "แม่ฮ่องสอน",
+   "ap_code": "02",
+   "ap_tn": "ขุนยวม",
+   "ap_en": "Khun Yuam",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "58",
+   "pv_tn": "แม่ฮ่องสอน",
+   "ap_code": "03",
+   "ap_tn": "ปาย",
+   "ap_en": "Pai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "58",
+   "pv_tn": "แม่ฮ่องสอน",
+   "ap_code": "04",
+   "ap_tn": "แม่สะเรียง",
+   "ap_en": "Mae Sariang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "58",
+   "pv_tn": "แม่ฮ่องสอน",
+   "ap_code": "05",
+   "ap_tn": "แม่ลาน้อย",
+   "ap_en": "Mae La Noi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "58",
+   "pv_tn": "แม่ฮ่องสอน",
+   "ap_code": "06",
+   "ap_tn": "สบเมย",
+   "ap_en": "Sop Moei",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครสวรรค์",
+   "ap_en": "Mueang Nakhon Sawan",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "02",
+   "ap_tn": "โกรกพระ",
+   "ap_en": "Krok Phra",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "03",
+   "ap_tn": "ชุมแสง",
+   "ap_en": "Chum Saeng",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "04",
+   "ap_tn": "หนองบัว",
+   "ap_en": "Nong Bua",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "05",
+   "ap_tn": "บรรพตพิสัย",
+   "ap_en": "Banphot Phisai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "06",
+   "ap_tn": "เก้าเลี้ยว",
+   "ap_en": "Kao Liao",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "07",
+   "ap_tn": "ตาคลี",
+   "ap_en": "Takhli",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "08",
+   "ap_tn": "ท่าตะโก",
+   "ap_en": "Tha Tako",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "09",
+   "ap_tn": "ไพศาลี",
+   "ap_en": "Phaisali",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "10",
+   "ap_tn": "พยุหะคีรี",
+   "ap_en": "Phayuha Hkiri",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "11",
+   "ap_tn": "ลาดยาว",
+   "ap_en": "Lat Yao",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "12",
+   "ap_tn": "ตากฟ้า",
+   "ap_en": "Tak Fa",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "13",
+   "ap_tn": "แม่วงก์",
+   "ap_en": "Mae Wong",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "14",
+   "ap_tn": "แม่เปิน",
+   "ap_en": "Mae Pern",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "60",
+   "pv_tn": "นครสวรรค์",
+   "ap_code": "15",
+   "ap_tn": "ชุมตาบง",
+   "ap_en": "Chum Ta Bong",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองอุทัยธานี",
+   "ap_en": "Mueang Uthai Thani",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "02",
+   "ap_tn": "ทัพทัน",
+   "ap_en": "Thap Than",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "03",
+   "ap_tn": "สว่างอารมณ์",
+   "ap_en": "Sawang Arom",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "04",
+   "ap_tn": "หนองฉาง",
+   "ap_en": "Nong Chang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "05",
+   "ap_tn": "หนองขาหย่าง",
+   "ap_en": "Nong Khayang",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "06",
+   "ap_tn": "บ้านไร่",
+   "ap_en": "Ban Rai",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "07",
+   "ap_tn": "ลานสัก",
+   "ap_en": "Lan Sak",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "61",
+   "pv_tn": "อุทัยธานี",
+   "ap_code": "08",
+   "ap_tn": "ห้วยคต",
+   "ap_en": "Huai Khot",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "01",
+   "ap_tn": "เมืองกำแพงเพชร",
+   "ap_en": "Mueang Kamphaeng Phet",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "02",
+   "ap_tn": "ไทรงาม",
+   "ap_en": "Sai Ngam",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "03",
+   "ap_tn": "คลองลาน",
+   "ap_en": "Khlong Lan",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "04",
+   "ap_tn": "ขาณุวรลักษบุรี",
+   "ap_en": "Khanu Woralaksaburi",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "05",
+   "ap_tn": "คลองขลุง",
+   "ap_en": "Khlong Khlung",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "06",
+   "ap_tn": "พรานกระต่าย",
+   "ap_en": "Phran Kratai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "07",
+   "ap_tn": "ลานกระบือ",
+   "ap_en": "Lan Krabue",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "08",
+   "ap_tn": "ทรายทองวัฒนา",
+   "ap_en": "Sai Thong Watthana",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "09",
+   "ap_tn": "ปางศิลาทอง",
+   "ap_en": "Pang Sila Thong",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "10",
+   "ap_tn": "บึงสามัคคี",
+   "ap_en": "Bueng Samakkhi",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "62",
+   "pv_tn": "กำแพงเพชร",
+   "ap_code": "11",
+   "ap_tn": "โกสัมพีนคร",
+   "ap_en": "Kosamphi Nakhon",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "01",
+   "ap_tn": "เมืองตาก",
+   "ap_en": "Mueang Tak",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "02",
+   "ap_tn": "บ้านตาก",
+   "ap_en": "Ban Tak",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "03",
+   "ap_tn": "สามเงา",
+   "ap_en": "Sam Ngao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "04",
+   "ap_tn": "แม่ระมาด",
+   "ap_en": "Mae Ramat",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "05",
+   "ap_tn": "ท่าสองยาง",
+   "ap_en": "Tha Song Yang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "06",
+   "ap_tn": "แม่สอด",
+   "ap_en": "Mae Sot",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "07",
+   "ap_tn": "พบพระ",
+   "ap_en": "Phop Phra",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "63",
+   "pv_tn": "ตาก",
+   "ap_code": "09",
+   "ap_tn": "วังเจ้า",
+   "ap_en": "Wang Chao",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "01",
+   "ap_tn": "เมืองสุโขทัย",
+   "ap_en": "Mueang Sukhothai",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "02",
+   "ap_tn": "บ้านด่านลานหอย",
+   "ap_en": "Ban Dan Lan Hoi",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "03",
+   "ap_tn": "คีรีมาศ",
+   "ap_en": "Khiri Mat",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "04",
+   "ap_tn": "กงไกรลาศ",
+   "ap_en": "Kong Krailat",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "05",
+   "ap_tn": "ศรีสัชนาลัย",
+   "ap_en": "Si Satchanalai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "06",
+   "ap_tn": "ศรีสำโรง",
+   "ap_en": "Si Samrong",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "07",
+   "ap_tn": "สวรรคโลก",
+   "ap_en": "Sawankhalok",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "08",
+   "ap_tn": "ศรีนคร",
+   "ap_en": "Si Nakhon",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "64",
+   "pv_tn": "สุโขทัย",
+   "ap_code": "09",
+   "ap_tn": "ทุ่งเสลี่ยม",
+   "ap_en": "Thung Saliam",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "01",
+   "ap_tn": "เมืองพิษณุโลก",
+   "ap_en": "Mueang Phitsanulok",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "02",
+   "ap_tn": "นครไทย",
+   "ap_en": "Nakhon Thai",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "03",
+   "ap_tn": "ชาติตระการ",
+   "ap_en": "Chat Trakan",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "04",
+   "ap_tn": "บางระกำ",
+   "ap_en": "Bang Rakam",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "05",
+   "ap_tn": "บางกระทุ่ม",
+   "ap_en": "Bang Krathum",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "06",
+   "ap_tn": "พรหมพิราม",
+   "ap_en": "Phrom Phiram",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "07",
+   "ap_tn": "วัดโบสถ์",
+   "ap_en": "Wat Bot",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "08",
+   "ap_tn": "วังทอง",
+   "ap_en": "Wang Thong",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "65",
+   "pv_tn": "พิษณุโลก",
+   "ap_code": "09",
+   "ap_tn": "เนินมะปราง",
+   "ap_en": "Noen Maprang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "01",
+   "ap_tn": "เมืองพิจิตร",
+   "ap_en": "Mueang Phichit",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "02",
+   "ap_tn": "วังทรายพูน",
+   "ap_en": "Wang Sai Phun",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "03",
+   "ap_tn": "โพธิ์ประทับช้าง",
+   "ap_en": "Pho Prathap Chang",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "04",
+   "ap_tn": "ตะพานหิน",
+   "ap_en": "Taphan Hin",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "05",
+   "ap_tn": "บางมูลนาก",
+   "ap_en": "Bang Mun Nak",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "06",
+   "ap_tn": "โพทะเล",
+   "ap_en": "Pho Thale",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "07",
+   "ap_tn": "สามง่าม",
+   "ap_en": "Sam Ngam",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "08",
+   "ap_tn": "ทับคล้อ",
+   "ap_en": "Tap Khlo",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "09",
+   "ap_tn": "สากเหล็ก",
+   "ap_en": "Sak Lek",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "10",
+   "ap_tn": "บึงนาราง",
+   "ap_en": "Bueng Na Rang",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "11",
+   "ap_tn": "ดงเจริญ",
+   "ap_en": "Dong Charoen",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "66",
+   "pv_tn": "พิจิตร",
+   "ap_code": "12",
+   "ap_tn": "วชิรบารมี",
+   "ap_en": "Wachirabarami",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "01",
+   "ap_tn": "เมืองเพชรบูรณ์",
+   "ap_en": "Mueang Phetchabun",
+   "maxfreq": 11
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "02",
+   "ap_tn": "ชนแดน",
+   "ap_en": "Chon Daen",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "03",
+   "ap_tn": "หล่มสัก",
+   "ap_en": "Lom Sak",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "04",
+   "ap_tn": "หล่มเก่า",
+   "ap_en": "Lom Kao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "05",
+   "ap_tn": "วิเชียรบุรี",
+   "ap_en": "Wichian Buri",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "06",
+   "ap_tn": "ศรีเทพ",
+   "ap_en": "Si Thep",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "07",
+   "ap_tn": "หนองไผ่",
+   "ap_en": "Nong Phai",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "08",
+   "ap_tn": "บึงสามพัน",
+   "ap_en": "Bueng Sam Phan",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "10",
+   "ap_tn": "วังโป่ง",
+   "ap_en": "Wang Pong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "67",
+   "pv_tn": "เพชรบูรณ์",
+   "ap_code": "11",
+   "ap_tn": "เขาค้อ",
+   "ap_en": "Khao kho",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองราชบุรี",
+   "ap_en": "Mueang Ratchaburi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "02",
+   "ap_tn": "จอมบึง",
+   "ap_en": "Chom Bueng",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "04",
+   "ap_tn": "ดำเนินสะดวก",
+   "ap_en": "Damnoen Saduak",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "05",
+   "ap_tn": "บ้านโป่ง",
+   "ap_en": "Ban Pong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "06",
+   "ap_tn": "บางแพ",
+   "ap_en": "Bang Phae",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "07",
+   "ap_tn": "โพธาราม",
+   "ap_en": "Photharam",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "08",
+   "ap_tn": "ปากท่อ",
+   "ap_en": "Pak Tho",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "70",
+   "pv_tn": "ราชบุรี",
+   "ap_code": "09",
+   "ap_tn": "วัดเพลง",
+   "ap_en": "Wat Phleng",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองกาญจนบุรี",
+   "ap_en": "Mueang Kanchanaburi",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "03",
+   "ap_tn": "บ่อพลอย",
+   "ap_en": "Bo Phloi",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "05",
+   "ap_tn": "ท่ามะกา",
+   "ap_en": "Tha Maka",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "06",
+   "ap_tn": "ท่าม่วง",
+   "ap_en": "Tha Muang",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "09",
+   "ap_tn": "พนมทวน",
+   "ap_en": "Phanom Thuan",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "10",
+   "ap_tn": "เลาขวัญ",
+   "ap_en": "Lao Khwan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "11",
+   "ap_tn": "ด่านมะขามเตี้ย",
+   "ap_en": "Dan Makham Tia",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "71",
+   "pv_tn": "กาญจนบุรี",
+   "ap_code": "13",
+   "ap_tn": "ห้วยกระเจา",
+   "ap_en": "Huai Krachao",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองสุพรรณบุรี",
+   "ap_en": "Mueang Saphan Buri",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "02",
+   "ap_tn": "เดิมบางนางบวช",
+   "ap_en": "Doem Bang Nang Buat",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "03",
+   "ap_tn": "ด่านช้าง",
+   "ap_en": "Dan Chang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "04",
+   "ap_tn": "บางปลาม้า",
+   "ap_en": "Bang Pla Ma",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "05",
+   "ap_tn": "ศรีประจันต์",
+   "ap_en": "Si Prachan",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "06",
+   "ap_tn": "ดอนเจดีย์",
+   "ap_en": "Don Chedi",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "07",
+   "ap_tn": "สองพี่น้อง",
+   "ap_en": "Song Phi Nong",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "08",
+   "ap_tn": "สามชุก",
+   "ap_en": "Sam Chuk",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "09",
+   "ap_tn": "อู่ทอง",
+   "ap_en": "U Thong",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "72",
+   "pv_tn": "สุพรรณบุรี",
+   "ap_code": "10",
+   "ap_tn": "หนองหญ้าไซ",
+   "ap_en": "Nong Ya Sai",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครปฐม",
+   "ap_en": "mueang Nakhon Pathom",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "02",
+   "ap_tn": "กำแพงแสน",
+   "ap_en": "Kamphaeng Saen",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "03",
+   "ap_tn": "นครชัยศรี",
+   "ap_en": "Nakhon Chai Si",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "04",
+   "ap_tn": "ดอนตูม",
+   "ap_en": "Don Tum",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "05",
+   "ap_tn": "บางเลน",
+   "ap_en": "Bang Len",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "06",
+   "ap_tn": "สามพราน",
+   "ap_en": "Sam Phran",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "73",
+   "pv_tn": "นครปฐม",
+   "ap_code": "07",
+   "ap_tn": "พุทธมณฑล",
+   "ap_en": "Phutthamonthon",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "74",
+   "pv_tn": "สมุทรสาคร",
+   "ap_code": "01",
+   "ap_tn": "เมืองสมุทรสาคร",
+   "ap_en": "Mueang Samut Sakhon",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "74",
+   "pv_tn": "สมุทรสาคร",
+   "ap_code": "02",
+   "ap_tn": "กระทุ่มแบน",
+   "ap_en": "Krathum Baen",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "74",
+   "pv_tn": "สมุทรสาคร",
+   "ap_code": "03",
+   "ap_tn": "บ้านแพ้ว",
+   "ap_en": "Ban Phaeo",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "75",
+   "pv_tn": "สมุทรสงคราม",
+   "ap_code": "01",
+   "ap_tn": "เมืองสมุทรสงคราม",
+   "ap_en": "Mueang Samut Songkhram",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "75",
+   "pv_tn": "สมุทรสงคราม",
+   "ap_code": "03",
+   "ap_tn": "อัมพวา",
+   "ap_en": "Amphawa",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "01",
+   "ap_tn": "เมืองเพชรบุรี",
+   "ap_en": "Mueang Phetchaburi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "02",
+   "ap_tn": "เขาย้อย",
+   "ap_en": "Khao Yoi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "04",
+   "ap_tn": "ชะอำ",
+   "ap_en": "Cha-am",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "05",
+   "ap_tn": "ท่ายาง",
+   "ap_en": "Tha Yang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "06",
+   "ap_tn": "บ้านลาด",
+   "ap_en": "Ban Lat",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "76",
+   "pv_tn": "เพชรบุรี",
+   "ap_code": "07",
+   "ap_tn": "บ้านแหลม",
+   "ap_en": "Ban Laem",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "01",
+   "ap_tn": "เมืองประจวบคีรีขันธ์",
+   "ap_en": "Mueang Prachuap Khiri Khan",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "02",
+   "ap_tn": "กุยบุรี",
+   "ap_en": "Kui Buri",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "03",
+   "ap_tn": "ทับสะแก",
+   "ap_en": "Thap Sakae",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "06",
+   "ap_tn": "ปราณบุรี",
+   "ap_en": "Pran Buri",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "07",
+   "ap_tn": "หัวหิน",
+   "ap_en": "Hua Hin",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "77",
+   "pv_tn": "ประจวบคีรีขันธ์",
+   "ap_code": "08",
+   "ap_tn": "สามร้อยยอด",
+   "ap_en": "Sam Roi Yot",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "01",
+   "ap_tn": "เมืองนครศรีธรรมราช",
+   "ap_en": "Mueang Nakhon Si Thammarat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "02",
+   "ap_tn": "พรหมคีรี",
+   "ap_en": "Phrom Khiri",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "03",
+   "ap_tn": "ลานสกา",
+   "ap_en": "Lan Saka",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "04",
+   "ap_tn": "ฉวาง",
+   "ap_en": "Chawang",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "05",
+   "ap_tn": "พิปูน",
+   "ap_en": "Phipun",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "06",
+   "ap_tn": "เชียรใหญ่",
+   "ap_en": "Chian Yai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "07",
+   "ap_tn": "ชะอวด",
+   "ap_en": "Cha-uat",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "08",
+   "ap_tn": "ท่าศาลา",
+   "ap_en": "Tha Sala",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "09",
+   "ap_tn": "ทุ่งสง",
+   "ap_en": "Thung Song",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "10",
+   "ap_tn": "นาบอน",
+   "ap_en": "Na Bon",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "11",
+   "ap_tn": "ทุ่งใหญ่",
+   "ap_en": "Thung Yai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "12",
+   "ap_tn": "ปากพนัง",
+   "ap_en": "Pak Phanang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "13",
+   "ap_tn": "ร่อนพิบูลย์",
+   "ap_en": "Ron Phibun",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "14",
+   "ap_tn": "สิชล",
+   "ap_en": "Sichon",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "15",
+   "ap_tn": "ขนอม",
+   "ap_en": "Khanom",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "16",
+   "ap_tn": "หัวไทร",
+   "ap_en": "Hua Sai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "17",
+   "ap_tn": "บางขัน",
+   "ap_en": "Bang Khan",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "18",
+   "ap_tn": "ถ้ำพรรณรา",
+   "ap_en": "Tham Phannara",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "19",
+   "ap_tn": "จุฬาภรณ์",
+   "ap_en": "Chulabhorn",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "20",
+   "ap_tn": "พระพรหม",
+   "ap_en": "Phra Phrom",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "21",
+   "ap_tn": "นบพิตำ",
+   "ap_en": "Nopphitam",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "22",
+   "ap_tn": "ช้างกลาง",
+   "ap_en": "Chang Klang",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "80",
+   "pv_tn": "นครศรีธรรมราช",
+   "ap_code": "23",
+   "ap_tn": "เฉลิมพระเกียรติ",
+   "ap_en": "Chaloem Phra Kiet",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "81",
+   "pv_tn": "กระบี่",
+   "ap_code": "02",
+   "ap_tn": "เขาพนม",
+   "ap_en": "Khao Phanom",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "81",
+   "pv_tn": "กระบี่",
+   "ap_code": "05",
+   "ap_tn": "อ่าวลึก",
+   "ap_en": "Ao Luek",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "81",
+   "pv_tn": "กระบี่",
+   "ap_code": "06",
+   "ap_tn": "ปลายพระยา",
+   "ap_en": "Plai Phraya",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "81",
+   "pv_tn": "กระบี่",
+   "ap_code": "08",
+   "ap_tn": "เหนือคลอง",
+   "ap_en": "Nuea Khlong",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "82",
+   "pv_tn": "พังงา",
+   "ap_code": "01",
+   "ap_tn": "เมืองพังงา",
+   "ap_en": "Mueang Phang-nga",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "82",
+   "pv_tn": "พังงา",
+   "ap_code": "05",
+   "ap_tn": "ตะกั่วป่า",
+   "ap_en": "Takua Pa",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "82",
+   "pv_tn": "พังงา",
+   "ap_code": "06",
+   "ap_tn": "คุระบุรี",
+   "ap_en": "Khura Buri",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "82",
+   "pv_tn": "พังงา",
+   "ap_code": "08",
+   "ap_tn": "ท้ายเหมือง",
+   "ap_en": "Thai Mueang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองสุราษฎร์ธานี",
+   "ap_en": "Mueang Surat Thani",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "02",
+   "ap_tn": "กาญจนดิษฐ์",
+   "ap_en": "Kanchanadit",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "03",
+   "ap_tn": "ดอนสัก",
+   "ap_en": "Don Sak",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "04",
+   "ap_tn": "เกาะสมุย",
+   "ap_en": "Ko Samui",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "06",
+   "ap_tn": "ไชยา",
+   "ap_en": "Chaiya",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "07",
+   "ap_tn": "ท่าชนะ",
+   "ap_en": "Tha Chana",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "08",
+   "ap_tn": "คีรีรัฐนิคม",
+   "ap_en": "Khiri Rat Nikhom",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "09",
+   "ap_tn": "บ้านตาขุน",
+   "ap_en": "Ban Ta Khun",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "10",
+   "ap_tn": "พนม",
+   "ap_en": "Phanom",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "11",
+   "ap_tn": "ท่าฉาง",
+   "ap_en": "Tha Chang",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "12",
+   "ap_tn": "บ้านนาสาร",
+   "ap_en": "Ban Na San",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "13",
+   "ap_tn": "บ้านนาเดิม",
+   "ap_en": "Ban Na Doem",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "14",
+   "ap_tn": "เคียนซา",
+   "ap_en": "Khian Sa",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "15",
+   "ap_tn": "เวียงสระ",
+   "ap_en": "Wiang Sa",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "16",
+   "ap_tn": "พระแสง",
+   "ap_en": "Phrasaeng",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "17",
+   "ap_tn": "พุนพิน",
+   "ap_en": "Phunphin",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "84",
+   "pv_tn": "สุราษฎร์ธานี",
+   "ap_code": "18",
+   "ap_tn": "ชัยบุรี",
+   "ap_en": "Chai Buri",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "01",
+   "ap_tn": "เมืองชุมพร",
+   "ap_en": "Mueang Chumphon",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "02",
+   "ap_tn": "ท่าแซะ",
+   "ap_en": "Tha Sae",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "03",
+   "ap_tn": "ปะทิว",
+   "ap_en": "Pathio",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "04",
+   "ap_tn": "หลังสวน",
+   "ap_en": "Lang Suan",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "05",
+   "ap_tn": "ละแม",
+   "ap_en": "Lamae",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "07",
+   "ap_tn": "สวี",
+   "ap_en": "Sawi",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "86",
+   "pv_tn": "ชุมพร",
+   "ap_code": "08",
+   "ap_tn": "ทุ่งตะโก",
+   "ap_en": "Thung Tako",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "01",
+   "ap_tn": "เมืองสงขลา",
+   "ap_en": "Muaeng Songkhla",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "02",
+   "ap_tn": "สทิงพระ",
+   "ap_en": "Sathing Phra",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "03",
+   "ap_tn": "จะนะ",
+   "ap_en": "Chana",
+   "maxfreq": 10
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "04",
+   "ap_tn": "นาทวี",
+   "ap_en": "Na Thawi",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "05",
+   "ap_tn": "เทพา",
+   "ap_en": "Thepha",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "06",
+   "ap_tn": "สะบ้าย้อย",
+   "ap_en": "Saba Yoi",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "07",
+   "ap_tn": "ระโนด",
+   "ap_en": "Ranot",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "08",
+   "ap_tn": "กระแสสินธุ์",
+   "ap_en": "Krasae Sin",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "09",
+   "ap_tn": "รัตภูมิ",
+   "ap_en": "Rattaphum",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "10",
+   "ap_tn": "สะเดา",
+   "ap_en": "Sadao",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "11",
+   "ap_tn": "หาดใหญ่",
+   "ap_en": "Hat Yai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "12",
+   "ap_tn": "นาหม่อม",
+   "ap_en": "Na Mom",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "13",
+   "ap_tn": "ควนเนียง",
+   "ap_en": "Khuan Niang",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "14",
+   "ap_tn": "บางกล่ำ",
+   "ap_en": "Bang Klam",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "15",
+   "ap_tn": "สิงหนคร",
+   "ap_en": "Singhanakhon",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "90",
+   "pv_tn": "สงขลา",
+   "ap_code": "16",
+   "ap_tn": "คลองหอยโข่ง",
+   "ap_en": "Khlong Hoi Khong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "01",
+   "ap_tn": "เมืองสตูล",
+   "ap_en": "Mueang Satun",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "02",
+   "ap_tn": "ควนโดน",
+   "ap_en": "Khuan Don",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "03",
+   "ap_tn": "ควนกาหลง",
+   "ap_en": "Khuan Kalong",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "04",
+   "ap_tn": "ท่าแพ",
+   "ap_en": "Tha Phae",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "05",
+   "ap_tn": "ละงู",
+   "ap_en": "La-ngu",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "06",
+   "ap_tn": "ทุ่งหว้า",
+   "ap_en": "Thung  Wa",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "91",
+   "pv_tn": "สตูล",
+   "ap_code": "07",
+   "ap_tn": "มะนัง",
+   "ap_en": "Manang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "01",
+   "ap_tn": "เมืองตรัง",
+   "ap_en": "Mueang Trang",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "02",
+   "ap_tn": "กันตัง",
+   "ap_en": "Kantang",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "03",
+   "ap_tn": "ย่านตาขาว",
+   "ap_en": "Yan Ta Khao",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "04",
+   "ap_tn": "ปะเหลียน",
+   "ap_en": "Palian",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "05",
+   "ap_tn": "สิเกา",
+   "ap_en": "Sikao",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "06",
+   "ap_tn": "ห้วยยอด",
+   "ap_en": "Huai Yot",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "07",
+   "ap_tn": "วังวิเศษ",
+   "ap_en": "Wang Wiset",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "08",
+   "ap_tn": "นาโยง",
+   "ap_en": "Na Yong",
+   "maxfreq": 4
+  },
+  {
+   "pv_code": "92",
+   "pv_tn": "ตรัง",
+   "ap_code": "09",
+   "ap_tn": "รัษฎา",
+   "ap_en": "Ratsada",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "01",
+   "ap_tn": "เมืองพัทลุง",
+   "ap_en": "Mueang Phatthalung",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "02",
+   "ap_tn": "กงหรา",
+   "ap_en": "Kong Ra",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "03",
+   "ap_tn": "เขาชัยสน",
+   "ap_en": "Khao Chaison",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "04",
+   "ap_tn": "ตะโหมด",
+   "ap_en": "Tamot",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "05",
+   "ap_tn": "ควนขนุน",
+   "ap_en": "Khuan Khanun",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "06",
+   "ap_tn": "ปากพะยูน",
+   "ap_en": "Pak Phayun",
+   "maxfreq": 9
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "07",
+   "ap_tn": "ศรีบรรพต",
+   "ap_en": "Si Banphot",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "08",
+   "ap_tn": "ป่าบอน",
+   "ap_en": "Pa Bon",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "09",
+   "ap_tn": "บางแก้ว",
+   "ap_en": "Bang Kaeo",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "10",
+   "ap_tn": "ป่าพยอม",
+   "ap_en": "Pa Phayom",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "93",
+   "pv_tn": "พัทลุง",
+   "ap_code": "11",
+   "ap_tn": "ศรีนครินทร์",
+   "ap_en": "Srinagarindra",
+   "maxfreq": 3
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "01",
+   "ap_tn": "เมืองปัตตานี",
+   "ap_en": "Mueang Pattani",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "02",
+   "ap_tn": "โคกโพธิ์",
+   "ap_en": "Khok Pho",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "03",
+   "ap_tn": "หนองจิก",
+   "ap_en": "Nong Chik",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "04",
+   "ap_tn": "ปะนาเระ",
+   "ap_en": "Panare",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "05",
+   "ap_tn": "มายอ",
+   "ap_en": "Mayo",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "06",
+   "ap_tn": "ทุ่งยางแดง",
+   "ap_en": "Thung Yang Daeng",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "07",
+   "ap_tn": "สายบุรี",
+   "ap_en": "Sai Buri",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "08",
+   "ap_tn": "ไม้แก่น",
+   "ap_en": "Mai Kaen",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "09",
+   "ap_tn": "ยะหริ่ง",
+   "ap_en": "Yaring",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "10",
+   "ap_tn": "ยะรัง",
+   "ap_en": "Yarang",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "11",
+   "ap_tn": "กะพ้อ",
+   "ap_en": "Kapho",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "94",
+   "pv_tn": "ปัตตานี",
+   "ap_code": "12",
+   "ap_tn": "แม่ลาน",
+   "ap_en": "Mae Lan",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "95",
+   "pv_tn": "ยะลา",
+   "ap_code": "01",
+   "ap_tn": "เมืองยะลา",
+   "ap_en": "Mueang Yala",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "95",
+   "pv_tn": "ยะลา",
+   "ap_code": "03",
+   "ap_tn": "บันนังสตา",
+   "ap_en": "Bannang Sata",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "95",
+   "pv_tn": "ยะลา",
+   "ap_code": "05",
+   "ap_tn": "ยะหา",
+   "ap_en": "Yaha",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "95",
+   "pv_tn": "ยะลา",
+   "ap_code": "06",
+   "ap_tn": "รามัน",
+   "ap_en": "Raman",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "95",
+   "pv_tn": "ยะลา",
+   "ap_code": "08",
+   "ap_tn": "กรงปีนัง",
+   "ap_en": "Krong Pinang",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "01",
+   "ap_tn": "เมืองนราธิวาส",
+   "ap_en": "Mueang Narathiwat",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "02",
+   "ap_tn": "ตากใบ",
+   "ap_en": "Tak Bai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "03",
+   "ap_tn": "บาเจาะ",
+   "ap_en": "Tak Bai",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "04",
+   "ap_tn": "ยี่งอ",
+   "ap_en": "Yi-ngo",
+   "maxfreq": 7
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "05",
+   "ap_tn": "ระแงะ",
+   "ap_en": "Ra-ngae",
+   "maxfreq": 6
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "06",
+   "ap_tn": "รือเสาะ",
+   "ap_en": "Rueso",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "07",
+   "ap_tn": "ศรีสาคร",
+   "ap_en": "Si Sakhon",
+   "maxfreq": 2
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "08",
+   "ap_tn": "แว้ง",
+   "ap_en": "Waeng",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "10",
+   "ap_tn": "สุไหงโก-ลก",
+   "ap_en": "Su-ngai Kolok",
+   "maxfreq": 8
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "11",
+   "ap_tn": "สุไหงปาดี",
+   "ap_en": "Su-ngai Padi",
+   "maxfreq": 5
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "12",
+   "ap_tn": "จะแนะ",
+   "ap_en": "Chanae",
+   "maxfreq": 1
+  },
+  {
+   "pv_code": "96",
+   "pv_tn": "นราธิวาส",
+   "ap_code": "13",
+   "ap_tn": "เจาะไอร้อง",
+   "ap_en": "Cho-airong",
+   "maxfreq": 6
+  }
+ ]
+}

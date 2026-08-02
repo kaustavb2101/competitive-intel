@@ -756,6 +756,75 @@ def _shape_provenance(d):
     return None
 
 
+def _shape_contested_pop(d):
+    # The command-center (#home) "MOST CONTESTED GROUND" front-door read (obj #2):
+    # renderHomeWhitespace gates its lead competitive-pressure line on
+    # `CPOP && Array.isArray(CPOP.top) && CPOP.top.length` and renders top[0]'s
+    # .name/.prov/.region + .cpop/.pop (catchment pop within 2km of a rival) +
+    # .pct. The National-map contested lens ALSO reads the index-aligned .rows[i]
+    # = [pop10, contested_pop] (one row per branch). It is a MEASURED WorldPop ×
+    # rival-census overlay that live-degrades SILENTLY — a missing/truncated file
+    # just omits the front-door clause and hides the lens, with no phone alert —
+    # the same "broken demo" blind spot the peer_province / competitor_coverage /
+    # obj-#1 flow-card probes closed for the other exec reads. Asserts the .top
+    # leaderboard shape AND the exact index-aligned .rows length (a wrong length
+    # silently misaligns every branch's contested-pop lens value), not values;
+    # robust to a future census refresh shifting the pop counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    top = d.get("top")
+    if not isinstance(top, list) or not top:
+        return "missing/empty 'top' list (front-door 'most contested ground' render read)"
+    t0 = top[0]
+    if not isinstance(t0, dict) or not (isinstance(t0.get("name"), str) and t0["name"].strip()):
+        return "top[0] missing 'name' (contested-ground headline read)"
+    for k in ("pop", "cpop", "pct"):
+        if not isinstance(t0.get(k), (int, float)):
+            return "top[0] missing numeric '%s' (contested-ground headline read)" % k
+    rows = d.get("rows")
+    if not isinstance(rows, list) or len(rows) != 2015:
+        return "expected 2015 index-aligned 'rows' (one per branch), got %s" % (
+            len(rows) if isinstance(rows, list) else type(rows).__name__)
+    return None
+
+
+def _shape_exit_whitespace(d):
+    # The Competition (#acq) rival-fragility board (obj #2, ESTIMATED): drawExitWhitespace
+    # reads .districts and, per row, .exit_capture_score (the leaderboard sort key) +
+    # .name/.province/.region + .branches + .components{sub_scale_proxy, whitespace,
+    # big4_competitors}, plus the answer-first readout from meta.competitor_census +
+    # meta.regulatory_citation.deadline. An empty/missing .districts drops the whole
+    # board to its "Rival-fragility cue not yet computed" placeholder with NO phone
+    # alert — the same silent-degrade blind spot the other #acq probes (peer_province /
+    # competitor_coverage / pico_district / rival_density / search_demand) closed. It
+    # was the last surfaced #acq competitive read with no deploy probe. Asserts render
+    # shape (a non-empty district table carrying the sort key + component split, and the
+    # meta census block the readout headline reads), not values — robust to a future
+    # census/registry refresh. Floor guards a truncated build (928 amphoe expected).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    dists = d.get("districts")
+    if not isinstance(dists, list) or len(dists) < 500:
+        return "missing/short 'districts' list (expected the ~928-amphoe board)"
+    r0 = dists[0]
+    if not isinstance(r0, dict):
+        return "first district row is not an object"
+    if not isinstance(r0.get("exit_capture_score"), (int, float)):
+        return "first district missing numeric 'exit_capture_score' (leaderboard sort key)"
+    if not (isinstance(r0.get("name"), str) and r0["name"].strip()):
+        return "first district missing 'name' (board column read)"
+    comps = r0.get("components")
+    if not isinstance(comps, dict):
+        return "first district missing 'components' split (board cell render read)"
+    for k in ("sub_scale_proxy", "whitespace"):
+        if not isinstance(comps.get(k), (int, float)):
+            return "components.%s missing/non-numeric (board cell render read)" % k
+    meta = d.get("meta")
+    if not isinstance(meta, dict) or not isinstance(meta.get("competitor_census"), dict):
+        return "meta.competitor_census missing (readout headline census-provenance read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -869,6 +938,20 @@ DATA_FILES = [
     # spot. Asserts render shape (counts split + layers table + files.total), not
     # values — robust to the census growing.
     ("data/provenance.json", _shape_provenance, ".counts split + .layers (~120) census table + .files.total (Data Room honesty card)"),
+    # The two remaining surfaced-but-unprobed competitive reads (obj #2), each on a
+    # default-reachable route and each live-degrading SILENTLY when its file is
+    # missing/truncated (no phone alert) — the same "broken demo" blind spot the
+    # prior peer_province / competitor_coverage / pico_district / rival trio /
+    # rival_density / search_demand probes closed for their siblings:
+    #  - contested_pop: the command-center (#home) "MOST CONTESTED GROUND" front-door
+    #    lead (renderHomeWhitespace reads CPOP.top) + the National-map contested lens
+    #    (index-aligned .rows[i]=[pop10, contested_pop]);
+    #  - exit_whitespace: the Competition (#acq) rival-fragility board under the
+    #    Q1-2026 BoT registration deadline (drawExitWhitespace reads .districts +
+    #    meta.competitor_census) — the last unprobed #acq competitive read.
+    # Closes the Competition surface's + front-door's remaining obj-#2 deploy-health gap.
+    ("data/contested_pop.json", _shape_contested_pop, ".top contested-ground leaderboard + 2015 index-aligned .rows (#home lead + map lens)"),
+    ("data/exit_whitespace.json", _shape_exit_whitespace, ".districts (~928) fragility board + meta.competitor_census (#acq rival-fragility)"),
 ]
 
 
