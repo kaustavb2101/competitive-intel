@@ -8209,7 +8209,23 @@ function renderCommoditiesBoard(){
         const shocks=bp.map(x=>x.ip.agri_price_shock_pct).filter(v=>v!=null);
         const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
         const shock=avg(shocks), dbaht=avg(agri.map(a=>a.d_baht).filter(v=>v!=null));
-        const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces crop prices move farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`}. <span class="s">Agriculture is the occupation the tape records; the crop a given borrower grows is not recorded.</span></div>`;
+        // THIS LINE AND THE TABLE ABOVE IT REPORT DIFFERENT THINGS, AND ON A FALLING ROW THAT READS
+        // AS A CONTRADICTION UNLESS SAID OUT LOUD. Beef is the case that exposed it: the table's two
+        // income columns are BEEF's own effect (−3.4%, −฿260) while this line is the province's
+        // WHOLE farm income across all its crops together (+22.1%, +฿773), which is driven by rice,
+        // rubber and palm and has nothing to do with cattle. Printed side by side with no framing it
+        // looked like the page disagreeing with itself. It now names which is which and, when the
+        // two point opposite ways, says so — that opposition is the actual insight for a beef
+        // household: their own animal is falling into a rising all-crop backdrop.
+        // The noun is taken from the row's segment for the same reason as `dep` below — "crop
+        // prices" is wrong on four livestock rows, two fishery rows and two timber rows.
+        const ownAvg=avg((exp.top||[]).map(t=>t.crop_income_pct).filter(v=>v!=null));
+        const mover=c.seg==='Crops'?'crop prices':'farm and crop prices together';
+        const contrast=(ownAvg==null||shock==null)?''
+          : (ownAvg<0&&shock>0)?` <b>${c.lab} itself points the other way</b> (${ownAvg.toFixed(1)}% in the column above) — a ${c.lab.toLowerCase()} household here is falling into a rising all-crop backdrop.`
+          : (ownAvg>0&&shock<0)?` <b>${c.lab} itself points the other way</b> (+${ownAvg.toFixed(1)}% in the column above) — a ${c.lab.toLowerCase()} household here is the exception in a falling backdrop.`
+          : ` ${c.lab} moves the same way (${ownAvg>0?'+':''}${ownAvg.toFixed(1)}% in the column above).`;
+        const occLine=shock==null?'':`<div class="cb-occ"><b>Who carries it:</b> <span class="tag">${OCC_TH.Agriculture} · Agriculture</span> — across these belt provinces <b>all</b> ${mover} move the household's <b>whole</b> farm income <b style="color:${shock>=0?'var(--merch)':'var(--agri)'}">${shock>0?'+':''}${shock.toFixed(1)}%</b>${dbaht==null?'':` (≈ <b>${dbaht>0?'+':''}฿${icN(Math.round(dbaht))}</b>/month per farm household)`} — that is the backdrop, not ${c.lab}'s own effect.${contrast} <span class="s">Agriculture is the occupation the tape records; what a given borrower actually farms is not recorded.</span></div>`;
         // A row can carry a belt but no assistable population, because the assistance radar keys off
         // the Thai FARM-GATE series and not every crop has one. Sugar is exactly that case, and it
         // is the ONLY falling price that also has a belt — staying silent there reads as "nothing to
@@ -8217,13 +8233,24 @@ function renderCommoditiesBoard(){
         // unlock. (The other fallers — coconut, pineapple, pork, shrimp, eggs, chicken — have a Thai
         // price but no province area, so they cannot reach a belt at all.)
         // Two DIFFERENT reasons a belt can exist with no call list, and saying the wrong one is its
-        // own error: either we hold no Thai price for the crop, or we hold one and the assistance
-        // radar does not map the crop. All eight belted crops now clear both, so this line is a
-        // guard for future rows rather than something any current commodity hits.
+        // own error: either we hold no Thai price for the row, or we hold one and the assistance
+        // radar does not map it.
+        //
+        // The second branch used to assert the reason was "livestock and fisheries have no planted
+        // area", and the comment above it claimed no current row could even reach this line. Both
+        // went stale the same day: the 2026-08-02 additions put Durian, Longan, Rambutan and Lime
+        // on the board, and all four are seg='Crops' fruit that DO have planted area — they are
+        // simply not among the eight crops CB_CROP joins to assist_price_radar.json. A user opening
+        // the Durian drill was being told it was unmapped because it was "livestock and fisheries",
+        // which it is not. The reason is now read from CB_CROP membership rather than inferred from
+        // the segment, and the two genuinely different causes are named separately.
         const gapLine=`<div class="cb-assist cb-gap"><b>No call-list for ${c.lab} yet:</b> ${
           c.local_yoy==null
             ? `the assistable-now population is computed from a <b>Thai price series</b>, and ${c.lab} has none in this repo`
-            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but the assistance radar's exposure join does not map it — it reads crop_stress.json planted-area shares, which livestock and fisheries have none of`
+            : `${c.lab} <b>is</b> priced here (${c.local_yoy>0?'+':''}${c.local_yoy}% Thai), but it is not one of the <b>${Object.keys(CB_CROP).length} crops</b> the assistance radar joins on — that join reads crop_stress.json planted-area shares, which ${
+                c.seg==='Crops'
+                  ? `cover the staple mix rather than orchard fruit`
+                  : `${c.seg.toLowerCase()} has none of`}`
         } — so the ${icN(exp.book_accounts)} accounts above are <b>standing exposure</b>, not a worked list.</div>`;
         const assistLine=!ap?gapLine:`<div class="cb-assist"><b>Assistable now:</b> <b>${icN(ap.n_current_x)}</b> farm accounts across ${ap.n_provinces} provinces that depend on ${c.lab} are <b>Current or only X-bucket</b> — healthy today. ${ap.direction==='down'?`<b style="color:var(--agri)">This price is falling — that is the call list.</b>`:`Nothing to act on while the price is ${ap.direction} (${ap.yoy>0?'+':''}${ap.yoy}% farm-gate); this is the standing exposure if it turns.`} <a href="#assist" data-v="assist">Assistance →</a></div>`;
         const apv=exp.area_provenance||'', modelled=apv==='MODELLED';
@@ -9226,7 +9253,7 @@ function renderFarmBook(){
     host.innerHTML=`<h3 class="ovsub risk">Farm book — where the crop mix meets our money
         <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED exposure</span></h3>
       <div class="verdict"><b>${risePct}% of the ${bn(N.farm_os)} farm book sits in provinces whose crop mix is rising.</b>
-        Weighted by the farm book itself across all eight priced crops, the move is <b style="color:var(--merch)">+${N.farm_weighted_mix_pct}%</b>.
+        Weighted by the farm book itself across all ${CR.length} priced crops, the move is <b style="color:var(--merch)">+${N.farm_weighted_mix_pct}%</b>.
         Only <b>${N.neg_provinces} provinces</b> are falling and they hold <b>${m(N.neg_farm_os)}</b> — ${N.neg_share_of_os_pct}% of the book, ${num(N.neg_farm_n)} accounts, of which <b>${num(N.neg_current)} are still Current</b>.
         The two steepest crop falls in the country carry almost no farm lending, so the headline collapse is not a portfolio event.${cropLine}
         <span class="sub">Ranked by outstanding baht, not by an index — that is what makes the distinction visible.
@@ -9802,7 +9829,7 @@ function renderFarmCrops(host,j){
       <th scope="col">Crop</th>
       <th scope="col" class="gd-r" title="ALLOCATED — the province's measured farm book spread over its measured planted-area mix. The tape records an occupation, not a crop, so read the order of magnitude.">Farm ฿ (alloc)</th>
       <th scope="col" class="gd-r">% of book</th>
-      <th scope="col" class="gd-r" title="MEASURED — share of the eight priced crops' planted area nationally (OAE/DOAE)">% of area</th>
+      <th scope="col" class="gd-r" title="MEASURED — share of the ${CR.length} priced crops' planted area nationally (OAE/DOAE)">% of area</th>
       <th scope="col" class="gd-r" title="MEASURED — farm-gate price YoY (NABC daily averages; OCSB announced price for cane)">Price YoY</th>
       <th scope="col" class="gd-r" title="The crop's contribution, in percentage points, to the farm-baht-weighted move of the whole book. These sum to the banner figure — this is the column that answers 'what is actually moving us'.">Moved the book</th>
       <th scope="col" class="gd-r" title="MEASURED — farm-gate price, baht per kg">฿/kg</th>
@@ -10356,10 +10383,18 @@ function loadFuelPrices(){
 function renderHomeMacro(){
   const box=$('#cc-macro-body'); if(!box||!META) return;
   let html='';
-  // key commodity moves: 2 worst + 2 best crop/livestock YoY (borrower income drivers; gold is
-  // NOT AutoX collateral, so it is excluded).
+  // key commodity moves: 2 worst + 2 best YoY across every livelihood segment (borrower income
+  // drivers; gold is NOT AutoX collateral, so it is the one segment excluded).
+  //
+  // The filter used to name Crops and Livestock explicitly. The board has since grown Fisheries and
+  // Forestry rows, and an allowlist written before they existed silently dropped them — so the exec
+  // front door was ranking a subset while claiming to summarise the board. It was wrong in both
+  // directions at once: Fishmeal (+27.1%, Fisheries) actually beats Palm oil (+18.2%) for 2nd-best
+  // and was not shown, and Sawnwood (-1.6%, Forestry) falls further than Chicken (-0.6%) for
+  // 2nd-worst and was not shown. Now a DENYLIST of the one segment that genuinely does not belong,
+  // so a segment added to the board tomorrow is ranked instead of ignored.
   const board=(META.board||[]);
-  const agri=board.filter(b=>(b.seg==='Crops'||b.seg==='Livestock')&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy);
+  const agri=board.filter(b=>b.seg!=='Collateral'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy);
   const moves=agri.slice(0,2).concat(agri.slice(-2).reverse()).filter((b,i,arr)=>arr.indexOf(b)===i);
   html+=`<div class="cc-sub2" style="margin-top:0">Key commodity moves ${TAG_M} <span class="sub">World Bank price direction · borrower income</span></div>`;
   moves.forEach(b=>html+=ccRow(`${b.lab}`,b.note||'',`${b.yoy>0?'+':''}${b.yoy}%`,'YoY',b.yoy>=0?'var(--up)':'var(--agri)'));
@@ -10516,8 +10551,10 @@ function ccBriefCSV(){
   const gold=(META.board||[]).find(b=>/gold/i.test(b.lab||''));
   if(gold) rows.push(['collateral_gold','Gold',gold.note||'',(gold.yoy>0?'+':'')+gold.yoy+'%','measured']);
   rows.push(['collateral_pickup','Diesel-pickup','used-pickup glut + EV transition','pressure (down)','editorial']);
-  // macro
-  (META.board||[]).filter(b=>b.seg==='Crops'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2).forEach(b=>
+  // macro — the two worst-moving livelihood commodities. Same denylist as renderHomeMacro above,
+  // and for the same reason: a Crops-only filter here silently omitted the Fisheries and Forestry
+  // rows the board has carried since 2026-08-02, so the export disagreed with the card it exports.
+  (META.board||[]).filter(b=>b.seg!=='Collateral'&&b.yoy!=null).sort((a,b)=>a.yoy-b.yoy).slice(0,2).forEach(b=>
     rows.push(['macro_commodity',b.lab,b.note||'',(b.yoy>0?'+':'')+b.yoy+'%','measured']));
   // movers
   if(DELTAS&&!DELTAS.baseline&&DELTAS.branches){
