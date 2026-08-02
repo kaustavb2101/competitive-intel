@@ -59,6 +59,23 @@ HA_TO_RAI = 6.25          # DOAE and SPAM publish hectares; the board reports ra
 BOARD_TO_FARMGATE = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm",
                      "Maize": "maize", "Cassava": "cassava"}
 
+# board label -> key inside nabc_monthly.json's "products" (source-data/nabc_monthly.json, pulled
+# by pipeline/pull_nabc_monthly.py). Added 2026-08-02. This is a DIFFERENT NABC endpoint family
+# from nabc_prices.json/NABC_ROWS below (/api/monthly-prices vs /api/daily-prices) — durian and
+# rambutan have no daily-feed presence at all, so this is checked FIRST in the local-price
+# precedence in build() and nothing else (BOARD_TO_NABC, NABC_ROWS) points at these three labels,
+# so the stale daily "ลำไย" line (dropped by nabc_locals() below, see NABC_STALE_DAYS) can never
+# shadow Longan structurally — not just because it happens to be stale today.
+BOARD_TO_MONTHLY = {
+    "Durian": "durian",
+    "Rambutan": "rambutan",
+    # Longan: NABC monthly carries two grades, เกรด A and เกรด AA (both kept in nabc_monthly.json).
+    # Grade A is picked for the board's single row — it is the higher-volume COMMERCIAL grade (AA
+    # is the smaller export-premium grade); averaging the two would invent a synthetic product
+    # neither buyer actually trades. See source-data/nabc_monthly.json meta for both series.
+    "Longan": "longan_a",
+}
+
 # board label → (area source id, key inside that source). Pinned per crop on purpose; see the
 # module docstring for why the newest source is NOT preferred everywhere.
 BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
@@ -77,6 +94,11 @@ BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  # is DOAE's own 2019 "รต." crop-situation PDF series (ingest_doae_fruit.py). Old
                  # vintage, but the alternative was no belt at all for a row that already prices.
                  "Lime": ("doae_rt", "lime"),
+                 # Durian / Longan / Rambutan, added 2026-08-02 alongside BOARD_TO_MONTHLY above.
+                 # Same doae_rt PDF series as Lime — already carries these three crops on disk
+                 # (source-data/doae_fruit_area.json), just not wired to a board row until now.
+                 "Durian": ("doae_rt", "durian"), "Longan": ("doae_rt", "longan"),
+                 "Rambutan": ("doae_rt", "rambutan"),
                  # NON-CROP ROWS, added 2026-08-02 (owner: "i want the 'book exposed' data for all
                  # the commods meaning you need to find out where the belts of these commods are").
                  # A belt does not have to be planted area — it has to be the measured geography of
@@ -130,16 +152,19 @@ AREA_SOURCES = {
         "provenance": "MEASURED",
         "source": "DOAE annual crop-situation ('รต.') report, year 2562 BE / 2019 CE "
                   "(source-data/doae_fruit_area.json)",
-        "measure": {"lime": "planted area"},
-        "unit": {"lime": "rai"},
-        "note": "2019 vintage — seven years old, prominently so. Used anyway because it is the "
-                "ONLY province-grain lime source that exists anywhere: absent from the DOAE "
-                "farmer registry, the planted-area census, SPAM 2010 and OCSB alike, confirmed "
-                "across four independent searches. The DOAE site's own รต. series stops at this "
-                "year — year64/65/67 404, and later years carry an unrelated document set or sit "
-                "behind a login. An old belt names the same growing region a fresh one would; it "
-                "is the account count next to it that would go stale first, and there is no newer "
-                "figure to replace it with.",
+        "measure": {"lime": "planted area", "durian": "planted area", "longan": "planted area",
+                    "rambutan": "planted area"},
+        "unit": {"lime": "rai", "durian": "rai", "longan": "rai", "rambutan": "rai"},
+        "note": "2019 vintage — seven years old, prominently so. Originally added for lime, the "
+                "ONLY province-grain lime source that exists anywhere, confirmed across four "
+                "independent searches: absent from the DOAE farmer registry, the planted-area "
+                "census, SPAM 2010 and OCSB alike. Durian/longan/rambutan (added 2026-08-02 for "
+                "the NABC monthly board rows — see BOARD_TO_MONTHLY) reuse the SAME PDF series, "
+                "which is likewise the only province-grain source held for those three. The DOAE "
+                "site's own รต. series stops at this year — year64/65/67 404, and later years "
+                "carry an unrelated document set or sit behind a login. An old belt names the "
+                "same growing region a fresh one would; it is the account count next to it that "
+                "would go stale first, and there is no newer figure to replace it with.",
     },
     # --- non-crop belts (2026-08-02) ---------------------------------------------------------
     # These two do NOT measure planted area, so each carries its own `measure` + `unit`, and the
@@ -206,6 +231,20 @@ AREA_SOURCES = {
 LOCAL_ONLY = [
     {"lab": "Cassava", "seg": "Crops", "reg": "Isan·N·E",
      "note": "no World Bank series — Thai farm-gate only"},
+]
+
+# Durian / Longan / Rambutan, added 2026-08-02. Same LOCAL_ONLY reasoning as Cassava above (no
+# World Bank Pink Sheet series — these are not globally-traded index commodities) but priced off
+# the NABC MONTHLY feed (BOARD_TO_MONTHLY) rather than farmgate_prices, so kept as its own list
+# rather than folded into LOCAL_ONLY.
+MONTHLY_ONLY = [
+    {"lab": "Durian", "seg": "Crops", "reg": "E·S",
+     "note": "no World Bank series — Thai NABC monthly only"},
+    {"lab": "Longan", "seg": "Crops", "reg": "N",
+     "note": "no World Bank series — Thai NABC monthly only; Grade A of two grades pulled, see "
+             "BOARD_TO_MONTHLY"},
+    {"lab": "Rambutan", "seg": "Crops", "reg": "S·E",
+     "note": "no World Bank series — Thai NABC monthly only"},
 ]
 
 # NABC categories the Pink Sheet cannot cover and build_farmgate_prices.py deliberately drops.
@@ -385,16 +424,22 @@ def build():
     nabc = load(S, "nabc_prices.json")
     nkept, ndropped = nabc_locals(nabc)
     extra = [dict(spec, _nabc=cat) for cat, spec in NABC_ROWS if cat in nkept]
+    # NABC MONTHLY feed (pull_nabc_monthly.py) — a separate endpoint family from nabc_prices.json
+    # above; see BOARD_TO_MONTHLY. Durian/rambutan/longan have no daily-feed presence at all.
+    mprod = load(S, "nabc_monthly.json").get("products", {})
 
     items = []
-    for it in list(board) + LOCAL_ONLY + extra:
+    for it in list(board) + LOCAL_ONLY + extra + MONTHLY_ONLY:
         lab = it["lab"]
         ncat = it.get("_nabc") or BOARD_TO_NABC.get(lab)
         fgkey = BOARD_TO_FARMGATE.get(lab)
-        # farmgate_prices is the curated raw-crop layer; NABC covers everything else it drops; OCSB
-        # covers sugarcane, which neither of them can see (administered price, own regulator).
-        local = ((fgc.get(fgkey) if fgkey else None) or (nkept.get(ncat) if ncat else None)
-                 or (ocsb if lab == "Sugar" else None))
+        mkey = BOARD_TO_MONTHLY.get(lab)
+        # mprod checked FIRST and on its own dict — a board label only reaches ncat/fgkey lookups
+        # when mkey is unset, so the stale daily "ลำไย" line can never shadow a monthly-sourced row.
+        # farmgate_prices is the curated raw-crop layer; NABC daily covers everything else it drops;
+        # OCSB covers sugarcane, which neither of them can see (administered price, own regulator).
+        local = ((mprod.get(mkey) if mkey else None) or (fgc.get(fgkey) if fgkey else None)
+                 or (nkept.get(ncat) if ncat else None) or (ocsb if lab == "Sugar" else None))
         local_yoy = local.get("yoy") if local else None
         # LOCAL_ONLY rows have no Pink Sheet series at all, so global_yoy is genuinely absent
         # (rendered "n/a") rather than zero, and their up/stress class comes off the Thai move.
@@ -415,6 +460,7 @@ def build():
             "local_markets": local.get("n_markets") if local else None,
             "local_product": (local.get("product") or local.get("product_th")) if local else None,
             "local_source": ("OCSB announced price" if (local and local is ocsb)
+                             else "NABC monthly market" if (local and mkey and local is mprod.get(mkey))
                              else "NABC daily market" if (local and ncat and not fgkey)
                              else ("Thai farm-gate" if local else None)),
             "divergence": (round(local_yoy - global_yoy, 1)
@@ -540,6 +586,18 @@ def build():
                               "price is ADMINISTERED — one announced national price per season on "
                               "a ~10-CCS basis — so it is not a market quote and carries no "
                               "n_markets; the OAE 2561/2562 BE snapshot stays unwired.",
+            "monthly_note": "Durian, Longan and Rambutan added 2026-08-02 from a SECOND, separate "
+                           "NABC endpoint family — /api/monthly-prices (pipeline/pull_nabc_monthly.py "
+                           "-> source-data/nabc_monthly.json), distinct from the /api/daily-prices "
+                           "feed the rest of this board's NABC rows read. It requires an exact "
+                           "year_th + product_name and 400s otherwise, which is why it read as "
+                           "absent rather than gated and was never pulled before. These three carry "
+                           "no World Bank Pink Sheet series (not globally-traded index commodities) "
+                           "and no daily-feed presence, so the monthly feed is their only price at "
+                           "all. Longan shows Grade A of the two grades NABC publishes (the "
+                           "higher-volume commercial grade); YoY is same-calendar-month, not the "
+                           "30-day rolling window the daily feed uses, because these are seasonal "
+                           "harvest fruits with no off-season quote to roll through.",
             "farmgate_vintage": (fg.get("meta") or {}).get("pulled")
                                 or next((v.get("latest_date") for v in fgc.values()), None),
             "divergence_note": "A large local−global gap flags where the Thai farmer's cash reality "
