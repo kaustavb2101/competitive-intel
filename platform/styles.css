@@ -923,6 +923,14 @@ details.compsec>summary:focus-visible,details.ovsec>summary:focus-visible{outlin
 .compsub.risk,.ovsub.risk{color:#ef7d76}
 .compsub2{font-size:11.5px;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;
   margin:18px 0 8px;font-weight:600}
+/* A provenance pill that is a SENTENCE, not a word, has to be allowed to wrap. `.tag` is
+   white-space:nowrap — right for "MEASURED", wrong for "MIXED · footprint EST · service MEASURED",
+   which is 40 characters and ran 16px out of its own heading on a 390px phone. Caught in CI, where
+   the Google-hosted IBM Plex never loads and the wider system fallback is used — but the pages ship
+   `display=swap`, so that fallback is also what EVERY phone paints first, and what stays on a slow
+   Thai mobile connection. inline-block so it wraps INSIDE one continuous pill border instead of
+   breaking the border across two lines. */
+.compsub .tag,.compsub2 .tag,.ovsub .tag{white-space:normal;display:inline-block;max-width:100%}
 @media print{.jumpnav{display:none!important}details.compsec>summary::after,details.ovsec>summary::after{display:none}}
 
 /* ============================================================
