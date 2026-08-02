@@ -3,6 +3,23 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — UX loop: guard `pillCard` foot arrow against doubling — merged + deployed (PR #265, `c3b8694`)
+
+Autonomous UX-loop run. Closed the open backlog item `ux-pillar-foot-arrow-doubled` (polish/robustness).
+The command-center five-pillar band's `pillCard` (app.js) appended a literal `" →"` to the `foot` label
+with no guard (`${foot||''} →`), so a future caller passing a `foot` already ending in `→` would render a
+doubled `→ →`. Hardened the one template line to strip any trailing arrow before re-appending the canonical
+one: `${(foot||'').replace(/\s*→\s*$/,'')} →`. Idempotent — all five current callers pass plain labels
+(Macro / Data book / Assistance radar / Risk exposure / Competition), so **zero visual change today**.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` **118 passed / 0 failed**; headless `#home`
+render self-reviewed (`data-errors=[]`, each pill foot shows exactly one `→`, band otherwise identical); no
+secrets in diff; 2 files touched (1-line JS fix + 1 docs line), no stray files. **Squash-merged** own PR #265
+(`c3b8694`, branch deleted). **Deploy verified:** production alias `/` → 200, changed route `/index.html`
+(follows `cleanUrls` 308) → 200, `/app.js` → 200, and the new guard is live in the deployed `app.js` (old
+line gone). **No rollback.** Recommend next: `ux-viewport-user-scalable-3dpages` (WCAG 1.4.4 — but needs a
+device-tested run, not unattended auto-merge) or a fresh route review, since the surgical backlog is now thin.
+
 ## 2026-08-02 — Owner review: 17-point Macro-tab markup + stale-data audit + a visual-overflow gate — merged to master (PR #262, `286e450`)
 
 Kaustav marked up the live Macro tab against a PDF ahead of the MCOM presentation on Wednesday
