@@ -3641,13 +3641,13 @@ function drawPeerScore(){
   const roes=peers.map(p=>p.roe).filter(v=>typeof v==='number');
   const hiRoe=Math.max(...roes, tgt||0);
   const yc=v=>v==null?'var(--dim)':(v>0?'var(--merch)':'var(--agri)');
-  tbl.innerHTML=`<tr><th>#</th><th>Listed peer</th>`+
-    `<th title="market capitalisation (SET, price date)">Mkt cap</th>`+
-    `<th title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
-    `<th title="return on equity, latest quarter as SET reports">ROE</th>`+
-    `<th title="net profit, latest quarter">Net profit/q</th>`+
-    `<th title="price / earnings">P/E</th>`+
-    `<th title="dividend yield">Div</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Listed peer</th>`+
+    `<th scope="col" title="market capitalisation (SET, price date)">Mkt cap</th>`+
+    `<th scope="col" title="year-to-date price change — share-price momentum / investor mindshare">YTD</th>`+
+    `<th scope="col" title="return on equity, latest quarter as SET reports">ROE</th>`+
+    `<th scope="col" title="net profit, latest quarter">Net profit/q</th>`+
+    `<th scope="col" title="price / earnings">P/E</th>`+
+    `<th scope="col" title="dividend yield">Div</th></tr>`+
     peers.map((p,i)=>{
       const roeBar=(typeof p.roe==='number')?barHTML(p.roe,'var(--merch)',hiRoe):'';
       return `<tr>
@@ -3711,11 +3711,11 @@ function drawRivalIos(){
       <td class="mono sub">${r.sample&&r.sample.n!=null?r.sample.n:'—'}</td>
       <td class="mono" style="color:${(r.sample&&r.sample.low_share_pct>=40)?'var(--agri)':'var(--dim)'}">${r.sample&&r.sample.low_share_pct!=null?r.sample.low_share_pct+'%':'—'}</td>
       <td class="sub" style="font-size:12px">${th}${q}</td></tr>`;}).join('');
-  const head=`<tr><th>App</th><th title="lifetime average rating on the Thai App Store">Rating</th>`+
-    `<th title="how many ratings that average is computed over">Ratings</th>`+
-    `<th title="reviews we have stored and read for themes">Sample</th>`+
-    `<th title="share of the WRITTEN-REVIEW sample at 1–2★. People who bother to write skew negative, so this always runs far darker than the star rating beside it (Tidlor: 76% of written reviews are 1–2★ against a 3.62★ lifetime average). Read it to compare operators against each other, never as the share of customers who are unhappy.">1–2★ of written sample</th>`+
-    `<th title="ESTIMATED — Thai keyword read over the 1–2★ reviews">Top complaint</th></tr>`;
+  const head=`<tr><th scope="col">App</th><th scope="col" title="lifetime average rating on the Thai App Store">Rating</th>`+
+    `<th scope="col" title="how many ratings that average is computed over">Ratings</th>`+
+    `<th scope="col" title="reviews we have stored and read for themes">Sample</th>`+
+    `<th scope="col" title="share of the WRITTEN-REVIEW sample at 1–2★. People who bother to write skew negative, so this always runs far darker than the star rating beside it (Tidlor: 76% of written reviews are 1–2★ against a 3.62★ lifetime average). Read it to compare operators against each other, never as the share of customers who are unhappy.">1–2★ of written sample</th>`+
+    `<th scope="col" title="ESTIMATED — Thai keyword read over the 1–2★ reviews">Top complaint</th></tr>`;
   tbl.innerHTML=head+rows(title);
   if(ro&&own&&best){
     const gap=(best.score-own.score);
@@ -3777,15 +3777,15 @@ function drawRivalAds(){
   // converted here, because 1.25%/month is not 1.25%/year and pretending otherwise would
   // invent a price comparison the ads do not make.
   const rateTxt=r=>r?`<b>${r.value}%</b><span class="sub">/${r.basis==='month'?'mo':r.basis==='year'?'yr':'?'}</span>`:'<span class="sub">—</span>';
-  tbl.innerHTML=`<tr><th>#</th><th>Brand</th>`+
-    `<th title="distinct ad creatives Google lists for this advertiser in Thailand">Creatives</th>`+
-    `<th title="creatives Google still showed within ${m.live_window_days||2} days of the pull">Live now</th>`+
-    `<th title="creatives first shown in the last ${m.new_window_days||30} days — a fresh push">New 30d</th>`+
-    `<th title="share of all tracked creative volume — NOT share of spend (Google does not publish commercial spend)">Share of volume</th>`+
-    `<th title="median days between a creative's first and last shown date">Median run</th>`+
-    `<th title="the headline rate this operator advertises, in the basis its own copy states — %/mo and %/yr are never converted into one another">Advertised rate</th>`+
-    `<th title="ESTIMATED — the proposition its copy leans on most (keyword read over the ad text)">Lead message</th>`+
-    `<th title="creative launches per month, oldest to newest">Cadence (24 mo)</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Brand</th>`+
+    `<th scope="col" title="distinct ad creatives Google lists for this advertiser in Thailand">Creatives</th>`+
+    `<th scope="col" title="creatives Google still showed within ${m.live_window_days||2} days of the pull">Live now</th>`+
+    `<th scope="col" title="creatives first shown in the last ${m.new_window_days||30} days — a fresh push">New 30d</th>`+
+    `<th scope="col" title="share of all tracked creative volume — NOT share of spend (Google does not publish commercial spend)">Share of volume</th>`+
+    `<th scope="col" title="median days between a creative's first and last shown date">Median run</th>`+
+    `<th scope="col" title="the headline rate this operator advertises, in the basis its own copy states — %/mo and %/yr are never converted into one another">Advertised rate</th>`+
+    `<th scope="col" title="ESTIMATED — the proposition its copy leans on most (keyword read over the ad text)">Lead message</th>`+
+    `<th scope="col" title="creative launches per month, oldest to newest">Cadence (24 mo)</th></tr>`+
     brands.map((b,i)=>{
       const us=b.is_us, col=us?'var(--gold)':'var(--collat)';
       const name=us?`<b style="color:var(--gold)">${b.brand}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`
@@ -3837,7 +3837,7 @@ function drawRivalAds(){
           ${ocr?'<span class="tag" style="color:var(--gold);border:1px solid var(--gold)">incl. OCR · ESTIMATED</span>':''}
         </summary>
         <div class="chips" style="margin:6px 0">${themes}</div>
-        <table class="tbl"><tr><th>Last shown</th><th>Ad copy</th><th>Creatives</th><th>Source</th></tr>`+
+        <table class="tbl"><tr><th scope="col">Last shown</th><th scope="col">Ad copy</th><th scope="col">Creatives</th><th scope="col">Source</th></tr>`+
         b.messages.map(m=>`<tr>
             <td class="mono sub">${m.last||'—'}</td>
             <td style="font-size:12px">${(m.line||'').replace(/[<>]/g,'')}</td>
@@ -3902,15 +3902,15 @@ function drawRivalVideo(){
   // not earning reach. Flagging it stops the table reading as organic popularity.
   const bought=c=>c.subscribers!=null&&c.median_views_365d!=null&&c.subscribers>0&&
                    c.median_views_365d>c.subscribers*3&&c.median_views_365d>5000;
-  tbl.innerHTML=`<tr><th>#</th><th>Operator</th>`+
-    `<th title="as published by YouTube; rounded at scale, so read as a band">Subscribers</th>`+
-    `<th title="videos published in the last 30 days">Up 30d</th>`+
-    `<th title="videos published in the last 365 days">Up 1yr</th>`+
-    `<th title="days since the most recent upload">Last post</th>`+
-    `<th title="median views of videos published in the last 365 days">Median views</th>`+
-    `<th title="likes + comments per 1,000 views on the last 365 days of uploads">Engage /1k</th>`+
-    `<th title="ESTIMATED — what its video titles push most (same lexicon as the ad copy)">Lead message</th>`+
-    `<th title="uploads per month, oldest to newest">Cadence (24 mo)</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Operator</th>`+
+    `<th scope="col" title="as published by YouTube; rounded at scale, so read as a band">Subscribers</th>`+
+    `<th scope="col" title="videos published in the last 30 days">Up 30d</th>`+
+    `<th scope="col" title="videos published in the last 365 days">Up 1yr</th>`+
+    `<th scope="col" title="days since the most recent upload">Last post</th>`+
+    `<th scope="col" title="median views of videos published in the last 365 days">Median views</th>`+
+    `<th scope="col" title="likes + comments per 1,000 views on the last 365 days of uploads">Engage /1k</th>`+
+    `<th scope="col" title="ESTIMATED — what its video titles push most (same lexicon as the ad copy)">Lead message</th>`+
+    `<th scope="col" title="uploads per month, oldest to newest">Cadence (24 mo)</th></tr>`+
     ch.map((c,i)=>{
       const us=c.is_us, col=us?'var(--gold)':'var(--merch)';
       const name=us?`<b style="color:var(--gold)">${c.brand}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`
@@ -4002,8 +4002,8 @@ function drawPantip(){
   if(ro) ro.innerHTML=(PANTIP.headline?`<b>${escHtml(PANTIP.headline)}</b>`:'')+
     (PANTIP.reply_line?`<div class="sub" style="margin-top:6px">${escHtml(PANTIP.reply_line)}</div>`:'');
 
-  tbl.innerHTML='<tr><th>Lender</th><th>Threads on Pantip</th><th>Match</th><th>Est. about the brand</th>'+
-    '<th>Replies in public</th><th>What borrowers raise</th></tr>'+
+  tbl.innerHTML='<tr><th scope="col">Lender</th><th scope="col">Threads on Pantip</th><th scope="col">Match</th><th scope="col">Est. about the brand</th>'+
+    '<th scope="col">Replies in public</th><th scope="col">What borrowers raise</th></tr>'+
     rows.map(b=>{
       const us=b.is_us?' style="background:var(--raised)"':'';
       // Match rate carries a colour only where it is low enough to change how the row is read.
@@ -4078,7 +4078,7 @@ function drawSocialThemes(){
       `(${pct(q.demand_share_pct)}, ${(q.demand_docs||0).toLocaleString()} documents`+
       `${q.no_counterpart?', no counterpart message at all':''}).</span>`:'');
   }
-  tbl.innerHTML=`<tr><th>Theme</th><th>Lenders say</th><th>Customers raise</th><th>Imbalance</th><th>Read</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">Theme</th><th scope="col">Lenders say</th><th scope="col">Customers raise</th><th scope="col">Imbalance</th><th scope="col">Read</th></tr>`+
     over.concat(under).map(a=>{
       const g=a.unanswered_pts, oversaid=g<0;
       const col=oversaid?'var(--collat)':'var(--gold)';
@@ -4097,7 +4097,7 @@ function drawSocialThemes(){
     // behaves conversationally by hand and never buys it.
     const org=(THEMES&&Array.isArray(THEMES.ctas_organic))?THEMES.ctas_organic:[];
     const orgOf=k=>{const r=org.find(x=>x.key===k);return r?r.docs:0;};
-    cta.innerHTML=`<tr><th>Call to action</th><th>In paid ads</th><th>Share of paid</th><th>In organic replies</th><th>Who runs it (paid)</th></tr>`+
+    cta.innerHTML=`<tr><th scope="col">Call to action</th><th scope="col">In paid ads</th><th scope="col">Share of paid</th><th scope="col">In organic replies</th><th scope="col">Who runs it (paid)</th></tr>`+
       ctas.map(c=>`<tr><td>${c.label}</td><td class="mono">${(c.docs||0).toLocaleString()}</td>`+
         `<td class="mono">${pct(c.share_pct)}</td>`+
         `<td class="mono" style="color:var(--gold)">${orgOf(c.key)||'—'}</td>`+
@@ -4131,14 +4131,14 @@ function drawRivalPulse(){
   }
   // --- sentiment ladder (our own app highlighted) ---
   if(sent.length){
-    tbl.innerHTML=`<tr><th>#</th><th>App</th>`+
-      `<th title="lifetime Google Play score (all ratings)">Play score</th>`+
-      `<th title="number of star ratings on the store page">Ratings</th>`+
-      `<th title="share of ALL ratings that are 1★ (lifetime histogram)">1★ share</th>`+
-      `<th title="average star of reviews in the last 90 days (from the stored newest reviews)">Last 90d</th>`+
-      `<th title="share of last-90-day reviews at 1–2★">90d 1–2★</th>`+
-      `<th title="share of stored reviews that got a developer reply — CX ops discipline">Dev reply</th>`+
-      `<th title="ESTIMATED — keyword buckets over stored 1–2★ reviews">Top detractor theme</th></tr>`+
+    tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">App</th>`+
+      `<th scope="col" title="lifetime Google Play score (all ratings)">Play score</th>`+
+      `<th scope="col" title="number of star ratings on the store page">Ratings</th>`+
+      `<th scope="col" title="share of ALL ratings that are 1★ (lifetime histogram)">1★ share</th>`+
+      `<th scope="col" title="average star of reviews in the last 90 days (from the stored newest reviews)">Last 90d</th>`+
+      `<th scope="col" title="share of last-90-day reviews at 1–2★">90d 1–2★</th>`+
+      `<th scope="col" title="share of stored reviews that got a developer reply — CX ops discipline">Dev reply</th>`+
+      `<th scope="col" title="ESTIMATED — keyword buckets over stored 1–2★ reviews">Top detractor theme</th></tr>`+
       sent.map((s,i)=>{
         const own=s.own, name=own?`<b style="color:var(--gold)">${s.name}</b> <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">US</span>`:`<b>${s.name}</b>`;
         const sc=s.score!=null?s.score.toFixed(2):'—';
@@ -4268,9 +4268,9 @@ function drawRivalUniverse(){
                  rival counts come from the geo censuses, which only hold physical service points.
                  Without this entry the row rendered with a BLANK badge, which reads as a data bug. */
               broker:'<span class="tag" style="color:var(--dim);border:1px dashed var(--dim)">BROKER · NO BRANCHES</span>'};
-  tbl.innerHTML=`<tr><th></th><th>Operator</th><th>Backing</th><th>Model</th>`+
-    `<th title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
-    `<th title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col"></th><th scope="col">Operator</th><th scope="col">Backing</th><th scope="col">Model</th>`+
+    `<th scope="col" title="each company's own public footprint claim — ESTIMATED, cited in the data file">Footprint (their claim)</th>`+
+    `<th scope="col" title="measured Google Play score, joined from the sentiment ladder">App</th></tr>`+
     ops.map(o=>{
       const app=o.app?`<span class="mono">${o.app.score.toFixed(2)}★</span> <span class="sub mono">(${(o.app.ratings||0).toLocaleString()})</span>`:'<span class="sub">—</span>';
       return `<tr${o.tier==='us'?' style="background:rgba(230,180,80,.05)"':''}>
@@ -4385,11 +4385,11 @@ function drawRivRep(){
   const lo=Math.min(...vals), hi=Math.max(...vals);
   // higher rating = stronger reputation (green/merch), lower = weaker (red/agri), scaled across the spread.
   const col=v=>{ if(hi<=lo) return 'var(--merch)'; const t=(v-lo)/(hi-lo); return t>=0.67?'var(--merch)':t<=0.34?'var(--agri)':'var(--gold)'; };
-  tbl.innerHTML=`<tr><th>#</th><th>Rival brand</th>`+
-    `<th title="review-count-weighted mean Google rating across this brand's located branches">Rating ★ (wtd)</th>`+
-    `<th title="simple mean rating">Mean</th>`+
-    `<th title="located branches carrying a Google rating">Rated br.</th>`+
-    `<th title="total Google reviews across them">Reviews</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Rival brand</th>`+
+    `<th scope="col" title="review-count-weighted mean Google rating across this brand's located branches">Rating ★ (wtd)</th>`+
+    `<th scope="col" title="simple mean rating">Mean</th>`+
+    `<th scope="col" title="located branches carrying a Google rating">Rated br.</th>`+
+    `<th scope="col" title="total Google reviews across them">Reviews</th></tr>`+
     brands.map((b,i)=>{
       const v=(typeof b.rating_wavg==='number')?b.rating_wavg:null;
       const c=v!=null?col(v):'var(--dim)';
@@ -4439,10 +4439,10 @@ function drawRivThreat(){
                  if(t==='Quality threat') return 'var(--gold)';
                  if(t==='Contained') return 'var(--merch)'; return 'var(--dim)'; };
   const fmt=n=>(n==null?'—':n.toLocaleString());
-  tbl.innerHTML=`<tr><th>Rival brand</th>`+
-    `<th title="branches vs the ~2,015 AutoX runs — company-IR headline (ESTIMATED); census count in the sub-line">Footprint ×AutoX</th>`+
-    `<th title="review-count-weighted Google rating (MEASURED, located-branch sample)">Service ★</th>`+
-    `<th title="the combined read of footprint and service">Threat</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">Rival brand</th>`+
+    `<th scope="col" title="branches vs the ~2,015 AutoX runs — company-IR headline (ESTIMATED); census count in the sub-line">Footprint ×AutoX</th>`+
+    `<th scope="col" title="review-count-weighted Google rating (MEASURED, located-branch sample)">Service ★</th>`+
+    `<th scope="col" title="the combined read of footprint and service">Threat</th></tr>`+
     rows.map(b=>{
       const c=cls(b.threat_class);
       const ratio=(typeof b.footprint_vs_autox==='number')?b.footprint_vs_autox:null;
@@ -4500,10 +4500,10 @@ function drawRivThreatRegion(){
                  if(t==='Beatable on service') return 'var(--merch)';
                  if(t==='Most defensible') return 'var(--gold)'; return 'var(--dim)'; };
   const fmt=n=>(n==null?'—':n.toLocaleString());
-  tbl.innerHTML=`<tr><th>Region</th>`+
-    `<th title="rivals:AutoX branches within the region (MEASURED census, both sides); sub-line = share of AutoX districts where rivals lead">Outgunned ×</th>`+
-    `<th title="review-count-weighted Google rating for located rival branches (MEASURED sample); thin samples flagged">Rival service ★</th>`+
-    `<th title="service-led defensibility class — density is high everywhere">Defensibility</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">Region</th>`+
+    `<th scope="col" title="rivals:AutoX branches within the region (MEASURED census, both sides); sub-line = share of AutoX districts where rivals lead">Outgunned ×</th>`+
+    `<th scope="col" title="review-count-weighted Google rating for located rival branches (MEASURED sample); thin samples flagged">Rival service ★</th>`+
+    `<th scope="col" title="service-led defensibility class — density is high everywhere">Defensibility</th></tr>`+
     rows.map(r=>{
       const c=cls(r.threat_class);
       const ratio=(typeof r.rivals_vs_autox==='number')?r.rivals_vs_autox:null;
