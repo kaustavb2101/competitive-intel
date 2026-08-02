@@ -3,6 +3,27 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — UX loop (a11y): scope="col" on the district amphoe tables — MERGED + DEPLOYED + VERIFIED (PR #255)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. Fourth slice of `ux-table-scope-sweep-appjs`
+(WCAG 1.3.1): the two National (`#map`) district-lens tables `#amptbl` (coverage/whitespace, `drawAmpBoard`)
+and `#amprtbl` (risk proxy, `drawAmpRisk`) built their header rows with bare `<th>` / `<th title>`, so a
+screen reader couldn't reliably tie each data cell to its column header. Added `scope="col"` to all 16
+column-header `<th>` across both rows (incl. the conditional `haveOcc`/`haveComp` headers), matching the
+`data.html` `#ptbl`/`districtTable` convention and the prior search/competition/exposure slices. `platform/app.js`
++ a `docs/UXUI_AUDIT.md` fix-log entry only. Zero visual change (`scope` is non-presentational).
+
+**Safeguard protocol — all passed:** (a) `bash tests/run.sh check` → **113 passed, 0 failed** (no gate
+drift this run); (b) headless render of `index.html#map` (1100×900) `data-errors="[]"`, Leaflet initialised,
+map/lens-pills/controls/legend intact, self-reviewed — no visible regression (blank basemap expected);
+(c) no secrets in diff; (d) diff = 16 scoped `<th>`, no data cells, no stray files. Squash-merged to master
+(`36bb129`). **Deploy-verify:** prod alias `/` → 200, `/app.js` → 200 (deployed `app.js` confirmed to carry
+the scoped `#amptbl` header — merge is live, not stale cache), `/index.html` → 308 → 200 (expected `cleanUrls`
+redirect). No rollback needed. NOTE: the merged branch's remote ref could not be deleted — the CCR git proxy
+rejects ref-deletion pushes ("Everything up-to-date"); harmless (branch is fully merged). Remaining sweep
+families (Overview/commodity-board `#region` + `#acq` rival-pulse/ads/YouTube tables) still tracked under
+`ux-table-scope-sweep-appjs`.
+
 ## 2026-08-02 — intelligence loop (SERVICE): three MEASURED survey/registry layers had their real vintage dropped from the exec Data-room card — `_vintage_of` now scans `latest_year_ce` + `span`
 
 Autonomous market & service intelligence loop, SERVICE pillar. The service audit's standing freshness
