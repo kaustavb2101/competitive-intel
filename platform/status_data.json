@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-01T22:25:38+00:00",
-    "commit": "399d3e6"
+    "generated_at": "2026-08-02T04:19:00+00:00",
+    "commit": "bfc5fd6"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-01",
+    "eta_date": "2026-08-02",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-02T04:19:00+00:00",
+      "sha": "bfc5fd6",
+      "summary": "ci(data-macro): rebuild live_board + provenance in lockstep so the weekly macro PR gate stays green",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T09:35:09+07:00",
+      "sha": "9a0429c",
+      "summary": "Macro: the farm block — four tables become one, ranked by baht (review items 1-5, 13) (#254)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-02T02:23:33+00:00",
+      "sha": "d2c7c19",
+      "summary": "docs: log ux district-table scope=\"col\" fix — merge+deploy+verify (#255)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T09:19:04+07:00",
+      "sha": "36bb129",
+      "summary": "ux: scope=\"col\" on the district amphoe tables (#amptbl / #amprtbl) (#255)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-01T23:42:42+00:00",
+      "sha": "99d8e43",
+      "summary": "data: live fuel prices (2026-08-01, run 30723745519)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-01T22:26:12+00:00",
+      "sha": "08ae685",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room vintage fix",
+      "pillar": "data-integration"
+    },
+    {
       "date": "2026-08-01T22:25:38+00:00",
       "sha": "399d3e6",
       "summary": "data(provenance): surface the three #248 survey/registry vintages the Data-room card dropped",
@@ -673,42 +709,6 @@
       "date": "2026-08-01T04:24:13+00:00",
       "sha": "221f3b9",
       "summary": "chore(dashboard): refresh CEO autonomy plan after the province_pressure site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T04:23:20+00:00",
-      "sha": "b933fb8",
-      "summary": "health(deploy): site-health probe guards province_pressure.json (front-door cross-objective thesis)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-01T02:30:53+00:00",
-      "sha": "b60160d",
-      "summary": "docs: log ux-pillar-narrow-overflow-wrap merge+deploy+verify (#239)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T09:28:11+07:00",
-      "sha": "9a8756d",
-      "summary": "ux: wrap long Thai tokens in the five-pillar cards (overflow-wrap) (#239)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T09:07:24+07:00",
-      "sha": "4efd5bc",
-      "summary": "ux(macro): crisper Macro tab (13.7 → 5.8 screens), charts, per-tab print — plus the tape branch-join close-out (#237)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T00:30:07+00:00",
-      "sha": "18fe207",
-      "summary": "fix(gate): realign commodities.json + provenance.json to committed sources (master was RED)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-01T07:09:19+07:00",
-      "sha": "bc08233",
-      "summary": "feat: wave 2 price-assist radar, all six NAVIGATION_MAP items, and the branch join that was losing 4.3% of the book (#231)",
       "pillar": "feature"
     }
   ]
