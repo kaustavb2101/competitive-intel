@@ -427,28 +427,19 @@
          drought by district, and DLT vehicle density. META.region is untouched and still feeds the
          Command-center risk readout. -->
 
-    <!-- CROP MIX → FARM INCOME (data/crop_mix.json, build_crop_mix.py). Leads this section because
-         it is the answer the rest of it supports: with all eight priced crops weighted by province
-         area, farm income is NOT rising everywhere — four provinces are negative and they hold
-         17,287 book accounts. The prior engine weighted rice/rubber/oilpalm only, all three rising,
-         so it reported every province up. Null-safe: absent file → nothing renders. -->
+    <!-- THE FARM BLOCK (data/farm_book.json, build_farm_book.py) — one block where this section used
+         to carry four separate farm tables. Rendered by renderFarmBook() + renderFarmCrops():
+           · the 4-level geo drill (national → region → all 75 provinces → our branches), ranked by
+             OUTSTANDING BAHT rather than by the retired `agri_stress` composite;
+           · the by-crop lens underneath it — the old farmer-margin table, widened from the 5 crops
+             with an OAE cost row to all 8 the mix prices, and joined to the loan book.
+         ABSORBED AND REMOVED 2026-08-02 (owner review): the crop-mix panel + its 77-bar rank strip
+         ("doesn't give much utility apart from looking cool"), the crop-household stress table and
+         its agri_stress index ("an estimated measure that has been made up"), and the standalone
+         farmer-margin table ("expand to cover what we have on data AND consolidate with above
+         tables"). Their MEASURED content survives as columns; only the composite was dropped.
+         Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
     <div id="cropmix-wrap"></div>
-
-    <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
-    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
-    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note"></p>
-    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
-    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
-         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
-         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
-         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
-    <div id="margin-wrap" style="display:none">
-      <h3 class="ovsub risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h3>
-      <div class="verdict" id="margin-verdict" style="display:none"></div>
-      <p class="lead" id="margin-note"></p>
-      <table class="tbl" id="margintbl"></table>
-    </div>
     <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
          read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
     <div id="drought-district-wrap" style="display:none">
@@ -469,18 +460,26 @@
     </details>
 
     <details class="ovsec" id="sec-ov-collateral">
-    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2><span class="ovsec-what">Recovery-value outlook, diesel-pickup share, DLT registrations, EV watch</span></summary>
+    <summary><h2 class="collat">Collateral outlook — what the titles are worth</h2><span class="ovsec-what">The collateral book to 100%, all provinces, every brand, resale-market flow, recovery headroom, EV watch</span></summary>
 
     <h3 class="ovsub collat">Collateral outlook · vehicle-title value watch</h3>
     <p class="lead">What is happening to the value of what AutoX lends against — <b>vehicle titles</b> (pickups, cars, motorcycles) (portfolio objective #1). Directions are an <b>editorial / estimated watch</b>; the vehicle-mix shares are <b>measured</b> (DLT) — see note.</p>
     <div class="grid macro" id="collat-outlook"></div>
     <p class="lead" id="collat-note"></p>
 
-    <h3 class="ovsub collat">Diesel-pickup collateral · diesel share &amp; national brand mix</h3>
-    <div class="verdict v-warn" id="dcollat-verdict" style="display:none"></div>
-    <div class="grid macro" id="dcollat-brand"></div>
-    <p class="lead" id="dcollat-note"></p>
-    <table class="tbl" id="dcollattbl"></table>
+    <!-- THE COLLATERAL BOOK (data/collateral_book.json, build_collateral_book.py) — one block where
+         this section carried five. Rendered by renderCollateralBook(): the full 8-type mix to 100%,
+         the 4-level geo drill (national → region → all 77 provinces → our branches) with the DLT
+         collateral base as province columns, every brand we hold, and the resale market the book
+         recovers into.
+         ABSORBED AND REMOVED 2026-08-02 (owner review): the diesel-share table + brand tiles
+         (points 8, 10 — "its not all provinces. This is the weakness of top ten lists"), the
+         "most motorcycle-heavy provinces" mix table (point 12 — "full mix to 100% and all
+         provinces", and it ranked by the class that is 5.8% of the money), the truck-fleet block
+         (point 18 — "why isn't it in the collateral section?") and the used-collateral pulse
+         (point 19). Null-safe: absent file → the whole block hides itself. -->
+    <div id="collat-book"></div>
+
     <!-- New-pickup inflow TREND (data/brand_trends.json, DLT first registrations) — the TIME dimension
          the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
@@ -497,11 +496,7 @@
       <div class="grid macro" id="vehreg-cards"></div>
     </div>
 
-    <h3 class="ovsub collat">Collateral mix · most motorcycle-heavy provinces</h3>
-    <p class="lead" id="collatmix-note"></p>
-    <table class="tbl" id="collatmixtbl"></table>
-
-    <h3 class="ovsub collat">Collateral recovery-value sensitivity · illustrative</h3>
+    <h3 class="ovsub collat">Recovery-value headroom · how far resale can fall <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED positions · ILLUSTRATIVE shock</span></h3>
     <p class="lead" id="recovery-note"></p>
     <div class="grid macro" id="recovery-cards"></div>
     <table class="tbl" id="recoverytbl"></table>
@@ -538,33 +533,16 @@
     </details>
 
     <details class="ovsec" id="sec-ov-business">
-    <summary><h2 class="opp">Business &amp; credit backdrop</h2><span class="ovsec-what">DLT truck + used-collateral flow, DBD formation, FPO state-bank NPL</span></summary>
+    <summary><h2 class="opp">Business &amp; credit backdrop</h2><span class="ovsec-what">DBD business formation, FPO state-bank NPL</span></summary>
 
-    <!-- Logistics-SME (hauler) pulse (data/truck_flow.json) — MEASURED DLT truck registration actions,
-         trailing-12m vs the prior 12m (obj #1). An owner-operator hauler is a classic heavy-title
-         borrower; a contracting truck fleet = that segment's cash flow thinning, and a two-for-one on
-         obj #1 (borrower livelihood AND used-truck collateral). Nationally the fleet is still growing,
-         so the card leads with that cushion then names the province pockets where new-truck demand is
-         contracting. Rendered by renderTruckFlow(); hidden gracefully until the layer loads. -->
-    <div id="truckflow-wrap" style="display:none">
-      <h3 class="ovsub risk">Logistics-SME pulse · truck-fleet flow <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h3>
-      <div class="verdict" id="truckflow-verdict" style="display:none"></div>
-      <p class="lead" id="truckflow-note"></p>
-      <table class="tbl" id="truckflowtbl"></table>
-    </div>
-    <!-- Used-collateral pulse (data/collateral_flow.json) — MEASURED DLT car-law registration actions
-         (dataset_stat_1_008: motorcycle/car/pickup, the title-loan collateral classes), trailing-12m,
-         aggregated to the 5 macro regions (obj #1). Motorcycles are ~50% of the book; the card reads
-         where that core collateral is most liquid (used-market transfers = how fast repossessed units
-         clear) and where the base is attriting fastest (permanent deregistrations). REGION grain on
-         purpose — per-province ratios are confounded by central metro registration, which regional
-         aggregation cancels. Rendered by renderCollateralFlow(); hidden gracefully until the layer loads. -->
-    <div id="collflow-wrap" style="display:none">
-      <h3 class="ovsub risk">Used-collateral pulse · moto / car / pickup <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT registrations</span></h3>
-      <div class="verdict" id="collflow-verdict" style="display:none"></div>
-      <p class="lead" id="collflow-note"></p>
-      <table class="tbl" id="collflowtbl"></table>
-    </div>
+    <!-- MOVED 2026-08-02 into the Collateral section (owner points 18 + 19: "why isn't it in the
+         collateral section?" / "This too should be in the collateral section no?"). The truck-fleet
+         flow is now a per-province column on the collateral drill (all 77) plus a truck row in the
+         collateral mix — trucks are ฿1.84bn of our own book, so they are a collateral class, not a
+         business-backdrop curiosity. The used-collateral flow is the resale-market table at the foot
+         of that block. Point 18 also asked whether we have the flow for other vehicle classes: we do
+         — car, pickup and motorcycle — but DLT publishes that one by registration office, so it is
+         REGION grain, while the truck flow is per province. Both are labelled with their grain. -->
     <div id="dbdform-wrap" style="display:none">
       <h3 class="ovsub risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h3>
       <div class="verdict" id="dbdform-verdict" style="display:none"></div>
