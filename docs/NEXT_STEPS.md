@@ -169,9 +169,37 @@ that review still open:
 4. Co-pay ฿44bn: source and period unconfirmed. Candidate lead is "ไทยช่วยไทย พลัส" (cabinet-approved
    2026-05-19, government portion ~ ฿49.6bn at its two-month mark) but it doesn't cleanly match
    ฿44bn, so it was left rather than guessed.
-5. `tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.
+5. ~~`tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.~~
+   **DONE 2026-08-03** — `tests/run.sh overflow` (also in `all`), and a line in qa.yml's
+   "Render + health + visual" step. Wired the day after PR #259 shipped a Risk-tab panel that pushed
+   a 390px phone to 494px of horizontal page scroll with every gate green. It sits in the
+   **non-blocking** step for now, so a finding is visible in the log but does not red-gate a merge;
+   promoting it to the blocking gate is a deliberate follow-up once it has a few clean runs behind it
+   (it also fails on any uncaught console error, which is a wider net than layout alone).
 6. The TH/EN language switch was deferred by the owner to Thursday 2026-08-06 (lower priority than
    the 2026-08-05 deck).
+7. **OPEN — the three heavy 3D pages fail their headless render in CI.** `province-rayong`,
+   `province-chonburi` and `rayong-catchment` (all deck.gl/WebGL) each burn ~4 minutes on the runner
+   and then FAIL, on both master and PR runs — confirmed on the #262 master run (8 passed, 3 failed)
+   and the #266 branch run (9 passed, 2 failed). This is what exposed the qa.yml bug fixed alongside
+   it: the step's `bash -e` shell aborted at `render`, so `health` and `visual` had not been running
+   in CI at all, and the step still reported green because it is `continue-on-error`. Each phase now
+   runs independently, so the render failures are visible as warning annotations — **but they are not
+   fixed**. They render fine locally, so the suspect is the runner's software GL under the QA_BUDGET
+   timeout, not the pages. Diagnose from the uploaded `qa-renders` artifact before touching the pages.
+8. **OPEN — the page-health manifest hooks are stale.** With the step fixed so `health` actually runs,
+   it reports **0 passed / 10 failed** — but every failure is `missing #<hook>`, not a broken page:
+   `#region` (index), `#map` (national, branch-explorer), `#trendbaseline` (risk-trend), `#amprtbl`
+   (acquisition). Every page passes the substantive checks in the same run — no uncaught JS errors,
+   libs initialised, non-blank screenshot. So `tests/pages.manifest` is asserting DOM ids the
+   5-pillar reframe renamed or removed; the fix is to re-derive the hook column from the current
+   pages, NOT to change the app. Low risk, do it when the deck is out of the way.
+9. **OPEN — the visual-regression baselines are stale to the point of being noise.** Now that
+   `visual` runs it reports 0/10: five pages at `mean_diff` 175-212 against a tolerance of 12 (the
+   app has been rebuilt several times over since the PNGs were taken) and three with no baseline at
+   all (`acquisition`, `data-book`, `data-book-province`). Either refresh with
+   `tests/run.sh baseline` after a deliberate review of each PNG, or retire the phase — as written it
+   cannot tell a regression from the accumulated intended change.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"

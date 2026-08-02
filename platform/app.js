@@ -5615,7 +5615,12 @@ function renderFloodExposure(){
   const pct=n=>(100*n/N).toFixed(0)+'%';
   const cCol=s=>s>=0.25?'var(--agri)':s>=0.10?'var(--gold)':'var(--mid)';
   const rCol=s=>s>=0.80?'var(--agri)':s>=0.50?'var(--gold)':'var(--mid)';
-  const src=(floodhzMeta&&floodhzMeta.source)?floodhzMeta.source:'GISTDA Repeated Flooding 2005-2016 (50k census)';
+  const srcFull=(floodhzMeta&&floodhzMeta.source)?floodhzMeta.source:'GISTDA Repeated Flooding 2005-2016 (50k census)';
+  // meta.source carries the raw ArcGIS layer id (FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016) — a
+  // 42-character token with nothing to break on, which ran the sentence off a 390px screen and read
+  // as machine output in a line a director is meant to read. Cite the census in words and keep the
+  // full identifier on hover; it is also stated verbatim in the method box below.
+  const src=`<span title="${escHtml(srcFull)}">${escHtml(srcFull.split(/\s*\(/)[0].trim())}, 50k census</span>`;
   const vint=(floodhzMeta&&floodhzMeta.data_vintage)?floodhzMeta.data_vintage:'2005-2016';
   const regs=Object.values(byReg).sort((a,b)=>b.chr-a.chr||b.rep-a.rep);
   const provs=Object.values(byProv).filter(o=>o.chr>0).sort((a,b)=>b.chr-a.chr||b.rep-a.rep).slice(0,12);
@@ -5643,24 +5648,24 @@ function renderFloodExposure(){
     `<div class="dash2"><div class="dash2-side">`+
       `<h2 class="risk">By region</h2>`+
       `<p class="lead">Share of each region's branches sitting on repeat- and chronic-flood ground. Chronic ranked first.</p>`+
-      `<table class="tbl" id="expo-flood-reg"><tr><th scope="col">Region</th><th scope="col">Branches</th>`+
+      `<div class="tbl-wrap"><table class="tbl" id="expo-flood-reg"><tr><th scope="col">Region</th><th scope="col">Branches</th>`+
       `<th scope="col" title="branches in a district that flooded in ≥1 of 12 yrs — measured">Repeat-flood</th>`+
       `<th scope="col" class="h-agri" title="branches in a district that flooded in ≥`+FLOOD_CHRONIC+` of 12 yrs — measured">Chronic ≥`+FLOOD_CHRONIC+`/12</th></tr>`+
       regs.map(o=>{const rs=o.n?o.rep/o.n:0, cs=o.n?o.chr/o.n:0;
         return `<tr><td><b>${o.r}</b></td><td class="mono">${o.n.toLocaleString()}</td>`+
           `<td class="mono" style="color:${rCol(rs)}">${o.rep.toLocaleString()} <span class="sub">${(100*rs).toFixed(0)}%</span></td>`+
           `<td class="mono" style="color:${cCol(cs)}">${o.chr.toLocaleString()} <span class="sub">${(100*cs).toFixed(0)}%</span></td></tr>`;}).join('')+
-      `</table></div>`+
+      `</table></div></div>`+
       `<div class="dash2-main">`+
       `<h2 class="risk">Provinces most on chronic-flood ground</h2>`+
       `<p class="lead">Provinces ranked by how many of their branches sit in a <b>chronic</b> flood zone (≥${FLOOD_CHRONIC} of 12 yrs). Book proxy = branch count; the flood frequency is measured.</p>`+
-      (provs.length?`<table class="tbl" id="expo-flood-prov"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th>`+
+      (provs.length?`<div class="tbl-wrap"><table class="tbl" id="expo-flood-prov"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th>`+
         `<th scope="col">Branches</th><th scope="col" class="h-agri" title="branches in a ≥`+FLOOD_CHRONIC+`/12-yr flood district">Chronic</th>`+
         `<th scope="col" title="chronic share of the province's branches">Share</th></tr>`+
         provs.map((o,i)=>{const cs=o.n?o.chr/o.n:0;
           return `<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>`+
             `<td class="mono">${o.n.toLocaleString()}</td><td class="mono" style="color:${cCol(cs)}">${o.chr.toLocaleString()}</td>`+
-            `<td class="mono" style="color:${cCol(cs)}">${(100*cs).toFixed(0)}%</td></tr>`;}).join('')+`</table>`
+            `<td class="mono" style="color:${cCol(cs)}">${(100*cs).toFixed(0)}%</td></tr>`;}).join('')+`</table></div>`
         :`<p class="lead sub">No branch sits in a chronic-flood district.</p>`)+
       `</div></div>`;
 }

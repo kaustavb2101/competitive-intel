@@ -54,7 +54,12 @@ jobs:
       - name: Install Chromium (Playwright)
         continue-on-error: true
         run: |
-          npx --yes playwright@1.49.1 install --with-deps chromium
+          # The PACKAGE, not just the CLI. `npx --yes playwright install` fetches the installer
+          # transiently and leaves nothing in node_modules, which is fine for render.sh (it drives the
+          # chrome binary directly) but makes `require('playwright')` fail — so tests/run.sh overflow
+          # skipped itself with "playwright npm package is not installed here" the first time it ran.
+          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium
           # expose the installed chrome where render.sh looks (/opt/pw-browsers/chromium-*/...)
           PW_DIR="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
           sudo mkdir -p /opt/pw-browsers
@@ -64,13 +69,27 @@ jobs:
           sudo cp -r "$PW_DIR/$VER" "/opt/pw-browsers/$VER"
           ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome
 
-      # --- Phase 2+3+4: render, health smoke, visual regression (offline: vendored map libs) ---
-      - name: Render + health + visual (non-blocking)
+      # --- Phase 2+3+4+5: render, health smoke, visual regression, layout audit (offline: vendored map libs) ---
+      #
+      # Each phase runs INDEPENDENTLY. This step's shell is `bash -e`, and tests/run.sh exits non-zero
+      # whenever any case fails, so the previous one-command-per-line form aborted at the first
+      # failing phase and silently never ran the rest. `render` has been failing on the heavy deck.gl
+      # pages (province-rayong / province-chonburi / rayong-catchment time out on the runner), which
+      # means health and visual had not actually executed in CI for some time — the step still
+      # reported green because it is continue-on-error. Looping keeps every phase's output visible and
+      # raises a warning annotation per failing phase, without making any of them blocking.
+      - name: Render + health + visual + overflow (non-blocking)
         continue-on-error: true
         run: |
-          bash tests/run.sh render
-          bash tests/run.sh health
-          bash tests/run.sh visual
+          set +e
+          rc=0
+          for ph in render health visual overflow; do
+            echo "::group::tests/run.sh $ph"
+            bash tests/run.sh "$ph"; s=$?
+            echo "::endgroup::"
+            if [ "$s" -ne 0 ]; then echo "::warning::tests/run.sh $ph exited $s"; rc=1; fi
+          done
+          exit $rc
 
       # Always upload fresh renders so a visual-regression failure is inspectable.
       - name: Upload renders
