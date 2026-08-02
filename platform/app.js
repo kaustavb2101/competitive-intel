@@ -2527,7 +2527,7 @@ function renderEvWatch(){
     .filter(r=>r.branches>0)
     .sort((a,b)=>b.elec-a.elec).slice(0,8);
   if(!rows.length){ tbl.innerHTML=''; return; }
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="BEV+PHEV+hybrid as % of registered fleet — DLT, measured">Electrified % ▲ (DLT)</th><th title="pure battery-EV share — DLT, measured">BEV %</th><th title="diesel share — DLT, measured">Diesel %</th></tr>`+
+  tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th><th scope="col" title="AutoX branches">Branches</th><th scope="col" class="h-collat" title="BEV+PHEV+hybrid as % of registered fleet — DLT, measured">Electrified % ▲ (DLT)</th><th scope="col" title="pure battery-EV share — DLT, measured">BEV %</th><th scope="col" title="diesel share — DLT, measured">Diesel %</th></tr>`+
     rows.map((r,i)=>{const ec=r.elec>=4?'var(--agri)':r.elec>=2.5?'var(--gold)':'var(--collat)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${r.en}</b></td><td class="sub">${r.region}</td>
       <td class="mono">${r.branches}</td>
@@ -2566,7 +2566,7 @@ function renderDroughtDistrict(j){
   const clean=ds.filter(x=>x&&x.cls&&!x.suspect_zero&&!x.join_ambiguous&&x.spei!=null).slice(0,8);
   const col=cl=>cl==='extreme'?'var(--agri)':cl==='severe'?'var(--gold)':'var(--mid)';
   const tbl=$('#drought-district-tbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th>Severity</th></tr>`+
+  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">District</th><th scope="col">Province</th><th scope="col" title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th><th scope="col">Severity</th></tr>`+
     clean.map((x,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${x.name_th||x.name_en||x.code}</b></td><td class="sub">${x.province_th||'—'}</td><td class="mono" style="color:${col(x.cls)}">${x.spei.toFixed(2)}</td><td><span class="tag" style="color:${col(x.cls)};border:1px solid ${col(x.cls)}">${x.cls}</span></td></tr>`).join('');
 }
 
@@ -2602,7 +2602,7 @@ function renderAmphoeCrops(j){
   if(note) note.innerHTML='<b>MEASURED</b> planted area (OAE Geo-Informatics satellite amphoe surveys + Zone-6 surveys, every row cites its source PDF) <b>×</b> <b>MODELLED</b> drought (OAE SPEI from ERA5-Land reanalysis — a model product, not station rainfall, not a disaster declaration; lower = drier). Name-joined district-to-district'+(unj!=null?`; ${Number(unj).toLocaleString('en-US')} rows had no drought match and are dropped, never guessed`:'')+'. <b>Do not sum across crops</b> — the two survey sources carry different vintages.';
   const col=cl=>cl==='extreme'?'var(--agri)':cl==='severe'?'var(--gold)':'var(--mid)';
   const tbl=$('#amphoe-crops-tbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>District</th><th>Province</th><th>Crop</th><th title="Measured planted area, rai (OAE amphoe survey)">Planted rai ●</th><th title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th></tr>`+
+  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">District</th><th scope="col">Province</th><th scope="col">Crop</th><th scope="col" title="Measured planted area, rai (OAE amphoe survey)">Planted rai ●</th><th scope="col" title="Standardized Precipitation-Evapotranspiration Index — lower = drier (modelled)">SPEI ○ modelled</th></tr>`+
     hs.slice(0,10).map((h,i)=>`<tr><td class="mono sub">${i+1}</td><td><b>${h.amphoe_th}</b></td><td class="sub">${h.province_th}</td><td>${h.crop_th||h.crop}</td><td class="mono">${rai(h.planted_rai)}</td><td class="mono" style="color:${col(h.drought)}">${(h.spei).toFixed(2)} <span class="tag" style="color:${col(h.drought)};border:1px solid ${col(h.drought)}">${h.drought}</span></td></tr>`).join('');
 }
 
@@ -2630,7 +2630,7 @@ function renderProvinceLfs(){
     `agricultural seasons, which marks where borrower cash-flow is most seasonal (concentrated in the Isan rice belt, `+
     `behind the agri-PD book). Highest headline unemployment: ${topUnemp.map(p=>`${p.name_th} ${(p.unemployment_rate_pct||0).toFixed(1)}%`).join(', ')}.`;
   const tbl=$('#lfstbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="Share of the labour force seasonally waiting — idle between agricultural seasons (measured, NSO LFS)">Seasonal idle ●</th><th title="Unemployment rate (measured, NSO LFS)">Unemp. ●</th><th title="Labour force, thousands (measured, NSO LFS)">Labour force</th></tr>`+
+  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="Share of the labour force seasonally waiting — idle between agricultural seasons (measured, NSO LFS)">Seasonal idle ●</th><th scope="col" title="Unemployment rate (measured, NSO LFS)">Unemp. ●</th><th scope="col" title="Labour force, thousands (measured, NSO LFS)">Labour force</th></tr>`+
     bySeas.map((p,i)=>{const s=p.seasonal_share_pct||0;const c=s>=4?'var(--agri)':s>=2?'var(--gold)':'var(--mid)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${p.name_th}</b></td>`+
         `<td>${barHTML(Math.min(100,s*12),c)} <span class="mono" style="color:${c}">${s.toFixed(1)}%</span></td>`+
@@ -2683,7 +2683,7 @@ function renderBrandTrends(){
   const tbl=$('#btrendtbl');
   if(tbl){
     const pkMax=Math.max(...yrs.map(y=>t[y].pickup||0),1);
-    tbl.innerHTML=`<tr><th>Year</th><th title="MEASURED — DLT first registrations, pickup trucks (รย.3): AutoX’s core title collateral">Pickup titles ◆</th><th title="MEASURED — DLT first registrations, passenger cars">Passenger cars ◆</th><th title="MEASURED — DLT first registrations, all vehicle classes incl. motorcycles">All new regis ◆</th></tr>`+
+    tbl.innerHTML=`<tr><th scope="col">Year</th><th scope="col" title="MEASURED — DLT first registrations, pickup trucks (รย.3): AutoX’s core title collateral">Pickup titles ◆</th><th scope="col" title="MEASURED — DLT first registrations, passenger cars">Passenger cars ◆</th><th scope="col" title="MEASURED — DLT first registrations, all vehicle classes incl. motorcycles">All new regis ◆</th></tr>`+
       yrs.map((y,i)=>{
         const r=t[y], w=Math.round((r.pickup||0)/pkMax*100);
         const prev=i>0?t[yrs[i-1]].pickup:null;
@@ -2756,7 +2756,7 @@ function renderRegionDebt(){
     '<b>read direction, not decimals</b>.'+
     (prov.length?` BoT's own province examples put the <b>vulnerable-household share</b> highest in the Isan agri belt — ${prov.slice(0,3).map(p=>`${p.geo} ${p.value}%`).join(', ')} (2019), exactly where the agri-PD book sits.`:'');
   const tbl=$('#regdebttbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Region</th><th title="MEASURED — average debt per household, NSO SES 2566 (2023), carried in BoT regional letters">Debt / household ◆</th></tr>`+
+  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Region</th><th scope="col" title="MEASURED — average debt per household, NSO SES 2566 (2023), carried in BoT regional letters">Debt / household ◆</th></tr>`+
     rows.map((r,i)=>{const v=r.value||0; const c=v>=200000?'var(--agri)':v>=180000?'var(--gold)':'var(--merch)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${TH_REG[r.geo]||r.geo}</b></td>`+
         `<td>${barHTML(Math.round(100*v/max),c)} <span class="mono" style="color:${c}">${money(v)}</span></td></tr>`;}).join('');
@@ -2814,7 +2814,7 @@ function renderDbdForm(){
     'registered capital is <b>authorised at incorporation</b> (overstates deployed capital, skewed by a few large filings). '+
     'A merchant-demand / economic-vitality backdrop for the existing footprint — it makes <b>no</b> open / close / expand call.';
   const tbl=$('#dbdformtbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="MEASURED — new juristic-person registrations in the snapshot month">New firms ●</th><th title="share of the national monthly total">Share</th><th title="MEASURED — registered (authorised) capital at incorporation, snapshot month">Reg. capital ●</th></tr>`+
+  if(tbl) tbl.innerHTML=`<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="MEASURED — new juristic-person registrations in the snapshot month">New firms ●</th><th scope="col" title="share of the national monthly total">Share</th><th scope="col" title="MEASURED — registered (authorised) capital at incorporation, snapshot month">Reg. capital ●</th></tr>`+
     rows.slice(0,12).map((r,i)=>{ const sh=natN>0?r.n/natN*100:0;
       const c=sh>=15?'var(--merch)':sh>=3?'var(--gold)':'var(--dim)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
@@ -2860,7 +2860,7 @@ function renderSfi(){
   if(tbl){
     const last=SFI.slice(-8);
     const maxR=Math.max(...last.map(r=>r.npl_ratio||0),0.01);
-    tbl.innerHTML=`<tr><th>Quarter</th><th title="MEASURED — gross NPL outstanding ÷ gross credit outstanding for the SFI system">System NPL ratio ●</th><th title="MEASURED — gross NPL outstanding, THB billion">NPL (฿bn) ●</th><th>Trend</th></tr>`+
+    tbl.innerHTML=`<tr><th scope="col">Quarter</th><th scope="col" title="MEASURED — gross NPL outstanding ÷ gross credit outstanding for the SFI system">System NPL ratio ●</th><th scope="col" title="MEASURED — gross NPL outstanding, THB billion">NPL (฿bn) ●</th><th scope="col">Trend</th></tr>`+
       last.map((r,i)=>{ const prev=i>0?last[i-1].npl_ratio:null;
         const d=(prev!=null&&r.npl_ratio!=null)?r.npl_ratio-prev:null;
         const dC=(d==null)?'var(--dim)':(d>0.02?'var(--agri)':(d<-0.02?'var(--merch)':'var(--dim)'));
@@ -2914,16 +2914,16 @@ function renderThaiwater(){
     'This is a <b>live snapshot</b> of the sampled station network, <b>not</b> a disaster declaration and <b>not</b> a '+
     'catchment-weighted flood model — an acute early read on where borrower income and collections are exposed now.';
   const ft=$('#thaiwater-flood-tbl');
-  if(ft) ft.innerHTML=`<tr><th colspan="4" style="color:var(--accent)">Water on the ground · river/reservoir level ●</th></tr>`+
-    `<tr><th>#</th><th>Province</th><th title="MEASURED — stations at situation_level ≥4 (high water / overflow) of the province's sampled stations">Stations high ●</th><th title="worst situation_level in the province (5 = bank overflow flood)">Worst level ●</th></tr>`+
+  if(ft) ft.innerHTML=`<tr><th scope="colgroup" colspan="4" style="color:var(--accent)">Water on the ground · river/reservoir level ●</th></tr>`+
+    `<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="MEASURED — stations at situation_level ≥4 (high water / overflow) of the province's sampled stations">Stations high ●</th><th scope="col" title="worst situation_level in the province (5 = bank overflow flood)">Worst level ●</th></tr>`+
     (fShow.length?fShow.map((r,i)=>{ const c=r.max_level>=5?'var(--agri)':r.max_level>=4?'var(--gold)':'var(--dim)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
         `<td class="mono">${num(r.n_high)}<span class="sub">/${num(r.n_stations)}</span> <span style="color:${c}">${pct(r.pct_high)}</span></td>`+
         `<td class="mono" style="color:${c}">L${r.max_level}${r.max_level>=5?' ⚠':''}</td></tr>`;}).join('')
       :`<tr><td colspan="4" class="sub">No station at high water in the current snapshot.</td></tr>`);
   const rt=$('#thaiwater-rain-tbl');
-  if(rt) rt.innerHTML=`<tr><th colspan="4" style="color:var(--accent)">Rain arriving · 24h rainfall ●</th></tr>`+
-    `<tr><th>#</th><th>Province</th><th title="MEASURED — highest 24h rainfall at any station in the province">Max 24h ●</th><th title="share of the province's stations over the heavy threshold (≥35.1mm/24h)">Stations heavy ●</th></tr>`+
+  if(rt) rt.innerHTML=`<tr><th scope="colgroup" colspan="4" style="color:var(--accent)">Rain arriving · 24h rainfall ●</th></tr>`+
+    `<tr><th scope="col">#</th><th scope="col">Province</th><th scope="col" title="MEASURED — highest 24h rainfall at any station in the province">Max 24h ●</th><th scope="col" title="share of the province's stations over the heavy threshold (≥35.1mm/24h)">Stations heavy ●</th></tr>`+
     (rShow.length?rShow.map((r,i)=>{ const mm=r.max_mm||0; const c=mm>=90.1?'var(--agri)':mm>=35.1?'var(--gold)':'var(--dim)';
       return `<tr><td class="mono sub">${i+1}</td><td><b>${r.th}</b></td>`+
         `<td class="mono" style="color:${c}">${num(mm)}mm</td>`+
@@ -2964,21 +2964,21 @@ function renderDebtSource(){
         <td class="sub mono">${(r.informal_series||[]).map(s=>s.informal_pct+'%').join(' → ')}</td></tr>`).join('');
     host.innerHTML=`<p class="lead" style="margin:0 0 10px"><b>Informal debt is not a place, it is a job.</b> Nationally it is only <b>${n1.informal_pct}%</b> of the average household's debt and it has <b>shrunk</b> from ${n0.informal_pct}% in ${n0.year_ce} to ${n1.informal_pct}% in ${n1.year_ce}. But it barely moves between regions (${(j.by_region||[]).length?Math.min(...j.by_region.map(r=>r.informal_pct))+'–'+Math.max(...j.by_region.map(r=>r.informal_pct))+'%':'—'}) and varies <b>${mult?mult.toFixed(1)+'×':''}</b> between occupations — the most exposed being <b style="color:var(--agri)">${top.cls_en} at ${top.informal_pct}%</b>, which is squarely this book's borrower.</p>
       <div class="cb-gap cb-assist" style="margin:0 0 10px"><b>Read the level as a floor.</b> ${M.under_reporting_caveat||''}</div>
-      <table class="tbl"><tr><th>Household type (NSO class)</th><th>Debt / household</th><th>Outside the system</th><th>Share outside</th><th class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
+      <table class="tbl"><tr><th scope="col">Household type (NSO class)</th><th scope="col">Debt / household</th><th scope="col">Outside the system</th><th scope="col">Share outside</th><th scope="col" class="sub" title="share of that household's debt borrowed for farming">For farming</th></tr>${rows}</table>
       <details style="margin-top:10px"><summary class="sub">By region — and how the informal share moved across the seven survey waves</summary>
-        <table class="tbl" style="margin-top:8px"><tr><th>Region</th><th>Debt / household</th><th class="sub">Outside</th><th>Share</th><th class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
+        <table class="tbl" style="margin-top:8px"><tr><th scope="col">Region</th><th scope="col">Debt / household</th><th scope="col" class="sub">Outside</th><th scope="col">Share</th><th scope="col" class="sub">${(nat||[]).map(x=>x.year_ce).join(' → ')}</th></tr>${regs}</table></details>
       <p class="lead sub" style="margin:8px 0 0"><b>Reading:</b> ${M.scope_warning||''} ${M.label||''}</p>`;
     wrapTables();
   });
 }
 
 function renderCompetition(){
-  $('#estates').innerHTML = `<tr><th>AutoX ≤10km</th><th>Industrial estate</th></tr>`+
+  $('#estates').innerHTML = `<tr><th scope="col">AutoX ≤10km</th><th scope="col">Industrial estate</th></tr>`+
     META.estates.map(s=>{const c=s.own<=3?'#E0474B':s.own<=6?'var(--gold)':'#2BB673';const t=s.own<=3?'white space':s.own<=6?'thin':'covered';
       return `<tr><td><span class="tag" style="color:${c};border:1px solid ${c}">${s.own} · ${t}</span></td><td>${s.name}</td></tr>`;}).join('');
-  $('#mws').innerHTML = `<tr><th>Demand</th><th>AutoX</th><th>Fresh mkts</th><th>Province</th><th>Branch</th></tr>`+
+  $('#mws').innerHTML = `<tr><th scope="col">Demand</th><th scope="col">AutoX</th><th scope="col">Fresh mkts</th><th scope="col">Province</th><th scope="col">Branch</th></tr>`+
     META.mws.map(m=>`<tr><td class="mono" style="color:var(--merch)">${m.md}</td><td class="mono">${m.own}</td><td class="mono">${m.fmkt}</td><td>${m.v}</td><td class="sub">${m.n}</td></tr>`).join('');
-  $('#cws').innerHTML = `<tr><th>Collat</th><th>Vehicle</th><th>Gold</th><th>AutoX</th><th>Province</th><th>Branch</th></tr>`+
+  $('#cws').innerHTML = `<tr><th scope="col">Collat</th><th scope="col">Vehicle</th><th scope="col">Gold</th><th scope="col">AutoX</th><th scope="col">Province</th><th scope="col">Branch</th></tr>`+
     META.cws.map(c=>`<tr><td class="mono" style="color:var(--collat)">${c.c}</td><td class="mono">${c.veh}</td><td class="mono">${c.gold}</td><td class="mono">${c.own}</td><td>${c.v}</td><td class="sub">${c.n}</td></tr>`).join('');
   renderGapBoard();
   renderSearchDemand();
