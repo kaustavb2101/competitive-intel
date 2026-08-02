@@ -90,26 +90,6 @@ function loadAmphoeCrops(){
   return amphoecropsPromise;
 }
 
-// Dry-season (SECOND / irrigated) rice EXPOSURE per province — MEASURED, OAE ข้าวนาปรัง planted area
-// (data/napprang.json). This is the irrigated second-crop income cushion sitting behind the drought
-// flag: a big planted area = a big buffer today AND a big vulnerability if water cuts force the second
-// crop to be skipped. Abandonment is ~0 this season (harvested≈planted), so it is framed as EXPOSURE
-// (magnitude of irrigated income at risk), NOT current stress. NAPPRANG maps Thai province name ->
-// {planted_rai,harvested_rai,production_tons,abandon_pct}. Fully null-guarded: absent file → NAPPRANG
-// stays null, the crop-stress column is omitted, nothing fabricated.
-let NAPPRANG=null, NAPPRANG_META=null, napprangLoaded=false, napprangPromise=null;
-async function loadNapprang(){
-  if(napprangPromise) return napprangPromise;
-  napprangLoaded=true;
-  napprangPromise=(async()=>{
-    try{
-      const j = await fetch('data/napprang.json').then(r=>r.json());
-      NAPPRANG=j.by_province||null; NAPPRANG_META=j.meta||null;
-    }catch(e){ NAPPRANG=null; NAPPRANG_META=null; }
-    return NAPPRANG;
-  })();
-  return napprangPromise;
-}
 // Provincial labour market — MEASURED, NSO Labour Force Survey 2026 Q1, all 77 provinces
 // (data/province_lfs.json). Carries per-province unemployment_rate_pct + seasonal_share_pct (the
 // share of the labour force "seasonally waiting" — idle between agricultural seasons). Obj #1: an
@@ -127,23 +107,12 @@ async function loadProvinceLfs(){
   })();
   return lfsPromise;
 }
-// Farmer margin — MEASURED inputs (OAE production cost, crop year 2567/68 · NABC farm-gate prices,
-// live), DERIVED margin arithmetic (data/crop_margin.json). Per crop row: price_kg / cost_kg /
-// margin_per_rai / margin_pct_of_price / cost_method (measured_direct vs derived_from_cost_per_ton).
-// Obj #1: the income cushion behind the agri-PD book — does the price the stress table quotes actually
-// clear cost? Fully null-guarded: absent file → MARGIN stays null, the Overview block stays hidden.
-let MARGIN=null, MARGIN_META=null, MARGIN_HEAD=null, marginPromise=null;
-async function loadCropMargin(){
-  if(marginPromise) return marginPromise;
-  marginPromise=(async()=>{
-    try{
-      const j = await fetch('data/crop_margin.json').then(r=>r.json());
-      MARGIN=Array.isArray(j.crops)?j.crops:null; MARGIN_META=j.meta||null; MARGIN_HEAD=j.headline||null;
-    }catch(e){ MARGIN=null; MARGIN_META=null; MARGIN_HEAD=null; }
-    return MARGIN;
-  })();
-  return marginPromise;
-}
+// RETIRED 2026-08-02 — the client loaders for data/napprang.json (OAE dry-season 2nd-rice area) and
+// data/crop_margin.json (farm-gate price vs OAE cost). Both files are still MAINTAINED and still
+// shipped; they are now read SERVER-SIDE by pipeline/build_farm_book.py and reach the page inside
+// farm_book.json, so the browser no longer fetches them separately. Removing the loaders removes two
+// network round-trips on every Overview render and, more importantly, removes the second copy of a
+// join that used to live in both the builder and the page.
 // New-vehicle first-registration TREND (data/brand_trends.json, DLT first registrations by year).
 // Obj #1, collateral outlook: which vehicles enter the fleet today become tomorrow's used-title
 // collateral pool. The diesel-share card above is a point-in-time snapshot; this carries the TIME
@@ -1470,6 +1439,11 @@ const FOLD_KEEP=5, FOLD_MIN=8;
 function foldLongTables(root){
   (root||document).querySelectorAll('table.tbl,table.ic-tbl').forEach(t=>{
     if(t.dataset.folded) return;
+    // The geo drill is EXEMPT. Owner directive 2026-08-02 (point 13): "All provinces, roll up into
+    // regional summaries, roll up into national summary… the weakness of top ten lists." Folding a
+    // 77-province drill back to 10 rows behind a "+67 more rows" button re-creates exactly the
+    // pattern the drill exists to replace — and it is redundant, because .gd-wrap already scrolls.
+    if(t.classList.contains('gd-tbl')) return;
     const host=t.tBodies&&t.tBodies.length?t.tBodies[0]:t;
     // data rows only — this app builds several tables as bare <tr><th> headers with no <thead>
     const rows=[...host.children].filter(r=>r.tagName==='TR'&&!r.querySelector('th'));
@@ -1996,13 +1970,13 @@ function renderOverview(){
   renderEvWatch();
   // the crop mix → farm income correction (obj #1). Leads this section: it is the number the crop
   // tables underneath it explain. Null-safe: absent layer → nothing renders.
-  renderCropMix();
-  // lazy-load + render the crop-household stress card (objective #1, portfolio risk)
-  loadCropStress().then(renderCropStress);
-  loadNapprang().then(renderCropStress); // measured 2nd-rice exposure column arrives → re-render
-  // MEASURED farm-gate price vs MEASURED OAE cost → DERIVED farmer margin (crop_margin.json, obj #1) —
-  // the income cushion behind the agri-PD book. Null-safe: absent file → the block stays hidden.
-  loadCropMargin().then(renderCropMargin);
+  renderFarmBook();
+  // RETIRED 2026-08-02 from this tab — renderCropStress (the agri_stress 0-100 composite, owner:
+  // "an estimated measure that has been made up. Difficult to relate.") and renderCropMargin (the
+  // 5-crop farmer-margin table). Both are now INSIDE renderFarmBook: the stress table's measured
+  // survivors — rainfall % of normal and OAE 2nd-rice area — are province columns on the drill, and
+  // the margin table is the by-crop lens, widened to all 8 priced crops and joined to the loan book.
+  // CSTRESS itself is untouched and still feeds the map lens, the simulator and the Risk-trend tab.
   // district-grain OAE SPEI drought (obj #1), MODELLED — sharpens the province crop-stress verdict.
   loadDroughtDistrict().then(renderDroughtDistrict);
   // district crop × drought exposure (obj #1) — MEASURED OAE planted area × MODELLED OAE SPEI: names the
@@ -2082,18 +2056,34 @@ function abTile(o){
    so this can never invent a headline. Deliberately capped: if everything is urgent, nothing is. */
 function renderMacroSoWhat(){
   const host=$('#ov-sowhat'); if(!host) return;
-  Promise.all(['crop_mix','tape_real','brand_trends','thaiwater_flood','debt_source','farm_household']
-    .map(n=>tmliFetch(n))).then(([cm,tape,bt,flood,debt,fh])=>{
+  Promise.all(['crop_mix','tape_real','brand_trends','thaiwater_flood','debt_source','farm_household','tape_geo_occ']
+    .map(n=>tmliFetch(n))).then(([cm,tape,bt,flood,debt,fh,geo])=>{
     const R=[], N=n=>Number(n).toLocaleString();
     const row=(icon,jump,lead,tail)=>R.push({icon,jump,lead,tail});
 
-    // 1. The farm book, weighted across every priced crop. The point of the row is the CONTRAST: the
-    //    national aggregate is positive, which is exactly why the four provinces are invisible in it.
-    if(cm&&cm.national&&cm.national.negative_provinces){
-      const n=cm.national, w=n.worst&&n.worst[0];
-      row('🌾','sec-ov-agri',
-        `<b>${N(n.accounts_in_negative)} farm accounts</b> sit in <b>${n.negative_provinces} provinces whose crop mix is falling</b>${w?`, worst ${w.prov} down ${Math.abs(w.shock_pct)}%`:''}`,
-        `the book-weighted national move is <b>+${n.book_weighted_shock_pct}%</b>, so the aggregate hides them; this is concentration, not a national downturn`);
+    // 1. The farm book against the crop mix — in BAHT, not in account counts.
+    //    CORRECTED 2026-08-02. This row used to read "17,287 farm accounts sit in 4 provinces whose
+    //    crop mix is falling". Wrong: crop_mix.accounts is EVERY book account in the province (it is
+    //    the weighting basis for the book-weighted shock), not the farm ones. The farm-specific
+    //    exposure lives in the tape's เกษตร occupation cell, and it is an order of magnitude smaller
+    //    — 1,826 accounts / ฿213m / 3% of the ฿7.17bn farm book. Worse, the two provinces with the
+    //    dramatic crop collapses (สมุทรสงคราม −66%, สมุทรสาคร −62%) hold almost NO farm book at all
+    //    (zero and 48 accounts). Counting accounts manufactured an alarm that counting baht dissolves,
+    //    so this row now leads with baht and states the share.
+    const AGRI='เกษตร';
+    const farmOf=th=>{ const cs=(geo&&geo.provinces&&geo.provinces[th])||[];
+      return cs.find(c=>c.occupation===AGRI)||null; };
+    if(cm&&cm.national&&geo&&geo.provinces){
+      let tot=0, negOs=0, negN=0, negCur=0;
+      Object.keys(geo.provinces).forEach(th=>{
+        const f=farmOf(th); if(!f) return;
+        tot+=f.os_sum||0;
+        const p=cm.provinces&&cm.provinces[th];
+        if(p&&p.shock_pct<0){ negOs+=f.os_sum||0; negN+=f.n||0; negCur+=f.n_current||0; }
+      });
+      if(tot>0) row('🌾','sec-ov-agri',
+        `<b>${(100*(tot-negOs)/tot).toFixed(0)}% of the ฿${(tot/1e9).toFixed(2)}bn farm book</b> sits in provinces whose crop mix is <b>rising</b>; the falling ones hold <b>฿${Math.round(negOs/1e6)}m</b> across ${N(negN)} accounts`,
+        `the book-weighted national move is +${cm.national.book_weighted_shock_pct}% — and the two steepest crop falls (${(cm.national.worst||[]).slice(0,2).map(w=>w.prov).join(', ')}) carry almost no farm lending, so the headline crop collapse is not a portfolio event. ${N(negCur)} of the exposed accounts are still Current`);
     }
     // 2. What the titles are worth — accounts vs balance, which the book's own tape settles.
     const vt=tape&&tape.vehicle_types;
@@ -2557,54 +2547,12 @@ function renderEvWatch(){
       <td class="mono sub">${r.diesel!=null?r.diesel+'%':'—'}</td></tr>`;}).join('');
 }
 
-/* ---------- crop-household stress (Overview card) ----------
-   Top ~8 worst provinces by the ESTIMATED agri_stress triage index, with the REAL components:
-   dominant crop + share (OAE, measured), price YoY (MEASURED Thai farm-gate — NABC — for the major
-   crops rice/rubber/oil palm/cassava; World Bank global proxy only fills minor crops), rainfall %
-   of normal (HDX, measured). Data from data/crop_stress.json (lazy). */
-// LEAD WITH THE VERDICT — colored card above the crop-stress table, built ONLY from crop_stress.
-// w = the worst (most-stressed) province record; null → card hidden (graceful, no fabrication).
-function renderCstressVerdict(w){
-  const box=$('#cstress-verdict'); if(!box) return;
-  if(!w||!w.th){ box.style.display='none'; box.innerHTML=''; return; }
-  const dom=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'crops';
-  const sv=Math.round((w.agri_stress||0)*100);
-  const price=w.price_stress!=null?(w.price_stress>0?'+':'')+Math.round(w.price_stress)+'%':'—';
-  const drought=w.drought!=null?Math.round(w.drought*100)+'%':(w.components&&w.components.rain_pct_of_normal!=null?w.components.rain_pct_of_normal+'% of normal rain':'n/a');
-  box.style.display='block';
-  box.innerHTML=`<div class="verdict-line">⚠️ <b>Most stressed: ${w.th}</b> — ${dom.toLowerCase()}, price ${price}, drought ${drought}</div>`+
-    `<div class="sub" style="margin-top:4px">${w.region||''} · agri-stress ${sv}/100 (estimated triage) · price = Thai farm-gate, NABC ${TAG_M}</div>`;
-}
-function renderCropStress(){
-  const tbl=$('#cstresstbl'), note=$('#cstress-note');
-  if(!tbl) return;
-  if(!CSTRESS_LIST||!CSTRESS_LIST.length){
-    renderCstressVerdict(null);
-    if(note) note.textContent='Crop-household stress data not available (data/crop_stress.json missing).';
-    return;
-  }
-  const top=CSTRESS_LIST.slice(0,8); // already sorted worst-first by agri_stress
-  renderCstressVerdict(top[0]);
-  const hasNap=NAPPRANG&&Object.keys(NAPPRANG).length;
-  if(note) note.innerHTML='Which crop-farming provinces carry the most agri-income risk. '+
-    '<b>Agri-stress</b> is an <b>estimated triage index</b> (price × drought, scaled by how much the province farms). '+
-    '<b>Price YoY</b> is <b>measured Thai farm-gate</b> for all eight priced crops — rice, rubber, oil palm, cassava, maize (NABC daily averages), coconut and pineapple (NABC), sugarcane (OCSB announced price). No World Bank proxy fills any crop row here. '+
-    'Read this table WITH the crop-mix panel above it: the crops ranked here are rising, so the stress in THIS table is <b>drought-led, not price-led</b> — but three priced crops are falling hard (coconut −70.9%, pineapple −20.0%, sugarcane −17.9%) and they drive the four provinces the crop-mix panel flags. Neither table alone is the whole picture. '+
-    '<b>Dominant crop</b> (OAE + DOAE planting area) and <b>rainfall % of normal</b> (HDX) are <b>measured</b>.'+
-    (hasNap?' <b>2nd-rice exposure</b> is the <b>measured</b> irrigated dry-season (second) rice planted area (OAE '+(NAPPRANG_META&&NAPPRANG_META.vintage||'')+') — the income cushion behind the drought flag; a large area is a buffer today <i>and</i> the income most at risk if water cuts skip the second crop (abandonment ~0 this season, so it reads as <b>exposure</b>, not current stress).':'');
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-agri" title="ESTIMATED triage index 0–100">Agri-stress ▲ est</th><th title="OAE + DOAE planting-area dominant crop — measured">Dominant crop</th><th title="MEASURED Thai farm-gate YoY for the province's DOMINANT crop only (NABC daily averages; OCSB for cane). Positive = above last year. This is one crop, not the province's whole mix — the crop-mix panel above weights all eight.">Price YoY ◆ meas</th><th title="HDX rainfall as % of normal — measured">Rain % normal</th>`+(hasNap?`<th title="MEASURED — OAE dry-season (irrigated SECOND) rice planted area, rai. The irrigated income cushion behind the drought flag; exposure, not current stress (abandonment ~0 this season).">2nd-rice exposure ◆ meas</th>`:'')+`</tr>`+
-    top.map((p,i)=>{const c=p.components||{}; const dom=(p.crop_mix&&p.crop_mix[0])||{};
-      const sv=Math.round((p.agri_stress||0)*100); const bar=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)'; const sc=sv>=45?'var(--agri)':sv>=25?'var(--gold)':'var(--merch)';
-      const rn=c.rain_pct_of_normal; const rcol=rn!=null&&rn<85?'var(--gold)':'var(--mid)';
-      // double-stress badge: rice/rubber-heavy AND softening prices AND elevated drought
-      // (ESTIMATED flag from crop_stress.json). Graceful: nothing rendered when absent/false.
-      const ds=p.double_stress?` <span class="tag" style="color:var(--agri);border:1px solid var(--agri)" title="ESTIMATED — rice/rubber-heavy AND prices softening AND drought elevated (double-stress, crop_stress.json)">double-stress</span>`:'';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b>${ds}</td><td class="sub">${p.region||'—'}</td>
-      <td>${barHTML(sv,bar)} <span class="mono" style="color:${sc}">${sv}</span></td>
-      <td class="sub">${dom.crop||'—'} <span class="mono">${dom.share!=null?Math.round(dom.share*100)+'%':''}</span></td>
-      <td class="mono" style="color:${p.price_stress<0?'var(--agri)':'var(--mid)'}">${p.price_stress!=null?(p.price_stress>0?'+':'')+p.price_stress+'%':'—'}</td>
-      <td class="mono" style="color:${rcol}">${rn!=null?rn+'%':'n/a'}</td>`+(hasNap?(()=>{const np=NAPPRANG[p.th]; const pr=np&&np.planted_rai; return `<td class="mono sub" title="MEASURED — OAE dry-season second-rice planted area (rai)">${pr?fmtRai(pr):'—'}</td>`;})():'')+`</tr>`;}).join('');
-}
+/* RETIRED 2026-08-02 — renderCstressVerdict + renderCropStress (the `agri_stress` 0-100 composite
+   table). Owner: "agri stress is an estimated measure that has been made up. Difficult to relate…
+   tie it to the table in item 1, combine if possible." It is now combined: the table's two MEASURED
+   survivors — rainfall % of normal and OAE dry-season 2nd-rice area — are province columns on the
+   farm-book drill, and the ranking quantity is outstanding baht instead of a composite. The `CSTRESS`
+   layer itself is untouched and still drives the national map lens, the simulator and #trend. */
 
 /* ---------- district drought (OAE SPEI) · Overview card, objective #1 ----------
    MODELLED per-amphoe SPEI (ERA5-Land reanalysis, OAE) — a DISTRICT-grain sharpening of the province
@@ -2702,45 +2650,11 @@ function renderProvinceLfs(){
   wrap.style.display='';
 }
 
-// Farmer margin card (Overview, obj #1) — MEASURED farm-gate price vs MEASURED OAE cost, DERIVED
-// margin. Leads with the TIGHTEST cushion (lowest margin % of price) — the crop closest to the edge,
-// the risk-relevant read behind the agri-PD book. Null-safe: no rows → the whole block stays hidden.
-function renderCropMargin(){
-  const wrap=$('#margin-wrap'); if(!wrap) return;
-  const rows=Array.isArray(MARGIN)?MARGIN.filter(c=>c&&c.margin_pct_of_price!=null):[];
-  if(!rows.length){ wrap.style.display='none'; return; }
-  const money=v=>(v==null||!isFinite(v))?'—':'฿'+Math.round(v).toLocaleString('en-US');
-  // sort tightest-margin first (the crop nearest to not clearing cost = the risk read)
-  const by=rows.slice().sort((a,b)=>(a.margin_pct_of_price||0)-(b.margin_pct_of_price||0));
-  const clears=rows.filter(c=>(c.margin_per_rai||0)>0).length;
-  const tight=by[0];
-  const vb=$('#margin-verdict');
-  if(vb){
-    const clearsAll=clears===rows.length;
-    vb.className='verdict'+(clearsAll?'':' v-warn'); vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">${clearsAll?'✅':'⚠️'} <b>Farm-gate price clears OAE cost on ${clears} of ${rows.length} crop rows.</b> `+
-      `Tightest cushion: <b>${tight.crop_th||tight.crop}</b> at ${(tight.margin_pct_of_price||0).toFixed(0)}% of price (${money(tight.margin_per_rai)}/rai)</div>`+
-      `<div class="sub" style="margin-top:4px">For the crops priced here the margins still <b>clear cost today</b>, so the risk on these rows is the cushion narrowing, not a loss. That is <b>not</b> a statement about the whole farm book: coconut, pineapple and sugarcane are all falling and none of them has a joined OAE cost row, so they cannot appear in this table at all — see the crop-mix panel above for the provinces they hit. Inputs ${TAG_M} · margin derived.</div>`;
-  }
-  const note=$('#margin-note');
-  if(note) note.innerHTML='Does the <b>measured farm-gate price</b> the stress table quotes actually cover the '+
-    '<b>measured OAE production cost</b>? Sorted <b>tightest cushion first</b> — the crop nearest the edge. '+
-    '<b>Inputs are measured</b> (OAE cost reports crop year 2567/68 · NABC daily farm-gate prices); the '+
-    '<b>margin arithmetic is derived</b> and the two vintages differ, so <b>read direction, not decimals</b>. '+
-    'Rows marked <i>measured ฿/rai</i> carry OAE’s own per-rai cost; <i>derived</i> rows back-compute it from OAE’s ฿/ton × yield.'+
-    (MARGIN_META&&Array.isArray(MARGIN_META.omitted_crops)&&MARGIN_META.omitted_crops.length?' Omitted (no joined cost/price): '+MARGIN_META.omitted_crops.join(', ')+'.':'');
-  const tbl=$('#margintbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Crop</th><th title="DERIVED — farm-gate price minus OAE production cost, per rai">Margin/rai ◇</th><th title="DERIVED — margin as a share of the farm-gate price; lower = thinner cushion">Cushion % ◇</th><th title="MEASURED — NABC daily national-average farm-gate price">Price/kg ◆</th><th title="MEASURED — OAE production cost per kg (crop year 2567/68)">Cost/kg ◆</th><th title="Whether OAE reported ฿/rai directly (measured) or it was back-computed from ฿/ton × yield (derived)">Cost basis</th></tr>`+
-    by.map((c,i)=>{const m=c.margin_pct_of_price||0; const col=m<30?'var(--agri)':m<45?'var(--gold)':'var(--merch)';
-      const basis=c.cost_method==='measured_direct'?'<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">measured ฿/rai</span>':'<span class="sub">derived</span>';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${c.crop_th||c.crop}</b></td>`+
-        `<td class="mono">${money(c.margin_per_rai)}</td>`+
-        `<td>${barHTML(Math.min(100,m),col)} <span class="mono" style="color:${col}">${m.toFixed(0)}%</span></td>`+
-        `<td class="mono sub">${c.price_kg!=null?'฿'+c.price_kg:'—'}</td>`+
-        `<td class="mono sub">${c.cost_kg!=null?'฿'+c.cost_kg:'—'}</td>`+
-        `<td>${basis}</td></tr>`;}).join('');
-  wrap.style.display='';
-}
+/* RETIRED 2026-08-02 — renderCropMargin (the standalone farmer-margin table). Owner: "I like the
+   commodities/margin table but expand to cover what we have on data AND consolidate with above
+   tables." Both halves are done in renderFarmCrops: widened from the 5 crops with an OAE cost row to
+   all 8 the mix prices, and joined to the loan book by allocated farm baht and by each crop's
+   contribution in pp to the book's move. crop_margin.json is now read by build_farm_book.py. */
 
 /* ---------- New-pickup inflow trend · the future used-collateral pool (Overview, obj #1) ----------
    MEASURED — DLT first registrations by class per Buddhist-era year (data/brand_trends.json).
@@ -5773,7 +5687,7 @@ function renderOccConcentration(){
    reads collateral recovery-value DIRECTION from the gold + used-vehicle sliders, and surfaces the
    provinces that worsen most. Deterministic. Exposure = branch footprint (no per-branch ฿ balance / LTV /
    elasticities — all stated). Reuses crop_stress.json (lazy) + branches.json; no new data, no server. */
-const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (matches the red cut in renderCropStress)
+const SIM_HI=45; // high-agri-stress threshold on the 0–100 scale (crop_stress.agri_stress, still used by the map lens)
 const simState={price:0,rain:0,veh:0,factory:0};
 let simWired=false;
 
@@ -8946,134 +8860,268 @@ function priceDirColor(d){ return d==='down'?'var(--agri)':d==='up'?'var(--merch
    weighted rice/rubber/oilpalm only — all three up — so it reported all 77 provinces rising and was
    structurally blind to coconut, sugarcane and pineapple. Four provinces are negative and they carry
    real book. Null-safe: absent layer → nothing renders. */
-function renderCropMix(){
-  const host=document.getElementById('cropmix-wrap'); if(!host) return;
-  tmliFetch('crop_mix').then(j=>{
-    if(!j||!j.national||!j.provinces) return;
-    const N=j.national, M=j.meta||{}, P=j.provinces, num=n=>Number(n).toLocaleString();
-    const sign=v=>(v>0?'+':'')+v, col=v=>v<0?'var(--agri)':'var(--merch)';
-    const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
-    // One bar per province, sorted worst-first, so the shape of the country is one glance: a long
-    // green tail and a short red head. Fixed pixel geometry — a %-width SVG collapses here.
-    const all=Object.entries(P).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
-    const W=760,BW=Math.max(2,Math.floor(W/all.length)-1),H=54;
-    const lo=Math.min(...all.map(([,p])=>p.shock_pct)), hi=Math.max(...all.map(([,p])=>p.shock_pct));
-    const zero=H*(hi/(hi-lo||1));
-    const bars=all.map(([,p],i)=>{
-      const y=p.shock_pct>=0?zero-H*(p.shock_pct/(hi-lo||1)):zero;
-      const bh=Math.max(1,H*Math.abs(p.shock_pct)/(hi-lo||1));
-      return `<rect x="${i*(BW+1)}" y="${y.toFixed(1)}" width="${BW}" height="${bh.toFixed(1)}" fill="${col(p.shock_pct)}" opacity="${p.shock_pct<0?1:.55}"/>`;}).join('');
-    const spark=`<svg width="${all.length*(BW+1)}" height="${H+2}" viewBox="0 0 ${all.length*(BW+1)} ${H+2}" role="img" aria-label="${all.length} provinces ranked by crop-mix price shock, ${N.negative_provinces} negative">${bars}<line x1="0" y1="${zero.toFixed(1)}" x2="${all.length*(BW+1)}" y2="${zero.toFixed(1)}" stroke="var(--line)" stroke-width="1"/></svg>`;
+/* ================= GEO DRILL — one component, every table on this tab =================
+   Owner directive (2026-08-02, point 13): "All provinces, roll up into regional summaries, roll up
+   into national summary. This type of format can be used to analyze impact by branch, by province,
+   and by region for AutoX."
 
-    host.innerHTML=`<h3 class="ovsub risk">Crop mix → farm income · every priced crop, weighted by province land <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span></h3>
-      <div class="verdict v-warn"><b>Farm income is not rising everywhere — ${N.negative_provinces} provinces are falling, and they hold ${num(N.accounts_in_negative)} book accounts.</b>
-        Weighted across all eight priced crops, the average AutoX farm borrower's crop mix moved <b style="color:${col(N.book_weighted_shock_pct)}">${sign(N.book_weighted_shock_pct)}%</b> (median province ${sign(N.median_shock_pct)}%). But it is concentrated: the Mae Klong coconut delta is down two-thirds.
-        The previous engine weighted <b>rice, rubber and oilpalm only</b> — all three rising — and therefore reported <b>all 77 provinces up</b>. That was an artefact of the three crops it could see.</div>
-      <div class="cm-spark">${spark}<div class="s">77 provinces, worst on the left · red = falling crop mix</div></div>
-      <div id="cm-drill"></div>
-      <p class="lead sub" style="margin:8px 0 0"><b>Why you can trust the ranking:</b> the two area bases disagree on level and not on order — recomputing every crop on the DOAE registry alone moves สมุทรสงคราม from ${sign(P['สมุทรสงคราม'] ? P['สมุทรสงคราม'].shock_pct : 0)}% to ${sign(P['สมุทรสงคราม']?P['สมุทรสงคราม'].shock_pct_doae_basis:0)}% and leaves the worst-first order intact. ${M.area_basis_note||''} DOAE registration covers ${Object.entries(M.doae_coverage_vs_census||{}).map(([k,v])=>`${k} ${v}×`).join(', ')} of the census.</p>`;
-    cmDrill(j);
-    wrapTables();
-  });
+   A top-10 list answers the CEO's question and none of the branch team's. This is the same number at
+   four grains — national → region → all provinces → our branches — with ONE level on screen at a
+   time. That is what lets a table carry 77 provinces without costing 77 rows of scroll: the summary
+   is what you present, the branch rows are what someone works on Monday.
+
+   Deliberately generic. Every table in Waves B and C adopts it by passing a different `cols` and a
+   different `data`, so the drill behaviour is written once and cannot diverge between sections.
+
+   cfg = {
+     id      unique mount id (state is kept per id)
+     data    {national, regions:{}, provinces:{}, branches:{}}  — the farm_book.json shape
+     rank    numeric field every level is sorted by, descending (the "size" of the row)
+     cols    [{k, lab, fmt, cls, title, lev}]  lev omitted = all levels; 'p' = province only
+     bcols   column set for the branch level (defaults to cols minus province-only ones)
+     label   optional (row, key) => extra HTML appended to the geo name cell
+     act     optional (state, rows) => an action sentence rendered above the table
+   }
+   External data is province-grain for most sources: DLT, NSO and DBD publish nothing per branch. So
+   the branch level always shows OUR book's numbers joined to the province's signal — never a fake
+   branch-level external figure. */
+const GEO_ST={};
+function geoFmt(v,f){
+  if(v==null||v===''||(typeof v==='number'&&!isFinite(v))) return '<span class="gd-na">—</span>';
+  const n=Number(v);
+  switch(f){
+    case 'baht':  return '฿'+Math.round(n).toLocaleString('en-US');
+    case 'bahtM': return n>=1e9?'฿'+(n/1e9).toFixed(2)+'bn':'฿'+Math.round(n/1e6).toLocaleString('en-US')+'m';
+    case 'num':   return Math.round(n).toLocaleString('en-US');
+    case 'pct':   return n.toFixed(1)+'%';
+    case 'pctS':  return (n>0?'+':n<0?'−':'')+Math.abs(n).toFixed(1)+'%';
+    case 'bahtS': return (n>0?'+':n<0?'−':'')+'฿'+Math.abs(Math.round(n)).toLocaleString('en-US');
+    default:      return String(v);
+  }
+}
+function geoTone(v,cls){
+  if(cls!=='sgn'||v==null) return '';
+  return ' style="color:'+(Number(v)<0?'var(--agri)':'var(--merch)')+'"';
+}
+function geoDrill(host,cfg){
+  if(!host) return;
+  const D=cfg.data||{}, R=D.regions||{}, P=D.provinces||{}, B=D.branches||{};
+  const ST=GEO_ST[cfg.id]||(GEO_ST[cfg.id]={lev:'nat',reg:null,prov:null});
+  const rank=cfg.rank;
+
+  function rowsFor(){
+    if(ST.lev==='nat')  return Object.entries(R).map(([k,v])=>({key:k,v,kind:'reg'}));
+    if(ST.lev==='reg')  return Object.entries(P).filter(([,v])=>v.region===ST.reg).map(([k,v])=>({key:k,v,kind:'prov'}));
+    return (B[ST.prov]||[]).map(b=>({key:b.name,v:b,kind:'branch'}));
+  }
+  function draw(){
+    const rows=rowsFor().sort((a,b)=>(Number(b.v[rank])||0)-(Number(a.v[rank])||0));
+    const cols=(ST.lev==='reg'?cfg.cols:(ST.lev==='nat'?cfg.cols.filter(c=>c.lev!=='p'):(cfg.bcols||cfg.cols.filter(c=>c.lev!=='p'))));
+    const geoLab={nat:'Region',reg:'Province',branch:'Branch'}[ST.lev]||'';
+    const crumb=`<nav class="gd-crumb" aria-label="Drill level">`
+      +`<button type="button" data-go="nat"${ST.lev==='nat'?' class="on" aria-current="true"':''}>National</button>`
+      +(ST.reg?`<span>›</span><button type="button" data-go="reg"${ST.lev==='reg'?' class="on" aria-current="true"':''}>${ST.reg}</button>`:'')
+      +(ST.prov?`<span>›</span><button type="button" data-go="branch" class="on" aria-current="true">${ST.prov}</button>`:'')
+      +`</nav>`;
+    // The national row is always visible as a <tfoot>-style banner, so a reader three levels deep
+    // never loses the denominator the row they are looking at is a share OF.
+    const N=D.national||{};
+    const natline=`<div class="gd-nat">${(cfg.natCols||cfg.cols.filter(c=>c.lev!=='p')).map(c=>
+        `<span><i>${c.lab}</i>${geoFmt(N[c.k],c.fmt)}</span>`).join('')}</div>`;
+    const head=`<tr><th scope="col">${geoLab}</th>`
+      +cols.map(c=>`<th scope="col" class="gd-r"${c.title?` title="${c.title}"`:''}>${c.lab}</th>`).join('')+`</tr>`;
+    const body=rows.map(r=>{
+      const drill=r.kind!=='branch';
+      const extra=cfg.label?cfg.label(r.v,r.key,r.kind):'';
+      return `<tr${drill?` class="gd-go" data-k="${String(r.key).replace(/"/g,'&quot;')}" data-kind="${r.kind}" tabindex="0" role="link"`:''}>`
+        +`<td class="gd-geo">${r.key}${drill?'<span class="gd-ar">›</span>':''}${extra}</td>`
+        +cols.map(c=>`<td class="gd-r ${c.cls||''}"${geoTone(r.v[c.k],c.cls)}>${c.fmt==='raw'&&cfg.cell?cfg.cell(c.k,r.v):geoFmt(r.v[c.k],c.fmt)}</td>`).join('')
+        +`</tr>`;
+    }).join('');
+    const act=cfg.act?cfg.act(ST,rows):'';
+    host.innerHTML=crumb+natline+(act?`<div class="gd-act">${act}</div>`:'')
+      +`<div class="tblwrap gd-wrap"><table class="tbl gd-tbl">${head}${body}</table></div>`
+      +`<p class="gd-foot">${rows.length} ${ST.lev==='nat'?'regions':ST.lev==='reg'?'provinces':'branches'}${ST.lev!=='branch'?' — click a row to go deeper':''}${cfg.foot?' · '+cfg.foot:''}${(ST.lev==='branch'&&cfg.bfoot&&cfg.bfoot(ST))?' · '+cfg.bfoot(ST):''}</p>`;
+    wrapTables&&wrapTables();
+  }
+  host.onclick=e=>{
+    const go=e.target.closest('[data-go]');
+    if(go){ const l=go.dataset.go; ST.lev=l; if(l==='nat'){ST.reg=null;ST.prov=null;} if(l==='reg')ST.prov=null; draw(); return; }
+    const tr=e.target.closest('tr.gd-go'); if(!tr) return;
+    if(tr.dataset.kind==='reg'){ ST.lev='reg'; ST.reg=tr.dataset.k; ST.prov=null; }
+    else { ST.lev='branch'; ST.prov=tr.dataset.k; }
+    draw();
+  };
+  host.onkeydown=e=>{
+    if(e.key!=='Enter'&&e.key!==' ') return;
+    const tr=e.target.closest&&e.target.closest('tr.gd-go'); if(!tr||tr!==e.target) return;
+    e.preventDefault(); tr.click();
+  };
+  draw();
 }
 
-/* Region → province → BRANCH breadcrumb for the crop-mix read. A top-10 list answers the CEO's
-   question and none of the branch team's, so this is the same number at three grains: the region
-   card is what you present, the branch table is what someone actually works on Monday. One level is
-   on screen at a time — nesting a branch table inside a province table inside a region card is what
-   made the old impact drill unreadable. Branch rows come from impact_cards.json (the same measured
-   no-PII tape aggregate the risk views use); the crop shock is the province's, applied to the
-   branch's own book, and the row is sorted by the CURRENT (healthy) balance, because that is the
-   population you can still act on before it rolls. */
-function cmDrill(j){
-  const host=document.getElementById('cm-drill'); if(!host) return;
-  const P=j.provinces, R=j.regions||{}, num=n=>Number(n).toLocaleString();
-  const sign=v=>(v==null?'—':(v>0?'+':'')+v), col=v=>v<0?'var(--agri)':'var(--merch)';
-  const B=v=>(v==null?'—':(v<0?'−':'+')+'฿'+num(Math.abs(v)));
-  const D1=v=>(v==null?null:Math.round(v*10)/10);   // the tape's 2dp reads as false precision here
-  let ST={level:'region', region:null, prov:null};
+/* ================= THE FARM BLOCK — one table where there were four =================
+   Replaces: the crop-mix panel + its 77-bar rank strip (owner: "doesn't give much utility apart
+   from looking cool"), the crop-household stress table, and the `agri_stress` 0-100 composite
+   (owner: "an estimated measure that has been made up. Difficult to relate.").
 
-  const crumb=parts=>`<div class="cm-crumb">${parts.map((p,i)=>
-    i===parts.length-1?`<span class="cm-here">${p.t}</span>`
-      :`<a href="#" data-go="${p.go}">${p.t}</a><span class="cm-sep">›</span>`).join('')}</div>`;
+   Ranked by BAHT, which is what he chose over the index — and the choice immediately earned itself:
+   counting accounts said 17,287 were exposed to a falling crop mix; counting baht says ฿213m, 3% of
+   the book, and shows that the two provinces with the catastrophic crop moves carry almost no farm
+   lending at all. The alarm was an artefact of the unit.
 
-  function regionView(){
-    const rs=Object.entries(R).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
-    return crumb([{t:'All regions'}])
-      +`<p class="s" style="margin:0 0 8px">Press a region to see its provinces, then a province to see its branches. Region moves are weighted by <b>book accounts</b>, not by province count — five regions are not five equal books.</p>`
-      +`<div class="cm-cards">${rs.map(([r,g])=>`<button class="cm-card" data-region="${r}">
-          <div class="cm-card-k">${r}</div>
-          <div class="cm-card-v" style="color:${col(g.shock_pct)}">${sign(g.shock_pct)}%</div>
-          <div class="cm-card-n">${num(g.accounts)} accounts · ${g.provinces} provinces${
-            g.negative?` · <b style="color:var(--agri)">${g.negative} falling (${num(g.accounts_negative)} acc)</b>`:' · none falling'}</div>
-          <div class="cm-card-n s">worst: ${g.worst_prov} ${sign(g.worst_shock)}%</div></button>`).join('')}</div>`;
-  }
+   The "what is driving it" column is the fix for the contradiction he caught: it used to name the
+   biggest DRAG under a heading promising the biggest DRIVER, so ร้อยเอ็ด read "Sugarcane 5% of land"
+   while rice — 91.7% of the land — supplied +11.4pp of its +11.8% move. Now the mix is ranked by
+   absolute contribution and the drag is named as a drag. */
+function renderFarmBook(){
+  const host=document.getElementById('cropmix-wrap'); if(!host) return;
+  tmliFetch('farm_book').then(j=>{
+    if(!j||!j.national||!j.provinces){ host.style.display='none'; return; }
+    host.style.display='';
+    const N=j.national, num=n=>Number(n).toLocaleString('en-US');
+    const bn=v=>'฿'+(v/1e9).toFixed(2)+'bn', m=v=>'฿'+Math.round(v/1e6).toLocaleString('en-US')+'m';
+    const risePct=N.neg_share_of_os_pct==null?null:(100-N.neg_share_of_os_pct).toFixed(0);
 
-  function provView(region){
-    const ps=Object.entries(P).filter(([,p])=>p.region===region).sort((a,b)=>a[1].shock_pct-b[1].shock_pct);
-    const rows=ps.map(([th,p])=>{const d=p.crops[0];
-      return `<tr class="cm-prow" data-prov="${th}"><td><b>${th}</b> <span class="cm-chev">›</span></td>
-        <td class="n" style="color:${col(p.shock_pct)}"><b>${sign(p.shock_pct)}%</b></td>
-        <td class="n" style="color:${col(p.income_thb_month)}">${B(p.income_thb_month)}</td>
-        <td class="n">${num(p.accounts)}</td>
-        <td class="s">${d?`${d.en} <b>${Math.round(d.share*100)}%</b> of land, ${sign(d.yoy)}% → ${sign(Math.round(d.pp*10)/10)}pp`:'—'}</td>
-        <td class="n s">${sign(p.shock_pct_doae_basis)}%</td>
-        <td class="n s">${p.shock_pct_3crop_prior==null?'—':sign(D1(p.shock_pct_3crop_prior))+'%'}</td></tr>`;}).join('');
-    return crumb([{t:'All regions',go:'region'},{t:region}])
-      +`<table class="tbl cm-tbl"><tr><th scope="col">Province</th>
-        <th scope="col" title="area-weighted Thai farm-gate move across all 8 priced crops">Crop mix move</th>
-        <th scope="col" title="that move through the income engine's farm sensitivity, on the province's measured NSO SES farm income">Farm income</th>
-        <th scope="col">Book accounts</th><th scope="col">What is driving it</th>
-        <th scope="col" class="s" title="sensitivity: every crop on the DOAE registry alone">DOAE basis</th>
-        <th scope="col" class="s" title="the previous rice/rubber/palm-only figure">Prior</th></tr>${rows}</table>`;
-  }
+    // The crop that MOVED the book is not the crop that IS the book. Name it in the commentary —
+    // it is the single most counter-intuitive line in this section and a reader will not derive it
+    // from the table.
+    const CR=(j.crops||[]).slice();
+    const big=CR.slice().sort((a,b)=>b.farm_os_alloc-a.farm_os_alloc)[0];
+    const mov=CR.slice().sort((a,b)=>b.pp_of_book-a.pp_of_book)[0];
+    const drg=CR.slice().sort((a,b)=>a.pp_of_book-b.pp_of_book)[0];
+    const cropLine=(big&&mov&&drg&&mov.crop!==big.crop)
+      ? ` <b>${big.en} is ${big.os_share_pct}% of the book, but ${mov.en.toLowerCase()} is what moved it</b> — on half ${big.en.toLowerCase()}'s share of the book, ${mov.en.toLowerCase()} contributed <b style="color:var(--merch)">+${mov.pp_of_book.toFixed(1)}pp</b> against ${big.en.toLowerCase()}'s +${big.pp_of_book.toFixed(1)}pp, because it is ${mov.yoy>0?'+':''}${mov.yoy}% YoY. The only material drag is <b style="color:var(--agri)">${drg.en.toLowerCase()} at ${drg.pp_of_book.toFixed(1)}pp</b>.`
+      : '';
 
-  function branchView(th){
-    const p=P[th]||{}, mix=(p.crops||[]).slice().sort((a,b)=>b.share-a.share).slice(0,4);
-    const mixLine=mix.map(c=>`${c.en} ${Math.round(c.share*100)}% <span style="color:${col(c.yoy)}">${sign(c.yoy)}%</span>`).join(' · ');
-    return tmliFetch('impact_cards').then(ic=>{
-      const bs=((ic&&ic.branches)||{})[th]||[];
-      if(!bs.length) return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
-        +`<div class="ic-note">No branch rows published for ${th} — the tape aggregate suppresses any cell under the ${((ic&&ic.meta)||{}).min_cell||30}-account floor.</div>`;
-      // Rank by the CURRENT balance, not by size: the biggest branch is not the biggest opportunity,
-      // the one with the most still-healthy accounts in a falling crop region is.
-      const rows=bs.slice().map(b=>({...b, cur:Math.round(b.n*(b.current_pct||0)/100)}))
-        .sort((a,b)=>b.cur-a.cur)
-        .map(b=>`<tr><td>${b.name}</td>
-          <td class="n">${num(b.n)}</td><td class="n">฿${b.os_m}m</td>
-          <td class="n"><b>${num(b.cur)}</b> <span class="s">(${D1(b.current_pct)}%)</span></td>
-          <td class="n s">${D1(b.early_pct)}%</td>
-          <td class="n" style="color:${(b.dpd30p_pct||0)>=20?'var(--agri)':'inherit'}">${D1(b.dpd30p_pct)}%</td>
-          <td class="n s">${D1(b.npl_live_pct)}%</td></tr>`).join('');
-      const totCur=bs.reduce((s,b)=>s+Math.round(b.n*(b.current_pct||0)/100),0);
-      const act=p.shock_pct<0
-        ? `<b style="color:var(--agri)">Action:</b> ${th}'s crop mix fell ${sign(p.shock_pct)}% — roughly ${B(p.income_thb_month)}/month off a farm household's cash. <b>${num(totCur)} accounts across these ${bs.length} branches are still Current</b>; that is the pre-emptive contact list, worked biggest-Current-book first.`
-        : `<b>Watch only:</b> ${th}'s crop mix is ${sign(p.shock_pct)}%, so there is no price-driven action here today. ${num(totCur)} accounts are Current — this is the standing exposure if the mix turns.`;
-      return crumb([{t:'All regions',go:'region'},{t:p.region||'',go:'prov'},{t:th}])
-        +`<div class="cm-act">${act}<div class="s" style="margin-top:4px">Crop mix: ${mixLine}</div></div>`
-        +`<table class="tbl cm-tbl"><tr><th scope="col">Branch</th><th scope="col">Accounts</th>
-          <th scope="col" title="outstanding balance">O/S</th>
-          <th scope="col" title="accounts with nothing past due — the population you can still act on">Current</th>
-          <th scope="col" class="s" title="X-bucket, past due but under 30 days">X</th>
-          <th scope="col" title="30+ days past due">30+</th><th scope="col" class="s" title="90-179 days">NPL live</th></tr>${rows}</table>`;
+    host.innerHTML=`<h3 class="ovsub risk">Farm book — where the crop mix meets our money
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED exposure</span></h3>
+      <div class="verdict"><b>${risePct}% of the ${bn(N.farm_os)} farm book sits in provinces whose crop mix is rising.</b>
+        Weighted by the farm book itself across all eight priced crops, the move is <b style="color:var(--merch)">+${N.farm_weighted_mix_pct}%</b>.
+        Only <b>${N.neg_provinces} provinces</b> are falling and they hold <b>${m(N.neg_farm_os)}</b> — ${N.neg_share_of_os_pct}% of the book, ${num(N.neg_farm_n)} accounts, of which <b>${num(N.neg_current)} are still Current</b>.
+        The two steepest crop falls in the country carry almost no farm lending, so the headline collapse is not a portfolio event.${cropLine}
+        <span class="sub">Ranked by outstanding baht, not by an index — that is what makes the distinction visible.
+        Weighting by farm baht (+${N.farm_weighted_mix_pct}%) differs from weighting by every book account (+${N.book_weighted_mix_pct}%): farm lending is not spread like the book.</span></div>
+      <div id="fb-drill"></div>
+      <div id="fb-crops"></div>`;
+
+    const drivers=v=>{
+      const d=v.drivers||[]; if(!d.length) return '<span class="gd-na">—</span>';
+      return d.map(c=>`<span class="fb-crop"><b>${c.crop}</b> ${c.share}%<i${c.pp<0?' class="dn"':''}>${c.pp>0?'+':'−'}${Math.abs(c.pp).toFixed(1)}pp</i></span>`).join('');
+    };
+    geoDrill(document.getElementById('fb-drill'),{
+      id:'farmbook', data:j, rank:'farm_os',
+      cols:[
+        {k:'farm_os',fmt:'bahtM',lab:'Farm O/S',title:'MEASURED — outstanding on farm-occupation accounts, real loan tape'},
+        {k:'farm_n',fmt:'num',lab:'Accts'},
+        {k:'mix_pct',fmt:'pctS',cls:'sgn',lab:'Crop mix',title:'MEASURED — the province crop mix weighted by planted area, moved by each crop’s farm-gate YoY'},
+        {k:'drivers',fmt:'raw',lab:'What is driving it',lev:'p',title:'The mix ranked by contribution in percentage points — the crop that actually moved the province, not the biggest drag'},
+        {k:'farm_income_thb_month',fmt:'baht',lab:'Farm income',lev:'p',title:'NSO/LFS-anchored farm income per month — context only, not used to rank'},
+        {k:'rain_pct_of_normal',fmt:'pct',lab:'Rain % nml',lev:'p',title:'MEASURED — 3-month rainfall as a share of normal. Below 100 is dry.'},
+        {k:'napprang_rai',fmt:'num',lab:'2nd-rice rai',lev:'p',title:'MEASURED (OAE) — dry-season irrigated SECOND rice area. The income cushion behind a dry reading: a big area is a buffer today AND the income most at risk if water cuts skip the second crop.'},
+        {k:'current',fmt:'num',lab:'Current',title:'Accounts still Current — the population you can still act on before it rolls'},
+        {k:'dpd90p_pct',fmt:'pct',lab:'90+ %',lev:'p'}
+      ],
+      bcols:[
+        {k:'farm_os',fmt:'bahtM',lab:'Farm O/S'},
+        {k:'farm_n',fmt:'num',lab:'Accts'},
+        {k:'current',fmt:'num',lab:'Current'},
+        {k:'watch_x',fmt:'num',lab:'X-day'},
+        {k:'roll_3089',fmt:'num',lab:'30–89'},
+        {k:'dpd90p_pct',fmt:'pct',lab:'90+ %'}
+      ],
+      natCols:[{k:'farm_os',fmt:'bahtM',lab:'Farm book '},{k:'farm_n',fmt:'num',lab:'Accounts '},
+               {k:'current',fmt:'num',lab:'Current '},{k:'provinces',fmt:'num',lab:'Provinces '},
+               // farm-BAHT-weighted, matching every region row. crop_mix's headline weights by all
+               // book accounts, which is a different denominator and read here would be a unit error.
+               {k:'farm_weighted_mix_pct',fmt:'pctS',lab:'Farm-weighted mix '}],
+      cell:(k,v)=>k==='drivers'?drivers(v):'',
+      foot:'farm (เกษตร) accounts only · cells below the 30-account floor are not published',
+      act:(ST,rows)=>{
+        if(ST.lev!=='branch') return '';
+        const p=(j.provinces||{})[ST.prov]||{};
+        // A province can hold farm book that no single BRANCH cell can publish: in an urban province
+        // the farm accounts spread so thin that no branch × เกษตร cell clears the 30-account floor.
+        // Bangkok (฿15.7m / 102 accounts) and นนทบุรี (฿7.4m / 35) are both this case. Say so — an
+        // empty table would read as "no farm book here", which is the opposite of the truth.
+        if(!rows.length) return `<b>${ST.prov}</b> holds <b>${m(p.farm_os||0)}</b> of farm book across `
+          +`${num(p.farm_n||0)} accounts, but no single branch's farm cell clears the 30-account `
+          +`publication floor — so it cannot be broken out per branch. Work it from the province list.`;
+        const cur=rows.reduce((s,r)=>s+(r.v.current||0),0), os=rows.reduce((s,r)=>s+(r.v.farm_os||0),0);
+        const rn=p.rain_pct_of_normal, dry=rn!=null&&rn<100;
+        return `<b>Action:</b> ${ST.prov} holds ${m(os)} of farm book across ${rows.length} branches, `
+          +`<b>${num(cur)} accounts still Current</b>. `
+          +(p.mix_pct!=null&&p.mix_pct<0
+            ? `Its crop mix is down ${Math.abs(p.mix_pct)}% — work the Current list biggest-book-first before the next payment cycle.`
+            : dry
+              ? `Its crop mix is up ${p.mix_pct}%, but rainfall is <b>${rn.toFixed(1)}% of normal</b> — the risk here is water, not price. Watch collections; do not tighten on price.`
+              : `Prices and rainfall are both favourable — monitor only.`);
+      },
+      // Branch rows are reconciled to the province's MEASURED cell (see build_farm_book._reconcile),
+      // so they sum exactly. Saying which rows were measured and which were allocated is the honest
+      // part of making them tie.
+      bfoot:ST=>{
+        const r=((j.provinces||{})[ST.prov]||{}).recon;
+        if(!r) return '';
+        return `${r.n_measured} of ${r.n_branches} branch cells are MEASURED; the rest are allocated `
+          +`over the province mix so the branch rows sum exactly to the province's measured total`
+          +(r.mode==='proportional'?' (proportional — measured cells alone exceeded the province total)':'');
+      }
     });
-  }
+    renderFarmCrops(document.getElementById('fb-crops'),j);
+  }).catch(()=>{ host.style.display='none'; });
+}
 
-  function draw(){
-    const put=html=>{host.innerHTML=html; wrapTables();};
-    if(ST.level==='region') put(regionView());
-    else if(ST.level==='prov') put(provView(ST.region));
-    else branchView(ST.prov).then(put);
-  }
-  host.addEventListener('click',e=>{
-    const card=e.target.closest('[data-region]');
-    if(card){ ST={level:'prov',region:card.dataset.region,prov:null}; draw(); return; }
-    const row=e.target.closest('.cm-prow');
-    if(row){ ST={level:'branch',region:ST.region,prov:row.dataset.prov}; draw(); return; }
-    const go=e.target.closest('[data-go]');
-    if(go){ e.preventDefault(); ST.level=go.dataset.go; draw(); }
-  });
-  draw();
+/* THE SAME BOOK, CUT BY CROP — the second lens of the farm block, not a second section.
+   Owner on the old farmer-margin table: "I like the commodities/margin table but expand to cover what
+   we have on data AND consolidate with above tables." So it moves in here, widened from the 5 crops
+   OAE publishes a cost for to all 8 the mix prices, and gains the two columns that connect it to the
+   loan book: how much book each crop carries, and how many points of the book's move it supplied.
+
+   The two money columns deliberately disagree, and that disagreement is the insight:
+     Farm ฿ (alloc)  is an ALLOCATION — the tape records an occupation, never a crop. Order of
+                     magnitude only, and it says so in the header.
+     Contribution    is firm — measured farm-gate YoY x measured area share, weighted by measured
+                     baht. It sums to the farm-weighted move in the banner above, so the column foots.
+   Margin is DERIVED from two MEASURED OAE/NABC inputs whose vintages differ: read the direction. */
+function renderFarmCrops(host,j){
+  if(!host) return;
+  const CR=j.crops||[]; if(!CR.length){ host.style.display='none'; return; }
+  const N=j.national||{};
+  const m=v=>'฿'+Math.round(v/1e6).toLocaleString('en-US')+'m';
+  const sg=v=>v==null?'<span class="gd-na">—</span>':`<span style="color:${v<0?'var(--agri)':'var(--merch)'}">${v>0?'+':v<0?'−':''}${Math.abs(v).toFixed(1)}</span>`;
+  const priced=CR.filter(c=>c.margin_per_rai!=null).length;
+  host.innerHTML=`<h4 class="fb-h4">The same book, cut by crop
+      <span class="tag" style="color:var(--gold);border:1px solid var(--gold)">MEASURED price · ALLOCATED book</span></h4>
+    <div class="tblwrap"><table class="tbl gd-tbl"><tr>
+      <th scope="col">Crop</th>
+      <th scope="col" class="gd-r" title="ALLOCATED — the province's measured farm book spread over its measured planted-area mix. The tape records an occupation, not a crop, so read the order of magnitude.">Farm ฿ (alloc)</th>
+      <th scope="col" class="gd-r">% of book</th>
+      <th scope="col" class="gd-r" title="MEASURED — share of the eight priced crops' planted area nationally (OAE/DOAE)">% of area</th>
+      <th scope="col" class="gd-r" title="MEASURED — farm-gate price YoY (NABC daily averages; OCSB announced price for cane)">Price YoY</th>
+      <th scope="col" class="gd-r" title="The crop's contribution, in percentage points, to the farm-baht-weighted move of the whole book. These sum to the banner figure — this is the column that answers 'what is actually moving us'.">Moved the book</th>
+      <th scope="col" class="gd-r" title="MEASURED — farm-gate price, baht per kg">฿/kg</th>
+      <th scope="col" class="gd-r" title="MEASURED — OAE production cost, baht per kg. Where OAE reports several field practices the conservative (lowest-margin) one is shown.">Cost/kg</th>
+      <th scope="col" class="gd-r" title="DERIVED from the two measured inputs — margin per rai. The vintages differ; read direction, not decimals.">Margin ฿/rai</th>
+      <th scope="col" class="gd-r" title="Provinces where this crop is the largest share of planted area">Dominant in</th>
+    </tr>`+CR.map(c=>`<tr>
+      <td class="gd-geo"><b>${c.en}</b>${c.alts>1?`<span class="sub" title="OAE reports ${c.alts} cost rows for this crop (different field practices); the conservative one is shown"> · ${c.alts} OAE cost rows</span>`:''}</td>
+      <td class="gd-r">${m(c.farm_os_alloc)}</td>
+      <td class="gd-r">${c.os_share_pct.toFixed(1)}%</td>
+      <td class="gd-r">${c.area_share_pct==null?'<span class="gd-na">—</span>':c.area_share_pct.toFixed(1)+'%'}</td>
+      <td class="gd-r">${sg(c.yoy)}%</td>
+      <td class="gd-r"><b>${sg(c.pp_of_book)}pp</b></td>
+      <td class="gd-r">${c.price_kg==null?'<span class="gd-na">—</span>':'฿'+c.price_kg}</td>
+      <td class="gd-r">${c.cost_kg==null?'<span class="gd-na">—</span>':'฿'+c.cost_kg}</td>
+      <td class="gd-r">${c.margin_per_rai==null?'<span class="gd-na">—</span>':'฿'+Math.round(c.margin_per_rai).toLocaleString('en-US')}</td>
+      <td class="gd-r">${c.dominant_in||'<span class="gd-na">—</span>'}</td>
+    </tr>`).join('')+`</table></div>
+    <p class="gd-foot">All ${CR.length} priced crops · the <b>Moved the book</b> column sums to the
+      <b>${N.farm_weighted_mix_pct>0?'+':''}${Number(N.farm_weighted_mix_pct).toFixed(1)}%</b> in the banner above ·
+      OAE publishes a production cost for ${priced} of ${CR.length}, so margin is blank for the rest
+      rather than guessed · price and cost are MEASURED, the margin arithmetic is DERIVED and the two
+      vintages differ — read direction, not decimals.</p>`;
+  host.style.display='';
 }
 
 /* MEASURED farm-household cash P&L (data/farm_household.json) — the ground under every price claim

@@ -427,28 +427,19 @@
          drought by district, and DLT vehicle density. META.region is untouched and still feeds the
          Command-center risk readout. -->
 
-    <!-- CROP MIX → FARM INCOME (data/crop_mix.json, build_crop_mix.py). Leads this section because
-         it is the answer the rest of it supports: with all eight priced crops weighted by province
-         area, farm income is NOT rising everywhere — four provinces are negative and they hold
-         17,287 book accounts. The prior engine weighted rice/rubber/oilpalm only, all three rising,
-         so it reported every province up. Null-safe: absent file → nothing renders. -->
+    <!-- THE FARM BLOCK (data/farm_book.json, build_farm_book.py) — one block where this section used
+         to carry four separate farm tables. Rendered by renderFarmBook() + renderFarmCrops():
+           · the 4-level geo drill (national → region → all 75 provinces → our branches), ranked by
+             OUTSTANDING BAHT rather than by the retired `agri_stress` composite;
+           · the by-crop lens underneath it — the old farmer-margin table, widened from the 5 crops
+             with an OAE cost row to all 8 the mix prices, and joined to the loan book.
+         ABSORBED AND REMOVED 2026-08-02 (owner review): the crop-mix panel + its 77-bar rank strip
+         ("doesn't give much utility apart from looking cool"), the crop-household stress table and
+         its agri_stress index ("an estimated measure that has been made up"), and the standalone
+         farmer-margin table ("expand to cover what we have on data AND consolidate with above
+         tables"). Their MEASURED content survives as columns; only the composite was dropped.
+         Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
     <div id="cropmix-wrap"></div>
-
-    <h3 class="ovsub risk">Crop-household stress · worst provinces</h3>
-    <!-- VERDICT card (generated from crop_stress.json; omitted gracefully if absent) -->
-    <div class="verdict v-warn" id="cstress-verdict" style="display:none"></div>
-    <p class="lead" id="cstress-note"></p>
-    <table class="tbl" id="cstresstbl"><tbody class="skel-rows" aria-hidden="true"><tr><td><span class="skel skel-line skel-w70"></span></td></tr><tr><td><span class="skel skel-line skel-w55"></span></td></tr><tr><td><span class="skel skel-line skel-w40"></span></td></tr></tbody></table>
-    <!-- Farmer margin (data/crop_margin.json) — the income side of the same crops the stress table
-         prices: does the MEASURED farm-gate price clear OAE's MEASURED production cost? Margin
-         arithmetic is DERIVED (two vintages differ — read direction, not decimals). Obj #1: the
-         cash-flow cushion behind the agri-PD book. Rendered by renderCropMargin(); hidden until load. -->
-    <div id="margin-wrap" style="display:none">
-      <h3 class="ovsub risk">Farmer margin · farm-gate price vs OAE cost <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED inputs · DERIVED margin</span></h3>
-      <div class="verdict" id="margin-verdict" style="display:none"></div>
-      <p class="lead" id="margin-note"></p>
-      <table class="tbl" id="margintbl"></table>
-    </div>
     <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
          read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
     <div id="drought-district-wrap" style="display:none">
