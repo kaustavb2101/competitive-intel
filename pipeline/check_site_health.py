@@ -862,6 +862,44 @@ def _shape_collateral_book(d):
     return None
 
 
+def _shape_macro_book(d):
+    # The Overview/Macro tab's "CONDITIONS AT OUR GRAIN" geo drill (obj #1/#2) —
+    # the one drill that replaced five macro sections (labour / fleet / hazard /
+    # business-formation / household-debt). renderMacroBook GATES the whole block
+    # on `j.national && j.provinces` (else host.style.display='none'), then reads
+    # the per-lens note verdicts off national KPIs (unemployment_pct,
+    # electrified_pct, diesel_share_pct, flood_high/flood_stations, n_dry/
+    # n_districts, new_biz_n, ...), the 77-province drill table off j.provinces,
+    # and the header NPL sparkline off j.npl. It is the sibling of collateral_book
+    # from the #258/#261 macro wave and was the last unprobed read from it — the
+    # audit's own "next probe targets" note. It live-degrades SILENTLY: a missing
+    # or truncated file just hides the primary conditions-at-our-grain screen with
+    # no phone alert, the exact "broken demo" blind spot the collateral_book /
+    # collateral_flow / tape_real obj-#1 probes closed for their siblings. Asserts
+    # the gate + headline render shape (national KPI keys the notes read + the
+    # 77-province drill + the npl header), not values — robust to a future tape/
+    # DLT/ThaiWater vintage refresh moving the numbers.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (renderMacroBook display gate)"
+    for k in ("unemployment_pct", "electrified_pct", "diesel_share_pct",
+              "flood_high", "flood_stations", "n_dry", "n_districts", "new_biz_n"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (per-lens note verdict render read)" % k
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' object (renderMacroBook display gate + drill table)"
+    p0 = next(iter(provs.values()))
+    if not isinstance(p0, dict) or "region" not in p0 or "os" not in p0:
+        return "first province row missing region/os (drill-table cell render read)"
+    npl = d.get("npl")
+    if not isinstance(npl, dict) or not isinstance(npl.get("series"), list) or not npl["series"]:
+        return "missing 'npl.series' (header NPL sparkline render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -997,6 +1035,14 @@ DATA_FILES = [
     # blind spot the collateral_flow / truck_flow / tape_real probes closed for the
     # sibling obj-#1 reads. Asserts the gate + verdict render shape, not values.
     ("data/collateral_book.json", _shape_collateral_book, ".national KPI block + .types collateral-type table (Overview collateral section)"),
+    # The sibling from the same #258/#261 macro wave, and the audit's own flagged
+    # "next probe target". renderMacroBook gates the whole "CONDITIONS AT OUR
+    # GRAIN" geo drill (the one that replaced five macro sections) on `j.national
+    # && j.provinces`, so a truncated CDN deploy that drops either silently hides
+    # the primary conditions screen with no phone alert. Asserts the gate +
+    # per-lens verdict render shape (national KPIs + 77-province drill + npl
+    # header), not values.
+    ("data/macro_book.json", _shape_macro_book, ".national KPI block + 77-province drill + .npl header (Overview conditions-at-our-grain drill)"),
 ]
 
 

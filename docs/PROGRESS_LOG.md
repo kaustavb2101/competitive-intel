@@ -3,6 +3,37 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Intelligence loop (service): deploy site-health probe for `macro_book.json` — merged to master
+
+Autonomous market/service-intelligence run. Closed the SERVICE_AUDIT's own flagged "next probe target":
+`macro_book.json` was live-`fetch()`'d by `renderMacroBook` (app.js) yet had **no deploy site-health
+probe**. It is the sibling of `collateral_book` from the #258/#261 macro wave and drives the Overview/Macro
+"CONDITIONS AT OUR GRAIN" geo drill — the one drill that replaced five macro sections (labour / fleet /
+hazard / business-formation / household-debt). `renderMacroBook` GATES the whole block on
+`j.national && j.provinces` (else `host.style.display='none'`), then reads per-lens note verdicts off
+national KPIs (`unemployment_pct`, `electrified_pct`, `diesel_share_pct`, `flood_high`/`flood_stations`,
+`n_dry`/`n_districts`, `new_biz_n`), the 77-province drill table off `j.provinces`, and the header NPL
+sparkline off `j.npl.series`. So a truncated/failed CDN deploy that dropped or corrupted it would silently
+hide the primary conditions-at-our-grain screen with **no phone alert** — the same "broken demo" blind spot
+the `collateral_book` / `collateral_flow` / `tape_real` obj-#1 probes closed for their siblings.
+
+Added `_shape_macro_book` to `pipeline/check_site_health.py`: fetch + parse + render-shape (asserts the
+display gate — `national` KPI block with the 8 numeric keys the notes read, a non-empty 77-province drill
+whose rows carry `region`/`os`, and the `npl.series` sparkline array — **shape not values**, robust to a
+future tape/DLT/ThaiWater vintage refresh moving the numbers). Verified: eight negative tests reject
+non-dict / missing-`national` / non-numeric-KPI / missing-`provinces` / empty-`provinces` / province-row-
+missing-`region` / empty-`npl.series` / missing-`npl` shapes while accepting the real payload; the offline
+`--local platform` path reports **101/101 HEALTHY** with `macro_book.json` served (779 KB) and shape-sane.
+Probe coverage 98 → **101** checks.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` **118 passed / 0 failed**; data integrity
+**455/455**; no secrets in diff; 2 files touched (probe + this log), no stray files. Change is a CI/monitor
+script only — no app/visual behaviour altered, so no PR/headless-render needed. **Note for the next run:**
+the freshly-cloned container's local `master`/`origin/master` refs were stale (pointed at `ee657c3`, #219,
+2026-07-30); the authoritative remote (`git ls-remote origin master`) was already at `6c96aff` (#264). Work
+was based on the real remote tip, not the stale local ref. Next probe targets from the audit: `farm_book`
+and `flood_hazard`.
+
 ## 2026-08-02 — UX loop: guard `pillCard` foot arrow against doubling — merged + deployed (PR #265, `c3b8694`)
 
 Autonomous UX-loop run. Closed the open backlog item `ux-pillar-foot-arrow-doubled` (polish/robustness).
