@@ -72,6 +72,11 @@ BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  # 2026-08-01. Cane is the ONE crop where the pinned source is not a choice between
                  # census and registry — OCSB is the register of record for every cane grower.
                  "Sugar": ("ocsb", "sugarcane"),
+                 # Lime, added 2026-08-02. Not in the DOAE farmer registry (18 crops, no มะนาว) or
+                 # any other province source held here — the only belt that exists for it anywhere
+                 # is DOAE's own 2019 "รต." crop-situation PDF series (ingest_doae_fruit.py). Old
+                 # vintage, but the alternative was no belt at all for a row that already prices.
+                 "Lime": ("doae_rt", "lime"),
                  # NON-CROP ROWS, added 2026-08-02 (owner: "i want the 'book exposed' data for all
                  # the commods meaning you need to find out where the belts of these commods are").
                  # A belt does not have to be planted area — it has to be the measured geography of
@@ -120,6 +125,21 @@ AREA_SOURCES = {
                 "delivery, so this is a near-complete count rather than a survey or a registry "
                 "sample. It is the register of record for Thai cane: growers register with OCSB, "
                 "not DOAE, which is why cane is absent from the farmer registry entirely.",
+    },
+    "doae_rt": {
+        "provenance": "MEASURED",
+        "source": "DOAE annual crop-situation ('รต.') report, year 2562 BE / 2019 CE "
+                  "(source-data/doae_fruit_area.json)",
+        "measure": {"lime": "planted area"},
+        "unit": {"lime": "rai"},
+        "note": "2019 vintage — seven years old, prominently so. Used anyway because it is the "
+                "ONLY province-grain lime source that exists anywhere: absent from the DOAE "
+                "farmer registry, the planted-area census, SPAM 2010 and OCSB alike, confirmed "
+                "across four independent searches. The DOAE site's own รต. series stops at this "
+                "year — year64/65/67 404, and later years carry an unrelated document set or sit "
+                "behind a login. An old belt names the same growing region a fresh one would; it "
+                "is the account count next to it that would go stale first, and there is no newer "
+                "figure to replace it with.",
     },
     # --- non-crop belts (2026-08-02) ---------------------------------------------------------
     # These two do NOT measure planted area, so each carries its own `measure` + `unit`, and the
@@ -307,8 +327,22 @@ def area_tables(area_census):
         if tbl:
             dld[key] = tbl
 
+    # DOAE รต. crop-situation series (doae_fruit_area.json, owner-side ingest_doae_fruit.py). Same
+    # absent-file contract as dof/rfd/dld above — a fresh clone without the file just keeps Lime's
+    # belt empty rather than failing the build.
+    doae_rt = {}
+    try:
+        frt = load(S, "doae_fruit_area.json")
+    except (FileNotFoundError, ValueError):
+        frt = {}
+    for key, lay in (frt.get("crops") or {}).items():
+        tbl = {pv: v for pv, v in (lay.get("provinces") or {}).items()
+               if pv in REGION and isinstance(v, (int, float)) and v > 0}
+        if tbl:
+            doae_rt[key] = tbl
+
     return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane},
-            "dof": dof, "rfd": rfd, "dld": dld}
+            "dof": dof, "rfd": rfd, "dld": dld, "doae_rt": doae_rt}
 
 
 def ocsb_price():
