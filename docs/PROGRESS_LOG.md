@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Intelligence loop (deploy-health, obj #2): site-health probe now guards `contested_pop.json` + `exit_whitespace.json` — merged to master
+
+Autonomous market & service intelligence loop, safeguard-gated auto-merge. The formal `plan_cycle.py`
+backlog shows every autonomous pillar item done (98%, the one open item owner-side), so this run took a
+genuine **service/deploy-health** finding surfaced by a fresh render-path audit: the nightly live
+site-health probe (`pipeline/check_site_health.py`) covered **27 of the ~88** SPA-fetched `data/*.json`
+layers, and **two surfaced exec reads still had no deploy probe** — each live-degrades SILENTLY (no phone
+alert) when its file is missing/truncated after a deploy:
+
+- **`contested_pop.json`** — the command-center (`#home`) "MOST CONTESTED GROUND" front-door lead
+  (`renderHomeWhitespace` reads `CPOP.top`) **and** the National-map contested lens (index-aligned
+  `.rows[i]=[pop10, contested_pop]`, obj #2).
+- **`exit_whitespace.json`** — the Competition (`#acq`) rival-fragility board under the Q1-2026 BoT
+  registration deadline (`drawExitWhitespace` reads `.districts` + `meta.competitor_census`, obj #2,
+  ESTIMATED) — the last surfaced `#acq` competitive read with no probe.
+
+**Fix.** Added `_shape_contested_pop` (asserts the `.top` leaderboard shape AND the exact **2015**
+index-aligned `.rows` length a truncated build would silently misalign) and `_shape_exit_whitespace`
+(asserts a non-empty ~928-amphoe `.districts` board carrying the sort key + component split + the
+`meta.competitor_census` block the readout headline reads — shape not values, robust to census growth),
+plus their two `DATA_FILES` entries. Probe coverage **27 → 29** exec layers.
+
+**Verified.** Negative tests confirm the validators reject empty / short / mis-aligned shapes (not
+vacuously passing); the offline `--local platform` path and the **live master production alias** both
+report **95/95 HEALTHY** with both new files served HTTP 200 and shape-sane. Determinism gate **115
+passed · 0 failed** (data integrity 448/448); this change touches only the CI probe script + docs (no
+`platform/data` file, no gated `--check` golden), so provenance is unaffected and reproduces exactly
+(130 layers · 435 files · 70 measured · 60 estimated · 0 unlabelled). No app-visual change → committed
+straight to master per the safeguard protocol. Fresh scan re-confirmed the rest of the data room clean:
+0 broken references, 0 genuine orphan signal layers. Findings recorded in `docs/SERVICE_AUDIT.md`
+(2026-08-02 (b)). **Next recommended intelligence task:** continue closing the probe gap — the highest-value
+remaining unprobed exec reads are `segment_exposure.json` (`#exposure` obj-#1 concentration) and
+`province_stress_index.json` (the obj-#1 parent of the front-door `province_pressure` synthesis).
+
 ## 2026-08-02 — Integration loop (objective #1): GISTDA repeated-flood hazard → per-district & per-branch MEASURED flag (`flood_hazard.json`) — PR (app-visual)
 
 Autonomous integration & improvement loop. Shipped NEXT_STEPS §0, the top OPEN backlog item that was
