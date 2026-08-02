@@ -949,9 +949,19 @@ main{padding:64px var(--s5) 96px}
    `width:auto` is the other half of the fix — a `width:100%` table with few columns stretches the
    spare width into the gaps between them, which is what produced the acres of white space between
    THAI PRICE and BOOK EXPOSED. Sizing to content and letting .tblwrap scroll is both tighter and
-   honest about how wide the data actually is. */
+   honest about how wide the data actually is.
+
+   2026-08-02, second pass (owner: "the massive column spacing in the first column is present in all
+   tables in the macro tab"). `min-width:100%` was still forcing every table to fill its card, and a
+   browser hands that leftover width to the only column that can absorb it — the first one, because
+   every numeric column is nowrap/tabular and sizes to its digits. So "Isan" sat ~900px away from its
+   own outstanding balance. This is an OLD issue, not something this wave introduced: .tbl has been
+   width:100% since the base sheet (line 59). The padding pass shrank the cells but left the stretch.
+   Dropping min-width lets the table hug its content and left-pack; .tblwrap still scrolls when the
+   data really is wider than the card. Trailing space at the right of a wide card is the correct
+   place for slack — between a row label and its number is not. */
 .tbl th,.tbl td{padding:7px 9px}
-.tblwrap > .tbl{width:auto;min-width:100%}
+.tblwrap > .tbl{width:auto}
 /* .ic-tbl keeps its own 760px min-width — that floor is what stops the nowrap cells collapsing into
    an unreadable column. It just needs to hit that floor INSIDE the scroller instead of outside it. */
 .tblwrap > .ic-tbl{width:auto}
@@ -1474,12 +1484,18 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 .gd-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);
   border-radius:0 6px 6px 0;font-size:12px;line-height:1.55}
 .gd-wrap{max-height:420px;overflow:auto}
-.gd-tbl{font-size:12px;font-variant-numeric:tabular-nums;width:100%}
+/* width:auto, NOT 100% — see the note at .tblwrap > .tbl. A full-width table has to give its spare
+   width to some column, and every column here but the first is nowrap/tabular, so the label column
+   took all of it. Sizing to content left-packs the row: the geo name sits next to its own number. */
+.gd-tbl{font-size:12px;font-variant-numeric:tabular-nums;width:auto;min-width:min(100%,520px)}
 .gd-tbl th,.gd-tbl td{padding:5px 8px;white-space:nowrap}
 .gd-tbl th{position:sticky;top:0;z-index:1;background:var(--panel);font-size:10px;
   text-transform:uppercase;letter-spacing:.3px}
 .gd-tbl th.gd-r,.gd-tbl td.gd-r{text-align:right}
-.gd-tbl td.gd-geo{white-space:normal;width:99%}   /* geo name absorbs slack; numbers stay tight */
+/* was width:99% ("geo name absorbs slack; numbers stay tight") — that WAS the massive first column.
+   The geo cell now takes its natural width and caps, so a long Thai province name wraps onto a second
+   line instead of shoving the whole numeric block to the far edge of the card. */
+.gd-tbl td.gd-geo{white-space:normal;max-width:260px}
 .gd-tbl tr.gd-go{cursor:pointer}
 .gd-tbl tr.gd-go:hover td{background:rgba(255,255,255,.045)}
 .gd-tbl tr.gd-go:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
