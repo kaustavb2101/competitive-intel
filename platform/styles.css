@@ -306,6 +306,38 @@ h2.opp::before{background:linear-gradient(var(--gold),#b88a2e)}
 .mcard .d{font:600 11px var(--mono);margin-top:2px}
 .mcard .d.up,.mcard .v.up{color:var(--up)} .mcard .d.dn,.mcard .v.down{color:var(--down)}
 
+/* ---------- macro overlay, compact strip (owner review 2026-08-02, point 7) ----------
+   One scrollable line replaces two rows of KPI tiles. The full cards stay behind the <details>
+   below it, so nothing is lost — this is a summary, not a substitution. */
+.mstrip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.mcell{display:flex;align-items:baseline;gap:6px;padding:5px 10px;background:var(--panel);
+  border:1px solid var(--line);border-radius:999px;white-space:nowrap;line-height:1.15}
+.mcell .mk{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.4px}
+.mcell .mv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--hi);
+  font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.mcell .md{font:600 10.5px var(--mono);font-style:normal;font-variant-numeric:tabular-nums}
+.mcell .md.up{color:var(--up)} .mcell .md.dn{color:var(--down)} .mcell .md.fl{color:var(--dim)}
+.mcell .mspark{align-self:center;margin-left:1px;opacity:.9}
+/* ---------- conditions-at-our-grain block: lens nav + the NPL sparkline (points 15-17, 20-22) --- */
+.mb-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:10px;margin:0 0 8px}
+.mb-navwrap{display:flex;flex-wrap:wrap;gap:5px}
+.mb-lens{font:500 11.5px/1 var(--sans);color:var(--mid);background:var(--panel);cursor:pointer;
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;transition:color .12s,border-color .12s}
+.mb-lens:hover{color:var(--hi);border-color:#3a4868}
+.mb-lens.on{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:600}
+.mb-lens:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mb-npl{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mid);
+  font-variant-numeric:tabular-nums}
+.mb-npl b{color:var(--hi);font-family:var(--mono)}
+.mb-npl .sub{font-size:10px;color:var(--dim)}
+.mb-note{margin:0 0 10px}
+.mfull{margin:0 0 14px}
+.mfull > summary{cursor:pointer;font-size:11px;color:var(--mid);letter-spacing:.3px;
+  padding:3px 0;list-style:revert}
+.mfull > summary:hover{color:var(--hi)}
+.mfull[open] > summary{margin-bottom:8px}
+
 /* ---------- insight callout: tinted glass, segment-coded ---------- */
 .insight{background:linear-gradient(180deg,rgba(35,162,143,.10),var(--panel));
   border:1px solid var(--line);border-left:3px solid var(--merch);border-radius:var(--r);
@@ -909,7 +941,20 @@ main{padding:64px var(--s5) 96px}
 .purpose{padding:var(--s3) var(--s4);margin:var(--s2) 0 var(--s5)}
 .note{padding:var(--s4) var(--s4);margin-top:var(--s5)}
 .lenses,.chips{gap:var(--s2);margin-bottom:var(--s4)}
-.tbl th,.tbl td{padding:13px 14px}
+/* COMPACTED 2026-08-02 (owner review, point 3): "for tables, your column spacing is very wide.
+   Make it more compact." This rule was the cause — it sits late in the cascade and overrode the
+   7px/10px padding set earlier, so EVERY .tbl on the site ran at 13x14. The first pass scoped the
+   fix to the farm drill's .gd-tbl, which was too narrow a reading: the comment was about tables,
+   and the commodities board (many columns, all nowrap) was still overflowing its container.
+   `width:auto` is the other half of the fix — a `width:100%` table with few columns stretches the
+   spare width into the gaps between them, which is what produced the acres of white space between
+   THAI PRICE and BOOK EXPOSED. Sizing to content and letting .tblwrap scroll is both tighter and
+   honest about how wide the data actually is. */
+.tbl th,.tbl td{padding:7px 9px}
+.tblwrap > .tbl{width:auto;min-width:100%}
+/* .ic-tbl keeps its own 760px min-width — that floor is what stops the nowrap cells collapsing into
+   an unreadable column. It just needs to hit that floor INSIDE the scroller instead of outside it. */
+.tblwrap > .ic-tbl{width:auto}
 .cc-row{padding:8px 0}
 
 /* ---- 3 · HIERARCHY: make the primary metric dominate; dim the labels ---- */
@@ -1266,7 +1311,14 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .ic-drill:hover{border-color:var(--accent)}
 .ic-chev{display:inline-block;width:1em}
 .ic-provs{margin-top:8px}
-.ic-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+/* `max-width:100%` + `min-width:0` added 2026-08-02 — this was the "table is overspilling" bug.
+   .ic-scroll already had overflow-x:auto, but with no max-width it simply GREW to its content
+   instead of clipping it, so the commodities board (min-width:760px, every cell nowrap) and its
+   per-crop belt tables ran ~235px past the container on any viewport under ~1000px, with the
+   scrollbar never engaging. min-width:0 is the flex-item half of the same guard: inside a flex or
+   grid parent, `auto` min-width lets a child refuse to shrink below its content. .tblwrap has
+   carried both since it was written; .ic-scroll was missed. */
+.ic-scroll{overflow-x:auto;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:8px}
 .ic-tbl{border-collapse:collapse;width:100%;font-size:12px;min-width:760px}
 .ic-tbl th,.ic-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
 .ic-tbl thead th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
@@ -1389,7 +1441,12 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 .csp-l{fill:none;stroke-width:1.5;vector-effect:non-scaling-stroke}
 .csp-a{opacity:.12}
 .csp-p{stroke:var(--panel);stroke-width:1.2}
-.csp-none{font:400 10px var(--mono);color:var(--dim);letter-spacing:.02em;white-space:nowrap}
+/* `white-space:nowrap` here was pushing the whole DOCUMENT wider than the viewport: this span sits
+   in the flex row .ab-tr, and a nowrap flex item refuses to shrink below its content width. The
+   result was a page that scrolled sideways by ~30px, which clips the left edge of every heading and
+   table on the tab — the "sizing" symptom, and it was never the tables' fault. Keep the compact
+   mono look, drop the nowrap, and let it shrink. (Reported 2026-08-02.) */
+.csp-none{font:400 10px var(--mono);color:var(--dim);letter-spacing:.02em;min-width:0}
 
 /* two-column on wide screens — a verdict card and its table sit side by side
    instead of stacked, which is where roughly half the Macro tab's height went.
@@ -1504,7 +1561,8 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
   font-variant-numeric:tabular-nums;margin-top:5px;line-height:1.15}
 .ab-v small{font-size:11.5px;font-weight:500;color:var(--mid);letter-spacing:0}
 .ab-mv{font:600 11px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px}
-.ab-tr{margin-top:7px;min-height:26px;display:flex;align-items:center}
+.ab-tr{margin-top:7px;min-height:26px;display:flex;align-items:center;flex-wrap:wrap;min-width:0}
+.ab-tr > *{min-width:0}
 .ab-s{font-size:10px;color:var(--dim);margin-top:6px;line-height:1.4}
 @media print{.answerband{grid-template-columns:repeat(3,1fr)}
   .ab{background:#fff!important;border:1px solid #bbb!important;break-inside:avoid}
