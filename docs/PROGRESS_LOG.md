@@ -3,6 +3,131 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — UX loop: scope="col" on the Overview macro-route tables (a11y, WCAG 1.3.1) — merged + deploy-verified (PR #257)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. All seven originally-audited backlog items
+(favicon / contrast / theme / map-overlap / province-overflow / branches-lead / isochrone-guard) remain
+fixed, so this run took the highest-priority genuinely-open, auto-merge-safe item: the **fifth slice of
+`ux-table-scope-sweep-appjs`**. The other open backlog items are explicitly out of scope for an unattended
+surgical run (`ux-acquire-taxonomy-mandate` = bigger-than-surgical mandate work; `ux-viewport-user-scalable-3dpages`
+= needs on-device gesture testing).
+
+**Fix.** The ~14 Overview (`#overview`) macro-route tables in `app.js` built their column-header rows as
+inline template literals with bare `<th>` / `<th title="…">` (no `scope="col"`), so a screen reader could
+not reliably associate each data cell with its column header. Added `scope="col"` to every column `<th>`
+(EV-watch/DLT `#region`, drought SPEI, amphoe-crops, province-LFS, DLT vehicle-reg, region-debt, DBD-firms,
+SFI-NPL, ThaiWater flood+rain, informal-debt, and coverage `#estates`/`#mws`/`#cws`) and `scope="colgroup"`
+to the two ThaiWater `colspan="4"` section-title cells. Matches `data.html`'s convention and the four prior
+slices. Diff = 17-for-17 line replacement, scope-only; zero visual change (scope is non-presentational).
+Remaining bare family: the `#acq` rival-pulse/ads/YouTube/sentiment/footprint tables.
+
+**Safeguards (all passed).** (a) `tests/run.sh check` 115-passed/0-failed; (b) headless `index.html#overview`
+render `data-errors=[]`, PNG self-reviewed (layout identical), settled DOM 213 `scope="col"` + 2 `scope="colgroup"`;
+(c) no secrets in diff; (d) diff matches intent, no stray files.
+
+**Merge + deploy-verify.** Squash-merged PR #257 → master (`969a6e6`), branch deleted. Production alias
+`competitive-intel-git-master-…vercel.app`: root **200**, `/app.js` **200**, `/index.html` → **200**
+(the bare 308 is Vercel's configured `cleanUrls` redirect, not a regression). Confirmed the deployed
+`app.js` carries the change (`<th scope="col">Quarter</th>` present) — fresh build, no rollback needed.
+
+**Recommend next.** The last `ux-table-scope-sweep-appjs` slice — the `#acq` rival-pulse/ads/YouTube/
+sentiment/footprint tables — to close the a11y sweep; then `qa-visual-baseline-stale` (a deliberate
+`tests/run.sh baseline` refresh) so the CI visual-regression gate carries signal again now the five-pillar
+IA is stable.
+
+## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
+
+Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the
+last data-feed workflow still leaking the recurring **provenance-drift** class the progress log has been
+closing feed-by-feed. `.github/workflows/data-macro.yml` (weekly BIS + World Bank macro pull → committed
+`platform/data/macro_indicators.json`) opened its draft PR **without regenerating the two layers that file
+feeds**: `provenance.json` censuses `macro_indicators.json`'s bytes (confirmed — the file is in the
+manifest) and `build_live_board.py` reads it (3 refs), so every macro refresh drifted both and the PR's own
+`bash tests/run.sh check` came up **red** on `build_provenance.py --check` (+ `validate_data.py`'s byte-size
+row) — the PR could never auto-merge green without a manual provenance regen, exactly the drift the
+imf-weo / thaiwater / fuel-price / scenarios / nabc / sfi / search-demand / social-listening feeds already
+fixed in lockstep.
+
+**Fix (mirrors the imf-weo sibling exactly):** inserted a "Rebuild live_board + provenance when
+macro_indicators changed" step between the pull and the commit — `git status --porcelain` guards on the
+file, and on change runs `build_live_board.py` then `build_provenance.py` (deterministic, network-free,
+live_board first so provenance censuses its refreshed bytes); the commit's `git add` now stages
+`macro_indicators.json` + `live_board.json` + `provenance.json` together. CI-config only — no `platform/`
+app/data/visual change, so a direct commit to master (not a PR) per the safeguard rule.
+
+**Safeguard protocol — all passed:** (a) baseline `bash tests/run.sh check` → **115 passed, 0 failed**
+(the workflow YAML is not gate-material, so the gate is unaffected by this change); (b) no secrets in diff
+(the lone `token` hit is the pre-existing `GH_TOKEN: ${{ github.token }}` Actions context ref, unchanged);
+(c) diff = only `.github/workflows/data-macro.yml` + this log entry; (d) provenance / no-fabrication intact —
+no data values touched. **Verification:** confirmed `build_live_board.py --check` and
+`build_provenance.py --check` both reproduce byte-exact on the clean tree; confirmed `macro_indicators.json`
+is in `provenance.json`'s census and read by `build_live_board.py`; a drift simulation (perturb → restore
+via `git checkout`) left the tree clean (verified `git status`). **Deploy-verify:** prod alias `/` → 200,
+`/data/meta.json` → 200, `/data/competitor_coverage.json` → 200 (no app change to regress).
+
+**Next recommended (intelligence):** audit the remaining draft-PR data workflows that commit a
+`platform/data/*` file for the same lockstep gap — spot-check `data-gov-census.yml` (commits
+`source-data/`, likely provenance-safe) and `data-overture.yml`; then a small **shared composite action**
+(`rebuild-provenance-if-changed`) would let every feed reuse one audited regen step instead of the
+copy-pasted block, killing this drift class at the source.
+
+## 2026-08-02 — UX loop (a11y): scope="col" on the district amphoe tables — MERGED + DEPLOYED + VERIFIED (PR #255)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. Fourth slice of `ux-table-scope-sweep-appjs`
+(WCAG 1.3.1): the two National (`#map`) district-lens tables `#amptbl` (coverage/whitespace, `drawAmpBoard`)
+and `#amprtbl` (risk proxy, `drawAmpRisk`) built their header rows with bare `<th>` / `<th title>`, so a
+screen reader couldn't reliably tie each data cell to its column header. Added `scope="col"` to all 16
+column-header `<th>` across both rows (incl. the conditional `haveOcc`/`haveComp` headers), matching the
+`data.html` `#ptbl`/`districtTable` convention and the prior search/competition/exposure slices. `platform/app.js`
++ a `docs/UXUI_AUDIT.md` fix-log entry only. Zero visual change (`scope` is non-presentational).
+
+**Safeguard protocol — all passed:** (a) `bash tests/run.sh check` → **113 passed, 0 failed** (no gate
+drift this run); (b) headless render of `index.html#map` (1100×900) `data-errors="[]"`, Leaflet initialised,
+map/lens-pills/controls/legend intact, self-reviewed — no visible regression (blank basemap expected);
+(c) no secrets in diff; (d) diff = 16 scoped `<th>`, no data cells, no stray files. Squash-merged to master
+(`36bb129`). **Deploy-verify:** prod alias `/` → 200, `/app.js` → 200 (deployed `app.js` confirmed to carry
+the scoped `#amptbl` header — merge is live, not stale cache), `/index.html` → 308 → 200 (expected `cleanUrls`
+redirect). No rollback needed. NOTE: the merged branch's remote ref could not be deleted — the CCR git proxy
+rejects ref-deletion pushes ("Everything up-to-date"); harmless (branch is fully merged). Remaining sweep
+families (Overview/commodity-board `#region` + `#acq` rival-pulse/ads/YouTube tables) still tracked under
+`ux-table-scope-sweep-appjs`.
+
+## 2026-08-02 — intelligence loop (SERVICE): three MEASURED survey/registry layers had their real vintage dropped from the exec Data-room card — `_vintage_of` now scans `latest_year_ce` + `span`
+
+Autonomous market & service intelligence loop, SERVICE pillar. The service audit's standing freshness
+sweep caught the #248 macro/agri data wave: it landed four new live-fetched layers, and **three of
+them stamp their freshness under a key `build_provenance.py::_vintage_of()` never scanned**, so each
+showed **blank** in the Command-center Data-room card despite being MEASURED and carrying a real
+data-vintage:
+
+- `debt_source.json` (NSO household debt-by-source survey) → `latest_year_ce = 2023` (an **integer**)
+- `vehicle_fleet.json` (DLT registered-vehicle stock) → `latest_year_ce = 2025` (an **integer**)
+- `farm_household.json` (OAE farm-household cash P&L survey) → `span = "2562/63..2566/67"` (BE crop-years)
+
+`_vintage_of()` now scans `latest_year_ce` (with int→str coercion — a bare calendar year is exactly
+the `vintage_individual='2025'` NSO-year precedent, just stored as an int) and `span`, both appended
+**last** so any ISO/observation key still wins. `_parse_vintage` leaves all three age-blank — a bare
+year or a BE crop-year window is never coerced into a false age — so the vintage cell surfaces the
+layer's own committed label while the freshness pulse's age math correctly ignores them. The fourth
+new layer, `crop_mix.json`, correctly **stays blank**: it is a first-order DERIVED layer (province area
+× Thai farm-gate YoY × NSO income) inheriting freshness from its measured inputs — the honest ABSENT
+state, not a bug.
+
+- **Safeguards (all pass):** a diff of the regenerated `provenance.json` touches **only these three
+  vintage cells** (`'' → 2023`, `'' → 2025`, `'' → 2562/63..2566/67`); the 127-layer counts
+  (68 measured · 59 estimated · 0 unlabelled), labels, sources, files block, and the freshness block
+  (n_dated 24 / n_undated 103) are byte-identical. `build_provenance.py --check` reproduces exactly;
+  determinism gate **113 passed · 0 failed**, data integrity **448/448**; `node --check` clean;
+  no secrets in the diff; no fabrication — every value read from the layer's own committed `meta`.
+  `app.js` is byte-unchanged (the three values render through the existing `L.vintage` cell path that
+  already serves 24 other layers), so no new render path — same class as the `board_vintage` /
+  `farmgate_vintage` / `price_asof` vintage-surfacing fixes, shipped the same way (direct commit).
+- **Files:** `pipeline/build_provenance.py` (+2 scan keys, int coercion, comment), regenerated
+  `platform/data/provenance.json` (3 cells), `docs/SERVICE_AUDIT.md` + this log.
+- **Recommend next:** re-verify the DLT `vehicle_fleet` / `vehicle_registry` freshness pair reconciles
+  now that both surface a vintage, and continue the standing sweep as new layers land (any future
+  survey layer stamping only a year/`span` is now covered).
+
 ## 2026-08-01 — UX loop: scope="col" on the 15 Exposure render-path tables (merged + deployed + verified)
 
 Autonomous UX-improvement loop, one surgical fix. Third slice of `ux-table-scope-sweep-appjs`

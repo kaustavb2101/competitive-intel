@@ -1398,6 +1398,56 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 @media(min-width:1180px){.ovpair{grid-template-columns:minmax(300px,.85fr) 1.15fr}}
 @media print{.ovpair{grid-template-columns:1fr!important}}
 
+/* ---------- geo drill (national → region → province → branch) ----------
+   Owner point 13. Also carries the "column spacing is very wide" fix: these tables are dense
+   numeric reads, so they get tabular figures, tighter horizontal padding than the general .tbl, and
+   numeric columns sized to content instead of sharing the row equally. A 9-column table that
+   distributes width evenly wastes half the row on the geo name and squeezes the numbers. */
+.gd-crumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px;font-size:12px}
+.gd-crumb button{background:none;border:0;padding:2px 6px;border-radius:5px;font:inherit;
+  color:var(--accent);cursor:pointer}
+.gd-crumb button:hover{background:rgba(255,255,255,.05)}
+.gd-crumb button.on{color:var(--hi);cursor:default;font-weight:600}
+.gd-crumb span{color:var(--dim)}
+.gd-nat{display:flex;flex-wrap:wrap;gap:14px;padding:8px 11px;margin:0 0 8px;border-radius:7px;
+  background:var(--panel2);border:1px solid var(--line);font:600 12.5px var(--mono);
+  font-variant-numeric:tabular-nums;color:var(--hi)}
+.gd-nat i{font-style:normal;font-weight:500;color:var(--dim);font-size:10px;text-transform:uppercase;
+  letter-spacing:.4px;margin-right:5px}
+.gd-act{margin:0 0 8px;padding:9px 11px;background:var(--panel);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;font-size:12px;line-height:1.55}
+.gd-wrap{max-height:420px;overflow:auto}
+.gd-tbl{font-size:12px;font-variant-numeric:tabular-nums;width:100%}
+.gd-tbl th,.gd-tbl td{padding:5px 8px;white-space:nowrap}
+.gd-tbl th{position:sticky;top:0;z-index:1;background:var(--panel);font-size:10px;
+  text-transform:uppercase;letter-spacing:.3px}
+.gd-tbl th.gd-r,.gd-tbl td.gd-r{text-align:right}
+.gd-tbl td.gd-geo{white-space:normal;width:99%}   /* geo name absorbs slack; numbers stay tight */
+.gd-tbl tr.gd-go{cursor:pointer}
+.gd-tbl tr.gd-go:hover td{background:rgba(255,255,255,.045)}
+.gd-tbl tr.gd-go:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.gd-ar{color:var(--dim);margin-left:5px}
+.gd-na{color:var(--dim)}
+.gd-foot{font-size:10.5px;color:var(--dim);margin:6px 0 0}
+.fb-crop{display:inline-flex;align-items:baseline;gap:4px;margin-right:9px;font-size:11px}
+.fb-crop b{font-weight:600;color:var(--txt)}
+.fb-crop i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--merch)}
+.fb-crop i.dn{color:var(--agri)}
+/* a lens INSIDE a block (the by-crop cut of the farm book, the four cuts of the collateral book), so
+   the heading is subordinate to the block's <h3> and carries no rule of its own — it must not read
+   as a new section. */
+.fb-h4{font-size:12.5px;font-weight:600;color:var(--hi);letter-spacing:.2px;margin:16px 0 7px;
+  display:flex;align-items:center;gap:8px}
+/* focus tier on a collateral row — the owner's stated core/secondary split, made visible so the
+   reader does not have to remember which classes are the ones we actually lend against. */
+.cb-tier{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.5px;padding:1px 5px;
+  border-radius:3px;vertical-align:1px}
+.cb-tier.core{color:var(--collat);border:1px solid var(--collat)}
+.cb-tier.sec{color:var(--dim);border:1px solid var(--line)}
+.cb-tier.oth{color:var(--dim);border:1px dashed var(--line)}
+@media print{.gd-wrap{max-height:none;overflow:visible}
+  .gd-crumb,.gd-ar{display:none} .gd-tbl th{position:static}}
+
 /* ---------- within-topic sub-switcher (second level under the Macro chips) ----------
    SCREEN ONLY. The hide has to be !important because several renderers set an explicit inline
    `display:block` on their own wrapper, which would otherwise win. Scoping the whole rule to
