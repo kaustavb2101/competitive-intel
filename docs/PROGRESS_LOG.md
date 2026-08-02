@@ -3,6 +3,52 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — integration loop: NEW MEASURED layer — GISTDA repeated-flooding hazard per district + per branch (objective #1, NEXT_STEPS #0)
+
+Autonomous integration loop. Built the top open NEXT_STEPS item (#0): a MEASURED structural
+flood-hazard read on the existing footprint. Repeated flooding is a direct portfolio-risk signal —
+title-loan collateral (the pickup/motorcycle) and the borrower's cash flow both sit on ground that,
+in the worst districts, went underwater in 10-12 of the 12 years 2005-2016. This is a hazard the
+platform had no measured read on (the existing `thaiwater_*` layers are real-time nowcasts, not the
+decade-scale structural pattern).
+
+- **Source (MEASURED, no key, any IP):** GISTDA's `FL_RepeatedFlooding_GISTDA_50k_Y2005_Y2016`
+  FeatureServer (1:50,000 satellite flood extents, 12-year window). `pipeline/pull_flood_hazard.py`
+  pulls a server-side group-by (no geometry download) into `source-data/gistda_flood_hazard.json`
+  (committed — no PII, 838 districts). Network-only, NOT in the gate; the committed source is the
+  repo's source of truth, same convention as the other pullers.
+- **The overlap trap (NEXT_STEPS #0), respected:** the polygons OVERLAP (per-event, not dissolved),
+  so any `SUM(area_rai)` overstates flooded area 3-9x and is an artifact. The puller + builder take
+  ONLY `MAX(flood_freq)` per district — "this district contains ground that flooded in N of 12 years"
+  — which is immune to overlap. **No flooded-AREA figure is produced anywhere;** area needs a real
+  spatial dissolve (a shapely job) and is explicitly deferred. The meta states this in three places.
+- **Builder (deterministic, `--check`-gated):** `pipeline/build_flood_hazard.py` joins GISTDA to the
+  928-district master (`amphoe.json`) by exact Thai-name match — the SAME resolver convention as
+  `build_pico_district.py`. 91.6% of GISTDA's flood-affected districts resolve; the 70 unresolved
+  (mostly recently-split rural amphoe absent from the geoBoundaries 928-polygon set, plus a few
+  Bangkok khets) are counted honestly in `n_unresolved`, NOT dropped. GISTDA's `ap_en` is unreliable
+  (some rows carry the wrong romanization, e.g. เชียงม่วน→"Mueang Phayao"), so it is deliberately NOT
+  used as an English fallback — a bad English match would double-count. Output
+  `platform/data/flood_hazard.json`: `by_district{prov|amphoe:max_freq}`, `district_bands`,
+  `branches[]` (INDEX-ALIGNED to branches.json, each branch → its district's max_freq),
+  `branch_bands`, `top_districts`, honest `unresolved_samples`.
+- **The read (MEASURED):** of 2,015 branches, **567 (28%) sit in districts that flooded ≥8 of 12
+  years (severe), 1,006 (50%) ≥5 years (chronic), 1,839 (91%) at least once.** The 12/12-year
+  districts are the Nong Khai / Udon Thani Mekong floodplain (รัตนวาปี, บ้านดุง, เพ็ญ …). 0 =
+  "no repeatedly-flooded ground recorded 2005-2016", NOT "guaranteed dry in a given year" —
+  documented in `branch_semantics_of_0`.
+- **Provenance:** `build_provenance.py` regenerated — 128 layers now (was 127), flood_hazard.json
+  correctly classified **MEASURED**, vintage 2005-2016 (68→69 measured; 59 estimated unchanged).
+- **Verified:** `bash tests/run.sh check` → **114 passed / 0 failed** (the new `build_flood_hazard.py
+  --check` is the +1), data integrity **448/448**; the builder `--check` reproduces byte-exact; the
+  provenance diff is scoped to the single-line layer insertion + count bump. No app.js / visual
+  change (data-only) → committed straight to master per the operating rules.
+- **Recommend next:** SURFACE it — a National-map branch lens ("repeated-flood hazard") and/or an
+  honest one-line branch-popup readout ("Repeated-flood hazard (measured, 2005-16): flooded N/12
+  yrs"), matching the existing `croplandPopupHTML` / PICO-line pattern. That is an app/visual change,
+  so it should go via a PR. A later pass could add the true flooded-AREA figure via a shapely spatial
+  dissolve of the raw GISTDA polygons (the deferred geometry job).
+
 ## 2026-08-02 — intelligence loop (SERVICE): three MEASURED survey/registry layers had their real vintage dropped from the exec Data-room card — `_vintage_of` now scans `latest_year_ce` + `span`
 
 Autonomous market & service intelligence loop, SERVICE pillar. The service audit's standing freshness
