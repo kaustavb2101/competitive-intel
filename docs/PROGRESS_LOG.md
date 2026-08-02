@@ -3,6 +3,39 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Intelligence loop (deploy-health, obj #1): site-health probe now guards `collateral_book.json` — merged to master
+
+Autonomous market & service intelligence loop, safeguard-gated auto-merge. The `plan_cycle.py` backlog
+still shows every autonomous pillar item done (98%, the one open item owner-side), so this run took a
+fresh **service/deploy-health** finding: a render-path re-scan of the recently-landed **#258/#261
+macro/collateral wave** found several new SPA-fetched layers still with **no deploy probe** — the
+highest-value of them being **`collateral_book.json`**, the Overview/Macro tab's **section-leading
+collateral read** (obj #1). `renderCollateralBook` GATES the whole "Collateral value — what the titles
+are worth, and what we hold against them" section on `j.national && j.types` (else the section hides
+itself), and its load-bearing verdict sentence reads `N.os / N.core_share_pct / N.ltv_proxy_pct /
+N.ticket / N.eval_avg` plus the 8-row collateral-type table. It is MEASURED (real loan tape × DLT
+registrations) and live-degrades **SILENTLY** — a missing/truncated file after a deploy just hides the
+primary obj-#1 collateral-value screen with no phone alert, the exact "broken demo" blind spot the
+`collateral_flow` / `truck_flow` / `tape_real` probes closed for their sibling obj-#1 reads.
+
+**Fix.** Added `_shape_collateral_book` (asserts the display gate + verdict render shape — `national`
+with numeric `os/ltv_proxy_pct/ticket/eval_avg/core_share_pct` and a non-empty `types` table whose rows
+carry `type/tier/os_share_pct` — shape not values, robust to a future tape/DLT vintage refresh) plus its
+`DATA_FILES` entry. Probe coverage **97 → 98** exec checks.
+
+**Verified.** Eight negative tests confirm the validator rejects non-dict / missing-`national` /
+non-numeric-KPI / missing-`types` / empty-`types` / missing-`type` / missing-`tier` shapes (not
+vacuously passing) while accepting the real payload; the offline `--local platform` path and the **live
+master production alias** both report **98/98 HEALTHY** with `collateral_book.json` served HTTP 200 (632
+KB) and shape-sane. Determinism gate **0 failed**; this change touches only the CI probe script + docs
+(no `platform/data` file, no gated `--check` golden), so provenance is unaffected and reproduces exactly
+(135 layers · 0 blank-vintage · 0 unlabelled). No app-visual change → committed straight to master per
+the safeguard protocol. `site-health.yml` re-confirmed correctly targeting the master production alias.
+Findings recorded in `docs/SERVICE_AUDIT.md` (2026-08-02 (c)). **Next recommended intelligence task:**
+continue closing the #258/#261-wave probe gap — the sibling unprobed exec reads are `macro_book.json`
+(the Macro tab's lensed backdrop table, `renderMacroBook` gates on `.national && .provinces`) and
+`farm_book.json` (the Macro farm block), plus `flood_hazard.json` (obj-#1 GISTDA hazard).
+
 ## 2026-08-02 — Intelligence loop (deploy-health, obj #2): site-health probe now guards `contested_pop.json` + `exit_whitespace.json` — merged to master
 
 Autonomous market & service intelligence loop, safeguard-gated auto-merge. The formal `plan_cycle.py`

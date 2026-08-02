@@ -825,6 +825,43 @@ def _shape_exit_whitespace(d):
     return None
 
 
+def _shape_collateral_book(d):
+    # The Overview/Macro tab's SECTION-LEADING collateral read (obj #1) — the
+    # "Collateral value — what the titles are worth, and what we hold against
+    # them" block. renderCollateralBook GATES the whole section on `j.national
+    # && j.types` (else host.style.display='none') and its load-bearing verdict
+    # sentence reads N.os / N.core_share_pct / N.ltv_proxy_pct / N.ticket /
+    # N.eval_avg, then renders the 8-row collateral-type table (each .type/.tier/
+    # .os_share_pct/.dpd90p_pct) plus the fleet-class, resale-flow and brand-book
+    # sub-tables. It is MEASURED (real loan tape × DLT registrations) and
+    # live-degrades SILENTLY — a missing/truncated file just hides the section
+    # with no phone alert — the same "broken demo" blind spot the collateral_flow
+    # / truck_flow / tape_real obj-#1 probes closed for their siblings, and it was
+    # the last unprobed read from the #258/#261 macro/collateral wave. Asserts the
+    # gate + headline render shape (national KPI keys + the type-table rows), not
+    # values — robust to a future tape/DLT vintage refresh moving the numbers.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (renderCollateralBook display gate)"
+    for k in ("os", "ltv_proxy_pct", "ticket", "eval_avg", "core_share_pct"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (collateral-value verdict render read)" % k
+    types = d.get("types")
+    if not isinstance(types, list) or not types:
+        return "missing/empty 'types' list (collateral-type table + display gate)"
+    t0 = types[0]
+    if not isinstance(t0, dict):
+        return "first type row is not an object"
+    if not (isinstance(t0.get("type"), str) and t0["type"].strip()):
+        return "first type row missing 'type' (type-table row key)"
+    for k in ("tier", "os_share_pct"):
+        if k not in t0:
+            return "first type row missing '%s' (type-table cell render read)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -952,6 +989,14 @@ DATA_FILES = [
     # Closes the Competition surface's + front-door's remaining obj-#2 deploy-health gap.
     ("data/contested_pop.json", _shape_contested_pop, ".top contested-ground leaderboard + 2015 index-aligned .rows (#home lead + map lens)"),
     ("data/exit_whitespace.json", _shape_exit_whitespace, ".districts (~928) fragility board + meta.competitor_census (#acq rival-fragility)"),
+    # The Overview/Macro tab's section-leading collateral read (obj #1), shipped in
+    # the #258/#261 macro/collateral wave with no deploy probe. renderCollateralBook
+    # gates the whole "Collateral value" section on `j.national && j.types`, so a
+    # truncated CDN deploy that drops either silently hides the primary obj-#1
+    # collateral-value screen (real loan tape × DLT) with no phone alert — the same
+    # blind spot the collateral_flow / truck_flow / tape_real probes closed for the
+    # sibling obj-#1 reads. Asserts the gate + verdict render shape, not values.
+    ("data/collateral_book.json", _shape_collateral_book, ".national KPI block + .types collateral-type table (Overview collateral section)"),
 ]
 
 
