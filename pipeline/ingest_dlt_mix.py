@@ -25,7 +25,8 @@ Four raw inputs, two different DLT legal regimes, plus one nameplate-level overl
                                 (brand/model), NATIONAL ONLY (no จังหวัด column). Used only for the
                                 PPV (pickup-based SUV) nameplate overlay below — owner's house rule
                                 is "for autox, our PU (pickup) includes PPV in as well", and PPVs
-                                (Fortuner, MU-X, Pajero Sport, Everest, Terra) register in รย.1
+                                (Fortuner, MU-X, Pajero Sport, Everest, Terra, GWM Tank 300/500, and
+                                the not-yet-launched Land Cruiser FJ) register in รย.1
                                 (≤7 seats), not รย.3, so they're invisible to the class-based mix
                                 unless pulled out by nameplate at model grain.
 
@@ -47,8 +48,11 @@ Method:
            joined to the mva/lta window; it happens to land on the same span here). Every row's
            "<ยี่ห้อ> <รุ่น>" is uppercased and matched against PPV_NAMEPLATES with a word-boundary
            regex (a plain substring match on "TERRA" also catches Lamborghini "HURACAN STERRATO",
-           which is present in this mirror — the boundary is load-bearing, not decorative). National
-           total only; this series carries no จังหวัด column so there is no province split to make.
+           which is present in this mirror — the boundary is load-bearing, not decorative). The
+           boundary also guards against a DIGIT on either side, not just a letter — otherwise a
+           plate like "TANK 300" would match inside a hypothetical "TANK 3000" (no such nameplate
+           exists in this mirror today; checked empirically, see PPV_RE below). National total
+           only; this series carries no จังหวัด column so there is no province split to make.
 
 Thai Buddhist-era years fold to CE by -543 (only when > 2400, per convention). The trailing-12
 anchor is the newest month IN THE DATA, never wall clock. Province strings are canonicalised via
@@ -90,11 +94,21 @@ STOCK_NAME_RE = re.compile(r"ณ_วันที่_(\d+)_(\S+)_(\d+)")
 # they register in รย.1, not รย.3 — identified here by nameplate at model grain, national only
 # (stat_1_1_01_first_regis_vehicles_car has no จังหวัด column). SW4 kept in the list for
 # completeness even though it is not a Thailand-market badge (always 0 here).
-PPV_NAMEPLATES = ["FORTUNER", "MU-X", "PAJERO SPORT", "EVEREST", "TERRA", "TRAILBLAZER", "SW4"]
+# GWM TANK 300 counts as a PPV, not an SUV — it rides GWM's Pao/Cannon PICKUP ladder-frame platform
+# (same body-on-frame architecture as Fortuner/MU-X/Everest above) and GWM launched it explicitly
+# into the Thai PPV segment; it was the #3 PPV nameplate in 2025 (7,563 units, 17.2% of the PPV
+# segment) — AHEAD of the Everest, which is already on this list. TANK 500 is the same platform
+# family. Do not delete either thinking they are unrelated SUVs. LAND CRUISER FJ is added ahead of
+# its Q2-2026 launch (confirmed on the same Hilux Champ IMV-0 ladder platform as the Champ pickup);
+# it will match 0 until then and is kept so it is counted the moment it appears in the mirror.
+PPV_NAMEPLATES = ["FORTUNER", "MU-X", "PAJERO SPORT", "EVEREST", "TERRA", "TRAILBLAZER", "SW4",
+                  "TANK 300", "TANK 500", "LAND CRUISER FJ"]
 # The word boundary is NOT optional — a plain substring match on "TERRA" also catches Lamborghini
-# "HURACAN STERRATO" (present in this mirror). Anchor both sides to a non-letter so "TERRA" cannot
-# match inside a longer uppercase run.
-PPV_RE = {plate: re.compile(r"(?<![A-Z])" + re.escape(plate) + r"(?![A-Z])") for plate in PPV_NAMEPLATES}
+# "HURACAN STERRATO" (present in this mirror). Anchor both sides to a non-letter AND non-digit: a
+# few plates now contain a space + digits (TANK 300, TANK 500), and a letter-only boundary would
+# let "TANK 300" match inside a hypothetical "TANK 3000" (no such nameplate exists in this mirror
+# today, checked empirically — but the guard is free and protects future pulls).
+PPV_RE = {plate: re.compile(r"(?<![A-Z0-9])" + re.escape(plate) + r"(?![A-Z0-9])") for plate in PPV_NAMEPLATES}
 
 FUEL_RULES = [
     ("hybrid", lambda f: "เสียบปลั๊ก" in f),
@@ -345,9 +359,10 @@ def build():
                            "trailing 12 months common to both releases.",
             "ppv_source": "stat_1_1_01_first_regis_vehicles_car (รถจดทะเบียนครั้งแรก, จำแนกตามยี่ห้อและรุ่น) "
                            "— monthly first-registration counts by brand/model, national only. AutoX house "
-                           "definition folds PPVs (Fortuner, MU-X, Pajero Sport, Everest, Terra) into "
-                           "'pickup' because they register in รย.1 (<=7 seats), not รย.3; see "
-                           "ppv_new_national below. Trailing 12 months of this series' own data.",
+                           "definition folds PPVs (Fortuner, MU-X, Pajero Sport, Everest, Terra, GWM Tank "
+                           "300/500, and the not-yet-launched Land Cruiser FJ) into 'pickup' because they "
+                           "register in รย.1 (<=7 seats), not รย.3; see ppv_new_national below. Trailing "
+                           "12 months of this series' own data.",
             "stock_asof": stock_asof,
             "new_window_months": [f"{y - 543:04d}-{m:02d}" for y, m in sorted(window)],
             "new_window_label": f"{lo} -> {hi}",

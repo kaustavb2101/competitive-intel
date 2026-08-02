@@ -268,6 +268,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_brand_trends.py --check (dlt CSVs absent or output not generated — not data drift)"
   else bad "build_brand_trends.py --check (brand_trends.json drifted from the dlt CSVs)"
   fi
+  ( cd "$PIPE" && python3 build_vehicle_models.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_models.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_models.py --check (dlt model-grain mirror absent or output not generated — not data drift)"
+  else bad "build_vehicle_models.py --check (vehicle_models.json drifted from the dlt model-grain mirror)"
+  fi
   ( cd "$PIPE" && python3 build_napprang.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_napprang.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_napprang.py --check (oae_napprang.json absent or output not generated — not data drift)"
