@@ -1387,6 +1387,9 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .scn-prov{margin:0;font-size:10.5px;color:var(--dim);line-height:1.5}
 /* commodities board drill (Overview) */
 .cb-exp{cursor:pointer;color:var(--accent);font-family:var(--mono);white-space:nowrap}
+/* "Our exposure to it" — our book, set apart from the market read above it so the macro section
+   visibly leads with the external move and carries the loan book as the consequence, not the lead. */
+.cb-ours{margin-top:10px;padding-top:9px;border-top:1px solid var(--line2)}
 .cb-chev{display:inline-block;width:1em}
 .cb-drill>td{background:var(--panel2);padding:0}
 .cb-belt{padding:10px 12px;font-size:12px;color:var(--mid);line-height:1.55}

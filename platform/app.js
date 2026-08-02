@@ -9321,21 +9321,45 @@ function renderCollateralBook(){
       ? `<b>Motorcycles are ${mc.n_share_pct}% of accounts but ${mc.os_share_pct}% of the money</b> — and carry the worst 90+ rate of any class at <b style="color:var(--agri)">${mc.dpd90p_pct}%</b> against ${pu.dpd90p_pct}% on pickup. Counting customers and counting baht give opposite answers here; this section counts baht.`
       : '';
 
-    host.innerHTML=`<h3 class="ovsub collat">Collateral book — what we lend against, and what it is worth
-        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape + DLT</span></h3>
-      <div class="verdict"><b>Pickup and passenger car are ${N.core_share_pct}% of the ${bn(N.os)} book on ${N.core_n_share_pct}% of accounts.</b>
+    // ORDER INVERTED 2026-08-02 (owner: "i noticed you are putting our loan book in the macro section
+    // in collateral value section. Please advise why?"). The book belongs here — it is the exposure
+    // denominator, and points 12/14/18 all asked for it — but it was LEADING, which turned a macro
+    // section into a balance-sheet section. On this tab the external move comes first (what is the
+    // collateral base doing, where is resale value heading) and our book answers "so what does that
+    // cost us". Book anatomy — the full mix and the brand table — now sits underneath as detail.
+    const fcOf=k=>(j.fleet_classes||[]).find(x=>x.key===k);
+    const fpu=fcOf('pickup'), fcar=fcOf('car');
+    const sgn=v=>v>0?'+':'', arw=v=>v<0?'▼':v>0?'▲':'●';
+    const dcol=v=>v<0?'var(--agri)':'var(--merch)';
+    const mv=(f,lab)=>!f||f.yoy_pct==null?'':`${lab} <b style="color:${dcol(f.yoy_pct)}">${arw(f.yoy_pct)} ${sgn(f.yoy_pct)}${f.yoy_pct}%</b>`;
+    // National transfer rate: the used market's own turnover, summed across the five regions rather
+    // than averaged (a mean of five region rates would weight Bangkok the same as the South).
+    const uf=j.used_flow||[];
+    const tSum=uf.reduce((a,r)=>a+((r.all||{}).transferred||0),0);
+    const pSum=uf.reduce((a,r)=>a+((r.all||{}).processed||0),0);
+    const natTr=pSum?(100*tSum/pSum).toFixed(2):null;
+    const baseLine=(fpu||fcar)
+      ? `<b>The collateral base is moving under us.</b> Registered stock YoY: ${[mv(fpu,'pickup'),mv(fcar,'passenger car')].filter(Boolean).join(', ')}.
+         ${fpu&&fpu.yoy_pct<0?'A shrinking pickup fleet tightens the future used-pickup pool, which supports resale on the class carrying the most of our money.':''}
+         ${natTr?` The used market turns over <b>${natTr}%</b> of registered stock a year — that turnover is the depth we would actually recover into.`:''}`
+      : '';
+
+    host.innerHTML=`<h3 class="ovsub collat">Collateral value — what the titles are worth, and what we hold against them
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DLT + real loan tape</span></h3>
+      <div class="verdict">${baseLine}
+        <div class="cb-ours"><b>Our exposure to it:</b> ${bn(N.os)} outstanding, of which pickup and passenger car are <b>${N.core_share_pct}%</b> on ${N.core_n_share_pct}% of accounts.
+        We lend <b>${N.ltv_proxy_pct}%</b> of assessed collateral value (${B(N.ticket)} outstanding against a ${B(N.eval_avg)} appraisal, per account) — that gap is the headroom a resale fall eats into.
         ${motoLine}
-        ${mort?`The second-largest class is not a vehicle at all: <b>property/mortgage at ${mort.os_share_pct}%</b> of outstanding on ${mort.n_share_pct}% of accounts, at a ${B(mort.ticket)} ticket.`:''}
-        Across the whole book we lend <b>${N.ltv_proxy_pct}%</b> of assessed collateral value (${B(N.ticket)} outstanding against a ${B(N.eval_avg)} appraisal, per account).
+        ${mort?`The second-largest class is not a vehicle at all: <b>property/mortgage at ${mort.os_share_pct}%</b> of outstanding on ${mort.n_share_pct}% of accounts, at a ${B(mort.ticket)} ticket — it does not move with the vehicle market above.`:''}</div>
         <span class="sub">Ranked by outstanding baht at every grain. Ranking by account count would lead with motorcycles.</span></div>
-      <h4 class="fb-h4">The full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
-      <div id="cb-types"></div>
-      <h4 class="fb-h4">The same book by geography — and the collateral base around it</h4>
-      <div id="cb-drill"></div>
-      <h4 class="fb-h4">Every brand we hold<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
-      <div id="cb-brands"></div>
       <h4 class="fb-h4">The resale market this book recovers into<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h4>
-      <div id="cb-flow"></div>`;
+      <div id="cb-flow"></div>
+      <h4 class="fb-h4">The collateral base by geography — and our exposure beside it</h4>
+      <div id="cb-drill"></div>
+      <h4 class="fb-h4">What we hold · the full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
+      <div id="cb-types"></div>
+      <h4 class="fb-h4">What we hold · every brand on a title<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
+      <div id="cb-brands"></div>`;
 
     /* ---- 1. the full mix to 100% (point 12) ---- */
     const tierTag=t=>t==='core'?`<span class="cb-tier core" title="Owner-stated focus: pickup and passenger car are the core collateral">core</span>`
