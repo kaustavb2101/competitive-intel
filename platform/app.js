@@ -2739,9 +2739,23 @@ function renderBrandTrends(){
   const be2ce=y=>String((+y)-543);
   const num=v=>(v==null||!isFinite(v))?'—':(+v).toLocaleString('en-US');
   const first=t[yrs[0]], last=t[yrs[yrs.length-1]];
-  const pk0=first.pickup||0, pk1=last.pickup||0;
+  // THE VERDICT AND THE TABLE BELOW IT MUST COUNT PICKUPS THE SAME WAY. They did not: the verdict
+  // read brand_trends.json (the registrar's รย.3 class, 2025 = 99,984) while the table under it read
+  // the nameplate layer (AutoX's definition, 2025 = 186,405). Two "measured" pickup counts an inch
+  // apart, 86% different, with nothing on the page reconciling them — the reader has no way to know
+  // which one to believe, and both were ours. The verdict now takes the nameplate layer whenever it
+  // is loaded, so the headline and the table are the same number, and falls back to the class
+  // definition only when that layer is absent — labelled, in that case, as the class count.
+  const VA=(VMODELS&&Array.isArray(VMODELS.annual)&&VMODELS.annual.length>=2)?VMODELS.annual:null;
+  const vFirst=VA?VA[0]:null, vLast=VA?VA[VA.length-1]:null;
+  const pk0=VA?vFirst.pu:(first.pickup||0), pk1=VA?vLast.pu:(last.pickup||0);
   const pkChg=pk0?((pk1-pk0)/pk0*100):null;
-  const totChg=(first.total)?((last.total-first.total)/first.total*100):null;
+  const y0=VA?vFirst.year_ce:be2ce(yrs[0]), y1=VA?vLast.year_ce:be2ce(yrs[yrs.length-1]);
+  const tot0=VA?vFirst.total:first.total, tot1=VA?vLast.total:last.total;
+  const totChg=(tot0)?((tot1-tot0)/tot0*100):null;
+  const basis=VA
+    ? ` on <b>AutoX's pickup definition</b> — pickup and PPV nameplates wherever they register, not the รย.3 class`
+    : ` on DLT's <b>รย.3 truck class</b>; the nameplate layer that counts PPVs and pickups filed as passenger cars is not loaded`;
   const ev=(d.ytd&&d.ytd.ev_only_share_pct!=null)?d.ytd.ev_only_share_pct:null;
   const evYr=(d.ytd&&d.ytd.year_be)?be2ce(d.ytd.year_be):'';
   const pct=v=>(v==null)?'—':(v<0?'−':'+')+Math.abs(v).toFixed(0)+'%';
@@ -2749,8 +2763,8 @@ function renderBrandTrends(){
   const vb=$('#btrend-verdict');
   if(vb){
     vb.className='verdict v-warn'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${be2ce(yrs[0])}→${be2ce(yrs[yrs.length-1])} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
-      `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
+    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${y0}→${y1} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
+      `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations,${basis}${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
   }
   // ---- note ----
   const note=$('#btrend-note');
@@ -10232,7 +10246,11 @@ function renderCollateralBook(){
           ${(VM.missing_months||[]).length?`DLT never published ${(VM.missing_months||[]).join(', ')}, so that month is absent from every series rather than interpolated. `:''}
           ${(VM.incomplete_months_excluded||[]).length?`${(VM.incomplete_months_excluded||[]).join(', ')} is a catalog stub, not a month, and is excluded. `:''}
           ${(w.contains_flagged_months||[]).length?`This window contains ${(w.contains_flagged_months||[]).join(', ')} — ${'months moving more than 40% year-on-year'}, kept in and flagged rather than smoothed away (Jan-2026 ran +54% in cars while motorcycles stayed flat: registrations pulled forward ahead of an incentive deadline).`:''}
-          These are <b>first registrations</b> — the collateral pool we will be seizing and reselling in future years, not our current book and not used-vehicle sales.`;
+          These are <b>first registrations</b> — the collateral pool we will be seizing and reselling in future years, not our current book and not used-vehicle sales.
+          <b>One grain warning, because this block mixes two:</b> the brand shares here are per BRAND (DLT), but the resale-value comparison in the verdict above is per
+          CLASS (BoT publishes รถยนต์นั่ง and รถกระบะ, never a brand split). So "the class that kept its concentration is the class that stopped losing value" is an
+          observation across two classes — <b>not</b> a measurement that major-brand vehicles hold their value better than minor-brand ones. No published Thai series
+          measures that, and nothing here should be read as if one did.`;
       };
       draw('m12');
       rz.querySelectorAll('.rz-win').forEach(b=>b.addEventListener('click',()=>{
