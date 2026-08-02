@@ -118,7 +118,10 @@ async function loadProvinceLfs(){
 // collateral pool. The diesel-share card above is a point-in-time snapshot; this carries the TIME
 // dimension — how fast the future used-pickup collateral pool is replenished at source. Null-safe:
 // absent / malformed file → BTREND stays null and the Overview block stays hidden.
-let BTREND=null, btrendPromise=null;
+// VMODELS — data/vehicle_models.json (pipeline/build_vehicle_models.py). Same DLT registry read at
+// NAMEPLATE grain, which is what lets a pickup be counted as a pickup on AutoX's definition rather
+// than the registrar's, and what makes the year table reconcile to the all-class total.
+let BTREND=null, VMODELS=null, btrendPromise=null;
 async function loadBrandTrends(){
   if(btrendPromise) return btrendPromise;
   btrendPromise=(async()=>{
@@ -126,6 +129,13 @@ async function loadBrandTrends(){
       const j = await fetch('data/brand_trends.json').then(r=>r.json());
       BTREND=(j&&j.new_regis_trend&&typeof j.new_regis_trend==='object')?j:null;
     }catch(e){ BTREND=null; }
+    // Loaded in the same step because the year table needs both: brand_trends still carries the EV
+    // share, while vehicle_models carries the reconciling class breakdown and the AutoX-basis pickup
+    // count. Failure of either is survivable — the table falls back to the class-based shape.
+    try{
+      const v = await fetch('data/vehicle_models.json').then(r=>r.json());
+      VMODELS=(v&&Array.isArray(v.annual))?v:null;
+    }catch(e){ VMODELS=null; }
     return BTREND;
   })();
   return btrendPromise;
@@ -2729,9 +2739,23 @@ function renderBrandTrends(){
   const be2ce=y=>String((+y)-543);
   const num=v=>(v==null||!isFinite(v))?'—':(+v).toLocaleString('en-US');
   const first=t[yrs[0]], last=t[yrs[yrs.length-1]];
-  const pk0=first.pickup||0, pk1=last.pickup||0;
+  // THE VERDICT AND THE TABLE BELOW IT MUST COUNT PICKUPS THE SAME WAY. They did not: the verdict
+  // read brand_trends.json (the registrar's รย.3 class, 2025 = 99,984) while the table under it read
+  // the nameplate layer (AutoX's definition, 2025 = 186,405). Two "measured" pickup counts an inch
+  // apart, 86% different, with nothing on the page reconciling them — the reader has no way to know
+  // which one to believe, and both were ours. The verdict now takes the nameplate layer whenever it
+  // is loaded, so the headline and the table are the same number, and falls back to the class
+  // definition only when that layer is absent — labelled, in that case, as the class count.
+  const VA=(VMODELS&&Array.isArray(VMODELS.annual)&&VMODELS.annual.length>=2)?VMODELS.annual:null;
+  const vFirst=VA?VA[0]:null, vLast=VA?VA[VA.length-1]:null;
+  const pk0=VA?vFirst.pu:(first.pickup||0), pk1=VA?vLast.pu:(last.pickup||0);
   const pkChg=pk0?((pk1-pk0)/pk0*100):null;
-  const totChg=(first.total)?((last.total-first.total)/first.total*100):null;
+  const y0=VA?vFirst.year_ce:be2ce(yrs[0]), y1=VA?vLast.year_ce:be2ce(yrs[yrs.length-1]);
+  const tot0=VA?vFirst.total:first.total, tot1=VA?vLast.total:last.total;
+  const totChg=(tot0)?((tot1-tot0)/tot0*100):null;
+  const basis=VA
+    ? ` on <b>AutoX's pickup definition</b> — pickup and PPV nameplates wherever they register, not the รย.3 class`
+    : ` on DLT's <b>รย.3 truck class</b>; the nameplate layer that counts PPVs and pickups filed as passenger cars is not loaded`;
   const ev=(d.ytd&&d.ytd.ev_only_share_pct!=null)?d.ytd.ev_only_share_pct:null;
   const evYr=(d.ytd&&d.ytd.year_be)?be2ce(d.ytd.year_be):'';
   const pct=v=>(v==null)?'—':(v<0?'−':'+')+Math.abs(v).toFixed(0)+'%';
@@ -2739,8 +2763,8 @@ function renderBrandTrends(){
   const vb=$('#btrend-verdict');
   if(vb){
     vb.className='verdict v-warn'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${be2ce(yrs[0])}→${be2ce(yrs[yrs.length-1])} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
-      `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
+    vb.innerHTML=`<div class="verdict-line">🛻 <b>New-pickup registrations ${pkChg!=null?(pkChg<0?'fell '+Math.abs(pkChg).toFixed(0)+'%':'rose '+pkChg.toFixed(0)+'%'):'moved'}</b> ${y0}→${y1} — ${num(pk0)} → ${num(pk1)}${totChg!=null?`, far faster than the whole new-vehicle market (${pct(totChg)})`:''}.</div>`+
+      `<div class="sub" style="margin-top:4px">The diesel pickup is AutoX's core auto-title collateral — a shrinking new-pickup stream means a <b>shrinking future used-pickup collateral pool</b>${ev!=null?`, while pure-EV take a rising <b>${ev}%</b> of new inflow (${evYr}), thinner and less-certain used values as they age into the pool`:''}. Counts ${TAG_M} DLT first registrations,${basis}${ev!=null?` · EV share ${TAG_E}`:''}.</div>`;
   }
   // ---- note ----
   const note=$('#btrend-note');
@@ -2748,20 +2772,80 @@ function renderBrandTrends(){
     'Pickups are AutoX’s core title collateral — <b>31.3% of accounts and 38.3% of outstanding</b> in the measured loan tape, the largest single balance exposure in the book; passenger cars and the all-class total (incl. motorcycles) are shown alongside. '+
     'All counts are <b>measured</b> (DLT first-registration registry). Years are Buddhist-era (พ.ศ. − 543 = ค.ศ., e.g. 2568 = 2025).';
   // ---- per-year table (pickup bar-scaled to its own max) ----
+  // Two things were wrong with the old version of this table and both are fixed here.
+  //   1. Pickup + passenger car came nowhere near "all new regis" and the table gave the reader no
+  //      way to see why — a ~2.1M gap sat there unexplained. It is motorcycles: 72.7% of every new
+  //      registration in Thailand. Every class is now named and the row ADDS UP.
+  //   2. "Pickup" counted only the รย.3 truck class, which is the registrar's definition, not ours.
+  //      A double-cab D-Max is filed as a passenger car and is a PICKUP to AutoX, and so is a PPV.
+  //      On our own definition the 2025 number is 186,405, not 99,984 — 86% higher.
+  // Falls back to the old class-based shape when the nameplate layer is absent, so an old cached
+  // deploy degrades to the previous table rather than to nothing.
   const tbl=$('#btrendtbl');
   if(tbl){
-    const pkMax=Math.max(...yrs.map(y=>t[y].pickup||0),1);
-    tbl.innerHTML=`<tr><th scope="col">Year</th><th scope="col" title="MEASURED — DLT first registrations, pickup trucks (รย.3): AutoX’s core title collateral">Pickup titles ◆</th><th scope="col" title="MEASURED — DLT first registrations, passenger cars">Passenger cars ◆</th><th scope="col" title="MEASURED — DLT first registrations, all vehicle classes incl. motorcycles">All new regis ◆</th></tr>`+
-      yrs.map((y,i)=>{
-        const r=t[y], w=Math.round((r.pickup||0)/pkMax*100);
-        const prev=i>0?t[yrs[i-1]].pickup:null;
-        const yoy=(prev)?((r.pickup-prev)/prev*100):null;
-        const yoyTxt=yoy!=null?` <span class="mono sub" style="color:${yoy<0?'var(--agri)':'var(--merch)'}">${pct(yoy)}</span>`:'';
-        return `<tr><td class="mono">${be2ce(y)}<span class="sub"> · ${y}</span></td>`+
-          `<td>${barHTML(w,'var(--collat)')} <span class="mono">${num(r.pickup)}</span>${yoyTxt}</td>`+
-          `<td class="mono sub">${num(r.passenger)}</td>`+
-          `<td class="mono sub">${num(r.total)}</td></tr>`;
-      }).join('');
+    const A=(VMODELS&&Array.isArray(VMODELS.annual)&&VMODELS.annual.length)?VMODELS.annual:null;
+    if(A){
+      const pkMax=Math.max(...A.map(r=>r.pu||0),1);
+      const bad=A.filter(r=>!r.reconciles).length;
+      tbl.innerHTML=`<tr><th scope="col">Year</th>`+
+        `<th scope="col" title="MEASURED — DLT first registrations matched by NAMEPLATE, on AutoX's definition: pickups plus PPVs, wherever they register. Not the รย.3 truck class.">Pickup + PPV ◆</th>`+
+        `<th scope="col" title="MEASURED — passenger cars with the pickup and PPV nameplates taken out, so the two columns do not double-count">Passenger cars ◆</th>`+
+        `<th scope="col" title="MEASURED — motorcycles, by far the largest class of new registrations">Motorcycles ◆</th>`+
+        `<th scope="col" title="MEASURED — tractors, trailers, road rollers, taxis, tuk-tuks and the service classes">Other ◆</th>`+
+        `<th scope="col" title="MEASURED — every vehicle class. The four columns to the left sum to exactly this.">All new regis ◆</th></tr>`+
+        // Owner on the pickup column: "I like this progress bar format with % change. easy to
+        // quantify impact." So every column gets it, not just the one — a bare number beside a
+        // barred one is an invitation to compare the two by eye, which is exactly what the reader
+        // cannot do.
+        // EACH BAR IS SCALED WITHIN ITS OWN COLUMN, and the footer says so. Motorcycles run 1.8M
+        // against pickup's 450k, so one shared scale would flatten the pickup bars to a stub and the
+        // column that matters would be the one you could not read. The trade is that bar lengths
+        // compare DOWN a column and never ACROSS one — stated rather than left to be discovered.
+        (()=>{ const mx=k=>Math.max(...A.map(r=>(k==='oth'?(r.tractor||0)+(r.other||0):r[k])||0),1);
+          const M={pu:mx('pu'),pa:mx('pa'),motorcycle:mx('motorcycle'),oth:mx('oth'),total:mx('total')};
+          const cell=(v,prev,max,col,strong)=>{
+            const yoy=(prev)?((v-prev)/prev*100):null;
+            return `<td class="yt-c">${barHTML(Math.round((v||0)/max*100),col)} <span class="mono${strong?'':' sub'}">${num(v)}</span>`
+              +(yoy!=null?` <span class="mono sub yt-d" style="color:${yoy<0?'var(--agri)':yoy>0?'var(--merch)':'var(--muted)'}">${pct(yoy)}</span>`:'')+`</td>`;
+          };
+          return A.map((r,i)=>{
+            const p=i>0?A[i-1]:null, oth=(r.tractor||0)+(r.other||0);
+            const pOth=p?((p.tractor||0)+(p.other||0)):null;
+            return `<tr><td class="mono">${r.year_ce}<span class="sub"> · ${r.year_be}</span></td>`+
+              cell(r.pu,p&&p.pu,M.pu,'var(--collat)',true)+
+              cell(r.pa,p&&p.pa,M.pa,'var(--accent)')+
+              cell(r.motorcycle,p&&p.motorcycle,M.motorcycle,'var(--muted)')+
+              cell(oth,pOth,M.oth,'var(--muted)')+
+              cell(r.total,p&&p.total,M.total,'var(--dim)',true)+`</tr>`;
+          }).join(''); })()+
+        `<tr class="cb-foot"><td class="s" colspan="6">Every row adds up: pickup+PPV, passenger car,
+          motorcycle and other sum to the total${bad?` <b style="color:var(--agri)">(${bad} year(s) failed the check)</b>`:''}.
+          <b>Motorcycles are ${A[A.length-1].motorcycle_pct}% of all new registrations</b>, which is the whole of the gap that
+          used to sit unexplained between the pickup column and the total — they are not our collateral, so the
+          headline classes look small beside a number they were never comparable to.
+          The pickup column is <b>AutoX's definition, not the registrar's</b>: matched on the nameplate, so a
+          double-cab D-Max filed as a passenger car still counts as a pickup, and PPVs count too. In
+          ${A[A.length-1].year_ce} that is ${num(A[A.length-1].pu_pickup)} pickups plus ${num(A[A.length-1].pu_ppv)} PPVs.
+          Counts are the Motor Vehicle Act registry only, so buses and heavy trucks registered under the Land
+          Transport Act are not in the total.
+          <b>Each bar is scaled inside its own column</b>, against that column's own biggest year — so bar lengths
+          compare down a column and never across one. On a single shared scale motorcycles (${num(A[A.length-1].motorcycle)})
+          would flatten pickup (${num(A[A.length-1].pu)}) to a stub, and the column that matters would be the one you could not read.
+          Percentages are year on year and need no such caveat.</td></tr>`;
+    }else{
+      const pkMax=Math.max(...yrs.map(y=>t[y].pickup||0),1);
+      tbl.innerHTML=`<tr><th scope="col">Year</th><th scope="col" title="MEASURED — DLT first registrations, pickup trucks (รย.3)">Pickup titles ◆</th><th scope="col" title="MEASURED — DLT first registrations, passenger cars">Passenger cars ◆</th><th scope="col" title="MEASURED — DLT first registrations, all vehicle classes incl. motorcycles">All new regis ◆</th></tr>`+
+        yrs.map((y,i)=>{
+          const r=t[y], w=Math.round((r.pickup||0)/pkMax*100);
+          const prev=i>0?t[yrs[i-1]].pickup:null;
+          const yoy=(prev)?((r.pickup-prev)/prev*100):null;
+          const yoyTxt=yoy!=null?` <span class="mono sub" style="color:${yoy<0?'var(--agri)':'var(--merch)'}">${pct(yoy)}</span>`:'';
+          return `<tr><td class="mono">${be2ce(y)}<span class="sub"> · ${y}</span></td>`+
+            `<td>${barHTML(w,'var(--collat)')} <span class="mono">${num(r.pickup)}</span>${yoyTxt}</td>`+
+            `<td class="mono sub">${num(r.passenger)}</td>`+
+            `<td class="mono sub">${num(r.total)}</td></tr>`;
+        }).join('');
+    }
   }
   wrap.style.display='';
 }
@@ -9449,6 +9533,8 @@ function renderCollateralBook(){
       <div id="cb-mix"></div>
       <h4 class="fb-h4">Which brands the new collateral is<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED national</span></h4>
       <div id="cb-vbrands"></div>
+      <h4 class="fb-h4">Is the major-brand grip holding?<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT nameplate</span></h4>
+      <div id="cb-resil"></div>
       <h4 class="fb-h4">The collateral base by geography — and our exposure beside it</h4>
       <div id="cb-drill"></div>
       <h4 class="fb-h4">What we hold · the full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
@@ -9613,6 +9699,113 @@ function renderCollateralBook(){
       const pp=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1);
       const pct=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';
       const mcol=v=>v==null?'var(--muted)':v<0?'var(--agri)':'var(--merch)';
+      /* THE QUESTION THIS BLOCK EXISTS TO ANSWER — "is the recovery trend still downward, or has it
+         become stable?" It is a question about RESALE VALUE, so it is answered off the price index
+         and never off registration share; what brands are selling is a different block.
+
+         Answered by a rule applied identically to both series rather than by reading the chart:
+           stabilised   flat on the year (within ±2%), not falling across either the last 6 or the
+                        last 12 months, and clearly up off its own all-time trough
+           recovering   above that — rising on the year with both windows positive
+           still falling  down more than 2% on the year AND still sliding over the last 6
+           otherwise    the signs disagree, and it is called an unconfirmed turn, not a turn
+
+         The slope is quoted in index points per month BESIDE the series' own month-to-month
+         volatility. A +0.7/month drift inside a series that moves ±2.8 in an average month is a
+         direction, not a promise, and printing the two together is the difference between answering
+         the question and overselling the answer. */
+      const ols=v=>{ const n=v.length; if(n<3) return null;
+        let sx=0,sy=0,sxy=0,sxx=0;
+        for(let i=0;i<n;i++){ sx+=i; sy+=v[i]; sxy+=i*v[i]; sxx+=i*i; }
+        const den=n*sxx-sx*sx; return den?(n*sxy-sx*sy)/den:null; };
+      const sigmaMoM=v=>{ if(v.length<4) return null;
+        const d=[]; for(let i=1;i<v.length;i++) d.push(v[i]-v[i-1]);
+        const m=d.reduce((a,b)=>a+b,0)/d.length;
+        return Math.sqrt(d.reduce((a,b)=>a+(b-m)*(b-m),0)/d.length); };
+      const monthsBetween=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7));
+      const stab=s=>{
+        const H=((s||{}).history||[]).map(r=>r.value).filter(v=>typeof v==='number'&&isFinite(v));
+        if(H.length<13) return null;
+        const s6=ols(H.slice(-6)), s12=ols(H.slice(-12)), sd=sigmaMoM(H.slice(-24));
+        const y=s.yoy_pct, tr=(s.all_time||{}).trough||{}, L=s.latest||{}, lv=L.value;
+        const off=(tr.value&&lv!=null)?100*(lv-tr.value)/tr.value:null;
+        const since=(tr.period&&L.period)?monthsBetween(tr.period,L.period):null;
+        let lab='not yet a confirmed turn', col='var(--gold)', k='unclear';
+        if(y!=null&&s6!=null&&s12!=null){
+          if(y>2&&s6>0&&s12>0){ lab='recovering'; col='var(--merch)'; k='up'; }
+          else if(Math.abs(y)<=2&&s6>=0&&s12>=0&&off!=null&&off>5){ lab='stabilised'; col='var(--merch)'; k='flat'; }
+          else if(y<-2&&s6<0){ lab='still falling'; col='var(--agri)'; k='down'; }
+        }
+        return {s6:s6,s12:s12,sd:sd,off:off,since:since,trough:tr,lab:lab,col:col,k:k};
+      };
+      const slp=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(2);
+      const ST={truck:stab(S.truck),car:stab(S.car),overall:stab(S.overall)};
+      /* THE RESALE-VALUE CHART. The answer to "is it still going down?" has to be SEEN, not
+         asserted — the shape is a four-year slide into a trough and then a floor, and a sparkline
+         cannot carry that: no axis, no trough marker, and no second series to judge it against.
+         So the series are drawn full size on a shared axis with the pickup trough marked.
+
+         Two lines may share one y-axis here, which is unusual on this page and is legitimate for
+         exactly one reason: both are the SAME index on the SAME 2015=100 base. Nothing is rebased
+         to make the shapes agree. */
+      const MH={};
+      ['truck','car','overall'].forEach(k=>{ const m={};
+        (((S[k]||{}).history)||[]).forEach(r=>{ if(typeof r.value==='number'&&isFinite(r.value)) m[r.period]=r.value; });
+        MH[k]=m; });
+      const ALLP=Object.keys(MH.truck).sort();
+      // Series identity is carried by ONE hue each and never by red/green — those two are reserved
+      // for the verdict, so a line does not change meaning when the trend does.
+      const SER=[{k:'truck',lab:'Pickup · รถกระบะ',col:'var(--collat)',w:2.3},
+                 {k:'car',lab:'Passenger car · รถยนต์นั่ง',col:'var(--accent)',w:1.7},
+                 {k:'overall',lab:'All used vehicles (the blend)',col:'var(--dim)',w:1.2,dash:'4 3'}];
+      const uvChart=n=>{
+        const win=(n&&n<ALLP.length)?ALLP.slice(-n):ALLP;
+        if(win.length<6) return '';
+        const vals=[]; SER.forEach(s=>win.forEach(p=>{ const v=MH[s.k][p]; if(v!=null) vals.push(v); }));
+        if(!vals.length) return '';
+        const hi=Math.max(...vals), lo=Math.min(...vals);
+        const padv=((hi-lo)||1)*0.09, yHi=hi+padv, yLo=Math.max(0,lo-padv), span=(yHi-yLo)||1;
+        const W=760,H=256,padL=36,padR=12,padT=12,padB=24;
+        const pw=W-padL-padR, ph=H-padT-padB;
+        const X=i=>padL+(win.length<2?pw/2:pw*i/(win.length-1));
+        const Y=v=>padT+ph*(yHi-v)/span;
+        // Gridlines land on round index values, not on an even split of the data range — a y-axis
+        // reading 63.4 / 71.9 / 80.4 is arithmetically correct and unreadable.
+        const raw=span/4, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+        const step=[1,2,2.5,5,10].map(m=>m*mag).find(v=>v>=raw)||mag*10;
+        let grid='';
+        for(let t=Math.ceil(yLo/step)*step;t<=yHi+1e-9;t+=step){ const yy=Y(t);
+          grid+=`<line class="uvc-g" x1="${padL}" y1="${yy.toFixed(1)}" x2="${W-padR}" y2="${yy.toFixed(1)}"/>`
+              +`<text class="uvc-y" x="${padL-6}" y="${(yy+3).toFixed(1)}" text-anchor="end">${Math.round(t)}</text>`; }
+        // The 2015=100 base line, drawn only when it is inside the window — it is what the index
+        // means, so "half the base year is gone" is a distance the eye can measure.
+        const base=(100>=yLo&&100<=yHi)?`<line class="uvc-base" x1="${padL}" y1="${Y(100).toFixed(1)}" x2="${W-padR}" y2="${Y(100).toFixed(1)}"/>`
+          +`<text class="uvc-y uvc-baset" x="${W-padR}" y="${(Y(100)-4).toFixed(1)}" text-anchor="end">2015 base = 100</text>`:'';
+        const jans=win.map((p,i)=>({p:p,i:i})).filter(o=>o.p.slice(5)==='01');
+        const every=Math.max(1,Math.ceil(jans.length/9));
+        const xt=jans.filter((o,ix)=>ix%every===0).map(o=>
+          `<text class="uvc-x" x="${X(o.i).toFixed(1)}" y="${H-7}" text-anchor="middle">${o.p.slice(0,4)}</text>`).join('');
+        // A gap in the source breaks the path rather than bridging it — a straight segment drawn
+        // across a month BoT never published would be a reading we invented.
+        const paths=SER.map(s=>{ let d='', open=false;
+          win.forEach((p,i)=>{ const v=MH[s.k][p];
+            if(v==null){ open=false; return; }
+            d+=(open?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)+' '; open=true; });
+          return d?`<path class="uvc-l" d="${d.trim()}" stroke="${s.col}" stroke-width="${s.w}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`:''; }).join('');
+        let marks='';
+        const tr=((S.truck.all_time||{}).trough)||{}, ti=win.indexOf(tr.period);
+        if(ti>=0&&tr.value!=null){
+          marks+=`<line class="uvc-tl" x1="${X(ti).toFixed(1)}" y1="${padT}" x2="${X(ti).toFixed(1)}" y2="${(padT+ph).toFixed(1)}"/>`
+            +`<circle cx="${X(ti).toFixed(1)}" cy="${Y(tr.value).toFixed(1)}" r="4" fill="var(--agri)"><title>Pickup trough ${tr.value.toFixed(1)} (${tr.period})</title></circle>`
+            +`<text class="uvc-m" x="${X(ti).toFixed(1)}" y="${(Y(tr.value)+16).toFixed(1)}" text-anchor="${ti>win.length*0.75?'end':'middle'}">pickup trough ${tr.value.toFixed(1)} · ${tr.period}</text>`;
+        }
+        const li=win.length-1, lv=MH.truck[win[li]];
+        if(lv!=null) marks+=`<circle cx="${X(li).toFixed(1)}" cy="${Y(lv).toFixed(1)}" r="3.6" fill="var(--collat)"><title>Pickup ${lv.toFixed(1)} (${win[li]})</title></circle>`;
+        return `<svg class="uvc" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img"
+            aria-label="Used vehicle price index, pickup against passenger car, ${win[0]} to ${win[li]}, 2015 equals 100">
+          <title>BoT Used Vehicle Price Index, 2015=100 — ${win[0]} to ${win[li]}</title>
+          ${grid}${base}${xt}${paths}${marks}</svg>`;
+      };
       // Index level is NOT a rate — 66.8 on a 2015=100 base is "one third of its base year value
       // gone", so the tile shows the level, its distance from base in points, and the YoY move as
       // three separate readings rather than collapsing them into one number.
@@ -9632,6 +9825,10 @@ function renderCollateralBook(){
             title:(sp.periods&&sp.periods.length?sp.periods[0]+'..'+sp.periods[sp.periods.length-1]:'')+' — BoT UVPI, 2015=100'})}</div>
           <div class="uv-yoy">YoY <b style="color:${mcol(s.yoy_pct)}">${pct(s.yoy_pct)}</b>
             <span class="s">· trough ${(s.all_time&&s.all_time.trough)?s.all_time.trough.value.toFixed(1)+' ('+s.all_time.trough.period+')':'—'}</span></div>
+          ${ST[k]?`<div class="uv-dir" title="Ordinary least-squares slope of the published index, in index points per month. The ± figure is the standard deviation of month-on-month change over the last 24 months — the noise the slope has to be judged against.">
+            <span class="uv-dirb" style="color:${ST[k].col};border-color:${ST[k].col}">${ST[k].lab}</span>
+            <span class="s">6-mo <b style="color:${mcol(ST[k].s6)}">${slp(ST[k].s6)}</b> · 12-mo <b style="color:${mcol(ST[k].s12)}">${slp(ST[k].s12)}</b> pts/mo
+            · noise ±${ST[k].sd==null?'—':ST[k].sd.toFixed(2)}</span></div>`:''}
           <div class="uv-sub s">${sub}</div></div>`;
       };
       // The decoupling chart. A number ("the gap is 21 points") does not carry the finding; the
@@ -9664,12 +9861,49 @@ function renderCollateralBook(){
       const mult=(CMP.latest_vs_2015_base||{}).truck_decline_multiple_of_car;
       const L=S.truck.latest||{};
       const prelim=L.preliminary?` <span class="uv-p" title="${(UM.preliminary_note||'preliminary').replace(/"/g,'')}">p</span>`:'';
+      // The lead answers the DIRECTION question, because that is what is being asked of this book
+      // right now. The cumulative-damage reading that used to lead is still here and still matters —
+      // it is the LEVEL — but it is a different question and it now sits second, where it cannot be
+      // mistaken for an answer about where values are heading.
+      const TB=ST.truck, CB=ST.car;
+      const head=(TB&&CB)
+        ? ((TB.k==='flat'||TB.k==='up')&&CB.k==='down' ? 'Pickup recovery values have stopped falling. The passenger car has not.'
+          : TB.k==='down'&&CB.k==='down' ? 'Recovery values are still falling on both classes.'
+          : (TB.k==='flat'||TB.k==='up')&&(CB.k==='flat'||CB.k==='up') ? 'Recovery values have stopped falling on both classes.'
+          : 'The turn is not yet confirmed on either class.')
+        : '';
+      /* The closing clause is chosen by which way the series is GOING, because the same fact reads
+         as the opposite answer on the two of them. Distance above the all-time trough is the
+         evidence that a floor is holding — but only for a series that has stopped falling. Quoted
+         for one that is still falling it is actively misleading: the car is "+17.8% above its
+         2023-12 trough" and also down 8.3% on the year, and leading with the first would dress a
+         renewed slide up as a recovery. So a falling series is measured DOWN from its recent high
+         instead, which is the reading that matches where it is heading. */
+      const say=(k,name)=>{ const b=ST[k], s=S[k]||{}, L=s.latest||{}; if(!b) return '';
+        const hi=(s.trailing_12m||{}).high||{};
+        const offHi=(hi.value&&L.value!=null)?100*(L.value-hi.value)/hi.value:null;
+        const tail=(b.k==='flat'||b.k==='up')
+          ? (b.off!=null&&b.off>0?`, and now <b>+${b.off.toFixed(1)}%</b> above the ${b.trough.value.toFixed(1)} it bottomed at in ${b.trough.period}${b.since?`, ${b.since} months ago`:''}`:'')
+          : (offHi!=null&&offHi<0?`, back <b style="color:var(--agri)">${pct(offHi)}</b> from the ${hi.value.toFixed(1)} it reached in ${hi.period}`:'');
+        return `<b>${name} is <span style="color:${b.col}">${b.lab}</span></b> — ${L.value==null?'—':L.value.toFixed(1)} at ${L.period||'—'},
+          <b style="color:${mcol(s.yoy_pct)}">${pct(s.yoy_pct)}</b> on the year, running ${slp(b.s6)} points a month over the last six and ${slp(b.s12)} over the last twelve${tail}.`; };
       vt.innerHTML=`<div class="verdict uv-verdict">
-          <b>Pickup resale value has fallen ${mult?`${mult.toFixed(1)}×`:'far'} as far as passenger car.</b>
-          Against their own 2015 base, pickups sit <b style="color:var(--agri)">${pp(S.truck.vs_2015_base_pp)} pts</b> and cars
-          <b>${pp(S.car.vs_2015_base_pp)} pts</b>${pu?` — and pickup is <b>${pu.os_share_pct}%</b> of this book, the largest single collateral class`:''}.
-          <span class="sub">The damage is cumulative since 2022, not a fresh shock: over the last twelve months it is <b>cars</b> that are giving way
-          (${pct(S.car.yoy_pct)}) while pickups are close to flat (${pct(S.truck.yoy_pct)}). Both readings are below.</span></div>
+          <b>${head}</b>
+          <div class="uv-answers">${say('truck','Pickup')}<br>${say('car','Passenger car')}</div>
+          <span class="sub">Read the slope against the noise, not on its own: pickup moves
+            <b>±${TB&&TB.sd!=null?TB.sd.toFixed(2):'—'}</b> points in an average month and the car <b>±${CB&&CB.sd!=null?CB.sd.toFixed(2):'—'}</b>,
+            so a fraction of a point per month is a <b>direction</b> — a floor that has held for
+            ${TB&&TB.since?TB.since+' months':'over a year'} — and not a level anyone should underwrite to.
+            And this is the <b>direction</b>; the <b>level</b> is the second reading: against their own 2015 base pickups still sit
+            <b style="color:var(--agri)">${pp(S.truck.vs_2015_base_pp)} pts</b> and cars <b>${pp(S.car.vs_2015_base_pp)} pts</b>
+            — pickup has fallen ${mult?`${mult.toFixed(1)}×`:'far'} as far, cumulatively, since 2022${pu?`, and pickup is <b>${pu.os_share_pct}%</b> of this book`:''}.
+            Values stopping their fall is not values coming back.</span></div>
+        <div class="uv-charth">
+          <div class="uvc-legend">${SER.map(s=>`<span class="uvc-key"><i style="background:${s.col}${s.dash?';height:2px;opacity:.8':''}"></i>${s.lab}</span>`).join('')}</div>
+          <div class="rz-winbar" role="group" aria-label="Choose how far back the chart runs">
+            <span class="s">Show:</span>${[[36,'3 years'],[60,'5 years'],[120,'10 years'],[0,'all '+ALLP.length+' months']].map((o,i)=>
+              `<button type="button" class="rz-win uvc-win${o[0]===60?' on':''}" data-n="${o[0]}" aria-pressed="${o[0]===60}">${o[1]}</button>`).join('')}</div>
+          <div id="uv-chart"></div></div>
         <div class="uv-tiles">${tile('truck','Pickup · รถกระบะ','What we recover on the class holding most of our money')}
           ${tile('car','Passenger car · รถยนต์นั่ง','The comparison that isolates what is pickup-specific')}
           ${tile('overall','All used vehicles','BoT’s headline index — the blend of the two')}</div>
@@ -9679,7 +9913,20 @@ function renderCollateralBook(){
           BoT's "Truck" series is <b>รถกระบะ — pickups</b>, not heavy commercial vehicles: its own methodology paper captions the split
           "ประเภทรถยนต์นั่ง (Car) และ รถกระบะ (Truck)", and the 11 constituent marques are car/pickup brands with no heavy-truck OEM among them.
           ${L.preliminary?'The latest month is marked preliminary by BoT and may be revised.':''}
+          <b>Direction is measured, not eyeballed:</b> the per-month figures are ordinary least-squares slopes of the published index over the last 6 and 12 months,
+          and the volatility beside them is the standard deviation of month-on-month change over the last 24 — quoted together so a small slope is never read as a floor.
+          <b>The honest limit of this chart: BoT publishes the index by CLASS only</b> — รถยนต์นั่ง and รถกระบะ — <b>never by brand.</b>
+          So the resale half of this story is pickup-vs-car, while the brand half above it is registration share. There is no published
+          major-brand-vs-minor-brand resale series in Thailand to put beside it; getting one would mean auction-level hammer data by nameplate, which is not public.
           Nothing here is modelled — every figure is arithmetic over the published series.</p>`;
+      // Chart last, so a failure to draw it can never take the numbers above down with it.
+      const cw=document.getElementById('uv-chart');
+      const drawUv=n=>{ if(cw) cw.innerHTML=uvChart(n)||'<p class="s">Not enough published months to draw this window.</p>'; };
+      drawUv(60);
+      vt.querySelectorAll('.uvc-win').forEach(b=>b.addEventListener('click',()=>{
+        vt.querySelectorAll('.uvc-win').forEach(o=>{o.classList.remove('on');o.setAttribute('aria-pressed','false');});
+        b.classList.add('on'); b.setAttribute('aria-pressed','true'); drawUv(+b.dataset.n||0);
+      }));
     }).catch(()=>{ vt.style.display='none'; });
 
     /* ---- 6. the fleet mix: STOCK vs NEW, every class to 100% ----
@@ -9844,6 +10091,173 @@ function renderCollateralBook(){
       };
       if(sel){ drawProv(sel.value); sel.addEventListener('change',()=>drawProv(sel.value)); }
     }).catch(()=>{ vb2.style.display='none'; });
+
+    /* ---- 8. IS THE MAJOR-BRAND GRIP HOLDING? — resilience of major vs minor brands ----
+       Owner's question, verbatim: "we look at it in further lens of major brands vs the minor
+       brands of PU or PA to assess resilience. Plus, our portfolio is more major brands so we are
+       more concerned." So this is not a market-share table — it is a residual-value question. A
+       used Hilux has thirty years of auction history behind its price; a used JAECOO has none. The
+       faster unproven brands take the inflow, the less anyone can say what the collateral will
+       fetch when we seize it in 2029.
+
+       Three decisions make the answer trustworthy rather than merely plausible:
+
+       PU IS AUTOX'S PU, NOT THE REGISTRAR'S. A double-cab D-Max is filed under รย.1 "passenger car
+       ≤7 seats", and a Fortuner is filed there too — both are PICKUPS to this business. So the
+       split is read off the NAMEPLATE column, never the class column: รย.1 turns out to be 30.6%
+       pickup collateral (21.1% pickup nameplates + 9.5% PPV) and รย.3 is 95.9% pickup nameplates.
+       Counting the class column alone understates the pickup inflow by 86%.
+
+       THE MAJORS ARE A FIXED LIST, NOT A TOP-2. Toyota+Isuzu for pickups, Toyota+Honda for cars,
+       held constant across all 48 months. A "top two by volume" rule would silently re-pick the
+       brands mid-series — the month BYD passed Honda, the line would start measuring a different
+       thing and the whole trend would mean nothing.
+
+       THE PRIOR PERIOD IS THE SAME CALENDAR MONTHS A YEAR EARLIER, not the block immediately
+       before. Pickup registration is heavily seasonal: a naive back-to-back window read the last
+       six months as −25.9% when the seasonally-aligned comparison is −9.8%. */
+    const rz=document.getElementById('cb-resil');
+    if(rz) Promise.all([loadBrandTrends(),tmliFetch('used_vehicle_value')]).then(function(r){
+      const uv=r[1], V=VMODELS, W=(V||{}).windows||{}, VM=(V||{}).meta||{};
+      if(!W.m12||!W.m12.pu||!W.m12.pa){ rz.style.display='none'; return; }
+      const num=n=>n==null?'—':Math.round(n).toLocaleString('en-US');
+      const ppv=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(2)+'pp';
+      const pctv=v=>v==null?'—':(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(1)+'%';
+      const mcol=v=>v==null?'var(--muted)':v<0?'var(--agri)':v>0?'var(--merch)':'var(--muted)';
+      // "Holding" is a claim, so it gets defined ONCE and applied to both sides rather than
+      // eyeballed per panel. It grades ONE axis — points given up against the same months a year
+      // earlier — and nothing else.
+      //
+      // An earlier version graded the year-on-year change AND the within-window slope together, and
+      // the six-month pickup panel immediately produced a contradiction: down 3.13pp on the year, so
+      // "slipping", while the slope inside those six months ran +0.4pp a month, so recovering. Both
+      // readings are true and they are answers to different questions. Rolling them into one badge
+      // only hid that, so the badge now grades the year-on-year change, the slope is stated beside it
+      // on its own row, and the tooltip says outright that the two can disagree.
+      const WHY_YOY='Graded on the change against the same calendar months a year earlier: '
+        +'holding = gave up under 3 points, slipping = 3 to 6, eroding = more than 6. '
+        +'The Direction row below is a different reading — the trend INSIDE this window — and over a '
+        +'short window the two can disagree: the majors can be recovering month to month and still be '
+        +'down on the year.';
+      // DLT publishes nothing before 2022-01, so a 24- or 36-month window inside a 48-month series
+      // has no complete year-earlier period to be compared against — the builder leaves the change
+      // out rather than comparing against a part-year. The badge then grades what IS measurable, the
+      // trend inside the window, and both the wording and the tooltip change so the reader is never
+      // shown two different measures under one word.
+      const WHY_SLOPE='There is no year-earlier comparison for this window: the DLT series begins '
+        +'2022-01, so a window this long has no complete prior period to measure against. Rather than '
+        +'compare against a part-year, this badge grades the trend INSIDE the window — the slope on '
+        +'the Direction row. Use the 6- or 12-month window for a year-on-year read.';
+      const grade=e=>{
+        const d=e.major_share_change_pp, s=e.major_share_slope_pp_per_month;
+        if(d!=null){
+          if(d>=-3) return {lab:'holding',col:'var(--merch)',why:WHY_YOY};
+          if(d>=-6) return {lab:'slipping',col:'var(--gold)',why:WHY_YOY};
+          return {lab:'eroding',col:'var(--agri)',why:WHY_YOY};
+        }
+        if(s==null) return {lab:'—',col:'var(--muted)',why:'No comparison available for this window.'};
+        if(s>=-0.25) return {lab:'flat in-window',col:'var(--merch)',why:WHY_SLOPE};
+        if(s>=-1) return {lab:'drifting down',col:'var(--gold)',why:WHY_SLOPE};
+        return {lab:'falling in-window',col:'var(--agri)',why:WHY_SLOPE};
+      };
+      const LAB={pu:{t:'PU · pickup + PPV',u:'pickup and PPV'},pa:{t:'PA · passenger car',u:'passenger car'}};
+      const panel=(k,basis)=>{
+        const w=W[k]||{}, e=w[basis]; if(!e) return '';
+        const g=grade(e), majs=e.majors||[], maj=majs.join(' + ');
+        const minors=(e.top_brands||[]).filter(b=>majs.indexOf(b.brand)<0).slice(0,5);
+        const minorShare=e.units?100*(e.minor_units||0)/e.units:null;
+        const majW=Math.max(0,Math.min(100,e.major_share_pct||0));
+        return `<div class="rz-panel">
+          <div class="rz-head"><span class="rz-title">${LAB[basis].t}</span>
+            <span class="rz-badge" style="color:${g.col};border-color:${g.col}" title="${g.why}">${g.lab}</span></div>
+          <div class="rz-big" style="color:${g.col}">${e.major_share_pct==null?'—':e.major_share_pct.toFixed(1)}<span class="rz-pc">%</span></div>
+          <div class="rz-cap">of new ${LAB[basis].u} registrations are <b>${maj}</b> — the brands this book is concentrated in</div>
+          <div class="rz-bar" role="img" aria-label="${maj} took ${majW.toFixed(1)} percent, all other brands ${(100-majW).toFixed(1)} percent">
+            <span class="rz-maj" style="width:${majW.toFixed(2)}%;background:${g.col}"><b>${maj}</b></span>
+            <span class="rz-min" style="width:${(100-majW).toFixed(2)}%"><b>everyone else ${minorShare==null?'':minorShare.toFixed(1)+'%'}</b></span></div>
+          <div class="rz-spark">${svgSpark(e.major_share_monthly,{w:230,h:34,color:g.col,
+            aria:LAB[basis].t+' major-brand share, month by month',
+            title:(w.from||'')+' .. '+(w.to||'')+' — major-brand share of the class, % per month'})}
+            <span class="s">month by month across the window</span></div>
+          <table class="rz-kv"><tbody>
+            ${e.prior_major_share_pct==null
+              ? `<tr><th scope="row" colspan="2" class="rz-nocmp" title="${WHY_SLOPE}">No year-earlier comparison — the DLT series starts ${VM.first_month||'2022-01'}, so a window this long has no complete prior period</th></tr>`
+              : `<tr><th scope="row">Same months, a year earlier</th><td>${e.prior_major_share_pct.toFixed(1)}%</td></tr>
+                 <tr><th scope="row">Change</th><td style="color:${mcol(e.major_share_change_pp)}"><b>${ppv(e.major_share_change_pp)}</b></td></tr>`}
+            <tr><th scope="row" title="Ordinary least-squares slope of the monthly major-share line inside this window. Negative = the majors are giving up ground each month; compare it across windows to see whether the slide is steepening.">Direction</th>
+              <td style="color:${mcol(e.major_share_slope_pp_per_month)}">${e.major_share_slope_pp_per_month==null?'—':(e.major_share_slope_pp_per_month>0?'+':e.major_share_slope_pp_per_month<0?'−':'')+Math.abs(e.major_share_slope_pp_per_month).toFixed(1)+' pp / month'}</td></tr>
+            <tr><th scope="row">New registrations in window</th><td>${num(e.units)} <span class="s" style="color:${mcol(e.units_change_pct)}">${pctv(e.units_change_pct)}</span></td></tr>
+          </tbody></table>
+          <div class="rz-minh s">Who is taking the rest</div>
+          <table class="rz-min-tbl"><tbody>${minors.map(b=>`<tr><td>${b.brand}</td>
+            <td class="n">${num(b.units)}</td><td class="n"><b>${(b.share_pct||0).toFixed(2)}%</b></td></tr>`).join('')
+            ||'<tr><td colspan="3" class="s">No non-major brand registered in this window.</td></tr>'}</tbody></table>
+        </div>`;
+      };
+      // The tie-back that makes this a credit finding and not a car-industry fact: the class that
+      // kept its brand concentration is the same class whose resale value stopped falling. Read off
+      // the BoT index rather than asserted, so it stays true when the index moves.
+      let ceo='';
+      const T=((uv||{}).series||{}).truck, C=((uv||{}).series||{}).car;
+      if(T&&T.latest&&T.all_time&&T.all_time.trough){
+        const tr=T.all_time.trough, lv=T.latest.value;
+        const off=(tr.value&&lv!=null)?100*(lv-tr.value)/tr.value:null;
+        const dm=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5,7)-+a.slice(5,7));
+        const since=(tr.period&&T.latest.period)?dm(tr.period,T.latest.period):null;
+        ceo=`<span class="sub"><b>And it is the same split in the resale index.</b> Pickup value has
+          <b style="color:var(--merch)">stopped falling</b>: ${lv==null?'—':lv.toFixed(1)} at ${T.latest.period||'—'},
+          ${off==null?'':`<b>+${off.toFixed(1)}%</b> above the ${tr.value.toFixed(1)} it troughed at in ${tr.period}`}${since?`, ${since} months ago`:''},
+          and ${pctv(T.yoy_pct)} on the year — flat, not falling. The passenger car has not turned:
+          ${pctv(C&&C.yoy_pct)} on the year${C&&C.latest?` at ${C.latest.value.toFixed(1)}`:''}.
+          The class that kept its brand concentration is the class that stopped losing value. That is the
+          recovery-trend answer: <b>pickup has stabilised, the car has not.</b></span>`;
+      }
+      const A=W.m12.pu, B=W.m12.pa, gA=grade(A), gB=grade(B);
+      const steep=(W.m36&&W.m36.pa&&W.m36.pa.major_share_slope_pp_per_month!=null&&B.major_share_slope_pp_per_month!=null)
+        ? ` and the slide is steepening — ${Math.abs(B.major_share_slope_pp_per_month).toFixed(1)}pp a month over the last year against ${Math.abs(W.m36.pa.major_share_slope_pp_per_month).toFixed(1)}pp over three` : '';
+      rz.innerHTML=`<div class="verdict rz-verdict">
+          <b>The pickup grip is ${gA.lab}. The car side is ${gB.lab}.</b>
+          Over the last twelve months ${(A.majors||[]).join(' and ')} still took <b>${A.major_share_pct.toFixed(1)}%</b> of every new pickup and PPV —
+          ${ppv(A.major_share_change_pp)} against the same months a year earlier. ${(B.majors||[]).join(' and ')} took
+          <b>${B.major_share_pct.toFixed(1)}%</b> of new cars, ${ppv(B.major_share_change_pp)}${steep}.
+          ${ceo}</div>
+        <div class="rz-winbar" role="group" aria-label="Choose the window">
+          <span class="s">Window:</span>${['m6','m12','m24','m36'].filter(k=>W[k]&&W[k].pu).map(k=>
+            `<button type="button" class="rz-win${k==='m12'?' on':''}" data-w="${k}" aria-pressed="${k==='m12'}">${k.slice(1)} months</button>`).join('')}
+          <span class="rz-range s" id="rz-range"></span></div>
+        <div class="rz-panels" id="rz-panels"></div>
+        <p class="gd-foot" id="rz-foot"></p>`;
+      const CR=VM.class_reconciliation||{};
+      const cr1=(CR['รถยนต์บรรทุกส่วนบุคคล']||{}).autox_pu_pct, cr2=(CR['รถยนต์นั่งส่วนบุคคลไม่เกิน 7 คน']||{}).autox_pu_pct;
+      const draw=k=>{
+        const w=W[k]||{};
+        const ps=document.getElementById('rz-panels'); if(ps) ps.innerHTML=panel(k,'pu')+panel(k,'pa');
+        const rg=document.getElementById('rz-range');
+        if(rg) rg.innerHTML=`${w.from||'—'} → ${w.to||'—'}, compared against <b>${w.prior_from||'—'} → ${w.prior_to||'—'}</b>`
+          +(w.complete===false?' <span style="color:var(--gold)">· window runs past the start of the series, so it is short</span>':'');
+        const ft=document.getElementById('rz-foot');
+        if(ft) ft.innerHTML=`<b>MEASURED · Department of Land Transport</b>, first registrations at brand-and-model grain, national
+          (${VM.first_month||'—'} → ${VM.latest_month||'—'}, ${VM.n_months||'—'} months). <b>PU is AutoX's definition, not the registrar's</b> —
+          classified on the nameplate, so a D-Max or a Fortuner filed as a ${'"'}passenger car ≤7 seats${'"'} counts as a pickup here.
+          On that basis รย.3 is ${cr1==null?'—':cr1.toFixed(1)}% pickup collateral and รย.1 — the class the registrar calls a passenger car —
+          is ${cr2==null?'—':cr2.toFixed(1)}%. Reading the class column alone would miss most of the pickup inflow.
+          Majors are a <b>fixed list</b> (${(W.m12.pu.majors||[]).join('+')} / ${(W.m12.pa.majors||[]).join('+')}), never a top-two by volume, so the series measures the same thing in every month.
+          Prior period = <b>the same calendar months one year earlier</b>; pickup registration is seasonal and a back-to-back window would misread it.
+          ${(VM.missing_months||[]).length?`DLT never published ${(VM.missing_months||[]).join(', ')}, so that month is absent from every series rather than interpolated. `:''}
+          ${(VM.incomplete_months_excluded||[]).length?`${(VM.incomplete_months_excluded||[]).join(', ')} is a catalog stub, not a month, and is excluded. `:''}
+          ${(w.contains_flagged_months||[]).length?`This window contains ${(w.contains_flagged_months||[]).join(', ')} — ${'months moving more than 40% year-on-year'}, kept in and flagged rather than smoothed away (Jan-2026 ran +54% in cars while motorcycles stayed flat: registrations pulled forward ahead of an incentive deadline).`:''}
+          These are <b>first registrations</b> — the collateral pool we will be seizing and reselling in future years, not our current book and not used-vehicle sales.
+          <b>One grain warning, because this block mixes two:</b> the brand shares here are per BRAND (DLT), but the resale-value comparison in the verdict above is per
+          CLASS (BoT publishes รถยนต์นั่ง and รถกระบะ, never a brand split). So "the class that kept its concentration is the class that stopped losing value" is an
+          observation across two classes — <b>not</b> a measurement that major-brand vehicles hold their value better than minor-brand ones. No published Thai series
+          measures that, and nothing here should be read as if one did.`;
+      };
+      draw('m12');
+      rz.querySelectorAll('.rz-win').forEach(b=>b.addEventListener('click',()=>{
+        rz.querySelectorAll('.rz-win').forEach(o=>{o.classList.remove('on');o.setAttribute('aria-pressed','false');});
+        b.classList.add('on'); b.setAttribute('aria-pressed','true'); draw(b.dataset.w);
+      }));
+    }).catch(()=>{ rz.style.display='none'; });
   }).catch(()=>{ host.style.display='none'; });
 }
 

@@ -1447,6 +1447,37 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .uv-sub{display:block;margin-top:5px;font-size:10.5px;line-height:1.45}
 .uv-p{font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid var(--gold);
   border-radius:4px;padding:0 4px;vertical-align:1px;cursor:help}
+.uv-answers{margin:6px 0 2px;line-height:1.7;font-size:13px}
+.uv-dir{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums;cursor:help}
+.uv-dirb{font-family:var(--mono);font-size:9.5px;border:1px solid;border-radius:9px;padding:1px 7px;white-space:nowrap}
+.uv-dir .s{font-size:10.5px;color:var(--dim)}
+/* THE RESALE-VALUE CHART — full-size because the finding is a SHAPE (slide, trough, floor) that a
+   sparkline cannot carry. Two series share one y-axis, which is only legitimate because both are
+   the same index on the same 2015=100 base. */
+.uv-charth{margin:12px 0 4px;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2)}
+.uvc{width:100%;height:auto;display:block;margin-top:4px;overflow:visible}
+.uvc-l{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.uvc-g{stroke:var(--line);stroke-width:1;opacity:.55}
+/* The 2015 base is what the index MEANS, so it is drawn differently from an ordinary gridline. */
+.uvc-base{stroke:var(--dim);stroke-width:1;stroke-dasharray:2 3;opacity:.9}
+.uvc-baset{fill:var(--dim);font-size:8.5px}
+.uvc-tl{stroke:var(--agri);stroke-width:1;stroke-dasharray:3 3;opacity:.45}
+.uvc-y{font-family:var(--mono);font-size:9px;fill:var(--dim)}
+.uvc-x{font-family:var(--mono);font-size:9px;fill:var(--dim)}
+.uvc-m{font-family:var(--mono);font-size:9.5px;fill:var(--agri)}
+/* On a phone the 760-unit viewBox scales to ~270px, which would render the 9-unit axis labels at
+   about 3 real pixels. Rather than shrink the chart until it lies, it keeps a readable minimum
+   width and scrolls inside its own box — the page itself still never scrolls sideways. */
+@media(max-width:700px){
+  #uv-chart{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .uvc{min-width:600px}
+  .uvc-y,.uvc-x{font-size:12px}
+  .uvc-m{font-size:13px}
+  .uvc-baset{font-size:11px}
+}
+.uvc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mid);margin-bottom:2px}
+.uvc-key{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.uvc-key i{display:inline-block;width:14px;height:3px;border-radius:2px;flex:none}
 .uv-gap{margin:12px 0 4px;border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2)}
 .uv-gaph{font-size:12px;color:var(--txt);font-weight:600;margin-bottom:6px}
 .uv-gap svg{width:100%;max-width:560px;height:auto;display:block}
@@ -1481,6 +1512,53 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .vb-provhead select{font:500 12.5px var(--sans);background:var(--panel2);color:var(--txt);
   border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;max-width:100%}
 .vb-caveat{line-height:1.55;color:var(--mid);margin-top:6px}
+/* MAJOR-BRAND RESILIENCE — is the grip holding? Two panels side by side because the whole finding
+   IS the contrast: pickup concentration holds while the car side fragments. They stack on a phone,
+   pickup first, since that is the class carrying most of the book. */
+.rz-winbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:10px 0 4px}
+.rz-win{font:500 11.5px var(--mono);color:var(--mid);background:var(--panel2);border:1px solid var(--line);
+  border-radius:7px;padding:4px 10px;cursor:pointer;letter-spacing:.02em}
+.rz-win:hover{color:var(--txt);border-color:var(--dim)}
+.rz-win.on{color:var(--collat);border-color:var(--collat);background:rgba(122,79,224,.1)}
+.rz-win:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rz-range{color:var(--dim);font-variant-numeric:tabular-nums;margin-left:2px}
+.rz-panels{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:8px 0 4px}
+@media(max-width:880px){.rz-panels{grid-template-columns:1fr}}
+.rz-panel{border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--panel2);min-width:0}
+.rz-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rz-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim)}
+.rz-badge{font-family:var(--mono);font-size:9.5px;border:1px solid;border-radius:9px;padding:1px 7px;white-space:nowrap}
+.rz-big{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1.1;margin-top:4px;font-variant-numeric:tabular-nums}
+.rz-pc{font-size:16px;font-weight:500;margin-left:1px}
+.rz-cap{font-size:11.5px;color:var(--mid);line-height:1.5;margin-top:1px}
+.rz-cap b{color:var(--hi)}
+/* One bar, two segments, labels inside — the split reads without a legend. Labels clip rather than
+   wrap so a narrow panel never grows a second line and knocks the two panels out of alignment. */
+.rz-bar{display:flex;height:22px;border-radius:5px;overflow:hidden;margin:9px 0 2px;background:var(--panel)}
+.rz-bar span{display:flex;align-items:center;padding:0 7px;overflow:hidden;white-space:nowrap;
+  text-overflow:ellipsis;font-family:var(--mono);font-size:10px;letter-spacing:.02em}
+/* White label with a shadow rather than a dark one: the segment is filled with whichever grade
+   colour applies (green / gold / red), and no single fixed text colour reads on all three. */
+.rz-maj b{color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.rz-min{background:var(--line)}
+.rz-min b{color:var(--mid);font-weight:500}
+.rz-spark{margin:8px 0 2px}
+.rz-spark svg{width:100%;height:34px;display:block}
+.rz-spark .s{display:block;color:var(--dim);font-size:10px;margin-top:2px}
+.rz-kv{width:100%;margin:7px 0 0;border-collapse:collapse}
+.rz-kv th{text-align:left;font-weight:400;font-size:11.5px;color:var(--mid);padding:3px 0;white-space:normal}
+.rz-kv td{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--txt);
+  padding:3px 0;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* The absent-comparison row replaces two rows with one, so it says what is missing and why rather
+   than leaving an em-dash the reader has to interpret. */
+.rz-nocmp{color:var(--gold)!important;font-size:10.5px!important;line-height:1.45;cursor:help;
+  border-top:1px dashed var(--line);padding-top:5px!important}
+.rz-minh{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);color:var(--dim);
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+.rz-min-tbl{width:100%;margin:4px 0 0;border-collapse:collapse}
+.rz-min-tbl td{font-size:11.5px;color:var(--mid);padding:2px 0;font-variant-numeric:tabular-nums}
+.rz-min-tbl td.n{text-align:right;font-family:var(--mono);white-space:nowrap;padding-left:8px}
+.rz-min-tbl td.n b{color:var(--txt)}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}
