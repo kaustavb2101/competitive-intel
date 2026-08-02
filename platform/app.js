@@ -8234,7 +8234,12 @@ function renderCommoditiesBoard(){
         // farm income while coconut itself was down 70.9%, because ประจวบคีรีขันธ์'s crop mix is 61%
         // rubber / 34% palm and holds no coconut at all. They now carry THIS crop's own effect, and
         // the assumption that makes them readable is stated on the page rather than in a tooltip.
-        const incBasis=!exp.income_basis?'':`<div class="cb-incbasis"><span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span> <b>Reading the income columns:</b> they are <b>${c.lab}'s own effect</b> on a farm household in that province <b>whose main crop is ${c.lab}</b> — the crop's Thai move passed through the income engine's farm sensitivity onto that province's measured NSO SES farm income. They are not the province's all-crop farm income (a different number, driven mostly by rice, rubber and palm, and shown on the province view). Not weighted by ${c.lab}'s share of local land: belt areas come from different registries, so a cross-source share would be false precision.</div>`;
+        // "whose main crop is X" was written when every board row WAS a crop. It now reads over
+        // chicken keepers, pig herds and a fishmeal processing industry, none of which are crops, so
+        // the noun is taken from the row's own segment instead of assumed.
+        const dep=c.seg==='Crops'?`whose main crop is ${c.lab}`:`that depends on ${c.lab} for its main income`;
+        const share=c.seg==='Crops'?'share of local land':'share of local activity';
+        const incBasis=!exp.income_basis?'':`<div class="cb-incbasis"><span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED</span> <b>Reading the income columns:</b> they are <b>${c.lab}'s own effect</b> on a household in that province <b>${dep}</b> — the Thai price move passed through the income engine's farm sensitivity onto that province's measured NSO SES farm income. They are not the province's all-crop farm income (a different number, driven mostly by rice, rubber and palm, and shown on the province view). Not weighted by ${c.lab}'s ${share}: belts come from different registries, so a cross-source share would be false precision.</div>`;
         // TOTAL ROW (added 2026-08-01, owner ask). build_commodities.py used to emit only the belt's
         // six largest provinces while the line above the table quoted the whole belt, so the accounts
         // column visibly failed to add up to its own headline — rice showed 50,742 against 138,184
@@ -8245,6 +8250,14 @@ function renderCommoditiesBoard(){
         const shown=exp.top||[], shownAcc=shown.reduce((s,t)=>s+(t.accounts||0),0),
               shownArea=shown.reduce((s,t)=>s+(t.area_rai||0),0),
               restProv=(exp.belt_provinces||0)-shown.length, restAcc=(exp.book_accounts||0)-shownAcc;
+        // The belt column is NOT always planted area any more. Since 2026-08-02 the board's non-crop
+        // rows carry belts built on whatever measure actually locates that livelihood: fishmeal on
+        // output tonnes (it is a processing industry, it has no farm area), the four livestock rows
+        // on KEEPER counts, timber on registered plantation rai. This header used to be the hardcoded
+        // string "Planted area (rai)", which would have presented Nakhon Ratchasima's 155,188 chicken
+        // KEEPERS as 155,188 rai of planted chicken. The builder emits belt_measure_label precisely so
+        // the page does not have to guess; the fallback only applies to rows written before it existed.
+        const beltCol=exp.belt_measure_label||'Planted area (rai)';
         const footRow=!shown.length?'':`<tfoot><tr class="cb-foot">
           <td><b>${restProv>0?`${shown.length} of ${exp.belt_provinces} belt provinces shown`:`Belt total · ${exp.belt_provinces} provinces`}</b></td>
           <td class="n"><b>${icN(shownArea)}</b></td>
@@ -8255,7 +8268,7 @@ function renderCommoditiesBoard(){
         drill=`<tr class="cb-drill" data-i="${i}" hidden><td colspan="8"><div class="cb-belt">
           <b>Who's exposed:</b> ${icN(exp.book_accounts)} book accounts sit in the ${exp.belt_provinces}-province core belt — ${(exp.basis||'').replace(/^book accounts in /,'')}
           ${areaLine}
-          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">Planted area (rai)</th><th scope="col">Book accounts</th><th scope="col" title="THIS crop's effect on a farm household here whose main crop is ${c.lab} — sensitivity × the crop's Thai YoY. ESTIMATED.">${c.lab} → farm income</th><th scope="col" title="the same effect in baht, on the province's MEASURED NSO SES farm-income base">฿/month</th></tr></thead><tbody>${
+          <div class="cb-belttbl"><table class="ic-tbl" style="margin-top:6px"><thead><tr><th scope="col">Province (belt)</th><th scope="col">${beltCol}</th><th scope="col">Book accounts</th><th scope="col" title="${c.lab}'s own effect on a household here ${dep} — sensitivity × its Thai YoY. ESTIMATED.">${c.lab} → farm income</th><th scope="col" title="the same effect in baht, on the province's MEASURED NSO SES farm-income base">฿/month</th></tr></thead><tbody>${
             shown.map(t=>{
               const ipc=t.crop_income_pct, ibt=t.crop_income_baht;
               return `<tr><td>${t.prov}</td><td class="n">${icN(t.area_rai)}</td><td class="n">${icN(t.accounts)}</td>`+
