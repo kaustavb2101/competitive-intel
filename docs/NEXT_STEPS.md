@@ -169,7 +169,13 @@ that review still open:
 4. Co-pay ฿44bn: source and period unconfirmed. Candidate lead is "ไทยช่วยไทย พลัส" (cabinet-approved
    2026-05-19, government portion ~ ฿49.6bn at its two-month mark) but it doesn't cleanly match
    ฿44bn, so it was left rather than guessed.
-5. `tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.
+5. ~~`tests/visual_overflow.js` is not yet wired into `tests/run.sh` or CI — run by hand only.~~
+   **DONE 2026-08-03** — `tests/run.sh overflow` (also in `all`), and a line in qa.yml's
+   "Render + health + visual" step. Wired the day after PR #259 shipped a Risk-tab panel that pushed
+   a 390px phone to 494px of horizontal page scroll with every gate green. It sits in the
+   **non-blocking** step for now, so a finding is visible in the log but does not red-gate a merge;
+   promoting it to the blocking gate is a deliberate follow-up once it has a few clean runs behind it
+   (it also fails on any uncaught console error, which is a wider net than layout alone).
 6. The TH/EN language switch was deferred by the owner to Thursday 2026-08-06 (lower priority than
    the 2026-08-05 deck).
 

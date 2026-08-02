@@ -7,10 +7,11 @@
 #   render   headless-render every page in tests/pages.manifest (map libs vendored in platform/vendor/)
 #   health   per-page smoke: no uncaught errors, lib init, non-blank canvas, DOM hooks present
 #   visual   compare fresh renders to tests/baseline/*.png within tolerance
+#   overflow layout audit: does the text fit inside its box, at desktop AND phone width
 #   baseline (re)generate tests/baseline/*.png from current pages (use when a change is intended)
 #
 # Usage:
-#   tests/run.sh                 # check + render + health + visual  (the CI gate)
+#   tests/run.sh                 # check + render + health + visual + overflow  (the CI gate)
 #   tests/run.sh check           # offline, no chromium needed beyond python
 #   tests/run.sh baseline        # refresh committed baselines
 #
@@ -494,6 +495,32 @@ phase_visual(){
   done < <(manifest_rows)
 }
 
+# Layout audit — the one class of defect the other four phases structurally cannot see. `check`
+# reads bytes, `render` only asks whether a page painted, `visual` diffs against a baseline that a
+# new section changes legitimately. None of them asks whether the text fits inside its box. This
+# does, at desktop AND phone width. Added after PR #259 shipped a Risk-tab panel that pushed a
+# 390px phone to 494px of horizontal page scroll and every gate stayed green.
+phase_overflow(){
+  hdr "visual overflow audit (bleed / clip / page-x / collide)"
+  if ! command -v node >/dev/null 2>&1; then skip "overflow (node not installed)"; return 0; fi
+  local port=8791
+  python3 -m http.server "$port" --directory "$PLATFORM" >/dev/null 2>&1 &
+  local srv=$!
+  local i=0
+  while [ $i -lt 40 ]; do
+    curl -s -o /dev/null "http://localhost:$port/" 2>/dev/null && break
+    i=$((i+1)); sleep 0.25
+  done
+  local out rc
+  out="$(node "$TESTS/visual_overflow.js" "http://localhost:$port" 2>&1)"; rc=$?
+  kill "$srv" 2>/dev/null; wait "$srv" 2>/dev/null
+  printf '%s\n' "$out"
+  # exit 2 is "could not run" (playwright missing) — an environment gap, not a layout defect.
+  if [ "$rc" -eq 0 ]; then ok "visual overflow (no findings)"
+  elif [ "$rc" -eq 2 ]; then skip "visual overflow (could not run)"
+  else bad "visual overflow (findings above)"; fi
+}
+
 phase_baseline(){
   deps || return 1
   hdr "(re)generating baselines -> tests/baseline"
@@ -517,9 +544,10 @@ case "$PHASE" in
   render)   phase_render ;;
   health)   phase_health ;;
   visual)   phase_visual ;;
+  overflow) phase_overflow ;;
   baseline) phase_baseline ;;
-  all)      phase_check; phase_render; phase_health; phase_visual ;;
-  *) echo "unknown phase: $PHASE (use: check|render|health|visual|baseline|all)"; exit 2 ;;
+  all)      phase_check; phase_render; phase_health; phase_visual; phase_overflow ;;
+  *) echo "unknown phase: $PHASE (use: check|render|health|visual|overflow|baseline|all)"; exit 2 ;;
 esac
 
 printf '\n%s========================================%s\n' "$YLW" "$RST"

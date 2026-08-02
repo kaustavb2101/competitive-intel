@@ -71,6 +71,7 @@ jobs:
           bash tests/run.sh render
           bash tests/run.sh health
           bash tests/run.sh visual
+          bash tests/run.sh overflow
 
       # Always upload fresh renders so a visual-regression failure is inspectable.
       - name: Upload renders
