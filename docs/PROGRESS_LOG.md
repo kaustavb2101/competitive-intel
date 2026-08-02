@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — UX loop: scope="col" on the Overview macro-route tables (a11y, WCAG 1.3.1) — merged + deploy-verified (PR #257)
+
+Autonomous UX-improvement loop, safeguard-gated auto-merge. All seven originally-audited backlog items
+(favicon / contrast / theme / map-overlap / province-overflow / branches-lead / isochrone-guard) remain
+fixed, so this run took the highest-priority genuinely-open, auto-merge-safe item: the **fifth slice of
+`ux-table-scope-sweep-appjs`**. The other open backlog items are explicitly out of scope for an unattended
+surgical run (`ux-acquire-taxonomy-mandate` = bigger-than-surgical mandate work; `ux-viewport-user-scalable-3dpages`
+= needs on-device gesture testing).
+
+**Fix.** The ~14 Overview (`#overview`) macro-route tables in `app.js` built their column-header rows as
+inline template literals with bare `<th>` / `<th title="…">` (no `scope="col"`), so a screen reader could
+not reliably associate each data cell with its column header. Added `scope="col"` to every column `<th>`
+(EV-watch/DLT `#region`, drought SPEI, amphoe-crops, province-LFS, DLT vehicle-reg, region-debt, DBD-firms,
+SFI-NPL, ThaiWater flood+rain, informal-debt, and coverage `#estates`/`#mws`/`#cws`) and `scope="colgroup"`
+to the two ThaiWater `colspan="4"` section-title cells. Matches `data.html`'s convention and the four prior
+slices. Diff = 17-for-17 line replacement, scope-only; zero visual change (scope is non-presentational).
+Remaining bare family: the `#acq` rival-pulse/ads/YouTube/sentiment/footprint tables.
+
+**Safeguards (all passed).** (a) `tests/run.sh check` 115-passed/0-failed; (b) headless `index.html#overview`
+render `data-errors=[]`, PNG self-reviewed (layout identical), settled DOM 213 `scope="col"` + 2 `scope="colgroup"`;
+(c) no secrets in diff; (d) diff matches intent, no stray files.
+
+**Merge + deploy-verify.** Squash-merged PR #257 → master (`969a6e6`), branch deleted. Production alias
+`competitive-intel-git-master-…vercel.app`: root **200**, `/app.js` **200**, `/index.html` → **200**
+(the bare 308 is Vercel's configured `cleanUrls` redirect, not a regression). Confirmed the deployed
+`app.js` carries the change (`<th scope="col">Quarter</th>` present) — fresh build, no rollback needed.
+
+**Recommend next.** The last `ux-table-scope-sweep-appjs` slice — the `#acq` rival-pulse/ads/YouTube/
+sentiment/footprint tables — to close the a11y sweep; then `qa-visual-baseline-stale` (a deliberate
+`tests/run.sh baseline` refresh) so the CI visual-regression gate carries signal again now the five-pillar
+IA is stable.
+
 ## 2026-08-02 — Intelligence loop (deploy-health): stop the weekly macro-refresh PR landing a red gate (`ci-macro-provenance-lockstep`) — committed to master + deploy-verified
 
 Autonomous market-&-service intelligence loop, safeguard-gated. **Deployment-health pillar.** Found the
