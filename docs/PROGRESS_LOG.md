@@ -118,6 +118,52 @@ environment — Windows CPython 3.14 produces false float drift on this repo. `b
 was the one real drift and was rebuilt byte-exact; `validate_data.py` then passed 455/455. Six items
 came out of the review still open — see `docs/NEXT_STEPS.md` §0d.
 
+## 2026-08-02 — Integration loop (objective #1): repeated-flood exposure surfaced on `#exposure` as a portfolio readout — PR (app-visual)
+
+Autonomous integration & improvement loop. Took the explicit "next recommended integration" from the
+2026-08-02 flood-hazard ship: **surface the already-built, already-gated `flood_hazard.json` as a
+portfolio flood-exposure readout** (the layer's national aggregates + `by_province` rollup were built
+but unused in the UI — only the per-branch `#map` popup line consumed it). Backlog items #1 (FPO-PICO)
+and #2 (branch-cropland) re-confirmed already built/gated/surfaced; #3's remaining sub-items
+(BAAC/SME-bank credit) stay blocked in CI (raw xlsx gitignored, Thai-IP-only, `build_baac_credit.py`
+SKIP-passes with no committed input); #4 (GISTDA 40m) needs network + secret. So this was the top OPEN,
+network-free, CI-verifiable item.
+
+**What & why (objective #1 — collateral / PD risk).** The `#map` popup answers "does THIS branch
+flood"; the exec `#exposure` (Risk) tab had no answer to "how much of the BOOK sits on repeatedly-
+inundated ground". New `renderFloodExposure()` (app.js) adds a MEASURED readout after the contested-
+ground block:
+- **Headline:** **685 of 2,015 branches (34%)** sit on **chronically-flooded ground** — a district
+  that flooded in **≥7 of the 12 years 2005–2016** (the STRUCTURAL flood hazard under title-vehicle
+  collateral and farm/shop borrower cash-flow).
+- **Band breakdown** (from `meta.branch_freq_hist`, sums to 2,015): Chronic (10–12/12) 227 · Frequent
+  (7–9) 458 · Recurrent (4–6) 491 · Occasional (1–3) 672 · None 167. Honest caveat in the method box:
+  nearly the whole network is flagged at ≥1 year, so the risk sits in the **chronic tail**, not the
+  flagged-at-all count.
+- **Most chronically flood-exposed provinces** table (per-branch join via `floodHzRec`, index-aligned):
+  Nakhon Ratchasima 51 chronic branches, Nakhon Sawan 90%, Phitsanulok 87%, Ayutthaya 96% — the
+  Chao Phraya / Isan flood-plain provinces, a clean sanity check.
+
+**Honesty.** MAX(flood_freq) per district, never area (the GISTDA per-event polygons overlap — no
+flooded-AREA is claimed); MEASURED tag + `methodBox`; STRUCTURAL hazard explicitly distinguished from
+`thaiwater_flood.json`'s LIVE water-level pulse. Data-only-additive: **no new `platform/data` file**,
+so `flood_hazard.json`'s existing MEASURED provenance is unchanged (build_provenance untouched).
+
+**Verification.** Determinism + data-integrity gate (`bash tests/run.sh check`, the authoritative gate)
+**117 passed · 0 failed** (455/455 data checks; unchanged from baseline — app.js-only change touches no
+data file). `node --check platform/app.js` OK. Headless render of `index.html#exposure` →
+`data-errors="[]"` with the card + both tables present and numbers correct (bands sum 2,015; chronic
+tail 685; province chronic counts sensible). Full-suite render of the 4 app.js-loading SPA views
+(index/national/risk-trend/acquisition) all report `data-errors="[]"`. The 21 full-suite failures are
+all pre-existing/environmental and unrelated: the swiftshader page-settle health flakiness on
+province.html / data.html (neither loads app.js) and the blank-basemap / no-committed-baseline visual
+regressions (documented verbatim in prior entries). Because the change alters app visuals, shipped as a
+**PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number still owed (NEXT_STEPS §0 remainder) — a
+shapely geometry dissolve of the downloaded GISTDA polygons per district before any area is claimed;
+OR a deploy-health probe for `flood_hazard.json` on `#exposure` now that it drives a surfaced exec read.
+
 ## 2026-08-02 — Intelligence loop (deploy-health, obj #1): site-health probe now guards `collateral_book.json` — merged to master
 
 Autonomous market & service intelligence loop, safeguard-gated auto-merge. The `plan_cycle.py` backlog
