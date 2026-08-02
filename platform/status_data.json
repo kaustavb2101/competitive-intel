@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-02T10:29:50+00:00",
-    "commit": "a1cc7f3"
+    "generated_at": "2026-08-02T16:19:43+00:00",
+    "commit": "5d21e92"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-02T16:19:43+00:00",
+      "sha": "5d21e92",
+      "summary": "health(deploy): site-health probe guards collateral_book.json (obj #1 collateral section)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-02T21:38:48+07:00",
+      "sha": "e32cdba",
+      "summary": "Collateral: pickups on AutoX's definition, and the answer to \"has resale value stabilised?\" (#261)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-02T14:22:47+00:00",
+      "sha": "b5f51d5",
+      "summary": "docs(progress): log ux-table-scope-acq-tables merge+deploy+verify (#260)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T21:19:01+07:00",
+      "sha": "ad6f3a2",
+      "summary": "ux: scope=\"col\" on the 11 #acq rival tables — completes app.js header sweep (#260)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T20:40:15+07:00",
+      "sha": "a5548f5",
+      "summary": "Macro tab: external collateral value, fleet mix and brands — plus the belt-drill width bug and Beef's missing Thai price (#258)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-02T10:30:24+00:00",
+      "sha": "9807901",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-02T10:29:50+00:00",
       "sha": "a1cc7f3",
       "summary": "health(deploy): site-health probe guards contested_pop + exit_whitespace",
@@ -674,42 +710,6 @@
       "sha": "7f33f40",
       "summary": "feat(live-board): daily feeds get real trend lines — history accumulated, backfilled from git (#244)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T20:42:00+07:00",
-      "sha": "5f168fe",
-      "summary": "feat(competition): Pantip panel — what borrowers say about each lender, in their own words (#245)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T20:39:07+07:00",
-      "sha": "92abffd",
-      "summary": "ux(macro): one topic at a time — the six sections become a segmented switcher (#243)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T20:39:03+07:00",
-      "sha": "5975aef",
-      "summary": "fix(competition): classify WSOL/CarFinn as a broker — it is not a title lender (#242)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T12:38:04+00:00",
-      "sha": "4163100",
-      "summary": "data(gate): guard the hand-maintained commodity board against its MEASURED Pink Sheet source",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-01T10:23:04+00:00",
-      "sha": "f7835e4",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the provenance site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-01T10:22:33+00:00",
-      "sha": "1735a5f",
-      "summary": "health(deploy): site-health probe guards the DATA ROOM honesty census (provenance.json)",
-      "pillar": "data-integration"
     }
   ]
 }
