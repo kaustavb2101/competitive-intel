@@ -1463,6 +1463,24 @@ html[data-theme="light"] .vdg-chip.better{background:rgba(14,124,104,.08)}
 .vm-pu{margin:9px 0;padding:9px 12px;border:1px solid rgba(122,79,224,.35);border-radius:8px;
   background:var(--panel2);font-size:12px;line-height:1.55;color:var(--mid)}
 .vm-pu b{color:var(--hi)}
+/* DLT brand mix — pickups beside passenger cars, because the finding IS the contrast (pickup
+   concentrated in two nameplates, cars fragmenting toward BEV). Two columns that stack on a phone. */
+.vb-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+@media(max-width:880px){.vb-cols{grid-template-columns:1fr}}
+.vb-col{min-width:0}
+.vb-cap{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:5px}
+/* Every brand is listed rather than a top-ten, so the list scrolls in place instead of running the
+   section to several screens. Sticky header keeps the columns meaningful while scrolling. */
+.vb-scroll{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:7px}
+.vb-scroll table{margin:0;min-width:0}
+.vb-scroll thead th{position:sticky;top:0;z-index:1;background:var(--panel)}
+.vb-big td{color:var(--txt)}
+.vb-f{margin-top:5px;color:var(--mid)}
+.vb-prov{margin-top:12px;border-top:1px solid var(--line);padding-top:11px}
+.vb-provhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px;font-size:12px;color:var(--mid)}
+.vb-provhead select{font:500 12.5px var(--sans);background:var(--panel2);color:var(--txt);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;max-width:100%}
+.vb-caveat{line-height:1.55;color:var(--mid);margin-top:6px}
 /* product → segment → driver map (Exposure) */
 .pm-drv{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--gold);
   border:1px solid rgba(230,180,80,.4);border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0;white-space:nowrap}

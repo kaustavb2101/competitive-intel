@@ -9377,6 +9377,8 @@ function renderCollateralBook(){
       <div id="cb-flow"></div>
       <h4 class="fb-h4">What is on the road, and what is replacing it<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h4>
       <div id="cb-mix"></div>
+      <h4 class="fb-h4">Which brands the new collateral is<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED national</span></h4>
+      <div id="cb-vbrands"></div>
       <h4 class="fb-h4">The collateral base by geography — and our exposure beside it</h4>
       <div id="cb-drill"></div>
       <h4 class="fb-h4">What we hold · the full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
@@ -9691,6 +9693,79 @@ function renderCollateralBook(){
           Fuel of the parked fleet: <b>diesel ${fu('diesel')}</b>, petrol ${fu('petrol')}, hybrid ${fu('hybrid')}, <b>pure EV ${fu('ev')}</b>, gas ${fu('gas')} — DLT publishes fuel against stock only.
           MEASURED throughout (DLT gdcatalog); the PU=pickup+PPV overlay is measured at nameplate grain on the new file and is not separable on the stock file.</p>`;
     }).catch(()=>{ mx.style.display='none'; });
+
+    /* ---- 7. which BRANDS the new collateral is (DLT stat_1_1_01 + the province extrapolation) ----
+       The brand table further down this section is OUR book — what is on the titles we already
+       hold. This is the external counterpart: what the country is registering new, which becomes
+       the collateral we are offered next year. They answer different questions and both belong.
+
+       WHY IT MATTERS HERE AND NOT AS TRIVIA: pickup is effectively a TWO-BRAND market (Toyota +
+       Isuzu take ~89% of new pickups), so pickup resale value is not a diversified exposure — it
+       is a bet on two nameplates' residuals. The car side is doing the opposite: BYD is already
+       third in new passenger cars, and a battery-electric third of the car inflow ages into the
+       used pool with a shorter and much less certain residual history than the diesel it displaces.
+
+       THE PROVINCE HALF IS ESTIMATED AND SAYS SO IN THE UI, NOT ONLY IN A TOOLTIP. DLT publishes
+       brand nationally (no province column) and province by type (no brand column) and has never
+       crossed the two — proven absent, not merely unsearched. The province split here is a
+       two-hop extrapolation: national brand mix x that province's MEASURED volume x a measured
+       battery-electric concentration correction. Its one hard guarantee is marginal — every
+       province x type still sums to that province's measured total, so the estimate can
+       redistribute registrations across brands but can never invent or lose any. Directional only;
+       no single cell is a count, and the panel says that in plain words above the table. */
+    const vb2=document.getElementById('cb-vbrands');
+    if(vb2) tmliFetch('vehicle_brands').then(b=>{
+      const NB=((b||{}).national||{}).by_type||{}, PR=(b||{}).provinces||{}, BM=(b||{}).meta||{};
+      const TL=BM.type_labels_en||{};
+      if(!NB.ry3||!NB.ry1){ vb2.style.display='none'; return; }
+      const num=n=>n==null?'—':Number(n).toLocaleString('en-US');
+      const rnd=n=>n==null?'—':Math.round(n).toLocaleString('en-US');
+      // The DLT gloss IS the caption — pairing it with a hand-written one produced "Pickups
+      // Pickups (personal)". The parenthetical matters (it separates รย.3 pickups from the Land
+      // Transport Act truck classes), so the gloss stays and the hand-written word goes.
+      const tlab=t=>(TL[t]||t).replace('<=','≤');
+      const natTbl=t=>{
+        const L=(NB[t]||{}).brands||[]; if(!L.length) return '';
+        const tot=L.reduce((s,x)=>s+(x.count||0),0);
+        const top2=L.slice(0,2).reduce((s,x)=>s+(x.share_pct||0),0);
+        return `<div class="vb-col"><div class="vb-cap">${tlab(t)} <span class="s">· ${num(tot)} newly plated${L.length?` · ${L.length} brands`:''}</span></div>
+          <div class="vb-scroll"><table class="ic-tbl"><thead><tr><th scope="col">Brand</th><th scope="col">New regis</th><th scope="col">Share</th></tr></thead><tbody>`
+          +L.map(x=>`<tr${(x.share_pct||0)>=5?' class="vb-big"':''}><td>${x.brand}</td><td class="n">${num(x.count)}</td><td class="n">${(x.share_pct||0).toFixed(2)}%</td></tr>`).join('')
+          +`</tbody></table></div><p class="s vb-f">Top two take <b>${top2.toFixed(1)}%</b>. All ${L.length} brands listed — scroll, not a top-ten.</p></div>`;
+      };
+      const provs=Object.keys(PR).sort((a,b2)=>a.localeCompare(b2,'th'));
+      const pu3=(NB.ry3.brands||[]), pu2=pu3.slice(0,2);
+      const c1=(NB.ry1.brands||[]), byd=c1.find(x=>x.brand==='BYD'), bydRank=byd?c1.indexOf(byd)+1:null;
+      vb2.innerHTML=`<div class="verdict">
+          <b>New pickups are a two-brand market.</b> ${pu2.map(x=>`${x.brand} <b>${x.share_pct}%</b>`).join(' and ')} take
+          <b>${pu2.reduce((s,x)=>s+x.share_pct,0).toFixed(1)}%</b> of every pickup plated in the last twelve months — so pickup residual value is not a diversified exposure, it tracks two nameplates.
+          ${byd?`<span class="sub">Passenger cars are moving the other way: <b>BYD is already #${bydRank} at ${byd.share_pct}%</b> of new cars. Battery-electric collateral ages into the used pool with a far shorter residual history than the diesel it displaces — the leading indicator for the resale block above.</span>`:''}</div>
+        <div class="vb-cols">${natTbl('ry3')}${natTbl('ry1')}</div>
+        <p class="gd-foot">MEASURED — DLT first registrations by brand, <b>${BM.new_window_label||''}</b> (stat_1_1_01, the only DLT release carrying a brand column).
+          National grain: that release has <b>no province field</b>. The province view below is therefore an estimate, and is labelled as one.</p>
+        ${provs.length?`<div class="vb-prov">
+          <div class="vb-provhead"><span class="tag" style="color:var(--gold);border:1px solid var(--gold)">ESTIMATED · extrapolated</span>
+            <label for="vb-psel">Same question, one province:</label>
+            <select id="vb-psel">${provs.map(p=>`<option value="${p}"${p==='ชลบุรี'?' selected':''}>${p}</option>`).join('')}</select></div>
+          <div id="vb-pout"></div>
+          <p class="s vb-caveat"><b>Read this as direction, never as a count.</b> DLT publishes brand nationally and province-by-type, and has <b>never crossed the two</b> — this is
+            national brand mix × that province's <b>measured</b> volume × a measured battery-electric concentration correction, not a census.
+            Its one hard guarantee: every province × type still sums to that province's measured total, so the estimate redistributes registrations across brands and can never invent or lose any.
+            Fractional counts are shown rounded. Motorcycles, tractors and trailers are out of scope entirely.</p></div>`:''}`;
+      const out=document.getElementById('vb-pout'), sel=document.getElementById('vb-psel');
+      const drawProv=p=>{
+        const rec=PR[p]||{};
+        const one=t=>{
+          const L=(rec[t]||{}).brands||[]; if(!L.length) return `<div class="vb-col"><div class="vb-cap">${tlab(t)} · ${p}</div><p class="s">No registrations of this class in ${p} in the window.</p></div>`;
+          return `<div class="vb-col"><div class="vb-cap">${tlab(t)} · ${p} <span class="s">· top ${L.length} brands</span></div>
+            <div class="vb-scroll"><table class="ic-tbl"><thead><tr><th scope="col">Brand</th><th scope="col">Est. regis</th><th scope="col">Est. share</th></tr></thead><tbody>`
+            +L.map(x=>`<tr><td>${x.brand}</td><td class="n">${rnd(x.est_count)}</td><td class="n">${(x.est_share_pct||0).toFixed(2)}%</td></tr>`).join('')
+            +`</tbody></table></div></div>`;
+        };
+        if(out) out.innerHTML=`<div class="vb-cols">${one('ry3')}${one('ry1')}</div>`;
+      };
+      if(sel){ drawProv(sel.value); sel.addEventListener('change',()=>drawProv(sel.value)); }
+    }).catch(()=>{ vb2.style.display='none'; });
   }).catch(()=>{ host.style.display='none'; });
 }
 
