@@ -54,7 +54,12 @@ jobs:
       - name: Install Chromium (Playwright)
         continue-on-error: true
         run: |
-          npx --yes playwright@1.49.1 install --with-deps chromium
+          # The PACKAGE, not just the CLI. `npx --yes playwright install` fetches the installer
+          # transiently and leaves nothing in node_modules, which is fine for render.sh (it drives the
+          # chrome binary directly) but makes `require('playwright')` fail — so tests/run.sh overflow
+          # skipped itself with "playwright npm package is not installed here" the first time it ran.
+          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium
           # expose the installed chrome where render.sh looks (/opt/pw-browsers/chromium-*/...)
           PW_DIR="${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}"
           sudo mkdir -p /opt/pw-browsers

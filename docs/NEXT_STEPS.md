@@ -187,6 +187,19 @@ that review still open:
    runs independently, so the render failures are visible as warning annotations — **but they are not
    fixed**. They render fine locally, so the suspect is the runner's software GL under the QA_BUDGET
    timeout, not the pages. Diagnose from the uploaded `qa-renders` artifact before touching the pages.
+8. **OPEN — the page-health manifest hooks are stale.** With the step fixed so `health` actually runs,
+   it reports **0 passed / 10 failed** — but every failure is `missing #<hook>`, not a broken page:
+   `#region` (index), `#map` (national, branch-explorer), `#trendbaseline` (risk-trend), `#amprtbl`
+   (acquisition). Every page passes the substantive checks in the same run — no uncaught JS errors,
+   libs initialised, non-blank screenshot. So `tests/pages.manifest` is asserting DOM ids the
+   5-pillar reframe renamed or removed; the fix is to re-derive the hook column from the current
+   pages, NOT to change the app. Low risk, do it when the deck is out of the way.
+9. **OPEN — the visual-regression baselines are stale to the point of being noise.** Now that
+   `visual` runs it reports 0/10: five pages at `mean_diff` 175-212 against a tolerance of 12 (the
+   app has been rebuilt several times over since the PNGs were taken) and three with no baseline at
+   all (`acquisition`, `data-book`, `data-book-province`). Either refresh with
+   `tests/run.sh baseline` after a deliberate review of each PNG, or retire the phase — as written it
+   cannot tell a regression from the accumulated intended change.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
