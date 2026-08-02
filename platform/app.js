@@ -5506,6 +5506,9 @@ function renderExposure(){
   renderRiskReadouts();
   // OBJECTIVE #2: most contested ground — catchments where rivals sit on top of our population (measured).
   renderContestedGround();
+  // OBJECTIVE #1: portfolio flood-hazard exposure — how much of the book sits on repeatedly-flooding
+  // ground (MEASURED GISTDA census, joined client-side; no recompute).
+  renderFloodExposure();
 }
 
 /* ---------- most contested ground · contested population (objective #2, MEASURED) ----------
@@ -5552,6 +5555,91 @@ function renderContestedGround(){
         `<td class="mono" style="color:${col}">${(t.cpop||0).toLocaleString()}</td>`+
         `<td class="mono" style="color:${col}">${t.pct}%</td></tr>`;
     }).join('')+`</table>`;
+}
+
+/* ---------- portfolio flood-hazard exposure (objective #1, MEASURED) ----------
+   Surfaces the ALREADY-BUILT data/flood_hazard.json (pipeline/build_flood_hazard.py) as a
+   portfolio read: FLOODHZ[i] = MAX flood_freq (count of the 12 years 2005-2016 the branch's
+   district flooded, GISTDA 50k census), index-aligned to DATA. We join it to each branch's
+   region/province client-side — no recompute, no builder change — to answer "how much of the
+   book sits on ground that floods repeatedly". A branch is REPEAT-flood when freq≥1 and CHRONIC
+   when freq≥7/12 (the same ≥7 band the builder reports). MEASURED (only the district name-match
+   is inferred, and every unresolved district is zero-branch, so no branch loses a real flag).
+   This is the STRUCTURAL hazard behind the collateral / borrower-cashflow recovery risk — distinct
+   from the LIVE thaiwater water-level pulse. Lazy + graceful: absent file → renders nothing. */
+const FLOOD_CHRONIC=7;   // ≥7 of 12 yrs = chronic (matches build_flood_hazard.py's reported band)
+let floodExpoWired=false;
+function floodExpoHost(){
+  let h=document.getElementById('expo-flood');
+  if(h) return h;
+  const sec=document.getElementById('v-exposure'); if(!sec) return null;
+  const anchor=sec.querySelector('.dash2')||document.getElementById('expoprov');
+  if(!anchor||!anchor.parentNode) return null;
+  h=document.createElement('div'); h.id='expo-flood'; h.style.marginTop='18px';
+  anchor.parentNode.insertBefore(h, anchor.nextSibling);
+  return h;
+}
+function renderFloodExposure(){
+  const host=floodExpoHost(); if(!host) return;
+  if(!FLOODHZ){
+    // wire the lazy load exactly once — if the file is genuinely absent FLOODHZ stays null and we
+    // simply render nothing (no re-trigger loop).
+    if(!floodExpoWired){ floodExpoWired=true; loadFloodHazard().then(()=>{ if(onExposureView()) renderFloodExposure(); }); }
+    host.innerHTML=''; return;
+  }
+  if(!DATA||!FLOODHZ.length){ host.innerHTML=''; return; }
+  const N=DATA.length;
+  let natRep=0, natChr=0;
+  const byReg={}, byProv={};
+  DATA.forEach(d=>{
+    const f=floodHzRec(d);                       // index-safe, null when absent
+    const r=d.r||'—', v=d.v||'—';
+    const ro=byReg[r]||(byReg[r]={r,n:0,rep:0,chr:0});
+    const po=byProv[v]||(byProv[v]={v,r,n:0,rep:0,chr:0});
+    ro.n++; po.n++;
+    if(f!=null && f>=1){ natRep++; ro.rep++; po.rep++; if(f>=FLOOD_CHRONIC){ natChr++; ro.chr++; po.chr++; } }
+  });
+  const pct=n=>(100*n/N).toFixed(0)+'%';
+  const cCol=s=>s>=0.25?'var(--agri)':s>=0.10?'var(--gold)':'var(--mid)';
+  const rCol=s=>s>=0.80?'var(--agri)':s>=0.50?'var(--gold)':'var(--mid)';
+  const src=(floodhzMeta&&floodhzMeta.source)?floodhzMeta.source:'GISTDA Repeated Flooding 2005-2016 (50k census)';
+  const vint=(floodhzMeta&&floodhzMeta.data_vintage)?floodhzMeta.data_vintage:'2005-2016';
+  const regs=Object.values(byReg).sort((a,b)=>b.chr-a.chr||b.rep-a.rep);
+  const provs=Object.values(byProv).filter(o=>o.chr>0).sort((a,b)=>b.chr-a.chr||b.rep-a.rep).slice(0,12);
+  host.innerHTML=
+    `<h2 class="risk" style="margin-top:0">Portfolio flood-hazard exposure ${TAG_M}</h2>`+
+    `<p class="lead"><b>${natRep.toLocaleString()} of ${N.toLocaleString()} branches (${pct(natRep)})</b> sit in a district whose `+
+    `ground flooded in at least one of the 12 years ${vint}, and <b>${natChr.toLocaleString()} (${pct(natChr)})</b> in a `+
+    `<b>CHRONIC flood zone</b> — a district that flooded in ≥${FLOOD_CHRONIC} of those 12 years. This is the `+
+    `<b>structural</b> collateral- and borrower-cashflow recovery hazard sitting under the book — <b>measured</b> (${src}).</p>`+
+    methodBox('Each branch inherits the MAX repeated-flood frequency (0–12) of the district it sits in, from the GISTDA server-side census; REPEAT = freq ≥1, CHRONIC = freq ≥'+FLOOD_CHRONIC+'.',
+      ['Frequency is <b>measured</b> — GISTDA 1:50,000 repeated-flooding census, '+vint+'.',
+       'Only the district name-match is inferred; every unresolved district is zero-branch, so no branch loses a real flag.',
+       'This is a <b>hazard flag</b> (did the ground flood, how often), <b>not</b> a flooded-area or loss estimate — no area is claimed (the source polygons overlap).',
+       'Distinct from the LIVE ThaiWater water-level pulse on Overview — this is the standing structural hazard.'])+
+    `<div class="dash2"><div class="dash2-side">`+
+      `<h2 class="risk">By region</h2>`+
+      `<p class="lead">Share of each region's branches sitting on repeat- and chronic-flood ground. Chronic ranked first.</p>`+
+      `<table class="tbl" id="expo-flood-reg"><tr><th scope="col">Region</th><th scope="col">Branches</th>`+
+      `<th scope="col" title="branches in a district that flooded in ≥1 of 12 yrs — measured">Repeat-flood</th>`+
+      `<th scope="col" class="h-agri" title="branches in a district that flooded in ≥`+FLOOD_CHRONIC+` of 12 yrs — measured">Chronic ≥`+FLOOD_CHRONIC+`/12</th></tr>`+
+      regs.map(o=>{const rs=o.n?o.rep/o.n:0, cs=o.n?o.chr/o.n:0;
+        return `<tr><td><b>${o.r}</b></td><td class="mono">${o.n.toLocaleString()}</td>`+
+          `<td class="mono" style="color:${rCol(rs)}">${o.rep.toLocaleString()} <span class="sub">${(100*rs).toFixed(0)}%</span></td>`+
+          `<td class="mono" style="color:${cCol(cs)}">${o.chr.toLocaleString()} <span class="sub">${(100*cs).toFixed(0)}%</span></td></tr>`;}).join('')+
+      `</table></div>`+
+      `<div class="dash2-main">`+
+      `<h2 class="risk">Provinces most on chronic-flood ground</h2>`+
+      `<p class="lead">Provinces ranked by how many of their branches sit in a <b>chronic</b> flood zone (≥${FLOOD_CHRONIC} of 12 yrs). Book proxy = branch count; the flood frequency is measured.</p>`+
+      (provs.length?`<table class="tbl" id="expo-flood-prov"><tr><th scope="col">#</th><th scope="col">Province</th><th scope="col">Region</th>`+
+        `<th scope="col">Branches</th><th scope="col" class="h-agri" title="branches in a ≥`+FLOOD_CHRONIC+`/12-yr flood district">Chronic</th>`+
+        `<th scope="col" title="chronic share of the province's branches">Share</th></tr>`+
+        provs.map((o,i)=>{const cs=o.n?o.chr/o.n:0;
+          return `<tr><td class="mono sub">${i+1}</td><td><b>${o.v}</b></td><td class="sub">${o.r}</td>`+
+            `<td class="mono">${o.n.toLocaleString()}</td><td class="mono" style="color:${cCol(cs)}">${o.chr.toLocaleString()}</td>`+
+            `<td class="mono" style="color:${cCol(cs)}">${(100*cs).toFixed(0)}%</td></tr>`;}).join('')+`</table>`
+        :`<p class="lead sub">No branch sits in a chronic-flood district.</p>`)+
+      `</div></div>`;
 }
 
 /* ---------- portfolio concentration by region · segment mix + HHI (objective #1) ----------
