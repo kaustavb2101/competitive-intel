@@ -71,7 +71,34 @@ BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  # Sugar moved off the SPAM-2010 raster onto OCSB's own measured returns on
                  # 2026-08-01. Cane is the ONE crop where the pinned source is not a choice between
                  # census and registry — OCSB is the register of record for every cane grower.
-                 "Sugar": ("ocsb", "sugarcane")}
+                 "Sugar": ("ocsb", "sugarcane"),
+                 # NON-CROP ROWS, added 2026-08-02 (owner: "i want the 'book exposed' data for all
+                 # the commods meaning you need to find out where the belts of these commods are").
+                 # A belt does not have to be planted area — it has to be the measured geography of
+                 # the livelihood the price reaches. Each of these pins a different measure and the
+                 # row says which, rather than calling everything "planted area".
+                 "White shrimp": ("dof", "shrimp_marine"),
+                 "Fishmeal": ("dof", "fishmeal"),
+                 # Both timber rows point at the SAME belt on purpose: the plantation register is
+                 # where trees are legally grown for harvest, and logs and sawnwood are the same
+                 # standing timber at two points of the same chain. Reserve forest (ป่าสงวนแห่งชาติ)
+                 # was rejected as the source — protected area is where logging does NOT happen, so
+                 # it would have inverted the signal.
+                 "Logs": ("rfd", "plantation"),
+                 "Sawnwood": ("rfd", "plantation"),
+                 # Livestock, added 2026-08-02. DLD runs its own CKAN (dld.gdcatalog.go.th) which is
+                 # NOT geoblocked — the same pattern as DIW and DLT — so these are structured CSV
+                 # exports at 77/77 provinces, not OCR'd PDFs. Belt measure is herd/flock size.
+                 "Pork": ("dld", "pig"),
+                 "Chicken": ("dld", "chicken_all"),
+                 "Beef": ("dld", "cattle_beef"),
+                 # EGGS rides the SAME combined chicken flock as Chicken, on the owner's call
+                 # ("for eggs, chicken or whatever group is fine for a belt"). DLD's national
+                 # release reports จำนวนไก่ as ALL chicken types combined — no layer-vs-broiler
+                 # split at province grain — so this belt says "where chickens are", not "where
+                 # LAYING chickens are". The two overlap heavily (ลพบุรี/ชลบุรี/นครนายก run both)
+                 # but they are not identical, and the caveat is carried on the row.
+                 "Eggs": ("dld", "chicken_all")}
 
 AREA_SOURCES = {
     "census": {
@@ -93,6 +120,55 @@ AREA_SOURCES = {
                 "delivery, so this is a near-complete count rather than a survey or a registry "
                 "sample. It is the register of record for Thai cane: growers register with OCSB, "
                 "not DOAE, which is why cane is absent from the farmer registry entirely.",
+    },
+    # --- non-crop belts (2026-08-02) ---------------------------------------------------------
+    # These two do NOT measure planted area, so each carries its own `measure` + `unit`, and the
+    # exposure block quotes them instead of hardcoding "planted area". Calling a shrimp pond or a
+    # tonne of fishmeal "planted area" would be a mislabel, and every number on this site has to
+    # say what it actually is.
+    "dof": {
+        "provenance": "MEASURED",
+        "source": "Department of Fisheries aquaculture + fishmeal releases, newest year in the "
+                  "data (source-data/livelihood_area.json)",
+        "measure": {"shrimp_marine": "marine-shrimp farm area",
+                    "fishmeal": "fishmeal output"},
+        "unit": {"shrimp_marine": "rai", "fishmeal": "tonnes"},
+        "note": "DOF publishes farms, area, volume and value per province per year. Marine shrimp "
+                "uses FARM AREA, the direct analogue of planted area. Fishmeal has no farm area to "
+                "report — it is a processing industry — so its belt is built on OUTPUT VOLUME, and "
+                "the borrower behind a fishmeal price is the operator and the boats supplying it, "
+                "not a grower.",
+    },
+    "rfd": {
+        "provenance": "MEASURED",
+        "source": "Royal Forest Department register of commercial forest plantations under the "
+                  "Forest Plantation Act B.E. 2535 (source-data/livelihood_area.json)",
+        "measure": {"plantation": "registered plantation area"},
+        "unit": {"plantation": "rai"},
+        "note": "Land registered for commercial timber growing — where trees are legally grown to "
+                "be harvested, across all 77 provinces. Deliberately NOT the reserve-forest layer "
+                "(ป่าสงวนแห่งชาติ, 66 provinces): protected forest is where logging does not "
+                "happen, so ranking provinces by it would have inverted the signal.",
+    },
+    "dld": {
+        "provenance": "MEASURED",
+        "source": "Department of Livestock Development province census, CE 2025 "
+                  "(source-data/livestock_province.json, via dld.gdcatalog.go.th)",
+        "measure": {"pig": "pig keepers", "chicken_all": "chicken keepers",
+                    "cattle_beef": "beef-cattle keepers"},
+        "unit": {"pig": "farms", "chicken_all": "farms", "cattle_beef": "farms"},
+        "note": "Counted per province by the provincial livestock offices, all 77 covered. "
+                "Structured CSV from DLD's own catalog — no OCR, so no digit-transcription risk. "
+                "The belt ranks on KEEPERS, not on animals: DLD publishes both, and for a lender "
+                "the keeper count is the borrower population. Head counts point at the industrial "
+                "provinces — ลพบุรี holds 58.7m chickens across 18,916 keepers, 3,106 birds each, "
+                "which is contract production, not a customer base — so a head-ranked belt would "
+                "aim at exactly the provinces that do not borrow. Head is carried in the source "
+                "file for reference: nationally 12.2m pigs, 517m chickens, 9.5m beef cattle. "
+                "CAVEAT on eggs: DLD reports จำนวนไก่ as ALL chicken types combined, so the egg row "
+                "and the chicken row share one belt — it locates where chicken keepers are, not "
+                "where LAYER keepers are. The layer-vs-broiler split exists only in nine "
+                "regional-office publications on unstable subsites.",
     },
     "spam": {
         "provenance": "MODELLED",
@@ -194,7 +270,45 @@ def area_tables(area_census):
     cane = {pv: rec["area_rai"] for pv, rec in load(S, "ocsb_cane.json")["provinces"].items()
             if pv in REGION and rec.get("area_rai", 0) > 0}
 
-    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane}}
+    # Fisheries + forestry (livelihood_area.json, written by the owner-side ingest). Absent file =
+    # those board rows keep the empty belt they have today, rather than the build failing — the
+    # ingest reads a gitignored harvest, so a fresh clone legitimately will not have it yet.
+    dof, rfd = {}, {}
+    try:
+        liv = load(S, "livelihood_area.json")
+    except (FileNotFoundError, ValueError):
+        liv = {}
+    for grp, dest in (("fisheries", dof), ("forestry", rfd)):
+        for key, lay in (liv.get(grp) or {}).items():
+            tbl = {pv: v for pv, v in (lay.get("provinces") or {}).items()
+                   if pv in REGION and isinstance(v, (int, float)) and v > 0}
+            if tbl:
+                dest[key] = tbl
+
+    # Livestock (livestock_province.json). Same absent-file contract as above. Shape differs from
+    # livelihood_area.json: one flat {"species": {key: {provinces: ..., farms: ...}}} block.
+    #
+    # The belt ranks on FARMS, not on head, and that is a deliberate reversal of what the other
+    # sources do. Everywhere else the area measure and the borrower population move together — a
+    # province with more rai of rubber has more rubber farmers. Livestock breaks that: ลพบุรี runs
+    # 58.7m chickens across 18,916 keepers (3,106 birds each — contract complexes), while
+    # นครราชสีมา runs 24.7m across 155,188 keepers (159 each — backyard flocks). Ranking on head
+    # would point the belt at the industrial provinces, which are precisely the ones that do not
+    # borrow from us. Only 15 provinces are common to both belts for chicken, so the choice is
+    # material rather than cosmetic. Beef is nearly indifferent (5-8 head per keeper nationwide).
+    dld = {}
+    try:
+        lv = load(S, "livestock_province.json")
+    except (FileNotFoundError, ValueError):
+        lv = {}
+    for key, lay in (lv.get("species") or {}).items():
+        tbl = {pv: v for pv, v in (lay.get("farms") or {}).items()
+               if pv in REGION and isinstance(v, (int, float)) and v > 0}
+        if tbl:
+            dld[key] = tbl
+
+    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane},
+            "dof": dof, "rfd": rfd, "dld": dld}
 
 
 def ocsb_price():
@@ -292,10 +406,22 @@ def build():
                     break
             book_in_belt = sum(acc.get(pv, 0) for pv, _ in belt)
             src = AREA_SOURCES[src_id]
+            # Most belts are planted area in rai; the fisheries and forestry ones are not (see the
+            # `measure`/`unit` keys on those AREA_SOURCES entries). Resolve per source+key so the
+            # row states its own measure instead of every belt claiming to be planted area.
+            measure = (src.get("measure") or {}).get(akey, "planted area")
+            unit = (src.get("unit") or {}).get(akey, "rai")
             row["exposure"] = {
                 "book_accounts": book_in_belt,
                 "belt_provinces": len(belt),
                 "national_area_rai": round(national),
+                # What the belt is actually ranked on. The UI column header reads these, so a shrimp
+                # belt says "Farm area (rai)" and fishmeal says "Output (tonnes)" instead of both
+                # claiming planted area.
+                "belt_measure": measure,
+                "belt_unit": unit,
+                "belt_measure_label": "%s%s" % (measure[:1].upper() + measure[1:],
+                                                " (%s)" % unit if unit else ""),
                 # THE WHOLE BELT, not a top-6 slice (changed 2026-08-01, owner ask). The drill quotes
                 # book_accounts for the entire belt above the table, so emitting only 6 rows made the
                 # accounts column visibly fail to add up to its own headline — for rice, the 6 shown
@@ -325,9 +451,9 @@ def build():
                 "area_provenance": src["provenance"],
                 "area_source": src["source"],
                 "area_note": src["note"],
-                "basis": "book accounts in the crop's core belt (provinces = ~80%% of national "
-                         "planted area, %s); belt identifies the real growing region."
-                         % src["provenance"],
+                "basis": "book accounts in the core belt (provinces = ~80%% of national %s, %s); "
+                         "belt identifies the real producing region."
+                         % (measure, src["provenance"]),
                 "income_basis": (
                     "ESTIMATED, and conditional: the income columns are this crop's OWN effect on a "
                     "farm household in that province whose MAIN crop is this one — "
