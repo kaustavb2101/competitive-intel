@@ -8300,6 +8300,13 @@ function renderCommoditiesBoard(){
       <div class="ic-scroll"><table class="ic-tbl cb-tbl"><thead><tr><th>Commodity</th><th title="Thai farm-gate where a local series exists, world price otherwise">Borrower feels</th><th title="MEASURED price history. World price (World Bank Pink Sheet, up to 60 months) where that series is still running; the Thai farm-gate feed otherwise. Each cell states its own window and source.">Price trend</th><th>World YoY</th><th title="Thai farm-gate (raw crop forms) or the NABC daily market feed for livestock, fishery and orchard series. Nmkt = how many markets quote it.">Thai price</th><th>Divergence</th><th>Book exposed</th><th></th></tr></thead><tbody>${rows}</tbody></table>
         <p class="s cb-key">Sorted by the move the borrower feels. <b>°</b> = world price only, no Thai series (${(j.board||[]).length-nLoc} of ${(j.board||[]).length}). <b>Nmkt</b> = markets quoting that Thai price; a 1mkt series is measured but thin.${((j.meta||{}).nabc_excluded||[]).length?` Excluded as stale: ${(j.meta||{}).nabc_excluded.join('; ')}.`:''}</p></div>
       <p class="lead cc-provenance"><b>Provenance:</b> MEASURED prices (World Bank Pink Sheet global YoY + Thai farm-gate local YoY). Who's-exposed is an ESTIMATED book-footprint read — accounts in a crop's core growing belt (provinces = ~80% of national planted area). Each belt states its own area source, and <b>every belt on this board is now MEASURED</b>: rice / rubber / palm from the planted-area census, cassava / maize / coconut / pineapple from the DOAE farmer registry, sugarcane from OCSB's own returns (the modelled SPAM-2010 raster it replaced understated the cane belt by ~1.7×).</p>`;
+    // Feeds --cb-w to .cb-belt (see styles.css) so an opened drill's prose wraps at the width of the
+    // VISIBLE scroll box rather than at the width of the table, which is wider than the box on any
+    // screen narrower than ~1,750px. Re-measured on resize; falls back to 100% where ResizeObserver
+    // is absent, which is the pre-fix behaviour and still wraps.
+    const sc=el.querySelector('.ic-scroll');
+    if(sc){ const fit=()=>sc.style.setProperty('--cb-w',sc.clientWidth+'px'); fit();
+      if(window.ResizeObserver){ if(el._cbRO) el._cbRO.disconnect(); el._cbRO=new ResizeObserver(fit); el._cbRO.observe(sc); } }
     if(!el.dataset.wired){ el.dataset.wired='1';
       el.addEventListener('click',e=>{const x=e.target.closest('.cb-exp'); if(!x) return;
         const dr=el.querySelector(`.cb-drill[data-i="${x.dataset.i}"]`); if(!dr) return;
@@ -9365,8 +9372,11 @@ function renderCollateralBook(){
         ${motoLine}
         ${mort?`The second-largest class is not a vehicle at all: <b>property/mortgage at ${mort.os_share_pct}%</b> of outstanding on ${mort.n_share_pct}% of accounts, at a ${B(mort.ticket)} ticket — it does not move with the vehicle market above.`:''}</div>
         <span class="sub">Ranked by outstanding baht at every grain. Ranking by account count would lead with motorcycles.</span></div>
-      <h4 class="fb-h4">The resale market this book recovers into<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h4>
+      <h4 class="fb-h4">The resale market this book recovers into<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT + DLT</span></h4>
+      <div id="cb-value"></div>
       <div id="cb-flow"></div>
+      <h4 class="fb-h4">What is on the road, and what is replacing it<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h4>
+      <div id="cb-mix"></div>
       <h4 class="fb-h4">The collateral base by geography — and our exposure beside it</h4>
       <div id="cb-drill"></div>
       <h4 class="fb-h4">What we hold · the full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
@@ -9501,6 +9511,186 @@ function renderCollateralBook(){
           Motorcycles deregister at several times the rate of cars and pickups everywhere, which is the mechanism behind their weaker recovery.
           Region grain: DLT publishes this flow by registration office, not by province.</p>`;
     } else { ft.style.display='none'; }
+
+    /* ---- 5. what the collateral is WORTH — BoT's Used Vehicle Price Index ----
+       The turnover table above answers HOW DEEP the resale market is. It never answered AT WHAT
+       PRICE, which is the half that actually sets recovery on an enforced title, so this block
+       leads the section and the DLT flow becomes the second read.
+
+       WHY THIS SERIES AND NOT A DEALER LISTING FEED: EC_EI_040 is built from Union Auction's own
+       hammer prices — the price a lender is actually paid when it repossesses and auctions a
+       vehicle. That is our exit, not a shop-window ask.
+
+       THE ONE THING TO GET RIGHT: BoT's "Truck" series is รถกระบะ, PICKUPS — not heavy commercial
+       trucks. Confirmed from BoT's own 2019 Stat-Horizon methodology paper, which captions its
+       comparison chart 'ประเภทรถยนต์นั่ง (Car) และ รถกระบะ (Truck)', and from the 11 constituent
+       marques (Toyota/Isuzu/Honda/… — no Hino, Scania, UD or Fuso). Read as heavy trucks it would
+       be an irrelevant series; read correctly it is the single most important external number on
+       this tab, because pickup is the largest collateral class in the book.
+
+       HONESTY THIS BLOCK MUST NOT LOSE: the pickup damage is CUMULATIVE since 2022, not a
+       last-twelve-months event — over the trailing year it is CARS that are giving way (-8.3%)
+       while pickups are roughly flat (-0.4%). Leading with "pickups fell 2.7x as far" and stopping
+       there would invert what is happening right now, so both are stated. */
+    const vt=document.getElementById('cb-value');
+    if(vt) tmliFetch('used_vehicle_value').then(u=>{
+      const S=(u||{}).series||{}, CMP=(u||{}).comparison||{}, UM=(u||{}).meta||{};
+      if(!S.car||!S.truck||!S.overall){ vt.style.display='none'; return; }
+      const pp=v=>v==null?'—':(v>0?'+':'−')+Math.abs(v).toFixed(1);
+      const pct=v=>v==null?'—':(v>0?'+':'−')+Math.abs(v).toFixed(1)+'%';
+      const mcol=v=>v==null?'var(--muted)':v<0?'var(--agri)':'var(--merch)';
+      // Index level is NOT a rate — 66.8 on a 2015=100 base is "one third of its base year value
+      // gone", so the tile shows the level, its distance from base in points, and the YoY move as
+      // three separate readings rather than collapsing them into one number.
+      const tile=(k,lab,sub)=>{
+        const s=S[k], L=s.latest||{}, sp=s.sparkline||{};
+        return `<div class="uv-tile${k==='truck'?' hot':''}">
+          <div class="uv-lab">${lab}${k==='truck'?' <span class="uv-flag" title="Pickup is the largest collateral class in this book">our biggest class</span>':''}</div>
+          <div class="uv-val" style="color:${mcol(s.vs_2015_base_pp)}">${L.value==null?'—':L.value.toFixed(1)}</div>
+          <div class="uv-base">${pp(s.vs_2015_base_pp)} pts vs its own 2015 base</div>
+          <div class="uv-spark">${svgSpark(sp.values,{w:150,h:30,
+            // Deliberately NOT coloured by vs_2015_base_pp like the big number above it: that
+            // measures distance from 2015, while this line draws the last 36 months. Colouring the
+            // line by a figure it does not plot would make every spark red regardless of which way
+            // the drawn window actually ran. svgSpark's default derives the colour from the series
+            // it is given, which is the only colour that matches the shape.
+            aria:lab+' used-price index, last 36 months',
+            title:(sp.periods&&sp.periods.length?sp.periods[0]+'..'+sp.periods[sp.periods.length-1]:'')+' — BoT UVPI, 2015=100'})}</div>
+          <div class="uv-yoy">YoY <b style="color:${mcol(s.yoy_pct)}">${pct(s.yoy_pct)}</b>
+            <span class="s">· trough ${(s.all_time&&s.all_time.trough)?s.all_time.trough.value.toFixed(1)+' ('+s.all_time.trough.period+')':'—'}</span></div>
+          <div class="uv-sub s">${sub}</div></div>`;
+      };
+      // The decoupling chart. A number ("the gap is 21 points") does not carry the finding; the
+      // SHAPE does — flat for seven years, then a step in 2022 that never comes back. Drawn from
+      // comparison.gap_by_year rather than restated in prose so the eye gets the break-point.
+      const gby=CMP.gap_by_year||{}, yrs=Object.keys(gby).sort();
+      let gapChart='';
+      if(yrs.length>3){
+        const vals=yrs.map(y=>gby[y].mean_pp||0);
+        const hi=Math.max(...vals,1), lo=Math.min(...vals,0), span=(hi-lo)||1;
+        const W=Math.max(320,yrs.length*46), H=104, padT=8, padB=20, plotH=H-padT-padB;
+        const zeroY=padT+plotH*(hi/span), bw=Math.min(26,(W-8)/yrs.length-8);
+        const bars=yrs.map((y,i)=>{
+          const v=vals[i], x=4+(W-8)*(i+0.5)/yrs.length-bw/2;
+          const yTop=v>=0?padT+plotH*((hi-v)/span):zeroY, h=Math.max(1,plotH*Math.abs(v)/span);
+          // 2022 is the break year, so it and everything after it read as the new regime.
+          const col=Number(y)>=2022?'var(--agri)':'var(--muted)';
+          return `<rect x="${x.toFixed(1)}" y="${yTop.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${col}" opacity="${Number(y)>=2022?0.95:0.5}"><title>${y}: car sat ${v.toFixed(1)} pts ${v>=0?'above':'below'} pickup on average (${gby[y].n_months} months)</title></rect>`
+            +`<text class="uv-gx" x="${(x+bw/2).toFixed(1)}" y="${H-6}" text-anchor="middle">${y.slice(2)}</text>`;
+        }).join('');
+        gapChart=`<div class="uv-gap">
+          <div class="uv-gaph">How far the passenger car sat above the pickup, by year <span class="s">(index points, car − pickup; charted from the 2015 base year, the average below is measured over a longer window)</span></div>
+          <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Car-minus-pickup index gap by year, 2015 to 2026">
+            <line class="uv-zero" x1="0" y1="${zeroY.toFixed(1)}" x2="${W}" y2="${zeroY.toFixed(1)}"/>${bars}</svg>
+          <p class="s uv-gapf">Through <b>${(CMP.gap_mean_early_window||'').replace('..',' – ')}</b> the two moved together — the gap averaged just
+            <b>${CMP.gap_mean_early_pp==null?'—':CMP.gap_mean_early_pp.toFixed(1)} pt</b> and was often negative, meaning pickups held value
+            <i>better</i> than cars. It steps up in <b>2022</b> and stays there: <b>${CMP.gap_mean_recent_12m_pp==null?'—':CMP.gap_mean_recent_12m_pp.toFixed(1)} pts</b> over the last twelve months.
+            Whatever changed, changed then — this is not a long-standing feature of the Thai market.</p></div>`;
+      }
+      const mult=(CMP.latest_vs_2015_base||{}).truck_decline_multiple_of_car;
+      const L=S.truck.latest||{};
+      const prelim=L.preliminary?` <span class="uv-p" title="${(UM.preliminary_note||'preliminary').replace(/"/g,'')}">p</span>`:'';
+      vt.innerHTML=`<div class="verdict uv-verdict">
+          <b>Pickup resale value has fallen ${mult?`${mult.toFixed(1)}×`:'far'} as far as passenger car.</b>
+          Against their own 2015 base, pickups sit <b style="color:var(--agri)">${pp(S.truck.vs_2015_base_pp)} pts</b> and cars
+          <b>${pp(S.car.vs_2015_base_pp)} pts</b>${pu?` — and pickup is <b>${pu.os_share_pct}%</b> of this book, the largest single collateral class`:''}.
+          <span class="sub">The damage is cumulative since 2022, not a fresh shock: over the last twelve months it is <b>cars</b> that are giving way
+          (${pct(S.car.yoy_pct)}) while pickups are close to flat (${pct(S.truck.yoy_pct)}). Both readings are below.</span></div>
+        <div class="uv-tiles">${tile('truck','Pickup · รถกระบะ','What we recover on the class holding most of our money')}
+          ${tile('car','Passenger car · รถยนต์นั่ง','The comparison that isolates what is pickup-specific')}
+          ${tile('overall','All used vehicles','BoT’s headline index — the blend of the two')}</div>
+        ${gapChart}
+        <p class="gd-foot"><b>MEASURED · Bank of Thailand ${'EC_EI_040'}</b> (Used Vehicle Price Index), latest <b>${L.period||'—'}</b>${prelim}, base <b>2015 = 100</b>.
+          Built from <b>Union Auction</b>'s own auction hammer prices — the price actually paid when a repossessed vehicle is sold, which is our recovery, not a dealer asking price.
+          BoT's "Truck" series is <b>รถกระบะ — pickups</b>, not heavy commercial vehicles: its own methodology paper captions the split
+          "ประเภทรถยนต์นั่ง (Car) และ รถกระบะ (Truck)", and the 11 constituent marques are car/pickup brands with no heavy-truck OEM among them.
+          ${L.preliminary?'The latest month is marked preliminary by BoT and may be revised.':''}
+          Nothing here is modelled — every figure is arithmetic over the published series.</p>`;
+    }).catch(()=>{ vt.style.display='none'; });
+
+    /* ---- 6. the fleet mix: STOCK vs NEW, every class to 100% ----
+       The resale blocks above say what a vehicle is worth and how fast it changes hands. This one
+       says what the fleet is MADE of, and — the part that matters — how sharply the inflow differs
+       from the parked stock. Pickup sits at 15.7% of everything registered and 3.0% of everything
+       newly plated; motorcycles are the exact mirror. A class whose new share runs far under its
+       stock share is a collateral pool that is ageing and not being refilled.
+
+       ALL 28 CLASSES, NOT A TOP FIVE. Owner, on an earlier version of this section: "its not all
+       provinces. This is the weakness of top ten lists." The shares sum to 100% by construction and
+       the table shows every row so they visibly do.
+
+       THE ONE HONEST GAP: ten Land Transport Act classes (trucks and buses) publish NEW
+       registrations but no cumulative stock — DLT simply does not release a stock file for them.
+       They are shown with an explicit "not published" stock cell rather than dropped, because
+       dropping them would silently rebase the 100%. Their gap column is empty for the same reason.
+
+       PU = PICKUP + PPV is the owner's house definition and it is applied here, but only where it
+       can be MEASURED: PPVs register as รย.1 (they seat seven), so they are identifiable by
+       nameplate in the new-registration file and NOT separable in the stock file. The overlay
+       therefore moves the NEW share (3.02% -> 4.38%) and leaves the stock share alone, with the
+       reason stated on the page instead of quietly averaging the two. */
+    const mx=document.getElementById('cb-mix');
+    if(mx) tmliFetch('vehicle_mix').then(v=>{
+      const NAT=(v||{}).national||{}, TY=(v||{}).types||[], VM=(v||{}).meta||{};
+      if(!NAT.stock||!NAT.new||!TY.length){ mx.style.display='none'; return; }
+      // Short English glosses for the classes anyone actually reads. Deliberately partial: the DLT
+      // label is the authority and always shown, so a class with no gloss loses nothing.
+      const GLOSS={ry1:'Passenger car, ≤7 seats',ry2:'Passenger car, >7 seats — vans and MPVs',
+        ry3:'Pickup — personal goods vehicle',ry6:'Taxi, ≤7 seats',ry9:'Business service car',
+        ry12:'Motorcycle',ry13:'Tractor',ry15:'Agricultural vehicle',ry16:'Trailer',
+        ry17:'Public motorcycle',ry18:'E-hailing car',
+        lta_truck_personal:'Truck, own account',lta_truck_nonsched:'Truck, hire',
+        lta_bus_nonsched:'Bus, charter',lta_bus_personal:'Bus, own account'};
+      const num=n=>n==null?'—':Number(n).toLocaleString('en-US');
+      const shp=v2=>v2==null?'<span class="gd-na">—</span>':v2.toFixed(2)+'%';
+      const gapCell=g=>g==null?'<span class="gd-na">not published</span>'
+        :`<b style="color:${g<-1?'var(--agri)':g>1?'var(--merch)':'var(--muted)'}">${g>0?'+':'−'}${Math.abs(g).toFixed(2)}</b>`;
+      // Stock-bearing classes first, ranked by how much of the road they are; the ten stock-less
+      // Land Transport classes follow, ranked by new registrations, under their own divider.
+      const withS=TY.filter(t=>t.has_stock).sort((a,b)=>((NAT.stock[b.id]||{}).share_pct||0)-((NAT.stock[a.id]||{}).share_pct||0));
+      const noS=TY.filter(t=>!t.has_stock).sort((a,b)=>((NAT.new[b.id]||{}).share_pct||0)-((NAT.new[a.id]||{}).share_pct||0));
+      const row=t=>{
+        const s=NAT.stock[t.id]||{}, n=NAT.new[t.id]||{}, g=(NAT.gap_pp||{})[t.id];
+        const core=t.id==='ry3'||t.id==='ry1';
+        return `<tr${core?' class="vm-core"':''}>
+          <td class="gd-geo"><b>${t.label}</b>${GLOSS[t.id]?`<span class="vm-en">${GLOSS[t.id]}</span>`:''}</td>
+          <td class="gd-r">${s.count==null?'<span class="gd-na">not published</span>':num(s.count)}</td>
+          <td class="gd-r">${shp(s.share_pct)}</td>
+          <td class="gd-r">${num(n.count)}</td>
+          <td class="gd-r">${shp(n.share_pct)}</td>
+          <td class="gd-r">${gapCell(g)}</td></tr>`;
+      };
+      const PU=NAT.pu_incl_ppv||{};
+      const np=Object.entries(PU.by_nameplate||{}).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+      const f=NAT.fuel||{};
+      const fu=k=>f[k]?`${f[k].share_pct.toFixed(2)}%`:'—';
+      const ry3n=(NAT.new.ry3||{}).share_pct, ry3s=(NAT.stock.ry3||{}).share_pct;
+      const ry12n=(NAT.new.ry12||{}).share_pct, ry12s=(NAT.stock.ry12||{}).share_pct;
+      mx.innerHTML=`<div class="verdict">
+          <b>The pickup fleet is ageing without being replaced.</b> Pickups are <b>${shp(ry3s)}</b> of every vehicle registered in Thailand
+          but only <b>${shp(ry3n)}</b> of everything newly plated in the last twelve months — a <b style="color:var(--agri)">${gapCell((NAT.gap_pp||{}).ry3).replace(/<[^>]+>/g,'')} pt</b> gap.
+          Motorcycles run the other way (${shp(ry12s)} of stock, <b>${shp(ry12n)}</b> of new).
+          <span class="sub">Read against the resale block above: the class whose value has fallen furthest is also the class the country has largely stopped buying new.
+          That thins the future used-pickup pool we both lend against and recover into.</span></div>
+        ${PU.new_count?`<div class="vm-pu"><b>Under our own definition — PU = pickup + PPV</b> — new-registration share rises from
+          <b>${shp(ry3n)}</b> to <b>${shp(PU.new_share_pct)}</b> (${num(PU.new_count)} units), because pickup-based SUVs are counted in.
+          <span class="s">${np.length?`Measured by nameplate: ${np.map(([k,c])=>`${k} ${num(c)}`).join(' · ')}.`:''}
+          The <b>stock</b> share stays at ${shp(PU.stock_share_pct)}: ${PU.stock_caveat||''}</span></div>`:''}
+        <div class="tblwrap"><table class="tbl gd-tbl"><tr>
+            <th scope="col">DLT class</th>
+            <th scope="col" class="gd-r" title="MEASURED — cumulative registered stock, DLT dataset_1_1_04, as at ${VM.stock_asof||'—'}">On the road</th>
+            <th scope="col" class="gd-r">% of stock</th>
+            <th scope="col" class="gd-r" title="MEASURED — new red-plate first registrations (รถจดใหม่ป้ายแดง) summed over ${VM.new_window_label||'the trailing 12 months'}">Newly plated · 12mo</th>
+            <th scope="col" class="gd-r">% of new</th>
+            <th scope="col" class="gd-r" title="New share minus stock share, in percentage points. Negative = the class is a shrinking share of the fleet; positive = it is taking over.">Gap (pp)</th></tr>`
+        +withS.map(row).join('')
+        +(noS.length?`<tr class="vm-div"><td colspan="6">Land Transport Act classes — trucks and buses. DLT publishes new registrations for these but <b>no cumulative stock file</b>, so their stock cells and gap are genuinely absent rather than zero.</td></tr>`+noS.map(row).join(''):'')
+        +`</table></div>
+        <p class="gd-foot">All <b>${TY.length}</b> DLT classes, both shares summing to 100% — no top-ten slice.
+          Stock is one snapshot at <b>${VM.stock_asof||'—'}</b>; new registrations are the trailing twelve months <b>${VM.new_window_label||''}</b>, so the two columns answer different questions and the gap between them is the point.
+          Fuel of the parked fleet: <b>diesel ${fu('diesel')}</b>, petrol ${fu('petrol')}, hybrid ${fu('hybrid')}, <b>pure EV ${fu('ev')}</b>, gas ${fu('gas')} — DLT publishes fuel against stock only.
+          MEASURED throughout (DLT gdcatalog); the PU=pickup+PPV overlay is measured at nameplate grain on the new file and is not separable on the stock file.</p>`;
+    }).catch(()=>{ mx.style.display='none'; });
   }).catch(()=>{ host.style.display='none'; });
 }
 
