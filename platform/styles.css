@@ -1433,10 +1433,18 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
 .fb-crop b{font-weight:600;color:var(--txt)}
 .fb-crop i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--merch)}
 .fb-crop i.dn{color:var(--agri)}
-/* the by-crop lens sits INSIDE the farm block, so its heading is subordinate to the block's <h3>
-   and carries no rule of its own — it must not read as a new section. */
+/* a lens INSIDE a block (the by-crop cut of the farm book, the four cuts of the collateral book), so
+   the heading is subordinate to the block's <h3> and carries no rule of its own — it must not read
+   as a new section. */
 .fb-h4{font-size:12.5px;font-weight:600;color:var(--hi);letter-spacing:.2px;margin:16px 0 7px;
   display:flex;align-items:center;gap:8px}
+/* focus tier on a collateral row — the owner's stated core/secondary split, made visible so the
+   reader does not have to remember which classes are the ones we actually lend against. */
+.cb-tier{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.5px;padding:1px 5px;
+  border-radius:3px;vertical-align:1px}
+.cb-tier.core{color:var(--collat);border:1px solid var(--collat)}
+.cb-tier.sec{color:var(--dim);border:1px solid var(--line)}
+.cb-tier.oth{color:var(--dim);border:1px dashed var(--line)}
 @media print{.gd-wrap{max-height:none;overflow:visible}
   .gd-crumb,.gd-ar{display:none} .gd-tbl th{position:static}}
 

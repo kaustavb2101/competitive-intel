@@ -147,45 +147,11 @@ async function loadRegionDebt(){
   })();
   return regdebtPromise;
 }
-// Logistics-SME (hauler) pulse — MEASURED DLT truck-registration actions (trucks, private + for-hire),
-// trailing-12m vs the prior 12m (data/truck_flow.json). Per province: new_regis_12m / transfers_12m /
-// dereg_12m / net_flow_12m / new_regis_yoy_pct. Obj #1: an owner-operator hauler is a classic heavy-title
-// borrower — contracting truck flow = that segment's cash flow thinning in the province, and a two-for-one
-// (borrower livelihood AND used-truck collateral liquidity). Fully null-guarded: absent file → TRUCKFLOW
-// stays null, the Overview block stays hidden (see renderTruckFlow), nothing fabricated.
-let TRUCKFLOW=null, TRUCKFLOW_META=null, truckflowPromise=null;
-async function loadTruckFlow(){
-  if(truckflowPromise) return truckflowPromise;
-  truckflowPromise=(async()=>{
-    try{
-      const j = await fetch('data/truck_flow.json').then(r=>r.json());
-      TRUCKFLOW=Array.isArray(j.provinces)?j.provinces:null; TRUCKFLOW_META=j.meta||null;
-    }catch(e){ TRUCKFLOW=null; TRUCKFLOW_META=null; }
-    return TRUCKFLOW;
-  })();
-  return truckflowPromise;
-}
-
-// Used-collateral pulse — MEASURED DLT car-law registration actions (dataset_stat_1_008: motorcycles,
-// cars, pickups — the title-loan collateral classes), trailing-12m, aggregated to the 5 macro regions
-// (data/collateral_flow.json). Obj #1: motorcycles are ~50% of the book; a more active used market
-// (higher transfer intensity) means repossessed collateral clears faster, while a higher permanent-
-// deregistration rate marks where the collateral base is attriting faster. REGION grain on purpose —
-// per-province transfer/dereg is confounded by central metro registration (see the layer's grain_why),
-// so region is the honest grain. Fully null-guarded: absent file → COLLFLOW stays null, the Overview
-// block stays hidden (see renderCollateralFlow), nothing fabricated.
-let COLLFLOW=null, COLLFLOW_META=null, collflowPromise=null;
-async function loadCollateralFlow(){
-  if(collflowPromise) return collflowPromise;
-  collflowPromise=(async()=>{
-    try{
-      const j = await fetch('data/collateral_flow.json').then(r=>r.json());
-      COLLFLOW=Array.isArray(j.regions)?j.regions:null; COLLFLOW_META=j.meta||null;
-    }catch(e){ COLLFLOW=null; COLLFLOW_META=null; }
-    return COLLFLOW;
-  })();
-  return collflowPromise;
-}
+// RETIRED 2026-08-02 — the client loaders for data/truck_flow.json and data/collateral_flow.json.
+// Both files are still MAINTAINED and still shipped; they are now read SERVER-SIDE by
+// pipeline/build_collateral_book.py and reach the page inside collateral_book.json, where they sit
+// with the rest of the collateral picture instead of in a business-backdrop section (owner points
+// 18 + 19). Two fewer fetches per Overview render, and one place where the join lives.
 
 // Business-formation pulse — MEASURED DBD (Department of Business Development) new juristic-person
 // registrations for the snapshot month (data/dbd_formation.json). Per province: n new firms +
@@ -1959,12 +1925,15 @@ function renderOverview(){
   renderMacroSoWhat();
   renderAnswerBand();
   renderCollatOutlook();
-  renderDieselCollateral();
+  // THE COLLATERAL BOOK (collateral_book.json) — leads the section, because it is the answer the
+  // rest of it supports. Absorbs, and replaces, five tables that used to be scattered across three
+  // sections: collateral mix (point 12), diesel share (point 10), the brand tiles (point 8), the
+  // truck fleet (point 18) and the used-collateral pulse (point 19). Null-safe: absent → hides.
+  renderCollateralBook();
   // MEASURED new-pickup inflow trend (brand_trends.json, DLT) — the TIME dimension behind the
-  // diesel-share snapshot: how fast the future used-pickup collateral pool replenishes. Null-safe.
+  // collateral book: how fast the future used-pickup pool replenishes. Null-safe.
   loadBrandTrends().then(renderBrandTrends);
   loadVehReg().then(renderVehReg);
-  renderCollatMix();
   renderRecoverySensitivity();
   // MEASURED EV-penetration collateral watch (ev_penetration.json, DLT) — null-safe: absent file → note only
   renderEvWatch();
@@ -1988,13 +1957,9 @@ function renderOverview(){
   // MEASURED regional household-debt backdrop (region_debt.json, BoT over NSO SES, obj #1) — the borrower-
   // leverage floor under portfolio risk. Null-safe: absent file → the block stays hidden.
   loadRegionDebt().then(renderRegionDebt);
-  // MEASURED logistics-SME pulse (truck_flow.json, DLT truck registrations, obj #1) — where the heavy-
-  // title hauler segment's cash flow is thinning. Null-safe: absent file → the block stays hidden.
-  loadTruckFlow().then(renderTruckFlow);
-  // MEASURED used-collateral pulse (collateral_flow.json, DLT car-law registrations, obj #1) — where the
-  // primary title collateral (moto/car/pickup) is most liquid and where its base is attriting fastest,
-  // by region. Null-safe: absent file → the block stays hidden.
-  loadCollateralFlow().then(renderCollateralFlow);
+  // MOVED 2026-08-02 into the collateral block (owner points 18 + 19). truck_flow.json is now a
+  // per-province column on the collateral drill and collateral_flow.json is the resale-market table
+  // at its foot — both read server-side by build_collateral_book.py, so the page fetches neither.
   // MEASURED business-formation pulse (dbd_formation.json, DBD registry) — the small-business borrower
   // base backdrop for the merchant book (both objectives). Null-safe: absent file → the block stays hidden.
   loadDbdForm().then(renderDbdForm);
@@ -2335,63 +2300,22 @@ function loadVehicleCollateral(){
     .then(j=>{VCOLL=j||null;return VCOLL;}).catch(()=>{VCOLL=null;return null;});
   return vcollPromise;
 }
-function renderDieselCollateral(){
-  const vb=$('#dcollat-verdict'), grid=$('#dcollat-brand'), tbl=$('#dcollattbl'), note=$('#dcollat-note');
-  if(!tbl) return;
-  if(!vcollLoaded){ loadVehicleCollateral().then(()=>{ try{renderDieselCollateral();}catch(e){} }); return; }
-  if(!VCOLL||!VCOLL.provinces||!VCOLL.provinces.length){
-    if(vb) vb.style.display='none';
-    if(grid) grid.innerHTML='';
-    if(note) note.textContent='Vehicle-title collateral data not available (data/vehicle_collateral.json missing).';
-    return;
-  }
-  const meta=VCOLL.meta||{}, nat=meta.national||{}, provs=VCOLL.provinces, bm=VCOLL.national_brand_mix;
-  const top=provs.slice(0,10);
-  const dcol=v=>v>=70?'var(--agri)':v>=60?'var(--gold)':'var(--collat)';
-  // ---- answer-first verdict ----
-  if(vb){
-    const t3=provs.slice(0,3).map(p=>p.th).join(', ');
-    const pk=(bm&&bm.pickup_top_brands||[]).slice(0,2).map(b=>b.b.charAt(0)+b.b.slice(1).toLowerCase()).join(' + ');
-    vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🛻 <b>National pickup-title collateral is ${pk||'Toyota + Isuzu'}-led</b> — diesel is <b>${nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'}</b> of the car+pickup title fleet, highest in <b>${t3}</b>, where the EV transition most threatens resale.</div>`+
-      `<div class="sub" style="margin-top:4px">Diesel share ${TAG_M} DLT dataset_1_1_04 (${meta.vintage||'—'}) · brand mix ${TAG_M} DLT first registrations, <b>national only</b> ${TAG_E}<span style="opacity:.7"> (no measured brand×province in reachable Thai open data)</span></div>`;
-  }
-  // ---- national brand-mix readout (mcards) ----
-  if(grid){
-    const cards=[];
-    if(bm){
-      const nm=b=>b?b.b.charAt(0)+b.b.slice(1).toLowerCase():'';
-      const pk=bm.pickup_top_brands||[], cr=bm.car_top_brands||[];
-      if(pk.length) cards.push({k:'Pickup titles (national)',v:[nm(pk[0]),nm(pk[1])].filter(Boolean).join(' + '),d:'first-regis leaders',cls:'',
-        n:'MEASURED (DLT first registrations, '+(bm.vintage_be||'—')+'). '+pk.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. National only.'});
-      if(cr.length) cards.push({k:'Car titles (national)',v:[nm(cr.find(b=>!/YAMAHA|HONDA CUB|KUBOTA/i.test(b.b))||cr[0])].filter(Boolean).join('')||nm(cr[0]),d:'first-regis leader',cls:'',
-        n:'MEASURED (DLT first registrations). '+cr.slice(0,3).map(b=>nm(b)+' '+(b.n||0).toLocaleString()).join(' · ')+'. Includes motorcycles; national only.'});
-      if(bm.ev_only_share_pct!=null) cards.push({k:'New-EV share (national)',v:bm.ev_only_share_pct+'%',d:'rising ▲',cls:'up',
-        n:'MEASURED floor — pure-EV marques as a share of new car regis ('+(bm.vintage_be||'—')+'). BYD-led; the leading indicator for the diesel-pickup resale watch.'});
-    }
-    cards.push({k:'Diesel share (national)',v:(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—'),d:'of car+pickup fleet',cls:'down',
-      n:'MEASURED (DLT dataset_1_1_04) — diesel\'s share of the registered car+pickup title-able stock. Higher = more resale exposure to the EV transition.'});
-    grid.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
-      <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
-      <div class="n">${c.n}</div></div>`).join('');
-  }
-  // ---- per-province diesel-share table ----
-  if(note) note.innerHTML='The diesel pickup is AutoX\'s core title collateral, and the EV/diesel transition is the resale risk under it. '+
-    'These provinces carry the highest <b>diesel share</b> of the registered <b>car+pickup</b> title fleet — where recovery values are most exposed as Thailand electrifies. '+
-    'All shares are <b>measured</b> (DLT dataset_1_1_04, '+(meta.vintage||'—')+'). Nationally diesel is <b>'+(nat.diesel_share_pct!=null?nat.diesel_share_pct+'%':'—')+'</b> of the car+pickup fleet. '+
-    '<b>Brand is national only</b> — a measured brand×province cross is not in reachable Thai open data.';
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th class="h-collat" title="diesel share of the car(รย.1)+pickup(รย.3) registered stock — DLT, measured">Diesel % ▲ (DLT)</th><th title="car+pickup registered stock — DLT, measured">Car+pickup stock</th><th title="diesel pickups registered — DLT, measured">Pickup diesel</th></tr>`+
-    top.map((p,i)=>{const dc=dcol(p.diesel_share_pct);
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region||'—'}</td>
-      <td>${barHTML(p.diesel_share_pct,dc)} <span class="mono" style="color:${dc}">${p.diesel_share_pct}%</span></td>
-      <td class="mono sub">${(p.car_pickup_total||0).toLocaleString()}</td>
-      <td class="mono sub">${(p.pickup_diesel||0).toLocaleString()}</td></tr>`;}).join('');
-}
-/* ---------- Collateral mix · most motorcycle-heavy provinces (objective #1, MEASURED) ----------
-   Pure DLT vehicle stock split per province (moto / car / pickup / EV share of total). A ฿10k
-   motorcycle title and a ฿500k car title are one "vehicle" each but very different risk — this
-   surfaces the mix. We rank provinces WHERE AUTOX OPERATES (branches > 0) by motorcycle share,
-   the most volatile / lowest-recovery title collateral. Everything here is MEASURED (DLT). */
+/* RETIRED 2026-08-02 — renderDieselCollateral (the diesel-share + brand-tile block) and
+   renderCollatMix (the "most motorcycle-heavy provinces" table). Both are inside renderCollateralBook
+   now, and both were exactly what the owner objected to:
+
+     point 10  "Diesel-share table good but its not all provinces. This is the weakness of top ten
+               lists."      -> diesel share is a column on the geo drill, all 77 provinces
+     point 12  "Give me the full mix to 100% and all provinces."
+               -> the 8-type mix sums to 100% of the book; the geography is the drill
+     point  8  the four brand tiles -> every brand the tape carries, ranked by outstanding
+
+   renderCollatMix also ranked provinces by MOTORCYCLE share, which put the class that is 5.8% of the
+   money at the top of a collateral table. The replacement ranks by baht everywhere.
+
+   collatMixRows() SURVIVES — it is the province motorcycle/car/pickup/EV mix from the DLT stock, and
+   the Command-center risk readout and the data-room export still read it. Only the table it fed is
+   gone. */
 function collatMixRows(){
   return (PROV||[]).filter(p=>p.vehicles&&p.moto!=null&&(p.branches||0)>0)
     .map(p=>({th:p.th,region:p.region,branches:p.branches,vehicles:p.vehicles,
@@ -2400,24 +2324,6 @@ function collatMixRows(){
               pickup:p.pickup!=null?Math.round(100*p.pickup/p.vehicles):null,
               ev:p.ev!=null?Math.round(100*p.ev/p.vehicles):null}))
     .sort((a,b)=>b.moto-a.moto);
-}
-function renderCollatMix(){
-  const tbl=$('#collatmixtbl'), note=$('#collatmix-note'); if(!tbl) return;
-  const rows=collatMixRows();
-  if(!rows.length){ if(note) note.textContent='Vehicle-mix data not available (data/provinces/index.json missing).'; return; }
-  const natMoto=(()=>{let m=0,t=0;(PROV||[]).forEach(p=>{if(p.vehicles&&p.moto!=null){m+=p.moto;t+=p.vehicles;}});return t?Math.round(100*m/t):0;})();
-  if(note) note.innerHTML='The collateral behind a title loan is not one thing: a ฿10k motorcycle title and a ฿500k car title are each <b>one "vehicle"</b> but very different risk. '+
-    'These are the provinces (with AutoX branches) whose registered fleet is most <b>motorcycle</b>-weighted — the lowest-recovery, most volatile title collateral. '+
-    'All shares are <b>measured (DLT registered vehicle stock)</b>. Nationally motorcycles are <b>'+natMoto+'%</b> of the fleet.';
-  const top=rows.slice(0,10);
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of the province registered vehicle stock — DLT, measured">Motorcycle % ▲</th><th title="DLT, measured">Car %</th><th title="DLT, measured">Pickup %</th><th title="DLT, measured">EV %</th></tr>`+
-    top.map((p,i)=>{const mc=p.moto>=70?'var(--agri)':p.moto>=60?'var(--gold)':'var(--collat)';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
-      <td class="mono">${p.branches}</td>
-      <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
-      <td class="mono sub">${p.car!=null?p.car+'%':'—'}</td>
-      <td class="mono sub">${p.pickup!=null?p.pickup+'%':'—'}</td>
-      <td class="mono sub">${p.ev!=null?p.ev+'%':'—'}</td></tr>`;}).join('');
 }
 
 /* ---------- National registered-vehicle collateral base (objective #1, MEASURED) ----------
@@ -2466,29 +2372,83 @@ function renderVehReg(){
    invent LTV-breach counts. Instead we rank the provinces AutoX operates in by motorcycle-title
    SHARE (measured) — those most exposed if used-motorcycle recovery values fall. The 10% figure
    is a stated, illustrative scenario, NOT a forecast. */
+/* RECOVERY-VALUE SENSITIVITY — rebuilt on the real tape, 2026-08-02.
+   Owner, point 14: "a very powerful dataset and table. I want greater elaboration and detail as
+   AutoX focuses heavily on pickup and passenger cars. Motorcycles are a secondary focus due to
+   smaller ticket size."
+
+   The old version could not do that, and said so in its own note: "we have no loan balances and no
+   LTV, so we rank by motorcycle-share exposure and deliberately show no LTV-breach counts." That
+   stopped being true on 2026-07-21 when the real tape landed. Per collateral type we now hold the
+   MEASURED outstanding per account and the MEASURED appraised value per account — so the question
+   stops being "which provinces own a lot of motorcycles" and becomes the real one: how far can
+   resale values fall before the collateral stops covering the loan.
+
+   The shock ladder is ILLUSTRATIVE (no Thai used-vehicle price index exists to forecast from) but
+   every position it is applied to is measured, and the rows are ordered by outstanding, so pickup
+   and passenger car lead instead of the class that is 5.8% of the money. */
 function renderRecoverySensitivity(){
   const cards=$('#recovery-cards'), note=$('#recovery-note'), tbl=$('#recoverytbl'); if(!cards) return;
-  cards.innerHTML=[
-    {k:'Used-motorcycle value',v:'−10%',d:'illustrative shock',cls:'down',
-     n:'ILLUSTRATIVE scenario (not a forecast). We have no Thai used-motorcycle price index; this is a stated stress to rank exposure.'},
-    {k:'Diesel-pickup value',v:'↓ pressure',d:'resale at risk',cls:'down',
-     n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans.'},
-    {k:'Most exposed',v:'high-moto provinces',d:'by title-share',cls:'down',
-     n:'Ranked by MEASURED motorcycle-title share (DLT). No LTV/loan-balance data, so we rank exposure — we do NOT show breach counts.'},
-  ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
-    <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
-    <div class="n">${c.n}</div></div>`).join('');
-  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b>; motorcycles — the highest-share, lowest-recovery title collateral — would be most hurt by any fall in used-vehicle values. '+
-    'A <b>10% fall in used-motorcycle values</b> most exposes the provinces below, which carry the highest motorcycle-title share. '+
-    'This is an <b>ESTIMATED / illustrative sensitivity</b>: we have <b>no loan balances and no LTV</b>, so we rank by motorcycle-share exposure and deliberately show <b>no LTV-breach counts</b>. Shares are measured (DLT).';
-  const rows=collatMixRows().slice(0,8); if(!tbl||!rows.length) return;
-  tbl.innerHTML=`<tr><th>#</th><th>Province</th><th>Region</th><th title="AutoX branches">Branches</th><th class="h-collat" title="motorcycle share of registered vehicle stock — DLT, measured">Moto-title share ▲ (DLT)</th><th class="h-collat" title="relative exposure to a 10% used-motorcycle value fall — illustrative, proportional to motorcycle share">Relative exposure ◇ illustrative</th></tr>`+
-    rows.map((p,i)=>{const mc=p.moto>=70?'var(--agri)':p.moto>=60?'var(--gold)':'var(--collat)';
-      const rank=i===0?'Highest':i<3?'High':'Elevated';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td><td class="sub">${p.region}</td>
-      <td class="mono">${p.branches}</td>
-      <td>${barHTML(p.moto,mc)} <span class="mono" style="color:${mc}">${p.moto}%</span></td>
-      <td class="mono" style="color:${mc}">▲ ${rank}</td></tr>`;}).join('');
+  tmliFetch('collateral_book').then(j=>{
+    const T=(j&&j.types)||[];
+    if(!T.length){ cards.innerHTML=''; if(note) note.textContent=''; if(tbl) tbl.innerHTML=''; return; }
+    const B=v=>v==null?'—':'฿'+Math.round(v).toLocaleString('en-US');
+    const mB=v=>v>=1e9?'฿'+(v/1e9).toFixed(2)+'bn':'฿'+Math.round(v/1e6).toLocaleString('en-US')+'m';
+    const withLtv=T.filter(t=>t.ltv_proxy_pct!=null);
+    const head=v=>100-v;                       // the fall a class absorbs before it is underwater
+    const thin=withLtv.slice().sort((a,b)=>b.ltv_proxy_pct-a.ltv_proxy_pct)[0];
+    const core=T.filter(t=>t.tier==='core');
+    const coreOs=core.reduce((s,t)=>s+t.os,0);
+    // The fall the WHOLE book absorbs before the first baht is uncovered. At a ~52% lent-to-value
+    // ratio this is large, and that is the finding — not a table that reports "nothing happens" at
+    // shocks the book was never going to notice. The ladder below is scaled to actually cross 100%.
+    const bookHead=withLtv.length?Math.min(...withLtv.map(t=>head(t.ltv_proxy_pct))):null;
+    // Where a fall would actually be worked: the branches already lending the most against value.
+    // The class ladder says the book is safe; this says which branches stop being safe first.
+    let thinBr=null, nBr=0;
+    if(j&&j.branches){ const all=[].concat(...Object.values(j.branches));
+      nBr=all.length; thinBr=all.filter(b=>(b.ltv_proxy_pct||0)>=60).length; }
+    cards.innerHTML=[
+      {k:'Core collateral',v:mB(coreOs),d:core.map(t=>t.label.toLowerCase()).join(' + '),cls:'',
+       n:'MEASURED — outstanding on the two focus classes. First here because they are the money, not because they are the most numerous.'},
+      {k:'Thinnest headroom',v:thin?thin.label:'—',d:thin?head(thin.ltv_proxy_pct).toFixed(1)+'% before underwater':'',cls:'down',
+       n:'MEASURED — the class lending the highest share of assessed value, so the first to go underwater when resale values fall.'},
+      {k:'Branches over 60% of value',v:thinBr==null?'—':String(thinBr),d:nBr?'of '+nBr.toLocaleString('en-US')+' branches':'',cls:thinBr?'down':'',
+       n:'MEASURED — branches whose book already lends more than 60% of assessed collateral value. Nothing in the book is uncovered until resale values fall '+(bookHead==null?'far':bookHead.toFixed(0)+'%')+', but these branches reach that point first, so they are where a fall would be worked.'}
+    ].map(c=>`<div class="mcard"><div class="k">${c.k}</div>
+      <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='down'?'dn':'up'}">${c.d}</div>
+      <div class="n">${c.n}</div></div>`).join('');
+    if(note) note.innerHTML='<b>How far can resale values fall before the collateral stops covering the loan?</b> '+
+      'Per class we hold the <b>measured</b> outstanding per account and the <b>measured</b> appraised value per account; '+
+      '<b>headroom</b> is the gap between them. The shock columns are <b>illustrative</b> — no Thai used-vehicle price index exists to forecast from — '+
+      'but they are applied to measured positions, so the ranking is real, and the ladder is scaled to the fall that actually matters — at a 52% lent-to-value ratio a 10% dip changes nothing. '+
+      'Ordered by outstanding, so <b>pickup and passenger car lead</b>; the previous version ranked by motorcycle share and led with 5.8% of the money.';
+    if(tbl) tbl.innerHTML=`<tr><th scope="col">Collateral</th>
+        <th scope="col" class="gd-r">Outstanding</th>
+        <th scope="col" class="gd-r" title="MEASURED — outstanding per account">Ticket</th>
+        <th scope="col" class="gd-r" title="MEASURED — appraised value per account">Appraised</th>
+        <th scope="col" class="gd-r" title="DERIVED — outstanding ÷ appraised, per account">Lent vs value</th>
+        <th scope="col" class="gd-r" title="DERIVED — how far resale value can fall before outstanding exceeds it">Headroom</th>
+        <th scope="col" class="gd-r" title="ILLUSTRATIVE — appraised value after the fall, as a share of what is still lent. Below 100% the collateral no longer covers the loan.">After −20%</th>
+        <th scope="col" class="gd-r">After −35%</th>
+        <th scope="col" class="gd-r">After −50%</th></tr>`+
+      T.map(t=>{
+        if(t.ltv_proxy_pct==null) return `<tr><td class="gd-geo"><b>${t.label}</b></td><td class="gd-r">${mB(t.os)}</td>`+
+          `<td class="gd-r">${B(t.ticket)}</td><td class="gd-r"><span class="gd-na">—</span></td>`+
+          `<td class="gd-r" colspan="5"><span class="gd-na">no appraised value carried on this class</span></td></tr>`;
+        const h=head(t.ltv_proxy_pct);
+        const cell=f=>{ const cov=t.eval_avg*(1-f/100)/t.ticket*100;
+          const col=cov<100?'var(--agri)':cov<115?'var(--gold)':'var(--merch)';
+          return `<td class="gd-r" style="color:${col}">${cov.toFixed(0)}%</td>`; };
+        return `<tr><td class="gd-geo"><b>${t.label}</b>${t.tier==='core'?' <span class="cb-tier core">core</span>':''}</td>
+          <td class="gd-r">${mB(t.os)}</td><td class="gd-r">${B(t.ticket)}</td><td class="gd-r">${B(t.eval_avg)}</td>
+          <td class="gd-r">${t.ltv_proxy_pct}%</td>
+          <td class="gd-r" style="color:${h<40?'var(--agri)':h<48?'var(--gold)':'var(--merch)'}"><b>${h.toFixed(1)}%</b></td>
+          ${cell(20)}${cell(35)}${cell(50)}</tr>`;
+      }).join('')+`<tr><td class="gd-geo"><b>Whole book</b></td>
+        <td class="gd-r"><b>${mB(T.reduce((s,t)=>s+t.os,0))}</b></td>
+        <td colspan="7" class="sub" style="text-align:left">Cover = appraised value after the fall, as a share of what is still lent. Below 100% the collateral no longer covers the loan.</td></tr>`;
+  }).catch(()=>{});
 }
 
 /* ---------- EV transition · used-collateral value watch (objective #1, MEASURED) ----------
@@ -2780,87 +2740,13 @@ function renderRegionDebt(){
 // segment-stress read the layer carries, and the intended sort ("worst-first by new_regis_yoy_pct").
 // A modest base floor (≥250 new/12m) drops small-sample YoY noise; net fleet flow + used-market
 // transfers carried alongside. Null-safe: no rows → the whole block stays hidden (nothing fabricated).
-function renderTruckFlow(){
-  const wrap=$('#truckflow-wrap'); if(!wrap) return;
-  const rows=Array.isArray(TRUCKFLOW)?TRUCKFLOW.filter(p=>p&&p.th&&p.new_regis_yoy_pct!=null):[];
-  if(!rows.length){ wrap.style.display='none'; return; }
-  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
-  const pct=v=>(v==null||!isFinite(v)?'—':(v>=0?'+':'')+v.toFixed(1)+'%');
-  // national headline (measured) — prefer the layer's own national rollup, else sum the rows.
-  const nat=(TRUCKFLOW_META&&TRUCKFLOW_META.national)||null;
-  const natNew=nat?nat.new_regis_12m:rows.reduce((s,p)=>s+(p.new_regis_12m||0),0);
-  const natDereg=nat?nat.dereg_12m:rows.reduce((s,p)=>s+(p.dereg_12m||0),0);
-  const natNet=natNew-natDereg;
-  const natYoy=nat&&nat.new_regis_yoy_pct!=null?nat.new_regis_yoy_pct:null;
-  // segment-stress read: contracting new-truck demand YoY, worst-first, with a small-base floor.
-  const sized=rows.filter(p=>(p.new_regis_12m||0)>=250);
-  const by=sized.slice().sort((a,b)=>(a.new_regis_yoy_pct||0)-(b.new_regis_yoy_pct||0)).slice(0,8);
-  const nContract=sized.filter(p=>(p.new_regis_yoy_pct||0)<0).length;
-  const worst=by[0];
-  const vb=$('#truckflow-verdict');
-  if(vb){
-    const growing=natNet>0;
-    vb.className='verdict'+(growing?'':' v-warn'); vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">${growing?'✅':'📉'} <b>The truck fleet is ${growing?'still growing':'contracting'} nationally${natYoy!=null?` — new-truck registrations ${pct(natYoy)} YoY`:''}${growing?` (net +${num(natNet)} trucks)`:` (net ${num(natNet)})`}.</b> `+
-      `The heavy-title hauler segment is a tailwind in aggregate, not a stress.</div>`+
-      `<div class="sub" style="margin-top:4px">But new-truck demand is <b>contracting YoY in ${nContract} of ${sized.length}</b> sizeable-base provinces${worst?` — steepest: <b>${worst.th}</b> ${pct(worst.new_regis_yoy_pct)}`:''}. An owner-operator hauler is a classic heavy-title borrower, so a thinning truck pulse marks where that segment's cash flow — and used-truck collateral — is softening. ${TAG_M}.</div>`;
-  }
-  const note=$('#truckflow-note');
-  if(note) note.innerHTML='<b>Measured</b> — DLT truck-registration actions (trucks, private + for-hire), '+
-    'trailing-12-month sums vs the same window a year earlier'+(TRUCKFLOW_META&&TRUCKFLOW_META.window&&TRUCKFLOW_META.window.current?` (${TRUCKFLOW_META.window.current[0]}–${TRUCKFLOW_META.window.current[1]})`:'')+'. '+
-    'Sorted <b>worst YoY new-registration momentum first</b> — the hauler segment pulling back on new trucks. '+
-    'A <b>base floor of ≥250 new registrations/12m</b> is applied to drop small-sample YoY noise. '+
-    '<b>Net fleet</b> = new − deregistrations (negative = the province’s fleet is shrinking); '+
-    '<b>used transfers</b> is ownership-transfer volume — the used-truck market’s liquidity, which sets how easily that collateral clears.';
-  const tbl=$('#truckflowtbl');
-  if(tbl) tbl.innerHTML=`<tr><th>#</th><th>Province</th><th title="MEASURED — new truck registrations in the trailing 12 months, and the change vs the prior 12 months">New /12m · YoY ●</th><th title="MEASURED — new registrations minus deregistrations; negative = the fleet is contracting">Net fleet ●</th><th title="MEASURED — ownership transfers, a read on used-truck market liquidity">Used transfers ●</th></tr>`+
-    by.map((p,i)=>{const y=p.new_regis_yoy_pct||0; const c=y<-10?'var(--agri)':y<0?'var(--gold)':'var(--merch)';
-      const nf=p.net_flow_12m||0; const nfc=nf<0?'var(--agri)':nf<50?'var(--gold)':'var(--merch)';
-      return `<tr><td class="mono sub">${i+1}</td><td><b>${p.th}</b></td>`+
-        `<td><span class="mono">${num(p.new_regis_12m)}</span> <span class="mono" style="color:${c}">${pct(y)}</span></td>`+
-        `<td class="mono" style="color:${nfc}">${nf>=0?'+':''}${num(nf)}</td>`+
-        `<td class="mono sub">${num(p.transfers_12m)}</td></tr>`;}).join('');
-  wrap.style.display='';
-}
-
-function renderCollateralFlow(){
-  const wrap=$('#collflow-wrap'); if(!wrap) return;
-  const rows=Array.isArray(COLLFLOW)?COLLFLOW.filter(r=>r&&r.region&&r.moto&&r.moto.transfer_rate!=null):[];
-  if(!rows.length){ wrap.style.display='none'; return; }
-  const TH_REG={'Central&BKK':'ภาคกลาง+กทม.','East':'ภาคตะวันออก','Isan':'ภาคอีสาน','North':'ภาคเหนือ','South':'ภาคใต้'};
-  const num=v=>(v==null||!isFinite(v))?'—':Math.round(v).toLocaleString('en-US');
-  const rp=v=>(v==null||!isFinite(v))?'—':(v*100).toFixed(v<0.02?2:1)+'%';   // ratio → percent
-  const nat=(COLLFLOW_META&&COLLFLOW_META.national&&COLLFLOW_META.national.moto)||null;
-  const mix=(COLLFLOW_META&&COLLFLOW_META.national_mix_pct)||null;
-  // sorted worst-attrition-first in the layer; derive lowest-liquidity independently.
-  const worstAttr=rows[0];
-  const lowLiq=rows.slice().sort((a,b)=>(a.moto.transfer_rate||0)-(b.moto.transfer_rate||0))[0];
-  const vb=$('#collflow-verdict');
-  if(vb){
-    vb.className='verdict'; vb.style.display='block';
-    vb.innerHTML=`<div class="verdict-line">🏍 <b>Motorcycles are a third of AutoX's customers and a twentieth of its money — 33.3% of accounts but 5.8% of outstanding</b> (measured tape; pickups are 31.3% of accounts and 38.3% of outstanding). So moto used-market liquidity governs how fast a LOT of repossessed units clear, but very little balance.${mix?` Nationally they are ${mix.moto}% of car-law registration activity (car ${mix.car}%, pickup ${mix.pickup}%) — that is the market, not our book.`:''} `+
-      `${nat?`Nationally ${rp(nat.transfer_rate)} of moto registry actions are ownership transfers, and ${rp(nat.dereg_rate)} are permanent deregistrations.`:''}</div>`+
-      `<div class="sub" style="margin-top:4px">Collateral attrition (permanent deregistration) runs fastest in <b>${TH_REG[worstAttr.region]||worstAttr.region}</b> (${rp(worstAttr.moto.dereg_rate)}), and the moto used market is thinnest — slowest to clear collateral — in <b>${TH_REG[lowLiq.region]||lowLiq.region}</b> (${rp(lowLiq.moto.transfer_rate)} transfer intensity). A backdrop read on the book we already run, not an open/close cue. ${TAG_M}.</div>`;
-  }
-  const note=$('#collflow-note');
-  const win=(COLLFLOW_META&&Array.isArray(COLLFLOW_META.window))?COLLFLOW_META.window:null;
-  if(note) note.innerHTML='<b>Measured</b> — DLT car-law registration actions (dataset_stat_1_008: motorcycle / car / pickup — the title-loan collateral classes), '+
-    'trailing-12-month sums'+(win?` (${win[0]}–${win[1]})`:'')+'. '+
-    '<b>Region is the honest grain</b>: per-province transfer/deregistration ratios are confounded by central metropolitan registration (the Bangkok-ring provinces read artifactually low, Bangkok high), which regional aggregation cancels. '+
-    'These are single-window <b>levels</b>, not a year-on-year trend. '+
-    '<b>Used-market liquidity</b> = ownership transfers ÷ all registry actions (how easily collateral clears); '+
-    '<b>attrition</b> = permanent deregistrations ÷ all registry actions (the collateral base leaving the fleet).';
-  const maxLiq=Math.max(...rows.map(r=>r.moto.transfer_rate||0),0.0001);
-  const tbl=$('#collflowtbl');
-  if(tbl) tbl.innerHTML=`<tr><th>Region</th><th title="MEASURED — motorcycle ownership transfers as a share of all car-law registry actions; a read on how liquid the used-moto market is (how fast repossessed collateral clears)">Moto used-market liquidity ●</th><th title="MEASURED — motorcycle permanent deregistrations as a share of registry actions; the collateral base leaving the fleet">Moto attrition ●</th><th title="MEASURED — total car-law registration actions for motorcycles in the window (the base)">Moto base ●</th></tr>`+
-    rows.map(r=>{const m=r.moto; const tr=m.transfer_rate||0, dr=m.dereg_rate||0;
-      const dc=dr>=0.01?'var(--agri)':dr>=0.005?'var(--gold)':'var(--merch)';
-      return `<tr><td><b>${TH_REG[r.region]||r.region}</b></td>`+
-        `<td>${barHTML(Math.round(100*tr/maxLiq),'var(--collat)')} <span class="mono">${rp(tr)}</span></td>`+
-        `<td class="mono" style="color:${dc}">${rp(dr)}</td>`+
-        `<td class="mono sub">${num(m.processed)}</td></tr>`;}).join('');
-  wrap.style.display='';
-}
+/* RETIRED 2026-08-02 — renderTruckFlow + renderCollateralFlow. Owner, points 18 and 19: both belong
+   in the collateral section, and they are there now. Trucks are ฿1.84bn of our own book — a collateral
+   class, not a business-backdrop curiosity — so the truck flow is a per-province column on the
+   collateral drill and a row in the mix. The used-vehicle flow is the resale-market table at the foot
+   of the same block. Point 18 also asked whether the flow exists for other vehicle classes: it does
+   (car, pickup, motorcycle) but DLT publishes that one by registration office, so it is REGION grain
+   while the truck flow is per province — both are labelled with their grain rather than blended. */
 
 function renderDbdForm(){
   const wrap=$('#dbdform-wrap'); if(!wrap) return;
@@ -8916,7 +8802,13 @@ function geoDrill(host,cfg){
   }
   function draw(){
     const rows=rowsFor().sort((a,b)=>(Number(b.v[rank])||0)-(Number(a.v[rank])||0));
-    const cols=(ST.lev==='reg'?cfg.cols:(ST.lev==='nat'?cfg.cols.filter(c=>c.lev!=='p'):(cfg.bcols||cfg.cols.filter(c=>c.lev!=='p'))));
+    // `lev` scopes a column to the rows it actually has data for: 'p' = only when PROVINCE rows are
+    // listed, 'r' = only when REGION rows are. Without this a region-only field (a mix share the tape
+    // publishes at region grain but not province grain) would render as a column of em-dashes on the
+    // province list, which reads as missing data rather than as a different grain.
+    const cols=(ST.lev==='reg'?cfg.cols.filter(c=>c.lev!=='r')
+               :(ST.lev==='nat'?cfg.cols.filter(c=>c.lev!=='p')
+               :(cfg.bcols||cfg.cols.filter(c=>c.lev!=='p'&&c.lev!=='r'))));
     const geoLab={nat:'Region',reg:'Province',branch:'Branch'}[ST.lev]||'';
     const crumb=`<nav class="gd-crumb" aria-label="Drill level">`
       +`<button type="button" data-go="nat"${ST.lev==='nat'?' class="on" aria-current="true"':''}>National</button>`
@@ -9069,6 +8961,192 @@ function renderFarmBook(){
       }
     });
     renderFarmCrops(document.getElementById('fb-crops'),j);
+  }).catch(()=>{ host.style.display='none'; });
+}
+
+/* ================= THE COLLATERAL BOOK — one block where there were five =================
+   Owner review, points 8-12, 14, 18 and 19. Five tables scattered across three sections of the tab
+   ("Collateral outlook", "Business & credit backdrop") were all answering one question — what do we
+   lend against, what is it worth, and what is the resale market doing — so they are one block now.
+
+   POINT 14 IS THE ORGANISING PRINCIPLE, AND THE TAPE BACKS IT:
+     "AutoX focuses heavily on pickup and passenger cars. Motorcycles are a secondary focus due to
+      smaller ticket size."
+   Measured: pickup + passenger car = 60.7% of outstanding on 54.0% of accounts. Motorcycles = 33.3%
+   of accounts and 5.8% of the money, AND the worst 90+ rate of any class. Every table here therefore
+   ranks by BAHT; ranking by account count would put the least important class on top — which is
+   exactly what the retired "most motorcycle-heavy provinces" table did.
+
+   ABSORBED: collateral mix (point 12, now the full 8-type mix to 100%), diesel share (point 10, now a
+   province column across all 77), truck fleet (point 18, "why isn't it in the collateral section?" —
+   it is now both a type row and a province column), the used-collateral pulse (point 19, now the
+   resale-market table at the foot), and the brand box (point 8, "I want to know about all the other
+   brands as well" — every brand the tape carries, ranked by outstanding).
+
+   THE HONEST GAP, STATED IN THE UI: the tape crosses vehicle type with REGION, not province. So the
+   per-province split of OUR book by collateral type does not exist and is not estimated — province
+   rows carry our measured totals plus the measured local vehicle population, and the note says so. */
+function renderCollateralBook(){
+  const host=document.getElementById('collat-book'); if(!host) return;
+  tmliFetch('collateral_book').then(j=>{
+    if(!j||!j.national||!j.types){ host.style.display='none'; return; }
+    host.style.display='';
+    const N=j.national, M=j.meta||{};
+    const num=n=>Number(n).toLocaleString('en-US');
+    const bn=v=>'฿'+(v/1e9).toFixed(2)+'bn', mB=v=>v>=1e9?'฿'+(v/1e9).toFixed(2)+'bn':'฿'+Math.round(v/1e6).toLocaleString('en-US')+'m';
+    const B=v=>v==null?'—':'฿'+Math.round(v).toLocaleString('en-US');
+    const core=j.types.filter(t=>t.tier==='core');
+    const pu=j.types.find(t=>t.type==='PU'), mc=j.types.find(t=>t.type==='MC');
+    const mort=j.types.find(t=>t.type==='Mortgage');
+    // The single most load-bearing sentence in the section: the same class is a third of the customers
+    // and a twentieth of the money, and it is also the worst-performing. Say it in one breath.
+    const motoLine=(mc&&pu)
+      ? `<b>Motorcycles are ${mc.n_share_pct}% of accounts but ${mc.os_share_pct}% of the money</b> — and carry the worst 90+ rate of any class at <b style="color:var(--agri)">${mc.dpd90p_pct}%</b> against ${pu.dpd90p_pct}% on pickup. Counting customers and counting baht give opposite answers here; this section counts baht.`
+      : '';
+
+    host.innerHTML=`<h3 class="ovsub collat">Collateral book — what we lend against, and what it is worth
+        <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · real loan tape + DLT</span></h3>
+      <div class="verdict"><b>Pickup and passenger car are ${N.core_share_pct}% of the ${bn(N.os)} book on ${N.core_n_share_pct}% of accounts.</b>
+        ${motoLine}
+        ${mort?`The second-largest class is not a vehicle at all: <b>property/mortgage at ${mort.os_share_pct}%</b> of outstanding on ${mort.n_share_pct}% of accounts, at a ${B(mort.ticket)} ticket.`:''}
+        Across the whole book we lend <b>${N.ltv_proxy_pct}%</b> of assessed collateral value (${B(N.ticket)} outstanding against a ${B(N.eval_avg)} appraisal, per account).
+        <span class="sub">Ranked by outstanding baht at every grain. Ranking by account count would lead with motorcycles.</span></div>
+      <h4 class="fb-h4">The full mix to 100%<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
+      <div id="cb-types"></div>
+      <h4 class="fb-h4">The same book by geography — and the collateral base around it</h4>
+      <div id="cb-drill"></div>
+      <h4 class="fb-h4">Every brand we hold<span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED</span></h4>
+      <div id="cb-brands"></div>
+      <h4 class="fb-h4">The resale market this book recovers into<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h4>
+      <div id="cb-flow"></div>`;
+
+    /* ---- 1. the full mix to 100% (point 12) ---- */
+    const tierTag=t=>t==='core'?`<span class="cb-tier core" title="Owner-stated focus: pickup and passenger car are the core collateral">core</span>`
+      :t==='secondary'?`<span class="cb-tier sec" title="Secondary focus — smaller ticket or smaller book">secondary</span>`
+      :`<span class="cb-tier oth" title="Non-vehicle collateral">other</span>`;
+    const tt=document.getElementById('cb-types');
+    tt.innerHTML=`<div class="tblwrap"><table class="tbl gd-tbl"><tr>
+        <th scope="col">Collateral</th>
+        <th scope="col" class="gd-r" title="MEASURED — outstanding on this collateral type, real loan tape">Outstanding</th>
+        <th scope="col" class="gd-r">% of ฿</th>
+        <th scope="col" class="gd-r" title="Share of ACCOUNTS. Where this differs sharply from the baht share, the class is many small tickets.">% of accts</th>
+        <th scope="col" class="gd-r" title="DERIVED — outstanding per account">Ticket</th>
+        <th scope="col" class="gd-r" title="MEASURED — average appraised collateral value per account">Appraised</th>
+        <th scope="col" class="gd-r" title="DERIVED — outstanding per account ÷ appraised value per account. A proxy: outstanding amortises while the appraisal is struck at origination.">Lent vs value</th>
+        <th scope="col" class="gd-r" title="MEASURED — 90+ days past due, share of accounts">90+</th>
+        <th scope="col" class="gd-r" title="MEASURED — 180+ days, the legacy workout stock held apart from the live book">180+</th>
+      </tr>`+j.types.map(t=>`<tr>
+        <td class="gd-geo"><b>${t.label}</b> ${tierTag(t.tier)}</td>
+        <td class="gd-r">${mB(t.os)}</td>
+        <td class="gd-r"><b>${t.os_share_pct}%</b></td>
+        <td class="gd-r">${t.n_share_pct}%</td>
+        <td class="gd-r">${B(t.ticket)}</td>
+        <td class="gd-r">${B(t.eval_avg)}</td>
+        <td class="gd-r">${t.ltv_proxy_pct==null?'<span class="gd-na">—</span>':t.ltv_proxy_pct+'%'}</td>
+        <td class="gd-r"${t.dpd90p_pct!=null?` style="color:${t.dpd90p_pct>=16?'var(--agri)':t.dpd90p_pct>=13?'var(--gold)':'var(--merch)'}"`:''}>${t.dpd90p_pct==null?'—':t.dpd90p_pct+'%'}</td>
+        <td class="gd-r">${t.late180_pct==null?'—':t.late180_pct+'%'}</td>
+      </tr>`).join('')+`</table></div>
+      <p class="gd-foot">All ${j.types.length} collateral types, summing to 100% of the ${bn(N.os)} book — no top-N slice.
+        Every column is MEASURED from the real loan tape except <b>ticket</b> and <b>lent vs value</b>, which are DERIVED from measured inputs.</p>`;
+
+    /* ---- 2. the geo drill (point 13) ---- */
+    geoDrill(document.getElementById('cb-drill'),{
+      id:'collatbook', data:j, rank:'os',
+      cols:[
+        {k:'os',fmt:'bahtM',lab:'Outstanding',title:'MEASURED — our book here, real loan tape'},
+        {k:'n',fmt:'num',lab:'Accts'},
+        {k:'core_share_pct',fmt:'pct',lab:'Core %',lev:'r',title:'Pickup + passenger car as a share of outstanding. MEASURED at region grain; the tape does not cross collateral type with province.'},
+        {k:'moto_os_share_pct',fmt:'pct',lab:'Moto % ฿',lev:'r',title:'Motorcycle share of outstanding — compare against the account share beside it'},
+        {k:'ticket',fmt:'baht',lab:'Ticket'},
+        {k:'eval_avg',fmt:'baht',lab:'Appraised',title:'MEASURED — average appraised collateral value per account'},
+        {k:'ltv_proxy_pct',fmt:'pct',lab:'Lent vs value'},
+        {k:'diesel_share_pct',fmt:'pct',lab:'Diesel % fleet',lev:'p',title:'MEASURED (DLT) — diesel share of the province car+pickup stock. All 77 provinces, not a top-ten list.'},
+        {k:'electrified_pct',fmt:'pct',lab:'EV+hybrid %',lev:'p',title:'MEASURED (DLT) — BEV+PHEV+hybrid share of the province fleet. The leading indicator for used-value erosion on the diesel collateral we hold.'},
+        {k:'truck_net_flow',fmt:'num',lab:'Truck net',lev:'p',title:'MEASURED (DLT) — 12-month net truck flow (new + transfers − deregistrations) in this province. Trucks are a collateral class in our book, so this belongs here.'},
+        {k:'dpd90p_pct',fmt:'pct',lab:'90+'},
+        {k:'current_pct',fmt:'pct',lab:'Current %',title:'DERIVED — accounts neither in the X-day watch bucket nor 30+ overdue'}
+      ],
+      bcols:[
+        {k:'os',fmt:'bahtM',lab:'Outstanding'},
+        {k:'n',fmt:'num',lab:'Accts'},
+        {k:'ticket',fmt:'baht',lab:'Ticket'},
+        {k:'eval_avg',fmt:'baht',lab:'Appraised'},
+        {k:'ltv_proxy_pct',fmt:'pct',lab:'Lent vs value'},
+        {k:'dpd90p_pct',fmt:'pct',lab:'90+'},
+        {k:'late180_pct',fmt:'pct',lab:'180+'},
+        {k:'current_pct',fmt:'pct',lab:'Current %'},
+        {k:'fleet_est',fmt:'num',lab:'Vehicles ≤10km',title:'ESTIMATED — the province vehicle stock allocated to this branch’s 10km catchment by population share. The size of the local collateral pool, not its mix (the mix is identical for every branch in a province, so it is not shown per branch).'}
+      ],
+      natCols:[{k:'os',fmt:'bahtM',lab:'Book '},{k:'n',fmt:'num',lab:'Accounts '},
+               {k:'ticket',fmt:'baht',lab:'Ticket '},{k:'eval_avg',fmt:'baht',lab:'Appraised '},
+               {k:'ltv_proxy_pct',fmt:'pct',lab:'Lent vs value '},{k:'dpd90p_pct',fmt:'pct',lab:'90+ '}],
+      foot:'ranked by outstanding at every level',
+      act:(ST,rows)=>{
+        if(ST.lev==='nat') return `<b>Read this by money, not by count.</b> The region with the most accounts is not the region with the most book, and the province columns are the collateral BASE around our branches — fleet, diesel share, EV share, truck flow — all MEASURED across all 77 provinces.`;
+        if(ST.lev==='reg'){
+          const r=(j.regions||{})[ST.reg]||{};
+          return `<b>${ST.reg}</b> holds ${mB(r.os||0)} across ${num(r.n||0)} accounts. Pickup + passenger car are <b>${r.core_share_pct}%</b> of that money; motorcycles are ${r.moto_os_share_pct}% of the money on ${r.moto_n_share_pct}% of the accounts. `
+            +`<span class="sub">The tape crosses collateral type with region, not province — so the province rows below carry our measured totals and the measured local vehicle population, and do not split our book by type. That split is an outstanding ask on the next export.</span>`;
+        }
+        const p=(j.provinces||{})[ST.prov]||{};
+        if(!rows.length) return `<b>${ST.prov}</b> holds ${mB(p.os||0)} but has no branch rows in the tape's branch join.`;
+        const os=rows.reduce((s,r)=>s+(r.v.os||0),0);
+        const hi=rows.filter(r=>(r.v.ltv_proxy_pct||0)>=60).length;
+        return `<b>${ST.prov}</b>: ${mB(os)} across ${rows.length} branches. `
+          +(p.diesel_share_pct!=null?`Diesel is <b>${p.diesel_share_pct}%</b> of the local car+pickup fleet and EV+hybrid is ${p.electrified_pct}% — `:'')
+          +(hi?`<b>${hi} branch${hi===1?'':'es'}</b> lend 60%+ of assessed collateral value here, which is where a resale-value fall bites first.`
+              :`no branch here lends 60%+ of assessed collateral value.`);
+      },
+      bfoot:()=>`branch rows are MEASURED book totals; “Vehicles ≤10km” is ESTIMATED (province stock allocated by catchment population)`
+    });
+
+    /* ---- 3. every brand (point 8) ---- */
+    const bt=document.getElementById('cb-brands'), BR=j.brand_book||[];
+    if(BR.length){
+      const dlt=j.brand_mix||{};
+      bt.innerHTML=`<div class="tblwrap gd-wrap"><table class="tbl gd-tbl"><tr>
+          <th scope="col">Brand on the title</th>
+          <th scope="col" class="gd-r">Outstanding</th><th scope="col" class="gd-r">% of ฿</th>
+          <th scope="col" class="gd-r">Accts</th><th scope="col" class="gd-r">Ticket</th>
+          <th scope="col" class="gd-r">Appraised</th><th scope="col" class="gd-r">Lent vs value</th>
+          <th scope="col" class="gd-r">90+</th><th scope="col" class="gd-r">180+</th></tr>`
+        +BR.map(b=>`<tr><td class="gd-geo"><b>${b.brand}</b></td>
+          <td class="gd-r">${mB(b.os)}</td><td class="gd-r">${b.os_share_pct}%</td>
+          <td class="gd-r">${num(b.n)}</td><td class="gd-r">${B(b.ticket)}</td>
+          <td class="gd-r">${B(b.eval_avg)}</td>
+          <td class="gd-r">${b.ltv_proxy_pct==null?'<span class="gd-na">—</span>':b.ltv_proxy_pct+'%'}</td>
+          <td class="gd-r"${b.dpd90p_pct!=null?` style="color:${b.dpd90p_pct>=16?'var(--agri)':b.dpd90p_pct>=13?'var(--gold)':'var(--merch)'}"`:''}>${b.dpd90p_pct==null?'—':b.dpd90p_pct+'%'}</td>
+          <td class="gd-r">${b.late180_pct==null?'—':b.late180_pct+'%'}</td></tr>`).join('')
+        +`</table></div>
+        <p class="gd-foot">All ${BR.length} brands the tape carries, ranked by outstanding — not a top-four tile row.
+          This is what WE hold${dlt.vintage_be?`; what the COUNTRY buys new is a different question, answered by the DLT first-registration mix (${dlt.vintage_ce||dlt.vintage_be})`:''}.
+          Every column MEASURED except ticket and lent-vs-value, which are DERIVED.</p>`;
+    } else { bt.style.display='none'; }
+
+    /* ---- 4. the resale market (point 19) ---- */
+    const ft=document.getElementById('cb-flow'), FL=j.used_flow||[];
+    if(FL.length){
+      const pc=v=>v==null?'<span class="gd-na">—</span>':(100*v).toFixed(1)+'%';
+      ft.innerHTML=`<div class="tblwrap"><table class="tbl gd-tbl"><tr>
+          <th scope="col">Region</th>
+          <th scope="col" class="gd-r" title="Ownership transfers as a share of registrations processed — how liquid the second-hand market is">Transfer rate · all</th>
+          <th scope="col" class="gd-r">Car</th><th scope="col" class="gd-r">Pickup</th><th scope="col" class="gd-r">Moto</th>
+          <th scope="col" class="gd-r" title="Permanent deregistrations as a share of registrations processed — vehicles leaving the fleet for good">Dereg · car</th>
+          <th scope="col" class="gd-r">Dereg · pickup</th><th scope="col" class="gd-r">Dereg · moto</th></tr>`
+        +FL.map(r=>`<tr><td class="gd-geo"><b>${r.region}</b></td>
+          <td class="gd-r">${pc(r.all&&r.all.transfer_rate)}</td>
+          <td class="gd-r">${pc(r.car&&r.car.transfer_rate)}</td>
+          <td class="gd-r">${pc(r.pickup&&r.pickup.transfer_rate)}</td>
+          <td class="gd-r">${pc(r.moto&&r.moto.transfer_rate)}</td>
+          <td class="gd-r">${pc(r.car&&r.car.dereg_rate)}</td>
+          <td class="gd-r">${pc(r.pickup&&r.pickup.dereg_rate)}</td>
+          <td class="gd-r">${pc(r.moto&&r.moto.dereg_rate)}</td></tr>`).join('')
+        +`</table></div>
+        <p class="gd-foot">MEASURED (DLT registrations). A <b>transfer</b> is a used vehicle changing hands — the deeper that market, the faster an enforced title converts to cash.
+          A <b>deregistration</b> is a vehicle leaving the fleet permanently, which is the collateral pool shrinking.
+          Motorcycles deregister at several times the rate of cars and pickups everywhere, which is the mechanism behind their weaker recovery.
+          Region grain: DLT publishes this flow by registration office, not by province.</p>`;
+    } else { ft.style.display='none'; }
   }).catch(()=>{ host.style.display='none'; });
 }
 
