@@ -363,9 +363,7 @@
       <a class="chip" href="#overview" data-jump="sec-ov-macro">Conditions &amp; commodities</a>
       <a class="chip" href="#overview" data-jump="sec-ov-agri">Farm households</a>
       <a class="chip" href="#overview" data-jump="sec-ov-collateral">Collateral value</a>
-      <a class="chip" href="#overview" data-jump="sec-ov-labour">Labour &amp; debt</a>
-      <a class="chip" href="#overview" data-jump="sec-ov-business">Business &amp; credit</a>
-      <a class="chip" href="#overview" data-jump="sec-ov-hazard">Live hazard</a>
+      <a class="chip" href="#overview" data-jump="sec-ov-conditions">Conditions at our grain</a>
     </nav>
 
     <div class="ovswitch" id="ovswitch">
@@ -378,8 +376,20 @@
          whitespace — and the narrow rail was forcing the ten macro KPI cards to ~2 per row
          (1,590px of stacked tiles). Full width they auto-fit ~9 per row (~340px). Reading order is
          now headline KPIs → commodity board → IMF backdrop (context last). -->
+        <!-- COMPACT SINCE 2026-08-02 (owner review, point 7): "this will be seen once and never
+             looked at again as it's the least dynamic. I think it can take up less space somewhere."
+             The ten-to-thirteen KPI tiles were ~340px wide x ~110px tall each — two full rows of
+             screen before the reader reached anything that changes. They are now a single-line
+             strip (label / value / signed delta, with a sparkline where we hold a series), and the
+             full cards with their sources sit one click away in the <details> below. Nothing is
+             dropped: compactMacro() reads the SAME .mcard nodes the three producers already write,
+             so the strip cannot drift from the cards. -->
         <h3 class="ovsub">Macro overlay — current conditions</h3>
-        <div class="grid macro" id="macro"></div>
+        <div class="mstrip" id="macrostrip" aria-label="Macro indicators, compact"></div>
+        <details class="mfull">
+          <summary>Full detail — every indicator with its period and source</summary>
+          <div class="grid macro" id="macro"></div>
+        </details>
 
         <h3 class="ovsub">Commodity board — the segments diverge</h3>
         <div class="insight" id="ov-keyread">
@@ -501,84 +511,55 @@
     <div class="grid macro" id="recovery-cards"></div>
     <table class="tbl" id="recoverytbl"></table>
 
-    <h3 class="ovsub collat">EV transition · used-collateral value watch <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h3>
-    <p class="lead" id="ev-note"></p>
-    <div class="grid macro" id="ev-cards"></div>
-    <table class="tbl" id="evtbl"></table>
+    <!-- MOVED 2026-08-02 to the "Conditions at our grain" drill below (owner point 15: "very good
+         data, just presentation should be better. Always think of the roll-up mentioned in point
+         13."). The EV table was a national top-ten of provinces by BEV share, disconnected from any
+         book. It is now the "Vehicles & EV" lens on the four-level drill — every province, rolled
+         into regions and a national row, ranked by OUR outstanding, with lent-vs-value in the same
+         table. That is what makes electrification a collateral question rather than a statistic:
+         Central & Bangkok is 4.63% electrified against Isan's 0.90%, and Central is also where our
+         tickets are largest. -->
     </details>
 
-    <details class="ovsec" id="sec-ov-labour">
-    <summary><h2 class="opp">Labour &amp; household debt</h2><span class="ovsec-what">NSO province labour-force stress, BoT regional household debt</span></summary>
+    <details class="ovsec" id="sec-ov-conditions">
+    <summary><h2 class="opp">Conditions at our grain — labour, vehicles, hazard, business, debt</h2><span class="ovsec-what">One four-level drill: national → region → province → branch, all provinces, ranked by our outstanding</span></summary>
 
-    <!-- Provincial labour stress (data/province_lfs.json) — MEASURED NSO LFS 2026 Q1, all 77 provinces
-         (obj #1). Headline unemployment is uniformly low in Thailand, so the discriminator is the
-         seasonal-waiting share (agri off-season idle labour) that marks where borrower cash-flow is
-         most seasonal. Rendered by renderProvinceLfs(); hidden gracefully until the layer loads. -->
-    <div id="lfs-wrap" style="display:none">
-      <h3 class="ovsub risk">Provincial labour stress <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · NSO LFS 2026 Q1</span></h3>
-      <p class="lead" id="lfs-note"></p>
-      <table class="tbl" id="lfstbl"></table>
-    </div>
-    <!-- Regional household-debt backdrop (data/region_debt.json) — MEASURED Bank of Thailand regional
-         letters over NSO SES (obj #1). Household leverage is a direct portfolio-risk backdrop: where
-         borrower households carry the most debt, an income shock bites soonest. BoT publishes no routine
-         province table, so region is the honest grain; the debt-per-household cut is the most recent
-         common vintage (SES 2566/2023). Rendered by renderRegionDebt(); hidden gracefully until load. -->
-    <div id="regdebt-wrap" style="display:none">
-      <h3 class="ovsub risk">Regional household-debt backdrop <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · BoT over NSO SES</span></h3>
-      <div class="verdict" id="regdebt-verdict" style="display:none"></div>
-      <p class="lead" id="regdebt-note"></p>
-      <table class="tbl" id="regdebttbl"></table>
-    </div>
-    </details>
+    <!-- FIVE SECTIONS BECAME ONE, 2026-08-02. Retired here and rebuilt as lenses on a single
+         geo drill (renderMacroBook / build_macro_book.py):
+           * "Labour & household debt"   -> Labour lens (point 16) + Household debt lens (point 17)
+           * "Business & credit backdrop"-> Business formation lens (point 20); the state-bank NPL
+                                            table is now the sparkline in this block's header (21)
+           * "Live hazard - flood & rain"-> Hazard lens, now carrying DROUGHT beside flood (22)
+           * the EV table, from Collateral above -> Vehicles & EV lens (15)
 
-    <details class="ovsec" id="sec-ov-business">
-    <summary><h2 class="opp">Business &amp; credit backdrop</h2><span class="ovsec-what">DBD business formation, FPO state-bank NPL</span></summary>
+         The owner's comments on all five were versions of one comment. Point 16: "What value does
+         this have?" Point 17: "what do we get out of it if its only regional level? We have more
+         granular datasets no?" Point 20: "Follow point 13 for format of data drilldowns." Point 21:
+         "This can be a small graph somewhere, doesn't need its own section." Point 22: "This entire
+         section can be made into small graphs or a combined table... Hazard should also include
+         draught."
 
-    <!-- MOVED 2026-08-02 into the Collateral section (owner points 18 + 19: "why isn't it in the
-         collateral section?" / "This too should be in the collateral section no?"). The truck-fleet
-         flow is now a per-province column on the collateral drill (all 77) plus a truck row in the
-         collateral mix — trucks are ฿1.84bn of our own book, so they are a collateral class, not a
-         business-backdrop curiosity. The used-collateral flow is the resale-market table at the foot
-         of that block. Point 18 also asked whether we have the flow for other vehicle classes: we do
-         — car, pickup and motorcycle — but DLT publishes that one by registration office, so it is
-         REGION grain, while the truck flow is per province. Both are labelled with their grain. -->
-    <div id="dbdform-wrap" style="display:none">
-      <h3 class="ovsub risk">Business-formation pulse · small-business borrower base <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED · DBD registry</span></h3>
-      <div class="verdict" id="dbdform-verdict" style="display:none"></div>
-      <p class="lead" id="dbdform-note"></p>
-      <table class="tbl" id="dbdformtbl"></table>
-    </div>
-    <!-- SFI system credit-quality backdrop (data/sfi_credit.json) — MEASURED quarterly NPL ratio of
-         Thailand's Specialized Financial Institutions (GSB/BAAC/GHB/SME/EXIM/Islamic Bank), from the
-         FPO open-data aggregates. Obj #1 leading-indicator BACKDROP: GSB (household) + BAAC (rural/agri)
-         system NPL is the closest public read on the repayment stress AutoX's borrowers sit inside — a
-         macro tide, NOT AutoX's own book and NOT per-province. Rendered by renderSfi(); hidden until the
-         layer loads. -->
-    <div id="sfi-wrap" style="display:none">
-      <h3 class="ovsub risk">Credit-quality backdrop · state-bank system NPL <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED · FPO / SFI aggregates</span></h3>
-      <div class="verdict" id="sfi-verdict" style="display:none"></div>
-      <p class="lead" id="sfi-note"></p>
-      <table class="tbl" id="sfitbl"></table>
-    </div>
-    </details>
+         What they had in common: each table was pinned at whatever grain its own source publishes
+         at, and none of them sat next to our book. A province unemployment rate is a statistic; the
+         same rate beside the baht we have lent into that province is an exposure. So every lens
+         leads with our measured outstanding and rolls up national -> region -> province -> branch.
 
-    <details class="ovsec" id="sec-ov-hazard">
-    <summary><h2 class="opp">Live hazard — flood &amp; rain</h2><span class="ovsec-what">ThaiWater live river/reservoir level and 24h rainfall</span></summary>
+         On point 17 specifically: there is no province household-debt table to find. The BoT
+         publishes none, and the per-household figures trace to the 2019 socio-economic survey. The
+         debt lens says that in the table rather than spreading a regional number across provinces
+         it was never measured at - and puts OUR measured ticket and arrears, which do go to branch
+         level, in the same rows. -->
+    <div id="macro-book"></div>
 
-    <!-- Live flood + rain pulse (data/thaiwater_flood.json + thaiwater_rain.json) — MEASURED live
-         ThaiWater telemetry (keyless api-v3.thaiwater.net; refreshed daily by data-thaiwater.yml).
-         The ACUTE obj-#1 counterpart to the slower crop-stress drought read: water on the ground /
-         arriving is an immediate collections + collateral event, days before it shows in any monthly
-         series. Two station-aggregate reads — river/reservoir water LEVEL (flood) and 24h RAINFALL —
-         per province. Rendered by renderThaiwater(); hidden gracefully until BOTH layers load. -->
-    <div id="thaiwater-wrap" style="display:none">
-      <h3 class="ovsub risk">Live flood &amp; rain pulse <span class="tag" style="color:var(--accent);border:1px solid var(--accent)">MEASURED · ThaiWater (live)</span></h3>
+    <!-- The live 24h RAIN pulse is kept (it is same-day telemetry and genuinely "nice to know", in
+         the owner's words) but demoted out of its own section: the flood and drought columns that
+         drive decisions are in the drill above. -->
+    <details id="thaiwater-wrap" class="mfull" style="display:none">
+      <summary>Live 24-hour rainfall by province · measured ThaiWater telemetry</summary>
       <div class="verdict v-warn" id="thaiwater-verdict" style="display:none"></div>
       <p class="lead" id="thaiwater-note"></p>
-      <div class="tblwrap" role="region" tabindex="0" aria-label="Scrollable table: Live flood pulse"><table class="tbl" id="thaiwater-flood-tbl"></table></div>
-      <div class="tblwrap" style="margin-top:10px" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
-    </div>
+      <div class="tblwrap" role="region" tabindex="0" aria-label="Scrollable table: Live rain pulse"><table class="tbl" id="thaiwater-rain-tbl"></table></div>
+    </details>
     </details>
     </div><!-- /.ovswitch -->
 

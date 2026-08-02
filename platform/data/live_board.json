@@ -201,7 +201,7 @@
    "stamp_iso": "2026-08-01",
    "stamp_kind": "pulled",
    "unit": "stations",
-   "value": 4391,
+   "value": 4388,
    "what": "live rain telemetry behind the farm book — the early half of drought and flood"
   },
   {
@@ -224,8 +224,8 @@
    "stamp": "2026-08-01",
    "stamp_iso": "2026-08-01",
    "stamp_kind": "pulled",
-   "unit": "of 798",
-   "value": 134,
+   "unit": "of 795",
+   "value": 133,
    "what": "branches whose catchment is flooding now — collateral and collection both stop"
   },
   {
@@ -281,9 +281,9 @@
    "key": "macro_indicators",
    "label": "Household debt",
    "measured": true,
-   "source": "BIS Statistics (stats.bis.org, household debt + policy rate) + World Bank (api.worldbank.org, CPI/lending rate/FX). Keyless, cloud-reachable; BOT's own API is geoblocked (laptop-on",
-   "stamp": "2026-07-27",
-   "stamp_iso": "2026-07-27",
+   "source": "BIS Statistics (stats.bis.org, household debt + policy rate) + World Bank (api.worldbank.org, CPI + lending rate) + ECB daily reference rates via Frankfurter (api.frankfurter.dev, ",
+   "stamp": "2026-08-02",
+   "stamp_iso": "2026-08-02",
    "stamp_kind": "pulled",
    "unit": "% GDP",
    "value": 87.5,

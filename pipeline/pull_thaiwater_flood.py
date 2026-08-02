@@ -23,6 +23,9 @@ Network puller (live telemetry snapshot) — NOT in the determinism gate, same c
 """
 import argparse, json, os, sys, time, urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.regionmap import REGION
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "platform", "data", "thaiwater_flood.json")
 URL = "https://api-v3.thaiwater.net/api/v1/thaiwater30/public/waterlevel_load"
@@ -50,12 +53,23 @@ def main():
     if len(rows) < 300:
         sys.exit("pull_thaiwater_flood.py: only %d stations — likely truncated; not writing." % len(rows))
     prov = {}
+    foreign = {}
     latest_dt = ""
     for r in rows:
         g = r.get("geocode") or {}
         p = ((g.get("province_name") or {}).get("th") or "").strip()
         lvl = r.get("situation_level")
         if not p or not isinstance(lvl, int):
+            continue
+        # ThaiWater's network reaches upstream onto the shared Salween/Mekong systems, so a handful
+        # of stations geocode to a NEIGHBOURING COUNTRY, not a Thai province. They arrived filed
+        # under "สาธารณรัฐแห่งสหภาพเมียนมา" and every consumer treated that string as a province:
+        # the Overview card ranked it 2nd on the 24h-rainfall table, and it padded the "N provinces
+        # at high water" count by one. Gate on the canonical 77-province registry — an unknown key
+        # is counted out loud in meta.foreign_dropped rather than silently discarded, because a
+        # Thai province that ever failed this test would otherwise vanish without a trace.
+        if p not in REGION:
+            foreign[p] = foreign.get(p, 0) + 1
             continue
         latest_dt = max(latest_dt, r.get("waterlevel_datetime") or "")
         e = prov.setdefault(p, {"n": 0, "high": 0, "max_level": 0})
@@ -83,6 +97,8 @@ def main():
             "observed_to": latest_dt,
             "n_stations": sum(v["n_stations"] for v in out.values()),
             "n_provinces": len(out),
+            # Stations the feed geocoded outside Thailand, kept visible so the drop is auditable.
+            "foreign_dropped": {k: foreign[k] for k in sorted(foreign)},
             "levels": {"1": "critical low", "2": "low", "3": "normal", "4": "high water", "5": "bank overflow (flood)"},
         },
         "provinces": {k: out[k] for k in sorted(out)},

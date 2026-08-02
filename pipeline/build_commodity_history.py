@@ -135,11 +135,11 @@ def refresh():
             "n_series": len(series),
             "unmatched": unmatched if unmatched else None,
             "unmatched_note": (
-                "These WB_COMMODITIES labels have no exact header match in this sheet vintage "
-                "(e.g. the dict's 'Fishmeal' vs the sheet's actual header 'Fish meal') — the SAME "
-                "series autox_enrich_loop.py's stage_commodities() also misses today. Not silently "
-                "fixed here, to keep the header-matching contract byte-identical between the two "
-                "scripts; fixing the WB_COMMODITIES key is a separate, deliberate change."
+                "These WB_COMMODITIES labels have no exact header match in this sheet vintage. "
+                "The contract is deliberately byte-identical to autox_enrich_loop.py's "
+                "stage_commodities(), so a key is fixed in BOTH scripts or neither. ('Fishmeal' -> "
+                "'Fish meal' was fixed that way on 2026-08-02, verified against the live sheet's "
+                "row-5 header, which restored fishmeal's 60-month series to the commodities board.)"
             ) if unmatched else None,
         },
         "series": series,

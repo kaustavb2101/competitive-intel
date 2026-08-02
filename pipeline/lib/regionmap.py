@@ -29,7 +29,8 @@ ISO={ 'TH-10':'กรุงเทพมหานคร','TH-11':'สมุทร
  'TH-93':'พัทลุง','TH-94':'ปัตตานี','TH-95':'ยะลา','TH-96':'นราธิวาส'}
 ALIAS={'Lamphun':'ลำพูน','Samut Prakan':'สมุทรปราการ','Chaiyaphum':'ชัยภูมิ',
  'Prachuap Khiri Khan':'ประจวบคีรีขันธ์',
- 'สุราษฏร์ธานี':'สุราษฎร์ธานี'}   # ฏ→ฎ spelling variant seen in NSO data
+ 'สุราษฏร์ธานี':'สุราษฎร์ธานี',   # ฏ→ฎ spelling variant seen in NSO data
+ 'อยุธยา':'พระนครศรีอยุธยา'}      # everyday short form; OAE files the napprang crop under it
 # fallback for blank province strings: resolve by the (canonical) amphoe in the record
 DISTRICT_PROV={'ไชโย':'อ่างทอง','ลำปลายมาศ':'บุรีรัมย์','ลำลูกกา':'ปทุมธานี',
  'ลานสัก':'อุทัยธานี','เมืองร้อยเอ็ด':'ร้อยเอ็ด'}

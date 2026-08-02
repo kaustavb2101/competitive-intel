@@ -59,6 +59,33 @@ HA_TO_RAI = 6.25          # DOAE and SPAM publish hectares; the board reports ra
 BOARD_TO_FARMGATE = {"Rice": "rice", "Rubber": "rubber", "Palm oil": "oilpalm",
                      "Maize": "maize", "Cassava": "cassava"}
 
+# board label -> key inside nabc_monthly.json's "products" (source-data/nabc_monthly.json, pulled
+# by pipeline/pull_nabc_monthly.py). Added 2026-08-02. This is a DIFFERENT NABC endpoint family
+# from nabc_prices.json/NABC_ROWS below (/api/monthly-prices vs /api/daily-prices) — durian and
+# rambutan have no daily-feed presence at all, so this is checked FIRST in the local-price
+# precedence in build() and nothing else (BOARD_TO_NABC, NABC_ROWS) points at any label in here,
+# so the stale daily "ลำไย" line (dropped by nabc_locals() below, see NABC_STALE_DAYS) can never
+# shadow Longan structurally — not just because it happens to be stale today.
+BOARD_TO_MONTHLY = {
+    "Durian": "durian",
+    "Rambutan": "rambutan",
+    # Longan: NABC monthly carries two grades, เกรด A and เกรด AA (both kept in nabc_monthly.json).
+    # Grade A is picked for the board's single row — it is the higher-volume COMMERCIAL grade (AA
+    # is the smaller export-premium grade); averaging the two would invent a synthetic product
+    # neither buyer actually trades. See source-data/nabc_monthly.json meta for both series.
+    "Longan": "longan_a",
+    # BEEF, added 2026-08-02 — and unlike the three above, this label is NOT monthly-only: Beef is a
+    # long-standing Pink Sheet row that simply had no Thai counterpart, so it ran on the world index
+    # alone. That was materially misleading rather than merely thin. The world beef index is +11.8%;
+    # measured Thai crossbred cattle are -6.1% same-month YoY and -40% off their 2022-12 peak
+    # (฿34,688 -> ฿20,719 per head). The board was showing 136,293 book accounts in a 24-province
+    # belt against a rising number while the farmers in it were four years into a slide, and the
+    # belt drill's two income columns sat empty because the income engine will not pass a WORLD
+    # price into a Thai household's income — correctly, but silently. Now it has a Thai price.
+    # NOTE the unit: บาท/ตัว, per HEAD. Every other series on this feed is บาท/กก.
+    "Beef": "beef",
+}
+
 # board label → (area source id, key inside that source). Pinned per crop on purpose; see the
 # module docstring for why the newest source is NOT preferred everywhere.
 BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
@@ -71,7 +98,44 @@ BOARD_TO_AREA = {"Rice": ("census", "rice"), "Rubber": ("census", "rubber"),
                  # Sugar moved off the SPAM-2010 raster onto OCSB's own measured returns on
                  # 2026-08-01. Cane is the ONE crop where the pinned source is not a choice between
                  # census and registry — OCSB is the register of record for every cane grower.
-                 "Sugar": ("ocsb", "sugarcane")}
+                 "Sugar": ("ocsb", "sugarcane"),
+                 # Lime, added 2026-08-02. Not in the DOAE farmer registry (18 crops, no มะนาว) or
+                 # any other province source held here — the only belt that exists for it anywhere
+                 # is DOAE's own 2019 "รต." crop-situation PDF series (ingest_doae_fruit.py). Old
+                 # vintage, but the alternative was no belt at all for a row that already prices.
+                 "Lime": ("doae_rt", "lime"),
+                 # Durian / Longan / Rambutan, added 2026-08-02 alongside BOARD_TO_MONTHLY above.
+                 # Same doae_rt PDF series as Lime — already carries these three crops on disk
+                 # (source-data/doae_fruit_area.json), just not wired to a board row until now.
+                 "Durian": ("doae_rt", "durian"), "Longan": ("doae_rt", "longan"),
+                 "Rambutan": ("doae_rt", "rambutan"),
+                 # NON-CROP ROWS, added 2026-08-02 (owner: "i want the 'book exposed' data for all
+                 # the commods meaning you need to find out where the belts of these commods are").
+                 # A belt does not have to be planted area — it has to be the measured geography of
+                 # the livelihood the price reaches. Each of these pins a different measure and the
+                 # row says which, rather than calling everything "planted area".
+                 "White shrimp": ("dof", "shrimp_marine"),
+                 "Fishmeal": ("dof", "fishmeal"),
+                 # Both timber rows point at the SAME belt on purpose: the plantation register is
+                 # where trees are legally grown for harvest, and logs and sawnwood are the same
+                 # standing timber at two points of the same chain. Reserve forest (ป่าสงวนแห่งชาติ)
+                 # was rejected as the source — protected area is where logging does NOT happen, so
+                 # it would have inverted the signal.
+                 "Logs": ("rfd", "plantation"),
+                 "Sawnwood": ("rfd", "plantation"),
+                 # Livestock, added 2026-08-02. DLD runs its own CKAN (dld.gdcatalog.go.th) which is
+                 # NOT geoblocked — the same pattern as DIW and DLT — so these are structured CSV
+                 # exports at 77/77 provinces, not OCR'd PDFs. Belt measure is herd/flock size.
+                 "Pork": ("dld", "pig"),
+                 "Chicken": ("dld", "chicken_all"),
+                 "Beef": ("dld", "cattle_beef"),
+                 # EGGS rides the SAME combined chicken flock as Chicken, on the owner's call
+                 # ("for eggs, chicken or whatever group is fine for a belt"). DLD's national
+                 # release reports จำนวนไก่ as ALL chicken types combined — no layer-vs-broiler
+                 # split at province grain — so this belt says "where chickens are", not "where
+                 # LAYING chickens are". The two overlap heavily (ลพบุรี/ชลบุรี/นครนายก run both)
+                 # but they are not identical, and the caveat is carried on the row.
+                 "Eggs": ("dld", "chicken_all")}
 
 AREA_SOURCES = {
     "census": {
@@ -94,6 +158,73 @@ AREA_SOURCES = {
                 "sample. It is the register of record for Thai cane: growers register with OCSB, "
                 "not DOAE, which is why cane is absent from the farmer registry entirely.",
     },
+    "doae_rt": {
+        "provenance": "MEASURED",
+        "source": "DOAE annual crop-situation ('รต.') report, year 2562 BE / 2019 CE "
+                  "(source-data/doae_fruit_area.json)",
+        "measure": {"lime": "planted area", "durian": "planted area", "longan": "planted area",
+                    "rambutan": "planted area"},
+        "unit": {"lime": "rai", "durian": "rai", "longan": "rai", "rambutan": "rai"},
+        "note": "2019 vintage — seven years old, prominently so. Originally added for lime, the "
+                "ONLY province-grain lime source that exists anywhere, confirmed across four "
+                "independent searches: absent from the DOAE farmer registry, the planted-area "
+                "census, SPAM 2010 and OCSB alike. Durian/longan/rambutan (added 2026-08-02 for "
+                "the NABC monthly board rows — see BOARD_TO_MONTHLY) reuse the SAME PDF series, "
+                "which is likewise the only province-grain source held for those three. The DOAE "
+                "site's own รต. series stops at this year — year64/65/67 404, and later years "
+                "carry an unrelated document set or sit behind a login. An old belt names the "
+                "same growing region a fresh one would; it is the account count next to it that "
+                "would go stale first, and there is no newer figure to replace it with.",
+    },
+    # --- non-crop belts (2026-08-02) ---------------------------------------------------------
+    # These two do NOT measure planted area, so each carries its own `measure` + `unit`, and the
+    # exposure block quotes them instead of hardcoding "planted area". Calling a shrimp pond or a
+    # tonne of fishmeal "planted area" would be a mislabel, and every number on this site has to
+    # say what it actually is.
+    "dof": {
+        "provenance": "MEASURED",
+        "source": "Department of Fisheries aquaculture + fishmeal releases, newest year in the "
+                  "data (source-data/livelihood_area.json)",
+        "measure": {"shrimp_marine": "marine-shrimp farm area",
+                    "fishmeal": "fishmeal output"},
+        "unit": {"shrimp_marine": "rai", "fishmeal": "tonnes"},
+        "note": "DOF publishes farms, area, volume and value per province per year. Marine shrimp "
+                "uses FARM AREA, the direct analogue of planted area. Fishmeal has no farm area to "
+                "report — it is a processing industry — so its belt is built on OUTPUT VOLUME, and "
+                "the borrower behind a fishmeal price is the operator and the boats supplying it, "
+                "not a grower.",
+    },
+    "rfd": {
+        "provenance": "MEASURED",
+        "source": "Royal Forest Department register of commercial forest plantations under the "
+                  "Forest Plantation Act B.E. 2535 (source-data/livelihood_area.json)",
+        "measure": {"plantation": "registered plantation area"},
+        "unit": {"plantation": "rai"},
+        "note": "Land registered for commercial timber growing — where trees are legally grown to "
+                "be harvested, across all 77 provinces. Deliberately NOT the reserve-forest layer "
+                "(ป่าสงวนแห่งชาติ, 66 provinces): protected forest is where logging does not "
+                "happen, so ranking provinces by it would have inverted the signal.",
+    },
+    "dld": {
+        "provenance": "MEASURED",
+        "source": "Department of Livestock Development province census, CE 2025 "
+                  "(source-data/livestock_province.json, via dld.gdcatalog.go.th)",
+        "measure": {"pig": "pig keepers", "chicken_all": "chicken keepers",
+                    "cattle_beef": "beef-cattle keepers"},
+        "unit": {"pig": "farms", "chicken_all": "farms", "cattle_beef": "farms"},
+        "note": "Counted per province by the provincial livestock offices, all 77 covered. "
+                "Structured CSV from DLD's own catalog — no OCR, so no digit-transcription risk. "
+                "The belt ranks on KEEPERS, not on animals: DLD publishes both, and for a lender "
+                "the keeper count is the borrower population. Head counts point at the industrial "
+                "provinces — ลพบุรี holds 58.7m chickens across 18,916 keepers, 3,106 birds each, "
+                "which is contract production, not a customer base — so a head-ranked belt would "
+                "aim at exactly the provinces that do not borrow. Head is carried in the source "
+                "file for reference: nationally 12.2m pigs, 517m chickens, 9.5m beef cattle. "
+                "CAVEAT on eggs: DLD reports จำนวนไก่ as ALL chicken types combined, so the egg row "
+                "and the chicken row share one belt — it locates where chicken keepers are, not "
+                "where LAYER keepers are. The layer-vs-broiler split exists only in nine "
+                "regional-office publications on unstable subsites.",
+    },
     "spam": {
         "provenance": "MODELLED",
         "source": "IFPRI/MapSPAM 2010 v2.0 (platform/data/crop_landuse.json)",
@@ -110,6 +241,20 @@ AREA_SOURCES = {
 LOCAL_ONLY = [
     {"lab": "Cassava", "seg": "Crops", "reg": "Isan·N·E",
      "note": "no World Bank series — Thai farm-gate only"},
+]
+
+# Durian / Longan / Rambutan, added 2026-08-02. Same LOCAL_ONLY reasoning as Cassava above (no
+# World Bank Pink Sheet series — these are not globally-traded index commodities) but priced off
+# the NABC MONTHLY feed (BOARD_TO_MONTHLY) rather than farmgate_prices, so kept as its own list
+# rather than folded into LOCAL_ONLY.
+MONTHLY_ONLY = [
+    {"lab": "Durian", "seg": "Crops", "reg": "E·S",
+     "note": "no World Bank series — Thai NABC monthly only"},
+    {"lab": "Longan", "seg": "Crops", "reg": "N",
+     "note": "no World Bank series — Thai NABC monthly only; Grade A of two grades pulled, see "
+             "BOARD_TO_MONTHLY"},
+    {"lab": "Rambutan", "seg": "Crops", "reg": "S·E",
+     "note": "no World Bank series — Thai NABC monthly only"},
 ]
 
 # NABC categories the Pink Sheet cannot cover and build_farmgate_prices.py deliberately drops.
@@ -194,7 +339,59 @@ def area_tables(area_census):
     cane = {pv: rec["area_rai"] for pv, rec in load(S, "ocsb_cane.json")["provinces"].items()
             if pv in REGION and rec.get("area_rai", 0) > 0}
 
-    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane}}
+    # Fisheries + forestry (livelihood_area.json, written by the owner-side ingest). Absent file =
+    # those board rows keep the empty belt they have today, rather than the build failing — the
+    # ingest reads a gitignored harvest, so a fresh clone legitimately will not have it yet.
+    dof, rfd = {}, {}
+    try:
+        liv = load(S, "livelihood_area.json")
+    except (FileNotFoundError, ValueError):
+        liv = {}
+    for grp, dest in (("fisheries", dof), ("forestry", rfd)):
+        for key, lay in (liv.get(grp) or {}).items():
+            tbl = {pv: v for pv, v in (lay.get("provinces") or {}).items()
+                   if pv in REGION and isinstance(v, (int, float)) and v > 0}
+            if tbl:
+                dest[key] = tbl
+
+    # Livestock (livestock_province.json). Same absent-file contract as above. Shape differs from
+    # livelihood_area.json: one flat {"species": {key: {provinces: ..., farms: ...}}} block.
+    #
+    # The belt ranks on FARMS, not on head, and that is a deliberate reversal of what the other
+    # sources do. Everywhere else the area measure and the borrower population move together — a
+    # province with more rai of rubber has more rubber farmers. Livestock breaks that: ลพบุรี runs
+    # 58.7m chickens across 18,916 keepers (3,106 birds each — contract complexes), while
+    # นครราชสีมา runs 24.7m across 155,188 keepers (159 each — backyard flocks). Ranking on head
+    # would point the belt at the industrial provinces, which are precisely the ones that do not
+    # borrow from us. Only 15 provinces are common to both belts for chicken, so the choice is
+    # material rather than cosmetic. Beef is nearly indifferent (5-8 head per keeper nationwide).
+    dld = {}
+    try:
+        lv = load(S, "livestock_province.json")
+    except (FileNotFoundError, ValueError):
+        lv = {}
+    for key, lay in (lv.get("species") or {}).items():
+        tbl = {pv: v for pv, v in (lay.get("farms") or {}).items()
+               if pv in REGION and isinstance(v, (int, float)) and v > 0}
+        if tbl:
+            dld[key] = tbl
+
+    # DOAE รต. crop-situation series (doae_fruit_area.json, owner-side ingest_doae_fruit.py). Same
+    # absent-file contract as dof/rfd/dld above — a fresh clone without the file just keeps Lime's
+    # belt empty rather than failing the build.
+    doae_rt = {}
+    try:
+        frt = load(S, "doae_fruit_area.json")
+    except (FileNotFoundError, ValueError):
+        frt = {}
+    for key, lay in (frt.get("crops") or {}).items():
+        tbl = {pv: v for pv, v in (lay.get("provinces") or {}).items()
+               if pv in REGION and isinstance(v, (int, float)) and v > 0}
+        if tbl:
+            doae_rt[key] = tbl
+
+    return {"census": census, "doae": doae, "spam": spam, "ocsb": {"sugarcane": cane},
+            "dof": dof, "rfd": rfd, "dld": dld, "doae_rt": doae_rt}
 
 
 def ocsb_price():
@@ -237,16 +434,22 @@ def build():
     nabc = load(S, "nabc_prices.json")
     nkept, ndropped = nabc_locals(nabc)
     extra = [dict(spec, _nabc=cat) for cat, spec in NABC_ROWS if cat in nkept]
+    # NABC MONTHLY feed (pull_nabc_monthly.py) — a separate endpoint family from nabc_prices.json
+    # above; see BOARD_TO_MONTHLY. Durian/rambutan/longan have no daily-feed presence at all.
+    mprod = load(S, "nabc_monthly.json").get("products", {})
 
     items = []
-    for it in list(board) + LOCAL_ONLY + extra:
+    for it in list(board) + LOCAL_ONLY + extra + MONTHLY_ONLY:
         lab = it["lab"]
         ncat = it.get("_nabc") or BOARD_TO_NABC.get(lab)
         fgkey = BOARD_TO_FARMGATE.get(lab)
-        # farmgate_prices is the curated raw-crop layer; NABC covers everything else it drops; OCSB
-        # covers sugarcane, which neither of them can see (administered price, own regulator).
-        local = ((fgc.get(fgkey) if fgkey else None) or (nkept.get(ncat) if ncat else None)
-                 or (ocsb if lab == "Sugar" else None))
+        mkey = BOARD_TO_MONTHLY.get(lab)
+        # mprod checked FIRST and on its own dict — a board label only reaches ncat/fgkey lookups
+        # when mkey is unset, so the stale daily "ลำไย" line can never shadow a monthly-sourced row.
+        # farmgate_prices is the curated raw-crop layer; NABC daily covers everything else it drops;
+        # OCSB covers sugarcane, which neither of them can see (administered price, own regulator).
+        local = ((mprod.get(mkey) if mkey else None) or (fgc.get(fgkey) if fgkey else None)
+                 or (nkept.get(ncat) if ncat else None) or (ocsb if lab == "Sugar" else None))
         local_yoy = local.get("yoy") if local else None
         # LOCAL_ONLY rows have no Pink Sheet series at all, so global_yoy is genuinely absent
         # (rendered "n/a") rather than zero, and their up/stress class comes off the Thai move.
@@ -267,6 +470,7 @@ def build():
             "local_markets": local.get("n_markets") if local else None,
             "local_product": (local.get("product") or local.get("product_th")) if local else None,
             "local_source": ("OCSB announced price" if (local and local is ocsb)
+                             else "NABC monthly market" if (local and mkey and local is mprod.get(mkey))
                              else "NABC daily market" if (local and ncat and not fgkey)
                              else ("Thai farm-gate" if local else None)),
             "divergence": (round(local_yoy - global_yoy, 1)
@@ -292,10 +496,22 @@ def build():
                     break
             book_in_belt = sum(acc.get(pv, 0) for pv, _ in belt)
             src = AREA_SOURCES[src_id]
+            # Most belts are planted area in rai; the fisheries and forestry ones are not (see the
+            # `measure`/`unit` keys on those AREA_SOURCES entries). Resolve per source+key so the
+            # row states its own measure instead of every belt claiming to be planted area.
+            measure = (src.get("measure") or {}).get(akey, "planted area")
+            unit = (src.get("unit") or {}).get(akey, "rai")
             row["exposure"] = {
                 "book_accounts": book_in_belt,
                 "belt_provinces": len(belt),
                 "national_area_rai": round(national),
+                # What the belt is actually ranked on. The UI column header reads these, so a shrimp
+                # belt says "Farm area (rai)" and fishmeal says "Output (tonnes)" instead of both
+                # claiming planted area.
+                "belt_measure": measure,
+                "belt_unit": unit,
+                "belt_measure_label": "%s%s" % (measure[:1].upper() + measure[1:],
+                                                " (%s)" % unit if unit else ""),
                 # THE WHOLE BELT, not a top-6 slice (changed 2026-08-01, owner ask). The drill quotes
                 # book_accounts for the entire belt above the table, so emitting only 6 rows made the
                 # accounts column visibly fail to add up to its own headline — for rice, the 6 shown
@@ -325,9 +541,9 @@ def build():
                 "area_provenance": src["provenance"],
                 "area_source": src["source"],
                 "area_note": src["note"],
-                "basis": "book accounts in the crop's core belt (provinces = ~80%% of national "
-                         "planted area, %s); belt identifies the real growing region."
-                         % src["provenance"],
+                "basis": "book accounts in the core belt (provinces = ~80%% of national %s, %s); "
+                         "belt identifies the real producing region."
+                         % (measure, src["provenance"]),
                 "income_basis": (
                     "ESTIMATED, and conditional: the income columns are this crop's OWN effect on a "
                     "farm household in that province whose MAIN crop is this one — "
@@ -380,6 +596,18 @@ def build():
                               "price is ADMINISTERED — one announced national price per season on "
                               "a ~10-CCS basis — so it is not a market quote and carries no "
                               "n_markets; the OAE 2561/2562 BE snapshot stays unwired.",
+            "monthly_note": "Durian, Longan and Rambutan added 2026-08-02 from a SECOND, separate "
+                           "NABC endpoint family — /api/monthly-prices (pipeline/pull_nabc_monthly.py "
+                           "-> source-data/nabc_monthly.json), distinct from the /api/daily-prices "
+                           "feed the rest of this board's NABC rows read. It requires an exact "
+                           "year_th + product_name and 400s otherwise, which is why it read as "
+                           "absent rather than gated and was never pulled before. These three carry "
+                           "no World Bank Pink Sheet series (not globally-traded index commodities) "
+                           "and no daily-feed presence, so the monthly feed is their only price at "
+                           "all. Longan shows Grade A of the two grades NABC publishes (the "
+                           "higher-volume commercial grade); YoY is same-calendar-month, not the "
+                           "30-day rolling window the daily feed uses, because these are seasonal "
+                           "harvest fruits with no off-season quote to roll through.",
             "farmgate_vintage": (fg.get("meta") or {}).get("pulled")
                                 or next((v.get("latest_date") for v in fgc.values()), None),
             "divergence_note": "A large local−global gap flags where the Thai farmer's cash reality "
