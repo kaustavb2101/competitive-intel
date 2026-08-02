@@ -178,6 +178,15 @@ that review still open:
    (it also fails on any uncaught console error, which is a wider net than layout alone).
 6. The TH/EN language switch was deferred by the owner to Thursday 2026-08-06 (lower priority than
    the 2026-08-05 deck).
+7. **OPEN — the three heavy 3D pages fail their headless render in CI.** `province-rayong`,
+   `province-chonburi` and `rayong-catchment` (all deck.gl/WebGL) each burn ~4 minutes on the runner
+   and then FAIL, on both master and PR runs — confirmed on the #262 master run (8 passed, 3 failed)
+   and the #266 branch run (9 passed, 2 failed). This is what exposed the qa.yml bug fixed alongside
+   it: the step's `bash -e` shell aborted at `render`, so `health` and `visual` had not been running
+   in CI at all, and the step still reported green because it is `continue-on-error`. Each phase now
+   runs independently, so the render failures are visible as warning annotations — **but they are not
+   fixed**. They render fine locally, so the suspect is the runner's software GL under the QA_BUDGET
+   timeout, not the pages. Diagnose from the uploaded `qa-renders` artifact before touching the pages.
 
 ## 1. Deploy to Vercel and verify production  ⟶ do first
 - `cd platform && npx vercel --prod` (link to team "Kaustav Bagchi's projects"
