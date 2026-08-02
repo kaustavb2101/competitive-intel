@@ -15,6 +15,9 @@ Deterministic + network-free; --check byte-exact; exits 3 (SKIP) when the pull i
 """
 import argparse, json, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib.regionmap import canonical, region_of
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "source-data", "oae_napprang.json")
 OUT = os.path.join(ROOT, "platform", "data", "napprang.json")
@@ -26,8 +29,15 @@ def build():
     # already sorted by -planted_rai in the pull; stamp a 1-based national rank by planted area.
     out = []
     for i, p in enumerate(provs):
+        # OAE files Ayutthaya under the everyday short form "อยุธยา". This layer is joined BY NAME
+        # (build_farm_book reads by_province[<canonical name>]), so the raw string silently lost the
+        # province its own rank called 5th in the country — 714,070 rai, 5.7% of the national
+        # dry-season crop — and rendered as a blank second-rice column. Fold through canonical() so
+        # the key is whatever the rest of the repo joins on, and recompute the region, which the
+        # pull left null for exactly the same reason.
+        th = canonical(p["th"])
         out.append({
-            "th": p["th"], "region": p.get("region"),
+            "th": th, "region": p.get("region") or region_of(th),
             "planted_rai": int(p.get("planted_rai") or 0),
             "harvested_rai": int(p.get("harvested_rai") or 0),
             "production_tons": int(p.get("production_tons") or 0),
