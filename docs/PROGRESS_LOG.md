@@ -3,6 +3,121 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-02 — Owner review: 17-point Macro-tab markup + stale-data audit + a visual-overflow gate — NOT yet committed (working tree, branch `feat/macro-review-17pt`)
+
+Kaustav marked up the live Macro tab against a PDF ahead of the MCOM presentation on Wednesday
+2026-08-05 and returned 17 numbered points, three more raised mid-review, and a stale-data question.
+The governing principle he set, which reshaped several of the fixes: **the Macro tab is EXTERNAL
+data; the loan book belongs in Acquisition (`data.html`).**
+
+**The 17 points.**
+1. Removed the "WHAT THIS TAB SAYS TODAY" summary band.
+2. Removed the duplicated "CURRENT SITUATION" inflation + USD/THB block.
+3. The macro card grid stays in the DOM `hidden` rather than deleted; the compact chip strip now
+   carries a PERIOD on every chip plus a plain-language gloss on the jargon ones (co-pay, informal
+   work, self-employed, agri jobs, household debt, policy rate).
+4. Dropped the `฿/month` commodity-belt column — it multiplied an ESTIMATED per-commodity
+   sensitivity by a MEASURED province farm-income base and printed the product as a household baht
+   figure, reading far more precise than anything actually measured; the % beside it carries the same
+   information. Built a new crop→farm-income engine instead: `pipeline/build_farm_income_impact.py`
+   → `platform/data/farm_income_impact.json`, revenue-weighted (area × yield × price), price AND
+   margin bases, 5 crops with measured cost (cassava, maize, oil palm, rice, rubber), 77/77 provinces
+   reconcile. Added 6- and 12-month reference points to the charts, including car-sales/resale.
+5. "IMF macro outlook" table → "Macro backdrop · Thailand": measured Thai official series first
+   (NESDC quarterly GDP, TPSO/Ministry of Commerce monthly CPI, NSO LFS unemployment) with the IMF
+   projection alongside and a computed overtaken-flag. Government debt and current account keep the
+   IMF figure and say so in the row — no Thai GDP-share series is pulled for debt, and BoT's current
+   account is monthly USD, not comparable to an annual GDP share.
+6. Farm-book region table carries the point-4 income engine (price + margin columns; branch rows
+   are an equal-split ALLOCATION and labelled as one).
+7. Crop table dropped the allocated farm-baht column, its book share, and "moved the book" — all
+   three spread the province farm book over planted-area mix, but the tape records an OCCUPATION
+   never a crop, so they were allocations of an allocation. Replaced with MARGIN SHOCK from the new
+   engine (measured inputs only); kept cost/kg, margin/rai, dominant-in.
+8. Drought moved into the hazard section.
+9. Resale chart: 6/12-month views, month labels, finer gridlines, hover values.
+10. The three UVPI tiles got the same 6/12/24-month treatment.
+11. Fleet mix restated on AutoX's own pickup definition (PU = pickup + PPV nameplate in ANY
+    registration class — a double-cab files as รย.1 "passenger car" but is a pickup); starred
+    restatement row shows 116,586 units / 4.78% against 3.02% on รย.3 alone. Excluded the `2026-02`
+    catalog stub month (18 rows against a 195,074 median).
+12. Resilience windows now graded on the trailing window itself (first vs latest month, in points
+    per year, so every window sits on one scale).
+13/16/17. Our-book tables, recovery-value headroom, and the OUR O/S / ACCTS / OUR 90% columns moved
+    out of Macro into Acquisition (`data.html`, new `#db-collatbook`) — the governing principle above.
+14. Year-table bars got real colours. Root cause was a bug: `var(--muted)` is undefined in
+    `styles.css` (only `--mid`/`--dim` exist), so `background:var(--muted)` painted transparent — 11
+    sites across `app.js`, all meaning "neutral".
+15. Stock cards moved beside the year table.
+
+**Raised mid-review, not on the original 17.**
+- Macro-chip overbleed: `.mcell{white-space:nowrap}` was inherited by the `.mgl` gloss, so
+  `flex-basis:100%` gave the gloss its own row and `nowrap` then forbade it from wrapping.
+- "Why is this still here?" — removed the FACTORS block; it was the third telling of one story on a
+  single tab.
+- "Do you need any other tools to do a better scanning/reviewing job?" — answer was no new tools, a
+  standing check instead: `tests/visual_overflow.js`, 11 routes × 2 viewports (1440×900, 390×844),
+  flags BLEED/CLIP/PAGEX/COLLIDE, exit 0 clean / 1 findings / 2 cannot-run. Not yet wired into
+  `tests/run.sh` or CI — run by hand so far.
+- "The comments and the table don't jive" (ThaiWater rain table) — three real faults: it ranked by
+  the single wettest gauge while the column beside it reported province-wide share; a 609mm/24h
+  reading (Thai record ≈ 500mm) with only 4% of that province's stations heavy was leading both the
+  table and the verdict banner; and a "Left:/Right:" note pointed at tables that stack at narrow
+  widths. Now ranked by how widespread the rain is, with a suspect-reading flag and named panels.
+
+**The stale-data finding** ("why are figures still 2025? isn't there more current data?"). Three
+chips were hand-written constants in `meta.json` that nothing refreshed, and the one measured
+inflation figure was a World Bank ANNUAL average. The board read Thailand in deflation (−0.13%) while
+Ministry of Commerce had MEASURED +2.79% for May 2026 — a sign flip on a headline number. GDP showed
+an IMF projection (1.6% "slowing") with no period, as though it were an outturn. Closed at the source
+with six new keyless pulls — `pull_tpso_cpi.py`, `pull_nesdc_gdp.py`, `pull_bot_policy_rate.py`,
+`pull_bot_current_account.py`, `pull_bot_tourist_arrivals.py`, `pull_nso_lfs_status.py` — folded by
+the new `pipeline/build_macro_indicators.py` into `platform/data/macro_indicators.json`;
+`build_labour_context.py` gained an NSO quarterly override. Chip strip now shows: inflation +2.79%
+(TPSO, 2026-05), GDP +2.8% (NESDC 2026-Q1, labelled a measured quarter not a projection, prior
+quarter +2.5%), tourists 32.16M trailing 12 months (BoT, 2025-07→2026-06), self-employed 50.24% and
+agri jobs 27.32% +661k YoY (NSO LFS 2026-Q1) — each editorial twin deleted by the same code that
+renders the measured card, so the next pull moves the page.
+
+DELIBERATELY NOT SHOWN: `indicators.current_account`. Measured, but April 2026 alone prints −7,591
+USD million on a series whose trailing twelve months net to roughly +847M; on a strip that's scanned
+not read, one month reads as a national crisis. No trailing-sum is persisted in `platform/data` yet,
+so the chip waits for that builder rather than shipping the alarming half of the truth — carried to
+`docs/NEXT_STEPS.md` as an open item.
+
+STILL STALE, blocker named rather than left silent: informal work 63.2% (2024) — NSO's own Informal
+Employment Survey tops out at 2566/2023, older than what's already shown, so nothing fresher is
+published. Co-pay ฿44bn has no confirmed vintage; the chip now renders a dashed-italic "no date"
+marker instead of sitting undated beside nine dated ones.
+
+**The layout audit's own findings** (`tests/visual_overflow.js`'s first real run): 28 findings down
+to clean. Headline fix — `.tbl-wrap` (hyphenated) had never matched a CSS rule (the guard rail is
+spelled `.tblwrap`), so ten call sites had no overflow container at all and the Assistance-occupation
+table pushed a 390px phone out to 636px of horizontal scroll; aliased the two spellings in CSS rather
+than renamed, so they can't drift apart again. `.db-cards` used a hard `minmax(300px,1fr)` inside a
+258px phone container, now `minmax(min(300px,100%),1fr)`. `.cc-row .l` needed
+`overflow-wrap:anywhere` for a long English word squeezed by a nowrap value column. The audit itself
+was wrong twice and was fixed rather than worked around: eleven `<summary>` "5px wider" findings were
+arithmetic, not geometry (scrollWidth/clientWidth are integers rounded from a fractional layout —
+confirmed by absolutely-positioning the caret out of flow, which held the false reading at exactly
+5px); and the vertical branch fired on every text node because IBM Plex Sans Thai's vertical metrics
+give every string a ~1.5em natural line box, Latin included — with `overflow-y:visible` and no clamp
+that's leading, not loss. The Y branch now only fires where overflow is actually contained; two
+line-height edits made on the false reading were reverted (neither element was broken).
+
+**Verification.** `bash tests/run.sh check` on the WSL uv cpython-3.11.15 mirror (authoritative —
+Windows CPython 3.14 produces false float drift on this repo); `build_regional_outlook.py` rebuilt
+byte-exact; provenance regenerated on the LF mirror; `node --check` on every page's JS on Windows;
+`tests/visual_overflow.js` clean across 11 routes × 2 viewports; a fresh no-cache Playwright pass
+confirmed every chip's value, period and source, no duplicate chips, no console errors.
+
+**Status — committed on `feat/macro-review-17pt`, PR open.** 36 files (14 modified + 22 new across
+`pipeline/`, `platform/`, `source-data/`, `tests/`, `docs/`). The determinism gate and the provenance
+regeneration were both run on the WSL uv cpython-3.11.15 mirror, which is the authoritative
+environment — Windows CPython 3.14 produces false float drift on this repo. `build_regional_outlook.py`
+was the one real drift and was rebuilt byte-exact; `validate_data.py` then passed 455/455. Six items
+came out of the review still open — see `docs/NEXT_STEPS.md` §0d.
+
 ## 2026-08-02 — Intelligence loop (deploy-health, obj #1): site-health probe now guards `collateral_book.json` — merged to master
 
 Autonomous market & service intelligence loop, safeguard-gated auto-merge. The `plan_cycle.py` backlog

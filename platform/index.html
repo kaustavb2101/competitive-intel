@@ -386,10 +386,16 @@
              so the strip cannot drift from the cards. -->
         <h3 class="ovsub">Macro overlay — current conditions</h3>
         <div class="mstrip" id="macrostrip" aria-label="Macro indicators, compact"></div>
-        <details class="mfull">
-          <summary>Full detail — every indicator with its period and source</summary>
-          <div class="grid macro" id="macro"></div>
-        </details>
+        <!-- #macro STAYS IN THE DOM BUT IS NO LONGER SHOWN (owner review 2026-08-02, point 3):
+             "the big cards take up space and don't have much to offer". Two full rows of ~340x110px
+             tiles restating what the strip above already says in one line.
+             It is NOT deleted, because it is not a display — it is the DATA SOURCE. compactMacro()
+             reads these .mcard nodes to build the strip, so removing the container would empty the
+             strip too. Three separate producers (META editorial, renderMacroIndicators,
+             renderLabourContext) write into it and none of them need to change.
+             What the cards carried and the strip did not — the period and the source — now rides on
+             the chips themselves, so nothing is lost by hiding this. -->
+        <div class="grid macro" id="macro" hidden></div>
 
         <h3 class="ovsub">Commodity board — the segments diverge</h3>
         <div class="insight" id="ov-keyread">
@@ -450,23 +456,10 @@
          tables"). Their MEASURED content survives as columns; only the composite was dropped.
          Null-safe: absent file → the whole block hides itself, nothing else on the tab changes. -->
     <div id="cropmix-wrap"></div>
-    <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
-         read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
-    <div id="drought-district-wrap" style="display:none">
-      <div class="verdict v-warn" id="drought-district-verdict"></div>
-      <p class="lead" id="drought-district-note"></p>
-      <table class="tbl" id="drought-district-tbl"></table>
-    </div>
-    <!-- District crop × drought exposure (data/amphoe_crops.json) — MEASURED OAE planted area × MODELLED
-         OAE SPEI (obj #1). The district-drought card above names the driest districts; this names WHICH
-         crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
-         actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
-    <div id="amphoe-crops-wrap" style="display:none">
-      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
-      <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
-      <p class="lead" id="amphoe-crops-note"></p>
-      <table class="tbl" id="amphoe-crops-tbl"></table>
-    </div>
+    <!-- MOVED TO THE HAZARD SECTION 2026-08-02 (owner review, point 8: "Move drought into the
+         hazard section"). District drought and district crop × drought now sit under "Conditions at
+         our grain" beside the flood columns they are read against; this section keeps the crop and
+         margin story. -->
     </details>
 
     <details class="ovsec" id="sec-ov-collateral">
@@ -494,22 +487,34 @@
          the diesel-share snapshot above lacks: how fast the future used-pickup collateral pool is
          being replenished at source. Obj #1, collateral outlook. Rendered by renderBrandTrends();
          hidden until the layer loads (null-safe). -->
+    <!-- STOCK THEN FLOW, PAIRED (owner review 2026-08-02, point 15: "Why is this here? It should be
+         close to point 14's table"). The two blocks were already adjacent in the source, but in the
+         wrong order and separated by the year table's long footnote, so the stock cards read as an
+         orphan rather than as the denominator for the table above them.
+         They are the same question at two tenses — what is PARKED (stock) and what is ENTERING
+         (flow) — and the gap between the two shares is the actual finding: pickup is 15.7% of the
+         registered fleet and a fraction of that of new registrations, i.e. a collateral pool that is
+         ageing and not being refilled. Stock now comes first and states the base; the inflow trend
+         follows and says how fast it is being replenished. -->
+    <div id="vehreg-wrap" style="display:none">
+      <h3 class="ovsub collat">Collateral base · registered-vehicle stock (MOT, measured)</h3>
+      <p class="lead" id="vehreg-note"></p>
+      <div class="grid macro" id="vehreg-cards"></div>
+    </div>
     <div id="btrend-wrap" style="display:none">
       <h3 class="ovsub collat">New-pickup inflow trend · the future used-collateral pool <span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT</span></h3>
       <div class="verdict v-warn" id="btrend-verdict" style="display:none"></div>
       <p class="lead" id="btrend-note"></p>
       <table class="tbl" id="btrendtbl"></table>
     </div>
-    <div id="vehreg-wrap" style="display:none">
-      <h3 class="ovsub collat">Collateral base · registered-vehicle stock (MOT, measured)</h3>
-      <p class="lead" id="vehreg-note"></p>
-      <div class="grid macro" id="vehreg-cards"></div>
-    </div>
 
-    <h3 class="ovsub collat">Recovery-value headroom · how far resale can fall <span class="tag" style="color:var(--merch);border:1px solid var(--merch)">MEASURED positions · ILLUSTRATIVE shock</span></h3>
-    <p class="lead" id="recovery-note"></p>
-    <div class="grid macro" id="recovery-cards"></div>
-    <table class="tbl" id="recoverytbl"></table>
+    <!-- MOVED TO ACQUISITION 2026-08-02 (owner review, point 16: "Move this to acquisition").
+         Recovery-value headroom is OUR BOOK measured against the collateral — outstanding per
+         account vs appraised value per account, and how far resale can fall before the gap closes.
+         That is a balance-sheet question, and this tab is external data. The full three-table
+         collateral book (mix to 100%, every brand on a title, the shock ladder) now renders on
+         data.html under "The collateral book"; renderRecoverySensitivity() and its #recovery-*
+         mounts were removed from this page rather than hidden, so nothing renders into a void. -->
 
     <!-- MOVED 2026-08-02 to the "Conditions at our grain" drill below (owner point 15: "very good
          data, just presentation should be better. Always think of the roll-up mentioned in point
@@ -547,9 +552,39 @@
          On point 17 specifically: there is no province household-debt table to find. The BoT
          publishes none, and the per-household figures trace to the 2019 socio-economic survey. The
          debt lens says that in the table rather than spreading a regional number across provinces
-         it was never measured at - and puts OUR measured ticket and arrears, which do go to branch
-         level, in the same rows. -->
+         it was never measured at.
+
+         AMENDED 2026-08-02 (owner review, point 17: "take our O/S, accts and our 90% out of those
+         tables"). Every lens used to LEAD with our outstanding — that was the original point of the
+         block, macro next to exposure. This tab is external data, so the book columns came off all
+         five lenses and the branch rows; the ORDERING is still by our outstanding, so the largest
+         exposures still lead, and the drill footnote says so. The book itself reads in Acquisition. -->
     <div id="macro-book"></div>
+
+    <!-- DROUGHT, MOVED HERE 2026-08-02 (owner review, point 8). It used to live under Farm households,
+         two sections away from the flood stations it has to be read against — and a province can be
+         wet and dry at once, in different districts, which is the whole reason they belong together.
+         The Hazard lens on the drill above already carries drought at PROVINCE grain (n_dry,
+         dry_share_pct, n_extreme, SPEI); these two blocks sharpen it to DISTRICT grain: which
+         districts are driest, and which crop in which district carries the most rai under drought.
+         Both are MODELLED SPEI over MEASURED OAE planted area — labelled as such on the tables. -->
+    <!-- District drought (OAE SPEI) — a MODELLED per-amphoe sharpening of the province-grain drought
+         read above (obj #1). Rendered from data/drought_district.json; hidden gracefully if absent. -->
+    <div id="drought-district-wrap" style="display:none">
+      <div class="verdict v-warn" id="drought-district-verdict"></div>
+      <p class="lead" id="drought-district-note"></p>
+      <table class="tbl" id="drought-district-tbl"></table>
+    </div>
+    <!-- District crop × drought exposure (data/amphoe_crops.json) — MEASURED OAE planted area × MODELLED
+         OAE SPEI (obj #1). The district-drought card above names the driest districts; this names WHICH
+         crop in WHICH district carries the largest rai exposure under drought — the crop-named, portfolio-
+         actionable read behind the agri-PD book. Rendered by renderAmphoeCrops(); hidden if absent. -->
+    <div id="amphoe-crops-wrap" style="display:none">
+      <h3 class="ovsub risk">District crop × drought exposure <span class="tag" style="color:var(--agri);border:1px solid var(--agri)">MEASURED area · MODELLED drought</span></h3>
+      <div class="verdict v-warn" id="amphoe-crops-verdict"></div>
+      <p class="lead" id="amphoe-crops-note"></p>
+      <table class="tbl" id="amphoe-crops-tbl"></table>
+    </div>
 
     <!-- The live 24h RAIN pulse is kept (it is same-day telemetry and genuinely "nice to know", in
          the owner's words) but demoted out of its own section: the flood and drought columns that

@@ -1,0 +1,1652 @@
+{
+  "meta": {
+    "title": "Bank of Thailand policy rate — full MPC decision history",
+    "generated_by": "pipeline/pull_bot_policy_rate.py",
+    "label": "MEASURED — Bank of Thailand (ธปท.), MPC (กนง.) decision history, republished as an XLSX after every meeting on BOT's own monetary-policy microsite. Supersedes the BOTWEBSTAT report table (reportID=223, FM_RT_001_S2), which is stuck at July 2025 (verified stale 2026-08-02) and not used here.",
+    "source": "ธนาคารแห่งประเทศไทย (ธปท.) — ข้อมูลอัตราดอกเบี้ยนโยบายและผลการตัดสินนโยบายการเงินที่ผ่านมา",
+    "source_page_url": "https://www.bot.or.th/th/our-roles/monetary-policy/mpc-publication/policy-interest-rate.html",
+    "source_file_url": "https://www.bot.or.th/content/dam/bot/documents/th/our-roles/monetary-policy/mpc-publication/policy-interest-rate/table-mpc-2569-3-NVHKxr00.xlsx",
+    "definition": "The 1-day bilateral repurchase rate (อัตราดอกเบี้ยธุรกรรมซื้อคืนพันธบัตรแบบทวิภาคีระยะ 1 วัน) is BOT's policy rate since 17 Jan 2007; the 14-day repo rate was used from 23 May 2000 to 16 Jan 2007.",
+    "pulled": "2026-08-02",
+    "n_meetings": 203,
+    "period_range": {
+      "min": "2000-05-23",
+      "max": "2026-06-24"
+    },
+    "acceptance_test": "4 spot-verified meeting dates (2000-05-23 .. 2026-06-24) checked against fixed anchors on every pull; a mismatch hard-fails rather than silently landing a different reading — see ANCHORS in pull_bot_policy_rate.py."
+  },
+  "latest": {
+    "meeting": "ครั้งที่ 3/2569",
+    "date": "2026-06-24",
+    "body": "MPC",
+    "decision_th": "คง",
+    "decision_en": "Hold",
+    "rate": 1.0
+  },
+  "history": [
+    {
+      "meeting": "ครั้งที่ 1/2543",
+      "date": "2000-05-23",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2543",
+      "date": "2000-07-18",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2543",
+      "date": "2000-09-05",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2543",
+      "date": "2000-10-17",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2543",
+      "date": "2000-12-06",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2544",
+      "date": "2001-01-18",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2544",
+      "date": "2001-03-01",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2544",
+      "date": "2001-04-19",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2544",
+      "date": "2001-05-24",
+      "body": "MPB",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": null,
+      "date": "2001-06-08",
+      "body": "By Governor",
+      "decision_th": "ปรับขึ้น 100 bps",
+      "decision_en": "Raise 100 bps",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/25441/",
+      "date": "2001-07-12",
+      "body": "MPC1/",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2544",
+      "date": "2001-08-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2544",
+      "date": "2001-10-17",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2544",
+      "date": "2001-11-27",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 9/2544",
+      "date": "2001-12-25",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2545",
+      "date": "2002-01-21",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2545",
+      "date": "2002-03-04",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 3/2545",
+      "date": "2002-04-22",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2545",
+      "date": "2002-06-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 5/2545",
+      "date": "2002-07-22",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 6/2545",
+      "date": "2002-09-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 7/2545",
+      "date": "2002-10-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 8/2545",
+      "date": "2002-11-19",
+      "body": "MPC Special Meeting",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 9/2545",
+      "date": "2002-12-12",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 1/2546",
+      "date": "2003-01-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 2/2546",
+      "date": "2003-03-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2546",
+      "date": "2003-04-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 4/2546",
+      "date": "2003-06-02",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 5/2546",
+      "date": "2003-06-27",
+      "body": "MPC Special Meeting",
+      "decision_th": "ปรับลด 50 bps",
+      "decision_en": "Cut 50 bps",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2546",
+      "date": "2003-07-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 7/2546",
+      "date": "2003-09-11",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 8/2546",
+      "date": "2003-10-28",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 9/2546",
+      "date": "2003-12-12",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2547",
+      "date": "2004-01-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2547",
+      "date": "2004-03-17",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 3/2547",
+      "date": "2004-04-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 4/2547",
+      "date": "2004-06-09",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 5/2547",
+      "date": "2004-07-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2547",
+      "date": "2004-08-25",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2547",
+      "date": "2004-10-20",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 8/2547",
+      "date": "2004-12-15",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 1/2548",
+      "date": "2005-01-19",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2548",
+      "date": "2005-03-02",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 3/2548",
+      "date": "2005-04-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 4/2548",
+      "date": "2005-06-09",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2548",
+      "date": "2005-07-20",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 6/2548",
+      "date": "2005-09-07",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 50 bps.",
+      "decision_en": "Raise 50 bps.",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 7/2548",
+      "date": "2005-10-19",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 50 bps.",
+      "decision_en": "Raise 50 bps.",
+      "rate": 3.75
+    },
+    {
+      "meeting": "ครั้งที่ 8/2548",
+      "date": "2005-12-14",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 4.0
+    },
+    {
+      "meeting": "ครั้งที่ 1/2549",
+      "date": "2006-01-18",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 4.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2549",
+      "date": "2006-03-08",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 4.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2549",
+      "date": "2006-04-10",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 4.75
+    },
+    {
+      "meeting": "ครั้งที่ 4/2549",
+      "date": "2006-06-07",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 5.0
+    },
+    {
+      "meeting": "ครั้งที่ 5/2549",
+      "date": "2006-07-19",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 5.0
+    },
+    {
+      "meeting": "ครั้งที่ 6/2549",
+      "date": "2006-09-06",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 5.0
+    },
+    {
+      "meeting": "ครั้งที่ 7/2549",
+      "date": "2006-10-18",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 5.0
+    },
+    {
+      "meeting": "ครั้งที่ 8/2549",
+      "date": "2006-12-13",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 5.0
+    },
+    {
+      "meeting": "ครั้งที่ 1/25502/",
+      "date": "2007-01-17",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 4.75
+    },
+    {
+      "meeting": "ครั้งที่ 2/2550",
+      "date": "2007-02-28",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 4.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2550",
+      "date": "2007-04-11",
+      "body": "MPC",
+      "decision_th": "ปรับลด 50 bps",
+      "decision_en": "Cut 50 bps",
+      "rate": 4.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2550",
+      "date": "2007-05-23",
+      "body": "MPC",
+      "decision_th": "ปรับลด 50 bps",
+      "decision_en": "Cut 50 bps",
+      "rate": 3.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2550",
+      "date": "2007-07-18",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2550",
+      "date": "2007-08-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 7/2550",
+      "date": "2007-10-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 8/2550",
+      "date": "2007-12-04",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2551",
+      "date": "2008-01-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2551",
+      "date": "2008-02-27",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 3/2551",
+      "date": "2008-04-09",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 4/2551",
+      "date": "2008-05-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 5/2551",
+      "date": "2008-07-16",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 3.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2551",
+      "date": "2008-08-27",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 3.75
+    },
+    {
+      "meeting": "ครั้งที่ 7/2551",
+      "date": "2008-10-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.75
+    },
+    {
+      "meeting": "ครั้งที่ 8/2551",
+      "date": "2008-12-03",
+      "body": "MPC",
+      "decision_th": "ปรับลด 100 bps",
+      "decision_en": "Cut 100 bps",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 1/2552",
+      "date": "2009-01-14",
+      "body": "MPC",
+      "decision_th": "ปรับลด 75 bps",
+      "decision_en": "Cut 75 bps",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2552",
+      "date": "2009-02-25",
+      "body": "MPC",
+      "decision_th": "ปรับลด 50 bps",
+      "decision_en": "Cut 50 bps",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2552",
+      "date": "2009-04-08",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 4/2552",
+      "date": "2009-05-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 5/2552",
+      "date": "2009-07-15",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2552",
+      "date": "2009-08-26",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 7/2552",
+      "date": "2009-10-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 8/2552",
+      "date": "2009-12-02",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2553",
+      "date": "2010-01-13",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2553",
+      "date": "2010-03-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 3/2553",
+      "date": "2010-04-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 4/2553",
+      "date": "2010-06-02",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 5/2553",
+      "date": "2010-07-14",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2553",
+      "date": "2010-08-25",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 7/2553",
+      "date": "2010-10-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 8/2553",
+      "date": "2010-12-01",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 1/25543/",
+      "date": "2011-01-12",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2554",
+      "date": "2011-03-09",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2554",
+      "date": "2011-04-20",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 4/2554",
+      "date": "2011-06-01",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 5/2554",
+      "date": "2011-07-13",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2554",
+      "date": "2011-08-24",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps.",
+      "decision_en": "Raise 25 bps.",
+      "rate": 3.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2554",
+      "date": "2011-10-19",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2554",
+      "date": "2011-11-30",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 3.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2555",
+      "date": "2012-01-25",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2555",
+      "date": "2012-03-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 3/2555",
+      "date": "2012-05-02",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2555",
+      "date": "2012-06-13",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 5/2555",
+      "date": "2012-07-25",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 6/2555",
+      "date": "2012-09-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 3.0
+    },
+    {
+      "meeting": "ครั้งที่ 7/2555",
+      "date": "2012-10-17",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 8/2555",
+      "date": "2012-11-28",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 1/2556",
+      "date": "2013-01-09",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 2/2556",
+      "date": "2013-02-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2556",
+      "date": "2013-04-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.75
+    },
+    {
+      "meeting": "ครั้งที่ 6/2556",
+      "date": "2013-08-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2556",
+      "date": "2013-10-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2556",
+      "date": "2013-11-27",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2557",
+      "date": "2014-01-22",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 2/2557",
+      "date": "2014-03-12",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 3/2557",
+      "date": "2014-04-23",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2557",
+      "date": "2014-06-18",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 5/2557",
+      "date": "2014-08-06",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 6/2557",
+      "date": "2014-09-17",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 7/2557",
+      "date": "2014-11-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 8/2557",
+      "date": "2014-12-17",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 1/2558",
+      "date": "2015-01-28",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2558",
+      "date": "2015-03-11",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2558",
+      "date": "2015-04-29",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2558",
+      "date": "2015-06-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2558",
+      "date": "2015-08-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2558",
+      "date": "2015-09-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2558",
+      "date": "2015-11-04",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2558",
+      "date": "2015-12-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2559",
+      "date": "2016-02-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2559",
+      "date": "2016-03-23",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2559",
+      "date": "2016-05-11",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2559",
+      "date": "2016-06-22",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2559",
+      "date": "2016-08-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2559",
+      "date": "2016-09-14",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2559",
+      "date": "2016-11-09",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2559",
+      "date": "2016-12-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2560",
+      "date": "2017-02-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2560",
+      "date": "2017-03-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2560",
+      "date": "2017-05-24",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2560",
+      "date": "2017-07-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2560",
+      "date": "2017-08-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2560",
+      "date": "2017-09-27",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2560",
+      "date": "2017-11-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2560",
+      "date": "2017-12-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2561",
+      "date": "2018-02-14",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2561",
+      "date": "2018-03-28",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2561",
+      "date": "2018-05-16",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2561",
+      "date": "2018-06-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2561",
+      "date": "2018-08-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2561",
+      "date": "2018-09-19",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2561",
+      "date": "2018-11-14",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2561",
+      "date": "2018-12-19",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 1/2562",
+      "date": "2019-02-06",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 2/2562",
+      "date": "2019-03-20",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2562",
+      "date": "2019-05-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 4/2562",
+      "date": "2019-06-26",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 5/2562",
+      "date": "2019-08-07",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2562",
+      "date": "2019-09-25",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2562",
+      "date": "2019-11-06",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 8/2562",
+      "date": "2019-12-18",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2563",
+      "date": "2020-02-05",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.0
+    },
+    {
+      "meeting": null,
+      "date": "2020-03-20",
+      "body": "MPC Special Meeting",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 0.75
+    },
+    {
+      "meeting": "ครั้งที่ 2/2563",
+      "date": "2020-03-25",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2563",
+      "date": "2020-05-20",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2563",
+      "date": "2020-06-24",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2563",
+      "date": "2020-08-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2563",
+      "date": "2020-09-23",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2563",
+      "date": "2020-11-18",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2563",
+      "date": "2020-12-23",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2564",
+      "date": "2021-02-03",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2564",
+      "date": "2021-03-24",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2564",
+      "date": "2021-05-05",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2564",
+      "date": "2021-06-23",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2564",
+      "date": "2021-08-04",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2564",
+      "date": "2021-09-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 7/2564",
+      "date": "2021-11-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 8/2564",
+      "date": "2021-12-22",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2565",
+      "date": "2022-02-02",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2565",
+      "date": "2022-03-30",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2565",
+      "date": "2022-06-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 0.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2565",
+      "date": "2022-08-10",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 0.75
+    },
+    {
+      "meeting": "ครั้งที่ 5/2565",
+      "date": "2022-09-28",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 1.0
+    },
+    {
+      "meeting": "ครั้งที่ 6/2565",
+      "date": "2022-11-30",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2566",
+      "date": "2023-01-25",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2566",
+      "date": "2023-03-29",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2566",
+      "date": "2023-05-31",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 4/2566",
+      "date": "2023-08-02",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 5/2566",
+      "date": "2023-09-27",
+      "body": "MPC",
+      "decision_th": "ปรับขึ้น 25 bps",
+      "decision_en": "Raise 25 bps",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2566",
+      "date": "2023-11-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 1/2567",
+      "date": "2024-02-07",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 2/2567",
+      "date": "2024-04-10",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 3/2567",
+      "date": "2024-06-12",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 4/2567",
+      "date": "2024-08-21",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2567",
+      "date": "2024-10-16",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 6/2567",
+      "date": "2024-12-18",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 2.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2568",
+      "date": "2025-02-26",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 2.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2568",
+      "date": "2025-04-30",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 3/2568",
+      "date": "2025-06-25",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.75
+    },
+    {
+      "meeting": "ครั้งที่ 4/2568",
+      "date": "2025-08-13",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 5/2568",
+      "date": "2025-10-08",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.5
+    },
+    {
+      "meeting": "ครั้งที่ 6/2568",
+      "date": "2025-12-17",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.25
+    },
+    {
+      "meeting": "ครั้งที่ 1/2569",
+      "date": "2026-02-25",
+      "body": "MPC",
+      "decision_th": "ปรับลด 25 bps",
+      "decision_en": "Cut 25 bps",
+      "rate": 1.0
+    },
+    {
+      "meeting": "ครั้งที่ 2/2569",
+      "date": "2026-04-29",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.0
+    },
+    {
+      "meeting": "ครั้งที่ 3/2569",
+      "date": "2026-06-24",
+      "body": "MPC",
+      "decision_th": "คง",
+      "decision_en": "Hold",
+      "rate": 1.0
+    }
+  ]
+}

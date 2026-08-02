@@ -85,6 +85,7 @@ phase_check(){
   # (each --check reproduces its committed output byte-for-byte; all inputs are git-tracked source-data).
   ( cd "$PIPE" && python3 build_farmgate_prices.py --check >/dev/null 2>&1 ) && ok "build_farmgate_prices.py --check" || bad "build_farmgate_prices.py --check (source-data/farmgate_prices.json drifted from source-data/nabc_prices.json)"
   ( cd "$PIPE" && python3 build_crop_stress.py --check >/dev/null 2>&1 ) && ok "build_crop_stress.py --check" || bad "build_crop_stress.py --check (crop_stress.json drifted from crop_prov_area.json/commodity_board.json/farmgate_prices.json/branches_final.json)"
+  ( cd "$PIPE" && python3 build_farm_income_impact.py --check >/dev/null 2>&1 ) && ok "build_farm_income_impact.py --check" || bad "build_farm_income_impact.py --check (farm_income_impact.json drifted from crop_prov_area.json/doae_planted_area.json/crop_margin.json/agri_income_by_province.json/farm_household.json/branches_final.json)"
   ( cd "$PIPE" && python3 check_commodity_board.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "check_commodity_board.py --check"
   elif [ "$rc" -eq 3 ]; then skip "check_commodity_board.py --check (commodities.json/commodities_protein.json absent — not drift)"

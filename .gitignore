@@ -96,6 +96,34 @@ source-data/dlt/raw/
 # NSO wage-anchor raw CSV — re-pullable via pipeline/pull_nso_wages.py; only the distilled
 # source-data/nso_wages.json is committed, never the raw catalog CSV.
 source-data/.nso_wage_raw/
+
+# BoT policy rate raw XLSX (table-mpc-*.xlsx) — re-pullable via pipeline/pull_bot_policy_rate.py;
+# only the distilled source-data/bot_policy_rate.json is committed, never the raw MPC-history file.
+source-data/.bot_policy_rate_raw/
+
+# Ministry of Commerce (TPSO) headline CPI raw XLSX — re-pullable via pipeline/pull_tpso_cpi.py;
+# only the distilled source-data/tpso_cpi.json is committed, never the raw COICOP workbook.
+source-data/.tpso_cpi_raw/
+
+# BoT balance-of-payments / current-account raw ASP.NET grid response (reportID=953) —
+# re-pullable via pipeline/pull_bot_current_account.py; only the distilled
+# source-data/bot_current_account.json is committed, never the raw grid HTML.
+source-data/.bot_current_account_raw/
+
+# NESDC quarterly GDP release raw PDF — re-pullable via pipeline/pull_nesdc_gdp.py; only the
+# distilled source-data/nesdc_gdp.json is committed, never the raw QGDP press-release PDF.
+source-data/.nesdc_gdp_raw/
+
+# BoT tourism-indicator raw ASP.NET grid response (reportID=875) — re-pullable via
+# pipeline/pull_bot_tourist_arrivals.py; only the distilled source-data/bot_tourist_arrivals.json
+# is committed, never the raw grid HTML.
+source-data/.bot_tourist_arrivals_raw/
+
+# NSO LFS quarterly industry/work-status raw CSVs (LFS_02_20535_8/_9, ~16MB combined) — re-pullable
+# via pipeline/pull_nso_lfs_status.py; only the distilled source-data/nso_lfs_status.json is
+# committed, never the raw region x sex x category CSVs.
+source-data/.nso_lfs_status_raw/
+
 .claude/settings.local.json
 
 # Google Places ratings pull scratch cache
