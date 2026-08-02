@@ -3,7 +3,7 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-02 — Owner review: 17-point Macro-tab markup + stale-data audit + a visual-overflow gate — NOT yet committed (working tree, branch `feat/macro-review-17pt`)
+## 2026-08-02 — Owner review: 17-point Macro-tab markup + stale-data audit + a visual-overflow gate — merged to master (PR #262, `286e450`)
 
 Kaustav marked up the live Macro tab against a PDF ahead of the MCOM presentation on Wednesday
 2026-08-05 and returned 17 numbered points, three more raised mid-review, and a stale-data question.
