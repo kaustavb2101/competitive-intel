@@ -151,6 +151,42 @@ continue closing the #258/#261-wave probe gap — the sibling unprobed exec read
 (the Macro tab's lensed backdrop table, `renderMacroBook` gates on `.national && .provinces`) and
 `farm_book.json` (the Macro farm block), plus `flood_hazard.json` (obj-#1 GISTDA hazard).
 
+## 2026-08-02 — Integration loop (objective #1): surface the already-built GISTDA flood layer as a portfolio flood-exposure readout on `#exposure` — PR (app-visual)
+
+Autonomous integration & improvement loop. The GISTDA repeated-flood layer (`flood_hazard.json`)
+shipped 2026-08-02 as a per-branch popup flag, but its portfolio dimension was going unused — the
+last entry's own "next recommended integration" was to surface it as a book-level flood-exposure
+read. Did exactly that. Verified the higher backlog items are already built and gated first: FPO-PICO
+(`pico_census.json`/`branch_pico.json`), branch-cropland (`branch_cropland.json`), and the
+DIW/MOT/DBD distillations are all present; the only un-distilled datagoth sources (BAAC/SME-bank
+credit **penetration**) are blocked from the cloud IP (data.go.th 403 from CI, per DATAGOTH_CATALOG)
+so they cannot be built here — skipped, not faked.
+
+**What & why (objective #1 — collateral / borrower-cashflow recovery risk):** the exec Risk tab
+(`#exposure`) showed segment/crop/drought concentration but never answered "how much of the book
+sits on ground that floods repeatedly". Added a **"Portfolio flood-hazard exposure"** readout that
+joins the MEASURED per-branch `flood_hazard.json` frequencies (`FLOODHZ[i]`, index-aligned to `DATA`)
+to each branch's region/province **client-side — no recompute, no builder/golden change**. Headline:
+**1,848 of 2,015 branches (92%)** sit in a district that flooded in ≥1 of the 12 years 2005-2016, and
+**685 (34%)** in a CHRONIC zone (≥7/12 yrs). A by-region table (Isan 312 chronic / 52%, North 131 /
+42%, Central&BKK 110 / 19%, South 76 / 30%, East 56 / 21%) and a top-12 chronic-provinces table.
+
+**Provenance discipline:** labelled MEASURED (`TAG_M`) with a method box that states it is a *hazard
+flag* (did the ground flood, how often), NOT a flooded-area or loss estimate — no area is claimed
+(the source polygons overlap, the trap NEXT_STEPS §0 documents), and it is distinct from the LIVE
+ThaiWater water-level pulse. Lazy + graceful: absent file → renders nothing, wired-once so no
+re-trigger loop.
+
+**Verification:** `bash tests/run.sh check` → **116 passed, 0 failed** (data integrity 455/455); this
+change touches only `app.js` (no `platform/data` file), so the `--check` goldens and provenance are
+unaffected. Headless render of `index.html#exposure` → `data-errors="[]"`, the block populates with
+the exact figures above (region rows match a standalone Python tally byte-for-byte). App-visual →
+shipped as a **PR**, not a direct commit.
+
+**Next recommended integration:** the flooded-AREA number still needs the GISTDA polygon download +
+shapely per-district dissolve (NEXT_STEPS §0 remainder); OR distill the blocked BAAC/SME-bank credit
+**penetration** layer once a Thai-IP re-pull commits the raw CSVs (DATAGOTH_CATALOG open item).
+
 ## 2026-08-02 — Intelligence loop (deploy-health, obj #2): site-health probe now guards `contested_pop.json` + `exit_whitespace.json` — merged to master
 
 Autonomous market & service intelligence loop, safeguard-gated auto-merge. The formal `plan_cycle.py`
