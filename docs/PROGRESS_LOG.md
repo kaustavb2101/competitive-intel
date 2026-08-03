@@ -3,6 +3,54 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Integration loop (service/deploy-health): site-health probe guards `flood_hazard.json` — committed to master
+
+Autonomous integration run. The scheduled integration backlog's top items are all shipped or blocked:
+FPO PICO fold-in (`build_pico_*`, live on the `#map` `dpico`/`doutnum` lenses), per-branch measured
+cropland (`build_branch_cropland.py`, wired via `loadBranchCropland`), and the data.go.th distillations
+(`fpo_pico`/`dbd_newco`/`diw_factories`/`mot_vehicles`/excise → committed layers) are done; the two
+remaining undistilled sources (BAAC / SME-bank credit penetration) stay CI-blocked (gitignored Thai-IP
+cache + `data.go.th` 403 from CI) and GISTDA 40m crop-area needs a live keyed puller. A gate-coverage
+audit also confirmed **no ungated `--check` builder remains** (the 2026-08-03 four-builder run closed the
+last hole; `build_baac_credit` correctly SKIPs on its absent owner-side input). So this run took the
+service pillar's own flagged **"next probe target"** (the 2026-08-03 `farm_book` ship): after
+`collateral_book` / `macro_book` / `farm_book`, `flood_hazard.json` was the remaining surfaced obj-#1 exec
+read **live-fetched with no deploy site-health probe**.
+
+`renderFloodExposure` (the Exposure `#exposure` tab's "Portfolio flood-hazard exposure" panel) gates the
+whole panel on `FLOODHZ && FLOODHZ.length` — where `loadFloodHazard` sets `FLOODHZ = j.branches` (the 0-12
+MAX-flood-frequency array, INDEX-ALIGNED to `branches.json`) — then reads `FLOODHZ[i]` per branch for the
+region/province chronic-flood tables + the frequency-band ladder, plus `floodhzMeta.source` /
+`.data_vintage` for the header citation. It is MEASURED (GISTDA Repeated-Flooding 2005-2016 50k census)
+and **live-degrades SILENTLY**: a missing/truncated CDN deploy just blanks (`host.innerHTML=''`) the
+primary structural-hazard screen with no phone alert — the exact "broken demo" blind spot the
+`collateral_book` / `macro_book` / `farm_book` obj-#1 probes closed for their siblings.
+
+`pipeline/check_site_health.py` now probes it (`_shape_flood_hazard`: fetch + parse + render-shape —
+asserts the display gate `branches` array is a **full-length 2015** index-aligned list carrying numeric
+0-12 frequencies, and `meta` carries non-blank `source`/`data_vintage` — shape not values, robust to a
+future GISTDA-vintage refresh moving the frequencies). Verified: ten tests — the real payload is accepted
+while non-dict / missing-`branches` / empty-`branches` / wrong-length / all-null / out-of-0-12-range /
+missing-`meta` / missing-`source` / blank-`data_vintage` shapes are all rejected. The offline
+`--local platform` path reports **107/107 HEALTHY** with `flood_hazard.json` served (68 KB) and shape-sane.
+Probe coverage 104 → **107** exec checks. Diff = `check_site_health.py` only (+47 lines) — no `platform/data`
+file altered, so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455,
+  exit 0). (b) no secrets in diff. (c) diff = only `check_site_health.py` + this log, matches intent.
+  (d) provenance/no-fabrication intact — probe asserts shape, not values; no data layer touched.
+  Test/monitoring-infra only, no visual/app behaviour change → committed directly to master (no PR/headless
+  render needed).
+- **Next recommended:** the surfaced obj-#1/obj-#2 exec reads are now essentially all probed. The remaining
+  service follow-ups are lower-severity joined columns that vanish silently (`farm_income_impact.json`
+  columns inside the farm book) and, off the service pillar, the genuinely valuable-but-blocked data
+  integrations: the BAAC personal-credit **penetration** layer (`build_baac_credit.py`, written + `--check`-
+  ready but SKIP-only — needs the owner-side `source-data/datagoth/baac_credit.xlsx` re-pulled from a Thai
+  IP and committed) as an inverse formal-credit read beside the household-DTI lens, and the GISTDA flooded-
+  **AREA** dissolve (NEXT_STEPS §0 — a shapely dissolve over the overlapping per-event polygons; the raw
+  geometry is not cached, so it needs a fresh GISTDA pull and is deliberately deferred rather than shipped
+  with a 3-9x-overstated area number).
+
 ## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `farm_book.json` — committed to master
 
 Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open

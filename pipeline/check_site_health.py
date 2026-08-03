@@ -943,6 +943,43 @@ def _shape_farm_book(d):
     return None
 
 
+def _shape_flood_hazard(d):
+    # The Exposure (#exposure) tab's "Portfolio flood-hazard exposure" read (obj #1)
+    # — the MEASURED GISTDA Repeated-Flooding 2005-2016 census projected to a per-
+    # branch structural-hazard flag. loadFloodHazard sets FLOODHZ = j.branches (the
+    # 0-12 MAX-flood-frequency array, INDEX-ALIGNED to branches.json) and floodhzMeta
+    # = j.meta; renderFloodExposure gates the whole panel on `FLOODHZ && FLOODHZ.length`
+    # (else host.innerHTML='' — renders nothing) and reads FLOODHZ[i] per branch to
+    # tally the region/province chronic-flood tables + the frequency-band ladder, plus
+    # floodhzMeta.source / .data_vintage for the header citation. It live-degrades
+    # SILENTLY — a missing/truncated CDN deploy just blanks the primary obj-#1 flood-
+    # exposure screen with no phone alert, the same "broken demo" blind spot the
+    # collateral_book / macro_book / farm_book obj-#1 probes closed for their siblings,
+    # and it was the audit's own flagged "next probe target" after farm_book. Asserts
+    # the render contract — a full-length 2015-branch index-aligned 0-12 array + the
+    # meta header keys — as SHAPE not values, robust to a future GISTDA-vintage refresh
+    # moving the frequencies.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (renderFloodExposure display gate)"
+    if len(recs) != 2015:
+        return "expected 2015 branch frequencies (index-aligned to branches.json), got %d" % len(recs)
+    ints = [f for f in recs if isinstance(f, int) and not isinstance(f, bool)]
+    if not ints:
+        return "no branch carries a numeric flood frequency (FLOODHZ[i] band-tally read)"
+    if min(ints) < 0 or max(ints) > 12:
+        return "flood frequency out of the 0-12 census range (min %d, max %d)" % (min(ints), max(ints))
+    meta = d.get("meta")
+    if not isinstance(meta, dict):
+        return "missing 'meta' object (header citation render read)"
+    for k in ("source", "data_vintage"):
+        if not (isinstance(meta.get(k), str) and meta[k].strip()):
+            return "meta.%s missing/blank (flood-exposure header citation render read)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1094,6 +1131,16 @@ DATA_FILES = [
     # verdict/commentary render shape (national KPIs + province dict + crops rows),
     # not values.
     ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
+    # The Exposure (#exposure) tab's flagship obj-#1 flood read, and the audit's own
+    # flagged "next probe target" after farm_book. renderFloodExposure gates the whole
+    # "Portfolio flood-hazard exposure" panel on `FLOODHZ && FLOODHZ.length` (the
+    # per-branch 0-12 MAX-flood-frequency array, index-aligned to branches.json), so a
+    # truncated CDN deploy that drops or empties it silently blanks the primary
+    # structural-hazard screen (MEASURED GISTDA 50k census) with no phone alert — the
+    # same blind spot the collateral_book / macro_book / farm_book probes closed for
+    # the sibling obj-#1 reads. Asserts the index-aligned array shape + the meta header
+    # citation keys, not values.
+    ("data/flood_hazard.json", _shape_flood_hazard, ".branches 0-12 array of 2015 (index-aligned) + meta.source/data_vintage (Exposure flood-hazard panel)"),
 ]
 
 
