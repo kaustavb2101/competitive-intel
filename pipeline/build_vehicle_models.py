@@ -377,19 +377,64 @@ def build():
         wm = window_months(k)
         windows[wkey]["contains_flagged_months"] = [m for m in flagged_months if m in set(wm)]
 
-    # ── nameplate leaderboards over the last 12 months ───────────────────────────────────────
+    # ── nameplate leaderboards over the last 12 months, with YoY growth ─────────────────────
+    # The PRIOR window is the SAME seasonally-aligned comparison as the brand windows above: the
+    # same 12 calendar months one year earlier, not "the 12 months before this one" by list
+    # position, drawn from the identical filtered month set (stubs stay excluded, gaps stay
+    # gaps). If any of those 12 calendar months is missing or excluded, the whole comparison is
+    # withheld — never a partial sum of 11 months quietly priced as if it were a full 12.
     last12 = window_months(12)
+    prior12 = [_ym_add(m, -12) for m in last12]
+    prior12_present = [m for m in prior12 if m in present]
+    prior12_complete = len(last12) == 12 and len(prior12_present) == 12
+    cur_window = {"from": last12[0], "to": last12[-1]} if last12 else None
+    if prior12_complete:
+        prior_window = {"from": prior12_present[0], "to": prior12_present[-1]}
+        prior_window_note = None
+    else:
+        prior_window = None
+        if len(last12) < 12:
+            prior_window_note = ("the current window itself holds only %d month(s) — too few to "
+                                 "define a seasonally-aligned prior-year window" % len(last12))
+        else:
+            gaps = sorted(m for m in prior12 if m not in present)
+            prior_window_note = ("the seasonally-aligned prior window (%s..%s) is missing %s from "
+                                 "this filtered month set (missing from the mirror, or excluded as "
+                                 "an incomplete stub) — comparison withheld rather than compared "
+                                 "on unequal month counts" % (prior12[0], prior12[-1],
+                                                              ", ".join(gaps)))
+
     plates = {}
     for kind in ("pickup", "ppv"):
         c = collections.Counter()
         for ym in last12:
             c.update(plate_month[(kind, ym)])
         tot = sum(c.values())
+
+        prior_c = collections.Counter()
+        if prior12_complete:
+            for ym in prior12_present:
+                prior_c.update(plate_month[(kind, ym)])
+        prior_tot = sum(prior_c.values()) if prior12_complete else None
+
+        top_rows = []
+        for p, v in c.most_common(15):
+            pv = prior_c.get(p, 0) if prior12_complete else None
+            # null (never a divide-by-zero / infinity / fake 100%) when the prior window is
+            # unavailable OR the plate had zero units a year ago — a nameplate that did not exist
+            # yet has no growth RATE, only an appearance; the UI reads that as "new".
+            yoy = round(100.0 * (v - pv) / pv, 1) if (pv is not None and pv) else None
+            top_rows.append({"plate": p, "units": v,
+                              "share_pct": round(100.0 * v / tot, 2) if tot else None,
+                              "prior_units": pv, "yoy_pct": yoy})
+
         plates[kind] = {
             "units": tot,
-            "top": [{"plate": p, "units": v,
-                     "share_pct": round(100.0 * v / tot, 2) if tot else None}
-                    for p, v in c.most_common(15)],
+            "prior_units_total": prior_tot,
+            "window": cur_window,
+            "prior_window": prior_window,
+            "prior_window_note": prior_window_note,
+            "top": top_rows,
         }
 
     # ── the class-vs-nameplate reconciliation, the reason this layer exists ──────────────────
@@ -475,6 +520,17 @@ def build():
             "major_pa": list(MAJOR_PA),
             "major_basis": "Fixed brand lists, not top-N by volume: a top-N rule would reclassify a "
                            "brand mid-series and make the resilience trend meaningless.",
+            "plates_prior_window_basis": "prior_units / yoy_pct on each nameplate (plates_last12) "
+                                        "compare the current trailing-12-month window against the "
+                                        "SAME 12 calendar months one year earlier — seasonally "
+                                        "aligned, the identical rule used for the brand windows "
+                                        "above — drawn from the same filtered month set (stubs "
+                                        "excluded, gaps left as gaps). yoy_pct is null, never a "
+                                        "divide-by-zero, an infinity, or a fake 100%, when "
+                                        "prior_units is null (the prior window is not fully "
+                                        "available in this mirror) or zero (the nameplate had no "
+                                        "registrations a year ago — read that as \"new\", not a "
+                                        "growth rate).",
             "class_reconciliation": recon,
             "classes_excluded": {c: n for c, n in sorted(cls_units.items())
                                  if c not in COLLATERAL_CLASSES},
