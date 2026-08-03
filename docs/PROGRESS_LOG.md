@@ -3,6 +3,41 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `farm_book.json` — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), so this run took the service pillar's own standing "next
+probe targets" note in `docs/SERVICE_AUDIT.md` (2026-08-02 (c)): after `collateral_book`/`macro_book`
+landed, `farm_book` was the remaining obj-#1 exec read still **live-fetched with no deploy site-health
+probe**. `renderFarmBook` GATES the whole "Farm book — where the crop mix meets our money" Overview
+section on `j.national && j.provinces` (else `host.style.display='none'`), and its load-bearing verdict
+reads `N.farm_os / farm_weighted_mix_pct / neg_provinces / neg_farm_os / neg_share_of_os_pct /
+neg_farm_n / neg_current / book_weighted_mix_pct`, plus the "the crop that MOVED the book is not the crop
+that IS the book" commentary off `j.crops`. It is MEASURED (real loan tape × OAE crop mix × Thai
+farm-gate prices) and **live-degrades SILENTLY** — a missing/truncated CDN deploy just hides the primary
+crop-to-portfolio screen with no phone alert, the exact "broken demo" blind spot the collateral_book /
+macro_book / tape_real obj-#1 probes closed for their siblings.
+
+`pipeline/check_site_health.py` now probes it (`_shape_farm_book`: fetch + parse + render-shape — asserts
+the display gate `national` KPI block with the eight numeric verdict keys, a non-empty province dict, and
+a non-empty `crops` list whose first row carries `en`/`os_share_pct`/`pp_of_book`/`farm_os_alloc`/`yoy` —
+shape not values, robust to a future tape/crop/price vintage refresh). Verified: eight negative tests
+reject non-dict / missing-`national` / non-numeric-KPI / empty-or-missing-`provinces` / empty-`crops` /
+missing-`en` / non-numeric-crop shapes while accepting the real payload; the offline `--local platform`
+path and the **live master production alias** both report **104/104 HEALTHY** with `farm_book.json`
+served HTTP 200 (312 KB) and shape-sane. Probe coverage 103 → **104** exec checks. Diff = `check_site_health.py`
+only (+51 lines) — no `platform/data` file altered, so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455).
+  (b) no secrets in diff. (c) diff = only `check_site_health.py`, matches intent. (d) provenance/no-fabrication
+  intact — probe asserts shape, not values; no data layer touched. Test/monitoring-infra only, no visual/app
+  behaviour change → committed directly to master (no PR/headless render needed).
+- **Deploy-verify (PASS, no rollback):** live alias 200 on `/`, `/app.js`, `/data/branches.json`; the new
+  probe run against the production alias reports `farm_book.json` 200 + shape-sane, 104/104 HEALTHY.
+- **Next recommended:** the sibling `flood_hazard.json` (`renderFloodExposure` on `#exposure`, GISTDA
+  repeated-flood, obj #1) is the next surfaced read still unprobed; and `farm_income_impact.json` (joined
+  into the farm book, columns vanish silently when absent) is a lower-severity follow-up.
+
 ## 2026-08-03 — UX loop: `live.html` "Live board" feed-table a11y (`ux-live-feed-table-a11y`) — merged + deployed + verified
 - **Shipped** (branch `claude/ux-loop-20260803-0217`, squash-merged PR #270 → `1a2a5f1` on master): the newer `live.html` "Live board" page — added *after* both site-wide table-a11y sweeps and, being its own page (not `app.js`, not `data.html`), missed by both — shipped its "Every feed" table (`#lb-table`) with two gaps every other table on the site had already been hardened for. (1) **Keyboard scroll access (WCAG 2.1.1 / axe `scrollable-region-focusable`):** the `.lb-wrapx` horizontal-scroll wrapper had no `role="region"`/`tabindex="0"`/`aria-label`, so a keyboard-only user couldn't scroll it to reach the clipped right-hand columns on a narrow viewport — the exact gap `ux-static-tblwrap-missing-a11y` closed for index.html's ThaiWater wrappers. (2) **Header scope (WCAG 1.3.1):** the six header `<th>` (built in the render JS' `<thead>` string) were bare with no `scope="col"` — the class the completed `ux-table-scope-sweep-appjs` closed everywhere else. Fix: added `role="region" tabindex="0" aria-label="Scrollable table: Every feed"` to the wrapper (matching the site's `"Scrollable table: <heading>"` convention, keyed to the table's "Every feed" H2) + `scope="col"` to all six column headers. Both non-presentational — **zero visual change**. Diff = `platform/live.html` (6 lines) + one `docs/UXUI_AUDIT.md` entry.
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + `validate_data.py` 455/0), run on the post-edit tree. Gate was already 0-failed on `origin/master` — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` → pulse strip / nav / header render clean, PNG self-reviewed (nothing visibly broken; headless charts/table paint below the fold, JS parses); both attrs present in the settled DOM (`role="region"…` + all six `<th scope="col">`). (c) no secrets in the diff. (d) diff = only the two intended files, no stray files.

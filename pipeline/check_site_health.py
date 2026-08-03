@@ -900,6 +900,49 @@ def _shape_macro_book(d):
     return None
 
 
+def _shape_farm_book(d):
+    # The Overview tab's "Farm book — where the crop mix meets our money" section
+    # (obj #1) — the load-bearing crop-to-portfolio read. renderFarmBook GATES the
+    # whole block on `j.national && j.provinces` (else host.style.display='none'),
+    # then its verdict sentence reads N.farm_os / N.farm_weighted_mix_pct /
+    # N.neg_provinces / N.neg_farm_os / N.neg_share_of_os_pct / N.neg_farm_n /
+    # N.neg_current / N.book_weighted_mix_pct, and the "the crop that MOVED the book
+    # is not the crop that IS the book" commentary line reads j.crops (each .en /
+    # .os_share_pct / .pp_of_book / .farm_os_alloc / .yoy). It is MEASURED (real
+    # loan tape × OAE crop mix × farm-gate prices) and live-degrades SILENTLY — a
+    # missing/truncated file just hides the primary obj-#1 farm read with no phone
+    # alert, the same "broken demo" blind spot the collateral_book / macro_book /
+    # tape_real obj-#1 probes closed for their siblings, and it was the sibling the
+    # audit's own "next probe targets" note flagged after macro_book. Asserts the
+    # gate + headline render shape (national KPI keys + non-empty province dict +
+    # the crops commentary rows), not values — robust to a future tape/crop/price
+    # vintage refresh moving the numbers.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    nat = d.get("national")
+    if not isinstance(nat, dict):
+        return "missing 'national' object (renderFarmBook display gate)"
+    for k in ("farm_os", "farm_weighted_mix_pct", "neg_provinces", "neg_farm_os",
+              "neg_share_of_os_pct", "neg_farm_n", "neg_current", "book_weighted_mix_pct"):
+        if not isinstance(nat.get(k), (int, float)):
+            return "national.%s missing/non-numeric (farm-book verdict render read)" % k
+    provs = d.get("provinces")
+    if not isinstance(provs, dict) or not provs:
+        return "missing/empty 'provinces' object (renderFarmBook display gate)"
+    crops = d.get("crops")
+    if not isinstance(crops, list) or not crops:
+        return "missing/empty 'crops' list (crop-mix commentary render read)"
+    c0 = crops[0]
+    if not isinstance(c0, dict):
+        return "first crop row is not an object"
+    if not (isinstance(c0.get("en"), str) and c0["en"].strip()):
+        return "first crop row missing 'en' (crop-name commentary render read)"
+    for k in ("os_share_pct", "pp_of_book", "farm_os_alloc", "yoy"):
+        if not isinstance(c0.get(k), (int, float)):
+            return "first crop row %s missing/non-numeric (crop-mix commentary render read)" % k
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1043,6 +1086,14 @@ DATA_FILES = [
     # per-lens verdict render shape (national KPIs + 77-province drill + npl
     # header), not values.
     ("data/macro_book.json", _shape_macro_book, ".national KPI block + 77-province drill + .npl header (Overview conditions-at-our-grain drill)"),
+    # The obj-#1 sibling from the crop/tape line, and the audit's own next flagged
+    # "next probe target" after macro_book. renderFarmBook gates the whole "Farm
+    # book — where the crop mix meets our money" section on `j.national &&
+    # j.provinces`, so a truncated CDN deploy that drops either silently hides the
+    # primary crop-to-portfolio read with no phone alert. Asserts the gate +
+    # verdict/commentary render shape (national KPIs + province dict + crops rows),
+    # not values.
+    ("data/farm_book.json", _shape_farm_book, ".national KPI block + province drill + .crops commentary (Overview farm-book section)"),
 ]
 
 
