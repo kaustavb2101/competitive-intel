@@ -11,23 +11,36 @@ This builder is a DIRECTIONAL, ESTIMATED read — NOT a measured recovery rate. 
 signals already committed to the repo (no new external numbers, no invented prices):
   - commodity_board.json  Gold YoY %% (the MEASURED/GLOBAL board move; PROXY for Thai gold-pawn
                           collateral direction). Applied NATIONALLY — gold is a global price.
+  - used_vehicle_value.json  BoT UVPI used-vehicle price index (2015=100), separate car and
+                          truck(=รถกระบะ pickup) series. MEASURED / NATIONAL. Its trailing YoY is
+                          the ACTUAL resale-price direction of the car/pickup title collateral —
+                          the resale value AutoX recovers on a repossessed vehicle. Added
+                          2026-08-03: previously the vehicle leg ASSUMED a direction from fleet
+                          composition alone with no price evidence; this grounds it in the measured
+                          index that was already committed to the repo.
   - vehicles_by_province.json  DLT registered-vehicle stock per province -> motorcycle share of
                           the fleet (moto / total). MEASURED DLT. Used as the proxy for how
-                          moto-title-heavy a province's pledgeable collateral base is.
+                          moto-title-heavy a province's pledgeable collateral base is (UVPI does
+                          NOT cover motorcycles, so this stays a structural exposure proxy for the
+                          motorcycle-title slice specifically).
   - branches.json         per-branch collateral segment score 'c', aggregated to a province mean.
                           ESTIMATED (derive.py segment scoring). Tells us how collateral-reliant
                           AutoX's book is in that province.
 
-PER PROVINCE we emit the three raw signals + a transparent directional note. We do NOT fabricate
+PER PROVINCE we emit the raw signals + a transparent directional note. We do NOT fabricate
 a recovery rate; if a signal is absent for a province we omit it and say so in the note.
 
 OUTLOOK direction (documented, plain — see meta.formula):
-  gold_term = clamp(gold_yoy / GOLD_SCALE, -1, 1)        national gold tailwind, +1 = strong firming
-  moto_term = clamp((moto_title_share - MOTO_MID) / MOTO_SPAN, -1, 1)
-                                                          +1 = moto-title-heavy (more depreciation risk)
-  outlook   = round(W_GOLD*gold_term - W_MOTO*moto_term, 4)   in roughly [-1, +1]
-              POSITIVE = recovery value firming (gold tailwind dominates),
-              NEGATIVE = recovery value softening (moto-title depreciation dominates).
+  gold_term      = clamp(gold_yoy / GOLD_SCALE, -1, 1)   national gold tailwind, +1 = strong firming
+  veh_price_term = clamp(used_veh_yoy / VEH_SCALE, -1, 1)  MEASURED national used-car/pickup price
+                                                          direction, +1 = resale value rising (firming)
+  moto_term      = clamp((moto_title_share - MOTO_MID) / MOTO_SPAN, -1, 1)
+                                                          +1 = moto-title-heavy (structural depreciation
+                                                          exposure — the slice UVPI cannot price)
+  outlook   = round(W_GOLD*gold_term + W_VEH*veh_price_term - W_MOTO*moto_term, 4)  in roughly [-1, +1]
+              POSITIVE = recovery value firming, NEGATIVE = softening.
+  The gold:vehicle weight balance is held at the prior 60:40; within the 40, the MEASURED car/pickup
+  price direction now leads (W_VEH) and the unmeasured motorcycle structural proxy is demoted (W_MOTO).
   The outlook is scaled in the NOTE by the province collateral_score so the reader knows whether
   AutoX is actually collateral-exposed there — but the numeric outlook stays comparable across
   provinces (score shown alongside, not multiplied in, to keep the direction honest).
@@ -46,13 +59,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SRC = os.path.join(ROOT, "source-data")
 OUT = os.path.join(ROOT, "platform", "data", "collateral_outlook.json")
+# MEASURED BoT UVPI used-vehicle price index (2015=100), committed under platform/data (a projected
+# TMLI layer). Read from there like branches.json below — graceful/absent-safe.
+UVPI = os.path.join(ROOT, "platform", "data", "used_vehicle_value.json")
 
 # --- direction-scaling constants (see FORMULA in module docstring) ---
 GOLD_SCALE = 60.0    # gold YoY %% that maps gold_term to +1.0 (board shows +62.7 -> ~1.0 firming)
+VEH_SCALE = 15.0     # used-vehicle YoY %% that maps veh_price_term to +/-1.0. Used-vehicle indices
+                     # move far less than gold, so a ~15% annual swing is already a full-scale move.
 MOTO_MID = 0.50      # fleet moto-share considered "neutral"
 MOTO_SPAN = 0.30     # +/- span around MOTO_MID that maps moto_term to +/-1 (0.20..0.80 fleet share)
-W_GOLD = 0.6         # gold tailwind weight
-W_MOTO = 0.4         # moto-title depreciation weight
+# gold:vehicle balance held at the prior 60:40. Within the vehicle 0.40, the MEASURED car/pickup
+# price direction now leads (0.25) and the unmeasured motorcycle structural proxy is demoted (0.15).
+W_GOLD = 0.6         # gold tailwind weight (unchanged)
+W_VEH = 0.25         # MEASURED used-car/pickup resale-price direction weight (BoT UVPI)
+W_MOTO = 0.15        # motorcycle-title structural depreciation-exposure weight (demoted from 0.4)
 
 
 def load(name):
@@ -62,6 +83,54 @@ def load(name):
 
 def clamp(x, lo, hi):
     return max(lo, min(hi, x))
+
+
+def _series_yoy(history):
+    """Trailing YoY %% for a UVPI series: newest month vs the SAME month a year earlier.
+    Deterministic (anchors on the newest period IN the data, never wall clock). Returns
+    (yoy_pct, latest_period) or (None, latest_period/None) when the year-ago month is absent."""
+    if not isinstance(history, list) or not history:
+        return None, None
+    by_period = {}
+    for pt in history:
+        p = pt.get("period")
+        v = pt.get("value")
+        if isinstance(p, str) and isinstance(v, (int, float)):
+            by_period[p] = float(v)
+    if not by_period:
+        return None, None
+    latest = history[-1].get("period")
+    if not isinstance(latest, str) or "-" not in latest or latest not in by_period:
+        return None, latest
+    y, m = latest.split("-", 1)
+    prior = "%d-%s" % (int(y) - 1, m)
+    base = by_period.get(prior)
+    if base is None or base == 0:
+        return None, latest
+    return round((by_period[latest] / base - 1.0) * 100.0, 2), latest
+
+
+def used_vehicle_price():
+    """MEASURED used-car/pickup resale-price direction from the BoT UVPI index (national).
+    Returns a dict of car/pickup/blended trailing YoY %% + the period, or an absent marker.
+    Blended = simple mean of the available car & pickup YoYs (UVPI's own two constituent series,
+    equal-weighted — documented, no invented mix). None-safe: absent file -> absent marker."""
+    try:
+        with open(UVPI, encoding="utf-8") as f:
+            d = json.load(f)
+        series = d.get("series", {}) if isinstance(d, dict) else {}
+    except Exception:
+        return {"car_yoy": None, "pickup_yoy": None, "blended_yoy": None, "period": None}
+    car_yoy, car_p = _series_yoy((series.get("car") or {}).get("history"))
+    pk_yoy, pk_p = _series_yoy((series.get("truck") or {}).get("history"))  # UVPI 'truck' == รถกระบะ pickup
+    avail = [x for x in (car_yoy, pk_yoy) if x is not None]
+    blended = round(sum(avail) / len(avail), 2) if avail else None
+    return {
+        "car_yoy": car_yoy,
+        "pickup_yoy": pk_yoy,
+        "blended_yoy": blended,
+        "period": car_p or pk_p,
+    }
 
 
 def build():
@@ -136,6 +205,13 @@ def build():
     else:
         gold_term = 0.0
 
+    # --- national used-vehicle price direction (MEASURED BoT UVPI; car/pickup resale value) ---
+    # National, like gold: UVPI is a single national index, not a province series. + = resale
+    # value rising (recovery firming); - = falling (softening). Absent file -> 0.0 (honest neutral).
+    uvpi = used_vehicle_price()
+    veh_yoy = uvpi["blended_yoy"]
+    veh_price_term = clamp(veh_yoy / VEH_SCALE, -1.0, 1.0) if veh_yoy is not None else 0.0
+
     records = []
     n_with_moto = 0
     n_with_score = 0
@@ -164,22 +240,25 @@ def build():
         if collateral_score is not None:
             n_with_score += 1
 
-        # outlook: gold tailwind minus moto-title depreciation drag. POSITIVE = firming.
-        outlook = round(W_GOLD * gold_term - W_MOTO * moto_term, 4)
+        # outlook: gold tailwind + MEASURED used-vehicle price direction - moto structural drag.
+        # POSITIVE = firming.
+        outlook = round(W_GOLD * gold_term + W_VEH * veh_price_term - W_MOTO * moto_term, 4)
 
         # human note: lead with the direction, name which legs were present, flag missing signals.
-        note = _note(gold_yoy, moto_share, collateral_score, outlook)
+        note = _note(gold_yoy, veh_yoy, moto_share, collateral_score, outlook)
 
         records.append({
             "province": prov,
             "region": region,
             "gold_yoy": gold_yoy,            # MEASURED/GLOBAL proxy (national, same for all)
+            "used_veh_yoy": veh_yoy,         # MEASURED BoT UVPI car/pickup blended YoY (national)
             "moto_title_share": moto_share,  # MEASURED DLT (or null if absent)
             "collateral_score": collateral_score,  # ESTIMATED (or null if absent)
             "outlook": outlook,              # ESTIMATED directional read in ~[-1,+1]
             "outlook_note": note,
             "components": {
                 "gold_term": round(gold_term, 4),
+                "veh_price_term": round(veh_price_term, 4),
                 "moto_term": round(moto_term, 4),
                 "n_branches": len(cs),
             },
@@ -208,6 +287,11 @@ def build():
 
     national = {
         "gold_yoy": gold_yoy,
+        "used_veh_yoy_car": uvpi["car_yoy"],        # MEASURED BoT UVPI (national)
+        "used_veh_yoy_pickup": uvpi["pickup_yoy"],  # MEASURED BoT UVPI (national)
+        "used_veh_yoy_blended": veh_yoy,            # MEASURED — car/pickup equal-weight mean
+        "used_veh_price_period": uvpi["period"],    # newest period IN the UVPI data (not wall clock)
+        "veh_price_term": round(veh_price_term, 4),
         "n_provinces": len(records),
         "n_with_moto_share": n_with_moto,
         "n_with_collateral_score": n_with_score,
@@ -215,7 +299,7 @@ def build():
         "n_firming": len(firming),
         "exposure_weighted_outlook": nat_outlook,
         "most_at_risk_province": most_at_risk,
-        "headline": _headline(gold_yoy, nat_outlook, len(softening), len(records)),
+        "headline": _headline(gold_yoy, veh_yoy, uvpi["period"], nat_outlook, len(softening), len(records)),
     }
 
     meta = {
@@ -235,29 +319,46 @@ def build():
             "gold_yoy": "MEASURED / GLOBAL PROXY — Gold YoY %% from the commodity board (World Bank "
                         "Pink Sheet GLOBAL gold). Applied NATIONALLY (one global price). A DIRECTION "
                         "proxy for Thai gold-pawn collateral value, not a Thai gold-shop quote.",
+            "used_veh_yoy": "MEASURED — BoT UVPI used-vehicle price index (2015=100), trailing YoY of "
+                            "the car and truck(=รถกระบะ pickup) series, equal-weight mean. NATIONAL "
+                            "(one national index, same for all provinces). The ACTUAL resale-price "
+                            "direction of the car/pickup title collateral — negative = falling resale "
+                            "value = softening vehicle-title recovery. Does NOT cover motorcycles.",
             "moto_title_share": "MEASURED — motorcycle share of the province DLT registered-vehicle "
                                 "fleet (moto / total), from vehicles_by_province.json. Proxy for how "
                                 "moto-title-heavy the pledgeable collateral base is. null when absent.",
             "collateral_score": "ESTIMATED — province mean of the per-branch collateral segment score "
                                 "'c' (derive.py segment scoring). Tells you how collateral-reliant the "
                                 "AutoX book is in that province. null when no branch carries it.",
-            "outlook": "ESTIMATED — directional index in ~[-1,+1]. POSITIVE = recovery value firming "
-                       "(gold tailwind dominates), NEGATIVE = softening (moto-title depreciation drag "
-                       "dominates). See meta.formula. NOT a recovery rate.",
+            "outlook": "ESTIMATED — directional index in ~[-1,+1]. POSITIVE = recovery value firming, "
+                       "NEGATIVE = softening. A composite of a MEASURED gold direction, a MEASURED "
+                       "used-car/pickup resale-price direction (BoT UVPI), and a structural "
+                       "motorcycle-exposure proxy, combined with the documented weights below. The "
+                       "composite is ESTIMATED; its price legs are measured. NOT a recovery rate.",
         },
         "formula": {
             "gold_term": "clamp(gold_yoy / %g, -1, 1)" % GOLD_SCALE,
+            "veh_price_term": "clamp(used_veh_yoy / %g, -1, 1)" % VEH_SCALE,
             "moto_term": "clamp((moto_title_share - %g) / %g, -1, 1)" % (MOTO_MID, MOTO_SPAN),
-            "outlook": "round(%g*gold_term - %g*moto_term, 4)" % (W_GOLD, W_MOTO),
-            "rationale": "Gold firming lifts pawn/gold-collateral recovery (tailwind, +). A province "
-                         "skewed to motorcycle titles carries more used-vehicle depreciation risk, the "
-                         "highest-loss title collateral (drag, -). collateral_score is shown alongside "
-                         "(not multiplied in) so the outlook stays comparable across provinces while "
-                         "the reader can see actual collateral exposure.",
+            "outlook": "round(%g*gold_term + %g*veh_price_term - %g*moto_term, 4)" % (W_GOLD, W_VEH, W_MOTO),
+            "rationale": "Gold firming lifts pawn/gold-collateral recovery (tailwind, +). Used "
+                         "car/pickup resale prices set the MEASURED direction of vehicle-title "
+                         "recovery value (BoT UVPI; falling prices = drag, -). A province skewed to "
+                         "motorcycle titles carries extra depreciation risk on the slice UVPI cannot "
+                         "price (structural drag, -). The gold:vehicle weight balance is held at the "
+                         "prior 60:40; within the 40, the measured price direction (W_VEH=%g) leads "
+                         "and the unmeasured moto proxy (W_MOTO=%g) is demoted from 0.4. "
+                         "collateral_score is shown alongside (not multiplied in) so the outlook "
+                         "stays comparable across provinces while the reader can see actual exposure."
+                         % (W_VEH, W_MOTO),
         },
         "provenance": {
             "commodity_board.json": "World Bank Pink Sheet GLOBAL Gold price, YoY %% — MEASURED/GLOBAL, "
                                     "a DIRECTION proxy for Thai gold-pawn collateral, not farm/shop-gate.",
+            "used_vehicle_value.json": "BoT UVPI used-vehicle price index (2015=100), car + "
+                                       "truck(=รถกระบะ pickup) series — MEASURED / NATIONAL. Trailing "
+                                       "YoY = the actual resale-price direction of car/pickup title "
+                                       "collateral. Anchored on the newest period in the data.",
             "vehicles_by_province.json": "DLT registered-vehicle stock by province (data.go.th) — "
                                          "MEASURED. moto/total = motorcycle share of the fleet.",
             "branches.json": "per-branch collateral segment score 'c' (DERIVED by derive.py) — "
@@ -268,6 +369,10 @@ def build():
             "read it as a settlement value.",
             "gold_yoy is a GLOBAL board move applied to every province — it is not a province-level "
             "gold-shop price and it shifts every province's outlook by the same national constant.",
+            "used_veh_yoy is the BoT UVPI NATIONAL used-vehicle price index — one national number "
+            "applied to every province (like gold), not a province-level resale quote. It prices "
+            "cars and pickups (its two constituent series) but NOT motorcycles, so the motorcycle "
+            "slice keeps its structural moto_title_share proxy instead of a measured price.",
             "moto_title_share is the share of the ALL-VEHICLE fleet that is motorcycles, a proxy for "
             "the pledgeable collateral mix; it is not AutoX's actual pledged-collateral composition.",
             "collateral_score is an ESTIMATED segment score, shown for exposure context only; it is "
@@ -289,7 +394,7 @@ def _dir_word(outlook):
     return "broadly flat"
 
 
-def _note(gold_yoy, moto_share, collateral_score, outlook):
+def _note(gold_yoy, veh_yoy, moto_share, collateral_score, outlook):
     direction = _dir_word(outlook)
     parts = ["Collateral recovery value %s." % direction]
     if gold_yoy is not None:
@@ -299,6 +404,15 @@ def _note(gold_yoy, moto_share, collateral_score, outlook):
             parts.append("Gold %.1f%% YoY (global proxy) does not support pawn-collateral value." % gold_yoy)
     else:
         parts.append("Gold board signal absent.")
+    if veh_yoy is not None:
+        if veh_yoy < 0:
+            parts.append("Used car/pickup resale prices %.1f%% YoY (BoT UVPI, measured) — "
+                         "a real drag on vehicle-title recovery value." % veh_yoy)
+        else:
+            parts.append("Used car/pickup resale prices +%.1f%% YoY (BoT UVPI, measured) — "
+                         "vehicle-title recovery value holding." % veh_yoy)
+    else:
+        parts.append("BoT UVPI used-vehicle price signal absent.")
     if moto_share is not None:
         parts.append("Motorcycles are %.0f%% of the DLT fleet (measured) — "
                      "%s used-bike depreciation exposure on title collateral."
@@ -313,15 +427,21 @@ def _note(gold_yoy, moto_share, collateral_score, outlook):
     return " ".join(parts)
 
 
-def _headline(gold_yoy, nat_outlook, n_soft, n_total):
+def _headline(gold_yoy, veh_yoy, veh_period, nat_outlook, n_soft, n_total):
     g = ("Gold +%.1f%% YoY (global proxy) is the dominant collateral tailwind"
          % gold_yoy) if gold_yoy is not None else "Gold board signal absent"
+    if veh_yoy is not None:
+        per = (" to %s" % veh_period) if veh_period else ""
+        v = ("; used car/pickup resale prices %+.1f%% YoY%s (BoT UVPI, measured) pull the vehicle "
+             "side the other way" % (veh_yoy, per))
+    else:
+        v = ""
     if nat_outlook is None:
-        return "%s; no collateral-weighted national outlook (no province scores)." % g
+        return "%s%s; no collateral-weighted national outlook (no province scores)." % (g, v)
     dirn = _dir_word(nat_outlook)
-    return ("%s. Exposure-weighted national collateral outlook is %s (%.3f); "
-            "%d of %d provinces are softening on used-motorcycle-title depreciation."
-            % (g, dirn, nat_outlook, n_soft, n_total))
+    return ("%s%s. Exposure-weighted national collateral outlook is %s (%.3f); "
+            "%d of %d provinces are softening."
+            % (g, v, dirn, nat_outlook, n_soft, n_total))
 
 
 def dumps(obj):

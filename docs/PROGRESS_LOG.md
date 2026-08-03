@@ -3,6 +3,62 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Integration loop: collateral recovery-value outlook is now PRICE-AWARE (measured BoT UVPI) — PR (not committed)
+
+Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped; GISTDA 40m crop needs the
+`GISTDA_SPHERE_KEY` secret which is NOT exposed to this CI session, so its puller can't be built+verified
+here; BAAC credit stays CI-blocked). A negative-space sweep confirmed no high-value MEASURED file sits
+unwired, and surfaced two depth candidates. Candidate 1 (surface `farm_income_impact.json`'s per-branch
+array) was **rejected on inspection**: that array is `basis: "allocation"` — the province number copied
+onto every branch (zero within-province variance), so a per-branch readout would imply a branch grain that
+does not exist. Candidate 2 is this ship.
+
+**The defect fixed (objective #1, honesty + correctness).** `build_collateral_outlook.py` produced the
+per-province collateral RECOVERY-value outlook (the "firming vs softening" read on `#overview` and the
+#home risk card) from gold YoY + a `moto_term` that **assumed** vehicle-title-heavy provinces were
+softening — with NO regard for whether used-vehicle resale prices were actually rising or falling. It
+would have printed "softening on used-motorcycle-title depreciation" in a year when used-vehicle prices
+were RISING. Worse, the app's own note told the reader "**no live Thai used-vehicle price index in this
+data**" and the pickup card said "**No live Thai used-pickup index yet**" — both FALSE since
+`used_vehicle_value.json` (BoT UVPI, 2015=100, car + truck=รถกระบะ pickup series, MEASURED) was committed.
+The measured signal was sitting in the repo, unused, while the layer asserted a direction with no price
+evidence and told the reader the measurement didn't exist.
+
+**The fix.** Folded the MEASURED BoT UVPI used-vehicle price direction into the outlook:
+- `build_collateral_outlook.py` reads `platform/data/used_vehicle_value.json`, computes the trailing YoY
+  of the car and pickup series (newest period IN the data vs the same month a year earlier — anchored on
+  data vintage, never wall clock), equal-weights them into a blended used-vehicle YoY, and maps it to a
+  new `veh_price_term = clamp(used_veh_yoy / 15, -1, 1)` MEASURED national leg. Current read: car −8.33%,
+  pickup −0.37%, blended −4.35% YoY to 2026-05 → veh_price_term −0.29 (a real, measured drag).
+- New formula: `outlook = 0.6*gold_term + 0.25*veh_price_term − 0.15*moto_term`. The gold:vehicle weight
+  balance is held at the prior **60:40**; within the vehicle 0.40, the MEASURED price direction now leads
+  (0.25) and the unmeasured motorcycle structural proxy is DEMOTED (0.15 from 0.40). UVPI does not price
+  motorcycles, so the moto slice keeps its structural exposure proxy — said plainly in `meta.caveats`.
+- New MEASURED fields on `national` (`used_veh_yoy_car/pickup/blended`, `used_veh_price_period`,
+  `veh_price_term`) and per province (`used_veh_yoy`, `components.veh_price_term`); docstring, `meta.fields`
+  / `formula` / `provenance` / `caveats`, and the per-row notes/headline all updated. The composite stays
+  labelled ESTIMATED (it blends measured legs with chosen weights); its price legs are labelled MEASURED.
+- `app.js renderCollatOutlook`: replaced the false "no live index" editorial pickup card with a MEASURED
+  "Used car/pickup resale value" card driven by the new `national` fields (null-safe fallback to the old
+  editorial card when absent); corrected the national-outlook card note and the section read-note to cite
+  the measured UVPI leg and stop claiming no index exists. Motorcycle card now says plainly it is NOT
+  covered by the BoT car/pickup index.
+
+**Why a PR, not a direct commit.** It alters a surfaced card's numbers and the outlook weights are a
+modelling judgment Kaustav should sign off on (he has pushed back before on "made-up" composite knobs) —
+so the mandate's "alters app behaviour / not fully confident → open a PR" path applies.
+
+- **Verification (all pass):** `node --check app.js` OK; `build_collateral_outlook.py --check` reproduces
+  byte-for-byte (77 provinces); `build_provenance.py` regenerated (136 layers · 75 measured / 61 estimated
+  / **0 unlabelled** · 0 without a meta stamp); `bash tests/run.sh check` → **121 passed, 0 failed**
+  (data integrity 455/455); headless render of `index.html#overview` → **no uncaught JS errors**
+  (`data-errors="[]"`), the new MEASURED card + corrected notes present. Diff = `build_collateral_outlook.py`
+  + `app.js` (renderCollatOutlook) + regenerated `collateral_outlook.json` + provenance + this log.
+- **Next recommended:** GISTDA 40m satellite crop-area (`GISTDA_SPHERE_KEY`) — needs the secret plumbed
+  into the CI job's env before a puller can be built and verified; and the GISTDA flooded-AREA dissolve
+  (NEXT_STEPS §0), a shapely geometry job needing a fresh keyed pull.
+
 ## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `rival_threat_region.json` — committed to master
 
 Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
