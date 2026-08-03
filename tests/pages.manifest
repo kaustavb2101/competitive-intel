@@ -16,9 +16,18 @@
 
 # index default tab is "Overview": it renders macro + region tables but does NOT create the Leaflet
 # map (that's lazy-initialised only when the National tab is opened), so gl=none, min_canvas=0.
-index	index.html	none	0	macro,region
+# hooks: #macro is the JS-populated macro strip (static-empty in index.html, filled from meta.json on
+# render). The old second hook #region asserted the "Segment signals by region" table, which was
+# REMOVED 2026-08-01 (owner directive: real numbers, not a score-of-a-score) — so #region no longer
+# exists in the settled DOM and the health gate reported a false "missing #region" on every run.
+index	index.html	none	0	macro
 national	index.html#map	leaflet	1	map
-risk-trend	index.html#trend	none	0	trendbaseline
+# hooks: #trendregions is the region-mover list (JS-rendered from deltas.json, e.g. "Isan · 601
+# branches"). The old hook #trendbaseline is the SINGLE-VINTAGE placeholder — it is empty in the
+# shipped MULTI-vintage state (currently 2025M12 → 2026M06), so the gate reported a false
+# "#trendbaseline empty" every run. If snapshot history is ever reset to a lone baseline vintage,
+# the movers disappear and #trendbaseline fills — switch this hook back to trendbaseline then.
+risk-trend	index.html#trend	none	0	trendregions
 acquisition	index.html#acq	none	0	amptbl,amprtbl
 branch-explorer	branch-explorer.html?lat=12.7506&lng=101.038&n=%E0%B8%A3%E0%B8%B0%E0%B8%A2%E0%B8%AD%E0%B8%87	webgl	1	map
 province-rayong	province.html?p=rayong	webgl	1	map,kpis,v-districts

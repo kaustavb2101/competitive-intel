@@ -3,6 +3,59 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Integration loop (QA-health): un-broke the page-health gate — two stale manifest hooks fixed (NEXT_STEPS §0d.8) — committed to master
+
+Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced — reconfirmed this run
+by grep; GISTDA 40m crop needs `GISTDA_SPHERE_KEY`, which is NOT in this CI env — checked). A
+negative-space sweep surfaced `farm_income_impact.json` as the top unwired MEASURED layer, but its
+per-branch array is `basis:"allocation"` (province value copied to every branch, zero within-province
+variance — the exact trap the 2026-08-03 collateral-outlook run already rejected), and surfacing its
+province layer is a surfaced-numbers app change that needs a PR + owner signoff. So this run took the
+cleanest fully-CI-verifiable safeguard fix instead: **NEXT_STEPS §0d item 8 — the page-health gate was
+structurally broken (0 passed / 10 failed), every failure a false `missing #<hook>`.**
+
+**The defect.** `tests/pages.manifest` is the harness's single source of truth for which DOM hooks must
+exist & be non-empty after each page settles. Two rows asserted hooks that the current app no longer
+renders, so `bash tests/run.sh health` failed on EVERY page — a completely non-functional gate that
+could not tell a real regression from its own stale config:
+- `index` asserted `macro,region`. `#region` was the "Segment signals by region" Overview table,
+  **removed 2026-08-01** (owner directive: real numbers, not a score-of-a-score). Confirmed absent from
+  the settled DOM (`grep -c 'id="region"'` → 0). `#macro` (the JS-populated macro strip) still renders.
+- `risk-trend` asserted `trendbaseline`. That element is the SINGLE-VINTAGE placeholder — **empty in the
+  shipped MULTI-vintage state** (currently 2025M12 → 2026M06, so the movers render into `#trendregions`,
+  e.g. "Isan · 601 branches", and `#trendbaseline` stays len 0). The gate reported "#trendbaseline empty"
+  every run.
+
+**The fix (test-config only — NO app/data/HTML/provenance touched).** Repointed the two hooks to the
+elements the pages actually render now — `index` → `macro`, `risk-trend` → `trendregions` — each a
+genuine JS-populated content assertion (both are static-empty in source and filled on render, so a broken
+page still fails the gate; this is not a weakening). Added manifest comments recording why `#region` and
+`#trendbaseline` were dropped and, for the trend row, that the hook should flip back to `trendbaseline`
+if the snapshot history is ever reset to a lone baseline vintage. All 8 remaining rows were re-derived
+against the live settled DOM and confirmed already-correct (national/`map` canvas-backed, acquisition/
+`amptbl,amprtbl`, branch-explorer/`map`, both data-book/`db-root`, and the three 3D pages' `map,kpis,
+v-districts` / `map,focalName,leads,recos` all present) — so no other row needed a change.
+
+- **Verification (all pass):** rendered each page headless (chromium/swiftshader) and ran the real
+  `tests/lib/health.sh` per row — the two fixed pages now pass (`#macro present & non-empty`,
+  `#trendregions present & non-empty`); index/national/risk-trend/acquisition/branch-explorer/
+  data-book×2 **all health-green**; `province-chonburi` also rendered here (30s budget) and passed
+  `map,kpis`. The manifest parser (`grep -vE '^\s*#'`) correctly excludes the new comment lines — the
+  row set is unchanged at 10. `bash tests/run.sh check` → **121 passed, 0 failed** (unaffected — the
+  check phase does not read the manifest). No `platform/data` file changed → no `build_provenance.py`
+  regen needed. Diff = `tests/pages.manifest` + `docs/NEXT_STEPS.md` (§0d.8 marked done) + this log.
+- **Why a direct commit, not a PR.** Test-harness config only — no app behaviour, no visual, no surfaced
+  number, no data layer. It repairs a broken QA safeguard without altering what ships; same
+  safeguard-only direct-to-master path as the recent site-health probe commits.
+- **Note on the sibling open items (unchanged this run):** §0d.7 (the 3 heavy deck.gl pages time out
+  under the CI runner's software GL — they render fine here at a 30s budget, so it is a QA_BUDGET/runner
+  issue, not the pages) and §0d.9 (stale visual-regression baselines) are still open; the health phase
+  will now surface REAL hook regressions on the 7 non-3D pages instead of drowning in false positives.
+- **Next recommended:** surface `farm_income_impact.json`'s PROVINCE layer (measured crop-revenue
+  farm-income shock, obj #1) on `#exposure` as a PR — honest province-grain only, NOT the allocation-basis
+  per-branch array; or refresh the §0d.9 visual baselines now that `health` is trustworthy again.
+
 ## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `deltas.json` (the last unprobed front-door read) — committed to master
 
 Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
