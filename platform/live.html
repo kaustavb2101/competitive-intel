@@ -92,6 +92,11 @@
 .lb-unlock li{font:500 11.5px/1.6 var(--sans);color:var(--mid);break-inside:avoid;margin-bottom:2px}
 .lb-unlock li b{color:var(--ink,inherit);font-weight:600}
 @media(max-width:760px){.lb-unlock ul{columns:1}.lb-charts{grid-template-columns:1fr}}
+/* On a phone each chart is a single ~350px column, so the 1000-unit viewBox scales to ~0.26 and the
+   in-SVG axis/value labels (10-11 user-px) render at ~2.6px — legible on desktop, invisible on a
+   handset. Bump them ONLY below 520px (where the scale drops under ~0.5), so the tablet band + desktop
+   are byte-identical; headroom is ample (x-labels are ~6 apart, so no collision at these sizes). */
+@media(max-width:520px){.lb-axl{font-size:18px}.lb-lastv{font-size:19px}.lb-bandl{font-size:15px}}
 </style>
 </head>
 <body>
