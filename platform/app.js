@@ -9762,6 +9762,8 @@ function renderCollateralBook(){
       <div id="cb-vbrands"></div>
       <h4 class="fb-h4">Is the major-brand grip holding?<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED · DLT nameplate</span></h4>
       <div id="cb-resil"></div>
+      <h4 class="fb-h4">Which nameplates, and which are growing<span class="tag" style="color:var(--collat);border:1px solid var(--collat)">MEASURED national · DLT nameplate</span></h4>
+      <div id="cb-nameplates"></div>
       <h4 class="fb-h4">The collateral base by geography — and our exposure beside it</h4>
       <div id="cb-drill"></div>
       <p class="gd-foot">MOVED 2026-08-02 (owner review, point 13): <b>what we hold</b> — the full collateral
@@ -10555,6 +10557,102 @@ function renderCollateralBook(){
         b.classList.add('on'); b.setAttribute('aria-pressed','true'); draw(b.dataset.w);
       }));
     }).catch(()=>{ rz.style.display='none'; });
+
+    /* ---- 9. WHICH NAMEPLATES, AND WHICH ARE GROWING — the layer under the brand grip above ----
+       cb-vbrands (brand grain) and cb-resil (major-vs-minor brand grain) both stop one level above
+       the thing the owner actually asked for: "where is the per-MODEL data on the Macro tab?" This
+       panel reads the same DLT registry VMODELS already carries (data/vehicle_models.json →
+       plates_last12), one grain finer — every nameplate, not just the brand it ships under.
+
+       WHY THIS MATTERS COMMERCIALLY, NOT JUST TAXONOMICALLY: cb-vbrands already shows pickup as a
+       two-BRAND market (Toyota+Isuzu). This shows it is closer to a two-NAMEPLATE market — Hilux
+       Revo and D-Max alone, not "Toyota's various pickups" — which is a sharper concentration read:
+       the resale value of most of the pickup book rides on two specific models' residual history,
+       not on a brand's general reputation.
+
+       DEFENSIVE ON PURPOSE, BECAUSE TWO PRs LAND INDEPENDENTLY AND IN EITHER ORDER: the pipeline
+       side (build_vehicle_models.py) is adding prior_units/yoy_pct to each plates_last12.*.top[]
+       entry in a follow-up change. Today's file has neither field. This code must render a correct,
+       non-broken panel against BOTH shapes:
+         - today: unit + share columns only, with an honest note that growth isn't wired in yet
+         - once yoy_pct lands: a growth column, "new" for a nameplate with no comparable prior year
+           (prior_units null/0), "—" for a null growth that is NOT explained by a debut (an
+           incomplete comparison window), and NEVER 0% or +100% for either.
+       growthBuilt is detected by property PRESENCE (hasOwnProperty), not by value, so a real 0.0%
+       YoY move is never confused with "the column doesn't exist yet". */
+    const npz = document.getElementById('cb-nameplates');
+    if (npz) loadBrandTrends().then(()=>{
+      const V=VMODELS, PL=(V&&V.plates_last12)||null;
+      if(!PL){ npz.style.display='none'; return; }
+      const VM=(V||{}).meta||{};
+      const num=n=>n==null?'—':Math.round(n).toLocaleString('en-US');
+      const pctOf=n=>n==null?'—':n.toFixed(2)+'%';
+      const GROUP_LAB={pickup:'Pickup',ppv:'PPV'};
+      // Rows sorted defensively (never trust upstream order) and units/share back-filled if a row
+      // is missing share_pct, so a partial pipeline update degrades rather than blanks a column.
+      const rowsOf=key=>{
+        const g=PL[key]||{}; const rows=(g.top||[]).slice().sort((a,b)=>(b.units||0)-(a.units||0));
+        const total=g.units!=null?g.units:rows.reduce((s,x)=>s+(x.units||0),0);
+        return {g,rows,total};
+      };
+      const windowLab=g=>(g.window&&g.window.from&&g.window.to)
+        ? `${g.window.from} → ${g.window.to}`
+        : `trailing 12 months${VM.latest_month?', ending '+VM.latest_month:''}`;
+      const top2Line=key=>{
+        const {rows,total}=rowsOf(key); if(!rows.length) return null;
+        const top2=rows.slice(0,2);
+        const share=top2.reduce((s,x)=>s+(x.share_pct!=null?x.share_pct:(total?100*(x.units||0)/total:0)),0);
+        return {names:top2.map(x=>escHtml(x.plate||'—')).join(' + '),share};
+      };
+      const puTop2=top2Line('pickup'), ppvTop2=top2Line('ppv');
+      const vparts=[];
+      if(puTop2) vparts.push(`<b>${puTop2.names}</b> alone are <b>${puTop2.share.toFixed(1)}%</b> of new pickup nameplates`);
+      if(ppvTop2) vparts.push(`<b>${ppvTop2.names}</b> are <b>${ppvTop2.share.toFixed(1)}%</b> of new PPV nameplates`);
+      const anyGrowth=['pickup','ppv'].some(k=>((PL[k]||{}).top||[]).some(x=>Object.prototype.hasOwnProperty.call(x,'yoy_pct')));
+      const groupPanel=key=>{
+        const {g,rows,total}=rowsOf(key);
+        const cap=GROUP_LAB[key]||key;
+        if(!rows.length) return `<div class="vb-col"><div class="vb-cap">${escHtml(cap)}</div><p class="s">No nameplate data in this window.</p></div>`;
+        const growthBuilt=rows.some(x=>Object.prototype.hasOwnProperty.call(x,'yoy_pct'));
+        return `<div class="vb-col"><div class="vb-cap">${escHtml(cap)} <span class="s">· ${num(total)} units · ${escHtml(windowLab(g))}</span></div>
+          <div class="vb-scroll"><table class="ic-tbl"><thead><tr>
+            <th scope="col">Nameplate</th><th scope="col">Units</th><th scope="col">Share</th>${growthBuilt?'<th scope="col">YoY</th>':''}
+          </tr></thead><tbody>`
+          +rows.map(x=>{
+            const share=x.share_pct!=null?x.share_pct:(total?100*(x.units||0)/total:null);
+            let yc='';
+            if(growthBuilt){
+              if(x.yoy_pct==null){
+                // prior_units===0 is a MEASURED zero — the nameplate genuinely did not exist a year
+                // ago, so this is a real debut ("new"). prior_units missing/null is a different
+                // thing — the comparison itself isn't available (an incomplete window) — and must
+                // not be relabelled as a debut just because both happen to leave yoy_pct null.
+                const lab=x.prior_units===0?'new':'—';
+                yc=`<td class="n"><span class="gd-na">${lab}</span></td>`;
+              } else {
+                const v=x.yoy_pct, sign=v>0?'+':v<0?'−':'', col=v>0?'var(--merch)':v<0?'var(--agri)':'var(--dim)';
+                yc=`<td class="n" style="color:${col}">${sign}${Math.abs(v).toFixed(1)}%</td>`;
+              }
+            }
+            return `<tr${(share||0)>=20?' class="vb-big"':''}><td>${escHtml(x.plate||'—')}</td>`
+              +`<td class="n">${num(x.units)}</td><td class="n">${pctOf(share)}</td>${yc}</tr>`;
+          }).join('')
+          +`</tbody></table></div>
+          <p class="s vb-f">All ${rows.length} nameplate${rows.length===1?'':'s'} in the window — scroll, not a top-ten.${
+            growthBuilt?'':' <span class="gd-na">Year-over-year change is not built into this file yet; units and share are current.</span>'}</p></div>`;
+      };
+      npz.innerHTML=`<div class="verdict">${vparts.length
+          ? `<b>Pickup and PPV resale value is a bet on a couple of specific nameplates, not a diversified exposure.</b> In the trailing 12 months, ${vparts.join(', and ')} — one grain finer than the brand table above, and the sharper way to see the same concentration risk.`
+          : `<b>No nameplate data available in this window.</b>`}
+          <div class="sub" style="margin-top:6px">This is the same DLT registry as the two tables above, read at <b>NAMEPLATE</b> grain instead of brand.
+          <b>MEASURED, NATIONAL only</b> — DLT publishes brand/model with no province column, so there is no per-branch or per-province cut of this.
+          These are <b>first registrations</b> — the future collateral pool we would be seizing and reselling in years to come — <b>not our current book and not used-vehicle sales.</b>
+          ${anyGrowth?'':' <span class="gd-na">Growth (year-on-year) is not wired into this file yet — the table below shows units and share only.</span>'}</div></div>
+        <div class="vb-cols">${groupPanel('pickup')}${groupPanel('ppv')}</div>
+        <p class="gd-foot">MEASURED — DLT first registrations at nameplate grain (same source as the two tables above). Sorted by units, trailing 12 months.
+          A <b>new</b> growth cell means the nameplate had no comparable prior-year period (it did not exist a year ago); a <b>—</b> means the year-earlier comparison itself is not available for another reason.
+          Never read a blank as 0% or a debut as +100%.</p>`;
+    }).catch(()=>{ npz.style.display='none'; });
   }).catch(()=>{ host.style.display='none'; });
 }
 
