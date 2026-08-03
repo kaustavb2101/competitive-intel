@@ -141,6 +141,7 @@ class Deck:
         self.blank = self.prs.slide_layouts[6]
         self.slides = []       # list of (pptx slide, [draw ops]) for the preview renderer
         self.findings = []     # overflow / fit complaints
+        self.headings = []     # (eyebrow, title) per slide, so a review page needs no second list
 
     # ---------------------------------------------------------- primitives
     def new(self, ground=WHITE):
@@ -243,6 +244,7 @@ class Deck:
     # ---------------------------------------------------------- furniture
     def cover(self, title, sub, kicker):
         self.new(NAVY)
+        self.headings.append(("Cover", " ".join(title.split())))
         self.rect(10.73, 0, 2.60, self.H, GOLD)
         self.rect(10.73, 0, 0.12, self.H, RED)
         self.pic(ASSETS / "chaiyo.png", 0.70, 0.70, 3.20, 2.00)
@@ -253,6 +255,7 @@ class Deck:
 
     def divider(self, eyebrow, title, sub):
         self.new(NAVY)
+        self.headings.append((eyebrow, title))
         self.rect(12.83, 0, 0.18, self.H, RED)
         self.rect(13.01, 0, 0.18, self.H, GOLD)
         self.pic(ASSETS / "chaiyo.png", 0.70, 0.70, 2.72, 1.70)
@@ -264,6 +267,7 @@ class Deck:
     def content(self, eyebrow, title):
         """Returns the top of the usable content area."""
         self.new(WHITE)
+        self.headings.append((eyebrow, title))
         self.text(0.45, 0.24, 9.50, eyebrow.upper(), size=9, bold=True, color=RED)
         self.text(0.45, 0.50, 10.90, title, size=20, bold=True, color=NAVY, lh=25)
         self.pic(ASSETS / "autox.png", 11.63, 0.28, 1.03, 0.32)
