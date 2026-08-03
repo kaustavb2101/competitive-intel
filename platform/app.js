@@ -2411,12 +2411,28 @@ function renderCollatOutlook(){
   if(!colloLoaded) loadCollatOutlookData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   if(!fleetLoaded) loadFleetData().then(()=>{ try{renderCollatOutlook();}catch(e){} });
   if(!evexpLoaded) loadEvExposure().then(()=>{ try{renderCollatOutlook();}catch(e){} });
-  const cards=[
-    {k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
-     n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans. No live Thai used-pickup index yet.'},
-    {k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
-     n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book — see the motorcycle-share table below (DLT, measured).'},
-  ];
+  const cards=[];
+  // MEASURED used-car/pickup resale-price direction (BoT UVPI, from collateral_outlook.json national
+  // block) — the ACTUAL resale value AutoX recovers on a repossessed vehicle. This replaced the old
+  // "no live Thai used-vehicle price index yet" editorial card once the UVPI layer was folded into
+  // the outlook (2026-08-03). Null-safe: absent COLLO -> falls back to the editorial card below.
+  const _cn=COLLO&&COLLO.national;
+  if(_cn&&_cn.used_veh_yoy_blended!=null){
+    const cy=_cn.used_veh_yoy_car, py=_cn.used_veh_yoy_pickup, per=_cn.used_veh_price_period||'latest';
+    const dn=_cn.used_veh_yoy_blended<0;
+    const legs=[cy!=null?('car '+(cy<0?'':'+')+cy.toFixed(1)+'%'):null,
+                py!=null?('pickup '+(py<0?'':'+')+py.toFixed(1)+'%'):null].filter(Boolean).join(' · ');
+    cards.push({k:'Used car/pickup resale value', v:(_cn.used_veh_yoy_blended<0?'▼ ':'▲ +')+_cn.used_veh_yoy_blended.toFixed(1)+'%', d:'YoY, BoT UVPI', cls:dn?'down':'up',
+      n:'MEASURED · BoT used-vehicle price index (2015=100), YoY to '+per+' — '+legs+'. '+
+        'The actual resale value recovered on a repossessed car/pickup — the collateral behind the '+
+        'vehicle-title book. '+(dn?'Falling resale value lifts loss-given-default even before defaults move.':'Resale value holding up.')+
+        ' NATIONAL index (BoT does not publish it by province); motorcycles are not covered (see below).'});
+  }else{
+    cards.push({k:'Diesel-pickup collateral', v:'↓ pressure', d:'value at risk', cls:'down',
+      n:'Editorial / estimated watch · used-pickup glut + EV/PHEV transition erode resale of the trucks backing most title loans.'});
+  }
+  cards.push({k:'Used-motorcycle collateral', v:'↓ volatile', d:'lowest recovery', cls:'down',
+    n:'Motorcycle titles are the smallest, most volatile, lowest-recovery collateral on the book, and are NOT covered by the BoT car/pickup index — see the motorcycle-share table below (DLT, measured).'});
   // MEASURED national fleet trend (vehicle_fleet.json) — the collateral BASE size + whether it is
   // growing or shrinking (DLT/MOT registry). This is the measured companion to the editorial cards
   // above: it puts a real YoY number on the diesel-pickup / motorcycle collateral-pool direction.
@@ -2451,18 +2467,20 @@ function renderCollatOutlook(){
   const nat=COLLO&&COLLO.national;
   if(nat&&nat.exposure_weighted_outlook!=null){
     const o=nat.exposure_weighted_outlook, firm=o>=0;
+    const vy=nat.used_veh_yoy_blended;
+    const vleg=vy!=null?(' Vehicle side is the measured drag (used car/pickup '+(vy<0?'':'+')+vy.toFixed(1)+'% YoY, BoT UVPI); gold is the tailwind.'):'';
     cards.push({k:'Recovery outlook (national)', v:firm?'firming':'softening', d:(firm?'+':'')+o.toFixed(2)+' index', cls:firm?'up':'down',
       n:'Estimated directional read · '+(nat.n_firming||0)+'/'+(nat.n_provinces||0)+' provinces firming; most at-risk '+(nat.most_at_risk_province||'—')+
-        ' (highest motorcycle-title share). Based on measured DLT vehicle mix. NOT a measured recovery rate.'});
+        ' (highest motorcycle-title share).'+vleg+' A composite of MEASURED gold + MEASURED used-vehicle prices + a structural moto proxy. NOT a measured recovery rate.'});
   }
   el.innerHTML=cards.map(c=>`<div class="mcard"><div class="k">${c.k}</div>
     <div class="v ${c.cls}">${c.v}</div><div class="d ${c.cls==='up'?'up':'dn'}">${c.d}</div>
     <div class="n">${c.n}</div></div>`).join('');
   const note=$('#collat-note');
-  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the diesel-pickup and used-motorcycle sides both face a slow value squeeze. '+
+  if(note) note.innerHTML='<b>Read:</b> AutoX lends against <b>vehicle titles</b> (pickups, cars, motorcycles) — the car/pickup and used-motorcycle sides both face a slow value squeeze. '+
     'If recovery values on repossessed vehicles fall, loss-given-default on the title book rises even before any change in default rates. '+
     'The same EV transition also has an <b>income-side</b> channel — the measured ICE auto-parts workforce card is exposure (jobs that could be pressured), not a job-loss forecast. '+
-    'These directions are an <b>estimated / editorial watch</b> (no live Thai used-vehicle price index in this data); the vehicle-mix shares below are measured (DLT).';
+    'The car/pickup direction is now <b>measured</b> (BoT UVPI used-vehicle price index, national); motorcycles are not in that index, so their direction stays an estimated watch. The vehicle-mix shares below are measured (DLT).';
 }
 /* ---------- Diesel-pickup collateral · per-province diesel share + national brand mix ----------
    objective #1, MEASURED. AutoX's core title collateral is the diesel pickup; the EV/diesel
