@@ -275,6 +275,25 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_vehicle_models.py --check (dlt model-grain mirror absent or output not generated — not data drift)"
   else bad "build_vehicle_models.py --check (vehicle_models.json drifted from the dlt model-grain mirror)"
   fi
+  # vehicle_mix / used_vehicle_value project COMMITTED source-data (vehicle_mix_province.json, bot_uvpi.json),
+  # so both byte-reproduce here — they were previously outside the gate, leaving app-consumed committed
+  # layers unprotected against silent drift. vehicle_brands reads the OWNER-SIDE gitignored dlt mirror, so it
+  # SKIPs in CI like its dlt-fed siblings above.
+  ( cd "$PIPE" && python3 build_vehicle_mix.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_mix.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_mix.py --check (source-data/vehicle_mix_province.json absent — not data drift)"
+  else bad "build_vehicle_mix.py --check (vehicle_mix.json drifted from source-data/vehicle_mix_province.json)"
+  fi
+  ( cd "$PIPE" && python3 build_used_vehicle_value.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_used_vehicle_value.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_used_vehicle_value.py --check (source-data/bot_uvpi.json absent — BOT pull, not data drift)"
+  else bad "build_used_vehicle_value.py --check (used_vehicle_value.json drifted from source-data/bot_uvpi.json)"
+  fi
+  ( cd "$PIPE" && python3 build_vehicle_brands.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_vehicle_brands.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_vehicle_brands.py --check (source-data/dlt/raw mirror absent — owner-side dlt pull, not committed)"
+  else bad "build_vehicle_brands.py --check (vehicle_brands.json drifted from the dlt raw mirror)"
+  fi
   ( cd "$PIPE" && python3 build_napprang.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_napprang.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_napprang.py --check (oae_napprang.json absent or output not generated — not data drift)"
@@ -342,6 +361,14 @@ phase_check(){
     else bad "$ing.py --check (output drifted from source-data/staging/ — run: python3 pipeline/$ing.py)"
     fi
   done
+  # macro_indicators projects COMMITTED Thai-official series (nesdc_gdp / tpso_cpi / bot_current_account /
+  # bot_tourist_arrivals), so it byte-reproduces here; it was outside the gate, leaving the Macro-backdrop
+  # layer (macro_indicators.json) unprotected against silent drift.
+  ( cd "$PIPE" && python3 build_macro_indicators.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_macro_indicators.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_macro_indicators.py --check (a bot/nesdc/tpso source-data series absent — network pull, not data drift)"
+  else bad "build_macro_indicators.py --check (macro_indicators.json drifted from nesdc_gdp/tpso_cpi/bot_current_account/bot_tourist_arrivals)"
+  fi
   ( cd "$PIPE" && python3 build_rival_threat.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_rival_threat.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_rival_threat.py --check (rival_reputation.json absent — Google Places pull, not data drift)"

@@ -3,6 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Integration loop: close the determinism-gate hole for four ungated `--check` builders — committed to master
+
+Autonomous integration run. The scheduled backlog's top items were already shipped (FPO PICO fold-in —
+`build_pico_census`/`build_pico_district`/`build_pico_competitors`/`build_branch_pico`, all gated and live
+on the `#map` `dpico`/`doutnum` lenses; per-branch measured cropland — `build_branch_cropland.py` gated +
+wired via `loadBranchCropland`), and the remaining data unlocks (BAAC/SME credit penetration, GISTDA 40m
+crop-area) stay CI-blocked (gitignored Thai-IP xlsx / live-network puller). So this run closed a **gate-
+coverage hole** instead: a deterministic-regression audit found four `build_*.py` scripts that carry a
+`--check` and produce **committed, app-consumed** `platform/data` layers but were **not referenced by
+`tests/run.sh`** — meaning a builder regression or a hand-edit to those JSONs would ship silently.
+
+Three of them byte-reproduce right now on a fresh clone (their inputs are committed), so they were entirely
+unprotected:
+- `build_macro_indicators.py` → `macro_indicators.json` (Macro-backdrop card: NESDC GDP / TPSO CPI /
+  BoT current-account + tourist-arrivals).
+- `build_used_vehicle_value.py` → `used_vehicle_value.json` (collateral UVPI, `tmliFetch('used_vehicle_value')`).
+- `build_vehicle_mix.py` → `vehicle_mix.json` (fleet mix, `tmliFetch('vehicle_mix')`).
+
+Added all three to the gate using the established 0/3/else idiom (`ok` / `skip` on absent input / `bad` on
+drift), placed beside their siblings (the two vehicle checks after `build_vehicle_models`; the macro check
+after the staging-ingest loop). Also added `build_vehicle_brands.py` → `vehicle_brands.json` for family
+completeness — its input is the owner-side gitignored DLT raw mirror, so it correctly **SKIPs** in CI (exit
+3), exactly like `build_vehicle_registry`/`build_brand_trends` beside it, and becomes a real check the day
+that mirror is committed. No app/visual/data change — `tests/run.sh` only.
+
+**Safeguard protocol (all passed):** `bash tests/run.sh check` → **121 passed / 0 failed** (was 118; +3 new
+PASS + 1 SKIP), data integrity **455/455**, exit 0. Only `tests/run.sh` + this log touched; no `platform/data`
+file added, so no `build_provenance.py` regeneration required. No secrets in diff. Test-harness-only change,
+so committed straight to master (no PR/headless-render needed). **Next recommended integration:** the BAAC
+personal-credit penetration layer (`build_baac_credit.py`, already written + `--check`-ready but SKIP-only
+here) — it needs the owner-side `source-data/datagoth/baac_credit.xlsx` re-pulled from a Thai IP and the
+distilled output committed; then gate it (same SKIP-safe pattern) and surface it alongside the household-DTI
+lens as an inverse formal-credit-penetration read (objective #1).
+
 ## 2026-08-02 — Intelligence loop (service): deploy site-health probe for `macro_book.json` — merged to master
 
 Autonomous market/service-intelligence run. Closed the SERVICE_AUDIT's own flagged "next probe target":
