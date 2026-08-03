@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCOM · 5 Aug 2026 — Macro: the external conditions moving the book</title>
+<style>
+:root{
+  --bg:#0C0F16; --panel:#141922; --line:#232A38; --line2:#2E3646;
+  --hi:#EEF1F7; --txt:#CDD3E0; --mid:#8590A6; --dim:#6B7790;
+  --accent:#5B7CFA;
+  --agri:#E0574F; --merch:#23A28F; --collat:#8E63E8; --gold:#E6B450;
+  --sans:'IBM Plex Sans Thai','IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){
+  :root{--bg:#F4F6FA; --panel:#FFFFFF; --line:#DCE2EC; --line2:#C9D2E0;
+    --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#5B6678;
+    --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --gold:#A67714;}
+}
+:root[data-theme="dark"]{--bg:#0C0F16; --panel:#141922; --line:#232A38; --line2:#2E3646;
+  --hi:#EEF1F7; --txt:#CDD3E0; --mid:#8590A6; --dim:#6B7790;
+  --agri:#E0574F; --merch:#23A28F; --collat:#8E63E8; --gold:#E6B450;}
+:root[data-theme="light"]{--bg:#F4F6FA; --panel:#FFFFFF; --line:#DCE2EC; --line2:#C9D2E0;
+  --hi:#0F1420; --txt:#2A3346; --mid:#57627A; --dim:#5B6678;
+  --agri:#C0392F; --merch:#0E7C68; --collat:#5B3FB3; --gold:#A67714;}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px 80px}
+
+/* ---- slide ---- */
+.slide{border-top:1px solid var(--line);padding:44px 0 40px}
+.slide:first-of-type{border-top:none}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--dim);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:0 0 10px}
+.eyebrow .n{color:var(--accent);font-weight:600}
+h1{font-size:clamp(28px,4.6vw,44px);line-height:1.12;letter-spacing:-.6px;color:var(--hi);
+  margin:0 0 16px;text-wrap:balance;font-weight:600}
+h2{font-size:clamp(21px,2.9vw,30px);line-height:1.2;letter-spacing:-.3px;color:var(--hi);
+  margin:0 0 14px;text-wrap:balance;font-weight:600}
+h3{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--mid);
+  margin:26px 0 10px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:6px}
+p{margin:0 0 12px;max-width:68ch}
+.lead{font-size:16.5px;color:var(--txt)}
+.sub{color:var(--mid);font-size:13.5px}
+b,strong{color:var(--hi);font-weight:600}
+
+/* ---- provenance chips ---- */
+.tag{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.6px;padding:2px 8px;
+  border-radius:20px;border:1px solid;vertical-align:2px;white-space:normal;display:inline-block;
+  max-width:100%;text-transform:uppercase}
+.tag.m{color:var(--merch);border-color:var(--merch)}
+.tag.e{color:var(--gold);border-color:var(--gold)}
+.tag.mix{color:var(--collat);border-color:var(--collat)}
+
+/* ---- kpi grid ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px;margin:18px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;min-width:0}
+.kpi .k{font-size:11.5px;color:var(--mid);letter-spacing:.3px}
+.kpi .v{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--hi);margin:3px 0 2px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.kpi .n{font-size:11px;color:var(--dim);line-height:1.4;overflow-wrap:anywhere}
+.kpi.up .v{color:var(--merch)} .kpi.dn .v{color:var(--agri)} .kpi.wa .v{color:var(--gold)}
+
+/* ---- tables ---- */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;max-width:100%}
+table{border-collapse:collapse;width:auto;min-width:100%;font-size:13.5px}
+th,td{text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--line)}
+th{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--mid);font-weight:600;
+  white-space:nowrap;border-bottom-color:var(--line2)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap;padding-right:0}
+tr:last-child td{border-bottom:none}
+.up{color:var(--merch)} .dn{color:var(--agri)} .wa{color:var(--gold)} .fl{color:var(--mid)}
+
+/* ---- bar ---- */
+.bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;min-width:56px;display:block}
+.bar i{display:block;height:100%;border-radius:4px}
+
+/* ---- callout ---- */
+.note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:14px 16px;margin:18px 0}
+.note.warn{border-left-color:var(--gold)}
+.note.risk{border-left-color:var(--agri)}
+.note h4{margin:0 0 7px;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--mid);font-weight:600}
+.note p{margin:0 0 8px;font-size:13.5px}
+.note p:last-child{margin:0}
+.note ul{margin:0;padding-left:18px;font-size:13.5px}
+.note li{margin:0 0 6px}
+.note li:last-child{margin:0}
+
+/* ---- answer band ---- */
+.ans{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:20px 22px;margin:20px 0}
+.ans .row{display:flex;gap:14px;padding:11px 0;border-top:1px solid var(--line)}
+.ans .row:first-of-type{border-top:none;padding-top:0}
+.ans .row:last-child{padding-bottom:0}
+.ans .q{flex:0 0 34%;min-width:0;font-size:12.5px;color:var(--mid);line-height:1.4}
+.ans .a{flex:1;min-width:0;font-size:14px;color:var(--txt)}
+.ans .a b{color:var(--hi)}
+@media (max-width:620px){.ans .row{flex-direction:column;gap:3px}.ans .q{flex:none}}
+
+.foot{border-top:1px solid var(--line);margin-top:44px;padding-top:16px;font-size:11.5px;color:var(--dim)}
+.foot p{max-width:none}
+code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
+@media print{
+  :root{--bg:#fff;--panel:#fff;--hi:#111;--txt:#222;--mid:#555;--dim:#666;--line:#ccc;--line2:#999}
+  .slide{break-inside:avoid;page-break-inside:avoid;border-top:1px solid #ccc}
+  h1,h2{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============================================================ 1 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">MCOM</span><span>Wednesday 5 August 2026</span><span>AutoX / เงินไชโย</span></p>
+  <h1>Macro: the external conditions moving the book.</h1>
+  <p class="lead">This is the <b>Macro tab</b> — external data only. Nothing here is our loan book;
+  the book has its own tab. The question this answers is narrower and more useful:
+  <b>what is happening outside the company that will show up inside it.</b></p>
+
+  <div class="ans">
+    <div class="row"><div class="q">Is the economy the problem?</div>
+      <div class="a"><b>No.</b> Growth and inflation both came in <b>above</b> what the IMF projected for 2026,
+      and rates are at 1.0%. The macro backdrop is a mild tailwind.</div></div>
+    <div class="row"><div class="q">Are crop prices the problem?</div>
+      <div class="a"><b>No — they are a tailwind too.</b> Rice +17.9%, rubber +32.4%, palm +18.2% YoY.
+      Only sugar is falling hard (−13.5%).</div></div>
+    <div class="row"><div class="q">So what <em>is</em> deteriorating?</div>
+      <div class="a"><b>The collateral.</b> Used pickup values sit <b>50% below their peak</b> and 33 points
+      below their own 2015 base, and new pickup registrations have fallen <b>59% in three years</b>.
+      That is the pool we lend against, shrinking and cheapening at the same time.</div></div>
+    <div class="row"><div class="q">And the borrower?</div>
+      <div class="a"><b>Drought, not price.</b> <b>338 of 928 districts (36.4%)</b> are in drought.
+      The farm-price tailwind does not reach a household whose field did not yield.</div></div>
+  </div>
+
+  <p class="sub">Every figure carries its provenance. <span class="tag m">measured</span> means a
+  source published it. <span class="tag e">estimated</span> means we modelled it. Read them differently.</p>
+</section>
+
+<!-- ============================================================ 2 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">01</span><span>Macro overlay · current conditions</span></p>
+  <h2>The backdrop is benign, and it is finally current.</h2>
+  <p>Until last week this page was quoting a World Bank <em>annual average</em> that showed Thailand in
+  deflation at −0.13%. The Ministry of Commerce had already measured <b>+2.79% for May</b>. Every chip
+  below now comes from a Thai official source with its own vintage stamped on it.</p>
+
+  <div class="kpis">
+    <div class="kpi up"><div class="k">GDP growth</div><div class="v">+2.8%</div>
+      <div class="n">YoY · measured quarter, not a projection · NESDC 2026-Q1</div></div>
+    <div class="kpi wa"><div class="k">Inflation</div><div class="v">+2.79%</div>
+      <div class="n">headline CPI YoY · TPSO 2026-05</div></div>
+    <div class="kpi"><div class="k">Policy rate</div><div class="v">1.00%</div>
+      <div class="n">BoT policy rate · 2026-06</div></div>
+    <div class="kpi"><div class="k">USD/THB</div><div class="v">33.47</div>
+      <div class="n">ECB reference · 2026-07-31</div></div>
+    <div class="kpi wa"><div class="k">Household debt</div><div class="v">87.5%</div>
+      <div class="n">of GDP · BIS 2025-Q4</div></div>
+    <div class="kpi dn"><div class="k">Tourists</div><div class="v">32.2M</div>
+      <div class="n">arrivals, trailing 12 months · −6.6% YoY · BoT 2026-06</div></div>
+  </div>
+  <p><span class="tag m">measured</span> All six are pulled from the publishing agency, not typed in.
+  Sources: NESDC, TPSO (Ministry of Commerce), Bank of Thailand, BIS, ECB.</p>
+
+  <div class="note">
+    <h4>Thailand has already overtaken the IMF's 2026 projection</h4>
+    <p>The IMF projected <b>1.5%</b> growth and <b>0.9%</b> inflation for 2026. The measured outturns are
+    <b>+2.8%</b> and <b>+2.79%</b> — <b>1.3 points</b> and <b>1.9 points</b> higher. Where a Thai
+    measurement exists, we show it instead of the projection and say which is which.</p>
+  </div>
+
+  <div class="note warn">
+    <h4>One number is deliberately not on this page</h4>
+    <p>The current account printed <b>−7,591 USD million in April 2026</b> — but the trailing twelve
+    months of that same series net to roughly <b>+847M</b>. A single month shown alone would read as a
+    national crisis and would be wrong. The honest trailing figure is not yet built, so the chip waits.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">02</span><span>Commodity board · the segments diverge</span></p>
+  <h2>Farm prices are a tailwind. One crop is not.</h2>
+  <p>Eleven commodities that map onto our borrower segments, year over year. The spread matters more
+  than the average: <b>this is not a uniform farm story.</b></p>
+
+  <div class="tw">
+  <table>
+    <tr><th scope="col">Commodity</th><th scope="col">Segment</th><th scope="col">Belt</th>
+      <th scope="col" class="num">YoY</th><th scope="col">What it means</th></tr>
+    <tr><td><b>Rubber</b></td><td class="sub">Crops</td><td class="sub">South · East</td>
+      <td class="num up">+32.4%</td><td class="sub">prices firmed sharply</td></tr>
+    <tr><td><b>Fishmeal</b></td><td class="sub">Fisheries</td><td class="sub">S · E coast</td>
+      <td class="num up">+27.1%</td><td class="sub">feed cost up — shrimp margin <em>down</em></td></tr>
+    <tr><td><b>Palm oil</b></td><td class="sub">Crops</td><td class="sub">South</td>
+      <td class="num up">+18.2%</td><td class="sub">firmer</td></tr>
+    <tr><td><b>Rice</b></td><td class="sub">Crops</td><td class="sub">Isan · N · Central</td>
+      <td class="num up">+17.9%</td><td class="sub">recovered — the largest belt by area</td></tr>
+    <tr><td><b>Beef</b></td><td class="sub">Livestock</td><td class="sub">Isan</td>
+      <td class="num up">+11.8%</td><td class="sub">world index up, but Thai cattle −40% off the 2022 peak</td></tr>
+    <tr><td><b>Maize</b></td><td class="sub">Crops</td><td class="sub">North</td>
+      <td class="num fl">+0.5%</td><td class="sub">stable</td></tr>
+    <tr><td><b>Logs</b></td><td class="sub">Forestry</td><td class="sub">NE · E</td>
+      <td class="num fl">0.0%</td><td class="sub">flat</td></tr>
+    <tr><td><b>Chicken</b></td><td class="sub">Livestock</td><td class="sub">Central · East</td>
+      <td class="num fl">−0.6%</td><td class="sub">flat</td></tr>
+    <tr><td><b>Sawnwood</b></td><td class="sub">Forestry</td><td class="sub">South · NE</td>
+      <td class="num fl">−1.6%</td><td class="sub">soft</td></tr>
+    <tr><td><b>Sugar</b></td><td class="sub">Crops</td><td class="sub">Isan · Central</td>
+      <td class="num dn">−13.5%</td><td class="sub"><b>world price weak — the one real price stress</b></td></tr>
+  </table>
+  </div>
+  <p><span class="tag mix">mixed · price measured, belt mapping estimated</span>
+  Prices are World Bank Pink Sheet / OAE, vintage <code>2026M06</code>. The province belt each
+  commodity is assigned to is our mapping, not the source's.</p>
+
+  <div class="note risk">
+    <h4>Read the Beef row carefully — it is the trap on this board</h4>
+    <p>The world beef index is <b>+11.8%</b>. Thai cattle prices are <b>down about 40% from their 2022
+    peak</b>. A cattle household in Isan is not experiencing +11.8%. The world index is the wrong
+    instrument for that borrower, and the row says so rather than letting the green number stand.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">03</span><span>Farm households · crops, margin &amp; drought</span></p>
+  <h2>The hazard is drought, not price.</h2>
+  <p>Prices are up almost everywhere. That tailwind reaches a household only if the field yielded.
+  <b>36.4% of Thailand's districts are in drought</b>, and the concentration is in the rice belt that
+  carries most of our farm exposure.</p>
+
+  <div class="kpis">
+    <div class="kpi dn"><div class="k">Districts in drought</div><div class="v">338</div>
+      <div class="n">of 928 (36.4%) · SPEI mean −0.84</div></div>
+    <div class="kpi dn"><div class="k">Extreme</div><div class="v">2</div>
+      <div class="n">districts at the extreme drought band</div></div>
+    <div class="kpi wa"><div class="k">Provinces scored</div><div class="v">77</div>
+      <div class="n">all of them, crop mix by planted area</div></div>
+    <div class="kpi"><div class="k">Double-stressed</div><div class="v">0</div>
+      <div class="n">no province is hit by drought <em>and</em> falling prices at once</div></div>
+  </div>
+
+  <h3>Most crop-stressed provinces</h3>
+  <div class="tw">
+  <table>
+    <tr><th scope="col">Province</th><th scope="col">Region</th><th scope="col">Dominant crops</th>
+      <th scope="col" class="num">Drought</th><th scope="col">Stress</th></tr>
+    <tr><td><b>อุบลราชธานี</b></td><td class="sub">Isan</td><td class="sub">Rice 79% · Rubber 12%</td>
+      <td class="num wa">0.52</td><td><span class="bar"><i style="width:100%;background:var(--agri)"></i></span></td></tr>
+    <tr><td><b>ร้อยเอ็ด</b></td><td class="sub">Isan</td><td class="sub">Rice 92% · Sugarcane 5%</td>
+      <td class="num dn">0.74</td><td><span class="bar"><i style="width:92%;background:var(--agri)"></i></span></td></tr>
+    <tr><td><b>สุรินทร์</b></td><td class="sub">Isan</td><td class="sub">Rice 88% · Rubber 7%</td>
+      <td class="num wa">0.59</td><td><span class="bar"><i style="width:78%;background:var(--agri)"></i></span></td></tr>
+    <tr><td><b>ศรีสะเกษ</b></td><td class="sub">Isan</td><td class="sub">Rice 86% · Rubber 10%</td>
+      <td class="num wa">0.55</td><td><span class="bar"><i style="width:72%;background:var(--gold)"></i></span></td></tr>
+    <tr><td><b>สุพรรณบุรี</b></td><td class="sub">Central</td><td class="sub">Rice 65% · Sugarcane 31%</td>
+      <td class="num dn">0.95</td><td><span class="bar"><i style="width:69%;background:var(--gold)"></i></span></td></tr>
+    <tr><td><b>นครสวรรค์</b></td><td class="sub">North</td><td class="sub">Rice 65% · Sugarcane 20%</td>
+      <td class="num wa">0.47</td><td><span class="bar"><i style="width:68%;background:var(--gold)"></i></span></td></tr>
+  </table>
+  </div>
+  <p><span class="tag mix">mixed · crop area measured, drought modelled</span>
+  Crop mix is measured planted area (OAE). Drought is a modelled SPEI index, not a field observation.
+  The stress score combines them and is <b>estimated</b>.</p>
+
+  <div class="note warn">
+    <h4>สุพรรณบุรี is the one to watch</h4>
+    <p>Drought <b>0.95</b> — effectively the top of the scale — and a third of its planted area is
+    <b>sugarcane</b>, the only crop on the board whose price is falling. It is the closest thing we
+    have to a genuine price-and-drought coincidence, even though the formal double-stress count is zero.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 5 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">04</span><span>Collateral outlook · what the titles are worth</span></p>
+  <h2>This is the slide that matters.</h2>
+  <p>We lend against vehicle titles. Both halves of that collateral are deteriorating at once:
+  <b>what a used vehicle is worth</b>, and <b>how many new ones are entering the pool</b> that will
+  become our collateral in three to five years.</p>
+
+  <h3>Resale value · BoT used-vehicle price index, 2015 = 100</h3>
+  <div class="kpis">
+    <div class="kpi dn"><div class="k">Pickup (รถกระบะ)</div><div class="v">66.8</div>
+      <div class="n">2026-05 · <b>−50.0% off its 2012 peak</b> · 33.2 pts below its own 2015 base</div></div>
+    <div class="kpi dn"><div class="k">Passenger car</div><div class="v">87.8</div>
+      <div class="n">2026-05 · −40.5% off peak · 12.2 pts below base</div></div>
+    <div class="kpi dn"><div class="k">Overall index</div><div class="v">75.2</div>
+      <div class="n">2026-05 · −46.3% off peak · 185 months of history</div></div>
+    <div class="kpi wa"><div class="k">Trough behind us?</div><div class="v">Yes</div>
+      <div class="n">pickup bottomed at 54.6 in 2024-10; it has recovered, but not to base</div></div>
+  </div>
+  <p><span class="tag m">measured</span> Bank of Thailand used-vehicle price index, 185 monthly
+  observations. The pickup series is confirmed to be <b>pickup trucks</b>, not heavy commercial —
+  BoT's own 2019 methodology paper. Latest month is preliminary.</p>
+
+  <div class="note risk">
+    <h4>The pickup–car gap is recent, not structural</h4>
+    <p>Through most of 2013–2021 pickups held their value <em>as well as or better than</em> cars.
+    The 20–34 point gap only opened from <b>2022 onward</b>. Whatever is depressing pickup resale
+    started four years ago and has not reversed — it is not a long-run property of the asset class.</p>
+  </div>
+
+  <h3>Inflow · new pickup registrations, the future collateral pool</h3>
+  <div class="tw">
+  <table>
+    <tr><th scope="col">Year</th><th scope="col" class="num">Pickups (PU)</th>
+      <th scope="col" class="num">of which PPV</th><th scope="col" class="num">Passenger car</th>
+      <th scope="col" class="num">Motorcycle</th></tr>
+    <tr><td><b>2022</b></td><td class="num">453,745</td><td class="num sub">62,879</td>
+      <td class="num">388,164</td><td class="num">1,802,995</td></tr>
+    <tr><td><b>2023</b></td><td class="num">359,042</td><td class="num sub">67,398</td>
+      <td class="num">436,636</td><td class="num">1,879,838</td></tr>
+    <tr><td><b>2024</b></td><td class="num">222,807</td><td class="num sub">41,234</td>
+      <td class="num">377,374</td><td class="num">1,709,157</td></tr>
+    <tr><td><b>2025</b></td><td class="num dn"><b>186,405</b></td><td class="num sub">42,067</td>
+      <td class="num">413,968</td><td class="num">1,736,355</td></tr>
+  </table>
+  </div>
+  <p><span class="tag m">measured</span> DLT first registrations at <b>nameplate</b> grain, on AutoX's
+  own definition: PU = any pickup nameplate <em>plus</em> any PPV nameplate, in any registration class.
+  A double-cab D-Max and a Fortuner are both pickups to this business even though the registrar files
+  them under "passenger car ≤7 seats". On the registrar's class column 2025 would read 99,984 — an
+  <b>86% understatement</b> of what we actually lend against.</p>
+
+  <div class="note risk">
+    <h4>Pickup inflow is down 59% in three years</h4>
+    <p><b>453,745 → 186,405.</b> Passenger cars and motorcycles are broadly flat over the same period,
+    so this is specific to pickups, not a general vehicle-market decline. The stock we already lend
+    against is <b>6.98 million pickups (−0.8% YoY)</b>. The pipeline refilling it has more than halved.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 6 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">05</span><span>Conditions at our grain · labour, fleet, hazard, business, debt</span></p>
+  <h2>The same five lenses, from the country down to a branch.</h2>
+  <p>Every table on this tab used to sit pinned at whatever grain its source publishes. They now roll
+  through one drill — <b>national → region → province → branch</b> — each on its own correct weight
+  (labour force, fleet stock, account count, district count), never a plain average of provinces.</p>
+
+  <h3>National, all five lenses</h3>
+  <div class="kpis">
+    <div class="kpi"><div class="k">Labour force</div><div class="v">41.9M</div>
+      <div class="n">unemployment 0.94% · seasonal idle 0.77% (325k waiting)</div></div>
+    <div class="kpi wa"><div class="k">Informality</div><div class="v">63.2%</div>
+      <div class="n">of employment has no payslip or social cover — our core demographic (2024)</div></div>
+    <div class="kpi"><div class="k">Vehicle fleet</div><div class="v">44.3M</div>
+      <div class="n">diesel 56.3% · electrified 2.6% · BEV 0.95%</div></div>
+    <div class="kpi dn"><div class="k">Districts dry</div><div class="v">36.4%</div>
+      <div class="n">338 of 928 · 134 of 794 river stations above high mark (16.9%)</div></div>
+    <div class="kpi wa"><div class="k">Household debt</div><div class="v">฿163,930</div>
+      <div class="n">per indebted household · 45% of households carry debt</div></div>
+    <div class="kpi dn"><div class="k">No cushion</div><div class="v">60%</div>
+      <div class="n">of households could not cover 3 months without income</div></div>
+  </div>
+  <p><span class="tag m">measured</span> NSO Labour Force Survey, ILOSTAT mirror of Thailand's official
+  submissions, DLT registry, MOT, DBD business registrations, ThaiWater telemetry, BoT.</p>
+
+  <div class="note warn">
+    <h4>Read 0.94% unemployment together with 63.2% informality, never instead of it</h4>
+    <p>Headline unemployment is structurally near zero in Thailand because informal work absorbs the
+    slack. A borrower who loses formal work does not appear in the unemployment number — they appear in
+    the informal count, on a lower and less predictable income. <b>The unemployment rate is not a
+    stress signal for this book.</b> Informality and the seasonal-idle share are.</p>
+  </div>
+
+  <div class="note">
+    <h4>Electrification is not yet a collateral problem — but it is the clock</h4>
+    <p>BEVs are <b>0.95%</b> of the fleet and diesel is still <b>56.3%</b>. Nothing to act on this
+    quarter. It is worth watching precisely because our collateral has a five-to-ten-year resale tail:
+    the fleet mix that matters for recoveries in 2032 is being registered now.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 7 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">06</span><span>Live · 24-hour telemetry</span></p>
+  <h2>The one feed that changes daily.</h2>
+  <p>Everything else on this tab is monthly or quarterly. River levels and rainfall are pulled every
+  day from ThaiWater, and they are the early-warning layer under the drought and flood picture.</p>
+
+  <div class="kpis">
+    <div class="kpi dn"><div class="k">Stations above high mark</div><div class="v">134</div>
+      <div class="n">of 794 (16.9%) · up from 84 on 11 July</div></div>
+    <div class="kpi wa"><div class="k">Provinces with heavy rain</div><div class="v">31</div>
+      <div class="n">latest reading, 2026-08-03</div></div>
+    <div class="kpi"><div class="k">Heaviest 24h gauge</div><div class="v">180mm</div>
+      <div class="n">2026-08-03 · the 08-02 reading hit 608mm</div></div>
+    <div class="kpi wa"><div class="k">Structural flood exposure</div><div class="v">34%</div>
+      <div class="n">685 of 2,015 branches on ground that flooded ≥7 of 12 years</div></div>
+  </div>
+  <p><span class="tag m">measured</span> ThaiWater live telemetry, pulled daily and accumulated —
+  nothing interpolated, a missed pull leaves a gap rather than an invented point. Structural flood
+  exposure is the GISTDA 1:50,000 repeated-flooding census, 2005–2016.</p>
+
+  <div class="note">
+    <h4>Two different things, deliberately kept apart</h4>
+    <p>The <b>live</b> pulse says what is happening this week. The <b>structural</b> census says which
+    ground floods repeatedly, whatever the weather is doing today. The second is a hazard flag — did
+    the ground flood, how often — and explicitly <b>not</b> a flooded-area or loss estimate, because the
+    source's per-event polygons overlap and any area total from them would be wrong.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 8 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">07</span><span>What this tab cannot tell you</span></p>
+  <h2>Four gaps, said plainly.</h2>
+  <div class="note warn">
+    <h4>Open</h4>
+    <ul>
+      <li><b>The current account is a single month, not a trend.</b> April 2026 shows −7,591 USD
+      million against a trailing-twelve-month figure of roughly +847M. The trailing aggregate is not
+      built yet, so the chip is withheld rather than shown misleadingly.</li>
+      <li><b>Government debt has no Thai source yet.</b> It still reads from the IMF at 2025 vintage
+      while every other chip on the strip is Thai-official and current.</li>
+      <li><b>The ฿44bn co-pay figure is unconfirmed.</b> The likely referent is ไทยช่วยไทย พลัส
+      (cabinet-approved 2026-05-19, government portion ≈฿49.6bn at its two-month mark) but it does not
+      cleanly match ฿44bn, so it has been left rather than guessed at.</li>
+      <li><b>Drought is modelled, not observed.</b> SPEI is an index derived from rainfall and
+      evapotranspiration. It is the best national-coverage signal available, but no one has walked
+      those 338 districts.</li>
+    </ul>
+  </div>
+  <p class="sub">These are on the record because a number whose weakness is stated is worth more in a
+  committee room than one that is quietly wrong.</p>
+</section>
+
+<!-- ============================================================ 9 -->
+<section class="slide">
+  <p class="eyebrow"><span class="n">08</span><span>So what</span></p>
+  <h2>Three things the macro picture asks of us.</h2>
+  <div class="ans">
+    <div class="row"><div class="q">Collateral valuation</div>
+      <div class="a">Pickup resale is <b>33 points below its own 2015 base</b> and the gap to cars opened
+      only in 2022. If our advance rates on pickup titles were set against pre-2022 behaviour, they are
+      set against a market that no longer exists.</div></div>
+    <div class="row"><div class="q">Collateral supply</div>
+      <div class="a">New pickup inflow is <b>down 59% in three years</b> while cars and motorcycles are
+      flat. The pool we will be lending against in 2030 is being determined now, and it is shrinking
+      faster than the fleet is.</div></div>
+    <div class="row"><div class="q">Borrower stress</div>
+      <div class="a">Watch <b>drought and informality</b>, not crop prices and not the unemployment rate.
+      Prices are a tailwind; 36.4% of districts are dry; 63.2% of employment is informal; 60% of
+      households cannot cover three months.</div></div>
+  </div>
+  <p class="sub">All three are readings of the network and book <em>we already run</em>. Nothing on this
+  tab is an argument to open, close, or expand anything.</p>
+
+  <div class="foot">
+    <p><b>MCOM · Wednesday 5 August 2026 · AutoX / บริษัท ออโต้ เอกซ์ จำกัด (เงินไชโย)</b></p>
+    <p>Scope: the platform's <b>Macro</b> tab only — external conditions. The loan book, competition,
+    and branch-level readouts are separate tabs and are not covered here.</p>
+    <p>Data vintages: prices <code>2026M06</code> · drought <code>2026-06-21</code> · CPI
+    <code>2026-05</code> · GDP <code>2026-Q1</code> · resale index <code>2026-05</code> ·
+    registrations <code>2025</code> · telemetry <code>2026-08-03</code>.
+    Every figure is reproducible from <code>platform/data/</code> and gated by
+    <code>tests/run.sh check</code>.</p>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
