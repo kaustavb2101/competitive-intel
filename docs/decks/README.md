@@ -7,10 +7,24 @@ python docs/decks/build_mcom_macro_pptx.py              # -> mcom-2026-08-05-mac
 python docs/decks/build_mcom_macro_pptx.py --preview    # + preview/slideNN.png thumbnails
 ```
 
-Deterministic, network-free, and it reads live layers out of `platform/data/` (currently
-`used_vehicle_value.json` for the resale chart), so a rebuild after a data refresh picks the new
-numbers up. Scope is the **Macro tab only** — external conditions, no loan book, no competition,
-no branch readouts.
+Deterministic, network-free, and every figure is read out of `platform/data/` at build time — no
+transcribed numbers — so a rebuild after a data refresh picks the new vintage up. Layers read:
+`farm_book`, `collateral_book`, `macro_book`, `farm_household`, `vehicle_models`, `imf_weo`,
+`commodity_history`, `used_vehicle_value`, `amphoe_crops`.
+
+Scope is the **Macro tab only** — external conditions, no competition, no branch readouts. It does
+cross those conditions with the real loan tape, because the tab itself does: `macro_book`,
+`farm_book` and `collateral_book` are the external layers joined to the book at four grains.
+
+Twenty slides in five parts: the answer · macro backdrop (2) · agriculture (5) · collateral (6,
+behind a divider) · conditions at our own grain and the close (4).
+
+**Two places the build argues with its own source, deliberately.** The six-month registration window
+ends on a month the pipeline flags as an incentive pull-forward, so the trend column is recomputed
+without it (`ols_slope`) and both callouts say what changes — the raw six-month slope reads +131
+pickups a month, the ex-January slope reads −986. And the drought slide's formal double-stress count
+is zero only because that test is scored on world prices; the worked counter-example on the Thai
+farm gate is named instead of presenting the clean zero.
 
 **Why python-pptx and not the html2pptx workflow.** Kanit is the house font — confirmed by reading
 the run properties of the LTV decks, not assumed — and it is not installed on the laptop. An HTML

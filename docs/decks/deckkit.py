@@ -441,6 +441,33 @@ class Deck:
             self.text(l + 0.02, t + 0.01, w - 0.10, ylab, size=8, color=GREY)
         return h
 
+    def ladder(self, l, t, w, segs, h=0.30, gap=0.035, legend=True, size=9):
+        """One stacked horizontal bar. segs: [(label, value, colour)].
+
+        Used for the arrears ladder and the crop mix, where the point is the PROPORTION and a
+        column of percentages makes the reader do the comparison themselves.
+        """
+        tot = sum(v for _, v, _ in segs) or 1
+        x = l
+        for i, (_lab, v, col) in enumerate(segs):
+            sw = max(0.0, (w - gap * (len(segs) - 1)) * v / tot)
+            self.rect(x, t, sw, h, col)
+            x += sw + gap
+        if not legend:
+            return h
+        ly = t + h + 0.10
+        lx = l
+        for lab, v, col in segs:
+            txt = f"{lab} {100 * v / tot:.1f}%"
+            tw = TX.width_in(txt, size, False) + 0.30
+            if lx + tw > l + w:                      # wrap the legend rather than run it off the box
+                lx = l
+                ly += size * 1.5 / PT_IN
+            self.rect(lx, ly + 0.045, 0.15, 0.10, col)
+            self.text(lx + 0.21, ly, tw, txt, size=size, color=NAVY)
+            lx += tw
+        return ly + size * 1.45 / PT_IN - t
+
     def bars(self, l, t, w, h, items, color=RED, dim=LINE, fmt=lambda v: f"{v:,.0f}"):
         """Vertical bars with the value written on top. items: [(label, value, highlight)]."""
         self.rect(l, t, w, h, "FBFCFE", line=LINE)
