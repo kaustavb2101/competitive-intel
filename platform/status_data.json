@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-03T10:17:38+00:00",
-    "commit": "912bcf0"
+    "generated_at": "2026-08-03T16:24:08+00:00",
+    "commit": "8bb8fec"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,48 @@
   ],
   "activity": [
     {
+      "date": "2026-08-03T16:24:08+00:00",
+      "sha": "8bb8fec",
+      "summary": "health(deploy): site-health probe guards deltas.json (#home Movers card + #trend tab)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-03T23:05:09+07:00",
+      "sha": "6690102",
+      "summary": "feat(macro): nameplate panel — which models, and which are growing (#275)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-03T22:59:44+07:00",
+      "sha": "6e3999e",
+      "summary": "feat(collateral): ground the recovery-value outlook in the MEASURED BoT UVPI used-vehicle price index (#272)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-03T22:59:24+07:00",
+      "sha": "570b6c4",
+      "summary": "feat(deck): MCOM 5 Aug — the Macro tab as a house-style PPTX, and the commodity board it got wrong (#274)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-03T14:29:46+00:00",
+      "sha": "01e70b8",
+      "summary": "docs(progress): log ux-nav-active-pill-scroll merge+deploy+verify (PR #273)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T21:25:49+07:00",
+      "sha": "de29bf5",
+      "summary": "ux: active nav pill scrolls into view in the mobile nav strip (#273)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T10:18:48+00:00",
+      "sha": "a0f3ecc",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_threat_region site-health probe ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-03T10:17:38+00:00",
       "sha": "912bcf0",
       "summary": "health(deploy): site-health probe guards rival_threat_region.json (#home hardest-to-defend card + #acq per-region table)",
@@ -667,48 +709,6 @@
       "date": "2026-08-02T16:19:43+00:00",
       "sha": "5d21e92",
       "summary": "health(deploy): site-health probe guards collateral_book.json (obj #1 collateral section)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-02T21:38:48+07:00",
-      "sha": "e32cdba",
-      "summary": "Collateral: pickups on AutoX's definition, and the answer to \"has resale value stabilised?\" (#261)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-02T14:22:47+00:00",
-      "sha": "b5f51d5",
-      "summary": "docs(progress): log ux-table-scope-acq-tables merge+deploy+verify (#260)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T21:19:01+07:00",
-      "sha": "ad6f3a2",
-      "summary": "ux: scope=\"col\" on the 11 #acq rival tables — completes app.js header sweep (#260)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T20:40:15+07:00",
-      "sha": "a5548f5",
-      "summary": "Macro tab: external collateral value, fleet mix and brands — plus the belt-drill width bug and Beef's missing Thai price (#258)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-02T10:30:24+00:00",
-      "sha": "9807901",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-02T10:29:50+00:00",
-      "sha": "a1cc7f3",
-      "summary": "health(deploy): site-health probe guards contested_pop + exit_whitespace",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-02T17:06:49+07:00",
-      "sha": "3abfab9",
-      "summary": "feat(risk): GISTDA repeated-flood hazard → per-district & per-branch MEASURED flag (#256)",
       "pillar": "service"
     }
   ]
