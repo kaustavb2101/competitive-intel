@@ -400,6 +400,42 @@ def _shape_peer_province(d):
     return None
 
 
+def _shape_rival_threat_region(d):
+    # The per-region density x service JOIN (rival_threat_region.json, obj #2) —
+    # the ONE competitive read that renders on the exec FRONT DOOR (renderHomeDefend
+    # draws the command-center "Where the network is hardest to defend" card off
+    # RIVTHREATREG.regions) AND on the Competition tab (drawRivThreatRegion renders
+    # the full per-region table + reads RIVTHREATREG.headline for the readout). Both
+    # gate on `RIVTHREATREG.regions` being a non-empty array and degrade SILENTLY
+    # when the file is missing/truncated — the front-door card just never un-hides
+    # (wrap.style.display stays hidden) and the tab drops to its "not yet computed"
+    # placeholder, with no phone alert. It was the last surfaced front-door
+    # competitive read (and its non-region sibling rival_threat) with no deploy
+    # probe — a truncated CDN deploy that guts it silently blanks the hardest-to-
+    # defend card on the exec's first screen, the same "broken demo" blind spot the
+    # peer_province / province_pressure / competitor_coverage probes closed for the
+    # sibling competitive reads. Asserts render shape (the regions gate + the density/
+    # service/class axes each row renders + the headline the readout reads), not
+    # values — robust to a future census/rating vintage shifting the ratios.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    regs = d.get("regions")
+    if not isinstance(regs, list) or len(regs) < 3:
+        return "missing/short 'regions' list (expected the 5 AutoX regions)"
+    r0 = regs[0]
+    if not isinstance(r0, dict) or not r0.get("region"):
+        return "first region missing 'region' name (row render read)"
+    if "rivals_vs_autox" not in r0:
+        return "first region missing 'rivals_vs_autox' (density axis / outgunned-x render)"
+    if "rating_wavg" not in r0:
+        return "first region missing 'rating_wavg' (service axis render)"
+    if not r0.get("threat_class"):
+        return "first region missing 'threat_class' (defensibility class render + #home sort key)"
+    if not isinstance(d.get("headline"), str) or not d["headline"].strip():
+        return "missing/blank 'headline' (Competition readout gate)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -1141,6 +1177,17 @@ DATA_FILES = [
     # the sibling obj-#1 reads. Asserts the index-aligned array shape + the meta header
     # citation keys, not values.
     ("data/flood_hazard.json", _shape_flood_hazard, ".branches 0-12 array of 2015 (index-aligned) + meta.source/data_vintage (Exposure flood-hazard panel)"),
+    # The per-region density x service JOIN (rival_threat_region.json, obj #2) — the
+    # last surfaced FRONT-DOOR competitive read with no deploy probe. It renders on
+    # the command-center "Where the network is hardest to defend" card (renderHomeDefend)
+    # AND the Competition per-region table (drawRivThreatRegion), both gated on a
+    # non-empty .regions array, both degrading SILENTLY (the #home card never un-hides;
+    # the tab drops to "not yet computed") with no phone alert when a truncated CDN
+    # deploy guts it — the same "broken demo" blind spot the peer_province /
+    # province_pressure / competitor_coverage probes closed for the sibling competitive
+    # reads. Asserts the render shape (regions gate + density/service/class axes + the
+    # headline the readout reads), not values.
+    ("data/rival_threat_region.json", _shape_rival_threat_region, ".regions (5) density×service axes + threat_class + .headline (#home hardest-to-defend card + #acq table)"),
 ]
 
 

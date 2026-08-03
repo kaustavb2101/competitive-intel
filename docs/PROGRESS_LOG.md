@@ -3,6 +3,51 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `rival_threat_region.json` — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection) and the peer/market/service data room is healthy this run:
+provenance `--check`-reproducible (**136 layers · 75 measured · 61 estimated · 0 unlabelled**), freshness
+clean (oldest dated layer `vehicle_collateral.json` 156 days, **0 layers >180d stale**), the live master
+production alias serves **HTTP 200** on `/`, `/data/meta.json`, `/data/peer_province.json`,
+`/data/competitor_coverage.json` and `/data/rival_threat_region.json`, and `site-health.yml` correctly
+targets the master production alias. Peer comparison is already deep (`peer_province.json` carries the
+per-brand Muangthai/Srisawad/Tidlor/Heng split, rival:AutoX ratio, per-100k-vehicle density and
+districts-outnumbered for all 77 provinces; national standing in `competitor_coverage.json`), so this run
+took the service pillar's own standing brief — **surfaced exec reads that live-degrade SILENTLY with no
+deploy probe** — and found the highest-value one still open: `rival_threat_region.json`.
+
+`rival_threat_region.json` (obj #2 — the per-region density × service JOIN, MEASURED on both axes) is the
+last surfaced **exec FRONT-DOOR** competitive read with no site-health probe. It renders on the
+command-center "Where the network is hardest to defend" card (`renderHomeDefend`, #home — the exec's first
+screen) AND the Competition per-region table (`drawRivThreatRegion`, #acq), both gated on a non-empty
+`.regions` array and both degrading SILENTLY when the file is missing/truncated — the #home card never
+un-hides (`wrap.style.display` stays hidden) and the tab drops to a "not yet computed" placeholder, with
+no phone alert. That is the exact "broken demo" blind spot the `peer_province` / `province_pressure` /
+`competitor_coverage` probes closed for the sibling competitive reads, but on the higher-value front door.
+
+`pipeline/check_site_health.py` now probes it (`_shape_rival_threat_region`: fetch + parse + render-shape —
+asserts the display gate `.regions` is a ≥3-of-5-region list whose first row carries the axes each render
+reads (`region` name, `rivals_vs_autox` density, `rating_wavg` service, `threat_class` defensibility + the
+#home sort key), plus a non-blank top-level `.headline` the Competition readout reads — shape not values,
+robust to a future census/rating vintage shifting the ratios). Verified: fifteen negative tests reject
+non-dict / missing-or-short-`regions` / non-list-`regions` / row-not-dict / each missing/blank row axis /
+missing-or-blank-`headline` while accepting the real payload; the offline `--local platform` path reports
+**110/110 HEALTHY** with `rival_threat_region.json` served (3.8 KB) and shape-sane. Probe coverage
+107 → **110** exec checks. Diff = `check_site_health.py` only (+47 lines) — no `platform/data` file altered,
+so no `build_provenance.py` regeneration required.
+
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **0 failed** (see gate output). (b) no secrets
+  in diff. (c) diff = only `check_site_health.py` + this log, matches intent. (d) provenance/no-fabrication
+  intact — probe asserts shape, not values; no data layer touched. Test/monitoring-infra only, no
+  visual/app behaviour change → committed directly to master (no PR/headless render needed).
+- **Deploy-verify:** live master production alias re-checked HTTP 200 on `/` and `/data/rival_threat_region.json`.
+- **Next recommended:** `rival_threat.json` (the non-region brand-matrix sibling on #acq, `renderRivThreat`)
+  is the matching still-unprobed competitive read; after that the surfaced front-door + #acq competitive
+  reads are essentially all probed. Off the service pillar, the genuinely-valuable blocked integrations
+  remain (BAAC personal-credit **penetration** layer — `build_baac_credit.py` SKIP-only pending the
+  owner-side Thai-IP re-pull; GISTDA flooded-**AREA** dissolve needing a fresh keyed pull).
+
 ## 2026-08-03 — Integration loop (service/deploy-health): site-health probe guards `flood_hazard.json` — committed to master
 
 Autonomous integration run. The scheduled integration backlog's top items are all shipped or blocked:
