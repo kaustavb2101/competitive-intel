@@ -1557,7 +1557,7 @@ function showTab(v){
   // clicked Market and the nav gave you no confirmation of where you were. Harmless when Explore
   // held two rarely-used items; not harmless now that five of the eleven routes live there.
   // Scope stays nav + menu on purpose — content "→" links carry data-v too and must NOT highlight.
-  document.querySelectorAll('#nav a[data-v],#navMoreMenu a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
+  document.querySelectorAll('#nav a[data-v],#navMoreMenu a[data-v]').forEach(t=>{const sel=t.dataset.v===v;t.classList.toggle('on',sel);if(sel){t.setAttribute('aria-current','page');/* keep the active pillar visible in the horizontal #nav scroll strip on mobile: a route reached via a content jump-link / deep-link / hashchange can leave its nav pill scrolled off-screen. Only the in-strip pills scroll — the re-parented #navMoreMenu items (map/sim, moved to <body>) are excluded via closest('#nav'). inline:'nearest' scrolls only the nav horizontally; block:'nearest' is a no-op on the always-visible fixed nav (and the trailing window.scrollTo(0,0) resets any vertical nudge). */ if(t.closest('#nav')){try{t.scrollIntoView({block:'nearest',inline:'nearest'});}catch(e){}}}else t.removeAttribute('aria-current');});
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v));
   if(v==='home') renderHome();
   if(v==='assist'){ renderAssist(); renderIncome(); renderAssistOccMacro(); renderAssistOcc(); }
