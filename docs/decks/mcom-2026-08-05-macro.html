@@ -128,15 +128,18 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
       <div class="a"><b>No.</b> Growth and inflation both came in <b>above</b> what the IMF projected for 2026,
       and rates are at 1.0%. The macro backdrop is a mild tailwind.</div></div>
     <div class="row"><div class="q">Are crop prices the problem?</div>
-      <div class="a"><b>No — they are a tailwind too.</b> Rice +17.9%, rubber +32.4%, palm +18.2% YoY.
-      Only sugar is falling hard (−13.5%).</div></div>
+      <div class="a"><b>Not on the world index</b> — rice +17.9%, rubber +32.4%, palm +18.2% YoY. But on
+      the <b>measured Thai farm gate</b>, nine commodities are falling: coconut −70.9%, pineapple −20.0%,
+      sugar −17.9%, rambutan −13.5%, pork −6.7%, beef −6.1%, white shrimp −4.3%, chicken −2.4%,
+      eggs −1.7%.</div></div>
     <div class="row"><div class="q">So what <em>is</em> deteriorating?</div>
       <div class="a"><b>The collateral.</b> Used pickup values sit <b>50% below their peak</b> and 33 points
       below their own 2015 base, and new pickup registrations have fallen <b>59% in three years</b>.
       That is the pool we lend against, shrinking and cheapening at the same time.</div></div>
     <div class="row"><div class="q">And the borrower?</div>
-      <div class="a"><b>Drought, not price.</b> <b>338 of 928 districts (36.4%)</b> are in drought.
-      The farm-price tailwind does not reach a household whose field did not yield.</div></div>
+      <div class="a"><b>Drought first.</b> <b>338 of 928 districts (36.4%)</b> are in drought, and a price
+      tailwind does not reach a household whose field did not yield. The farm gate is a second,
+      separate hazard beside it.</div></div>
   </div>
 
   <p class="sub">Every figure carries its provenance. <span class="tag m">measured</span> means a
@@ -186,8 +189,19 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
 <!-- ============================================================ 3 -->
 <section class="slide">
   <p class="eyebrow"><span class="n">02</span><span>Commodity board · the segments diverge</span></p>
-  <h2>Farm prices are a tailwind. One crop is not.</h2>
-  <p>Eleven commodities that map onto our borrower segments, year over year. The spread matters more
+  <h2>The world index says tailwind. The Thai farm gate does not.</h2>
+  <div class="note risk">
+    <h4>Superseded 2026-08-02 — read this before the table</h4>
+    <p>The table below is the <b>world</b> price board, and on its own it says one crop is falling.
+    The board gained a <b>measured Thai farm-gate layer on 2 August</b>, and the builder's own metadata
+    records that the feed had been keeping crop forms only and silently dropping livestock, fishery and
+    orchard prices — <b>six falling Thai prices were invisible</b>. On the current data <b>nine</b>
+    commodities are negative at the farm gate: coconut <b>−70.9%</b>, pineapple −20.0%, sugar −17.9%,
+    rambutan −13.5%, pork −6.7%, <b>beef −6.1%</b>, white shrimp −4.3%, chicken −2.4%, eggs −1.7%.
+    The PPTX deck (<code>docs/decks/mcom-2026-08-05-macro.pptx</code>) presents the corrected board;
+    this page keeps the world view for the record.</p>
+  </div>
+  <p>World prices against our borrower segments, year over year. The spread matters more
   than the average: <b>this is not a uniform farm story.</b></p>
 
   <div class="tw">
@@ -213,7 +227,7 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
     <tr><td><b>Sawnwood</b></td><td class="sub">Forestry</td><td class="sub">South · NE</td>
       <td class="num fl">−1.6%</td><td class="sub">soft</td></tr>
     <tr><td><b>Sugar</b></td><td class="sub">Crops</td><td class="sub">Isan · Central</td>
-      <td class="num dn">−13.5%</td><td class="sub"><b>world price weak — the one real price stress</b></td></tr>
+      <td class="num dn">−13.5%</td><td class="sub"><b>world price weak · Thai farm gate −17.9%</b></td></tr>
   </table>
   </div>
   <p><span class="tag mix">mixed · price measured, belt mapping estimated</span>
@@ -222,9 +236,10 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
 
   <div class="note risk">
     <h4>Read the Beef row carefully — it is the trap on this board</h4>
-    <p>The world beef index is <b>+11.8%</b>. Thai cattle prices are <b>down about 40% from their 2022
-    peak</b>. A cattle household in Isan is not experiencing +11.8%. The world index is the wrong
-    instrument for that borrower, and the row says so rather than letting the green number stand.</p>
+    <p>The world beef index is <b>+11.8%</b>. The measured Thai farm-gate price is <b>−6.1%</b> — a
+    <b>17.9 point divergence</b>. A cattle household in Isan is not experiencing +11.8%. The world index
+    is the wrong instrument for that borrower, and until the farm-gate layer landed on 2 August we had
+    no measured way to say so.</p>
   </div>
 </section>
 
@@ -413,7 +428,7 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
 <!-- ============================================================ 8 -->
 <section class="slide">
   <p class="eyebrow"><span class="n">07</span><span>What this tab cannot tell you</span></p>
-  <h2>Four gaps, said plainly.</h2>
+  <h2>Five gaps, said plainly.</h2>
   <div class="note warn">
     <h4>Open</h4>
     <ul>
@@ -425,6 +440,10 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
       <li><b>The ฿44bn co-pay figure is unconfirmed.</b> The likely referent is ไทยช่วยไทย พลัส
       (cabinet-approved 2026-05-19, government portion ≈฿49.6bn at its two-month mark) but it does not
       cleanly match ฿44bn, so it has been left rather than guessed at.</li>
+      <li><b>The double-stress test still runs on the global price proxy.</b> It reports zero provinces
+      hit by drought and falling prices at once, but it has not been refitted to the Thai farm-gate layer
+      that landed on 2 August. สุพรรณบุรี — drought 0.95, 31% sugarcane at a −17.9% farm gate — is the
+      worked example of what a refit would pick up.</li>
       <li><b>Drought is modelled, not observed.</b> SPEI is an index derived from rainfall and
       evapotranspiration. It is the best national-coverage signal available, but no one has walked
       those 338 districts.</li>
@@ -448,9 +467,9 @@ code{font-family:var(--mono);font-size:.92em;color:var(--mid)}
       flat. The pool we will be lending against in 2030 is being determined now, and it is shrinking
       faster than the fleet is.</div></div>
     <div class="row"><div class="q">Borrower stress</div>
-      <div class="a">Watch <b>drought and informality</b>, not crop prices and not the unemployment rate.
-      Prices are a tailwind; 36.4% of districts are dry; 63.2% of employment is informal; 60% of
-      households cannot cover three months.</div></div>
+      <div class="a">Watch <b>drought, the Thai farm gate and informality</b> — and not the unemployment
+      rate, which is meaningless in a 63.2% informal economy. 36.4% of districts are dry; nine farm-gate
+      prices are negative; 60% of households cannot cover three months.</div></div>
   </div>
   <p class="sub">All three are readings of the network and book <em>we already run</em>. Nothing on this
   tab is an argument to open, close, or expand anything.</p>
