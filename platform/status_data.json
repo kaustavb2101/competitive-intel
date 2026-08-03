@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-02T22:16:13+00:00",
-    "commit": "670d999"
+    "generated_at": "2026-08-03T04:15:41+00:00",
+    "commit": "25e743f"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-02",
+    "eta_date": "2026-08-03",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,60 @@
   ],
   "activity": [
     {
+      "date": "2026-08-03T04:15:41+00:00",
+      "sha": "25e743f",
+      "summary": "health(deploy): site-health probe guards farm_book.json (Overview farm-book section)",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-03T02:21:56+00:00",
+      "sha": "66c6063",
+      "summary": "docs(progress): log ux-live-feed-table-a11y merge+deploy+verify (PR #270)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T09:18:13+07:00",
+      "sha": "1a2a5f1",
+      "summary": "ux: live board feed table a11y — focusable scroll region + scope='col' headers (#270)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T08:54:12+07:00",
+      "sha": "a6adb42",
+      "summary": "docs: MCOM deck for 2026-08-05 — the Macro tab, and only the Macro tab (#269)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-03T08:48:56+07:00",
+      "sha": "bfbde8e",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-03) — re-land #267 with the accumulators unioned (#268)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-03T00:23:46+00:00",
+      "sha": "caf2c24",
+      "summary": "test(gate): gate four ungated deterministic --check builders",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-02T23:43:05+00:00",
+      "sha": "c69c2d2",
+      "summary": "data: live fuel prices (2026-08-02, run 30772736204)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-03T06:36:58+07:00",
+      "sha": "200e3c2",
+      "summary": "Risk: the flood panel broke the phone, and the audit that catches it wasn't running (#266)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-02T22:18:35+00:00",
+      "sha": "dee8107",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the macro_book site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-02T22:16:13+00:00",
       "sha": "670d999",
       "summary": "health(deploy): site-health probe guards macro_book.json (Overview conditions drill)",
@@ -656,60 +710,6 @@
       "sha": "bfc5fd6",
       "summary": "ci(data-macro): rebuild live_board + provenance in lockstep so the weekly macro PR gate stays green",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T09:35:09+07:00",
-      "sha": "9a0429c",
-      "summary": "Macro: the farm block — four tables become one, ranked by baht (review items 1-5, 13) (#254)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-02T02:23:33+00:00",
-      "sha": "d2c7c19",
-      "summary": "docs: log ux district-table scope=\"col\" fix — merge+deploy+verify (#255)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T09:19:04+07:00",
-      "sha": "36bb129",
-      "summary": "ux: scope=\"col\" on the district amphoe tables (#amptbl / #amprtbl) (#255)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-01T23:42:42+00:00",
-      "sha": "99d8e43",
-      "summary": "data: live fuel prices (2026-08-01, run 30723745519)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-01T22:26:12+00:00",
-      "sha": "08ae685",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the Data-room vintage fix",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-01T22:25:38+00:00",
-      "sha": "399d3e6",
-      "summary": "data(provenance): surface the three #248 survey/registry vintages the Data-room card dropped",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-01T20:20:01+00:00",
-      "sha": "3e40719",
-      "summary": "docs: log ux scope=\"col\" exposure-tables fix — merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T03:16:25+07:00",
-      "sha": "cf9cef3",
-      "summary": "ux: scope=\"col\" on the 15 Exposure (#exposure) render-path tables (#250)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-02T03:00:07+07:00",
-      "sha": "a75f145",
-      "summary": "Macro audit: a decision band on top, a second switcher level inside, and three numbers that were saying the wrong thing (#249)",
-      "pillar": "deployment"
     }
   ]
 }
