@@ -1016,6 +1016,46 @@ def _shape_flood_hazard(d):
     return None
 
 
+def _shape_deltas(d):
+    # The TIME dimension (deltas.json, obj #1 — which segments/branches are getting
+    # riskier between vintages). It renders on the exec FRONT DOOR (renderHomeMovers
+    # draws the command-center "Movers" card off DELTAS.region + DELTAS.branches) AND
+    # is the whole payload of the Risk-trend tab (#trend reads DELTAS.board YoY
+    # re-ratings + the region/branch mover rows). Both degrade to a CALM empty state
+    # when the file is missing/truncated — and that is exactly the trap: a fetch
+    # failure or a gutted CDN deploy silently renders "Baseline captured — trends
+    # appear after the next data refresh", MASQUERADING a broken file as the normal
+    # single-vintage baseline, with no phone alert, hiding real obj-#1 risk movement.
+    # It was the last surfaced front-door read with no deploy probe. Asserts the
+    # render shape both surfaces read, NOT values — and stays healthy in a legitimate
+    # baseline vintage (baseline===true, movers genuinely absent), so it won't false-
+    # alarm if the snapshot history is ever reset to one vintage.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    if "baseline" not in d:
+        return "missing 'baseline' flag (renderHomeMovers/#trend gate read)"
+    if not (isinstance(d.get("to"), str) and d["to"].strip()):
+        return "missing/blank 'to' vintage label (empty-state + header render read)"
+    if d.get("baseline"):
+        return None  # legitimate single-vintage baseline — movers absent by design, healthy
+    # Populated diff: assert the mover shapes both surfaces render off.
+    brs = d.get("branches")
+    if not isinstance(brs, list) or not brs:
+        return "non-baseline deltas with missing/empty 'branches' movers (#home + #trend branch-mover render)"
+    b0 = brs[0]
+    if not isinstance(b0, dict) or not b0.get("n") or "comp" not in b0:
+        return "first branch mover missing 'n'/'comp' (branch-mover row render read)"
+    reg = d.get("region")
+    if not isinstance(reg, list) or not reg:
+        return "non-baseline deltas with missing/empty 'region' movers (#home region-mover render)"
+    r0 = reg[0]
+    if not isinstance(r0, dict) or not r0.get("r") or "d_agri" not in r0:
+        return "first region mover missing 'r'/'d_agri' (region-mover row render read)"
+    if not isinstance(d.get("board"), list):
+        return "missing 'board' commodity-YoY list (#trend board re-rating render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1188,6 +1228,15 @@ DATA_FILES = [
     # reads. Asserts the render shape (regions gate + density/service/class axes + the
     # headline the readout reads), not values.
     ("data/rival_threat_region.json", _shape_rival_threat_region, ".regions (5) density×service axes + threat_class + .headline (#home hardest-to-defend card + #acq table)"),
+    # The TIME dimension (deltas.json, obj #1) — the last surfaced FRONT-DOOR read with
+    # no deploy probe. Renders the command-center "Movers" card (renderHomeMovers off
+    # .region + .branches) AND is the whole Risk-trend tab payload (.board YoY re-ratings
+    # + mover rows). A truncated/404 file degrades to a CALM "Baseline captured" state on
+    # BOTH surfaces — masquerading a broken deploy as the normal single-vintage baseline,
+    # with no phone alert, silently hiding real obj-#1 risk movement. Asserts the mover
+    # render shape (baseline gate + branch/region mover fields + the #trend board list),
+    # shape not values, and stays green in a legitimate baseline vintage.
+    ("data/deltas.json", _shape_deltas, ".baseline gate + .branches/.region movers + .board YoY (#home Movers card + #trend tab)"),
 ]
 
 

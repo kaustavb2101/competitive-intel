@@ -3,6 +3,43 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `deltas.json` (the last unprobed front-door read) — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), and the data room re-confirmed healthy this run: **0 surfaced
+layers >180d stale** (oldest ISO-dated `vehicle_collateral.json`/`ev_penetration.json` at 156d), **0 broken
+data references** (all three `data/*`-shaped grep hits resolve to `source-data/…` in comments, not missing
+SPA fetches), and the **live master production alias serves HTTP 200** on `/`, `/data/meta.json` and
+`/data/deltas.json`. So this run took the service pillar's standing brief — surfaced exec reads that
+live-degrade with no deploy probe — and closed the highest-value one still open.
+
+**The gap.** `deltas.json` (the TIME dimension, obj #1 — which segments/branches are getting riskier
+between vintages) was the **last surfaced FRONT-DOOR (#home) read with no site-health probe**. It drives
+BOTH the command-center "Movers" card (`renderHomeMovers` off `DELTAS.region` + `DELTAS.branches`) AND the
+whole Risk-trend (#trend) tab (`.board` YoY re-ratings + the region/branch mover rows). Its failure mode is
+worse than a silent blank: a missing/truncated/404 file drops both surfaces to the CALM string _"Baseline
+captured — trends appear after the next data refresh"_, **masquerading a broken deploy as the normal
+single-vintage baseline state** — real obj-#1 risk movement vanishes with no phone alert.
+
+**The fix.** Added `_shape_deltas` to `pipeline/check_site_health.py` + its `DATA_FILES` entry. Asserts the
+render shape both surfaces read (NOT values): the `baseline` gate, a blank-safe `to` vintage label, and —
+when NOT in baseline mode — a non-empty `branches` movers list carrying `n/comp`, a non-empty `region` list
+carrying `r/d_agri`, and the `board` YoY list the #trend tab reads. It stays GREEN in a legitimate
+single-vintage baseline (`baseline:true`, movers absent by design) so it can never false-alarm if the
+snapshot history is reset. Probe-script-only — no `platform/data` file altered, so no provenance regen.
+
+- **Verification (all pass):** ten unit tests — the real 80-branch/5-region payload AND a `baseline:true`
+  file both accepted; eight negatives reject non-dict / missing-`baseline` / blank-`to` / empty-`branches` /
+  branch-missing-`comp` / empty-`region` / region-missing-`d_agri` / non-list-`board`. Offline
+  `--local platform` → **113/113 HEALTHY** with `deltas.json` shape-sane; live alias serves it **HTTP 200**
+  (16.3 KB). `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455). Diff =
+  `pipeline/check_site_health.py` (validator + entry) + `docs/SERVICE_AUDIT.md` + this log.
+- **Why a direct commit, not a PR.** No visual/app behaviour change — it only adds a CI/probe validator; no
+  UI, no data, no surfaced number touched. The safeguard-gated direct-to-master path applies.
+- **Next recommended:** the front-door probe coverage is now complete; the next service target is the
+  #trend tab's sibling `snapshots_index.json` (still unprobed — it drives the snapshot selector), or a
+  MARKET-pillar sharpening (needs a PR + owner signoff if it touches surfaced numbers).
+
 ## 2026-08-03 — Integration loop: collateral recovery-value outlook is now PRICE-AWARE (measured BoT UVPI) — PR (not committed)
 
 Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
