@@ -138,7 +138,7 @@
   <h2 class="opp" style="font:700 16px var(--sans);margin:0 0 4px">Every feed</h2>
   <p class="lb-sub" style="margin-bottom:12px">Grouped by what it moves in the book. Age is computed
     against your clock right now, so this readout is current every time you open it.</p>
-  <div class="lb-wrapx"><table class="lb-tbl" id="lb-table"></table></div>
+  <div class="lb-wrapx" role="region" tabindex="0" aria-label="Scrollable table: Every feed"><table class="lb-tbl" id="lb-table"></table></div>
 
   <div class="lb-unlock" id="lb-unlock"></div>
  </div>
@@ -444,8 +444,8 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
         : '<span class="lb-u">no history yet</span>') + '</td></tr>');
   });
   document.getElementById('lb-table').innerHTML =
-    '<thead><tr><th>Feed — what it moves in the book</th><th>Latest</th><th>State</th>' +
-    '<th>Age</th><th>Stamped / cadence</th><th>History</th></tr></thead><tbody>' +
+    '<thead><tr><th scope="col">Feed — what it moves in the book</th><th scope="col">Latest</th><th scope="col">State</th>' +
+    '<th scope="col">Age</th><th scope="col">Stamped / cadence</th><th scope="col">History</th></tr></thead><tbody>' +
     rows.join('') + '</tbody>';
 
   // ---- what would unlock more trend lines
