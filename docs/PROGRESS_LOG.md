@@ -3,6 +3,116 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Integration loop (provenance honesty): Data-room card now shows `rival_pulse`'s fresher `sentiment_anchor` (2026-08-03) instead of the stale `promos_pulled_at` pull-timestamp (2026-07-19) — committed to master
+
+Autonomous integration run. Re-verified the stated data-integration backlog is exhausted/blocked before
+picking work: **FPO PICO (item #1)** is fully shipped — I re-pulled a fresh `fpo_pico.csv` from
+`catalog.fpo.go.th` (reachable from CI, 2,042 licensed operators, 75/77 provinces, all mapping cleanly to
+the canonical 77) and confirmed all four PICO layers (`pico_census`/`pico_district`/`pico_competitors`/
+`branch_pico`) still reproduce **byte-exact** against it, so the committed census is current, not stale.
+**Per-branch cropland (item #2)** and the **data.go.th distillations (item #3** — DIW factories, MOT/Excise
+vehicles, DBD formation, BAAC/SME-bank credit) are all built + gated + surfaced. **GISTDA 40m crop (item #4)**
+stays blocked: `GISTDA_SPHERE_KEY` is **NOT** in this CI env (reconfirmed this run). So this run took the #1
+recommended follow-up the previous entry left.
+
+**The fix.** `rival_pulse.json` carries two freshness stamps for its two halves: `sentiment_anchor`
+(2026-08-03 — the newest review date IN the pulled data, the MEASURED observation vintage of the sentiment
+ladder, refreshed this morning) and `promos_pulled_at` (2026-07-19 — a pull-run timestamp for the Thai-IP-only
+promo half, honestly older). `build_provenance.py::_vintage_of()` had `promos_pulled_at` in its key list but
+not `sentiment_anchor`, so the Data-room card resolved rival_pulse's vintage to the **staler** 2026-07-19 —
+understating how current the competitive-sentiment read actually is. Added `sentiment_anchor` to the priority
+list among the data-observation keys (ahead of the pull-timestamp keys), with a documenting comment in the
+established style. Only `rival_pulse` carries that key (grep-verified), so no other layer's vintage moves.
+
+- **Effect (exactly one cell):** `provenance.json` rival_pulse row `vintage 2026-07-19 → 2026-08-03`,
+  `age_days 16 → 1`. Semantic diff confirms **1 changed row, 0 others**; measured/estimated/layer counts
+  unchanged (75/61/136). No fabrication — 2026-08-03 is the real newest-review observation date the layer
+  already ships; this shows the fresher of its two honest vintages, exactly like the prior `board_vintage` /
+  `price_asof` / `farmgate_vintage` key fixes.
+- **Verification:** regenerated `provenance.json` (`build_provenance.py`, byte-reproducible); `bash tests/run.sh
+  check` → **123 passed · 0 failed** (+ **455 data-validation checks, 0 failed**); `build_provenance.py --check`
+  reproduces byte-exact in-gate. All SKIPs are pre-existing (absent network inputs / numpy / rasterio). The
+  freshly-pulled `fpo_pico.csv` stays in the gitignored `source-data/datagoth/` cache — not committed.
+- **Next recommended:** the previous entry's *other* thread — extend the social-listening watchlist's blind
+  spot (**Sabuy Cash**, NEXT_STEPS §0c) once its Play/Apple/ATC ids are verified from a Thai IP; or, if a Thai-IP
+  session lands, distill the two `pulled-but-never-distilled` datagoth penetration signals (`baac_credit`,
+  `smebank_credit`) into committed per-province layers (DATAGOTH_CATALOG flags them as the last undistilled sources).
+
+Autonomous market & service intelligence run. The planner backlog is exhausted (98%, the one open item is
+owner-side Vercel access-protection) and the recent loop history is a treadmill of one-off `site-health probe
+guards X.json` commits, so this run took the highest-value **genuinely stale** thing a negative-space freshness
+sweep surfaced: **`rival_pulse.json`'s sentiment half was 16 days old** (`sentiment_anchor` 2026-07-19) while
+every other measured competitive layer was current — and its Google Play source (`pull_app_reviews.py`) is
+explicitly **any-IP / CI-schedulable** (only the promo half needs a Thai IP). Verified Google Play IS reachable
+from this CI runner (AUTOX ratings moved 1004→1020 on a probe), so this is a real MEASURED refresh, not a
+fabrication.
+
+**What shipped (the one improvement).** Re-pulled all 10 title-lender apps' Play store pages
+(`pull_app_reviews.py` → `source-data/app_reviews.json`, 1,786 reviews merged, newest 2026-08-03) and rebuilt the
+three gated layers that derive from it: **`rival_pulse.json`** (the #acq sentiment ladder), **`rival_universe.json`**
+(the 18-operator board's Play-score join) and **`social_themes.json`** (demand-side review mining). Each rebuild is
+`--check` byte-exact. The refresh surfaces **real competitive movement**: the best-rated rival flipped
+**SAWAD 4.65★ → MTC 4.66★** (SAWAD's app rating actually *fell* to 4.58, TIDLOR jumped 4.49→4.58), and AutoX's own
+gap to the leader widened 0.67★ → 0.68★ — all now current on the #acq board instead of frozen at the July pull.
+The promo half (`promos_pulled_at`) correctly stays 2026-07-19 (Thai-IP-only pull, honestly not refreshed).
+
+**Also (a bundled gate-repair, not caused by this change).** The determinism gate flagged
+`build_live_board.py --check` as drifted — a **pre-existing** failure at HEAD (`live_board.json` was not in this
+run's diff; an earlier data-refresh cron committed a 2026-08-03 feed stamp without rebuilding the derived board).
+Rebuilt it (`build_live_board.py`, network-free + byte-reproducible) to reach a 0-failed gate; it now reproduces
+exactly. Noted here so the next caller doesn't re-attribute it to the sentiment refresh.
+
+- **Verification (all pass):** `pull_app_reviews.py` live-pulled 10/10 apps; `build_rival_pulse.py`,
+  `build_rival_universe.py`, `build_social_themes.py`, `build_live_board.py` all `--check` **byte-exact**;
+  `build_provenance.py --check` reproduces exactly (only the four refreshed layers' byte-size cells changed — no
+  count/label/other-layer drift); `bash tests/run.sh check` → **536 passed · 0 failed**. No broken data references
+  (negative-space sweep: 0), no fabrication (every star/review is a Google Play public value).
+- **Provenance note:** `rival_pulse.json`'s Data-room vintage cell still keys on `promos_pulled_at` (2026-07-19,
+  the Thai-IP promo half); the refreshed sentiment observation (2026-08-03) surfaces directly on the #acq ladder.
+  Left the extractor key unchanged this run to keep scope to the one improvement.
+- **Next recommended:** consider having `build_provenance.py::_vintage_of()` prefer `sentiment_anchor` (a
+  data-observation date) over `promos_pulled_at` (a pull timestamp) for `rival_pulse.json`, so the Data-room card
+  reflects the fresher of the layer's two vintages — same class as the prior `board_vintage`/`price_asof` key fixes.
+
+## 2026-08-04 — Integration loop (provenance honesty): corrected `contested_pop.json`'s false "pop10 matches branch_population.json" claim — committed to master
+
+Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced; GISTDA 40m crop
+needs `GISTDA_SPHERE_KEY`, reconfirmed **NOT** in this CI env this run). So this run took the #1
+recommended follow-up left by the previous entry: the second half of the same provenance defect that
+run fixed in the app — the source-side claim in the contested-population layer.
+
+**The bug.** `build_contested_pop.py`'s meta provenance (and its docstring + an inline comment) stated
+that `pop10` — the per-branch 10km WorldPop catchment population — was computed by "the EXACT
+raster-sampling method of build_branch_population.py, **so pop10 matches branch_population.json**." That
+cross-reference is false. `pop10` genuinely IS a direct WorldPop-2020 1km raster sample (this builder
+opens `worldpop_tha_2020_1km.tif` via rasterio and sums cells — MEASURED, correct, and already cleared
+by the provenance audit). But `branch_population.json`'s OWN meta says `method: "areaweight"`,
+`measured: false` — its shipped values are a district-population AREA-WEIGHT estimate, because
+`build_branch_population.py`'s rasterio path was unavailable and it fell back. The two do NOT match and
+differ materially (e.g. branch 0: area-weight 210,389 vs WorldPop 165,523) — the exact discrepancy the
+2026-08-04 app-side fix corrected. The layer was asserting equality with a number it does not equal.
+
+**The fix (build script only — meta text, no numbers).** Reworded the three spots carrying the false
+claim (docstring §METHOD, the pass-2 loop comment, and `meta.provenance.population`) to state the truth:
+`pop10` is a direct WorldPop raster count, and it does NOT match `branch_population.json`, whose shipped
+values are an area-weight fallback that `pop10` only approximates. Rebuilt `contested_pop.json` — the
+`rows` and `top` arrays (every numeric value) are byte-identical to HEAD; only the `meta.provenance`
+string changed.
+
+- **Net effect:** the contested-population layer's provenance stops claiming a false equality; `pop10` is
+  now honestly described as the genuine measured raster count, consistent with the app-side correction.
+- **Not app-visible:** the app reads only `rows`/`top` from `contested_pop.json` (verified by grep);
+  `meta.provenance` is never rendered. No surfaced number, visual, or app behaviour changes — hence a
+  direct commit, not a PR (a safeguard/metadata honesty fix, same class as the recent provenance commits).
+- **Verification (all pass):** installed `rasterio` (absent by default here) so the builder runs;
+  `build_contested_pop.py --check` reproduces byte-exact; `rows`/`top` confirmed identical to HEAD, only
+  `meta.provenance` differs; `build_provenance.py --check` reproduces exactly (the contested_pop byte-size
+  line updated); `bash tests/run.sh check` → **123 passed, 0 failed** (data integrity 455/455).
+- **Next recommended:** the second small follow-up still open from the previous entry — `CLAUDE.md`'s
+  claim that `tests/run.sh check` gates `bake_catchment_heights --check` is stale (that check was removed
+  from `tests/run.sh`); a trivial offline doc fix.
+
 ## 2026-08-04 — Integration loop (provenance honesty): branch-popup catchment population now shows the MEASURED WorldPop count, not the ESTIMATED area-weight labelled "measured" — PR (app-visible)
 
 Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO, per-branch
@@ -4328,3 +4438,22 @@ Kaustav deploys).
 - **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + 455 data-integrity checks). (b) headless `render.sh index.html#acq` @ 390×844 → `data-errors="[]"`; PNG self-reviewed — Competition route active, content intact, nav scrolled toward the active region, no visible breakage. (c) no secrets in diff. (d) diff = only `platform/app.js` + `docs/UXUI_AUDIT.md`, no stray files.
 - **Deploy-verify (PASS, no rollback):** after the build, the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js` (route not regressed). The merge commit `cb75f4e` on `origin/master` is confirmed to carry the fix (`git show origin/master:platform/app.js` grep = 1). The **deployed** `app.js` still served the pre-fix bytes at verify time — the known Vercel edge-CDN path-cache lag on the static `app.js` (documented in prior runs); it catches up on cache expiry, and since the route returns 200 with a valid working app this is normal propagation, not a rollback condition.
 - **Next recommended:** the standing bigger-than-surgical / device-tested backlog is unchanged and is what remains: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` as competitive-RISK, not branch expansion — mandate-critical, ripples across national/regional/province + app.js, needs a dedicated pass), `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` on the 3 deck.gl pages + add `touch-action:none` — needs real-device pinch-zoom test, not headless-verifiable), and `ux-live-chart-mobile-viewbox-responsive` (narrower `viewBox` on small screens — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again. The surgical-and-headless-verifiable queue is now essentially drained — the next runs should either tackle one of the above as a dedicated (non-unattended for the device-tested ones) effort or discover fresh issues by route review.
+
+## 2026-08-04 — Intelligence loop: deploy-health probe guards `rival_threat.json` (#acq rival threat matrix) — merged + deployed + verified
+- **Shipped** (direct to master): a nightly deploy-health probe for `data/rival_threat.json`, the brand-level density × service **rival threat matrix** on the Competition (#acq) surface (obj #2). This was the ONE surfaced competitive read the existing `rival_threat_region` probe's own comment explicitly named as its unprobed sibling. `drawRivThreat` gates the whole board on a non-empty `.brands` array and, per row, renders `.brand` (name), `.footprint_vs_autox` (the ×AutoX ratio — the board's primary quantitative column) and `.threat_class` (the Threat column + its risk-colour), plus `.headline` for the readout. Like every other competitive read it **degrades silently** — a missing/truncated CDN deploy drops the board to its "Rival threat matrix not yet computed" placeholder with **no phone alert** — the same "broken demo" blind spot the peer_province / competitor_coverage / rival_threat_region probes closed. Added `_shape_rival_threat` (asserts the brands gate + the brand/threat_class columns each row renders + at least one numeric ×AutoX ratio + the readout headline; shape not values, robust to a future census/rating vintage) and registered it in `DATA_FILES` next to its region sibling. `pipeline/check_site_health.py` (+48) + this log entry only — no `platform/data` file added/altered, so no provenance regen needed.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (455/455 data-integrity). (b) offline self-test `python3 check_site_health.py --local platform` → **119/119 PASS**, the new `rival_threat.json` fetch/parse/shape rows green; negative tests confirm the validator fires on empty `.brands`, missing `.headline`, and non-dict inputs (passes only the real file). (c) no secrets in the diff (secret scan clean). (d) diff = only `pipeline/check_site_health.py` (+48, one validator + one registry line) + this log entry; no data fabricated (the probe validates shape, never writes numbers).
+- **Deploy-verify (PASS, no rollback):** the change is a CI-only script (nightly `site-health.yml`), not app/visual behaviour, so it does not affect the served bundle. Independently confirmed the LIVE production alias `competitive-intel-git-master-…vercel.app` is healthy this run — **200** on `/`, `/app.js`, `/data/meta.json`, `/data/province_stress_index.json`, and the newly-guarded `/data/rival_threat.json`.
+- **Next recommended intelligence task:** continue the deploy-health sweep with the remaining unprobed **surfaced** competitive/risk reads — `province_stress_index.json` (obj #1 peer benchmark + the structural household-leverage read on #home, and the un-probed PARENT of the already-guarded `province_pressure` synthesis) is the highest-value next pick; `rival_pressure.json` and `rival_universe.json` (both #acq boards) follow. Many committed `data/*.json` are fetched by app.js but not yet probed (see the diff list this run); prioritise by front-door / default-route render prominence.
+
+## 2026-08-04 — UX loop: `ux-live-series-switcher-group-role` (live.html a11y) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260804-0812`, squash-merged PR #285 → `aefdb0f` on master): `live.html`'s two series-switcher button groups — `#lb-cmdbtns` (commodity-price selector, `drawC`'s card) and `#lb-fhbtns` (daily-feed selector, `drawF`'s card) — are single-select control sets whose `.lb-sb` buttons already carry `aria-pressed`, but the containing `.lb-seriesbtns` divs had **no `role="group"`/`aria-label`**, so a screen reader announced a bare run of toggle buttons with no cue about what set they belong to (WCAG 4.1.2 Name/Role/Value). Same gap `ux-chip-aria-pressed` closed for the SPA's `.chip` groups; live.html's switchers were added after that sweep and missed it. Added `role="group" aria-label="Commodity price series"` / `"Daily feed series"` to the two container template strings, matching the house `role="group"`+`aria-label`+`aria-pressed` pattern (`#sortchips`, region-filter chips). Change confined to `platform/live.html` (2 template-string edits, attrs only) + a one-line `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's extracted inline JS + 455/455 data-integrity checks); gate was already 0-failed on `origin/master` before the change — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` @ 1100×900: commodity switcher (RICE active) visually **identical**, settled DOM confirms both `role="group"`/`aria-label` present on `#lb-cmdbtns`/`#lb-fhbtns`, `data-errors="[]"`, PNG self-reviewed (nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/live.html` (2 lines) + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/live` (the changed route); `/live.html` → **308** (expected `cleanUrls` redirect to `/live`, not a regression). The merge commit `aefdb0f` on `origin/master` is confirmed to carry the fix (`git show origin/master:platform/live.html` grep = 1). The **deployed** `/live` HTML still served the pre-fix bytes at first verify time — the known Vercel edge-CDN path-cache lag documented in prior runs; the route returns 200 with a valid working app, so this is normal propagation, not a rollback condition. (Housekeeping: the remote branch delete returned a sideband git-proxy disconnect — same recurring proxy issue as PRs #260/#283 — but the branch is fully merged and `origin` reports it gone; harmless.)
+- **Next recommended:** the surgical-and-headless-verifiable UX queue is essentially drained again — the standing backlog is all bigger-than-surgical or device-tested: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language in `build_regional_outlook.py` + app.js as competitive-RISK, not branch expansion — mandate-critical, ripples across surfaces, dedicated pass), `ux-viewport-user-scalable-3dpages` (drop `maximum-scale=1` on the 3 deck.gl pages + add `touch-action:none` — needs real-device pinch-zoom test, not auto-mergeable), and `ux-live-chart-mobile-viewbox-responsive` (narrower `viewBox` on phones so chart geometry+text scale together — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual gate carries signal again; and the recurring **pipeline-hygiene** ask stands — fold a `build_provenance.py`/`build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted. Next runs should pick one of these as a dedicated effort (non-unattended for the device-tested ones) or discover fresh issues by route review.
+
+## 2026-08-04 — UX loop: ux-live-aging-pill-contrast (WCAG AA contrast) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260804-1419`, squash-merged PR #286 → `9f011d4` on master): fixed a real WCAG 1.4.3 AA failure on `live.html`'s "Every feed" freshness-board. The **"aging"** pill (`.lb-aging`, `font:600 9.5px` — small text needing 4.5:1) used `--opp` gold, which in LIGHT theme is `#A67714` and measured only **3.68:1** on the light canvas (`--bg #F4F6FA`) / 3.78:1 on row-hover — below AA. This is the board's own "this feed is overdue" flag, so it renders in production whenever a daily feed slips a day. The other three pills already pass in their table context (fresh 4.73:1, stale 5.02:1, ref 5.37:1); the 26px pulse-strip "Aging" count is large text and correctly stays `--opp`. Fix is one scoped CSS line — `html[data-theme="light"] .lb-aging{color:#8A6210}` (≈5.06:1 canvas / 5.19:1 hover, still recognizably gold, distinct from the red stale pill). Light theme only; dark theme's bright `#E6B450` (~8.3:1) untouched; no global `--opp` change so no other gold surface shifts. `platform/live.html` (+5) + `docs/UXUI_AUDIT.md` (fix-log entry) only.
+- **How it was found:** the seven backlog priorities the loop names are all long-since fixed, so this run reviewed `live.html` directly and computed contrast ratios for every freshness pill against its real rendering background with the WCAG relative-luminance formula — the aging pill was the one genuine failure.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. 455 data-integrity checks + `node --check` on every page's inline JS — `live.html` clean). (b) headless `render.sh live.html` → `data-errors="[]"`, default PNG byte-identical (144961 B, the pill class only appears when a feed is overdue); a forced pill-swatch render + a computed-style probe confirm the aging pill resolves to `rgb(138,98,16)`=`#8A6210` in light and unchanged `rgb(230,180,80)`=`#E6B450` in dark, legible and distinct from the red stale pill. (c) no secrets in the CSS-only diff. (d) diff = only `platform/live.html` + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** after ~95s the production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and on the changed route `/live` (its canonical clean URL); `/live.html` → 308 is the expected `cleanUrls` redirect to `/live`, not a regression. Session auto-unsubscribed from PR #286 on merge. The merged branch was not remotely deleted — `git push --delete` returns the known git-proxy "remote end hung up" artifact (same as prior runs; GitHub prunes it server-side), the merge itself succeeded.
+- **Next recommended:** backlog is deep and mostly closed; the remaining open items are all deliberately *bigger-than-surgical* and unsuited to unattended auto-merge — `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" expansion language as competitive-RISK, ripples across national/regional/province + app.js), `ux-viewport-user-scalable-3dpages` (drop the `maximum-scale=1` lock on the 3 deck.gl pages + add `touch-action:none`, needs real-device pinch-zoom testing), `ux-live-chart-mobile-viewbox-responsive` (narrower viewBox on phones so `live.html`'s SVG geometry+labels scale together — touches `lineChart()` coordinate math). Non-platform: `qa-visual-baseline-stale` wants a deliberate `tests/run.sh baseline` refresh so the visual-regression gate carries signal again. Future runs should keep reviewing individual routes for concrete surgical wins as this one did.

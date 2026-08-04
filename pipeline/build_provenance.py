@@ -200,6 +200,12 @@ def _vintage_of(m):
     # price_vintage / farmgate_vintage, so it sits with them, ahead of any pull timestamp. The
     # layer stamps freshness only under this key, so without it the scenario engine showed
     # blank in the Data-room card despite carrying a real measured board vintage.
+    # sentiment_anchor (rival_pulse — the always-on rival app-review + promo watch) is the newest
+    # review date IN the pulled data (e.g. 2026-08-03), the MEASURED observation vintage of the
+    # sentiment ladder — the layer's fresher half. It sits with the other data-observation keys,
+    # AHEAD of promos_pulled_at (the Thai-IP promo-pull timestamp, the layer's staler half): the
+    # Data-room card should show when the competitive sentiment was actually observed, not a pull
+    # timestamp for the other sub-layer. Only rival_pulse carries this key, so no other layer moves.
     # latest_year_ce (debt_source — NSO household debt-by-source; vehicle_fleet — DLT registered-
     # vehicle stock) is the newest SURVEY/registry year those MEASURED layers report, an INTEGER
     # calendar year (e.g. 2023 / 2025) — their native data-vintage, exactly like vintage_individual's
@@ -211,8 +217,8 @@ def _vintage_of(m):
     # or BE label is never coerced into a false age), matching the vintage_individual precedent.
     for k in ("updated", "vintage", "as_of", "updated_to",
               "observed_to", "price_vintage", "price_asof", "farmgate_vintage", "board_vintage",
-              "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc", "pulled",
-              "promos_pulled_at", "latest_year_ce", "span"):
+              "sentiment_anchor", "snapshot", "pico_vintage", "vintage_individual", "pulled_at_utc",
+              "pulled", "promos_pulled_at", "latest_year_ce", "span"):
         v = m.get(k)
         if isinstance(v, str) and v.strip():
             return _trunc(v, 24)
