@@ -377,12 +377,25 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
   }
   if (BIS && BIS.indicators && BIS.indicators.household_debt_gdp) {
     var hd = BIS.indicators.household_debt_gdp, tr = hd.trend || [];
-    var hp = tr.map(function (v, i) { return { x: 'q' + (i + 1 - tr.length) || 'now', y: v }; });
-    if (hp.length) hp[hp.length - 1].x = 'now';
+    /* Real quarter labels ("24Q3" … "25Q4") derived from the anchor period the source stamps
+       (hd.period, e.g. "2025-Q4"), so this chart reads like every other one instead of the cryptic
+       relative "q-5 … now". Falls back to the old relative labels if the anchor is absent/unparseable,
+       so a missing or renamed period never leaves the axis blank. */
+    var qm = String(hd.period || '').match(/(\d{4})\D*Q?\s*([1-4])/i);
+    var hp = tr.map(function (v, i) {
+      var x;
+      if (qm) {
+        var tot = (+qm[1]) * 4 + (+qm[2] - 1) - (tr.length - 1 - i);   // quarters, anchored on the last point
+        x = String(Math.floor(tot / 4) % 100) + 'Q' + ((tot % 4) + 1);
+      } else {
+        x = i === tr.length - 1 ? 'now' : 'q' + (i + 1 - tr.length);
+      }
+      return { x: x, y: v };
+    });
     cards.push({ h: 'Household debt — the leverage backdrop', color: 'var(--collat)',
       s: tr.length + ' quarters · ' + esc(hd.period || '') + ' · deleveraging eases borrower risk across the whole book',
       svg: lineChart(hp, { color: 'var(--collat)', unit: '% GDP',
-        aria: 'Thailand household debt to GDP, last ' + tr.length + ' quarters' }),
+        aria: 'Thailand household debt to GDP, last ' + tr.length + ' quarters through ' + esc(hd.period || 'the latest quarter') }),
       src: (BIS.meta || {}).source || '' });
   }
   /* Accumulated series — the feeds whose publisher only ever says "today". Their history is not
