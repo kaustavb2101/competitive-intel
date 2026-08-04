@@ -129,6 +129,88 @@ def rgb(h):
     return RGBColor.from_string(h)
 
 
+# The sign-off page's stylesheet, lifted verbatim from the hand-authored review page it
+# replaces so the page Kaustav already signed off on still looks like itself. Only the
+# CONTENT is generated now; the design was fine, it was the numbers in it that went stale.
+REVIEW_CSS = """<style>
+:root{
+  --navy:#1E2F5C; --navy-lift:#2A3F73; --gold:#C08A12; --red:#CC0000;
+  --bg:#F6F7FA; --card:#FFFFFF; --ink:#151A24; --ink-2:#4A5468; --rule:#DDE1E9;
+  --shadow:0 1px 2px rgba(30,47,92,.06), 0 8px 24px rgba(30,47,92,.07);
+}
+@media (prefers-color-scheme:dark){
+  :root{--navy:#8FA6DC; --navy-lift:#A8BBE8; --gold:#E0B54A; --red:#F2635B;
+    --bg:#0F1219; --card:#171B24; --ink:#E7EAF1; --ink-2:#A2ABBE; --rule:#262C39;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);}
+}
+:root[data-theme="light"]{--navy:#1E2F5C; --navy-lift:#2A3F73; --gold:#C08A12; --red:#CC0000;
+  --bg:#F6F7FA; --card:#FFFFFF; --ink:#151A24; --ink-2:#4A5468; --rule:#DDE1E9;
+  --shadow:0 1px 2px rgba(30,47,92,.06), 0 8px 24px rgba(30,47,92,.07);}
+:root[data-theme="dark"]{--navy:#8FA6DC; --navy-lift:#A8BBE8; --gold:#E0B54A; --red:#F2635B;
+  --bg:#0F1219; --card:#171B24; --ink:#E7EAF1; --ink-2:#A2ABBE; --rule:#262C39;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 96px}
+a{color:var(--navy)}
+
+/* ---------- masthead ---------- */
+header.top{padding:56px 0 28px;border-bottom:3px solid var(--navy)}
+.kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+  font-weight:700;margin:0 0 12px}
+h1{font-size:clamp(28px,4.4vw,42px);line-height:1.1;letter-spacing:-.02em;margin:0 0 14px;
+  font-weight:700;text-wrap:balance}
+.dek{font-size:17px;color:var(--ink-2);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+.meta li{font-size:12px;padding:5px 11px;border:1px solid var(--rule);border-radius:999px;
+  color:var(--ink-2);background:var(--card)}
+.meta li b{color:var(--ink);font-weight:600}
+
+/* ---------- notice ---------- */
+.notice{background:var(--card);border:1px solid var(--rule);border-left:4px solid var(--red);
+  border-radius:0 10px 10px 0;padding:20px 22px;margin:32px 0 0;box-shadow:var(--shadow)}
+.notice h3{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--red);font-weight:700}
+.notice p{margin:0 0 10px}
+.notice p:last-child{margin:0}
+.notice .q{font-size:14px;color:var(--ink-2)}
+
+/* ---------- jump bar ---------- */
+nav.jump{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 12px;
+  border-bottom:1px solid var(--rule);margin:36px 0 0;overflow-x:auto}
+nav.jump ol{display:flex;gap:6px;margin:0;padding:0;list-style:none;min-width:min-content}
+nav.jump a{display:block;min-width:30px;text-align:center;padding:5px 8px;font-size:12px;
+  font-variant-numeric:tabular-nums;text-decoration:none;color:var(--ink-2);
+  border:1px solid var(--rule);border-radius:6px;background:var(--card)}
+nav.jump a:hover,nav.jump a:focus-visible{border-color:var(--navy);color:var(--navy);outline:none}
+
+/* ---------- slides ---------- */
+.slide{margin:38px 0 0;background:var(--card);border:1px solid var(--rule);border-radius:12px;
+  overflow:hidden;box-shadow:var(--shadow);scroll-margin-top:70px}
+.sh{display:flex;gap:16px;align-items:flex-start;padding:20px 22px 16px}
+.num{flex:0 0 auto;font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;
+  color:var(--card);background:var(--navy);border-radius:6px;padding:4px 9px;margin-top:3px}
+.eb{margin:0 0 3px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gold);font-weight:700}
+.sh h2{margin:0;font-size:19px;line-height:1.3;font-weight:600;letter-spacing:-.01em;
+  text-wrap:balance}
+.slide img{display:block;width:100%;height:auto;border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+.note{margin:0;padding:16px 22px 20px;font-size:14px;color:var(--ink-2);background:var(--card)}
+.note b{color:var(--navy);font-weight:700}
+
+footer{margin:52px 0 0;padding:26px 0 0;border-top:1px solid var(--rule);
+  font-size:13px;color:var(--ink-2)}
+footer p{margin:0 0 9px;max-width:70ch}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;
+  background:var(--bg);padding:1px 5px;border-radius:4px;border:1px solid var(--rule)}
+@media (max-width:560px){.sh{padding:16px 15px 13px}.note{padding:14px 15px 17px}}
+</style>"""
+
+
 class Deck:
     """Emits python-pptx shapes and, in parallel, records enough to re-draw the slide with Pillow."""
 
@@ -571,3 +653,45 @@ class Deck:
             img.save(p)
             made.append(p)
         return made
+
+    def review(self, pngs, out, title, dek, pptx_name):
+        """The sign-off page: every slide as the PNG just rendered, with its own speaker note.
+
+        Generated, never hand-written. The previous copy of this page was authored by hand and went
+        quietly wrong the moment the deck grew: it still announced "Twelve slides" against an
+        eighteen-slide deck and still quoted a commodity list two price vintages old. A review
+        artifact that drifts from what it is reviewing is worse than none, so the slide count, the
+        headings and the notes all come off the Deck that was just built.
+        """
+        import base64
+
+        def esc(s):
+            return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+
+        cards, jump = [], []
+        for i, ((_s, _ops), (eyebrow, head)) in enumerate(zip(self.slides, self.headings), 1):
+            note = ""
+            if _s.has_notes_slide:
+                note = _s.notes_slide.notes_text_frame.text or ""
+            b64 = base64.b64encode(Path(pngs[i - 1]).read_bytes()).decode("ascii")
+            jump.append(f'<li><a href="#s{i}">{i:02d}</a></li>')
+            cards.append(
+                f'<article class="slide" id="s{i}">\n'
+                f'  <header class="sh"><span class="num">{i:02d}</span><div>'
+                f'<p class="eb">{esc(eyebrow)}</p><h2>{esc(head)}</h2></div></header>\n'
+                f'  <img src="data:image/png;base64,{b64}" alt="Slide {i}: {esc(head)}" '
+                f'loading="lazy">\n'
+                + (f'  <p class="note"><b>Say:</b> {esc(note)}</p>\n' if note else "")
+                + "</article>")
+        html = (REVIEW_CSS
+                + f'\n<div class="wrap">\n<header class="top">\n'
+                f'  <p class="kicker">Draft for sign-off</p>\n  <h1>{title}</h1>\n'
+                f'  <p class="dek">{esc(dek)}</p>\n  <ul class="meta">\n'
+                f'    <li><b>{len(self.slides)}</b> slides</li>\n'
+                f'    <li><b>16:9</b> · 13.33 × 7.5 in</li>\n    <li>Font <b>Kanit</b></li>\n'
+                f'    <li>Speaker notes on every slide</li>\n'
+                f'    <li>File <b>{esc(pptx_name)}</b></li>\n  </ul>\n</header>\n'
+                f'<nav class="jump" aria-label="Jump to slide"><ol>{"".join(jump)}</ol></nav>\n'
+                + "\n".join(cards) + "\n</div>\n")
+        Path(out).write_text(html, encoding="utf-8")
+        return out
