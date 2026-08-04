@@ -3,6 +3,60 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Integration loop (provenance honesty): branch-popup catchment population now shows the MEASURED WorldPop count, not the ESTIMATED area-weight labelled "measured" — PR (app-visible)
+
+Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO, per-branch
+cropland, and the data.go.th distillations are all shipped + surfaced — reconfirmed this run; GISTDA 40m crop
+needs `GISTDA_SPHERE_KEY`, which is **NOT** in this CI env — checked). CI-reachable data refreshes are all
+no-ops or blocked this run: a fresh FPO PICO pull is **byte-exact** (`build_pico_census.py --check` passes →
+registry unchanged since 2026-07-30), and DLT (`gdcatalog.dlt.go.th`), the data.go.th aggregator
+(baac/smebank/diw), DBD (`openapi.dbd.go.th` 403), NSO (`catalog.nso.go.th` 418) and Excise (SSL EOF) all
+fail from this cloud IP. A negative-space sweep confirmed the repo has **no unwired MEASURED layers** and
+effectively complete gate coverage. So this run took the highest-value fully-verifiable item: a **provenance
+honesty bug** surfaced by the provenance audit — a false MEASURED claim on a number shown in every one of the
+2,015 branch popups.
+
+**The bug.** The branch-popup "Catchment ≤10km — measured" block (`platform/app.js` `catchmentPopupHTML`)
+showed a **Catchment population** value taken from `branch_population.json` `.values[i]` and labelled it
+_"population = WorldPop 2020 inside this branch's 10km circle"_ under a "— measured" section header. But that
+file's OWN meta says `measured: false`, `method: "areaweight"`, `population: "ESTIMATED — … WorldPop
+raster/rasterio unavailable; fallback method"` — it is a district-population **area-weight estimate**
+assuming uniform intra-district density, NOT a WorldPop count. The genuinely MEASURED WorldPop-2020 1km-raster
+count for the SAME branch sat right beside it, in `contested_pop.json` `rows[i][0]` (`pop10`, MEASURED per its
+meta, verified + cleared by the provenance audit at its `#exposure` use), used only as a **fallback that was
+never reached** because `BPOP` is populated for all 2,015 branches. The code comments compounded it, claiming
+the two were "the same raster, same method" — they are not, and their values differ materially (e.g. branch 0:
+area-weight 210,389 vs WorldPop 165,523; branch 1: 23,572 vs 33,259). Worse, the "% contested by rivals"
+figure on the same line already used `cp[1]/cp[0]` (WorldPop base) as its denominator, so the displayed
+population and its own contested share were computed on **two different population bases**.
+
+**The fix (app.js only — NO data/HTML/provenance touched).** Flipped the population source priority in
+`catchmentPopupHTML` to prefer the MEASURED WorldPop count (`contested_pop.json` `rows[i][0]`) over the
+area-weight estimate, with `branch_population.json` kept as a defensive fallback. Added a `popMeasured` flag so
+the footer states the honest source per branch — "WorldPop 2020 (1km raster) …" when measured, else "ESTIMATED
+— district population area-weighted …". Since `contested_pop` covers all 2,015 branches, the measured path is
+taken for every branch (verified 2015/2015), so the "— measured" header is now truthful AND the displayed
+population shares the same base as its contested-share denominator. Corrected the four misleading comments
+(`app.js` ~1119, ~1128, ~7082, ~7089) that called `branch_population.json` "TRUE WorldPop 2020 / MEASURED /
+same raster, same method".
+
+- **Net effect:** the catchment population shown in every branch popup changes from an unlabelled-as-such
+  estimate to the true measured WorldPop count (e.g. 210,389 → 165,523 for branch 0), and its provenance label
+  is now honest — directly serving the project's core "measured-vs-estimated honesty" value.
+- **Verification (all pass):** `node --check platform/app.js` OK; a node harness replaying the new selection
+  confirms **2015/2015** branches take the measured path and the value matches `contested_pop` `pop10`;
+  `build_provenance.py --check` reproduces exactly (no data file changed); `bash tests/run.sh check` →
+  **123 passed, 0 failed** (data integrity 455/455); `render` passes all 7 non-3D pages. (The `health`
+  hook-checks are flaky in THIS sandbox — `#db-root` "fails" on `data.html`, which does not even load app.js —
+  so they are environmental settle-timing noise here, unrelated to this edit; CI runs health on Linux.)
+- **Why a PR, not a direct commit.** It changes a surfaced number and its label in every branch popup — an
+  app-visible change — so per the loop's own rule it goes to review rather than straight to master.
+- **Next recommended:** two small follow-ups. (1) `contested_pop.json`'s own meta still claims `pop10`
+  "matches branch_population.json" — false now that BPOP fell back to area-weight; correct that sentence in
+  `build_contested_pop.py` and rebuild. (2) `CLAUDE.md:73` claims `tests/run.sh check` gates
+  `bake_catchment_heights --check`, but that check was removed (`tests/run.sh:71-75`) — drop the stale claim
+  (a trivial offline doc fix flagged by the negative-space sweep).
+
 ## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict) — committed to master
 
 Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open

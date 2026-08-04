@@ -1116,8 +1116,10 @@ function compTooltip(d){
    Two extra MEASURED layers behind each branch popup's "Catchment ≤10km" block, both lazy-loaded
    with the same cached-promise pattern used across this file and both fully null-guarded (absent
    file → the line, or the whole block, is simply omitted — nothing is fabricated):
-   (a) data/branch_population.json .values[i] — the TRUE ~10km-perimeter WorldPop 2020 population
-       INSIDE this branch's 10km circle (MEASURED, index-aligned to branches.json).
+   (a) data/branch_population.json .values[i] — an ESTIMATED ~10km-perimeter population (its own meta:
+       measured:false, method "areaweight", WorldPop raster unavailable). Index-aligned to branches.json.
+       This is only the FALLBACK: the popup prefers the MEASURED WorldPop-2020 raster count in
+       contested_pop.json rows[i][0], which covers all 2015 branches.
    (b) data/competitors_census.json .items — the MERGED measured rival-branch census (Google Places
        UNION Overture, ~4,384 points); we count how many sit within CATCH_RADIUS_KM of this branch
        (client-side haversine, reusing havKm). This is the merged census (a fuller count than the
@@ -1125,7 +1127,7 @@ function compTooltip(d){
    The third number — total establishments ≤10km — is just the sum of this branch's own k10 OSM
    counts already in branches.json, so it needs no extra fetch. */
 const CATCH_RADIUS_KM=10;                                   // radius (km) for the catchment population / establishments / rival read
-let BPOP=null, bpopLoaded=false, bpopPromise=null;          // MEASURED ~10km WorldPop population per branch (index-aligned .values)
+let BPOP=null, bpopLoaded=false, bpopPromise=null;          // ESTIMATED ~10km area-weight population per branch (index-aligned .values) — fallback only; the measured WorldPop count comes from contested_pop.json
 async function loadBranchPopulation(){
   if(bpopPromise) return bpopPromise;
   bpopLoaded=true;
@@ -7079,17 +7081,27 @@ function picoLineHTML(d){
     +`<b style="color:${col}">${body}</b></div>`;
 }
 // Catchment block for a branch popup — three MEASURED numbers about this branch's ~10km catchment:
-// (1) reachable population INSIDE the 10km circle (WorldPop 2020, data/branch_population.json .values[i]);
+// (1) reachable population INSIDE the 10km circle — MEASURED WorldPop 2020 1km raster
+//     (contested_pop.json rows[i][0]); branch_population.json .values[i] is only an ESTIMATED
+//     area-weight fallback (see below), used when the raster count is unavailable;
 // (2) total establishments ≤10km = sum of this branch's OSM k10 counts (branches.json); (3) rival
 // branches ≤10km from the merged competitor census (data/competitors_census.json, client-side haversine).
 // Fully null-guarded: each line renders only when its measured value exists, and the whole block is
 // omitted when none of the three are available. Nothing is fabricated.
 function catchmentPopupHTML(d,sec,r){
   const i=idxOf(d);
-  // contested-population overlay (contested_pop.json rows[i]=[pop10, contested_pop], measured);
-  // falls back to its pop10 when branch_population.json is absent (same raster, same method).
+  // contested-population overlay (contested_pop.json rows[i]=[pop10, contested_pop], MEASURED WorldPop
+  // 2020 raster). pop10 is the PRIMARY population source below (a true raster count); BPOP is the
+  // ESTIMATED area-weight fallback only.
   const cp=(CPOP&&i>=0&&i<CPOP.rows.length&&Array.isArray(CPOP.rows[i]))?CPOP.rows[i]:null;
-  const pop=(BPOP&&i>=0&&i<BPOP.length&&BPOP[i]!=null)?BPOP[i]:(cp?cp[0]:null);
+  // Prefer the MEASURED WorldPop-2020 raster count (contested_pop.json rows[i][0], measured per its
+  // meta) over branch_population.json .values[i], which is an ESTIMATED district-area-weight fallback
+  // (its own meta: measured:false, method "areaweight", raster unavailable — so the two are NOT the
+  // same method and their values differ). Both are index-aligned and cover all 2015 branches, so the
+  // measured path is taken for every branch; BPOP is only a defensive fallback. Using cp[0] also makes
+  // the displayed population share the SAME base as the "% contested" denominator below (cp[1]/cp[0]).
+  const popMeasured=!!(cp&&cp[0]!=null);
+  const pop=popMeasured?cp[0]:((BPOP&&i>=0&&i<BPOP.length&&BPOP[i]!=null)?BPOP[i]:null);
   const cpct=(cp&&cp[0]>0)?Math.round(100*cp[1]/cp[0]):null;
   const cc=cpct==null?'':cpct>=60?'var(--agri)':cpct>=35?'var(--gold)':'var(--merch)';
   const hasK=d.k10&&typeof d.k10==='object';
@@ -7102,7 +7114,7 @@ function catchmentPopupHTML(d,sec,r){
         +(cpct!=null?` · <span style="color:${cc}" title="share of this 10km population also living within 2km of a rival branch — measured WorldPop 2020 × competitor census; census lower bound">${cpct}% contested by rivals</span>`:''), 'var(--accent)'):'')
     + (estab!=null?r('Establishments ≤10km (OSM)', estab.toLocaleString(), 'var(--merch)'):'')
     + (rivals!=null?r('Rival branches ≤10km', `<span style="color:${rc}">${rivals}</span>`, rc):'')
-    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = WorldPop 2020 inside this branch's 10km circle${cpct!=null?'; contested = share of that population within 2km of any census rival (lower bound — Heng sampled, sub-scale operators missing)':''}; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
+    + `<div class="sub" style="margin:2px 0 0;font-size:10px">population = ${popMeasured?"WorldPop 2020 (1km raster) inside this branch's 10km circle":"ESTIMATED — district population area-weighted to the 10km circle (WorldPop raster unavailable)"}${cpct!=null?'; contested = share of that population within 2km of any census rival (lower bound — Heng sampled, sub-scale operators missing)':''}; establishments = sum of OSM POI counts ≤10km; rivals = official store-locator census (Muangthai/Srisawad/Tidlor measured-complete; Heng sample)</div>`;
 }
 // Macro cluster brief — a one-line plain-language read of the macro forces on this branch's customer
 // cluster (cluster_brief.json, index-aligned; templated from measured board/crop/occupation signals).
