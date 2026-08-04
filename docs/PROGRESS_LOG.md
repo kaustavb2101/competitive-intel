@@ -3,6 +3,25 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — UX loop: real quarter labels on the live.html household-debt chart (PR #289, merged + deployed + verified)
+
+Autonomous UX-improvement run. The backlog's listed items (1–7) and every surgical Open-backlog item are
+already fixed; the remaining open ones are all explicitly flagged bigger-than-surgical / not-for-unattended-
+merge (`qa-visual-baseline-stale`, `ux-acquire-taxonomy-mandate`, `ux-viewport-user-scalable-3dpages`,
+`ux-live-chart-mobile-viewbox-responsive`). So per the mandate I reviewed a route and found a new concrete
+gap: the **household-debt trend chart on `live.html` was the only one of the five charts with cryptic
+relative x-axis labels** (`q-5 … now`, whose `|| 'now'` was dead code) — every other chart (SFI NPL,
+commodity, GDP, daily feeds) shows real time labels. Derived real quarter labels (`24Q3 … 25Q4`) from the
+anchor period the BIS layer stamps (`hd.period`, e.g. `"2025-Q4"`) by back-counting one quarter per point,
+with a fallback to the old relative labels if the anchor is absent/unparseable so the axis never blanks;
+also folded the anchor into the SVG `aria-label`. Against the "concrete, not abstract" mandate the cryptic
+axis was a real clarity gap, and this makes the chart consistent with the other four.
+
+- **Scope:** `platform/live.html` only (+ one-line `docs/UXUI_AUDIT.md` entry). No data files / gated outputs touched.
+- **Safeguards:** `bash tests/run.sh check` → **121 passed, 0 failed** (data validation 455/0); `node --check` clean on all 4 inline blocks; headless render self-reviewed (x-axis now `24Q3 … 25Q4`, rest of page unchanged); no secrets; diff matches intent, no stray files.
+- **Merge:** PR #289 squash-merged to master (`b1775c0`).
+- **Deploy-verify:** after ~90s, `https://competitive-intel-git-master-kaustav-bagchis-projects.vercel.app/` → **200**, `/live` → **200** (`/live.html` → 308, the normal cleanUrls redirect); confirmed the deployed `/live` HTML carries the new label logic (`Real quarter labels` marker present). No rollback needed.
+
 ## 2026-08-04 — Integration loop (DECISION, no data change): the two remaining CI "openings" verified as dead ends — DLT collateral is upstream-frozen at its newest vintage, BAAC has no CI-reachable source — committed to master
 
 Autonomous integration run. The stated data-integration backlog (FPO PICO census, per-branch cropland,
