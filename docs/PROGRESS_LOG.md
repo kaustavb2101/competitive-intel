@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Integration loop (DECISION, no data change): the two remaining CI "openings" verified as dead ends — DLT collateral is upstream-frozen at its newest vintage, BAAC has no CI-reachable source — committed to master
+
+Autonomous integration run. The stated data-integration backlog (FPO PICO census, per-branch cropland,
+data.go.th distillations, GISTDA 40m crop) is shipped or key-blocked, and the recent loop history is a
+treadmill of one-off provenance/freshness commits. A negative-space sweep surfaced exactly two things that
+still *read* as live openings: (a) refresh the ~5-month-stale DLT vehicle/collateral layers
+(`ev_penetration`/`vehicle_collateral`/`vehicle_mix`/`vehicle_models`), and (b) probe a BAAC department
+CKAN to unblock `build_baac_credit.py` (a complete, `--check`-gated builder whose `baac_credit.json` output
+has never been produced). This run **live-probed both and proved both are dead ends from a cloud IP** — so
+instead of manufacturing a byte-identical "refresh" or re-probing a source that 403s, it records the
+verified negatives with precise recheck triggers, so the survey/loop stops re-flagging them (the treadmill
+this loop keeps hitting). **No app or data-layer change — a settled-decision doc entry only.**
+
+**What was verified (live probes, 2026-08-04):**
+- **DLT is reachable but upstream-frozen — the collateral layers are already at DLT's newest
+  genuinely-complete vintage, not stale by neglect.** `gdcatalog.dlt.go.th` returns HTTP 200 from CI, but
+  its cumulative-stock dataset `dataset_1_1_04` serves ONE resource, `stt_car_fuel_at_25690228.csv` = 28
+  Feb 2026 — exactly the committed `vintage: 2026-02-28`. The first-registration dataset
+  `stat_1_1_01_first_regis_vehicles_car`'s Feb-2026 file (`sttt_car_new_reg_mm_2569_02.csv`) is a
+  **permanent ~6-row stub** (1,031 B, 7 lines) against Jan-2026's 151 KB / ~1,421 rows — re-checked
+  still-a-stub 4 months after its 2026-03-17 last-modified — which is precisely why
+  `build_vehicle_models.py`'s `STUB_FRACTION` rule excludes it and `vehicle_models.json`'s
+  `latest_month: 2026-01` is CORRECT. The monthly-action datasets `dataset_stat_1_008/009` top out at
+  Feb-2569 too. Re-pulling today reproduces byte-identical output; a refresh is worthwhile only once DLT
+  publishes newer files (recheck trigger recorded in `NEXT_STEPS.md` §2).
+- **BAAC has no CI-reachable source.** `data.go.th/api/3/action/package_show?id=baac02_2567` → **HTTP 403**
+  from CI (aggregator geoblock), and BAAC — unlike DIW/DLT — has **no own department CKAN**:
+  `catalog.baac.or.th`, `data.baac.or.th`, `opendata.baac.or.th`, `baac.or.th` all resolve **HTTP 000**.
+  `build_baac_credit.py` stays correctly SKIP-gated; its xlsx is Thai-IP/owner-side only.
+- **Google Trends (`search_demand.json`, the prior entry's #1 follow-up) is 429-blocked from this cloud IP**
+  (pytrends `interest_by_region` → `TooManyRequestsError 429`) — confirmed, not refreshable from CI either.
+
+- **Provenance / honesty:** no numbers touched anywhere; `provenance.json` counts and every data layer are
+  byte-unchanged. The app does not misrepresent the DLT vintages (no machine-readable staleness defect to
+  fix — checked `provenance_sidecar.json` + the app's vintage rendering).
+- **Verification:** `bash tests/run.sh check` → **122 passed · 0 failed** (455 data-validation checks, 0
+  failed) both before and after — the edit is confined to `docs/NEXT_STEPS.md` §2 and this log, which the
+  gate does not derive from, so the green baseline is preserved by construction and re-confirmed.
+- **Next recommended:** the genuine remaining unlocks are all Thai-IP/owner-side (a fresh loan-tape export;
+  the Sabuy Cash Play/Apple/ATC ids per `NEXT_STEPS.md` §0c; DLT once it publishes >Feb-2569 data) or wait
+  on upstream. From CI, prefer a real analytical cross-join over existing committed layers to any further
+  byte-identical "refresh" — the freshness backlog is exhausted.
+
 ## 2026-08-04 — Intelligence loop (PEER COMPARISON): rival EXPANSION PACE + loan-book SCALE now structured on `#acq`, no longer prose-only — PR #… → master
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
