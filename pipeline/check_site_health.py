@@ -400,6 +400,43 @@ def _shape_peer_province(d):
     return None
 
 
+def _shape_rival_threat(d):
+    # The brand-level density x service matrix (rival_threat.json, obj #2) — the
+    # per-BRAND sibling of rival_threat_region (whose probe comment already named
+    # this file as its one unprobed twin). It renders the Competition (#acq)
+    # "rival threat matrix" (drawRivThreat): each big-4 rival's national footprint
+    # ×AutoX (ESTIMATED company-IR headline, MEASURED census in the sub-line) next
+    # to its MEASURED Google service rating, so the strongest COMBINED threat reads
+    # at a glance. The render gates the whole board on a non-empty .brands array
+    # and, per row, reads .brand (name), .footprint_vs_autox (the ×AutoX ratio —
+    # the board's primary quantitative column) and .threat_class (the Threat column
+    # + its risk-colour), plus .headline for the readout. It degrades SILENTLY — a
+    # missing/truncated file drops the board to its "Rival threat matrix not yet
+    # computed" placeholder with NO phone alert — the same "broken demo" blind spot
+    # the peer_province / competitor_coverage / rival_threat_region probes closed
+    # for the sibling competitive reads. Asserts render shape (the brands gate, the
+    # brand/threat_class columns each row renders, at least one numeric ×AutoX
+    # ratio, and the headline the readout reads), not values — robust to a future
+    # census/rating vintage shifting the ratios.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or len(brands) < 3:
+        return "missing/short 'brands' list (expected the big-4 rivals)"
+    b0 = brands[0]
+    if not isinstance(b0, dict):
+        return "first brand row is not an object"
+    if not (isinstance(b0.get("brand"), str) and b0["brand"].strip()):
+        return "first brand row missing/empty 'brand' (matrix row name render)"
+    if not (isinstance(b0.get("threat_class"), str) and b0["threat_class"].strip()):
+        return "first brand row missing/empty 'threat_class' (Threat column render + colour key)"
+    if not any(isinstance(b, dict) and isinstance(b.get("footprint_vs_autox"), (int, float)) for b in brands):
+        return "no brand carries a numeric 'footprint_vs_autox' (the ×AutoX ratio column)"
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/blank 'headline' (Competition readout render read)"
+    return None
+
+
 def _shape_rival_threat_region(d):
     # The per-region density x service JOIN (rival_threat_region.json, obj #2) —
     # the ONE competitive read that renders on the exec FRONT DOOR (renderHomeDefend
@@ -1273,6 +1310,17 @@ DATA_FILES = [
     # reads. Asserts the render shape (regions gate + density/service/class axes + the
     # headline the readout reads), not values.
     ("data/rival_threat_region.json", _shape_rival_threat_region, ".regions (5) density×service axes + threat_class + .headline (#home hardest-to-defend card + #acq table)"),
+    # The brand-level density x service matrix (rival_threat.json, obj #2) — the
+    # per-BRAND sibling of rival_threat_region (whose own probe comment named this
+    # file as its one unprobed twin). Renders the Competition (#acq) "rival threat
+    # matrix" (drawRivThreat), gated on a non-empty .brands array, each row reading
+    # .brand + .footprint_vs_autox (×AutoX ratio) + .threat_class; it degrades
+    # SILENTLY to a "not yet computed" placeholder with no phone alert when a
+    # truncated CDN deploy guts it — the same blind spot the peer_province /
+    # competitor_coverage / rival_threat_region probes closed. Asserts render shape
+    # (brands gate + brand/threat_class columns + a numeric ×AutoX ratio + the
+    # readout headline), not values.
+    ("data/rival_threat.json", _shape_rival_threat, ".brands (big-4) density×service matrix + threat_class + .headline (#acq rival threat matrix)"),
     # The TIME dimension (deltas.json, obj #1) — the last surfaced FRONT-DOOR read with
     # no deploy probe. Renders the command-center "Movers" card (renderHomeMovers off
     # .region + .branches) AND is the whole Risk-trend tab payload (.board YoY re-ratings
