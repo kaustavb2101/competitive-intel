@@ -72,6 +72,38 @@ EXPECTED_SOURCES = {
     "Heng":      "No nationwide branch count cited in docs/RESEARCH_DIGEST.md — left null (not invented).",
 }
 
+# REPORTED peer SCALE + EXPANSION PACE — the direction behind the static branch counts, from the
+# operators' own FY2025 / 2025 IR (docs/RESEARCH_DIGEST.md §B). Objective #2: AutoX is CONSOLIDATING
+# its ~2,015-branch network while the #1 rival keeps adding branches into the same districts — a
+# margin-erosion-on-the-existing-network read the static count alone can't show. Every figure is a
+# CITED public number; leave a field None when no figure is cited (never inferred). `net_adds_yr` is
+# reported only where the operator disclosed a branch-count delta (MTC alone), so the pace column is
+# populated only for MTC — the others stay honestly blank rather than back-computed.
+PEER_FINANCIALS = {
+    # loan_book_bn = total loans outstanding, ฿bn; net_adds_yr = branches opened net in the stated
+    # year; prior_year_branches = current cited count − net_adds_yr (arithmetic on cited figures, MTC
+    # only); book_yoy_pct = reported YoY growth of the book; asof = the book's observation label.
+    "Muangthai": {"loan_book_bn": 183.222, "net_adds_yr": 518, "net_adds_year": 2025,
+                  "prior_year_branches": 8155, "book_yoy_pct": None, "book_asof": "FY2025",
+                  "growth_target_pct": "10–15"},
+    "Tidlor":    {"loan_book_bn": 109.586, "net_adds_yr": None, "net_adds_year": 2025,
+                  "prior_year_branches": None, "book_yoy_pct": 5.4, "book_asof": "FY2025",
+                  "growth_target_pct": None},
+    "Srisawad":  {"loan_book_bn": 93.155, "net_adds_yr": None, "net_adds_year": 2025,
+                  "prior_year_branches": None, "book_yoy_pct": None, "book_asof": "30 Jun 2025",
+                  "growth_target_pct": None},
+    "Heng":      None,   # no cited book / branch-delta in our research — omitted, not invented
+}
+PEER_FINANCIALS_SOURCES = {
+    "Muangthai": "MTC FY2025 — loan portfolio ฿183,222m, opened 518 branches in 2025 (→ 8,673 "
+                 "total, i.e. 8,155 prior-year), targets 10–15% portfolio growth; company IR / kaohoon. "
+                 "https://www.kaohooninternational.com/markets/577190",
+    "Tidlor":    "Ngern Tid Lor FY2025 — outstanding loans ฿109,586m (+5.4% YoY); thaipr / company IR. "
+                 "https://www.thaipr.net/en/finance_en/3695435",
+    "Srisawad":  "Srisawad (SAWAD) — total loans outstanding ฿93,155m as of 30 Jun 2025; IR oppday deck. "
+                 "https://sawad.listedcompany.com/misc/presentation/20250523-sawad-oppday-1q2025.pdf",
+}
+
 
 def _count_found():
     """De-duplicated MEASURED per-brand counts across the census files (by place_id; falls
@@ -173,11 +205,27 @@ def _national_standing(autox_n, counts):
     if not autox_n:
         return None
     # pool = AutoX (measured own network) + each peer WITH a cited reported figure.
-    pool = [{"operator": "AutoX", "branches": autox_n, "basis": "MEASURED (own operating network, branches.json)"}]
+    pool = [{"operator": "AutoX", "branches": autox_n,
+             "basis": "MEASURED (own operating network, branches.json)",
+             # AutoX is CONSOLIDATING its network (CLAUDE.md) — no branch-growth target. Stated as a
+             # posture, never as an invented positive net-adds number.
+             "net_adds_yr": None, "expansion": "consolidating (no branch-growth target)"}]
     for b in BRANDS:
         exp = EXPECTED.get(b)
         if exp:
-            pool.append({"operator": b, "branches": exp, "basis": "REPORTED (cited public IR figure)"})
+            entry = {"operator": b, "branches": exp, "basis": "REPORTED (cited public IR figure)"}
+            fin = PEER_FINANCIALS.get(b)
+            if fin:
+                # attach only the cited fields; None-valued keys stay present (honest ABSENT), so the
+                # UI can tell "not reported" from a genuine zero.
+                entry["loan_book_bn"] = fin.get("loan_book_bn")
+                entry["book_asof"] = fin.get("book_asof")
+                entry["book_yoy_pct"] = fin.get("book_yoy_pct")
+                entry["net_adds_yr"] = fin.get("net_adds_yr")
+                entry["net_adds_year"] = fin.get("net_adds_year")
+                entry["prior_year_branches"] = fin.get("prior_year_branches")
+                entry["growth_target_pct"] = fin.get("growth_target_pct")
+            pool.append(entry)
     # rank by network size desc; deterministic tie-break by the fixed pool order (AutoX first,
     # then census brand order) — matches build_peer_province's tie-break convention.
     order = ["AutoX"] + BRANDS
@@ -223,6 +271,15 @@ def _national_standing(autox_n, counts):
                   "different stories, both true. Heng carries no cited branch count so it is excluded "
                   "from the rank (never invented). Peer figures are listed-ENTITY IR counts; a group's "
                   "full retail footprint can be larger (see the Srisawad note above).",
+        "expansion_label": "REPORTED — each peer's own FY2025 / 2025 IR (loan book ฿bn, branch net-adds "
+                           "where disclosed). AutoX is MEASURED own-network + CONSOLIDATING posture "
+                           "(no branch-growth target). Direction, not just static counts.",
+        "expansion_note": "The #1 rival (MTC) kept opening branches — +518 in 2025 (8,155 → 8,673) — "
+                          "and runs a ฿183bn loan book, ~2.6x AutoX's ~2,015-branch network, while AutoX "
+                          "consolidates. That is competitive pressure / margin erosion on the network we "
+                          "already run (objective #2), not a case for matching branch count. Tidlor's book "
+                          "grew +5.4% YoY to ฿110bn; Srisawad's is ฿93bn (30 Jun 2025). Branch net-adds are "
+                          "shown only for MTC (the one operator that disclosed a delta) — never back-computed.",
     }
 
 
@@ -248,6 +305,9 @@ def build():
         "census_files_used": sources,
         "expected_label": "ESTIMATED-from-public-reports",
         "expected_sources": {b: EXPECTED_SOURCES[b] for b in BRANDS},
+        "peer_financials_label": "REPORTED-from-public-reports (peer loan book & branch net-adds — "
+                                 "cited FY2025 / 2025 IR, see peer_financials_sources).",
+        "peer_financials_sources": PEER_FINANCIALS_SOURCES,
         "totals": {"found": total_found, "expected": total_expected or None,
                    "coverage_pct": overall_cov},
         "national_standing": national_standing,
