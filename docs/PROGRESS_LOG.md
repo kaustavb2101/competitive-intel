@@ -3,6 +3,38 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+HTTP 200 on `/` and `/data/meta.json`; `build_provenance.py --check` reproduces exactly; planner backlog
+exhausted at 98%, the one OPEN item owner-side). The recent SERVICE-audit history had become a "one probe
+per run" pattern over the front-door layers, so a render-path re-scan looked for the *highest-value* still-
+unprobed read and found a genuine structural blind spot rather than just the next file in line:
+**`rival_reputation.json`** (obj #2, MEASURED sample — review-count-weighted Google rating by brand, the
+`#acq` "rival service reputation" board). It is the shared **parent of both already-probed threat layers**
+(`rival_threat` + `rival_threat_region` consume its ratings) — but those children are **pre-built, committed
+files**, so they keep rendering even when a truncated CDN deploy guts the parent. `drawRivRep` gates its
+board on a non-empty `.by_brand` array and silently drops to a calm "not yet computed" placeholder with no
+phone alert when the file is missing/truncated — the "broken demo" blind spot the sibling competitive probes
+already close. Added `_shape_rival_reputation` to `pipeline/check_site_health.py` (fetch + parse + render-
+shape: the `by_brand` gate, the `brand` column each row renders, ≥1 numeric `rating_wavg`, and the non-blank
+`headline` the readout reads — shape not values, robust to a future rating-vintage refresh).
+
+- **Scope:** `pipeline/check_site_health.py` only (+ `docs/SERVICE_AUDIT.md` audit-run line, this entry). No
+  `platform/data` file, no app/visual change — probe-script-only, so no provenance regen and no PR/headless
+  render needed.
+- **Safeguards:** gate `bash tests/run.sh check` → **121 passed · 0 failed** (data integrity 455/455; the
+  gate does not invoke `check_site_health.py`, so this change is outside its scope by construction);
+  `_shape_rival_reputation` accepts the real payload and rejects **9** malformed shapes (non-dict / missing-
+  or-non-list-or-short `by_brand` / row-not-dict / row-missing-`brand` / no-numeric-`rating_wavg` / blank-or-
+  missing-`headline`); offline `--local platform` → **122/122 HEALTHY** (was 119) with the file served +
+  shape-sane; live alias serves `rival_reputation.json` **HTTP 200** (1,561 B, matches local); no secrets in
+  diff; diff (48 insertions, one probe fn + registry entry) matches intent.
+- **Ship:** safeguard-gated auto-commit to master (probe-script-only). Probe coverage **36 → 37** exec layers.
+- **Deploy-verify:** master production alias re-checked HTTP 200 on `/` and the newly-probed
+  `/data/rival_reputation.json` after the push (the change is a CI probe script, not a served asset, so it
+  does not alter the deployed site — the verify confirms no regression).
+
 ## 2026-08-04 — UX loop: real quarter labels on the live.html household-debt chart (PR #289, merged + deployed + verified)
 
 Autonomous UX-improvement run. The backlog's listed items (1–7) and every surgical Open-backlog item are
