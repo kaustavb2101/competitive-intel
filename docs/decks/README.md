@@ -5,13 +5,47 @@
 ```bash
 python docs/decks/build_mcom_macro_pptx.py              # -> mcom-2026-08-05-macro.pptx
 python docs/decks/build_mcom_macro_pptx.py --preview    # + preview/slideNN.png thumbnails
+python docs/decks/build_mcom_macro_pptx.py --review     # + mcom-review.html, the sign-off page
 ```
 
 Deterministic, network-free, and every figure is read out of `platform/data/` at build time — no
 transcribed numbers — so a rebuild after a data refresh picks the new vintage up. Layers read:
-`macro_book`, `imf_weo`, `commodity_history`, `crop_mix`, `farm_book`, `crop_farmer_income`,
-`income_impact`, `province_stress_index`, `amphoe_crops`, `used_vehicle_value`, `vehicle_models`,
-`collateral_book`.
+`macro_book`, `macro_indicators`, `imf_weo`, `commodity_history`, `commodities`, `crop_mix`,
+`farm_book`, `farm_income_impact`, `crop_farmer_income`, `income_impact`, `province_stress_index`,
+`amphoe_crops`, `thaiwater_rain`, `thaiwater_flood`, `flood_hazard`, `used_vehicle_value`,
+`vehicle_models`, `collateral_book`, plus one file upstream of the app —
+`source-data/bot_tourist_arrivals.json`, because `platform/data/` carries only the trailing-twelve-
+month arrivals LEVEL and the year-on-year move has to be computed from the monthly series.
+
+### That claim used to be half true, and it cost a review cycle
+
+Numbers in TABLES were always read from the data. Numbers in PROSE — callouts, cards, the vintage
+footer — were transcribed, and on 2026-08-04 a routine NABC price pull moved eight farm-gate series
+under a deck that had been signed off. What went stale, and is now computed:
+
+| was typed | said | data said |
+|---|---|---|
+| commodity board, 9 rows | nine falling; pork −6.7%, shrimp −4.3%, chicken −2.4%, eggs −1.7% | **eight** falling; −3.5%, −1.8%, −0.1%, eggs no longer negative |
+| crop belts callout | rubber +38%, cassava +57%, palm +32%, rice +12% | **+41%, +59%, +28%, +13%** |
+| crop belts callout | South +34.9%, East +23.9%, worst province −66.4% | **+36.4%, +25.3%, −65.2%** |
+| rice callout ×3 | price up 12.4% | **13.2%** |
+| coconut, twice | collapsing 70.9% | **69.7%** |
+| answer slide | a 24% price move becomes a 73% swing | **25% → 80%** |
+| USD/THB chip | 33.47 at 2026-07-31 | **33.34 at 2026-08-03** |
+| falling-crop area, twice | 12.2% of planted area | **10.7%** — this one was never right |
+| water cards | 31 provinces with heavy rain, 2026-08-03 | **41**, observed to **2026-08-04** |
+
+So the discipline is now: **if a figure can move with a vintage, the build computes it.** `pct()`
+formats with the typographic minus the hand-written prose already used, and `word()` spells small
+counts out, because "the 3 crops" in a sentence is the tell that a number was interpolated. The
+vintage footer reads its own stamps off the layers. What remains hand-typed is the argument, the
+crop names, and figures from layers that do not move on a price pull (OAE cost of production, DLT
+turnover, the used-vehicle index).
+
+`--review` regenerates `mcom-review.html` from the build. That page used to be hand-authored, and it
+had drifted furthest of all: it still announced "Twelve slides" against an eighteen-slide deck and
+still listed the nine-commodity board from two price vintages back. The design is unchanged — only
+its content is generated now.
 
 Scope is the **Macro tab only, and the tab is EXTERNAL DATA** — that line is the owner's, set when
 `renderRecoverySensitivity` was moved off the tab on 2026-08-02: *"it is a balance-sheet reading, and
@@ -100,8 +134,9 @@ reproducible on any machine rather than silently degrading to "unchecked". Kanit
   `(eyebrow, title)` per slide in `Deck.headings` so a review page needs no parallel title list.
 - `build_mcom_macro_pptx.py` — the deck's content, one function, eighteen slides, speaker notes on
   each.
-- `mcom-review.html` — the reviewable page: one card per slide, PNG plus the speaker note.
-  Regenerated from the build, not hand-edited.
+- `mcom-review.html` — the reviewable page: one card per slide, PNG plus the speaker note. Written
+  by `--review` (`Deck.review()` in deckkit); gitignored, since it inlines every slide as base64 and
+  runs to ~3MB. Do not hand-edit it — the previous hand-written copy is exactly how it went stale.
 - `mcom-2026-08-05-macro.html` — the earlier HTML version of the same deck. **Superseded**: its
   commodity slide predates the measured Thai farm-gate layer that landed 2026-08-02 and is annotated
   to that effect. The .pptx is the deliverable.
