@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-04T04:17:33+00:00",
-    "commit": "c18774c"
+    "generated_at": "2026-08-04T11:02:38+00:00",
+    "commit": "6da5322"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-04T11:02:38+00:00",
+      "sha": "6da5322",
+      "summary": "market(pulse): refresh rival app-review sentiment to 2026-08-03 (was 2026-07-19)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-04T08:24:20+00:00",
+      "sha": "3f2dd8e",
+      "summary": "chore(dashboard): log ux-live-series-switcher-group-role merge+deploy+verify (PR #285)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T15:21:11+07:00",
+      "sha": "aefdb0f",
+      "summary": "ux: role=group + aria-label on live.html series switchers (#285)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T06:35:14+00:00",
+      "sha": "476b49c",
+      "summary": "fix(provenance): contested_pop stops claiming pop10 matches branch_population.json (it doesn't)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-04T04:19:45+00:00",
+      "sha": "0e56789",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_threat site-health probe ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-04T04:17:33+00:00",
       "sha": "c18774c",
       "summary": "health(deploy): site-health probe guards rival_threat.json (#acq rival threat matrix)",
@@ -680,36 +710,6 @@
       "sha": "912bcf0",
       "summary": "health(deploy): site-health probe guards rival_threat_region.json (#home hardest-to-defend card + #acq per-region table)",
       "pillar": "market"
-    },
-    {
-      "date": "2026-08-03T08:33:21+00:00",
-      "sha": "f656ade",
-      "summary": "docs(progress): log ux-live-chart-mobile-label-legibility merge+deploy+verify (PR #271)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T15:27:12+07:00",
-      "sha": "a718939",
-      "summary": "ux: legible live-board chart labels on mobile (#271)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T06:21:35+00:00",
-      "sha": "6e3d7ec",
-      "summary": "health(deploy): site-health probe guards flood_hazard.json (Exposure flood-hazard panel)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-03T04:17:58+00:00",
-      "sha": "cf147e6",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the farm_book site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T04:15:41+00:00",
-      "sha": "25e743f",
-      "summary": "health(deploy): site-health probe guards farm_book.json (Overview farm-book section)",
-      "pillar": "deployment"
     }
   ]
 }
