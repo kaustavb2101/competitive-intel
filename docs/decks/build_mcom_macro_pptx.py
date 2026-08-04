@@ -125,8 +125,24 @@ def price_history(keys):
     return out
 
 
-def build():
-    d = Deck()
+def load_catalog(lang):
+    """The translation catalogue for a language, or None for the English original.
+
+    One deck definition, two languages: the Thai build is the SAME build() with a catalogue
+    attached, so both decks read the same data on the same day and a refresh moves both. A separate
+    Thai script would be a second copy of every number, and the copy would be wrong within a week.
+    """
+    if not lang or lang == "en":
+        return None
+    p = Path(__file__).resolve().parent / f"mcom_{lang}.json"
+    if not p.exists():
+        return {}                       # harvest mode: nothing translated yet, report everything
+    with open(p, encoding="utf-8") as f:
+        return {k: v for k, v in json.load(f)["strings"].items() if v}
+
+
+def build(lang=None):
+    d = Deck(catalog=load_catalog(lang))
     FB, CB, MB = load("farm_book.json"), load("collateral_book.json"), load("macro_book.json")
     FH, VM, WEO = load("farm_household.json"), load("vehicle_models.json"), load("imf_weo.json")
     mn = MB["national"]        # macro_book's EXTERNAL national roll-up (labour, fleet, hazard)
@@ -649,8 +665,9 @@ def build():
                       RED if (rain is not None and rain < 90) else NAVY)])
     y += d.table(L, y, W, ["Largest planted areas", "region", "planted rai",
                            "crop mix, % of planted area", "shock", "farm ฿/mo", "rain"], rows,
-                 colw=[1.45, 0.85, 0.80, 6.65, 0.80, 1.25, 0.63], size=8, hsize=9.5, rh=0.25,
-                 hh=0.32, aligns=["l", "l", "r", "l", "r", "r", "r"]) + 0.14
+                 # rh/gap trimmed to keep the long source row clear of the footer caption
+                 colw=[1.45, 0.85, 0.80, 6.65, 0.80, 1.25, 0.63], size=8, hsize=9.5, rh=0.235,
+                 hh=0.32, aligns=["l", "l", "r", "l", "r", "r", "r"]) + 0.12
     d.source(L, y, W, MIX, NAVY,
              "Planted area MEASURED (OAE, by province). Crop mix MEASURED — every crop OAE tracks "
              "for that province, share of planted area, rounded to the nearest point and shown for "
@@ -1071,7 +1088,9 @@ def build():
                   f"Car {pct(c6)} in 6 months, {pct(c12)} in 12 — same shape, weaker level.",
                   f"Pickup is {abs(UV['truck']['vs_2015_base_pp']):.0f} pts below its 2015 base, "
                   f"car {abs(UV['car']['vs_2015_base_pp']):.0f} pts.",
-                  "Pre-2022 advance rates price a market that no longer exists.",
+                  # "Pre-2022" would hand the translator the token "-2022" (see Deck._NUM) — and
+                  # spelling it out is the plainer sentence anyway
+                  "Advance rates set before 2022 price a market that no longer exists.",
               ]), tone="risk", size=10)
     y += 2.20 + 0.16
     d.source(L, y, W, MEAS, GREEN,
@@ -1286,7 +1305,7 @@ def build():
                  [[c for i, c in enumerate(prow(r, pa_units, set())) if i != 1]
                   for r in pa_all[:8]],
                  colw=[2.65, 1.35, 1.25, 0.84], size=9, rh=0.258,
-                 aligns=["l", "r", "r", "r"]) + 0.16
+                 aligns=["l", "r", "r", "r"]) + 0.13
     y += d.source(L, y, W, MEAS, GREEN,
                   "DLT first registrations at the registrar's own ยี่ห้อ + รุ่น grain, trailing 12 "
                   "months to " + VM["meta"]["latest_month"] + ", NATIONAL only. PU shares are over "
@@ -1523,15 +1542,30 @@ def main():
     ap.add_argument("--preview", action="store_true", help="render PNG thumbnails to check fit")
     ap.add_argument("--review", action="store_true",
                     help="also write mcom-review.html — the sign-off page (implies --preview)")
+    ap.add_argument("--lang", default="en", help="en (default) or th — th reads mcom_th.json")
+    ap.add_argument("--harvest", metavar="PATH",
+                    help="write every string that has no translation, so the catalogue can be "
+                         "completed; numbers are punched out so one entry covers every vintage")
     a = ap.parse_args()
 
-    d = build()
+    d = build(a.lang)
     d.fit_vertical()          # horizontal fit is checked as each box is made; this is the other axis
-    out = Path(a.out) / "mcom-2026-08-05-macro.pptx"
+    suffix = "" if a.lang in ("en", None) else f"-{a.lang.upper()}"
+    out = Path(a.out) / f"mcom-2026-08-05-macro{suffix}.pptx"
     out.parent.mkdir(parents=True, exist_ok=True)
     d.save(out)
     print(f"wrote {out}  ({len(d.slides)} slides, {out.stat().st_size // 1024} KB)")
     print("Kanit metrics:", "available" if TX.ok else "NOT FOUND — fit unchecked")
+    if d.catalog is not None:
+        done = len(d.catalog)
+        print(f"translation: {done} entries applied, {len(d.untranslated)} string(s) still English")
+    if a.harvest:
+        with open(a.harvest, "w", encoding="utf-8", newline="\n") as f:
+            json.dump({"note": "key = English with every number replaced by {}; value = the "
+                               "translation, using {} in the same order or {0}/{1} to reorder",
+                       "strings": {k: "" for k in sorted(d.untranslated)}},
+                      f, ensure_ascii=False, indent=1)
+        print(f"harvested {len(d.untranslated)} string(s) -> {a.harvest}")
     if d.findings:
         print(f"\n{len(d.findings)} fit finding(s):")
         for f in d.findings:
