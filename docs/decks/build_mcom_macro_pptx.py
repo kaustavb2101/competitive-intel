@@ -267,8 +267,9 @@ def build():
         ("Inflation", pct(cpi["value"], 2), f"headline CPI YoY · TPSO · {cpi['period']}", GOLD),
         ("Policy rate", f"{pol['value']:.2f}%", f"Bank of Thailand · {pol['period']}", NAVY),
         ("USD / THB", f"{fx['value']:.2f}", f"ECB reference · {fx['period']}", NAVY),
-        ("Household debt", f"{hdebt['value']:.1f}%", f"of GDP · BIS · {hdebt['period']}", GOLD),
-        ("Tourist arrivals", f"{tour['value']:.1f}M",
+        ("Household debt หนี้ครัวเรือน", f"{hdebt['value']:.1f}%",
+         f"of GDP · BIS · {hdebt['period']}", GOLD),
+        ("Tourist arrivals นักท่องเที่ยว", f"{tour['value']:.1f}M",
          f"trailing 12m · {pct(TOUR_YOY)} YoY · BoT {tour['period']}", RED),
     ], cols=6, ch=1.22) + 0.20
     P = WEO["peers"]
@@ -293,7 +294,7 @@ def build():
     pts = [(ym(lab[:4] + "-" + qmap[lab[-2:]]), v)
            for lab, v in zip(npl["labels"], npl["series"])]
     d.linechart(L + 6.75, y, W - 6.75, 1.70, [("System NPL", RED, pts)],
-                ylab="Thai banking-system NPL, % of loans · 40 quarters",
+                ylab="Thai banking-system NPL หนี้เสีย, % of loans · 40 quarters",
                 xticks=[(2017, "2017"), (2020, "2020"), (2023, "2023"), (2026, "2026")],
                 ymin=2, ymax=6)
     y += 1.70 + 0.18
@@ -353,19 +354,19 @@ def build():
                          and r["value"] == MB["regions"]["Isan"]["debt_hh_thb"])
     y = d.content("02 · Conditions on the ground", "Five lenses, from the country down to a district.")
     y += d.cards(L, y, W, [
-        ("Labour force", f"{mn['labor_force_k'] / 1000:.1f}M",
+        ("Labour force กำลังแรงงาน", f"{mn['labor_force_k'] / 1000:.1f}M",
          f"unemployment {mn['unemployment_pct']}% · seasonal idle {mn['seasonal_share_pct']}%, "
          f"{mn['seasonal_waiting_k']:.0f}k waiting", NAVY),
-        ("Informality", f"{LC['rate_pct']:.1f}%",
+        ("Informal work นอกระบบ", f"{LC['rate_pct']:.1f}%",
          f"no payslip or social cover · core borrower base ({LC['as_of']})", GOLD),
-        ("Vehicle fleet", f"{mn['fleet_total'] / 1e6:.1f}M",
+        ("Vehicle fleet รถจดทะเบียน", f"{mn['fleet_total'] / 1e6:.1f}M",
          f"diesel {mn['diesel_share_pct']:.1f}% · EV {mn['electrified_pct']:.2f}%", NAVY),
-        ("Districts dry", f"{mn['dry_share_pct']}%",
+        ("Districts dry ภัยแล้ง", f"{mn['dry_share_pct']}%",
          f"{mn['n_dry']} of {mn['n_districts']} districts · {mn['flood_high']} of "
          f"{mn['flood_stations']} rivers high", RED),
-        ("Household debt", f"{debt_months:.1f} months",
+        ("Household debt หนี้ครัวเรือน", f"{debt_months:.1f} months",
          f"debt ÷ monthly income, all households · {mn['hh_with_debt_pct']:.0f}% carry debt", GOLD),
-        ("No cushion", f"{mn['cushion_lt3mo_pct']:.0f}%",
+        ("No cushion กันชนทางการเงิน", f"{mn['cushion_lt3mo_pct']:.0f}%",
          "savings buffer, not debt — would last under 3 months without income", RED),
     ], cols=3, ch=1.16) + 0.20
     # The same lenses one level down. Only the EXTERNAL fields of macro_book's region record are
@@ -1107,7 +1108,7 @@ def build():
                 (f"{sl:+,.0f}", True, GREEN if sl > 0 else RED)]
     y += d.table(L, y, W, ["", "12-month units", "12m YoY", "6-month units †", "6m YoY †",
                            "6m trend ex-flag, units/mo"],
-                 [wrow("pu", "Pickup + PPV"), wrow("pa", "Passenger car")],
+                 [wrow("pu", "Pickup + PPV รถกระบะ"), wrow("pa", "Passenger car รถยนต์นั่ง")],
                  colw=[2.6, 2.1, 1.6, 2.1, 1.6, 2.4], size=11, rh=0.36,
                  aligns=["l", "r", "r", "r", "r", "r"]) + 0.06
     y += d.text(L, y, W, f"† flagged months in this window: {', '.join(m6['contains_flagged_months'])} "
@@ -1405,9 +1406,9 @@ def build():
                   f"{moto_nat:.0f}%.")
     fc = {f["key"]: f for f in CB["fleet_classes"]}
     y += d.cards(L, y, W, [
-        ("Pickup stock", f"{fc['pickup']['latest'] / 1e6:.2f}M",
+        ("Pickup stock รถกระบะ", f"{fc['pickup']['latest'] / 1e6:.2f}M",
          f"registered pickups nationally · {fc['pickup']['yoy_pct']:+.2f}% YoY", RED),
-        ("Car stock", f"{fc['car']['latest'] / 1e6:.2f}M",
+        ("Car stock รถยนต์นั่ง", f"{fc['car']['latest'] / 1e6:.2f}M",
          f"{fc['car']['yoy_pct']:+.2f}% YoY · +{fc['car']['since_2563_pct']:.1f}% since 2563", GREEN),
         ("Diesel share", f"{mn['diesel_share_pct']:.1f}%",
          f"of the {mn['fleet_total'] / 1e6:.1f}M fleet — what the market runs on today", NAVY),
@@ -1435,8 +1436,9 @@ def build():
                  colw=[1.55, 1.55, 1.45, 1.45, 1.55, 1.60, 1.60, 1.68], size=10, rh=0.30,
                  aligns=["l", "r", "r", "r", "r", "r", "r", "r"]) + 0.16
     y += d.source(L, y, W, MEAS, GREEN,
-                  "DLT registered stock and ownership transfers by region and class, plus MOT fleet "
-                  "totals. Share = class stock ÷ all registered vehicles in the region. Turnover = "
+                  "DLT registered stock and ownership transfers by region and class (PU รถกระบะ · "
+                  "car รถยนต์นั่ง · moto รถจักรยานยนต์), plus MOT fleet totals. Share = class "
+                  "stock ÷ all registered vehicles in the region. Turnover = "
                   "transfers ÷ registered stock — how much of the parc changes hands a year, the "
                   "depth a repossessed title sells into.", size=9) + 0.20
     cw2 = (W - 0.25) / 2
