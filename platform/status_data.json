@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-04T11:02:38+00:00",
-    "commit": "6da5322"
+    "generated_at": "2026-08-04T23:38:17+07:00",
+    "commit": "78b4c26"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-04T23:38:17+07:00",
+      "sha": "78b4c26",
+      "summary": "feat(peer): structure rival expansion pace + loan-book scale on #acq (was prose-only) (#288)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-04T14:32:35+00:00",
+      "sha": "2de1e28",
+      "summary": "chore(dashboard): log ux-live-aging-pill-contrast merge+deploy+verify (PR #286)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T21:27:49+07:00",
+      "sha": "9f011d4",
+      "summary": "ux: darken live.html aging freshness pill for WCAG AA in light theme (#286)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T12:35:54+00:00",
+      "sha": "8fd953a",
+      "summary": "fix(provenance): Data-room shows rival_pulse's fresher sentiment_anchor, not the stale promo pull-timestamp",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-04T11:04:53+00:00",
+      "sha": "7d86f26",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival-sentiment refresh ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-04T11:02:38+00:00",
       "sha": "6da5322",
       "summary": "market(pulse): refresh rival app-review sentiment to 2026-08-03 (was 2026-07-19)",
@@ -680,36 +710,6 @@
       "sha": "6e3999e",
       "summary": "feat(collateral): ground the recovery-value outlook in the MEASURED BoT UVPI used-vehicle price index (#272)",
       "pillar": "service"
-    },
-    {
-      "date": "2026-08-03T22:59:24+07:00",
-      "sha": "570b6c4",
-      "summary": "feat(deck): MCOM 5 Aug — the Macro tab as a house-style PPTX, and the commodity board it got wrong (#274)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-03T14:29:46+00:00",
-      "sha": "01e70b8",
-      "summary": "docs(progress): log ux-nav-active-pill-scroll merge+deploy+verify (PR #273)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T21:25:49+07:00",
-      "sha": "de29bf5",
-      "summary": "ux: active nav pill scrolls into view in the mobile nav strip (#273)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T10:18:48+00:00",
-      "sha": "a0f3ecc",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_threat_region site-health probe ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-03T10:17:38+00:00",
-      "sha": "912bcf0",
-      "summary": "health(deploy): site-health probe guards rival_threat_region.json (#home hardest-to-defend card + #acq per-region table)",
-      "pillar": "market"
     }
   ]
 }
