@@ -156,6 +156,19 @@ def classify(joined):
     return "pa", None
 
 
+def _pa_plate(brand, model):
+    """'TOYOTA' + 'YARIS' -> 'TOYOTA YARIS'; 'MAZDA' + 'MAZDA 2' -> 'MAZDA 2'.
+
+    DLT files some models with the brand already inside the model string and some without, so a
+    naive concatenation produces both 'MAZDA MAZDA 2' and 'MAZDA 2' as separate nameplates and
+    splits one car's volume across two rows.
+    """
+    b, m = brand.strip().upper(), (model or "").strip().upper()
+    if not m:
+        return b
+    return m if m == b or m.startswith(b + " ") else (b + " " + m).strip()
+
+
 def kind_of(joined):
     """Finer label for reporting: pickup vs ppv vs car."""
     for p in PICKUP_PLATES:
@@ -278,7 +291,7 @@ def build():
     cls_units = collections.Counter()
     cls_split = collections.defaultdict(lambda: collections.Counter())     # cls -> kind
 
-    for ym, cls, brand, _model, joined, n in rows:
+    for ym, cls, brand, model, joined, n in rows:
         cls_units[cls] += n
         kind, plate = kind_of(joined)
         cls_split[cls][kind] += n
@@ -289,6 +302,12 @@ def build():
         brand_month[(basis, ym)][brand] += n
         if plate:
             plate_month[(kind, ym)][plate] += n
+        else:
+            # PA has no curated plate list — PU's exists because the PU/PA split is decided on the
+            # nameplate, and PA is defined as the remainder. So the car nameplate is the registrar's
+            # own ยี่ห้อ + รุ่น pair, deduplicated where the model string already repeats the brand
+            # ("MAZDA" + "MAZDA 2"). Reported, never used to classify.
+            plate_month[("car", ym)][_pa_plate(brand, model)] += n
 
     # ── window aggregates ────────────────────────────────────────────────────────────────────
     def window_months(k):
@@ -405,7 +424,7 @@ def build():
                                                               ", ".join(gaps)))
 
     plates = {}
-    for kind in ("pickup", "ppv"):
+    for kind in ("pickup", "ppv", "car"):
         c = collections.Counter()
         for ym in last12:
             c.update(plate_month[(kind, ym)])

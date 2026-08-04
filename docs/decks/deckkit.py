@@ -141,6 +141,7 @@ class Deck:
         self.blank = self.prs.slide_layouts[6]
         self.slides = []       # list of (pptx slide, [draw ops]) for the preview renderer
         self.findings = []     # overflow / fit complaints
+        self.headings = []     # (eyebrow, title) per slide, so a review page needs no second list
 
     # ---------------------------------------------------------- primitives
     def new(self, ground=WHITE):
@@ -243,6 +244,7 @@ class Deck:
     # ---------------------------------------------------------- furniture
     def cover(self, title, sub, kicker):
         self.new(NAVY)
+        self.headings.append(("Cover", " ".join(title.split())))
         self.rect(10.73, 0, 2.60, self.H, GOLD)
         self.rect(10.73, 0, 0.12, self.H, RED)
         self.pic(ASSETS / "chaiyo.png", 0.70, 0.70, 3.20, 2.00)
@@ -253,6 +255,7 @@ class Deck:
 
     def divider(self, eyebrow, title, sub):
         self.new(NAVY)
+        self.headings.append((eyebrow, title))
         self.rect(12.83, 0, 0.18, self.H, RED)
         self.rect(13.01, 0, 0.18, self.H, GOLD)
         self.pic(ASSETS / "chaiyo.png", 0.70, 0.70, 2.72, 1.70)
@@ -264,6 +267,7 @@ class Deck:
     def content(self, eyebrow, title):
         """Returns the top of the usable content area."""
         self.new(WHITE)
+        self.headings.append((eyebrow, title))
         self.text(0.45, 0.24, 9.50, eyebrow.upper(), size=9, bold=True, color=RED)
         self.text(0.45, 0.50, 10.90, title, size=20, bold=True, color=NAVY, lh=25)
         self.pic(ASSETS / "autox.png", 11.63, 0.28, 1.03, 0.32)
@@ -440,6 +444,33 @@ class Deck:
         if ylab:
             self.text(l + 0.02, t + 0.01, w - 0.10, ylab, size=8, color=GREY)
         return h
+
+    def ladder(self, l, t, w, segs, h=0.30, gap=0.035, legend=True, size=9):
+        """One stacked horizontal bar. segs: [(label, value, colour)].
+
+        Used for the arrears ladder and the crop mix, where the point is the PROPORTION and a
+        column of percentages makes the reader do the comparison themselves.
+        """
+        tot = sum(v for _, v, _ in segs) or 1
+        x = l
+        for i, (_lab, v, col) in enumerate(segs):
+            sw = max(0.0, (w - gap * (len(segs) - 1)) * v / tot)
+            self.rect(x, t, sw, h, col)
+            x += sw + gap
+        if not legend:
+            return h
+        ly = t + h + 0.10
+        lx = l
+        for lab, v, col in segs:
+            txt = f"{lab} {100 * v / tot:.1f}%"
+            tw = TX.width_in(txt, size, False) + 0.30
+            if lx + tw > l + w:                      # wrap the legend rather than run it off the box
+                lx = l
+                ly += size * 1.5 / PT_IN
+            self.rect(lx, ly + 0.045, 0.15, 0.10, col)
+            self.text(lx + 0.21, ly, tw, txt, size=size, color=NAVY)
+            lx += tw
+        return ly + size * 1.45 / PT_IN - t
 
     def bars(self, l, t, w, h, items, color=RED, dim=LINE, fmt=lambda v: f"{v:,.0f}"):
         """Vertical bars with the value written on top. items: [(label, value, highlight)]."""

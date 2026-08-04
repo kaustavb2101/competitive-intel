@@ -3,6 +3,50 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict) — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), and the data room re-confirmed healthy this run: `build_provenance.py
+--check` reproduces exactly, the master production alias serves **HTTP 200** on `/`, `/data/meta.json` and
+`/data/deltas.json` (a transient TLS blip on the first deltas fetch cleared on retry — not a regression), and
+`site-health.yml` correctly targets the master production alias. So this run took the service pillar's standing
+brief — surfaced exec reads that live-degrade with no deploy probe — and closed the highest-value one still open.
+
+**The gap.** A render-path re-scan of surfaced-but-unprobed `data/*.json` reads (75 of them, most secondary or
+graceful-degrading) found the newest wave still uncovered: **`vehicle_models.json`** (the #275/#276 Macro
+"nameplate" wave, obj #1 collateral context — which pickup/PPV models dominate registrations and which are
+growing). It is load-bearing on TWO MEASURED render paths, not one: (1) the "which models, and which are growing"
+nameplate panel (`cb-nameplates`) GATES on `V.plates_last12` then renders the pickup/ppv `.top[]` boards
+(plate/units/share_pct/yoy_pct); (2) the **collateral pickup-definition verdict** (`renderYearTable`) takes this
+layer as the AUTHORITATIVE pickup count on AutoX's own nameplate rule (pickup+PPV nameplates in any class),
+falling back to the registrar's รย.3 truck class only when it is absent. The client loader itself sets
+`VMODELS=null` unless `Array.isArray(v.annual)`, so a truncated/gutted CDN deploy **silently** reverts BOTH
+surfaces to their fallback with no phone alert — the same "broken demo" blind spot the collateral_book /
+macro_book / deltas obj-#1 probes closed for their siblings. It was the last unprobed read from the newest
+surfaced wave.
+
+**The fix (probe-script only — NO app/data/HTML/visual/provenance touched).** Added `_shape_vehicle_models` to
+`pipeline/check_site_health.py` + its `DATA_FILES` entry. Asserts the render contract both paths read (NOT
+values): the `annual` array gate (the client's own `VMODELS` gate) + a `plates_last12` dict carrying non-empty
+`pickup` AND `ppv` groups whose first `.top` row has a string `plate` and numeric `units`/`share_pct` — shape,
+not counts, so a future DLT-vintage refresh that moves the registration numbers stays green.
+
+- **Verification (all pass):** unit-tested — the real 21,829-byte payload accepted; twelve negatives reject
+  non-dict / missing-or-empty-or-non-list `annual` / missing-or-empty `plates_last12` / missing pickup-or-ppv
+  group / empty `.top` / row-missing-`plate` / non-numeric-`units` / missing-`share_pct`. Offline `--local
+  platform` reports **116/116 HEALTHY** with `vehicle_models.json` served + shape-sane; the live master
+  production alias serves it **HTTP 200** (21,829 bytes, matches local). Probe coverage +1 exec check (35 → 36
+  probed data layers). `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455 — the check
+  phase does not read the site-health probes; unaffected). No `platform/data` file changed → no
+  `build_provenance.py` regen needed. Diff = `pipeline/check_site_health.py` (+57) + this log + SERVICE_AUDIT.
+- **Why a direct commit, not a PR.** Probe-script only — no app behaviour, no visual, no surfaced number, no data
+  layer. It closes a deploy-health blind spot without altering what ships; same safeguard-only direct-to-master
+  path as the recent site-health probe commits.
+- **Next recommended:** probe the two sibling reads from the same nameplate wave still uncovered — `vehicle_brands.json`
+  (`cb-vbrands`, gates on `national.by_type.ry3 && .ry1`, ESTIMATED province split) and `vehicle_mix.json`
+  (`cb-mix`, gates on `national.stock && .new && types.length`, MEASURED) — then the Overview switchboard's
+  multi-source `debt_source`/`farm_household` reads.
+
 ## 2026-08-03 — Integration loop (QA-health): un-broke the page-health gate — two stale manifest hooks fixed (NEXT_STEPS §0d.8) — committed to master
 
 Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
