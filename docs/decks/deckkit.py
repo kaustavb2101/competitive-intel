@@ -554,6 +554,39 @@ class Deck:
             lx += tw
         return ly + size * 1.45 / PT_IN - t
 
+    def sparkline(self, l, t, w, h, pts, color=NAVY, pad=0.05):
+        """A shape-only trend line: no axis, no labels, no legend.
+
+        linechart() above is the wrong tool at this size — it reserves 0.42in for value labels and
+        prints the series min and max, which at a 2in width turns a rice price of ฿17,440/tonne into
+        an unreadable smear across the plot. A sparkline answers one question, "which way and how
+        steadily", and the numbers that go with it belong in the text beside it. Each line is scaled
+        to its OWN range, so shape is comparable across crops even when levels are not.
+        """
+        self.rect(l, t, w, h, "FBFCFE", line=LINE)
+        ys = [v for _, v in pts]
+        lo, hi = min(ys), max(ys)
+        span = (hi - lo) or 1.0
+        px0, py0 = l + pad, t + pad
+        pw, ph = w - 2 * pad, h - 2 * pad
+        n = len(pts)
+        sx = lambda i: px0 + (i / (n - 1)) * pw if n > 1 else px0 + pw / 2
+        sy = lambda v: py0 + ph - (v - lo) / span * ph
+        if n > 1:
+            fb = self._s.shapes.build_freeform(Inches(sx(0)), Inches(sy(ys[0])))
+            fb.add_line_segments([(Inches(sx(i)), Inches(sy(v)))
+                                  for i, v in enumerate(ys)][1:], close=False)
+            sh = fb.convert_to_shape()
+            sh.fill.background()
+            sh.line.color.rgb = rgb(color)
+            sh.line.width = Pt(1.6)
+            sh.shadow.inherit = False
+        # The endpoint is the reading everyone actually takes off a sparkline, so mark it.
+        r = 0.045
+        self.rect(sx(n - 1) - r, sy(ys[-1]) - r, 2 * r, 2 * r, color, radius=r)
+        self._ops.append(("poly", [(sx(i), sy(v)) for i, v in enumerate(ys)], color))
+        return h
+
     def bars(self, l, t, w, h, items, color=RED, dim=LINE, fmt=lambda v: f"{v:,.0f}"):
         """Vertical bars with the value written on top. items: [(label, value, highlight)]."""
         self.rect(l, t, w, h, "FBFCFE", line=LINE)
@@ -572,6 +605,33 @@ class Deck:
         return h
 
     # ---------------------------------------------------------- output
+    def fit_vertical(self, limit=7.30):
+        """Report any content shape whose BOTTOM edge runs past the footer.
+
+        The text fit check above is horizontal only — it asks whether a string fits the box it was
+        given, never where that box ended up. A slide can therefore pass with "no findings" and
+        still print its last callout underneath the red footer bar, which is what happened to the
+        conditions slide on 2026-08-04: its author measured the y-cursor BEFORE the trailing callout
+        and never added the callout's own height. Walk the real python-pptx geometry instead of the
+        preview ops, so every primitive is covered whether or not it draws in the preview.
+
+        Full-bleed grounds and the footer furniture itself sit below the limit by design and are
+        excluded by shape, not by name."""
+        EMU = 914400.0
+        for i, (s, _ops) in enumerate(self.slides, 1):
+            worst = None
+            for sh in s.shapes:
+                t, h = sh.top / EMU, (sh.height or 0) / EMU
+                if h > 7.0 or t >= 7.10:            # the ground rect and the footer strip/caption
+                    continue
+                if t + h > limit and (worst is None or t + h > worst[0]):
+                    worst = (t + h, getattr(sh, "text", "") or "")
+            if worst:
+                head = self.headings[i - 1][1] if i <= len(self.headings) else f"slide {i}"
+                self.findings.append(
+                    f"[slide {i} '{head[:30]}'] content reaches y={worst[0]:.2f}in, past the "
+                    f"{limit:.2f}in floor — {(worst[1] or '(no text)')[:44]!r}")
+
     def save(self, path):
         self.prs.save(str(path))
 

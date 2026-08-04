@@ -168,44 +168,87 @@ def build():
 
     # ================================================================ 2 the answer
     y = d.content("The answer first", "Four questions about the world outside the company.")
-    y += d.text(L, y, W, "Everything on this tab is external — published by an agency, a ministry or "
-                "a market, none of it by us. Where a line says what an external move touches, that "
-                "is one column of context, not the subject.", size=11.5, color=GREY, lh=15.5) + 0.20
+
+    # Figures used only on this slide — each read fresh off its own layer so the verdict below
+    # never drifts from the detail slide that unpacks it.
+    gdp, cpi, pol = MI["gdp_growth"], MI["cpi_inflation"], MI["policy_rate"]
+    P = WEO["peers"]
+
+    UV = load("used_vehicle_value.json")["series"]
+    Wd = VM["windows"]
+    y12_pu = 100 * (Wd["m12"]["pu"]["units"] / Wd["m12"]["pu"]["prior_units"] - 1)
+    pl = VM["plates_last12"]
+    pu_all = sorted(pl["pickup"]["top"] + pl["ppv"]["top"], key=lambda r: -r["units"])
+    top_pu = pu_all[0]
+    worst_pu = min(pu_all[:5], key=lambda r: r.get("yoy_pct") or 0)
+
+    II = load("income_impact.json")
+    prov_by_region = {}
+    for pname, pr in II["provinces"].items():
+        prov_by_region.setdefault(pr["region"], []).append(pr)
+    farm_vals, wage_vals = [], []
+    for rg in II["regions"]:
+        ps = prov_by_region.get(rg["key"], [])
+        incs = [p["occ"]["Agriculture"]["income"] for p in ps
+                if (p["occ"].get("Agriculture") or {}).get("income") is not None]
+        if incs:
+            farm_vals.append(sum(incs) / len(incs))
+        wr = (rg.get("nso_wage_ref") or {}).get("headline")
+        if wr:
+            wage_vals.append(wr)
+    farm_lo, farm_hi = min(farm_vals), max(farm_vals)
+    wage_lo, wage_hi = min(wage_vals), max(wage_vals)
+
+    CFI = load("crop_farmer_income.json")
+    n_loss = sum(1 for c in CFI["crops"] if c["national"]["loss"])
+    n_cfi = len(CFI["crops"])
+
+    npl = MB["npl"]
+    s4 = npl["series"][-5:]
+    nq = len(s4) - 1
+    risen = sum(1 for i in range(1, len(s4)) if s4[i] > s4[i - 1])
+
     y += d.qa(L, y, W, [
-        ("Is the economy the problem?",
-         "No. Growth and inflation both came in above what the IMF projected for 2026 and the policy "
-         f"rate is {MI['policy_rate']['value']:.2f}%. But Thailand is projected to grow slowest in "
-         f"ASEAN-5 — {WEO['peers']['NGDP_RPCH']['THA']:.1f}% against Vietnam’s "
-         f"{WEO['peers']['NGDP_RPCH']['VNM']:.1f}%, on the narrowest fiscal room in the group. "
-         "Stable, not strong."),
-        ("Are crop prices the problem?",
-         "Not on the world index — but that is the wrong instrument. On the measured Thai farm gate "
-         f"{word(len(B_FALL))} commodities are falling, beef by {abs(BEEF['local_yoy']):.1f}% while "
-         f"the world index reads {pct(BEEF['global_yoy'])}. And margin matters more than price: "
-         f"netted of cost, a price move of {FII['price_impact_pct']:.0f}% becomes a swing of "
-         f"{FII['margin_impact_pct']:.0f}% in crop income."),
-        ("So what is deteriorating?",
-         "The collateral. Used pickup values sit 50% below their peak and 33 points below their own "
-         "2015 base, new pickup registrations are down 15.3% on the year, and every pickup nameplate "
-         "of any size is falling — Hilux Revo −21.5%, D-Max −23.0%, Ranger −30.0%. Pickups also turn "
-         "over more slowly than any other class in every region."),
-        ("And the borrower?",
-         "Thin before any of this. Farming pays ฿7,200–14,200 a month depending on region, against "
-         "an employee wage of ฿13,700–17,700 in those same regions. Three of the five crops with "
-         "full published economics do not cover their own cost, and 60% of households could not "
-         "cover three months without income. System arrears have risen in three of the last four "
-         "quarters."),
-    ], size=12) + 0.24
+        ("Is the economy\nthe problem?",
+         "No — stable, not strong.\n"
+         f"• GDP {pct(gdp['value'])}, CPI {pct(cpi['value'], 2)} — both above the IMF's 2026 "
+         f"forecast. Policy rate {pol['value']:.2f}%.\n"
+         f"• Slowest growth in ASEAN-5: Thailand {P['NGDP_RPCH']['THA']:.1f}% vs Vietnam "
+         f"{P['NGDP_RPCH']['VNM']:.1f}%.\n"
+         f"• Government debt {P['GGXWDG_NGDP']['THA']:.1f}% of GDP vs Vietnam's "
+         f"{P['GGXWDG_NGDP']['VNM']:.1f}% — thinnest cushion in the group."),
+        ("Are crop prices\nthe problem?",
+         "Not on the world index — the farm gate (ราคาที่เกษตรกรขายได้) says otherwise.\n"
+         f"• {word(len(B_FALL)).capitalize()} of {word(len(B_THAI))} Thai farm-gate prices are "
+         "falling year on year.\n"
+         f"• Beef: farm gate {pct(BEEF['local_yoy'])} vs world index {pct(BEEF['global_yoy'])}.\n"
+         f"• Margin over price: a {FII['price_impact_pct']:.0f}% price move becomes an "
+         f"{FII['margin_impact_pct']:.0f}% swing in crop income."),
+        ("What is\ndeteriorating?",
+         "The collateral — the used-pickup (รถกระบะ) market.\n"
+         f"• Resale value {pct(UV['truck']['change_since_peak_pct'], 0)} off peak, "
+         f"{UV['truck']['vs_2015_base_pp']:+.0f} pts below its 2015 base.\n"
+         f"• New pickup registrations {pct(y12_pu)} year on year.\n"
+         f"• {top_pu['plate'].title()} {pct(top_pu['yoy_pct'])}, worst nameplate "
+         f"{worst_pu['plate'].title()} {pct(worst_pu['yoy_pct'])}."),
+        ("And the\nborrower?",
+         "Thin before any of this.\n"
+         f"• Farming pays ฿{farm_lo:,.0f}–{farm_hi:,.0f}/month vs an employee wage of "
+         f"฿{wage_lo:,.0f}–{wage_hi:,.0f}.\n"
+         f"• {word(n_loss).capitalize()} of {word(n_cfi)} full-cost crops pay below cost of "
+         "production.\n"
+         f"• {mn['cushion_lt3mo_pct']:.0f}% of households have no 3-month cushion; arrears rose "
+         f"in {word(risen)} of the last {word(nq)} quarters."),
+    ], qw=2.15, size=11) + 0.20
     y += d.source(L, y, W, MEAS, GREEN,
                   "NESDC · TPSO · Bank of Thailand · BIS · ECB · IMF · World Bank · NABC · OAE · "
                   "DLT · MOT · NSO · ThaiWater. Each page carries its own chip and vintage; where a "
-                  "figure is modelled rather than published it is labelled ESTIMATED.") + 0.26
+                  "figure is modelled rather than published it is labelled ESTIMATED.") + 0.20
     d.text(L, y, W, "What follows", size=10, bold=True, color=NAVY)
-    d.text(L, y + 0.24, W,
-           "01–02  the macro backdrop and the conditions underneath it        "
-           "03–08  agriculture: prices, the belts, cost of production, income now, water        "
-           "09  where to reach out first        10  collateral, in five parts        "
-           "11  what it asks of us", size=10, color=GREY, lh=14)
+    d.text(L, y + 0.22, W,
+           "01–02  macro backdrop        03–08  agriculture: prices, belts, cost, income, water   "
+           "     09  where to reach out first        10  collateral        11  what it asks of us",
+           size=10, color=GREY, lh=14)
     d.notes("If they take one thing: the macro is stable, the crops are mixed, the collateral is "
             "deteriorating — and the borrower was already thin before any of it. Scope is external "
             "conditions; the book readouts live on Exposure and Risk, not here.")
@@ -242,6 +285,10 @@ def build():
                          "Govt debt/GDP"], rows,
             colw=[2.1, 1.3, 1.15, 1.5, 1.6], size=10, rh=0.283, aligns=["l", "r", "r", "r", "r"])
     npl = MB["npl"]
+    # "Risen in N of the last 4 quarters" used to be typed prose beside the same series it describes
+    # and had drifted a quarter stale. Computed off npl['series'] itself so it can't drift again.
+    npl_last4, npl_prev4 = npl["series"][-4:], npl["series"][-5:-1]
+    npl_risen = sum(1 for c, p in zip(npl_last4, npl_prev4) if c > p)
     qmap = {"Q1": "01", "Q2": "04", "Q3": "07", "Q4": "10"}
     pts = [(ym(lab[:4] + "-" + qmap[lab[-2:]]), v)
            for lab, v in zip(npl["labels"], npl["series"])]
@@ -251,58 +298,77 @@ def build():
                 ymin=2, ymax=6)
     y += 1.70 + 0.18
     y += d.source(L, y, W, MEAS, GREEN,
-                  "NESDC · TPSO · Bank of Thailand · BIS · ECB, each pulled from the publishing "
-                  "agency. IMF World Economic Outlook 2026 for the peer projections; BoT published "
-                  f"NPL ratio — {npl['latest']}% at {npl['period']}, from {npl['prev']}% the quarter "
-                  f"before, {npl['yoy']:+.2f} points on the year, against a {npl['min']}% low in "
-                  f"{npl['min_period']}.", size=9) + 0.20
+                  f"NESDC {gdp['period']} · TPSO {cpi['period']} · Bank of Thailand {pol['period']} "
+                  f"· BIS {hdebt['period']} · ECB {fx['period']}, each pulled from the publishing "
+                  f"agency. IMF World Economic Outlook 2026 (pulled {WEO['meta']['pulled']}) for "
+                  "the peer table. BoT published NPL "
+                  f"ratio — {npl['latest']}% at {npl['period']}, {npl['prev']}% the quarter before, "
+                  f"{npl['yoy']:+.2f}pp on the year, {npl['min']}% low in {npl['min_period']}.",
+                  size=9) + 0.20
     cw2 = (W - 0.25) / 2
     pj_g, pj_i = P["NGDP_RPCH"]["THA"], P["PCPIPCH"]["THA"]
-    d.callout(L, y, cw2, "Thailand has already overtaken the IMF’s own 2026 projection",
-              f"The IMF projected {pj_g:.1f}% growth and {pj_i:.1f}% inflation. The measured "
-              f"outturns are {pct(gdp['value'])} and {pct(cpi['value'], 2)} — "
-              f"{gdp['value'] - pj_g:.1f} and {cpi['value'] - pj_i:.1f} points higher. Where a Thai "
-              "measurement exists we show it instead of the projection.\n\nThe one falling chip is "
-              f"tourism: arrivals {pct(TOUR_YOY)} on a trailing-twelve-month basis. That income is a "
-              "large part of the informal cash economy in the South and on the eastern seaboard, and "
-              "it shows up in no crop or fleet series.",
-              tone="warn", size=10)
-    d.callout(L + cw2 + 0.25, y, cw2, "Slowest growth, narrowest room to cushion it",
-              f"Thailand grows at {P['NGDP_RPCH']['THA']:.1f}% while the region runs 4–7%, so "
-              "the informal wage most of our borrowers are paid out of will not be lifted by the "
-              f"cycle. And government debt is {P['GGXWDG_NGDP']['THA']:.1f}% of GDP against "
-              f"Vietnam's {P['GGXWDG_NGDP']['VNM']:.1f}% — the fiscal space for the household relief "
-              "that carried people through 2020–21 is materially narrower this time.\n\nSystem "
-              "arrears have risen in three of the last four quarters. Read that line as a direction, "
-              "not a benchmark: it is bank loans on a regulatory definition.", tone="risk", size=10)
-    d.notes("Two slides merged. The economy is fine and the region is not the story — the story is "
-            "that growth is slow, the fiscal cushion is thin, and arrears are turning up. If relief "
-            "comes, less of it will come from government this time.")
+    # Peer growth range computed from the same table above, not typed — it used to read a rounded
+    # "4-7%" that was already off once Vietnam's own print moved.
+    peer_lo = min(P["NGDP_RPCH"][c] for c in ("VNM", "IDN", "MYS", "PHL"))
+    peer_hi = max(P["NGDP_RPCH"][c] for c in ("VNM", "IDN", "MYS", "PHL"))
+    b1 = [
+        f"Growth: IMF forecast {pj_g:.1f}%, actual {pct(gdp['value'])}.",
+        f"Inflation: IMF forecast {pj_i:.1f}%, actual {pct(cpi['value'], 2)}.",
+        "We use the Thai number over the projection, wherever one exists.",
+        f"Exception: tourism, {pct(TOUR_YOY)} YoY (trailing 12 months) — feeds informal income in "
+        "the South and East, missing from crop and fleet data.",
+    ]
+    d.callout(L, y, cw2, "Growth beat the IMF's own 2026 forecast",
+              "\n".join(f"• {ln}" for ln in b1), tone="warn", size=10)
+    b2 = [
+        f"Thailand grows {P['NGDP_RPCH']['THA']:.1f}%. The rest of the region runs "
+        f"{peer_lo:.1f}–{peer_hi:.1f}%.",
+        f"Govt debt {P['GGXWDG_NGDP']['THA']:.1f}% of GDP vs Vietnam's "
+        f"{P['GGXWDG_NGDP']['VNM']:.1f}%.",
+        "Less fiscal room for relief than in 2020–21.",
+        f"System arrears rose in {word(npl_risen)} of the last {word(len(npl_last4))} quarters — "
+        "bank loans, a direction not a benchmark.",
+    ]
+    d.callout(L + cw2 + 0.25, y, cw2, "Slowest growth in the region, least room to cushion it",
+              "\n".join(f"• {ln}" for ln in b2), tone="risk", size=10)
+    d.notes("Economy is fine — the region and the arrears line are the story. Slow growth, thin "
+            "fiscal cushion, arrears up in most of the last year. Less relief room than 2020–21.")
 
     # ================================================================ 4 conditions at our grain
     # Moved up to sit beside the macro overlay: it is the same question at a finer grain —
     # what the national numbers look like once you drill to a region, a province, a district.
+    # Household debt now reads in MONTHS OF MONTHLY INCOME (debt ÷ income) — the AutoX underwriting
+    # frame — computed at NATIONAL grain, the only grain macro_book carries both fields at. The
+    # region table stays in baht: BoT publishes debt for all five regions but income for almost
+    # none, so a region-level "months" figure can't be built honestly (macro_book's own grain_note).
+    # The two vintages differ too — national is BoT/NSO 2019, the region cut is a newer 2023 read —
+    # both read off region_debt.json rather than typed, so a re-pull can't drift silently out of sync.
+    LC = load("labour_context.json")["informality"]
+    RD = load("region_debt.json")["series"]
+    debt_months = mn["debt_hh_thb"] / mn["income_hh_thb_month"]
+    nat_debt_vint = next(r["vintage"] for r in RD["national"]
+                         if r["indicator"] == "debt_per_household_thb")
+    reg_debt_vint = next(r["vintage"] for r in RD["region"]
+                         if r["indicator"] == "debt_per_household_thb" and r["geo"] == "Northeast"
+                         and r["value"] == MB["regions"]["Isan"]["debt_hh_thb"])
     y = d.content("02 · Conditions on the ground", "Five lenses, from the country down to a district.")
     y += d.cards(L, y, W, [
         ("Labour force", f"{mn['labor_force_k'] / 1000:.1f}M",
-         f"unemployment {mn['unemployment_pct']}% · seasonal idle {mn['seasonal_share_pct']}% "
-         f"({mn['seasonal_waiting_k']:.0f}k waiting)", NAVY),
-        ("Informality", "63.2%",
-         "of employment has no payslip or social cover — our core demographic (2024)", GOLD),
+         f"unemployment {mn['unemployment_pct']}% · seasonal idle {mn['seasonal_share_pct']}%, "
+         f"{mn['seasonal_waiting_k']:.0f}k waiting", NAVY),
+        ("Informality", f"{LC['rate_pct']:.1f}%",
+         f"no payslip or social cover · core borrower base ({LC['as_of']})", GOLD),
         ("Vehicle fleet", f"{mn['fleet_total'] / 1e6:.1f}M",
-         f"diesel {mn['diesel_share_pct']:.1f}% · electrified {mn['electrified_pct']:.2f}% · BEV "
-         f"{mn['bev_pct']:.2f}%", NAVY),
+         f"diesel {mn['diesel_share_pct']:.1f}% · EV {mn['electrified_pct']:.2f}%", NAVY),
         ("Districts dry", f"{mn['dry_share_pct']}%",
-         f"{mn['n_dry']} of {mn['n_districts']} · {mn['flood_high']} of {mn['flood_stations']} river "
-         f"stations above high mark", RED),
-        ("Household debt", thb(mn["debt_hh_thb"]),
-         f"per indebted household · {mn['hh_with_debt_pct']}% carry debt · income "
-         f"{thb(mn['income_hh_thb_month'])}/month", GOLD),
+         f"{mn['n_dry']} of {mn['n_districts']} districts · {mn['flood_high']} of "
+         f"{mn['flood_stations']} rivers high", RED),
+        ("Household debt", f"{debt_months:.1f} months",
+         f"debt ÷ monthly income, all households · {mn['hh_with_debt_pct']:.0f}% carry debt", GOLD),
         ("No cushion", f"{mn['cushion_lt3mo_pct']:.0f}%",
-         f"could not cover three months without income · {mn['vulnerable_hh_pct']}% classed "
-         "vulnerable", RED),
+         "savings buffer, not debt — would last under 3 months without income", RED),
     ], cols=3, ch=1.16) + 0.20
-    # The same six lenses one level down. Only the EXTERNAL fields of macro_book's region record are
+    # The same lenses one level down. Only the EXTERNAL fields of macro_book's region record are
     # read here — labour, fleet, water, household debt. The book fields sitting beside them in that
     # layer (n, os, ticket, dpd) belong to Exposure and Risk and are not touched.
     order = ["Isan", "North", "South", "East", "Central&BKK"]
@@ -325,75 +391,167 @@ def build():
     y += d.table(L, y, W, ["Region", "labour force", "unemployment", "seasonal idle",
                            "vehicle fleet", "diesel", "districts dry", "rivers high",
                            "household debt", "new firms"], rows,
-                 colw=[1.4, 1.3, 1.4, 1.3, 1.2, 0.9, 1.35, 1.15, 1.5, 0.93], size=9, rh=0.288,
-                 aligns=["l", "r", "r", "r", "r", "r", "r", "r", "r", "r"]) + 0.16
+                 colw=[1.4, 1.3, 1.4, 1.3, 1.2, 0.9, 1.35, 1.15, 1.5, 0.93], size=9, rh=0.268,
+                 aligns=["l", "r", "r", "r", "r", "r", "r", "r", "r", "r"]) + 0.14
+    # Both the source row and the callout below are deliberately tight: the first draft of this
+    # slide ran its callout to y≈7.49, past the 7.38 footer bar, because the pre-callout cursor was
+    # measured instead of the callout's own bottom edge. Every disclosure survives, in fewer words.
     y += d.source(L, y, W, MEAS, GREEN,
-                  "NSO Labour Force Survey · ILOSTAT mirror of Thailand’s official submissions · DLT "
-                  "registry · MOT · DBD business registrations · ThaiWater telemetry · BoT/NSO "
-                  "household debt. Every lens rolls national → region → province → district on its "
-                  "own correct weight — labour force, fleet stock, district count. Never a plain "
-                  "average of provinces. The NSO four-region cut places the East inside Central for "
-                  "household debt, so those two carry the same figure.", size=9) + 0.18
-    d.callout(L, y, W, "Read 0.94% unemployment together with 63.2% informality, never instead of it",
-              "Unemployment is structurally near zero here because informal work absorbs the slack: "
-              "someone who loses formal work does not appear in that number, they appear in the "
-              "informal count on a lower and less predictable income. Informality, the seasonal-idle "
-              "share and the cushion figure are the stress signals. Isan carries 256,000 people idle "
-              "between seasons against 53,000 in the North — five times the number on two thirds of "
-              "the labour force.", tone="warn", size=10)
+                  "NSO LFS · ILOSTAT · DLT · MOT · DBD · ThaiWater · BoT/NSO household debt. "
+                  "Labour, fleet and water roll province → region → national on their own weight, "
+                  f"never a plain average. The debt card is BoT/NSO {nat_debt_vint}, ALL households "
+                  f"— not only the {mn['hh_with_debt_pct']:.0f}% carrying debt. The table's region "
+                  f"column is a newer cut, {reg_debt_vint}, in baht: income is not published at "
+                  "region grain for enough regions to convert it. East shares Central's figure.",
+                  size=9) + 0.16
+    isan_w = MB["regions"]["Isan"]["seasonal_waiting_k"]
+    north_w = MB["regions"]["North"]["seasonal_waiting_k"]
+    d.callout(L, y, W,
+              f"{pct(mn['unemployment_pct'], 2, sign=False)} unemployment hides informal work",
+              "A lost formal job reappears as informal work, not as unemployment — on lower, less "
+              "predictable pay. Read informality, seasonal idle and the cushion instead. Isan's "
+              f"seasonal idle is {isan_w / north_w:.1f}× the North's.", tone="warn", size=10)
     d.notes("This drill goes from a national number to a district without changing instrument. "
-            "If someone reaches for 0.94% unemployment as evidence the borrower is fine, this is the "
-            "slide. Note the seasonal-idle column: Isan is five times the North.")
+            "Household debt is now months of income, not baht — that's the underwriting frame. "
+            "If someone reaches for near-zero unemployment as evidence the borrower is fine, this "
+            "is the slide.")
 
     # ================================================================ 5 commodity board
+    # The accounts column is FARMER accounts, not all accounts — the owner's correction on
+    # 2026-08-04, after the app's own "Book exposed" column was read as a farmer count and is not
+    # one. `exposure.book_accounts` counts every borrower living in the belt, office workers and
+    # traders included; ~78% of them are not farmers.
+    #
+    # This is the ONE place in this deck that reads the loan tape. The Macro tab is external data by
+    # the owner's own scope rule, and the exception was granted explicitly and only for this column:
+    # "i'm fine with using the autox account farmer accounts by province for this one instance."
+    # Everything else on the slide is published external data, and the column is labelled as ours.
+    GEO = load("tape_geo_occ.json")
+    FARMER_OCC = "เกษตร"
+
+    def farmers_in_belt(r):
+        """Accounts recorded as farming occupation, summed over the crop's belt provinces.
+
+        A belt province is one of the provinces making up ~80% of national planted area for that
+        crop, so this is 'our farming borrowers who live where this crop is grown' — NOT 'borrowers
+        confirmed to grow it'. The distinction is in the source row, and it is not a small one."""
+        tot, seen = 0, 0
+        for p in (r.get("exposure") or {}).get("top", []):
+            for o in GEO["provinces"].get(p["prov"], []):
+                if o["occupation"] == FARMER_OCC:
+                    tot += o["n"]
+                    seen += 1
+        return tot, seen
+
+    def six_month(lab):
+        """Thai farm-gate move over six months, from the measured monthly series."""
+        h = (TPH_S or {}).get(lab)
+        if not h or h.get("cadence") != "monthly" or len(h.get("values") or []) < 7:
+            return None
+        v = h["values"]
+        return 100.0 * (v[-1] / v[-7] - 1.0)
+
+    TPH_S = load("thai_price_history.json")["series"]
     y = d.content("03 · Commodity board", "The world index says tailwind. The Thai farm gate does not.")
-    y += d.text(L, y, W, f"The board carries {len(BOARD)} commodities. "
-                f"{word(len(B_THAI)).capitalize()} have a measured Thai farm-gate price beside the "
-                f"world index, and {word(len(B_FALL))} of those {word(len(B_THAI))} are negative "
-                "year on year.",
-                size=11, color=GREY, lh=15) + 0.16
-    rows = [[(r["lab"], True, NAVY), r["seg"], r["reg"].replace("·", " · "),
-             (pct(r["local_yoy"]), True, RED),
-             ((pct(r["global_yoy"]), True, GREEN if r["global_yoy"] > 0 else RED)
-              if r.get("global_yoy") is not None else ("—", False, GREY))]
-            for r in B_FALL]
-    y += d.table(L, y, W, ["Falling at the farm gate", "Segment", "Belt", "Thai farm-gate YoY",
-                           "World index YoY"], rows,
-                 colw=[2.6, 1.9, 3.4, 2.4, 2.13], size=10, rh=0.278,
-                 aligns=["l", "l", "l", "r", "r"]) + 0.14
+    y += d.bullets(L, y, W, [
+        f"{word(len(B_THAI)).capitalize()} of the {word(len(BOARD))} commodities we track have a "
+        f"measured Thai farm-gate price (ราคาที่เกษตรกรขายได้). {word(len(B_FALL)).capitalize()} "
+        "are falling year on year.",
+        "Six months beside the year: they disagree on direction more often than they agree on size.",
+        "The last column is OUR farming customers living in that belt — the only loan-book number "
+        "in this deck.",
+    ], size=11, gap=0.09) + 0.16
+
+    def tri(v):
+        return GREEN if v > 0 else (RED if v < 0 else GREY)
+
+    rows = []
+    for r in B_FALL:
+        s6 = six_month(r["lab"])
+        nf, nprov = farmers_in_belt(r)
+        allacc = (r.get("exposure") or {}).get("book_accounts") or 0
+        rows.append([
+            (r["lab"], True, NAVY), r["seg"], r["reg"].replace("·", " · "),
+            (pct(r["local_yoy"]), True, RED),
+            (pct(s6), True, tri(s6)) if s6 is not None else ("no series", False, GREY),
+            (f"{nf:,}", True, COLLAT) if nf else ("—", False, GREY),
+            (f"{100 * nf / allacc:.0f}%" if nf and allacc else "—", False, GREY),
+        ])
+    y += d.table(L, y, W, ["Falling at the farm gate", "Segment", "Belt", "Farm-gate YoY",
+                           "Farm-gate 6m", "Farming accounts in belt", "share of our accounts"],
+                 rows, colw=[2.25, 1.20, 1.80, 1.50, 1.50, 2.20, 1.98], size=10, rh=0.278,
+                 aligns=["l", "l", "l", "r", "r", "r", "r"]) + 0.14
     y += d.source(L, y, W, MIX, NAVY,
-                  "Prices MEASURED — NABC daily and monthly market feeds, Thai farm gate, OCSB "
-                  "announced cane price, World Bank Pink Sheet 2026M06; newest farm-gate quote "
-                  f"{max(r['local_date'] for r in B_THAI)}. The belt column is an ESTIMATED read of "
-                  "where each is produced, and "
-                  "the belts overlap — the same household often keeps poultry and grows rice.",
-                  size=9) + 0.16
-    d.callout(L, y, W, "Beef is the row that shows why the world index is the wrong instrument",
-              f"The world beef index is {pct(BEEF['global_yoy'])}. The measured Thai farm-gate price "
-              f"is {pct(BEEF['local_yoy'])} — a {abs(BEEF['divergence']):.1f} point divergence. A "
-              f"cattle household in Isan is not experiencing {pct(BEEF['global_yoy'])}. Rubber, palm "
-              "and cassava run the other way and are genuinely up on both measures.", tone="risk")
-    d.notes("The divergence rows are the point: the world index and the Thai farm gate can face "
-            "opposite directions, and only one of them is what a Thai grower is paid.")
+                  "Prices MEASURED — NABC daily quotes for the Thai farm gate, OCSB announced cane "
+                  f"price; newest quote {max(r['local_date'] for r in B_THAI)}. The six-month move "
+                  "is computed from NABC's own monthly series (thai_price_history, vintage "
+                  f"{load('thai_price_history.json')['meta']['vintage']}); a crop with no monthly "
+                  "series is marked, never estimated. Belt is an ESTIMATED read of where each "
+                  "commodity is produced, and belts overlap. Farming accounts are OURS and "
+                  "MEASURED — accounts whose recorded occupation is เกษตร in the belt provinces, "
+                  f"from the {GEO['meta']['n_accounts']:,}-account tape at {GEO['meta']['mob_anchor']}; "
+                  f"no cell below {GEO['meta']['min_cell']} accounts is published. They live where "
+                  "the crop grows; they are not confirmed to grow it.", size=9) + 0.16
+    bf, _ = farmers_in_belt(BEEF)
+    d.callout(L, y, W, "Beef: the world index is the wrong instrument",
+              f"World beef {pct(BEEF['global_yoy'])}, Thai farm gate {pct(BEEF['local_yoy'])} — a "
+              f"{abs(BEEF['divergence']):.1f}-point gap, opposite directions. {bf:,} of our farming "
+              "customers live in the beef belt, Isan.", tone="risk")
+    d.notes("Two points. First, the world index and the Thai farm gate can face opposite ways, and "
+            "only one of them is what a Thai grower is paid — beef is the clean example. Second, "
+            "the last column is farmers, not all accounts: the app's 'book exposed' number counts "
+            "every borrower in the belt and about four in five of them are not farming.")
 
     # ================================================================ 6 five-year price history
     y = d.content("04 · Five years of price", "Sugar has not fallen for a year. It has fallen for four.")
-    KEYS = [("rubber", "Rubber", GREEN), ("rice", "Rice", NAVY),
-            ("palm", "Palm oil", GOLD), ("sugar", "Sugar", RED)]
+    KEYS = [("rubber", "Rubber ยางพารา", GREEN), ("rice", "Rice ข้าว", NAVY),
+            ("palm", "Palm oil ปาล์มน้ำมัน", GOLD), ("sugar", "Sugar น้ำตาล", RED)]
     hist = price_history([k for k, _, _ in KEYS])
     d.linechart(L, y, 7.55, 3.05, [(lab, col, hist[k]) for k, lab, col in KEYS],
                 ylab="World price rebased to 100 at 2021-07 · 60 monthly observations",
                 baseline=100, ymin=40, ymax=200,
                 xticks=[(2021.5, "2021"), (2023, "2023"), (2024.5, "2024"), (2026, "2026")])
+    CH = load("commodity_history.json")          # .meta.vintage is what the source row cites
+    raw = CH["series"]
+    fx = MI["usd_thb"]                            # measured ECB reference rate — read, not typed
+
+    def series_vals(k):
+        return [(m, v) for m, v in zip(raw[k]["months"], raw[k]["values"]) if v is not None]
+
+    # The two callout facts, computed off the same series the chart plots, not transcribed. Sugar's
+    # own peak inside the 60-month window (not the window's start) is what "falling for four" refers
+    # to; rubber's own 2021 starting level is its natural comparison point, the same base the chart
+    # rebases every series to.
+    sv = series_vals("sugar")
+    pk_i = max(range(len(sv)), key=lambda i: sv[i][1])
+    sugar_off = 100 * (sv[-1][1] / sv[pk_i][1] - 1)
+    sugar_since_peak = len(sv) - 1 - pk_i
+    sugar_down = sum(1 for i in range(pk_i, len(sv) - 1) if sv[i + 1][1] <= sv[i][1])
+    sugar_peak_period = sv[pk_i][0].replace("M", "-")
+    rv = [v for _, v in series_vals("rubber")]
+    rub_below = sum(1 for v in rv if v < rv[0])
+    rub_run = 0
+    for v in reversed(rv):
+        if v >= rv[0]:
+            rub_run += 1
+        else:
+            break
     d.callout(L + 7.75, y, W - 7.75, "A year-on-year number hides the shape",
-              "Sugar reads −13.5% on the year. Across five it has gone from a 0.58 $/kg peak to "
-              "0.32 — roughly 45% off, falling almost continuously since early 2023. A grower who "
-              "planted against 2023 economics has had three bad years, not one.\n\nRubber is the "
-              "mirror image: three years below its 2021 base, recovering only in the last eighteen "
-              "months. Those households are repairing a balance sheet, not enjoying a windfall.",
+              f"• Sugar (น้ำตาล): world price {pct(sugar_off, 0)} against its {sugar_peak_period} "
+              f"peak — down in {sugar_down} of the last {sugar_since_peak} months, not a one-year "
+              "dip.\n"
+              f"• Rubber (ยางพารา): spent {rub_below} of the last {len(rv)} months below its own "
+              f"2021 level — only just cleared it, after {rub_run} months running above.",
               tone="warn", size=10)
     y += 3.05 + 0.20
-    raw = load("commodity_history.json")["series"]
+
+    def bfmt(v):
+        """Baht formatting only: sub-100 crop prices keep 2dp, tonne prices round to the baht."""
+        return f"{v:,.2f}" if v < 1000 else f"{v:,.0f}"
+
+    # Baht only replaces the LATEST price. Converting the 5-yr peak at today's rate would price a
+    # 2021–24 dollar figure on a 2026 exchange rate — a number nobody was ever actually paid. Latest
+    # is safe to convert because today's price and today's FX are the same today.
     rows = []
     for k, lab, _ in KEYS:
         vs = [v for v in raw[k]["values"] if v is not None]
@@ -402,23 +560,28 @@ def build():
                      (f"{AREA[{'rubber': 'Rubber', 'rice': 'Rice', 'palm': 'Oil palm', 'sugar': 'Sugarcane'}[k]]:.1f}%",
                       False, NAVY),
                      (f"{pk:,.2f}", False, NAVY),
-                     (f"{now:,.2f}", True, NAVY),
+                     (bfmt(now * fx['value']), True, NAVY),
                      (f"{100 * (now / pk - 1):+.1f}%", True,
                       RED if now / pk < 0.85 else NAVY),
                      (f"{100 * (now / vs[0] - 1):+.1f}%", True,
                       GREEN if now > vs[0] else RED)])
-    y += d.table(L, y, 8.60, ["World price, five years", "of planted area", "5-yr peak", "latest",
-                              "off peak", "vs 5 yrs ago"], rows,
+    y += d.table(L, y, 8.60, ["World price, five years", "of planted area", "5-yr peak, US$",
+                              "latest, ฿", "off peak", "vs 5 yrs ago"], rows,
                  colw=[2.6, 1.3, 1.2, 1.1, 1.2, 1.2], size=10, rh=0.278,
-                 aligns=["l", "r", "r", "r", "r", "r"]) + 0.18
+                 aligns=["l", "r", "r", "r", "r", "r"]) + 0.10
+    y += d.text(L, y, W, "Only ‘latest’ is converted to baht — today’s FX is right for today’s "
+                "price, not a 2021–23 one, so ‘5-yr peak’ stays in US$.",
+                size=9.5, color=GREY) + 0.14
     d.source(L, y, W, MEAS, GREEN,
-             "World Bank Pink Sheet nominal-USD monthly prices, last 60 observations per series, "
-             "rebased to 100 at 2021-07 for the chart — the series are quoted in different units and "
-             "cannot otherwise share an axis. The table is in each series’ own published unit. "
-             "Nominal, not deflated: five years of Thai CPI sits under every ‘vs 5 yrs ago’ figure.",
-             size=9)
-    d.notes("The point: YoY is a poor instrument for a slow decline. Sugar's −13.5% is the fourth "
-            "year of one move, not a new event.")
+             f"World Bank Pink Sheet nominal-USD monthly prices, vintage {CH['meta']['vintage']} (60 "
+             "observations per series, rebased to 100 at 2021-07 for the chart — units differ, so "
+             "raw levels can’t share an axis). Baht conversion at the ECB reference rate USD/THB "
+             f"{fx['value']:.3f}, {fx['period']}. Planted-area share MEASURED, OAE/DOAE crop mix "
+             "(crop_mix.json). Nominal, not deflated: five years of Thai CPI sit under every "
+             "‘vs 5 yrs ago’ figure.", size=9)
+    d.notes("YoY hides a slow move: sugar is down most months since its 2023 peak, not a one-off "
+            "dip; rubber only just cleared its own 2021 level. We convert only the latest price to "
+            "baht — the five-year peak stays in US$ so we don’t mix an old price with today’s FX.")
 
     # ================================================================ 6 the crop belts
     y = d.content("05 · The crop belts",
@@ -431,7 +594,9 @@ def build():
          "most of the country gained from this price round", GREEN),
         ("Provinces where it went backwards", f"{CM['national']['negative_provinces']}",
          "all four are coconut belts on the western gulf", RED),
-    ], cols=4, ch=1.12) + 0.22
+    ], cols=4, ch=1.12) + 0.18
+    y += d.text(L, y, W, "Farm gate (ราคาที่เกษตรกรขายได้) = what the farmer is paid at first sale — "
+                "before trading, milling or transport take a cut.", size=10, color=GREY, lh=13.5) + 0.14
     RG = CM["regions"]
     rows = [[(k, True, NAVY),
              (f"{v['provinces']}", False, NAVY),
@@ -440,155 +605,160 @@ def build():
              (v["worst_prov"], False, NAVY),
              (f"{v['worst_shock']:+.1f}%", True, GREEN if v["worst_shock"] > 0 else RED)]
             for k, v in sorted(RG.items(), key=lambda kv: kv[1]["shock_pct"])]
-    d.table(L, y, 6.05, ["Region", "provs", "income shock", "backwards", "weakest", ""], rows,
-            colw=[1.25, 0.75, 1.25, 1.05, 1.05, 0.7], size=9.5, rh=0.272,
-            aligns=["l", "r", "r", "r", "l", "r"])
+    th = d.table(L, y, 6.05, ["Region", "provs", "income shock", "backwards", "weakest", ""], rows,
+                colw=[1.25, 0.75, 1.25, 1.05, 1.05, 0.7], size=9.5, rh=0.272,
+                aligns=["l", "r", "r", "r", "l", "r"])
     negp = sorted(((n2, v["shock_pct"]) for n2, v in CM["provinces"].items() if v["shock_pct"] < 0),
                   key=lambda kv: kv[1])
-    d.callout(L + 6.30, y - 0.05, W - 6.30, "The price round was good for farming almost everywhere",
-              f"Rubber {pct(gyoy['Rubber'], 0)}, cassava {pct(gyoy['Cassava'], 0)}, palm "
-              f"{pct(gyoy['Oil palm'], 0)} and rice {pct(gyoy['Rice'], 0)} at the farm gate lifted "
-              f"crop income in every region — the South by {RG['South']['shock_pct']:.1f}%, the East "
-              f"by {RG['East']['shock_pct']:.1f}%. On a mix basis this is the best crop year in "
-              f"several.\n\nThe exception is narrow and worth naming: {word(len(negp))} provinces "
-              "on the "
-              "western gulf — " + ", ".join(n2 for n2, _ in negp[:-1]) + f" and {negp[-1][0]} — all "
-              f"coconut, all negative, the worst at {pct(negp[0][1])}. A single crop collapsing "
-              f"{abs(gyoy['Coconut']):.1f}% is enough to take a whole province backwards while the "
-              "national picture improves.\n\nAnd a gain on a mix basis is not cash in hand: "
-              "the next slide nets these same prices against cost of production.",
+    ch = d.callout(L + 6.30, y - 0.05, W - 6.30, "Good for farming, almost everywhere",
+              f"•  {pct(gyoy['Rubber'], 0)} rubber, {pct(gyoy['Cassava'], 0)} cassava, "
+              f"{pct(gyoy['Oil palm'], 0)} palm, {pct(gyoy['Rice'], 0)} rice at the farm gate. "
+              "Crop income rose in every region.\n"
+              f"•  {word(len(negp)).capitalize()} provinces fell — all coconut, all on the "
+              f"western gulf. Coconut price is down {abs(gyoy['Coconut']):.0f}%.\n"
+              "•  A gain on paper is not cash yet — the next table nets prices against cost.",
               tone="warn", size=10)
-    y += 1.85
+    y += max(th, ch - 0.05) + 0.16
+
+    def crop_share_str(p2):
+        """Every crop OAE tracks for this province, share of planted area, summing to 100%."""
+        cs = sorted(p2["crops"], key=lambda c: -c["share"])
+        parts, ssum = [], 0.0
+        for c in cs:
+            v = 100.0 * c["share"]
+            ssum += c["share"]
+            parts.append(f"{c['en']} {v:.0f}%" if v >= 0.5 else f"{c['en']} <1%")
+        rem = max(0.0, 100.0 * (1.0 - ssum))
+        if rem >= 0.5:                                     # honest rounding residual, not a real crop
+            parts.append(f"other {rem:.0f}%")
+        return ", ".join(parts)
+
     top = sorted(CM["provinces"].items(), key=lambda kv: -kv[1]["area_rai"])[:6]
     rows = []
     for nm2, p2 in top:
-        cs = sorted(p2["crops"], key=lambda c: -c["share"])
-        lead = cs[0]
-        drag = min(p2["crops"], key=lambda c: c["pp"])
         fbp = FB["provinces"].get(nm2, {})
         rain = fbp.get("rain_pct_of_normal")
         rows.append([(nm2, True, NAVY), (p2["region"], False, GREY),
                      (f"{p2['area_rai'] / 1e6:.2f}M", False, NAVY),
-                     (f"{lead['en']} {100 * lead['share']:.0f}% ({lead['yoy']:+.0f}%)", False,
-                      GREEN if lead["yoy"] > 0 else RED),
-                     (f"{drag['en']} ({drag['yoy']:+.0f}%)", False, RED),
+                     (crop_share_str(p2), False, NAVY),
                      (f"{p2['shock_pct']:+.1f}%", True,
                       GREEN if p2["shock_pct"] > 0 else RED),
                      (f"{p2['income_base_thb']:,.0f}", False, NAVY),
-                     (f"{p2['income_thb_month']:+,.0f}", True,
-                      GREEN if p2["income_thb_month"] > 0 else RED),
                      (f"{rain:.0f}%" if rain is not None else "—", True,
                       RED if (rain is not None and rain < 90) else NAVY)])
-    y += d.table(L, y, W, ["Largest planted areas", "region", "planted rai", "lead crop, share, YoY",
-                           "the drag", "shock", "farm ฿/mo", "in baht", "rain"], rows,
-                 colw=[1.75, 1.05, 1.1, 2.75, 1.7, 0.9, 1.05, 0.95, 0.68], size=9, rh=0.268,
-                 aligns=["l", "l", "r", "l", "l", "r", "r", "r", "r"]) + 0.14
+    y += d.table(L, y, W, ["Largest planted areas", "region", "planted rai",
+                           "crop mix, % of planted area", "shock", "farm ฿/mo", "rain"], rows,
+                 colw=[1.45, 0.85, 0.80, 6.65, 0.80, 1.25, 0.63], size=8, hsize=9.5, rh=0.25,
+                 hh=0.32, aligns=["l", "l", "r", "l", "r", "r", "r"]) + 0.14
     d.source(L, y, W, MIX, NAVY,
-             "Planted area and crop mix MEASURED (OAE, by province); farm-gate price moves MEASURED "
-             "(NABC/OCSB); farm income level MEASURED (NSO/OAE, baht per month). The income shock is "
-             "ESTIMATED — each province's crop mix weighted by the measured price move, expressed as "
-             "a percentage of its measured farm income and as the baht that implies. Six of 77 "
-             "provinces shown, ordered by planted area.", size=9)
+             "Planted area MEASURED (OAE, by province). Crop mix MEASURED — every crop OAE tracks "
+             "for that province, share of planted area, rounded to the nearest point and shown for "
+             "all of them, not just the lead crop; a share that rounds to zero reads “<1%”, and any "
+             "rounding gap is shown honestly as “other”. Farm-gate price moves MEASURED (NABC/OCSB); "
+             "farm income level MEASURED (NSO/OAE, baht per month). The income shock is ESTIMATED — "
+             "each province's crop mix weighted by the measured price move, as a percentage of its "
+             "measured farm income. Six of 77 provinces shown, ordered by planted area.", size=9)
     d.notes("What earns agriculture a section is that its hazards are external and forecastable — "
-            "price, cost, rainfall — which is rare. The last column is context for how much of it "
-            "reaches us; the belts themselves are the subject.")
+            "price, cost, rainfall — which is rare. The crop-mix column is now the full published "
+            "mix for each province, every crop, summing to 100 — not just the lead crop.")
 
     # ============================================ 8 margin and cost, on ONE price basis
-    # This slide used to be two, and the two disagreed: a "Margin %" table read rice at +51.1% while
-    # the next slide read the same crop at a LOSS. Both were quoting published numbers; only one of
-    # them netted a price against a cost measured at the same point in the chain.
+    # Rewritten 2026-08-04 on the owner's instruction: "if the conflicting reports on profitability
+    # by crop are going to create problems, take it out and mention more crops."
     #
-    #   crop_margin.json  price = NABC DAILY MARKET quote   (rice 17.74 B/kg)  ->  cost from OAE
-    #   crop_farmer_income.json  price = OAE FARM GATE      (rice  8.11 B/kg)  ->  cost from OAE
+    # What came out: the margin-versus-cost argument. This slide used to spend its whole surface
+    # reconciling two published prices per crop — OAE's farm gate against NABC's market quote — and
+    # concluding that three of FIVE crops lose money. The reconciliation was correct but it cost the
+    # slide to make, it only ever covered the five crops with an OAE cost series, and a room hearing
+    # two contradictory profitability numbers argues about the numbers instead of the exposure.
     #
-    # The costs agree almost exactly (rubber 63.18 both, maize 6.76 both). The PRICES are 1.4x-2.2x
-    # apart, because a market quote is a milled/graded product several steps past the field and the
-    # OAE cost is what it costs to put paddy on the ground. Netting one against the other invents a
-    # margin out of the marketing chain. OAE publishes price, cost AND net return on one basis, so
-    # that is the basis this slide uses; the market quote is shown beside it, named for what it is.
-    CFI = load("crop_farmer_income.json")
-    y = d.content("06 · Margin and cost",
-                  "There are two published prices for every crop. Only one is what the grower gets.")
-    y += d.text(L, y, W, "OAE publishes, on one consistent basis, what a crop yields, what it sells "
-                "for at the farm gate and what it costs to produce. Netted out per household and "
-                "divided by the people in it, this is what a month of farming is actually worth.",
-                size=11, color=GREY, lh=15) + 0.16
-    mkt = {c["en"]: c for c in FB["crops"]}
-    rows = []
-    for c in sorted(CFI["crops"], key=lambda c: c["national"]["net_per_person_month"]):
-        n = c["national"]
-        gate = c["price_thb_per_kg"]
-        cost = gate - n["net_return_per_ton"] / 1000.0       # OAE's own net return, back to a cost
-        m = mkt.get(c["crop_en"], {})
-        rows.append([(c["crop_en"], True, NAVY),
-                     # OAE's own area for THIS crop, not the crop_mix share — the whole point of the
-                     # slide is that every figure on a row comes off one source on one basis.
-                     (f"{n['area_rai'] / 1e6:.1f}M", False, NAVY),
-                     (f"{n['households']:,}", False, NAVY),
-                     ((f"{m['yoy']:+.1f}%" if m.get("yoy") is not None else "—"), True,
-                      GREEN if (m.get("yoy") or 0) > 0 else RED),
-                     (f"{gate:.2f}", True, NAVY),
-                     (f"{cost:.2f}", False, NAVY),
-                     (f"{n['net_return_per_ton']:+,.0f}", True,
-                      RED if n["net_return_per_ton"] < 0 else GREEN),
-                     (f"{n['net_per_person_month']:+,.0f}", True,
-                      RED if n["net_per_person_month"] < 0 else GREEN),
-                     ("below cost" if n["loss"] else "covers cost", True,
-                      RED if n["loss"] else GREEN),
-                     (f"{m['price_kg']:.2f}" if m.get("price_kg") else "—", False, GREY)])
-    y += d.table(L, y, W, ["Crop", "area (rai)", "households", "farm-gate YoY", "OAE gate ฿/kg",
-                           "OAE cost ฿/kg", "net ฿/tonne", "net ฿/person/mo", "verdict",
-                           "market"], rows,
-                 colw=[1.5, 0.9, 1.3, 1.5, 1.45, 1.4, 1.2, 1.6, 1.3, 1.28], size=9.5,
-                 rh=0.295,
-                 aligns=["l", "r", "r", "r", "r", "r", "r", "r", "l", "r"]) + 0.14
-    y += d.source(L, y, W, MIX, NAVY,
-                  f"OAE Cai-up {CFI['crops'][0]['vintage']} — households, planted area, yield, "
-                  "farm-gate price, cost of production and NET RETURN PER TONNE all MEASURED and all "
-                  "on one basis; the ฿/kg cost column is OAE's own net return read back off its own "
-                  "price. Net per person per month is our arithmetic on those measured inputs "
-                  "(ESTIMATED — it assumes 1.6 working adults per farm household). The last column "
-                  "is the NABC daily MARKET quote, a different point in the chain, shown for "
-                  "contrast and never netted against the cost. Sugarcane, coconut and pineapple have "
-                  "no OAE cost series and are absent.", size=9) + 0.18
-    fall_area = sum(AREA.get(k, 0.0) for k, _ in FALLING)
-    y += d.text(L, y, W, f"The {word(len(FALLING))} crops whose farm-gate prices are FALLING — "
-                f"{fall_str}, together {fall_area:.1f}% of the country’s planted area — are exactly "
-                f"the {word(len(FALLING))} with no OAE cost series, which is why they are not on "
-                "this table. We can see the price move and cannot see whether it has taken the "
-                "grower under.",
-                size=9.5, color=GREY, lh=13) + 0.16
-    cw2 = (W - 0.25) / 2
-    d.callout(L, y, cw2, f"Rice: the price is up {gyoy['Rice']:.1f}% and the crop still loses money",
-                   "4.53 million households — by far the largest farming population in the country — "
-                   "on a crop that returns −฿1,433 a tonne, or −฿444 per person per month, after "
-                   "cost of production.\n\nRubber (−฿379) and cassava (−฿702) are in the same "
-                   "position. Only maize (+฿603) and oil palm (+฿7,486) clear their cost, and palm "
-                   "is 453,000 households in the South against rice's 4.5 million everywhere else. "
-                   "That is the geography of who is under water.", tone="risk", size=10)
-    d.callout(L + cw2 + 0.25, y, cw2, "Why a “margin” table can say the opposite",
-              "Read the last two ฿/kg columns together. OAE's farm gate for rice is ฿8.11; the daily "
-              "market quote is ฿17.74 for the same crop — 2.2× — because the market number is a "
-              "milled, graded product several steps past the field.\n\nNet the market price "
-              "against a field cost and rice reads +51% margin. Net OAE’s own price against OAE’s "
-              "own cost and it reads −฿1,433 a tonne. Both sides take cost from the same OAE "
-              "returns — rubber is ฿63.18 on either — so the price basis is the entire difference. "
-              "Everything on this table is on OAE’s basis, which is the one the grower is paid on. "
-              "The gap between the two ฿/kg columns is the marketing chain, and the grower does not "
-              "own it.", tone="warn", size=10)
-    d.notes("This is the merge of what were two contradicting slides. Say it plainly: there are two "
-            "published prices for every crop — the farm gate and the market quote — and only the "
-            "farm gate belongs beside a production cost. On that basis three of the five crops with "
-            f"full economics lose money, rice included, with its price up {gyoy['Rice']:.1f}%.")
+    # What went in: every crop with a MEASURED Thai farm-gate price, each with its own six-month
+    # line. Thirteen of them carry a real monthly baht series in thai_price_history.json — a layer
+    # that has been built and gated since 2026-08-02 and that the deck had never read. No cost, no
+    # margin, no netting: just the price the grower is paid and its direction.
+    TPH = load("thai_price_history.json")
+    HS = TPH["series"]
+
+    def six_month(h):
+        """Latest against six months earlier, on a series that is genuinely monthly.
+
+        Sugar is the reason for the cadence test: OCSB announces one administered cane price per
+        season, so its six points are YEARS. Slicing the last seven and calling the result a
+        six-month move would be arithmetic on the wrong clock."""
+        if h.get("cadence") != "monthly" or len(h.get("values") or []) < 7:
+            return None
+        v = h["values"]
+        return 100.0 * (v[-1] / v[-7] - 1.0)
+
+    panels, noseries = [], []
+    for r in B_THAI:
+        h = HS.get(r["lab"])
+        s6 = six_month(h) if h else None
+        (panels if s6 is not None else noseries).append((r, h, s6))
+    panels.sort(key=lambda p: p[0]["local_yoy"])          # worst farm gate first
+    n_dis = sum(1 for r, _h, s6 in panels if (r["local_yoy"] < 0) != (s6 < 0))
+
+    y = d.content("06 · Every crop at the farm gate",
+                  "What the grower is paid, and which way it has moved.")
+    y += d.bullets(L, y, W, [
+        f"{word(len(B_THAI)).capitalize()} commodities have a measured Thai farm-gate price "
+        f"(ราคาที่เกษตรกรขายได้). {word(len(panels)).capitalize()} also have a real monthly price "
+        "series — those are the lines below.",
+        f"Year on year and six months disagree on direction for {word(n_dis)} of them. A single "
+        "annual number can point the wrong way.",
+        "Every line is scaled to its own range: read the shape, not the height.",
+    ], size=10.5, gap=0.07) + 0.16
+
+    def money(v):
+        return f"{v:,.0f}" if v >= 1000 else f"{v:,.2f}"
+
+    def tri(v):
+        return GREEN if v > 0 else (RED if v < 0 else GREY)
+
+    COLS, GAPX = 5, 0.16
+    cwp = (W - GAPX * (COLS - 1)) / COLS
+    for i, (r, h, s6) in enumerate(panels):
+        px, py = L + (i % COLS) * (cwp + GAPX), y + (i // COLS) * 1.21
+        yoy = r["local_yoy"]
+        d.text(px, py, cwp, f"{r['lab']}  {h.get('category_th', '')}", size=9, bold=True, color=NAVY)
+        d.text(px, py + 0.155, cwp,
+               f"฿{money(h['values'][-1])} {h['unit'].replace('บาท/', '/')} · {r['reg']}",
+               size=7.5, color=GREY)
+        d.text(px, py + 0.30, cwp * 0.5, f"YoY {pct(yoy)}", size=8, bold=True, color=tri(yoy))
+        d.text(px + cwp * 0.5, py + 0.30, cwp * 0.5, f"6m {pct(s6)}", size=8, bold=True,
+               color=tri(s6))
+        d.sparkline(px, py + 0.47, cwp, 0.60,
+                    list(zip(h["months"][-6:], h["values"][-6:])), color=tri(s6))
+    y += ((len(panels) + COLS - 1) // COLS) * 1.21 + 0.04
+
+    # The remaining board rows are named rather than dropped: a grid that silently shows 13 of 17
+    # reads as "these are the crops", and two of the four absentees are falling.
+    y += d.text(L, y, W, "Priced but not plotted — no monthly series: "
+                + " · ".join(f"{r['lab']} {pct(r['local_yoy'])}"
+                             + (" (annual, administered)" if (h or {}).get("cadence") == "annual"
+                                else "")
+                             for r, h, _s in sorted(noseries, key=lambda p: p[0]["local_yoy"])),
+                size=9, color=GREY, lh=12.5) + 0.14
+    d.source(L, y, W, MEAS, GREEN,
+             "Farm-gate prices MEASURED — NABC daily quotes, monthly means, in baht as published "
+             f"(no currency conversion); newest quote {max(r['local_date'] for r in B_THAI)}, "
+             f"history vintage {TPH['meta']['vintage']}. Farm gate (ราคาที่เกษตรกรขายได้) is what "
+             "the grower is paid at first sale, before trading, milling or transport take a cut — "
+             "not the world index and not a supermarket price. Belts are an ESTIMATED read of where "
+             "each commodity is produced, and they overlap. Sugar is OCSB's announced season price, "
+             "one point a year, so it has no six-month move to show.", size=9)
+    d.notes("The profitability argument is gone on purpose — it covered five crops and invited a "
+            "fight about which published price is right. This shows the price the grower is "
+            "actually paid, for every commodity we can measure, with its own six-month line. The "
+            "point to land: year-on-year and six-month disagree on direction for several of them, "
+            "so a single annual number is not enough to act on.")
 
     # ================================================================ 9 income now, by region
     II = load("income_impact.json")
     y = d.content("07 · Income right now, by region",
                   "What each occupation earns, where the floor is, and which way it moved.")
-    y += d.text(L, y, W, "The annual farm survey is a national mean two crop years old. This is the "
-                "current monthly picture: measured income by region and occupation, the province "
-                "where farming pays least, and each region's own employee wage to read it against.",
-                size=11, color=GREY, lh=15) + 0.16
+    y += d.text(L, y, W, "Monthly income now, by region and job — each region set against its own "
+                "wage.", size=11, color=GREY, lh=15) + 0.16
     prov_by_region = {}
     for pname, pr in II["provinces"].items():
         prov_by_region.setdefault(pr["region"], []).append((pname, pr))
@@ -597,7 +767,7 @@ def build():
         vals = [p["occ"][key] for _, p in ps if (p["occ"].get(key) or {}).get(field) is not None]
         return sum(v[field] for v in vals) / len(vals) if vals else None
 
-    rows = []
+    rows, reg = [], {}
     for rg in II["regions"]:
         ps = prov_by_region.get(rg["key"], [])
         ag = sorted(((p["occ"]["Agriculture"]["income"], n) for n, p in ps
@@ -605,9 +775,10 @@ def build():
         farm = occ_mean(ps, "Agriculture")
         dp = occ_mean(ps, "Agriculture", "d_pct")
         wage = (rg.get("nso_wage_ref") or {}).get("headline")
+        reg[rg["key"]] = {"farm": farm, "wage": wage, "weak": ag[0] if ag else None}
         rows.append([(rg["key"], True, NAVY),
                      (f"{farm:,.0f}", True, NAVY),
-                     (f"{dp:+.1f}%", True, GREEN),
+                     (pct(dp), True, GREEN if dp >= 0 else RED),
                      (f"{ag[0][1]} {ag[0][0]:,.0f}" if ag else "—", False, RED),
                      (f"{occ_mean(ps, 'FactoryWorkers'):,.0f}", False, NAVY),
                      (f"{occ_mean(ps, 'Transport'):,.0f}", False, NAVY),
@@ -620,54 +791,60 @@ def build():
                            "Factory", "Transport", "SME", "Office", "employee wage",
                            "farm vs wage"], rows,
                  colw=[1.3, 1.25, 0.9, 2.35, 1.0, 1.15, 0.95, 0.95, 1.4, 1.18], size=9, rh=0.30,
-                 aligns=["l", "r", "r", "l", "r", "r", "r", "r", "r", "r"]) + 0.10
-    # The three non-farm moves are one number each, nationally: sensitivity x the single fuel driver.
-    # Printed from the model's own coefficients so they cannot drift away from the table.
-    SEN, DRV = II["meta"]["sensitivity"], II["meta"]["drivers"]["fuel_move_pct"]
-    natmove = ", ".join(f"{lab.lower()} {SEN[k]['fuel'] * DRV:+.2f}%"
-                        for k, lab in [("FactoryWorkers", "Factory"), ("Transport", "transport"),
-                                       ("OfficeStaff", "office")])
-    y += d.text(L, y, W, "Only farming and SME carry a per-province driver, so only farming’s move is "
-                f"shown. The other three move by one national assumption applied everywhere — "
-                f"{natmove} — printed once here rather than repeated as four identical columns. "
-                "Office’s zero means no channel is modelled for it, not that nothing changed.",
-                size=9, color=GREY, lh=12.5) + 0.16
+                 aligns=["l", "r", "r", "l", "r", "r", "r", "r", "r", "r"]) + 0.12
     y += d.source(L, y, W, MIX, NAVY,
-                  "Income levels MEASURED — NSO SES province income and NSO Labour Force Survey "
-                  "wages, in baht per month; the region figure is the unweighted mean of its "
-                  "provinces, so a small province counts the same as Bangkok. The employee-wage "
-                  "column is that region’s own measured LFS headline, not a national one. The move "
-                  "is ESTIMATED — a first-order model of what the measured price and fuel round does "
-                  "to each occupation, at coefficients we chose and documented rather than fitted.",
-                  size=9) + 0.20
+                  "Income MEASURED — NSO SES province income "
+                  f"({II['meta']['vintage']['income']}), NSO LFS regional wages "
+                  f"({II['meta']['vintage']['wage_anchor']}), ฿/month; region = unweighted mean of "
+                  "its provinces. Move is ESTIMATED — one first-order model of the price and fuel "
+                  f"round (fuel driver {II['meta']['vintage']['fuel']}), at documented "
+                  "coefficients, not fitted. No monthly SES/LFS series exists, so no 6-month figure "
+                  "sits beside it.", size=9) + 0.20
+
+    # Farming and SME are the only occupations with a per-province driver; factory, transport and
+    # office each move by one fixed national number — sensitivity x the single measured fuel driver.
+    SEN, DRV = II["meta"]["sensitivity"], II["meta"]["drivers"]["fuel_move_pct"]
+    tmove = SEN["Transport"]["fuel"] * DRV
+    _, floor = min(((k, v) for k, v in reg.items() if v["weak"]),
+                   key=lambda kv: kv[1]["weak"][0])
     cw2 = (W - 0.25) / 2
-    d.callout(L, y, cw2, "Farming is rising, and it is still the floor",
-              "Agriculture is the best-moving occupation in every region — the price round has been "
-              "kind to it. It is also the lowest-paid: ฿7,157 a month in the North and ฿8,030 in "
-              "Isan, against employee wages of ฿15,400 and ฿14,800 in those same regions. Under "
-              "half.\n\nThe East’s ฿14,213 is the outlier and it is real — จันทบุรี fruit at "
-              "฿29,157 pulls a seven-province mean. Read the weakest-province column instead: "
-              "นราธิวาส farms on ฿2,742 a month, แม่ฮ่องสอน on ฿4,641, ขอนแก่น on ฿4,762. That is "
-              "the floor a pre-emptive programme should be sized against.", tone="warn", size=10)
-    d.callout(L + cw2 + 0.25, y, cw2, "Transport is falling — but say what that number is",
-              "Transport carries −3.28% in every region, and it is one number, not five findings: "
-              "the model passes a single measured crude-oil move through one chosen coefficient. "
-              "There is no province-level fuel or freight series behind it. Treat it as a direction "
-              "with a real driver, not a measurement.\n\nThe direction still matters, because "
-              "transport is the occupation where the vehicle IS the income. The asset cannot be "
-              "surrendered without ending the earning, which is exactly the population where an "
-              "early conversation beats a late collection. A measured Thai diesel and freight-rate "
-              "series would turn this from an assumption into a signal.", tone="risk", size=10)
-    d.notes("Two things to say. First, farming is up everywhere and still under half the local "
-            "employee wage — a good month on a very low base is not resilience, and the weakest "
-            "province column is where to size the programme. Second, be honest that the transport "
-            "line is one national assumption, not five measurements.")
+    # "Under half, both" was in the copy this replaces, and the table two inches above disproves it:
+    # Isan farms on 54% of its own regional wage, not under 50%. Both ratios are now printed from the
+    # same `reg` dict the table reads, so the sentence cannot contradict the row beneath it again.
+    n_ratio = 100 * reg["North"]["farm"] / reg["North"]["wage"]
+    i_ratio = 100 * reg["Isan"]["farm"] / reg["Isan"]["wage"]
+    d.callout(L, y, cw2, "Farming (เกษตรกร) — up everywhere, still the floor",
+              "• Best-moving job in every region — and still the lowest-paid.\n"
+              f"• North ฿{reg['North']['farm']:,.0f} against a ฿{reg['North']['wage']:,.0f} wage "
+              f"({n_ratio:.0f}%); Isan ฿{reg['Isan']['farm']:,.0f} against "
+              f"฿{reg['Isan']['wage']:,.0f} ({i_ratio:.0f}%).\n"
+              f"• Floor: {floor['weak'][1]} farms on ฿{floor['weak'][0]:,.0f}/mo — size a "
+              "programme against this, not the mean.", tone="warn", size=10)
+    d.callout(L + cw2 + 0.25, y, cw2, "Transport (ขนส่ง) — one number, not five",
+              f"• Down {pct(tmove, 2)} in every region. Factory moves the same way; office is flat "
+              "— no channel modelled for it, which is not the same as no change.\n"
+              "• One measured crude-oil move through one chosen coefficient. No Thai diesel or "
+              "freight series behind it.\n"
+              "• Still matters: here the vehicle IS the income. An early call beats a late one.",
+              tone="risk", size=10)
+    d.notes("Two things: farming is up everywhere and still under half the local wage — size the "
+            "programme off the floor province, not the mean. Be upfront that the transport number "
+            "is one national assumption, not five measurements.")
 
     # ============================================ 10 water: the season and the live pulse
-    # Drought and the daily river/rain feed were two slides. They are one hazard read at two clocks:
-    # SPEI says how the season has gone, ThaiWater says what is happening this week. Merged, with
-    # the structural flood census kept explicitly apart from both.
-    y = d.content("08 · Water", "One hazard, three clocks: the season, this week, and the ground itself.")
+    # Drought and the live rain/river pulse read on two different clocks and answer two
+    # different questions, so each now gets its own table rather than one merged read: SPEI is
+    # MODELLED and monthly — has the season had enough water; ThaiWater is MEASURED and live —
+    # what is happening today. GISTDA's repeated-flood census is a third, separate thing, kept
+    # to its own card and never blended into either table.
+    y = d.content("08 · Water", "Where it is driest, and where it is wettest — right now.")
+    y += d.bullets(L, y, W, [
+        "SPEI (ภัยแล้ง, drought) is modelled once a month — how the season has gone, not "
+        "today’s weather.",
+        "ThaiWater is measured every day — rain gauges and river levels (น้ำท่วม, flood), live.",
+        "GISTDA is a separate 12-year census — ground that has flooded before, not what is "
+        "happening now.",
+    ], size=10.5) + 0.18
     ac = load("amphoe_crops.json")
     # Distinct province·district·crop cells at severe-or-worse SPEI that actually have planted area —
     # the same dedup build_amphoe_crops.py uses for its own headline, since the raw rows carry the
@@ -677,8 +854,10 @@ def build():
     TWR, TWF = load("thaiwater_rain.json"), load("thaiwater_flood.json")
     # ThaiWater's own observation window, not the pull timestamp: the gauges report to 05:00 Bangkok,
     # so the file is fetched on one date and is current to the next. append_history dates the series
-    # the same way.
+    # the same way. Rain and river are two separate feeds and occasionally land a day apart, so each
+    # keeps its own stamp rather than sharing one.
     rain_to = (TWR["meta"].get("observed_to") or TWR["meta"]["pulled"])[:10]
+    flood_to = (TWF["meta"].get("observed_to") or TWF["meta"]["pulled"])[:10]
     heavy = sum(1 for v in TWR["provinces"].values() if v["pct_heavy"] > 0)
     FLH = load("flood_hazard.json")["meta"]
     chronic = FLH["n_branches_chronic"]
@@ -689,61 +868,102 @@ def build():
         ("District-crop cells", f"{len(sev_cells)}",
          f"of {len(ac['rows']):,} measured cells at severe drought or worse", GOLD),
         ("Stations above high mark", f"{mn['flood_high']}",
-         f"of {mn['flood_stations']} ({mn['flood_high_pct']}%) · up from 84 on 11 July · live", RED),
+         f"of {mn['flood_stations']} ({mn['flood_high_pct']}%) · live · {flood_to}", RED),
         ("Provinces with heavy rain", f"{heavy}", f"latest daily reading · {rain_to}", GOLD),
         ("Ground that floods anyway", f"{100 * chronic / FLH['n_branches']:.0f}%",
          f"{chronic:,} of {FLH['n_branches']:,} branch locations flooded in "
          f"{FLH['chronic_threshold']}+ of 12 years", GOLD),
-    ], cols=6, ch=1.22) + 0.20
-    rows = [[(h["province_th"], True, NAVY), h["amphoe_th"], h["crop_th"],
-             (f"{h['planted_rai']:,.0f}", False, NAVY), (f"{h['spei']:.2f}", True, RED),
-             (h["drought"], False, RED)] for h in ac["hotspots"][:6]]
-    y += d.table(L, y, 7.30, ["Driest cells", "District", "Crop", "Planted (rai)",
-                              "SPEI", "Band"], rows,
-                 colw=[1.35, 1.30, 1.55, 1.20, 0.85, 1.05], size=9, rh=0.272,
-                 aligns=["l", "l", "l", "r", "r", "l"]) + 0.14
-    d.callout(L + 7.50, y - 2.02, W - 7.50, "Three different questions, deliberately kept apart",
-              "SPEI is the SEASON: has enough water arrived over months, which is what decides a "
-              "yield. ThaiWater is TODAY: river levels and rainfall pulled daily, the early-warning "
-              "layer. The GISTDA census is neither — it is which ground has flooded repeatedly over "
-              "twelve years, whatever the weather is doing now.\n\nThe third one is a hazard flag "
-              "and explicitly not a loss estimate: the source's per-event polygons overlap, so any "
-              "flooded-area total drawn from them would be wrong. It is also not an argument to "
-              "close anything.", tone="warn", size=10)
+    ], cols=6, ch=1.16) + 0.20
+
+    cw2 = (W - 0.25) / 2
+    # Bilingual short crop labels for the drought table — the OAE Thai names run long (18
+    # characters for cassava's factory-grade name), and a short English word beside a short Thai
+    # term is what the bilingual pass asked for. Falls back to the OAE Thai name for any crop
+    # code not in this list, so an unmapped crop still prints something rather than crashing.
+    CROP_LABEL = {
+        "black_pepper": "Pepper (พริกไทย)", "cassava": "Cassava (มัน)",
+        "coconut_aromatic": "Coconut (มะพร้าว)", "coconut_mature": "Coconut (มะพร้าว)",
+        "coffee": "Coffee (กาแฟ)", "durian": "Durian (ทุเรียน)",
+        "feed_corn_round1": "Maize (ข้าวโพด)", "feed_corn_round2": "Maize (ข้าวโพด)",
+        "longan": "Longan (ลำไย)", "longkong": "Longkong (ลองกอง)",
+        "mangosteen": "Mangosteen (มังคุด)", "oil_palm": "Oil palm (ปาล์ม)",
+        "pineapple": "Pineapple (สับปะรด)", "rambutan": "Rambutan (เงาะ)",
+        "rice_dry_season": "Rice, dry (นาปรัง)", "rice_wet_season": "Rice, wet (นาปี)",
+        "rubber": "Rubber (ยาง)",
+    }
+    d.text(L, y, cw2, "Drought (ภัยแล้ง) — worst planted-area cells", size=10, bold=True, color=NAVY)
+    d.text(L + cw2 + 0.25, y, cw2, "Rain & rivers (น้ำท่วม) — worst today, live", size=10,
+           bold=True, color=NAVY)
+    y += 0.26
+    rows_dry = [[(h["province_th"], True, NAVY), h["amphoe_th"],
+                 CROP_LABEL.get(h["crop"], h["crop_th"]),
+                 (f"{h['planted_rai']:,.0f}", False, NAVY), (f"{h['spei']:.2f}", True, RED),
+                 (h["drought"], False, RED)] for h in ac["hotspots"][:6]]
+    ty = y
+    th1 = d.table(L, ty, cw2, ["Driest cells", "District", "Crop", "Rai", "SPEI", "Band"],
+                  rows_dry, colw=[1.00, 1.35, 1.35, 0.85, 0.70, 0.84], size=9, rh=0.27,
+                  aligns=["l", "l", "l", "r", "r", "l"])
+    # Same 77 provinces ranked worst-first: river level (5 = bank overflow) leads, rain intensity
+    # is the tiebreak — a live read, re-ranked on every pull, never a fixed watch-list.
+    wet = []
+    for p, r in TWR["provinces"].items():
+        f = TWF["provinces"].get(p, {})
+        wet.append((p, r["n_stations"], r["max_mm"], r["pct_heavy"], f.get("n_high"),
+                    f.get("n_stations"), f.get("max_level")))
+    wet.sort(key=lambda w: (-(w[6] or 0), -w[3]))
+    rows_wet = []
+    for p, nrain, mm, ph, nhigh, nriver, lvl in wet[:6]:
+        rows_wet.append([(p, True, NAVY), (f"{nrain}", False, NAVY), (f"{mm:.0f}", False, NAVY),
+                         (f"{ph:.1f}%", True, GOLD if ph > 0 else GREY),
+                         (f"{nhigh}/{nriver}" if nhigh is not None else "—", True,
+                          RED if (nhigh or 0) > 0 else NAVY),
+                         (f"{lvl}" if lvl is not None else "—", True,
+                          RED if (lvl or 0) >= 5 else (GOLD if lvl == 4 else NAVY))])
+    th2 = d.table(L + cw2 + 0.25, ty, cw2,
+                  ["Wettest today", "Rain gauges", "Max mm/24h", "% heavy+", "River ≥high",
+                   "Level"], rows_wet, colw=[1.25, 1.00, 1.05, 0.95, 1.00, 0.84], size=9, rh=0.27,
+                  aligns=["l", "r", "r", "r", "r", "r"])
+    y += max(th1, th2) + 0.12
+    h1 = d.text(L, y, cw2, "Severe drought at planting means a lighter harvest and less cash "
+                "this season.", size=9.5, color=GREY, lh=13)
+    h2 = d.text(L + cw2 + 0.25, y, cw2, "High rivers and heavy rain threaten roads, fields and "
+                "branches right now — today’s reading, not a forecast.", size=9.5, color=GREY,
+                lh=13)
+    y += max(h1, h2) + 0.14
     y += d.source(L, y, W, MIX, NAVY,
-                  "Planted area MEASURED (OAE — 3,295 amphoe crop rows). Drought is a MODELLED SPEI "
-                  "index from rainfall and evapotranspiration — the best national-coverage signal "
-                  "available, but nobody has walked those districts. River and rainfall telemetry "
-                  "MEASURED (ThaiWater, pulled daily and accumulated — a missed pull leaves a gap "
-                  "rather than an invented point). Structural flood exposure MEASURED (GISTDA "
-                  "1:50,000 repeated-flooding census, 2005–2016).", size=9) + 0.16
-    d.callout(L, y, W, "สุพรรณบุรี is the coincidence to watch",
-              "Drought 0.95 — effectively the top of the scale — and a third of its planted area is "
-              "sugarcane, at a −17.9% farm gate. The formal double-stress count reads zero because "
-              "that test is scored on world prices; on the Thai farm gate this province is drought "
-              "and falling price at once, and sugarcane is one of the three crops whose cost of "
-              "production we cannot see.", tone="risk")
-    d.notes("Two slides merged. Keep the three clocks straight: SPEI is the season, ThaiWater is "
-            "this week, GISTDA is the ground itself. Zero double-stressed provinces is a world-price "
-            "result — สุพรรณบุรี is the worked counter-example, so say it rather than presenting a "
-            "clean zero.")
+                  f"Planted area MEASURED (OAE — {len(ac['rows']):,} amphoe crop rows). Drought "
+                  "is a MODELLED SPEI index from rainfall and evapotranspiration, refreshed "
+                  f"monthly, retrieved {ac['meta']['retrieved']} — the best national-coverage "
+                  "signal available, but nobody has walked those districts. Rain and river "
+                  "telemetry MEASURED (ThaiWater, live, pulled daily and accumulated — a missed "
+                  f"pull leaves a gap rather than an invented point) · rain to {rain_to}, river "
+                  f"to {flood_to}. Structural flood exposure MEASURED (GISTDA 1:50,000 "
+                  f"repeated-flooding census, {FLH['data_vintage']} — a 12-year ground record, "
+                  "not a forecast).", size=9)
+    d.notes("Two clocks, kept apart: SPEI is the season (modelled, monthly), ThaiWater is today "
+            "(measured, live). GISTDA is a third, separate thing — which ground floods anyway — "
+            "its own card, never blended into either table.")
 
     # ==================================== 11 where a pre-emptive conversation is worth having
-    # The previous version of this slide RANKED on debt + unemployment and then displayed two more
-    # signals beside the ranking — so a province tripping all four could sit at rank 30 and never
-    # appear. It also took the lead crop from income_impact's crop_mix, which is weighted over rice,
-    # rubber and oil palm ONLY: that called กำแพงเพชร "rice 97%" when its measured OAE mix is 47%
-    # rice, 29% sugarcane, 18% cassava. Both are fixed here — the ranking IS the signal count, with
-    # the measured debt/unemployment composite only breaking ties, and the crop mix is the full
-    # eight-crop OAE one.
+    # The ranking IS the signal count (the measured debt/unemployment composite only breaks ties),
+    # and the lead crop is the full eight-crop OAE mix, not income_impact's rice/rubber/palm-only one.
     PSI = load("province_stress_index.json")
     y = d.content("09 · Where to reach out first",
-                  "Ranking provinces on stress that no payment file can show yet.")
-    y += d.text(L, y, W, "Four independent external signals, none of them a repayment record: debt "
-                "already above a year of household income, unemployment above 2%, a lead crop that "
-                "does not cover its cost, and rain below 90% of normal. Provinces are ordered by how "
-                "many tripped — not, as before, by two of the four.",
-                size=11, color=GREY, lh=15) + 0.16
+                  "Provinces ranked by how many stress signals tripped.")
+    SIGNALS = [
+        ("1  Debt (หนี้)", "debt-to-income ≥ 100% of a year's income"),
+        ("2  Unemployment (การว่างงาน)", "unemployment ≥ 2%"),
+        ("3  Crop (พืชหลัก)", "lead crop pays below cost"),
+        ("4  Rain (ฝน)", "rainfall < 90% of normal"),
+    ]
+    cw2s = (W - 0.30) / 2
+    for i, (lab, desc) in enumerate(SIGNALS):
+        col, row = i % 2, i // 2
+        d.text(L + col * (cw2s + 0.30), y + row * 0.27, cw2s, f"{lab}  —  {desc}",
+               size=10.5, color=NAVY)
+    y += 2 * 0.27 + 0.08
+    y += d.text(L, y, W, "Ordered by signals tripped; ties broken on debt + unemployment.",
+                size=9.5, color=GREY) + 0.14
     croploss = {c["crop_en"]: c["national"]["loss"] for c in CFI["crops"]}
     psi = {p["province"]: p for p in PSI["provinces"]}
     scored = []
@@ -758,8 +978,6 @@ def build():
                  lossy is True, rain is not None and rain < 90]
         scored.append((sum(flags), st["composite_stress"], nm2, pm, st, lead, lossy, rain))
     scored.sort(key=lambda r: (-r[0], -r[1]))
-    n4 = sum(1 for r in scored if r[0] == 4)
-    n3 = sum(1 for r in scored if r[0] >= 3)
     rows = []
     for flags, _cs, nm2, pm, st, lead, lossy, rain in scored[:8]:
         agri = ((II["provinces"].get(nm2, {}).get("occ") or {}).get("Agriculture") or {})
@@ -786,33 +1004,18 @@ def build():
                   "Household debt-to-income MEASURED (NSO SES 2566 — debt as a share of ANNUAL "
                   "income, so above 100% is more debt than a year of earnings). Unemployment "
                   "MEASURED (NSO LFS, by province). Lead crop MEASURED (OAE planted area, all eight "
-                  "crops); its economics ESTIMATED from OAE cost of production. Rainfall MEASURED as "
-                  "precipitation against the long-run normal — a different instrument from the SPEI "
-                  "index two slides back, which also prices evapotranspiration, so the two can "
-                  "disagree; two provinces carry no gauge and cannot trip this signal at all. "
-                  "Ordered by signals tripped, ties broken on the measured debt + unemployment "
-                  "composite. A plain tally, not a weighted score.", size=9) + 0.18
-    cw2 = (W - 0.25) / 2
-    d.callout(L, y, cw2, "One province trips all four, three trip three",
-              f"อำนาจเจริญ is the only province of 77 on all four signals: debt at 114% of a year's "
-              f"income, unemployment 2.84%, rice below cost, rain at 86% of normal. {n3 - n4} more "
-              "trip three — สุโขทัย, สิงห์บุรี and อุบลราชธานี, all rice, all short of rain.\n\n"
-              "Note สิงห์บุรี: its household debt is a low 47%, so it never appeared on the old "
-              "debt-ranked list at all. It is here because the other three signals tripped, which is "
-              "the whole point of ordering on the count.", tone="risk", size=10)
-    d.callout(L + cw2 + 0.25, y, cw2, "Read the crop column as context, not as a discriminator",
-              "Rice is the lead crop in 51 of 77 provinces and rice is below cost, so 70 of 77 "
-              "provinces lead on a crop that does not cover its own cost. That signal is close to a "
-              "national constant — it tells you the country is exposed, not which province to "
-              "call.\n\nWhat actually separates provinces here is debt, unemployment and rain. And "
-              "the list points at geographies, never at people: turning it into names is the "
-              "Assistance tab's job, crossed with who is currently paying. Most households in these "
-              "provinces are paying normally — the value is timing, reaching someone while a "
-              "restructure is still cheap.", tone="warn", size=10)
-    d.notes("This is the slide the assistance programme comes out of, and it is now ranked on the "
-            "count rather than on two of the four signals — which is why สิงห์บุรี appears and "
-            "นครพนม does not. Be straight that the crop test trips almost everywhere and therefore "
-            "does not discriminate; debt, unemployment and rain do. Geographies, not people.")
+                  "crops); its economics ESTIMATED from OAE cost of production "
+                  f"({CFI['crops'][0]['vintage']}). Rainfall MEASURED as "
+                  "precipitation against the long-run normal, a different instrument from the SPEI "
+                  "index two slides back; two provinces carry no gauge and cannot trip this signal.",
+                  size=9) + 0.18
+    crop_trip = sum(1 for r in scored if r[6] is True)
+    d.callout(L, y, W, "Crop is a poor discriminator",
+              f"It trips {crop_trip} of {len(scored)} provinces — national exposure, not who to "
+              "call. Debt, jobs and rain are what separate this list.", tone="warn", size=10.5)
+    d.notes("Ranked on how many of four signals tripped, not on two of them — that is why "
+            "สิงห์บุรี appears despite low debt. The crop test trips almost everywhere and does "
+            "not discriminate; debt, jobs and rain do. Geographies, not people.")
 
     # ================================================================ 11 collateral divider
     d.divider("10 · Collateral", "This is the half with a decision attached.",
@@ -843,12 +1046,12 @@ def build():
         t12 = s["trailing_12m"]
         rows.append([(lab, True, NAVY),
                      (f"{s['latest']['value']:.1f}", True, NAVY),
-                     (f"{p6:+.1f}%", True, GREEN if p6 > 0 else RED),
-                     (f"{p12:+.1f}%", True, GREEN if p12 > 0 else RED),
+                     (pct(p6), True, GREEN if p6 > 0 else RED),
+                     (pct(p12), True, GREEN if p12 > 0 else RED),
                      (f"{t12['low']['value']:.1f}", False, NAVY),
                      (f"{t12['high']['value']:.1f}", False, NAVY),
                      (f"{s['vs_2015_base_pp']:+.1f}", True, RED),
-                     (f"{s['change_since_peak_pct']:+.1f}%", True, RED)])
+                     (pct(s['change_since_peak_pct']), True, RED)])
     y += d.table(L, y, W, ["BoT used-vehicle price index", "latest (2026-05)", "6-month move",
                            "12-month move", "12m low", "12m high", "vs 2015 base",
                            "off all-time peak"], rows,
@@ -861,39 +1064,33 @@ def build():
                 xticks=[(2011, "2011"), (2015, "2015"), (2019, "2019"), (2022, "2022"), (2026, "2026")])
     t6, t12 = win("truck", 6)[1], win("truck", 12)[1]
     c6, c12 = win("car", 6)[1], win("car", 12)[1]
-    d.callout(L + 7.75, y, W - 7.75, "The two windows say different things — both are true",
-              f"Over twelve months pickup is flat at {t12:+.1f}% and cars are down {c12:+.1f}%. Over "
-              f"six months both are sharply up — pickup {t6:+.1f}%, cars {c6:+.1f}% — because the "
-              "series bottomed in November and has climbed since.\n\nSo the fall has stopped; the "
-              "level has not recovered. Pickup still sits "
-              f"{UV['truck']['vs_2015_base_pp']:.1f} points below its own 2015 base against "
-              f"{UV['car']['vs_2015_base_pp']:.1f} for cars, and {UV['truck']['change_since_peak_pct']:.0f}% "
-              "off its 2012 peak. The gap between the two lines is recent: they sat on top of each "
-              "other through 2013–2021 and separated only from 2022. Advance rates calibrated on "
-              "pre-2022 behaviour are calibrated against a market that no longer exists.",
-              tone="risk", size=10)
+    d.callout(L + 7.75, y, W - 7.75, "Two windows, one message",
+              "\n".join(f"• {b}" for b in [
+                  f"Pickup {pct(t6)} in 6 months, {pct(t12)} in 12 — the fall has stopped.",
+                  f"Car {pct(c6)} in 6 months, {pct(c12)} in 12 — same shape, weaker level.",
+                  f"Pickup is {abs(UV['truck']['vs_2015_base_pp']):.0f} pts below its 2015 base, "
+                  f"car {abs(UV['car']['vs_2015_base_pp']):.0f} pts.",
+                  "Pre-2022 advance rates price a market that no longer exists.",
+              ]), tone="risk", size=10)
     y += 2.20 + 0.16
     d.source(L, y, W, MEAS, GREEN,
-             "Bank of Thailand used-vehicle price index (EC_EI_040), 185 monthly observations; the "
-             "6- and 12-month moves are computed off the published monthly series. Both rebased so "
-             "their own 2015 average = 100. The pickup series is confirmed pickup trucks (รถกระบะ), "
-             "not heavy commercial — BoT’s 2019 Stat-Horizon methodology paper. Latest month "
-             "preliminary.", size=9)
-    d.notes("Lead with the two windows: pickup +12.5% over six months but −0.4% over twelve, so the "
-            "fall has stopped rather than reversed. Then the level — still 33 points below its own "
-            "2015 base. Direction improving, level still bad.")
+             "Bank of Thailand used-vehicle price index (EC_EI_040), 185 monthly points; 6- and "
+             "12-month moves computed from the published series, rebased to 2015 = 100. Pickup = "
+             "confirmed pickup trucks (รถกระบะ), not heavy commercial (BoT Stat-Horizon "
+             "methodology, 2019). Latest month preliminary.", size=9)
+    d.notes(f"Two windows: pickup {pct(t6)} over six months but {pct(t12)} over twelve — the fall "
+            "has stopped, not reversed. Level still well below 2015.")
 
     # ================================================================ 13 registration windows
     y = d.content("10b · Collateral supply", "Two vehicle markets, moving opposite ways.")
-    y += d.text(L, y, W, "DLT first registrations on AutoX’s own pickup definition — any pickup or "
-                "PPV nameplate, in any registration class. Read on trailing windows rather than "
-                "calendar years: the last six months say something the twelve-month figure hides.",
+    y += d.text(L, y, W, "DLT first registrations, AutoX’s own pickup definition — any pickup or "
+                "PPV, any class. Six- and 12-month windows, side by side.",
                 size=11, color=GREY, lh=15) + 0.16
     Wd = VM["windows"]
 
-    # The six-month window ends on 2026-01, a month the pipeline itself flags. Both the pickup's
-    # positive slope and the car's +34.3% are computed WITH it, so the trend column is re-derived
-    # without it — the chart below makes the reason visible before the callouts make the argument.
+    # The six-month window ends on a month the pipeline itself flags. Both the pickup's positive
+    # slope and the car's YoY spike are computed WITH it, so the trend column is re-derived without
+    # it — the chart below makes the reason visible before the callouts make the argument.
     m6 = Wd["m6"]
     last = m6["to"] in m6["contains_flagged_months"]
 
@@ -904,20 +1101,33 @@ def build():
         sl = ols_slope(w6["monthly"][:-1] if last else w6["monthly"])
         return [(label, True, NAVY),
                 (f"{m12['units']:,}", False, NAVY),
-                (f"{y12:+.1f}%", True, GREEN if y12 > 0 else RED),
+                (pct(y12), True, GREEN if y12 > 0 else RED),
                 (f"{w6['units']:,}", False, NAVY),
-                (f"{y6:+.1f}%", True, GREEN if y6 > 0 else RED),
+                (pct(y6), True, GREEN if y6 > 0 else RED),
                 (f"{sl:+,.0f}", True, GREEN if sl > 0 else RED)]
     y += d.table(L, y, W, ["", "12-month units", "12m YoY", "6-month units †", "6m YoY †",
-                           "6m trend ex-flagged, units/mo"],
+                           "6m trend ex-flag, units/mo"],
                  [wrow("pu", "Pickup + PPV"), wrow("pa", "Passenger car")],
                  colw=[2.6, 2.1, 1.6, 2.1, 1.6, 2.4], size=11, rh=0.36,
                  aligns=["l", "r", "r", "r", "r", "r"]) + 0.06
-    y += d.text(L, y, W, "† the six-month window contains flagged months — "
-                f"{', '.join(m6['contains_flagged_months'])}. The trend column strips the flagged "
-                "January; the two YoY columns do not.", size=9, color=GREY, lh=12) + 0.18
-    months = [f"{m6['from'][:4]}-{m:02d}" for m in
-              [8, 9, 10, 11, 12]] + [m6["to"]]
+    y += d.text(L, y, W, f"† flagged months in this window: {', '.join(m6['contains_flagged_months'])} "
+                "— registrations pulled forward before an incentive deadline. Only the last is "
+                "stripped from the trend column; both YoY columns keep it.",
+                size=9, color=GREY, lh=12) + 0.18
+
+    def month_range(frm, to):
+        """Every 'YYYY-MM' from frm to to inclusive — computed, not assumed, so a shifted window
+        can't silently mislabel the bars below."""
+        yy, mm = int(frm[:4]), int(frm[5:7])
+        out = []
+        while True:
+            out.append(f"{yy}-{mm:02d}")
+            if out[-1] == to:
+                return out
+            mm += 1
+            if mm > 12:
+                mm, yy = 1, yy + 1
+    months = month_range(m6["from"], m6["to"])
     cw = (W - 0.25) / 2
     for i, (basis, lab, col) in enumerate([("pu", "Pickup + PPV", RED), ("pa", "Passenger car", NAVY)]):
         mo = m6[basis]["monthly"]
@@ -934,30 +1144,38 @@ def build():
     pu_ex = ols_slope(pu6[:-1]) if last else ols_slope(pu6)
     pa_ex_units = (sum(pa6[:-1]) / (len(pa6) - 1)) + sum(pa6[:-1]) if last else sum(pa6)
     pa_ex_yoy = 100 * (pa_ex_units / m6["pa"]["prior_units"] - 1)
-    ch = d.callout(L, y, cw, "Why any “positive pickup trend” is an artifact",
-                   "Look at the left chart. Five months fall steadily — 14.9k, 15.3k, 13.2k, 12.3k, "
-                   f"11.4k — then January jumps to 18.3k. Fit a line through all six and that one "
-                   f"bar drags the slope to {m6['pu']['slope_units_per_month']:+,.0f} a month, which "
-                   "reads as a recovery. Fit it through the five months before January and it is "
-                   f"{pu_ex:+,.0f} a month. January is a flagged month, not demand: registrations "
-                   "pulled forward before an incentive deadline. Pickups are still falling at "
-                   "roughly a thousand units a month.", tone="risk", size=10)
-    d.callout(L + cw + 0.25, y, cw, "Two thirds of the car boom is one month",
-              f"January 2026 ran +54% in cars while motorcycles were flat — registrations pulled "
-              f"forward ahead of an incentive deadline, not demand appearing. Replace that month "
-              f"with the average of the other five and six-month growth falls from "
-              f"{100 * (m6['pa']['units'] / m6['pa']['prior_units'] - 1):+.1f}% to "
-              f"{pa_ex_yoy:+.1f}%. The twelve-month {y12pa:+.1f}% is the safer number.",
-              tone="warn", size=10)
+    pa_y6 = 100 * (m6["pa"]["units"] / m6["pa"]["prior_units"] - 1)
+
+    # The flagged month's own YoY, read off the monthly series rather than typed — it confirms the
+    # story even for pickup: the "spike" month is still down against a year ago.
+    mo_all = {r["ym"]: r for r in VM["monthly"]}
+    prior_ym = f"{int(m6['to'][:4]) - 1}-{m6['to'][5:]}"
+    pu_flag_yoy = pa_flag_yoy = None
+    if m6["to"] in mo_all and prior_ym in mo_all:
+        pu_flag_yoy = 100 * (mo_all[m6["to"]]["pu"] / mo_all[prior_ym]["pu"] - 1)
+        pa_flag_yoy = 100 * (mo_all[m6["to"]]["pa"] / mo_all[prior_ym]["pa"] - 1)
+
+    pu_bul = ["Five months fall in a row, then one month jumps — a bar, not a turn.",
+              f"Slope with that month in: {m6['pu']['slope_units_per_month']:+,.0f}/mo. "
+              f"Without it: {pu_ex:+,.0f}/mo."]
+    if pu_flag_yoy is not None:
+        pu_bul.append(f"Even that month was {pct(pu_flag_yoy)} YoY for pickups — still falling.")
+    ch = d.callout(L, y, cw, "The pickup “trend” is one flagged month",
+                   "\n".join(f"• {b}" for b in pu_bul), tone="risk", size=10)
+    pa_bul = [f"6-month car growth: {pct(pa_y6)}. Ex-flag: {pct(pa_ex_yoy)}."]
+    if pa_flag_yoy is not None:
+        pa_bul.append(f"That month alone ran {pct(pa_flag_yoy)} YoY — pulled forward, not demand.")
+    pa_bul.append(f"The 12-month figure, {pct(y12pa)}, is the safer read.")
+    d.callout(L + cw + 0.25, y, cw, "Most of the car “boom” is one month",
+              "\n".join(f"• {b}" for b in pa_bul), tone="warn", size=10)
     y += ch + 0.16
     d.source(L, y, W, MIX, NAVY,
-             "Registrations MEASURED — DLT gdcatalog first registrations, 48 months from 2022-01. A "
-             "month under 20% of the median is a catalog stub and excluded; a month moving more than "
-             "40% YoY is flagged and kept, never dropped. The ex-January figures are our arithmetic "
-             "on that measured series — ESTIMATED, a judgement about which month to trust.", size=9)
-    d.notes("Correction worth making out loud: the pickup six-month slope is NOT a recovery — strip "
-            "the flagged January and it is about −986 units a month. Same month inflates the car "
-            "boom from +11% to +34%. Quote the twelve-month windows.")
+             "Registrations MEASURED — DLT gdcatalog first registrations, 48 months from 2022-01. "
+             "Ex-flag figures are our arithmetic on that series — ESTIMATED, a judgement call on "
+             "which month to trust.", size=9)
+    d.notes(f"Pickup's six-month slope is not a recovery — ex-flag it is {pu_ex:+,.0f}/mo. The same "
+            f"month inflates car growth from {pct(pa_ex_yoy)} to {pct(pa_y6)}. Quote the 12-month "
+            "windows.")
 
     # ================================================================ 14 concentration
     y = d.content("10c · Brand concentration", "Two vehicle markets, and only one is holding its shape.")
@@ -967,17 +1185,18 @@ def build():
     # denominators for one Hilux on adjacent slides reads as a contradiction even when both are right.
     ENTRANTS = ("BYD", "MG", "JAECOO", "AION", "DEEPAL")
     ent_share = sum(b["share_pct"] for b in pa12["top_brands"] if b["brand"] in ENTRANTS)
-    pu3 = [b for b in pu12["top_brands"] if b["brand"] not in pu12["majors"]][0]
+    pu_rest = [b for b in pu12["top_brands"] if b["brand"] not in pu12["majors"]]
+    pu3, pu4 = pu_rest[0], pu_rest[1]
     y += d.cards(L, y, W, [
         ("Top 2 pickup brands", f"{pu12['major_share_pct']:.1f}%",
          f"{' + '.join(pu12['majors'])} · was {pu12['prior_major_share_pct']:.1f}% a year ago", GOLD),
         ("Top 2 car brands", f"{pa12['major_share_pct']:.1f}%",
-         f"{' + '.join(pa12['majors'])} · was {pa12['prior_major_share_pct']:.1f}% — "
-         f"{pa12['prior_major_share_pct'] - pa12['major_share_pct']:.1f} points gone in a year", RED),
+         f"{' + '.join(pa12['majors'])} · down "
+         f"{pa12['prior_major_share_pct'] - pa12['major_share_pct']:.1f} points in a year", RED),
         ("Third PU brand", f"{pu3['share_pct']:.1f}%",
-         f"{pu3['brand']} · the only challenger at scale · GWM next at 3.5%", NAVY),
+         f"{pu3['brand']} · next is {pu4['brand']} at {pu4['share_pct']:.1f}%", NAVY),
         ("New car brands", f"{ent_share:.1f}%",
-         "BYD + MG + Jaecoo + AION + Deepal · a quarter of new cars, no Thai residual record", RED),
+         "BYD + MG + Jaecoo + AION + Deepal · no Thai residual record", RED),
     ], cols=4, ch=1.16) + 0.20
     cw2 = (W - 0.25) / 2
     # Brands, not nameplates, and the two markets side by side — the concentration argument only
@@ -1004,36 +1223,34 @@ def build():
                   "DLT first registrations at nameplate grain, trailing 12 months, NATIONAL only — "
                   "no province column exists. First registrations are the FUTURE collateral pool, "
                   "not a stock of what is on the road, and not used-vehicle sales.", size=9) + 0.18
-    d.callout(L, y, W, "The two markets are moving in opposite directions, and that is the point",
-              f"Pickup stays concentrated: Toyota and Isuzu hold {pu12['major_share_pct']:.1f}% of "
-              f"new pickups, down only {pu12['prior_major_share_pct'] - pu12['major_share_pct']:.1f} "
-              "points in a year, and the nearest challenger is GWM at 3.5%. Every pickup nameplate "
-              "of any size is shrinking — the only PU growth is a PPV, GWM’s Tank 300, from 650 "
-              "units to 5,865. The pool gets smaller without much changing shape, so residual "
-              f"values there stay predictable.\n\nCars are the opposite: "
-              f"{pa12['prior_major_share_pct'] - pa12['major_share_pct']:.1f} points surrendered in "
-              f"one year, and {ent_share:.1f}% of new cars are now brands with little or no Thai "
-              "residual record. Those vehicles age into the used pool over the next five years with "
-              "no history to price them against.", tone="risk", size=10)
-    d.notes("Every pickup nameplate of any size is down double digits; the one thing growing on the "
-            "PU side is a PPV, GWM's Tank 300, off a 650-unit base. The commercial point: we know "
-            "what a five-year-old Hilux is worth. "
-            "We do not know what a five-year-old BYD or Jaecoo is worth, and a fifth of new cars "
-            "are now those.")
+    d.callout(L, y, W, "Two markets, opposite directions",
+              "\n".join(f"• {b}" for b in [
+                  f"Pickup: Toyota + Isuzu hold {pu12['major_share_pct']:.1f}%, down only "
+                  f"{pu12['prior_major_share_pct'] - pu12['major_share_pct']:.1f} points in a year. "
+                  "The pool shrinks; its shape barely changes.",
+                  f"Car: {pa12['prior_major_share_pct'] - pa12['major_share_pct']:.1f} points "
+                  f"surrendered in a year. {ent_share:.1f}% of new cars now carry no Thai residual "
+                  "record.",
+                  "We know what a five-year-old Hilux is worth. We do not yet know what a "
+                  "five-year-old BYD is worth.",
+              ]), tone="risk", size=10)
+    d.notes("Pickup pool shrinks without changing shape — residual values stay predictable. Cars are "
+            "the opposite: a growing share carries no Thai residual record to price against.")
 
     # ============================================ 17 nameplates as a share of their own market
     # Brands were the previous slide; this is the grain below it, because a title is written against
     # a MODEL, not a marque. Shares are computed against each market's OWN 12-month total — PU over
     # pickup+PPV combined (183k), PA over cars (444k) — rather than the sub-totals the layer emits,
     # so "share of its market" means the same thing on both sides of the slide.
-    y = d.content("10d · The nameplates",
-                  "Five pickups are three quarters of the PU market. The biggest car is an eighth.")
     pu_units = pl["pickup"]["units"] + pl["ppv"]["units"]
     pa_units = pl["car"]["units"]
     pu_all = sorted(pl["pickup"]["top"] + pl["ppv"]["top"], key=lambda r: -r["units"])
     pa_all = pl["car"]["top"]
     pu_top5 = 100.0 * sum(r["units"] for r in pu_all[:5]) / pu_units
     pa_top5 = 100.0 * sum(r["units"] for r in pa_all[:5]) / pa_units
+    pa_top1 = 100.0 * pa_all[0]["units"] / pa_units
+    y = d.content("10d · The nameplates",
+                  f"Top 5 pickups are {pu_top5:.1f}% of the market. The top car is {pa_top1:.1f}%.")
     y += d.cards(L, y, W, [
         ("Top 5 PU nameplates", f"{pu_top5:.1f}%",
          f"of the {pu_units:,} pickups and PPVs registered in 12 months", GOLD),
@@ -1041,7 +1258,7 @@ def build():
          f"of the {pa_units:,} cars — the same five-model test, less than half the answer", RED),
         ("Biggest PU nameplate", f"{100.0 * pu_all[0]['units'] / pu_units:.1f}%",
          f"{pu_all[0]['plate']} · {pu_all[0]['units']:,} units · {pu_all[0]['yoy_pct']:+.1f}% YoY", RED),
-        ("Biggest PA nameplate", f"{100.0 * pa_all[0]['units'] / pa_units:.1f}%",
+        ("Biggest PA nameplate", f"{pa_top1:.1f}%",
          f"{pa_all[0]['plate']} · {pa_all[0]['units']:,} units · {pa_all[0]['yoy_pct']:+.1f}% YoY", NAVY),
     ], cols=4, ch=1.14) + 0.20
     cw2 = (W - 0.25) / 2
@@ -1078,25 +1295,114 @@ def build():
                   "filing 172 — so each PA share is a floor. Merging every trim would not close the "
                   "gap: BYD's entire car volume is 11.3%, still under the single biggest PU "
                   "nameplate.", size=9) + 0.18
-    d.callout(L, y, W, "This is the grain a title is actually written against",
-              f"{pu_all[0]['plate']} and {pu_all[1]['plate']} alone are "
-              f"{100.0 * (pu_all[0]['units'] + pu_all[1]['units']) / pu_units:.0f}% of every pickup "
-              f"and PPV registered this year, and five nameplates reach {pu_top5:.0f}% — all five "
-              "with a decade of Thai resale history, so a five-row residual table very nearly "
-              "prices the market we lend against. Cars do not work that way: the biggest car "
-              f"nameplate is {100.0 * pa_all[0]['units'] / pa_units:.1f}% and the top five reach "
-              f"{pa_top5:.0f}%, with BYD, MG, Jaecoo, AION and Deepal models behind them carrying no "
-              "Thai residual record at all — several registered for the first time this year. Each "
-              "needs an advance rate set on judgement until enough have aged through the market.",
-              tone="risk", size=10)
-    d.notes("The point of dropping from brands to nameplates: an advance rate is set per model, not "
-            "per marque. On PU that is a five-row problem we can price from history. On PA it is a "
-            "long tail of models registered for the first time this year — say plainly that the "
-            "trim-splitting caveat makes PA shares a floor, and that it does not change the "
-            "conclusion.")
+    d.bullets(L, y, W, [
+        f"Top 5 pickup nameplates cover {pu_top5:.1f}% of the market — priced off years of Thai "
+        "resale history.",
+        f"Top 5 car nameplates cover only {pa_top5:.1f}%, and the single biggest is just "
+        f"{pa_top1:.1f}%.",
+        "New brands — BYD, MG, Jaecoo, AION, Deepal — carry no Thai resale record; some registered "
+        "for the first time this year.",
+        "An advance rate is set per model. PU is five rows we can price. PA is a long tail we "
+        "cannot, yet.",
+    ], size=10.5)
+    d.notes("Advance rates are set per model, not brand. PU is five rows we can price from "
+            "history. PA is a long tail of models registered for the first time this year — the "
+            "trim-split caveat makes PA shares a floor, but it does not change the conclusion.")
+
+    # ============================================ 17b four years of nameplates
+    # The owner asked for "the total stock of the models in the market going back as many years as
+    # you have data". The honest answer is that no such series exists: DLT publishes a true
+    # registered stock (จดทะเบียนสะสม) but only by class, province and fuel — it carries no brand or
+    # model column. The longest nameplate history any Thai source supports is FIRST registrations,
+    # 2022 onward, which is a flow into the fleet, not the parc. The slide says so in its own
+    # headline rather than in a footnote, because "stock" and "flow" answer different questions and
+    # a four-year fall in the flow is the more useful of the two here anyway.
+    PAN = VM["plates_annual"]
+    yrs = sorted(PAN)
+
+    def kunits(yy, kinds):
+        return sum(PAN[yy][k]["units"] for k in kinds if k in PAN[yy])
+
+    pu_u = [kunits(v, ("pickup", "ppv")) for v in yrs]
+    pa_u = [kunits(v, ("car",)) for v in yrs]
+    pu_fall = 100.0 * (pu_u[-1] / pu_u[0] - 1)
+    pa_move = 100.0 * (pa_u[-1] / pa_u[0] - 1)
+    y = d.content("10f · Four years of nameplates",
+                  f"Pickups entering the road are down {abs(pu_fall):.0f}% since {yrs[0]}. "
+                  f"Cars are {'down' if pa_move < 0 else 'up'} {abs(pa_move):.0f}%.")
+    y += d.cards(L, y, W, [
+        (f"Pickups + PPV, {yrs[0]}", f"{pu_u[0]:,}", "first registrations that year", NAVY),
+        (f"Pickups + PPV, {yrs[-1]}", f"{pu_u[-1]:,}", f"{pct(pu_fall)} over four years", RED),
+        (f"Cars, {yrs[0]}", f"{pa_u[0]:,}", "first registrations that year", NAVY),
+        (f"Cars, {yrs[-1]}", f"{pa_u[-1]:,}", f"{pct(pa_move)} over four years", GREEN),
+    ], cols=4, ch=1.10) + 0.18
+
+    def plate_rows(kinds, n=7):
+        """Top nameplates of the LATEST year, traced back through the earlier ones.
+
+        Each year publishes its own top 15, so a nameplate outside an early year's top 15 has no
+        figure here — that prints as an em-dash rather than a zero, because "we did not rank it"
+        and "none were registered" are different claims and only one of them is true."""
+        per = {}
+        for v in yrs:
+            agg = {}
+            for k in kinds:
+                for t in PAN[v].get(k, {}).get("top", []):
+                    agg[t["plate"]] = agg.get(t["plate"], 0) + t["units"]
+            per[v] = agg
+        order = sorted(per[yrs[-1]], key=lambda p: -per[yrs[-1]][p])[:n]
+        out = []
+        for p in order:
+            first, last = per[yrs[0]].get(p), per[yrs[-1]][p]
+            out.append([(p.title(), True, NAVY)]
+                       + [(f"{per[v][p]:,}" if p in per[v] else "—", False,
+                           NAVY if p in per[v] else GREY) for v in yrs]
+                       + [(pct(100.0 * (last / first - 1), 0) if first else "—", True,
+                           (GREEN if last > first else RED) if first else GREY)])
+        return out
+
+    cw2 = (W - 0.25) / 2
+    d.text(L, y, cw2, "Pickup + PPV nameplates", size=9.5, bold=True, color=NAVY)
+    d.text(L + cw2 + 0.25, y, cw2, "Car nameplates", size=9.5, bold=True, color=NAVY)
+    y += 0.24
+    hdr = ["Nameplate"] + list(yrs) + ["4-yr"]
+    cwl = [1.85, 0.82, 0.82, 0.82, 0.82, 0.96]
+    d.table(L, y, cw2, hdr, plate_rows(("pickup", "ppv")), colw=cwl, size=9, rh=0.262,
+            aligns=["l", "r", "r", "r", "r", "r"])
+    y += d.table(L + cw2 + 0.25, y, cw2, hdr, plate_rows(("car",)), colw=cwl, size=9, rh=0.262,
+                 aligns=["l", "r", "r", "r", "r", "r"]) + 0.14
+    y += d.source(L, y, W, MEAS, GREEN,
+                  "DLT first registrations at the registrar's own ยี่ห้อ + รุ่น grain, from the "
+                  f"yearly roll-up files so the mirror's missing 2023-12 month cannot distort a "
+                  f"year. {yrs[0]}–{yrs[-1]} are the only complete years published. These are "
+                  "vehicles entering the fleet, NOT the stock on the road — no DLT dataset carries "
+                  "brand or model against registered stock, so a total parc by nameplate does not "
+                  "exist and is not shown here. An em-dash means the nameplate was outside that "
+                  f"year's top {len(PAN[yrs[-1]]['car']['top'])}, not that none were registered.",
+                  size=9) + 0.16
+    d.callout(L, y, W, "The collateral pool is shrinking faster than it is changing shape",
+              f"Four years took {pu_u[0] - pu_u[-1]:,} pickups a year out of the flow — "
+              f"{abs(pu_fall):.0f}% — while cars held roughly flat. Fewer new pickups now means a "
+              "thinner supply of five-year-old pickups to lend against later, and the nameplates "
+              "are the same ones: this is a volume problem, not a mix problem.", tone="risk",
+              size=10)
+    d.notes("Say the caveat first: this is what ENTERED the road each year, not what is on it — "
+            "DLT publishes no stock by model, so the parc by nameplate cannot be built. What it "
+            "shows is a four-year collapse in pickup supply with the same nameplates on top "
+            "throughout, which is a volume problem rather than a mix problem.")
 
     # ================================================================ 17 recovery depth + EV
-    y = d.content("10e · The second-hand market", "How deep the market is that a title sells into.")
+    # The owner's ask: show pickup, car AND motorcycle as a share of the same regional parc — not
+    # pickup alone — so the comparison across all three classes is the point of the table, not a
+    # side note. Shares and turnover both come from the same collateral_book used_flow rows.
+    uf_rows = CB["used_flow"]
+    tot_parc = sum(r["all"]["processed"] for r in uf_rows)
+    pu_nat = 100.0 * sum(r["pickup"]["processed"] for r in uf_rows) / tot_parc
+    car_nat = 100.0 * sum(r["car"]["processed"] for r in uf_rows) / tot_parc
+    moto_nat = 100.0 * sum(r["moto"]["processed"] for r in uf_rows) / tot_parc
+    y = d.content("10e · The second-hand market",
+                  f"Pickups are {pu_nat:.0f}% of the parc — cars {car_nat:.0f}%, motorcycles "
+                  f"{moto_nat:.0f}%.")
     fc = {f["key"]: f for f in CB["fleet_classes"]}
     y += d.cards(L, y, W, [
         ("Pickup stock", f"{fc['pickup']['latest'] / 1e6:.2f}M",
@@ -1109,94 +1415,102 @@ def build():
          f"electrified {mn['electrified_pct']:.2f}% — not a factor this quarter", GOLD),
     ], cols=4, ch=1.12) + 0.20
     # How deep the second-hand market is, region by region — this is the market a repossessed title
-    # has to be sold into, so it is the external half of any recovery assumption.
-    rows = []
-    for uf in CB["used_flow"]:
-        pshare = 100 * uf["pickup"]["processed"] / uf["all"]["processed"]
-        rows.append([(uf["region"], True, NAVY),
-                     (f"{uf['all']['processed'] / 1e6:.2f}M", False, NAVY),
-                     (f"{pshare:.1f}%", False, NAVY),
-                     (f"{uf['pickup']['transferred']:,}", False, NAVY),
-                     (f"{uf['pickup']['transfer_rate'] * 100:.2f}%", True,
-                      RED if uf["pickup"]["transfer_rate"] < 0.06 else NAVY),
-                     (f"{uf['car']['transfer_rate'] * 100:.2f}%", False, NAVY),
-                     (f"{uf['moto']['transfer_rate'] * 100:.2f}%", False, NAVY)])
-    y += d.table(L, y, W, ["Region", "vehicles registered", "of them pickups",
-                           "pickups changing hands", "pickup turnover", "car turnover",
-                           "motorcycle turnover"], rows,
-                 colw=[1.9, 1.9, 1.7, 2.2, 1.7, 1.5, 1.53], size=10, rh=0.30,
-                 aligns=["l", "r", "r", "r", "r", "r", "r"]) + 0.16
+    # has to be sold into, so it is the external half of any recovery assumption. Pickup, car and
+    # motorcycle each get a share-of-parc column AND a turnover column, on equal footing, so the
+    # reader compares all three classes rather than reading pickup against an unlabelled remainder.
+    def urow(uf):
+        parc = uf["all"]["processed"]
+        pu_t = uf["pickup"]["transfer_rate"] * 100
+        return [(uf["region"], True, NAVY),
+                (f"{parc / 1e6:.2f}M", False, NAVY),
+                (f"{100 * uf['pickup']['processed'] / parc:.1f}%", False, NAVY),
+                (f"{100 * uf['car']['processed'] / parc:.1f}%", False, NAVY),
+                (f"{100 * uf['moto']['processed'] / parc:.1f}%", False, NAVY),
+                (f"{pu_t:.2f}%", True, RED if pu_t < 6 else NAVY),
+                (f"{uf['car']['transfer_rate'] * 100:.2f}%", False, NAVY),
+                (f"{uf['moto']['transfer_rate'] * 100:.2f}%", False, NAVY)]
+    y += d.table(L, y, W, ["Region", "Registered", "PU share", "Car share", "Moto share",
+                           "PU turnover", "Car turnover", "Moto turnover"],
+                 [urow(uf) for uf in uf_rows],
+                 colw=[1.55, 1.55, 1.45, 1.45, 1.55, 1.60, 1.60, 1.68], size=10, rh=0.30,
+                 aligns=["l", "r", "r", "r", "r", "r", "r", "r"]) + 0.16
     y += d.source(L, y, W, MEAS, GREEN,
-                  "DLT registered stock and ownership-transfer counts by region and vehicle class, "
-                  "plus MOT fleet totals. Turnover is transfers divided by registered stock — how "
-                  "much of the parc changes hands in a year, which is the depth a repossessed title "
-                  "has to be sold into.", size=9) + 0.20
+                  "DLT registered stock and ownership transfers by region and class, plus MOT fleet "
+                  "totals. Share = class stock ÷ all registered vehicles in the region. Turnover = "
+                  "transfers ÷ registered stock — how much of the parc changes hands a year, the "
+                  "depth a repossessed title sells into.", size=9) + 0.20
     cw2 = (W - 0.25) / 2
-    d.callout(L, y, cw2, "Pickups are the slowest-moving thing on the road",
-              "Transfers run 5.2–7.6% of registered pickups a year against 5.6–10.2% for cars — "
-              "pickup is the slowest-turning class in every single region, and the East is the "
-              "extreme at 5.21%.\n\nA thinner secondary market is a longer disposal and a wider "
-              "discount, and it compounds the resale-value slide: the asset that fell furthest is "
-              "also the one hardest to sell.", tone="risk", size=10)
+    pu_rates = [r["pickup"]["transfer_rate"] * 100 for r in uf_rows]
+    car_rates = [r["car"]["transfer_rate"] * 100 for r in uf_rows]
+    pu_slowest = min(uf_rows, key=lambda r: r["pickup"]["transfer_rate"])
+    d.callout(L, y, cw2, "Small and slow, at the same time",
+              f"Pickups are only {pu_nat:.0f}% of the vehicle parc — cars {car_nat:.0f}%, "
+              f"motorcycles {moto_nat:.0f}% — and still turn over slowest: "
+              f"{min(pu_rates):.1f}–{max(pu_rates):.1f}% of pickups change hands a year against "
+              f"{min(car_rates):.1f}–{max(car_rates):.1f}% for cars, worst in "
+              f"{pu_slowest['region']}.\n\nA smaller, slower market means a longer disposal and a "
+              "wider discount on a repossessed title.", tone="risk", size=10)
     d.callout(L + cw2 + 0.25, y, cw2, "Electrification is a clock, not a problem",
-              "BEVs are 0.95% of the fleet and electrified vehicles 2.57%. Nothing on the road today "
-              "is priced by that.\n\nBut a title has a five-to-ten-year resale tail, and the fleet "
-              f"mix that sets used values in 2032 is being registered now — {ent_share:.0f}% of new "
-              "cars are already brands with no Thai residual history. The question it raises is how "
-              "to price a title we cannot yet benchmark, not what to do this quarter.",
-              tone="warn", size=10)
-    d.notes("Turnover is the depth a repossession is actually sold into. Pickup is the "
-            "slowest-turning class in every region, and the East is the extreme.")
+              f"BEVs are {mn['bev_pct']:.1f}% of the fleet, electrified {mn['electrified_pct']:.1f}% "
+              "— not a factor today.\n\nBut titles resell over five to ten years, and "
+              f"{ent_share:.0f}% of new cars already carry no Thai resale history. That fleet ages "
+              "into the used market before 2032.", tone="warn", size=10)
+    d.notes("The point of the table: pickup is both the smallest class of the three and the "
+            "slowest to turn over. Turnover is the depth a repossession actually sells into.")
 
     # ================================================================ 20 so what
+    # Cut to five short asks per the owner's plain-language pass. The farm-income ask used to quote
+    # the OAE cost-of-production table on 06 — that table is dropping off 06 entirely, so this ask
+    # now stands on the farm-gate PRICE shock (crop_mix.json), the same basis 05 uses, not a cost
+    # netting. `scored`/`three_sig` reuse 09's own ranked list rather than retyping its names.
     y = d.content("11 · So what", "Five things the macro picture asks of us.")
+    CROP_TH = {"Rice": "ข้าว", "Rubber": "ยางพารา", "Oil palm": "ปาล์มน้ำมัน", "Cassava": "มันสำปะหลัง",
+               "Maize": "ข้าวโพด", "Coconut": "มะพร้าว", "Pineapple": "สับปะรด", "Sugarcane": "อ้อย"}
+    four_sig = [r[2] for r in scored if r[0] == 4]
+    three_sig = [r[2] for r in scored if r[0] == 3]
+    worst_neg = CM["national"]["worst"][0]
+    fall_names = ", ".join(f"{k} ({CROP_TH.get(k, k)})" for k, _ in FALLING)
+    fall_area = sum(AREA.get(k, 0.0) for k, _ in FALLING)
+    transport_move = (II["meta"]["sensitivity"]["Transport"]["fuel"]
+                      * II["meta"]["drivers"]["fuel_move_pct"])
     y += d.qa(L, y, W, [
-        ("Contact the four-signal provinces before they miss",
-         "อำนาจเจริญ is the only province of 77 tripping all four external signals — debt at 114% of "
-         "a year’s income, unemployment 2.84%, rice below cost, rain at 86% of normal. Three more "
-         "trip three: สุโขทัย, สิงห์บุรี, อุบลราชธานี. Cross that list with who is CURRENT and make "
-         "contact while a restructure is still cheap — the point is to arrive before the arrears do."),
-        ("Read cost of production, not the price headline",
-         f"Rice prices are UP {gyoy['Rice']:.1f}% and rice still returns −฿1,433 a tonne, −฿444 per person per "
-         "month, after cost. Three of the five crops with a full OAE cost series are below cost. Two "
-         "published prices exist for every crop and only the farm gate belongs beside a cost — the "
-         "market quote for rice is 2.2× the gate, and the grower does not own that difference."),
-        (f"Ask OAE for the {word(len(FALLING))} missing cost series",
-         f"Sugarcane, coconut and pineapple are {fall_area:.1f}% of the country’s planted area, they "
-         f"are the {word(len(FALLING))} crops whose farm-gate prices are FALLING, and they are the "
-         f"{word(len(FALLING))} with no published cost of production. We can see the price move and "
-         "cannot see whether it has taken the grower under. สุพรรณบุรี is drought and a "
-         f"{pct(gyoy['Sugarcane'])} cane price at once, and we cannot price it."),
-        ("Reprice against a used-vehicle market that changed in 2022",
-         "Pickup resale is 33 points below its own 2015 base and the slowest-turning class in every "
-         "region; the six-month bounce has not recovered the level. Five PU nameplates carry three "
-         "quarters of that market and we can price all five from Thai history — but the biggest car "
-         "nameplate is 12.5%, and behind it sits a long tail with no residual record at all."),
-        ("Fix the two instruments we are reading blind",
-         "Transport shows −3.28% in every region because one crude-oil move passes through one "
-         "chosen coefficient — no Thai diesel or freight series sits behind it, and transport is the "
-         "occupation whose vehicle IS the income. And the crop-cost signal trips in 70 of 77 "
-         "provinces, so it cannot discriminate."),
-    ], qw=4.30, size=10.5) + 0.16
+        ("Call the four-signal provinces first",
+         f"{four_sig[0]} trips all four warning flags. {word(len(three_sig)).capitalize()} more trip "
+         f"three — {', '.join(three_sig)}."),
+        ("Watch the provinces left behind",
+         f"Median crop income rose {pct(CM['national']['median_shock_pct'])}, but "
+         f"{word(CM['national']['negative_provinces'])} provinces fell — all on the coconut "
+         f"({CROP_TH['Coconut']}) belt, worst {worst_neg['prov']} at {pct(worst_neg['shock_pct'])}."),
+        (f"Track the {word(len(FALLING))} crops still falling",
+         f"{fall_names} keep falling at the farm gate (ราคาที่เกษตรกรขายได้) — {fall_area:.0f}% of "
+         "the country’s planted land."),
+        ("Reprice the vehicle we lend against",
+         f"Pickup resale is still {abs(UV['truck']['vs_2015_base_pp']):.0f} points below its 2015 "
+         f"level, the slowest-selling class on the road. Five nameplates cover {pu_top5:.0f}% of "
+         "that market; new car brands do not."),
+        ("Read two signals as models, not facts",
+         f"Transport income moves {pct(transport_move)} on one national fuel number, no Thai "
+         "freight data behind it. Drought (ภัยแล้ง) is a rainfall model — nobody has walked those "
+         "districts."),
+    ], qw=3.60, size=13.5) + 0.22
     y += d.callout(L, y, W, "Scope, stated",
-                   "Everything above is external data — published statistics about the economy, the "
-                   "crops, water and the used-vehicle market. It points at regions, provinces and "
-                   "the districts under them, never at a person. Turning a geography into a call "
-                   "list is the Assistance tab’s job and belongs in that conversation, with the book "
-                   "beside it. Nothing here is an argument to open, close or expand anything.") + 0.14
+                   "External data only — the economy, crops, water, vehicles. It points at places, "
+                   "never at people; turning a place into a call list is the Assistance tab’s job. "
+                   "Nothing here argues to open, close or expand anything.") + 0.14
     # The vintage line is the deck's own provenance footer, so it reads every stamp it can off the
     # layer rather than restating one. A vintage line that has to be hand-edited after a refresh is
     # the first thing to go stale and the last thing anyone checks.
     d.text(L, y, W, "Vintages — world prices 2026M06 · Thai farm gate "
-           f"{max(r['local_date'] for r in B_THAI)} · crop cost of production OAE Cai-up 2568 · "
+           f"{max(r['local_date'] for r in B_THAI)} · Thai price history "
+           f"{load('thai_price_history.json')['meta']['vintage']} · crop cost of production OAE "
+           f"Cai-up {CFI['crops'][0]['vintage']} · "
            f"drought 2026-06-21 · CPI {cpi['period']} · GDP {gdp['period']} · IMF WEO 2026 · resale "
            f"index 2026-05 · registrations to {VM['meta']['latest_month']} · household debt NSO SES "
            f"2566 · wages NSO LFS 2568 · telemetry {rain_to}.",
            size=9, color=GREY, lh=12.5)
-    d.notes("Close on scope: external conditions on the network we already run — no open, close or "
-            "expand recommendation, and no book readout, by design. The last two asks are honest "
-            "gaps, not conclusions: three crops we cannot cost, and one occupation we are reading "
-            "through a global proxy.")
+    d.notes("Five short asks, easiest slide in the deck to read. The farm-income ask now stands on "
+            "the price shock, not the OAE cost table — that argument left with 06. Close on scope: "
+            "external conditions only, no book, no open/close/expand call.")
 
     return d
 
@@ -1210,6 +1524,7 @@ def main():
     a = ap.parse_args()
 
     d = build()
+    d.fit_vertical()          # horizontal fit is checked as each box is made; this is the other axis
     out = Path(a.out) / "mcom-2026-08-05-macro.pptx"
     out.parent.mkdir(parents=True, exist_ok=True)
     d.save(out)
