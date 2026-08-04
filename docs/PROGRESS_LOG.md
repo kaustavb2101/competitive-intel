@@ -3,6 +3,45 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Integration loop (provenance honesty): corrected `contested_pop.json`'s false "pop10 matches branch_population.json" claim — committed to master
+
+Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced; GISTDA 40m crop
+needs `GISTDA_SPHERE_KEY`, reconfirmed **NOT** in this CI env this run). So this run took the #1
+recommended follow-up left by the previous entry: the second half of the same provenance defect that
+run fixed in the app — the source-side claim in the contested-population layer.
+
+**The bug.** `build_contested_pop.py`'s meta provenance (and its docstring + an inline comment) stated
+that `pop10` — the per-branch 10km WorldPop catchment population — was computed by "the EXACT
+raster-sampling method of build_branch_population.py, **so pop10 matches branch_population.json**." That
+cross-reference is false. `pop10` genuinely IS a direct WorldPop-2020 1km raster sample (this builder
+opens `worldpop_tha_2020_1km.tif` via rasterio and sums cells — MEASURED, correct, and already cleared
+by the provenance audit). But `branch_population.json`'s OWN meta says `method: "areaweight"`,
+`measured: false` — its shipped values are a district-population AREA-WEIGHT estimate, because
+`build_branch_population.py`'s rasterio path was unavailable and it fell back. The two do NOT match and
+differ materially (e.g. branch 0: area-weight 210,389 vs WorldPop 165,523) — the exact discrepancy the
+2026-08-04 app-side fix corrected. The layer was asserting equality with a number it does not equal.
+
+**The fix (build script only — meta text, no numbers).** Reworded the three spots carrying the false
+claim (docstring §METHOD, the pass-2 loop comment, and `meta.provenance.population`) to state the truth:
+`pop10` is a direct WorldPop raster count, and it does NOT match `branch_population.json`, whose shipped
+values are an area-weight fallback that `pop10` only approximates. Rebuilt `contested_pop.json` — the
+`rows` and `top` arrays (every numeric value) are byte-identical to HEAD; only the `meta.provenance`
+string changed.
+
+- **Net effect:** the contested-population layer's provenance stops claiming a false equality; `pop10` is
+  now honestly described as the genuine measured raster count, consistent with the app-side correction.
+- **Not app-visible:** the app reads only `rows`/`top` from `contested_pop.json` (verified by grep);
+  `meta.provenance` is never rendered. No surfaced number, visual, or app behaviour changes — hence a
+  direct commit, not a PR (a safeguard/metadata honesty fix, same class as the recent provenance commits).
+- **Verification (all pass):** installed `rasterio` (absent by default here) so the builder runs;
+  `build_contested_pop.py --check` reproduces byte-exact; `rows`/`top` confirmed identical to HEAD, only
+  `meta.provenance` differs; `build_provenance.py --check` reproduces exactly (the contested_pop byte-size
+  line updated); `bash tests/run.sh check` → **123 passed, 0 failed** (data integrity 455/455).
+- **Next recommended:** the second small follow-up still open from the previous entry — `CLAUDE.md`'s
+  claim that `tests/run.sh check` gates `bake_catchment_heights --check` is stale (that check was removed
+  from `tests/run.sh`); a trivial offline doc fix.
+
 ## 2026-08-04 — Integration loop (provenance honesty): branch-popup catchment population now shows the MEASURED WorldPop count, not the ESTIMATED area-weight labelled "measured" — PR (app-visible)
 
 Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO, per-branch
