@@ -3350,6 +3350,19 @@ function drawCompCoverage(){
       nstxt=`<div style="margin-top:6px"><b>Nationally, AutoX runs the ${ordLabel(ns.autox_rank)} title-loan branch network</b> `+
         `of the ${ns.n_ranked} big operators with a cited count: ${chain}. ${TAG_M} ${TAG_E} `+
         `<span class="sub">By network size — a different question from the per-province density board above, where rivals cluster and AutoX reads as a local 3rd.</span></div>`;
+      // Expansion PACE + book SCALE behind the static counts — the DIRECTION the count alone hides
+      // (objective #2: margin erosion on the network we already run). REPORTED peer IR; fully null-safe
+      // (a pre-fold competitor_coverage.json carries no loan_book_bn on its ranking rows → renders nothing).
+      const scaled=ns.ranking.filter(o=>o.loan_book_bn!=null);
+      if(scaled.length){
+        const bookChain=scaled.map(o=>{
+          const yoy=(o.book_yoy_pct!=null)?` (+${o.book_yoy_pct}% YoY)`:'';
+          const adds=(o.net_adds_yr!=null)?` <span style="color:var(--agri)">+${o.net_adds_yr.toLocaleString()} branches${o.net_adds_year?'/'+o.net_adds_year:''}</span>`:'';
+          return `${o.operator==='AutoX'?'<b style="color:var(--accent)">AutoX</b>':o.operator} ฿${o.loan_book_bn.toLocaleString()}bn${yoy}${adds}`;
+        }).join(' &rsaquo; ');
+        nstxt+=`<div style="margin-top:6px"><b>Expansion pace &amp; book scale</b> — ${bookChain}. ${TAG_E} `+
+          `<span class="sub">${ns.expansion_note||''}</span></div>`;
+      }
       // MEASURED-footprint reframe: rivals' full store-locator networks can outrank AutoX on
       // points-on-the-ground even when it leads on cited listed-entity counts. All-measured, null-safe.
       const fp=ns.footprint_measured;
