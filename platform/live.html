@@ -287,12 +287,15 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
   var feeds = LB.feeds, M = LB.meta || {};
 
   // ---- pulse strip
-  var tally = { lb_fresh: 0, lb_aging: 0, lb_stale: 0 };
+  var tally = { lb_fresh: 0, lb_aging: 0, lb_stale: 0, lb_ref: 0 };
   feeds.forEach(function (f) {
     var s = freshness(f);
     if (s.cls === 'lb-fresh') tally.lb_fresh++;
     else if (s.cls === 'lb-aging') tally.lb_aging++;
     else if (s.cls === 'lb-stale') tally.lb_stale++;
+    // reference (no cadence) + no-stamp feeds don't age — count them so the four
+    // freshness buckets reconcile against Live feeds rather than silently under-summing.
+    else tally.lb_ref++;
   });
   var daily = feeds.filter(function (f) { return f.cadence === 'daily'; }).length;
   var P = function (k, v, n, cls) {
@@ -308,6 +311,8 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
       tally.lb_aging + '</div><div class="lb-pn">past due, still usable</div></div>' +
     '<div class="lb-p"><div class="lb-pk">Stale</div><div class="lb-pv" style="color:var(--agri)">' +
       tally.lb_stale + '</div><div class="lb-pn">needs a pull</div></div>' +
+    '<div class="lb-p"><div class="lb-pk">Reference</div><div class="lb-pv" style="color:var(--dim)">' +
+      tally.lb_ref + '</div><div class="lb-pn">no cadence or stamp — don\'t age</div></div>' +
     P('Trend lines', M.n_with_history || 0, 'feeds with stored history') +
     P('Stored points', (M.history_points || 0).toLocaleString('en-US'), 'real observations on file');
 

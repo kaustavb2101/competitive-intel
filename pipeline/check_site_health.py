@@ -1056,6 +1056,51 @@ def _shape_deltas(d):
     return None
 
 
+def _shape_vehicle_models(d):
+    # The Macro tab's nameplate wave (#275/#276, obj #1 collateral context) — the
+    # newest surfaced data layer and the last one from that wave with no deploy
+    # probe. It is load-bearing on TWO render paths, both MEASURED (DLT registry
+    # at nameplate grain): (1) the "which models, and which are growing" nameplate
+    # panel (`cb-nameplates`) GATES on `V.plates_last12` (else display='none'),
+    # then rowsOf('pickup')/rowsOf('ppv') render each group's `.top[]` rows
+    # (plate/units/share_pct/yoy_pct); (2) the collateral pickup-definition verdict
+    # (renderYearTable) takes this layer as the AUTHORITATIVE pickup count on
+    # AutoX's own nameplate rule, falling back to the registrar's รย.3 class only
+    # when it is absent. The client loader itself sets VMODELS=null unless
+    # `Array.isArray(v.annual)`, so a truncated/gutted CDN deploy silently reverts
+    # both surfaces to their fallback with no phone alert — the same "broken demo"
+    # blind spot the collateral_book / macro_book / deltas obj-#1 probes closed for
+    # their siblings. Asserts the render contract both paths read — the `annual`
+    # array gate + the pickup/ppv nameplate boards — as SHAPE not values, robust to
+    # a future DLT-vintage refresh moving the registration counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    annual = d.get("annual")
+    if not isinstance(annual, list) or not annual:
+        return "missing/empty 'annual' array (client VMODELS gate: Array.isArray(v.annual))"
+    if not isinstance(annual[0], dict):
+        return "first 'annual' row is not an object (year-table reconciliation render read)"
+    pl = d.get("plates_last12")
+    if not isinstance(pl, dict) or not pl:
+        return "missing/empty 'plates_last12' object (nameplate-panel display gate)"
+    for grp in ("pickup", "ppv"):
+        g = pl.get(grp)
+        if not isinstance(g, dict):
+            return "plates_last12.%s missing (nameplate-board group render read)" % grp
+        top = g.get("top")
+        if not isinstance(top, list) or not top:
+            return "plates_last12.%s.top missing/empty (nameplate-board row render read)" % grp
+        r0 = top[0]
+        if not isinstance(r0, dict):
+            return "plates_last12.%s.top[0] is not an object" % grp
+        if not (isinstance(r0.get("plate"), str) and r0["plate"].strip()):
+            return "plates_last12.%s.top[0] missing 'plate' (nameplate-row label render read)" % grp
+        for k in ("units", "share_pct"):
+            if not isinstance(r0.get(k), (int, float)) or isinstance(r0.get(k), bool):
+                return "plates_last12.%s.top[0].%s missing/non-numeric (nameplate-row cell render read)" % (grp, k)
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1237,6 +1282,18 @@ DATA_FILES = [
     # render shape (baseline gate + branch/region mover fields + the #trend board list),
     # shape not values, and stays green in a legitimate baseline vintage.
     ("data/deltas.json", _shape_deltas, ".baseline gate + .branches/.region movers + .board YoY (#home Movers card + #trend tab)"),
+    # The Macro tab's nameplate wave (vehicle_models.json, #275/#276, obj #1) — the
+    # newest surfaced layer and the last from that wave with no deploy probe. It is
+    # load-bearing on two MEASURED render paths: the "which models, and which are
+    # growing" nameplate panel (gates on .plates_last12, renders the pickup/ppv
+    # .top[] boards) AND the collateral pickup-definition verdict (takes this layer
+    # as the AUTHORITATIVE pickup count on AutoX's nameplate rule). The client sets
+    # VMODELS=null unless .annual is an array, so a truncated/gutted CDN deploy
+    # silently reverts BOTH surfaces to their fallback with no phone alert — the
+    # same "broken demo" blind spot the collateral_book / macro_book / deltas obj-#1
+    # probes closed for their siblings. Asserts the .annual gate + the pickup/ppv
+    # nameplate-board shape, not values — robust to a future DLT-vintage refresh.
+    ("data/vehicle_models.json", _shape_vehicle_models, ".annual year table + .plates_last12 pickup/ppv boards (Macro nameplate panel + collateral pickup verdict)"),
 ]
 
 

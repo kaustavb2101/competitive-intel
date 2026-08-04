@@ -3,6 +3,103 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict) — committed to master
+
+Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
+item is owner-side Vercel access-protection), and the data room re-confirmed healthy this run: `build_provenance.py
+--check` reproduces exactly, the master production alias serves **HTTP 200** on `/`, `/data/meta.json` and
+`/data/deltas.json` (a transient TLS blip on the first deltas fetch cleared on retry — not a regression), and
+`site-health.yml` correctly targets the master production alias. So this run took the service pillar's standing
+brief — surfaced exec reads that live-degrade with no deploy probe — and closed the highest-value one still open.
+
+**The gap.** A render-path re-scan of surfaced-but-unprobed `data/*.json` reads (75 of them, most secondary or
+graceful-degrading) found the newest wave still uncovered: **`vehicle_models.json`** (the #275/#276 Macro
+"nameplate" wave, obj #1 collateral context — which pickup/PPV models dominate registrations and which are
+growing). It is load-bearing on TWO MEASURED render paths, not one: (1) the "which models, and which are growing"
+nameplate panel (`cb-nameplates`) GATES on `V.plates_last12` then renders the pickup/ppv `.top[]` boards
+(plate/units/share_pct/yoy_pct); (2) the **collateral pickup-definition verdict** (`renderYearTable`) takes this
+layer as the AUTHORITATIVE pickup count on AutoX's own nameplate rule (pickup+PPV nameplates in any class),
+falling back to the registrar's รย.3 truck class only when it is absent. The client loader itself sets
+`VMODELS=null` unless `Array.isArray(v.annual)`, so a truncated/gutted CDN deploy **silently** reverts BOTH
+surfaces to their fallback with no phone alert — the same "broken demo" blind spot the collateral_book /
+macro_book / deltas obj-#1 probes closed for their siblings. It was the last unprobed read from the newest
+surfaced wave.
+
+**The fix (probe-script only — NO app/data/HTML/visual/provenance touched).** Added `_shape_vehicle_models` to
+`pipeline/check_site_health.py` + its `DATA_FILES` entry. Asserts the render contract both paths read (NOT
+values): the `annual` array gate (the client's own `VMODELS` gate) + a `plates_last12` dict carrying non-empty
+`pickup` AND `ppv` groups whose first `.top` row has a string `plate` and numeric `units`/`share_pct` — shape,
+not counts, so a future DLT-vintage refresh that moves the registration numbers stays green.
+
+- **Verification (all pass):** unit-tested — the real 21,829-byte payload accepted; twelve negatives reject
+  non-dict / missing-or-empty-or-non-list `annual` / missing-or-empty `plates_last12` / missing pickup-or-ppv
+  group / empty `.top` / row-missing-`plate` / non-numeric-`units` / missing-`share_pct`. Offline `--local
+  platform` reports **116/116 HEALTHY** with `vehicle_models.json` served + shape-sane; the live master
+  production alias serves it **HTTP 200** (21,829 bytes, matches local). Probe coverage +1 exec check (35 → 36
+  probed data layers). `bash tests/run.sh check` → **121 passed, 0 failed** (data integrity 455/455 — the check
+  phase does not read the site-health probes; unaffected). No `platform/data` file changed → no
+  `build_provenance.py` regen needed. Diff = `pipeline/check_site_health.py` (+57) + this log + SERVICE_AUDIT.
+- **Why a direct commit, not a PR.** Probe-script only — no app behaviour, no visual, no surfaced number, no data
+  layer. It closes a deploy-health blind spot without altering what ships; same safeguard-only direct-to-master
+  path as the recent site-health probe commits.
+- **Next recommended:** probe the two sibling reads from the same nameplate wave still uncovered — `vehicle_brands.json`
+  (`cb-vbrands`, gates on `national.by_type.ry3 && .ry1`, ESTIMATED province split) and `vehicle_mix.json`
+  (`cb-mix`, gates on `national.stock && .new && types.length`, MEASURED) — then the Overview switchboard's
+  multi-source `debt_source`/`farm_household` reads.
+
+## 2026-08-03 — Integration loop (QA-health): un-broke the page-health gate — two stale manifest hooks fixed (NEXT_STEPS §0d.8) — committed to master
+
+Autonomous integration run. The scheduled data-integration backlog is exhausted or blocked (FPO PICO,
+per-branch cropland, and the data.go.th distillations are all shipped + surfaced — reconfirmed this run
+by grep; GISTDA 40m crop needs `GISTDA_SPHERE_KEY`, which is NOT in this CI env — checked). A
+negative-space sweep surfaced `farm_income_impact.json` as the top unwired MEASURED layer, but its
+per-branch array is `basis:"allocation"` (province value copied to every branch, zero within-province
+variance — the exact trap the 2026-08-03 collateral-outlook run already rejected), and surfacing its
+province layer is a surfaced-numbers app change that needs a PR + owner signoff. So this run took the
+cleanest fully-CI-verifiable safeguard fix instead: **NEXT_STEPS §0d item 8 — the page-health gate was
+structurally broken (0 passed / 10 failed), every failure a false `missing #<hook>`.**
+
+**The defect.** `tests/pages.manifest` is the harness's single source of truth for which DOM hooks must
+exist & be non-empty after each page settles. Two rows asserted hooks that the current app no longer
+renders, so `bash tests/run.sh health` failed on EVERY page — a completely non-functional gate that
+could not tell a real regression from its own stale config:
+- `index` asserted `macro,region`. `#region` was the "Segment signals by region" Overview table,
+  **removed 2026-08-01** (owner directive: real numbers, not a score-of-a-score). Confirmed absent from
+  the settled DOM (`grep -c 'id="region"'` → 0). `#macro` (the JS-populated macro strip) still renders.
+- `risk-trend` asserted `trendbaseline`. That element is the SINGLE-VINTAGE placeholder — **empty in the
+  shipped MULTI-vintage state** (currently 2025M12 → 2026M06, so the movers render into `#trendregions`,
+  e.g. "Isan · 601 branches", and `#trendbaseline` stays len 0). The gate reported "#trendbaseline empty"
+  every run.
+
+**The fix (test-config only — NO app/data/HTML/provenance touched).** Repointed the two hooks to the
+elements the pages actually render now — `index` → `macro`, `risk-trend` → `trendregions` — each a
+genuine JS-populated content assertion (both are static-empty in source and filled on render, so a broken
+page still fails the gate; this is not a weakening). Added manifest comments recording why `#region` and
+`#trendbaseline` were dropped and, for the trend row, that the hook should flip back to `trendbaseline`
+if the snapshot history is ever reset to a lone baseline vintage. All 8 remaining rows were re-derived
+against the live settled DOM and confirmed already-correct (national/`map` canvas-backed, acquisition/
+`amptbl,amprtbl`, branch-explorer/`map`, both data-book/`db-root`, and the three 3D pages' `map,kpis,
+v-districts` / `map,focalName,leads,recos` all present) — so no other row needed a change.
+
+- **Verification (all pass):** rendered each page headless (chromium/swiftshader) and ran the real
+  `tests/lib/health.sh` per row — the two fixed pages now pass (`#macro present & non-empty`,
+  `#trendregions present & non-empty`); index/national/risk-trend/acquisition/branch-explorer/
+  data-book×2 **all health-green**; `province-chonburi` also rendered here (30s budget) and passed
+  `map,kpis`. The manifest parser (`grep -vE '^\s*#'`) correctly excludes the new comment lines — the
+  row set is unchanged at 10. `bash tests/run.sh check` → **121 passed, 0 failed** (unaffected — the
+  check phase does not read the manifest). No `platform/data` file changed → no `build_provenance.py`
+  regen needed. Diff = `tests/pages.manifest` + `docs/NEXT_STEPS.md` (§0d.8 marked done) + this log.
+- **Why a direct commit, not a PR.** Test-harness config only — no app behaviour, no visual, no surfaced
+  number, no data layer. It repairs a broken QA safeguard without altering what ships; same
+  safeguard-only direct-to-master path as the recent site-health probe commits.
+- **Note on the sibling open items (unchanged this run):** §0d.7 (the 3 heavy deck.gl pages time out
+  under the CI runner's software GL — they render fine here at a 30s budget, so it is a QA_BUDGET/runner
+  issue, not the pages) and §0d.9 (stale visual-regression baselines) are still open; the health phase
+  will now surface REAL hook regressions on the 7 non-3D pages instead of drowning in false positives.
+- **Next recommended:** surface `farm_income_impact.json`'s PROVINCE layer (measured crop-revenue
+  farm-income shock, obj #1) on `#exposure` as a PR — honest province-grain only, NOT the allocation-basis
+  per-branch array; or refresh the §0d.9 visual baselines now that `health` is trustworthy again.
+
 ## 2026-08-03 — Intelligence loop (service/deploy-health): site-health probe guards `deltas.json` (the last unprobed front-door read) — committed to master
 
 Autonomous market & service intelligence run. The `plan_cycle` backlog is exhausted (98% — the one open
@@ -4165,3 +4262,9 @@ Kaustav deploys).
 - **Safeguards (all pass, on the correct base):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's inline JS + data-integrity checks); gate was already 0-failed on `origin/master` before my change — no provenance/commodities drift to restore this run. (b) headless `render.sh` @ 390×844: default `#home` **unchanged** (brand + Home visible at `scrollLeft:0`, no scroll needed); deep-linked `#acq` scrolls the strip toward the active Competition pill; `#sim` (a re-parented More-menu route) renders clean with the guard correctly skipping the scroll; all three `data-errors="[]"`; PNGs self-reviewed (nav/header/content intact, nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/app.js` (one line) + `docs/UXUI_AUDIT.md`, no stray files.
 - **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/app.js`; `/index.html` → **308** (expected `cleanUrls` redirect to `/`, not a regression). Polled the edge CDN until the new build served — the deployed `app.js` carries the `closest('#nav')` guard after ~80s. Change is **live**.
 - **Next recommended:** the highest-leverage remaining item is still the **pipeline hygiene fix** — fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted (clean this run, but a recurring class). The surgical UX backlog is now thin: `ux-nav-active-pill-deeplink-fontreflow` (re-run the pill scroll on `document.fonts.ready` so deep-links reveal fully — small, auto-mergeable, spotted this run) is the natural next surgical pick. Larger dedicated passes remain: `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK), `ux-viewport-user-scalable-3dpages` (real-device pinch-zoom test — not auto-mergeable), and non-platform `qa-visual-baseline-stale` (deliberate `tests/run.sh baseline` refresh). **Housekeeping:** the remote branch delete returned a sideband disconnect (git-proxy network, not a merge problem — same recurring issue as PR #260); the branch is fully merged, harmless, worth a manual delete when the proxy is stable.
+
+## 2026-08-03 — UX loop: live.html pulse strip reconciles (`ux-live-pulse-tally-gap`) — merged + deployed + verified
+- **Shipped** (branch `claude/ux-loop-20260803-1200`, squash-merged PR #278 → `e7a2c45` on master): `live.html`'s "lead-with-the-answer" pulse strip showed **Live feeds: 20** then **Current 15 / Aging 0 / Stale 0** — but the three freshness counts only tallied feeds with a `fresh_days` cadence **and** a parseable stamp, so the 5 feeds classed `reference` (no cadence, 3) or `no stamp` (2) were counted in **none** and 15+0+0 ≠ 20; the 5-feed gap sat unexplained on an exec strip whose entire purpose is honest numbers. Fix: added a fourth freshness bucket — a `tally.lb_ref` counter (the `forEach` `else` branch now captures every non-fresh/aging/stale feed) and a **"Reference"** pulse card right after Stale in `var(--dim)` (matching the existing `.lb-ref`/`.lb-nostamp` badge color, line 47), subtext "no cadence or stamp — don't age". Now **Current + Aging + Stale + Reference = Live feeds** (15+0+0+5 = 20). `.lb-pulse` is `auto-fit,minmax(132px,1fr)` so the 7th card reflows cleanly; zero change to any other surface. Change confined to `platform/live.html` + a one-line `docs/UXUI_AUDIT.md` fix-log entry.
+- **Safeguards (all pass):** (a) `bash tests/run.sh check` → **121 passed, 0 failed** (incl. `node --check` on every page's extracted inline JS + 455 data-integrity checks); gate was already 0-failed on `origin/master` before the change — no provenance/commodities drift to restore this run. (b) headless `render.sh live.html` @ 1100×900: strip reads `20 · 15 · 0 · 0 · 5 · 7 · 187`, the four freshness buckets reconcile to Live feeds, the Reference card renders dim/neutral and reflows onto row 1, `data-errors="[]"`, PNG self-reviewed (nothing visibly broken). (c) no secrets in the diff. (d) diff = only `platform/live.html` (7 lines) + `docs/UXUI_AUDIT.md`, no stray files.
+- **Deploy-verify (PASS, no rollback):** production alias `competitive-intel-git-master-…vercel.app` → **200** on `/` and `/live` (first check, ~15s); deployed `/live` HTML confirmed to carry the new `lb_ref` tally + "Reference" card (not a stale cache). Change is **live**.
+- **Next recommended:** the highest-leverage remaining item is still the **pipeline hygiene fix** — fold a `build_provenance.py` + `build_commodities.py` regen step into the data-bot commit path so master stops arriving gate-drifted (clean this run, but a recurring class). Remaining surgical UX backlog is now thin: `ux-nav-active-pill-deeplink-fontreflow` (re-run the active-pill scroll on `document.fonts.ready` so deep-links reveal fully — small, auto-mergeable) is the natural next surgical pick; `ux-live-chart-mobile-viewbox-responsive` (narrower SVG viewBox on phones so chart geometry+text scale together) and `ux-acquire-taxonomy-mandate` (reframe surviving `acquire`/"Expand" language as competitive-RISK) each need a dedicated non-surgical pass; `ux-viewport-user-scalable-3dpages` needs a real-device pinch-zoom test (not auto-mergeable); `qa-visual-baseline-stale` needs a deliberate `tests/run.sh baseline` refresh once the front door is IA-stable.

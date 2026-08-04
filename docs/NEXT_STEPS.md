@@ -187,13 +187,16 @@ that review still open:
    runs independently, so the render failures are visible as warning annotations — **but they are not
    fixed**. They render fine locally, so the suspect is the runner's software GL under the QA_BUDGET
    timeout, not the pages. Diagnose from the uploaded `qa-renders` artifact before touching the pages.
-8. **OPEN — the page-health manifest hooks are stale.** With the step fixed so `health` actually runs,
-   it reports **0 passed / 10 failed** — but every failure is `missing #<hook>`, not a broken page:
-   `#region` (index), `#map` (national, branch-explorer), `#trendbaseline` (risk-trend), `#amprtbl`
-   (acquisition). Every page passes the substantive checks in the same run — no uncaught JS errors,
-   libs initialised, non-blank screenshot. So `tests/pages.manifest` is asserting DOM ids the
-   5-pillar reframe renamed or removed; the fix is to re-derive the hook column from the current
-   pages, NOT to change the app. Low risk, do it when the deck is out of the way.
+8. ~~**OPEN — the page-health manifest hooks are stale.**~~ **DONE 2026-08-03.** Re-derived the hook
+   column against the live settled DOM. Only two rows were actually wrong: `index` asserted `#region`
+   (the "Segment signals by region" table removed 2026-08-01) → repointed to `#macro` (the JS-populated
+   macro strip); `risk-trend` asserted `#trendbaseline` (the single-vintage placeholder, empty in the
+   shipped multi-vintage state) → repointed to `#trendregions` (the region-mover list). The other 8 rows
+   (national/`map`, acquisition/`amptbl,amprtbl`, branch-explorer/`map`, both data-book/`db-root`, the
+   three 3D pages) were verified already-correct against rendered output and left unchanged. `health`
+   now passes on all 7 non-3D pages (was 0/10, all false `missing #<hook>`). Test-config only — no app
+   change. NOTE the earlier list here (`#map` national/branch-explorer, `#amprtbl` acquisition) was from
+   an older render-failing state; those hooks were confirmed fine this pass.
 9. **OPEN — the visual-regression baselines are stale to the point of being noise.** Now that
    `visual` runs it reports 0/10: five pages at `mean_diff` 175-212 against a tolerance of 12 (the
    app has been rebuilt several times over since the PNGs were taken) and three with no baseline at

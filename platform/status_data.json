@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-03T16:24:08+00:00",
-    "commit": "8bb8fec"
+    "generated_at": "2026-08-03T22:22:01+00:00",
+    "commit": "e9c304e"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-03T22:22:01+00:00",
+      "sha": "e9c304e",
+      "summary": "health(deploy): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict)",
+      "pillar": "service"
+    },
+    {
+      "date": "2026-08-03T20:24:11+00:00",
+      "sha": "28322c8",
+      "summary": "chore(log): record ux-live-pulse-tally-gap merge+deploy+verify",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T03:19:21+07:00",
+      "sha": "e7a2c45",
+      "summary": "ux: reconcile live.html pulse tally (add Reference bucket) (#278)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-03T18:33:12+00:00",
+      "sha": "6ddc57e",
+      "summary": "test(qa): un-break the page-health gate — repoint two stale manifest hooks",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-03T23:32:41+07:00",
+      "sha": "6510cd4",
+      "summary": "Per-nameplate YoY growth in vehicle_models.json's plates_last12 (#276)",
+      "pillar": "feature"
+    },
+    {
+      "date": "2026-08-03T16:24:47+00:00",
+      "sha": "168f059",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the deltas.json site-health probe ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-03T16:24:08+00:00",
       "sha": "8bb8fec",
       "summary": "health(deploy): site-health probe guards deltas.json (#home Movers card + #trend tab)",
@@ -674,42 +710,6 @@
       "sha": "21b1c34",
       "summary": "docs(progress): log ux-pillar-foot-arrow-doubled merge+deploy+verify (#265)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T03:22:27+07:00",
-      "sha": "c3b8694",
-      "summary": "ux: guard pillCard foot arrow against doubling (#265)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T02:29:28+07:00",
-      "sha": "2f16f4e",
-      "summary": "feat(risk): surface GISTDA flood layer as portfolio flood-exposure readout on #exposure (#259)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-03T01:44:36+07:00",
-      "sha": "ab635e0",
-      "summary": "docs: the 17-point review entry is merged, not \"not yet committed\"",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T01:36:53+07:00",
-      "sha": "286e450",
-      "summary": "feat(macro): the Macro tab on the owner's 17-point review — external data only, and none of it stale (#262)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-02T16:20:24+00:00",
-      "sha": "2227f0a",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the collateral_book site-health probe ship",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-02T16:19:43+00:00",
-      "sha": "5d21e92",
-      "summary": "health(deploy): site-health probe guards collateral_book.json (obj #1 collateral section)",
-      "pillar": "service"
     }
   ]
 }
