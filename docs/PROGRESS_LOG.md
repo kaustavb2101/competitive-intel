@@ -3,7 +3,40 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
-## 2026-08-04 — Intelligence loop (market/service): refreshed the rival app-review sentiment ladder (2026-07-19 → 2026-08-03) + synced a pre-existing `live_board.json` gate drift — committed to master
+## 2026-08-04 — Integration loop (provenance honesty): Data-room card now shows `rival_pulse`'s fresher `sentiment_anchor` (2026-08-03) instead of the stale `promos_pulled_at` pull-timestamp (2026-07-19) — committed to master
+
+Autonomous integration run. Re-verified the stated data-integration backlog is exhausted/blocked before
+picking work: **FPO PICO (item #1)** is fully shipped — I re-pulled a fresh `fpo_pico.csv` from
+`catalog.fpo.go.th` (reachable from CI, 2,042 licensed operators, 75/77 provinces, all mapping cleanly to
+the canonical 77) and confirmed all four PICO layers (`pico_census`/`pico_district`/`pico_competitors`/
+`branch_pico`) still reproduce **byte-exact** against it, so the committed census is current, not stale.
+**Per-branch cropland (item #2)** and the **data.go.th distillations (item #3** — DIW factories, MOT/Excise
+vehicles, DBD formation, BAAC/SME-bank credit) are all built + gated + surfaced. **GISTDA 40m crop (item #4)**
+stays blocked: `GISTDA_SPHERE_KEY` is **NOT** in this CI env (reconfirmed this run). So this run took the #1
+recommended follow-up the previous entry left.
+
+**The fix.** `rival_pulse.json` carries two freshness stamps for its two halves: `sentiment_anchor`
+(2026-08-03 — the newest review date IN the pulled data, the MEASURED observation vintage of the sentiment
+ladder, refreshed this morning) and `promos_pulled_at` (2026-07-19 — a pull-run timestamp for the Thai-IP-only
+promo half, honestly older). `build_provenance.py::_vintage_of()` had `promos_pulled_at` in its key list but
+not `sentiment_anchor`, so the Data-room card resolved rival_pulse's vintage to the **staler** 2026-07-19 —
+understating how current the competitive-sentiment read actually is. Added `sentiment_anchor` to the priority
+list among the data-observation keys (ahead of the pull-timestamp keys), with a documenting comment in the
+established style. Only `rival_pulse` carries that key (grep-verified), so no other layer's vintage moves.
+
+- **Effect (exactly one cell):** `provenance.json` rival_pulse row `vintage 2026-07-19 → 2026-08-03`,
+  `age_days 16 → 1`. Semantic diff confirms **1 changed row, 0 others**; measured/estimated/layer counts
+  unchanged (75/61/136). No fabrication — 2026-08-03 is the real newest-review observation date the layer
+  already ships; this shows the fresher of its two honest vintages, exactly like the prior `board_vintage` /
+  `price_asof` / `farmgate_vintage` key fixes.
+- **Verification:** regenerated `provenance.json` (`build_provenance.py`, byte-reproducible); `bash tests/run.sh
+  check` → **123 passed · 0 failed** (+ **455 data-validation checks, 0 failed**); `build_provenance.py --check`
+  reproduces byte-exact in-gate. All SKIPs are pre-existing (absent network inputs / numpy / rasterio). The
+  freshly-pulled `fpo_pico.csv` stays in the gitignored `source-data/datagoth/` cache — not committed.
+- **Next recommended:** the previous entry's *other* thread — extend the social-listening watchlist's blind
+  spot (**Sabuy Cash**, NEXT_STEPS §0c) once its Play/Apple/ATC ids are verified from a Thai IP; or, if a Thai-IP
+  session lands, distill the two `pulled-but-never-distilled` datagoth penetration signals (`baac_credit`,
+  `smebank_credit`) into committed per-province layers (DATAGOTH_CATALOG flags them as the last undistilled sources).
 
 Autonomous market & service intelligence run. The planner backlog is exhausted (98%, the one open item is
 owner-side Vercel access-protection) and the recent loop history is a treadmill of one-off `site-health probe
