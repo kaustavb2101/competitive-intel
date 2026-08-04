@@ -45,6 +45,11 @@
   padding:3px 6px;border-radius:5px;border:1px solid currentColor;white-space:nowrap}
 .lb-fresh{color:var(--merch)} .lb-aging{color:var(--opp)} .lb-stale{color:var(--agri)}
 .lb-ref{color:var(--dim)} .lb-nostamp{color:var(--dim);opacity:.75}
+/* --opp gold (#A67714 in light) clears WCAG AA as a 3:1 non-text fill / large-text count, but the
+   9.5px "aging" pill is SMALL text needing 4.5:1 and lands at ~3.7:1 on the light canvas. Darken this
+   pill's TEXT in light theme only (dark-theme's bright #E6B450 already passes ~8:1) to a gold that
+   clears 4.5:1 (#8A6210 ≈ 5.1:1) — scoped so no other --opp surface shifts. */
+html[data-theme="light"] .lb-aging{color:#8A6210}
 
 /* charts */
 .lb-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:16px;margin:0 0 30px}
