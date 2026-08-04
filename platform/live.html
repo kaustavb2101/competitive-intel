@@ -347,7 +347,7 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
     };
     cards.push({ h: 'Commodity prices — the farm-income line', color: 'var(--opp)',
       s: '<span id="lb-chart-cmdh"></span>', raw: true,
-      btns: '<div class="lb-seriesbtns" id="lb-cmdbtns">' + keys.map(function (k) {
+      btns: '<div class="lb-seriesbtns" id="lb-cmdbtns" role="group" aria-label="Commodity price series">' + keys.map(function (k) {
         return '<button type="button" class="lb-sb" data-k="' + esc(k) + '" aria-pressed="false">' +
           esc(k) + '</button>'; }).join('') + '</div>',
       mount: 'lb-chart-cmd', after: function () {
@@ -409,7 +409,7 @@ Promise.all([jget('live_board.json'), jget('sfi_credit.json'), jget('commodity_h
       };
       cards.push({ h: 'Daily feeds — accumulated here, not published as history', color: 'var(--opp)',
         s: '<span id="lb-chart-fhh"></span>', raw: true,
-        btns: '<div class="lb-seriesbtns" id="lb-fhbtns">' + drawn.map(function (k) {
+        btns: '<div class="lb-seriesbtns" id="lb-fhbtns" role="group" aria-label="Daily feed series">' + drawn.map(function (k) {
           return '<button type="button" class="lb-sb" data-k="' + esc(k) + '" aria-pressed="false">' +
             esc(FH.series[k].label) + '</button>'; }).join('') + '</div>',
         mount: 'lb-chart-fh', after: function () {
