@@ -6,7 +6,7 @@
     "network_free": true,
     "label": "MEASURED — real-tape account counts and balances crossed with MEASURED planted-area crop shares and MEASURED Thai farm-gate price YoY. The only judgement is the dominance threshold in meta.trigger. Nothing is modelled and nothing is forecast.",
     "source": "accounts + balances: platform/data/tape_real.json (agri_impact.by_province, real no-PII tape aggregates); crop shares: platform/data/crop_stress.json (OAE crop_prov_area + DOAE 2568 registry); prices: source-data/farmgate_prices.json (NABC daily national-average farm-gate series).",
-    "price_vintage": "2026-07-23",
+    "price_vintage": "2026-08-03",
     "tape_vintage": null,
     "n_provinces": 67,
     "n_current_x_total": 44828,
@@ -30,7 +30,7 @@
     {
       "crop": "Rice",
       "key": "rice",
-      "yoy": 12.4,
+      "yoy": 13.2,
       "direction": "up",
       "n_provinces": 48,
       "n_current_x": 30101,
@@ -47,7 +47,7 @@
     {
       "crop": "Rubber",
       "key": "rubber",
-      "yoy": 38.0,
+      "yoy": 41.2,
       "direction": "up",
       "n_provinces": 28,
       "n_current_x": 18737,
@@ -81,7 +81,7 @@
     {
       "crop": "Oil palm",
       "key": "oilpalm",
-      "yoy": 31.8,
+      "yoy": 27.5,
       "direction": "up",
       "n_provinces": 11,
       "n_current_x": 8999,
@@ -98,7 +98,7 @@
     {
       "crop": "Cassava",
       "key": "cassava",
-      "yoy": 57.3,
+      "yoy": 58.8,
       "direction": "up",
       "n_provinces": 3,
       "n_current_x": 3196,
@@ -113,7 +113,7 @@
     {
       "crop": "Maize",
       "key": "maize",
-      "yoy": 11.3,
+      "yoy": 13.4,
       "direction": "up",
       "n_provinces": 8,
       "n_current_x": 1960,
@@ -130,7 +130,7 @@
     {
       "crop": "Coconut",
       "key": "coconut",
-      "yoy": -70.9,
+      "yoy": -69.7,
       "direction": "down",
       "n_provinces": 1,
       "n_current_x": 993,
@@ -143,7 +143,7 @@
     {
       "crop": "Pineapple",
       "key": "pineapple",
-      "yoy": -20.0,
+      "yoy": -18.4,
       "direction": "down",
       "n_provinces": 0,
       "n_current_x": 0,
@@ -169,7 +169,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.602,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -177,7 +177,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.3853,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -185,7 +185,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0082,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -193,7 +193,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0044,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -201,7 +201,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -209,14 +209,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -237,7 +237,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6722,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -245,7 +245,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.1201,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -261,7 +261,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0737,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -269,7 +269,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0145,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -277,7 +277,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0021,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -285,7 +285,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -293,14 +293,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -321,7 +321,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7924,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -329,7 +329,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1191,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -337,7 +337,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0768,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -345,7 +345,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0062,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -353,7 +353,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0047,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -369,7 +369,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -377,14 +377,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -405,7 +405,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.8206,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -413,7 +413,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0831,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -429,7 +429,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0428,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -437,7 +437,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0021,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -445,7 +445,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0006,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -453,14 +453,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -481,7 +481,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.6723,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -489,7 +489,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.2526,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -497,7 +497,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0621,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -505,7 +505,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0129,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -513,7 +513,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -521,14 +521,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -549,7 +549,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.8555,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -557,7 +557,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1036,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -565,7 +565,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0283,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -573,7 +573,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0068,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -589,7 +589,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0022,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -597,14 +597,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -625,7 +625,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.5019,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": true
         },
@@ -641,7 +641,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0456,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -649,7 +649,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0105,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -679,7 +679,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7785,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -687,7 +687,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1444,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -703,7 +703,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0289,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -711,7 +711,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0112,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -719,7 +719,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -727,7 +727,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0001,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -735,14 +735,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -763,7 +763,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.9111,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -779,7 +779,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0274,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -787,7 +787,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0048,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -795,7 +795,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -803,7 +803,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0001,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -811,14 +811,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -839,7 +839,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6548,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -855,7 +855,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0865,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -863,7 +863,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0615,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -871,7 +871,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0028,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -879,7 +879,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -887,7 +887,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
@@ -917,7 +917,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5729,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -933,7 +933,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1641,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -941,7 +941,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0449,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -949,7 +949,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0092,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -957,7 +957,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -965,7 +965,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0001,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
@@ -995,7 +995,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7826,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1003,7 +1003,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1936,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1011,7 +1011,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.009,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1027,7 +1027,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0055,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1035,7 +1035,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0003,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -1043,7 +1043,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1051,14 +1051,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -1079,7 +1079,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.5956,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -1087,7 +1087,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3755,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1095,7 +1095,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0276,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1103,7 +1103,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0013,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1111,14 +1111,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -1139,7 +1139,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.4955,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1155,7 +1155,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.093,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1163,7 +1163,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0444,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1171,7 +1171,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0433,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1179,7 +1179,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0275,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1187,7 +1187,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0005,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1195,7 +1195,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -1225,7 +1225,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.7963,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1233,7 +1233,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.1963,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -1241,7 +1241,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0057,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1249,7 +1249,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0017,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1257,7 +1257,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1265,7 +1265,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1273,14 +1273,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -1301,7 +1301,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.8771,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1309,7 +1309,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0686,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1325,7 +1325,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0166,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1333,7 +1333,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0015,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1341,7 +1341,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1349,7 +1349,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1357,14 +1357,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -1385,7 +1385,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3473,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1393,7 +1393,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.2864,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": true
         },
@@ -1401,7 +1401,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.1948,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -1409,7 +1409,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0804,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -1425,7 +1425,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0278,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1433,7 +1433,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0007,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1441,14 +1441,14 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0004,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 3,
       "weakest_crop": "Coconut",
-      "weakest_yoy": -70.9,
+      "weakest_yoy": -69.7,
       "also_in_drought_radar": false,
       "tripped": true,
       "falling_crops": [
@@ -1471,7 +1471,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5693,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1479,7 +1479,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.1951,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": true
         },
@@ -1495,7 +1495,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0387,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1503,7 +1503,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0136,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1511,7 +1511,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0018,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1519,7 +1519,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0013,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -1527,7 +1527,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -1557,7 +1557,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.9166,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1573,7 +1573,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0307,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1581,7 +1581,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0018,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1589,7 +1589,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0006,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1597,7 +1597,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1605,14 +1605,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -1633,7 +1633,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.9198,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1641,7 +1641,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0407,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1649,7 +1649,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0227,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1657,7 +1657,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0069,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1673,7 +1673,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0026,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1681,7 +1681,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0025,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1689,14 +1689,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0002,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -1717,7 +1717,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.9754,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1725,7 +1725,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0156,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1733,7 +1733,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0078,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1741,7 +1741,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0012,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1749,14 +1749,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -1777,7 +1777,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.4674,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1785,7 +1785,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.2177,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1801,7 +1801,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0811,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1809,7 +1809,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0496,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1817,7 +1817,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0122,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1825,7 +1825,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0031,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -1833,7 +1833,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0004,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -1871,7 +1871,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.239,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1879,7 +1879,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.1323,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -1887,7 +1887,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0835,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1895,7 +1895,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0457,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1903,7 +1903,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0143,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1911,7 +1911,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0041,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -1919,7 +1919,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0009,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -1949,7 +1949,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.8911,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -1957,7 +1957,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0624,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -1965,7 +1965,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0391,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -1973,7 +1973,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0073,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -1981,7 +1981,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -1989,14 +1989,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2017,7 +2017,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.474,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2033,7 +2033,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.176,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": true
         },
@@ -2041,7 +2041,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.045,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -2049,7 +2049,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0119,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2057,7 +2057,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.003,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2065,7 +2065,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2073,7 +2073,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -2103,7 +2103,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.8074,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2111,7 +2111,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0964,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2119,7 +2119,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0926,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2127,7 +2127,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0036,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2135,7 +2135,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0001,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -2143,14 +2143,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2171,7 +2171,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7228,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2187,7 +2187,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0546,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2195,7 +2195,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0253,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2203,7 +2203,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0006,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -2211,7 +2211,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0006,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2219,7 +2219,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -2249,7 +2249,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6453,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2265,7 +2265,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0894,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -2273,7 +2273,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0641,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2281,7 +2281,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0016,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2289,7 +2289,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0008,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2297,7 +2297,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2305,7 +2305,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -2335,7 +2335,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.6648,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -2343,7 +2343,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3311,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2351,7 +2351,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0034,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2359,7 +2359,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0007,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2367,14 +2367,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2395,7 +2395,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.8234,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2403,7 +2403,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0723,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2419,7 +2419,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0398,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2427,7 +2427,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0025,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2435,7 +2435,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2443,14 +2443,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0001,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2471,7 +2471,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7602,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2479,7 +2479,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0953,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2495,7 +2495,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0658,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2503,7 +2503,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0056,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2511,7 +2511,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2519,14 +2519,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2547,7 +2547,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5746,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2555,7 +2555,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3257,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2571,7 +2571,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0239,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2579,7 +2579,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0047,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2587,7 +2587,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0006,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2595,7 +2595,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0004,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -2603,14 +2603,14 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0002,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -2631,7 +2631,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6455,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2647,7 +2647,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0192,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -2655,7 +2655,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0179,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2663,7 +2663,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0034,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2671,7 +2671,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0013,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2679,7 +2679,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2687,7 +2687,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0001,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -2717,7 +2717,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5002,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2733,7 +2733,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.122,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -2741,7 +2741,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0886,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2749,7 +2749,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0294,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2757,7 +2757,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0075,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2765,7 +2765,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.005,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -2773,7 +2773,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -2803,7 +2803,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.4017,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2819,7 +2819,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.1162,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -2827,7 +2827,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.08,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2835,7 +2835,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0277,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2843,7 +2843,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0256,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -2851,7 +2851,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0213,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2859,7 +2859,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0008,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
@@ -2889,7 +2889,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5006,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2905,7 +2905,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.2009,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -2913,7 +2913,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0395,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -2921,7 +2921,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0376,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -2929,7 +2929,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0067,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -2937,7 +2937,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0008,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -2945,7 +2945,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0003,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -2975,7 +2975,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6709,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2983,7 +2983,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.152,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -2991,7 +2991,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0617,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3007,7 +3007,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0445,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3015,7 +3015,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0082,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3023,7 +3023,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0012,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -3031,14 +3031,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -3059,7 +3059,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.4639,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3067,7 +3067,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.2709,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3083,7 +3083,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0448,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3091,7 +3091,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0046,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3099,7 +3099,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3107,7 +3107,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
@@ -3137,7 +3137,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.8954,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3145,7 +3145,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.072,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3153,7 +3153,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0285,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3161,7 +3161,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0041,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3169,14 +3169,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -3197,7 +3197,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.4248,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3213,7 +3213,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.1608,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -3221,7 +3221,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0547,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3229,7 +3229,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0013,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3237,7 +3237,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0009,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3245,7 +3245,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -3275,7 +3275,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6563,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3283,7 +3283,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.2407,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3291,7 +3291,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0408,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3307,7 +3307,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.018,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3315,7 +3315,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0095,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3323,7 +3323,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0017,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3331,14 +3331,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0013,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -3359,7 +3359,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.7745,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3367,7 +3367,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.2011,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -3375,7 +3375,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0216,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3383,7 +3383,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0028,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3391,14 +3391,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0001,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -3419,7 +3419,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6013,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3435,7 +3435,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0913,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3443,7 +3443,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0185,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3451,7 +3451,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0061,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3459,7 +3459,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0039,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3467,7 +3467,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0003,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
@@ -3497,7 +3497,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.927,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3513,7 +3513,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0302,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3521,7 +3521,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0026,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3529,7 +3529,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0014,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3537,7 +3537,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0009,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3545,14 +3545,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -3573,7 +3573,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7003,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3581,7 +3581,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.2094,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3589,7 +3589,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.076,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3597,7 +3597,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0068,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3605,7 +3605,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0061,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3613,7 +3613,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0012,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -3621,14 +3621,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -3649,7 +3649,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.6525,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3657,7 +3657,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.3406,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -3665,7 +3665,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0044,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3673,7 +3673,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0025,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3681,14 +3681,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -3709,7 +3709,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.7846,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3717,7 +3717,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.1673,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -3725,7 +3725,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.034,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3733,7 +3733,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0137,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3741,7 +3741,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0004,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -3749,14 +3749,14 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -3777,7 +3777,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7344,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3793,7 +3793,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0469,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3801,7 +3801,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0391,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3809,7 +3809,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0301,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -3817,7 +3817,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0244,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3825,7 +3825,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0113,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -3833,14 +3833,14 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0027,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -3861,7 +3861,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.9081,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3869,7 +3869,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0564,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3877,7 +3877,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0155,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3885,7 +3885,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0122,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3893,7 +3893,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0042,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3901,7 +3901,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0025,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -3916,7 +3916,7 @@
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -3937,7 +3937,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7761,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -3945,7 +3945,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.1829,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -3953,7 +3953,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0352,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -3961,7 +3961,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0047,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -3969,7 +3969,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0006,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -3977,7 +3977,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0005,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -3985,14 +3985,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4013,7 +4013,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7169,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4029,7 +4029,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0395,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -4037,7 +4037,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0316,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4045,7 +4045,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0193,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4053,7 +4053,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0041,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4061,7 +4061,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4069,7 +4069,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -4099,7 +4099,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.7932,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4107,7 +4107,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.1305,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4115,7 +4115,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0505,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4123,7 +4123,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0257,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4131,14 +4131,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rubber",
-      "weakest_yoy": 38.0,
+      "weakest_yoy": 41.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -4159,7 +4159,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.6722,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4167,7 +4167,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.3222,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -4175,7 +4175,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0045,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4183,7 +4183,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.0011,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4191,14 +4191,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0001,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Oil palm",
-      "weakest_yoy": 31.8,
+      "weakest_yoy": 27.5,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4219,7 +4219,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.8061,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4235,7 +4235,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0319,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4243,7 +4243,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0108,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -4251,7 +4251,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0012,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4259,7 +4259,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0008,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4267,7 +4267,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4275,14 +4275,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4303,7 +4303,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5273,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4319,7 +4319,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.1947,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -4327,7 +4327,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.028,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4335,7 +4335,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0076,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4343,7 +4343,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0029,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4351,7 +4351,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0007,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4359,7 +4359,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0001,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
@@ -4389,7 +4389,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.5988,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4397,7 +4397,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.2897,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -4405,7 +4405,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0539,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4413,7 +4413,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0524,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4421,7 +4421,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0031,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4429,7 +4429,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0017,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -4437,14 +4437,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0004,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4465,7 +4465,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7185,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4473,7 +4473,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.1731,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4481,7 +4481,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.1002,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -4489,7 +4489,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.005,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4497,7 +4497,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0029,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4505,7 +4505,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0003,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4513,14 +4513,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4541,7 +4541,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7121,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4557,7 +4557,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0452,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4565,7 +4565,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0013,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4573,7 +4573,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4581,7 +4581,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         }
@@ -4611,7 +4611,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.483,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -4619,7 +4619,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.3768,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4627,7 +4627,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.1155,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4635,7 +4635,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0122,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4651,7 +4651,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0018,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4659,7 +4659,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0003,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4667,14 +4667,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4695,7 +4695,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3846,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4711,7 +4711,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.1884,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": true
         },
@@ -4719,7 +4719,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.1152,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4727,7 +4727,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0572,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4735,7 +4735,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.015,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -4743,7 +4743,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0028,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -4751,7 +4751,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         }
@@ -4781,7 +4781,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.7658,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4797,7 +4797,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0677,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4805,7 +4805,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0341,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4813,7 +4813,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0306,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4821,7 +4821,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0259,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -4829,14 +4829,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0013,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
@@ -4857,7 +4857,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6613,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4865,7 +4865,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.2641,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -4873,7 +4873,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0502,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4881,7 +4881,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0195,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4889,7 +4889,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.004,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4897,14 +4897,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0009,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 2,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -4925,7 +4925,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.6814,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -4941,7 +4941,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.1228,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -4949,7 +4949,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.0311,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": false
         },
@@ -4957,7 +4957,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0299,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -4965,7 +4965,7 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0065,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         },
@@ -4973,7 +4973,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0038,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -4981,14 +4981,14 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -5009,7 +5009,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.3397,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": true
         },
@@ -5017,7 +5017,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.3248,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -5025,7 +5025,7 @@
           "crop": "Rubber",
           "key": "rubber",
           "share": 0.3037,
-          "yoy": 38.0,
+          "yoy": 41.2,
           "direction": "up",
           "depended_on": true
         },
@@ -5033,7 +5033,7 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0285,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         },
@@ -5041,7 +5041,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0031,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -5049,7 +5049,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0002,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -5057,14 +5057,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 3,
-      "weakest_crop": "Maize",
-      "weakest_yoy": 11.3,
+      "weakest_crop": "Rice",
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -5085,7 +5085,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.9303,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -5101,7 +5101,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0006,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -5109,7 +5109,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0003,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -5117,7 +5117,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0001,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -5125,14 +5125,14 @@
           "crop": "Cassava",
           "key": "cassava",
           "share": 0.0,
-          "yoy": 57.3,
+          "yoy": 58.8,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -5153,7 +5153,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.9983,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -5161,7 +5161,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.001,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -5169,7 +5169,7 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0008,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         },
@@ -5177,7 +5177,7 @@
           "crop": "Maize",
           "key": "maize",
           "share": 0.0,
-          "yoy": 11.3,
+          "yoy": 13.4,
           "direction": "up",
           "depended_on": false
         },
@@ -5185,14 +5185,14 @@
           "crop": "Pineapple",
           "key": "pineapple",
           "share": 0.0,
-          "yoy": -20.0,
+          "yoy": -18.4,
           "direction": "down",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": false,
       "tripped": false,
       "falling_crops": []
@@ -5213,7 +5213,7 @@
           "crop": "Rice",
           "key": "rice",
           "share": 0.9791,
-          "yoy": 12.4,
+          "yoy": 13.2,
           "direction": "up",
           "depended_on": true
         },
@@ -5221,7 +5221,7 @@
           "crop": "Coconut",
           "key": "coconut",
           "share": 0.0163,
-          "yoy": -70.9,
+          "yoy": -69.7,
           "direction": "down",
           "depended_on": false
         },
@@ -5229,14 +5229,14 @@
           "crop": "Oil palm",
           "key": "oilpalm",
           "share": 0.0046,
-          "yoy": 31.8,
+          "yoy": 27.5,
           "direction": "up",
           "depended_on": false
         }
       ],
       "n_depended_on": 1,
       "weakest_crop": "Rice",
-      "weakest_yoy": 12.4,
+      "weakest_yoy": 13.2,
       "also_in_drought_radar": true,
       "tripped": false,
       "falling_crops": []
