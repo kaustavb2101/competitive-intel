@@ -3,6 +3,48 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Intelligence loop (PEER COMPARISON): rival EXPANSION PACE + loan-book SCALE now structured on `#acq`, no longer prose-only — PR #… → master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+HTTP 200 on `/`, `/app.js`, `/data/meta.json`; live `meta.updated` + today's `rival_pulse.sentiment_anchor`
+2026-08-03 both match the committed tree — 0 deploy drift), provenance `--check` reproduces exactly, and the
+planner backlog is exhausted (98%, the one OPEN item is owner-side Vercel access-protection). To avoid the
+"add another site-health probe" treadmill the recent history had become, a negative-space sweep over the
+market/peer/service pillars surfaced a **genuine, highest-value gap**: the single most-emphasised competitive
+fact in the research base — that the #1 rival keeps **expanding** into the same districts while AutoX
+**consolidates** — lived only as prose in `docs/RESEARCH_DIGEST.md` §B and one dead meta string
+(`"opened 518 in 2025"`), captured in **zero** structured fields (grepped `opened_20|net_add|loan_book|
+book_yoy` across `platform/data/*.json` + `pipeline/*.py` → only vehicle hits). The `#acq` Competition tab
+therefore showed only STATIC current branch counts (MTC 8,673 › AutoX 2,015 › Tidlor 1,873 › Srisawad 1,138),
+never the DIRECTION behind them — precisely the "margin erosion on the network we already run" read
+objective #2 exists to surface.
+
+**What shipped (the one improvement).** `pipeline/build_competitor_coverage.py` now carries a
+`PEER_FINANCIALS` block (REPORTED, cited per operator from RESEARCH_DIGEST §B FY2025/2025 IR) and folds it
+onto each `national_standing.ranking` row: **loan-book ฿bn** (MTC ฿183.222bn · Tidlor ฿109.586bn +5.4% YoY ·
+Srisawad ฿93.155bn @30 Jun 2025), **branch net-adds** (MTC +518 in 2025 → prior-year 8,155, the ONLY operator
+that disclosed a delta — the others stay honestly blank, never back-computed), plus MTC's 10–15% portfolio
+growth target. AutoX's own row is MEASURED branches + a `"consolidating (no branch-growth target)"` posture and
+a **null** loan-book (its book is not conflated into the REPORTED peer set — no invented ฿70bn). A new
+`expansion_note` + `expansion_label` narrate the read, and `meta.peer_financials_sources` cites every figure
+with its IR URL. `app.js drawCompCoverage` gains a null-safe "**Expansion pace & book scale**" line under the
+existing network-size chain (filters on `loan_book_bn!=null`, so a pre-fold file renders nothing).
+
+- **Provenance / no-fabrication:** every number is a CITED public IR figure (labelled REPORTED, same class as
+  the existing `expected` branch counts); branch net-adds shown only where disclosed; AutoX book left null.
+  `provenance.json` counts unchanged (75 measured / 61 estimated / 0 unlabelled) — only the
+  `competitor_coverage` byte-size cell moved.
+- **Verification (all pass):** `build_competitor_coverage.py --check` byte-exact · `build_provenance.py --check`
+  reproduces exactly · `node --check platform/app.js` OK · `bash tests/run.sh check` → **121 passed · 0 failed**
+  (data validation 455/455). Headless render self-review (chromium 390px + 1280px): **0** JS/page errors from the
+  change, in-browser `fetch('data/competitor_coverage.json')` confirms the new `expansion_note` + `loan_book_bn`
+  fields load; the readout's non-render in the sandbox is an environmental lazy-render/CDN limitation that hits
+  the unchanged network-size anchor line equally (not a regression) — the render expression was additionally
+  verified correct by node-simulation against the committed JSON.
+- **Next recommended:** refresh `search_demand.json` (brand share-of-search, obj #2) — `pulled_at_utc`
+  2026-07-04 is 31d stale while its siblings are 2026-08-03, and its pytrends `geo=TH` source is CI-reachable
+  (not Thai-IP-blocked): `cd pipeline && python3 pull_google_trends.py && python3 build_search_demand.py`.
+
 ## 2026-08-04 — Integration loop (provenance honesty): Data-room card now shows `rival_pulse`'s fresher `sentiment_anchor` (2026-08-03) instead of the stale `promos_pulled_at` pull-timestamp (2026-07-19) — committed to master
 
 Autonomous integration run. Re-verified the stated data-integration backlog is exhausted/blocked before
