@@ -3,6 +3,44 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Intelligence loop (market/service): refreshed the rival app-review sentiment ladder (2026-07-19 → 2026-08-03) + synced a pre-existing `live_board.json` gate drift — committed to master
+
+Autonomous market & service intelligence run. The planner backlog is exhausted (98%, the one open item is
+owner-side Vercel access-protection) and the recent loop history is a treadmill of one-off `site-health probe
+guards X.json` commits, so this run took the highest-value **genuinely stale** thing a negative-space freshness
+sweep surfaced: **`rival_pulse.json`'s sentiment half was 16 days old** (`sentiment_anchor` 2026-07-19) while
+every other measured competitive layer was current — and its Google Play source (`pull_app_reviews.py`) is
+explicitly **any-IP / CI-schedulable** (only the promo half needs a Thai IP). Verified Google Play IS reachable
+from this CI runner (AUTOX ratings moved 1004→1020 on a probe), so this is a real MEASURED refresh, not a
+fabrication.
+
+**What shipped (the one improvement).** Re-pulled all 10 title-lender apps' Play store pages
+(`pull_app_reviews.py` → `source-data/app_reviews.json`, 1,786 reviews merged, newest 2026-08-03) and rebuilt the
+three gated layers that derive from it: **`rival_pulse.json`** (the #acq sentiment ladder), **`rival_universe.json`**
+(the 18-operator board's Play-score join) and **`social_themes.json`** (demand-side review mining). Each rebuild is
+`--check` byte-exact. The refresh surfaces **real competitive movement**: the best-rated rival flipped
+**SAWAD 4.65★ → MTC 4.66★** (SAWAD's app rating actually *fell* to 4.58, TIDLOR jumped 4.49→4.58), and AutoX's own
+gap to the leader widened 0.67★ → 0.68★ — all now current on the #acq board instead of frozen at the July pull.
+The promo half (`promos_pulled_at`) correctly stays 2026-07-19 (Thai-IP-only pull, honestly not refreshed).
+
+**Also (a bundled gate-repair, not caused by this change).** The determinism gate flagged
+`build_live_board.py --check` as drifted — a **pre-existing** failure at HEAD (`live_board.json` was not in this
+run's diff; an earlier data-refresh cron committed a 2026-08-03 feed stamp without rebuilding the derived board).
+Rebuilt it (`build_live_board.py`, network-free + byte-reproducible) to reach a 0-failed gate; it now reproduces
+exactly. Noted here so the next caller doesn't re-attribute it to the sentiment refresh.
+
+- **Verification (all pass):** `pull_app_reviews.py` live-pulled 10/10 apps; `build_rival_pulse.py`,
+  `build_rival_universe.py`, `build_social_themes.py`, `build_live_board.py` all `--check` **byte-exact**;
+  `build_provenance.py --check` reproduces exactly (only the four refreshed layers' byte-size cells changed — no
+  count/label/other-layer drift); `bash tests/run.sh check` → **536 passed · 0 failed**. No broken data references
+  (negative-space sweep: 0), no fabrication (every star/review is a Google Play public value).
+- **Provenance note:** `rival_pulse.json`'s Data-room vintage cell still keys on `promos_pulled_at` (2026-07-19,
+  the Thai-IP promo half); the refreshed sentiment observation (2026-08-03) surfaces directly on the #acq ladder.
+  Left the extractor key unchanged this run to keep scope to the one improvement.
+- **Next recommended:** consider having `build_provenance.py::_vintage_of()` prefer `sentiment_anchor` (a
+  data-observation date) over `promos_pulled_at` (a pull timestamp) for `rival_pulse.json`, so the Data-room card
+  reflects the fresher of the layer's two vintages — same class as the prior `board_vintage`/`price_asof` key fixes.
+
 ## 2026-08-04 — Integration loop (provenance honesty): corrected `contested_pop.json`'s false "pop10 matches branch_population.json" claim — committed to master
 
 Autonomous integration run. The stated data-integration backlog is exhausted/blocked (FPO PICO,
