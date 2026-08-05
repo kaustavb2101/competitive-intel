@@ -3,6 +3,50 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-05 — Integration loop (GATE HARDENING): de-opaque the 19-builder `run.sh` loop — accurate per-source FAIL messages + grep-visibility for the objective-#1 book layers — committed to master
+
+Autonomous integration run. The named data-integration backlog was re-verified **shipped or CI-blocked**:
+FPO PICO census (fully integrated — `branch_pico`/`pico_district`/`pico_competitors`/`rival_universe`, the
+`dpico`/`doutnum` map lenses, the national-readout PICO column), per-branch `branch_cropland` (built, gated,
+surfaced, and honestly labelled — "magnitude MEASURED-corrected to DOAE-2025, SPAM-2010 spatial pattern
+modelled/ESTIMATED, sugarcane uncorrected"), and the data.go.th distillations (DIW factories, MOT vehicle
+layers, `dbd_formation`) are all done. **GISTDA 40m crop (backlog #4) is blocked this run — `GISTDA_SPHERE_KEY`
+is not in the CI env** (verified: no env var, no `.env`); **Excise (`catalog.excise.go.th`) is SSL-blocked from
+CI (HTTP 000)**; DLT frozen / BAAC no-CI-CKAN / data.go.th aggregator 403 remain settled dead ends. So the
+CI-doable data-pull backlog is genuinely exhausted, as the 2026-08-04 entries recorded.
+
+Rather than a treadmill commit, a rigorous gate-coverage audit (all **150** `--check`-capable pipeline
+scripts diffed against everything `tests/run.sh` references, the `for ing in …` loop **included**) surfaced a
+real integrity-gate defect worth fixing: **19 deterministic builders — including the objective-#1 portfolio
+book layers `build_collateral_book`, `build_farm_book`, `build_macro_book`, `build_debt_source`, plus
+`build_tape_layers` over the REAL loan-tape aggregates — were gated only inside an opaque bare-name `for`
+loop.** Two concrete problems: (1) every failure blamed a single shared, **wrong** source
+(`source-data/staging/` "ingest wave") even for the 13 scripts that read committed non-staging
+`source-data/*.json` or committed `platform/data` book layers — so a real drift would misdirect the
+maintainer; and (2) the loop was **invisible to grep-based gate-coverage audits** (`grep "build_X.py --check"`
+returned 0 for all 19), which had just caused a negative-space audit to false-flag all 19 as "missing from the
+gate." Note `source-data/staging/` is now **committed** (21 tracked files, incl. `real_tape_aggregates.json`),
+so the old "staging source absent" skip rationale is obsolete for these.
+
+- **The fix (`tests/run.sh` only):** replaced the bare `for ing in …` loop with a `while read <<'HEREDOC'`
+  driven by an explicit `name|source` table, so each FAIL message now names the builder's ACTUAL source
+  (e.g. `build_debt_source` → `source-data/nso_debt_by_source.json`; `build_macro_book` → its
+  `platform/data` book inputs), the honest SKIP wording drops the false "staging absent — ingest wave"
+  claim, and a header comment lists all 19 as `build_X.py --check` so coverage audits find them. **Behaviour
+  is identical** — same 19 scripts, same `rc 0→ok / rc 3→skip / else→bad` per script, and (heredoc, not a
+  pipe) the loop still runs in the current shell so `ok`/`bad` keep incrementing `pass`/`failc`.
+- **Safeguards:** `bash -n tests/run.sh` clean; `bash tests/run.sh check` → **121 passed · 0 failed**
+  (data validation 455/455) — the SAME totals as the pre-change baseline, confirming no pass/skip/fail
+  moved; all 19 builders still gate green (rc 0, byte-reproduce); `grep "build_collateral_book.py --check"`
+  now returns 1 (was 0). No `platform/data` file, no app/JS/visual change, no secrets in the diff — so no
+  provenance regen or headless render needed; the change is confined to the test harness.
+- **Ship:** test-infra-only, gate green → auto-commit to master (per the loop mandate). No deploy impact
+  (the site's served assets are untouched).
+- **Next recommended integration:** GISTDA 40m satellite crop-area (backlog #4) once `GISTDA_SPHERE_KEY` is
+  exposed to the CI env — it would supersede the SPAM-2010 spatial baseline in `build_branch_cropland.py`
+  with 40m MEASURED values; today it is the single highest-value data unlock still blocked only by a missing
+  key rather than a hard geoblock. Everything else CI-doable is shipped.
+
 ## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias

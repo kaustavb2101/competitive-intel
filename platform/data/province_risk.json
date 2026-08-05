@@ -466,7 +466,7 @@
       "province": "ราชบุรี",
       "region": "Central&BKK",
       "n_branches": 27,
-      "mean_risk": 25.0,
+      "mean_risk": 24.9,
       "p90_risk": 26.5,
       "top_driver_mix": {
         "household": 27
