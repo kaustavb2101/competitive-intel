@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-04T23:38:17+07:00",
-    "commit": "78b4c26"
+    "generated_at": "2026-08-04T22:26:32+00:00",
+    "commit": "b6d566d"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,42 @@
   ],
   "activity": [
     {
+      "date": "2026-08-04T22:26:32+00:00",
+      "sha": "b6d566d",
+      "summary": "feat(service): deploy site-health probe for rival_reputation.json (unprobed parent of the two threat layers)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-04T22:02:54+00:00",
+      "sha": "29b631b",
+      "summary": "data: crude-oil baseline (2026-08-04, run 30954636769)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-04T20:25:24+00:00",
+      "sha": "680321d",
+      "summary": "chore(dashboard): log ux-live-hhdebt-real-quarter-labels merge+deploy+verify (PR #289)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T03:22:20+07:00",
+      "sha": "b1775c0",
+      "summary": "ux: real quarter labels on live.html household-debt chart (#289)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-04T18:39:06+00:00",
+      "sha": "4ef118e",
+      "summary": "docs: record DLT-upstream-frozen + BAAC-no-CI-source as settled dead ends",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-04T16:41:22+00:00",
+      "sha": "9d14d7c",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after peer expansion-pace ship (#288)",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-04T23:38:17+07:00",
       "sha": "78b4c26",
       "summary": "feat(peer): structure rival expansion pace + loan-book scale on #acq (was prose-only) (#288)",
@@ -674,42 +710,6 @@
       "sha": "e7a2c45",
       "summary": "ux: reconcile live.html pulse tally (add Reference bucket) (#278)",
       "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-03T18:33:12+00:00",
-      "sha": "6ddc57e",
-      "summary": "test(qa): un-break the page-health gate — repoint two stale manifest hooks",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-03T23:32:41+07:00",
-      "sha": "6510cd4",
-      "summary": "Per-nameplate YoY growth in vehicle_models.json's plates_last12 (#276)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T16:24:47+00:00",
-      "sha": "168f059",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the deltas.json site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T16:24:08+00:00",
-      "sha": "8bb8fec",
-      "summary": "health(deploy): site-health probe guards deltas.json (#home Movers card + #trend tab)",
-      "pillar": "deployment"
-    },
-    {
-      "date": "2026-08-03T23:05:09+07:00",
-      "sha": "6690102",
-      "summary": "feat(macro): nameplate panel — which models, and which are growing (#275)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T22:59:44+07:00",
-      "sha": "6e3999e",
-      "summary": "feat(collateral): ground the recovery-value outlook in the MEASURED BoT UVPI used-vehicle price index (#272)",
-      "pillar": "service"
     }
   ]
 }
