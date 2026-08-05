@@ -3,6 +3,100 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-04 — Intelligence loop (SERVICE / DEPLOYMENT HEALTH): deploy site-health probe for `rival_reputation.json` — the unprobed PARENT of the two probed threat layers — committed to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+HTTP 200 on `/` and `/data/meta.json`; `build_provenance.py --check` reproduces exactly; planner backlog
+exhausted at 98%, the one OPEN item owner-side). The recent SERVICE-audit history had become a "one probe
+per run" pattern over the front-door layers, so a render-path re-scan looked for the *highest-value* still-
+unprobed read and found a genuine structural blind spot rather than just the next file in line:
+**`rival_reputation.json`** (obj #2, MEASURED sample — review-count-weighted Google rating by brand, the
+`#acq` "rival service reputation" board). It is the shared **parent of both already-probed threat layers**
+(`rival_threat` + `rival_threat_region` consume its ratings) — but those children are **pre-built, committed
+files**, so they keep rendering even when a truncated CDN deploy guts the parent. `drawRivRep` gates its
+board on a non-empty `.by_brand` array and silently drops to a calm "not yet computed" placeholder with no
+phone alert when the file is missing/truncated — the "broken demo" blind spot the sibling competitive probes
+already close. Added `_shape_rival_reputation` to `pipeline/check_site_health.py` (fetch + parse + render-
+shape: the `by_brand` gate, the `brand` column each row renders, ≥1 numeric `rating_wavg`, and the non-blank
+`headline` the readout reads — shape not values, robust to a future rating-vintage refresh).
+
+- **Scope:** `pipeline/check_site_health.py` only (+ `docs/SERVICE_AUDIT.md` audit-run line, this entry). No
+  `platform/data` file, no app/visual change — probe-script-only, so no provenance regen and no PR/headless
+  render needed.
+- **Safeguards:** gate `bash tests/run.sh check` → **121 passed · 0 failed** (data integrity 455/455; the
+  gate does not invoke `check_site_health.py`, so this change is outside its scope by construction);
+  `_shape_rival_reputation` accepts the real payload and rejects **9** malformed shapes (non-dict / missing-
+  or-non-list-or-short `by_brand` / row-not-dict / row-missing-`brand` / no-numeric-`rating_wavg` / blank-or-
+  missing-`headline`); offline `--local platform` → **122/122 HEALTHY** (was 119) with the file served +
+  shape-sane; live alias serves `rival_reputation.json` **HTTP 200** (1,561 B, matches local); no secrets in
+  diff; diff (48 insertions, one probe fn + registry entry) matches intent.
+- **Ship:** safeguard-gated auto-commit to master (probe-script-only). Probe coverage **36 → 37** exec layers.
+- **Deploy-verify:** master production alias re-checked HTTP 200 on `/` and the newly-probed
+  `/data/rival_reputation.json` after the push (the change is a CI probe script, not a served asset, so it
+  does not alter the deployed site — the verify confirms no regression).
+
+## 2026-08-04 — UX loop: real quarter labels on the live.html household-debt chart (PR #289, merged + deployed + verified)
+
+Autonomous UX-improvement run. The backlog's listed items (1–7) and every surgical Open-backlog item are
+already fixed; the remaining open ones are all explicitly flagged bigger-than-surgical / not-for-unattended-
+merge (`qa-visual-baseline-stale`, `ux-acquire-taxonomy-mandate`, `ux-viewport-user-scalable-3dpages`,
+`ux-live-chart-mobile-viewbox-responsive`). So per the mandate I reviewed a route and found a new concrete
+gap: the **household-debt trend chart on `live.html` was the only one of the five charts with cryptic
+relative x-axis labels** (`q-5 … now`, whose `|| 'now'` was dead code) — every other chart (SFI NPL,
+commodity, GDP, daily feeds) shows real time labels. Derived real quarter labels (`24Q3 … 25Q4`) from the
+anchor period the BIS layer stamps (`hd.period`, e.g. `"2025-Q4"`) by back-counting one quarter per point,
+with a fallback to the old relative labels if the anchor is absent/unparseable so the axis never blanks;
+also folded the anchor into the SVG `aria-label`. Against the "concrete, not abstract" mandate the cryptic
+axis was a real clarity gap, and this makes the chart consistent with the other four.
+
+- **Scope:** `platform/live.html` only (+ one-line `docs/UXUI_AUDIT.md` entry). No data files / gated outputs touched.
+- **Safeguards:** `bash tests/run.sh check` → **121 passed, 0 failed** (data validation 455/0); `node --check` clean on all 4 inline blocks; headless render self-reviewed (x-axis now `24Q3 … 25Q4`, rest of page unchanged); no secrets; diff matches intent, no stray files.
+- **Merge:** PR #289 squash-merged to master (`b1775c0`).
+- **Deploy-verify:** after ~90s, `https://competitive-intel-git-master-kaustav-bagchis-projects.vercel.app/` → **200**, `/live` → **200** (`/live.html` → 308, the normal cleanUrls redirect); confirmed the deployed `/live` HTML carries the new label logic (`Real quarter labels` marker present). No rollback needed.
+
+## 2026-08-04 — Integration loop (DECISION, no data change): the two remaining CI "openings" verified as dead ends — DLT collateral is upstream-frozen at its newest vintage, BAAC has no CI-reachable source — committed to master
+
+Autonomous integration run. The stated data-integration backlog (FPO PICO census, per-branch cropland,
+data.go.th distillations, GISTDA 40m crop) is shipped or key-blocked, and the recent loop history is a
+treadmill of one-off provenance/freshness commits. A negative-space sweep surfaced exactly two things that
+still *read* as live openings: (a) refresh the ~5-month-stale DLT vehicle/collateral layers
+(`ev_penetration`/`vehicle_collateral`/`vehicle_mix`/`vehicle_models`), and (b) probe a BAAC department
+CKAN to unblock `build_baac_credit.py` (a complete, `--check`-gated builder whose `baac_credit.json` output
+has never been produced). This run **live-probed both and proved both are dead ends from a cloud IP** — so
+instead of manufacturing a byte-identical "refresh" or re-probing a source that 403s, it records the
+verified negatives with precise recheck triggers, so the survey/loop stops re-flagging them (the treadmill
+this loop keeps hitting). **No app or data-layer change — a settled-decision doc entry only.**
+
+**What was verified (live probes, 2026-08-04):**
+- **DLT is reachable but upstream-frozen — the collateral layers are already at DLT's newest
+  genuinely-complete vintage, not stale by neglect.** `gdcatalog.dlt.go.th` returns HTTP 200 from CI, but
+  its cumulative-stock dataset `dataset_1_1_04` serves ONE resource, `stt_car_fuel_at_25690228.csv` = 28
+  Feb 2026 — exactly the committed `vintage: 2026-02-28`. The first-registration dataset
+  `stat_1_1_01_first_regis_vehicles_car`'s Feb-2026 file (`sttt_car_new_reg_mm_2569_02.csv`) is a
+  **permanent ~6-row stub** (1,031 B, 7 lines) against Jan-2026's 151 KB / ~1,421 rows — re-checked
+  still-a-stub 4 months after its 2026-03-17 last-modified — which is precisely why
+  `build_vehicle_models.py`'s `STUB_FRACTION` rule excludes it and `vehicle_models.json`'s
+  `latest_month: 2026-01` is CORRECT. The monthly-action datasets `dataset_stat_1_008/009` top out at
+  Feb-2569 too. Re-pulling today reproduces byte-identical output; a refresh is worthwhile only once DLT
+  publishes newer files (recheck trigger recorded in `NEXT_STEPS.md` §2).
+- **BAAC has no CI-reachable source.** `data.go.th/api/3/action/package_show?id=baac02_2567` → **HTTP 403**
+  from CI (aggregator geoblock), and BAAC — unlike DIW/DLT — has **no own department CKAN**:
+  `catalog.baac.or.th`, `data.baac.or.th`, `opendata.baac.or.th`, `baac.or.th` all resolve **HTTP 000**.
+  `build_baac_credit.py` stays correctly SKIP-gated; its xlsx is Thai-IP/owner-side only.
+- **Google Trends (`search_demand.json`, the prior entry's #1 follow-up) is 429-blocked from this cloud IP**
+  (pytrends `interest_by_region` → `TooManyRequestsError 429`) — confirmed, not refreshable from CI either.
+
+- **Provenance / honesty:** no numbers touched anywhere; `provenance.json` counts and every data layer are
+  byte-unchanged. The app does not misrepresent the DLT vintages (no machine-readable staleness defect to
+  fix — checked `provenance_sidecar.json` + the app's vintage rendering).
+- **Verification:** `bash tests/run.sh check` → **122 passed · 0 failed** (455 data-validation checks, 0
+  failed) both before and after — the edit is confined to `docs/NEXT_STEPS.md` §2 and this log, which the
+  gate does not derive from, so the green baseline is preserved by construction and re-confirmed.
+- **Next recommended:** the genuine remaining unlocks are all Thai-IP/owner-side (a fresh loan-tape export;
+  the Sabuy Cash Play/Apple/ATC ids per `NEXT_STEPS.md` §0c; DLT once it publishes >Feb-2569 data) or wait
+  on upstream. From CI, prefer a real analytical cross-join over existing committed layers to any further
+  byte-identical "refresh" — the freshness backlog is exhausted.
+
 ## 2026-08-04 — Intelligence loop (PEER COMPARISON): rival EXPANSION PACE + loan-book SCALE now structured on `#acq`, no longer prose-only — PR #… → master
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias

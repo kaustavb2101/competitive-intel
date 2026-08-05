@@ -217,6 +217,33 @@ that review still open:
 ## 2. Unblock the gov data from the Thai IP  ⟶ biggest data win, only possible locally
 The whole reason to be in Claude Code on Kaustav's laptop. **Exact copy-pasteable commands live in
 `docs/TONIGHT_CHECKLIST.md`** — this is the summary of what and why.
+
+> **SETTLED 2026-08-04 — two CI "openings" verified as dead ends (stop re-flagging them; this is what
+> was re-checked so the autonomous loop doesn't re-probe every run).** A negative-space sweep kept
+> surfacing (a) refreshing the DLT vehicle/collateral layers and (b) probing a BAAC department CKAN as
+> live openings. Both were probed from CI this date and are **not actionable from a cloud IP** — not
+> because of a geoblock we can route around, but because the upstream data itself is frozen / absent:
+> - **DLT collateral layers are already at DLT's newest genuinely-complete vintage — NOT stale by
+>   neglect.** `gdcatalog.dlt.go.th` IS reachable from CI (HTTP 200), but: `dataset_1_1_04` (cumulative
+>   stock → `ev_penetration.json`, `vehicle_collateral.json`, `vehicle_mix.json` stock) serves a single
+>   resource `stt_car_fuel_at_25690228.csv` = **28 Feb 2026**, exactly the committed `vintage`;
+>   `stat_1_1_01_first_regis_vehicles_car`'s `sttt_car_new_reg_mm_2569_02.csv` (Feb-2026) is a **permanent
+>   ~6-row stub** (1KB vs Jan's 151KB/~1,421 rows) — re-verified still-a-stub 4 months after its
+>   2026-03-17 last-modified — so `vehicle_models.json`'s `latest_month: 2026-01` is CORRECT, not a
+>   laggard; the monthly-action datasets `dataset_stat_1_008/009` top out at Feb-2569. A DLT refresh is
+>   worthwhile ONLY once newer files land. **Precise recheck trigger:** a `stt_car_fuel_at_2569MMDD.csv`
+>   dated after 2569-02-28 on `dataset_1_1_04`, OR a `sttt_car_new_reg_mm_2569_03.csv` (or later) that is
+>   **>20 rows** (not a stub) on `stat_1_1_01_first_regis_vehicles_car`. Until then, re-pulling produces
+>   byte-identical output — do not "refresh" it.
+> - **BAAC personal-credit (`build_baac_credit.py`) has NO CI-reachable source.** Its only source is the
+>   data.go.th aggregator (`package_show?id=baac02_2567`, HTTP **403** from CI), and BAAC has **no own
+>   department CKAN** — `catalog/data/opendata/…baac.or.th` all resolve **HTTP 000** (unlike the DIW/DLT
+>   dept-CKAN breakthrough, there is no BAAC equivalent to bypass to). The builder stays correctly
+>   SKIP-gated; the xlsx is **Thai-IP / owner-side only**. Do not re-probe a BAAC CKAN from CI.
+>
+> Net: the CI-doable, offline-deterministic data backlog is genuinely **exhausted** as of this date —
+> the remaining unlocks are all Thai-IP/owner-side (below) or wait on the upstream publishing newer data.
+
 - ✅ **Partly done (prior session):** DIW factories (66,100, all 77 prov) + a first DLT vehicle / NSO
   employment fold-in landed via `autox_dgt_ingest.py` → `ingest_gov.py`. Vehicles/crops are still only
   partial-province; widen them.

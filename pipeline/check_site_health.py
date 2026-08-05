@@ -473,6 +473,41 @@ def _shape_rival_threat_region(d):
     return None
 
 
+def _shape_rival_reputation(d):
+    # The rival SERVICE-REPUTATION board (rival_reputation.json, obj #2, MEASURED
+    # sample) — the QUALITY layer on top of rival density: review-count-weighted
+    # Google rating by brand. It is the shared PARENT of the two already-probed
+    # threat layers (rival_threat + rival_threat_region both consume its ratings),
+    # yet the file has its OWN render board and was itself unprobed — a truncated
+    # CDN deploy that guts it silently blanks the "rival service reputation" board
+    # (drawRivRep) while the pre-built, committed threat siblings keep rendering,
+    # masking the breakage with no phone alert. drawRivRep GATES the whole board on
+    # a non-empty .by_brand array and, per row, reads .brand (name) + .rating_wavg
+    # (the review-weighted rating — the board's primary quantitative column, and the
+    # colour scale), and the readout reads .headline + meta.n_rated/.reviews. It
+    # degrades SILENTLY to a "Rival reputation not yet computed" placeholder — the
+    # same "broken demo" blind spot the peer_province / competitor_coverage /
+    # rival_threat probes closed for the sibling competitive reads. Asserts render
+    # shape (the by_brand gate, the brand name each row renders, at least one numeric
+    # rating_wavg, and the headline the readout reads), not values — robust to a
+    # future rating-vintage refresh shifting the scores.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("by_brand")
+    if not isinstance(brands, list) or len(brands) < 3:
+        return "missing/short 'by_brand' list (expected the rated rival brands)"
+    b0 = brands[0]
+    if not isinstance(b0, dict):
+        return "first by_brand row is not an object"
+    if not (isinstance(b0.get("brand"), str) and b0["brand"].strip()):
+        return "first by_brand row missing/empty 'brand' (board row name render)"
+    if not any(isinstance(b, dict) and isinstance(b.get("rating_wavg"), (int, float)) for b in brands):
+        return "no brand carries a numeric 'rating_wavg' (the weighted-rating column + colour scale)"
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/blank 'headline' (rival-reputation readout render read)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -1321,6 +1356,19 @@ DATA_FILES = [
     # (brands gate + brand/threat_class columns + a numeric ×AutoX ratio + the
     # readout headline), not values.
     ("data/rival_threat.json", _shape_rival_threat, ".brands (big-4) density×service matrix + threat_class + .headline (#acq rival threat matrix)"),
+    # The rival SERVICE-REPUTATION board (rival_reputation.json, obj #2, MEASURED
+    # sample) — the review-count-weighted Google rating by brand, and the shared
+    # PARENT of the two already-probed threat layers (rival_threat +
+    # rival_threat_region both consume its ratings) that was itself unprobed. It
+    # renders the Competition (#acq) "rival service reputation" board (drawRivRep),
+    # gated on a non-empty .by_brand array, each row reading .brand + .rating_wavg;
+    # a truncated CDN deploy that guts it silently blanks the board (with NO phone
+    # alert) while the pre-built committed threat siblings keep rendering, masking
+    # the breakage — the same "broken demo" blind spot the peer_province /
+    # competitor_coverage / rival_threat probes closed. Asserts render shape (the
+    # by_brand gate + brand column + a numeric weighted rating + the readout
+    # headline), not values.
+    ("data/rival_reputation.json", _shape_rival_reputation, ".by_brand rated-rival ratings + .headline (#acq rival service reputation board)"),
     # The TIME dimension (deltas.json, obj #1) — the last surfaced FRONT-DOOR read with
     # no deploy probe. Renders the command-center "Movers" card (renderHomeMovers off
     # .region + .branches) AND is the whole Risk-trend tab payload (.board YoY re-ratings
