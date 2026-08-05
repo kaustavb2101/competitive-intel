@@ -8106,7 +8106,11 @@ function icLadder(r){
   const s=icSegs(r); if(!s) return '<span class="s">—</span>';
   const bar=IC_BUCKETS.map(([k,lab,c])=>s[k]>0
     ?`<span class="ic-lad-seg" style="width:${s[k]}%;background:${c}" title="${lab} ${s[k]}%"></span>`:'').join('');
-  return `<span class="ic-lad" title="Current ${s.current}% · X ${s.x}% · 30–89 ${s.roll}% · 90–179 ${s.npl}% · 180+ ${s.late}%">${bar}</span>`;
+  // The bar is a data-viz proportion; carry an aria-label (screen-reader NAME) alongside the title
+  // (sighted hover tooltip), matching the rz-bar role="img" pattern — a bare title on a <span> is not
+  // a reliable accessible name, so without this the whole-book delinquency split is silent to AT.
+  const desc=`Current ${s.current}% · X ${s.x}% · 30–89 ${s.roll}% · 90–179 ${s.npl}% · 180+ ${s.late}%`;
+  return `<span class="ic-lad" role="img" aria-label="Delinquency ladder — ${desc}" title="${desc}">${bar}</span>`;
 }
 function icLadderLegend(){
   return `<div class="ic-lad-leg">${IC_BUCKETS.map(([k,lab,c])=>`<span><i style="background:${c}"></i>${lab}</span>`).join('')}</div>`;
