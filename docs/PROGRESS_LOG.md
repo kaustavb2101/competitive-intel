@@ -3,6 +3,52 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-05 — Market/Service loop: 3D catchment scene headlines the MEASURED WorldPop catchment population (was the ESTIMATED area-weight fallback)
+
+Autonomous market & service intelligence run. A negative-space sweep surfaced a genuine
+measured-vs-estimated honesty gap on the platform's PRIMARY 3D entry point. `rayong-catchment.html`
+(the building scene for every province) headlined its "people ≤10km" reachable-population stat from
+`branch_population.json` — an **ESTIMATED** area-weight fallback (`meta.measured:false`,
+`method:"areaweight"`, assumes uniform intra-district density) tagged `EST · NSO` — even though the
+**MEASURED** WorldPop-2020 raster count of the *exact same quantity* (population inside each branch's
+10 km circle) already ships committed in `contested_pop.json` `rows[i][0]`, and `app.js`'s branch
+popup ALREADY prefers it (labelled measured/WorldPop). So one branch's catchment population read
+MEASURED in the map popup and a materially-different EST on the 3D card — an internal contradiction.
+The two layers diverge for real: median estimate/measured ratio **0.78** (the fallback under-counts
+~22% at the median), p10 0.47 / p90 1.43, and **351 of 2,015 branches (17%) differ by >2×** — e.g.
+the Rayong สายล่าง branch reads 296,810 (measured) vs 178,638 (estimated).
+
+**Fix (HTML/JS only, CI-doable — `contested_pop.json` is committed + already deployed, 38 KB):** wire
+`contested_pop.json` into the scene's data-fetch batch (appended as a[19]; no existing index shifts)
+and make `branchPop()` prefer `CPOP.rows[i][0]` as the MEASURED 10 km count, keeping
+`branch_population.json` as a null-guarded ESTIMATED fallback and district-NSO population as the last
+resort — a direct port of the already-in-production `app.js` popup logic. The card now tags the figure
+`WorldPop` (measured) with the measured footnote when the raster count is present, and degrades to the
+`EST · NSO` estimate (no crash) if it isn't. Also corrected the two stale comments that called the
+area-weight layer "TRUE ~10km-perimeter" (they predate the measured layer being wired into the app).
+`platform/rayong-catchment.html` +25/−12.
+
+**Verification:** determinism gate `bash tests/run.sh check` → **121 passed · 0 failed**
+(`node --check inline JS of rayong-catchment.html` PASS; validate_data 544/544). A deterministic
+execution test of the REAL `branchPop()` against committed data confirmed all three paths: CPOP
+present → measured value, meas=true (WorldPop tag); CPOP absent → estimated fallback, meas=false
+(EST·NSO tag, no crash); both absent → district NSO. Single caller (`updatePanels`) reads only
+`.v/.scope/.meas`, all provided. The headless GL render of this heaviest 3,631-building scene could
+not produce a frame under the sandbox's software WebGL (a documented render-harness limitation for
+this specific scene — no JS error captured; two escalating attempts simply returned empty), so
+behaviour was verified by the gate + the deterministic function test (a stronger guarantee of the
+exact rendered value than a screenshot), and the change mirrors the already-live `app.js` popup path.
+
+**Decision — branch-base correction:** the container's `origin/master` tracking ref was stale
+(`ee657c3`, a divergent line ~20 commits behind the true tip `f692def`); the first working branch was
+cut off it. Caught before any commit via a PROGRESS_LOG top-entry mismatch, then re-based the
+single-file change onto the fetched true `origin/master` and re-verified (gate green on the correct
+base). No stale history entered master.
+
+**Ship:** safeguard-gated — gate 0-failed, no secrets in diff, surgical single-file code diff, no
+`platform/data` file touched (no provenance regen; the measured figures are READ from committed
+`contested_pop.json`, nothing fabricated). Draft PR + safeguard-gated self-merge + deploy-verify.
+
 ## 2026-08-05 — UX loop (a11y): aria-label the impact-card delinquency ladder bar — merged + deployed + verified (PR #294)
 
 Autonomous safeguard-gated UX run. Reviewed `live.html` and the `#home` command center end-to-end
