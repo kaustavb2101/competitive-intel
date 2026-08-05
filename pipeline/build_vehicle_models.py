@@ -211,9 +211,15 @@ def _read_annual():
 
     Used for the year table because they are complete by construction: the monthly files are missing
     2023-12 from this mirror, so summing months would understate 2023 and invent a fall that did not
-    happen. Returns {ce_year: Counter(class -> units)} plus the nameplate split.
+    happen. Returns ({ce_year: Counter(class -> units)}, {ce_year: {kind: Counter(plate -> units)}}).
+
+    The per-nameplate tally is taken from these same yearly files for the same reason the class
+    table is: a nameplate history summed from months would carry the 2023-12 hole into every model's
+    2023 figure, and a reader comparing nameplates across years would be reading our gap, not the
+    market's.
     """
     out = collections.defaultdict(lambda: collections.Counter())
+    plates = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
     for path in sorted(glob.glob(os.path.join(SRC, "*_ปี_25*.csv"))):
         with io.open(path, encoding="utf-8-sig", newline="") as fh:
             rdr = csv.DictReader(fh)
@@ -228,18 +234,22 @@ def _read_annual():
                 if n <= 0:
                     continue
                 cls = (r.get("ประเภทรถ") or "").strip()
-                joined = ((r.get("ยี่ห้อ") or "").strip().upper() + " "
-                          + (r.get("รุ่น") or "").strip().upper())
-                kind, _p = kind_of(joined)
+                brand, model = (r.get("ยี่ห้อ") or "").strip(), (r.get("รุ่น") or "").strip()
+                joined = brand.upper() + " " + model.upper()
+                kind, p = kind_of(joined)
                 c = out[y]
                 c["total"] += n
                 c["__cls__" + cls] += n
                 if cls in COLLATERAL_CLASSES and kind in ("pickup", "ppv"):
                     c["pu"] += n
                     c["pu_" + kind] += n
+                    plates[y][kind][p] += n
                 elif cls in COLLATERAL_CLASSES:
                     c["pa"] += n
-    return out
+                    # Cars have no curated plate list, so the nameplate is the de-duplicated
+                    # brand+model string — the same key plates_last12 already reports on.
+                    plates[y]["car"][_pa_plate(brand, model)] += n
+    return out, plates
 
 
 def _slope(series):
@@ -479,7 +489,7 @@ def build():
     # residual is named rather than left as a silent 2.1M gap. The motorcycle line is most of it.
     MOTO = ("รถจักรยานยนต์", "รถจักรยานยนต์สาธารณะ")
     TRACTOR = ("รถแทร็กเตอร์", "รถใช้ในงานเกษตรกรรม")
-    annual_raw = _read_annual()
+    annual_raw, annual_plates_raw = _read_annual()
     annual = []
     for y in sorted(annual_raw):
         c = annual_raw[y]
@@ -501,6 +511,28 @@ def build():
                               if k not in MOTO and k not in TRACTOR
                               and k not in COLLATERAL_CLASSES},
         })
+
+    # Per-nameplate volumes by year, 2022 onward — the longest nameplate history this source can
+    # support. It is a FLOW: how many of each model entered the road that year. DLT publishes a true
+    # registered STOCK (dataset_1_1_04, "จดทะเบียนสะสม") but only by class, province and fuel — it
+    # carries no brand or model column, so a "total parc by model" cannot be built from any source
+    # in this repo and is not attempted here.
+    TOP_N = 15                 # a full year has ~1,200 distinct car nameplate strings
+    plates_annual = {}
+    for y in sorted(annual_plates_raw):
+        by_kind = {}
+        for kind, ctr in sorted(annual_plates_raw[y].items()):
+            tot = sum(ctr.values())
+            # most_common ties resolve on insertion order, which follows the sorted-glob CSV row
+            # order, so this is stable across runs — the same property plates_last12 relies on.
+            by_kind[kind] = {
+                "units": tot,
+                "n_plates": len(ctr),
+                "top": [{"plate": p, "units": v,
+                         "share_pct": round(100.0 * v / tot, 2) if tot else None}
+                        for p, v in ctr.most_common(TOP_N)],
+            }
+        plates_annual[str(y)] = by_kind
 
     return {
         "meta": {
@@ -553,9 +585,18 @@ def build():
             "class_reconciliation": recon,
             "classes_excluded": {c: n for c, n in sorted(cls_units.items())
                                  if c not in COLLATERAL_CLASSES},
+            "plates_annual_basis": "Units of each nameplate FIRST REGISTERED in that calendar year, "
+                                   "read from the DLT yearly roll-up files (not summed from months, "
+                                   "so the missing 2023-12 month cannot distort a year). This is a "
+                                   "FLOW into the fleet, NOT a stock of what is on the road: a model "
+                                   "sold before 2022 is invisible here. No DLT dataset publishes "
+                                   "registered stock at brand or model grain, so the total parc by "
+                                   "nameplate cannot be built and is not shown. Top "
+                                   "15 nameplates per class per year; only complete years appear.",
         },
         "monthly": monthly,
         "annual": annual,
+        "plates_annual": plates_annual,
         "windows": windows,
         "plates_last12": plates,
     }

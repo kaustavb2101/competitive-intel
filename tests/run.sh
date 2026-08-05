@@ -354,13 +354,51 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_rival_universe.py --check (source-data/rival_universe.json absent)"
   else bad "build_rival_universe.py --check (rival_universe.json drifted from source-data/rival_universe.json + app_reviews.json — run: python3 pipeline/build_rival_universe.py)"
   fi
-  for ing in build_crop_margin build_drought_district build_province_lfs build_region_debt build_amphoe_crops build_tape_layers build_impact_cards build_income_impact build_scenarios build_commodities build_product_segments ingest_ocsb_cane build_thai_price_history build_farm_household build_debt_source build_crop_mix build_farm_book build_collateral_book build_macro_book; do
+  # Deterministic, network-free builders over COMMITTED inputs — source-data/ (now INCLUDING the
+  # committed source-data/staging/ aggregates, 21 tracked files) and, for the *_book layers, the
+  # committed platform/data layers they roll up. Each carries --check and byte-reproduces here (rc 0);
+  # rc 3 = an optional / owner-pulled input absent (SKIP, honest — not drift); any other code = the
+  # committed output drifted from its named source (FAIL — regenerate it). Driven from an explicit
+  # name|source table (not a bare-name loop) so each FAIL message points at the ACTUAL source rather
+  # than blanket-blaming source-data/staging/, and so a grep for "build_X.py --check" over this file
+  # finds every gated builder below (a bare loop hid these 19 from gate-coverage audits):
+  #   build_crop_margin.py --check   build_drought_district.py --check   build_province_lfs.py --check
+  #   build_region_debt.py --check   build_amphoe_crops.py --check       build_tape_layers.py --check
+  #   build_impact_cards.py --check  build_income_impact.py --check      build_scenarios.py --check
+  #   build_commodities.py --check   build_product_segments.py --check   ingest_ocsb_cane.py --check
+  #   build_thai_price_history.py --check  build_farm_household.py --check  build_debt_source.py --check
+  #   build_crop_mix.py --check      build_farm_book.py --check           build_collateral_book.py --check
+  #   build_macro_book.py --check
+  # NOTE: this is a `while read <<'HEREDOC'` (not a pipe), so it runs in the current shell and ok/bad
+  # keep incrementing pass/failc — same counter semantics as the bare `for` loop it replaced.
+  while IFS='|' read -r ing src; do
+    [ -z "$ing" ] && continue
     ( cd "$PIPE" && python3 "$ing.py" --check >/dev/null 2>&1 ); rc=$?
     if [ "$rc" -eq 0 ]; then ok "$ing.py --check"
-    elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (staging source absent — ingest wave, not data drift)"
-    else bad "$ing.py --check (output drifted from source-data/staging/ — run: python3 pipeline/$ing.py)"
+    elif [ "$rc" -eq 3 ]; then skip "$ing.py --check (an input absent — optional/owner-pulled source, not data drift)"
+    else bad "$ing.py --check ($ing output drifted from $src — run: python3 pipeline/$ing.py)"
     fi
-  done
+  done <<'INGESTS'
+build_crop_margin|source-data/farmgate_prices.json + staging/oae_crop_costs.json
+build_drought_district|source-data/staging/drought_district.json
+build_province_lfs|source-data/staging/nso_lfs.json
+build_region_debt|source-data/staging/bot_hhdebt.json
+build_amphoe_crops|source-data/staging/amphoe_crops_*.json + doae_amphoe_crops.json
+build_tape_layers|source-data/staging/real_tape_aggregates.json
+build_impact_cards|source-data/branches_final.json + commodity_board.json + employment_by_province.json
+build_income_impact|source-data/commodity_board.json + crop_prov_area.json + energy_prices.json
+build_scenarios|source-data/commodity_board.json
+build_commodities|source-data/commodity_board.json + crop_prov_area.json + doae_fruit_area.json
+build_product_segments|source-data/staging/ tape aggregates
+ingest_ocsb_cane|source-data/ocsb_cane.json + ocsb_canearea.csv
+build_thai_price_history|source-data/nabc_history.json + ocsb_cane.json
+build_farm_household|source-data/oae_household/*.csv
+build_debt_source|source-data/nso_debt_by_source.json
+build_crop_mix|source-data/crop_prov_area.json + ocsb_cane.json
+build_farm_book|platform/data book layers (tape_geo_occ/crop_mix/crop_stress/income_impact/crop_margin/napprang)
+build_collateral_book|source-data/staging/real_tape_aggregates.json
+build_macro_book|platform/data book layers (collateral_book/province_lfs/dbd_formation/region_debt/sfi_credit)
+INGESTS
   # macro_indicators projects COMMITTED Thai-official series (nesdc_gdp / tpso_cpi / bot_current_account /
   # bot_tourist_arrivals), so it byte-reproduces here; it was outside the gate, leaving the Macro-backdrop
   # layer (macro_indicators.json) unprotected against silent drift.
