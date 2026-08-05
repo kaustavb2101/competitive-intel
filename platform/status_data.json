@@ -2,14 +2,14 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-04T22:26:32+00:00",
-    "commit": "b6d566d"
+    "generated_at": "2026-08-05T04:23:39+00:00",
+    "commit": "df5a691"
   },
   "overall": {
     "progress_pct": 98,
     "status": "on-track",
     "eta_days": 0,
-    "eta_date": "2026-08-04",
+    "eta_date": "2026-08-05",
     "done_items": 49,
     "in_progress_items": 0,
     "open_items": 1,
@@ -532,6 +532,66 @@
   ],
   "activity": [
     {
+      "date": "2026-08-05T04:23:39+00:00",
+      "sha": "df5a691",
+      "summary": "health(deploy): site-health probe guards peer_scoreboard.json (last unprobed obj-#2 peer read on #acq)",
+      "pillar": "peer"
+    },
+    {
+      "date": "2026-08-05T02:43:00+00:00",
+      "sha": "d07293d",
+      "summary": "docs(progress): log ux-font-preconnect-gstatic merge+deploy+verify (PR #293)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T09:38:17+07:00",
+      "sha": "ddb0fc1",
+      "summary": "ux: preconnect fonts.gstatic.com so text paints without a handshake waterfall (#293)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T09:33:52+07:00",
+      "sha": "afc941d",
+      "summary": "chore(deck): rebuild EN + TH against the refreshed NABC and ThaiWater data (#292)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-05T09:09:42+07:00",
+      "sha": "ac8ba4b",
+      "summary": "data: ThaiWater flood + rain pulse (2026-08-04, run 30956707171) (#291)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-05T08:44:57+07:00",
+      "sha": "569d388",
+      "summary": "data: NABC live prices (2026-08-04, run 30953139408) (#290)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-05T00:38:22+00:00",
+      "sha": "9b8d310",
+      "summary": "test(gate): de-opaque the 19-builder run.sh loop — accurate per-source FAIL messages + grep-visibility",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T07:36:06+07:00",
+      "sha": "a4c0de2",
+      "summary": "MCOM deck rework + nameplate history + honest column names (#287)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-04T23:43:50+00:00",
+      "sha": "d991344",
+      "summary": "data: live fuel prices (2026-08-04, run 30960786178)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-04T22:28:32+00:00",
+      "sha": "ec962e6",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after rival_reputation site-health probe ship",
+      "pillar": "market"
+    },
+    {
       "date": "2026-08-04T22:26:32+00:00",
       "sha": "b6d566d",
       "summary": "feat(service): deploy site-health probe for rival_reputation.json (unprobed parent of the two threat layers)",
@@ -650,66 +710,6 @@
       "sha": "ba4a08b",
       "summary": "fix(provenance): branch popup shows MEASURED WorldPop pop, not the area-weight labelled \"measured\" (#282)",
       "pillar": "feature"
-    },
-    {
-      "date": "2026-08-04T02:23:54+00:00",
-      "sha": "9e80fe6",
-      "summary": "chore(dashboard): log ux-nav-active-pill-deeplink-fontreflow merge+deploy+verify (PR #283)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-04T09:22:06+07:00",
-      "sha": "cb75f4e",
-      "summary": "ux: re-scroll active nav pill on document.fonts.ready (deep-link font reflow) (#283)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-04T09:18:47+07:00",
-      "sha": "c833f13",
-      "summary": "data: ThaiWater flood + rain pulse (2026-08-03, run 30858844096) (#280)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-04T08:38:20+07:00",
-      "sha": "3a7dafe",
-      "summary": "data: NABC live prices (2026-08-03, run 30854958165) (#279)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-04T07:23:17+07:00",
-      "sha": "19204e9",
-      "summary": "MCOM 5 Aug — the Macro tab as an 18-slide house-style PPTX (#277)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T23:50:07+00:00",
-      "sha": "aa7f1a4",
-      "summary": "data: live fuel prices (2026-08-03, run 30863414479)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-03T22:22:45+00:00",
-      "sha": "0209e2e",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the vehicle_models.json site-health probe ship",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-03T22:22:01+00:00",
-      "sha": "e9c304e",
-      "summary": "health(deploy): site-health probe guards vehicle_models.json (Macro nameplate panel + collateral pickup verdict)",
-      "pillar": "service"
-    },
-    {
-      "date": "2026-08-03T20:24:11+00:00",
-      "sha": "28322c8",
-      "summary": "chore(log): record ux-live-pulse-tally-gap merge+deploy+verify",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-04T03:19:21+07:00",
-      "sha": "e7a2c45",
-      "summary": "ux: reconcile live.html pulse tally (add Reference bucket) (#278)",
-      "pillar": "uxui"
     }
   ]
 }
