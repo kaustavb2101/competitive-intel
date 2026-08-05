@@ -118,6 +118,12 @@ than its key supplies. JSON cannot carry a comment, and a translation with no no
 chosen (ราคาที่เกษตรกรขายได้ for farm gate, วัดจริง / ประมาณการ for MEASURED / ESTIMATED) decays the first
 time someone else edits it.
 
+**One known cost of `word()`.** Spelling small counts out is what stops "the 3 crops" reading as an
+interpolated figure — but a spelled count is part of the catalogue KEY, not a `{}` argument. When a
+price pull moves the count ("eight of seventeen falling" → "seven"), that sentence becomes a new key
+and reports as untranslated. That is the harvest working, not a bug; budget two or three new entries
+per data refresh, and keep the old reading, because the count can move back.
+
 **`0 string(s) still English` plus `fit: no findings` is the pass condition.** `--harvest` writes
 every string with no entry, so the gap is a file rather than a hunt. Fit matters more here than in
 English: Kanit sets Thai at different widths, so a table header or a callout that fitted in English

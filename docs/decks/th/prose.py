@@ -12,6 +12,27 @@ point of the chip is that a reader can tell the two apart at a glance, in either
 """
 
 STRINGS = {
+    # ------------------------------------------------------ counts the build spells out in words
+    # word() spells small counts ("eight of seventeen") so a reader cannot mistake them for an
+    # interpolated figure. The cost lands here: a spelled count is part of the catalogue KEY, not a
+    # {} argument, so when the data moves the count the string is a new key and reports as
+    # untranslated. That is the harvest doing its job, not a bug — but it means a price pull can
+    # add two or three entries. Both readings are kept, because the count can move back.
+    "Not on the world index — the farm gate (ราคาที่เกษตรกรขายได้) says otherwise.\n• Seven of "
+    "seventeen Thai farm-gate prices are falling year on year.\n• Beef: farm gate {} vs world index "
+    "{}.\n• Margin over price: a {} price move becomes an {} swing in crop income.":
+        "ไม่ใช่ถ้าดูดัชนีโลก — แต่ราคาหน้าฟาร์ม (ราคาที่เกษตรกรขายได้) บอกคนละเรื่อง\n"
+        "• ราคาหน้าฟาร์มไทยเจ็ดจากสิบเจ็ดรายการลดลงเมื่อเทียบกับปีก่อน\n"
+        "• เนื้อวัว: หน้าฟาร์ม {} เทียบดัชนีโลก {}\n"
+        "• ส่วนต่างสำคัญกว่าราคา: ราคาขยับ {} กลายเป็นรายได้เกษตรเหวี่ยง {}",
+    "Seventeen of the {} commodities we track have a measured Thai farm-gate price "
+    "(ราคาที่เกษตรกรขายได้). Seven are falling year on year.":
+        "สินค้าเกษตร 17 จากทั้งหมด {} รายการที่เราติดตาม มีราคาหน้าฟาร์มไทยที่วัดได้จริง "
+        "(ราคาที่เกษตรกรขายได้) และเจ็ดรายการกำลังลดลงเมื่อเทียบกับปีก่อน",
+    "Year on year and six months disagree on direction for four of them. A single annual number can "
+    "point the wrong way.":
+        "สี่รายการมีทิศทางไม่ตรงกันระหว่างเทียบปีก่อนกับหกเดือน ตัวเลขรายปีเพียงตัวเดียวจึงอาจชี้ผิดทางได้",
+
     # ---------------------------------------------------------------- 02 the answer
     "No — stable, not strong.\n• GDP {}, CPI {} — both above the IMF's {} forecast. Policy rate "
     "{}.\n• Slowest growth in ASEAN{}: Thailand {} vs Vietnam {}.\n• Government debt {} of GDP vs "
