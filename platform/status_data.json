@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-05T04:23:39+00:00",
-    "commit": "df5a691"
+    "generated_at": "2026-08-05T17:56:31+07:00",
+    "commit": "1b82e2f"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-05T17:56:31+07:00",
+      "sha": "1b82e2f",
+      "summary": "market(3d): headline the MEASURED WorldPop catchment population, not the area-weight estimate (#295)",
+      "pillar": "3d-enrichment"
+    },
+    {
+      "date": "2026-08-05T08:30:30+00:00",
+      "sha": "f692def",
+      "summary": "docs(progress): log ux-impact-ladder-bar-aria merge+deploy+verify (PR #294)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T15:25:44+07:00",
+      "sha": "8076c0b",
+      "summary": "ux: aria-label the impact-card delinquency ladder bar (a11y) (#294)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T06:35:22+00:00",
+      "sha": "dc3fec5",
+      "summary": "test(gate): cover build_baac_credit.py — the one deterministic builder missing from the determinism gate",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-05T04:26:46+00:00",
+      "sha": "7706efb",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_scoreboard site-health probe ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-05T04:23:39+00:00",
       "sha": "df5a691",
       "summary": "health(deploy): site-health probe guards peer_scoreboard.json (last unprobed obj-#2 peer read on #acq)",
@@ -679,36 +709,6 @@
       "date": "2026-08-04T06:35:14+00:00",
       "sha": "476b49c",
       "summary": "fix(provenance): contested_pop stops claiming pop10 matches branch_population.json (it doesn't)",
-      "pillar": "feature"
-    },
-    {
-      "date": "2026-08-04T04:19:45+00:00",
-      "sha": "0e56789",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after the rival_threat site-health probe ship",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-04T04:17:33+00:00",
-      "sha": "c18774c",
-      "summary": "health(deploy): site-health probe guards rival_threat.json (#acq rival threat matrix)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-04T10:11:47+07:00",
-      "sha": "9b0ff7e",
-      "summary": "fix(deck): compute the numbers the prose was quoting, so a price pull cannot strand them (#284)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-04T09:51:43+07:00",
-      "sha": "e7189b5",
-      "summary": "data: macro indicators (2026-08-03) (#281)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-04T09:40:12+07:00",
-      "sha": "ba4a08b",
-      "summary": "fix(provenance): branch popup shows MEASURED WorldPop pop, not the area-weight labelled \"measured\" (#282)",
       "pillar": "feature"
     }
   ]
