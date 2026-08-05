@@ -142,16 +142,16 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "16 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 16,
+    "note": "17 observations from 2026-07-05, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 17,
     "series": "fuel_diesel"
    },
    "key": "fuel_prices",
    "label": "Diesel · retail pump",
    "measured": true,
    "source": "Bangchak retail oil-price API (www.bangchak.co.th/api/oilprice) — daily Bangkok reference prices; free, no key, cloud-reachable (EPPO/PTT/data.go.th are geoblocked).",
-   "stamp": "2026-08-04",
-   "stamp_iso": "2026-08-04",
+   "stamp": "2026-08-05",
+   "stamp_iso": "2026-08-05",
    "stamp_kind": "pulled",
    "unit": "฿/L",
    "value": 36.69,
@@ -189,8 +189,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "12 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 12,
+    "note": "13 observations from 2026-07-10, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 13,
     "series": "rain_max_mm"
    },
    "key": "thaiwater_rain",
@@ -213,8 +213,8 @@
    "history": {
     "file": "feed_history.json",
     "kind": "accumulated",
-    "note": "12 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
-    "points": 12,
+    "note": "13 observations from 2026-07-11, accumulated here one pull at a time — the source itself publishes only today's value",
+    "points": 13,
     "series": "flood_high"
    },
    "key": "thaiwater_flood",
@@ -417,7 +417,7 @@
   "forecast_note": "IMF WEO years after 2025 are PROJECTIONS and are rendered distinctly from measured history.",
   "freshness_note": "Age is computed in the browser against the reader's clock, not baked in here — this layer is deterministic and --check-gated, so it carries no wall clock. Each feed's fresh/aging thresholds are relative to its OWN cadence.",
   "history_note": "A trend line is drawn only where a stored series exists. 7 of 20 feeds carry one; the rest are point-in-time pulls that overwrite on each run and say so.",
-  "history_points": 191,
+  "history_points": 194,
   "missing_files": [],
   "n_feeds": 20,
   "n_with_history": 7,
