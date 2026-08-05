@@ -6538,8 +6538,8 @@ function renderTrendBaseline(deltas){
   if(CSTRESS_LIST&&CSTRESS_LIST.length){
     const top=CSTRESS_LIST.slice(0,6);
     html+=`<h2 class="risk" style="margin-top:18px">Worst crop-household stress now ${TAG_E}</h2>`+
-      `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (World Bank global proxy) × drought × crop dependence.</p>`+
-      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY, global proxy">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
+      `<p class="lead">Agri-stress proxy (0–100) per province — crop-price direction (MEASURED Thai farm-gate · NABC/OAE) × drought × crop dependence.</p>`+
+      `<table class="tbl"><tr><th>#</th><th>Province</th><th>Region</th><th>Dominant crop</th><th title="planting-area-weighted crop-price YoY — MEASURED Thai farm-gate (NABC live / OAE); World Bank global proxy is fallback only, for unpriced crops (none in current vintage)">Price YoY</th><th>Agri-stress ▲</th><th>Trend</th></tr>`+
       top.map((w,i)=>{const sv=Math.round((w.agri_stress||0)*100); const sc=sv>=60?'var(--agri)':sv>=40?'var(--gold)':'var(--merch)';
         const crop=(w.crop_mix&&w.crop_mix[0]&&w.crop_mix[0].crop)||'—';
         return `<tr><td class="mono sub">${i+1}</td><td><b>${w.th}</b></td><td class="sub">${w.region||''}</td>`+
@@ -7179,7 +7179,7 @@ function cstressPopupHTML(d,sec,r){
   return sec('Crop-household stress — ESTIMATED triage')
     + r('Agri-stress (0–100) · est', `<span style="color:${sc}">▲ ${sv}</span>`, sc)
     + (dom?r('Dominant crop (OAE · measured)', `${dom.crop} ${Math.round((dom.share||0)*100)}%`, '#c7cedd'):'')
-    + r('Price YoY · WB global proxy', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
+    + r('Price YoY · Thai farm-gate (measured)', (p.price_stress>0?'+':'')+p.price_stress+'%', p.price_stress<0?'var(--agri)':'var(--merch)')
     + r('Rainfall % of normal · measured', (c.rain_pct_of_normal!=null?c.rain_pct_of_normal+'%':'n/a'), c.rain_pct_of_normal!=null&&c.rain_pct_of_normal<85?'var(--gold)':'var(--merch)');
 }
 // Household debt-to-income block for a branch popup — the MEASURED NSO SES province balance-sheet
