@@ -508,6 +508,45 @@ def _shape_rival_reputation(d):
     return None
 
 
+def _shape_peer_scoreboard(d):
+    # The listed-peer MARKET scoreboard (peer_scoreboard.json, obj #2, MEASURED) —
+    # SET market cap / valuation / ROE / net profit for the 3-4 listed title-lenders,
+    # with AutoX's 25% ROE TARGET as the reference line. The code itself calls it
+    # "the sharpest external benchmark we have", yet it was the last unprobed obj-#2
+    # peer read on the Competition surface. drawPeerScore GATES the whole board on a
+    # non-empty .peers array (else it silently drops to a calm "Listed-peer scoreboard
+    # not available" placeholder with NO phone alert), and per row renders p.name/
+    # p.symbol + p.market_cap_bn (the bold "Mkt cap" column) + p.roe (the ROE column,
+    # its bar, AND the readout's benchmark clause vs the 25% target). The readout leads
+    # with .headline and hangs its "would sit above / below" clause on .autox_roe_target.
+    # SET is Akamai-blocked from CI (owner-side refresh only), so this file cannot self-
+    # heal — a truncated/404 CDN deploy that guts it is exactly the "broken demo" blind
+    # spot the peer_province / competitor_coverage / rival_reputation probes close for
+    # the sibling competitive reads. Asserts render shape (the peers gate, the row name/
+    # symbol, a numeric market-cap column, a numeric ROE, the non-blank headline, and the
+    # numeric ROE reference line), not values — robust to a future SET price/quarter pull.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    peers = d.get("peers")
+    if not isinstance(peers, list) or len(peers) < 3:
+        return "missing/short 'peers' list (expected the listed title-lender rows)"
+    p0 = peers[0]
+    if not isinstance(p0, dict):
+        return "first peers row is not an object"
+    if not ((isinstance(p0.get("name"), str) and p0["name"].strip())
+            or (isinstance(p0.get("symbol"), str) and p0["symbol"].strip())):
+        return "first peers row missing 'name'/'symbol' (scoreboard row label render)"
+    if not any(isinstance(p, dict) and isinstance(p.get("market_cap_bn"), (int, float)) for p in peers):
+        return "no peer carries a numeric 'market_cap_bn' (the 'Mkt cap' column)"
+    if not any(isinstance(p, dict) and isinstance(p.get("roe"), (int, float)) for p in peers):
+        return "no peer carries a numeric 'roe' (the ROE column + bar + benchmark clause)"
+    if not (isinstance(d.get("headline"), str) and d["headline"].strip()):
+        return "missing/blank 'headline' (peer-scoreboard readout render read)"
+    if not isinstance(d.get("autox_roe_target"), (int, float)):
+        return "missing/non-numeric 'autox_roe_target' (the ROE reference line the readout benchmarks against)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -1235,6 +1274,18 @@ DATA_FILES = [
     # meta.national_standing) was the last unprobed piece of the Competition
     # surface, so a truncated deploy could blank it with no phone alert. Closes it.
     ("data/competitor_coverage.json", _shape_competitor_coverage, ".brands (big-4 found vs public expected) + meta.totals.found"),
+    # The listed-peer MARKET scoreboard (peer_scoreboard.json, obj #2, MEASURED) —
+    # SET market cap / valuation / ROE for the listed title-lenders with AutoX's 25%
+    # ROE target as the reference line, the code's own "sharpest external benchmark we
+    # have" and the last unprobed obj-#2 peer read on the Competition surface. Unlike
+    # its census siblings it CANNOT self-heal (SET is Akamai-blocked from CI, owner-side
+    # refresh only), so a truncated/404 CDN deploy that guts it silently drops the board
+    # to a calm "not available" placeholder with no phone alert. drawPeerScore gates on
+    # a non-empty .peers array, per row reading .name/.symbol + .market_cap_bn + .roe,
+    # and the readout leads with .headline and benchmarks against .autox_roe_target.
+    # Asserts render shape (the peers gate + row label + numeric mkt-cap/ROE columns +
+    # headline + the ROE reference line), not values — robust to a future SET pull.
+    ("data/peer_scoreboard.json", _shape_peer_scoreboard, ".peers (listed title-lenders) with market_cap_bn/roe + .headline + .autox_roe_target (#acq listed-peer scoreboard)"),
     # The district-grain competitive layer (obj #2) that sharpens the Competition
     # surface below province level: the "Top go-live districts (recent/total)"
     # go-live leaderboard + the provincial-capital clustering clause both render

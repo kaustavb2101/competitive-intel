@@ -3,6 +3,51 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-05 — Intelligence loop (SERVICE / PEER / DEPLOYMENT HEALTH): deploy site-health probe for `peer_scoreboard.json` — the last unprobed obj-#2 PEER read on the Competition surface — committed to master
+
+Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias
+**HTTP 200** on `/` and `/data/meta.json`; `build_provenance.py --check` reproduces byte-exact — 136 layers,
+75 measured · 61 estimated · 0 unlabelled; freshness clean, 0 layers >180d stale). The named planner backlog
+is exhausted at 98% with the one OPEN item owner-side, and the PEER pillar's per-province/per-brand comparison
+(`peer_province.json` — AutoX next to each big-4 rival per province, ratios, outnumbered districts, per-100k-veh
+density) is already deep and probed. So this run took the SERVICE pillar's mandate — audit the platform *as a
+service*, emit to `docs/SERVICE_AUDIT.md`, fix one concrete gap — and a render-path re-scan for the highest-value
+surfaced-but-unprobed `data/*.json` read surfaced a genuine structural blind spot rather than the next file in line.
+
+- **The gap:** `peer_scoreboard.json` (obj #2, MEASURED — the SET listed-peer market scoreboard: market cap /
+  valuation / ROE / net profit for the listed title-lenders, with AutoX's 25% ROE TARGET as the reference line)
+  was the **last unprobed obj-#2 PEER read on the Competition (#acq) surface** — every sibling (`peer_province`,
+  `competitor_coverage`, `rival_reputation`, `rival_threat[_region]`, `pico_district`) is already probed. Two
+  reasons it matters: (1) the render code itself calls it _"the sharpest external benchmark we have"_; (2) unlike
+  the census siblings it **cannot self-heal** — SET (`set.or.th`) is Akamai-blocked from CI (owner-side / Thai-IP
+  refresh only), so a truncated/404 CDN deploy that guts it has no CI job to re-pull it. `drawPeerScore` GATES the
+  whole board on a non-empty `.peers` array and silently drops to a calm _"Listed-peer scoreboard not available"_
+  placeholder with **no phone alert** — the "broken demo" blind spot the sibling competition probes already close.
+- **The fix (`pipeline/check_site_health.py` only):** added `_shape_peer_scoreboard` (fetch + parse + render-shape:
+  the `.peers` gate, a row `name`/`symbol` label, ≥1 numeric `market_cap_bn` [the bold "Mkt cap" column], ≥1 numeric
+  `roe` [the ROE column + bar + the readout's benchmark clause], a non-blank `headline`, and the numeric
+  `autox_roe_target` reference line the readout benchmarks against — **shape not values**, robust to a future SET
+  price/quarter pull) + its `DATA_FILES` registration in the Competition-cluster comment block.
+- **Safeguards (all pass):** (a) gate `bash tests/run.sh check` → **121 passed · 0 failed** (data integrity
+  455/455; the gate does not invoke `check_site_health.py`, so this probe-script-only change is outside its scope
+  by construction). (b) validator self-test: the real 2,360-byte payload accepted, **11 negatives** rejected
+  (non-dict / short-or-non-list `peers` / row-not-dict / row-missing-`name`&`symbol` / no-numeric-`market_cap_bn`
+  / no-numeric-`roe` / blank-`headline` / missing-or-non-numeric-`autox_roe_target`), symbol-only row still
+  accepted. (c) offline `--local platform` → **125/125 HEALTHY** with `peer_scoreboard.json` served + shape-sane
+  (probe coverage 37 → 38 exec layers, 122 → 125 checks). (d) no secrets in the diff (51 insertions, one file);
+  no `platform/data` file altered — probe-script-only, so no provenance regen and no PR/headless render needed.
+- **Ship:** probe-script-only, gate green → auto-commit to master (per the loop's safeguard mandate). No served-
+  asset change, so no visual/app regression risk; the site's rendered pages are untouched.
+- **Deploy-verify:** the live master production alias already serves `peer_scoreboard.json` **HTTP 200** (2,360
+  bytes, byte-matches local) — this change only adds a monitor over it; post-push `/` + the changed file re-checked
+  for 200 (the probe script is not itself a served asset).
+- **Next recommended intelligence task:** the remaining unprobed reads are all lower-value secondary/graceful-
+  degrading layers — `peer_npl.json` (the listed lenders' reported-NPL benchmark, obj #2/#1, next-highest peer
+  read) is the freshest candidate, then the rival-pulse promo/review boards and the province deep-dive fetches.
+  The probe-per-run pattern is nearing genuine exhaustion of the *load-bearing* reads; a future run should weigh a
+  self-maintaining probe-coverage assertion (surfaced-fetch set vs `DATA_FILES`) over adding secondary probes one
+  at a time.
+
 ## 2026-08-05 — UX loop: `ux-font-preconnect-gstatic` (perceived-load / font paint) — merged + deployed + verified
 - **Shipped** (branch `claude/ux-loop-20260805-0215`, squash-merged PR #293 → `ddb0fc1` on master): all 5 pages that load the Google Fonts stylesheet — `index.html`, `data.html`, `status.html`, `province.html`, `rayong-catchment.html` — fetch the IBM Plex Sans Thai + Mono font **files** from `fonts.gstatic.com`, but **no page preconnected to gstatic**: the 3 with a preconnect only warmed `fonts.googleapis.com` (the stylesheet host, not the font-file host), and `province`/`rayong-catchment` had no font preconnect at all. Without the gstatic preconnect the browser only opens the DNS+TLS connection to gstatic *after* the stylesheet arrives — a render-blocking waterfall that delays first text paint, and text (Thai script + mono numbers) is the entire content of this console, so a real perceived-load cost on Thai mobile. Added Google's own recommended pairing `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>` (crossorigin required — fonts are fetched with CORS) after the googleapis preconnect on all 5 pages, plus the googleapis preconnect on the 2 pages that lacked it. Head-only — no body/JS/CSS touched. `platform/{index,data,status,province,rayong-catchment}.html` (+7 lines total) + `docs/UXUI_AUDIT.md` (fix-log entry + 1 new backlog item).
 - **How it was found:** the seven named backlog priorities are all long-since fixed and the remaining open items are all bigger-than-surgical/device-tested, so this run reviewed the page `<head>`s directly and audited the font-loading resource-hint chain — the missing gstatic preconnect (Google's textbook first-paint optimisation) was the one clean surgical, headless-verifiable win.
