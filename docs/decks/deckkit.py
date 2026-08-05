@@ -26,6 +26,7 @@ render: its purpose is to catch text running out of its box before the file reac
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 from pptx import Presentation
@@ -216,7 +217,7 @@ class Deck:
 
     W, H = 13.3333, 7.5
 
-    def __init__(self):
+    def __init__(self, catalog=None):
         self.prs = Presentation()
         self.prs.slide_width = Inches(self.W)
         self.prs.slide_height = Inches(self.H)
@@ -224,6 +225,44 @@ class Deck:
         self.slides = []       # list of (pptx slide, [draw ops]) for the preview renderer
         self.findings = []     # overflow / fit complaints
         self.headings = []     # (eyebrow, title) per slide, so a review page needs no second list
+        self.catalog = catalog          # {normalised English -> translated template} or None
+        self.untranslated = {}          # normalised key -> a real example, for the harvest pass
+
+    # ---------------------------------------------------------- translation
+    # Every display string passes through _t() on its way into a shape. Translating here rather
+    # than in the build script means one deck definition and one set of numbers: the Thai deck is
+    # the same build, so a data refresh moves both languages and neither can drift from the other.
+    #
+    # Numbers are punched out of the key before lookup and pushed back into the translated template
+    # afterwards, so "Eight are falling year on year" and "Six are falling year on year" are one
+    # catalogue entry and a price pull cannot silently strand the Thai copy. Templates may reorder
+    # with {0}/{1} where Thai word order needs it.
+    # A leading -/+ is taken as part of the number. That is right for "−6.1%" and for the date
+    # "2026-08-02", but it means an English compound like "Pre-2022" hands the translator the token
+    # "-2022", which cannot be repositioned in a Thai sentence. Rather than special-case the regex
+    # (a letter-lookbehind also re-keys every vintage string), write such compounds out in full.
+    _NUM = re.compile(r"[-−+]?\d[\d,]*(?:\.\d+)?%?")
+
+    @classmethod
+    def tkey(cls, s):
+        return cls._NUM.sub("{}", s)
+
+    def _t(self, s):
+        if self.catalog is None or not isinstance(s, str) or not s.strip():
+            return s
+        k = self.tkey(s)
+        tpl = self.catalog.get(k)
+        if tpl is None:
+            self.untranslated.setdefault(k, s)
+            return s
+        nums = self._NUM.findall(s)
+        try:
+            return tpl.format(*nums)
+        except (IndexError, KeyError, ValueError):
+            # A template asking for more numbers than the string carries is a catalogue bug, not a
+            # reason to ship a half-formatted sentence. Fail loud, keep the English.
+            self.findings.append(f"[catalog] template does not fit its string: {k[:60]!r}")
+            return s
 
     # ---------------------------------------------------------- primitives
     def new(self, ground=WHITE):
@@ -260,6 +299,7 @@ class Deck:
     def text(self, l, t, w, s, size=11, bold=False, color=NAVY, align="l", lh=None,
              h=None, anchor="t", space_after=0.0, name=""):
         """One text box. Returns the height it actually consumed, in inches."""
+        s = self._t(s)
         lh = lh or size * 1.32
         lines = TX.wrap(s, size, w, bold)
         need = (len(lines) * lh) / PT_IN
@@ -321,7 +361,7 @@ class Deck:
         self._ops.append(("pic", l, t, w, h, str(path)))
 
     def notes(self, s):
-        self._s.notes_slide.notes_text_frame.text = s
+        self._s.notes_slide.notes_text_frame.text = self._t(s)
 
     # ---------------------------------------------------------- furniture
     def cover(self, title, sub, kicker):
@@ -355,7 +395,9 @@ class Deck:
         self.pic(ASSETS / "autox.png", 11.63, 0.28, 1.03, 0.32)
         self.rect(0.45, 1.06, 12.43, 0.022, NAVY)
         self.rect(0, 7.38, self.W, 0.12, RED)
-        self.text(0.45, 7.16, 7.00, FOOTER, size=8, color=GREY)
+        # 7.21, not 7.16: three slides' last line was landing on the caption. It still clears the
+        # red bar, and the extra 0.05in is the difference between crowded and collided.
+        self.text(0.45, 7.21, 7.00, FOOTER, size=8, color=GREY)
         return 1.26
 
     # ---------------------------------------------------------- components
@@ -392,8 +434,10 @@ class Deck:
         col = {"info": NAVY, "warn": "9A7411", "risk": RED}[tone]
         bar = {"info": NAVY, "warn": GOLD, "risk": RED}[tone]
         inner = w - 0.36
-        hh = (len(TX.wrap(head, 9.5, inner, True)) * 12.5) / PT_IN
-        bh = (len(TX.wrap(body, size, inner)) * size * 1.34) / PT_IN
+        # size the tint block against the text that will actually sit in it: a translation that
+        # wraps to one more line than its English source would otherwise spill out of the block
+        hh = (len(TX.wrap(self._t(head), 9.5, inner, True)) * 12.5) / PT_IN
+        bh = (len(TX.wrap(self._t(body), size, inner)) * size * 1.34) / PT_IN
         h = 0.16 + hh + 0.05 + bh + 0.16
         self.rect(l, t, w, h, tint)
         self.rect(l, t, 0.055, h, bar)
@@ -449,7 +493,7 @@ class Deck:
             p = tf.paragraphs[0]
             p.alignment = {"l": PP_ALIGN.LEFT, "c": PP_ALIGN.CENTER, "r": PP_ALIGN.RIGHT}[align]
             r = p.add_run()
-            r.text = txt
+            r.text = self._t(txt)
             r.font.name = "Kanit"
             r.font.size = Pt(sz)
             r.font.bold = bold
@@ -458,20 +502,30 @@ class Deck:
         colw_in = [w * c / total for c in colw]
         for c, htxt in enumerate(header):
             style(tbl.cell(0, c), htxt, hsize, True, WHITE, NAVY2, aligns[c])
-            if TX.width_in(htxt, hsize, True) > colw_in[c] - 0.12:
-                self.findings.append(f"[table hdr '{htxt}'] wider than its {colw_in[c]:.2f}in column")
+            # measure the string that actually lands in the cell, not its English source
+            hw = TX.width_in(self._t(htxt), hsize, True)
+            if hw > colw_in[c] - 0.12:
+                self.findings.append(f"[table hdr '{htxt}'] {hw:.2f}in at {hsize}pt, wider than "
+                                     f"its {colw_in[c]:.2f}in column")
+        shown = []                       # what the cells actually say, for measuring and previewing
         for ri, row in enumerate(rows):
             fill = WHITE if ri % 2 == 0 else BAND
+            srow = []
             for ci, cellv in enumerate(row):
                 txt, bold, color = cellv if isinstance(cellv, tuple) else (cellv, False, NAVY)
                 if cellcolors and (ri, ci) in cellcolors:
                     color = cellcolors[(ri, ci)]
                 style(tbl.cell(ri + 1, ci), txt, size, bold, color, fill, aligns[ci])
-                if TX.width_in(txt, size, bold) > colw_in[ci] - 0.12:
+                stxt = self._t(txt)
+                srow.append((stxt, bold, color) if isinstance(cellv, tuple) else stxt)
+                if TX.width_in(stxt, size, bold) > colw_in[ci] - 0.12:
                     self.findings.append(
-                        f"[table r{ri}c{ci} '{txt[:26]}'] wider than its {colw_in[ci]:.2f}in column")
-        self._ops.append(("table", l, t, w, hh + rh * len(rows), header, rows, colw_in, size,
-                          hsize, rh, hh, aligns))
+                        f"[table r{ri}c{ci} '{stxt[:26]}'] wider than its {colw_in[ci]:.2f}in column")
+            shown.append(srow)
+        # the preview must render what the deck says, not its English source — otherwise the
+        # thumbnail of a translated deck silently reassures you about text nobody will ever see
+        self._ops.append(("table", l, t, w, hh + rh * len(rows), [self._t(h) for h in header],
+                          shown, colw_in, size, hsize, rh, hh, aligns))
         return hh + rh * len(rows)
 
     # ---------------------------------------------------------- charts
@@ -554,6 +608,39 @@ class Deck:
             lx += tw
         return ly + size * 1.45 / PT_IN - t
 
+    def sparkline(self, l, t, w, h, pts, color=NAVY, pad=0.05):
+        """A shape-only trend line: no axis, no labels, no legend.
+
+        linechart() above is the wrong tool at this size — it reserves 0.42in for value labels and
+        prints the series min and max, which at a 2in width turns a rice price of ฿17,440/tonne into
+        an unreadable smear across the plot. A sparkline answers one question, "which way and how
+        steadily", and the numbers that go with it belong in the text beside it. Each line is scaled
+        to its OWN range, so shape is comparable across crops even when levels are not.
+        """
+        self.rect(l, t, w, h, "FBFCFE", line=LINE)
+        ys = [v for _, v in pts]
+        lo, hi = min(ys), max(ys)
+        span = (hi - lo) or 1.0
+        px0, py0 = l + pad, t + pad
+        pw, ph = w - 2 * pad, h - 2 * pad
+        n = len(pts)
+        sx = lambda i: px0 + (i / (n - 1)) * pw if n > 1 else px0 + pw / 2
+        sy = lambda v: py0 + ph - (v - lo) / span * ph
+        if n > 1:
+            fb = self._s.shapes.build_freeform(Inches(sx(0)), Inches(sy(ys[0])))
+            fb.add_line_segments([(Inches(sx(i)), Inches(sy(v)))
+                                  for i, v in enumerate(ys)][1:], close=False)
+            sh = fb.convert_to_shape()
+            sh.fill.background()
+            sh.line.color.rgb = rgb(color)
+            sh.line.width = Pt(1.6)
+            sh.shadow.inherit = False
+        # The endpoint is the reading everyone actually takes off a sparkline, so mark it.
+        r = 0.045
+        self.rect(sx(n - 1) - r, sy(ys[-1]) - r, 2 * r, 2 * r, color, radius=r)
+        self._ops.append(("poly", [(sx(i), sy(v)) for i, v in enumerate(ys)], color))
+        return h
+
     def bars(self, l, t, w, h, items, color=RED, dim=LINE, fmt=lambda v: f"{v:,.0f}"):
         """Vertical bars with the value written on top. items: [(label, value, highlight)]."""
         self.rect(l, t, w, h, "FBFCFE", line=LINE)
@@ -572,6 +659,41 @@ class Deck:
         return h
 
     # ---------------------------------------------------------- output
+    def fit_vertical(self, limit=7.30):
+        """Report any content shape whose BOTTOM edge runs past the footer.
+
+        The text fit check above is horizontal only — it asks whether a string fits the box it was
+        given, never where that box ended up. A slide can therefore pass with "no findings" and
+        still print its last callout underneath the red footer bar, which is what happened to the
+        conditions slide on 2026-08-04: its author measured the y-cursor BEFORE the trailing callout
+        and never added the callout's own height. Walk the real python-pptx geometry instead of the
+        preview ops, so every primitive is covered whether or not it draws in the preview.
+
+        Full-bleed grounds and the footer furniture itself sit below the limit by design and are
+        excluded by shape, not by name.
+
+        The floor is not one line. The confidentiality caption occupies x 0.45-7.45 from y=7.16, so
+        anything overlapping that column has to stop higher than content in the clear right-hand
+        third — a distinction the Thai build found, where a source row wrapping to one extra line
+        landed on top of the caption while still clearing 7.30."""
+        EMU = 914400.0
+        CAP_L, CAP_R, CAP_T = 0.45, 7.45, 7.19       # the confidentiality caption's own footprint
+        for i, (s, _ops) in enumerate(self.slides, 1):
+            worst = None
+            for sh in s.shapes:
+                t, h = sh.top / EMU, (sh.height or 0) / EMU
+                l, w = sh.left / EMU, (sh.width or 0) / EMU
+                if h > 7.0 or t >= 7.10:            # the ground rect and the footer strip/caption
+                    continue
+                floor = CAP_T if (l < CAP_R and l + w > CAP_L) else limit
+                if t + h > floor and (worst is None or t + h - floor > worst[0] - worst[2]):
+                    worst = (t + h, getattr(sh, "text", "") or "", floor)
+            if worst:
+                head = self.headings[i - 1][1] if i <= len(self.headings) else f"slide {i}"
+                self.findings.append(
+                    f"[slide {i} '{head[:30]}'] content reaches y={worst[0]:.2f}in, past the "
+                    f"{worst[2]:.2f}in floor — {(worst[1] or '(no text)')[:44]!r}")
+
     def save(self, path):
         self.prs.save(str(path))
 

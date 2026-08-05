@@ -4,9 +4,12 @@
 
 ```bash
 python docs/decks/build_mcom_macro_pptx.py              # -> mcom-2026-08-05-macro.pptx
+python docs/decks/build_mcom_macro_pptx.py --lang th    # -> mcom-2026-08-05-macro-TH.pptx
 python docs/decks/build_mcom_macro_pptx.py --preview    # + preview/slideNN.png thumbnails
 python docs/decks/build_mcom_macro_pptx.py --review     # + mcom-review.html, the sign-off page
 ```
+
+Both .pptx files are committed, so they can be downloaded without running anything.
 
 Deterministic, network-free, and every figure is read out of `platform/data/` at build time — no
 transcribed numbers — so a rebuild after a data refresh picks the new vintage up. Layers read:
@@ -90,6 +93,44 @@ never appear (สิงห์บุรี did). The lead crop comes from the ful
 The crop signal trips in **70 of 77 provinces**, so the slide says out loud that it is context rather
 than a discriminator; debt, unemployment and rain do the separating.
 
+### The Thai deck is the same build, not a second deck
+
+`--lang th` runs the **same `build()`** with a translation catalogue attached, so both languages read
+the same data on the same day and a price pull moves both. A separate Thai script would be a second
+copy of every number, and the copy would be wrong within a week.
+
+Every display string passes through `Deck._t()`. The catalogue key is the English string with each
+number punched out to `{}` (`Deck.tkey`), so one entry covers every vintage: `"GDP {}, CPI {}"` is one
+key whatever the quarter says. A template consumes those numbers in order, or reorders them with
+`{0}`/`{1}` where Thai word order differs — slide 13's "33 pts below its 2015 base" has to become
+"below its 2015 base by 33 pts", which is `{9}` then `{8}`.
+
+```bash
+python docs/decks/th/build_catalog.py            # th/*.py  -> mcom_th.json
+python docs/decks/th/build_catalog.py --check    # verify the json matches its sources
+python docs/decks/build_mcom_macro_pptx.py --lang th --harvest /tmp/left.json
+```
+
+The catalogue source is four commented `.py` files under `th/` — `labels`, `headings`, `prose`,
+`misc` — merged into `mcom_th.json` by `build_catalog.py`, which rejects a duplicate key, an empty
+translation, a key that still carries a literal number, and a template asking for more placeholders
+than its key supplies. JSON cannot carry a comment, and a translation with no note on why a term was
+chosen (ราคาที่เกษตรกรขายได้ for farm gate, วัดจริง / ประมาณการ for MEASURED / ESTIMATED) decays the first
+time someone else edits it.
+
+**`0 string(s) still English` plus `fit: no findings` is the pass condition.** `--harvest` writes
+every string with no entry, so the gap is a file rather than a hunt. Fit matters more here than in
+English: Kanit sets Thai at different widths, so a table header or a callout that fitted in English
+can wrap to an extra line and land on the footer.
+
+Four bugs the Thai build found in the English one, all now fixed: the preview renderer drew table
+text from the untranslated source (so a translated deck's thumbnails silently reassured you about
+text nobody would see); `callout()` sized its tint block from the untranslated string, so a longer
+translation spilled out of the box; `Deck._NUM` read the compound "Pre-2022" as the number −2022,
+which no Thai sentence can reposition — the English now spells it out; and the vertical fit check
+used a single 7.30in floor when the confidentiality caption actually starts at 7.21in across the left
+seven inches, which was hiding a genuine collision on **the English slides 07 and 16 too**.
+
 ### Why python-pptx and not the html2pptx workflow
 
 Kanit is the house font — confirmed by reading the run properties of the LTV decks, not assumed — and
@@ -137,6 +178,13 @@ reproducible on any machine rather than silently degrading to "unchecked". Kanit
 - `mcom-review.html` — the reviewable page: one card per slide, PNG plus the speaker note. Written
   by `--review` (`Deck.review()` in deckkit); gitignored, since it inlines every slide as base64 and
   runs to ~3MB. Do not hand-edit it — the previous hand-written copy is exactly how it went stale.
+- `mcom_th.json` — the generated Thai catalogue, 506 strings. Build artefact; edit `th/*.py`.
+- `th/labels.py`, `th/headings.py`, `th/prose.py`, `th/misc.py` — the catalogue source, split by kind
+  of string so the notes stay next to what they explain. `misc.py` also holds the pass-throughs:
+  province names arrive from the pipeline already in Thai, but they still need an entry, because a
+  string with no entry is reported as untranslated and "0 untranslated" is the only signal that
+  nothing was missed.
+- `th/build_catalog.py` — merges and validates those four into `mcom_th.json`.
 - `mcom-2026-08-05-macro.html` — the earlier HTML version of the same deck. **Superseded**: its
   commodity slide predates the measured Thai farm-gate layer that landed 2026-08-02 and is annotated
   to that effect. The .pptx is the deliverable.
