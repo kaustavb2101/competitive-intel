@@ -3,6 +3,61 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-05 — Integration loop (GATE COVERAGE): gate the objective-#1 `build_baac_credit.py` builder — the one deterministic pipeline builder missing from the determinism gate — committed to master
+
+Autonomous integration run. Two independent sweeps (mine + a `negative-space` agent) converged on the
+same conclusion the last several entries have been circling: **the CI-doable, offline-deterministic
+data-integration backlog is genuinely exhausted.** Verified this run, not assumed:
+- The named integration backlog is shipped — FPO PICO census, per-branch `branch_cropland` (built, gated,
+  surfaced, honestly labelled), and the data.go.th distillations (`dbd_formation`, `debt_source`,
+  `household_risk`) are all live. GISTDA 40m crop (backlog #4) stays blocked — `GISTDA_SPHERE_KEY` is not
+  in the CI env (re-checked: no env var, no `.env`).
+- **Every** `platform/data/*.json` has a consumer (literal `fetch`, `tmliFetch(stem)`, or a
+  dynamically-built `data/<slug>_*.json` basemap path — the naive `grep '<file>.json'` false-positives
+  that a prior negative-space pass tripped on are all dynamic loads, verified). No built-but-unwired
+  layer remains. `provenance.json`: 0 unlabelled, 0 stale >180d, 75 measured / 61 estimated.
+- The one genuinely-open high-value integration — BAAC per-province agri/rural credit penetration
+  (objective #1: an inverse proxy for unmet title-loan demand) — is **owner-side/Thai-IP blocked**: its
+  only input `source-data/datagoth/baac_credit.xlsx` is a `pull_datagoth` (`baac02_2567`) pull off the
+  data.go.th aggregator, which is 403 from CI and has no department-CKAN bypass. Not a CI task.
+- The heavy remaining named item (GISTDA repeated-flood **area** dissolve, NEXT_STEPS #0) was ruled out
+  for a single run: a nationwide shapely `unary_union` over the overlapping per-event polygons (Sukhothai
+  alone returns 202,744) is a multi-hour geometry job with a non-deterministic network input, which
+  NEXT_STEPS itself defers to "a later pass." GISTDA's ArcGIS *is* reachable (HTTP 200), so this stays a
+  clean future data-job — it just isn't well-scoped to one autonomous run.
+
+**Rather than a treadmill probe commit, an integrity-gate audit surfaced a real coverage hole.** A diff of
+every `--check`-capable `pipeline/*.py` against everything `tests/run.sh` references (the `for ing in …`
+loop included, post the 2026-08-05 de-opaque) found that **`build_baac_credit.py` is the one deterministic,
+committed-source-projecting builder absent from the gate entirely.** Its own docstring declares it "Carries
+`--check`; SKIP-passes (exit 3) … same convention as `build_dbd_formation` / `build_pico_census`" — but
+where its sibling `build_dbd_formation` has a proper rc-based gate entry (run.sh:139), BAAC's was never
+added. The consequence is not cosmetic: the moment the owner runs the Thai-IP pull and builds
+`baac_credit.json`, any later drift of that output from `source-data/datagoth/baac_credit.xlsx` (a re-pull,
+or an edit to the builder) would go **undetected** — uniquely among the pipeline's deterministic builders.
+This is the "blocked and forgotten" builder made safe: gated now (SKIP, input absent in CI), byte-exact
+drift-checked automatically the instant it is populated.
+
+- **The fix (`tests/run.sh` only):** one rc-based gate block for `build_baac_credit.py --check`, inserted
+  directly after its closest sibling `build_dbd_formation` (both are `pull_datagoth`/data.go.th builders),
+  mirroring the established OK/SKIP(rc=3)/BAD pattern verbatim — `bad` names the exact drift source
+  (`baac_credit.json drifted from source-data/datagoth/baac_credit.xlsx`), so a future failure points at
+  the right file rather than a shared wrong one.
+- **Safeguards (all pass):** gate `bash tests/run.sh check` → **121 passed · 0 failed** (data-integrity
+  455/455); `build_baac_credit.py --check` registers as **SKIP** (input absent in CI, exit 3) — it does
+  not inflate the pass count, identical to how `build_dbd_formation` behaves today. Test-config only: no
+  `platform/data` file touched (so no `build_provenance.py` regen required), no app/HTML/JS change (so no
+  visual/render risk), no secrets in the diff.
+- **Ship:** test-harness-only, gate green, mirrors a proven pattern exactly, fully confident → auto-commit
+  to master (consistent with the prior gate-hardening commit `9b8d310`, "de-opaque the 19-builder run.sh
+  loop", which likewise shipped straight to master).
+- **Next recommended integration:** the CI-doable, offline-deterministic class is exhausted — the honest
+  remaining unlocks are all owner-side/Thai-IP (BAAC agri-credit pull; a fresh loan-tape vintage) or wait
+  on upstream publishing newer data (DLT frozen at 2026-02-28). The one big CI-reachable *data* job left is
+  the GISTDA flood-area geometry dissolve (network + heavy shapely), which wants its own dedicated run, not
+  an autonomous single-improvement slot. Future autonomous runs should keep favouring audit-surfaced
+  integrity/honesty hardening over probe-per-file treadmill commits until an owner-side unlock lands.
+
 ## 2026-08-05 — Intelligence loop (SERVICE / PEER / DEPLOYMENT HEALTH): deploy site-health probe for `peer_scoreboard.json` — the last unprobed obj-#2 PEER read on the Competition surface — committed to master
 
 Autonomous market & service intelligence run. Deploy re-verified green up front (master production alias

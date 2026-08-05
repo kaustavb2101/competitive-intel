@@ -141,6 +141,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_dbd_formation.py --check (source-data/datagoth/dbd_newco.csv absent — re-pullable pull_datagoth input, not committed)"
   else bad "build_dbd_formation.py --check (dbd_formation.json drifted from source-data/datagoth/dbd_newco.csv)"
   fi
+  ( cd "$PIPE" && python3 build_baac_credit.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_baac_credit.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_baac_credit.py --check (source-data/datagoth/baac_credit.xlsx absent — Thai-IP pull_datagoth input, not committed)"
+  else bad "build_baac_credit.py --check (baac_credit.json drifted from source-data/datagoth/baac_credit.xlsx)"
+  fi
   ( cd "$PIPE" && python3 build_occupation_income_individual.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_occupation_income_individual.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_occupation_income_individual.py --check (ilostat_labour.json or household_income_by_province.json absent — not data drift)"
