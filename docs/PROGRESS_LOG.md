@@ -3,6 +3,28 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-05 — UX loop (a11y): aria-label the impact-card delinquency ladder bar — merged + deployed + verified (PR #294)
+
+Autonomous safeguard-gated UX run. Reviewed `live.html` and the `#home` command center end-to-end
+(both already exhaustively polished; no confirmed regression — the mobile pulse-card "clipping" in a
+390px headless shot was a harness artifact, the layout viewport floors at 500px, `scrollWidth ==
+clientWidth`, no real overflow). Picked the one genuine, fully-verifiable a11y gap: the impact cards'
+whole-book **delinquency ladder bar** (`icLadder` in `app.js`, on the `#home` province/branch drill
+tables + the Assistance/Exposure/Competition strips) carried its Current/X/30–89/90–179/180+ split
+ONLY in a `title` on a bare `<span>` — a hover tooltip, not a reliable accessible NAME — so it was
+silent to screen readers, and the 30–89 + 180+ buckets aren't in any adjacent numeric column.
+Aligned it to the app's OTHER proportion bar (`rz-bar`, already `role="img"` + `aria-label`): factored
+the split into a shared `desc` feeding both the unchanged `title` and a new
+`role="img" aria-label="Delinquency ladder — <desc>"`. WCAG 1.1.1 / 4.1.2. `platform/app.js` +5/−1.
+
+**Safeguards (all passed):** `tests/run.sh check` 121-passed/0-failed (baseline + post-fix);
+headless `#home` render byte-identical to baseline PNG (zero visual change), `data-errors=[]`, all 5
+`.ic-lad` bars carry the new `aria-label`, `title` preserved; no secrets; surgical 2-file diff.
+**Merge+deploy+verify:** squash-merged #294 → master `8076c0b`; after ~90s the production alias
+`competitive-intel-git-master-…vercel.app` returned root **200** and the deployed `app.js` served the
+`aria-label` (fresh cache, age 1s). No rollback needed. (Vercel `/index.html` → `/` is a 308
+`cleanUrls` canonical redirect resolving to 200, not a regression.)
+
 ## 2026-08-05 — Integration loop (GATE COVERAGE): gate the objective-#1 `build_baac_credit.py` builder — the one deterministic pipeline builder missing from the determinism gate — committed to master
 
 Autonomous integration run. Two independent sweeps (mine + a `negative-space` agent) converged on the
