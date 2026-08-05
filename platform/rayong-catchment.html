@@ -659,10 +659,12 @@ function _normNat(b){const k=b.k10||{};
     gold:(b.gold!=null?b.gold:(k.gold!=null?k.gold:null)),
     pop:(b.pop!=null?b.pop:null),
     k10:b.k10||null};}
-// population for a focal branch's catchment. PREFER the true ~10km-perimeter figure
-// (branch_population.json, area-weighted district pop — index-aligned to branches.json/NATBRANCHES).
-// Fall back to the branch's DISTRICT population (branches.json `pop`, MEASURED NSO) if the perimeter
-// layer isn't built. Returns {v:number, scope:'10km'|'district'} or null.
+// population for a focal branch's catchment. PREFER the MEASURED WorldPop-2020 raster count of the
+// 10km catchment population (contested_pop.json rows[i][0]) — the SAME measured figure the app.js
+// branch popup shows. Fall back to the ESTIMATED area-weight layer (branch_population.json .values[i],
+// meta.measured:false) when the raster count is unavailable, then to the branch's DISTRICT population
+// (branches.json `pop`, MEASURED NSO). All index-aligned to branches.json/NATBRANCHES.
+// Returns {v:number, scope:'10km'|'district', meas:bool} or null.
 function branchPopIndex(f){
   const NB=window.NATBRANCHES; if(!NB||!NB.length)return -1;
   // _normNat branches ARE NATBRANCHES entries; curated ones aren't — match by nearest coordinate.
@@ -675,11 +677,16 @@ function branchPopIndex(f){
 function branchPop(f){
   if(!f)return null;
   const idx=branchPopIndex(f);
+  // MEASURED WorldPop-2020 raster count first (a true 10km catchment count, contested_pop.json
+  // rows[i][0]), matching the app.js popup; BRANCHPOP is only the ESTIMATED area-weight fallback
+  // (its meta.measured is false), then the branch's DISTRICT population (MEASURED NSO).
+  const CP=window.CPOP;
+  if(CP&&idx>=0&&idx<CP.length&&Array.isArray(CP[idx])&&CP[idx][0]>0)return {v:CP[idx][0],scope:'10km',meas:true};
   const BP=window.BRANCHPOP;
-  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km'};
-  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district'};
+  if(BP&&idx>=0&&BP[idx]>0)return {v:BP[idx],scope:'10km',meas:!!window.BRANCHPOP_MEAS};
+  if(f.pop!=null&&f.pop>0)return {v:f.pop,scope:'district',meas:true};
   const NB=window.NATBRANCHES;
-  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district'};
+  if(idx>=0&&NB&&NB[idx]&&NB[idx].pop>0)return {v:NB[idx].pop,scope:'district',meas:true};
   return null;
 }
 // BR = the interactive branch set: dropdown, dots, labels, 10km rings, fly-to focus.
@@ -2021,7 +2028,7 @@ function updatePanels(){
     // in the 10km perimeter (sum of every measured OSM POI count). Lead with the answer.
     const totalPOI=Object.keys(k).reduce((a,kk)=>a+(k[kk]||0),0);
     const pop=branchPop(focal);
-    const popMeas=(pop&&pop.scope==='10km'&&window.BRANCHPOP_MEAS);   // 10km figure from the WorldPop raster
+    const popMeas=(pop&&pop.scope==='10km'&&pop.meas);   // 10km figure from the MEASURED WorldPop raster (contested_pop.json)
     const popScope=pop&&pop.scope==='10km'?'people ≤10km':'people in district';
     const popTag=popMeas?'<span class="tag meas">WorldPop</span>'
       :(pop&&pop.scope==='10km'?'<span class="tag est">EST · NSO</span>':'<span class="tag meas">NSO</span>');
@@ -2906,8 +2913,9 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // layer) reads it, and never for curated-province scenes; keeping its ~1.2MB off the critical path
    // lets the buildings paint first.
    Promise.resolve(null),
-   // TRUE ~10km-perimeter population per branch (area-weighted district pop), index-aligned to
-   // branches.json — the "people" headline the catchment card shows.
+   // a[15] ESTIMATED ~10km-perimeter population per branch (area-weighted district pop), index-aligned
+   // to branches.json — the FALLBACK "people" figure; the MEASURED WorldPop raster count (a[19]) is
+   // preferred over it when present.
    opt('data/branch_population.json'),
    // a[16] occupation leads — DEFERRED to the second wave (its ~6.8MB parse was the biggest non-scene
    // item on the critical path); fetched + applied ~1s after first paint.
@@ -2918,7 +2926,11 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    // a[18] per-branch WORKFORCE mix (build_branch_workforce.py, ~330KB) — the reflective
    // "who works here" layer where farmers surface; kept on the critical path so the panel
    // leads with occupations, not storefronts. Index-aligned to branches.json / NATBRANCHES.
-   opt('data/branch_workforce.json')
+   opt('data/branch_workforce.json'),
+   // a[19] MEASURED WorldPop-2020 catchment population (contested_pop.json rows[i]=[pop10, contested]),
+   // index-aligned to branches.json — the true 10km people count the card headlines, preferred over the
+   // a[15] area-weight estimate (the same measured source the app.js branch popup reads).
+   opt('data/contested_pop.json')
  ]);
  }).then(function(a){
    if(!a[0]){notPulled();return;}   // building file not pulled yet for this province — calm state
@@ -2929,7 +2941,8 @@ fetch('data/meta.json').then(function(r){return r.ok?r.json():null;}).then(funct
    window.COMPNAT=a[11];window.TILECFG=a[13];   // a[12] (opportunity_score) removed — strategy pivot
    window.POINAT=(a[14]&&a[14].poi)||null;
    window.BRANCHPOP=(a[15]&&a[15].values)||null;
-   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // raster count => MEASURED tag
+   window.BRANCHPOP_MEAS=!!(a[15]&&a[15].meta&&a[15].meta.measured);   // area-weight fallback => ESTIMATED
+   window.CPOP=(a[19]&&Array.isArray(a[19].rows))?a[19].rows:null;     // MEASURED WorldPop 10km catchment pop (rows[i][0]) — preferred
    window.OCCLEADS=(a[16]&&a[16].branches)||null;
    window.OCCLEADS_BUCKETS=(a[16]&&a[16].meta&&a[16].meta.buckets)||null;
    window.SCENEPLACES=a[17]||null;               // dense Overture POI for this city (folded in by initCatch)
