@@ -3,6 +3,36 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — UX loop: load IBM Plex fonts on branch-explorer.html (PR #299, merged + deployed + verified)
+
+Autonomous UX-improvement run. Closed `ux-branch-explorer-font-not-loaded` — the last font-loading
+inconsistency in the app. `branch-explorer.html` (the per-branch `?lat=&lng=&n=` deck.gl scene)
+declared `font-family:'IBM Plex Sans Thai'` / `'IBM Plex Mono'` across its CSS (33 references) but,
+unlike the other 5 pages, **never loaded the Google Fonts stylesheet** — so its branch-name + panel
+text silently rendered in the `system-ui` fallback, inconsistent with the rest of the app and (per
+CLAUDE.md: "Fonts IBM Plex Sans Thai + IBM Plex Mono") the mandated design standard; Thai branch
+names in particular lost IBM Plex Sans Thai shaping. The backlog had deferred this as a "design call",
+but the page already DECLARES IBM Plex everywhere and the standard is unambiguous, so loading them
+(option a) is the design-correct move, not a toss-up. Added the exact three head lines
+`province.html`/`data.html` use — the `fonts.googleapis.com` + `fonts.gstatic.com`(crossorigin)
+preconnect pairing + the `css2?family=IBM+Plex+Sans+Thai…&IBM+Plex+Mono…&display=swap` stylesheet —
+after the share-metadata block. Head-only, no body/JS/CSS touched; `display=swap` avoids an
+invisible-text flash. `platform/branch-explorer.html` +6.
+
+**Safeguard protocol (all passed):** (a) `bash tests/run.sh check` → **121 passed · 0 failed**;
+(b) headless render of `branch-explorer.html?lat=12.7506&lng=101.038` → scene + left acquisition panel
++ right BASEMAP/LAYERS controls + nav all intact, `data-errors="[]"`, nothing broken (gstatic is
+proxy-blocked in the harness so the swap isn't visible headless, but the fallback is unchanged → no
+regression); (c) no secrets in the diff; (d) 2 files, no stray. **Merge:** squash-merged own PR #299
+→ master `baaf329`. **Deploy-verify:** production alias root **200** and the changed route
+`/branch-explorer` **200** (the `.html` 308 is `cleanUrls`, expected); confirmed the deployed HTML now
+serves the `fonts.googleapis.com/css2` IBM Plex link (build propagated). No rollback needed. (Remote
+feature branch delete hit a transient git-proxy disconnect and was left in place — merged + harmless.)
+**Recommend next:** `ux-viewport-user-scalable-3dpages` (WCAG 1.4.4 — the three deck.gl pages lock
+pinch-zoom; needs `touch-action:none` on the canvas + a real-device gesture test, so it wants an
+attended run, not unattended auto-merge) or `ux-live-chart-mobile-viewbox-responsive` (a responsive
+viewBox for live.html's SVG charts — touches `lineChart()` coordinate math, bigger than surgical).
+
 ## 2026-08-05 — Market/Service loop: 3D catchment scene headlines the MEASURED WorldPop catchment population (was the ESTIMATED area-weight fallback)
 
 Autonomous market & service intelligence run. A negative-space sweep surfaced a genuine
