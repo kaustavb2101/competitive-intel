@@ -1748,7 +1748,7 @@ g:hover .cbars-b,g:hover .cdot{filter:brightness(1.25)}
    the heading is subordinate to the block's <h3> and carries no rule of its own — it must not read
    as a new section. */
 .fb-h4{font-size:12.5px;font-weight:600;color:var(--hi);letter-spacing:.2px;margin:16px 0 7px;
-  display:flex;align-items:center;gap:8px}
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 /* focus tier on a collateral row — the owner's stated core/secondary split, made visible so the
    reader does not have to remember which classes are the ones we actually lend against. */
 .cb-tier{font:600 9px var(--mono);text-transform:uppercase;letter-spacing:.5px;padding:1px 5px;
