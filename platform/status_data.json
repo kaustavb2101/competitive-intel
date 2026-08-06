@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-06T16:38:51+00:00",
-    "commit": "810df37"
+    "generated_at": "2026-08-06T22:25:36+00:00",
+    "commit": "89585c8"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,36 @@
   ],
   "activity": [
     {
+      "date": "2026-08-06T22:25:36+00:00",
+      "sha": "89585c8",
+      "summary": "health(deploy): site-health probe guards rival_pressure.json (last unprobed obj-#2 per-branch competitive read)",
+      "pillar": "market"
+    },
+    {
+      "date": "2026-08-06T20:36:07+00:00",
+      "sha": "cf97241",
+      "summary": "docs(progress): log .fb-h4 mobile-bleed UX fix merge+deploy+verify (PR #307)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-07T03:32:49+07:00",
+      "sha": "e70893f",
+      "summary": "ux: wrap .fb-h4 tag pill so it stops bleeding out on mobile (#overview) (#307)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-06T23:49:09+07:00",
+      "sha": "6e391ca",
+      "summary": "fix(ci): stop generated data layers from blocking PRs when master moves (#305)",
+      "pillar": "data-integration"
+    },
+    {
+      "date": "2026-08-06T16:40:45+00:00",
+      "sha": "06a7f6f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the freshness-guard ship",
+      "pillar": "feature"
+    },
+    {
       "date": "2026-08-06T16:38:51+00:00",
       "sha": "810df37",
       "summary": "health(deploy): live-only data-freshness guard on the daily-CI price/weather layers",
@@ -680,36 +710,6 @@
       "sha": "ac8ba4b",
       "summary": "data: ThaiWater flood + rain pulse (2026-08-04, run 30956707171) (#291)",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-05T08:44:57+07:00",
-      "sha": "569d388",
-      "summary": "data: NABC live prices (2026-08-04, run 30953139408) (#290)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-05T00:38:22+00:00",
-      "sha": "9b8d310",
-      "summary": "test(gate): de-opaque the 19-builder run.sh loop — accurate per-source FAIL messages + grep-visibility",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-05T07:36:06+07:00",
-      "sha": "a4c0de2",
-      "summary": "MCOM deck rework + nameplate history + honest column names (#287)",
-      "pillar": "3d-enrichment"
-    },
-    {
-      "date": "2026-08-04T23:43:50+00:00",
-      "sha": "d991344",
-      "summary": "data: live fuel prices (2026-08-04, run 30960786178)",
-      "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-04T22:28:32+00:00",
-      "sha": "ec962e6",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after rival_reputation site-health probe ship",
-      "pillar": "market"
     }
   ]
 }

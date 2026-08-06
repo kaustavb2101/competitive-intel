@@ -42,6 +42,37 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
+
+Autonomous market/service-intelligence run. The `plan_cycle.py` backlog is exhausted (49 done, the 1 open
+item is owner-side), so this run took the DEPLOYMENT-HEALTH pillar's own standing pattern — the commit history
+is a methodical series of "site-health probe guards X.json" additions — and closed the **last surfaced obj-#2
+competitive read still with no deploy probe**. Method: diffed the SPA-fetched `data/*.json` set against the
+45 files `pipeline/check_site_health.py` probes; cross-checked that the three fetched-but-missing paths
+(`apple_reviews`/`fuel_stations`/`perimeter_counts`) are comment/string references to `source-data/`, **not**
+live 404s (data room clean, matching SERVICE_AUDIT §3); and confirmed the live production alias + `meta.json`
+serve 200. That left **`rival_pressure.json`** — the MEASURED per-branch rival-pressure layer
+(`build_rival_pressure.py`) — fetched but unprobed while its obj-#2 siblings `rival_density` / `rival_threat`
+/ `rival_threat_region` all carry probes.
+- **Why it matters:** the layer is load-bearing on two render paths and degrades SILENTLY. (1) The Risk-trend
+  (`#trend`) "Most besieged branches" board — `drawSiegeTable` reads `.besieged`; missing/empty drops the whole
+  board to a "Rival pressure not yet computed." placeholder. (2) The per-branch popup line
+  (`rivalPressureLineHTML` reads the `.branches` array, **index-aligned to branches.json**). The client sets
+  `RIVP=null` unless BOTH `.branches` and `.brands` are arrays, so a truncated CDN deploy silently reverts both
+  surfaces to their fallback with **no phone alert** — the exact "broken demo" blind spot the sibling probes close.
+- **Change:** one file (`pipeline/check_site_health.py`, +60). Added `_shape_rival_pressure` (asserts the client
+  `.branches`/`.brands` gate + the 2015-branch index-aligned `.branches` array + the `.besieged` board rows —
+  SHAPE not values, robust to a census refresh moving counts) and its `DATA_FILES` registry entry. **No data
+  file altered → no provenance rebuild, no fabrication (zero numbers added); no visual/app change → no PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` deploy-probe self-test accepts the committed payload → **134/134**;
+  `rival_pressure.json branches_fingerprint matches branches.json`). Negative-tested the validator directly: it
+  rejects empty `.besieged` (board gutted), truncated `.branches` (index misalignment), missing `.brands`
+  (client gate), and a besieged row missing `name` — proving it is not a no-op. No secrets in diff.
+- **Next recommended intelligence task:** continue the same deploy-health sweep — the next surfaced-but-unprobed
+  reads are `branch_peers.json` (obj-#1 peer-twin outlier board on `#trend`) and `segment_exposure.json`
+  (obj-#1 segment×collateral concentration on `#exposure`), both of which degrade silently on a truncated deploy.
+
 ## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
 
 Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
