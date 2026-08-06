@@ -547,6 +547,48 @@ def _shape_peer_scoreboard(d):
     return None
 
 
+def _shape_peer_npl(d):
+    # The peer LOAN-QUALITY benchmark (peer_npl.json, obj #1 + #2) — the listed
+    # title-lenders' OWN reported NPL ratios (docs/RESEARCH_DIGEST.md §B, FY2025 /
+    # 2025 IR) shown next to AutoX's MEASURED own-book NPL from the real loan tape.
+    # The last surfaced obj-#2 peer read on the Competition surface with no deploy
+    # probe. Like peer_scoreboard it CANNOT self-heal — its peer figures come from
+    # an off-repo research doc and the AutoX anchor from the owner-side tape, neither
+    # of which any CI job re-pulls — so a truncated/404 CDN deploy that guts it has no
+    # job to restore it. drawPeerNpl GATES the whole board on a non-empty .peers array
+    # (else it silently drops to the calm "Peer NPL benchmark not available" placeholder
+    # with NO phone alert), and per row renders p.name/p.ticker + p.npl (numeric — the
+    # bar, the colour band, the label, AND the readout's best/worst spread clause) +
+    # p.collateral + p.source. The distinct MEASURED AutoX row renders .autox.name +
+    # .npl_live_os_pct (numeric, .toFixed(2) — bar + readout) + .npl_90plus_os_pct
+    # (numeric, .toFixed(1)). Asserts render shape (the peers gate + row label + a
+    # numeric npl column + the AutoX anchor's two numeric NPL fields), not values —
+    # robust to a future RESEARCH_DIGEST / tape-vintage refresh moving the ratios.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    peers = d.get("peers")
+    if not isinstance(peers, list) or len(peers) < 2:
+        return "missing/short 'peers' list (expected the reported title-lender NPL rows)"
+    p0 = peers[0]
+    if not isinstance(p0, dict):
+        return "first peers row is not an object"
+    if not ((isinstance(p0.get("name"), str) and p0["name"].strip())
+            or (isinstance(p0.get("ticker"), str) and p0["ticker"].strip())):
+        return "first peers row missing 'name'/'ticker' (peer-NPL row label render)"
+    if not any(isinstance(p, dict) and isinstance(p.get("npl"), (int, float)) for p in peers):
+        return "no peer carries a numeric 'npl' (the reported-NPL bar + colour band + spread clause)"
+    ax = d.get("autox")
+    if not isinstance(ax, dict):
+        return "missing 'autox' MEASURED self-anchor block (the distinct own-tape row)"
+    if not (isinstance(ax.get("name"), str) and ax["name"].strip()):
+        return "autox anchor missing 'name' (the MEASURED own-book row label)"
+    if not isinstance(ax.get("npl_live_os_pct"), (int, float)):
+        return "autox anchor missing/non-numeric 'npl_live_os_pct' (the measured NPL-live bar + readout)"
+    if not isinstance(ax.get("npl_90plus_os_pct"), (int, float)):
+        return "autox anchor missing/non-numeric 'npl_90plus_os_pct' (the strict-90+ readout figure)"
+    return None
+
+
 def _shape_province_pressure(d):
     # The cross-objective SYNTHESIS layer (province_pressure.json) — the
     # deterministic JOIN of portfolio risk (province_stress_index composite,
@@ -1318,6 +1360,18 @@ DATA_FILES = [
     # Asserts render shape (the peers gate + row label + numeric mkt-cap/ROE columns +
     # headline + the ROE reference line), not values — robust to a future SET pull.
     ("data/peer_scoreboard.json", _shape_peer_scoreboard, ".peers (listed title-lenders) with market_cap_bn/roe + .headline + .autox_roe_target (#acq listed-peer scoreboard)"),
+    # The peer LOAN-QUALITY benchmark (peer_npl.json, obj #1 + #2) — the listed
+    # title-lenders' OWN reported NPL ratios next to AutoX's MEASURED own-book NPL
+    # from the real loan tape. The last surfaced obj-#2 peer read on the Competition
+    # surface with no deploy probe, and like peer_scoreboard it CANNOT self-heal (peer
+    # figures from off-repo RESEARCH_DIGEST §B, the AutoX anchor from the owner-side
+    # tape — no CI job re-pulls either), so a truncated/404 CDN deploy that guts it
+    # silently drops the board to the calm "Peer NPL benchmark not available"
+    # placeholder with no phone alert. drawPeerNpl gates on a non-empty .peers array,
+    # per row reading .name/.ticker + .npl (the bar/colour/spread), plus the distinct
+    # MEASURED .autox row (.name + .npl_live_os_pct + .npl_90plus_os_pct). Asserts
+    # render shape, not values — robust to a future RESEARCH_DIGEST / tape refresh.
+    ("data/peer_npl.json", _shape_peer_npl, ".peers reported-NPL rows (name/ticker + npl) + .autox MEASURED anchor (npl_live_os_pct/npl_90plus_os_pct) (#acq peer loan-quality board)"),
     # The district-grain competitive layer (obj #2) that sharpens the Competition
     # surface below province level: the "Top go-live districts (recent/total)"
     # go-live leaderboard + the provincial-capital clustering clause both render

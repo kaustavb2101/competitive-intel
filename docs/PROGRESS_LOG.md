@@ -3,6 +3,30 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Intelligence loop: site-health probe now guards peer_npl.json (the last unprobed obj-#2 PEER read on #acq)
+
+Autonomous market & service intelligence run. Data room re-confirmed healthy up front (`build_provenance.py
+--check` reproduces byte-exact — 136 layers · 75 measured · 61 estimated · 0 unlabelled; freshness clean,
+0 layers >180d stale; live master production alias HTTP 200 on `/` + `/data/meta.json`). A render-path
+re-scan for the highest-value surfaced-but-unprobed `data/*.json` read closed **`peer_npl.json`** — the peer
+LOAN-QUALITY benchmark on `#acq` (obj #1 + #2: listed title-lenders' OWN reported NPL ratios from
+RESEARCH_DIGEST §B next to AutoX's MEASURED own-book NPL from the real loan tape). It was the exact read the
+2026-08-05 audit named as the next target.
+- **Why it matters:** `drawPeerNpl` GATES the whole board on a non-empty `.peers` array — a truncated/404
+  CDN deploy silently drops it to a calm "Peer NPL benchmark not available" placeholder with **no phone
+  alert**. And like its `peer_scoreboard` sibling it **cannot self-heal**: the peer figures are off-repo
+  (RESEARCH_DIGEST §B) and the AutoX anchor is owner-side (loan tape), so no CI job re-pulls it — the probe
+  is the only deploy safeguard.
+- `_shape_peer_npl` asserts render shape (the `.peers` gate ≥2 rows, a row `name`/`ticker` label, ≥1 numeric
+  `npl`, the `.autox` anchor's non-blank `name` + numeric `npl_live_os_pct` + `npl_90plus_os_pct`), not
+  values — robust to a future RESEARCH_DIGEST/tape-vintage refresh.
+- **Verified:** real 2,571-byte payload accepted; 12 negatives all reject. Offline `--local platform`
+  131/131 HEALTHY (128 → 131 checks, +3). Determinism gate 121 passed · 0 failed (data integrity 455/455) —
+  probe-script-only (the gate does not invoke `check_site_health.py`; no `platform/data` file altered, so no
+  provenance regen). Emitted the finding to `docs/SERVICE_AUDIT.md`.
+- **Next intelligence task:** the remaining lower-value secondary reads still unprobed — the
+  graceful-degrading rival-pulse promo/review boards and the province deep-dive fetches.
+
 ## 2026-08-06 — Integration loop: site-health probe now guards pico_competitors.json (the last unprobed obj-#2 PICO read on #acq)
 
 Autonomous integration run. **First established the CI-doable data-integration backlog is genuinely
