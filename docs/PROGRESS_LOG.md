@@ -3,6 +3,63 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Intelligence loop (deployment health): site-health probe now guards `rival_pressure.json` (committed to master, deployed + verified)
+
+Autonomous market/service-intelligence run. The `plan_cycle.py` backlog is exhausted (49 done, the 1 open
+item is owner-side), so this run took the DEPLOYMENT-HEALTH pillar's own standing pattern — the commit history
+is a methodical series of "site-health probe guards X.json" additions — and closed the **last surfaced obj-#2
+competitive read still with no deploy probe**. Method: diffed the SPA-fetched `data/*.json` set against the
+45 files `pipeline/check_site_health.py` probes; cross-checked that the three fetched-but-missing paths
+(`apple_reviews`/`fuel_stations`/`perimeter_counts`) are comment/string references to `source-data/`, **not**
+live 404s (data room clean, matching SERVICE_AUDIT §3); and confirmed the live production alias + `meta.json`
+serve 200. That left **`rival_pressure.json`** — the MEASURED per-branch rival-pressure layer
+(`build_rival_pressure.py`) — fetched but unprobed while its obj-#2 siblings `rival_density` / `rival_threat`
+/ `rival_threat_region` all carry probes.
+- **Why it matters:** the layer is load-bearing on two render paths and degrades SILENTLY. (1) The Risk-trend
+  (`#trend`) "Most besieged branches" board — `drawSiegeTable` reads `.besieged`; missing/empty drops the whole
+  board to a "Rival pressure not yet computed." placeholder. (2) The per-branch popup line
+  (`rivalPressureLineHTML` reads the `.branches` array, **index-aligned to branches.json**). The client sets
+  `RIVP=null` unless BOTH `.branches` and `.brands` are arrays, so a truncated CDN deploy silently reverts both
+  surfaces to their fallback with **no phone alert** — the exact "broken demo" blind spot the sibling probes close.
+- **Change:** one file (`pipeline/check_site_health.py`, +60). Added `_shape_rival_pressure` (asserts the client
+  `.branches`/`.brands` gate + the 2015-branch index-aligned `.branches` array + the `.besieged` board rows —
+  SHAPE not values, robust to a census refresh moving counts) and its `DATA_FILES` registry entry. **No data
+  file altered → no provenance rebuild, no fabrication (zero numbers added); no visual/app change → no PR.**
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation
+  455/455; `check_site_health.py --local` deploy-probe self-test accepts the committed payload → **134/134**;
+  `rival_pressure.json branches_fingerprint matches branches.json`). Negative-tested the validator directly: it
+  rejects empty `.besieged` (board gutted), truncated `.branches` (index misalignment), missing `.brands`
+  (client gate), and a besieged row missing `name` — proving it is not a no-op. No secrets in diff.
+- **Next recommended intelligence task:** continue the same deploy-health sweep — the next surfaced-but-unprobed
+  reads are `branch_peers.json` (obj-#1 peer-twin outlier board on `#trend`) and `segment_exposure.json`
+  (obj-#1 segment×collateral concentration on `#exposure`), both of which degrade silently on a truncated deploy.
+
+## 2026-08-06 — UX loop: `.fb-h4` tag pill wraps so it stops bleeding out on mobile #overview (PR #307, merged + deployed + verified)
+
+Autonomous UX-improvement run. The named backlog is exhausted (remaining open items are all "bigger than
+surgical" content/mandate passes or device-tested-only 3D-page gaps excluded from unattended auto-merge), so
+this run reviewed routes with the project's own standing overflow audit (`tests/visual_overflow.js`) — which
+normally **skips** in the gate because the sandbox `node_modules` has no `playwright`. Running it against the
+global Playwright install (`/opt/node22/lib/node_modules`) surfaced a real, unguarded defect on the
+**`#overview` (Macro)** route at 390px: the collateral-book sub-headings (`.fb-h4` in `#collat-book`) pair a
+title with a `white-space:nowrap` provenance `.tag` pill in a `display:flex` container with **no `flex-wrap`**,
+so the longest heading forced the un-wrappable tag inline and **bled 49px past its box**, pushing the document
+to **393px wide (3px sideways page scroll / PAGEX)** on a phone.
+- **Fix:** one declaration — `flex-wrap:wrap` on `.fb-h4` (`platform/styles.css` L1751) so the tag drops to its
+  own line below the title on narrow viewports. Desktop (title+tag fit on one line) is a no-op by flex-wrap semantics.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **124 passed · 0 failed** (data validation 455/455);
+  Playwright at true mobile 390px/DSF2 → heading `right=344`, `scrollWidth==clientWidth==390` (PAGEX gone), and the
+  full `visual_overflow.js` audit **clean across all 11 routes** at mobile (was PAGEX 1 + BLEED 1 on macro); PNG
+  self-review confirmed the tag pill wraps cleanly with its rounded `var(--collat)` border intact; no secrets in
+  diff; diff is exactly `platform/styles.css` (+1 char) + the `docs/UXUI_AUDIT.md` entries, no stray files.
+- **Merge + deploy + verify:** PR #307 squash-merged to master (sha `e70893f`). Deploy-verified against the master
+  production alias — the deployed `styles.css` now carries `…gap:8px;flex-wrap:wrap}` and both `/` (hosts `#overview`)
+  and `/styles.css` return **HTTP 200** (no regression, no rollback needed). `/index.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/`.
+- **New backlog item logged:** `qa-visual-overflow-not-in-ci` — the overflow audit that caught this silently skips in
+  the gate (no `playwright` in `node_modules`) despite a usable global install; wiring the phase to that global would
+  give the loop a real automated bleed/clip/page-x gate. Left for its own run (test infra, not `platform/`).
+
 ## 2026-08-06 — UX loop: `fonts.gstatic.com` preconnect added on `live.html` (PR #303, merged + deployed + verified)
 
 Autonomous UX-improvement run. The clean surgical backlog is exhausted (the remaining open items are all

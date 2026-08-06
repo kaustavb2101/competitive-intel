@@ -1287,6 +1287,57 @@ def _shape_vehicle_models(d):
     return None
 
 
+def _shape_rival_pressure(d):
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED
+    # geometry over the merged competitor census — pipeline/build_rival_pressure.py).
+    # It is load-bearing on TWO render paths and was the last surfaced obj-#2
+    # competitive read still with no deploy probe: (1) the Risk-trend (#trend) "Most
+    # besieged branches" board — drawSiegeTable renders RIVP.besieged.slice(0,10)
+    # (the branches with >=3 rivals within 2 km) and, when it is missing/empty, drops
+    # the whole board to a "Rival pressure not yet computed." placeholder; (2) the
+    # per-branch popup line (rivalPressureLineHTML reads RIVP.branches[i], INDEX-
+    # ALIGNED to branches.json — nearest-rival km per brand in .d aligned to .brands,
+    # plus the 2 km / 5 km counts n2/n5). The client loader itself sets RIVP=null
+    # unless BOTH .branches and .brands are arrays, so a truncated/gutted CDN deploy
+    # silently reverts both surfaces to their fallback with NO phone alert — the same
+    # "broken demo" blind spot the rival_density / rival_threat / rival_threat_region
+    # probes closed for the sibling obj-#2 competitive reads. Asserts the render
+    # contract (the client .branches/.brands gate + the 2015-branch index-aligned
+    # popup array + the .besieged board rows) as SHAPE not values, robust to a future
+    # competitor-census refresh moving the counts.
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    brands = d.get("brands")
+    if not isinstance(brands, list) or not brands:
+        return "missing/empty 'brands' array (client RIVP gate: Array.isArray(j.brands))"
+    recs = d.get("branches")
+    if not isinstance(recs, list) or not recs:
+        return "missing/empty 'branches' array (client RIVP gate + popup RIVP.branches[i] read)"
+    if len(recs) != 2015:
+        return "expected 2015 branch records (index-aligned to branches.json), got %d" % len(recs)
+    r0 = recs[0]
+    if not isinstance(r0, dict):
+        return "first 'branches' record is not an object"
+    for k in ("n2", "n5"):
+        if not isinstance(r0.get(k), (int, float)) or isinstance(r0.get(k), bool):
+            return "first branch record missing numeric '%s' (popup 2/5 km-count render read)" % k
+    if not isinstance(r0.get("d"), list):
+        return "first branch record missing 'd' list (per-brand nearest-rival km, aligned to .brands)"
+    bes = d.get("besieged")
+    if not isinstance(bes, list) or not bes:
+        return "missing/empty 'besieged' list (#trend Most-besieged board render read)"
+    b0 = bes[0]
+    if not isinstance(b0, dict):
+        return "first 'besieged' row is not an object"
+    if not isinstance(b0.get("i"), int) or isinstance(b0.get("i"), bool):
+        return "first besieged row missing integer 'i' (branch index the board row keys on)"
+    if not (isinstance(b0.get("name"), str) and b0["name"].strip()):
+        return "first besieged row missing 'name' (board branch-label render read)"
+    if not isinstance(b0.get("n2"), (int, float)) or isinstance(b0.get("n2"), bool):
+        return "first besieged row missing numeric 'n2' (board rivals-<=2km column render read)"
+    return None
+
+
 DATA_FILES = [
     ("data/branches.json", _shape_branches, "array of 2015 branches with x/y"),
     ("data/meta.json", _shape_meta, "object with 'updated' vintage"),
@@ -1529,6 +1580,15 @@ DATA_FILES = [
     # probes closed for their siblings. Asserts the .annual gate + the pickup/ppv
     # nameplate-board shape, not values — robust to a future DLT-vintage refresh.
     ("data/vehicle_models.json", _shape_vehicle_models, ".annual year table + .plates_last12 pickup/ppv boards (Macro nameplate panel + collateral pickup verdict)"),
+    # The per-branch rival-pressure layer (rival_pressure.json, obj #2, MEASURED) —
+    # the last surfaced obj-#2 competitive read with no deploy probe. It drives the
+    # Risk-trend (#trend) "Most besieged branches" board (drawSiegeTable reads
+    # .besieged) AND the per-branch popup line (rivalPressureLineHTML reads the
+    # .branches index-aligned array). The client sets RIVP=null unless BOTH .branches
+    # and .brands are arrays, so a truncated CDN deploy silently reverts both surfaces
+    # to their fallback with no phone alert — the same blind spot the rival_density /
+    # rival_threat / rival_threat_region probes closed for their obj-#2 siblings.
+    ("data/rival_pressure.json", _shape_rival_pressure, ".brands + 2015-branch index-aligned .branches + .besieged board rows (#trend Most-besieged board + per-branch popup)"),
 ]
 
 
