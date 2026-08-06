@@ -3,6 +3,36 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Intelligence loop: the ~40 deploy probe validators are now under the repo determinism gate
+
+Autonomous market & service intelligence run. Deploy + data room re-confirmed healthy up front (live master
+production alias HTTP 200 on `/` + `/data/meta.json`; `build_provenance.py --check` reproduces byte-exact;
+freshness clean, 0 layers >180d stale; 0 broken data references across the 131 static `data/*.json` refs;
+77/77 province catchments present; every `--check`-capable builder already in the gate; `site-health.yml`
+correctly targets the master production alias).
+
+**The one gap fixed:** `check_site_health.py`'s ~40 deploy probe validators (`_shape_*`) — all hand-authored
+by this intelligence loop over the past weeks to guard each surfaced-but-unprobed exec read — had **no
+repo-gate regression protection**. Every prior audit note said so verbatim ("the gate does not invoke
+`check_site_health.py`, so this probe-script-only change is outside its scope by construction"). The
+consequence: a future edit that broke a validator so it *rejects* the real committed payload (or a page that
+dropped the AutoX wordmark, or a probed data file gone missing) would ship **silently** — caught only by the
+nightly LIVE run as a filed GitHub issue, never by `bash tests/run.sh check`.
+- **Fix:** `tests/run.sh` `phase_check` now runs the SAME code path as the nightly live check, pointed at the
+  local committed tree — `python3 pipeline/check_site_health.py --local platform`. `LocalFetcher` is
+  filesystem-only (pure stdlib, **no network**), so it stays inside the gate's offline/deterministic
+  contract; all 41 probed data files AND the probed pages are git-tracked, so it reproduces on a clean
+  checkout. It FAILs only on a genuine probe/payload regression.
+- **Verified:** gate green **122 passed · 0 failed** (was 121 — the new self-test is the +1, reports `[PASS]`).
+  Negative-tested that it is a real guard, not a no-op: temporarily dropping `meta.json`'s `updated` key made
+  the self-test exit 1 (gate red); `git checkout` restored it to exit 0 (gate green). No `platform/data`
+  file altered — a test-harness change only (like the probe-script-only changes before it), so no provenance
+  regen and no PR/headless render needed.
+- **Why this over another probe:** the audit backlog of "add one more site-health probe" had reached its
+  low-value tail (only secondary graceful-degrading reads remained). Bringing the whole probe LAYER under the
+  gate is strictly higher leverage — it protects all ~40 existing validators AND every future one, for free,
+  from the class of silent breakage the loop has been guarding against one file at a time.
+
 ## 2026-08-06 — Intelligence loop: site-health probe now guards peer_npl.json (the last unprobed obj-#2 PEER read on #acq)
 
 Autonomous market & service intelligence run. Data room re-confirmed healthy up front (`build_provenance.py

@@ -517,6 +517,22 @@ INGESTS
   else
     bad "validate_data.py (platform/data integrity — see report above)"
   fi
+
+  # deploy-probe self-test: the SAME code path the nightly live site-health check runs (check_site_health.py),
+  # but pointed at the local committed tree (--local platform, LocalFetcher = filesystem only, pure stdlib,
+  # NO network). It asserts every deploy probe validator (_shape_*) still ACCEPTS its real committed payload,
+  # every critical page carries the AutoX wordmark, and no probed data file is missing/oversized. Added
+  # because the ~40 probes are hand-authored by the intelligence loop yet had NO repo-gate guard: a future
+  # edit that broke a validator against the real data would ship silently and only surface on the nightly
+  # LIVE run (a filed GitHub issue), not here. All 41 probed data files + the probed pages are git-tracked,
+  # so this reproduces on a clean checkout; it FAILs only on a genuine probe/payload regression.
+  hc_out="$( python3 "$PIPE/check_site_health.py" --local "$PLATFORM" 2>&1 )"; rc=$?
+  if [ "$rc" -eq 0 ]; then
+    ok "check_site_health.py --local (deploy probe validators accept the committed payloads)"
+  else
+    printf '%s\n' "$hc_out" | grep -E '\[FAIL\]|ERROR|Traceback' | head -12 | sed 's/^/      /'
+    bad "check_site_health.py --local (a deploy probe validator rejects its committed payload — see above)"
+  fi
 }
 
 # ---------------------------------------------------------------------------
