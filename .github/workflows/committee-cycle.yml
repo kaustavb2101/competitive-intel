@@ -119,7 +119,15 @@ jobs:
           COV="$(python3 -c "import json;c=json.load(open('source-data/competitor_census.json'));print(len(c),'provinces,',sum(c.values()),'rival branches')" 2>/dev/null || echo '?')"
           git commit -m "committee: autonomous competitor scout (run ${{ github.run_id }})" \
                      -m "scout.py over the least-covered provinces; competitors_prov joined; every derived layer rebuilt and 'bash tests/run.sh check' passed 0-failed before this auto-merge. Coverage: $COV."
-          # master may have advanced since checkout — rebase before pushing.
-          git pull --rebase origin "$BASE_BRANCH"
-          git push origin "HEAD:$BASE_BRANCH"
-          echo "Autonomous merge landed on $BASE_BRANCH."
+          # The base may have advanced since checkout — another data job, or a phone session. This
+          # was `git pull --rebase`, which conflicts on provenance.json every time that happens and
+          # killed the job outright. resolve_derived_conflicts.sh takes the base's side of the
+          # generated layers and recomputes, which cannot conflict because it never merges.
+          for attempt in 1 2 3; do
+            git fetch -q origin "$BASE_BRANCH"
+            bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || {
+              echo "::warning::real conflict outside platform/data/ — leaving $BASE_BRANCH alone."; exit 0; }
+            git push origin "HEAD:$BASE_BRANCH" && { echo "Autonomous merge landed on $BASE_BRANCH."; exit 0; }
+            echo "push rejected (base moved) — re-syncing, attempt $attempt"
+          done
+          echo "::warning::could not land on $BASE_BRANCH after 3 attempts; next cycle retries."

@@ -42,6 +42,26 @@ carried per-province yield — the farm-household income lever. A province below
   MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
   so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
   gate-protected input that surfacing needs.
+## 2026-08-06 — UX loop: `fonts.gstatic.com` preconnect added on `live.html` (PR #303, merged + deployed + verified)
+
+Autonomous UX-improvement run. The clean surgical backlog is exhausted (the remaining open items are all
+"bigger than surgical" content/mandate passes or device-tested-only 3D-page gaps explicitly excluded from
+unattended auto-merge), so this run reviewed the `live.html` route and found a concrete gap: it loads the
+IBM Plex Google Fonts CSS but only preconnected to `fonts.googleapis.com` (the stylesheet host), **missing
+the `fonts.gstatic.com` (font-file host) preconnect**. `ux-font-preconnect-gstatic` (2026-08-05) added that
+warm-up to "all 5 pages that load the Google Fonts CSS" but `live.html` is a 6th such page and was outside
+that scope — so its browser still ran a fresh DNS+TLS handshake to gstatic *after* the stylesheet arrived,
+a render-blocking waterfall that delays first text paint on a page whose content is entirely text/numbers.
+- **Fix:** one head-only line in `platform/live.html` — `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`
+  right after the googleapis preconnect, matching `province.html` byte-for-byte incl. the explanatory comment.
+  Zero visual/behavioral change (no body/JS/CSS touched). Now all 6 font-loading pages preconnect to gstatic.
+- **Safeguard protocol (all passed):** `bash tests/run.sh check` **122 passed · 0 failed**; headless render of
+  `live.html` self-reviewed (nav/hero/pulse-strip render correctly with IBM Plex loaded, no breakage); no
+  secrets in diff; diff is exactly `platform/live.html` (+1) + the `docs/UXUI_AUDIT.md` backlog entry, no stray files.
+- **Merge + deploy + verify:** PR #303 squash-merged to master (sha `d545755`). Deploy-verified against the
+  master production alias — after propagation, `/live` serves the new gstatic preconnect line and both `/`
+  and `/live` return **HTTP 200** (no regression, no rollback needed). `/live.html` → 308 is the expected
+  Vercel `cleanUrls` redirect to `/live`.
 
 ## 2026-08-06 — Intelligence loop: the ~40 deploy probe validators are now under the repo determinism gate
 

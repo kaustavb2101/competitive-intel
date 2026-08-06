@@ -97,16 +97,17 @@ jobs:
             echo "::warning title=Pantip pull failed::pull_pantip.py exited $rc. Nothing was written."
           fi
 
-      - name: Rebuild the derived layers, then provenance LAST
+      - name: Rebuild this job's own layers, then re-derive whatever else went stale
         run: |
+          # These three are the layers this job owns, so they are built explicitly; everything
+          # downstream is discovered rather than named. The hand-named tail this replaced
+          # (live_board, provenance) is the same shape of list that went stale three times on the
+          # NABC job — rederive_drift.py iterates the gate's OWN --check set to a fixed point.
           python pipeline/build_rival_pulse.py
           python pipeline/build_social_themes.py
           python pipeline/build_pantip_panel.py
-          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts
-          # it and turns build_live_board.py --check red in the gate. Rebuild it AFTER the other
-          # layers and before provenance, which then censuses its bytes.
-          python pipeline/build_live_board.py
-          python pipeline/build_provenance.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
 
       - name: Detect a substantive change (ignore volatile meta stamps)
         id: detect
@@ -140,11 +141,11 @@ jobs:
           DATA_BRANCH: data/social-${{ github.run_id }}
           PANTIP_RC: ${{ steps.pantip.outputs.rc }}
         run: |
-          git add source-data/app_reviews.json source-data/apple_reviews.json \
-                  source-data/youtube_comments.json source-data/pantip_threads.json \
-                  platform/data/rival_pulse.json platform/data/social_themes.json \
-                  platform/data/pantip_panel.json platform/data/live_board.json \
-                  platform/data/provenance.json 2>/dev/null || true
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          # (The || true this replaced was swallowing a missing path — a source that failed to pull
+          # would vanish from the commit silently rather than fail; -u simply stages what changed.)
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0

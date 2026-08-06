@@ -485,6 +485,19 @@ INGESTS
   # reproduce against the just-verified committed data tree.
   ( cd "$PIPE" && python3 build_provenance.py --check >/dev/null 2>&1 ) && ok "build_provenance.py --check" || bad "build_provenance.py --check (provenance.json drifted from platform/data/*.json — run: python3 pipeline/build_provenance.py)"
 
+  # The data-pull workflows re-derive their fan-out by running rederive_drift.py, which discovers
+  # what to rebuild by PARSING the --check invocations in THIS file. That makes run.sh's syntax load-
+  # bearing for those jobs: reshape the lines above and the parser could quietly match nothing, the
+  # pulls would stop re-deriving, and every data PR would go back to arriving red — with no error
+  # anywhere to say why. --selftest fails if the parse drops below its floor, so that breaks here
+  # instead, next to the change that caused it.
+  ( cd "$PIPE" && python3 rederive_drift.py --selftest >/dev/null 2>&1 ) && ok "rederive_drift.py --selftest" || bad "rederive_drift.py --selftest (it can no longer read the --check set out of tests/run.sh — the data-pull workflows would silently stop re-deriving; fix RE_EXPLICIT/RE_HEREDOC in pipeline/rederive_drift.py)"
+
+  # resolve_derived_conflicts.sh auto-resolves merge conflicts and the committee/auto-merge jobs call
+  # it before pushing STRAIGHT TO MASTER, so its two abort paths are the only thing between an
+  # unattended job and a wrongly-resolved conflict in source-data/ or in code. Fixture-based, seconds.
+  bash "$REPO/tests/test_resolve_derived_conflicts.sh" >/dev/null 2>&1 && ok "resolve_derived_conflicts.sh (16 fixture cases)" || bad "resolve_derived_conflicts.sh fixture tests (run: bash tests/test_resolve_derived_conflicts.sh)"
+
   node --check "$PLATFORM/app.js" >/dev/null 2>&1 && ok "node --check app.js" || bad "node --check app.js (syntax error)"
 
   # every page: extract each inline <script> (that has no src) and node --check it.

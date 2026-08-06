@@ -59,14 +59,15 @@ jobs:
       - name: Pull the Google Trends snapshot
         run: python pipeline/pull_google_trends.py
 
-      - name: Rebuild the derived layer + provenance
+      - name: Rebuild the derived layer, then re-derive whatever else went stale
         run: |
+          # search_demand is the layer this job owns, so it is built explicitly; everything
+          # downstream is discovered rather than named. The hand-named tail this replaced
+          # (live_board, provenance) is the same shape of list that went stale three times on the
+          # NABC job — rederive_drift.py iterates the gate's OWN --check set to a fixed point.
           python pipeline/build_search_demand.py
-          # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-          # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-          # which then censuses its bytes.
-          python pipeline/build_live_board.py
-          python pipeline/build_provenance.py
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
 
       - name: Detect a substantive change (ignore the pulled_at_utc timestamp)
         id: detect
@@ -92,8 +93,9 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/trends-${{ github.run_id }}
         run: |
-          git add source-data/google_trends.json platform/data/search_demand.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No net change vs committed layers. No PR opened."
             exit 0

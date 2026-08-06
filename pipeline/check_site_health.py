@@ -35,6 +35,7 @@
 
 import argparse
 import base64
+import calendar
 import json
 import os
 import sys
@@ -1532,6 +1533,88 @@ DATA_FILES = [
 
 
 # ---------------------------------------------------------------------------
+# DATA FRESHNESS — the one class of breakage the ~40 shape validators above
+# CANNOT catch. Every check_site_health probe asserts a file's SHAPE; none
+# asserts its VINTAGE. So if a data-refresh cron silently freezes (upstream
+# API drops, a workflow secret rotates, a pull script starts erroring), the
+# last-good file keeps serving, still passes every shape probe, and ships
+# green forever — the deploy looks healthy while the numbers quietly rot,
+# with no phone alert. This closes that blind spot for the DAILY,
+# CI-REFRESHED, CI-REACHABLE price/weather layers, where a lagging vintage is
+# an unambiguous "the cron broke" signal (not an owner-side / Thai-IP data gap).
+#
+# WHY LIVE-ONLY (HttpFetcher, never --local): freshness is inherently a
+# function of wall-clock "now", so it CANNOT be part of the deterministic repo
+# gate (tests/run.sh runs --local and must reproduce byte-for-byte on any
+# date). The nightly probe is exactly where it belongs — it already runs
+# against the real deployment with a real clock. The --local path skips this
+# block entirely, so the gate's output is unchanged.
+#
+# FALSE-ALARM-PROOF: a layer is FAILED only when its vintage parses cleanly AND
+# is older than a generous per-layer TTL (14 days — ~2 weeks of missed daily
+# runs, well past any weekend/holiday upstream gap; only a genuinely stuck cron
+# reaches it). Any fetch / parse / missing-key case is recorded as a non-fatal
+# "not evaluated" note, never a failure — the fetch + shape probes already own
+# "does the file serve and parse". EXCLUDED by design: owner-side / Thai-IP /
+# monthly-or-slower layers (rival_pulse promos, search_demand, dbd_formation,
+# the annual DLT vehicle stock), whose lag is a known constraint, not a break.
+FRESHNESS_LAYERS = [
+    # (rel_path, meta_key, max_age_days, cron/source note)
+    ("data/commodities.json", "farmgate_vintage", 14,
+     "NABC farm-gate + fuel, daily CI (data-nabc-prices.yml / data-fuel-prices.yml)"),
+    ("data/thai_price_history.json", "vintage", 14,
+     "Thai daily price history (rebuilt with the daily price pulls)"),
+    ("data/thaiwater_flood.json", "pulled", 14,
+     "ThaiWater flood pulse, daily CI (data-thaiwater.yml)"),
+    ("data/thaiwater_rain.json", "pulled", 14,
+     "ThaiWater rain pulse, daily CI (data-thaiwater.yml)"),
+]
+
+
+def _parse_iso_day(s):
+    """Parse a 'YYYY-MM-DD' (optionally with a trailing time) vintage to an
+    epoch (UTC midnight). Returns None if it does not start with an ISO day."""
+    if not isinstance(s, str):
+        return None
+    head = s.strip()[:10]
+    try:
+        t = time.strptime(head, "%Y-%m-%d")
+    except (ValueError, TypeError):
+        return None
+    return calendar.timegm(t)
+
+
+def _freshness_result(vintage_str, max_age_days, now_epoch):
+    """PURE + deterministic given its inputs (unit-testable offline). Returns
+    (ok, detail). ok is False ONLY for a cleanly-parsed vintage older than the
+    TTL; an unparseable/absent vintage yields ok=True with a 'not evaluated'
+    note so freshness never fires a false alarm."""
+    epoch = _parse_iso_day(vintage_str)
+    if epoch is None:
+        return True, "vintage %r not an ISO day — freshness not evaluated" % (vintage_str,)
+    age_days = (now_epoch - epoch) / 86400.0
+    if age_days > max_age_days:
+        return False, ("vintage %s is %.0f days old (> %d-day TTL) — the refresh "
+                       "cron may be stuck" % (str(vintage_str)[:10], age_days, max_age_days))
+    return True, "vintage %s, %.0f days old (TTL %d)" % (str(vintage_str)[:10], age_days, max_age_days)
+
+
+def run_freshness_checks(fetcher, now_epoch, record):
+    """Live-only vintage-lag guard over FRESHNESS_LAYERS. Records via `record`."""
+    for rel, key, max_age, note in FRESHNESS_LAYERS:
+        try:
+            body = fetcher.fetch(rel)
+            parsed = json.loads(body.decode("utf-8"))
+            vintage = parsed.get("meta", {}).get(key)
+        except Exception as e:
+            record("%s fresh (%s)" % (rel, note), True,
+                   "freshness not evaluated (%r)" % e)
+            continue
+        ok, detail = _freshness_result(vintage, max_age, now_epoch)
+        record("%s fresh (%s)" % (rel, note), ok, detail)
+
+
+# ---------------------------------------------------------------------------
 def run_checks(fetcher):
     """Run every check through the given fetcher. Returns a list of dicts:
     {name, ok, detail}. Same code path for HTTP and local."""
@@ -1616,6 +1699,12 @@ def run_checks(fetcher):
             record("%s shape sane (%s)" % (rel, expect), False, err)
         else:
             record("%s shape sane (%s)" % (rel, expect), True)
+
+    # --- data freshness (LIVE ONLY) ---
+    # Runs against the real deployment with a real clock; the deterministic
+    # --local gate path (LocalFetcher) skips it so the repo gate is unaffected.
+    if isinstance(fetcher, HttpFetcher):
+        run_freshness_checks(fetcher, time.time(), record)
 
     return results
 
