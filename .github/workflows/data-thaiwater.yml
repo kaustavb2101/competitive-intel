@@ -16,8 +16,10 @@ name: Data — ThaiWater live flood + rain pulse (daily)
 #
 # These layers are LIVE snapshots — NOT in the determinism gate (same class as the NABC / macro pulls).
 # But both ARE tracked in platform/data/provenance.json (build_provenance.py globs every data file), so a
-# refresh MUST rebuild provenance.json in lockstep or the gate goes red on merge. No downstream builder
-# consumes them, so nothing else needs rebuilding.
+# refresh MUST rebuild provenance.json in lockstep or the gate goes red on merge. This header used to add
+# "no downstream builder consumes them, so nothing else needs rebuilding" — untrue: feed_history
+# accumulates the readings, live_board fingerprints every layer's stamp, and macro_book rolls the flood
+# vintage up. Which layers those are is no longer asserted here; rederive_drift.py measures it per run.
 #
 # Committed to a fresh data/thaiwater-<run_id> branch and opened as a DRAFT PR back to the branch this
 # ran on (cron uses the default branch). NEVER pushes to a working branch — can't race a session.
@@ -53,26 +55,32 @@ jobs:
           python pipeline/pull_thaiwater_flood.py --stamp "$(date -u +%F)"
           python pipeline/pull_thaiwater_rain.py  --stamp "$(date -u +%F)"
 
-      - name: Rebuild provenance when the telemetry changed
+      - name: Append tonight's readings to the accumulated series
         run: |
-          # Both layers are tracked in provenance.json — if either changed, provenance.json must be
-          # regenerated in the same commit or the determinism gate goes red on merge.
+          # ThaiWater serves live telemetry with no archive, so this row is the only lasting record
+          # of it. Dated by the feed's own meta.observed_to — NOT meta.pulled: this job runs at
+          # 21:20 UTC, already the next morning in Bangkok, so pulled would file every reading a day
+          # early. This is an APPEND, not a re-derivation, so it stays an explicit step: the
+          # fixed-point driver below deliberately never runs anything with a side effect like this.
           if git status --porcelain -- platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json | grep -q .; then
-            echo "telemetry changed — rebuilding provenance"
-            # Append tonight's gauge readings to the accumulated series first. ThaiWater serves live
-            # telemetry with no archive, so this row is the only lasting record of it. Dated by the
-            # feed's own meta.observed_to — NOT meta.pulled: this job runs at 22:40 UTC, already the
-            # next morning in Bangkok, so pulled would file every reading a day early.
             python pipeline/append_history.py
-            python pipeline/build_feed_history.py
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
           else
-            echo "telemetry unchanged — nothing to rebuild."
+            echo "telemetry unchanged — nothing to append."
           fi
+
+      - name: Re-derive every layer the telemetry pull left stale
+        run: |
+          # The header above used to claim "no downstream builder consumes them, so nothing else
+          # needs rebuilding". That was wrong: feed_history accumulates the readings, live_board
+          # fingerprints every layer's stamp, and macro_book rolls the flood vintage up — the
+          # 2026-08-04 pull shipped live_board and macro_book stale and the PR arrived red-gated.
+          #
+          # Rather than swap one hand-kept list for another, drive off the determinism gate's OWN
+          # --check set: run them all, rebuild whatever reports drift, repeat until nothing does.
+          # Coverage equals the gate's coverage — the set that can turn CI red — so a future layer
+          # that starts reading ThaiWater is picked up with no edit here.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
 
       - name: Commit to a data branch + open a draft PR
         env:
@@ -80,9 +88,10 @@ jobs:
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/thaiwater-${{ github.run_id }}
         run: |
-          git add platform/data/thaiwater_flood.json platform/data/thaiwater_rain.json \
-                  source-data/feed_history.json platform/data/feed_history.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale — and without adding the deliberately
+          # uncommitted generated layers (branch_fuel/branch_cropland/…), which stay untracked.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then
             echo "No change vs committed telemetry. No PR opened."
             exit 0
@@ -104,8 +113,11 @@ jobs:
             echo
             echo "Provenance: MEASURED — live per-province water-level + 24h-rainfall station aggregates"
             echo "(ThaiWater RID/DWR/TMD/EGAT networks, keyless). These are LIVE snapshots (not in the"
-            echo "determinism gate); provenance.json is rebuilt in lockstep so the gate stays green on merge."
-            echo "Nothing fabricated. Run \`bash tests/run.sh check\` after merge."
+            echo "determinism gate) — nothing fabricated."
+            echo
+            cat /tmp/rederived.md
+            echo
+            echo "Run \`bash tests/run.sh check\` after merge."
           } > /tmp/pr_body.md
           gh pr create --draft --base "$BASE_BRANCH" --head "$DATA_BRANCH" \
             --title "data: ThaiWater flood + rain pulse ($STAMP, run ${{ github.run_id }})" \

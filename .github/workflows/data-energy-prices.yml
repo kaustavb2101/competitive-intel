@@ -36,28 +36,22 @@ jobs:
         run: python pipeline/pull_energy_prices.py
       - name: Rebuild the income/scenario chain + provenance when crude changed
         run: |
-          if git status --porcelain -- source-data/energy_prices.json | grep -q .; then
-            echo "crude baseline changed — rebuilding income_impact -> scenarios -> product_segments -> provenance"
-            python pipeline/build_income_impact.py
-            python pipeline/build_scenarios.py
-            python pipeline/build_product_segments.py
-            # live_board.json fingerprints every layer's own meta stamp, so refreshing ANY feed drifts it
-            # and turns build_live_board.py --check red in the gate. Rebuild it before provenance,
-            # which then censuses its bytes.
-            python pipeline/build_live_board.py
-            python pipeline/build_provenance.py
-          else
-            echo "crude unchanged — nothing to rebuild."
-          fi
+          # The hand-named chain that used to live here (income_impact -> scenarios ->
+          # product_segments -> live_board -> provenance) is the same shape of list that went stale
+          # three times on the NABC job. rederive_drift.py iterates the determinism gate's OWN
+          # --check set to a fixed point instead, so the gate below sees a consistent tree and this
+          # job auto-merges rather than falling back to a draft PR a human has to finish.
+          python pipeline/rederive_drift.py --report-md /tmp/rederived.md
+          cat /tmp/rederived.md
       - name: Gate, then auto-merge to the base branch (draft PR only on gate failure)
         env:
           GH_TOKEN: ${{ github.token }}
           BASE_BRANCH: ${{ github.ref_name }}
           DATA_BRANCH: data/energy-${{ github.run_id }}
         run: |
-          git add source-data/energy_prices.json platform/data/income_impact.json \
-                  platform/data/scenarios.json platform/data/product_segments.json \
-                  platform/data/live_board.json platform/data/provenance.json
+          # -u stages TRACKED modifications only, so it follows the re-derive wherever it reached
+          # without a second hand-kept list to go stale, and never adds an untracked generated layer.
+          git add -u source-data platform/data
           if git diff --cached --quiet; then echo "No change vs committed crude. Nothing to merge."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
