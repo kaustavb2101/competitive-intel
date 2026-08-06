@@ -111,6 +111,11 @@ phase_check(){
   elif [ "$rc" -eq 3 ]; then skip "build_province_cropland.py --check (source-data/doae_planted_area.json absent — not data drift)"
   else bad "build_province_cropland.py --check (province_cropland.json drifted from doae_planted_area)"
   fi
+  ( cd "$PIPE" && python3 build_oae_agstats.py --check >/dev/null 2>&1 ); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "build_oae_agstats.py --check"
+  elif [ "$rc" -eq 3 ]; then skip "build_oae_agstats.py --check (source-data/staging/oae_agstats.json absent — not data drift)"
+  else bad "build_oae_agstats.py --check (oae_agstats.json drifted from source-data/staging/oae_agstats.json)"
+  fi
   ( cd "$PIPE" && python3 build_flood_hazard.py --check >/dev/null 2>&1 ); rc=$?
   if [ "$rc" -eq 0 ]; then ok "build_flood_hazard.py --check"
   elif [ "$rc" -eq 3 ]; then skip "build_flood_hazard.py --check (source-data/gistda_flood_hazard.json or an input layer absent — not data drift)"

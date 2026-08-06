@@ -3,6 +3,46 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Integration loop: distilled the unused OAE yearbook into a MEASURED per-province crop YIELD layer
+
+Autonomous integration run. Re-verified the prompt's backlog before picking: items 1 (FPO PICO → competitor
+census) and 2 (per-branch `branch_cropland`) are already DONE + surfaced; item 3's CI-reachable legs
+(DIW/vehicle/DBD) are distilled; item 4 (GISTDA 40m crop) needs `GISTDA_SPHERE_KEY`, which is a repo secret
+NOT present in this shell (only injected into Actions steps), so a real crop pull can't be produced or
+verified here. A DBD refresh was probed live and is now **403 from CI** even for the already-committed month
+(openapi.dbd.go.th blocking datacenter IPs) — logged, not faked. A negative-space sweep then surfaced the
+real gap: **`source-data/staging/oae_agstats.json` (303 KB, committed, retrieved 2026-07-20) had ZERO
+consumers** — measured OAE per-province crop area/yield/production sitting unused.
+
+**Shipped:** `pipeline/build_oae_agstats.py` → `platform/data/oae_agstats.json` (58 KB). A clean,
+canonical-77-province-keyed MEASURED layer: per-province AREA · **YIELD (kg/rai)** · PRODUCTION for the six
+major field crops (rice main+second season, maize, cassava, sugarcane, oil palm, rubber), each with its
+latest measured year, a multi-year `yield_trend_pct`, a national-benchmark block, and the 10-year national
+farm-gate price series (with YoY). **Why yield specifically:** the existing crop layers already cover
+per-province AREA (DOAE 2568 → `branch_cropland`) and PRICE (NABC/OAE cascade → `crop_stress`), but nothing
+carried per-province yield — the farm-household income lever. A province below the national yield benchmark
+(or on a multi-year yield decline) is a direct crop-household repayment-capacity signal for the agri book
+(objective #1). It scores nothing; it is a verbatim yearbook read.
+
+- **Honesty / normalisation, all documented in `meta.gaps`:** region-total/national-total rows excluded
+  (nationals feed the benchmark block); 5 provinces arriving with a doubled sara-am vowel (`ำา`→`ำ`, a PDF
+  parse artifact) repaired before mapping so they aren't silently dropped; `อื่น ๆ` (others) rows counted
+  unmapped, never guessed; BE→CE year conversion for the rice tables; area BASIS differs by crop
+  (planted/harvested/standing — pinned per crop) so comparisons stay same-crop-only.
+- **Provenance guard caught a real mislabel:** the first build classified as ESTIMATED because the source
+  text "no modelling or synthesis" contains the substring "SYNTH" (an `EST_MARKER`). Reworded to
+  "not modelled, not derived" → correctly MEASURED. `provenance.json`: 137 layers · **76 measured** (was
+  75) · 61 estimated · **0 unlabelled**.
+- **Verified:** `bash tests/run.sh check` green — **123 passed · 0 failed** (was 122; the new
+  `build_oae_agstats.py --check` is the +1), data integrity 455/455, `check_site_health.py --local` accepts
+  all committed payloads. Because the input is git-committed (not a re-pullable cache), `--check` ALWAYS
+  runs in the gate — a stronger guard than the SKIP-on-absent crop builders. No app code touched (pure data
+  layer + gate + provenance), so committed straight to master.
+- **Next recommended integration:** SURFACE this layer — a per-province "crop yield vs national benchmark"
+  MEASURED readout on the province deep-dive or the Overview collateral outlook. That's an app-visual change,
+  so it should go via a PR with the render+health gate, not a master commit. The layer is now the first-class,
+  gate-protected input that surfacing needs.
+
 ## 2026-08-06 — Intelligence loop: the ~40 deploy probe validators are now under the repo determinism gate
 
 Autonomous market & service intelligence run. Deploy + data room re-confirmed healthy up front (live master
