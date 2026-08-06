@@ -157,10 +157,15 @@ html[data-theme="light"] .lb-aging{color:#8A6210}
 <script>/* "Explore ▾" nav dropdown — pure UI (copied from index.html, same as every other page) */
 (function(){var wrap=document.getElementById('navMore'),btn=document.getElementById('navMoreBtn'),menu=document.getElementById('navMoreMenu');
  if(!wrap||!btn||!menu)return;
- function open(o){wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
+ /* Re-parent the menu to <body>: #nav has backdrop-filter (making it the containing block for
+    position:fixed children) AND overflow-x:auto, so an in-nav fixed menu is clipped and dragged
+    off-screen by the nav's horizontal scroll on a phone. As a <body> child its fixed top/right
+    anchor to the viewport instead. Matches index.html's nav script. */
+ document.body.appendChild(menu);
+ function open(o){menu.classList.toggle('open',o);wrap.classList.toggle('open',o);btn.setAttribute('aria-expanded',String(o));}
  btn.addEventListener('click',function(e){e.stopPropagation();open(!wrap.classList.contains('open'));});
  menu.addEventListener('click',function(){open(false);});
- document.addEventListener('click',function(e){if(!wrap.contains(e.target))open(false);});
+ document.addEventListener('click',function(e){if(!wrap.contains(e.target)&&!menu.contains(e.target))open(false);});
  document.addEventListener('keydown',function(e){if(e.key==='Escape')open(false);});})();
 </script>
 <script>
