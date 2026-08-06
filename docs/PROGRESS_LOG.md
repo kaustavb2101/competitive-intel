@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Integration loop: surface the MEASURED debt-PURPOSE (consumption-vs-productive) read on #acq (PR, visual change)
+
+Autonomous integration run. **First re-confirmed the CI-doable DATA-pull backlog is genuinely
+exhausted** (consistent with the last ~6 runs): backlog items 1–2 (FPO PICO → competitor census,
+`branch_cropland`) are DONE and surfaced; item 3's excise/BAAC/SME legs are not CI-reachable
+(Thai-IP/owner-side); **item 4 (GISTDA 40m `check-crop`) is blocked this run — `GISTDA_SPHERE_KEY`
+is NOT present in this CI env** (I did not fake it). A negative-space sweep also confirmed the
+STRUCTURAL backlog is dry (every deterministic builder is `--check`-gated; no offline-rebuildable
+stale layer; no fetched-but-unbuilt layer; the only "dead" top-level layers are deliberate
+intermediates). So the improvement is surfacing MEASURED data already committed but hidden, not a new pull.
+
+**The gap (objective #1, portfolio risk):** `debt_source.json` (NSO SES household debt, MEASURED,
+7 waves 2011–2023) carries a full debt-**purpose** split — `agri_debt`, `business_debt`,
+`consumption_debt`, `in_system` — on every `national`/`by_region`/`by_class` row, but
+`renderDebtSource()` (`platform/app.js`) rendered only the informal-share cut + `agri_pct` ("For
+farming"). The production-vs-consumption mix — which is a direct credit-quality read for a
+title-lender, since consumption debt has **no income stream of its own to service it**, unlike a
+loan taken to farm or run a business — was committed but never shown.
+
+**Ship (app.js only, +national purpose lead + one table column):**
+- A national lead read: **consumption is 36% of the average household's debt — already more than the
+  22% borrowed productively (farming 14% + business 8%)**; the rest (~42%) is housing/education etc.
+  (honest: the three named purposes don't sum to 100%, the residual is stated, not hidden).
+- A **"For consumption"** column on the by-class table beside "For farming", coloured a risk cue
+  (`--agri` red) when the consumption share is ≥45% of the book. It runs **23–66%** across classes —
+  heaviest among wage-labour households (Farm/forestry/fishery labourer 66%, no productive asset),
+  lightest among farm operators whose borrowing is majority productive (59–68% farming). All values
+  computed in JS from the committed debt figures, so they stay correct across a vintage refresh.
+
+**Verified:** `bash tests/run.sh check` → **121 passed · 0 failed** (455/455 data integrity;
+`node --check` on app.js clean); no `platform/data` file added → no `build_provenance.py` regen owed.
+Headless render of `index.html#acq` (chromium-direct harness) → `data-errors="[]"`, the new column +
+lead present, rendered values exact (36% / 14% / 8% / 23–66% / correct heaviest class). Overflow
+audit SKIPs (playwright not installed in CI) but the new column lives inside the existing `.tblwrap`
+horizontal-scroll region, so it cannot cause page-x overflow by construction. **This CHANGES app
+visuals → opened a draft PR rather than committing to master.**
+
+**Recommend next:** item 4 (GISTDA 40m per-branch crop) once `GISTDA_SPHERE_KEY` is available to the
+runner — it's the highest-value remaining data upgrade but needs the secret + attended review (it
+alters `branch_cropland` numbers). Otherwise the remaining unlocks are all Thai-IP/owner-side
+(commit the FPO PICO / excise / BAAC raw pulls from the laptop; distill `smebank_credit`/`baac_credit`
+penetration once their raw CSVs are committed).
+
 ## 2026-08-06 — Intelligence loop: site-health probe now guards peer_npl.json (the last unprobed obj-#2 PEER read on #acq)
 
 Autonomous market & service intelligence run. Data room re-confirmed healthy up front (`build_provenance.py
