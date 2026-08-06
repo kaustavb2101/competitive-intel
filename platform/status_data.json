@@ -2,8 +2,8 @@
   "meta": {
     "title": "AutoX Platform — Autonomy Plan",
     "generated_by": "committee/plan_cycle.py",
-    "generated_at": "2026-08-06T04:18:55+00:00",
-    "commit": "d643483"
+    "generated_at": "2026-08-06T10:30:13+00:00",
+    "commit": "245b7e4"
   },
   "overall": {
     "progress_pct": 98,
@@ -532,6 +532,30 @@
   ],
   "activity": [
     {
+      "date": "2026-08-06T10:30:13+00:00",
+      "sha": "245b7e4",
+      "summary": "test(gate): bring the ~40 deploy probe validators under the determinism gate",
+      "pillar": "deployment"
+    },
+    {
+      "date": "2026-08-06T08:44:39+00:00",
+      "sha": "e583254",
+      "summary": "docs(progress): log Explore ▾ mobile-dropdown fix merge+deploy+verify (PR #301)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-06T15:41:43+07:00",
+      "sha": "029fcb2",
+      "summary": "ux: fix Explore ▾ nav dropdown dragged off-screen on mobile (live/data/status) (#301)",
+      "pillar": "uxui"
+    },
+    {
+      "date": "2026-08-06T04:19:58+00:00",
+      "sha": "46fe02f",
+      "summary": "chore(dashboard): refresh CEO autonomy plan after the peer_npl site-health probe ship",
+      "pillar": "peer"
+    },
+    {
       "date": "2026-08-06T04:18:55+00:00",
       "sha": "d643483",
       "summary": "health(deploy): site-health probe guards peer_npl.json (last unprobed obj-#2 PEER read on #acq)",
@@ -686,30 +710,6 @@
       "sha": "4ef118e",
       "summary": "docs: record DLT-upstream-frozen + BAAC-no-CI-source as settled dead ends",
       "pillar": "data-integration"
-    },
-    {
-      "date": "2026-08-04T16:41:22+00:00",
-      "sha": "9d14d7c",
-      "summary": "chore(dashboard): refresh CEO autonomy plan after peer expansion-pace ship (#288)",
-      "pillar": "peer"
-    },
-    {
-      "date": "2026-08-04T23:38:17+07:00",
-      "sha": "78b4c26",
-      "summary": "feat(peer): structure rival expansion pace + loan-book scale on #acq (was prose-only) (#288)",
-      "pillar": "market"
-    },
-    {
-      "date": "2026-08-04T14:32:35+00:00",
-      "sha": "2de1e28",
-      "summary": "chore(dashboard): log ux-live-aging-pill-contrast merge+deploy+verify (PR #286)",
-      "pillar": "uxui"
-    },
-    {
-      "date": "2026-08-04T21:27:49+07:00",
-      "sha": "9f011d4",
-      "summary": "ux: darken live.html aging freshness pill for WCAG AA in light theme (#286)",
-      "pillar": "uxui"
     }
   ]
 }
