@@ -678,6 +678,38 @@ def _shape_pico_district(d):
     return None
 
 
+def _shape_pico_competitors(d):
+    # The PROVINCE-grain sibling of pico_district (obj #2): "where do sub-scale
+    # rivals most outnumber our own footprint?" app.js live-fetches it
+    # (loadPicoCompetitors -> PICOCOMP) and drawPicoCompetitors renders the
+    # #acq "sub-scale rivals per province vs our footprint" leaderboard off
+    # PICOCOMP.provinces, each row read for .outnumber (sort key + the pressure
+    # column), .pico_total, .autox_branches and .th (the row name). Both counts
+    # are MEASURED tallies (FPO PICO licence registry vs the AutoX branch book).
+    # pico_district (the district grain) is already probed; this closes the same
+    # "a truncated deploy silently blanks the Competition surface with no phone
+    # alert" blind spot for the province grain it renders alongside. The render
+    # empties gracefully to a "not yet computed" note on an absent/empty file,
+    # so a probe is exactly how a broken deploy would otherwise stay invisible.
+    # Robust to registry growth (asserts render shape, not exact counts).
+    if not isinstance(d, dict):
+        return "expected an object, got %s" % type(d).__name__
+    provs = d.get("provinces")
+    if not isinstance(provs, list) or not provs:
+        return "missing/empty 'provinces' list (leaderboard render read)"
+    r0 = provs[0]
+    if not isinstance(r0, dict):
+        return "provinces[0] not an object"
+    for k in ("outnumber", "pico_total", "autox_branches"):
+        if not isinstance(r0.get(k), (int, float)):
+            return "provinces[0].%s missing/not numeric (leaderboard render read)" % k
+    if not r0.get("th"):
+        return "provinces[0].th missing (row name render read)"
+    if not isinstance(d.get("meta"), dict):
+        return "missing 'meta' object (provenance/momentum block the readout reads)"
+    return None
+
+
 def _shape_scenarios(d):
     # The LIVE / stress scenario engine (#sim, a whole default-reachable nav
     # route). renderScenarios live-fetches it (tmliFetch('scenarios')) and, when
@@ -1294,6 +1326,7 @@ DATA_FILES = [
     # truncated deploy that guts the recently-shipped go-live leaderboard fires a
     # phone alert instead of silently blanking the อำเภอ reads.
     ("data/pico_district.json", _shape_pico_district, ".top_districts + meta.operating_momentum.top_recent (go-live leaderboard)"),
+    ("data/pico_competitors.json", _shape_pico_competitors, ".provinces leaderboard rows (outnumber/pico_total/autox_branches/th) — #acq province-grain sub-scale-rival board"),
     # The LIVE/stress scenario engine (#sim) — the last default-reachable nav
     # route with no probe. renderScenarios reads .scenarios[] (kind/title/
     # headline per card); an empty/truncated build drops the whole engine to its

@@ -3,6 +3,49 @@
 Reverse-chronological. Most recent first. "Decision" entries explain *why* a path was taken so you
 don't re-litigate settled choices.
 
+## 2026-08-06 — Integration loop: site-health probe now guards pico_competitors.json (the last unprobed obj-#2 PICO read on #acq)
+
+Autonomous integration run. **First established the CI-doable data-integration backlog is genuinely
+exhausted this run**, so the improvement is deploy-robustness hardening, not a new pull:
+- Backlog items 1 (FPO PICO → competitor census) and 2 (per-branch `branch_cropland`) are already
+  DONE and surfaced (`pico_census`/`pico_competitors`/`pico_district`/`branch_pico` built + consumed
+  in `app.js`+`index.html`; `branch_cropland`/`province_cropland` gated + surfaced in `app.js`+
+  `province.html`). Item 3's DIW/MOT/DBD legs are distilled (`vehicle_*`, `dbd_formation`).
+- The remaining un-distilled gov sources (`excise_moto_tax`/`excise_car_tax`, `osmep_sme_growth`,
+  `baac_credit`, `smebank_credit`) were re-probed live from CI and confirmed **not CI-reachable**:
+  `catalog.excise.go.th` SSL-fails (HTTP 000), `opendata.sme.go.th` HTTP 000, and the data.go.th-only
+  BAAC/SME legs are 403 with their raw caches gitignored/absent. Their unblock stays Thai-IP/owner-side
+  (consistent with NEXT_STEPS §2). **Not faked** — logged and skipped.
+- A determinism-gate coverage sweep found every deterministic data builder is already `--check`-gated
+  (only `build_platform.py`, an HTML assembler, is out, correctly). And a negative-space sweep found
+  no committed MEASURED "dead" layer to wire (every zero-fetch candidate is either an intermediate
+  baked into a surfaced layer, or a deliberately-dormant expansion score out of consolidation scope).
+
+**The gap that WAS real (the ship):** the live-site health probe (`pipeline/check_site_health.py`, the
+nightly `site-health.yml` job that phone-alerts the owner when the Vercel deploy serves a broken/missing
+file) probed the DISTRICT-grain PICO read (`pico_district.json`, `_shape_pico_district`) but NOT its
+PROVINCE-grain sibling `pico_competitors.json` — the `#acq` "where do sub-scale rivals most outnumber
+our footprint?" leaderboard (`drawPicoCompetitors` reads `PICOCOMP.provinces` rows for
+`.outnumber`/`.pico_total`/`.autox_branches`/`.th`). Both are MEASURED FPO-registry-vs-branch-book
+tallies rendered side-by-side on Competition; the render empties gracefully to a "not yet computed"
+note, so a truncated deploy that dropped/emptied the file would have silently blanked the province-grain
+competitive board with **no phone alert** — the exact blind spot the peer_province / competitor_coverage
+/ pico_district probes were added to close (see the 2026-08-04 `df5a691` peer_scoreboard entry, same
+pattern). Added `_shape_pico_competitors` (asserts render shape — non-empty `.provinces`, first row
+numeric `outnumber`/`pico_total`/`autox_branches` + a `.th` name, `meta` present — robust to registry
+growth, not exact counts) and its `DATA_FILES` entry. `pipeline/check_site_health.py` +33, one file.
+
+**Verification:** determinism gate `bash tests/run.sh check` → **121 passed · 0 failed** (unchanged —
+the probe is not gated, and nothing in `platform/data`/the app changed, so no `build_provenance.py`
+regen was owed). Offline probe `check_site_health.py --local platform` → **HEALTHY 128/128** (was
+125/125; +3 pico_competitors checks, all PASS). Negative test of `_shape_pico_competitors` against
+crafted-broken inputs confirmed it catches every failure mode (empty `provinces`, missing `outnumber`,
+missing `meta`, non-object) and returns `None` on the real file. No app behaviour/visual change → direct
+commit to master. **Recommend next:** the CI-reachable data backlog is exhausted; the remaining
+high-value integrations are all Thai-IP/owner-side (commit the FPO PICO / excise / BAAC raw pulls from
+the laptop) or the GISTDA 40m `check-crop` per-branch upgrade (item 4 — big, alters `branch_cropland`
+numbers → wants an attended PR, not an unattended run).
+
 ## 2026-08-06 — UX loop: load IBM Plex fonts on branch-explorer.html (PR #299, merged + deployed + verified)
 
 Autonomous UX-improvement run. Closed `ux-branch-explorer-font-not-loaded` — the last font-loading
