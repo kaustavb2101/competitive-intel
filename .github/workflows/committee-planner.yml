@@ -66,7 +66,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "committee: refresh autonomy plan (run ${{ github.run_id }})" \
                      -m "committee/plan_cycle.py regenerated platform/status_data.json + docs/AUTONOMY_PLAN.md from committed repo state; 'bash tests/run.sh check' passed 0-failed before this auto-merge."
-          # master may have advanced since checkout — rebase before pushing.
-          git pull --rebase origin "$BASE_BRANCH"
-          git push origin "HEAD:$BASE_BRANCH"
-          echo "Autonomy plan refreshed on $BASE_BRANCH."
+          # The base may have advanced since checkout — another data job, or a phone session. This
+          # was `git pull --rebase`, which conflicts on provenance.json every time that happens and
+          # killed the job outright. resolve_derived_conflicts.sh takes the base's side of the
+          # generated layers and recomputes, which cannot conflict because it never merges.
+          for attempt in 1 2 3; do
+            git fetch -q origin "$BASE_BRANCH"
+            bash pipeline/resolve_derived_conflicts.sh "origin/$BASE_BRANCH" || {
+              echo "::warning::real conflict outside platform/data/ — leaving $BASE_BRANCH alone."; exit 0; }
+            git push origin "HEAD:$BASE_BRANCH" && { echo "Autonomy plan refreshed on $BASE_BRANCH."; exit 0; }
+            echo "push rejected (base moved) — re-syncing, attempt $attempt"
+          done
+          echo "::warning::could not land on $BASE_BRANCH after 3 attempts; next cycle retries."
